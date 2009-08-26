@@ -28,9 +28,9 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
@@ -72,11 +72,11 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 		this.plans = plans;
 	}
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEventImpl event) {
 		this.tmpDptTimes.put(event.getPersonId().toString(), event.getTime());
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEventImpl event) {
 		double time = event.getTime();
 		String agentId = event.getPersonId().toString();
 		Double dptTime = this.tmpDptTimes.get(agentId);
@@ -160,7 +160,7 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 
 		TripDurationHandler tdh = new TripDurationHandler(
 		// network,

@@ -19,13 +19,13 @@
 
 package org.matsim.core.events.handler;
 
-import org.matsim.core.events.AgentReplanEvent;
+import org.matsim.core.events.AgentReplanEventImpl;
 
 /**
  * @author dgrether
  */
 public interface AgentReplanEventHandler extends EventHandler {
 	
-	public void handleEvent (AgentReplanEvent event);
+	public void handleEvent (AgentReplanEventImpl event);
 
 }

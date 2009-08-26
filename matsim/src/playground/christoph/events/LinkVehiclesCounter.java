@@ -20,7 +20,7 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.Simulation;
@@ -184,7 +184,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 //		log.info("BasicAgentDepartureEvent " + event.getLinkId().toString() + " " + event.getTime());
 
 		// Handling depends on the Route of the Agent
-		LegImpl leg = ((AgentDepartureEvent) event).getLeg();
+		LegImpl leg = ((AgentDepartureEventImpl) event).getLeg();
 
 		if (leg.getMode().equals(TransportMode.car)) {
 			Id id = event.getLinkId();

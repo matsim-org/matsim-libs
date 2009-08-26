@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.events.handler;
 
-import org.matsim.core.events.LaneLeaveEvent;
+import org.matsim.core.events.LaneLeaveEventImpl;
 
 
 
@@ -29,5 +29,5 @@ import org.matsim.core.events.LaneLeaveEvent;
  */
 public interface LaneLeaveEventHandler extends EventHandler {
 
-	public void handleEvent (LaneLeaveEvent event);
+	public void handleEvent (LaneLeaveEventImpl event);
 }

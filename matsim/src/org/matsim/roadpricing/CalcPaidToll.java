@@ -29,9 +29,9 @@ import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.core.events.AgentMoneyEvent;
-import org.matsim.core.events.AgentWait2LinkEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentMoneyEventImpl;
+import org.matsim.core.events.AgentWait2LinkEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
@@ -82,7 +82,7 @@ public class CalcPaidToll implements BasicLinkEnterEventHandler, BasicAgentWait2
 	}
 
 	/**
-	 * Sends {@link AgentMoneyEvent}s for all agents that must pay a toll.
+	 * Sends {@link AgentMoneyEventImpl}s for all agents that must pay a toll.
 	 * This method should usually be called at the end before of an iteration.
 	 *
 	 * <strong>Important note: </strong>Do not call this method twice without
@@ -90,11 +90,11 @@ public class CalcPaidToll implements BasicLinkEnterEventHandler, BasicAgentWait2
 	 * may be added twice to the agents' score!
 	 *
 	 * @param time the current time the generated events are associated with
-	 * @param events the {@link Events} collection, the generated events are sent to for processing
+	 * @param events the {@link EventsImpl} collection, the generated events are sent to for processing
 	 */
-	public void sendUtilityEvents(final double time, final Events events) {
+	public void sendUtilityEvents(final double time, final EventsImpl events) {
 		for (Map.Entry<Id, AgentInfo> entries : this.agents.entrySet()) {
-			events.processEvent(new AgentMoneyEvent(time, entries.getKey(), -entries.getValue().toll));
+			events.processEvent(new AgentMoneyEventImpl(time, entries.getKey(), -entries.getValue().toll));
 		}
 	}
 
@@ -156,7 +156,7 @@ public class CalcPaidToll implements BasicLinkEnterEventHandler, BasicAgentWait2
 	 */
 	class DistanceTollBehaviour implements TollBehaviourI {
 		public void handleEvent(final BasicPersonEvent event, final LinkImpl link) {
-			if (event instanceof AgentWait2LinkEvent) {
+			if (event instanceof AgentWait2LinkEventImpl) {
 				/* we do not handle wait2link-events for distance toll, because the agent
 				 * must not pay twice for this link, and he (likely) paid already when
 				 * arriving at this link.  */

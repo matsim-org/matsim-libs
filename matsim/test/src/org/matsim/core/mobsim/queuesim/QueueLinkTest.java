@@ -23,7 +23,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -99,7 +99,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QueueSimulation qsim = new QueueSimulation(f.scenario, new Events());
+		QueueSimulation qsim = new QueueSimulation(f.scenario, new EventsImpl());
 
 		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(23));
@@ -145,7 +145,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QueueSimulation qsim = new QueueSimulation(f.scenario, new Events());
+		QueueSimulation qsim = new QueueSimulation(f.scenario, new EventsImpl());
 
 		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(42));
@@ -180,7 +180,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QueueSimulation qsim = new QueueSimulation(f.scenario, new Events());
+		QueueSimulation qsim = new QueueSimulation(f.scenario, new EventsImpl());
 
 		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(80));
@@ -232,7 +232,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		qlink.setSimEngine(simEngine);
 		qlink.finishInit();
 
-		QueueSimulation qsim = new QueueSimulation(network, null, new Events());
+		QueueSimulation qsim = new QueueSimulation(network, null, new EventsImpl());
 		QueueVehicleImpl v1 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl("1"), new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		PlanImpl plan = p.createPlan(true);
@@ -298,7 +298,7 @@ public class QueueLinkTest extends MatsimTestCase {
 	public void testStorageSpaceDifferentVehicleSizes() {
 		Fixture f = new Fixture();
 		PersonImpl p = new PersonImpl(new IdImpl(5));
-		QueueSimulation qsim = new QueueSimulation(new ScenarioImpl(), new Events());
+		QueueSimulation qsim = new QueueSimulation(new ScenarioImpl(), new EventsImpl());
 
 		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		QueueVehicle veh1 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl(1), vehType));

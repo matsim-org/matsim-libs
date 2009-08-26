@@ -41,7 +41,7 @@ public class MyEventsHandling {
 		//path to events file
 		String inputFile = "output/ITERS/it.10/10.events.txt.gz";
 		//create an event object
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		//create the handler and add it
 		MyEventHandler1 handler = new MyEventHandler1();
 //		MyEventHandler2 handler = new MyEventHandler2(500);

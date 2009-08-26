@@ -6,8 +6,8 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigReaderMatsimV1;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.evacuation.flooding.FloodingReader;
@@ -25,7 +25,7 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 			
 		FloodingReader fr = new FloodingReader(sc.getConfig().evacuation().getFloodingDataFile(),true);
 		
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		RiskCostFromFloodingData rcf = new RiskCostFromFloodingData(sc.getNetwork(),fr,events,sc.getConfig().evacuation().getBufferSize());
 		
 		double delta = Math.pow(10, -6);
@@ -71,17 +71,17 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		events.addHandler(rcf);
 		double refCost = 0.;
 		
-		events.processEvent(new LinkEnterEvent(0.,id,l0.getId()));
+		events.processEvent(new LinkEnterEventImpl(0.,id,l0.getId()));
 		refCost += 33703318.3116002 / -600.;
-		events.processEvent(new LinkEnterEvent(0.,id,l0Inverse.getId()));
+		events.processEvent(new LinkEnterEventImpl(0.,id,l0Inverse.getId()));
 		refCost += 0.;
-		events.processEvent(new LinkEnterEvent(0.,id,l1.getId()));
+		events.processEvent(new LinkEnterEventImpl(0.,id,l1.getId()));
 		refCost += 124442.470964684 / -600.;
-		events.processEvent(new LinkEnterEvent(0.,id,l1Inverse.getId()));
+		events.processEvent(new LinkEnterEventImpl(0.,id,l1Inverse.getId()));
 		refCost += 0.;
-		events.processEvent(new LinkEnterEvent(0.,id,l2.getId()));
+		events.processEvent(new LinkEnterEventImpl(0.,id,l2.getId()));
 		refCost += 497605.266434762 / -600.;
-		events.processEvent(new LinkEnterEvent(0.,id,l2Inverse.getId()));
+		events.processEvent(new LinkEnterEventImpl(0.,id,l2Inverse.getId()));
 		refCost += 0.;
 		
 		

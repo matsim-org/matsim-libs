@@ -21,7 +21,7 @@
 package org.matsim.core.events;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -30,8 +30,8 @@ import org.matsim.testcases.MatsimTestCase;
 public class LinkLeaveEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		final LinkLeaveEvent event1 = new LinkLeaveEvent(68423.98, new IdImpl("648"), new IdImpl(".235"));
-		final LinkLeaveEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
+		final LinkLeaveEventImpl event1 = new LinkLeaveEventImpl(68423.98, new IdImpl("648"), new IdImpl(".235"));
+		final LinkLeaveEventImpl event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
 		assertEquals(event1.getPersonId(), event2.getPersonId());
 		assertEquals(event1.getLinkId(), event2.getLinkId());

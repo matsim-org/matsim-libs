@@ -32,9 +32,9 @@ import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -96,13 +96,13 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFile);
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		new MatsimEventsReader(events).readFile(eventsFile);
 		events.printEventsCount();
 		
-		Events events2 = new Events();
+		EventsImpl events2 = new EventsImpl();
 		
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 30*3600, scenario.getConfig().travelTimeCalculator());
 		ttcalc.setTravelTimeAggregator(aggregator);
@@ -180,10 +180,10 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		double linkEnterTime2 = 7.75 * 3600 + 10;
 		double linkTravelTime2 = 10.0 * 60; // 10minutes!
 		
-		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime1, person, link1));
-		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime1 + linkTravelTime1, person, link1));
-		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime2, person, link1));
-		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime2 + linkTravelTime2, person, link1));
+		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime1, person, link1));
+		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime1 + linkTravelTime1, person, link1));
+		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2, person, link1));
+		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime2 + linkTravelTime2, person, link1));
 
 		assertEquals(50 * 60, ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60), EPSILON); // linkTravelTime1
 		assertEquals(35 * 60, ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 1*timeBinSize), EPSILON);  // linkTravelTime1 - 1*timeBinSize
@@ -219,7 +219,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).parse(networkFile);
 		
-		Events events = new Events(); // DO NOT USE EventsBuilderImpl() here, as we do not have a population!
+		EventsImpl events = new EventsImpl(); // DO NOT USE EventsBuilderImpl() here, as we do not have a population!
 		
 		TravelTimeCalculator ttCalc = new TravelTimeCalculator(network, config.travelTimeCalculator());
 		events.addHandler(ttCalc);

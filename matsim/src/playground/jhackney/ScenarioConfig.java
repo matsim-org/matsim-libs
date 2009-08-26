@@ -25,7 +25,7 @@ import java.io.IOException;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -294,11 +294,11 @@ public abstract class ScenarioConfig {
 	}
 
 
-	public static final Events readEvents(final int i, final EventsMapStartEndTimes epp) {
+	public static final EventsImpl readEvents(final int i, final EventsMapStartEndTimes epp) {
 		System.out.println("  reading plans xml file... ");
 		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+config.events().getInputFile();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(epp);
 		System.out.println(filename);
 		new MatsimEventsReader(events).readFile(filename);
@@ -307,11 +307,11 @@ public abstract class ScenarioConfig {
 		return events;
 	}
 
-	public static final Events readEvents(final int i, final EventsMapStartEndTimes epp, final EventsToScore scoring) {
+	public static final EventsImpl readEvents(final int i, final EventsMapStartEndTimes epp, final EventsToScore scoring) {
 		System.out.println("  reading plans xml file... ");
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
 		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(epp);
 		events.addHandler(scoring);
 		System.out.println(filename);
@@ -321,11 +321,11 @@ public abstract class ScenarioConfig {
 		return events;
 	}
 
-	public static final Events readEvents(final int i, final EventsMapStartEndTimes epp, final playground.jhackney.scoring.EventsToScoreAndReport scoring) {
+	public static final EventsImpl readEvents(final int i, final EventsMapStartEndTimes epp, final playground.jhackney.scoring.EventsToScoreAndReport scoring) {
 		System.out.println("  reading plans xml file... ");
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
 		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(epp);
 		events.addHandler(scoring);
 		System.out.println(filename);

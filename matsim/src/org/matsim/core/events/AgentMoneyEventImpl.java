@@ -23,7 +23,7 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.population.PersonImpl;
 
 /**
@@ -34,7 +34,7 @@ import org.matsim.core.population.PersonImpl;
  *
  * @author mrieser
  */
-public final class AgentMoneyEvent extends PersonEvent implements BasicAgentMoneyEvent {
+public final class AgentMoneyEventImpl extends PersonEventImpl implements AgentMoneyEvent {
 
 	public static final String ATTRIBUTE_AMOUNT = "amount";
 
@@ -51,7 +51,7 @@ public final class AgentMoneyEvent extends PersonEvent implements BasicAgentMone
 	 * @param agent
 	 * @param amount
 	 */
-	public AgentMoneyEvent(final double time, final PersonImpl agent, final double amount) {
+	public AgentMoneyEventImpl(final double time, final PersonImpl agent, final double amount) {
 		super(time, agent);
 		this.amount = amount;
 	}
@@ -65,7 +65,7 @@ public final class AgentMoneyEvent extends PersonEvent implements BasicAgentMone
 	 * @param agentId
 	 * @param amount
 	 */
-	public AgentMoneyEvent(final double time, final Id agentId, final double amount) {
+	public AgentMoneyEventImpl(final double time, final Id agentId, final double amount) {
 		super(time, agentId);
 		this.amount = amount;
 	}

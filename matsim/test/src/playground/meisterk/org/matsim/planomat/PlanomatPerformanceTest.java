@@ -25,7 +25,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -85,7 +85,7 @@ public class PlanomatPerformanceTest extends MatsimTestCase {
 		log.info("Initializing DepartureDelayAverageCalculator...done.");
 
 		log.info("Reading events...");
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(tTravelEstimator);
 		events.addHandler(depDelayCalc);
 		new MatsimEventsReader(events).readFile(config.events().getInputFile());

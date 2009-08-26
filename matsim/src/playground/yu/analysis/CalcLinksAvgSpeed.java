@@ -33,10 +33,10 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -186,14 +186,14 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent arrival) {
+	public void handleEvent(final AgentArrivalEventImpl arrival) {
 		SpeedCounter sc = speedCounters.get(arrival.getLinkId().toString());
 		if (sc != null)
 			sc.removeTmpEnterTime(arrival.getPersonId().toString());
 	}
 
 	@Override
-	public void handleEvent(final LinkEnterEvent enter) {
+	public void handleEvent(final LinkEnterEventImpl enter) {
 		String linkId = enter.getLinkId().toString();
 		SpeedCounter sc = speedCounters.get(linkId);
 		if (sc == null) {
@@ -208,7 +208,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	@Override
-	public void handleEvent(final LinkLeaveEvent leave) {
+	public void handleEvent(final LinkLeaveEventImpl leave) {
 		double time = leave.getTime();
 		int timeBin = getBinIdx(time);
 		String linkId = leave.getLinkId().toString();
@@ -332,7 +332,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, 900);
 		events.addHandler(clas);
 
@@ -371,7 +371,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
 		tollReader.parse(roadPricingFilename);

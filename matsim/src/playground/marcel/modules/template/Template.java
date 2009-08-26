@@ -25,7 +25,7 @@ import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.AgentArrivalEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
@@ -99,7 +99,7 @@ public class Template implements MatsimModule {
 		// *** EventHandler *********************
 		
 		AgentArrivalEventHandler eventHandler = new AgentArrivalEventHandler() {
-			public void handleEvent(AgentArrivalEvent event) {
+			public void handleEvent(AgentArrivalEventImpl event) {
 			}
 			public void reset(int iteration) {
 			}

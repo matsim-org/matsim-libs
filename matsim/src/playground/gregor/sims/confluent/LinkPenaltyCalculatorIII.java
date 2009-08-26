@@ -10,10 +10,10 @@ import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentMoneyEvent;
-import org.matsim.core.events.AgentStuckEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentMoneyEventImpl;
+import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -33,7 +33,7 @@ public class LinkPenaltyCalculatorIII implements LinkPenalty, AfterMobsimListene
 	private static final double gamma = 0.5;
 	
 	private final HashMap<Id,LinkInfo> linkInfos = new HashMap<Id, LinkInfo>();
-	private final List<AgentArrivalEvent> arrivedPersons = new ArrayList<AgentArrivalEvent>();
+	private final List<AgentArrivalEventImpl> arrivedPersons = new ArrayList<AgentArrivalEventImpl>();
 
 	private int it;
 
@@ -67,8 +67,8 @@ public class LinkPenaltyCalculatorIII implements LinkPenalty, AfterMobsimListene
 	}
 
 
-	private void scorePlans(Events events) {
-		for (AgentArrivalEvent e : this.arrivedPersons) {
+	private void scorePlans(EventsImpl events) {
+		for (AgentArrivalEventImpl e : this.arrivedPersons) {
 			PersonImpl pers = e.getPerson();
 			PlanImpl plan = pers.getSelectedPlan();
 			List<Id> links = ((NetworkRouteWRefs) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();
@@ -76,7 +76,7 @@ public class LinkPenaltyCalculatorIII implements LinkPenalty, AfterMobsimListene
 				LinkInfo li = this.linkInfos.get(id);
 				if (li.penalty > 0) {
 					Double time = li.enterTimes.get(pers.getId());
-					AgentMoneyEvent a = new AgentMoneyEvent(time,pers.getId(),STUCK_PENALTY/-600);
+					AgentMoneyEventImpl a = new AgentMoneyEventImpl(time,pers.getId(),STUCK_PENALTY/-600);
 					events.processEvent(a);
 				}
 			}
@@ -100,20 +100,20 @@ public class LinkPenaltyCalculatorIII implements LinkPenalty, AfterMobsimListene
 		this.it = iteration;
 	}
 
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(AgentStuckEventImpl event) {
 		LinkInfo info = getLinkInfo(event.getLinkId());
 		info.cin++;
 		info.cumTT += STUCK_PENALTY;
 		
 	}
 	
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEventImpl event) {
 		this.arrivedPersons.add(event);
 		
 	}
 	
 	private void updateAvgTT() {
-		for (AgentArrivalEvent e : this.arrivedPersons) {
+		for (AgentArrivalEventImpl e : this.arrivedPersons) {
 			PersonImpl pers = e.getPerson();
 			PlanImpl plan = pers.getSelectedPlan();
 			List<Id> links = ((NetworkRouteWRefs) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();

@@ -29,9 +29,9 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
@@ -133,12 +133,12 @@ public class DpDurWriter implements AgentDepartureEventHandler,
 		}
 	}
 
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEventImpl event) {
 		String agentId = event.getPersonId().toString();
 		agentDepTimes.put(agentId, (int) event.getTime());
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEventImpl event) {
 		String agentId = event.getPersonId().toString();
 		if (agentDepTimes.containsKey(agentId)) {
 			int depT = agentDepTimes.remove(agentId);
@@ -170,7 +170,7 @@ public class DpDurWriter implements AgentDepartureEventHandler,
 		Config config = new ScenarioLoader(args[0]).loadScenario().getConfig();
 		DpDurWriter ddw = new DpDurWriter("DpDurMatrix.txt");
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(ddw);// TODO ...
 
 		System.out.println("@reading the eventsfile (TXTv1) ...");

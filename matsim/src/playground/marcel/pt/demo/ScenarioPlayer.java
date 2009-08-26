@@ -26,7 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoader;
@@ -48,7 +48,7 @@ public class ScenarioPlayer {
 
 	private static final String SERVERNAME = "ScenarioPlayer";
 
-	public static void play(final ScenarioImpl scenario, final Events events) {
+	public static void play(final ScenarioImpl scenario, final EventsImpl events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
 		sim.startOTFServer(SERVERNAME);
@@ -79,7 +79,7 @@ public class ScenarioPlayer {
 		new TransitScheduleReaderV1(schedule, network).parse("test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml");
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 
-		final Events events = new Events();
+		final EventsImpl events = new EventsImpl();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
 

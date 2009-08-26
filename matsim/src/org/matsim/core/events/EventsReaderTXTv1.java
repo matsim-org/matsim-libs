@@ -33,10 +33,10 @@ import org.matsim.core.utils.misc.StringUtils;
 public class EventsReaderTXTv1 {
 
 	private BufferedReader infile = null;
-	protected Events events;
+	protected EventsImpl events;
 	private EventsBuilder builder;
 
-	public EventsReaderTXTv1(final Events events) {
+	public EventsReaderTXTv1(final EventsImpl events) {
 		super();
 		this.events = events;
 		this.builder = events.getBuilder();
@@ -63,7 +63,7 @@ public class EventsReaderTXTv1 {
 
 	}
 
-	 public final void createEvent(final Events events, final double time, final Id agentId,
+	 public final void createEvent(final EventsImpl events, final double time, final Id agentId,
 			final Id linkId, final int flag, final String desc, final String acttype) {
 		 BasicEvent data = null;
 
@@ -88,14 +88,14 @@ public class EventsReaderTXTv1 {
 				break;
 			case 7:
 				if ("".equals(acttype) && (desc != null)) {
-					data = new ActivityStartEvent(time, agentId, linkId, desc.replace("actstart ", ""));
+					data = new ActivityStartEventImpl(time, agentId, linkId, desc.replace("actstart ", ""));
 				} else {
 					data = this.builder.createActivityStartEvent(time, agentId, linkId, acttype);
 				}
 				break;
 			case 8:
 				if ("".equals(acttype) && (desc != null)) {
-					data = new ActivityEndEvent(time, agentId, linkId, desc.replace("actend ", ""));
+					data = new ActivityEndEventImpl(time, agentId, linkId, desc.replace("actend ", ""));
 				} else {
 					data = this.builder.createActivityEndEvent(time, agentId, linkId, acttype);
 				}

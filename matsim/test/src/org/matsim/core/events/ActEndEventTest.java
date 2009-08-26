@@ -21,7 +21,7 @@
 package org.matsim.core.events;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -30,8 +30,8 @@ import org.matsim.testcases.MatsimTestCase;
 public class ActEndEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		final ActivityEndEvent event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
-				new ActivityEndEvent(7893.14, new IdImpl("143"), new IdImpl("293"), "home"));
+		final ActivityEndEventImpl event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
+				new ActivityEndEventImpl(7893.14, new IdImpl("143"), new IdImpl("293"), "home"));
 		assertEquals(7893.14, event.getTime(), EPSILON);
 		assertEquals("143", event.getPersonId().toString());
 		assertEquals(new IdImpl("293"), event.getLinkId());

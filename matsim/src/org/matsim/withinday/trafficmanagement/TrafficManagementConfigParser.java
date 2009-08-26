@@ -25,7 +25,7 @@ import java.util.Stack;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -124,7 +124,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private ControlInput controlInput;
 
-	private Events events;
+	private EventsImpl events;
 
 	private VDSSignOutput vdsSignOutput;
 
@@ -132,7 +132,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 
 	public TrafficManagementConfigParser(final NetworkLayer network,
-			final Events events, SimulationConfigGroup simulationConfigGroup) {
+			final EventsImpl events, SimulationConfigGroup simulationConfigGroup) {
 		this.network = network;
 		this.events = events;
 		this.simulationConfig = simulationConfigGroup;

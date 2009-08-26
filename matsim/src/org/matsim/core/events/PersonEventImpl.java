@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActStartEvent.java
+ * PersonEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,27 +20,46 @@
 
 package org.matsim.core.events;
 
+import java.util.Map;
+
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.core.population.PersonImpl;
 
-public class ActivityStartEvent extends ActivityEvent implements BasicActivityStartEvent {
+/**
+ * @author mrieser
+ */
+public abstract class PersonEventImpl extends BasicEventImpl implements BasicPersonEvent {
 
-	public static final String EVENT_TYPE = "actstart";
+	public static final String ATTRIBUTE_PERSON = "person";
 
-	public ActivityStartEvent(final double time, final PersonImpl agent, final LinkImpl link, final ActivityImpl act) {
-		super(time, agent, link, act);
+	private PersonImpl person;
+	private final Id personId;
+
+	public PersonEventImpl(final double time, final PersonImpl person) {
+		super(time);
+		this.person = person;
+		this.personId = person.getId();
 	}
 
-	public ActivityStartEvent(final double time, final Id agentId, final Id linkId, final String acttype) {
-		super(time, agentId, linkId, acttype);
+	public PersonEventImpl(final double time, final Id personId)	{
+		super(time);
+		this.personId = personId;
 	}
 
 	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
+		return attr;
 	}
 
+	/** @deprecated use {@link #getPersonId()} instead */
+	public PersonImpl getPerson() {
+		return this.person;
+	}
+
+	public Id getPersonId() {
+		return this.personId;
+	}
 }

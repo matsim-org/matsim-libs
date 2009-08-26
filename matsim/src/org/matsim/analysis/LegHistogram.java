@@ -39,9 +39,9 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentStuckEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
@@ -85,7 +85,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 
 	/* Implementation of EventHandler-Interfaces */
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEventImpl event) {
 		int index = getBinIndex(event.getTime());
 		allModesData.countsDep[index]++;
 		if (event.getLeg() != null) {
@@ -94,7 +94,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		}
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEventImpl event) {
 		int index = getBinIndex(event.getTime());
 		allModesData.countsArr[index]++;
 		if (event.getLeg() != null) {
@@ -103,7 +103,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 		}
 	}
 
-	public void handleEvent(final AgentStuckEvent event) {
+	public void handleEvent(final AgentStuckEventImpl event) {
 		int index = getBinIndex(event.getTime());
 		allModesData.countsStuck[index]++;
 		if (event.getLeg() != null) {

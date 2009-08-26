@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AgentEvent.java
+ * AgentDepartureEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,46 +20,27 @@
 
 package org.matsim.core.events;
 
-import java.util.Map;
-
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentEvent;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
-public abstract class AgentEvent extends PersonEvent implements BasicAgentEvent {
+public class AgentDepartureEventImpl extends AgentEventImpl implements AgentDepartureEvent {
 
-	public static final String ATTRIBUTE_LINK = "link";	
+	public static final String EVENT_TYPE = "departure";
 
-	private LegImpl leg;
-
-	private final Id linkId;
-
-	AgentEvent(final double time, final PersonImpl agent, final Link link, final LegImpl leg) {
-		super(time, agent);
-		this.linkId = link.getId();
-		this.leg = leg;
+	public AgentDepartureEventImpl(final double time, final PersonImpl agent, final LinkImpl link, final LegImpl leg) {
+		super(time, agent, link, leg);
 	}
 
-	AgentEvent(final double time, final Id agentId, final Id linkId) {
-		super(time, agentId);
-		this.linkId = linkId;
+	public AgentDepartureEventImpl(final double time, final Id agentId, final Id linkId) {
+		super(time, agentId, linkId);
 	}
 
 	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		return attr;
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
 
-	public LegImpl getLeg() {
-		return this.leg;
-	}
-	
-	public Id getLinkId() {
-		return this.linkId;
-	}
-	
 }

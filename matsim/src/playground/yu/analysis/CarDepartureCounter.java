@@ -28,9 +28,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
@@ -79,7 +79,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		System.out.println("->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(ppl, network).readFile(plansFilename);
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		CarDepartureCounter cdc = new CarDepartureCounter(ppl);
 		events.addHandler(cdc);
 		System.out.println("-> reading eventsfile: " + eventsFilename);
@@ -103,7 +103,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		System.exit(0);
 	}
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEventImpl event) {
 		PersonImpl p = this.ppl.getPersons().get(
 				new IdImpl(event.getPersonId().toString()));
 		if (PlanModeJudger.useCar(p.getSelectedPlan()))
@@ -119,7 +119,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		return this.cdc;
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEventImpl event) {
 		PersonImpl p = this.ppl.getPersons().get(
 				new IdImpl(event.getPersonId().toString()));
 		if (PlanModeJudger.useCar(p.getSelectedPlan()))

@@ -37,7 +37,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.roadpricing.CalcPaidToll;
@@ -92,7 +92,7 @@ public class NewPtcheckControler extends Controler {
 			NetworkLayer network = ctl.getNetwork();
 			cas = new CalcNetAvgSpeed(network);
 			ctpf = new CalcTrafficPerformance(network);
-			Events events = ctl.getEvents();
+			EventsImpl events = ctl.getEvents();
 			events.addHandler(cas);
 			events.addHandler(ctpf);
 			if (cf.roadpricing() != null) {

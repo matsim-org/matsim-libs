@@ -52,6 +52,7 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
+import org.matsim.core.api.experimental.events.Events;
 import org.matsim.core.api.experimental.events.EventsBuilder;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
@@ -82,9 +83,9 @@ import org.matsim.core.events.handler.LinkLeaveEventHandler;
  * @author dstrippgen
  * @author mrieser
  */
-public class Events implements MatsimToplevelContainer {
+public class EventsImpl implements MatsimToplevelContainer, Events {
 
-	private static final Logger log = Logger.getLogger(Events.class);
+	private static final Logger log = Logger.getLogger(EventsImpl.class);
 
 	static private class HandlerData {
 
@@ -121,11 +122,11 @@ public class Events implements MatsimToplevelContainer {
 
 	private EventsBuilder builder;
 	
-	public Events() {
+	public EventsImpl() {
 		this.builder = new EventsBuilderImpl();
 	}
 	
-	private Events(EventsBuilder builder) {
+	private EventsImpl(EventsBuilder builder) {
 		this.builder = builder;
 	}
 	
@@ -312,62 +313,62 @@ public class Events implements MatsimToplevelContainer {
 	// this method is purely for performance reasons and need not be implemented
 	private boolean callHandlerFast(final Class<?> klass, final BasicEvent ev, final EventHandler handler) {
 
-		if (klass == LinkLeaveEvent.class) {
-			((LinkLeaveEventHandler)handler).handleEvent((LinkLeaveEvent)ev);
+		if (klass == LinkLeaveEventImpl.class) {
+			((LinkLeaveEventHandler)handler).handleEvent((LinkLeaveEventImpl)ev);
 			return true;
 		} else if (klass == BasicLinkLeaveEvent.class) {
 				((BasicLinkLeaveEventHandler)handler).handleEvent((BasicLinkLeaveEvent)ev);
 				return true;
-		} else if (klass == LinkEnterEvent.class) {
-			((LinkEnterEventHandler)handler).handleEvent((LinkEnterEvent)ev);
+		} else if (klass == LinkEnterEventImpl.class) {
+			((LinkEnterEventHandler)handler).handleEvent((LinkEnterEventImpl)ev);
 			return true;
 		} else if (klass == BasicLinkEnterEvent.class) {
 			((BasicLinkEnterEventHandler)handler).handleEvent((BasicLinkEnterEvent)ev);
 			return true;
-		} else if (klass == AgentWait2LinkEvent.class) {
-			((AgentWait2LinkEventHandler)handler).handleEvent((AgentWait2LinkEvent)ev);
+		} else if (klass == AgentWait2LinkEventImpl.class) {
+			((AgentWait2LinkEventHandler)handler).handleEvent((AgentWait2LinkEventImpl)ev);
 			return true;
 		} else if (klass == BasicAgentWait2LinkEvent.class) {
 			((BasicAgentWait2LinkEventHandler)handler).handleEvent((BasicAgentWait2LinkEvent)ev);
 			return true;
-		} else if (klass == AgentArrivalEvent.class) {
-			((AgentArrivalEventHandler)handler).handleEvent((AgentArrivalEvent)ev);
+		} else if (klass == AgentArrivalEventImpl.class) {
+			((AgentArrivalEventHandler)handler).handleEvent((AgentArrivalEventImpl)ev);
 			return true;
 		} else if (klass == BasicAgentArrivalEvent.class) {
 			((BasicAgentArrivalEventHandler)handler).handleEvent((BasicAgentArrivalEvent)ev);
 			return true;
-		} else if (klass == AgentDepartureEvent.class) {
-			((AgentDepartureEventHandler)handler).handleEvent((AgentDepartureEvent)ev);
+		} else if (klass == AgentDepartureEventImpl.class) {
+			((AgentDepartureEventHandler)handler).handleEvent((AgentDepartureEventImpl)ev);
 			return true;
 		} else if (klass == BasicAgentDepartureEvent.class) {
 			((BasicAgentDepartureEventHandler)handler).handleEvent((BasicAgentDepartureEvent)ev);
 			return true;
-		} else if (klass == ActivityEndEvent.class) {
-			((ActivityEndEventHandler)handler).handleEvent((ActivityEndEvent)ev);
+		} else if (klass == ActivityEndEventImpl.class) {
+			((ActivityEndEventHandler)handler).handleEvent((ActivityEndEventImpl)ev);
 			return true;
 		} else if (klass == BasicActivityEndEvent.class) {
 			((BasicActivityEndEventHandler)handler).handleEvent((BasicActivityEndEvent)ev);
 			return true;
-		} else if (klass == ActivityStartEvent.class) {
-			((ActivityStartEventHandler)handler).handleEvent((ActivityStartEvent)ev);
+		} else if (klass == ActivityStartEventImpl.class) {
+			((ActivityStartEventHandler)handler).handleEvent((ActivityStartEventImpl)ev);
 			return true;
 		} else if (klass == BasicActivityStartEvent.class) {
 			((BasicActivityStartEventHandler)handler).handleEvent((BasicActivityStartEvent)ev);
 			return true;
-		} else if (klass == AgentStuckEvent.class) {
-			((AgentStuckEventHandler)handler).handleEvent((AgentStuckEvent)ev);
+		} else if (klass == AgentStuckEventImpl.class) {
+			((AgentStuckEventHandler)handler).handleEvent((AgentStuckEventImpl)ev);
 			return true;
 		} else if (klass == BasicAgentStuckEvent.class) {
 			((BasicAgentStuckEventHandler)handler).handleEvent((BasicAgentStuckEvent)ev);
 			return true;
-		} else if (klass == AgentMoneyEvent.class) {
-			((AgentMoneyEventHandler)handler).handleEvent((AgentMoneyEvent)ev);
+		} else if (klass == AgentMoneyEventImpl.class) {
+			((AgentMoneyEventHandler)handler).handleEvent((AgentMoneyEventImpl)ev);
 			return true;
 		} else if (klass == BasicAgentMoneyEvent.class) {
 			((BasicAgentMoneyEventHandler)handler).handleEvent((BasicAgentMoneyEvent)ev);
 			return true;
-		} else if (klass == AgentReplanEvent.class) {
-			((AgentReplanEventHandler)handler).handleEvent((AgentReplanEvent)ev);
+		} else if (klass == AgentReplanEventImpl.class) {
+			((AgentReplanEventHandler)handler).handleEvent((AgentReplanEventImpl)ev);
 			return true;
 		} else if (klass == BasicEvent.class) {
 			((BasicEventHandler)handler).handleEvent(ev);

@@ -33,8 +33,8 @@ import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -80,13 +80,13 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 		this.learningRate = learningRate;
 	}
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEventImpl event) {
 		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.getPersonId().toString());
 		sf.endActivity(event.getTime());
 		sf.startLeg(event.getTime(), event.getLeg());
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEventImpl event) {
 		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.getPersonId().toString());
 		sf.endLeg(event.getTime());
 		sf.startActivity(event.getTime(), null);

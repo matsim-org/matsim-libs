@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkLeaveEvent.java
+ * LinkEnterEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,28 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.events;
+package org.matsim.core.api.experimental.events.handler;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 
-public class LinkLeaveEvent extends LinkEvent implements BasicLinkLeaveEvent {
-
-	public static final String EVENT_TYPE = "left link";
-
-	public LinkLeaveEvent(final double time, final PersonImpl agent, final LinkImpl link) {
-		super(time, agent, link);
-	}
-
-	public LinkLeaveEvent(final double time, final Id agentId, final Id linkId) {
-		super(time, agentId, linkId);
-	}
-
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
+public interface LinkEnterEventHandler extends BasicLinkEnterEventHandler {
 
 }

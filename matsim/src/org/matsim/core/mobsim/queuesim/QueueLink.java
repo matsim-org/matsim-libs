@@ -32,8 +32,8 @@ import java.util.SortedMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink;
 import org.matsim.core.network.LinkImpl;
@@ -308,7 +308,7 @@ public class QueueLink {
 		this.originalLane.add(veh, now);
 		veh.setCurrentLink(this.getLink());
 		QueueSimulation.getEvents().processEvent(
-				new LinkEnterEvent(now, veh.getDriver().getPerson(),
+				new LinkEnterEventImpl(now, veh.getDriver().getPerson(),
 						this.getLink()));
 	}
 	
@@ -354,7 +354,7 @@ public class QueueLink {
 
 	/*package*/ void processVehicleArrival(final double now, final QueueVehicle veh) {
 		QueueSimulation.getEvents().processEvent(
-				new AgentArrivalEvent(now, veh.getDriver().getPerson(),
+				new AgentArrivalEventImpl(now, veh.getDriver().getPerson(),
 						this.getLink(), veh.getDriver().getCurrentLeg()));
 		// Need to inform the veh that it now reached its destination.
 		veh.getDriver().legEnds(now);

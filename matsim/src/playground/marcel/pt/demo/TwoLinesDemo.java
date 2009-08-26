@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.PopulationBuilder;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -304,7 +304,7 @@ public class TwoLinesDemo {
 	}
 
 	private void runSim() {
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario, events);
 		sim.startOTFServer("two_lines_demo");

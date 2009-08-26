@@ -45,47 +45,47 @@ import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEventImpl;
 public class EventsBuilderImpl implements EventsBuilder {
 
 	public BasicActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, String acttype) {
-		return new ActivityEndEvent(time, agentId, linkId, acttype);
+		return new ActivityEndEventImpl(time, agentId, linkId, acttype);
 	}
 
 	public BasicActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, String acttype) {
-		return new ActivityStartEvent(time, agentId, linkId, acttype);
+		return new ActivityStartEventImpl(time, agentId, linkId, acttype);
 	}
 
 	public BasicAgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId) {
-		return new AgentArrivalEvent(time, agentId, linkId);
+		return new AgentArrivalEventImpl(time, agentId, linkId);
 	}
 
 	public BasicAgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId) {
-		return new AgentDepartureEvent(time, agentId, linkId);
+		return new AgentDepartureEventImpl(time, agentId, linkId);
 	}
 
 	public BasicAgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney) {
-		return new AgentMoneyEvent(time, agentId, amountMoney);
+		return new AgentMoneyEventImpl(time, agentId, amountMoney);
 	}
 
 	public BasicAgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId) {
-		return new AgentStuckEvent(time, agentId, linkId);
+		return new AgentStuckEventImpl(time, agentId, linkId);
 	}
 
 	public BasicAgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId) {
-		return new AgentWait2LinkEvent(time, agentId, linkId);
+		return new AgentWait2LinkEventImpl(time, agentId, linkId);
 	}
 
 	public BasicLinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId) {
-		return new LinkEnterEvent(time, agentId, linkId);
+		return new LinkEnterEventImpl(time, agentId, linkId);
 	}
 
 	public BasicLinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId) {
-		return new LinkLeaveEvent(time, agentId, linkId);
+		return new LinkLeaveEventImpl(time, agentId, linkId);
 	}
 	
 	public BasicPersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
-		return new PersonEntersVehicleEvent(time, personId, vehicleId);
+		return new PersonEntersVehicleEventImpl(time, personId, vehicleId);
 	}
 	
 	public BasicPersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
-		return new PersonLeavesVehicleEvent(time, personId, vehicleId);
+		return new PersonLeavesVehicleEventImpl(time, personId, vehicleId);
 	}
 	
 	public BasicVehicleArrivesAtFacilityEvent createVehicleArrivesAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId) {

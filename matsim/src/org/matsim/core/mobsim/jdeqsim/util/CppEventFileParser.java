@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.jdeqsim.EventLog;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 
@@ -123,8 +123,8 @@ public class CppEventFileParser {
 			return false;
 		}
 
-		if (personEvent instanceof AgentDepartureEvent) {
-			if (Integer.parseInt(((AgentDepartureEvent) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
+		if (personEvent instanceof AgentDepartureEventImpl) {
+			if (Integer.parseInt(((AgentDepartureEventImpl) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
@@ -135,8 +135,8 @@ public class CppEventFileParser {
 			}
 		}
 
-		if (personEvent instanceof LinkEnterEvent) {
-			if (Integer.parseInt(((LinkEnterEvent) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
+		if (personEvent instanceof LinkEnterEventImpl) {
+			if (Integer.parseInt(((LinkEnterEventImpl) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
@@ -147,8 +147,8 @@ public class CppEventFileParser {
 			}
 		}
 
-		if (personEvent instanceof LinkLeaveEvent) {
-			if (Integer.parseInt(((LinkLeaveEvent) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
+		if (personEvent instanceof LinkLeaveEventImpl) {
+			if (Integer.parseInt(((LinkLeaveEventImpl) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
@@ -159,8 +159,8 @@ public class CppEventFileParser {
 			}
 		}
 
-		if (personEvent instanceof AgentArrivalEvent) {
-			if (Integer.parseInt(((AgentArrivalEvent) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
+		if (personEvent instanceof AgentArrivalEventImpl) {
+			if (Integer.parseInt(((AgentArrivalEventImpl) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}

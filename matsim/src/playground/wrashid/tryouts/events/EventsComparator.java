@@ -1,7 +1,7 @@
 package playground.wrashid.tryouts.events;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 
 public class EventsComparator {
@@ -9,7 +9,7 @@ public class EventsComparator {
 	public static void main(String[] args) {
 		String eventsFilePath = "c:\\data\\matsim\\input\\runRW1000\\0.events_jdeq.txt";
 		
-		Events events1 = new Events();
+		EventsImpl events1 = new EventsImpl();
 		
 		EventStatistics eventStatistics=new EventStatistics();
 		events1.addHandler(eventStatistics);
@@ -22,7 +22,7 @@ public class EventsComparator {
 		// read and process second file
 		eventsFilePath = "c:\\data\\matsim\\input\\runRW1000\\0.events_pjdeq.txt";
 		
-		Events events2 = new Events();
+		EventsImpl events2 = new EventsImpl();
 		
 		EventStatistics eventStatistics2=new EventStatistics();
 		events2.addHandler(eventStatistics2);

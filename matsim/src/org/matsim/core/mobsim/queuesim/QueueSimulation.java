@@ -40,10 +40,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentStuckEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
@@ -94,7 +94,7 @@ public class QueueSimulation {
 	protected QueueNetwork network;
 	protected NetworkLayer networkLayer;
 
-	private static Events events = null;
+	private static EventsImpl events = null;
 	protected  SimStateWriterI netStateWriter = null;
 
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
@@ -139,7 +139,7 @@ public class QueueSimulation {
 	 * @param plans
 	 * @param events
 	 */
-	public QueueSimulation(final NetworkLayer network, final PopulationImpl plans, final Events events) {
+	public QueueSimulation(final NetworkLayer network, final PopulationImpl plans, final EventsImpl events) {
 		// In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
 		this.listenerManager = new QueueSimListenerManager(this);
 		Simulation.reset();
@@ -160,7 +160,7 @@ public class QueueSimulation {
 	 * @param scenario
 	 * @param events
 	 */
-	public QueueSimulation(final ScenarioImpl scenario, final Events events) {
+	public QueueSimulation(final ScenarioImpl scenario, final EventsImpl events) {
 		this(scenario.getNetwork(), scenario.getPopulation(), events);
 		this.scenario = scenario;
 	}
@@ -393,12 +393,12 @@ public class QueueSimulation {
 		double now = SimulationTimer.getTime();
 		for (Tuple<Double, DriverAgent> entry : this.teleportationList) {
 			DriverAgent agent = entry.getSecond();
-			events.processEvent(new AgentStuckEvent(now, agent.getPerson(), (LinkImpl)agent.getDestinationLink(), agent.getCurrentLeg()));
+			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson(), (LinkImpl)agent.getDestinationLink(), agent.getCurrentLeg()));
 		}
 		this.teleportationList.clear();
 
 		for (DriverAgent agent : this.activityEndsList) {
-			events.processEvent(new AgentStuckEvent(now, agent.getPerson(), (LinkImpl)agent.getDestinationLink(), agent.getCurrentLeg()));
+			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson(), (LinkImpl)agent.getDestinationLink(), agent.getCurrentLeg()));
 		}
 		this.activityEndsList.clear();
 
@@ -478,11 +478,11 @@ public class QueueSimulation {
 		}
 	}
 
-	public static final Events getEvents() {
+	public static final EventsImpl getEvents() {
 		return events;
 	}
 
-	private static final void setEvents(final Events events) {
+	private static final void setEvents(final EventsImpl events) {
 		QueueSimulation.events = events;
 	}
 
@@ -500,7 +500,7 @@ public class QueueSimulation {
 				Link destinationLink = driver.getDestinationLink();
 				driver.teleportToLink(destinationLink);
 
-				getEvents().processEvent(new AgentArrivalEvent(now, driver.getPerson(),
+				getEvents().processEvent(new AgentArrivalEventImpl(now, driver.getPerson(),
 						(LinkImpl)destinationLink, driver.getCurrentLeg()));
 				driver.legEnds(now);
 			} else break;
@@ -552,7 +552,7 @@ public class QueueSimulation {
 
 		LegImpl leg = agent.getCurrentLeg();
 
-		events.processEvent(new AgentDepartureEvent(now, agent.getPerson(), (LinkImpl) link, leg));
+		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson(), (LinkImpl) link, leg));
 
 		if (leg.getMode().equals(TransportMode.car)) {
 			NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();

@@ -10,7 +10,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoader;
@@ -72,7 +72,7 @@ public class OTFSnapshotGenerator {
 		
 		PositionInfo.setLANE_WIDTH(this.scenario.getNetwork().getEffectiveLaneWidth());
 		
-		Events ev = new Events();
+		EventsImpl ev = new EventsImpl();
 		DestinationDependentColorizer d = new DestinationDependentColorizer();
 		ev.addHandler(d);
 		EvacuationLinksTeleporter e = new EvacuationLinksTeleporter();

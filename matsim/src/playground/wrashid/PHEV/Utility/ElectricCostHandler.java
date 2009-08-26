@@ -16,8 +16,8 @@ import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.core.events.AgentMoneyEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentMoneyEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.network.LinkImpl;
 
 //TODO: write tests for this class
@@ -33,7 +33,7 @@ public class ElectricCostHandler implements BasicLinkLeaveEventHandler,
 	private final double penaltyForRunningOutOfElectricEnergy = -100000000;
 	private MobSimController controler = null;
 	private EnergyConsumptionSamples energyConsumptionSamples = null;
-	private Events events = null;
+	private EventsImpl events = null;
 
 	// application specific
 	private double averageTimeSpentAtWork = 0;
@@ -75,7 +75,7 @@ public class ElectricCostHandler implements BasicLinkLeaveEventHandler,
 
 	// observedVehicleId: if not null, the SOC of this vehicle is recorded
 	public ElectricCostHandler(MobSimController controler,
-			EnergyConsumptionSamples energyConsumptionSamples, Events events,
+			EnergyConsumptionSamples energyConsumptionSamples, EventsImpl events,
 			String observedVehicleId) {
 		this.controler = controler;
 		this.energyConsumptionSamples = energyConsumptionSamples;
@@ -88,7 +88,7 @@ public class ElectricCostHandler implements BasicLinkLeaveEventHandler,
 	}
 
 	public ElectricCostHandler(DESController controler2,
-			EnergyConsumptionSamples energyConsumptionSamples2, Events events2,
+			EnergyConsumptionSamples energyConsumptionSamples2, EventsImpl events2,
 			String observedVehicleId) {
 		this.controler2 = controler2;
 		this.energyConsumptionSamples = energyConsumptionSamples2;
@@ -138,7 +138,7 @@ public class ElectricCostHandler implements BasicLinkLeaveEventHandler,
 
 		// if energy level is below zero: give huge penalty to agent
 		if (state.energyLevel <= 0) {
-			events.processEvent(new AgentMoneyEvent(event.getTime(), event.getPersonId(),
+			events.processEvent(new AgentMoneyEventImpl(event.getTime(), event.getPersonId(),
 					penaltyForRunningOutOfElectricEnergy));
 		}
 		recordSOCOfVehicle(event);
@@ -257,7 +257,7 @@ public class ElectricCostHandler implements BasicLinkLeaveEventHandler,
 			// System.out.println("noooo:"+costOfEnergy);
 		}
 
-		events.processEvent(new AgentMoneyEvent(event.getTime(), event.getPersonId(),
+		events.processEvent(new AgentMoneyEventImpl(event.getTime(), event.getPersonId(),
 				costOfEnergy));
 
 		state.energyLevel += energyCharged;

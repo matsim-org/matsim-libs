@@ -25,8 +25,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -43,7 +43,7 @@ public class CalcLegDistances implements AgentDepartureEventHandler, AgentArriva
 		this.population = population;
 	}
 
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEventImpl event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 	}
 
@@ -52,7 +52,7 @@ public class CalcLegDistances implements AgentDepartureEventHandler, AgentArriva
 		this.sumTripsByModeAndActType.clear();
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEventImpl event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		Person agent = this.population.getPersons().get(event.getPersonId());
 			

@@ -22,7 +22,7 @@ package org.matsim.integration.controler;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -38,8 +38,8 @@ public class ParallelEventsTest extends MatsimTestCase {
 		config.controler().setLastIteration(-1); // disable running any iteration
 		final Controler controler = new Controler(config);
 		controler.run();
-		Events events = controler.getEvents();
-		assertEquals(org.matsim.core.events.Events.class, events.getClass());
+		EventsImpl events = controler.getEvents();
+		assertEquals(org.matsim.core.events.EventsImpl.class, events.getClass());
 	}
 
 	public void testLoadParallelWithConfig() {
@@ -48,7 +48,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 		config.setParam("parallelEventHandling", "numberOfThreads", "3");
 		final Controler controler = new Controler(config);
 		controler.run();
-		Events events = controler.getEvents();
+		EventsImpl events = controler.getEvents();
 		assertEquals(org.matsim.core.events.parallelEventsHandler.ParallelEvents.class, events.getClass());
 	}
 

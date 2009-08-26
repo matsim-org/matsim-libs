@@ -25,9 +25,9 @@ package playground.yu.analysis;
 
 import java.util.TreeMap;
 
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
@@ -73,7 +73,7 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 		this.toll = toll;
 	}
 
-	public void handleEvent(LinkEnterEvent enter) {
+	public void handleEvent(LinkEnterEventImpl enter) {
 		if (toll == null)
 			this.enterTimes
 					.put(enter.getPersonId().toString(), enter.getTime());
@@ -94,7 +94,7 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 		this.timeSum = 0;
 	}
 
-	public void handleEvent(LinkLeaveEvent leave) {
+	public void handleEvent(LinkLeaveEventImpl leave) {
 		Double enterTime = this.enterTimes.remove(leave.getPersonId()
 				.toString());
 		if (enterTime != null) {
@@ -113,7 +113,7 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 		return ((this.timeSum != 0.0) ? this.lengthSum / this.timeSum : 0.0);
 	}
 
-	public void handleEvent(AgentArrivalEvent arrival) {
+	public void handleEvent(AgentArrivalEventImpl arrival) {
 		String id = arrival.getPersonId().toString();
 		if (this.enterTimes.containsKey(id)) {
 			this.enterTimes.remove(id);

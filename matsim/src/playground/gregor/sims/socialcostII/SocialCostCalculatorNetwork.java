@@ -28,10 +28,10 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentMoneyEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.AgentMoneyEventImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
@@ -104,7 +104,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 	}
 
 	
-	public void handleEvent(final LinkEnterEvent event) {
+	public void handleEvent(final LinkEnterEventImpl event) {
 
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
@@ -128,7 +128,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 	
 	
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEventImpl event) {
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
 		ai.enterTime = event.getTime();
@@ -137,7 +137,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 		info.agentsOnLink++;
 	}
 	
-	public void handleEvent(final LinkLeaveEvent event) {
+	public void handleEvent(final LinkLeaveEventImpl event) {
 		
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		info.agentsOnLink--;
@@ -198,12 +198,12 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 //			double scoringCost =  socCostCurrent / -600;
 			for (String agentId : toCongested) {
 				Id id = new IdImpl(agentId);
-				AgentMoneyEvent e = new AgentMoneyEvent(currentTimeUncongested,id,scoringCost);
+				AgentMoneyEventImpl e = new AgentMoneyEventImpl(currentTimeUncongested,id,scoringCost);
 				QueueSimulation.getEvents().processEvent(e);
 			}
 			for (String agentId : toUncongested) {
 				Id id = new IdImpl(agentId);
-				AgentMoneyEvent e = new AgentMoneyEvent(currentTimeUncongested,id,scoringCost);
+				AgentMoneyEventImpl e = new AgentMoneyEventImpl(currentTimeUncongested,id,scoringCost);
 				QueueSimulation.getEvents().processEvent(e);
 			}
 			

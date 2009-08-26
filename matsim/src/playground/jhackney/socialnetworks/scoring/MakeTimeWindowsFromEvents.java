@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.events.ActivityEndEvent;
-import org.matsim.core.events.ActivityStartEvent;
+import org.matsim.core.events.ActivityEndEventImpl;
+import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -47,8 +47,8 @@ public class MakeTimeWindowsFromEvents {
 	public MakeTimeWindowsFromEvents(){
 	}
 	public void makeTimeWindows(EventsMapStartEndTimes epp){
-		LinkedHashMap<PersonImpl, ArrayList<ActivityStartEvent>> startMap = epp.startMap;
-		LinkedHashMap<PersonImpl, ArrayList<ActivityEndEvent>> endMap = epp.endMap;
+		LinkedHashMap<PersonImpl, ArrayList<ActivityStartEventImpl>> startMap = epp.startMap;
+		LinkedHashMap<PersonImpl, ArrayList<ActivityEndEventImpl>> endMap = epp.endMap;
 		Object[] persons = startMap.keySet().toArray();
 		for (int i=0;i<persons.length;i++){
 			//for each startEvent and endEvent
@@ -56,8 +56,8 @@ public class MakeTimeWindowsFromEvents {
 			PersonImpl person=(PersonImpl) persons[i];
 			ArrayList<TimeWindow> twList;
 			PlanImpl plan =person.getSelectedPlan();
-			ArrayList<ActivityStartEvent> startEvents =startMap.get(person);
-			ArrayList<ActivityEndEvent> endEvents = endMap.get(person);
+			ArrayList<ActivityStartEventImpl> startEvents =startMap.get(person);
+			ArrayList<ActivityEndEventImpl> endEvents = endMap.get(person);
 //30.12			for (int j=0;j<endEvents.size()+1;j++){
 			for (int j=0;j<endEvents.size();j++){
 				double startTime=0;

@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
 
 /**
  * This class is used to calculate statistical values (used among others in some tests).
@@ -25,9 +25,9 @@ public class EventLibrary {
 
 		for (int i = 0; i < events.size(); i++) {
 			if (Integer.parseInt(events.get(i).getPersonId().toString()) == agentId) {
-				if (events.get(i) instanceof AgentDepartureEvent) {
+				if (events.get(i) instanceof AgentDepartureEventImpl) {
 					startLegTime = events.get(i).getTime();
-				} else if (events.get(i) instanceof AgentArrivalEvent) {
+				} else if (events.get(i) instanceof AgentArrivalEventImpl) {
 					travelTime += events.get(i).getTime() - startLegTime;
 				}
 			}
@@ -48,7 +48,7 @@ public class EventLibrary {
 		BasicPersonEvent currentEvent = null;
 		for (int i = 0; i < events.size(); i++) {
 			currentEvent = events.get(i);
-			if (currentEvent instanceof AgentDepartureEvent) {
+			if (currentEvent instanceof AgentDepartureEventImpl) {
 				if (currentEvent.getTime() < 0) {
 					// the problem is, that some agent departure events are
 					// negative.
@@ -57,7 +57,7 @@ public class EventLibrary {
 				} else {
 					startingTime.put(currentEvent.getPersonId().toString(), currentEvent.getTime());
 				}
-			} else if (currentEvent instanceof AgentArrivalEvent) {
+			} else if (currentEvent instanceof AgentArrivalEventImpl) {
 				travelTime += currentEvent.getTime()
 						- startingTime.get(currentEvent.getPersonId().toString());
 			}

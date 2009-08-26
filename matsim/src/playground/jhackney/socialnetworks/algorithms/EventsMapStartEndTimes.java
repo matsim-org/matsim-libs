@@ -5,8 +5,8 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.events.ActivityEndEvent;
-import org.matsim.core.events.ActivityStartEvent;
+import org.matsim.core.events.ActivityEndEventImpl;
+import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.population.PersonImpl;
@@ -14,8 +14,8 @@ import org.matsim.core.population.PopulationImpl;
 
 public class EventsMapStartEndTimes implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	public LinkedHashMap<PersonImpl, ArrayList<ActivityStartEvent>> startMap = new LinkedHashMap<PersonImpl,ArrayList<ActivityStartEvent>>();
-	public LinkedHashMap<PersonImpl, ArrayList<ActivityEndEvent>> endMap = new LinkedHashMap<PersonImpl,ArrayList<ActivityEndEvent>>();
+	public LinkedHashMap<PersonImpl, ArrayList<ActivityStartEventImpl>> startMap = new LinkedHashMap<PersonImpl,ArrayList<ActivityStartEventImpl>>();
+	public LinkedHashMap<PersonImpl, ArrayList<ActivityEndEventImpl>> endMap = new LinkedHashMap<PersonImpl,ArrayList<ActivityEndEventImpl>>();
 	public double maxtime=0;
 	private PopulationImpl plans;
 	static final private Logger log = Logger.getLogger(EventsMapStartEndTimes.class);
@@ -27,11 +27,11 @@ public class EventsMapStartEndTimes implements ActivityStartEventHandler, Activi
 		log.info(" Looking through plans and mapping social interactions for scoring");
 	}
 
-	public void handleEvent(ActivityStartEvent event) {
+	public void handleEvent(ActivityStartEventImpl event) {
 		PersonImpl person = plans.getPersons().get(event.getPersonId());
-		ArrayList<ActivityStartEvent> startList;
+		ArrayList<ActivityStartEventImpl> startList;
 		if((startMap.get(person)==null)){
-			startList=new ArrayList<ActivityStartEvent>();
+			startList=new ArrayList<ActivityStartEventImpl>();
 		}else{
 			startList=startMap.get(person);
 		}
@@ -47,11 +47,11 @@ public class EventsMapStartEndTimes implements ActivityStartEventHandler, Activi
 
 	}
 
-	public void handleEvent(ActivityEndEvent event) {
+	public void handleEvent(ActivityEndEventImpl event) {
 		PersonImpl person = plans.getPersons().get(event.getPersonId());
-		ArrayList<ActivityEndEvent> endList;
+		ArrayList<ActivityEndEventImpl> endList;
 		if((endMap.get(person)== null)){
-			endList=new ArrayList<ActivityEndEvent>();
+			endList=new ArrayList<ActivityEndEventImpl>();
 		}else{
 			endList=endMap.get(person);
 		}

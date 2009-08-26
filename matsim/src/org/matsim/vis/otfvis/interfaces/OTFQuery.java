@@ -22,7 +22,7 @@ package org.matsim.vis.otfvis.interfaces;
 
 import java.io.Serializable;
 
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
@@ -80,7 +80,7 @@ public interface OTFQuery extends Serializable{
 	 * will actually only transport NEW objects. 
 	 * 
 	 */
-	public OTFQuery query(QueueNetwork net, PopulationImpl plans, Events events, OTFServerQuad quad) ;
+	public OTFQuery query(QueueNetwork net, PopulationImpl plans, EventsImpl events, OTFServerQuad quad) ;
 	
 	/**
 	 * Remove is called when a query is removed, to give the query the option to

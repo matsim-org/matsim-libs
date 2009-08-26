@@ -26,7 +26,7 @@ import java.util.Locale;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -81,7 +81,7 @@ public class VolvoAnalysisMain {
 			return;
 		}
 		System.out.println("  done.");
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		VolvoAnalysis analysis = new VolvoAnalysis(network, hundekopf, gemarkung);
 		System.out.println("created VolvoAnalysis");
 

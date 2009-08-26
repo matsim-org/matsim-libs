@@ -27,8 +27,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -62,7 +62,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 	/*package*/ final TransitStopAgentTracker agentTracker;
 	private final HashMap<PersonImpl, DriverAgent> agents = new HashMap<PersonImpl, DriverAgent>(100);
 
-	public TransitQueueSimulation(final ScenarioImpl scenario, final Events events) {
+	public TransitQueueSimulation(final ScenarioImpl scenario, final EventsImpl events) {
 		super(scenario, events);
 
 		this.schedule = scenario.getTransitSchedule();
@@ -150,7 +150,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 								+ ". The agent is removed from the simulation.");
 				return;
 			}
-			getEvents().processEvent(new AgentDepartureEvent(SimulationTimer.getTime(), agent.getPerson(), (LinkImpl) link, leg));
+			getEvents().processEvent(new AgentDepartureEventImpl(SimulationTimer.getTime(), agent.getPerson(), (LinkImpl) link, leg));
 
 			TransitStopFacility stop = this.schedule.getFacilities().get(route.getAccessStopId());
 			this.agentTracker.addAgentToStop((PassengerAgent) agent, stop);

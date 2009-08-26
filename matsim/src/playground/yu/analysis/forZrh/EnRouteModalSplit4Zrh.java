@@ -8,10 +8,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentEvent;
-import org.matsim.core.events.AgentStuckEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.AgentEventImpl;
+import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -80,7 +80,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 		super(scenario, ppl, toll);
 	}
 
-	protected void internalCompute(int binIdx, AgentEvent ae, PlanImpl plan,
+	protected void internalCompute(int binIdx, AgentEventImpl ae, PlanImpl plan,
 			double[] allCount, double[] carCount, double[] ptCount,
 			double[] wlkCount, double[] throughCount) {
 		allCount[binIdx]++;
@@ -110,13 +110,13 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEventImpl event) {
 		internalHandleEvent(event, this.arr, this.carArr, this.ptArr, wlkArr,
 				throughArr);
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEventImpl event) {
 		Id id = event.getPersonId();
 		Integer itg = legCounts.get(id);
 		if (itg == null)
@@ -127,12 +127,12 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(AgentStuckEventImpl event) {
 		internalHandleEvent(event, this.stuck, this.carStuck, null, null,
 				this.throughStuck);
 	}
 
-	protected void internalHandleEvent(AgentEvent ae, double[] allCount,
+	protected void internalHandleEvent(AgentEventImpl ae, double[] allCount,
 			double[] carCount, double[] ptCount, double[] wlkCount,
 			double[] throughCount) {
 		int binIdx = getBinIndex(ae.getTime());

@@ -22,7 +22,7 @@ package org.matsim.examples;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -66,7 +66,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		plansReader.readFile(popFileName);
 		population.printPlansCount();
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
 		events.addHandler(writer);
 

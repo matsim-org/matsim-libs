@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -30,7 +30,7 @@ public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 	
 	
 	
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(LinkEnterEventImpl event) {
 		LinkImpl l = event.getLink();
 		if (l == null) {
 			l = this.network.getLink(event.getLinkId());

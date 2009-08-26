@@ -27,11 +27,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentEvent;
-import org.matsim.core.events.AgentStuckEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.AgentEventImpl;
+import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
@@ -155,7 +155,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 
 	/* Implementation of eventhandler-Interfaces */
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEventImpl event) {
 		Id id = event.getPersonId();
 		Integer itg = legCounts.get(id);
 		if (itg == null)
@@ -165,17 +165,17 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 				bikeDep, this.othersDep);
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEventImpl event) {
 		internalHandleEvent(event, this.arr, this.carArr, this.ptArr, wlkArr,
 				bikeArr, this.othersArr);
 	}
 
-	public void handleEvent(final AgentStuckEvent event) {
+	public void handleEvent(final AgentStuckEventImpl event) {
 		internalHandleEvent(event, this.stuck, this.carStuck, null, null, null,
 				this.othersStuck);
 	}
 
-	protected void internalHandleEvent(AgentEvent ae, double[] allCount,
+	protected void internalHandleEvent(AgentEventImpl ae, double[] allCount,
 			double[] carCount, double[] ptCount, double[] wlkCount,
 			double[] bikeCount, double[] othersCount) {
 		int binIdx = getBinIndex(ae.getTime());
@@ -194,7 +194,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 
 	}
 
-	protected void internalCompute(int binIdx, AgentEvent ae, PlanImpl plan,
+	protected void internalCompute(int binIdx, AgentEventImpl ae, PlanImpl plan,
 			double[] allCount, double[] carCount, double[] ptCount,
 			double[] wlkCount, double[] bikeCount, double[] othersCount) {
 		allCount[binIdx]++;
@@ -444,7 +444,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		// } catch (IOException e) {
 		// e.printStackTrace();
 		// }
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		EnRouteModalSplit orms = new EnRouteModalSplit("Berlin", population,
 				null
 		// tollReader.getScheme()

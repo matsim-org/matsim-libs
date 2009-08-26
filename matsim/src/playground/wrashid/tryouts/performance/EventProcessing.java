@@ -3,8 +3,8 @@ package playground.wrashid.tryouts.performance;
 import java.util.LinkedList;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 
@@ -36,7 +36,7 @@ public class EventProcessing {
 		double timer=System.currentTimeMillis();
 		EventProcessing ep=new EventProcessing();
 		
-		Events events = new ParallelEvents(numberOfThreads);
+		EventsImpl events = new ParallelEvents(numberOfThreads);
 		//Events events = new Events();
 		
 		// start iteration
@@ -47,7 +47,7 @@ public class EventProcessing {
 			events.addHandler(ep.new Handler1());
 		}
 		
-		LinkLeaveEvent linkLeaveEvent=new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""));
+		LinkLeaveEventImpl linkLeaveEvent=new LinkLeaveEventImpl(0, new IdImpl(""), new IdImpl(""));
 		
 		for (int i=0;i<1000000;i++){
 				events.processEvent(linkLeaveEvent);
@@ -65,7 +65,7 @@ public class EventProcessing {
 	
 	private class Handler1 implements LinkLeaveEventHandler {
 
-		public void handleEvent(LinkLeaveEvent event) {
+		public void handleEvent(LinkLeaveEventImpl event) {
 			LinkedList list=new LinkedList();
 			for (int i = 0; i < 100; i++) {
 				list.add(Math.sin(i));

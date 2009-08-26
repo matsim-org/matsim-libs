@@ -20,7 +20,7 @@
 package org.matsim.core.mobsim.jdeqsim;
 
 import org.matsim.core.events.BasicEventImpl;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.LinkLeaveEventImpl;
 
 /**
  * The micro-simulation internal handler for leaving a road.
@@ -45,7 +45,7 @@ public class LeaveRoadMessage extends EventMessage {
 		Road road = (Road) this.getReceivingUnit();
 		BasicEventImpl event = null;
 
-		event = new LinkLeaveEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson(), road.getLink());
+		event = new LinkLeaveEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson(), road.getLink());
 
 		SimulationParameters.getProcessEventThread().processEvent(event);
 	}

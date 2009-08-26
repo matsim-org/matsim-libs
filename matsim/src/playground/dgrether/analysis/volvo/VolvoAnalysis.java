@@ -26,10 +26,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
@@ -99,7 +99,7 @@ public class VolvoAnalysis implements LinkEnterEventHandler,
 		return (int) seconds / (60 * 60 * 24 / TIMESTEPS);
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(LinkEnterEventImpl event) {
 		LinkImpl link = event.getLink();
 		int hour = getTimestep(event.getTime());
 		if (link == null) {
@@ -118,7 +118,7 @@ public class VolvoAnalysis implements LinkEnterEventHandler,
 		this.depTimes.put(event.getPersonId().toString(), Double.valueOf(event.getTime()));
 	}
 
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEventImpl event) {
 		Double depTime = this.depTimes.put(event.getPersonId().toString(), Double.valueOf(-1.0));
 		int hour = getTimestep(event.getTime());
 		if (depTime == null)
@@ -141,7 +141,7 @@ public class VolvoAnalysis implements LinkEnterEventHandler,
 		}
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEventImpl event) {
 		Double depTime = this.depTimes.put(event.getPersonId().toString(), Double.valueOf(-1.0));
 		int hour = getTimestep(event.getTime());
 		if (depTime == null)
@@ -161,7 +161,7 @@ public class VolvoAnalysis implements LinkEnterEventHandler,
 		}
 	}
 
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEventImpl event) {
 		int hour = getTimestep(event.getTime());
 		LinkImpl link = this.network.getLinks().get(event.getLinkId());
 		if (this.hundekopfLinkIds.contains(link.getId())) {

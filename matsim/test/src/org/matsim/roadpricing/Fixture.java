@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -212,7 +212,7 @@ import org.matsim.core.utils.misc.Time;
 		// run mobsim once without toll and get score for network1/population1
 		NetworkLayer network = createNetwork1();
 		PopulationImpl referencePopulation = Fixture.createPopulation1(network);
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory(config));
 		events.addHandler(scoring);
 		QueueSimulation sim = new QueueSimulation(network, referencePopulation, events);

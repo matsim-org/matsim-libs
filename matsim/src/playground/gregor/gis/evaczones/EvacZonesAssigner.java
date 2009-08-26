@@ -35,8 +35,8 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -188,7 +188,7 @@ public class EvacZonesAssigner implements AgentDepartureEventHandler{
 
 		HashMap<String,ArrayList<Point>> exits = new HashMap<String, ArrayList<Point>>();
 		
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		DestinationDependentColorizer ddc = new DestinationDependentColorizer();
 		events.addHandler(ddc);
 		events.addHandler(this);
@@ -258,7 +258,7 @@ public class EvacZonesAssigner implements AgentDepartureEventHandler{
 		}
 
 
-		public void handleEvent(final AgentDepartureEvent event) {
+		public void handleEvent(final AgentDepartureEventImpl event) {
 			String id = event.getPersonId().toString();
 			if (id.contains("guide")) {
 				return;

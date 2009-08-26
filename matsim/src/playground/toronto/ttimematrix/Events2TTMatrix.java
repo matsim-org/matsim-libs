@@ -28,7 +28,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -115,7 +115,7 @@ public class Events2TTMatrix {
 		TTimeMatrixCalculator ttmc = new TTimeMatrixCalculator(parseL2ZMapping(mapfile),hours,st,network);
 
 		// creating events object and assign handlers
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(ttmc);
 		events.addHandler(ttc);
 		

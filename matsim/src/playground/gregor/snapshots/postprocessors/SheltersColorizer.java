@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
@@ -32,7 +32,7 @@ public class SheltersColorizer implements LinkLeaveEventHandler {
 	}
 	
 	
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEventImpl event) {
 		if (event.getLinkId().toString().contains("sl") && event.getLinkId().toString().contains("a")) {
 			String id = event.getLinkId().toString().replace("sl","");
 			id = id.replace("a", "");

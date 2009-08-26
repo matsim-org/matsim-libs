@@ -3,7 +3,7 @@ package playground.wrashid.PHEV.co2emissions;
 import java.util.HashMap;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -28,7 +28,7 @@ public class OneLinkHandler implements LinkLeaveEventHandler {
 		this.interval=interval;
 	}
 	
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEventImpl event) {
 		if (event.getLinkId().toString().equals(link.getId().toString())){
 			long hour= Math.round(event.getTime()/interval);
 			if (!co2EmissionsEachHour.containsKey(hour)){

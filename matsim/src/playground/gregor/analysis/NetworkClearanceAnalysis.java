@@ -35,10 +35,10 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
@@ -146,8 +146,8 @@ public class NetworkClearanceAnalysis {
 	}
 
 	private void readEvents() {
-		Events events1 = new Events();
-		Events events2 = new Events();
+		EventsImpl events1 = new EventsImpl();
+		EventsImpl events2 = new EventsImpl();
 		EventsHandler e1 = new EventsHandler(this.linkMapping1);
 		EventsHandler e2 = new EventsHandler(this.linkMapping2);
 		events1.addHandler(e1);
@@ -204,7 +204,7 @@ public class NetworkClearanceAnalysis {
 			this.linkMapping = linkMapping;
 		}
 		
-		public void handleEvent(final LinkEnterEvent event) {
+		public void handleEvent(final LinkEnterEventImpl event) {
 			if (event.getLinkId().toString().contains("el")) {
 				return;
 			}
@@ -221,7 +221,7 @@ public class NetworkClearanceAnalysis {
 			
 		}
 
-		public void handleEvent(final LinkLeaveEvent event) {
+		public void handleEvent(final LinkLeaveEventImpl event) {
 			if (event.getLinkId().toString().contains("el")) {
 				return;
 			}

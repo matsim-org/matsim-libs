@@ -24,7 +24,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
 // a simple example how to implement an eventsHandler
@@ -38,7 +38,7 @@ public class DailyLinkVolumeCalc implements LinkLeaveEventHandler {
 
 	// implementation of a LinkLeaveEventHandler method
 	// it fills up the TreeMap
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEventImpl event) {
 		Id id = new IdImpl(event.getLinkId().toString());
 		Integer cnt = counts.get(id);
 		if (cnt == null) {

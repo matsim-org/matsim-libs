@@ -8,20 +8,20 @@ import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.ActivityEndEvent;
-import org.matsim.core.events.ActivityStartEvent;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentWait2LinkEvent;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.ActivityEndEventImpl;
+import org.matsim.core.events.ActivityStartEventImpl;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.AgentWait2LinkEventImpl;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 
 @SuppressWarnings("unused")
 public class Mobsim {
 	private static final Logger log = Logger.getLogger(Mobsim.class);
 	
-	public Mobsim( BasicNetwork<BasicNode, BasicLink> net , BasicPopulation<BasicPerson> pop , Events eve ) {
+	public Mobsim( BasicNetwork<BasicNode, BasicLink> net , BasicPopulation<BasicPerson> pop , EventsImpl eve ) {
 		// TODO All the events stuff is not behind interfaces ...
 		
 		// for network, pop see MentalModule ...
@@ -31,22 +31,22 @@ public class Mobsim {
 		Id agentId = new IdImpl("agentId");
 		Id linkId = new IdImpl("linkId");
 		double time = 1. ;
-		ActivityEndEvent aee = new ActivityEndEvent(time, agentId, linkId, "actType" ) ;
+		ActivityEndEventImpl aee = new ActivityEndEventImpl(time, agentId, linkId, "actType" ) ;
 		eve.processEvent( aee ) ;
 
 		
 		int legNumber = 1 ;
-		AgentDepartureEvent ade = new AgentDepartureEvent( time, agentId, linkId ) ;
+		AgentDepartureEventImpl ade = new AgentDepartureEventImpl( time, agentId, linkId ) ;
 
-		AgentWait2LinkEvent aw2le = new AgentWait2LinkEvent(time,agentId,linkId) ;
+		AgentWait2LinkEventImpl aw2le = new AgentWait2LinkEventImpl(time,agentId,linkId) ;
 
-		LinkLeaveEvent lle = new LinkLeaveEvent( time, agentId, linkId ) ;
+		LinkLeaveEventImpl lle = new LinkLeaveEventImpl( time, agentId, linkId ) ;
 
-		LinkEnterEvent lee = new LinkEnterEvent( time, agentId, linkId ) ;
+		LinkEnterEventImpl lee = new LinkEnterEventImpl( time, agentId, linkId ) ;
 
-		AgentArrivalEvent aae = new AgentArrivalEvent( time, agentId, linkId ) ;
+		AgentArrivalEventImpl aae = new AgentArrivalEventImpl( time, agentId, linkId ) ;
 
-		ActivityStartEvent ase = new ActivityStartEvent( time, agentId, linkId, "acttype" ) ;
+		ActivityStartEventImpl ase = new ActivityStartEventImpl( time, agentId, linkId, "acttype" ) ;
 
 		// TODO: None of this is behind interfaces.  Needed if we want to accept "external" mobsims.  Do we want that?
 		// If so, we would need to be sure that we want to maintain the create methods.

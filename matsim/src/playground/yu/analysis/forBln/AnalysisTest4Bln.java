@@ -28,7 +28,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.analysis.CalcAverageTripLength;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -150,7 +150,7 @@ public class AnalysisTest4Bln {
 			ld = new LegDistance(network);
 		}
 		// only PersonAlgorithm ends.
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		// EventsHandlers without parameter of "Population":
 		CalcTrafficPerformance ctpf = new CalcTrafficPerformance(network, toll);
 		CalcNetAvgSpeed cas = new CalcNetAvgSpeed(network, toll);

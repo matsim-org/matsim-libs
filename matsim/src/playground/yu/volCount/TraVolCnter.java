@@ -28,9 +28,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -66,7 +66,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 	 * org.matsim.demandmodeling.events.handler.EventHandlerLinkEnterI#handleEvent
 	 * (org.matsim.demandmodeling.events.EventLinkEnter)
 	 */
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(LinkEnterEventImpl event) {
 		// TODO save entertime into agentTimer
 		String agentId = event.getPersonId().toString();
 		if (!agentTimer.containsKey(agentId))
@@ -83,7 +83,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 	 * org.matsim.demandmodeling.events.handler.EventHandlerLinkLeaveI#handleEvent
 	 * (org.matsim.demandmodeling.events.EventLinkLeave)
 	 */
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEventImpl event) {
 		String agentId = event.getPersonId().toString();
 		if (agentTimer.containsKey(agentId)) {
 			for (int tbIdx = agentTimer.remove(agentId).intValue(); tbIdx <= event
@@ -134,7 +134,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 				network);
 		plansReader.readFile(plansFilename);
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 
 		TraVolCnter traVolCounter = new TraVolCnter();
 		events.addHandler(traVolCounter);

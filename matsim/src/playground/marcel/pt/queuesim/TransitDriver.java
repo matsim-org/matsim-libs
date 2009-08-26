@@ -31,10 +31,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEventImpl;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.PersonLeavesVehicleEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.PersonEntersVehicleEventImpl;
+import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.mobsim.queuesim.TransitDriverAgent;
@@ -116,7 +116,7 @@ public class TransitDriver implements TransitDriverAgent {
 				throw new RuntimeException("Expected different stop.");
 			}
 			
-			Events events = TransitQueueSimulation.getEvents();
+			EventsImpl events = TransitQueueSimulation.getEvents();
 			if (this.lastHandledStop != stop) {
 				events.processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
 			}
@@ -156,9 +156,9 @@ public class TransitDriver implements TransitDriverAgent {
 				for (PassengerAgent passenger : passengersLeaving) {
 					this.vehicle.removePassenger(passenger);
 					DriverAgent agent = (DriverAgent) passenger;
-					events.processEvent(new PersonLeavesVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
+					events.processEvent(new PersonLeavesVehicleEventImpl(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
 					agent.teleportToLink(stop.getLink());
-					events.processEvent(new AgentArrivalEvent(now, agent.getPerson(),
+					events.processEvent(new AgentArrivalEventImpl(now, agent.getPerson(),
 							stop.getLink(), agent.getCurrentLeg()));
 					agent.legEnds(now);
 				}
@@ -167,7 +167,7 @@ public class TransitDriver implements TransitDriverAgent {
 					this.agentTracker.removeAgentFromStop(passenger, stop);
 					this.vehicle.addPassenger(passenger);
 					DriverAgent agent = (DriverAgent) passenger;
-					events.processEvent(new PersonEntersVehicleEvent(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
+					events.processEvent(new PersonEntersVehicleEventImpl(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
 				}
 
 			}

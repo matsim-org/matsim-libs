@@ -23,7 +23,7 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.events.BasicPersonEntersVehicleEvent;
+import org.matsim.core.basic.v01.events.BasicPersonLeavesVehicleEvent;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.vehicles.BasicVehicle;
 
@@ -31,19 +31,19 @@ import org.matsim.vehicles.BasicVehicle;
  *
  * @author mrieser
  */
-public class PersonEntersVehicleEvent extends PersonEvent implements BasicPersonEntersVehicleEvent {
+public class PersonLeavesVehicleEventImpl extends PersonEventImpl implements BasicPersonLeavesVehicleEvent {
 
-	public static final String EVENT_TYPE = "PersonEntersVehicle";
+	public static final String EVENT_TYPE = "PersonLeavesVehicle";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
 	private final Id vehicleId;
-	
-	public PersonEntersVehicleEvent(final double time, final PersonImpl person, final BasicVehicle vehicle) {
+
+	public PersonLeavesVehicleEventImpl(final double time, final PersonImpl person, final BasicVehicle vehicle) {
 		super(time, person);
 		this.vehicleId = vehicle.getId();
 	}
-
-	public PersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+	
+	public PersonLeavesVehicleEventImpl(final double time, final Id personId, final Id vehicleId) {
 		super(time, personId);
 		this.vehicleId = vehicleId;
 	}
@@ -59,7 +59,7 @@ public class PersonEntersVehicleEvent extends PersonEvent implements BasicPerson
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-
+	
 	public Id getVehicleId() {
 		return this.vehicleId;
 	}

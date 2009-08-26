@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.events.AgentReplanEvent;
+import org.matsim.core.events.AgentReplanEventImpl;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
@@ -212,7 +212,7 @@ public class WithindayAgent extends PersonAgent {
     	this.getPerson().exchangeSelectedPlan(newPlan, false);
     	this.exchangeCurrentLeg(newLeg);
 
-    	QueueSimulation.getEvents().processEvent(new AgentReplanEvent(SimulationTimer.getTime(), this.getPerson().getId(), alternativeRoute));
+    	QueueSimulation.getEvents().processEvent(new AgentReplanEventImpl(SimulationTimer.getTime(), this.getPerson().getId(), alternativeRoute));
     }
 	}
 

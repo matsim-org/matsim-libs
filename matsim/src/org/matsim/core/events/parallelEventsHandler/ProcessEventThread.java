@@ -25,7 +25,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.Gbl;
 
 /**
@@ -36,11 +36,11 @@ import org.matsim.core.gbl.Gbl;
 public class ProcessEventThread implements Runnable {
 	ArrayList<BasicEvent> preInputBuffer = null;
 	ConcurrentListSPSC<BasicEvent> eventQueue = null;
-	Events events;
+	EventsImpl events;
 	CyclicBarrier cb = null;
 	private int preInputBufferMaxLength;
 
-	public ProcessEventThread(Events events, int preInputBufferMaxLength,
+	public ProcessEventThread(EventsImpl events, int preInputBufferMaxLength,
 			CyclicBarrier cb) {
 		this.events = events;
 		this.preInputBufferMaxLength = preInputBufferMaxLength;

@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.PopulationBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -181,7 +181,7 @@ public class AccessEgressDemo {
 	}
 
 	private void runSim() {
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 
 		VehicleTracker vehTracker = new VehicleTracker();
 		events.addHandler(vehTracker);

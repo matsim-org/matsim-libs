@@ -31,8 +31,8 @@ import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
 import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
-import org.matsim.core.events.ActivityEndEvent;
-import org.matsim.core.events.ActivityStartEvent;
+import org.matsim.core.events.ActivityEndEventImpl;
+import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
@@ -93,9 +93,9 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 		
 		EventData eventData = data.get(personId);
 				
-		if ((event instanceof ActivityStartEvent) && (((ActivityStartEvent)event).getAct() != null))
+		if ((event instanceof ActivityStartEventImpl) && (((ActivityStartEventImpl)event).getAct() != null))
 		{
-			eventData.addStartActivityEvent(event.getTime(), ((ActivityStartEvent)event).getAct().getCoord());
+			eventData.addStartActivityEvent(event.getTime(), ((ActivityStartEventImpl)event).getAct().getCoord());
 		}
 		else if (network != null)
 		{
@@ -146,9 +146,9 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 		
 		EventData eventData = data.get(personId);
 		
-		if ((event instanceof ActivityEndEvent) && (((ActivityEndEvent)event).getAct() != null))
+		if ((event instanceof ActivityEndEventImpl) && (((ActivityEndEventImpl)event).getAct() != null))
 		{
-			eventData.addEndActivityEvent(event.getTime(), ((ActivityEndEvent)event).getAct().getCoord());
+			eventData.addEndActivityEvent(event.getTime(), ((ActivityEndEventImpl)event).getAct().getCoord());
 		}
 		else if (network != null)
 		{

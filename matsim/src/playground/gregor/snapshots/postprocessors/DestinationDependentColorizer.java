@@ -22,7 +22,7 @@ package playground.gregor.snapshots.postprocessors;
 
 import java.util.HashMap;
 
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
 import playground.gregor.snapshots.writers.PositionInfo;
@@ -74,7 +74,7 @@ public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveE
 //		
 //	}
 
-	public void handleEvent(final LinkLeaveEvent event) {
+	public void handleEvent(final LinkLeaveEventImpl event) {
 		if (event.getLinkId().toString().contains("shelter")) {
 			this.destNodeMapping.put(event.getPersonId().toString(),event.getLinkId().toString().replace("shelter", ""));
 		} else if (event.getLinkId().toString().contains("rev_el")) {

@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.dgrether.events.filters;
 
-import org.matsim.core.events.PersonEvent;
+import org.matsim.core.events.PersonEventImpl;
 
 
 /**
@@ -28,13 +28,13 @@ import org.matsim.core.events.PersonEvent;
 public interface EventFilter {
 	/**
 	 * judges whether the PersonEvent
-	 * ({@link org.matsim.core.events.PersonEvent}) will be processed or not
+	 * ({@link org.matsim.core.events.PersonEventImpl}) will be processed or not
 	 *
 	 * @param event -
 	 *            which is being judged
 	 * @return true if the event meets the criterion of the implementation
 	 */
-	boolean judge(PersonEvent event);
+	boolean judge(PersonEventImpl event);
 
 
 }

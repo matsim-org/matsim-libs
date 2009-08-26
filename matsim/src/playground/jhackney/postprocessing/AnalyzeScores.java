@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
@@ -89,7 +89,7 @@ public class AnalyzeScores {
 		config.socnetmodule().setInDirName(ScenarioConfig.getSNInDir());
 		
 		SocialNetwork snet=new SocialNetwork(plans);
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		EventsMapStartEndTimes epp;
 		MakeTimeWindowsFromEvents teo=null;
 		LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats=null;

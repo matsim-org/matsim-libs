@@ -20,8 +20,8 @@
 
 package org.matsim.core.events.handler;
 
-import org.matsim.core.events.AgentMoneyEvent;
+import org.matsim.core.events.AgentMoneyEventImpl;
 
 public interface AgentMoneyEventHandler extends EventHandler {
-	public void handleEvent (AgentMoneyEvent event);
+	public void handleEvent (AgentMoneyEventImpl event);
 }

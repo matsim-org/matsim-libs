@@ -22,10 +22,10 @@ package org.matsim.planomat.costestimators;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.BasicEventImpl;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -65,14 +65,14 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 
 		double depDelay = 0.0;
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		DepartureDelayAverageCalculator testee = new DepartureDelayAverageCalculator(network, TIME_BIN_SIZE);
 		events.addHandler(testee);
 		events.printEventHandlers();
 
 		// this gives a delay of 36s
-		AgentDepartureEvent depEvent = new AgentDepartureEvent(6.01 * 3600, PERSON_ID, LINK_ID);
-		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(6.02 * 3600, PERSON_ID, LINK_ID);
+		AgentDepartureEventImpl depEvent = new AgentDepartureEventImpl(6.01 * 3600, PERSON_ID, LINK_ID);
+		LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(6.02 * 3600, PERSON_ID, LINK_ID);
 
 		for (BasicEventImpl event : new BasicEventImpl[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
@@ -82,8 +82,8 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		assertEquals(depDelay, 36.0, EPSILON);
 
 		// let's add another delay of 72s, should result in an average of 54s
-		depEvent = new AgentDepartureEvent(6.02 * 3600, PERSON_ID, LINK_ID);
-		leaveEvent = new LinkLeaveEvent(6.04 * 3600, PERSON_ID, LINK_ID);
+		depEvent = new AgentDepartureEventImpl(6.02 * 3600, PERSON_ID, LINK_ID);
+		leaveEvent = new LinkLeaveEventImpl(6.04 * 3600, PERSON_ID, LINK_ID);
 
 		for (BasicEventImpl event : new BasicEventImpl[]{depEvent, leaveEvent}) {
 			events.processEvent(event);

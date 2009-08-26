@@ -27,7 +27,7 @@ import java.util.Date;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.population.ActivityImpl;
@@ -42,7 +42,7 @@ public class ItsumoSim extends ExternalMobsim {
 
 	protected static final String CONFIG_MODULE = "itsumo";
 
-	public ItsumoSim(final PopulationImpl population, final Events events) {
+	public ItsumoSim(final PopulationImpl population, final EventsImpl events) {
 		super(population, events);
 		System.out.println("\n##################################################################################################\n" +
 				"#   REMINDER - Header in writeItsumoConfig has to be changed\n" +

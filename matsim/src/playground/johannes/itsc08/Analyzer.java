@@ -47,9 +47,9 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
@@ -76,9 +76,9 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 	
 	private Set<PlanImpl> safePlans;
 	
-	private HashMap<PersonImpl, AgentDepartureEvent> events;
+	private HashMap<PersonImpl, AgentDepartureEventImpl> events;
 	
-	private HashMap<PersonImpl, AgentDepartureEvent> eventsReturn;
+	private HashMap<PersonImpl, AgentDepartureEventImpl> eventsReturn;
 	
 	private HashMap<PersonImpl, Double> traveltimes;
 	
@@ -149,8 +149,8 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		riskyTriptime = 0;
 		safeTriptime = 0;
 		returnTripTime = 0;
-		events = new HashMap<PersonImpl, AgentDepartureEvent>();
-		eventsReturn = new HashMap<PersonImpl, AgentDepartureEvent>();
+		events = new HashMap<PersonImpl, AgentDepartureEventImpl>();
+		eventsReturn = new HashMap<PersonImpl, AgentDepartureEventImpl>();
 		traveltimes = new HashMap<PersonImpl, Double>();
 		
 		
@@ -257,7 +257,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			return String.valueOf(val);
 	}
 
-	public void handleEvent(LinkEnterEvent event) { 
+	public void handleEvent(LinkEnterEventImpl event) { 
 		if(event.getLink().getId().toString().equals("4"))
 			riskyUsers.add(event.getPerson());
 		else if(event.getLink().getId().toString().equals("5"))
@@ -305,15 +305,15 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		return scoresum/(double)persons.size();
 	}
 	
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEventImpl event) {
 		if(event.getLinkId().toString().equals("1"))
 			events.put(event.getPerson(), event);
 		else
 			eventsReturn.put(event.getPerson(), event);
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
-		AgentDepartureEvent e = events.get(event.getPerson());
+	public void handleEvent(AgentArrivalEventImpl event) {
+		AgentDepartureEventImpl e = events.get(event.getPerson());
 		if(e != null) {
 			events.remove(event.getPerson());
 			double triptime = event.getTime() - e.getTime();

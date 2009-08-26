@@ -32,8 +32,8 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -55,7 +55,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 
 	private int hour = 0;
 	private Map<Id,Map<Id,Tuple<Double,Integer>>> ttimeMatrix = new HashMap<Id, Map<Id,Tuple<Double,Integer>>>();
-	private final Map<String,AgentDepartureEvent> departures = new HashMap<String,AgentDepartureEvent>();
+	private final Map<String,AgentDepartureEventImpl> departures = new HashMap<String,AgentDepartureEventImpl>();
 	
 	private final Map<String,String> matrix = new TreeMap<String, String>();
 	
@@ -230,12 +230,12 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	// event handlers
 	//////////////////////////////////////////////////////////////////////
 	
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEventImpl event) {
 		departures.put(event.getPersonId().toString(),event);
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
-		AgentDepartureEvent dEvent = departures.remove(event.getPersonId().toString());
+	public void handleEvent(AgentArrivalEventImpl event) {
+		AgentDepartureEventImpl dEvent = departures.remove(event.getPersonId().toString());
 		if (dEvent == null) throw new RuntimeException("Missing AgentDepartureEvent for AgentArrivalEvent: " + event.toString());
 		else if (event.getTime() < hour*3600) {
 			throw new RuntimeException("At hour "+hour+": AgentArrivalEvent too early! ("+event.toString()+")");

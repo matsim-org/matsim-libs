@@ -41,7 +41,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -69,7 +69,7 @@ public class ExeViaListener {
 	public static class ResetableMobsimControler extends Controler{
 		protected boolean useResetable = true;
 		
-		public static class MyEvents extends Events{
+		public static class MyEvents extends EventsImpl{
 			List<BasicEvent> events = new ArrayList<BasicEvent>();
 
 			@Override
@@ -106,7 +106,7 @@ public class ExeViaListener {
 			}
 			
 			boolean simIsFinished = false;
-			Events events = this.events;
+			EventsImpl events = this.events;
 			this.events = new MyEvents();
 
 			Gbl.startMeasurement();
@@ -151,7 +151,7 @@ QueueSimulationAfterSimStepListener {
 	private QueueNetwork queueNetwork;
 	protected OnTheFlyServer myOTFServer;
 	private PopulationImpl population;
-	private Events events;
+	private EventsImpl events;
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Controler cont = event.getControler();

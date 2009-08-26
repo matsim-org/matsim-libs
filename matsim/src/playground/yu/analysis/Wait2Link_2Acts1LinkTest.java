@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.events.AgentWait2LinkEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentWait2LinkEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -152,7 +152,7 @@ public class Wait2Link_2Acts1LinkTest {
 			this.overlapCount = 0;
 		}
 
-		public void handleEvent(final AgentWait2LinkEvent event) {
+		public void handleEvent(final AgentWait2LinkEventImpl event) {
 			for (AgentLinkPair alp : this.agentLinksPairs)
 				if (alp.agentId.equals(event.getPersonId().toString())
 						&& alp.linkId.equals(event.getLinkId().toString())) {
@@ -211,7 +211,7 @@ public class Wait2Link_2Acts1LinkTest {
 		System.out.println("there is " + sal.getPersonCount() + " persons, "
 				+ sal.getActLocCount() + " 2Acts1Link-s!");
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 
 		Wait2Link w2l = new Wait2Link(sal.getAgentLinks(), outputFilename);
 		events.addHandler(w2l);

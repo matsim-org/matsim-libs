@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneEvent
+ * AgentEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,57 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.events;
 
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.AgentEvent;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
+public abstract class AgentEventImpl extends PersonEventImpl implements AgentEvent {
 
-/**
- * @author dgrether
- *
- */
-public abstract class LaneEvent extends LinkEvent {
+	public static final String ATTRIBUTE_LINK = "link";	
 
-	public static final String ATTRIBUTE_LANE = "lane";
-	
-	private final Id laneId;
-	
+	private LegImpl leg;
 
-	/**
-	 * @param time
-	 * @param agent
-	 * @param link
-	 * @param laneId 
-	 */
-	public LaneEvent(double time, PersonImpl agent, LinkImpl link, Id laneId) {
-		super(time, agent, link);
-		this.laneId = laneId;
+	private final Id linkId;
+
+	AgentEventImpl(final double time, final PersonImpl agent, final Link link, final LegImpl leg) {
+		super(time, agent);
+		this.linkId = link.getId();
+		this.leg = leg;
 	}
-	
-	/**
-	 * @param time
-	 * @param agentId
-	 * @param linkId
-	 */
-	public LaneEvent(double time, Id agentId, Id linkId, Id laneId) {
-		super(time, agentId, linkId);
-		this.laneId = laneId;
+
+	AgentEventImpl(final double time, final Id agentId, final Id linkId) {
+		super(time, agentId);
+		this.linkId = linkId;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_LANE, this.laneId.toString());
+		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
 		return attr;
 	}
 
-	public Id getLaneId() {
-		return this.laneId;
+	public LegImpl getLeg() {
+		return this.leg;
 	}
-
-
+	
+	public Id getLinkId() {
+		return this.linkId;
+	}
+	
 }

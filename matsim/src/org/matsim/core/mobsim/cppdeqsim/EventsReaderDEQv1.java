@@ -33,21 +33,21 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentWait2LinkEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.BasicEventImpl;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 
 public class EventsReaderDEQv1 {
 
-	private final Events events;
+	private final EventsImpl events;
 
 	/*package*/ final static Logger log = Logger.getLogger(EventsReaderDEQv1.class);
 
-	public EventsReaderDEQv1(final Events events) {
+	public EventsReaderDEQv1(final EventsImpl events) {
 		this.events = events;
 	}
 
@@ -159,19 +159,19 @@ public class EventsReaderDEQv1 {
 
 		switch (flag) {
 			case 2:
-				event = new LinkLeaveEvent(time, new IdImpl(agentID), new IdImpl(linkID));
+				event = new LinkLeaveEventImpl(time, new IdImpl(agentID), new IdImpl(linkID));
 				break;
 			case 5:
-				event = new LinkEnterEvent(time, new IdImpl(agentID), new IdImpl(linkID));
+				event = new LinkEnterEventImpl(time, new IdImpl(agentID), new IdImpl(linkID));
 				break;
 			case 4:
-				event = new AgentWait2LinkEvent(time, new IdImpl(agentID), new IdImpl(linkID));
+				event = new AgentWait2LinkEventImpl(time, new IdImpl(agentID), new IdImpl(linkID));
 				break;
 			case 6:
-				event = new AgentDepartureEvent(time, new IdImpl(agentID), new IdImpl(linkID));
+				event = new AgentDepartureEventImpl(time, new IdImpl(agentID), new IdImpl(linkID));
 				break;
 			case 0:
-				event = new AgentArrivalEvent(time, new IdImpl(agentID), new IdImpl(linkID));
+				event = new AgentArrivalEventImpl(time, new IdImpl(agentID), new IdImpl(linkID));
 				break;
 			default:
 				throw new RuntimeException("unknown event type: " + flag);

@@ -25,8 +25,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.ActivityEndEvent;
-import org.matsim.core.events.ActivityStartEvent;
+import org.matsim.core.events.ActivityEndEventImpl;
+import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.facilities.ActivityFacilities;
@@ -70,7 +70,7 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 	 * Add an arrival event in "FacilityLoad" for every start of an activity
 	 * Home activities are excluded.
 	 */
-	public void handleEvent(final ActivityStartEvent event) {
+	public void handleEvent(final ActivityStartEventImpl event) {
 		ActivityFacility facility = event.getAct().getFacility();
 		if (!(event.getAct().getType().startsWith("h") || event.getAct().getType().startsWith("tta"))) {
 			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addArrival(event.getTime());
@@ -81,7 +81,7 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 	 * Add a departure event in "FacilityLoad" for every ending of an activity
 	 * Home activities are excluded
 	 */
-	public void handleEvent(final ActivityEndEvent event) {
+	public void handleEvent(final ActivityEndEventImpl event) {
 		ActivityFacility facility = event.getAct().getFacility();
 		if (!(event.getAct().getType().startsWith("h") || event.getAct().getType().startsWith("tta"))) {
 			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addDeparture(event.getTime());

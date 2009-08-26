@@ -20,7 +20,7 @@
 package playground.dgrether.signalVis;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.scenario.ScenarioLoader;
 
 
@@ -60,7 +60,7 @@ public class FourWaysVis {
 		ScenarioLoader loader = new ScenarioLoader(scenario);
 		loader.loadScenario();
 		
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		
 		
 		DgOnTheFlyQueueSimQuad client = new DgOnTheFlyQueueSimQuad(scenario, events);

@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -56,7 +56,7 @@ public class CreateKnowledgeForDatabase {
 	private double[] dijkstraCostFactors = {1.25};
 	private int parallelThreads = 2;
 	private ReplanningQueueSimulation sim;
-	private Events events;
+	private EventsImpl events;
 	private LinkVehiclesCounter linkVehiclesCounter;
 	
 	private final String dtdFileName = null;
@@ -187,7 +187,7 @@ public class CreateKnowledgeForDatabase {
 	
 	private void initSim()
 	{
-		events = new Events();
+		events = new EventsImpl();
 		sim = new ReplanningQueueSimulation(network, population, events);
 	}
 	

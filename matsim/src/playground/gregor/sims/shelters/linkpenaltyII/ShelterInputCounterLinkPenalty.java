@@ -5,10 +5,10 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.events.AgentMoneyEvent;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.AgentMoneyEventImpl;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
@@ -24,12 +24,12 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, Li
 	private final HashMap<Id,LinkInfo> linkInfos = new HashMap<Id, LinkInfo>();
 	private final HashMap<Id, Building> shelterLinkMapping;
 
-	private final Events events;
+	private final EventsImpl events;
 	
 	private int it;
 
 
-	public ShelterInputCounterLinkPenalty(NetworkLayer network, HashMap<Id,Building> shelterLinkMapping, Events events) {
+	public ShelterInputCounterLinkPenalty(NetworkLayer network, HashMap<Id,Building> shelterLinkMapping, EventsImpl events) {
 
 		this.events = events;
 		this.shelterLinkMapping = shelterLinkMapping;
@@ -53,7 +53,7 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, Li
 		return 0.;
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(LinkEnterEventImpl event) {
 		LinkInfo li = this.linkInfos.get(event.getLinkId()); 
 		if (li != null) {
 			li.count++;
@@ -70,14 +70,14 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, Li
 			if (li.count > li.space) {
 //				double pen = Math.pow((event.getTime() - li.blockingTime),PENALTY_COEF) / -600;
 				double pen = 30.*3600./-600.;
-				AgentMoneyEvent e = new AgentMoneyEvent(event.getTime(),event.getPersonId(),pen);
+				AgentMoneyEventImpl e = new AgentMoneyEventImpl(event.getTime(),event.getPersonId(),pen);
 				this.events.processEvent(e);
 			}
 			
 		}
 	}
 	
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEventImpl event) {
 //		LinkInfo li = this.linkInfos.get(event.getLinkId()); 
 //		if (li != null) {
 //			li.count++;

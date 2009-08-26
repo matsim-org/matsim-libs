@@ -24,7 +24,7 @@ import java.rmi.RemoteException;
 import java.util.UUID;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimEngine;
@@ -85,7 +85,7 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 		this.myOTFServer.updateStatus(time);
 	}
 
-	public OnTheFlyQueueSimQuad(final ScenarioImpl scenario, final Events events) {
+	public OnTheFlyQueueSimQuad(final ScenarioImpl scenario, final EventsImpl events) {
 		super(scenario, events);
 
 		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");

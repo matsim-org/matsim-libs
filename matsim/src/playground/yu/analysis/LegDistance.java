@@ -28,11 +28,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentEvent;
-import org.matsim.core.events.AgentStuckEvent;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentEventImpl;
+import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
@@ -79,7 +79,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		return bin;
 	}
 
-	protected void handleEventIntern(AgentEvent ae) {
+	protected void handleEventIntern(AgentEventImpl ae) {
 		int binIdx = getBinIndex(ae.getTime());
 		Double distance = this.distances.remove(ae.getPersonId().toString());
 		if (distance != null) {
@@ -119,7 +119,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		this.ppl = ppl;
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(LinkEnterEventImpl event) {
 		String linkId = event.getLinkId().toString();
 		LinkImpl l = this.network.getLink(linkId);
 		String agentId = event.getPersonId().toString();
@@ -143,11 +143,11 @@ public class LegDistance implements LinkEnterEventHandler,
 		}
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEventImpl event) {
 		handleEventIntern(event);
 	}
 
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(AgentStuckEventImpl event) {
 		handleEventIntern(event);
 	}
 
@@ -241,7 +241,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		// new MatsimPopulationReader(population).readFile(plansFilename);
 		// world.setPopulation(population);
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 
 		LegDistance legDist = new LegDistance(300, network);
 		events.addHandler(legDist);

@@ -21,7 +21,7 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.HashMap;
 
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 
 /**
  * The micro-simulation parameters.
@@ -75,7 +75,7 @@ public class SimulationParameters {
 
 	// OUTPUT
 	// The thread for processing the events
-	private static Events processEventThread = null;
+	private static EventsImpl processEventThread = null;
 
 	// METHODS
 	public static boolean isGC_MESSAGES() {
@@ -142,11 +142,11 @@ public class SimulationParameters {
 		SimulationParameters.squeezeTime = squeezeTime;
 	}
 
-	public static Events getProcessEventThread() {
+	public static EventsImpl getProcessEventThread() {
 		return processEventThread;
 	}
 
-	public static void setProcessEventThread(Events processEventThread) {
+	public static void setProcessEventThread(EventsImpl processEventThread) {
 		SimulationParameters.processEventThread = processEventThread;
 	}
 

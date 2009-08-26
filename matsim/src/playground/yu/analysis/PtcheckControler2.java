@@ -36,7 +36,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -95,7 +95,7 @@ public class PtcheckControler2 extends Controler {
 			NetworkLayer network = ctl.getNetwork();
 			cas = new CalcNetAvgSpeed(network);
 			ctpf = new CalcTrafficPerformance(network);
-			Events events = ctl.getEvents();
+			EventsImpl events = ctl.getEvents();
 			events.addHandler(cas);
 			events.addHandler(ctpf);
 		}
@@ -170,7 +170,7 @@ public class PtcheckControler2 extends Controler {
 
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			Controler c = event.getControler();
-			Events es = c.getEvents();
+			EventsImpl es = c.getEvents();
 			NetworkLayer nl = c.getNetwork();
 			PopulationImpl ps = c.getPopulation();
 			if (event.getIteration() == c.getLastIteration()) {

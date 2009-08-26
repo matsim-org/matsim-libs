@@ -20,7 +20,7 @@
 
 package playground.toronto.example;
 
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 
 
@@ -29,7 +29,7 @@ public class ReadEvents {
 	public static void main(String[] args) {
 		// Instance which takes over line by line of the events file
 		// and throws events of added types
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		
 		// An example of an events handler which takes
 		// "LinkLeaveEvents" to calculate total volumes per link of the network

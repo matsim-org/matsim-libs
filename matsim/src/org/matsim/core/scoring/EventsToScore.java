@@ -32,8 +32,8 @@ import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.core.events.ActivityStartEvent;
-import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.ActivityStartEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -72,7 +72,7 @@ public class EventsToScore implements BasicAgentArrivalEventHandler, AgentDepart
 		this.learningRate = learningRate;
 	}
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEventImpl event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
 		if (sf != null) {
 			sf.startLeg(event.getTime(), event.getLeg());
@@ -100,7 +100,7 @@ public class EventsToScore implements BasicAgentArrivalEventHandler, AgentDepart
 		}
 	}
 
-	public void handleEvent(final ActivityStartEvent event) {
+	public void handleEvent(final ActivityStartEventImpl event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
 		if (sf != null) {
 			sf.startActivity(event.getTime(), event.getAct());

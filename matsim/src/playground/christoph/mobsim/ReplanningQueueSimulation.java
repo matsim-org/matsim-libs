@@ -26,7 +26,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -53,7 +53,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	protected final PriorityBlockingQueue<DriverAgent> offsetActivityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
 	protected final double timeOffset = 120.0;
 	
-	public ReplanningQueueSimulation(final NetworkLayer network, final PopulationImpl population, final Events events)
+	public ReplanningQueueSimulation(final NetworkLayer network, final PopulationImpl population, final EventsImpl events)
 	{
 		super(network, population, events);
 		

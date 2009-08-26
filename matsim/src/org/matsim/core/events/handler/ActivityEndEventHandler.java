@@ -21,9 +21,9 @@
 package org.matsim.core.events.handler;
 
 import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
-import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityEndEventImpl;
 
 /** @deprecated use {@link BasicActivityEndEventHandler} */
 public interface ActivityEndEventHandler extends EventHandler {
-	public void handleEvent (ActivityEndEvent event);
+	public void handleEvent (ActivityEndEventImpl event);
 }

@@ -10,7 +10,7 @@ import java.io.IOException;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -47,7 +47,7 @@ public class CountsSimCompareDayTest {
 		new MatsimCountsReader(counts).readFile(countsFilename);
 
 		System.out.println("  reading the events...");
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, network);
 		events.addHandler(va);
 		new MatsimEventsReader(events).readFile(eventsFilename);

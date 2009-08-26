@@ -33,7 +33,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.basic.v01.network.BasicLegImpl;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
@@ -198,7 +198,7 @@ public class Wardrop {
 	{
 		// Instance which takes over line by line of the events file
 		// and throws events of added types
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		
 		// An example of an events handler which takes
 		// "LinkLeaveEvents" to calculate total volumes per link of the network

@@ -8,8 +8,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
@@ -84,7 +84,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	/**
 	 * String - AgentID LinkEnterEvent - an event of LinkEnterEvent
 	 */
-	private Map<String, LinkEnterEvent> enters = new HashMap<String, LinkEnterEvent>();
+	private Map<String, LinkEnterEventImpl> enters = new HashMap<String, LinkEnterEventImpl>();
 
 	protected long timeBinMinimum = -1;
 
@@ -110,15 +110,15 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	/*---------------------------OVERRIDE METHODS--------------------------*/
 	@Override
 	public void handleEvent(BasicEvent event) {
-		if (event instanceof LinkEnterEvent) { // event.getClass().equals(LinkEnterEvent.class))
+		if (event instanceof LinkEnterEventImpl) { // event.getClass().equals(LinkEnterEvent.class))
 												// {
-			this.enters.put(((LinkEnterEvent) event).getPersonId().toString(), (LinkEnterEvent) event);
-		} else if (event instanceof LinkLeaveEvent) { // event.getClass().equals(LinkLeaveEvent.class))
+			this.enters.put(((LinkEnterEventImpl) event).getPersonId().toString(), (LinkEnterEventImpl) event);
+		} else if (event instanceof LinkLeaveEventImpl) { // event.getClass().equals(LinkLeaveEvent.class))
 														// {
-			String agentId = ((LinkLeaveEvent) event).getPersonId().toString();
+			String agentId = ((LinkLeaveEventImpl) event).getPersonId().toString();
 			if (this.enters.containsKey(agentId))
 				if (this.enters.get(agentId).getLinkId().toString()
-						.equals(((LinkLeaveEvent) event).getLinkId().toString())) {
+						.equals(((LinkLeaveEventImpl) event).getLinkId().toString())) {
 					count();
 					count();
 					compute(this.enters.remove(agentId), event.getTime());
@@ -255,7 +255,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	 *            the point of time of the event called "leaving a link" with
 	 *            unit second
 	 */
-	public abstract void compute(LinkEnterEvent enter, double leaveTime_s);
+	public abstract void compute(LinkEnterEventImpl enter, double leaveTime_s);
 
 	/**
 	 * This function does nothing and must be overridden by subclasses and

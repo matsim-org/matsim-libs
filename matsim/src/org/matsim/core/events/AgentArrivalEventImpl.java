@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AgentStuckEvent.java
+ * AgentArrivalEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,20 +21,20 @@
 package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
-public class AgentStuckEvent extends AgentEvent implements BasicAgentStuckEvent {
+public class AgentArrivalEventImpl extends AgentEventImpl implements AgentArrivalEvent {
 
-	public static final String EVENT_TYPE = "stuckAndAbort";
+	public static final String EVENT_TYPE = "arrival";
 
-	public AgentStuckEvent(final double time, final PersonImpl agent, final LinkImpl link, final LegImpl leg) {
+	public AgentArrivalEventImpl(final double time, final PersonImpl agent, final Link link, final LegImpl leg) {
 		super(time, agent, link, leg);
 	}
 
-	public AgentStuckEvent(final double time, final Id agentId, final Id linkId) {
+	public AgentArrivalEventImpl(final double time, final Id agentId, final Id linkId) {
 		super(time, agentId, linkId);
 	}
 

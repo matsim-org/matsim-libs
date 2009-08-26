@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -83,7 +83,7 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 
 	}
 
-	public OnTheFlyQueueSimQuadLinkSpeed(final NetworkLayer net, final PopulationImpl plans, final Events events) {
+	public OnTheFlyQueueSimQuadLinkSpeed(final NetworkLayer net, final PopulationImpl plans, final EventsImpl events) {
 		super(net, plans, events);
 	}
 
@@ -143,7 +143,7 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 		plansReader.readFile(popFileName);
 		System.out.println("agents read: " + population.getPersons().size());
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 
 		OnTheFlyQueueSimQuadLinkSpeed sim = new OnTheFlyQueueSimQuadLinkSpeed(net, population, events);
 

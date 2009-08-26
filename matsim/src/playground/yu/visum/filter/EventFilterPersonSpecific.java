@@ -9,7 +9,7 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.PersonEvent;
+import org.matsim.core.events.PersonEventImpl;
 
 /**
  * A EventFilterPersonSpecific lets the events, whose agentId belong to the
@@ -60,8 +60,8 @@ public class EventFilterPersonSpecific extends EventFilterA {
 	 */
 	@Override
 	public boolean judge(BasicEvent event) {
-		if (event instanceof PersonEvent) {
-			return this.personIds.contains(new IdImpl(((PersonEvent) event).getPersonId().toString()));
+		if (event instanceof PersonEventImpl) {
+			return this.personIds.contains(new IdImpl(((PersonEventImpl) event).getPersonId().toString()));
 		}
 		return false;
 	}

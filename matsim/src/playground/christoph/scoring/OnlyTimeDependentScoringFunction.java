@@ -20,7 +20,7 @@
 
 package playground.christoph.scoring;
 
-import org.matsim.core.events.AgentMoneyEvent;
+import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -115,7 +115,7 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 
 	/**
 	 * Adds the specified amount of utility to the agent's score. This is mostly
-	 * used for handling {@link AgentMoneyEvent}s, allowing other parts of the
+	 * used for handling {@link AgentMoneyEventImpl}s, allowing other parts of the
 	 * code to influence an agent's score.
 	 *
 	 * @param amount amount to be added to the agent's score

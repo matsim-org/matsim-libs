@@ -64,7 +64,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -150,7 +150,7 @@ public class Controler {
 	private final String configFileName;
 	private final String dtdFileName;
 
-	protected Events events = null;
+	protected EventsImpl events = null;
 	protected NetworkLayer network = null;
 	protected PopulationImpl population = null;
 	private Counts counts = null;
@@ -349,7 +349,7 @@ public class Controler {
 				this.events = new ParallelEvents(numOfThreads);
 			}
 		} else {
-			this.events = new Events();
+			this.events = new EventsImpl();
 		}
 	}
 
@@ -1053,7 +1053,7 @@ public class Controler {
 		return this.population;
 	}
 
-	public final Events getEvents() {
+	public final EventsImpl getEvents() {
 		return this.events;
 	}
 

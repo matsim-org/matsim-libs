@@ -23,7 +23,7 @@ package playground.kai.usecases.mentalmodule;
  */
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -40,7 +40,7 @@ public class MyStrategy extends PlanStrategy {
 		
 		addStrategyModule(mod) ;
 		
-		Events events = controler.getEvents() ;
+		EventsImpl events = controler.getEvents() ;
 		events.addHandler( mod ) ;
 		
 	}

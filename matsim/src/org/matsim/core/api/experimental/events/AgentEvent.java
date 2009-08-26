@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicAgentEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.events;
+package org.matsim.core.api.experimental.events;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.api.basic.v01.events.BasicAgentEvent;
 
-/**
- * @author dgrether
- */
-public class AgentReplanEvent extends PersonEvent {
 
-	public static final String EVENT_TYPE = "replan";
-
-	private final NetworkRouteWRefs replannedRoute;
-
-	public AgentReplanEvent(final double time, final Id agentId, final NetworkRouteWRefs alternativeRoute) {
-		super(time, agentId);
-		this.replannedRoute = alternativeRoute;
-	}
-
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-
-	public NetworkRouteWRefs getReplannedRoute() {
-		return this.replannedRoute;
-	}
+public interface AgentEvent extends BasicAgentEvent {
 
 }

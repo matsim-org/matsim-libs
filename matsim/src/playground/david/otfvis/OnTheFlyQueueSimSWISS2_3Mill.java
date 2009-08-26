@@ -21,7 +21,7 @@
 package playground.david.otfvis;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -45,7 +45,7 @@ public class OnTheFlyQueueSimSWISS2_3Mill {
 		QueueSimulation sim;
 		NetworkLayer net;
 		PopulationImpl population;
-		Events events;
+		EventsImpl events;
 
 		String netFileName = "../../tmp/studies/ivtch/network.xml";
 //		String netFileName = "../../tmp/network.xml.gz";
@@ -69,7 +69,7 @@ public class OnTheFlyQueueSimSWISS2_3Mill {
 		PopulationReader plansReader = new MatsimPopulationReader(population, net);
 		plansReader.readFile(popFileName);
 
-		events = new Events();
+		events = new EventsImpl();
 
 
 		config.simulation().setSnapshotFormat("otfvis");

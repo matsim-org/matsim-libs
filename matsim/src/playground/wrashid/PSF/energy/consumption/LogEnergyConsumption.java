@@ -9,11 +9,11 @@ import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.ActivityEndEvent;
-import org.matsim.core.events.ActivityStartEvent;
-import org.matsim.core.events.AgentWait2LinkEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.ActivityEndEventImpl;
+import org.matsim.core.events.ActivityStartEventImpl;
+import org.matsim.core.events.AgentWait2LinkEventImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
@@ -42,7 +42,7 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 	 * 
 	 * @see org.matsim.core.events.handler.LinkEnterEventHandler#handleEvent(org.matsim.core.events.LinkEnterEvent)
 	 */
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(LinkEnterEventImpl event) {
 		Id personId = event.getPersonId();
 
 		EnergyConsumption eConsumption = energyConsumption.get(personId);
@@ -55,7 +55,7 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 
 	}
 
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEventImpl event) {
 		Id personId = event.getPersonId();
 
 		EnergyConsumption eConsumption = energyConsumption.get(personId);
@@ -85,7 +85,7 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 	 * 
 	 * @see org.matsim.core.events.handler.AgentWait2LinkEventHandler#handleEvent(org.matsim.core.events.AgentWait2LinkEvent)
 	 */
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(AgentWait2LinkEventImpl event) {
 		Id personId = event.getPersonId();
 		if (!energyConsumption.containsKey(personId)) {
 			energyConsumption.put(personId, new EnergyConsumption());

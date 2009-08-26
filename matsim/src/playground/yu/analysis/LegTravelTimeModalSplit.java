@@ -30,9 +30,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
@@ -122,7 +122,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		this.toll = toll;
 	}
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEventImpl event) {
 		if (toll != null) {
 			// only inhabitant from Kanton
 			if (TollTools.isInRange(plans.getPersons().get(event.getPersonId())
@@ -138,7 +138,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		this.tmpDptTimes.clear();
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEventImpl event) {
 		double arrTime = event.getTime();
 		String agentId = event.getPersonId().toString();
 		if (toll == null)
@@ -354,7 +354,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 			e.printStackTrace();
 		}
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 
 		LegTravelTimeModalSplit lttms = new LegTravelTimeModalSplit(population
 		// ,tollReader.getScheme()

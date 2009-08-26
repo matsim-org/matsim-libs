@@ -23,7 +23,7 @@ package org.matsim.core.replanning.modules;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -70,7 +70,7 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		// - set possible modes such that a scenario consisting only of "car" and "pt" modes is generated
 		config.planomat().setPossibleModes("car,pt");
 
-		Events emptyEvents = new Events();
+		EventsImpl emptyEvents = new EventsImpl();
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, config.charyparNagelScoring());

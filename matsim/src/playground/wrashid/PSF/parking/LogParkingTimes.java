@@ -10,9 +10,9 @@ import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.events.ActivityEndEvent;
-import org.matsim.core.events.ActivityStartEvent;
-import org.matsim.core.events.AgentMoneyEvent;
+import org.matsim.core.events.ActivityEndEventImpl;
+import org.matsim.core.events.ActivityStartEventImpl;
+import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 
@@ -26,7 +26,7 @@ public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEv
 		this.controler = controler;
 	}
 
-	public void handleEvent(ActivityStartEvent event) {
+	public void handleEvent(ActivityStartEventImpl event) {
 		// log the (start) time when the car departs
 		Id personId = event.getPersonId();
 		if (event.getActType().equalsIgnoreCase("parkingDeparture")) {
@@ -58,7 +58,7 @@ public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEv
 
 	}
 
-	public void handleEvent(ActivityEndEvent event) {
+	public void handleEvent(ActivityEndEventImpl event) {
 		// log the (end) time when the car has been parked
 		Id personId = event.getPersonId();
 		if (event.getActType().equalsIgnoreCase("parkingArrival")) {

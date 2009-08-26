@@ -40,15 +40,15 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.core.events.ActivityEndEvent;
-import org.matsim.core.events.ActivityStartEvent;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentMoneyEvent;
-import org.matsim.core.events.AgentStuckEvent;
-import org.matsim.core.events.AgentWait2LinkEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.ActivityEndEventImpl;
+import org.matsim.core.events.ActivityStartEventImpl;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.AgentMoneyEventImpl;
+import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.core.events.AgentWait2LinkEventImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -153,38 +153,38 @@ public class EventWriterTXT implements EventWriter, BasicActivityEndEventHandler
 	}
 
 	public void handleEvent(BasicActivityEndEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 8, ActivityEndEvent.EVENT_TYPE + " " + event.getActType());
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 8, ActivityEndEventImpl.EVENT_TYPE + " " + event.getActType());
 	}
 
 	public void handleEvent(BasicActivityStartEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 7, ActivityStartEvent.EVENT_TYPE + " " + event.getActType());
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 7, ActivityStartEventImpl.EVENT_TYPE + " " + event.getActType());
 	}
 
 	public void handleEvent(BasicAgentArrivalEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 0, AgentArrivalEvent.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 0, AgentArrivalEventImpl.EVENT_TYPE);
 	}
 
 	public void handleEvent(BasicAgentDepartureEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 6, AgentDepartureEvent.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 6, AgentDepartureEventImpl.EVENT_TYPE);
 	}
 	
 	public void handleEvent(BasicAgentStuckEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 3, AgentStuckEvent.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 3, AgentStuckEventImpl.EVENT_TYPE);
 	}
 
-	public void handleEvent(AgentMoneyEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), null, 9, AgentMoneyEvent.EVENT_TYPE + "\t" + event.getAmount());
+	public void handleEvent(AgentMoneyEventImpl event) {
+		writeLine(event.getTime(), event.getPersonId(), null, 9, AgentMoneyEventImpl.EVENT_TYPE + "\t" + event.getAmount());
 	}
 
 	public void handleEvent(BasicAgentWait2LinkEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 4, AgentWait2LinkEvent.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 4, AgentWait2LinkEventImpl.EVENT_TYPE);
 	}
 
 	public void handleEvent(BasicLinkEnterEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 5, LinkEnterEvent.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 5, LinkEnterEventImpl.EVENT_TYPE);
 	}
 
 	public void handleEvent(BasicLinkLeaveEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 2, LinkLeaveEvent.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 2, LinkLeaveEventImpl.EVENT_TYPE);
 	}
 }

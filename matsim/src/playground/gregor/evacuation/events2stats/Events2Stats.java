@@ -32,7 +32,7 @@ import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -51,7 +51,7 @@ public class Events2Stats implements BasicAgentDepartureEventHandler, BasicAgent
 		this.numAgents = 0;
 		this.cumUt = 0;
 		this.numUtilityEvents = 0;
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(this);
 		
 		new EventsReaderTXTv1(events).readFile(eventsFile);

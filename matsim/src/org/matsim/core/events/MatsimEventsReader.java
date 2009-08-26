@@ -38,14 +38,14 @@ import org.xml.sax.SAXException;
  */
 public class MatsimEventsReader {
 
-	private final Events events;
+	private final EventsImpl events;
 
 	/**
 	 * Creates a new reader for MATSim events files.
 	 *
 	 * @param events The Events-object that handles the events.
 	 */
-	public MatsimEventsReader(final Events events) {
+	public MatsimEventsReader(final EventsImpl events) {
 		this.events = events;
 	}
 
@@ -67,11 +67,11 @@ public class MatsimEventsReader {
 
 	private static class XmlEventsReader extends MatsimXmlParser {
 
-		final Events events;
+		final EventsImpl events;
 		private final static String EVENTS_V1 = "events_v1.dtd";
 		private MatsimXmlParser delegate = null;
 
-		public XmlEventsReader(final Events events) {
+		public XmlEventsReader(final EventsImpl events) {
 			this.events = events;
 			this.setValidating(false); // events-files have no DTD, thus they cannot validate
 			setDoctype("events_v1.dtd"); // manually set a doctype, otherwise delegate would not be initialized

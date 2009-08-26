@@ -30,10 +30,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentMoneyEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.AgentMoneyEventImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
@@ -108,7 +108,7 @@ public class SocialCostCalculatorNetworkIII implements SocialCostCalculator, Ite
 	}
 
 	
-	public void handleEvent(final LinkEnterEvent event) {
+	public void handleEvent(final LinkEnterEventImpl event) {
 
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
@@ -136,7 +136,7 @@ public class SocialCostCalculatorNetworkIII implements SocialCostCalculator, Ite
 	
 	
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEventImpl event) {
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
 		ai.enterTime = event.getTime();
@@ -145,7 +145,7 @@ public class SocialCostCalculatorNetworkIII implements SocialCostCalculator, Ite
 //		info.agentsOnLink++;
 	}
 	
-	public void handleEvent(final LinkLeaveEvent event) {
+	public void handleEvent(final LinkLeaveEventImpl event) {
 		
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
@@ -275,7 +275,7 @@ public class SocialCostCalculatorNetworkIII implements SocialCostCalculator, Ite
 				AgentCongestionInfo aci = info.agentsLeftLink.poll();
 				if (aci.timeSlot == i) {
 					Id id = new IdImpl(aci.agentId);
-					AgentMoneyEvent e = new AgentMoneyEvent(currentTimeUncongested,id,scoringCost);
+					AgentMoneyEventImpl e = new AgentMoneyEventImpl(currentTimeUncongested,id,scoringCost);
 					QueueSimulation.getEvents().processEvent(e);					
 				}
 			}

@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.PersonEvent;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.PersonEventImpl;
 
 import playground.dgrether.events.filters.EventFilter;
 
@@ -33,7 +33,7 @@ import playground.dgrether.events.filters.EventFilter;
  * @author dgrether
  *
  */
-public class FilteredEvents extends Events {
+public class FilteredEvents extends EventsImpl {
 
 	private List<EventFilter> filters = new ArrayList<EventFilter>();
 
@@ -58,10 +58,10 @@ public class FilteredEvents extends Events {
 	 */
 	@Override
 	public void processEvent(final BasicEvent event) {
-		if (event instanceof PersonEvent) {
+		if (event instanceof PersonEventImpl) {
 			boolean doProcess = true;
 			for (EventFilter f : this.filters) {
-				if (!f.judge((PersonEvent)event)) {
+				if (!f.judge((PersonEventImpl)event)) {
 					doProcess = false;
 					break;
 				}

@@ -39,7 +39,7 @@ import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -105,9 +105,9 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	private transient PopulationImpl pop = null;
 	public transient ByteArrayOutputStream out = null;
 	public transient QueueNetwork network = null;
-	public transient Events events;
+	public transient EventsImpl events;
 
-	protected OnTheFlyServer(String ReadableName, QueueNetwork network, PopulationImpl population, Events events) throws RemoteException {
+	protected OnTheFlyServer(String ReadableName, QueueNetwork network, PopulationImpl population, EventsImpl events) throws RemoteException {
 		super(0, new SslRMIClientSocketFactory(),	new SslRMIServerSocketFactory());
 		this.userReadableName = ReadableName;
 		this.network = network;
@@ -117,7 +117,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		OTFDataWriter.setServer(this);
 	}
 
-	protected OnTheFlyServer(String ReadableName, QueueNetwork network, PopulationImpl population, Events events, boolean noSSL) throws RemoteException {
+	protected OnTheFlyServer(String ReadableName, QueueNetwork network, PopulationImpl population, EventsImpl events, boolean noSSL) throws RemoteException {
 		super(0);
 		this.userReadableName = ReadableName;
 		this.network = network;
@@ -128,7 +128,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 //	public static boolean useSSL = true;
 	
-	public static OnTheFlyServer createInstance(String ReadableName, QueueNetwork network, PopulationImpl population, Events events, boolean useSSL) {
+	public static OnTheFlyServer createInstance(String ReadableName, QueueNetwork network, PopulationImpl population, EventsImpl events, boolean useSSL) {
 		OnTheFlyServer result = null;
 		
 //		OnTheFlyServer.useSSL = useSSL;

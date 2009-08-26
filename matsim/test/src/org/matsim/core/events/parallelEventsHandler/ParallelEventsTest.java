@@ -3,8 +3,8 @@ package org.matsim.core.events.parallelEventsHandler;
 import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -32,7 +32,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 
 	/** test, if adding and removing a handler works */
 	public void testAddAndRemoveHandler() {
-		Events events = new ParallelEvents(2);
+		EventsImpl events = new ParallelEvents(2);
 
 		// start iteration
 		events.initProcessing();
@@ -41,7 +41,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 		events.addHandler(handler);
 		events.removeHandler(handler);
 
-		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""));
+		LinkLeaveEventImpl linkLeaveEvent = new LinkLeaveEventImpl(0, new IdImpl(""), new IdImpl(""));
 
 		for (int i = 0; i < 100; i++) {
 			events.processEvent(linkLeaveEvent);
@@ -52,7 +52,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 		assertEquals(0, handler.getNumberOfProcessedMessages());
 	}
 
-	private void processEvents(final Events events, final int eventCount,
+	private void processEvents(final EventsImpl events, final int eventCount,
 			final int numberOfHandlers, final int numberOfIterations) {
 
 		Handler1[] handlers = new Handler1[numberOfHandlers];
@@ -62,7 +62,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 			events.addHandler(handlers[i]);
 		}
 
-		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""));
+		LinkLeaveEventImpl linkLeaveEvent = new LinkLeaveEventImpl(0, new IdImpl(""), new IdImpl(""));
 
 		for (int j = 0; j < numberOfIterations; j++) {
 

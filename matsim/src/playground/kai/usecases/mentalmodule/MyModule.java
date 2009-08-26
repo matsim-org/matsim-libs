@@ -17,13 +17,13 @@ import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.PopulationBuilder;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.ActivityEndEvent;
-import org.matsim.core.events.ActivityStartEvent;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentWait2LinkEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.ActivityEndEventImpl;
+import org.matsim.core.events.ActivityStartEventImpl;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.AgentWait2LinkEventImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
@@ -184,27 +184,27 @@ ActivityStartEventHandler
 
 	}
 
-	public void handleEvent(ActivityEndEvent event) {
+	public void handleEvent(ActivityEndEventImpl event) {
 		String str = event.getEventType(); // TODO: String?  Not an enum??
 		Map<String,String> attribs = event.getAttributes() ; // TODO: String?  may be ok ... 
 	}
 
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEventImpl event) {
 	}
 
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(AgentWait2LinkEventImpl event) {
 	}
 
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEventImpl event) {
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(LinkEnterEventImpl event) {
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEventImpl event) {
 	}
 
-	public void handleEvent(ActivityStartEvent event) {
+	public void handleEvent(ActivityStartEventImpl event) {
 	}
 
 	public void reset(int iteration) {

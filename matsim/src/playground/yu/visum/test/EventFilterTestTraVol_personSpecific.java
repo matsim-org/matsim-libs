@@ -23,7 +23,7 @@ package playground.yu.visum.test;
 import java.io.IOException;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -90,7 +90,7 @@ public class EventFilterTestTraVol_personSpecific {
 
 		// events
 		System.out.println("  creating events object... ");
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		System.out.println("  done.");
 
 		System.out.println("  reading plans file... ");

@@ -22,7 +22,7 @@ package org.matsim.core.mobsim.queuesim.listener;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
@@ -36,7 +36,7 @@ public class QueueSimulationAfterSimStepListenerTest extends MatsimTestCase {
 		config.simulation().setStartTime(6.0 * 3600);
 		config.simulation().setEndTime(6.0 * 3600 + 10);
 		ScenarioImpl scenario = new ScenarioLoader(config).loadScenario();
-		QueueSimulation qsim = new QueueSimulation(scenario, new Events());
+		QueueSimulation qsim = new QueueSimulation(scenario, new EventsImpl());
 		
 		MockQueueSimStepListener mockListener = new MockQueueSimStepListener(1.0);
 		qsim.addQueueSimulationListeners(mockListener);
@@ -48,7 +48,7 @@ public class QueueSimulationAfterSimStepListenerTest extends MatsimTestCase {
 		config.simulation().setTimeStepSize(10.0);
 		Gbl.reset(); Gbl.setConfig(config); // reset...
 		scenario = new ScenarioLoader(config).loadScenario();
-		qsim = new QueueSimulation(scenario, new Events());
+		qsim = new QueueSimulation(scenario, new EventsImpl());
 		
 		mockListener = new MockQueueSimStepListener(10.0);
 		qsim.addQueueSimulationListeners(mockListener);

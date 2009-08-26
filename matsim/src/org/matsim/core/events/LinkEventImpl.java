@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneExitEvent
+ * LinkEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,48 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.events;
 
+import java.util.Map;
+
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicLinkEvent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PersonImpl;
 
+public abstract class LinkEventImpl extends PersonEventImpl implements BasicLinkEvent {
 
-/**
- * @author dgrether
- *
- */
-public class LaneLeaveEvent extends LaneEvent {
-	
-	public static final String EVENT_TYPE = "entered lane";
-	
-	public LaneLeaveEvent(double time, PersonImpl agent, LinkImpl link, Id laneId) {
-		super(time, agent, link, laneId);
+	public static final String ATTRIBUTE_LINK = "link";
+
+	private final Id linkId;
+	private transient LinkImpl link;
+
+	LinkEventImpl(final double time, final PersonImpl agent, final LinkImpl link) {
+		super(time, agent);
+		this.link = link;
+		this.linkId = link.getId();
 	}
 
-	public LaneLeaveEvent(double time, Id agentId, Id linkId, Id laneId) {
-		super(time, agentId, linkId, laneId);
+	LinkEventImpl(final double time, final Id agentId, final Id linkId) {
+		super(time, agentId);
+		this.linkId = linkId;
 	}
 
 	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+		return attr;
 	}
-	
+
+	public Id getLinkId() {
+		return this.linkId;
+	}
+
+	/** @deprecated use getLinkId() */
+	public LinkImpl getLink() {
+		return this.link;
+	}
+
 }

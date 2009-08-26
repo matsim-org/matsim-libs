@@ -3,7 +3,7 @@ package playground.wrashid.PHEV.co2emissions;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.NetworkLayer;
 
@@ -25,7 +25,7 @@ public class AllLinkHandler implements LinkLeaveEventHandler {
 		this.network=network;
 	}
 	
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEventImpl event) {
 		if (!co2EmissionsWholeDay.containsKey(event.getLinkId())){
 			co2EmissionsWholeDay.put(event.getLinkId(), 0.0);
 		}

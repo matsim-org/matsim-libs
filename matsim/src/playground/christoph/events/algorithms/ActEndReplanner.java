@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
-import org.matsim.core.events.ActivityEndEvent;
+import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.network.NodeImpl;

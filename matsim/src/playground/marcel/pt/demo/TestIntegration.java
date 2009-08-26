@@ -26,7 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoader;
@@ -57,7 +57,7 @@ public class TestIntegration {
 		scenario.getConfig().scenario().setUseVehicles(true);
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		final Events events = new Events();
+		final EventsImpl events = new EventsImpl();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
 

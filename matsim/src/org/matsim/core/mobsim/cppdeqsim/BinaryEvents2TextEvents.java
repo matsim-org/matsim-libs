@@ -22,13 +22,13 @@ package org.matsim.core.mobsim.cppdeqsim;
 
 import java.io.File;
 
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 
 public class BinaryEvents2TextEvents {
 
 	public static void convert(final String fromFilename, final String toFilename) {
-		final Events events = new Events();
+		final EventsImpl events = new EventsImpl();
 
 		EventWriterTXT ew_txt = new EventWriterTXT(toFilename);
 		events.addHandler(ew_txt);

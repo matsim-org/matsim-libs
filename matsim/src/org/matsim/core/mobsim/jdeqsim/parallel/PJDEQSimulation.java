@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.*;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
@@ -71,7 +71,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 	private int numOfThreads;
 
 	public PJDEQSimulation(NetworkLayer network, PopulationImpl population,
-			Events events, int numOfThreads) {
+			EventsImpl events, int numOfThreads) {
 		super(network, population, events);
 		this.numOfThreads = numOfThreads; // TODO: use this number really...
 		log = Logger.getLogger(JDEQSimulation.class);

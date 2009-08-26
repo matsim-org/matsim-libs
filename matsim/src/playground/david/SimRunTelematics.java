@@ -20,7 +20,7 @@
 
 package playground.david;
 
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -44,7 +44,7 @@ public class SimRunTelematics {
 		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(popFileName);
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(new EventWriterTXT("EventsTelematicsSimWrapper.txt"));
 
 		//TelematicsSimWrapper sim = new TelematicsSimWrapper(netFileName,population, events);

@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.events.AgentMoneyEvent;
+import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -74,7 +74,7 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests if the scoring function correctly handles {@link AgentMoneyEvent}.
+	 * Tests if the scoring function correctly handles {@link AgentMoneyEventImpl}.
 	 * It generates one person with one plan having two activities (home, work)
 	 * and a car-leg in between. It then tests the scoring function by calling
 	 * several methods on an instance of the scoring function with the

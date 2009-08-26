@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
@@ -207,7 +207,7 @@ public class VisualizeTransitPlans {
 	}
 
 	private void visualize() {
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(this.visScenario, events);
 		client.run();
 	}

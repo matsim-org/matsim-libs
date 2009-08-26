@@ -23,7 +23,7 @@ import java.rmi.RemoteException;
 import java.util.UUID;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -63,7 +63,7 @@ public class DgOnTheFlyQueueSimQuad extends QueueSimulation {
 	 * @param events
 	 * @param laneDefs
 	 */
-	public DgOnTheFlyQueueSimQuad(ScenarioImpl scenario, Events events) {
+	public DgOnTheFlyQueueSimQuad(ScenarioImpl scenario, EventsImpl events) {
 		super(scenario, events);
 		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
 		if (isMac) {

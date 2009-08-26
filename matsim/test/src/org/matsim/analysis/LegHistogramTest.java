@@ -24,8 +24,8 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -59,15 +59,15 @@ public class LegHistogramTest extends MatsimTestCase {
 		leg.setTravelTime(Time.UNDEFINED_TIME);
 		leg.setArrivalTime(Time.UNDEFINED_TIME);
 		LegHistogram histo = new LegHistogram(5*60);
-		histo.handleEvent(new AgentDepartureEvent(7*3600, person1, link, leg));
-		histo.handleEvent(new AgentDepartureEvent(7*3600 + 6*60, person2, link, leg));
+		histo.handleEvent(new AgentDepartureEventImpl(7*3600, person1, link, leg));
+		histo.handleEvent(new AgentDepartureEventImpl(7*3600 + 6*60, person2, link, leg));
 		leg.setMode(TransportMode.bike);
-		histo.handleEvent(new AgentDepartureEvent(7*3600 + 6*60, person1, link, leg));
-		histo.handleEvent(new AgentDepartureEvent(7*3600 + 10*60, person2, link, leg));
+		histo.handleEvent(new AgentDepartureEventImpl(7*3600 + 6*60, person1, link, leg));
+		histo.handleEvent(new AgentDepartureEventImpl(7*3600 + 10*60, person2, link, leg));
 		leg.setMode(TransportMode.undefined);
-		histo.handleEvent(new AgentDepartureEvent(7*3600 + 10*60, person1, link, leg));
+		histo.handleEvent(new AgentDepartureEventImpl(7*3600 + 10*60, person1, link, leg));
 		leg.setMode(TransportMode.undefined);
-		histo.handleEvent(new AgentDepartureEvent(7*3600 + 16*60, person1, link, leg));
+		histo.handleEvent(new AgentDepartureEventImpl(7*3600 + 16*60, person1, link, leg));
 
 		int[] carDepartures = histo.getDepartures(TransportMode.car);
 		int[] bikeDepartures = histo.getDepartures(TransportMode.bike);
@@ -111,14 +111,14 @@ public class LegHistogramTest extends MatsimTestCase {
 
 		assertEquals(11, histo.getDepartures().length);
 
-		histo.handleEvent(new AgentDepartureEvent(2700, person1, link, leg));
-		histo.handleEvent(new AgentArrivalEvent(2999, person1, link, leg));
+		histo.handleEvent(new AgentDepartureEventImpl(2700, person1, link, leg));
+		histo.handleEvent(new AgentArrivalEventImpl(2999, person1, link, leg));
 		leg.setMode(TransportMode.train);
-		histo.handleEvent(new AgentDepartureEvent(3000, person1, link, leg));
-		histo.handleEvent(new AgentArrivalEvent(3001, person1, link, leg));
+		histo.handleEvent(new AgentDepartureEventImpl(3000, person1, link, leg));
+		histo.handleEvent(new AgentArrivalEventImpl(3001, person1, link, leg));
 		leg.setMode(TransportMode.bus);
-		histo.handleEvent(new AgentDepartureEvent(3600, person1, link, leg));
-		histo.handleEvent(new AgentArrivalEvent(7200, person1, link, leg));
+		histo.handleEvent(new AgentDepartureEventImpl(3600, person1, link, leg));
+		histo.handleEvent(new AgentArrivalEventImpl(7200, person1, link, leg));
 
 		assertEquals(1, histo.getDepartures(TransportMode.car)[9]);
 		assertEquals(1, histo.getArrivals(TransportMode.car)[9]);
@@ -146,11 +146,11 @@ public class LegHistogramTest extends MatsimTestCase {
 		
 		LegHistogram histo = new LegHistogram(5*60);
 
-		histo.handleEvent(new AgentDepartureEvent(7*3600, person1, link, leg));
-		histo.handleEvent(new AgentArrivalEvent(7*3600 + 6*60, person1, link, leg));
+		histo.handleEvent(new AgentDepartureEventImpl(7*3600, person1, link, leg));
+		histo.handleEvent(new AgentArrivalEventImpl(7*3600 + 6*60, person1, link, leg));
 		leg.setMode(TransportMode.train);
-		histo.handleEvent(new AgentDepartureEvent(8*3600, person1, link, leg));
-		histo.handleEvent(new AgentArrivalEvent(8*3600 + 11*60, person1, link, leg));
+		histo.handleEvent(new AgentDepartureEventImpl(8*3600, person1, link, leg));
+		histo.handleEvent(new AgentArrivalEventImpl(8*3600 + 11*60, person1, link, leg));
 
 		Set<TransportMode> modes = histo.getLegModes();
 		assertEquals(2, modes.size());

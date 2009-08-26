@@ -37,9 +37,9 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.events.LinkEnterEvent;
+import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -113,7 +113,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 
 	public void run(){
 		this.agentsOnLink.clear();
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(this);
 		new EventsReaderTXTv1(events).readFile(this.eventsFile);
 	}
@@ -121,7 +121,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 	
 
 
-	public void handleEvent(final LinkEnterEvent event) {
+	public void handleEvent(final LinkEnterEventImpl event) {
 		double time = event.getTime();
 		if (time > this.oldTime + SNAPSHOT_PERIOD) {
 			this.oldTime = time;

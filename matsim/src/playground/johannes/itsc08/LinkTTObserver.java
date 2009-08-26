@@ -30,8 +30,8 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
@@ -45,7 +45,7 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 
 	private EstimReactiveLinkTT linktt;
 	
-	private Map<PersonImpl, LinkEnterEvent> events;
+	private Map<PersonImpl, LinkEnterEventImpl> events;
 	
 	private BufferedWriter realTTWriter;
 	
@@ -58,9 +58,9 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 		this.linktt = linktt;
 	}
 	
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEventImpl event) {
 		if(event.getLinkId().toString().equals("2")) {
-			LinkEnterEvent enter = events.remove(event.getPerson());
+			LinkEnterEventImpl enter = events.remove(event.getPerson());
 			double realTT = event.getTime() - enter.getTime();
 			try {
 				realTTWriter.write(String.valueOf(enter.getTime()));
@@ -77,11 +77,11 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 	}
 
 	public void reset(int iteration) {
-		events = new HashMap<PersonImpl, LinkEnterEvent>();
+		events = new HashMap<PersonImpl, LinkEnterEventImpl>();
 		
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(LinkEnterEventImpl event) {
 		events.put(event.getPerson(), event);
 		
 		double estimTT = linktt.getLinkTravelTime(link, event.getTime());

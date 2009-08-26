@@ -1,6 +1,6 @@
 package playground.wrashid.PHEV.co2emissions;
 
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoader;
@@ -16,7 +16,7 @@ public class SimpleEvaluator {
 		sl.loadNetwork();
 		NetworkLayer network = sl.getScenario().getNetwork();
 		
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 
 		AllLinkHandler allLinkHandler = new AllLinkHandler(180.0,network); // co2 emissions in gram per km 
 		// get for one link statistics of CO2, for the specified interval

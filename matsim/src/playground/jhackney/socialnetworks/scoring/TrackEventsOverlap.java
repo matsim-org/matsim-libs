@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.events.ActivityEndEvent;
-import org.matsim.core.events.ActivityStartEvent;
+import org.matsim.core.events.ActivityEndEventImpl;
+import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.facilities.ActivityFacility;
@@ -56,7 +56,7 @@ public class TrackEventsOverlap implements ActivityStartEventHandler, ActivityEn
 	}
 
 
-	public void handleEvent(final ActivityEndEvent event) {
+	public void handleEvent(final ActivityEndEventImpl event) {
 
 		double eventStartTime=-999;// event start time is unknown
 		double eventEndTime=event.getTime();
@@ -86,7 +86,7 @@ public class TrackEventsOverlap implements ActivityStartEventHandler, ActivityEn
 		}
 	}
 
-	public void handleEvent(final ActivityStartEvent event) {
+	public void handleEvent(final ActivityStartEventImpl event) {
 
 		double eventStartTime=event.getTime();
 		double eventEndTime=-999;// the event end time is not known

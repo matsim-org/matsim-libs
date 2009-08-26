@@ -10,9 +10,9 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
@@ -37,7 +37,7 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		
 		Controler c = new Controler(this.sc);
 		
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		
 		
 		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink((NetworkLayer) this.network,60, events);
@@ -51,12 +51,12 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		for (Vehicle v : this.agents) {
 			v.enterTime = time;
 			vehQueue.add(v);
-			LinkEnterEvent lee = new LinkEnterEvent(time,v.id,this.l0);
+			LinkEnterEventImpl lee = new LinkEnterEventImpl(time,v.id,this.l0);
 			events.processEvent(lee);
 			
 			while (vehQueue.size() > 0 && (time-vehQueue.peek().enterTime) >= this.link0.getFreespeedTravelTime(time) ) {
 				Vehicle tmp = vehQueue.poll();
-				LinkLeaveEvent lle = new LinkLeaveEvent(time,tmp.id,this.l0);
+				LinkLeaveEventImpl lle = new LinkLeaveEventImpl(time,tmp.id,this.l0);
 				events.processEvent(lle);
 				
 			}
@@ -84,7 +84,7 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		
 		Controler c = new Controler(this.sc);
 		
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		
 		
 		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink((NetworkLayer) this.network,60, events);
@@ -101,7 +101,7 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		for (Vehicle v : this.agents) {
 			v.enterTime = time;
 			vehQueue.add(v);
-			LinkEnterEvent lee = new LinkEnterEvent(time,v.id,this.l0);
+			LinkEnterEventImpl lee = new LinkEnterEventImpl(time,v.id,this.l0);
 			events.processEvent(lee);
 			
 			
@@ -109,7 +109,7 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 			if (time <= 90 || time > 630) {
 				while (vehQueue.size() > 0 && (time-vehQueue.peek().enterTime) >= this.link0.getFreespeedTravelTime(time) ) {
 					Vehicle tmp = vehQueue.poll();
-					LinkLeaveEvent lle = new LinkLeaveEvent(time,tmp.id,this.l0);
+					LinkLeaveEventImpl lle = new LinkLeaveEventImpl(time,tmp.id,this.l0);
 					events.processEvent(lle);
 					
 				}
@@ -119,7 +119,7 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 			} else if (time <= 630) {
 				while (vehQueue.size() > 0 && (time-vehQueue.peek().enterTime) >= (20+this.link0.getFreespeedTravelTime(time)) ) {
 					Vehicle tmp = vehQueue.poll();
-					LinkLeaveEvent lle = new LinkLeaveEvent(time,tmp.id,this.l0);
+					LinkLeaveEventImpl lle = new LinkLeaveEventImpl(time,tmp.id,this.l0);
 					events.processEvent(lle);
 					
 				}				

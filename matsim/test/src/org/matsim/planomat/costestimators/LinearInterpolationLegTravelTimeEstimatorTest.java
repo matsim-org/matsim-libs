@@ -26,9 +26,9 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -123,11 +123,11 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 		
 		// now let's repeat the same stuff with some events that indicate a very long travel time on the highway
 		// the result must be the free speed travel time of the alternate route
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(linkTravelTimeEstimator);
 		
-		events.processEvent(new LinkEnterEvent(Time.parseTime("06:50:00"), dummyPersonId, HIGHWAY_LINK_ID));
-		events.processEvent(new LinkLeaveEvent(Time.parseTime("07:49:00"), dummyPersonId, HIGHWAY_LINK_ID));
+		events.processEvent(new LinkEnterEventImpl(Time.parseTime("06:50:00"), dummyPersonId, HIGHWAY_LINK_ID));
+		events.processEvent(new LinkLeaveEventImpl(Time.parseTime("07:49:00"), dummyPersonId, HIGHWAY_LINK_ID));
 		
 		LegImpl legIntermediate = new LegImpl(TransportMode.car);
 		for (String str : new String[] { 

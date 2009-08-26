@@ -35,10 +35,10 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.AgentStuckEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
@@ -172,8 +172,8 @@ public class EventFilesEvacuationTimeCompare {
 
 
 	private void readEvents() {
-		Events events1 = new Events();
-		Events events2 = new Events();
+		EventsImpl events1 = new EventsImpl();
+		EventsImpl events2 = new EventsImpl();
 		this.t1 = new TravelTimesFromEvents();
 		this.t2 = new TravelTimesFromEvents();
 		events1.addHandler(this.t1);
@@ -243,7 +243,7 @@ public class EventFilesEvacuationTimeCompare {
 			
 		}
 
-		public void handleEvent(final AgentDepartureEvent event) {
+		public void handleEvent(final AgentDepartureEventImpl event) {
 			AgentInfo ai = new AgentInfo();
 			ai.time = 3*3600; //event.getTime();
 			LinkImpl link = EventFilesEvacuationTimeCompare.this.network.getLink(event.getLinkId().toString());
@@ -257,14 +257,14 @@ public class EventFilesEvacuationTimeCompare {
 			
 		}
 
-		public void handleEvent(final AgentArrivalEvent event) {
+		public void handleEvent(final AgentArrivalEventImpl event) {
 			AgentInfo ai = this.ttimes.get(event.getPersonId().toString());
 			ai.time = event.getTime() - ai.time;
 			this.ttimesTree.put(ai.c.x, ai.c.y, ai);
 			
 		}
 
-		public void handleEvent(final AgentStuckEvent event) {
+		public void handleEvent(final AgentStuckEventImpl event) {
 			this.ttimes.remove(event.getPersonId().toString());
 			
 		}

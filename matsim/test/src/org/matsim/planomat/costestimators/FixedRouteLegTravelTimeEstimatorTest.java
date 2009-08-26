@@ -31,11 +31,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.events.AgentDepartureEvent;
+import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.BasicEventImpl;
-import org.matsim.core.events.Events;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -129,7 +129,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			
 			testee.initPlanSpecificInformation(this.testPlan);
 			
-			Events events = new Events();
+			EventsImpl events = new EventsImpl();
 			events.addHandler(tDepDelayCalc);
 			events.addHandler(linkTravelTimeEstimator);
 			events.printEventHandlers();
@@ -164,11 +164,11 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			// next, a departure delay of 5s at the origin link is added
 			departureTime = Time.parseTime("06:05:00");
 			double depDelay = Time.parseTime("00:00:05");
-			AgentDepartureEvent depEvent = new AgentDepartureEvent(
+			AgentDepartureEventImpl depEvent = new AgentDepartureEventImpl(
 					departureTime,
 					TEST_PERSON_ID,
 					originAct.getLink().getId());
-			LinkLeaveEvent leaveEvent = new LinkLeaveEvent(departureTime + depDelay, testPerson, originAct.getLink());
+			LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(departureTime + depDelay, testPerson, originAct.getLink());
 
 			for (BasicEventImpl event : new BasicEventImpl[]{depEvent, leaveEvent}) {
 				events.processEvent(event);
@@ -206,12 +206,12 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			BasicEventImpl event = null;
 			for (int eventTimesCnt = 0; eventTimesCnt < eventTimes.length; eventTimesCnt++) {
 				for (int linkCnt = 0; linkCnt < links.size(); linkCnt++) {
-					event = new LinkEnterEvent(
+					event = new LinkEnterEventImpl(
 							Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
 							testPerson,
 							(LinkImpl) links.get(linkCnt));
 					events.processEvent(event);
-					event = new LinkLeaveEvent(
+					event = new LinkLeaveEventImpl(
 							Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
 							testPerson,
 							(LinkImpl) links.get(linkCnt));
@@ -285,13 +285,13 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				plansCalcRoute);
 		Id linkId = this.originAct.getLinkId();
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(tDepDelayCalc);
 		events.printEventHandlers();
 
 		// this gives a delay of 36s (1/100th of an hour)
-		AgentDepartureEvent depEvent = new AgentDepartureEvent(6.03 * 3600, TEST_PERSON_ID, this.originAct.getLinkId());
-		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(6.04 * 3600, TEST_PERSON_ID, this.originAct.getLinkId());
+		AgentDepartureEventImpl depEvent = new AgentDepartureEventImpl(6.03 * 3600, TEST_PERSON_ID, this.originAct.getLinkId());
+		LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(6.04 * 3600, TEST_PERSON_ID, this.originAct.getLinkId());
 
 		for (BasicEventImpl event : new BasicEventImpl[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
@@ -302,8 +302,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		assertEquals(delayEndTime, startTime + 36.0, EPSILON);
 
 		// let's add another delay of 72s, should result in an average of 54s
-		depEvent = new AgentDepartureEvent(6.02 * 3600, TEST_PERSON_ID, linkId);
-		leaveEvent = new LinkLeaveEvent(6.04 * 3600, TEST_PERSON_ID, linkId);
+		depEvent = new AgentDepartureEventImpl(6.02 * 3600, TEST_PERSON_ID, linkId);
+		leaveEvent = new LinkLeaveEventImpl(6.04 * 3600, TEST_PERSON_ID, linkId);
 
 		for (BasicEventImpl event : new BasicEventImpl[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
@@ -345,7 +345,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(linkTravelTimeEstimator);
 		events.printEventHandlers();
 
@@ -365,12 +365,12 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		for (int eventTimesCnt = 0; eventTimesCnt < eventTimes.length; eventTimesCnt++) {
 			for (int linkCnt = 0; linkCnt < links.size(); linkCnt++) {
-				event = new LinkEnterEvent(
+				event = new LinkEnterEventImpl(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
 						this.testPerson,
 						(LinkImpl)links.get(linkCnt));
 				events.processEvent(event);
-				event = new LinkLeaveEvent(
+				event = new LinkLeaveEventImpl(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
 						this.testPerson,
 						(LinkImpl)links.get(linkCnt));
@@ -430,13 +430,13 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		Id linkId = ((NetworkRouteWRefs) this.testLeg.getRoute()).getLinks().get(0).getId();
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(linkTravelTimeEstimator);
 		events.printEventHandlers();
 
 		// we have one agent on this link, taking 1 minute and 48 seconds
-		LinkEnterEvent enterEvent = new LinkEnterEvent(Time.parseTime("06:05:00"), this.testPerson, this.scenario.getNetwork().getLink(linkId));
-		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(Time.parseTime("06:06:48"), this.testPerson, this.scenario.getNetwork().getLink(linkId));
+		LinkEnterEventImpl enterEvent = new LinkEnterEventImpl(Time.parseTime("06:05:00"), this.testPerson, this.scenario.getNetwork().getLink(linkId));
+		LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(Time.parseTime("06:06:48"), this.testPerson, this.scenario.getNetwork().getLink(linkId));
 
 		for (BasicEventImpl event : new BasicEventImpl[]{enterEvent, leaveEvent}) {
 			events.processEvent(event);

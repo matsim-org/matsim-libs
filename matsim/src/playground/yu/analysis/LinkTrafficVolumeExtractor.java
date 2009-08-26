@@ -9,7 +9,7 @@ import java.io.IOException;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -44,7 +44,7 @@ public class LinkTrafficVolumeExtractor {
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(population, network).readFile(plansFilename);
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 
 		VolumesAnalyzer va = new VolumesAnalyzer(timeBin, 30 * 3600, network);
 		events.addHandler(va);

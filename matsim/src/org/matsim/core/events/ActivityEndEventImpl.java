@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonEntersVehicleEvent.java
+ * ActEndEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,48 +20,27 @@
 
 package org.matsim.core.events;
 
-import java.util.Map;
-
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.events.BasicPersonLeavesVehicleEvent;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.vehicles.BasicVehicle;
 
-/**
- *
- * @author mrieser
- */
-public class PersonLeavesVehicleEvent extends PersonEvent implements BasicPersonLeavesVehicleEvent {
+public class ActivityEndEventImpl extends ActivityEventImpl implements ActivityEndEvent {
 
-	public static final String EVENT_TYPE = "PersonLeavesVehicle";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	public static final String EVENT_TYPE = "actend";
 
-	private final Id vehicleId;
-
-	public PersonLeavesVehicleEvent(final double time, final PersonImpl person, final BasicVehicle vehicle) {
-		super(time, person);
-		this.vehicleId = vehicle.getId();
-	}
-	
-	public PersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
-		super(time, personId);
-		this.vehicleId = vehicleId;
+	public ActivityEndEventImpl(final double time, final PersonImpl agent, final LinkImpl link, final ActivityImpl act) {
+		super(time, agent, link, act);
 	}
 
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attrs = super.getAttributes();
-		attrs.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		return attrs;
+	public ActivityEndEventImpl(final double time, final Id agentId, final Id linkId, final String acttype) {
+		super(time, agentId, linkId, acttype);
 	}
 
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
-	}
-	
-	public Id getVehicleId() {
-		return this.vehicleId;
 	}
 
 }

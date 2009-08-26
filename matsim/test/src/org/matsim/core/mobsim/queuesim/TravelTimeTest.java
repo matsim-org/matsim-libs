@@ -30,7 +30,7 @@ import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -59,7 +59,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 		ScenarioLoader loader = new ScenarioLoader(data);
 		loader.loadScenario();
 		
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(this);
 
 		new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();
@@ -84,7 +84,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 		ScenarioLoader loader = new ScenarioLoader(data);
 		loader.loadScenario();
 		
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(this);
 
 		new QueueSimulation(data.getNetwork(), data.getPopulation(), events).run();

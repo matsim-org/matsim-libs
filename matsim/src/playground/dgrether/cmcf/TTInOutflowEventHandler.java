@@ -25,8 +25,8 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
@@ -34,7 +34,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 
 	private Id linkIdIn;
 
-	private Map<Id, LinkEnterEvent> enterEvents;
+	private Map<Id, LinkEnterEventImpl> enterEvents;
 	
 	private SortedMap<Double, Integer> inflow;
 	
@@ -52,7 +52,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	public TTInOutflowEventHandler(Id linkIdIn, Id linkIdOut) {
 		this.linkIdIn = linkIdIn;
 		this.linkIdOut = linkIdOut;
-		this.enterEvents = new HashMap<Id, LinkEnterEvent>();
+		this.enterEvents = new HashMap<Id, LinkEnterEventImpl>();
 		this.inflow = new TreeMap<Double, Integer>();
 		this.outflow =  new TreeMap<Double, Integer>();
 		this.travelTimes = new TreeMap<Double, Double>();
@@ -63,7 +63,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 		return this.linkIdIn;
 	}
 	
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(LinkEnterEventImpl event) {
 		Id id = new IdImpl(event.getLinkId().toString());
 		if (linkIdIn.equals(id)) {
 			Integer in = getInflowMap().get(event.getTime());
@@ -80,7 +80,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	}
 
 
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEventImpl event) {
 		Id id = new IdImpl(event.getLinkId().toString());
 		if (linkIdOut.equals(id)) {
 			Integer out = getOutflowMap().get(event.getTime());
@@ -93,7 +93,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 				getOutflowMap().put(event.getTime(), out);
 			}
 			
-			LinkEnterEvent enterEvent = this.enterEvents.get(new IdImpl(event.getPersonId().toString()));
+			LinkEnterEventImpl enterEvent = this.enterEvents.get(new IdImpl(event.getPersonId().toString()));
 			double tt = event.getTime() - enterEvent.getTime();
 			Double ttravel = getTravelTimesMap().get(enterEvent.getTime());
 			if (ttravel == null) {

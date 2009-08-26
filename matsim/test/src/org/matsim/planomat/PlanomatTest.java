@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -82,7 +82,7 @@ public class PlanomatTest extends MatsimTestCase {
 		//store the only existing person
 		PersonImpl p = scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		//read the events once to create a complete test population
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(new ScenarioCreatePersonEventHandler(this.scenario));
 		new MatsimEventsReader(events).readFile(this.getClassInputDirectory() + "equil-times-only-1000.events.txt.gz");
 		//now overwrite the testee person in the scenario
@@ -138,7 +138,7 @@ public class PlanomatTest extends MatsimTestCase {
 		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.scenario.getConfig().charyparNagelScoring());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		events.addHandler(tTravelEstimator);
 		events.addHandler(depDelayCalc);
 

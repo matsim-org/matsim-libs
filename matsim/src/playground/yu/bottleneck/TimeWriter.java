@@ -26,9 +26,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.matsim.core.events.AgentArrivalEvent;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
@@ -61,7 +61,7 @@ public class TimeWriter implements AgentDepartureEventHandler,
 	 * If an agent departures, will the information be saved in a hashmap
 	 * (agentDepTimes).
 	 */
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEventImpl event) {
 		if (!this.agentDepTimes.containsKey(event.getPersonId().toString())) { // only
 																				// store
 																				// first
@@ -74,7 +74,7 @@ public class TimeWriter implements AgentDepartureEventHandler,
 	 * If an agent arrives, will the "agent-ID", "depTime" and "arrTime" be
 	 * written in a .txt-file
 	 */
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEventImpl event) {
 		String agentId = event.getPersonId().toString();
 		if (agentDepTimes.containsKey(agentId)) {
 			int depT = (int) agentDepTimes.remove(agentId).doubleValue();
@@ -159,7 +159,7 @@ public class TimeWriter implements AgentDepartureEventHandler,
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 
 		TimeWriter tw = new TimeWriter(outputFilename);
 		events.addHandler(tw);

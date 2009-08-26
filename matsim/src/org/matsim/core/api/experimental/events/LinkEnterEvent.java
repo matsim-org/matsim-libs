@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneEnterEvent
+ * BasicLinkEnterEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,32 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.events;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.population.PersonImpl;
+package org.matsim.core.api.experimental.events;
+
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 
 
-/**
- * @author dgrether
- *
- */
-public class LaneEnterEvent extends LaneEvent {
-	
-	public static final String EVENT_TYPE = "entered lane";
-
-	public LaneEnterEvent(double time, PersonImpl agent, LinkImpl link, Id laneId) {
-		super(time, agent, link, laneId);
-	}
-
-	public LaneEnterEvent(double time, Id agentId, Id linkId, Id laneId) {
-		super(time, agentId, linkId, laneId);
-	}
-
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
+public interface LinkEnterEvent extends BasicLinkEnterEvent {
 
 }

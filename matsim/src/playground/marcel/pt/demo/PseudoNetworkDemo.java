@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -120,7 +120,7 @@ public class PseudoNetworkDemo {
 		plan.addLeg(leg);
 		plan.addActivity(population.getBuilder().createActivityFromLinkId("home", link1.getId()));
 
-		final Events events = new Events();
+		final EventsImpl events = new EventsImpl();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
 

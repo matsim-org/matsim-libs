@@ -11,10 +11,10 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.events.AgentMoneyEvent;
-import org.matsim.core.events.AgentStuckEvent;
-import org.matsim.core.events.LinkEnterEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.AgentMoneyEventImpl;
+import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
@@ -178,7 +178,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 				}
 				cost += getSocialCost(this.network.getLink(id), li.getAgentEnterTime(pers.getId()));
 			}
-			AgentMoneyEvent e = new AgentMoneyEvent(this.maxK * this.binSize,pers.getId(),cost/-600);
+			AgentMoneyEventImpl e = new AgentMoneyEventImpl(this.maxK * this.binSize,pers.getId(),cost/-600);
 			QueueSimulation.getEvents().processEvent(e);
 		}
 		
@@ -247,23 +247,23 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 				} 
 			}
 		}
-		AgentMoneyEvent e = new AgentMoneyEvent(this.maxK * this.binSize,agentId,agentDelay/-600);
+		AgentMoneyEventImpl e = new AgentMoneyEventImpl(this.maxK * this.binSize,agentId,agentDelay/-600);
 		QueueSimulation.getEvents().processEvent(e);
 		
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(LinkEnterEventImpl event) {
 		LinkInfo li = getLinkInfo(event.getLinkId());
 		li.incrementInFlow(getTimeBin(event.getTime()));
 		li.setAgentEnterTime(event.getPersonId(), event.getTime());
 	}
 
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEventImpl event) {
 		this.maxK = getTimeBin(event.getTime());
 		getLinkInfo(event.getLinkId()).incrementOutFlow(this.maxK);
 	}
 
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(AgentStuckEventImpl event) {
 		this.stuckedAgents.add(event.getPersonId());
 		
 	}

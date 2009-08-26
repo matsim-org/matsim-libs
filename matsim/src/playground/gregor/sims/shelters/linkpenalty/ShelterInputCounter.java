@@ -8,8 +8,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.events.AgentMoneyEvent;
-import org.matsim.core.events.LinkLeaveEvent;
+import org.matsim.core.events.AgentMoneyEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
@@ -37,7 +37,7 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 		}
 	}
 
-	public void handleEvent(LinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEventImpl event) {
 		Counter c = this.counts.get(event.getLink().getId()); 
 		if (c != null) {
 			c.count++;
@@ -45,7 +45,7 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 			c.count++;
 			if (c.count > b.getShelterSpace()) {
 //				AgentMoneyEvent e = new AgentMoneyEvent(event.getTime(),event.getPersonId(),-(c.count - b.getShelterSpace())/10.);
-				AgentMoneyEvent e = new AgentMoneyEvent(event.getTime(),event.getPersonId(),-12*6);
+				AgentMoneyEventImpl e = new AgentMoneyEventImpl(event.getTime(),event.getPersonId(),-12*6);
 				QueueSimulation.getEvents().processEvent(e);
 				LinkInfo li = this.linkInfos.get(event.getLink());
 				if (li == null) {

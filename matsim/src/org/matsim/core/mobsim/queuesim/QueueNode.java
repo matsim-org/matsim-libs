@@ -27,7 +27,7 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.events.AgentStuckEvent;
+import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
@@ -140,7 +140,7 @@ public class QueueNode {
 					Simulation.decLiving();
 					Simulation.incLost();
 					QueueSimulation.getEvents().processEvent(
-							new AgentStuckEvent(now, veh.getDriver().getPerson(), (LinkImpl)currentLink, veh.getDriver().getCurrentLeg()));
+							new AgentStuckEventImpl(now, veh.getDriver().getPerson(), (LinkImpl)currentLink, veh.getDriver().getCurrentLeg()));
 				} else {
 					currentLane.popFirstFromBuffer();
 					veh.getDriver().moveOverNode();

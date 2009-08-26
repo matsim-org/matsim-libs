@@ -37,8 +37,8 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.AgentDepartureEvent;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -182,7 +182,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 
 		Coordinate superSink = MGC.coord2Coordinate(this.network.getNode("en1").getCoord());
 		
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 		DestinationDependentColorizer ddc = new DestinationDependentColorizer();
 		events.addHandler(ddc);
 		events.addHandler(this);
@@ -243,7 +243,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 	}
 
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEventImpl event) {
 		String id = event.getPersonId().toString();
 		if (id.contains("guide")) {
 			return;

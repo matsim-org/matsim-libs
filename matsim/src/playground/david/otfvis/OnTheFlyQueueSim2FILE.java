@@ -23,7 +23,7 @@ package playground.david.otfvis;
 import java.io.IOException;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -83,7 +83,7 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 
 	}
 
-	public OnTheFlyQueueSim2FILE(final NetworkLayer net, final PopulationImpl plans, final Events events) {
+	public OnTheFlyQueueSim2FILE(final NetworkLayer net, final PopulationImpl plans, final EventsImpl events) {
 		super(net, plans, events);
 		// TODO Auto-generated constructor stub
 	}
@@ -126,7 +126,7 @@ public class OnTheFlyQueueSim2FILE extends QueueSimulation{
 		PopulationReader plansReader = new MatsimPopulationReader(population, net);
 		plansReader.readFile(popFileName);
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 
 		config.simulation().setStartTime(Time.parseTime("05:00:00"));
 		config.simulation().setEndTime(Time.parseTime("18:02:00"));

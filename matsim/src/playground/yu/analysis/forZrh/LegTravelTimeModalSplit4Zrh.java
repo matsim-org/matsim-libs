@@ -4,7 +4,7 @@
 package playground.yu.analysis.forZrh;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.Events;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -186,7 +186,7 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 		// e.printStackTrace();
 		// }
 
-		Events events = new Events();
+		EventsImpl events = new EventsImpl();
 
 		LegTravelTimeModalSplit lttms = new LegTravelTimeModalSplit(population
 		// ,tollReader.getScheme()
