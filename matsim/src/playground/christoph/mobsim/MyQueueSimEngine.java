@@ -97,10 +97,14 @@ public class MyQueueSimEngine extends QueueSimEngine{
 		PriorityBlockingQueue<DriverAgent> queue = simulation.getActivityEndsList();
 		
 		for (DriverAgent driverAgent : queue)
-		{
+		{			
 			// If the Agent will depart
 			if (driverAgent.getDepartureTime() <= time)
 			{
+				// Skip Agent if Replanning Flag is not set
+				boolean replanning = (Boolean)driverAgent.getPerson().getCustomAttributes().get("endActivityReplanning");
+				if(!replanning) continue; 
+				
 				PersonImpl person = driverAgent.getPerson();
 				personsToReplanActEnd.add(person);
 				

@@ -47,7 +47,7 @@ public class MyDijkstra extends Dijkstra{
 //		if (newFromNode == null) System.out.println("NewFromNode Null!");
 //		else if (newFromNode.getId() == null) System.out.println("NewFromNodeId Null!");
 //		
-//		if (newToNode == null) 	System.out.println("NewToNode Null!");
+		if (newToNode == null) 	System.out.println("NewToNode Null!");
 //		else if (newToNode.getId() == null) System.out.println("NewToNodeId Null!");
 		
 		Path path = super.calcLeastCostPath(newFromNode, newToNode, startTime);

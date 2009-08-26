@@ -77,13 +77,7 @@ public class MapKnowledge extends BasicNodeKnowledge{
 	{
 		return nodes;
 	}
-	
-	public synchronized void reset()
-	{
-		this.nodes = new HashMap<Id, NodeImpl>();
-//		this.nodes.clear();
-	}
-	
+		
 	public void setKnownNodes(Map<Id, NodeImpl> nodes)
 	{
 		// If we have a network, we can check, whether using a Black- or WhiteList would be better.
@@ -115,5 +109,12 @@ public class MapKnowledge extends BasicNodeKnowledge{
 			log.warn("No Network found");
 			this.nodes = nodes;
 		}
+	}
+
+	public synchronized void clearKnowledge()
+	{
+		this.isWhiteList = true;
+		//this.nodes.clear();
+		this.nodes = new HashMap<Id, NodeImpl>();
 	}
 }

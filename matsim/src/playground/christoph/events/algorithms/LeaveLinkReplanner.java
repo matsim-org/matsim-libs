@@ -131,6 +131,10 @@ public class LeaveLinkReplanner {
 	 */
 	protected void routing()
 	{	
+		if(this.personAgent.getPerson().getId().toString().equals("2116372"))
+		{
+			log.error("Replanning wrong Agent!");
+		}
 		/*
 		 * Get the index and the currently next Node on the route.
 		 * Entries with a lower index have already been visited!

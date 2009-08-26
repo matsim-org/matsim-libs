@@ -29,7 +29,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	
 	private static String separator = "@";
 	//private static String tableName = "MapKnowledge";
-	private static String tableName = "BatchTable1_2";
+	private static String tableName = "BatchTable1_0";
 	
 	private Lock lock = new ReentrantLock();
 	
@@ -162,9 +162,8 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	
 	public synchronized void clearLocalKnowledge()
 	{
-		super.reset();
+		super.clearKnowledge();
 		localKnowledge = false;
-//		super.getKnownNodes().clear();
 	}
 	
 	public void clearTable()

@@ -53,8 +53,8 @@ public class CreateKnowledgeForDatabase {
 	private ArrayList<SelectNodes> nodeSelectors;
 	private double dijkstraCostFactor = 1.0;
 	//private double[] dijkstraCostFactors = {1.0, 1.5, 2.0, 2.5, 3.0};
-	private double[] dijkstraCostFactors = {1.25};
-	private int parallelThreads = 2;
+	private double[] dijkstraCostFactors = {1.4};
+	private int parallelThreads = 4;
 	private ReplanningQueueSimulation sim;
 	private EventsImpl events;
 	private LinkVehiclesCounter linkVehiclesCounter;

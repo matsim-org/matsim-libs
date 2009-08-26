@@ -25,4 +25,6 @@ public interface NodeKnowledge {
 	public Map<Id, NodeImpl> getKnownNodes();
 	
 	public void setKnownNodes(Map<Id, NodeImpl> nodes);
+	
+	public void clearKnowledge();
 }

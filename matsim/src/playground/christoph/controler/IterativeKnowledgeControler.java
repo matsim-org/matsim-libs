@@ -123,7 +123,7 @@ public class IterativeKnowledgeControler extends Controler{
 		if (!knowledgeLoaded)
 		{
 			setKnowledgeStorageHandler();
-			initialReplanning();
+//			initialReplanning();
 			knowledgeLoaded = true;
 		}
 		

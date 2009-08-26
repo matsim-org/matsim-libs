@@ -226,8 +226,8 @@ public class EventControler extends Controler {
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 
-		travelTimeWrapper.checkNodeKnowledge(true);
-		travelCostWrapper.checkNodeKnowledge(true);
+		travelTimeWrapper.checkNodeKnowledge(false);
+		travelCostWrapper.checkNodeKnowledge(false);
 		travelTimeWrapper.useLookupTable(false);
 		travelCostWrapper.useLookupTable(false);
 
@@ -271,7 +271,7 @@ public class EventControler extends Controler {
 	 */
 	protected void initParallelReplanningModules() {
 		ParallelReplanner.init(replanners);
-		ParallelReplanner.setNumberOfThreads(2);
+		ParallelReplanner.setNumberOfThreads(4);
 
 		ParallelActEndReplanner.init();
 		ParallelLeaveLinkReplanner.init();
@@ -400,56 +400,51 @@ public class EventControler extends Controler {
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 
 			double probability = MatsimRandom.getRandom().nextDouble();
-
+			
 			// No Replanning
-			if (probability <= pNoReplanning) {
+			if (probability <= pNoReplanning) 
+			{
 				noReplanningCounter++;
 				customAttributes.put("initialReplanning", new Boolean(false));
 				customAttributes.put("leaveLinkReplanning", new Boolean(false));
-				customAttributes.put("endActivityReplanning",
-						new Boolean(false));
+				customAttributes.put("endActivityReplanning", new Boolean(false));
 			}
 
 			// Initial Replanning
 			else if ((probability > pNoReplanning)
-					&& (probability <= pNoReplanning + pInitialReplanning)) {
+					&& (probability <= pNoReplanning + pInitialReplanning)) 
+			{
 				initialReplanningCounter++;
 				customAttributes.put("initialReplanning", new Boolean(true));
 				customAttributes.put("leaveLinkReplanning", new Boolean(false));
-				customAttributes.put("endActivityReplanning",
-						new Boolean(false));
+				customAttributes.put("endActivityReplanning", new Boolean(false));
 			}
 
 			// Act End Replanning
 			else if ((probability > pNoReplanning + pInitialReplanning)
-					&& (probability <= pNoReplanning + pInitialReplanning
-							+ pActEndReplanning)) {
+					&& (probability <= pNoReplanning + pInitialReplanning + pActEndReplanning)) 
+			{
 				actEndReplanningCounter++;
 				customAttributes.put("initialReplanning", new Boolean(false));
 				customAttributes.put("leaveLinkReplanning", new Boolean(false));
-				customAttributes
-						.put("endActivityReplanning", new Boolean(true));
+				customAttributes.put("endActivityReplanning", new Boolean(true));
 			}
 
 			// Leave Link Replanning
-			else {
+			else 
+			{
 				leaveLinkReplanningCounter++;
 				customAttributes.put("initialReplanning", new Boolean(false));
 				customAttributes.put("leaveLinkReplanning", new Boolean(true));
-				customAttributes.put("endActivityReplanning",
-						new Boolean(false));
+				customAttributes.put("endActivityReplanning", new Boolean(false));
 			}
-
+			
 			// (de)activate replanning
-			if (actEndReplanningCounter == 0)
-				MyQueueSimEngine.doActEndReplanning(false);
-			else
-				MyQueueSimEngine.doActEndReplanning(true);
+			if (actEndReplanningCounter == 0) MyQueueSimEngine.doActEndReplanning(false);
+			else MyQueueSimEngine.doActEndReplanning(true);
 
-			if (leaveLinkReplanningCounter == 0)
-				MyQueueSimEngine.doLeaveLinkReplanning(false);
-			else
-				MyQueueSimEngine.doLeaveLinkReplanning(true);
+			if (leaveLinkReplanningCounter == 0) MyQueueSimEngine.doLeaveLinkReplanning(false);
+			else MyQueueSimEngine.doLeaveLinkReplanning(true);
 
 		}
 

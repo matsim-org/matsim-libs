@@ -114,7 +114,7 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 					 *  The NodeKnowledge Class decides, whether reading the
 					 *  Knowledge from the Database is really neccessary or not.
 					 */
-					((DBStorage) nodeKnowledge).readFromDB();
+//					((DBStorage) nodeKnowledge).readFromDB();
 					
 //					count++;
 //					if (count % 1000 == 0) System.out.println("Read " + count + " Knowledges from DB");

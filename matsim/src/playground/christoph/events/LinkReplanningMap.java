@@ -21,9 +21,12 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.mobsim.jdeqsim.Vehicle;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 public class LinkReplanningMap implements BasicLinkEnterEventHandler,
@@ -57,7 +60,7 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 		double now = event.getTime();
 		QueueLink queueLink = queueNetwork.getQueueLink(event.getLinkId());
 		double departureTime = (now + queueLink.getLink().getFreespeedTravelTime(now));
-		
+
 		replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), departureTime));
 	}
 
@@ -82,7 +85,7 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 	 * time offset here.
 	 */
 	public void handleEvent(BasicAgentWait2LinkEvent event)
-	{
+	{		
 		replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), event.getTime()));
 	}
 
@@ -107,17 +110,26 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 			Entry<Id, Tuple<Id, Double>> entry = entries.next();
 			Id personId = entry.getKey();
 			Id linkId = entry.getValue().getFirst();
-          
+          			
 			double replanningTime = entry.getValue().getSecond();
 	       
 			if (time >= replanningTime)
 			{
+				// check whether the replanning flag is set - if not, skip the person
+				QueueVehicle vehicle = this.queueNetwork.getQueueLink(linkId).getVehicle(personId);
+				boolean replanning = (Boolean)vehicle.getDriver().getPerson().getCustomAttributes().get("leaveLinkReplanning");
+				if(!replanning)
+				{
+					entries.remove();
+					continue;
+				}
+				
 				// Repeated Replanning per Link possible? 
 				if (repeatedReplanning) entry.setValue(new Tuple<Id,Double>(linkId, time + this.replanningInterval));
 				else entries.remove();
 				
-				//personsToReplanMap.put(personId, linkId);
-				vehiclesToReplanLeaveLink.add(this.queueNetwork.getQueueLink(linkId).getVehicle(personId));
+				vehiclesToReplanLeaveLink.add(vehicle);
+				//vehiclesToReplanLeaveLink.add(this.queueNetwork.getQueueLink(linkId).getVehicle(personId));
 			}
 		}
 		

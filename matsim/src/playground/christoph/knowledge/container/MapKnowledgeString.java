@@ -121,7 +121,6 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 			
 		return string;
 	}
-
 	
 	public void createTable() {
 		// TODO Auto-generated method stub

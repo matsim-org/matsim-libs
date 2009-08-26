@@ -164,9 +164,10 @@ public class KnowledgeTools {
 			if(customAttributes.containsKey("NodeKnowledge"))
 			{
 				NodeKnowledge nodeKnowledge = (NodeKnowledge)customAttributes.get("NodeKnowledge");
-			
-				knownNodesMap = nodeKnowledge.getKnownNodes();
-				knownNodesMap.clear();
+	
+				nodeKnowledge.clearKnowledge();
+//				knownNodesMap = nodeKnowledge.getKnownNodes();
+//				knownNodesMap.clear();
 			}
 			else
 			{

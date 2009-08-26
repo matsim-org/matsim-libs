@@ -231,4 +231,10 @@ public class CellKnowledge extends BasicNodeKnowledge {
 			return whiteList;
 		}
 	}
+
+	public void clearKnowledge()
+	{
+		this.whiteList = true;
+		this.cellDataMap.clear();
+	}
 }

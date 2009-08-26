@@ -1,18 +1,29 @@
 package playground.christoph.network;
 
+import java.util.Set;
+
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.network.BasicLinkImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.world.Layer;
 
-public class SubLink extends BasicLinkImpl implements Link{
+public class SubLink implements BasicLink, Link{
 
+	private NetworkLayer network;
+	private BasicNode from;
+	private BasicNode to;
 	private LinkImpl parentLink;
 	
 	public SubLink(NetworkLayer network, BasicNode from, BasicNode to, LinkImpl link)
 	{
-		super(network, link.getId(), from, to);
+		this.network = network;
+		this.from = from;
+		this.to = to;
 		this.parentLink = link;
 	}
 	
@@ -21,54 +32,91 @@ public class SubLink extends BasicLinkImpl implements Link{
 		return parentLink;
 	}
 	
-	@Override
 	public SubNode getFromNode()
 	{ 
 		return (SubNode)this.from;
 	}
 	
-	@Override
 	public SubNode getToNode()
 	{
 		return (SubNode)this.to;
 	}
 	
-	/**
-	 * This method returns the capacity as set in the xml defining the network. Be aware
-	 * that this capacity is not normalized in time, it depends on the period set
-	 * in the network file (the capperiod attribute).
-	 *
- 	 * @param time - the current time
-	 * @return the capacity per network's capperiod timestep
-	 */
-	@Override
 	public double getCapacity(final double time)
 	{
 		return parentLink.getCapacity(time);
 	}
 
-	/**
-	 * This method returns the freespeed velocity in meter per seconds.
-	 *
-	 * @param time - the current time
-	 * @return freespeed
-	 */
-	@Override
 	public double getFreespeed(final double time)
 	{
 		return parentLink.getFreespeed(time);
 	}
 
-	@Override
 	public double getLength()
 	{
 		return parentLink.getLength();
 	}
 
-	@Override
 	public double getNumberOfLanes(final double time)
 	{
 		return parentLink.getNumberOfLanes(time);
+	}
+
+	public Set<TransportMode> getAllowedModes()
+	{
+		return parentLink.getAllowedModes();
+	}
+
+	public void setAllowedModes(Set<TransportMode> modes)
+	{
+		// nothing to do...
+	}
+
+	public void setCapacity(double capacity)
+	{
+		// nothing to do...
+	}
+
+	public void setFreespeed(double freespeed)
+	{
+		// nothing to do...
+	}
+
+	public boolean setFromNode(BasicNode node)
+	{
+		this.from = node;
+		return true;
+	}
+
+	public void setLength(double length)
+	{
+		// nothing to do...	
+	}
+
+	public void setNumberOfLanes(double lanes)
+	{
+		// nothing to do...
+	}
+
+	public boolean setToNode(BasicNode node)
+	{
+		this.to = node;
+		return true;
+	}
+
+	public Id getId()
+	{
+		return parentLink.getId();
+	}
+
+	public Layer getLayer()
+	{
+		return parentLink.getLayer();
+	}
+
+	public Coord getCoord()
+	{
+		return parentLink.getCoord();
 	}
 	
 }
