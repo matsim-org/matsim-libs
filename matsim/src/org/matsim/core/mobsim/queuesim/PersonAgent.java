@@ -33,6 +33,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -144,7 +145,14 @@ public class PersonAgent implements DriverAgent {
 	}
 
 	private void initNextLeg(final LegImpl leg) {
-		this.destinationLink = leg.getRoute().getEndLink();
+		RouteWRefs route = leg.getRoute();
+		if (route == null) {
+			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
+			Simulation.decLiving();
+			Simulation.incLost();
+			return;
+		}
+		this.destinationLink = route.getEndLink();
 
 		// set the route according to the next leg
 		this.currentLeg = leg;
@@ -219,10 +227,10 @@ public class PersonAgent implements DriverAgent {
 		if ((act.getDuration() == Time.UNDEFINED_TIME) && (act.getEndTime() == Time.UNDEFINED_TIME)) {
 			setDepartureTime(Double.POSITIVE_INFINITY);
 		} else {
-			
+
 			double departure = 0;
 
-			if (this.simulation.isUseActivityDurations()) { 
+			if (this.simulation.isUseActivityDurations()) {
 				/* The person leaves the activity either 'actDur' later or
 				 * when the end is defined of the activity, whatever comes first. */
 				if (act.getDuration() == Time.UNDEFINED_TIME) {
@@ -232,7 +240,7 @@ public class PersonAgent implements DriverAgent {
 				} else {
 					departure = Math.min(act.getEndTime(), now + act.getDuration());
 				}
-			} 
+			}
 			else {
 				if (act.getEndTime() != Time.UNDEFINED_TIME) {
 					departure = act.getEndTime() ;
@@ -241,9 +249,9 @@ public class PersonAgent implements DriverAgent {
 					throw new IllegalStateException("Can not use activity end time as new departure time as it is not set for person: " + this.getPerson().getId());
 				}
 			}
-				
-			
-			
+
+
+
 			if (departure < now) {
 				// we cannot depart before we arrived, thus change the time so the timestamp in events will be right
 				departure = now;
