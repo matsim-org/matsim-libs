@@ -26,4 +26,4 @@ public class GeneralLibTest extends MatsimTestCase {
 		
 		assertEquals(23, facilities.getFacilities().size());
 	}
-}
+} 
