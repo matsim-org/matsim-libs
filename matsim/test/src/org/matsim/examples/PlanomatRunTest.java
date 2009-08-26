@@ -52,7 +52,7 @@ public class PlanomatRunTest extends MatsimTestCase {
 	 * checksums of actual test results are not stable even in repeated runs of this test on one machine 
 	 */
 	public void testMainCarPt() {
-//		this.runControlerTest(this.config);
+//		this.runControlerTest(this.config); // commented this out because I don't really like non-deterministic tests. kai, aug09
 	}
 
 	private void runControlerTest(final Config config) {
