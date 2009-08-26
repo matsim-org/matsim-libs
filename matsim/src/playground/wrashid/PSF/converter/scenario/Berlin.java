@@ -1,8 +1,8 @@
 package playground.wrashid.PSF.converter.scenario;
 
 import playground.wrashid.PSF.converter.addingParkings.AddParkingsToPlans;
-import playground.wrashid.PSF.converter.addingParkings.GeneralTestOptimizedCharger;
 import playground.wrashid.PSF.converter.addingParkings.GenerateParkingFacilities;
+
 
 public class Berlin {
 
