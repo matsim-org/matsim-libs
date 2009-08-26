@@ -45,6 +45,9 @@ public class KtiConfigGroupTest extends MatsimTestCase {
 		assertEquals(
 				Boolean.parseBoolean(KtiConfigGroup.KtiConfigParameter.USE_PLANS_CALC_ROUTE_KTI.getDefaultValue()), 
 				testee.isUsePlansCalcRouteKti());
+		assertEquals(Double.parseDouble(KtiConfigGroup.KtiConfigParameter.DISTANCE_COST_CAR.getDefaultValue()), testee.getDistanceCostCar());
+		assertEquals(Double.parseDouble(KtiConfigGroup.KtiConfigParameter.DISTANCE_COST_PT.getDefaultValue()), testee.getDistanceCostPtNoTravelCard());
+		assertEquals(Double.parseDouble(KtiConfigGroup.KtiConfigParameter.DISTANCE_COST_PT_UNKNOWN.getDefaultValue()), testee.getDistanceCostPtUnknownTravelCard());
 		
 	}
 	
@@ -64,7 +67,9 @@ public class KtiConfigGroupTest extends MatsimTestCase {
 		assertEquals("filename1", testee.getPtTraveltimeMatrixFilename());
 		assertEquals("filename3", testee.getWorldInputFilename());
 		assertTrue(testee.isUsePlansCalcRouteKti());
-		
+		assertEquals(0.1, testee.getDistanceCostCar());
+		assertEquals(-0.2, testee.getDistanceCostPtNoTravelCard());
+		assertEquals(0.3, testee.getDistanceCostPtUnknownTravelCard());
 	}
 	
 }

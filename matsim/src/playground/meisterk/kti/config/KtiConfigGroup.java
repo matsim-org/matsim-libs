@@ -54,7 +54,19 @@ public class KtiConfigGroup extends Module {
 		/**
 		 * boolean variable indicating whether the kti router should be used or not
 		 */
-		USE_PLANS_CALC_ROUTE_KTI("usePlansCalcRouteKti", "false", "");
+		USE_PLANS_CALC_ROUTE_KTI("usePlansCalcRouteKti", "false", ""),
+		/**
+		 * distance cost for mode "car" in CHF/km
+		 */
+		DISTANCE_COST_CAR("distanceCostCar", "0.0", ""),
+		/**
+		 * distance cost for mode "pt" in CHF/km, without travel card
+		 */
+		DISTANCE_COST_PT("distanceCostPtNoTravelCard", "0.0", ""),
+		/**
+		 * distance cost for mode "pt" in CHF/km, with travel card "unknown"
+		 */
+		DISTANCE_COST_PT_UNKNOWN("distanceCostPtUnknownTravelCard", "0.0", "");
 		
 		private final String parameterName;
 		private final String defaultValue;
@@ -153,5 +165,18 @@ public class KtiConfigGroup extends Module {
 	public void setUsePlansCalcRouteKti(boolean usePlansCalcRouteKti) {
 		KtiConfigParameter.USE_PLANS_CALC_ROUTE_KTI.setActualValue(Boolean.toString(usePlansCalcRouteKti));
 	}
+	
+	public double getDistanceCostCar() {
+		return Double.parseDouble(KtiConfigParameter.DISTANCE_COST_CAR.getActualValue());
+	}
+	
+	public double getDistanceCostPtNoTravelCard() {
+		return Double.parseDouble(KtiConfigParameter.DISTANCE_COST_PT.getActualValue());
+	}
+	
+	public double getDistanceCostPtUnknownTravelCard() {
+		return Double.parseDouble(KtiConfigParameter.DISTANCE_COST_PT_UNKNOWN.getActualValue());
+	}
+	
 	
 }
