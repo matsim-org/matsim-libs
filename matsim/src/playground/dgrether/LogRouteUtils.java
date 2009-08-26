@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 
 /**
@@ -33,7 +33,7 @@ import org.matsim.core.population.routes.NetworkRoute;
  */
 public class LogRouteUtils {
 
-	public static String getNodeRoute(final NetworkRoute r) {
+	public static String getNodeRoute(final NetworkRouteWRefs r) {
 		StringBuffer buffer = new StringBuffer();
 		for (Node n : r.getNodes()) {
 			buffer.append(n.getId().toString());

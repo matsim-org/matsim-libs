@@ -26,8 +26,8 @@ import org.matsim.core.events.LinkLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -47,9 +47,9 @@ public class AbstractControlInputImplTest extends MatsimTestCase {
 		MatsimNetworkReader parser = new MatsimNetworkReader(network);
 		parser.readFile(getInputDirectory() + "network.xml");
 
-		NetworkRoute route1 = new NodeNetworkRoute();
+		NetworkRouteWRefs route1 = new NodeNetworkRouteImpl();
 		route1.setNodes(NetworkUtils.getNodes(network, "3 6 7 12"));
-		NetworkRoute route2 = new NodeNetworkRoute();
+		NetworkRouteWRefs route2 = new NodeNetworkRouteImpl();
 		route2.setNodes(NetworkUtils.getNodes(network, "3 8 9 12"));
 
 		//control input test class

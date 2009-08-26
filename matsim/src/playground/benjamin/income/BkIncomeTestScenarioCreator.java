@@ -40,7 +40,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 
 import playground.dgrether.DgPaths;
 
@@ -91,7 +91,7 @@ public class BkIncomeTestScenarioCreator {
 			plan.addActivity(act1);
 			
 			BasicLeg leg1Car = builder.createLeg(TransportMode.car);
-			NodeNetworkRoute routeCar = new NodeNetworkRoute(this.uselessNetwork.getLink(id1), this.uselessNetwork.getLink(id4));
+			NodeNetworkRouteImpl routeCar = new NodeNetworkRouteImpl(this.uselessNetwork.getLink(id1), this.uselessNetwork.getLink(id4));
 			//this would be so nice
 			List<Id> linkidsCar = new ArrayList<Id>();
 			linkidsCar.add(id2);
@@ -111,7 +111,7 @@ public class BkIncomeTestScenarioCreator {
 			plan.addActivity(act2);
 			
 			BasicLeg leg2Car = builder.createLeg(TransportMode.car);
-			routeCar = new NodeNetworkRoute(this.uselessNetwork.getLink(id4), this.uselessNetwork.getLink(id1));
+			routeCar = new NodeNetworkRouteImpl(this.uselessNetwork.getLink(id4), this.uselessNetwork.getLink(id1));
 			//in a beautiful world we would do...
 			linkidsCar = new ArrayList<Id>();
 			linkidsCar.add(id5);

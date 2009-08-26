@@ -37,9 +37,9 @@ import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRoute getNetworkRouteInstance(final Link fromLink, final Link toLink, final NetworkLayer network) {
+	public NetworkRouteWRefs getNetworkRouteInstance(final Link fromLink, final Link toLink, final NetworkLayer network) {
 		SubsequentLinksAnalyzer subsequent = new SubsequentLinksAnalyzer(network);
-		return new CompressedNetworkRoute(fromLink, toLink, subsequent.getSubsequentLinks());
+		return new CompressedNetworkRouteImpl(fromLink, toLink, subsequent.getSubsequentLinks());
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		links.add(link12);
 		links.add(link13);
 		links.add(linkM24);
-		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link1, link4, network);
 		route.setLinks(link1, links, link4);
 
 		List<Link> links2 = route.getLinks();
@@ -91,7 +91,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		subsequentLinks.put(link2, link3);
 		subsequentLinks.put(link3, link4);
 
-		NetworkRoute route = new CompressedNetworkRoute(link0, link4, subsequentLinks);
+		NetworkRouteWRefs route = new CompressedNetworkRouteImpl(link0, link4, subsequentLinks);
 		route.setLinks(link0, links, link4);
 
 		List<Link> links2 = route.getLinks();
@@ -102,7 +102,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	}
 
 	/**
-	 * Tests that {@link CompressedNetworkRoute#getLinks()} doesn't crash or
+	 * Tests that {@link CompressedNetworkRouteImpl#getLinks()} doesn't crash or
 	 * hang when a route object is not correctly initialized.
 	 */
 	public void testGetLinks_incompleteInitialization() {
@@ -119,7 +119,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		subsequentLinks.put(link2, link3);
 		subsequentLinks.put(link3, link4);
 
-		NetworkRoute route = new CompressedNetworkRoute(link0, link4, subsequentLinks);
+		NetworkRouteWRefs route = new CompressedNetworkRouteImpl(link0, link4, subsequentLinks);
 		// NO route.setLinks() here!
 
 		assertEquals("expected 0 links.", 0, route.getLinks().size());
@@ -127,7 +127,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	}
 
 	/**
-	 * Tests that {@link CompressedNetworkRoute#getNodes()} doesn't crash or
+	 * Tests that {@link CompressedNetworkRouteImpl#getNodes()} doesn't crash or
 	 * hang when a route object is not correctly initialized.
 	 */
 	public void testGetNodes_incompleteInitialization() {
@@ -144,7 +144,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		subsequentLinks.put(link2, link3);
 		subsequentLinks.put(link3, link4);
 
-		NetworkRoute route = new CompressedNetworkRoute(link0, link4, subsequentLinks);
+		NetworkRouteWRefs route = new CompressedNetworkRouteImpl(link0, link4, subsequentLinks);
 		// NO route.setLinks() here!
 
 		assertEquals("expected 0 links.", 0, route.getNodes().size());

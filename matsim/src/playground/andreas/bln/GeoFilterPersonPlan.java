@@ -12,7 +12,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /**
  * Filters persons with plans which do not have one node of a given network in common.
@@ -57,7 +57,7 @@ public class GeoFilterPersonPlan extends NewPopulation {
 
 			for (PlanElement planElement : plan.getPlanElements()) {
 				if(planElement instanceof LegImpl){
-					for (Node node : ((NetworkRoute)((LegImpl) planElement).getRoute()).getNodes()) {
+					for (Node node : ((NetworkRouteWRefs)((LegImpl) planElement).getRoute()).getNodes()) {
 						if(this.targetNet.getNodes().containsValue(node)){
 							keepPlan = true;
 							break;

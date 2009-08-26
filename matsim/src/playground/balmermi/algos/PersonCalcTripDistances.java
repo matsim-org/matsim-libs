@@ -25,7 +25,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -64,14 +64,14 @@ public class PersonCalcTripDistances extends AbstractPersonAlgorithm implements 
 			ActivityImpl next = (ActivityImpl)plan.getPlanElements().get(i+1);
 
 			if (prev.getLinkId().equals(next.getLinkId())) {
-				if (!((NetworkRoute) leg.getRoute()).getNodes().isEmpty()) { throw new RuntimeException("Person id=" + person.getId() + ": route should be empty!"); }
+				if (!((NetworkRouteWRefs) leg.getRoute()).getNodes().isEmpty()) { throw new RuntimeException("Person id=" + person.getId() + ": route should be empty!"); }
 				leg.getRoute().setDistance(0.0);
 			}
 			else {
-				if (((NetworkRoute) leg.getRoute()).getNodes().isEmpty()) { leg.getRoute().setDistance(CoordUtils.calcDistance(next.getCoord(), prev.getCoord())); }
+				if (((NetworkRouteWRefs) leg.getRoute()).getNodes().isEmpty()) { leg.getRoute().setDistance(CoordUtils.calcDistance(next.getCoord(), prev.getCoord())); }
 				else {
 					double dist = prev.getLink().getLength();
-					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+					for (Link link : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
 						dist += link.getLength();
 					}
 					leg.getRoute().setDistance(dist);

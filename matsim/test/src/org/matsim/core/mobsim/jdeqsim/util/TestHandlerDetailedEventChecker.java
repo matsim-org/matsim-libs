@@ -27,7 +27,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -115,7 +115,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 								((LinkLeaveEvent) list.get(index)).getLinkId().toString()));
 						index++;
 						
-						for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+						for (Link link : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
 							// enter link and leave each link on route
 							assertTrue(list.get(index) instanceof LinkEnterEvent);
 							assertTrue(link.getId().toString().equalsIgnoreCase(

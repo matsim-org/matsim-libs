@@ -37,8 +37,8 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandlerImplV4;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 
@@ -85,7 +85,7 @@ public class Plansgenerator {
 			a.setEndTime(homeEndtime);
 			//leg to work
 			LegImpl leg = plan.createLeg(TransportMode.car);
-			NetworkRoute route = new NodeNetworkRoute(link1, link20);
+			NetworkRouteWRefs route = new NodeNetworkRouteImpl(link1, link20);
 			route.setNodes(link1, NetworkUtils.getNodes(network, "2 4 5"), link20);
 			leg.setRoute(route);
 			//work
@@ -94,7 +94,7 @@ public class Plansgenerator {
 			a.setDuration(2.5 * 3600);
 			//leg to work
 			leg = plan.createLeg(TransportMode.car);
-			route = new NodeNetworkRoute(link20, link1);
+			route = new NodeNetworkRouteImpl(link20, link1);
 			route.setNodes(link20, NetworkUtils.getNodes(network, "13 14 15 1"), link1);
 			leg.setRoute(route);
 			a = plan.createActivity("h", homeCoord);

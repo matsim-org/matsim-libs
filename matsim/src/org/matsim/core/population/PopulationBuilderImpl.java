@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.LinkNetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /**
  * @author dgrether
@@ -105,7 +105,7 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 		if (end == null) {
 			throw new IllegalStateException("Can't create Route with EndLink Id " + startLinkId + " because the Link cannot be found in the loaded Network.");
 		}
-		NetworkRoute route = new LinkNetworkRoute(start, end);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(start, end);
 		List<Link> links = new ArrayList<Link>();
 		Link link;
 		for (Id id : currentRouteLinkIds) {

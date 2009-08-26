@@ -32,7 +32,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /**
  * select an existing Plan according to the Path Size Logit (e.g. Frejinger, E. and Bierlaire, M.: Capturing Correlation
@@ -105,7 +105,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 				if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
 					currentEndTime = leg.getDepartureTime();
-					NetworkRoute r = (NetworkRoute) leg.getRoute();
+					NetworkRouteWRefs r = (NetworkRouteWRefs) leg.getRoute();
 					pathSize += r.getDistance();
 					for (Link link : r.getLinks()){
 						ArrayList<Double> lit = linksInTime.get(link.getId());
@@ -129,7 +129,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 				if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
 					double currentTime = leg.getDepartureTime();
-					NetworkRoute route = (NetworkRoute) leg.getRoute();
+					NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
 					for (Link link : route.getLinks()){
 						double denominator = 0;
 						for (double dbl : linksInTime.get(link.getId())){

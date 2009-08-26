@@ -40,7 +40,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -69,7 +69,7 @@ public class ControlerTest extends MatsimTestCase {
 		ActivityImpl a1 = plan1.createActivity("h", f.link1);
 		a1.setEndTime(7.0*3600);
 		LegImpl leg1 = plan1.createLeg(TransportMode.car);
-		NetworkRoute route1 = (NetworkRoute)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
+		NetworkRouteWRefs route1 = (NetworkRouteWRefs)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		leg1.setRoute(route1);
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		nodes.add(f.node2);
@@ -83,7 +83,7 @@ public class ControlerTest extends MatsimTestCase {
 		ActivityImpl a2 = plan2.createActivity("h", f.link1);
 		a2.setEndTime(7.0*3600);
 		LegImpl leg2 = plan2.createLeg(TransportMode.car);
-		NetworkRoute route2 = (NetworkRoute)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
+		NetworkRouteWRefs route2 = (NetworkRouteWRefs)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		leg2.setRoute(route2);
 		route2.setNodes(f.link1, nodes, f.link3);
 		plan2.createActivity("h", f.link3);

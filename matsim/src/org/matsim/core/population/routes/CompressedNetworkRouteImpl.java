@@ -26,12 +26,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
 /**
- * Implementation of {@link NetworkRoute} that tries to minimize the amount of
+ * Implementation of {@link NetworkRouteWRefs} that tries to minimize the amount of
  * data needed to be stored for each route. This will give some memory savings,
  * allowing for larger scenarios (=more agents), especially on detailed
  * networks, but is likely a bit slower due to the more complex access of the
@@ -39,9 +40,9 @@ import org.matsim.api.core.v01.network.Node;
  *
  * @author mrieser
  */
-public class CompressedNetworkRoute extends AbstractRoute implements NetworkRoute {
+public class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkRouteWRefs {
 
-	private final static Logger log = Logger.getLogger(CompressedNetworkRoute.class);
+	private final static Logger log = Logger.getLogger(CompressedNetworkRouteImpl.class);
 
 	private final ArrayList<Link> route = new ArrayList<Link>(0);
 	private final Map<Link, Link> subsequentLinks;
@@ -52,7 +53,7 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 	private int routeModCountState = 0;
 	private Id vehicleId = null;
 
-	public CompressedNetworkRoute(final Link startLink, final Link endLink, final Map<Link, Link> subsequentLinks) {
+	public CompressedNetworkRouteImpl(final Link startLink, final Link endLink, final Map<Link, Link> subsequentLinks) {
 		super(startLink, endLink);
 		this.subsequentLinks = subsequentLinks;
 	}
@@ -158,7 +159,7 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 
 	}
 
-	public NetworkRoute getSubRoute(final Node fromNode, final Node toNode) {
+	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
 		Link newStartLink = null;
 		Link newEndLink = null;
 		List<Link> newLinks = new ArrayList<Link>(10);
@@ -190,7 +191,7 @@ public class CompressedNetworkRoute extends AbstractRoute implements NetworkRout
 			}
 		}
 
-		NetworkRoute subRoute = new CompressedNetworkRoute(newStartLink, newEndLink, this.subsequentLinks);
+		NetworkRouteWRefs subRoute = new CompressedNetworkRouteImpl(newStartLink, newEndLink, this.subsequentLinks);
 		subRoute.setLinks(newStartLink, newLinks, newEndLink);
 		return subRoute;
 	}

@@ -45,7 +45,7 @@ public class CompressedNetworkRouteFactory implements RouteFactory {
 		if (this.subsequentLinks == null) {
 			this.subsequentLinks = new SubsequentLinksAnalyzer(this.network).getSubsequentLinks();
 		}
-		return new CompressedNetworkRoute(startLink, endLink, this.subsequentLinks);
+		return new CompressedNetworkRouteImpl(startLink, endLink, this.subsequentLinks);
 	}
 
 }

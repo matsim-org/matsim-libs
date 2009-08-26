@@ -37,7 +37,7 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -295,7 +295,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 	}
 
 	@Override
-	public double getPredictedNashTime(final NetworkRoute route) {
+	public double getPredictedNashTime(final NetworkRouteWRefs route) {
 		if (route.equals(this.mainRoute)) {
 			return this.predTTMainRoute;
 		}
@@ -331,7 +331,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		return this.predTTMainRoute - this.predTTAlternativeRoute;
 	}
 
-	private double getPredictedTravelTime(final NetworkRoute route, final Link bottleNeck) {
+	private double getPredictedTravelTime(final NetworkRouteWRefs route, final Link bottleNeck) {
 
 		double predictedTT;
 		List<Link> routeLinks = route.getLinks();
@@ -468,7 +468,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		return predictedTT;
 	}
 
-	private int getAdditionalAgents(final NetworkRoute route, final int linkIndex) {
+	private int getAdditionalAgents(final NetworkRouteWRefs route, final int linkIndex) {
 		double totalExtraAgents = 0.0;
 
 		// check distance and free speed travel time from start node to bottleneck
@@ -496,7 +496,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		return (int) (totalExtraAgents);
 	}
 
-	private double getInOutFlow(final Id inLinkId, final NetworkRoute route) {
+	private double getInOutFlow(final Id inLinkId, final NetworkRouteWRefs route) {
 		double flow;
 		if (route == this.mainRoute) {
 			flow = this.extraFlowsMainRoute.get(inLinkId);
@@ -520,7 +520,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		return capacity;
 	}
 
-	public Link getDetectedBottleNeck(final NetworkRoute route) {
+	public Link getDetectedBottleNeck(final NetworkRouteWRefs route) {
 		Link l;
 		if (route == this.mainRoute) {
 			l = this.currentBottleNeckMainRoute;
@@ -531,7 +531,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		return l;
 	}
 
-	public void setIncidentLink(final Link link, final NetworkRoute route) {
+	public void setIncidentLink(final Link link, final NetworkRouteWRefs route) {
 		if (route == this.mainRoute) {
 			this.currentBottleNeckMainRoute = link;
 		}
@@ -540,7 +540,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		}
 	}
 
-	private void setIncidentCapacity(final Double currentBottleNeckCapacity, final NetworkRoute route) {
+	private void setIncidentCapacity(final Double currentBottleNeckCapacity, final NetworkRouteWRefs route) {
 		if (route == this.mainRoute) {
 			this.currentBNCapacityMainRoute = currentBottleNeckCapacity;
 		}
@@ -549,7 +549,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 		}
 	}
 
-	private Double getIncidentCapacity(final NetworkRoute route) {
+	private Double getIncidentCapacity(final NetworkRouteWRefs route) {
 		double cap;
 		if (route == this.mainRoute) {
 			cap = this.currentBNCapacityMainRoute;
@@ -561,7 +561,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 	}
 
 	private Link searchAccidentsOnRoutes(final Id accidentLinkId) {
-		NetworkRoute r = this.mainRoute;
+		NetworkRouteWRefs r = this.mainRoute;
 		for (int j = 0; j < 2; j++) {
 			for (Link link : r.getLinks()) {
 				if (link.getId().equals(accidentLinkId)) {

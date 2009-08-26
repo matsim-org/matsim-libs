@@ -61,7 +61,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.scenario.ScenarioLoader;
@@ -430,11 +430,11 @@ public class MyRuns {
 							final List actslegs = plan.getPlanElements();
 							for (int i = 1, max = actslegs.size(); i < max; i+=2) {
 								final LegImpl leg = (LegImpl)actslegs.get(i);
-								run((NetworkRoute) leg.getRoute(), leg.getDepartureTime());
+								run((NetworkRouteWRefs) leg.getRoute(), leg.getDepartureTime());
 							}
 						}
 
-						public void run(final NetworkRoute route, final double time) {
+						public void run(final NetworkRouteWRefs route, final double time) {
 							if (route == null) return;
 
 							final int hour = (int)time / 3600;

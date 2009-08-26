@@ -10,8 +10,8 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.routes.LinkNetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
@@ -101,7 +101,7 @@ public class TransitRouteFinder {
 			routeNodeList.add(link.getToNode());
 		} 
 		
-		NetworkRoute legRoute = new LinkNetworkRoute(null, null);
+		NetworkRouteWRefs legRoute = new LinkNetworkRouteImpl(null, null);
 		legRoute.setDistance(distance);
 		legRoute.setLinks(null, routeLinks, null);
 		legRoute.setTravelTime(travTime);

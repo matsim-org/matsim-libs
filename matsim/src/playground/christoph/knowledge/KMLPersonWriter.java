@@ -46,7 +46,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.vis.kml.KMZWriter;
@@ -66,7 +66,7 @@ public class KMLPersonWriter {
 	protected ArrayList<Node> routeNodes;
 	protected NetworkLayer network;
 	protected Map<Id, Node> nodes;
-	protected NetworkRoute route;
+	protected NetworkRouteWRefs route;
 	
 	protected boolean writeKnownNodes = true;
 	protected boolean writeActivityLinks = true;
@@ -297,9 +297,9 @@ public class KMLPersonWriter {
 					if (pe instanceof BasicLeg) {
 						BasicLeg leg = (BasicLeg) pe;
 						
-						if (leg.getRoute() instanceof NetworkRoute)
+						if (leg.getRoute() instanceof NetworkRouteWRefs)
 						{
-							NetworkRoute route = (NetworkRoute)leg.getRoute();
+							NetworkRouteWRefs route = (NetworkRouteWRefs)leg.getRoute();
 							for(Node node : route.getNodes())
 							{
 								routeNodes.add(node);

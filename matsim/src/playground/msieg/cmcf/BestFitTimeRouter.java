@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 
 import playground.msieg.structure.Commodity;
 
@@ -96,7 +96,7 @@ public class BestFitTimeRouter extends CMCFRouter {
 					
 					assert(person != null && leg != null);
 					
-					NodeNetworkRoute route = new NodeNetworkRoute(leg.getRoute().getStartLink(), leg.getRoute().getEndLink());
+					NodeNetworkRouteImpl route = new NodeNetworkRouteImpl(leg.getRoute().getStartLink(), leg.getRoute().getEndLink());
 					route.setLinks(	leg.getRoute().getStartLink(), path, leg.getRoute().getEndLink());
 					leg.setRoute(route);
 					double depTime = person.getSelectedPlan().getFirstActivity().getStartTime()

@@ -39,8 +39,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.run.Events2Snapshot;
@@ -126,7 +126,7 @@ public class MyControler1 extends Controler {
 				act1a.setLink(link9);
 				act1a.setEndTime(0*60*60.);
 				LegImpl leg = plan1.createLeg(TransportMode.car);
-				NetworkRoute route = new NodeNetworkRoute(link9, link15);
+				NetworkRouteWRefs route = new NodeNetworkRouteImpl(link9, link15);
 				route.setNodes(link9, NetworkUtils.getNodes(this.network, "3 4"), link15);
 				leg.setRoute(route);
 				ActivityImpl act1b = plan1.createActivity("h", new CoordImpl(200., 200.));
@@ -139,7 +139,7 @@ public class MyControler1 extends Controler {
 				act2a.setLink(link9);
 				act2a.setEndTime(0*60*60.);
 				LegImpl leg2 = plan2.createLeg(TransportMode.car);
-				NetworkRoute route2 = new NodeNetworkRoute(link9, link15);
+				NetworkRouteWRefs route2 = new NodeNetworkRouteImpl(link9, link15);
 				route2.setNodes(link9, NetworkUtils.getNodes(this.network, "3 6 4"), link15);
 				leg2.setRoute(route2);
 				ActivityImpl act2b = plan1.createActivity("h", new CoordImpl(200., 200.));

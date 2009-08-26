@@ -35,8 +35,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.LinkNetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -87,14 +87,14 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		
 		/* Memorize the initial car routes.
 		 * Do this in any case as the car routes are required in the setTimes() method. */
-		ArrayList <LinkNetworkRoute> routes = new ArrayList<LinkNetworkRoute>();
+		ArrayList <LinkNetworkRouteImpl> routes = new ArrayList<LinkNetworkRouteImpl>();
 		for (int i=1;i<basePlan.getPlanElements().size();i=i+2){
-			LinkNetworkRoute r = new LinkNetworkRoute(((LegImpl)(basePlan.getPlanElements().get(i))).getRoute().getStartLink(), ((LegImpl)(basePlan.getPlanElements().get(i))).getRoute().getEndLink());
+			LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(((LegImpl)(basePlan.getPlanElements().get(i))).getRoute().getStartLink(), ((LegImpl)(basePlan.getPlanElements().get(i))).getRoute().getEndLink());
 		/*	List<Id> l = new ArrayList<Id>();
 			for (int j=0;j<((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().size();j++){
 				l.add(((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().get(j));
 			}*/
-			List<Id> l = ((NetworkRoute) ((LegImpl)(basePlan.getPlanElements().get(i))).getRoute()).getLinkIds(); // to be checked whether this works
+			List<Id> l = ((NetworkRouteWRefs) ((LegImpl)(basePlan.getPlanElements().get(i))).getRoute()).getLinkIds(); // to be checked whether this works
 			r.setLinkIds(l);
 			routes.add(r);
 		}

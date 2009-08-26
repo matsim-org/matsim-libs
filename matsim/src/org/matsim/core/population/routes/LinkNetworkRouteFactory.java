@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 public class LinkNetworkRouteFactory implements RouteFactory {
 
 	public RouteWRefs createRoute(Link startLink, Link endLink) {
-		return new LinkNetworkRoute(startLink, endLink);
+		return new LinkNetworkRouteImpl(startLink, endLink);
 	}
 
 }

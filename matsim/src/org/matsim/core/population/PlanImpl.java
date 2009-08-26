@@ -31,7 +31,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
@@ -227,10 +227,10 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 				l2.setArrivalTime(l.getArrivalTime());
 				RouteWRefs route = l.getRoute();
 				if (route != null) {
-					if (route instanceof NetworkRoute) {
+					if (route instanceof NetworkRouteWRefs) {
 						NetworkLayer net = (NetworkLayer) route.getStartLink().getLayer();
-						NetworkRoute r2 = (NetworkRoute) net.getFactory().createRoute(TransportMode.car, route.getStartLink(), route.getEndLink());
-						r2.setLinks(route.getStartLink(), ((NetworkRoute) route).getLinks(), route.getEndLink());
+						NetworkRouteWRefs r2 = (NetworkRouteWRefs) net.getFactory().createRoute(TransportMode.car, route.getStartLink(), route.getEndLink());
+						r2.setLinks(route.getStartLink(), ((NetworkRouteWRefs) route).getLinks(), route.getEndLink());
 						r2.setDistance(route.getDistance());
 						r2.setTravelTime(route.getTravelTime());
 						l2.setRoute(r2);

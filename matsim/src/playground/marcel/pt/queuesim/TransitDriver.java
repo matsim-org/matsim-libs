@@ -40,7 +40,7 @@ import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.mobsim.queuesim.TransitDriverAgent;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -52,7 +52,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 public class TransitDriver implements TransitDriverAgent {
 
 		private final List<Link> linkRoute;
-		private final NetworkRoute carRoute;
+		private final NetworkRouteWRefs carRoute;
 		private final double departureTime;
 
 		/*package*/ TransitVehicle vehicle = null;
@@ -227,12 +227,12 @@ public class TransitDriver implements TransitDriverAgent {
 		 *
 		 * @author mrieser
 		 */
-		protected class NetworkRouteWrapper implements NetworkRoute {
+		protected class NetworkRouteWrapper implements NetworkRouteWRefs {
 
 			private static final long serialVersionUID = 1L;
-			private final NetworkRoute delegate;
+			private final NetworkRouteWRefs delegate;
 
-			public NetworkRouteWrapper(final NetworkRoute route) {
+			public NetworkRouteWrapper(final NetworkRouteWRefs route) {
 				this.delegate = route;
 			}
 
@@ -252,7 +252,7 @@ public class TransitDriver implements TransitDriverAgent {
 				return this.delegate.getStartLink();
 			}
 
-			public NetworkRoute getSubRoute(final Node fromNode, final Node toNode) {
+			public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
 				return this.delegate.getSubRoute(fromNode, toNode);
 			}
 

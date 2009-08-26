@@ -34,7 +34,7 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.GenericRoute;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.knowledges.ActivitySpace;
@@ -364,8 +364,8 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 		out.write(">\n");
 
 		out.write("\t\t\t\t\t");
-		if (route instanceof NetworkRoute) {
-			for (Node n : ((NetworkRoute) route).getNodes()) {
+		if (route instanceof NetworkRouteWRefs) {
+			for (Node n : ((NetworkRouteWRefs) route).getNodes()) {
 				out.write(n.getId() + " ");
 			}
 		} else if (route instanceof GenericRoute) {

@@ -22,7 +22,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /*
  * TODO: (next steps):
@@ -127,8 +127,8 @@ public class PJDEQSimulation extends JDEQSimulation {
 				// numberOfLinks++;
 
 				Leg leg = ((Leg) actsLegs.get(i));
-				if (leg.getRoute() instanceof NetworkRoute) {
-					List<Link> links = ((NetworkRoute) leg.getRoute())
+				if (leg.getRoute() instanceof NetworkRouteWRefs) {
+					List<Link> links = ((NetworkRouteWRefs) leg.getRoute())
 							.getLinks();
 					Link[] currentLinkRoute = links.toArray(new LinkImpl[links
 							.size()]);

@@ -24,7 +24,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.population.routes.GenericRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.testcases.MatsimTestCase;
@@ -39,7 +39,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 
 		// test default
 		RouteWRefs carRoute = factory.createRoute(TransportMode.car, null, null);
-		assertTrue(carRoute instanceof NodeNetworkRoute);
+		assertTrue(carRoute instanceof NodeNetworkRouteImpl);
 
 		RouteWRefs route = factory.createRoute(TransportMode.pt, null, null);
 		assertTrue(route instanceof GenericRoute);

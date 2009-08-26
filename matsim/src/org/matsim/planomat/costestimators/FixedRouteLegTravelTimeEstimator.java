@@ -33,8 +33,8 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -101,7 +101,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 
 			if (doModifyLeg) {
 				// TODO where do I know from the type of the NetworkRoute to be constructed? (node or link)
-				NodeNetworkRoute nodeNetworkRoute = new NodeNetworkRoute(actOrigin.getLink(), actDestination.getLink());
+				NodeNetworkRouteImpl nodeNetworkRoute = new NodeNetworkRouteImpl(actOrigin.getLink(), actDestination.getLink());
 				nodeNetworkRoute.setLinks(actOrigin.getLink(), this.fixedRoutes.get(legIntermediate), actDestination.getLink());
 				legIntermediate.setRoute(nodeNetworkRoute);
 			}
@@ -174,8 +174,8 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 			if (planElement instanceof BasicLeg) {
 				
 				LegImpl leg = (LegImpl) planElement;
-				if (leg.getRoute() instanceof NetworkRoute) {
-					this.fixedRoutes.put(leg, ((NetworkRoute) leg.getRoute()).getLinks());
+				if (leg.getRoute() instanceof NetworkRouteWRefs) {
+					this.fixedRoutes.put(leg, ((NetworkRouteWRefs) leg.getRoute()).getLinks());
 				}
 				
 			}

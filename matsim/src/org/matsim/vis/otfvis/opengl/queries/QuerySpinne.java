@@ -54,7 +54,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
@@ -151,7 +151,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 					LegImpl leg = (LegImpl)actslegs.get(i);
 					// just look at car routes right now
 					if(leg.getMode() != TransportMode.car) continue;
-					for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+					for (Link link : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
 						Id id2 = link.getId();
 						if(id2.equals(this.linkId) ) {
 							actPersons.add(plan);
@@ -184,9 +184,9 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 				if ( pe instanceof LegImpl ) {
 					LegImpl leg = (LegImpl) pe ;
 					RouteWRefs route = leg.getRoute();
-					if ( route instanceof NetworkRoute ) { // added in jun09, see below in "collectLinks". kai, jun09
+					if ( route instanceof NetworkRouteWRefs ) { // added in jun09, see below in "collectLinks". kai, jun09
 						List<Link> links = new ArrayList<Link>();
-						for (Link link : ((NetworkRoute) route).getLinks() ) {
+						for (Link link : ((NetworkRouteWRefs) route).getLinks() ) {
 							links.add(link);
 							if(link.getId().equals(this.linkId) ) {
 								// only if this specific route includes link, add the route
@@ -222,8 +222,8 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 					 */
 
 					RouteWRefs route = leg.getRoute() ;
-					if ( route instanceof NetworkRoute ) {
-						NetworkRoute nr = (NetworkRoute) route ;
+					if ( route instanceof NetworkRouteWRefs ) {
+						NetworkRouteWRefs nr = (NetworkRouteWRefs) route ;
 						for (Link link : nr.getLinks() ) {
 							addLink(link);
 						}

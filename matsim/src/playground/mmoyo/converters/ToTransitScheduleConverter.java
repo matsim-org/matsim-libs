@@ -8,7 +8,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
@@ -65,7 +65,7 @@ public class ToTransitScheduleConverter {
 			}
 			
 			Id idTransitRoute = new IdImpl(ptLineId + "-" +  ptLine.getDirection());
-			NetworkRoute networkRoute= null; //new NodeNetworkRoute(null, null);
+			NetworkRouteWRefs networkRoute= null; //new NodeNetworkRoute(null, null);
 			TransitRoute transitRoute = this.builder.createTransitRoute(idTransitRoute, networkRoute, transitRouteStops, TransportMode.pt);
 			transitRoute.setTransportMode(ptLine.getTransportMode());
 			x=0;

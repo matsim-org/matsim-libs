@@ -23,7 +23,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.IntegerCache;
 import org.matsim.evacuation.socialcost.SocialCostCalculator;
@@ -92,7 +92,7 @@ public class SocialCostCalculatorMultiLinkII implements SocialCostCalculator, Qu
 				continue;
 			}
 			PlanImpl plan = pers.getSelectedPlan();
-			List<Id> links = ((NetworkRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();
+			List<Id> links = ((NetworkRouteWRefs) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();
 			traceAgentsRoute(links,pers.getId());
 			
 		}

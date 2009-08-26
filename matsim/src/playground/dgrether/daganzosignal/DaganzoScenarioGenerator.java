@@ -38,8 +38,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
@@ -212,7 +212,7 @@ public class DaganzoScenarioGenerator {
 			// leg to home
 			LegImpl leg = (LegImpl) builder.createLeg(TransportMode.car);
 			// TODO check this
-			NetworkRoute route = new NodeNetworkRoute(l1, l7);
+			NetworkRouteWRefs route = new NodeNetworkRouteImpl(l1, l7);
 			if (isAlternativeRouteEnabled) {
 				route
 						.setNodes(l1, NetworkUtils.getNodes(network, "2 3 4 5 6"), l7);

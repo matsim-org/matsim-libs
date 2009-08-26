@@ -29,8 +29,8 @@ import org.matsim.core.network.NetworkLayer;
 public class NodeNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRoute getNetworkRouteInstance(final Link fromLink, final Link toLink, final NetworkLayer network) {
-		return new NodeNetworkRoute(fromLink, toLink);
+	public NetworkRouteWRefs getNetworkRouteInstance(final Link fromLink, final Link toLink, final NetworkLayer network) {
+		return new NodeNetworkRouteImpl(fromLink, toLink);
 	}
 
 }

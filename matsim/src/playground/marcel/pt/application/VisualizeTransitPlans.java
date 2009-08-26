@@ -46,8 +46,8 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -138,9 +138,9 @@ public class VisualizeTransitPlans {
 							if (route instanceof GenericRouteImpl) {
 								((GenericRouteImpl) route).setStartLink(fromLink);
 								((GenericRouteImpl) route).setEndLink(toLink);
-							} else if (route instanceof NetworkRoute) {
-								((NetworkRoute) route).setStartLink(fromLink);
-								((NetworkRoute) route).setEndLink(toLink);
+							} else if (route instanceof NetworkRouteWRefs) {
+								((NetworkRouteWRefs) route).setStartLink(fromLink);
+								((NetworkRouteWRefs) route).setEndLink(toLink);
 							}
 						}
 					}
@@ -186,7 +186,7 @@ public class VisualizeTransitPlans {
 		TransitStopFacility accessStop = this.realScenario.getTransitSchedule().getFacilities().get(route.getAccessStopId());
 		TransitStopFacility egressStop = this.realScenario.getTransitSchedule().getFacilities().get(route.getEgressStopId());
 
-		NetworkRoute netRoute = new LinkNetworkRoute(accessStop.getLink(), egressStop.getLink());
+		NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(accessStop.getLink(), egressStop.getLink());
 		List<Link> links = new ArrayList<Link>();
 		boolean include = false;
 		TransitStopFacility prevStop = null;

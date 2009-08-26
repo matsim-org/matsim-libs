@@ -13,8 +13,8 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 
 /**
  * Creates a representation of a special adjacency List [StopFacilities X TransitRoutes]
@@ -50,7 +50,7 @@ public class AdjList {
 				}
 				
 		 		/**sets also route as nodes.*/ 
-				NetworkRoute nodeRoute = new NodeNetworkRoute(null, null);
+				NetworkRouteWRefs nodeRoute = new NodeNetworkRouteImpl(null, null);
 				nodeRoute.setNodes(null, nodeList, null);
 				transitRoute.setRoute(nodeRoute);
 			}

@@ -40,8 +40,8 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelCost;
@@ -91,7 +91,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 		for (LinksScoreGroup group : this.linksScoreGroups) {
 			LinkImpl link = group.getBestLink();
 			PlanImpl plan = getBestLinkPlan(link);
-			ArrayList<Node> evacRoute = new ArrayList<Node>(((NetworkRoute) ((LegImpl) plan.getPlanElements().get(1)).getRoute()).getNodes());
+			ArrayList<Node> evacRoute = new ArrayList<Node>(((NetworkRouteWRefs) ((LegImpl) plan.getPlanElements().get(1)).getRoute()).getNodes());
 			if (isOutLink(link, group.getNode())){
 				evacRoute.add(0, group.getNode());
 			}
@@ -147,7 +147,7 @@ public class EvacDestinationAssigner implements ScoringListener {
 		
 		for (PlanImpl plan : plans) {
 			LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
-			NetworkRoute route = new NodeNetworkRoute();
+			NetworkRouteWRefs route = new NodeNetworkRouteImpl();
 			route.setNodes(evacRoute);
 			leg.setRoute(route);
 			ActivityImpl act = new org.matsim.core.population.ActivityImpl("h",(LinkImpl)dest);

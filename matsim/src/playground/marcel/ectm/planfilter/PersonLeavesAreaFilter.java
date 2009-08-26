@@ -30,7 +30,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.PersonAlgorithm;
 import org.matsim.population.filters.AbstractPersonFilter;
 
@@ -55,7 +55,7 @@ public class PersonLeavesAreaFilter extends AbstractPersonFilter {
 				if (leg.getRoute() == null) {
 					return false;
 				}
-				for (Link link : ((NetworkRoute) leg.getRoute()).getLinks()) {
+				for (Link link : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
 					if (!this.areaOfInterest.containsKey(link.getId())) return true;
 				}
 				// test departure link

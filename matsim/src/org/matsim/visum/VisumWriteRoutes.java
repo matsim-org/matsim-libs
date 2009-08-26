@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.world.MappedLocation;
@@ -71,7 +71,7 @@ public class VisumWriteRoutes extends AbstractPersonAlgorithm implements PlanAlg
 		for (int i = 1; i < plan.getPlanElements().size(); i += 2) {
 			LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
 			StringBuilder visum = new StringBuilder();
-			List<Node> route = ((NetworkRoute) leg.getRoute()).getNodes();
+			List<Node> route = ((NetworkRouteWRefs) leg.getRoute()).getNodes();
 
 			if (route.size() > 0) {
 				ArrayList<MappedLocation> locs = this.tvzLayer.getNearestLocations(route.get(0).getCoord(), null);

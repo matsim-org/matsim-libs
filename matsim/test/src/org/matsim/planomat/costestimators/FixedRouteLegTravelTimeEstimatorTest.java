@@ -42,7 +42,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
@@ -134,7 +134,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			events.addHandler(linkTravelTimeEstimator);
 			events.printEventHandlers();
 
-			NetworkRoute route = (NetworkRoute) testLeg.getRoute();
+			NetworkRouteWRefs route = (NetworkRouteWRefs) testLeg.getRoute();
 			List<Link> links = route.getLinks();
 
 			// let's test a route without events first
@@ -349,7 +349,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		events.addHandler(linkTravelTimeEstimator);
 		events.printEventHandlers();
 
-		NetworkRoute route = (NetworkRoute) this.testLeg.getRoute();
+		NetworkRouteWRefs route = (NetworkRouteWRefs) this.testLeg.getRoute();
 		log.info(route.toString());
 
 		// generate some travel times
@@ -428,7 +428,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
 
-		Id linkId = ((NetworkRoute) this.testLeg.getRoute()).getLinks().get(0).getId();
+		Id linkId = ((NetworkRouteWRefs) this.testLeg.getRoute()).getLinks().get(0).getId();
 
 		Events events = new Events();
 		events.addHandler(linkTravelTimeEstimator);

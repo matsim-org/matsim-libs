@@ -39,8 +39,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class PlansCreateFromMZ {
@@ -222,7 +222,7 @@ public class PlansCreateFromMZ {
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
-					NetworkRoute route = new NodeNetworkRoute();
+					NetworkRouteWRefs route = new NodeNetworkRouteImpl();
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
@@ -242,7 +242,7 @@ public class PlansCreateFromMZ {
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
-					NetworkRoute route = new NodeNetworkRoute(); 
+					NetworkRouteWRefs route = new NodeNetworkRouteImpl(); 
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());

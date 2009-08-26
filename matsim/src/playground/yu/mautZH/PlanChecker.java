@@ -41,7 +41,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -120,7 +120,7 @@ public class PlanChecker extends AbstractPersonAlgorithm {
 			for (PlanElement pe : pl.getPlanElements()) {
 				if (pe instanceof LegImpl) {
 					LegImpl l = (LegImpl) pe;
-					NetworkRoute r = (NetworkRoute) l.getRoute();
+					NetworkRouteWRefs r = (NetworkRouteWRefs) l.getRoute();
 					text.append(r.getDistance() + "\t" + r.getTravelTime()
 							+ "\t");
 				}

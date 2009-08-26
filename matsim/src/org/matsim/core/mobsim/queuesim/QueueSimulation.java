@@ -54,7 +54,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
@@ -555,7 +555,7 @@ public class QueueSimulation {
 		events.processEvent(new AgentDepartureEvent(now, agent.getPerson(), (LinkImpl) link, leg));
 
 		if (leg.getMode().equals(TransportMode.car)) {
-			NetworkRoute route = (NetworkRoute) leg.getRoute();
+			NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
 			Id vehicleId = route.getVehicleId();
 			if (vehicleId == null) {
 				vehicleId = agent.getPerson().getId(); // backwards-compatibility

@@ -42,7 +42,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 class EventHH implements BasicLinkEnterEventHandler {
@@ -86,7 +86,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 					LegImpl l = (LegImpl) actl.get(i);
 					if(l.getMode().equals(TransportMode.car) && l.getRoute() != null){
 						
-						List<Link> ll = ((NetworkRoute) l.getRoute()).getLinks();
+						List<Link> ll = ((NetworkRouteWRefs) l.getRoute()).getLinks();
 						for(Link link : ll) {
 							usedlinkList.add(link);
 						}

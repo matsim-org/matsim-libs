@@ -30,7 +30,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -113,7 +113,7 @@ public class PersonLinkRoutesTable extends AbstractPersonAlgorithm implements Pl
 				out_routes.write(person.getId() + "\t\t" + l.getMode() + "\t");
 				out_types.write(person.getId() + "\t\t" + l.getMode() + "\t");
 				out_length.write(person.getId() + "\t\t" + l.getMode() + "\t");
-				for (Link link : ((NetworkRoute) l.getRoute()).getLinks()) {
+				for (Link link : ((NetworkRouteWRefs) l.getRoute()).getLinks()) {
 					out_routes.write(link.getId() + "\t");
 					out_types.write(((LinkImpl)link).getType() + "\t");
 					out_length.write(link.getLength() + "\t");

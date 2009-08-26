@@ -31,7 +31,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.PersonAlgorithm;
 import org.matsim.world.WorldUtils;
 
@@ -87,8 +87,8 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 						return true;
 					}
 				}
-				else if (leg.getRoute() instanceof NetworkRoute) {
-					List<Link> links = ((NetworkRoute) leg.getRoute()).getLinks();
+				else if (leg.getRoute() instanceof NetworkRouteWRefs) {
+					List<Link> links = ((NetworkRouteWRefs) leg.getRoute()).getLinks();
 					if (links.size() == 0) {
 						if (judgeByBeeline((ActivityImpl) plan.getPlanElements().get(i-1), (ActivityImpl) plan.getPlanElements().get(i+1))) {
 							return true;

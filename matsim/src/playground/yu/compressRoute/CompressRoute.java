@@ -40,7 +40,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -95,7 +95,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 			Stack<Link> newLinks = new Stack<Link>();
 			for (int legId = 1; legId < actsLegs.size(); legId += 2) {
 				LegImpl leg = (LegImpl) actsLegs.get(legId);
-				List<Link> links = ((NetworkRoute) leg.getRoute()).getLinks();
+				List<Link> links = ((NetworkRouteWRefs) leg.getRoute()).getLinks();
 				int linksLength = links.size();
 				this.oldLinksNr += linksLength;
 				try {

@@ -25,8 +25,8 @@ package playground.johannes.eut;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
@@ -54,21 +54,21 @@ public class ReactRouteGuidance implements RouteProvider {
 		return 10;
 	}
 
-	public boolean providesRoute(Link currentLink, NetworkRoute subRoute) {
+	public boolean providesRoute(Link currentLink, NetworkRouteWRefs subRoute) {
 		if(currentLink.getId().toString().equals("1"))
 			return true;
 		else
 			return false;
 	}
 
-	public synchronized NetworkRoute requestRoute(Link departureLink, Link destinationLink,
+	public synchronized NetworkRouteWRefs requestRoute(Link departureLink, Link destinationLink,
 			double time) {
 		if(linkcost.traveltimes instanceof EventBasedTTProvider) {
 			((EventBasedTTProvider)linkcost.traveltimes).requestLinkCost();
 		}
 		Path path = this.algorithm.calcLeastCostPath(departureLink.getToNode(),
 				destinationLink.getFromNode(), time);
-		NetworkRoute route = new NodeNetworkRoute();
+		NetworkRouteWRefs route = new NodeNetworkRouteImpl();
 		route.setStartLink(departureLink);
 		route.setEndLink(destinationLink);
 		route.setNodes(path.nodes);

@@ -44,7 +44,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -159,7 +159,7 @@ public class RouteSummaryTest {
 								aOdRouteSet = new HashSet<List<Id>>();
 
 							List<Id> routeLinkIds = new LinkedList<Id>();
-							NetworkRoute r = (NetworkRoute) l.getRoute();
+							NetworkRouteWRefs r = (NetworkRouteWRefs) l.getRoute();
 							// boolean illegalRoute = false;
 
 							if (r.getNodes().size() > 0) {

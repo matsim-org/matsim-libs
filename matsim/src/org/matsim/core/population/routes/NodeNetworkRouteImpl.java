@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.misc.Time;
 
-public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
+public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteWRefs {
 
 	protected final ArrayList<Node> route = new ArrayList<Node>();
 
@@ -44,13 +44,13 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 	 * start and the end link of a Route correctly.
 	 */
 	@Deprecated
-	public NodeNetworkRoute(){}
+	public NodeNetworkRouteImpl(){}
 
-	public NodeNetworkRoute(final Link startLink, final Link endLink) {
+	public NodeNetworkRouteImpl(final Link startLink, final Link endLink) {
 		super(startLink, endLink);
 	}
 
-	public NodeNetworkRoute(final NetworkRoute route) {
+	public NodeNetworkRouteImpl(final NetworkRouteWRefs route) {
 		super(route.getStartLink(), route.getEndLink());
 		super.setDistance(route.getDistance());
 		super.setTravelTime(route.getTravelTime());
@@ -189,7 +189,7 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 	 * @return a route leading from <code>fromNode</code> to <code>toNode</code> along this route
 	 * @throws IllegalArgumentException if <code>fromNode</code> or <code>toNode</code> are not part of this route
 	 */
-	public NetworkRoute getSubRoute(final Node fromNode, final Node toNode) {
+	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode) {
 		Link fromLink = getStartLink();
 		Link toLink = getEndLink();
 		int fromIndex = -1;
@@ -256,7 +256,7 @@ public class NodeNetworkRoute extends AbstractRoute implements NetworkRoute {
 				throw new IllegalArgumentException("Can't create subroute because toNode is not in the original Route");
 			}
 		}
-		NodeNetworkRoute ret = new NodeNetworkRoute();
+		NodeNetworkRouteImpl ret = new NodeNetworkRouteImpl();
 		ret.setNodes(fromLink, this.route.subList(fromIndex, toIndex + 1), toLink);
 		return ret;
 	}

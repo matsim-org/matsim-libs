@@ -30,7 +30,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
@@ -64,14 +64,14 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		PersonImpl person;
 		PlanImpl plan;
 		LegImpl leg;
-		NetworkRoute route;
+		NetworkRouteWRefs route;
 
 		person = new PersonImpl(new IdImpl("1"));
 		plan = person.createPlan(true);
 		ActivityImpl a = plan.createActivity("h", link1);
 		a.setEndTime(7.0 * 3600);
 		leg = plan.createLeg(TransportMode.car);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link20);
+		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link20);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 7 12"), link20);
 		leg.setRoute(route);
 		plan.createActivity("w", link20);
@@ -82,7 +82,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		ActivityImpl a2 = plan.createActivity("h", link1);
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
 		leg = plan.createLeg(TransportMode.car);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link20);
+		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link20);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 7 12"), link20);
 		leg.setRoute(route);
 		plan.createActivity("w", link20);
@@ -93,7 +93,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		ActivityImpl a3 = plan.createActivity("h", link1);
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
 		leg = plan.createLeg(TransportMode.car);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1, link20);
+		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link20);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 6 12"), link20);
 		leg.setRoute(route);
 		plan.createActivity("w", link20);

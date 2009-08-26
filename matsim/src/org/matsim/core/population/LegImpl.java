@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.network.BasicLegImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
@@ -48,11 +48,11 @@ public class LegImpl extends BasicLegImpl implements Leg {
 		this.setDepartureTime(leg.getDepartureTime());
 		this.setTravelTime(leg.getTravelTime());
 		this.setArrivalTime(leg.getArrivalTime());
-		if (leg.getRoute() instanceof NetworkRoute) {
-			NetworkRoute route2 = (NetworkRoute) leg.getRoute();
+		if (leg.getRoute() instanceof NetworkRouteWRefs) {
+			NetworkRouteWRefs route2 = (NetworkRouteWRefs) leg.getRoute();
 			NetworkLayer net = (NetworkLayer) route2.getStartLink().getLayer();
 			this.route = net.getFactory().createRoute(TransportMode.car, route2.getStartLink(), route2.getEndLink());
-			((NetworkRoute) this.route).setLinks(route2.getStartLink(), route2.getLinks(), route2.getEndLink());
+			((NetworkRouteWRefs) this.route).setLinks(route2.getStartLink(), route2.getLinks(), route2.getEndLink());
 			this.route.setDistance(route.getDistance());
 			this.route.setTravelTime(route.getTravelTime());
 		} else {

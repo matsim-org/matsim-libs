@@ -38,7 +38,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -115,7 +115,7 @@ public class AccessEgressDemo {
 		}
 		LinkImpl startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
 		LinkImpl endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks - 1]);
-		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink, endLink);
+		NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink, endLink);
 		ArrayList<Link> linkList = new ArrayList<Link>(nOfLinks - 2);
 		for (int i = 1; i < nOfLinks -1; i++) {
 			linkList.add(this.scenario.getNetwork().getLinks().get(this.ids[i]));

@@ -37,7 +37,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -161,7 +161,7 @@ public class TwoLinesDemo {
 
 
 		TransitLine tLine1 = builder.createTransitLine(this.ids[1]);
-		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link1, link13);
+		NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link1, link13);
 		ArrayList<Link> linkList = new ArrayList<Link>(6);
 		linkList.add(link3);
 		linkList.add(link5);
@@ -188,7 +188,7 @@ public class TwoLinesDemo {
 		schedule.addTransitLine(tLine1);
 
 		TransitLine tLine2 = builder.createTransitLine(this.ids[2]);
-		networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link2, link12);
+		networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link2, link12);
 		linkList = new ArrayList<Link>(6);
 		linkList.add(link4);
 		linkList.add(link6);

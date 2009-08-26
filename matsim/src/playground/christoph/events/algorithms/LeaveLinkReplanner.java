@@ -33,8 +33,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.network.util.SubNetworkTools;
@@ -136,7 +136,7 @@ public class LeaveLinkReplanner {
 		 * Entries with a lower index have already been visited!
 		 */ 
 		int currentNodeIndex = this.personAgent.getCurrentNodeIndex();
-		NetworkRoute route = (NetworkRoute) this.leg.getRoute();
+		NetworkRouteWRefs route = (NetworkRouteWRefs) this.leg.getRoute();
 		
 		// create dummy data for the "new" activities
 		String type = "w";
@@ -148,7 +148,7 @@ public class LeaveLinkReplanner {
 		newFromAct.setStartTime(time);
 		newFromAct.setEndTime(time);
 
-		NodeNetworkRoute subRoute = new NodeNetworkRoute(this.vehicle.getCurrentLink(), route.getEndLink());
+		NodeNetworkRouteImpl subRoute = new NodeNetworkRouteImpl(this.vehicle.getCurrentLink(), route.getEndLink());
 		/*
 		 * This can be used for debugging purposes. It copies the current
 		 * non-driven Parts of the Route to the new SubRoute which is
@@ -190,7 +190,7 @@ public class LeaveLinkReplanner {
 		replanner.run(newPlan);	
 		
 		// get new calculated Route
-		NetworkRoute newRoute = (NetworkRoute) newLeg.getRoute();
+		NetworkRouteWRefs newRoute = (NetworkRouteWRefs) newLeg.getRoute();
 		
 		// get Nodes from the current Route
 		List<Node> nodesBuffer = route.getNodes();
@@ -211,7 +211,7 @@ public class LeaveLinkReplanner {
 		 * Entries with a lower index have already been visited!
 		 */ 
 		int currentNodeIndex = this.personAgent.getCurrentNodeIndex();
-		NetworkRoute route = (NetworkRoute) this.leg.getRoute();
+		NetworkRouteWRefs route = (NetworkRouteWRefs) this.leg.getRoute();
 		
 		// create dummy data for the "new" activities
 		String type = "w";
@@ -245,7 +245,7 @@ public class LeaveLinkReplanner {
 		// create new, shortend Route
 		//NetworkRoute subRoute = new NodeNetworkRoute();
 		//subRoute.setNodes(nodesRoute);
-		NodeNetworkRoute subRoute = new NodeNetworkRoute(this.vehicle.getCurrentLink(), route.getEndLink());
+		NodeNetworkRouteImpl subRoute = new NodeNetworkRouteImpl(this.vehicle.getCurrentLink(), route.getEndLink());
 		subRoute.setNodes(subRoute.getStartLink(), nodesRoute, subRoute.getEndLink());
 
 		// put the new route in a new leg
@@ -285,14 +285,14 @@ public class LeaveLinkReplanner {
 		replanner.run(newPlan);			
 		
 		// get new calculated Route
-		NetworkRoute newRoute = (NetworkRoute) newLeg.getRoute();
+		NetworkRouteWRefs newRoute = (NetworkRouteWRefs) newLeg.getRoute();
 			
 		// Merge already driven parts of the Route with the new routed parts.
 		nodeBuffer.addAll(newRoute.getNodes());
 		
 		//NetworkRoute mergedRoute = new NodeNetworkRoute();
 		//mergedRoute.setNodes(nodeBuffer);
-		NetworkRoute mergedRoute = new NodeNetworkRoute(route.getStartLink(), route.getEndLink());
+		NetworkRouteWRefs mergedRoute = new NodeNetworkRouteImpl(route.getStartLink(), route.getEndLink());
 		mergedRoute.setNodes(route.getStartLink(), nodeBuffer, route.getEndLink());
 		
 		// replace Route
@@ -325,7 +325,7 @@ public class LeaveLinkReplanner {
 	/*
 	 * Checks, whether a new created Route is valid or not.
 	 */
-	protected boolean checkRoute(NetworkRoute route)
+	protected boolean checkRoute(NetworkRouteWRefs route)
 	{
 		List<Node> nodes = route.getNodes();
 		

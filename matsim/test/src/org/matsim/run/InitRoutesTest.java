@@ -38,7 +38,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -97,7 +97,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
 		PlanImpl plan2 = person2.getPlans().get(0);
 		LegImpl leg2 = (LegImpl) plan2.getPlanElements().get(1);
-		NetworkRoute route2 = (NetworkRoute) leg2.getRoute();
+		NetworkRouteWRefs route2 = (NetworkRouteWRefs) leg2.getRoute();
 		assertNotNull("no route assigned.", route2);
 		assertEquals("wrong route", 3, route2.getNodes().size());
 	}

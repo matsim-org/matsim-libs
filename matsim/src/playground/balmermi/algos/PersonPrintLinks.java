@@ -26,7 +26,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PersonPrintLinks extends AbstractPersonAlgorithm {
@@ -56,7 +56,7 @@ public class PersonPrintLinks extends AbstractPersonAlgorithm {
 				LegImpl leg = (LegImpl) pe;
 				System.out.println("Person id=" + person.getId() + "; Leg nr=" + counter);
 				counter++;
-				NetworkRoute route = (NetworkRoute) leg.getRoute();
+				NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
 				for (Link link : route.getLinks()) {
 					System.out.println(((LinkImpl)link).getOrigId());
 				}

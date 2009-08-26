@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.queuesim;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -32,7 +33,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
@@ -277,7 +278,7 @@ public class PersonAgent implements DriverAgent {
 			return this.cachedNextLink;
 		}
 		if (this.cacheRouteNodes == null) {
-			this.cacheRouteNodes = ((NetworkRoute) this.currentLeg.getRoute()).getNodes();
+			this.cacheRouteNodes = ((NetworkRouteWRefs) this.currentLeg.getRoute()).getNodes();
 		}
 
 		if (this.currentNodeIndex >= this.cacheRouteNodes.size() ) {

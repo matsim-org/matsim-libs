@@ -30,7 +30,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -62,7 +62,7 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		
 		Leg leg = testPlan.createLeg(TransportMode.car);
 		
-		NodeNetworkRoute route = new NodeNetworkRoute(startLink, endLink);
+		NodeNetworkRouteImpl route = new NodeNetworkRouteImpl(startLink, endLink);
 		route.setDistance(1200.0);
 		
 		leg.setRoute(route);

@@ -49,8 +49,8 @@ import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.routes.LinkNetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -1005,7 +1005,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			Activity act = pb.createActivityFromLinkId("home", id1);
 			plan.addActivity(act);
 			Leg leg = pb.createLeg(TransportMode.car);
-			LinkNetworkRoute route = new LinkNetworkRoute(links[1], links[3]);
+			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(links[1], links[3]);
 			List<Link> links_2 = new ArrayList<Link>();
 			links_2.add(links[2]);
 			route.setLinks(links[1], links_2, links[3]);
@@ -1027,7 +1027,7 @@ public class TransitQueueNetworkTest extends TestCase {
 				stop2.setLink(links[secondStopLocation]);
 			}
 			TransitLine tLine = builder.createTransitLine(id1);
-			NetworkRoute netRoute = new LinkNetworkRoute(links[1], links[3]);
+			NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(links[1], links[3]);
 			netRoute.setLinks(links[1], links_2, links[3]);
 			ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			stops.add(builder.createTransitRouteStop(stop1, 50, 60));
@@ -1088,7 +1088,7 @@ public class TransitQueueNetworkTest extends TestCase {
 				act2.setEndTime(120);
 				plan2.addActivity(act2);
 				Leg leg2 = pb.createLeg(TransportMode.car);
-				LinkNetworkRoute route2 = new LinkNetworkRoute(links[1], links[3]);
+				LinkNetworkRouteImpl route2 = new LinkNetworkRouteImpl(links[1], links[3]);
 				route2.setLinks(links[1], links_2, links[3]);
 				leg2.setRoute(route2);
 				plan2.addLeg(leg2);

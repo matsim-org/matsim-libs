@@ -36,8 +36,8 @@ import org.matsim.core.network.NodeImpl;
 public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRoute getNetworkRouteInstance(final Link fromLink, final Link toLink, final NetworkLayer network) {
-		return new LinkNetworkRoute(fromLink, toLink);
+	public NetworkRouteWRefs getNetworkRouteInstance(final Link fromLink, final Link toLink, final NetworkLayer network) {
+		return new LinkNetworkRouteImpl(fromLink, toLink);
 	}
 
 	public void testGetNodes_subsequentLinks_setLinks() {
@@ -46,7 +46,7 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 		LinkImpl link2 = network.getLink(new IdImpl("2"));
 		NodeImpl node2 = network.getNode(new IdImpl("2"));
 
-		NetworkRoute route = new LinkNetworkRoute(link1, link2);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1, link2);
 		route.setLinks(link1, null, link2);
 		assertEquals("number of links.", 0, route.getLinks().size());
 		assertEquals("number of nodes.", 1, route.getNodes().size());
@@ -61,7 +61,7 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 		List<Node> nodes = new ArrayList<Node>();
 		nodes.add(node2);
 
-		NetworkRoute route = new LinkNetworkRoute(link1, link2);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1, link2);
 		route.setNodes(link1, nodes, link2);
 		assertEquals("number of links.", 0, route.getLinks().size());
 		assertEquals("number of nodes.", 1, route.getNodes().size());

@@ -29,7 +29,7 @@ import org.matsim.core.events.Events;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImpl1;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputMB;
@@ -227,11 +227,11 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		String content2 = content.trim();
 		if (name.equalsIgnoreCase(MAINROUTE)) {
-			NetworkRoute route = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
+			NetworkRouteWRefs route = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, null, null);
 			route.setNodes(null, this.currentRouteNodes, null);
 			this.controlInput.setMainRoute(route);
 		} else if (name.equalsIgnoreCase(ALTERNATIVEROUTE)) {
-			NetworkRoute route = (NetworkRoute) this.network.getFactory().createRoute(TransportMode.car, null, null);
+			NetworkRouteWRefs route = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, null, null);
 			route.setNodes(null, this.currentRouteNodes, null);
 			this.controlInput.setAlternativeRoute(route);
 		}

@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 
 /**
@@ -69,13 +69,13 @@ public class VDSSign {
 
 	private LinkImpl directionLink;
 
-	private NetworkRoute currentRoute;
+	private NetworkRouteWRefs currentRoute;
 
-	private List<NetworkRoute> currentRouteSet;
+	private List<NetworkRouteWRefs> currentRouteSet;
 
-	private NetworkRoute mainRoute;
+	private NetworkRouteWRefs mainRoute;
 
-	private NetworkRoute alternativeRoute;
+	private NetworkRouteWRefs alternativeRoute;
 
 	private double complianceRate;
 
@@ -89,7 +89,7 @@ public class VDSSign {
 		// completes the routes, i.e. calculates out and inlinks
 		this.mainRoute = completeRoute(this.controlInput.getMainRoute());
 		this.alternativeRoute = completeRoute(this.controlInput.getAlternativeRoute());
-		this.currentRouteSet = new ArrayList<NetworkRoute>(this.controlEvents);
+		this.currentRouteSet = new ArrayList<NetworkRouteWRefs>(this.controlEvents);
 		if (this.signOutput != null) {
 			try {
 				this.signOutput.init();
@@ -252,7 +252,7 @@ public class VDSSign {
 	 * Returns the guidance message as a <code>Route</code>
 	 * @return current route
 	 */
-	public NetworkRoute requestRoute() {
+	public NetworkRouteWRefs requestRoute() {
 		double time = SimulationTimer.getTime();
 		double trust = MatsimRandom.getRandom().nextDouble();
 		if (time > this.nextUpdate) {
@@ -282,8 +282,8 @@ public class VDSSign {
 		}
 	}
 
-	private NetworkRoute completeRoute(final NetworkRoute r) {
-		NetworkRoute ret = new NodeNetworkRoute();
+	private NetworkRouteWRefs completeRoute(final NetworkRouteWRefs r) {
+		NetworkRouteWRefs ret = new NodeNetworkRouteImpl();
 		ArrayList<Node> rNodes = new ArrayList<Node>(r.getNodes());
 		if (!this.signLink.getToNode().equals(rNodes.get(0))) {
 			for (Node n : calculateInLinks(this.signLink, rNodes.get(0))) {

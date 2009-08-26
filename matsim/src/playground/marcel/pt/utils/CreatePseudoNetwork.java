@@ -35,8 +35,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.routes.LinkNetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -94,7 +94,7 @@ public class CreatePseudoNetwork {
 					Link startLink = routeLinks.get(0);
 					List<Link> linksBetween = (routeLinks.size() > 2) ? routeLinks.subList(1, routeLinks.size() - 1) : new ArrayList<Link>(0);
 					Link endLink = routeLinks.get(routeLinks.size() - 1);
-					NetworkRoute route = new LinkNetworkRoute(startLink, endLink);
+					NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink, endLink);
 					route.setLinks(startLink, linksBetween, endLink);
 					tRoute.setRoute(route);
 				} else {

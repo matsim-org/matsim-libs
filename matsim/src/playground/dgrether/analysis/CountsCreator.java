@@ -29,8 +29,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -62,34 +62,34 @@ public class CountsCreator {
 		config.simulation().setStorageCapFactor(0.13);
 		this.network = loadNetwork(networkPath);
 		log.info("  creating routes...");
-		NetworkRoute r1 = new NodeNetworkRoute();
+		NetworkRouteWRefs r1 = new NodeNetworkRouteImpl();
 		//the nodes of carls master thesis main route
 //		r1.setRoute("9232  1563  1558  1562  1564  1000597  1565  1525  1519  1518 1776  1780  1000498  1000497  1786  1000470  1794  1795  1797  1806  1809  1811  1758  1757  1754");
 		//the nodes of davids otf scenario
 //		r1.setRoute("9296 9298 9294 9282 9281");
 		//the new route
 		r1.setNodes(NetworkUtils.getNodes(this.network, "1341 5268 1342 1348 1349 1375 1585 1581 1583"));
-		NetworkRoute r2 = new NodeNetworkRoute();
+		NetworkRouteWRefs r2 = new NodeNetworkRouteImpl();
 		//the nodes of carls master thesis alternative route
 //		r2.setRoute("9231 9234 9243 9218 9189 9210 9193 9206 9283 9295 9299 9297 9285 9288 9305");
 		//the nodes of davids otf scenario
 //		r2.setRoute("9286 1725 1727 1722 1718 9284 9281");
 		//the new routes
 		r2.setNodes(NetworkUtils.getNodes(this.network, "1583 1588 1597 1596 1591 1593 1600 2216 1603 1601 9250 9254"));
-		NetworkRoute r3 = new NodeNetworkRoute();
+		NetworkRouteWRefs r3 = new NodeNetworkRouteImpl();
 		r3.setNodes(NetworkUtils.getNodes(this.network, "1583 1587 1641 1644 1645 1648 5210 2420 9275 9272"));
-		NetworkRoute r4 = new NodeNetworkRoute();
+		NetworkRouteWRefs r4 = new NodeNetworkRouteImpl();
 		r4.setNodes(NetworkUtils.getNodes(this.network, "1370 9180 9183 9181 9261 9265 9269 9408 9409 9404 9400 9403 9402 9398 9394 9414 9276"));
 
 		log.info("  creating routes done");
-		Set<NetworkRoute> routes = new HashSet<NetworkRoute>();
+		Set<NetworkRouteWRefs> routes = new HashSet<NetworkRouteWRefs>();
 		routes.add(r1);
 		routes.add(r2);
 		routes.add(r3);
 		routes.add(r4);
 
 		Set<Link> links = new HashSet<Link>(r2.getNodes().size() + r1.getNodes().size());
-		for (NetworkRoute r : routes) {
+		for (NetworkRouteWRefs r : routes) {
 			for (Link l : r.getLinks()) {
 				if (!links.contains(l))
 					links.add(l);

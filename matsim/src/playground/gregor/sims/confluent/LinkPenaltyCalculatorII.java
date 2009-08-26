@@ -21,7 +21,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 
 public class LinkPenaltyCalculatorII implements LinkPenalty, AfterMobsimListener {
@@ -118,7 +118,7 @@ public class LinkPenaltyCalculatorII implements LinkPenalty, AfterMobsimListener
 		for (AgentArrivalEvent e : this.arrivedPersons) {
 			PersonImpl pers = e.getPerson();
 			PlanImpl plan = pers.getSelectedPlan();
-			List<Id> links = ((NetworkRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();
+			List<Id> links = ((NetworkRouteWRefs) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();
 			for (Id id : links) {
 				LinkInfo li = this.linkInfos.get(id);
 				if (li.penalty > 0) {
@@ -167,7 +167,7 @@ public class LinkPenaltyCalculatorII implements LinkPenalty, AfterMobsimListener
 		for (AgentArrivalEvent e : this.arrivedPersons) {
 			PersonImpl pers = e.getPerson();
 			PlanImpl plan = pers.getSelectedPlan();
-			List<Id> links = ((NetworkRoute) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();
+			List<Id> links = ((NetworkRouteWRefs) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();
 			Collections.reverse(links);
 			traceAgent(links,pers.getId(),e.getTime());
 		}

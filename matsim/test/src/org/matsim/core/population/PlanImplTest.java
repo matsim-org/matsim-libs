@@ -28,8 +28,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -222,7 +222,7 @@ public class PlanImplTest extends MatsimTestCase {
 		plan.createActivity("h", new CoordImpl(0, 0));
 		LegImpl leg = plan.createLeg(TransportMode.car);
 		plan.createActivity("w", new CoordImpl(100, 200));
-		RouteWRefs route = new NodeNetworkRoute(link1, link2);
+		RouteWRefs route = new NodeNetworkRouteImpl(link1, link2);
 		route.setDistance(123.45);
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
@@ -233,7 +233,7 @@ public class PlanImplTest extends MatsimTestCase {
 		assertEquals("person must not be copied.", new IdImpl(2), plan2.getPerson().getId());
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
 		RouteWRefs route2 = ((LegImpl) plan.getPlanElements().get(1)).getRoute();
-		assertTrue(route2 instanceof NetworkRoute);
+		assertTrue(route2 instanceof NetworkRouteWRefs);
 		assertEquals(123.45, route2.getDistance(), EPSILON);
 		assertEquals(98.76, route2.getTravelTime(), EPSILON);
 	}

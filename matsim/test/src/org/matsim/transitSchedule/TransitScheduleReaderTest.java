@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -78,7 +78,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 		assertNotNull("could not get transit route stops.", stops);
 		assertEquals("wrong number of stops.", 6, stops.size());
 
-		NetworkRoute route = route1.getRoute();
+		NetworkRouteWRefs route = route1.getRoute();
 		assertNotNull("could not get route.", route);
 		assertEquals("wrong start link.", network.getLinks().get(new IdImpl("1")), route.getStartLink());
 		assertEquals("wrong end link.", network.getLinks().get(new IdImpl("8")), route.getEndLink());

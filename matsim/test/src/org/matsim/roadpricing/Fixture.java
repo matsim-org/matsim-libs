@@ -39,8 +39,8 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -184,7 +184,7 @@ import org.matsim.core.utils.misc.Time;
 		person.addPlan(plan);
 		plan.createActivity("h", (LinkImpl)homeLink).setEndTime(Time.parseTime(startTime));
 		LegImpl leg = plan.createLeg(TransportMode.car);//"car", startTime, "00:01", null);
-		NetworkRoute route = new NodeNetworkRoute(homeLink, workLink);
+		NetworkRouteWRefs route = new NodeNetworkRouteImpl(homeLink, workLink);
 		route.setNodes(homeLink, routeNodes, workLink);
 		leg.setRoute(route);
 		plan.createActivity("w", (LinkImpl)workLink);//, null, "24:00", null, "yes");
@@ -222,7 +222,7 @@ import org.matsim.core.utils.misc.Time;
 		return referencePopulation;
 	}
 
-	protected static void compareRoutes(final String expectedRoute, final NetworkRoute realRoute) {
+	protected static void compareRoutes(final String expectedRoute, final NetworkRouteWRefs realRoute) {
 		StringBuilder strBuilder = new StringBuilder();
 		for (Node node : realRoute.getNodes()) {
 			strBuilder.append(node.getId().toString());

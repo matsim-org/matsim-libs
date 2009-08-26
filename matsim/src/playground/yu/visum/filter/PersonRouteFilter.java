@@ -10,7 +10,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /**
  * transfer the "right" persons to next PersonFilter. These "right" persons
@@ -62,7 +62,7 @@ public class PersonRouteFilter extends PersonFilterA {
 				for (BasicPlanElement obj : acts_Legs) {
 					if (even) {
 						LegImpl leg = (LegImpl) obj;
-						NetworkRoute route = (NetworkRoute) leg.getRoute();
+						NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
 						if (route != null) {
 							List<Link> links = route.getLinks();
 							if (links != null)

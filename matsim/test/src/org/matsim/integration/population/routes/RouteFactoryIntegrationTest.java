@@ -35,9 +35,9 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.CompressedNetworkRoute;
+import org.matsim.core.population.routes.CompressedNetworkRouteImpl;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
-import org.matsim.core.population.routes.NodeNetworkRoute;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -76,7 +76,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 					if (pe instanceof BasicLeg) {
 						BasicLeg leg = (BasicLeg) pe;
 						BasicRoute route = leg.getRoute();
-						assertTrue(route instanceof NodeNetworkRoute); // that must be different from the class used below
+						assertTrue(route instanceof NodeNetworkRouteImpl); // that must be different from the class used below
 					}
 				}
 			}
@@ -104,7 +104,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 					if (pe instanceof BasicLeg) {
 						BasicLeg leg = (BasicLeg) pe;
 						BasicRoute route = leg.getRoute();
-						assertTrue("person: " + person.getId() + "; plan: " + planCounter, route instanceof CompressedNetworkRoute);
+						assertTrue("person: " + person.getId() + "; plan: " + planCounter, route instanceof CompressedNetworkRouteImpl);
 					}
 				}
 			}

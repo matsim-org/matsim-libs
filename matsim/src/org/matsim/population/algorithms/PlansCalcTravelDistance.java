@@ -33,7 +33,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -98,7 +98,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 			ArrayList<Node> nodes = new ArrayList<Node>();
 			nodes.add(startnode);
 
-			NetworkRoute route = (NetworkRoute) leg.getRoute();
+			NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
 			if (route == null) throw new Exception("route missing");
 			nodes.addAll(route.getNodes());
 

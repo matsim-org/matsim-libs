@@ -48,7 +48,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
@@ -151,7 +151,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		LegImpl leg = this.plan.createLeg(TransportMode.car);
-		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("2030"), this.network.getLink("3040"));
+		NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.network.getLink("2030"), this.network.getLink("3040"));
 		leg.setRoute(route);
 		route.setTravelTime(Time.parseTime("00:30:00"));
 
@@ -160,7 +160,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createLeg(TransportMode.pt);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("3040"), this.network.getLink("4050"));
+		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.network.getLink("3040"), this.network.getLink("4050"));
 		leg.setRoute(route);
 		route.setTravelTime(Time.parseTime("00:05:00"));
 
@@ -169,7 +169,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createLeg(TransportMode.pt);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("4050"), this.network.getLink("3040"));
+		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.network.getLink("4050"), this.network.getLink("3040"));
 		leg.setRoute(route);
 		route.setTravelTime(Time.parseTime("00:05:00"));
 
@@ -178,7 +178,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createLeg(TransportMode.car);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("3040"), this.network.getLink("2030"));
+		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.network.getLink("3040"), this.network.getLink("2030"));
 		leg.setRoute(route);
 		route.setTravelTime(Time.parseTime("00:30:00"));
 
@@ -187,7 +187,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createLeg(TransportMode.bike);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("2030"), this.network.getLink("1020"));
+		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.network.getLink("2030"), this.network.getLink("1020"));
 		leg.setRoute(route);
 		route.setTravelTime(Time.parseTime("04:00:00"));
 		leg.setTravelTime(Time.parseTime("04:00:00"));
@@ -197,7 +197,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createLeg(TransportMode.bike);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.network.getLink("1020"), this.network.getLink("2030"));
+		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.network.getLink("1020"), this.network.getLink("2030"));
 		leg.setRoute(route);
 		route.setTravelTime(Time.parseTime("04:00:00"));
 		leg.setTravelTime(Time.parseTime("04:00:00"));

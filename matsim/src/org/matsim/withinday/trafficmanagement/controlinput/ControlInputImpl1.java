@@ -20,7 +20,7 @@
 
 package org.matsim.withinday.trafficmanagement.controlinput;
 
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /**
  * Measures the travel time difference between route 1 and 2 and returns that as
@@ -31,7 +31,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 public class ControlInputImpl1 extends AbstractControlInputImpl {
 
 	@Override
-	public double getPredictedNashTime(NetworkRoute route) {
+	public double getPredictedNashTime(NetworkRouteWRefs route) {
 		if (route.equals(this.mainRoute)) {
 			return this.lastTimeMainRoute;
 		}

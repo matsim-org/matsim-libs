@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkCarRouteFactory.java
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,30 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.population.routes;
+package org.matsim.api.core.v01.population;
 
-import org.matsim.api.core.v01.network.Link;
+import java.util.List;
 
+import org.matsim.api.basic.v01.Id;
 
 /**
- * Creates new instances of {@link NodeNetworkRouteImpl}.
- * 
- * @author mrieser
+ * @author nagel
+ *
  */
-public class NodeNetworkRouteFactory implements RouteFactory {
-
-
-	public RouteWRefs createRoute(Link startLink, Link endLink) {
-		return new NodeNetworkRouteImpl(startLink, endLink);
-	}
-
-	/**
-	 * Method only available for backward compatibility. Make use
-	 * of createRoute(Link, Link) method if possible.
-	 */
-	@Deprecated
-	public RouteWRefs createRoute() {
-		return new NodeNetworkRouteImpl();
-	}
+public interface LinkNetworkRoute extends Route {
+	
+	public void setLinkIds(final List<Id> linkIds) ;
+	
+	public List<Id> getLinkIds() ;
 
 }

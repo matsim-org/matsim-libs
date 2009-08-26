@@ -44,7 +44,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
@@ -194,9 +194,9 @@ public class DEQSim extends ExternalMobsim {
 
 			RouteWRefs route = leg.getRoute();
 			List<Link> linkRoute = null;
-			if (route instanceof NetworkRoute) {
+			if (route instanceof NetworkRouteWRefs) {
 				// in the binary format, we write the link-ids instead of the node-ids
-				 linkRoute = ((NetworkRoute) route).getLinks();
+				 linkRoute = ((NetworkRouteWRefs) route).getLinks();
 			} else {
 				linkRoute = new LinkedList<Link>();
 			}

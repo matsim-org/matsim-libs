@@ -36,7 +36,7 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
- * Tests several methods of {@link NetworkRoute}.
+ * Tests several methods of {@link NetworkRouteWRefs}.
  * Classes inheriting from RouteImpl should be able to inherit from this
  * test, too, and only overwrite the method getRouteInstance().
  *
@@ -46,14 +46,14 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 
 	static private final Logger log = Logger.getLogger(AbstractNetworkRouteTest.class);
 
-	abstract protected NetworkRoute getNetworkRouteInstance(final Link fromLink, final Link toLink, final NetworkLayer network);
+	abstract protected NetworkRouteWRefs getNetworkRouteInstance(final Link fromLink, final Link toLink, final NetworkLayer network);
 
 	public void testSetNodes_asList() {
 		NetworkLayer network = createTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, "12 13 3 4");
 		final Link link11 = network.getLink(new IdImpl("11"));
 		final Link link4 = network.getLink(new IdImpl("4"));
-		NetworkRoute route = getNetworkRouteInstance(link11, link4, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link11, link4, network);
 		route.setNodes(link11, nodes, link4);
 
 		List<Link> links = route.getLinks();
@@ -68,7 +68,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		List<Link> links = NetworkUtils.getLinks(network, "-22 2 3 24 14");
 		final Link link11 = network.getLink(new IdImpl("11"));
 		final Link link15 = network.getLink(new IdImpl("15"));
-		NetworkRoute route = getNetworkRouteInstance(link11, link15, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link11, link15, network);
 		route.setLinks(link11, links, link15);
 
 		List<Node> nodes = route.getNodes();
@@ -85,7 +85,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link1 = network.getLink(new IdImpl("1"));
 		Link link4 = network.getLink(new IdImpl("4"));
-		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link1, link4, network);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 		List<Node> nodes = route.getNodes();
 		assertEquals("number of nodes in route.", 5, nodes.size());
@@ -101,7 +101,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link1 = network.getLink(new IdImpl("1"));
 		Link link4 = network.getLink(new IdImpl("4"));
-		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link1, link4, network);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 		List<Node> nodes = route.getNodes();
 		assertEquals("number of nodes in route.", 5, nodes.size());
@@ -119,7 +119,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link1 = network.getLink(new IdImpl("1"));
 		Link link4 = network.getLink(new IdImpl("4"));
-		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link1, link4, network);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 		assertEquals("number of nodes in route.", 5, route.getNodes().size());
 
@@ -141,7 +141,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link1 = network.getLink(new IdImpl("1"));
 		Link link4 = network.getLink(new IdImpl("4"));
-		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link1, link4, network);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 
 		assertEquals("different distance calculated.", 4000.0, route.getDistance(), EPSILON);
@@ -151,7 +151,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link1 = network.getLink(new IdImpl("1"));
 		Link link4 = network.getLink(new IdImpl("4"));
-		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link1, link4, network);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4"), link4);
 
 		List<Id> ids = route.getLinkIds();
@@ -166,10 +166,10 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
-		NetworkRoute route = getNetworkRouteInstance(link0, link15, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
-		NetworkRoute subRoute = route.getSubRoute(network.getNode(new IdImpl("12")), network.getNode(new IdImpl("4")));
+		NetworkRouteWRefs subRoute = route.getSubRoute(network.getNode(new IdImpl("12")), network.getNode(new IdImpl("4")));
 		List<Node> nodes = subRoute.getNodes();
 		assertEquals("number of nodes in subRoute.", 4, nodes.size());
 		assertEquals(network.getNode(new IdImpl("12")), nodes.get(0));
@@ -189,10 +189,10 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
-		NetworkRoute route = getNetworkRouteInstance(link0, link15, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
-		NetworkRoute subRoute = route.getSubRoute(network.getNode(new IdImpl("1")), network.getNode(new IdImpl("3")));
+		NetworkRouteWRefs subRoute = route.getSubRoute(network.getNode(new IdImpl("1")), network.getNode(new IdImpl("3")));
 		List<Node> nodes = subRoute.getNodes();
 		assertEquals("number of nodes in subRoute.", 5, nodes.size());
 		assertEquals(network.getNode(new IdImpl("1")), nodes.get(0));
@@ -214,10 +214,10 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
-		NetworkRoute route = getNetworkRouteInstance(link0, link15, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
-		NetworkRoute subRoute = route.getSubRoute(network.getNode(new IdImpl("4")), network.getNode(new IdImpl("15")));
+		NetworkRouteWRefs subRoute = route.getSubRoute(network.getNode(new IdImpl("4")), network.getNode(new IdImpl("15")));
 		List<Node> nodes = subRoute.getNodes();
 		assertEquals("number of nodes in subRoute.", 3, nodes.size());
 		assertEquals(network.getNode(new IdImpl("4")), nodes.get(0));
@@ -235,11 +235,11 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link1 = network.getLink(new IdImpl("1"));
 		Link link15 = network.getLink(new IdImpl("15"));
-		NetworkRoute route = getNetworkRouteInstance(link1, link15, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link1, link15, network);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 12 13 3 4 14 15"), link15);
 
 		Node node2 = network.getNode(new IdImpl("2"));
-		NetworkRoute subRoute = route.getSubRoute(node2, node2);
+		NetworkRouteWRefs subRoute = route.getSubRoute(node2, node2);
 		List<Node> nodes = subRoute.getNodes();
 		assertEquals("number of nodes in subRoute.", 1, nodes.size());
 		assertEquals(node2, nodes.get(0));
@@ -253,11 +253,11 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
-		NetworkRoute route = getNetworkRouteInstance(link0, link15, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
 		Node node15 = network.getNode(new IdImpl("15"));
-		NetworkRoute subRoute = route.getSubRoute(node15, node15);
+		NetworkRouteWRefs subRoute = route.getSubRoute(node15, node15);
 		List<Node> nodes = subRoute.getNodes();
 		assertEquals("number of nodes in subRoute.", 1, nodes.size());
 		assertEquals(node15, nodes.get(0));
@@ -271,7 +271,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
-		NetworkRoute route = getNetworkRouteInstance(link0, link15, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
 		try {
@@ -288,7 +288,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
-		NetworkRoute route = getNetworkRouteInstance(link0, link15, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
 		try {
@@ -305,11 +305,11 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
-		NetworkRoute route = getNetworkRouteInstance(link0, link15, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		route.setNodes(link0, NetworkUtils.getNodes(network, "1 2 12 13 3 4 14 15"), link15);
 
 		Node node = network.getNode(new IdImpl("3"));
-		NetworkRoute subRoute = route.getSubRoute(node, node);
+		NetworkRouteWRefs subRoute = route.getSubRoute(node, node);
 		List<Node> nodes = subRoute.getNodes();
 		assertEquals("number of nodes in subRoute.", 1, nodes.size());
 		assertEquals(node, nodes.get(0));
@@ -323,11 +323,11 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link11 = network.getLink(new IdImpl("11"));
 		Link link12 = network.getLink(new IdImpl("12"));
-		NetworkRoute route = getNetworkRouteInstance(link11, link12, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link11, link12, network);
 		route.setNodes(link11, NetworkUtils.getNodes(network, "12"), link12);
 
 		Node node = network.getNode(new IdImpl("12"));
-		NetworkRoute subRoute = route.getSubRoute(node, node);
+		NetworkRouteWRefs subRoute = route.getSubRoute(node, node);
 		List<Node> nodes = subRoute.getNodes();
 		assertEquals("number of nodes in subRoute.", 1, nodes.size());
 		assertEquals(node, nodes.get(0));
@@ -340,7 +340,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 	public void testStartAndEndOnSameLinks_setNodes() {
 		NetworkLayer network = createTestNetwork();
 		Link link2 = network.getLink(new IdImpl("2"));
-		NetworkRoute route = getNetworkRouteInstance(link2, link2, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link2, link2, network);
 		route.setNodes(link2, new ArrayList<Node>(0), link2);
 		assertEquals(0, route.getNodes().size());
 		assertEquals(0, route.getLinks().size());
@@ -349,7 +349,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 	public void testStartAndEndOnSameLinks_setLinks() {
 		NetworkLayer network = createTestNetwork();
 		Link link = network.getLink(new IdImpl("3"));
-		NetworkRoute route = getNetworkRouteInstance(link, link, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link, link, network);
 		route.setLinks(link, new ArrayList<Link>(0), link);
 		assertEquals(0, route.getNodes().size());
 		assertEquals(0, route.getLinks().size());
@@ -359,7 +359,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link12 = network.getLink(new IdImpl("12"));
 		Link link13 = network.getLink(new IdImpl("13"));
-		NetworkRoute route = getNetworkRouteInstance(link12, link13, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link12, link13, network);
 		route.setNodes(link12, NetworkUtils.getNodes(network, "13"), link13);
 		assertEquals(1, route.getNodes().size());
 		assertEquals(0, route.getLinks().size());
@@ -369,7 +369,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		final Link link13 = network.getLink(new IdImpl("13"));
 		final Link link14 = network.getLink(new IdImpl("14"));
-		NetworkRoute route = getNetworkRouteInstance(link13, link14, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link13, link14, network);
 		route.setLinks(link13, new ArrayList<Link>(0), link14);
 		assertEquals(1, route.getNodes().size());
 		assertEquals(0, route.getLinks().size());
@@ -380,7 +380,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		NetworkLayer network = createTestNetwork();
 		Link link0 = network.getLink(new IdImpl("0"));
 		Link link15 = network.getLink(new IdImpl("15"));
-		NetworkRoute route = getNetworkRouteInstance(link0, link15, network);
+		NetworkRouteWRefs route = getNetworkRouteInstance(link0, link15, network);
 		assertNull(route.getVehicleId());
 		Id id = new IdImpl("8134");
 		route.setVehicleId(id);

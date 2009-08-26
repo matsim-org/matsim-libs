@@ -39,7 +39,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -560,10 +560,10 @@ public class Wardrop {
 				{
 					BasicLegImpl leg = (BasicLegImpl) planElement;
 					
-					if (leg.getRoute() instanceof NetworkRoute)
+					if (leg.getRoute() instanceof NetworkRouteWRefs)
 					{
 						//BasicRouteImpl route = (BasicRouteImpl) leg.getRoute();
-						NetworkRoute route = (NetworkRoute) leg.getRoute();
+						NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
 						linkCounter = linkCounter + route.getLinkIds().size();
 						legCounter++;
 					}

@@ -34,7 +34,7 @@ import org.matsim.core.network.LinkImpl;
  *
  * @author mrieser
  */
-public interface NetworkRoute extends RouteWRefs {
+public interface NetworkRouteWRefs extends RouteWRefs {
 
 	public Link getStartLink();
 
@@ -72,7 +72,7 @@ public interface NetworkRoute extends RouteWRefs {
 	 * @param toNode
 	 * @return A flat copy of the original Route
 	 */
-	public NetworkRoute getSubRoute(final Node fromNode, final Node toNode);
+	public NetworkRouteWRefs getSubRoute(final Node fromNode, final Node toNode);
 
 	/**
 	 * Sets the id of the vehicle that should be used to drive along this route.

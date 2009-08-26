@@ -31,7 +31,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
@@ -764,7 +764,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_SCHEDULE
 
 		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId1);
-		NetworkRoute netRoute = route.getRoute();
+		NetworkRouteWRefs netRoute = route.getRoute();
 		assertNotNull(netRoute);
 		assertEquals(link2, netRoute.getStartLink());
 		assertEquals(link2, netRoute.getEndLink());
@@ -825,7 +825,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_SCHEDULE
 
 		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId1);
-		NetworkRoute netRoute = route.getRoute();
+		NetworkRouteWRefs netRoute = route.getRoute();
 		assertNotNull(netRoute);
 		assertEquals(link3, netRoute.getStartLink());
 		assertEquals(link4, netRoute.getEndLink());
@@ -891,7 +891,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		reader.endTag(context.pop(), EMPTY_STRING, context); // TRANSIT_SCHEDULE
 
 		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId1);
-		NetworkRoute netRoute = route.getRoute();
+		NetworkRouteWRefs netRoute = route.getRoute();
 		assertNotNull(netRoute);
 		assertEquals(link1, netRoute.getStartLink());
 		assertEquals(link4, netRoute.getEndLink());

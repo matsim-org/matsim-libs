@@ -31,7 +31,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -80,7 +80,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 		final int TOLL_INDEX = 0;
 		final int NOTOLL_INDEX = 1;
 		final int nofLegs = (actslegs.size() - 1) / 2;
-		NetworkRoute[][] routes = new NetworkRoute[2][nofLegs];
+		NetworkRouteWRefs[][] routes = new NetworkRouteWRefs[2][nofLegs];
 		double[][] depTimes = new double[2][nofLegs];
 		boolean[] isCarLeg = new boolean[nofLegs];
 
@@ -115,8 +115,8 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 				NodeImpl startNode = fromLink.getToNode();	// start at the end of the "current" link
 				NodeImpl endNode = toLink.getFromNode(); // the target is the start of the link
 
-				NetworkRoute tollRoute = (NetworkRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(TransportMode.car, fromLink, toLink);
-				NetworkRoute noTollRoute = null;
+				NetworkRouteWRefs tollRoute = (NetworkRouteWRefs) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(TransportMode.car, fromLink, toLink);
+				NetworkRouteWRefs noTollRoute = null;
 
 				// # start searching a route where agent may pay the toll
 				boolean tollRouteInsideTollArea = false;
@@ -147,7 +147,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 					 * will still be a route returned.
 					 */
 					Path path = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
-					noTollRoute = (NetworkRoute) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(TransportMode.car, fromLink, toLink);
+					noTollRoute = (NetworkRouteWRefs) ((NetworkLayer) fromLink.getLayer()).getFactory().createRoute(TransportMode.car, fromLink, toLink);
 					noTollRoute.setNodes(fromLink, path.nodes, toLink);
 					noTollRoute.setTravelTime((int) path.travelTime);
 					noTollRoute.setTravelCost(path.travelCost);
