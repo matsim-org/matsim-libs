@@ -26,11 +26,20 @@ public class RunMyCommercialDemandGenerator01 {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		/*===========================================================
+		 * Variables that must be set:
+		 */
+		String studyArea = "Temp";
+		String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 
-		String plansFolder = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Input/";
-		MyCommercialDemandGenerator01 mcdg = new MyCommercialDemandGenerator01(plansFolder, 1, 0.9);
-		String vehicleStatistics = "/Users/johanwjoubert/MATSim/workspace/MATSimData/Gauteng/Activities/GautengVehicleStats	.txt";
-		mcdg.createPlans(vehicleStatistics);
+		MyCommercialDemandGenerator01 mcdg = new MyCommercialDemandGenerator01(root, studyArea, 1, 0.9);
+		mcdg.buildVehicleLists();
+		
+		
+		mcdg.createPlans();
+		
+		
+		
 		
 	}
 

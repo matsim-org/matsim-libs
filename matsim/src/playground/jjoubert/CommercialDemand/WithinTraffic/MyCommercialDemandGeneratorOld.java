@@ -54,9 +54,9 @@ import com.vividsolutions.jts.geom.Point;
 
 public class MyCommercialDemandGeneratorOld {
 	// String value that must be set
-	final static String PROVINCE = "Gauteng";
+	final static String PROVINCE = "Temp";
 	// Mac
-	final static String ROOT = "~MATSim/workspace/MATSimData/";
+	final static String ROOT = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";
 	// IVT-Sim0
 //	final static String ROOT = "~/";
 	
