@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -57,7 +56,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 /*
  * TODO: [AH] This is copy-paste based on "ScoreStats". Refactoring needed!
- * 
+ *
  */
 public class TravelDistanceStats implements StartupListener, IterationEndsListener, ShutdownListener {
 
@@ -120,12 +119,12 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 			double sumAvgLegTravelDistance = 0.0;
 			double cntAvgLegTravelDistance = 0;
 			for (PlanImpl plan : person.getPlans()) {
-				
+
 				if (plan.getScore() == null) {
 					continue;
 				}
 				double score = plan.getScore().doubleValue();
-				
+
 				// worst plan -----------------------------------------------------
 				if (worstPlan == null) {
 					worstPlan = plan;
@@ -238,8 +237,10 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
 				final LegImpl leg = (LegImpl) pe;
-				planTravelDistance+=leg.getRoute().getDistance();
-				numberOfLegs++;
+				if (leg.getRoute() != null) {
+					planTravelDistance+=leg.getRoute().getDistance();
+					numberOfLegs++;
+				}
 			}
 		}
 		if (numberOfLegs>0) {
