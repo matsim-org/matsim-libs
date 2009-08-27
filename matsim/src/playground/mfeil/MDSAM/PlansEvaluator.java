@@ -24,10 +24,8 @@ package playground.mfeil.MDSAM;
 
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -52,7 +50,7 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 
 public class PlansEvaluator extends PlansConstructor implements PlanStrategyModule{
 		
-	private final String outputFile;
+	private final String outputFileBiogeme, outputFile, inputFile;
 	private final DepartureDelayAverageCalculator tDepDelayCalc;
 	private final PlansCalcRoute router;
 	private final LegTravelTimeEstimator estimator;
@@ -61,7 +59,9 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 	                      
 	public PlansEvaluator (Controler controler) {
 		super (controler);
-		this.outputFile = "./plans/output_plans.dat";	
+		this.inputFile = "/home/baug/mfeil/data/largeSet/it1/output_plans_mz1.xml.gz";	
+		this.outputFile = "/home/baug/mfeil/data/largeSet/it0/output_plans_mz0.xml.gz";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/largeSet/it0/output_plans0.dat";	
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
@@ -72,18 +72,28 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 				this.router);
 		
 	}
+	
+	public void prepareReplanning() {
+		// Read the external plans file.
+		new MatsimPopulationReader(this.population, this.controler.getNetwork()).readFile(this.inputFile);		
+		log.info("Reading population done.");
+	}
 
 	public void finishReplanning(){
 		this.evaluatePlans();
-		this.writePlansForBiogeme(this.outputFile);
+		this.writePlans(this.outputFile);
+		//TODO: Similarity should be stored somewhere and re-used, rather than calculated again
+		this.sims = new MDSAM(this.population).runPopulation();
+		this.writePlansForBiogeme(this.outputFileBiogeme);
 	}
 	
 	private void evaluatePlans (){
+		log.info("Evaluating plans...");
 		for (Iterator<PersonImpl> iterator1 = this.population.getPersons().values().iterator(); iterator1.hasNext();){
 			PersonImpl person = iterator1.next();
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
-				//this.router.run(plan);
+				
 				this.estimator.initPlanSpecificInformation(plan);
 				// Start from first leg
 				for (int i=1;i<plan.getPlanElements().size();i++){
@@ -108,7 +118,12 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 						}
 					}
 				}
+				// if plan too long make it invalid (set score to -100000)
+				if (plan.getLastActivity().getStartTime()-86400>plan.getFirstActivity().getEndTime()){
+					plan.setScore(-100000.0);
+				}
 			}
 		}
+		log.info("done.");
 	}
 }

@@ -34,6 +34,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -78,9 +80,9 @@ public class PlansConstructor implements PlanStrategyModule{
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
 		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
-		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
-		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
-		this.outputFileMod = "/home/baug/mfeil/data/mz/model.mod";
+		this.outputFile = "/home/baug/mfeil/data/smallSet/it0/output_plans_mz0.xml.gz";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/smallSet/it0/output_plans0.dat";
+		this.outputFileMod = "/home/baug/mfeil/data/smallSet/it0/model0.mod";
 	/*	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
@@ -169,7 +171,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.actChains = new ArrayList<List<PlanElement>>();
 		List<Id> agents = new LinkedList<Id>();
 		for (int i=0;i<pl.size();i++){
-			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-51,0))){ //51
+			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-20,0))){ //51
 //			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-2,0))){
 				this.actChains.add(ac.get(i));
 				for (Iterator<PlanImpl> iterator = pl.get(i).iterator(); iterator.hasNext();){
@@ -227,9 +229,11 @@ public class PlansConstructor implements PlanStrategyModule{
 				// Add all plans with activity chains different to the one of person's current plan
 				if (!acCheck.checkEqualActChainsModes(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))){
 					PlanImpl plan = new PlanImpl (person);
+			
 					for (int j=0;j<this.actChains.get(i).size();j++){
 						if (j%2==0) {
 							ActivityImpl act = new ActivityImpl((ActivityImpl)this.actChains.get(i).get(j));
+							if (j!=0 && j!=this.actChains.get(i).size()-1) act.setEndTime(MatsimRandom.getRandom().nextDouble()*act.getDuration()*2+act.getStartTime());
 							plan.addActivity((BasicActivity)act);
 						}
 						else {
@@ -237,6 +241,7 @@ public class PlansConstructor implements PlanStrategyModule{
 							plan.addLeg((BasicLeg)leg);
 						}
 					}
+					
 					plan.getFirstActivity().setCoord(person.getSelectedPlan().getFirstActivity().getCoord());
 					plan.getLastActivity().setCoord(person.getSelectedPlan().getLastActivity().getCoord());
 					
@@ -305,7 +310,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 	}*/
 	
-	private void writePlans(String outputFile){
+	public void writePlans(String outputFile){
 		log.info("Writing plans...");
 		new PopulationWriter(this.population, outputFile).write();
 		log.info("done.");
