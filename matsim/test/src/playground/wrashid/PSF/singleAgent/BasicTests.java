@@ -22,6 +22,17 @@ import playground.wrashid.PSF.parking.ParkingTimes;
 
 public class BasicTests extends MatsimTestCase {
 
+	Controler controler;
+	
+	protected void setUp() throws Exception {
+		// TODO Auto-generated method stub
+		super.setUp();
+		
+		controler = new Controler("test/input/playground/wrashid/PSF/singleAgent/" + "config.xml");
+		controler.addControlerListener(new AddEnergyScoreListener());
+		controler.setOverwriteFiles(true);
+	}
+	
 	/*
 	 * The agent drives to work and arrives still before the start of peak hour
 	 * energy. Therefore the agent charges fully immediately. When arriving at
@@ -30,10 +41,6 @@ public class BasicTests extends MatsimTestCase {
 	 */
 
 	public void testOptimizedCharger() {
-		Controler controler = new Controler("test/input/playground/wrashid/PSF/singleAgent/" + "config.xml");
-		controler.addControlerListener(new AddEnergyScoreListener());
-		controler.setOverwriteFiles(true);
-
 		LogEnergyConsumption logEnergyConsumption = new LogEnergyConsumption(controler);
 		LogParkingTimes logParkingTimes = new LogParkingTimes(controler);
 		SimulationStartupListener simulationStartupListener = new SimulationStartupListener(controler);
@@ -68,10 +75,6 @@ public class BasicTests extends MatsimTestCase {
 	}
 
 	public void testLogParkingTime() {
-		Controler controler = new Controler("test/input/playground/wrashid/PSF/singleAgent/" + "config.xml");
-		controler.addControlerListener(new AddEnergyScoreListener());
-		controler.setOverwriteFiles(true);
-
 		LogParkingTimes logParkingTimes = new LogParkingTimes(controler);
 		SimulationStartupListener simulationStartupListener = new SimulationStartupListener(controler);
 		controler.addControlerListener(simulationStartupListener);
@@ -93,10 +96,6 @@ public class BasicTests extends MatsimTestCase {
 	}
 
 	public void testLogEnergyConsumption() {
-		Controler controler = new Controler("test/input/playground/wrashid/PSF/singleAgent/" + "config.xml");
-		controler.addControlerListener(new AddEnergyScoreListener());
-		controler.setOverwriteFiles(true);
-
 		LogEnergyConsumption logEnergyConsumption = new LogEnergyConsumption(controler);
 		SimulationStartupListener simulationStartupListener = new SimulationStartupListener(controler);
 		controler.addControlerListener(simulationStartupListener);
