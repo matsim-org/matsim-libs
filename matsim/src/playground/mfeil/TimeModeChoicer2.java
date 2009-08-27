@@ -31,8 +31,6 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.basic.v01.network.BasicLegImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -76,54 +74,67 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 	// TODO: this is bad programming style... needs to be improved!
 	public void run (PlanImpl basePlan){
 		
-		/*Do nothing if the plan has only one activity (=24h home)*/
-		if (basePlan.getPlanElements().size()==1) return;
+		/*Do nothing if the plan has only one or two activities (=24h home)*/
+		if (basePlan.getPlanElements().size()<=3) return;
+		
+		/* Replace delivered plan by copy since delivered plan must not be changed until valid solution has been found */
+		PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());
+		plan.copyPlan(basePlan);
 		
 		/*Set all leg modes to car*/
-		for (int z=1;z<basePlan.getPlanElements().size();z+=2){
-			((LegImpl)(basePlan.getPlanElements().get(z))).setMode(TransportMode.car);
+		for (int z=1;z<plan.getPlanElements().size();z+=2){
+			((LegImpl)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
 		}
-		this.router.run(basePlan);
+		this.router.run(plan);
 		
 		/* Memorize the initial car routes.
 		 * Do this in any case as the car routes are required in the setTimes() method. */
 		ArrayList <LinkNetworkRouteImpl> routes = new ArrayList<LinkNetworkRouteImpl>();
-		for (int i=1;i<basePlan.getPlanElements().size();i=i+2){
-			LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(((LegImpl)(basePlan.getPlanElements().get(i))).getRoute().getStartLink(), ((LegImpl)(basePlan.getPlanElements().get(i))).getRoute().getEndLink());
+		for (int i=1;i<plan.getPlanElements().size();i=i+2){
+			LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(((LegImpl)(plan.getPlanElements().get(i))).getRoute().getStartLink(), ((LegImpl)(plan.getPlanElements().get(i))).getRoute().getEndLink());
+
 		/*	List<Id> l = new ArrayList<Id>();
 			for (int j=0;j<((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().size();j++){
 				l.add(((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().get(j));
 			}*/
-			List<Id> l = ((NetworkRouteWRefs) ((LegImpl)(basePlan.getPlanElements().get(i))).getRoute()).getLinkIds(); // to be checked whether this works
+			List<Id> l = ((NetworkRouteWRefs) ((LegImpl)(plan.getPlanElements().get(i))).getRoute()).getLinkIds();
+
 			r.setLinkIds(l);
 			routes.add(r);
 		}
 		this.routes = routes;
 		
+		// meisterk
+		this.estimator.initPlanSpecificInformation(plan);
+		
+		/* Replace delivered plan by copy since delivered plan must not be changed until valid solution has been found */
+		//PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());
+		//plan.copyPlan(basePlan);
+		
 		/* Analysis of subtours */
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
-		planAnalyzeSubtours.run(basePlan);
+		planAnalyzeSubtours.run(plan);
 		
 		/* Make sure that all subtours with distance = 0 are set to "walk" */
 		int [] subtourDis = new int [planAnalyzeSubtours.getNumSubtours()];
 		for (int i=0;i<subtourDis.length;i++) {
-			subtourDis[i]=this.checksubtourDistance2(basePlan.getPlanElements(), planAnalyzeSubtours, i);
+			subtourDis[i]=this.checksubtourDistance2(plan.getPlanElements(), planAnalyzeSubtours, i);
 		}
-		for (int i=1;i<basePlan.getPlanElements().size();i=i+2){
+		for (int i=1;i<plan.getPlanElements().size();i=i+2){
 			if (subtourDis[planAnalyzeSubtours.getSubtourIndexation()[(i-1)/2]]==0) {
-				((LegImpl)(basePlan.getPlanElements().get(i))).setMode(TransportMode.walk);
+				((LegImpl)(plan.getPlanElements().get(i))).setMode(TransportMode.walk);
 			}
 		}
 		
 		/* Initial clean-up of plan for the case actslegs is not sound*/
-		double move = this.cleanSchedule (((ActivityImpl)(basePlan.getPlanElements().get(0))).getEndTime(), basePlan);
+		double move = this.cleanSchedule (((ActivityImpl)(plan.getPlanElements().get(0))).getEndTime(), plan);
 		int loops=1;
 		while (move!=0.0){
 			if (loops>3) {
-				for (int i=0;i<basePlan.getPlanElements().size()-2;i=i+2){
-					((ActivityImpl)basePlan.getPlanElements().get(i)).setDuration(this.minimumTime.get(((ActivityImpl)basePlan.getPlanElements().get(i)).getType()));
+				for (int i=0;i<plan.getPlanElements().size()-2;i=i+2){
+					((ActivityImpl)plan.getPlanElements().get(i)).setDuration(this.minimumTime.get(((ActivityImpl)plan.getPlanElements().get(i)).getType()));
 				}
-				move = this.cleanSchedule(this.minimumTime.get(((ActivityImpl)basePlan.getPlanElements().get(0)).getType()), basePlan);
+				move = this.cleanSchedule(this.minimumTime.get(((ActivityImpl)plan.getPlanElements().get(0)).getType()), plan);
 				if (move!=0.0){
 					/*
 					// TODO: whole plan copying needs to removed when there is no PlanomatXPlan any longer!
@@ -142,24 +153,24 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 					}
 					else {		*/		
 						// TODO Check whether allowed?
-						basePlan.setScore(-100000.0);	// Like this, PlanomatX will see that the solution is no proper solution
-						log.warn("No valid initial solution found for person "+basePlan.getPerson().getId()+"!");
+					basePlan.setScore(-100000.0);	// Like this, PlanomatX will see that the solution is no proper solution
+						log.warn("No valid initial solution found for person "+plan.getPerson().getId()+"!");
 						return;
 			//		}
 				}
 			}
 			loops++;
-			for (int i=0;i<basePlan.getPlanElements().size()-2;i=i+2){
-				((ActivityImpl)basePlan.getPlanElements().get(i)).setDuration(java.lang.Math.max(((ActivityImpl)basePlan.getPlanElements().get(i)).getDuration()*0.9, this.minimumTime.get(((ActivityImpl)(basePlan.getPlanElements().get(i))).getType())));
+			for (int i=0;i<plan.getPlanElements().size()-2;i=i+2){
+				((ActivityImpl)plan.getPlanElements().get(i)).setDuration(java.lang.Math.max(((ActivityImpl)plan.getPlanElements().get(i)).getDuration()*0.9, this.minimumTime.get(((ActivityImpl)(plan.getPlanElements().get(i))).getType())));
 			}
-			move = this.cleanSchedule(((ActivityImpl)(basePlan.getPlanElements().get(0))).getDuration(), basePlan);
+			move = this.cleanSchedule(((ActivityImpl)(plan.getPlanElements().get(0))).getDuration(), plan);
 		}
-		// TODO Check whether allowed?
-		basePlan.setScore(this.scorer.getScore(basePlan));	
+
+		plan.setScore(this.scorer.getScore(plan));	
 		
-		/* TODO: just as long as PlanomatXPlan exists. Needs then to be removed!!! */
+		/* Old copying 
 		PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());
-		plan.copyPlan(basePlan);
+		plan.copyPlan(basePlan); */
 		
 		/* Initializing */ 
 		int neighbourhood_size = 0;
@@ -304,6 +315,12 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 				((LegImpl)al.get(i)).setArrivalTime(time);
 				BasicLegImpl mode = new BasicLegImpl(((LegImpl)(bestSolution.get(i))).getMode());
 				((LegImpl)al.get(i)).setMode(mode.getMode());
+				
+				LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(((LegImpl)(bestSolution.get(i))).getRoute().getStartLink(), ((LegImpl)(bestSolution.get(i))).getRoute().getEndLink());
+				List<Id> l = ((NetworkRouteWRefs) ((LegImpl)(bestSolution.get(i))).getRoute()).getLinkIds();
+				r.setLinkIds(l);
+				((LegImpl)al.get(i)).setRoute(r);
+				
 			}
 		}
 		this.cleanRoutes(basePlan);
