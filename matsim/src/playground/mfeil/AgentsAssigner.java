@@ -310,7 +310,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			}
 		}
 		
-		if(al.size()>bestPlan.getPlanElements().size()){ 
+		if(bestPlan.getPlanElements().size()!=1 && al.size()>bestPlan.getPlanElements().size()){ 
 			int i;
 			for (i = 2; i<bestPlan.getPlanElements().size()-2;i++){
 				al.remove(i);
@@ -320,7 +320,15 @@ public class AgentsAssigner implements PlanAlgorithm{
 				al.remove(j);
 			}
 		}
-		else if(al.size()<bestPlan.getPlanElements().size()){
+		// bestPlan.getPlanElements().size() == 0
+		else if(al.size()>bestPlan.getPlanElements().size()){ 
+			for (int j = 1; j<al.size();j=j+0){
+				al.remove(j);
+			}
+			((ActivityImpl)al.get(0)).setEndTime(86400);
+			((ActivityImpl)al.get(0)).setDuration(86400);
+		}
+		else if(al.size()!=1 && al.size()<bestPlan.getPlanElements().size()){
 			int i;
 			for (i = 2; i<al.size()-2;i++){
 				al.remove(i);
@@ -330,6 +338,14 @@ public class AgentsAssigner implements PlanAlgorithm{
 				al.add(j, bestPlan.getPlanElements().get(j));
 			}
 		}
+		// al.size() == 0
+		else if(al.size()<bestPlan.getPlanElements().size()){
+			ActivityImpl actHelp = new ActivityImpl((ActivityImpl)al.get(0));
+			al.add(actHelp);
+			for (int j = 1; j<bestPlan.getPlanElements().size()-1;j++){			
+				al.add(j, bestPlan.getPlanElements().get(j));
+			}
+		}		
 		else {
 			for (int i = 2; i<al.size()-2;i++){
 			al.remove(i);
