@@ -18,6 +18,8 @@ import org.opengis.referencing.operation.TransformException;
 
 import playground.jjoubert.Utilities.MyShapefileReader;
 import playground.jjoubert.Utilities.ProgressBar;
+import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
+import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -80,22 +82,23 @@ public class SelectVehicles {
 		int inFiles = 0;
 		int outFiles = 0;
 		
-		File vehicleFile[] = originFolder.listFiles();
+		MyFileFilter vehicleFilter = new MyFileFilter(".txt");
+		
+		File vehicleFile[] = originFolder.listFiles(vehicleFilter);
 		log.info("Done" );
 		
 		log.info("Processing vehicle files.");
 		ProgressBar pb = new ProgressBar('*', files);
 		pb.printProgressBar();
-		
+
+		MyFileSampler sampler = new MyFileSampler(originFolder.getAbsolutePath(), destinationFolder.getAbsolutePath());
 		for (int i = 0; i < vehicleFile.length; i++ ) {
-			if( (vehicleFile[i].isFile()) && !(vehicleFile[i].getName().startsWith(".") ) ){
-				if ( getVehicleStatus(studyArea, vehicleFile[i], mt ) ){
-					copyVehicleFile(destinationFolder, vehicleFile[i] );
-					inFiles++;
-				} else{
-					outFiles++;
-				}			
-			}
+			if ( getVehicleStatus(studyArea, vehicleFile[i], mt ) ){
+				sampler.copyFile(destinationFolder, vehicleFile[i] );
+				inFiles++;
+			} else{
+				outFiles++;
+			}			
 			// Report on progress
 			if( i%100 == 0){
 				pb.updateProgress(i);
@@ -146,44 +149,44 @@ public class SelectVehicles {
 		return numberoffiles;
 	}
 
-	public static boolean copyVehicleFile(File destinationFolder, File fromFile) {
-		boolean result = false;
-		String toFileName = destinationFolder.getAbsolutePath() + "/" + fromFile.getName();
-		File toFile = new File(toFileName);
-
-		FileInputStream from = null;
-		FileOutputStream to = null;
-		try{
-			from = new FileInputStream(fromFile);
-			to = new FileOutputStream(toFile);
-			byte[] buffer = new byte[4096];
-			int bytesRead;
-
-			while ((bytesRead = from.read(buffer)) != -1)
-				to.write(buffer, 0, bytesRead); // write
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (from != null){
-				try {
-					from.close();
-				} catch (IOException e2) {
-					e2.printStackTrace();
-				}
-				if (to != null){
-					try {
-						to.close();
-						result = true;
-					} catch (IOException e3) {
-						e3.printStackTrace();
-					}
-				}
-			}
-		}
-		return result;
-	}
+//	public static boolean copyVehicleFile(File destinationFolder, File fromFile) {
+//		boolean result = false;
+//		String toFileName = destinationFolder.getAbsolutePath() + "/" + fromFile.getName();
+//		File toFile = new File(toFileName);
+//
+//		FileInputStream from = null;
+//		FileOutputStream to = null;
+//		try{
+//			from = new FileInputStream(fromFile);
+//			to = new FileOutputStream(toFile);
+//			byte[] buffer = new byte[4096];
+//			int bytesRead;
+//
+//			while ((bytesRead = from.read(buffer)) != -1)
+//				to.write(buffer, 0, bytesRead); // write
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} finally {
+//			if (from != null){
+//				try {
+//					from.close();
+//				} catch (IOException e2) {
+//					e2.printStackTrace();
+//				}
+//				if (to != null){
+//					try {
+//						to.close();
+//						result = true;
+//					} catch (IOException e3) {
+//						e3.printStackTrace();
+//					}
+//				}
+//			}
+//		}
+//		return result;
+//	}
 
 	public static boolean testPolygon(MultiPolygon mp, Point point) {
 		boolean inPolygon = mp.contains(point);		

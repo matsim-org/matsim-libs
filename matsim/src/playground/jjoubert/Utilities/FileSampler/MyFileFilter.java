@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * TextFileFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,21 +18,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.Utilities;
+package playground.jjoubert.Utilities.FileSampler;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.io.File;
+import java.io.FilenameFilter;
 
-
-public class AllTests {
-		
-	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for playground.jjoubert.Utilities");
-		
-		suite.addTestSuite(MyXmlConverterTest.class);
-		suite.addTestSuite(MyVehicleIdentifierTest.class);
-		suite.addTestSuite(MyFileSamplerTest.class);
-		
-		return suite;
+/**
+ * This class just implements the FilenameFilter interface. A file is accepted if it has 
+ * the same file extension as specified in the constructor. 
+ * @author johanwjoubert
+ */
+public class MyFileFilter implements FilenameFilter {
+	private final String extension;
+	
+	/**
+	 * Constructs an instance of the <code>FilenameFilter</code> interface.
+	 * @param extension the file extension of the created files. <b><i>Note:</i></b> the 
+	 * 		extension must include the '.' (full stop) character. For example, the 
+	 * 		extansion should be specified as <code>".txt"</code> and not just 
+	 * 		<code>"txt"</code>.
+	 */
+	public MyFileFilter(String extension) {
+		super();
+		this.extension = extension;
 	}
+
+	public String getExtension() {
+		return extension;
+	}
+
+	public boolean accept(File directory, String filename) {
+		int filepathLength = filename.length();
+		int pos = filename.indexOf(".");
+		String extention = filename.substring(pos, filepathLength);
+		if(extention.equalsIgnoreCase(".txt")){
+			return true;
+		} else{
+			return false;
+		}
+	}
+
 }

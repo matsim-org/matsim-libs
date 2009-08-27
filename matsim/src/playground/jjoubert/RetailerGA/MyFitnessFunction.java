@@ -25,6 +25,8 @@ import java.util.Collections;
 
 import org.matsim.core.gbl.MatsimRandom;
 
+import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class MyFitnessFunction {
@@ -32,21 +34,48 @@ public class MyFitnessFunction {
 	private int numberOfPoints;
 	private final boolean max;
 	private ArrayList<Integer> precedenceVector;
+	private DenseDoubleMatrix2D distanceMatrix;
 
 	public MyFitnessFunction(boolean isMax, int number){
 		this.max = isMax;
 		this.numberOfPoints = number;
-		this.points = new ArrayList<Coordinate>(this.numberOfPoints);		
+		this.points = new ArrayList<Coordinate>(this.numberOfPoints);	
 		this.precedenceVector = generateRandomInstance(this.numberOfPoints,-100,100,-100,100);
+		this.distanceMatrix = calculateDistanceMatrix();
 	}	
+	
+	private DenseDoubleMatrix2D calculateDistanceMatrix(){
+		DenseDoubleMatrix2D result = new DenseDoubleMatrix2D(points.size(), points.size());
+		for(int row = 0; row < result.rows(); row++){
+			for(int col = 0; col < result.columns(); col++){
+				if(col > row){
+					/*
+					 * For simplicity, I am going to round the values.
+					 */
+					result.setQuick(row, col, Math.round(points.get(row).distance(points.get(col))));
+				} else{
+					result.setQuick(row, col, result.getQuick(col, row));
+				}
+			}
+		}
+		return result;
+	}
+
 
 	public Double evaluate(ArrayList<Integer> solution){
 		Double fitness = 0.0;
-		
+		int fromNode = 0;
+		int toNode = 0;
 		for(int i = 0; i < solution.size()-1; i++){
-			fitness += this.points.get(solution.get(i)-1).distance(this.points.get(solution.get(i+1)-1));
+			fromNode = solution.get(i)-1;
+			toNode = solution.get(i+1)-1;
+			fitness += distanceMatrix.getQuick(fromNode, toNode);
+//			fitness += this.points.get(solution.get(i)-1).distance(this.points.get(solution.get(i+1)-1));
 		}
-		fitness += this.points.get(solution.get(solution.size()-1)-1).distance(this.points.get(solution.get(0)-1));
+		fromNode = solution.get(solution.size()-1)-1;
+		toNode = solution.get(0)-1;
+		fitness += distanceMatrix.getQuick(fromNode, toNode);
+//		fitness += this.points.get(solution.get(solution.size()-1)-1).distance(this.points.get(solution.get(0)-1));
 		
 		if(fitness == null){
 			throw new RuntimeException("Could not evaluate solution!");
@@ -71,8 +100,8 @@ public class MyFitnessFunction {
 			Coordinate c = new Coordinate(x, y);
 			this.points.add(c);
 		}
-		ArrayList<Integer> precedenceVector = this.createPrecedenceVector();
-		return precedenceVector;
+		ArrayList<Integer> result = this.createPrecedenceVector();
+		return result;
 	}	
 
 	private ArrayList<Integer> createPrecedenceVector() {
@@ -112,6 +141,10 @@ public class MyFitnessFunction {
 
 	public void setPrecedenceVector(ArrayList<Integer> precedenceVector) {
 		this.precedenceVector = precedenceVector;
+	}
+	
+	public DenseDoubleMatrix2D getDistanceMatrix() {
+		return distanceMatrix;
 	}
 
 		

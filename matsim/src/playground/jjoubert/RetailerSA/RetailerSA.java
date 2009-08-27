@@ -38,7 +38,7 @@ public class RetailerSA {
 	private MySaFitnessFunction fitnessFunction;
 	private boolean isMax;
 	private ArrayList<Double[]> solutionProgress;
-	private int maximumTriesPerIteration = (int) Math.max(5, ((double) iterationLimit)/((double)10));
+	private int maximumTriesPerIteration;
 	private double initialStepSize = 0.02;
 	private double currentStepSize; 
 	private final static Logger log = Logger.getLogger(RetailerSA.class);
@@ -51,6 +51,7 @@ public class RetailerSA {
 			ArrayList<Double> initialSolution,
 			MySaFitnessFunction fitnessFunction,
 			boolean isMax){
+		maximumTriesPerIteration = (int) Math.max(5, ((double) iterationLimit)/((double)10));
 		this.currentTemperature = initialTemperature;
 		this.temperatureReductionFrequency = temperatureReductionFrequency;
 		this.temperatureReductionFactor = temperatureReductionFactor;

@@ -480,7 +480,7 @@ public class DJCluster {
 				double pX = point.getX();
 				double pY = point.getY();
 				if((pX > lsx1 && pX < lsx2) && (pY > lsy1 && pY < lsy2)){
-					Double d = new Double(ls.distance(point));
+					Double d = Double.valueOf(ls.distance(point));
 					if(d > 0){
 						distances.add(d);
 						distanceMap.put(d, point);
@@ -571,7 +571,7 @@ public class DJCluster {
 				linePoints[1] = hullCoordinates[0];
 			}
 			LineString ls = gf.createLineString(linePoints);
-			Double length = new Double(ls.getLength());
+			Double length = Double.valueOf(ls.getLength());
 			lengths.add(length);
 			lengthMap.put(length, ls);
 		}

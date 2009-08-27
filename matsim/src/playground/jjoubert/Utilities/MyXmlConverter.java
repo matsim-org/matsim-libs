@@ -34,10 +34,24 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class MyXmlConverter {
 	private XStream xstream = null;
+	private Boolean silent;
 	private final static Logger log = Logger.getLogger(MyXmlConverter.class);
 	
+	/**
+	 * The constructor without any options will always produce log messages. 
+	 */
 	public MyXmlConverter(){
+		this(null);
+	}
+	/**
+	 * This constructor can be used to explicitly indicate whether log messages must be
+	 * written, or not. If not specified, i.e. set to <code>null</code>, log messages 
+	 * will be written.
+	 * @param silent indicating whether log messages should be suppressed.
+	 */
+	public MyXmlConverter(Boolean silent){
 		this.xstream = new XStream(new DomDriver());
+		this.silent = silent;
 	}
 	
 	private String convertObjectToXmlString(Object obj){
@@ -54,7 +68,9 @@ public class MyXmlConverter {
 	 * 		  written.
 	 */
 	public void writeObjectToFile(Object object, String fileString){
-		log.info("Writing " + object.getClass().getSimpleName() + " to XML: " + fileString);
+		if(!silent){
+			log.info("Writing " + object.getClass().getSimpleName() + " to XML: " + fileString);
+		}
 		String xmlString = convertObjectToXmlString(object);
 		try {
 			BufferedWriter xmlOutput = new BufferedWriter(new FileWriter(new File(fileString)));
@@ -66,7 +82,9 @@ public class MyXmlConverter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		log.info("XML written.");
+		if(!silent){
+			log.info("XML written.");
+		}
 	}
 	
 	private String convertFileToXmlString(String fileString){
@@ -89,10 +107,14 @@ public class MyXmlConverter {
 	}
 	
 	public Object readObjectFromFile(String fileString){
-		log.info("Reading object from XML: " + fileString);
+		if(!silent){
+			log.info("Reading object from XML: " + fileString);
+		}
 		Object result = null;
 		result = this.xstream.fromXML( convertFileToXmlString(fileString));
-		log.info("Object read.");
+		if(!silent){
+			log.info("Object read.");
+		}
 		return result;
 	}
 	

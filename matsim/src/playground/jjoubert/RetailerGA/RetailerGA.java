@@ -27,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.demandmodeling.primloc.CumulativeDistribution;
 
+import playground.jjoubert.Utilities.MyPermutator;
+
 public class RetailerGA {
 	private final int populationSize;
 	private int genomeLength;

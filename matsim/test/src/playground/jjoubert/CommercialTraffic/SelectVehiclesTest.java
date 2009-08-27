@@ -6,6 +6,9 @@ import java.util.ArrayList;
 
 import org.jfree.util.Log;
 import org.matsim.testcases.MatsimTestCase;
+
+import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
+
 import com.vividsolutions.jts.geom.*;
 
 public class SelectVehiclesTest extends MatsimTestCase{
@@ -33,25 +36,27 @@ public class SelectVehiclesTest extends MatsimTestCase{
 	}	
 	
 	public void testMoveFile() {
-		File testFolder = new File("~/MATSim/workspace/MATSimTestData/");
-		assertTrue("Folder should be empty", emptyFolder(testFolder) );
-		boolean checkFolder = testFolder.mkdirs();
+		File fromFolder = new File(getOutputDirectory() + "fromFolder/");
+		assertTrue("Folder should be empty", emptyFolder(fromFolder) );
+		boolean checkFolder = fromFolder.mkdirs();
 		if(!checkFolder){
-			Log.warn("Could not create " + testFolder.toString() + ", or it already exists!");
+			Log.warn("Could not create " + fromFolder.toString() + ", or it already exists!");
 		}
 		
-		createTestFiles(testFolder, 3);
-		File files[] = testFolder.listFiles();
+		createTestFiles(fromFolder, 3);
+		File files[] = fromFolder.listFiles();
 		File fileOne = files[0];
 		File fileTwo = files[1];
-		File copyFolder = new File("~/MATSim/workspace/MATSimTestData/CopyFolder");
-		assertTrue("Copy folder should have been created", copyFolder.mkdirs() );
+		File toFolder = new File(getOutputDirectory() + "toFolder/");
+		assertTrue("Copy folder should have been created", toFolder.mkdirs() );
 		
-		assertTrue("First file should have been copied.", SelectVehicles.copyVehicleFile(copyFolder, fileOne) );
-		assertEquals("There should be one file in copy folder.", 1, copyFolder.listFiles().length);
+		MyFileSampler sampler = new MyFileSampler(fromFolder.getAbsolutePath(), toFolder.getAbsolutePath());
 		
-		assertTrue("Second file should have been copied.", SelectVehicles.copyVehicleFile(copyFolder, fileTwo) );
-		assertEquals("There should be two files in copy folder.", 2, copyFolder.listFiles().length);
+		assertTrue("First file should have been copied.", sampler.copyFile(toFolder, fileOne) );
+		assertEquals("There should be one file in copy folder.", 1, toFolder.listFiles().length);
+		
+		assertTrue("Second file should have been copied.", sampler.copyFile(toFolder, fileTwo) );
+		assertEquals("There should be two files in copy folder.", 2, toFolder.listFiles().length);
 	}
 	
 	public void testCheckStudyArea() {

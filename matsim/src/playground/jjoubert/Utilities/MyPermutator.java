@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.RetailerGA;
+package playground.jjoubert.Utilities;
 
 import java.util.ArrayList;
 
