@@ -11,11 +11,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
 		suite.addTestSuite(BasicTests.class);
-		suite.addTestSuite(AdvancedTest1.class);
-		suite.addTestSuite(AdvancedTest2.class);
-		suite.addTestSuite(AdvancedTest3.class);
-		suite.addTestSuite(AdvancedTest4.class);
-		suite.addTestSuite(AdvancedTest5.class);
+		suite.addTestSuite(AdvancedTests.class);
 
 		return suite;
 	}
