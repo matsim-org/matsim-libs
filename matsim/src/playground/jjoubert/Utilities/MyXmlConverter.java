@@ -41,7 +41,7 @@ public class MyXmlConverter {
 	 * The constructor without any options will always produce log messages. 
 	 */
 	public MyXmlConverter(){
-		this(null);
+		this(false);
 	}
 	/**
 	 * This constructor can be used to explicitly indicate whether log messages must be

@@ -24,7 +24,11 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class MyXmlConverterTest extends MatsimTestCase{
 
-	public void testMyXmlConverter(){
+	/**
+	 * This test creates a dummy XML object, and tests the XML converter with no
+	 * argument about the log messages being silent in the constructor.
+	 */
+	public void testMyXmlConverterNoMessage(){
 		String theFile = getOutputDirectory() + "TestFile.txt";
 		
 		MyTestXmlObject testObject = new MyTestXmlObject("Type", 123, true);
@@ -41,4 +45,51 @@ public class MyXmlConverterTest extends MatsimTestCase{
 			assertTrue("Attribute 'test' converted incorrectly.", ((MyTestXmlObject) newObject).isTest() == true);
 		}
 	}
+
+	/**
+	 * This test creates a dummy XML object, and tests the XML converter with the
+	 * argument about the log messages being silent set to <code>true</code> in the
+	 * constructor.
+	 */
+	public void testMyXmlConverterTrue(){
+		String theFile = getOutputDirectory() + "TestFile.txt";
+		
+		MyTestXmlObject testObject = new MyTestXmlObject("Type", 123, true);
+		
+		MyXmlConverter xmlConverter = new MyXmlConverter(true);
+		xmlConverter.writeObjectToFile(testObject, theFile);
+		
+		Object newObject = xmlConverter.readObjectFromFile(theFile);
+		assertTrue("The read file should be of type MyTestXmlObject.", (newObject instanceof MyTestXmlObject));
+		if(newObject instanceof MyTestXmlObject){
+			newObject = (MyTestXmlObject) newObject;
+			assertTrue("Attribute 'Type' converted incorrectly.", ((MyTestXmlObject) newObject).getType().equalsIgnoreCase("Type"));
+			assertTrue("Attribute 'number' converted incorrectly.", ((MyTestXmlObject) newObject).getNumber() == 123);
+			assertTrue("Attribute 'test' converted incorrectly.", ((MyTestXmlObject) newObject).isTest() == true);
+		}
+	}
+	
+	/**
+	 * This test creates a dummy XML object, and tests the XML converter with the
+	 * argument about the log messages being silent set to <code>false</code> in the
+	 * constructor.
+	 */
+	public void testMyXmlConverterFalse(){
+		String theFile = getOutputDirectory() + "TestFile.txt";
+		
+		MyTestXmlObject testObject = new MyTestXmlObject("Type", 123, true);
+		
+		MyXmlConverter xmlConverter = new MyXmlConverter(false);
+		xmlConverter.writeObjectToFile(testObject, theFile);
+		
+		Object newObject = xmlConverter.readObjectFromFile(theFile);
+		assertTrue("The read file should be of type MyTestXmlObject.", (newObject instanceof MyTestXmlObject));
+		if(newObject instanceof MyTestXmlObject){
+			newObject = (MyTestXmlObject) newObject;
+			assertTrue("Attribute 'Type' converted incorrectly.", ((MyTestXmlObject) newObject).getType().equalsIgnoreCase("Type"));
+			assertTrue("Attribute 'number' converted incorrectly.", ((MyTestXmlObject) newObject).getNumber() == 123);
+			assertTrue("Attribute 'test' converted incorrectly.", ((MyTestXmlObject) newObject).isTest() == true);
+		}
+	}
+
 }
