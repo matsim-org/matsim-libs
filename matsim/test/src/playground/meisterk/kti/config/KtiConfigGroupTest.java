@@ -48,7 +48,7 @@ public class KtiConfigGroupTest extends MatsimTestCase {
 		assertEquals(Double.parseDouble(KtiConfigGroup.KtiConfigParameter.DISTANCE_COST_CAR.getDefaultValue()), testee.getDistanceCostCar());
 		assertEquals(Double.parseDouble(KtiConfigGroup.KtiConfigParameter.DISTANCE_COST_PT.getDefaultValue()), testee.getDistanceCostPtNoTravelCard());
 		assertEquals(Double.parseDouble(KtiConfigGroup.KtiConfigParameter.DISTANCE_COST_PT_UNKNOWN.getDefaultValue()), testee.getDistanceCostPtUnknownTravelCard());
-		
+		assertEquals(Double.parseDouble(KtiConfigGroup.KtiConfigParameter.TRAVELING_BIKE.getDefaultValue()), testee.getTravelingBike());
 	}
 	
 	public void testAddParam() {
@@ -70,6 +70,7 @@ public class KtiConfigGroupTest extends MatsimTestCase {
 		assertEquals(0.1, testee.getDistanceCostCar());
 		assertEquals(-0.2, testee.getDistanceCostPtNoTravelCard());
 		assertEquals(0.3, testee.getDistanceCostPtUnknownTravelCard());
+		assertEquals(-3.1, testee.getTravelingBike());
 	}
 	
 }

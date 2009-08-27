@@ -56,17 +56,25 @@ public class KtiConfigGroup extends Module {
 		 */
 		USE_PLANS_CALC_ROUTE_KTI("usePlansCalcRouteKti", "false", ""),
 		/**
-		 * distance cost for mode "car" in CHF/km
+		 * distance cost for mode "car"
+		 * unit: CHF/km
 		 */
 		DISTANCE_COST_CAR("distanceCostCar", "0.0", ""),
 		/**
-		 * distance cost for mode "pt" in CHF/km, without travel card
+		 * distance cost for mode "pt", without travel card
+		 * unit: CHF/km
 		 */
 		DISTANCE_COST_PT("distanceCostPtNoTravelCard", "0.0", ""),
 		/**
-		 * distance cost for mode "pt" in CHF/km, with travel card "unknown"
+		 * distance cost for mode "pt", with travel card "unknown"
+		 * unit: CHF/km
 		 */
-		DISTANCE_COST_PT_UNKNOWN("distanceCostPtUnknownTravelCard", "0.0", "");
+		DISTANCE_COST_PT_UNKNOWN("distanceCostPtUnknownTravelCard", "0.0", ""),
+		/**
+		 * marginal utility of travel time for mode "bike"
+		 * unit: 1/h
+		 */
+		TRAVELING_BIKE("travelingBike", "0.0", "");
 		
 		private final String parameterName;
 		private final String defaultValue;
@@ -166,6 +174,10 @@ public class KtiConfigGroup extends Module {
 		KtiConfigParameter.USE_PLANS_CALC_ROUTE_KTI.setActualValue(Boolean.toString(usePlansCalcRouteKti));
 	}
 	
+	public void setDistanceCostCar(double newValue) {
+		KtiConfigParameter.DISTANCE_COST_CAR.setActualValue(Double.toString(newValue));
+	}
+	
 	public double getDistanceCostCar() {
 		return Double.parseDouble(KtiConfigParameter.DISTANCE_COST_CAR.getActualValue());
 	}
@@ -174,9 +186,24 @@ public class KtiConfigGroup extends Module {
 		return Double.parseDouble(KtiConfigParameter.DISTANCE_COST_PT.getActualValue());
 	}
 	
+	public void setDistanceCostPtNoTravelCard(double newValue) {
+		KtiConfigParameter.DISTANCE_COST_PT.setActualValue(Double.toString(newValue));
+	}
+	
 	public double getDistanceCostPtUnknownTravelCard() {
 		return Double.parseDouble(KtiConfigParameter.DISTANCE_COST_PT_UNKNOWN.getActualValue());
 	}
 	
+	public void setDistanceCostPtUnknownTravelCard(double newValue) {
+		KtiConfigParameter.DISTANCE_COST_PT_UNKNOWN.setActualValue(Double.toString(newValue));
+	}
+	
+	public double getTravelingBike() {
+		return Double.parseDouble(KtiConfigParameter.TRAVELING_BIKE.getActualValue());
+	}
+
+	public void setTravelingBike(double newValue) {
+		KtiConfigParameter.TRAVELING_BIKE.setActualValue(Double.toString(newValue));
+	}
 	
 }

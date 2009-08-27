@@ -13,6 +13,7 @@
 		<param name="distanceCostCar" value="0.1" />
 		<param name="distanceCostPtNoTravelCard" value="-0.2" />
 		<param name="distanceCostPtUnknownTravelCard" value="0.3" />
+		<param name="travelingBike" value="-3.1" />
 	</module>
 
 	<!-- ====================================================================== -->
