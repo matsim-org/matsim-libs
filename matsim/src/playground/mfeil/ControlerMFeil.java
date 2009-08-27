@@ -120,6 +120,11 @@ public class ControlerMFeil extends Controler {
 		    	strategy = new PlanStrategy(new KeepSelected());
 				strategy.addStrategyModule(new PlansConstructor(this));
 			}
+			
+			else if (classname.equals("PlansEvaluator")) {
+		    	strategy = new PlanStrategy(new KeepSelected());
+				strategy.addStrategyModule(new PlansEvaluator(this));
+			}
 		
 			manager.addStrategy(strategy, rate);
 		}
