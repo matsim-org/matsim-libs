@@ -19,22 +19,21 @@
  * *********************************************************************** */
 package playground.dgrether.signalVis.drawer;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.vecmath.Point2d;
 
 import playground.dgrether.signalVis.io.DgOtfLaneWriter;
 
 public class DgOtfLaneData {
 	private String id;
-	private Point2d endPoint;
+	private Point2D.Double endPoint;
 	private boolean isGreen = false;
-	private List<Point2d> toLinkStartPoints;
+	private List<Point2D.Double> toLinkStartPoints;
 
 	public DgOtfLaneData() {
 		if (DgOtfLaneWriter.DRAW_LINK_TO_LINK_LINES) {
-			this.toLinkStartPoints = new ArrayList<Point2d>();
+			this.toLinkStartPoints = new ArrayList<Point2D.Double>();
 		}
 	}
 	
@@ -43,7 +42,7 @@ public class DgOtfLaneData {
 	}
 
 	public void setEndPoint(double endx, double endy) {
-		this.endPoint = new Point2d(endx, endy);
+		this.endPoint = new Point2D.Double(endx, endy);
 	}
 
 	public void setGreen(boolean isGreen) {
@@ -54,7 +53,7 @@ public class DgOtfLaneData {
 		return this.isGreen ;
 	}
 	
-	public Point2d getEndPoint() {
+	public Point2D.Double getEndPoint() {
 		return endPoint;
 	}
 	
@@ -62,7 +61,7 @@ public class DgOtfLaneData {
 		return id;
 	}
 
-	public List<Point2d> getToLinkStartPoints(){
+	public List<Point2D.Double> getToLinkStartPoints(){
 		return this.toLinkStartPoints;
 	}
 	

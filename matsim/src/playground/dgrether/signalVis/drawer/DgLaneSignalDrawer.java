@@ -24,7 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.media.opengl.GL;
-import javax.vecmath.Point2d;
 
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.caching.SceneGraph;
@@ -53,14 +52,25 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 	public void onDraw( GL gl) {
 		gl.glColor3d(0.0, 0.0, 1.0);
 		double zCoord = 1.0;
-		double offset = 5.0;
+		double offsetLinkEnd = 4.0;
+		double offsetLinkStart = 2.5;
 		// always draw a branch point
 		gl.glBegin(GL.GL_QUADS);
-		gl.glVertex3d(branchPoint.x - offset, branchPoint.y - offset, zCoord);
-		gl.glVertex3d(branchPoint.x - offset, branchPoint.y + offset, zCoord);
-		gl.glVertex3d(branchPoint.x + offset, branchPoint.y + offset, zCoord);
-		gl.glVertex3d(branchPoint.x + offset, branchPoint.y - offset, zCoord);
+			gl.glVertex3d(branchPoint.x - offsetLinkEnd, branchPoint.y - offsetLinkEnd, zCoord);
+			gl.glVertex3d(branchPoint.x - offsetLinkEnd, branchPoint.y + offsetLinkEnd, zCoord);
+			gl.glVertex3d(branchPoint.x + offsetLinkEnd, branchPoint.y + offsetLinkEnd, zCoord);
+			gl.glVertex3d(branchPoint.x + offsetLinkEnd, branchPoint.y - offsetLinkEnd, zCoord);
 		gl.glEnd();
+		//draw a rect around linkStart
+		gl.glBegin(GL.GL_QUADS);
+			gl.glVertex3d(this.startX - offsetLinkStart, this.startY - offsetLinkStart, zCoord);
+			gl.glVertex3d(this.startX - offsetLinkStart, this.startY + offsetLinkStart, zCoord);
+			gl.glVertex3d(this.startX + offsetLinkStart, this.startY + offsetLinkStart, zCoord);
+			gl.glVertex3d(this.startX + offsetLinkStart, this.startY - offsetLinkStart, zCoord);
+		gl.glEnd();
+
+		
+		
 	//draw lines between link start point and branch point
 		gl.glBegin(GL.GL_LINES);
 			gl.glVertex3d(this.startX, this.startY , zCoord); 
@@ -77,8 +87,9 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 		  		gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord); 
   			gl.glEnd();
   			
+  			gl.glColor3d(1.0, 1.0, 0.5);
   			if (DgOtfLaneWriter.DRAW_LINK_TO_LINK_LINES){
-  				for (Point2d point : ld.getToLinkStartPoints()){
+  				for (Point2D.Double point : ld.getToLinkStartPoints()){
   					gl.glBegin(GL.GL_LINES);
   					  gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord); 
   	  			  gl.glVertex3d(point.x, point.y, zCoord); 
@@ -94,14 +105,16 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 				}
 				// draw lane ends
 				gl.glBegin(GL.GL_QUADS);
-  			  gl.glVertex3d(ld.getEndPoint().x - offset, ld.getEndPoint().y - offset, zCoord);
-	  		  gl.glVertex3d(ld.getEndPoint().x - offset, ld.getEndPoint().y + offset, zCoord);
-		  	  gl.glVertex3d(ld.getEndPoint().x + offset, ld.getEndPoint().y + offset, zCoord);
-			    gl.glVertex3d(ld.getEndPoint().x + offset, ld.getEndPoint().y - offset, zCoord);
+  			  gl.glVertex3d(ld.getEndPoint().x - offsetLinkEnd, ld.getEndPoint().y - offsetLinkEnd, zCoord);
+	  		  gl.glVertex3d(ld.getEndPoint().x - offsetLinkEnd, ld.getEndPoint().y + offsetLinkEnd, zCoord);
+		  	  gl.glVertex3d(ld.getEndPoint().x + offsetLinkEnd, ld.getEndPoint().y + offsetLinkEnd, zCoord);
+			    gl.glVertex3d(ld.getEndPoint().x + offsetLinkEnd, ld.getEndPoint().y - offsetLinkEnd, zCoord);
    		  gl.glEnd();
 			}
 		}
 	}
+	
+
 	
 	@Override
 	public void invalidate(SceneGraph graph) {

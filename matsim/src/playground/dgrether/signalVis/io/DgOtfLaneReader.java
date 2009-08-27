@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package playground.dgrether.signalVis.io;
 
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
-import javax.vecmath.Point2d;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.ByteBufferUtils;
@@ -65,7 +64,7 @@ public class DgOtfLaneReader extends OTFDataReader {
 				if (DgOtfLaneWriter.DRAW_LINK_TO_LINK_LINES){
 					int numberOfToLinks = in.getInt();
 					for (int j = 0; j < numberOfToLinks; j++) {
-						data.getToLinkStartPoints().add(new Point2d(in.getDouble(), in.getDouble()));
+						data.getToLinkStartPoints().add(new Point2D.Double(in.getDouble(), in.getDouble()));
 					}
 				}
 			}
