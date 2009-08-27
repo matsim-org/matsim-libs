@@ -32,11 +32,26 @@ import org.apache.log4j.Logger;
 
 import playground.jjoubert.Utilities.MyPermutator;
 
+/**
+ * This class allows you to randomly sample files from a specified <i>input</i> folder.
+ * It is also possible, depending on the constructor used, to copy the selected files to 
+ * a specified <i>output</i> folder.
+ * 
+ * @author jwjoubert
+ */
 public class MyFileSampler {
 	private final static Logger log = Logger.getLogger(MyFileSampler.class);
 	private File fromFolder;
 	private File toFolder;
 	
+	/**
+	 * The constructor instantiates an instance of of the class.
+	 * 
+	 * @param fromFoldername the absolute path name of the folder from which files will 
+	 * 		be considered.
+	 * @param toFoldername the absolute path name of the folder to which sampled files 
+	 * 		will be copied (if selected).
+	 */
 	public MyFileSampler(String fromFoldername, String toFoldername) {
 		File fromFolder = new File(fromFoldername);	
 		if(!fromFolder.isDirectory()){
@@ -44,42 +59,77 @@ public class MyFileSampler {
 		} else{
 			this.fromFolder = fromFolder;
 		}
-		File toFolder = new File(toFoldername);
-		if(!toFolder.exists()){
-			boolean checkCreate = toFolder.mkdirs();
-			if(!checkCreate){
-				throw new RuntimeException("Could not successfully create the destination folder " + toFoldername);
+		if(toFoldername != null){
+			File toFolder = new File(toFoldername);
+			if(!toFolder.exists()){
+				boolean checkCreate = toFolder.mkdirs();
+				if(!checkCreate){
+					throw new RuntimeException("Could not successfully create the destination folder " + toFoldername);
+				} else{
+					this.toFolder = toFolder;
+				}
 			} else{
 				this.toFolder = toFolder;
 			}
-		} else{
-			this.toFolder = toFolder;
+		}else{
+			this.toFolder = null;
 		}
 	}
 
-	public ArrayList<File> sampleFiles(int numberOfSamples, FilenameFilter filter){
+	/**
+	 * The constructor instantiates an instance of of the class. If you do want to copy
+	 * the selected files to a separate folder, you have to use another constructor. 
+	 * 
+	 * @param fromFoldername the absolute path name of the folder from which files will 
+	 * 		be considered.
+	 */
+	public MyFileSampler(String fromFoldername){
+		this(fromFoldername, null);
+	}
+
+	/**
+	 * The method samples from a filtered file list. 
+	 * @param number the number of files that must be sampled. 
+	 * @param filter the type <code>java.io.FilenameFilter</code> filter that will be 
+	 * 		used to filter the files from the source folder. In my case, I have written
+	 * 		my own <code>playground.jjoubert.Utilities.FileSampler.MyFileFilter</code>
+	 * 		that uses the file extension as filter.
+	 * @return an <code>ArrayList</code> of <code>File</code>s containing the 
+	 */
+	public ArrayList<File> sampleFiles(int number, FilenameFilter filter){
 		ArrayList<File> result = null;
 		File[] fileList = fromFolder.listFiles(filter);
 		if(fileList.length > 0){
-			if(fileList.length < numberOfSamples){
-				log.warn("Although " + numberOfSamples + " files were requested, only " + fileList.length + " are available");
+			result = new ArrayList<File>();
+			if(fileList.length < number){
+				log.warn("Although " + number + " files were requested, only " + fileList.length + " are available");
 			}
 			MyPermutator mp = new MyPermutator();
 			ArrayList<Integer> permutation = mp.permutate(fileList.length);
-			for(int i = 0; i < Math.min(numberOfSamples, fileList.length); i++){
+			for(int i = 0; i < Math.min(number, fileList.length); i++){
 				File theFile = fileList[permutation.get(i)-1];
-				boolean checkMove = copyFile(toFolder, theFile);
-				if(!checkMove){
-					log.warn("Could not successfully relocate " + theFile.toString());
+				if(toFolder != null){
+					boolean checkMove = copyFile(toFolder, theFile);
+					if(!checkMove){
+						log.warn("Could not successfully relocate " + theFile.toString());
+					}
 				}
+				result.add(theFile);
 			}
 		} else{
 			log.warn("The folder contains no relevant files. A null list is returned!");
 		}
-
 		return result;
 	}
 	
+	/**
+	 * The method copies a given file to a given folder, instead of just relocating the
+	 * file to the destination as is done with the <code>File.renameTo()</code> method.
+	 * @param destinationFolder the folder of type <code>File</code> to which the given
+	 * 		file will be copied.
+	 * @param fromFile the <code>File</code> that will be copied.
+	 * @return <code>true</code> if and only if the file was copied successfully. 
+	 */
 	public boolean copyFile(File destinationFolder, File fromFile) {
 		boolean result = false;
 		String toFileName = destinationFolder.getAbsolutePath() + "/" + fromFile.getName();
