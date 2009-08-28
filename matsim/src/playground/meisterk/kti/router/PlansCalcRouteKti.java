@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.kti.router;
+package playground.meisterk.kti.router;
 
 import java.util.List;
 
@@ -40,7 +40,6 @@ import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
 
-import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 
 /**
  * Special Routing Module for finding (more or less) realistic public transit travel times.

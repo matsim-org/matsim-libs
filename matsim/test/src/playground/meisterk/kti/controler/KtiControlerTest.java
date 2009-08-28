@@ -26,7 +26,7 @@ import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.marcel.kti.router.PlansCalcRouteKti;
+import playground.meisterk.kti.router.PlansCalcRouteKti;
 
 public class KtiControlerTest extends MatsimTestCase {
 

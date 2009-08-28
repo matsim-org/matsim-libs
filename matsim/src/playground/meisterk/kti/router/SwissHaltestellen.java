@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.kti.router;
+package playground.meisterk.kti.router;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
