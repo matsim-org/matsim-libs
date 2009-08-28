@@ -20,6 +20,9 @@
 
 package playground.meisterk.org.matsim.population.algorithms;
 
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
@@ -32,6 +35,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution.CrosstabFormat;
@@ -72,7 +76,14 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		PopulationImpl pop = new PopulationImpl();
 		pop.setIsStreaming(true);
 		
-		PopulationLegDistanceDistribution testee = new PopulationLegDistanceDistribution();
+		PrintStream out = null;
+		try {
+			out = new PrintStream(this.getOutputDirectory() + "actualOutput.txt");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		PopulationLegDistanceDistribution testee = new PopulationLegDistanceDistribution(out);
 		pop.addAlgorithm(testee);
 		
 		pop.addPerson(testPerson);
@@ -118,6 +129,12 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 
 		testee.printQuantiles(true, 12);
 
+		out.close();
+
+		final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + "expectedOutput.txt");
+		final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + "actualOutput.txt");
+		assertEquals(expectedChecksum, actualChecksum);
+		
 	}
 	
 }

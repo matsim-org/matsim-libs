@@ -20,6 +20,7 @@
 
 package playground.meisterk.org.matsim.population.algorithms;
 
+import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.util.EnumMap;
 
@@ -46,7 +47,7 @@ public class PopulationLegDistanceDistribution extends AbstractPersonAlgorithm i
 
 	private static final NumberFormat kmFormat, percentFormat;
 	private static final double DUMMY_NEGATIVE_DISTANCE = -1000.0;
-	
+
 	static {
 
 		kmFormat = NumberFormat.getInstance();
@@ -54,6 +55,13 @@ public class PopulationLegDistanceDistribution extends AbstractPersonAlgorithm i
 		percentFormat = NumberFormat.getPercentInstance();
 		percentFormat.setMaximumFractionDigits(2);
 		
+	}
+
+	private PrintStream out;
+	
+	public PopulationLegDistanceDistribution(PrintStream out) {
+		super();
+		this.out = out;
 	}
 	
 	private EnumMap<TransportMode, Frequency> frequencies = new EnumMap<TransportMode, Frequency>(TransportMode.class);
@@ -171,16 +179,16 @@ public class PopulationLegDistanceDistribution extends AbstractPersonAlgorithm i
 
 		long numberOfLegs;
 		
-		System.out.println();
+		out.println();
 		/*
 		 * header - start
 		 */
-		System.out.print("#i\td [km]");
+		out.print("#i\td [km]");
 		for (TransportMode mode : this.frequencies.keySet()) {
-			System.out.print("\t" + mode);
+			out.print("\t" + mode);
 		}
-		System.out.print("\tsum");
-		System.out.println();
+		out.print("\tsum");
+		out.println();
 		/*
 		 * header - end
 		 */
@@ -189,10 +197,10 @@ public class PopulationLegDistanceDistribution extends AbstractPersonAlgorithm i
 		 * table - start
 		 */
 		for (int i=0; i < distanceClasses.length; i++) {
-			System.out.print(Integer.toString(i) + "\t");
-			System.out.print(kmFormat.format(distanceClasses[i] / 1000));
+			out.print(Integer.toString(i) + "\t");
+			out.print(kmFormat.format(distanceClasses[i] / 1000));
 			for (TransportMode mode : this.frequencies.keySet()) {
-				System.out.print("\t");
+				out.print("\t");
 				if (isCumulative) {
 					numberOfLegs = this.getNumberOfLegs(mode, DUMMY_NEGATIVE_DISTANCE, distanceClasses[i]);
 				} else {
@@ -203,14 +211,14 @@ public class PopulationLegDistanceDistribution extends AbstractPersonAlgorithm i
 				}
 				switch(crosstabFormat) {
 				case ABSOLUTE:
-					System.out.print(Long.toString(numberOfLegs));
+					out.print(Long.toString(numberOfLegs));
 					break;
 				case PERCENTAGE:
-					System.out.print(percentFormat.format((double) numberOfLegs / (double) this.getNumberOfLegs()));
+					out.print(percentFormat.format((double) numberOfLegs / (double) this.getNumberOfLegs()));
 					break;
 				}
 			}
-			System.out.print("\t");
+			out.print("\t");
 			if (isCumulative) {
 				numberOfLegs = this.getNumberOfLegs(DUMMY_NEGATIVE_DISTANCE, distanceClasses[i]);
 			} else {
@@ -220,13 +228,13 @@ public class PopulationLegDistanceDistribution extends AbstractPersonAlgorithm i
 			}
 			switch(crosstabFormat) {
 			case ABSOLUTE:
-				System.out.print(Long.toString(numberOfLegs));
+				out.print(Long.toString(numberOfLegs));
 				break;
 			case PERCENTAGE:
-				System.out.print(percentFormat.format((double) numberOfLegs / (double) this.getNumberOfLegs()));
+				out.print(percentFormat.format((double) numberOfLegs / (double) this.getNumberOfLegs()));
 				break;
 			}
-			System.out.println();
+			out.println();
 		}
 		/*
 		 * table - end
@@ -235,35 +243,35 @@ public class PopulationLegDistanceDistribution extends AbstractPersonAlgorithm i
 		/*
 		 * sum - start
 		 */
-		System.out.print("#sum\t");
+		out.print("#sum\t");
 		for (TransportMode mode : this.frequencies.keySet()) {
-			System.out.print("\t");
+			out.print("\t");
 			numberOfLegs = this.getNumberOfLegs(mode);
 			switch(crosstabFormat) {
 			case ABSOLUTE:
-				System.out.print(numberOfLegs);
+				out.print(numberOfLegs);
 				break;
 			case PERCENTAGE:
-				System.out.print(percentFormat.format((double) numberOfLegs / (double) this.getNumberOfLegs()));
+				out.print(percentFormat.format((double) numberOfLegs / (double) this.getNumberOfLegs()));
 				break;
 			}
 		}
 		
-		System.out.print("\t");
+		out.print("\t");
 		numberOfLegs = this.getNumberOfLegs();
 		switch(crosstabFormat) {
 		case ABSOLUTE:
-			System.out.print(Long.toString(numberOfLegs));
+			out.print(Long.toString(numberOfLegs));
 			break;
 		case PERCENTAGE:
-			System.out.print(percentFormat.format(1.0));
+			out.print(percentFormat.format(1.0));
 			break;
 		}
 		/*
 		 * sum - end
 		 */
 
-		System.out.println();
+		out.println();
 
 	}
 
@@ -278,16 +286,16 @@ public class PopulationLegDistanceDistribution extends AbstractPersonAlgorithm i
 	 */
 	public void printQuantiles(boolean isCumulative, int numberOfQuantiles) {
 
-		System.out.println();
+		out.println();
 
 		/*
 		 * header - start
 		 */
-		System.out.print("#p");
+		out.print("#p");
 		for (TransportMode mode : this.frequencies.keySet()) {
-			System.out.print("\t" + mode);
+			out.print("\t" + mode);
 		}
-		System.out.println();
+		out.println();
 		/*
 		 * header - end
 		 */
@@ -301,19 +309,19 @@ public class PopulationLegDistanceDistribution extends AbstractPersonAlgorithm i
 		}
 		
 		for (int ii = 0; ii < numberOfQuantiles; ii++) {
-			System.out.print(percentFormat.format(quantiles[ii]));
+			out.print(percentFormat.format(quantiles[ii]));
 			for (TransportMode mode : this.frequencies.keySet()) {
-				System.out.print("\t");
-				System.out.print(kmFormat.format(StatUtils.percentile(this.rawData.get(mode).getInternalValues(), quantiles[ii] * 100.0)));
+				out.print("\t");
+				out.print(kmFormat.format(StatUtils.percentile(this.rawData.get(mode).getInternalValues(), quantiles[ii] * 100.0)));
 			}
-			System.out.println();
+			out.println();
 		}
 		/*
 		 * table - end
 		 */
 	
-		System.out.println();
+		out.println();
 
 	}
-	
+
 }
