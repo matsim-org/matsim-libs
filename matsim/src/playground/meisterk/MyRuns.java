@@ -132,38 +132,44 @@ public class MyRuns {
 			100000, 200000, 500000,
 			1000000};
 
-		// initialize scenario with events from a given events file
-		// - network
-		logger.info("Reading network xml file...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		logger.info("Reading network xml file...done.");
+		ScenarioImpl sc = new ScenarioImpl(config);
+		ScenarioLoader loader = new ScenarioLoader(sc);
+		sc.getPopulation().setIsStreaming(true);
+		PopulationLegDistanceDistribution pa = new PopulationLegDistanceDistribution();
+		sc.getPopulation().addAlgorithm(pa);
+
+		loader.loadScenario();
 		
-		// - facilities
-		logger.info("Reading facilities xml file...");
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		try {
-			new MatsimFacilitiesReader(facilities).parse(config.facilities().getInputFile());
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		Gbl.getWorld().setFacilityLayer(facilities);
-		logger.info("Reading facilities xml file...");
+//		// - network
+//		logger.info("Reading network xml file...");
+//		NetworkLayer network = new NetworkLayer();
+//		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+//		logger.info("Reading network xml file...done.");
+//		
+//		// - facilities
+//		logger.info("Reading facilities xml file...");
+//		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
+//		try {
+//			new MatsimFacilitiesReader(facilities).parse(config.facilities().getInputFile());
+//		} catch (SAXException e) {
+//			e.printStackTrace();
+//		} catch (ParserConfigurationException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		Gbl.getWorld().setFacilityLayer(facilities);
+//		logger.info("Reading facilities xml file...");
 		
 		// - population
-		PopulationLegDistanceDistribution pa = new PopulationLegDistanceDistribution();
-		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
-		plansAlgos.add(pa);
+//		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
+//		plansAlgos.add(pa);
 
-		PopulationImpl matsimAgentPopulation = new PopulationImpl();
-		matsimAgentPopulation.setIsStreaming(true);
-		matsimAgentPopulation.addAlgorithm(pa);
-		PopulationReader plansReader = new MatsimPopulationReader(matsimAgentPopulation, network);
-		plansReader.readFile(config.plans().getInputFile());
+//		PopulationImpl matsimAgentPopulation = new PopulationImpl();
+//		pop.setIsStreaming(true);
+//		pop.addAlgorithm(pa);
+//		PopulationReader plansReader = new MatsimPopulationReader(pop, sc.getNetwork());
+//		plansReader.readFile(config.plans().getInputFile());
 
 		for (boolean isCumulative : new boolean[]{false, true}) {
 			for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
