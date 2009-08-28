@@ -48,6 +48,7 @@ public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimList
 		super();
 		this.filename = filename;
 	}
+	
 	public void notifyStartup(StartupEvent event) {
 
 		try {
