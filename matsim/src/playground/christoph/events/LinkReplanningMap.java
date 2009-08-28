@@ -61,17 +61,26 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 		QueueLink queueLink = queueNetwork.getQueueLink(event.getLinkId());
 		double departureTime = (now + queueLink.getLink().getFreespeedTravelTime(now));
 
-		replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), departureTime));
+		synchronized(replanningMap)
+		{
+			replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), departureTime));	
+		}
 	}
 
 	public void handleEvent(BasicLinkLeaveEvent event)
 	{
-		replanningMap.remove(event.getPersonId());
+		synchronized(replanningMap)
+		{
+			replanningMap.remove(event.getPersonId());
+		}
 	}
 
 	public void handleEvent(BasicAgentArrivalEvent event)
 	{
-		replanningMap.remove(event.getPersonId());
+		synchronized(replanningMap)
+		{
+			replanningMap.remove(event.getPersonId());
+		}
 	}
 
 	// Nothing to do here...
@@ -86,12 +95,18 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 	 */
 	public void handleEvent(BasicAgentWait2LinkEvent event)
 	{		
-		replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), event.getTime()));
+		synchronized(replanningMap)
+		{
+			replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), event.getTime()));
+		}
 	}
 
 	public void handleEvent(BasicAgentStuckEvent event)
 	{
-		replanningMap.remove(event.getPersonId());
+		synchronized(replanningMap)
+		{
+			replanningMap.remove(event.getPersonId());
+		}
 	}
 	
 	public Map<Id, Tuple<Id, Double>> getLinkReplanningMap()
@@ -99,7 +114,7 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 		return this.replanningMap;
 	}
 	
-	public List<QueueVehicle> getReplanningVehicles(double time)
+	public synchronized List<QueueVehicle> getReplanningVehicles(double time)
 	{
 		// using the ArrayList is just a Workaround...
 		ArrayList<QueueVehicle> vehiclesToReplanLeaveLink = new ArrayList<QueueVehicle>();
@@ -136,7 +151,7 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 		return vehiclesToReplanLeaveLink;
 	}
 
-	public void reset(int iteration)
+	public synchronized void reset(int iteration)
 	{
 		replanningMap = new HashMap<Id, Tuple<Id, Double>>();
 	}

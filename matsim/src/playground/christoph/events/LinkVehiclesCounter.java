@@ -86,7 +86,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 //		createInitialCounts();
 	}
 
-	private void createInitialCounts() {
+	private synchronized void createInitialCounts() {
 		
 		// initialize the Data Structures
 		parkingMap = new HashMap<Id, Integer>();
@@ -121,7 +121,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		}
 	}
 
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public synchronized void handleEvent(BasicLinkEnterEvent event) {
 //		log.info("BasicLinkEnterEvent " + event.getLinkId().toString() + " " + event.getTime());
 
 		Id id = event.getLinkId();
@@ -138,7 +138,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		countChangedMap.put(id, count + 1);
 	}
 
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public synchronized void handleEvent(BasicLinkLeaveEvent event) {
 //		log.info("BasicLinkLeaveEvent " + event.getLinkId().toString() + " " + event.getTime());
 
 		Id id = event.getLinkId();
@@ -155,7 +155,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		countChangedMap.put(id, count - 1);
 	}
 
-	public void handleEvent(BasicAgentArrivalEvent event) {
+	public synchronized void handleEvent(BasicAgentArrivalEvent event) {
 //		log.info("BasicAgentArrivalEvent " + event.getLinkId().toString() + " " + event.getTime());
 
 		Id id = event.getLinkId();
@@ -180,7 +180,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	 * Structure of this method: Have a look at
 	 * QueueSimulation.agentDeparts()...
 	 */
-	public void handleEvent(BasicAgentDepartureEvent event) {
+	public synchronized void handleEvent(BasicAgentDepartureEvent event) {
 //		log.info("BasicAgentDepartureEvent " + event.getLinkId().toString() + " " + event.getTime());
 
 		// Handling depends on the Route of the Agent
@@ -235,7 +235,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		}
 	}
 
-	public void handleEvent(BasicAgentWait2LinkEvent event) {
+	public synchronized void handleEvent(BasicAgentWait2LinkEvent event) {
 //		log.info("BasicAgentWait2LinkEvent " + event.getLinkId().toString() + " " + event.getTime());
 
 		Id id = event.getLinkId();
@@ -250,7 +250,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		bufferMap.put(id, vehCount);
 	}
 
-	public void handleEvent(BasicAgentStuckEvent event) {
+	public synchronized void handleEvent(BasicAgentStuckEvent event) {
 //		log.info("BasicAgentStuckEvent " + event.getLinkId().toString() + " " + event.getTime());
 
 		lostVehicles++;
@@ -276,7 +276,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	 * To use this method, some getters have to be added to the QueueLink Class!
 	 */
 	
-	private void checkVehicleCount(QueueSimulationAfterSimStepEvent e)
+	private synchronized void checkVehicleCount(QueueSimulationAfterSimStepEvent e)
 	{  
 //		log.info("checking Vehicle Count");
 //		if (e.getSimulationTime() >= infoTime) 
@@ -390,7 +390,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	 * We assume that the Simulation uses MyLinkImpl instead of LinkImpl, so
 	 * we don't check this for every Link...
 	 */
-	private void updateLinkVehicleCounts()
+	private synchronized void updateLinkVehicleCounts()
 	{
 		Map<Id, Integer> links2Update = getChangedLinkVehiclesCounts();
 		

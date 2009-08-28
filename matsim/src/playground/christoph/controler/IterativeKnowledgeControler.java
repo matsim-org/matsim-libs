@@ -70,10 +70,17 @@ public class IterativeKnowledgeControler extends Controler{
 		travelCostWrapper.useLookupTable(false);
 
 		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
-		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime, network);
-
-		
+		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime, network);	
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
+		
+//		FreespeedTravelTimeCost test = new FreespeedTravelTimeCost();
+//		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(test);
+//		travelCostWrapper.checkNodeKnowledge(false);
+//		travelCostWrapper.useLookupTable(false);
+//		
+//		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, test);
+//		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, test, network);
+//		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
 		
 		for (PersonImpl person : this.getPopulation().getPersons().values())
 		{
