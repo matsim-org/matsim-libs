@@ -31,7 +31,7 @@ import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.PersonAlgorithm;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -42,7 +42,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @author meisterk
  *
  */
-public class PopulationLegDistanceDistribution implements PlanAlgorithm, PersonAlgorithm {
+public class PopulationLegDistanceDistribution extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private static final NumberFormat kmFormat, percentFormat;
 	private static final double DUMMY_NEGATIVE_DISTANCE = -1000.0;
