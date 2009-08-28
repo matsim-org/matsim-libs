@@ -22,6 +22,7 @@ package playground.meisterk.kti.controler;
 
 import java.io.File;
 
+import org.matsim.core.controler.Controler;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.testcases.MatsimTestCase;
@@ -55,6 +56,8 @@ public class KtiControlerTest extends MatsimTestCase {
 //		assertTrue(new File(this.getOutputDirectory() + KTIControler.SVN_INFO_FILE_NAME).exists());
 		assertTrue(new File(this.getOutputDirectory() + KTIControler.CALC_LEG_TIMES_KTI_FILE_NAME).exists());
 		assertTrue(new File(this.getOutputDirectory() + KTIControler.SCORE_ELEMENTS_FILE_NAME).exists());
+		assertTrue(new File(Controler.getIterationFilename(KTIControler.LEG_DISTANCE_FILE_NAME, 0)).exists());
+		assertTrue(new File(Controler.getIterationFilename(KTIControler.LEG_DISTANCE_FILE_NAME, 10)).exists());
 	}
 
 }

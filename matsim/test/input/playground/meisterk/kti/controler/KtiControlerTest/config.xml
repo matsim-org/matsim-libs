@@ -12,7 +12,7 @@
 
 	<module name="controler">
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="9" />
+		<param name="lastIteration" value="10" />
 		<param name="routingAlgorithmType" value="AStarLandmarks" />
 	</module>
 

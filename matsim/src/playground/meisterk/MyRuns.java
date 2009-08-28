@@ -135,7 +135,7 @@ public class MyRuns {
 		ScenarioImpl sc = new ScenarioImpl(config);
 		ScenarioLoader loader = new ScenarioLoader(sc);
 		sc.getPopulation().setIsStreaming(true);
-		PopulationLegDistanceDistribution pa = new PopulationLegDistanceDistribution();
+		PopulationLegDistanceDistribution pa = new PopulationLegDistanceDistribution(System.out);
 		sc.getPopulation().addAlgorithm(pa);
 
 		loader.loadScenario();
