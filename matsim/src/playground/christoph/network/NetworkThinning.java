@@ -424,6 +424,7 @@ public class NetworkThinning {
 	
 	public void transformDuoNodes()
 	{		
+/*		
 		Entry<Id, Node> entry;
 		while((entry = ((TreeMap<Id, Node>)transformableNodes).pollFirstEntry()) != null)
 		{
@@ -606,7 +607,7 @@ public class NetworkThinning {
 		}
 		
 //		log.info("Nodes to Transform: " + nodesToTransform.size());
-
+*/
 		log.info("New NodeCount: " + subNetwork.getNodes().size());
 		log.info("new LinkCount: " + subNetwork.getLinks().size());
 	}
@@ -617,7 +618,7 @@ public class NetworkThinning {
 	public void selectTriNodes()
 	{
 		nodesToTransform = new HashMap<Id, Node>();
-				
+/*				
 		Entry<Id, Node> entry;
 		while((entry = ((TreeMap<Id, Node>)transformableNodes).pollFirstEntry()) != null)
 		{
@@ -631,7 +632,7 @@ public class NetworkThinning {
 				transformableNodes.remove(toNode.getId());
 			}
 		}
-		
+*/		
 		log.info("Nodes to Transform: " + nodesToTransform.size());
 	}
 	
