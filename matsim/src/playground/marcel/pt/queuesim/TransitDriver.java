@@ -115,7 +115,7 @@ public class TransitDriver implements TransitDriverAgent {
 			if (stop != this.nextStop.getStopFacility()) {
 				throw new RuntimeException("Expected different stop.");
 			}
-			
+
 			EventsImpl events = TransitQueueSimulation.getEvents();
 			if (this.lastHandledStop != stop) {
 				events.processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
@@ -148,9 +148,9 @@ public class TransitDriver implements TransitDriverAgent {
 			int cntEgress = passengersLeaving.size();
 			int cntAccess = passengersEntering.size();
 			if (cntAccess > 0 || cntEgress > 0) {
-				stopTime = cntAccess * 5 + cntEgress * 3;
+				stopTime = cntAccess * 4 + cntEgress * 2;
 				if (this.lastHandledStop != stop) {
-					stopTime += 10.0; // add fixed amount of time for door-operations and similar stuff
+					stopTime += 15.0; // add fixed amount of time for door-operations and similar stuff
 				}
 
 				for (PassengerAgent passenger : passengersLeaving) {
