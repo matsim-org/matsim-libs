@@ -47,6 +47,8 @@ import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 import playground.marcel.OTFDemo;
+import playground.marcel.pt.analysis.RouteOccupancy;
+import playground.marcel.pt.analysis.VehicleTracker;
 import playground.marcel.pt.queuesim.TransitQueueSimulation;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
 import playground.marcel.pt.utils.CreateVehiclesForSchedule;
@@ -158,7 +160,6 @@ public class TwoLinesDemo {
 		schedule.addStopFacility(stop4);
 		schedule.addStopFacility(stop5);
 		schedule.addStopFacility(stop6);
-
 
 		TransitLine tLine1 = builder.createTransitLine(this.ids[1]);
 		NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link1, link13);
@@ -305,12 +306,40 @@ public class TwoLinesDemo {
 
 	private void runSim() {
 		EventsImpl events = new EventsImpl();
+		VehicleTracker vehTracker = new VehicleTracker();
+		events.addHandler(vehTracker);
+		TransitRoute route1 = this.scenario.getTransitSchedule().getTransitLines().get(this.ids[1]).getRoutes().get(this.ids[1]);
+		TransitRoute route2 = this.scenario.getTransitSchedule().getTransitLines().get(this.ids[2]).getRoutes().get(this.ids[1]);
+		RouteOccupancy analysis1 = new RouteOccupancy(route1, vehTracker);
+		RouteOccupancy analysis2 = new RouteOccupancy(route2, vehTracker);
+		events.addHandler(analysis1);
+		events.addHandler(analysis2);
 
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario, events);
 		sim.startOTFServer("two_lines_demo");
 		OTFDemo.ptConnect("two_lines_demo");
 
 		sim.run();
+
+		System.out.println("stop\t#exitleaving\t#enter\t#inVehicle");
+		int inVehicle = 0;
+		for (TransitRouteStop stop : route1.getStops()) {
+			Id stopId = stop.getStopFacility().getId();
+			int enter = analysis1.getNumberOfEnteringPassengers(stopId);
+			int leave = analysis1.getNumberOfLeavingPassengers(stopId);
+			inVehicle = inVehicle + enter - leave;
+			System.out.println(stopId + "\t" + leave + "\t" + enter + "\t" + inVehicle);
+		}
+
+		System.out.println("stop\t#exitleaving\t#enter\t#inVehicle");
+		inVehicle = 0;
+		for (TransitRouteStop stop : route2.getStops()) {
+			Id stopId = stop.getStopFacility().getId();
+			int enter = analysis2.getNumberOfEnteringPassengers(stopId);
+			int leave = analysis2.getNumberOfLeavingPassengers(stopId);
+			inVehicle = inVehicle + enter - leave;
+			System.out.println(stopId + "\t" + leave + "\t" + enter + "\t" + inVehicle);
+		}
 	}
 
 	public void run() {
