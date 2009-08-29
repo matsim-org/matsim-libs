@@ -55,7 +55,7 @@ import playground.marcel.pt.routes.ExperimentalTransitRoute;
 public class TransitQueueSimulation extends QueueSimulation {
 
 	private static final Logger log = Logger.getLogger(TransitQueueSimulation.class);
-	
+
 	private OnTheFlyServer otfServer = null;
 
 	private TransitSchedule schedule = null;
@@ -133,8 +133,8 @@ public class TransitQueueSimulation extends QueueSimulation {
 		LegImpl leg = agent.getCurrentLeg();
 		if (leg.getMode() == TransportMode.pt) {
 			if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
-				log.error("pt-leg has no TransitRoute. Removing agent from simulation.");
-				log.info("route: " + leg.getRoute().getClass().getCanonicalName() + " " + ((GenericRoute) leg.getRoute()).getRouteDescription());
+				log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + agent.getPerson().getId().toString());
+				log.info("route: " + leg.getRoute().getClass().getCanonicalName() + " " + (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
 				Simulation.decLiving();
 				Simulation.incLost();
 				return;
