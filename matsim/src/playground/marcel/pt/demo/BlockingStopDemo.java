@@ -27,6 +27,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationBuilder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -40,6 +41,9 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -275,11 +279,14 @@ public class BlockingStopDemo {
 
 	private void runSim() {
 		EventsImpl events = new EventsImpl();
+		Network network = this.scenario.getNetwork();
 
 		VehicleTracker vehTracker = new VehicleTracker();
 		events.addHandler(vehTracker);
 		TransitRouteAccessEgressAnalysis analysis = new TransitRouteAccessEgressAnalysis(this.scenario.getTransitSchedule().getTransitLines().get(this.ids[1]).getRoutes().get(this.ids[1]), vehTracker);
 		events.addHandler(analysis);
+		TravelTimeCalculator ttc = new TravelTimeCalculator(this.scenario.getNetwork(), 120, 7*3600+1800, new TravelTimeCalculatorConfigGroup());
+		events.addHandler(ttc);
 
 		this.sim = new TransitQueueSimulation(this.scenario, events);
 		this.sim.startOTFServer("blocking_stop_demo");
@@ -288,7 +295,33 @@ public class BlockingStopDemo {
 
 		this.sim.run();
 
+		System.out.println("TransitRouteAccessEgressAnalysis:");
 		analysis.printStats();
+
+		System.out.println("TravelTimes:");
+		for (int i = 13; i < 26; i++) {
+			System.out.print("\tlink " + i);
+		}
+		System.out.println();
+		for (int time = 7*3600; time < (7*3600 + 15*60); time += 120) {
+			System.out.print(Time.writeTime(time));
+			for (int i = 13; i < 26; i++) {
+				System.out.print("\t" + ttc.getLinkTravelTime(network.getLinks().get(this.ids[i]), time));
+			}
+			System.out.println();
+		}
+		System.out.println();
+		for (int i = 0; i < 13; i++) {
+			System.out.print("\tlink " + i);
+		}
+		System.out.println();
+		for (int time = 7*3600; time < (7*3600 + 15*60); time += 120) {
+			System.out.print(Time.writeTime(time));
+			for (int i = 0; i < 13; i++) {
+				System.out.print("\t" + ttc.getLinkTravelTime(network.getLinks().get(this.ids[i]), time));
+			}
+			System.out.println();
+		}
 	}
 
 	public void run() {

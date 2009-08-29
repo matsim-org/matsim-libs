@@ -52,11 +52,11 @@ import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vehicles.VehicleBuilder;
 
 import playground.marcel.OTFDemo;
+import playground.marcel.pt.analysis.RouteTimeDiagram;
 import playground.marcel.pt.analysis.TransitRouteAccessEgressAnalysis;
 import playground.marcel.pt.analysis.VehicleTracker;
 import playground.marcel.pt.queuesim.TransitQueueSimulation;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
-import playground.mohit.pt.agentGraph;
 
 public class AccessEgressDemo {
 
@@ -64,7 +64,7 @@ public class AccessEgressDemo {
 	private static final int nOfBuses = 20;
 	private static final int nOfAgentsPerStop = 100;
 	private static final int agentInterval = 60;
-	private static final int delayedBus = 6;
+	private static final int delayedBus = 9;
 	private static final int heading = 5*60;
 	private static final int delay = 60;
 	private static final double departureTime = 7.0*3600;
@@ -183,18 +183,27 @@ public class AccessEgressDemo {
 	private void runSim() {
 		EventsImpl events = new EventsImpl();
 
+		TransitRoute route = this.scenario.getTransitSchedule().getTransitLines().get(this.ids[1]).getRoutes().get(this.ids[1]);
 		VehicleTracker vehTracker = new VehicleTracker();
 		events.addHandler(vehTracker);
-		TransitRouteAccessEgressAnalysis analysis = new TransitRouteAccessEgressAnalysis(this.scenario.getTransitSchedule().getTransitLines().get(this.ids[1]).getRoutes().get(this.ids[1]), vehTracker);
+		TransitRouteAccessEgressAnalysis analysis = new TransitRouteAccessEgressAnalysis(route, vehTracker);
 		events.addHandler(analysis);
+		RouteTimeDiagram diagram = new RouteTimeDiagram();
+		events.addHandler(diagram);
 
 		final TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario, events);
 		sim.startOTFServer(SERVERNAME);
 		OTFDemo.ptConnect(SERVERNAME);
 		sim.run();
 
+		System.out.println("TransitRouteAccessEgressAnalysis:");
 		analysis.printStats();
-		new agentGraph(this,analysis);
+		System.out.println("Route-Time-Diagram:");
+		diagram.writeData();
+		String filename = "output/routeTimeDiagram.png";
+		System.out.println("writing route-time diagram to: " + filename);
+		diagram.createGraph(filename, route);
+//		new agentGraph(this,analysis);
 	}
 
 	public void run() {
