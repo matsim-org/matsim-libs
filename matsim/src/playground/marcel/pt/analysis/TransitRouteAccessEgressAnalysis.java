@@ -36,7 +36,12 @@ import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 
-
+/**
+ * Keeps track of the number of passengers entering and leaving each single
+ * departure along a given route.
+ *
+ * @author mrieser
+ */
 public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicleEventHandler, BasicPersonLeavesVehicleEventHandler {
 
 	public final TransitRoute transitRoute;
