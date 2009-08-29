@@ -37,6 +37,7 @@ public abstract class AllTests {
 		suite.addTestSuite(TransitScheduleReaderTest.class);
 		suite.addTestSuite(TransitScheduleReaderV1Test.class);
 		suite.addTestSuite(TransitScheduleFormatV1Test.class);
+		suite.addTestSuite(TransitScheduleWriterTest.class);
 
 		return suite;
 	}
