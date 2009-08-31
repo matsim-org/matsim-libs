@@ -46,8 +46,11 @@ import java.util.List;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 //import org.matsim.population.algorithms.PlanAnalyzeSubtours;
+import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.population.algorithms.XY2Links;
+import org.matsim.world.MappedLocation;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
@@ -55,6 +58,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacility;
 
 
 
@@ -72,6 +77,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected ArrayList<List<PlanElement>> actChains;
 	protected NetworkLayer network;
 	protected PlansCalcRoute router;
+	protected LocationMutatorwChoiceSet locator;
 	protected XY2Links linker;
 	protected List<List<Double>> sims;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
@@ -80,9 +86,9 @@ public class PlansConstructor implements PlanStrategyModule{
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
 		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
-		this.outputFile = "/home/baug/mfeil/data/smallSet/it0/output_plans_mz0.xml.gz";	
-		this.outputFileBiogeme = "/home/baug/mfeil/data/smallSet/it0/output_plans0.dat";
-		this.outputFileMod = "/home/baug/mfeil/data/smallSet/it0/model0.mod";
+		this.outputFile = "/home/baug/mfeil/data/largeSet/it0/output_plans_mz01.xml.gz";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/largeSet/it0/output_plans01.dat";
+		this.outputFileMod = "/home/baug/mfeil/data/largeSet/it0/model01.mod";
 	/*	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
@@ -91,6 +97,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.network = controler.getNetwork();
 		this.init(network);	
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
+		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
 		this.linker = new XY2Links (this.controler.getNetwork());
 	}
 	
@@ -159,7 +166,8 @@ public class PlansConstructor implements PlanStrategyModule{
 	private void reducePersons (){
 		// Drop those persons whose plans do not belong to x most frequent activity chains.
 		log.info("Analyzing activitiy chains...");
-		AnalysisSelectedPlansActivityChains analyzer = new AnalysisSelectedPlansActivityChainsModes(this.population);
+		AnalysisSelectedPlansActivityChainsModes analyzer = new AnalysisSelectedPlansActivityChainsModes(this.population);
+		analyzer.run();
 		ArrayList<List<PlanElement>> ac = analyzer.getActivityChains();
 		ArrayList<ArrayList<PlanImpl>> pl = analyzer.getPlans();
 		log.info("done.");
@@ -171,7 +179,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.actChains = new ArrayList<List<PlanElement>>();
 		List<Id> agents = new LinkedList<Id>();
 		for (int i=0;i<pl.size();i++){
-			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-20,0))){ //51
+			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-51,0))){ //51
 //			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-2,0))){
 				this.actChains.add(ac.get(i));
 				for (Iterator<PlanImpl> iterator = pl.get(i).iterator(); iterator.hasNext();){
@@ -220,7 +228,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
 			counter++;
-			if (counter%10==0) {
+			if (counter%1==0) {
 				log.info("Handled "+counter+" persons");
 				Gbl.printMemoryUsage();
 			}
@@ -233,7 +241,17 @@ public class PlansConstructor implements PlanStrategyModule{
 					for (int j=0;j<this.actChains.get(i).size();j++){
 						if (j%2==0) {
 							ActivityImpl act = new ActivityImpl((ActivityImpl)this.actChains.get(i).get(j));
-							if (j!=0 && j!=this.actChains.get(i).size()-1) act.setEndTime(MatsimRandom.getRandom().nextDouble()*act.getDuration()*2+act.getStartTime());
+							if (/*j!=0 && */j!=this.actChains.get(i).size()-1) {
+								act.setEndTime(MatsimRandom.getRandom().nextDouble()*act.getDuration()*2+act.getStartTime());
+								if (j!=0 && !act.getType().equalsIgnoreCase("h")) {
+									log.info("In erster if-Schleife, before modify.");
+									this.modifyLocationCoord(act);
+									log.info("In erster if-Schleife, nach modify.");
+								}
+								else if (act.getType().equalsIgnoreCase("h")) {
+									act.setCoord(person.getSelectedPlan().getFirstActivity().getCoord());
+								}
+							}
 							plan.addActivity((BasicActivity)act);
 						}
 						else {
@@ -283,32 +301,40 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("done.");
 	}
 	/*
-	private void getSimilarityOfPlans () {
-		UniSAM sim = new UniSAM ();
-		this.sims = new ArrayList<List<Double>>();
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
-			this.sims.add(new ArrayList<Double>());
-			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				PlanImpl plan = iterator2.next();
-				if (plan.equals(person.getSelectedPlan())) {
-					this.sims.get(this.sims.size()-1).add(0.0);
-					continue;
-				}
-		/*		System.out.println("origPlan");
-				for (int i=0;i<person.getSelectedPlan().getPlanElements().size();i+=2){
-					System.out.print(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(i))).getType()+" ");
-				}
-				System.out.println();
-				System.out.println("comparePlan");
-				for (int i=0;i<plan.getPlanElements().size();i+=2){
-					System.out.print(((ActivityImpl)(plan.getPlanElements().get(i))).getType()+" ");
-				}
-				System.out.println();
-				this.sims.get(this.sims.size()-1).add(sim.run(person.getSelectedPlan(), plan));
-			}
-		}
+	private void modifyLocation (ActivityImpl act){
+		log.info("Start modify.");
+		ActivityFacilitiesImpl afImpl = (ActivityFacilitiesImpl) this.controler.getFacilities();
+		log.info("Start act type ident.");
+		String actType = null;
+		if (act.getType().equalsIgnoreCase("w")) actType = "work_sector2";
+		else if (act.getType().equalsIgnoreCase("e")) actType = "education_higher";
+		else if (act.getType().equalsIgnoreCase("s")) actType = "shop";
+		else if (act.getType().equalsIgnoreCase("l")) actType = "leisure";
+		else log.warn("Unerkannter act type: "+act.getType());
+		log.info("Start act type ident.");
+		List <ActivityFacility> facs = new ArrayList<ActivityFacility>(afImpl.getFacilitiesForActivityType(actType).values());
+		ActivityFacility fac;
+		do {
+			int position = (int) MatsimRandom.getRandom().nextDouble()*facs.size();
+			fac = facs.get(position);
+		} while (CoordUtils.calcDistance(fac.getCoord(), new CoordImpl(683518.0,246836.0))>30000);
+		act.setFacility(fac);
 	}*/
+	
+	private void modifyLocationCoord (ActivityImpl act){
+		log.info("Start modify.");
+		ActivityFacilitiesImpl afImpl = (ActivityFacilitiesImpl) this.controler.getFacilities();
+		log.info("Start circle def.");
+		// circle around Zurich centre
+		double X = 683518.0 - 30000 + java.lang.Math.floor(MatsimRandom.getRandom().nextDouble()*60000);
+		double Y = 246836.0 - Math.sqrt(30000*30000-X*X) + java.lang.Math.floor(MatsimRandom.getRandom().nextDouble()*Math.sqrt(30000*30000-X*X)*2);
+		log.info("Coord def.");
+		ArrayList<MappedLocation> choiceSet = afImpl.getNearestLocations(new CoordImpl (X,Y));
+		int position = (int) MatsimRandom.getRandom().nextDouble()*choiceSet.size();
+		act.setCoord(choiceSet.get(position).getCoord());
+		log.info("Done. ");
+	}
+	
 	
 	public void writePlans(String outputFile){
 		log.info("Writing plans...");
