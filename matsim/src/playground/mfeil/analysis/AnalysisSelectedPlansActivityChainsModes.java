@@ -62,9 +62,16 @@ public class AnalysisSelectedPlansActivityChainsModes extends AnalysisSelectedPl
 	
 	public AnalysisSelectedPlansActivityChainsModes(final PopulationImpl population) {
 		super (population);
+		this.outputDir = "/home/baug/mfeil/data/largeSet";
+	//	this.outputDir = "./plans";
 	}
 	
-	protected void initAnalysis(){
+	public void run(){
+		this.initAnalysis();
+		this.analyze();
+	}
+	
+	private void initAnalysis(){
 		
 		this.activityChains = new ArrayList<List<PlanElement>>();
 		this.plans = new ArrayList<ArrayList<PlanImpl>>();
@@ -91,7 +98,7 @@ public class AnalysisSelectedPlansActivityChainsModes extends AnalysisSelectedPl
 	
 		PrintStream stream1;
 		try {
-			stream1 = new PrintStream (new File(this.outputDir + "/analysis.xls"));
+			stream1 = new PrintStream (new File(this.outputDir + "/analysis01.xls"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;
@@ -133,8 +140,7 @@ public class AnalysisSelectedPlansActivityChainsModes extends AnalysisSelectedPl
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
 		AnalysisSelectedPlansActivityChainsModes sp = new AnalysisSelectedPlansActivityChainsModes(scenario.getPopulation(), scenario.getKnowledges(), outputDir);
-		sp.analyze();
-	//	sp.checkCorrectness();
+		sp.run();
 		
 		log.info("Analysis of plan finished.");
 	}

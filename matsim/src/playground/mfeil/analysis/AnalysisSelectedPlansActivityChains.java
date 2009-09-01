@@ -65,7 +65,6 @@ public class AnalysisSelectedPlansActivityChains {
 		this.population = population;
 		this.outputDir = outputDir;
 		this.knowledges = knowledges;
-		initAnalysis();
 		this.minimumTime = new TreeMap<String, Double>();
 		this.minimumTime.put("home", 7200.0);
 		this.minimumTime.put("work", 3600.0);
@@ -75,7 +74,10 @@ public class AnalysisSelectedPlansActivityChains {
 	
 	public AnalysisSelectedPlansActivityChains(final PopulationImpl population) {
 		this.population = population;
-		initAnalysis();
+	}
+	
+	public void run(){
+		this.initAnalysis();
 	}
 	
 	public ArrayList<List<PlanElement>> getActivityChains (){
@@ -86,7 +88,7 @@ public class AnalysisSelectedPlansActivityChains {
 		return this.plans;
 	}
 	
-	protected void initAnalysis(){
+	private void initAnalysis(){
 		
 		this.activityChains = new ArrayList<List<PlanElement>>();
 		this.plans = new ArrayList<ArrayList<PlanImpl>>();
@@ -176,15 +178,15 @@ public class AnalysisSelectedPlansActivityChains {
 	
 
 	public static void main(final String [] args) {
-//		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
-//		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-//		final String populationFilename = "/home/baug/mfeil/data/mz/plans.xml";
-		final String populationFilename = "./plans/output_plans.xml.gz";
+		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
+		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
+		final String populationFilename = "/home/baug/mfeil/data/mz/plans.xml";
+/*		final String populationFilename = "./plans/output_plans.xml.gz";
 		final String networkFilename = "./plans/network.xml";
 		final String facilitiesFilename = "./plans/facilities.xml.gz";
-
-//		final String outputDir = "/home/baug/mfeil/data/Zurich10";
-		final String outputDir = "./plans";
+*/
+		final String outputDir = "/home/baug/mfeil/data/mz";
+//		final String outputDir = "./plans";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
