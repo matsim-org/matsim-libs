@@ -137,6 +137,8 @@ ActivityStartEventHandler
 		
 		PopulationBuilder pb = pop.getBuilder() ; 
 		
+		
+		
 		try {
 			Id id = sc.createId("1") ; 
 //			Person person = pb.createPerson(id) ;
