@@ -27,7 +27,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import playground.mfeil.ActChainEqualityCheck;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import playground.mfeil.analysis.AnalysisSelectedPlansActivityChains;
 import playground.mfeil.analysis.AnalysisSelectedPlansActivityChainsModes;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.population.PersonImpl;
@@ -59,6 +58,7 @@ import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityFacility;
 
 
@@ -245,7 +245,7 @@ public class PlansConstructor implements PlanStrategyModule{
 								act.setEndTime(MatsimRandom.getRandom().nextDouble()*act.getDuration()*2+act.getStartTime());
 								if (j!=0 && !act.getType().equalsIgnoreCase("h")) {
 									log.info("In erster if-Schleife, before modify.");
-									this.modifyLocationCoord(act);
+									this.modifyLocation(act);
 									log.info("In erster if-Schleife, nach modify.");
 								}
 								else if (act.getType().equalsIgnoreCase("h")) {
@@ -300,41 +300,43 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		log.info("done.");
 	}
-	/*
+	
 	private void modifyLocation (ActivityImpl act){
 		log.info("Start modify.");
 		ActivityFacilitiesImpl afImpl = (ActivityFacilitiesImpl) this.controler.getFacilities();
-		log.info("Start act type ident.");
+		
 		String actType = null;
 		if (act.getType().equalsIgnoreCase("w")) actType = "work_sector2";
 		else if (act.getType().equalsIgnoreCase("e")) actType = "education_higher";
 		else if (act.getType().equalsIgnoreCase("s")) actType = "shop";
 		else if (act.getType().equalsIgnoreCase("l")) actType = "leisure";
 		else log.warn("Unerkannter act type: "+act.getType());
-		log.info("Start act type ident.");
+		
 		List <ActivityFacility> facs = new ArrayList<ActivityFacility>(afImpl.getFacilitiesForActivityType(actType).values());
 		ActivityFacility fac;
 		do {
-			int position = (int) MatsimRandom.getRandom().nextDouble()*facs.size();
+			int position = (int) (MatsimRandom.getRandom().nextDouble()*facs.size());
 			fac = facs.get(position);
 		} while (CoordUtils.calcDistance(fac.getCoord(), new CoordImpl(683518.0,246836.0))>30000);
-		act.setFacility(fac);
-	}*/
-	
+		act.setCoord(fac.getCoord());
+	}
+	/*
 	private void modifyLocationCoord (ActivityImpl act){
 		log.info("Start modify.");
 		ActivityFacilitiesImpl afImpl = (ActivityFacilitiesImpl) this.controler.getFacilities();
+		log.info("afImpl: "+afImpl);
 		log.info("Start circle def.");
 		// circle around Zurich centre
 		double X = 683518.0 - 30000 + java.lang.Math.floor(MatsimRandom.getRandom().nextDouble()*60000);
 		double Y = 246836.0 - Math.sqrt(30000*30000-X*X) + java.lang.Math.floor(MatsimRandom.getRandom().nextDouble()*Math.sqrt(30000*30000-X*X)*2);
 		log.info("Coord def.");
 		ArrayList<MappedLocation> choiceSet = afImpl.getNearestLocations(new CoordImpl (X,Y));
+		log.info("choiceSet: "+choiceSet);
 		int position = (int) MatsimRandom.getRandom().nextDouble()*choiceSet.size();
 		act.setCoord(choiceSet.get(position).getCoord());
 		log.info("Done. ");
 	}
-	
+	*/
 	
 	public void writePlans(String outputFile){
 		log.info("Writing plans...");
