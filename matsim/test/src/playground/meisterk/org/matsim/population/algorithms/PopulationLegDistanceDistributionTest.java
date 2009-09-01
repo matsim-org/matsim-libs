@@ -121,13 +121,13 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		
 		for (boolean isCumulative : new boolean[]{false, true}) {
 			for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
-				testee.printClasses(crosstabFormat, isCumulative, distanceClasses);
+				testee.printClasses(crosstabFormat, isCumulative, distanceClasses, out);
 			}
 		}
 
-		testee.printDeciles(true);
+		testee.printDeciles(true, out);
 
-		testee.printQuantiles(true, 12);
+		testee.printQuantiles(true, 12, out);
 
 		out.close();
 

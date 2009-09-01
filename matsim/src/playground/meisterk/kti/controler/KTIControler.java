@@ -67,7 +67,7 @@ public class KTIControler extends Controler {
 		// the scoring function processes facility loads
 		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
-		this.addControlerListener(new CalcLegTimesKTIListener(CALC_LEG_TIMES_KTI_FILE_NAME));
+		this.addControlerListener(new CalcLegTimesKTIListener(CALC_LEG_TIMES_KTI_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
 		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME));
 		// TODO balmermi: there is a problem with that listener. It uses a system call,
 		// and this call needs at least as much memory as the main process (i do not know why, but it is like that).

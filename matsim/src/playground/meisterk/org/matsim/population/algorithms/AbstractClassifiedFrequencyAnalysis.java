@@ -46,13 +46,11 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 	
 	private static final double DUMMY_NEGATIVE_BOUND = -1000.0;
 	
-	protected PrintStream out;
 	protected EnumMap<TransportMode, Frequency> frequencies = new EnumMap<TransportMode, Frequency>(TransportMode.class);
 	protected EnumMap<TransportMode, ResizableDoubleArray> rawData = new EnumMap<TransportMode, ResizableDoubleArray>(TransportMode.class);
 
 	public AbstractClassifiedFrequencyAnalysis(PrintStream out) {
 		super();
-		this.out = out;
 	}
 
 	public int getNumberOfModes() {
@@ -137,7 +135,7 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 	 * @param isCumulative indicates if cumulative numbers are printed
 	 * @param classes the classification of distances
 	 */
-	public void printClasses(CrosstabFormat crosstabFormat, boolean isCumulative, double[] classes) {
+	public void printClasses(CrosstabFormat crosstabFormat, boolean isCumulative, double[] classes, PrintStream out) {
 	
 		long numberOfLegs;
 		
@@ -237,8 +235,8 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 	
 	}
 
-	public void printDeciles(boolean isCumulative) {
-		this.printQuantiles(isCumulative, 10);
+	public void printDeciles(boolean isCumulative, PrintStream out) {
+		this.printQuantiles(isCumulative, 10, out);
 	}
 
 	/**
@@ -246,7 +244,7 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 	 * @param isCumulative indicates if cumulative numbers are printed
 	 * @param numberOfQuantiles number of quantiles desired
 	 */
-	public void printQuantiles(boolean isCumulative, int numberOfQuantiles) {
+	public void printQuantiles(boolean isCumulative, int numberOfQuantiles, PrintStream out) {
 	
 		out.println();
 	

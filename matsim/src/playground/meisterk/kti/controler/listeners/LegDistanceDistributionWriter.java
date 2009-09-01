@@ -71,10 +71,10 @@ public class LegDistanceDistributionWriter implements IterationEndsListener {
 			log.info("Writing results file...");
 			for (boolean isCumulative : new boolean[]{false, true}) {
 				for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
-					algo.printClasses(crosstabFormat, isCumulative, distanceClasses);
+					algo.printClasses(crosstabFormat, isCumulative, distanceClasses, out);
 				}
 			}
-			algo.printDeciles(true);
+			algo.printDeciles(true, out);
 			out.close();
 			log.info("Writing results file...done.");
 

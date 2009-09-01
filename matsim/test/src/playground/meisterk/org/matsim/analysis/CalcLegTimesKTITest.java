@@ -116,13 +116,13 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 		
 		for (boolean isCumulative : new boolean[]{false, true}) {
 			for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
-				testee.printClasses(crosstabFormat, isCumulative, timeBins);
+				testee.printClasses(crosstabFormat, isCumulative, timeBins, out);
 			}
 		}
 
-		testee.printDeciles(true);
+		testee.printDeciles(true, out);
 
-		testee.printQuantiles(true, 12);
+		testee.printQuantiles(true, 12, out);
 
 		out.close();
 

@@ -59,11 +59,8 @@ import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activit
 import org.xml.sax.SAXException;
 
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
-import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis;
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeChoiceSet;
-import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution;
-import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
 
 public class MyRuns {
 
@@ -123,23 +120,31 @@ public class MyRuns {
 
 	}
 
+	/**
+	 * @param config
+	 * 
+	 * TODO this analysis doesnt work for big kti scenario plans files
+	 * it crashes with a "GC overhead limit exceeded" exception
+	 * there is probably a memory leak when streaming populations:
+	 * when person is removed, knowledge and desires are NOT removed.
+	 */
 	public void analyzeLegDistanceDistribution(Config config) {
 
-		double[] distanceClasses = new double[]{
-			0, 
-			100, 200, 500, 
-			1000, 2000, 5000, 
-			10000, 20000, 50000, 
-			100000, 200000, 500000,
-			1000000};
-
-		ScenarioImpl sc = new ScenarioImpl(config);
-		ScenarioLoader loader = new ScenarioLoader(sc);
-		sc.getPopulation().setIsStreaming(true);
-		AbstractClassifiedFrequencyAnalysis pa = new PopulationLegDistanceDistribution(System.out);
-		sc.getPopulation().addAlgorithm(pa);
-
-		loader.loadScenario();
+//		double[] distanceClasses = new double[]{
+//			0, 
+//			100, 200, 500, 
+//			1000, 2000, 5000, 
+//			10000, 20000, 50000, 
+//			100000, 200000, 500000,
+//			1000000};
+//
+//		ScenarioImpl sc = new ScenarioImpl(config);
+//		ScenarioLoader loader = new ScenarioLoader(sc);
+//		sc.getPopulation().setIsStreaming(true);
+//		AbstractClassifiedFrequencyAnalysis pa = new PopulationLegDistanceDistribution(System.out);
+//		sc.getPopulation().addAlgorithm(pa);
+//
+//		loader.loadScenario();
 		
 //		// - network
 //		logger.info("Reading network xml file...");
@@ -172,13 +177,13 @@ public class MyRuns {
 //		PopulationReader plansReader = new MatsimPopulationReader(pop, sc.getNetwork());
 //		plansReader.readFile(config.plans().getInputFile());
 
-		for (boolean isCumulative : new boolean[]{false, true}) {
-			for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
-				pa.printClasses(crosstabFormat, isCumulative, distanceClasses);
-			}
-		}
-		
-		pa.printDeciles(true);
+//		for (boolean isCumulative : new boolean[]{false, true}) {
+//			for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
+//				pa.printClasses(crosstabFormat, isCumulative, distanceClasses);
+//			}
+//		}
+//		
+//		pa.printDeciles(true);
 		
 	}
 	
