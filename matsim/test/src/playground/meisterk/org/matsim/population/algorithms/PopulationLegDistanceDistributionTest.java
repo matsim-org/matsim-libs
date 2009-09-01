@@ -38,7 +38,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution.CrosstabFormat;
+import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
 
 public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 
@@ -83,7 +83,7 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		PopulationLegDistanceDistribution testee = new PopulationLegDistanceDistribution(out);
+		AbstractClassifiedFrequencyAnalysis testee = new PopulationLegDistanceDistribution(out);
 		pop.addAlgorithm(testee);
 		
 		pop.addPerson(testPerson);
@@ -121,7 +121,7 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 		
 		for (boolean isCumulative : new boolean[]{false, true}) {
 			for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
-				testee.printDistanceClasses(crosstabFormat, isCumulative, distanceClasses);
+				testee.printClasses(crosstabFormat, isCumulative, distanceClasses);
 			}
 		}
 

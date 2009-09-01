@@ -29,8 +29,9 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.PopulationImpl;
 
+import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis;
 import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution;
-import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution.CrosstabFormat;
+import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
 
 public class LegDistanceDistributionWriter implements IterationEndsListener {
 
@@ -64,13 +65,13 @@ public class LegDistanceDistributionWriter implements IterationEndsListener {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
-			PopulationLegDistanceDistribution algo = new PopulationLegDistanceDistribution(out);
+			AbstractClassifiedFrequencyAnalysis algo = new PopulationLegDistanceDistribution(out);
 			algo.run(pop);
 			
 			log.info("Writing results file...");
 			for (boolean isCumulative : new boolean[]{false, true}) {
 				for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
-					algo.printDistanceClasses(crosstabFormat, isCumulative, distanceClasses);
+					algo.printClasses(crosstabFormat, isCumulative, distanceClasses);
 				}
 			}
 			algo.printDeciles(true);

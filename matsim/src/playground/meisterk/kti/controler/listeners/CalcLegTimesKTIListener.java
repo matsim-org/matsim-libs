@@ -20,9 +20,8 @@
 
 package playground.meisterk.kti.controler.listeners;
 
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.PrintStream;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.TransportMode;
@@ -32,7 +31,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.meisterk.org.matsim.analysis.CalcLegTimesKTI;
@@ -40,7 +38,7 @@ import playground.meisterk.org.matsim.analysis.CalcLegTimesKTI;
 public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimListener, ShutdownListener {
 
 	final private String filename;
-	private BufferedWriter out;
+	private PrintStream out;
 	private CalcLegTimesKTI calcLegTimesKTI;
 	
 	
@@ -52,19 +50,17 @@ public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimList
 	public void notifyStartup(StartupEvent event) {
 
 		try {
-			this.out = IOUtils.getBufferedWriter(org.matsim.core.controler.Controler.getOutputFilename(this.filename));
-			this.out.write("#iteration\tall");
+			this.out = new PrintStream(org.matsim.core.controler.Controler.getOutputFilename(this.filename));
+			this.out.print("#iteration\tall");
 			for (TransportMode mode : TransportMode.values()) {
-				this.out.write("\t" + mode.toString());
+				this.out.print("\t" + mode.toString());
 			}
-			this.out.write(System.getProperty("line.separator"));
+			this.out.println();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		this.calcLegTimesKTI = new CalcLegTimesKTI(event.getControler().getPopulation());
+		this.calcLegTimesKTI = new CalcLegTimesKTI(event.getControler().getPopulation(), out);
 		event.getControler().getEvents().addHandler(this.calcLegTimesKTI);
 
 	}
@@ -74,30 +70,22 @@ public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimList
 		TreeMap<TransportMode, Double> avgTripDurations = this.calcLegTimesKTI.getAverageTripDurationsByMode();
 		String str;
 		
-		try {
-			this.out.write(Integer.toString(event.getIteration()));
-			this.out.write("\t" + Time.writeTime(this.calcLegTimesKTI.getAverageOverallTripDuration()));
-			for (TransportMode mode : TransportMode.values()) {
-				if (avgTripDurations.containsKey(mode)) {
-					str = Time.writeTime(avgTripDurations.get(mode));
-				} else {
-					str = "---";
-				}
-				this.out.write("\t" + str);
+		this.out.print(Integer.toString(event.getIteration()));
+		this.out.print("\t" + Time.writeTime(this.calcLegTimesKTI.getAverageOverallTripDuration()));
+		for (TransportMode mode : TransportMode.values()) {
+			if (avgTripDurations.containsKey(mode)) {
+				str = Time.writeTime(avgTripDurations.get(mode));
+			} else {
+				str = "---";
 			}
-			this.out.write(System.getProperty("line.separator"));
-			this.out.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
+			this.out.print("\t" + str);
 		}
+		this.out.println();
+		this.out.flush();
 	}
 
 	public void notifyShutdown(ShutdownEvent event) {
-		try {
-			this.out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.out.close();
 	}
 
 }

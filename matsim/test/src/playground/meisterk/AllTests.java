@@ -22,6 +22,7 @@ package playground.meisterk;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import playground.meisterk.org.matsim.analysis.CalcLegTimesKTITest;
 
 public class AllTests {
 
@@ -31,6 +32,7 @@ public class AllTests {
 		suite.addTest(playground.meisterk.org.matsim.config.groups.AllTests.suite());
 		suite.addTest(playground.meisterk.org.matsim.population.algorithms.AllTests.suite());
 		suite.addTest(playground.meisterk.kti.AllTests.suite());
+		suite.addTestSuite(CalcLegTimesKTITest.class);
 		//$JUnit-END$
 		return suite;
 	}

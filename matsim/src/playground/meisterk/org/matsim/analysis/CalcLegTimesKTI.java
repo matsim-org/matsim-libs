@@ -20,8 +20,12 @@
 
 package playground.meisterk.org.matsim.analysis;
 
+import java.io.PrintStream;
 import java.util.TreeMap;
 
+import org.apache.commons.math.stat.Frequency;
+import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math.util.ResizableDoubleArray;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.events.AgentArrivalEventImpl;
@@ -31,22 +35,22 @@ import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
+import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis;
+
 /**
  * Calculates average trip durations by mode.
  * 
  * @author meisterk
  *
  */
-public class CalcLegTimesKTI implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
 	private PopulationImpl population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
-	private final TreeMap<TransportMode, Double> sumTripDurationsByMode = new TreeMap<TransportMode, Double>();
-	private final TreeMap<TransportMode, Integer> sumTripsByMode = new TreeMap<TransportMode, Integer>();
 
-	public CalcLegTimesKTI(PopulationImpl population) {
-		super();
-		this.population = population;
+	public CalcLegTimesKTI(PopulationImpl pop, PrintStream out) {
+		super(out);
+		this.population = pop;
 	}
 
 	public void handleEvent(AgentDepartureEventImpl event) {
@@ -54,30 +58,40 @@ public class CalcLegTimesKTI implements AgentDepartureEventHandler, AgentArrival
 	}
 
 	public void reset(int iteration) {
-		this.sumTripDurationsByMode.clear();
-		this.sumTripsByMode.clear();
+		this.rawData.clear();
+		this.frequencies.clear();
 	}
 
 	public void handleEvent(AgentArrivalEventImpl event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		PersonImpl agent = this.population.getPersons().get(event.getPersonId());
 		if (depTime != null && agent != null) {
-			double travTime = event.getTime() - depTime;
 
-			Double oldSumTripDuration = this.sumTripDurationsByMode.get(event.getLeg().getMode());
-			if (oldSumTripDuration == null) oldSumTripDuration = 0.0;
-			this.sumTripDurationsByMode.put(event.getLeg().getMode(), oldSumTripDuration + travTime);
-			
-			Integer oldSumTripsByMode = this.sumTripsByMode.get(event.getLeg().getMode());
-			if (oldSumTripsByMode == null) oldSumTripsByMode = 0;
-			this.sumTripsByMode.put(event.getLeg().getMode(), oldSumTripsByMode + 1);
+			double travelTime = event.getTime() - depTime;
+			TransportMode mode = event.getLeg().getMode();
+
+			Frequency frequency = null;
+			ResizableDoubleArray rawData = null;
+			if (!this.frequencies.containsKey(mode)) {
+				frequency = new Frequency();
+				this.frequencies.put(mode, frequency);
+				rawData = new ResizableDoubleArray();
+				this.rawData.put(mode, rawData);
+			} else {
+				frequency = this.frequencies.get(mode);
+				rawData = this.rawData.get(mode);
+			}
+
+			frequency.addValue(travelTime);
+			rawData.addElement(travelTime);
+
 		}
 	}
 
 	public TreeMap<TransportMode, Double> getAverageTripDurationsByMode() {
 		TreeMap<TransportMode, Double> averageTripDurations = new TreeMap<TransportMode, Double>();
-		for (TransportMode mode : this.sumTripDurationsByMode.keySet()) {
-			averageTripDurations.put(mode, this.sumTripDurationsByMode.get(mode) / this.sumTripsByMode.get(mode));
+		for (TransportMode mode : this.rawData.keySet()) {
+			averageTripDurations.put(mode, StatUtils.mean(this.rawData.get(mode).getElements()));
 		}
 		return averageTripDurations;
 	}
@@ -87,12 +101,17 @@ public class CalcLegTimesKTI implements AgentDepartureEventHandler, AgentArrival
 		double overallTripDuration = 0.0; 
 		int overallNumTrips = 0;
 		
-		for (TransportMode mode : this.sumTripDurationsByMode.keySet()) {
-			overallTripDuration += this.sumTripDurationsByMode.get(mode);
-			overallNumTrips += this.sumTripsByMode.get(mode);
+		for (TransportMode mode : this.rawData.keySet()) {
+			overallTripDuration += StatUtils.sum(this.rawData.get(mode).getElements());
+			overallNumTrips += this.rawData.get(mode).getNumElements();
 		}
-		
+
 		return (overallTripDuration / overallNumTrips);
+	}
+
+	@Override
+	public void run(PersonImpl person) {
+		// not used
 	}
 	
 }

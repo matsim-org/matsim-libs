@@ -59,10 +59,11 @@ import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activit
 import org.xml.sax.SAXException;
 
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
+import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis;
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeChoiceSet;
 import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution;
-import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution.CrosstabFormat;
+import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
 
 public class MyRuns {
 
@@ -135,7 +136,7 @@ public class MyRuns {
 		ScenarioImpl sc = new ScenarioImpl(config);
 		ScenarioLoader loader = new ScenarioLoader(sc);
 		sc.getPopulation().setIsStreaming(true);
-		PopulationLegDistanceDistribution pa = new PopulationLegDistanceDistribution(System.out);
+		AbstractClassifiedFrequencyAnalysis pa = new PopulationLegDistanceDistribution(System.out);
 		sc.getPopulation().addAlgorithm(pa);
 
 		loader.loadScenario();
@@ -173,7 +174,7 @@ public class MyRuns {
 
 		for (boolean isCumulative : new boolean[]{false, true}) {
 			for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
-				pa.printDistanceClasses(crosstabFormat, isCumulative, distanceClasses);
+				pa.printClasses(crosstabFormat, isCumulative, distanceClasses);
 			}
 		}
 		
