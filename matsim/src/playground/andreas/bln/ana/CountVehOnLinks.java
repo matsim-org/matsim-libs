@@ -79,6 +79,8 @@ public class CountVehOnLinks implements TabularFileHandler {
 				
 				if(outputEvent2.containsKey(string)){
 					compareMap.put(string, Integer.valueOf((outputEvent1.get(string)).intValue() - (outputEvent2.get(string)).intValue()));					
+				} else {
+					compareMap.put(string, Integer.valueOf(outputEvent1.get(string).intValue()));
 				}
 										
 			}
@@ -86,10 +88,7 @@ public class CountVehOnLinks implements TabularFileHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 			
-		
-		
 		return compareMap;
 	}
 	

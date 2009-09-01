@@ -1,5 +1,6 @@
 package playground.andreas.bln.ana;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.geotools.factory.FactoryRegistryException;
@@ -21,30 +22,30 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
-public class MyLineStringBasedFeatureGenerator implements FeatureGenerator{
+public class LinkstatsStringBasedFeatureGenerator implements FeatureGenerator{
 
 
 	private final WidthCalculator widthCalculator;
 	private FeatureType featureType;
 	private final CoordinateReferenceSystem crs;
 	private final GeometryFactory geofac;
-	private final HashMap<String, Integer> compareResultMap;
+	private final HashMap<String, ArrayList<Double>> compareResultMap;
 
 
-	public MyLineStringBasedFeatureGenerator(final WidthCalculator widthCalculator, final CoordinateReferenceSystem crs) {
+	public LinkstatsStringBasedFeatureGenerator(final WidthCalculator widthCalculator, final CoordinateReferenceSystem crs) {
 		this.widthCalculator = widthCalculator;
 		this.crs = crs;
 		this.geofac = new GeometryFactory();
 		initFeatureType();
 		
-		this.compareResultMap = CountVehOnLinks.compareEventFiles("c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\1000.events.txt", "c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\1000.events.txt");
+		this.compareResultMap = EvaluateLinkstats.compareLinkstatFiles("c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\763.500.linkstats.txt", "c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\762.500.linkstats.txt");
 		
 	}
 
 
 	private void initFeatureType() {
 
-		AttributeType [] attribs = new AttributeType[11];
+		AttributeType [] attribs = new AttributeType[10+24];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, this.crs);
 		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("fromID", String.class);
@@ -55,8 +56,11 @@ public class MyLineStringBasedFeatureGenerator implements FeatureGenerator{
 		attribs[7] = AttributeTypeFactory.newAttributeType("lanes", Double.class);
 		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);		
 		attribs[9] = AttributeTypeFactory.newAttributeType("type", String.class);
-		attribs[10] = AttributeTypeFactory.newAttributeType("Diff", Double.class);	
 
+		for (int i = 0; i < 24; i++) {
+			attribs[10 + i] = AttributeTypeFactory.newAttributeType("HRS" + i + "-" + (i+1) + "avg", Double.class);			
+		}
+		
 		try {
 			this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
 		} catch (FactoryRegistryException e) {
@@ -75,7 +79,7 @@ public class MyLineStringBasedFeatureGenerator implements FeatureGenerator{
 		LineString ls = this.geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()),
 				MGC.coord2Coordinate(link.getToNode().getCoord())});
 
-		Object [] attribs = new Object[11];
+		Object [] attribs = new Object[10+24];
 		attribs[0] = ls;
 		attribs[1] = link.getId().toString();
 		attribs[2] = link.getFromNode().getId().toString();
@@ -88,7 +92,10 @@ public class MyLineStringBasedFeatureGenerator implements FeatureGenerator{
 		attribs[9] = link.getType();
 		
 		if(this.compareResultMap.get(link.getId().toString()) != null){
-			attribs[10] = this.compareResultMap.get(link.getId().toString());
+			ArrayList<Double> tempArray = this.compareResultMap.get(link.getId().toString());
+			for (int i = 0; i < tempArray.size(); i++) {
+				attribs[10 + i] = tempArray.get(i);
+			}			
 		}
 
 		try {

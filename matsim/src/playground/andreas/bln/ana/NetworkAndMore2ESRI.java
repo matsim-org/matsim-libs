@@ -55,14 +55,16 @@ public class NetworkAndMore2ESRI extends Links2ESRIShape{
 		log.info("done.");
 
 		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(network);
-		builder.setFeatureGeneratorPrototype(MyLineStringBasedFeatureGenerator.class);
+//		builder.setFeatureGeneratorPrototype(CountVehOnLinksStringBasedFeatureGenerator.class);
+		builder.setFeatureGeneratorPrototype(LinkstatsStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);		
 		new Links2ESRIShape(network,outputFileLs, builder).write();
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		builder.setWidthCoefficient(0.01);
-		builder.setFeatureGeneratorPrototype(MyPolygonBasedFeatureGenerator.class);
+//		builder.setFeatureGeneratorPrototype(CountVehOnLinksPolygonBasedFeatureGenerator.class);
+		builder.setFeatureGeneratorPrototype(LinksstatsPolygonBasedFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
 		new Links2ESRIShape(network,outputFileP, builder).write();
