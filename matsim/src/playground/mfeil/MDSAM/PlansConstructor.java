@@ -47,7 +47,6 @@ import org.matsim.core.population.LegImpl;
 //import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.population.algorithms.XY2Links;
-import org.matsim.world.MappedLocation;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.apache.log4j.Logger;
@@ -58,7 +57,6 @@ import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityFacility;
 
 
@@ -72,23 +70,31 @@ import org.matsim.core.facilities.ActivityFacility;
 public class PlansConstructor implements PlanStrategyModule{
 		
 	protected Controler controler;
-	protected final String inputFile, outputFile, outputFileBiogeme, outputFileMod;
+	protected final String inputFile, outputFile, outputFileBiogeme, outputFileMod, outputFileSims, outputFileSimsActs, outputFileSimsModes, outputFileSimsLocations;
 	protected PopulationImpl population;
 	protected ArrayList<List<PlanElement>> actChains;
 	protected NetworkLayer network;
 	protected PlansCalcRoute router;
 	protected LocationMutatorwChoiceSet locator;
+	protected MDSAM mdsam;
 	protected XY2Links linker;
 	protected List<List<Double>> sims;
+	protected List<Double> simsActs;
+	protected List<Double> simsLocations;
+	protected List<Double> simsModes;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	
 	                      
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
 		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
-		this.outputFile = "/home/baug/mfeil/data/largeSet/it0/output_plans_mz01.xml.gz";	
-		this.outputFileBiogeme = "/home/baug/mfeil/data/largeSet/it0/output_plans01.dat";
-		this.outputFileMod = "/home/baug/mfeil/data/largeSet/it0/model01.mod";
+		this.outputFile = "/home/baug/mfeil/data/largeSet/it0/output_plans_mz03.xml.gz";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/largeSet/it0/output_plans03.dat";
+		this.outputFileMod = "/home/baug/mfeil/data/largeSet/it0/model03.mod";
+		this.outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims03.xls";
+		this.outputFileSimsActs = "/home/baug/mfeil/data/largeSet/it0/sims03acts.xls";
+		this.outputFileSimsModes = "/home/baug/mfeil/data/largeSet/it0/sims03modes.xls";
+		this.outputFileSimsLocations = "/home/baug/mfeil/data/largeSet/it0/sims03locations.xls";
 	/*	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
@@ -106,6 +112,10 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
 		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
 		this.outputFileMod = "/home/baug/mfeil/data/mz/model.mod";
+		this.outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims03.xls";
+		this.outputFileSimsActs = "/home/baug/mfeil/data/largeSet/it0/sims03acts.xls";
+		this.outputFileSimsModes = "/home/baug/mfeil/data/largeSet/it0/sims03modes.xls";
+		this.outputFileSimsLocations = "/home/baug/mfeil/data/largeSet/it0/sims03locations.xls";
 	/*	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
@@ -134,7 +144,12 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.linkRouteOrigPlans();
 		this.enlargePlansSet();
 		this.writePlans(this.outputFile);
-		this.sims = new MDSAM(this.population).runPopulation();
+		this.mdsam = new MDSAM(this.population);
+		this.sims = this.mdsam.runPopulation();
+		this.simsActs = this.mdsam.getSimsActs();
+		this.simsModes = this.mdsam.getSimsModes();
+		this.simsLocations = this.mdsam.getSimsLocations();
+		this.writeSims(this.outputFileSims, this.outputFileSimsActs, this.outputFileSimsModes, this.outputFileSimsLocations);
 		this.writePlansForBiogeme(this.outputFileBiogeme);
 		this.writeModFile(this.outputFileMod);
 	}
@@ -204,7 +219,6 @@ public class PlansConstructor implements PlanStrategyModule{
 			PersonImpl person = iterator.next();
 			PlanImpl plan = person.getSelectedPlan();
 			this.linker.run(plan);
-			//this.router.run(person);
 			for (int j=1;j<plan.getPlanElements().size();j++){
 				if (j%2==1){
 					this.router.handleLeg((LegImpl)plan.getPlanElements().get(j), (ActivityImpl)plan.getPlanElements().get(j-1), (ActivityImpl)plan.getPlanElements().get(j+1), ((ActivityImpl)plan.getPlanElements().get(j-1)).getEndTime());
@@ -228,7 +242,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
 			counter++;
-			if (counter%1==0) {
+			if (counter%10==0) {
 				log.info("Handled "+counter+" persons");
 				Gbl.printMemoryUsage();
 			}
@@ -244,9 +258,7 @@ public class PlansConstructor implements PlanStrategyModule{
 							if (/*j!=0 && */j!=this.actChains.get(i).size()-1) {
 								act.setEndTime(MatsimRandom.getRandom().nextDouble()*act.getDuration()*2+act.getStartTime());
 								if (j!=0 && !act.getType().equalsIgnoreCase("h")) {
-									log.info("In erster if-Schleife, before modify.");
-									this.modifyLocation(act);
-									log.info("In erster if-Schleife, nach modify.");
+									this.modifyLocationCoord(act);
 								}
 								else if (act.getType().equalsIgnoreCase("h")) {
 									act.setCoord(person.getSelectedPlan().getFirstActivity().getCoord());
@@ -301,7 +313,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("done.");
 	}
 	
-	private void modifyLocation (ActivityImpl act){
+	protected void modifyLocation (ActivityImpl act){
 		log.info("Start modify.");
 		ActivityFacilitiesImpl afImpl = (ActivityFacilitiesImpl) this.controler.getFacilities();
 		
@@ -320,29 +332,21 @@ public class PlansConstructor implements PlanStrategyModule{
 		} while (CoordUtils.calcDistance(fac.getCoord(), new CoordImpl(683518.0,246836.0))>30000);
 		act.setCoord(fac.getCoord());
 	}
-	/*
-	private void modifyLocationCoord (ActivityImpl act){
-		log.info("Start modify.");
-		ActivityFacilitiesImpl afImpl = (ActivityFacilitiesImpl) this.controler.getFacilities();
-		log.info("afImpl: "+afImpl);
-		log.info("Start circle def.");
+	
+	protected void modifyLocationCoord (ActivityImpl act){
 		// circle around Zurich centre
 		double X = 683518.0 - 30000 + java.lang.Math.floor(MatsimRandom.getRandom().nextDouble()*60000);
-		double Y = 246836.0 - Math.sqrt(30000*30000-X*X) + java.lang.Math.floor(MatsimRandom.getRandom().nextDouble()*Math.sqrt(30000*30000-X*X)*2);
-		log.info("Coord def.");
-		ArrayList<MappedLocation> choiceSet = afImpl.getNearestLocations(new CoordImpl (X,Y));
-		log.info("choiceSet: "+choiceSet);
-		int position = (int) MatsimRandom.getRandom().nextDouble()*choiceSet.size();
-		act.setCoord(choiceSet.get(position).getCoord());
-		log.info("Done. ");
+		double Y = 246836.0 - Math.sqrt(Math.abs(30000*30000-(683518-X)*(683518-X))) + java.lang.Math.floor(MatsimRandom.getRandom().nextDouble()*Math.sqrt(Math.abs(30000*30000-(683518-X)*(683518-X)))*2);
+		act.setCoord(new CoordImpl(X, Y));
 	}
-	*/
+	
 	
 	public void writePlans(String outputFile){
 		log.info("Writing plans...");
 		new PopulationWriter(this.population, outputFile).write();
 		log.info("done.");
 	}
+	
 	
 	public void writePlansForBiogeme(String outputFile){
 		log.info("Writing plans for Biogeme...");
@@ -408,6 +412,110 @@ public class PlansConstructor implements PlanStrategyModule{
 	
 	private void writeModFile(String outputFile){
 		new ModFileMaker (this.population, this.sims).write(this.outputFileMod);
+	}
+	
+	public void writeSims (String outputFile, String outputFile1, String outputFile2, String outputFile3){
+		log.info("Writing sims file...");
+		
+		int [] stats = new int [21];
+		int [] stats1 = new int [21];
+		int [] stats2 = new int [21];
+		int [] stats3 = new int [21];
+		for (int i=0;i<stats.length;i++){
+			stats[i]=0;
+			stats1[i]=0;
+			stats2[i]=0;
+			stats3[i]=0;
+		}
+		
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputFile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		PrintStream stream1;
+		try {
+			stream1 = new PrintStream (new File(outputFile1));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		PrintStream stream2;
+		try {
+			stream2 = new PrintStream (new File(outputFile1));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		PrintStream stream3;
+		try {
+			stream3 = new PrintStream (new File(outputFile1));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		
+		for (int i=0;i<this.sims.size();i++){
+			stream.print("alt"+(i+1)+"\t");
+			stream1.print("alt"+(i+1)+"\t");
+			stream2.print("alt"+(i+1)+"\t");
+			stream3.print("alt"+(i+1)+"\t");
+		}		
+		stream.println();
+		
+		int counter1 = 0;
+		int counter2 = 0;
+		int counter3 = 0;
+		
+		for (int i=0;i<this.sims.size();i++){
+			for (int j=0;j<this.sims.get(i).size();j++){
+				stream.print(this.sims.get(i).get(j)+"\t");
+				stats [this.sims.get(i).get(j).intValue()]++;
+				if (this.sims.get(i).get(j)!=0){
+					stream1.print(this.simsActs.get(counter1)+"\t");
+					stream2.print(this.simsModes.get(counter2)+"\t");
+					stream3.print(this.simsLocations.get(counter3)+"\t");
+					stats1 [this.simsActs.get(counter1).intValue()]++;
+					stats2 [this.simsModes.get(counter2).intValue()]++;
+					stats3 [this.simsLocations.get(counter3).intValue()]++;
+					counter1++;
+					counter2++;
+					counter3++;
+				}
+				else {
+					stream1.print("0\t");
+					stream2.print("0\t");
+					stream3.print("0\t");
+					stats1 [0]++;
+					stats2 [0]++;
+					stats3 [0]++;
+				}
+			}
+			stream.println();
+			stream1.println();
+			stream2.println();
+			stream3.println();
+		}
+		stream.println();
+		stream1.println();
+		stream2.println();
+		stream3.println();
+		
+		for (int i=0;i<stats.length;i++){
+			stream.println(i+"\t"+stats[i]);
+			stream1.println(i+"\t"+stats1[i]);
+			stream2.println(i+"\t"+stats2[i]);
+			stream3.println(i+"\t"+stats3[i]);
+		} 
+		
+		stream.close();
+		stream1.close();
+		stream2.close();
+		stream3.close();
+		log.info("done.");
 	}
 		
 }

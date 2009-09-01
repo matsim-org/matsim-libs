@@ -98,7 +98,7 @@ public class AnalysisSelectedPlansActivityChainsModes extends AnalysisSelectedPl
 	
 		PrintStream stream1;
 		try {
-			stream1 = new PrintStream (new File(this.outputDir + "/analysis01.xls"));
+			stream1 = new PrintStream (new File(this.outputDir + "/analysis02.xls"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;

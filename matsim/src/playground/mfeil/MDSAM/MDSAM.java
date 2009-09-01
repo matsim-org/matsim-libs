@@ -40,7 +40,10 @@ import org.matsim.core.population.PopulationImpl;
 
 
 /**
- * Creates mod-file for Biogeme estimation.
+ * Determines similarity of plans, based on 
+ * - act chain sequence
+ * - mode choice
+ * - location choice.
  *
  * @author mfeil
  */
@@ -48,6 +51,9 @@ public class MDSAM {
 
 	private final PopulationImpl population;
 	private List<List<Double>> sims;
+	private List<Double> simsActs;
+	private List<Double> simsLocations;
+	private List<Double> simsModes;
 	private final double GWact, GWmode, GWlocation; 
 	private static final Logger log = Logger.getLogger(MDSAM.class);
 	private final String outputFile;
@@ -56,12 +62,24 @@ public class MDSAM {
 
 	public MDSAM(final PopulationImpl population) {
 		this.population=population;
-		this.GWact = 2.0;
+		this.GWact = 1.0;
 		this.GWmode = 1.0;
 		this.GWlocation = 1.0;
 	//	this.outputFile = "./plans/plans_similarity.xls";	
 		this.outputFile = "/home/baug/mfeil/data/mz/simlog.xls";	
-		this.printing = true;
+		this.printing = false;
+	}
+	
+	public List<Double> getSimsActs (){
+		return this.simsActs;
+	}
+	
+	public List<Double> getSimsLocations (){
+		return this.simsLocations;
+	}
+	
+	public List<Double> getSimsModes (){
+		return this.simsModes;
 	}
 	
 	public List<List<Double>> runPopulation () {
@@ -76,6 +94,9 @@ public class MDSAM {
 		}	
 		
 		this.sims = new ArrayList<List<Double>>();
+		this.simsActs = new ArrayList<Double>();
+		this.simsLocations = new ArrayList<Double>();
+		this.simsModes = new ArrayList<Double>();
 		
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
@@ -191,60 +212,16 @@ public class MDSAM {
 			}
 			stream.println();
 		}
+		
+		this.simsActs.add(table[0][table[0].length-1][table[0][0].length-1]);
+		this.simsModes.add(table[1][table[0].length-1][table[0][0].length-1]);
+		this.simsLocations.add(table[2][table[0].length-1][table[0][0].length-1]);
 	
 		// Find one optimal trajectory close to the diagonal, for each attribute dimension
 		ArrayList<int[]> oset = new ArrayList<int[]>();	// contains the operation and position
 		ArrayList<ArrayList<Integer>> dimensions = new ArrayList<ArrayList<Integer>>(); // contains the attribute dimensions of operation and position
 		
-		/*
-		for (int k=0;k<table.length;k++){
-			//System.out.println("k = "+k);
-			int i=0;
-			int j=0;
-			boolean goRight = true;
-			while (i!=table[k].length-1 || j!=table[k][0].length-1){
-				if (i<table[k].length-1 &&
-					j<table[k][0].length-1 &&
-					table[k][i+1][j+1]==table[k][i][j]){
-					//System.out.println("Identity.");
-					i++;
-					j++;
-				}
-				// check insertion {1,x}
-				else if (j<table[k][0].length-1 &&
-						osetContains(oset,dimensions,k,1,j+1)){
-					//System.out.println("Insertion.");
-					j++;
-				}
-				// check deletion {2,x}
-				else if (i<table[k].length-1 &&
-						osetContains(oset,dimensions,k,2,i+1)){
-					//System.out.println("Deletion.");
-					i++;
-				}
-				// go new path (insertion)
-				else if (goRight && j!=table[k][0].length-1) {
-					oset.add(new int[]{1,j+1});
-					ArrayList<Integer> l = new ArrayList<Integer>();
-					l.add(k);
-					dimensions.add(l);
-					j++;
-					goRight = false;
-					//System.out.println("New insertion.");
-				}
-				// go new path (deletion)
-				else {
-					oset.add(new int[]{2,i+1});
-					ArrayList<Integer> l = new ArrayList<Integer>();
-					l.add(k);
-					dimensions.add(l);
-					i++;
-					goRight = true;
-					//System.out.println("New deletion.");
-				}
-			}
-		}
-		*/
+		
 		
 		for (int k=0;k<table.length;k++){
 			double GW = 0;
@@ -367,12 +344,16 @@ public class MDSAM {
 	public static void main(final String [] args) {
 				final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 				final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-				final String populationFilename = "/home/baug/mfeil/data/mz/output_plans.xml";
+				final String populationFilename = "/home/baug/mfeil/data/largeSet/it0/output_plans_mz02.xml";
 		/*		final String populationFilename = "./plans/output_plans.xml";
 				final String networkFilename = "./plans/network.xml";
 				final String facilitiesFilename = "./plans/facilities.xml";
 		*/
-				final String outputFile = "/home/baug/mfeil/data/mz/output_plans.dat";
+				final String outputFileBiogeme = "/home/baug/mfeil/data/largeSet/it0/output_plans08.dat";
+				final String outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims08.xls";
+				final String outputFileSimsActs = "/home/baug/mfeil/data/largeSet/it0/sims08acts.xls";
+				final String outputFileSimsModes = "/home/baug/mfeil/data/largeSet/it0/sims08modes.xls";
+				final String outputFileSimsLocations = "/home/baug/mfeil/data/largeSet/it0/sims08locations.xls";
 		//		final String outputFile = "./plans/output_plans.dat";
 
 				ScenarioImpl scenario = new ScenarioImpl();
@@ -383,7 +364,8 @@ public class MDSAM {
 				List<List<Double>> sims = new MDSAM(scenario.getPopulation()).runPopulation();
 
 				PlansConstructor pc = new PlansConstructor(scenario.getPopulation(), sims);
-				pc.writePlansForBiogeme(outputFile);
+				pc.writePlansForBiogeme(outputFileBiogeme);
+				pc.writeSims(outputFileSims, outputFileSimsActs, outputFileSimsModes, outputFileSimsLocations);
 				log.info("Process finished.");
 			}
 }
