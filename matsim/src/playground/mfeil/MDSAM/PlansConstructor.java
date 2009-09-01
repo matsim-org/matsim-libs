@@ -122,6 +122,9 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.outputFileMod = "./plans/model.mod";
 	*/	this.population = population;
 		this.sims = sims;
+		this.simsActs = this.mdsam.getSimsActs();
+		this.simsModes = this.mdsam.getSimsModes();
+		this.simsLocations = this.mdsam.getSimsLocations();
 	}
 	
 	private void init(final NetworkLayer network) {
