@@ -59,5 +59,5 @@ public class HubLinkMappingTest extends TestCase {
 		assertEquals (1,linkHubMapping.get("1").intValue());
 	}
 	
-}    
+}     
   

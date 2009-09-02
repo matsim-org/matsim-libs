@@ -25,6 +25,9 @@ public class CreateAndWritePerson {
 	*/
 	
 	public static void main(String[] args) {
+		Scenario sc=new ScenarioImpl();
+		
+		
 		createAndWritePerson();
 	}
 	
@@ -60,7 +63,7 @@ public class CreateAndWritePerson {
 		Scenario sc=new ScenarioImpl();
 		
 		// reader for population is missing
-		// reader, writer for population are missing
+		// reader, writer for network are missing
 		// facilities are missing
 		// replanning: how to add strategy module? parts still in core.
 		// events is missing

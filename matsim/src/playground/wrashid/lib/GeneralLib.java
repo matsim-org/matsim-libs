@@ -26,7 +26,6 @@ public class GeneralLib {
 	 * Note: use the other method with the same name, if this poses problems.
 	 */
 	public static Population readPopulation(String plansFile, String networkFile) {
-
 		Population population = new PopulationImpl();
 
 		NetworkLayer network = new NetworkLayer();
@@ -72,8 +71,6 @@ public class GeneralLib {
 	public static ActivityFacilities readActivityFacilities(String facilitiesFile){		
 		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(facilitiesFile);
-		
-		
 		return facilities;	
 	}
 	

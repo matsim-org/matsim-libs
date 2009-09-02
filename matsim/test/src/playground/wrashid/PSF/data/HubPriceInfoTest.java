@@ -16,5 +16,5 @@ public class HubPriceInfoTest extends TestCase {
 	}
 	
 		
-}
+} 
  
