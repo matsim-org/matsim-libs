@@ -10,7 +10,7 @@ public class HubPriceInfoTest extends TestCase {
 		HubPriceInfo hubPriceInfo=new HubPriceInfo("test/input/playground/wrashid/PSF/data/hublinkMapping.txt",4);
 		
 		double price=hubPriceInfo.getPrice(1.5, 0);
-		
+		// CONTINUE here...
 		//assertEquals(8.0000000e+001,price);
 		
 	}
