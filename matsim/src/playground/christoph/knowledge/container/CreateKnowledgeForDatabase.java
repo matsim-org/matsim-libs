@@ -10,8 +10,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsImpl;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -47,7 +47,7 @@ public class CreateKnowledgeForDatabase {
 	
 	private NetworkLayer network;
 	private PopulationImpl population;
-	private ActivityFacilities facilities;
+	private ActivityFacilitiesImpl facilities;
 	private Config config;
 	private ArrayList<PlanAlgorithm> replanners;
 	private ArrayList<SelectNodes> nodeSelectors;
@@ -367,10 +367,10 @@ public class CreateKnowledgeForDatabase {
 	
 	private void loadFacilities()
 	{
-		facilities = new ActivityFacilities();
+		facilities = new ActivityFacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(facilitiesFile);
 		
-		Gbl.getWorld().setFacilityLayer((ActivityFacilities)facilities);
+		Gbl.getWorld().setFacilityLayer((ActivityFacilitiesImpl)facilities);
 		
 		log.info("Loading Facilities ... done");
 	}

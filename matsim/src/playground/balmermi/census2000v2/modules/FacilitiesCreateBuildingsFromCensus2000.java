@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -65,7 +65,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final int getMinFacilityId(final ActivityFacilities facilities) {
+	private final int getMinFacilityId(final ActivityFacilitiesImpl facilities) {
 		int min_id = Integer.MAX_VALUE;
 		for (Id id : facilities.getFacilities().keySet()) {
 			int f_id = Integer.parseInt(id.toString());
@@ -78,7 +78,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final ActivityFacilities facilities) {
+	public void run(final ActivityFacilitiesImpl facilities) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		log.info("      # facilities = " + facilities.getFacilities().size());
 
@@ -113,7 +113,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 
 				// home facility creation
 				Coord coord = new CoordImpl(entries[CAtts.I_XACH],entries[CAtts.I_YACH]);
-				ActivityFacility f = facilities.getFacilities().get(f_id);
+				ActivityFacilityImpl f = facilities.getFacilities().get(f_id);
 				if (f == null) {
 					// create new home facility id
 					f = facilities.createFacility(f_id,coord);

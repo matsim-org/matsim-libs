@@ -29,8 +29,8 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.OpeningTime;
@@ -48,7 +48,7 @@ import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreatio
  */
 public class AddOpentimes extends AbstractFacilityAlgorithm {
 
-	private final ActivityFacilities shopsOf2005 = new ActivityFacilities("shopsOf2005", ActivityFacilities.FACILITIES_NO_STREAMING);
+	private final ActivityFacilitiesImpl shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
 	private final String shopsOf2005Filename = "input/facilities/facilities_shopsOf2005.xml";
 	private static final Logger log = Logger.getLogger(AddOpentimes.class);
 
@@ -63,7 +63,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		log.info("Reading shops Of 2005 xml file...done.");
 	}
 
-	public void run(final ActivityFacility facility) {
+	public void run(final ActivityFacilityImpl facility) {
 		
 		DayType[] days = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri, DayType.sat, DayType.sun };
 		DayType[] weekDays = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri };
@@ -73,7 +73,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		Map<DayType, SortedSet<BasicOpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<BasicOpeningTime>>();
 
 		List<MappedLocation> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
-		ActivityOption shopsOf2005ShopAct = ((ActivityFacility) closestShops.get(0)).getActivityOption(FacilitiesProductionKTI.ACT_TYPE_SHOP);
+		ActivityOption shopsOf2005ShopAct = ((ActivityFacilityImpl) closestShops.get(0)).getActivityOption(FacilitiesProductionKTI.ACT_TYPE_SHOP);
 		if (shopsOf2005ShopAct != null) {
 			closestShopOpentimes = shopsOf2005ShopAct.getOpeningTimes();
 		} else {

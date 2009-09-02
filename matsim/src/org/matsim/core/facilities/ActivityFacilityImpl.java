@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -39,13 +40,13 @@ import org.matsim.world.World;
 import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
-public class ActivityFacility extends AbstractLocation {
+public class ActivityFacilityImpl extends AbstractLocation implements ActivityFacility {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final static Logger log = Logger.getLogger(ActivityFacility.class);
+	private final static Logger log = Logger.getLogger(ActivityFacilityImpl.class);
 	
 	private final TreeMap<String, ActivityOption> activities = new TreeMap<String, ActivityOption>();
 	private String desc = null;
@@ -54,7 +55,7 @@ public class ActivityFacility extends AbstractLocation {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	protected ActivityFacility(final ActivityFacilities layer, final Id id, final Coord center) {
+	protected ActivityFacilityImpl(final ActivityFacilitiesImpl layer, final Id id, final Coord center) {
 		super(layer,id,center);
 	}
 

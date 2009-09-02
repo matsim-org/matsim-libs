@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
@@ -25,7 +25,7 @@ public class GenerateParkingFacilitiesTest extends MatsimTestCase {
 
 		GenerateParkingFacilities.generateParkingFacilties(inputPlansFile,networkFile,outputFacilitiesFile);
 		
-		ActivityFacilities facilities = GeneralLib.readActivityFacilities(outputFacilitiesFile);
+		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(outputFacilitiesFile);
 		
 		assertEquals(4, facilities.getFacilities().size());
 	}

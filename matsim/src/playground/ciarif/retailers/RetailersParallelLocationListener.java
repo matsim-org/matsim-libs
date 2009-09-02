@@ -43,8 +43,8 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -86,8 +86,8 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 	private PlansCalcRoute pcrl = null;
 	private String facilityIdFile = null;
 	private ArrayList<LinkRetailersImpl> retailersLinks = new ArrayList<LinkRetailersImpl>();
-	private Map<Id,ActivityFacility> controlerFacilities = null;
-	private Map<Id,ActivityFacility> retailersFacilities = new TreeMap<Id, ActivityFacility>();
+	private Map<Id,ActivityFacilityImpl> controlerFacilities = null;
+	private Map<Id,ActivityFacilityImpl> retailersFacilities = new TreeMap<Id, ActivityFacilityImpl>();
 	
 	public RetailersParallelLocationListener() {
 	}
@@ -127,7 +127,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 					Id rId = new IdImpl(entries[0]);
 					if (this.retailers.getRetailers().containsKey(rId)) { // retailer exists already
 						Id fId = new IdImpl (entries[1]);
-						ActivityFacility f = controler.getFacilities().getFacilities().get(fId);
+						ActivityFacilityImpl f = controler.getFacilities().getFacilities().get(fId);
 						this.retailersFacilities.put(f.getId(),f);
 						this.retailers.getRetailers().get(rId).addFacility(f);
 					}
@@ -135,7 +135,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 						Retailer r = new Retailer(rId, null);
 						r.addStrategy(controler, entries[2]);
 						Id fId = new IdImpl (entries[1]);
-						ActivityFacility f = controler.getFacilities().getFacilities().get(fId);
+						ActivityFacilityImpl f = controler.getFacilities().getFacilities().get(fId);
 						r.addFacility(f);
 						this.retailersFacilities.put(f.getId(),f);
 						this.retailers.addRetailer(r);
@@ -191,7 +191,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 //		}	<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		
 		
-			Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
+			Map<Id,ActivityFacilityImpl> movedFacilities = new TreeMap<Id,ActivityFacilityImpl>();
 			
 			// works, but it is not nicely programmed. shouldn't be a global container, should be
 			// controlled by the controler (or actually added to the population)
@@ -230,7 +230,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 						pcrl.run(plan);
 					}
 //				}
-				for (ActivityFacility f:controler.getFacilities().getFacilities().values()) {
+				for (ActivityFacilityImpl f:controler.getFacilities().getFacilities().values()) {
 					for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
 						if (pe2 instanceof ActivityImpl) {
 							ActivityImpl act = (ActivityImpl) pe2;
@@ -251,7 +251,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		//ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
-		for (ActivityFacility f : controler.getFacilities().getFacilities().values()) { //TODO check if it is really necessary to iterate on facilities or if it should be done on persons as in the sequential case (see relevant class) 
+		for (ActivityFacilityImpl f : controler.getFacilities().getFacilities().values()) { //TODO check if it is really necessary to iterate on facilities or if it should be done on persons as in the sequential case (see relevant class) 
 			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -268,7 +268,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		return personQuadTree;
 	}
 	
-	private final QuadTree<ActivityFacility> createFacilityQuadTree(Controler controler) {
+	private final QuadTree<ActivityFacilityImpl> createFacilityQuadTree(Controler controler) {
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -282,8 +282,8 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		}
 		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 		
-		QuadTree<ActivityFacility> facilityQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-		for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
+		QuadTree<ActivityFacilityImpl> facilityQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
+		for (ActivityFacilityImpl f : controler.getFacilities().getFacilities().values()) {
 			Coord c = f.getCoord();
 			facilityQuadTree.put(c.getX(),c.getY(),f);
 		}

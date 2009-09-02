@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
@@ -84,7 +84,7 @@ public class DilutedZurichFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reading facilities xml file...");
-		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		world.complete();
 		log.info("  done.");

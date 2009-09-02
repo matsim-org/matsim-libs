@@ -26,8 +26,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 
 public class FacilitiesPrepareEC2000 {
@@ -53,15 +53,15 @@ public class FacilitiesPrepareEC2000 {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void setIdsAndCaps(final ActivityFacilities facilities) {
+	private final void setIdsAndCaps(final ActivityFacilitiesImpl facilities) {
 		log.info("  setting new ids with shift of "+ID_SHIFT+" and setting caps <1 to 1...");
 		log.info("    number of facilities: " + facilities.getFacilities().size());
 		
 		int capCnt = 0;
-		Map<Id,ActivityFacility> afs = new TreeMap<Id, ActivityFacility>(facilities.getFacilities());
+		Map<Id,ActivityFacilityImpl> afs = new TreeMap<Id, ActivityFacilityImpl>(facilities.getFacilities());
 		facilities.getFacilities().clear();
-		for (ActivityFacility af : afs.values()) {
-			ActivityFacility afNew = facilities.createFacility(new IdImpl(Integer.parseInt(af.getId().toString())+ID_SHIFT),af.getCoord());
+		for (ActivityFacilityImpl af : afs.values()) {
+			ActivityFacilityImpl afNew = facilities.createFacility(new IdImpl(Integer.parseInt(af.getId().toString())+ID_SHIFT),af.getCoord());
 			afNew.getActivityOptions().putAll(af.getActivityOptions());
 			for (ActivityOption ao : afNew.getActivityOptions().values()) {
 				if (ao.getCapacity() < 1) { ao.setCapacity(1.0); capCnt++; }
@@ -73,13 +73,13 @@ public class FacilitiesPrepareEC2000 {
 		log.info("  done.");
 	}
 	
-	private final void reduceShopAndLeisureOptions(final ActivityFacilities facilities) {
+	private final void reduceShopAndLeisureOptions(final ActivityFacilitiesImpl facilities) {
 		log.info("  reducing different shop and leisure act-options to 'shop' and 'leisure'...");
 		log.info("    number of facilities: " + facilities.getFacilities().size());
 
 		int shopCnt = 0;
 		int leisCnt = 0;
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			TreeMap<String,ActivityOption> s_map = new TreeMap<String, ActivityOption>();
 			TreeMap<String,ActivityOption> l_map = new TreeMap<String, ActivityOption>();
 			for (String t : f.getActivityOptions().keySet()) {
@@ -122,7 +122,7 @@ public class FacilitiesPrepareEC2000 {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final ActivityFacilities facilities) {
+	public void run(final ActivityFacilitiesImpl facilities) {
 		log.info("running " + this.getClass().getName() + " module...");
 		setIdsAndCaps(facilities);
 		reduceShopAndLeisureOptions(facilities);

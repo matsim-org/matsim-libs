@@ -49,11 +49,11 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	private final static String CAPACITY = "capacity";
 	private final static String OPENTIME = "opentime";
 
-	private final ActivityFacilities facilities;
-	private ActivityFacility currfacility = null;
+	private final ActivityFacilitiesImpl facilities;
+	private ActivityFacilityImpl currfacility = null;
 	private ActivityOption curractivity = null;
 	
-	public FacilitiesReaderMatsimV1(final ActivityFacilities facilities) {
+	public FacilitiesReaderMatsimV1(final ActivityFacilitiesImpl facilities) {
 		this.facilities = facilities;
 	}
 

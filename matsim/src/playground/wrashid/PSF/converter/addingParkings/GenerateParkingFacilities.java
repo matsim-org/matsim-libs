@@ -5,9 +5,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.Facility;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
@@ -38,7 +38,7 @@ public class GenerateParkingFacilities {
 
 		// generate facilities
 
-		ActivityFacilities facilities = new ActivityFacilities();
+		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 
 		for (Person person : inPop.getPersons().values()) {
 
@@ -51,7 +51,7 @@ public class GenerateParkingFacilities {
 					
 					// add facility only, if it does not already exist
 					if (!facilities.getFacilities().containsKey(facilityId)){
-						ActivityFacility facility = facilities.createFacility(facilityId, act.getCoord());
+						ActivityFacilityImpl facility = facilities.createFacility(facilityId, act.getCoord());
 						facility.createActivityOption(act.getType());
 						facility.createActivityOption("parkingArrival");
 						facility.createActivityOption("parkingDeparture");

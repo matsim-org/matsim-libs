@@ -33,9 +33,9 @@ import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.MatsimRandom;
@@ -76,7 +76,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 	private PlanImpl plan;
 	private Config config;
 	private KtiConfigGroup ktiConfigGroup;
-	private ActivityFacilities facilities;
+	private ActivityFacilitiesImpl facilities;
 	private NetworkLayer network;
 
 	/*package*/ static final Logger logger = Logger.getLogger(ActivityScoringFunctionTest.class);
@@ -109,14 +109,14 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		this.population.getPersons().put(person.getId(), person);
 
 		// generate facilities
-		this.facilities = new ActivityFacilities();
-		ActivityFacility facilityHome = this.facilities.createFacility(new IdImpl(1), new CoordImpl(0.0, 0.0));
+		this.facilities = new ActivityFacilitiesImpl();
+		ActivityFacilityImpl facilityHome = this.facilities.createFacility(new IdImpl(1), new CoordImpl(0.0, 0.0));
 		facilityHome.createActivityOption("home");
-		ActivityFacility facilityWork = this.facilities.createFacility(new IdImpl(3), new CoordImpl(1000.0, 1000.0));
+		ActivityFacilityImpl facilityWork = this.facilities.createFacility(new IdImpl(3), new CoordImpl(1000.0, 1000.0));
 		facilityWork.createActivityOption("work_sector3");
-		ActivityFacility facilityLeisure = this.facilities.createFacility(new IdImpl(5), new CoordImpl(1000.0, 1010.0));
+		ActivityFacilityImpl facilityLeisure = this.facilities.createFacility(new IdImpl(5), new CoordImpl(1000.0, 1010.0));
 		facilityLeisure.createActivityOption("leisure");
-		ActivityFacility facilityShop = this.facilities.createFacility(new IdImpl(7), new CoordImpl(500.0, 0.0));
+		ActivityFacilityImpl facilityShop = this.facilities.createFacility(new IdImpl(7), new CoordImpl(500.0, 0.0));
 		facilityShop.createActivityOption("shop");
 
 		// generate network

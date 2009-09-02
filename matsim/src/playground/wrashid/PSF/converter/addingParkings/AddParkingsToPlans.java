@@ -17,10 +17,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.population.BasicRouteImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -63,7 +63,7 @@ public class AddParkingsToPlans {
 	 * The facility is also added to the existing acts.
 	 */
 	private static Population addParkings(Population population, String facilitiesFile) {
-		ActivityFacilities facilities=GeneralLib.readActivityFacilities(facilitiesFile);
+		ActivityFacilitiesImpl facilities=GeneralLib.readActivityFacilities(facilitiesFile);
 		
 		for (Person person : population.getPersons().values()) {
 			List<PlanElement> planElements = person.getSelectedPlan()
@@ -146,7 +146,7 @@ public class AddParkingsToPlans {
 	 * @return
 	 */
 	private static ActivityImpl getParkingFacility(ActivityImpl activity,
-			String activityType, ActivityFacilities facilities) {
+			String activityType, ActivityFacilitiesImpl facilities) {
 		double parkingActivityDuration = 10; // in seconds
 
 		// copy the activity

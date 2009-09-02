@@ -24,8 +24,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 
@@ -55,10 +55,10 @@ public class FacilitiesReduceTypes {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final ActivityFacilities facilities) {
+	public void run(final ActivityFacilitiesImpl facilities) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			TreeMap<String,ActivityOption> h_map = new TreeMap<String, ActivityOption>();
 			TreeMap<String,ActivityOption> w_map = new TreeMap<String, ActivityOption>();
 			TreeMap<String,ActivityOption> e_map = new TreeMap<String, ActivityOption>();

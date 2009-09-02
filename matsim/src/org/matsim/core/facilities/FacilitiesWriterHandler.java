@@ -32,7 +32,7 @@ interface FacilitiesWriterHandler extends WriterHandler {
 	// <facilities ... > ... </facilities>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startFacilities(final ActivityFacilities facilities, final BufferedWriter out) throws IOException;
+	public void startFacilities(final ActivityFacilitiesImpl facilities, final BufferedWriter out) throws IOException;
 
 	public void endFacilities(final BufferedWriter out) throws IOException;
 
@@ -40,7 +40,7 @@ interface FacilitiesWriterHandler extends WriterHandler {
 	// <facility ... > ... </facility>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startFacility(final ActivityFacility facility, final BufferedWriter out) throws IOException;
+	public void startFacility(final ActivityFacilityImpl facility, final BufferedWriter out) throws IOException;
 
 	public void endFacility(final BufferedWriter out) throws IOException;
 

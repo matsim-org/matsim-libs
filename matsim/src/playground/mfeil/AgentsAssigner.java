@@ -31,7 +31,7 @@ import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -298,7 +298,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			if (!primActs.isEmpty()){
 				for (int j=0;j<primActs.size();j++){
 					if (((ActivityImpl)(bestPlan.getPlanElements().get(i))).getType().equals(primActs.get(j).getType())){
-						ActivityFacility fac = this.controler.getFacilities().getFacilities().get(primActs.get(j).getFacility().getId());
+						ActivityFacilityImpl fac = this.controler.getFacilities().getFacilities().get(primActs.get(j).getFacility().getId());
 						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setFacility(fac);
 						// not only update of fac required but also coord and link; data inconsistencies otherwise
 						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setCoord(fac.getCoord());

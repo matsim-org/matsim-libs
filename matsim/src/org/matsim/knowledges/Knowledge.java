@@ -28,7 +28,7 @@ import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.knowledges.BasicKnowledge;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
@@ -237,8 +237,8 @@ public class Knowledge implements BasicKnowledge<ActivityOption> {
 
 	/**
 	 * Returns all occurrences of an given {@link ActivityOption},
-	 * that is part of a {@link ActivityFacility} with the given {@link Id}.
-	 * @param facilityId The {@link Id} of a {@link ActivityFacility}
+	 * that is part of a {@link ActivityFacilityImpl} with the given {@link Id}.
+	 * @param facilityId The {@link Id} of a {@link ActivityFacilityImpl}
 	 * @return The list of {@link ActivityOption Activities} that are part of the {@link Knowledge} and fulfill the above.
 	 * The list can also be empty.
 	 */
@@ -348,7 +348,7 @@ public class Knowledge implements BasicKnowledge<ActivityOption> {
 	/**
 	 * Returns if a specific activity of a specific facility is primary
 	 * @param act_type The activity type of the {@link ActivityOption Activities}
-	 * @param facilityId The {@link Id} of a {@link ActivityFacility}
+	 * @param facilityId The {@link Id} of a {@link ActivityFacilityImpl}
 	 */
 	public final boolean isPrimary(String act_type, Id facilityId) {
 		if (activities == null) { 

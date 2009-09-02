@@ -20,8 +20,8 @@
 
 package playground.balmermi.datapuls;
 
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
@@ -73,7 +73,7 @@ public class PopulationCreation {
 		System.out.println("done. (census population)");
 		
 		System.out.println("loading datapuls facilities...");
-		ActivityFacilities datapulsFacilities = new ActivityFacilities();
+		ActivityFacilitiesImpl datapulsFacilities = new ActivityFacilitiesImpl();
 		new MatsimFacilitiesReader(datapulsFacilities).readFile(args[1]);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (loading datapuls facilities).");

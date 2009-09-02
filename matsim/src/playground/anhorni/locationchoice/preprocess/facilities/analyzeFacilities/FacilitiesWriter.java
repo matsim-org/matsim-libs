@@ -15,7 +15,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
@@ -25,15 +25,15 @@ public class FacilitiesWriter {
 	
 	private FeatureType featureType;
 
-	public int[] write(List<ActivityFacility> facilities)  {
+	public int[] write(List<ActivityFacilityImpl> facilities)  {
 						
 		this.initGeometries();
 		ArrayList<Feature> features = new ArrayList<Feature>();	
 		int numberOfShops[] = {0,0,0,0,0,0};
 		
-		Iterator<ActivityFacility> facilities_it = facilities.iterator();
+		Iterator<ActivityFacilityImpl> facilities_it = facilities.iterator();
 		while (facilities_it.hasNext()) {
-			ActivityFacility facility = facilities_it.next();
+			ActivityFacilityImpl facility = facilities_it.next();
 			Coord coord = facility.getCoord();
 			
 			

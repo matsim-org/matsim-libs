@@ -25,8 +25,8 @@ import java.util.TreeMap;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -42,14 +42,14 @@ public class FacilitiesWork9To18 {
 		super();
 	}
 
-	public void run(ActivityFacilities facilities) {
+	public void run(ActivityFacilitiesImpl facilities) {
 
 		int hectareCnt = 0, facilityCnt = 0;
 		int skip = 1;
 		int B01S2, B01S3, B01EQTS2, B01EQTS3, jobsPerFacility;
 		Integer reli; 
 		String X, Y;
-		ActivityFacility f;
+		ActivityFacilityImpl f;
 		ActivityOption a;
 
 		System.out.println("  creating EnterpriseCensus object... ");

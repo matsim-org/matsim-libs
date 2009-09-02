@@ -29,14 +29,14 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 
 /**
  * Basic collection of same geographical objects in MATSim.
  * @see NetworkLayer
- * @see ActivityFacilities
+ * @see ActivityFacilitiesImpl
  * @see ZoneLayer
  * @author Michael Balmer
  */

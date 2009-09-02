@@ -3,10 +3,10 @@ package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreati
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -14,7 +14,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 public class CreateZHLeisure {
 	
-	private ActivityFacilities facilities = new ActivityFacilities();
+	private ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 	private final static Logger log = Logger.getLogger(CreateZHLeisure.class);
 	
 	public static void main(final String[] args) {
@@ -38,7 +38,7 @@ public class CreateZHLeisure {
 		// need a deep copy -> avoid java.util.ConcurrentModificationException
 		Object [] oldFacilitiesArray = this.facilities.getFacilities().values().toArray();
 		for (int i = 0; i < oldFacilitiesArray.length; i++) {		
-			ActivityFacility facility = (ActivityFacility)oldFacilitiesArray[i];
+			ActivityFacilityImpl facility = (ActivityFacilityImpl)oldFacilitiesArray[i];
 			if (!(facility.getActivityOption("leisure") == null)) {
 				this.facilities.getFacilities().remove(facility.getId());
 			}
@@ -67,7 +67,7 @@ public class CreateZHLeisure {
 					IdImpl id = new IdImpl(3000000 + cnt);
 					cnt++;
 					this.facilities.createFacility(id, coord);				
-					ActivityFacility facility = (ActivityFacility)this.facilities.getFacilities().get(id);
+					ActivityFacilityImpl facility = (ActivityFacilityImpl)this.facilities.getFacilities().get(id);
 					facility.createActivityOption("leisure");
 					facility.getActivityOption("leisure").setCapacity(1.0);
 					facility.getActivityOption("leisure").addOpeningTime(new OpeningTime(DayType.wk, 9.0 * 3600, 24.0 * 3600));

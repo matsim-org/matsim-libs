@@ -9,8 +9,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -27,9 +27,9 @@ import playground.toronto.ttimematrix.SpanningTree;
 public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownListener {
 	private static final Logger log = Logger.getLogger(MyControlerListener.class);
 	
-	ActivityFacilities zones ;
+	ActivityFacilitiesImpl zones ;
 	
-	public MyControlerListener( ActivityFacilities zones ) {
+	public MyControlerListener( ActivityFacilitiesImpl zones ) {
 		this.zones = zones ;
 	}
 
@@ -57,7 +57,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 			
 			System.out.println("|--------------------------------------------------------------------------------------------------|") ;
 			long cnt = 0 ; long percentDone = 0 ;
-			for ( ActivityFacility fromZone : zones.getFacilities().values() ) {
+			for ( ActivityFacilityImpl fromZone : zones.getFacilities().values() ) {
 				if ( (int) (100.*cnt/zones.getFacilities().size()) > percentDone ) { 
 					percentDone++ ; System.out.print('.') ; 
 				}  
@@ -68,7 +68,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 				assert( fromNode != null ) ;
 				st.setOrigin( fromNode ) ;
 				st.run(network) ;
-				for ( ActivityFacility toZone : zones.getFacilities().values() ) {
+				for ( ActivityFacilityImpl toZone : zones.getFacilities().values() ) {
 					Coord toCoord = toZone.getCoord() ;
 					NodeImpl toNode = network.getNearestNode( toCoord ) ;
 					double arrTime = st.getTree().get(toNode.getId()).getTime();

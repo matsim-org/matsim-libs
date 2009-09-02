@@ -23,8 +23,8 @@ package org.matsim.facilities.algorithms;
 import java.util.Iterator;
 
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.Gbl;
@@ -54,7 +54,7 @@ public class FacilitiesDefineCapAndOpentime {
 		}
 	}
 
-	public void run(ActivityFacilities facilities) {
+	public void run(ActivityFacilitiesImpl facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		int home_cnt = 0;
@@ -63,7 +63,7 @@ public class FacilitiesDefineCapAndOpentime {
 		int shop_cnt = 0;
 		int leis_cnt = 0;
 
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			Iterator<String> at_it = f.getActivityOptions().keySet().iterator();
 			while (at_it.hasNext()) {
 				String at = at_it.next();
@@ -81,7 +81,7 @@ public class FacilitiesDefineCapAndOpentime {
 		System.out.println("      shop_cnt = " + shop_cnt);
 		System.out.println("      leis_cnt = " + leis_cnt);
 
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
 				ActivityOption a = a_it.next();

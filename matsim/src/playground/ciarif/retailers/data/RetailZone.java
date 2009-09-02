@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -14,15 +14,15 @@ public class RetailZone {
 	
 	private Id id;
 	private QuadTree<PersonImpl> personsQuadTree;   
-	private QuadTree<ActivityFacility> shopsQuadTree;
+	private QuadTree<ActivityFacilityImpl> shopsQuadTree;
 	private ArrayList<PersonImpl> persons = new ArrayList<PersonImpl>();
-	private ArrayList<ActivityFacility> shops = new ArrayList<ActivityFacility>();
+	private ArrayList<ActivityFacilityImpl> shops = new ArrayList<ActivityFacilityImpl>();
 
 	
 	public RetailZone(Id id,final Double minx,final Double miny,final Double maxx,final Double maxy) { 
 		this.id = id;
 		this.personsQuadTree = new QuadTree<PersonImpl>(minx, miny, maxx, maxy);
-		this.shopsQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		this.shopsQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
 		
 	}
 
@@ -36,7 +36,7 @@ public class RetailZone {
 		this.persons.add(person);
 	}
 
-	public void addShopToQuadTree(Coord coord, ActivityFacility shop) { //TODO look if it is possible to eliminate the QuadTree and use another data structure
+	public void addShopToQuadTree(Coord coord, ActivityFacilityImpl shop) { //TODO look if it is possible to eliminate the QuadTree and use another data structure
 		this.shopsQuadTree.put(coord.getX(),coord.getY(),shop);	
 		this.shops.add(shop);
 	}
@@ -49,11 +49,11 @@ public class RetailZone {
 		return this.persons;
 	}
 	
-	public ArrayList<ActivityFacility> getShops (){
+	public ArrayList<ActivityFacilityImpl> getShops (){
 		return this.shops;
 	}
 	
-	public QuadTree<ActivityFacility> getShopsQuadTree (){
+	public QuadTree<ActivityFacilityImpl> getShopsQuadTree (){
 		return this.shopsQuadTree;
 	}
 

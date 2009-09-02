@@ -22,8 +22,8 @@ package org.matsim.facilities.algorithms;
 
 import java.util.Iterator;
 
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -33,7 +33,7 @@ public class FacilitiesSummary {
 		super();
 	}
 
-	public void run(ActivityFacilities facilities) {
+	public void run(ActivityFacilitiesImpl facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 		int f_cnt = 0;
 		int act_cnt = 0;
@@ -42,7 +42,7 @@ public class FacilitiesSummary {
 		//            home,work,education,shop,leisure
 		int caps[] = {0   ,   0,        0,   0,      0};
 		int unlimit_cap_cnt = 0;
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			f_cnt++;
 			if (f.getCoord().getX() > max_coord.getX()) { max_coord.setX(f.getCoord().getX()); }
 			if (f.getCoord().getY() > max_coord.getY()) { max_coord.setY(f.getCoord().getY()); }

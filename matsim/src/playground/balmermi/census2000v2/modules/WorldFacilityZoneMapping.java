@@ -24,8 +24,8 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.world.MappedLocation;
@@ -72,20 +72,20 @@ public class WorldFacilityZoneMapping {
 		world.complete();
 		
 		if (world.getLayers().size() != 2) { Gbl.errorMsg("World must contian 2 layers!"); }
-		ActivityFacilities fs = (ActivityFacilities)world.getBottomLayer();
+		ActivityFacilitiesImpl fs = (ActivityFacilitiesImpl)world.getBottomLayer();
 		ZoneLayer ms = (ZoneLayer)world.getTopLayer();
 		if (!fs.getUpRule().getUpLayer().equals(ms)) { Gbl.errorMsg("Incorrect mapping!"); }
 
 		// add mapping as given in the census2000
 		for (Household h : this.households.getHouseholds().values()) {
 			Zone z = h.getMunicipality().getZone();
-			ActivityFacility f = h.getFacility();
+			ActivityFacilityImpl f = h.getFacility();
 			world.addMapping(z,f);
 			if (!z.contains(f.getCoord())) { log.warn("      mapping via census info produces dist(f["+f.getId()+"]->z["+z.getId()+"])="+z.calcDistance(f.getCoord())); }
 		}
 		
 		// add mapping for the remaining facilities (non home facilities)
-		for (ActivityFacility f : fs.getFacilities().values()) {
+		for (ActivityFacilityImpl f : fs.getFacilities().values()) {
 			if (f.getUpMapping().size() == 0) {
 				if (f.getActivityOption(CAtts.ACT_HOME) != null) { Gbl.errorMsg("That should not happen!"); }
 				ArrayList<MappedLocation> locs = new ArrayList<MappedLocation>();

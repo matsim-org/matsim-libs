@@ -27,9 +27,9 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicActivityOption;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.testcases.MatsimTestCase;
@@ -97,7 +97,7 @@ public class KnowledgeTest extends MatsimTestCase {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private final void check(Knowledge k, ActivityFacility f1, ActivityFacility f2) {
+	private final void check(Knowledge k, ActivityFacilityImpl f1, ActivityFacilityImpl f2) {
 		assertTrue(k.getActivities(f1.getId()).containsAll(actsF1));
 		assertTrue(k.getActivities(f2.getId()).containsAll(actsF2));
 		assertTrue(k.getActivities(true).containsAll(actsPrim));
@@ -131,14 +131,14 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("running testKnowledge()...");
 		
 		log.info("  creating test facilities...");
-		ActivityFacilities facilities = new ActivityFacilities();
-		ActivityFacility f1 = facilities.createFacility(new IdImpl(1),new CoordImpl(1,1));
+		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
+		ActivityFacilityImpl f1 = facilities.createFacility(new IdImpl(1),new CoordImpl(1,1));
 		f1.createActivityOption(H);
 		f1.createActivityOption(W);
 		f1.createActivityOption(E);
 		f1.createActivityOption(S);
 		f1.createActivityOption(L);
-		ActivityFacility f2 = facilities.createFacility(new IdImpl(2),new CoordImpl(2,2));
+		ActivityFacilityImpl f2 = facilities.createFacility(new IdImpl(2),new CoordImpl(2,2));
 		f2.createActivityOption(H);
 		f2.createActivityOption(W);
 		log.info("  done.");

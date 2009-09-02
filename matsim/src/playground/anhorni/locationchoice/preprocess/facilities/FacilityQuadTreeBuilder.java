@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.utils.QuadTreeRing;
@@ -15,11 +15,11 @@ public class FacilityQuadTreeBuilder {
 	
 	private static final Logger log = Logger.getLogger(LocationMutator.class);
 	
-	public QuadTreeRing<ActivityFacility> buildFacilityQuadTree(String type, List<ActivityFacility> facilities) {
+	public QuadTreeRing<ActivityFacilityImpl> buildFacilityQuadTree(String type, List<ActivityFacilityImpl> facilities) {
 		
-		TreeMap<Id, ActivityFacility> treeMap = new TreeMap<Id, ActivityFacility>();
+		TreeMap<Id, ActivityFacilityImpl> treeMap = new TreeMap<Id, ActivityFacilityImpl>();
 		// get all types of activities
-		for (ActivityFacility f : facilities) {		
+		for (ActivityFacilityImpl f : facilities) {		
 			if (!treeMap.containsKey(f.getId())) {
 				treeMap.put(f.getId(), f);
 			}	
@@ -28,10 +28,10 @@ public class FacilityQuadTreeBuilder {
 	}
 	
 	
-	public QuadTreeRing<ActivityFacility> buildFacilityQuadTree(String type, ActivityFacilities facilities) {
-		TreeMap<Id, ActivityFacility> treeMap = new TreeMap<Id, ActivityFacility>();
+	public QuadTreeRing<ActivityFacilityImpl> buildFacilityQuadTree(String type, ActivityFacilitiesImpl facilities) {
+		TreeMap<Id, ActivityFacilityImpl> treeMap = new TreeMap<Id, ActivityFacilityImpl>();
 		// get all types of activities
-		for (ActivityFacility f : facilities.getFacilitiesForActivityType(type).values()) {		
+		for (ActivityFacilityImpl f : facilities.getFacilitiesForActivityType(type).values()) {		
 			if (!treeMap.containsKey(f.getId())) {
 				treeMap.put(f.getId(), f);
 			}	
@@ -40,7 +40,7 @@ public class FacilityQuadTreeBuilder {
 	}
 	
 	
-	public QuadTreeRing<ActivityFacility> builFacQuadTree(String type, TreeMap<Id,ActivityFacility> facilities_of_type) {
+	public QuadTreeRing<ActivityFacilityImpl> builFacQuadTree(String type, TreeMap<Id,ActivityFacilityImpl> facilities_of_type) {
 		Gbl.startMeasurement();
 		log.info(" building " + type + " facility quad tree");
 		double minx = Double.POSITIVE_INFINITY;
@@ -48,7 +48,7 @@ public class FacilityQuadTreeBuilder {
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 
-		for (final ActivityFacility f : facilities_of_type.values()) {
+		for (final ActivityFacilityImpl f : facilities_of_type.values()) {
 			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -59,8 +59,8 @@ public class FacilityQuadTreeBuilder {
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTreeRing<ActivityFacility> quadtree = new QuadTreeRing<ActivityFacility>(minx, miny, maxx, maxy);
-		for (final ActivityFacility f : facilities_of_type.values()) {
+		QuadTreeRing<ActivityFacilityImpl> quadtree = new QuadTreeRing<ActivityFacilityImpl>(minx, miny, maxx, maxy);
+		for (final ActivityFacilityImpl f : facilities_of_type.values()) {
 			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 		}
 		log.info("Number of facilities: " + quadtree.size());

@@ -28,8 +28,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -57,7 +57,7 @@ public class FacilitiesAllActivitiesFTE {
 		this.ktiYear = ktiYear;
 	}
 
-	public void run(ActivityFacilities facilities) {
+	public void run(ActivityFacilitiesImpl facilities) {
 
 		this.loadFacilityActivities();
 //		this.createThem(facilities);
@@ -82,7 +82,7 @@ public class FacilitiesAllActivitiesFTE {
 		log.info("Reading enterprise census files into EnterpriseCensus object...done.");
 	}
 
-	private void createThem(ActivityFacilities facilities) {
+	private void createThem(ActivityFacilitiesImpl facilities) {
 
 		Random random = new Random(Gbl.getConfig().global().getRandomSeed());
 
@@ -135,7 +135,7 @@ public class FacilitiesAllActivitiesFTE {
 		int numFacilities, numFTEs, numSectorFTE = Integer.MAX_VALUE, sizeRange;
 		String X, Y, attributeId, tempFacilityId, activityId = null;
 		HashSet<String> presenceCodeItems = null;
-		ActivityFacility f;
+		ActivityFacilityImpl f;
 		ActivityOption a;
 
 		loadCensus();

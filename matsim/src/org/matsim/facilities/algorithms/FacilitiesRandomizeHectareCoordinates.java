@@ -21,16 +21,16 @@
 package org.matsim.facilities.algorithms;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 
 public class FacilitiesRandomizeHectareCoordinates {
 
-	public void run(ActivityFacilities facilities) {
+	public void run(ActivityFacilitiesImpl facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			Coord coord = f.getCoord();
 			coord.setX((Double.valueOf(coord.getX()).intValue() / 100) * 100 + MatsimRandom.getRandom().nextInt(99));
 			coord.setY((Double.valueOf(coord.getY()).intValue() / 100) * 100 + MatsimRandom.getRandom().nextInt(99));

@@ -27,8 +27,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -65,7 +65,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	
 	public void testFacilitiesBased() {
 		Config config = loadConfig(PlanAnalyzeSubtoursTest.CONFIGFILE);
-		ActivityFacilities facilities = new ActivityFacilities();
+		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 
 		config.planomat().setTripStructureAnalysisLayer("facility");
@@ -175,7 +175,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 			for (int aa=0; aa < locationIdSequence.length; aa++) {
 				location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
 				if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
-					act = plan.createActivity("actAtFacility" + locationIdSequence[aa], (ActivityFacility) location);
+					act = plan.createActivity("actAtFacility" + locationIdSequence[aa], (ActivityFacilityImpl) location);
 				} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(subtourAnalysisLocationType)) {
 					act = plan.createActivity("actOnLink" + locationIdSequence[aa], (LinkImpl) location);
 				}

@@ -26,8 +26,8 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 
 public class FacilitiesCombine {
@@ -44,7 +44,7 @@ public class FacilitiesCombine {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void combine(ActivityFacility f,ActivityFacility f2) {
+	private final void combine(ActivityFacilityImpl f,ActivityFacilityImpl f2) {
 		System.out.println("      Combining f_id=" + f.getId() + " into f2_id=" + f2.getId());
 		Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 		while (a_it.hasNext()) {
@@ -80,20 +80,20 @@ public class FacilitiesCombine {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final ActivityFacilities facilities) {
+	public void run(final ActivityFacilitiesImpl facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 		System.out.println("      # facilities = " + facilities.getFacilities().size());
 
 		// TreeMap<XCOORD,TreeMap<YCOORD,FACILITY>>
-		TreeMap<Double,TreeMap<Double,ActivityFacility>> facs = new TreeMap<Double, TreeMap<Double,ActivityFacility>>();
+		TreeMap<Double,TreeMap<Double,ActivityFacilityImpl>> facs = new TreeMap<Double, TreeMap<Double,ActivityFacilityImpl>>();
 
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			Double x = f.getCoord().getX();
 			Double y = f.getCoord().getY();
 			if (facs.containsKey(x)) { // same x coord
-				TreeMap<Double,ActivityFacility> tree = facs.get(x);
+				TreeMap<Double,ActivityFacilityImpl> tree = facs.get(x);
 				if (tree.containsKey(y)) { // and same y coord
-					ActivityFacility f2 = tree.get(y);
+					ActivityFacilityImpl f2 = tree.get(y);
 					this.combine(f,f2);
 				}
 				else { // not the same y coord
@@ -101,21 +101,21 @@ public class FacilitiesCombine {
 				}
 			}
 			else { // not the same x coord
-				TreeMap<Double,ActivityFacility> tree = new TreeMap<Double, ActivityFacility>();
+				TreeMap<Double,ActivityFacilityImpl> tree = new TreeMap<Double, ActivityFacilityImpl>();
 				tree.put(y,f);
 				facs.put(x,tree);
 			}
 		}
 
-		TreeMap<Id, ActivityFacility> fs = (TreeMap<Id, ActivityFacility>)facilities.getFacilities();
+		TreeMap<Id, ActivityFacilityImpl> fs = (TreeMap<Id, ActivityFacilityImpl>)facilities.getFacilities();
 		fs.clear();
 
-		Iterator<TreeMap<Double,ActivityFacility>> t_it = facs.values().iterator();
+		Iterator<TreeMap<Double,ActivityFacilityImpl>> t_it = facs.values().iterator();
 		while (t_it.hasNext()) {
-			TreeMap<Double,ActivityFacility> t = t_it.next();
-			Iterator<ActivityFacility> ff_it = t.values().iterator();
+			TreeMap<Double,ActivityFacilityImpl> t = t_it.next();
+			Iterator<ActivityFacilityImpl> ff_it = t.values().iterator();
 			while (ff_it.hasNext()) {
-				ActivityFacility ff = ff_it.next();
+				ActivityFacilityImpl ff = ff_it.next();
 				fs.put(ff.getId(),ff);
 			}
 		}

@@ -28,8 +28,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
@@ -57,7 +57,7 @@ public class ScenarioCut {
 	private static void calcExtent(ScenarioImpl scenario) {
 		Coord min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
 		Coord max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
-		for (ActivityFacility f : scenario.getActivityFacilities().getFacilities().values()) {
+		for (ActivityFacilityImpl f : scenario.getActivityFacilities().getFacilities().values()) {
 			if (f.getCoord().getX() < min.getX()) { min.setX(f.getCoord().getX()); }
 			if (f.getCoord().getY() < min.getY()) { min.setY(f.getCoord().getY()); }
 			if (f.getCoord().getX() > max.getX()) { max.setX(f.getCoord().getX()); }
@@ -101,7 +101,7 @@ public class ScenarioCut {
 							if (n.getCoord().getY() > max.getY()) { max.setY(n.getCoord().getY()); }
 						}
 						if (a.getFacilityId() != null) {
-							ActivityFacility f = a.getFacility();
+							ActivityFacilityImpl f = a.getFacility();
 							if (f.getCoord().getX() < min.getX()) { min.setX(f.getCoord().getX()); }
 							if (f.getCoord().getY() < min.getY()) { min.setY(f.getCoord().getY()); }
 							if (f.getCoord().getX() > max.getX()) { max.setX(f.getCoord().getX()); }
@@ -112,7 +112,7 @@ public class ScenarioCut {
 			}
 			if (((ScenarioImpl)scenario).getKnowledges().getKnowledgesByPersonId().get(p.getId()) != null) {
 				for (ActivityOption ao : ((ScenarioImpl)scenario).getKnowledges().getKnowledgesByPersonId().get(p.getId()).getActivities()) {
-					ActivityFacility f = ao.getFacility();
+					ActivityFacilityImpl f = ao.getFacility();
 					if (f.getCoord().getX() < min.getX()) { min.setX(f.getCoord().getX()); }
 					if (f.getCoord().getY() < min.getY()) { min.setY(f.getCoord().getY()); }
 					if (f.getCoord().getX() > max.getX()) { max.setX(f.getCoord().getX()); }
@@ -125,10 +125,10 @@ public class ScenarioCut {
 
 	//////////////////////////////////////////////////////////////////////
 	
-	private static void reduceFacilities(ActivityFacilities facilities, NetworkLayer network) {
+	private static void reduceFacilities(ActivityFacilitiesImpl facilities, NetworkLayer network) {
 		System.out.println("removing facilities that refer to removed links of the network... " + (new Date()));
 		Set<Id> toRemove = new HashSet<Id>();
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			if (network.getLink(f.getLink().getId()) == null) { toRemove.add(f.getId()); }
 		}
 		System.out.println("=> "+toRemove.size()+" facilities to remove.");
@@ -139,10 +139,10 @@ public class ScenarioCut {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private static void reduceFacilities(ActivityFacilities facilities, Coord center, double radius) {
+	private static void reduceFacilities(ActivityFacilitiesImpl facilities, Coord center, double radius) {
 		System.out.println("removing facilities outside of circle ("+center.toString()+";"+radius+""+")... " + (new Date()));
 		Set<Id> toRemove = new HashSet<Id>();
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			if (f.calcDistance(center) > radius) { toRemove.add(f.getId()); }
 		}
 		System.out.println("=> "+toRemove.size()+" facilities to remove.");
@@ -153,10 +153,10 @@ public class ScenarioCut {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private static void reduceFacilities(ActivityFacilities facilities, Coord min, Coord max) {
+	private static void reduceFacilities(ActivityFacilitiesImpl facilities, Coord min, Coord max) {
 		System.out.println("removing facilities outside of rectangle ("+min.toString()+";"+max.toString()+""+")... " + (new Date()));
 		Set<Id> toRemove = new HashSet<Id>();
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			Coord c = f.getCoord();
 			if (c.getX() < min.getX()) { toRemove.add(f.getId()); continue; }
 			if (c.getX() > max.getX()) { toRemove.add(f.getId()); continue; }

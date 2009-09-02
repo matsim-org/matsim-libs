@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -57,7 +57,7 @@ public class FacilitiesAddDataPulsBuildings {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void parse(ActivityFacilities facilities) {
+	private final void parse(ActivityFacilitiesImpl facilities) {
 		log.info("  parsing "+infile+", create facilities and add them to the given ones...");
 		log.info("    number of facilities: " + facilities.getFacilities().size());
 		int line_cnt = 0;
@@ -77,7 +77,7 @@ public class FacilitiesAddDataPulsBuildings {
 				if (cap < 1.0) { cap = 1.0; }
 				Id id = new IdImpl(entries[39].trim());
 				
-				ActivityFacility af = facilities.createFacility(id,coord);
+				ActivityFacilityImpl af = facilities.createFacility(id,coord);
 				ActivityOption ao = af.createActivityOption("home");
 				ao.setCapacity(cap);
 				
@@ -98,7 +98,7 @@ public class FacilitiesAddDataPulsBuildings {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final ActivityFacilities facilities) {
+	public void run(final ActivityFacilitiesImpl facilities) {
 		log.info("running " + this.getClass().getName() + " module...");
 		parse(facilities);
 		log.info("done.");

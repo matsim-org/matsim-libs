@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.MatsimRandom;
@@ -48,15 +48,15 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 	//////////////////////////////////////////////////////////////////////
 
 	private final Random random = MatsimRandom.getRandom();
-	private final ActivityFacilities activityFacilities;
-	private final QuadTree<ActivityFacility> facs = new QuadTree<ActivityFacility>(-900000,-900000,2700000,2700000);
+	private final ActivityFacilitiesImpl activityFacilities;
+	private final QuadTree<ActivityFacilityImpl> facs = new QuadTree<ActivityFacilityImpl>(-900000,-900000,2700000,2700000);
 	private int id;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAdaptPlanAndCreateFacilities(ActivityFacilities activityFacilities) {
+	public PersonAdaptPlanAndCreateFacilities(ActivityFacilitiesImpl activityFacilities) {
 		super();
 		this.activityFacilities = activityFacilities;
 		if (!activityFacilities.getFacilities().isEmpty()) { throw new RuntimeException("given facilities container is not empty!"); }
@@ -121,7 +121,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 					int x = (int)a.getCoord().getX();
 					int y = (int)a.getCoord().getY();
 					CoordImpl c = new CoordImpl(x,y);
-					ActivityFacility af = facs.get(x,y);
+					ActivityFacilityImpl af = facs.get(x,y);
 					if (af == null) {
 						af = activityFacilities.createFacility(new IdImpl(id),c);
 						id++;

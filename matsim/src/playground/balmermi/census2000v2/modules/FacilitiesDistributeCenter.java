@@ -22,8 +22,8 @@ package playground.balmermi.census2000v2.modules;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -54,11 +54,11 @@ public class FacilitiesDistributeCenter {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final ActivityFacilities facilities) {
+	public void run(final ActivityFacilitiesImpl facilities) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		log.info("      # facilities = " + facilities.getFacilities().size());
 		
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			Coord c = f.getCoord();
 			if (c.getX()%100 != 0) { Gbl.errorMsg("f_id="+f.getId()+" xccord is not a heactar!"); }
 			if (c.getY()%100 != 0) { Gbl.errorMsg("f_id="+f.getId()+" xccord is not a heactar!"); }

@@ -39,7 +39,7 @@ public class ActivityOption implements BasicActivityOption {
 	//////////////////////////////////////////////////////////////////////
 	private final String type;
 	private Double capacity = Double.valueOf(Integer.MAX_VALUE);
-	private final ActivityFacility facility;
+	private final ActivityFacilityImpl facility;
 
 	// TreeMap(String day,TreeSet(Opentime opentime))
 	private Map<DayType, SortedSet<BasicOpeningTime>> opentimes = new TreeMap<DayType, SortedSet<BasicOpeningTime>>();
@@ -49,7 +49,7 @@ public class ActivityOption implements BasicActivityOption {
 	//////////////////////////////////////////////////////////////////////
 
 	
-	public ActivityOption(final String type, final ActivityFacility facility) {
+	public ActivityOption(final String type, final ActivityFacilityImpl facility) {
 		this.type = type;
 		this.facility = facility;
 		if (this.facility == null) { Gbl.errorMsg("facility=null not allowed!"); }
@@ -147,7 +147,7 @@ public class ActivityOption implements BasicActivityOption {
 		return this.type;
 	}
 
-	public final ActivityFacility getFacility() {
+	public final ActivityFacilityImpl getFacility() {
 		return this.facility;
 	}
 

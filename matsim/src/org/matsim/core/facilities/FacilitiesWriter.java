@@ -33,7 +33,7 @@ import org.matsim.core.utils.io.Writer;
 public class FacilitiesWriter extends Writer {
 
 	private FacilitiesWriterHandler handler = null;
-	private final ActivityFacilities facilities;
+	private final ActivityFacilitiesImpl facilities;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -45,7 +45,7 @@ public class FacilitiesWriter extends Writer {
 	 *
 	 * @param facilities
 	 */
-	public FacilitiesWriter(final ActivityFacilities facilities) {
+	public FacilitiesWriter(final ActivityFacilitiesImpl facilities) {
 		this(facilities, Gbl.getConfig().facilities().getOutputFile());
 	}
 
@@ -55,7 +55,7 @@ public class FacilitiesWriter extends Writer {
 	 * @param facilities
 	 * @param filename
 	 */
-	public FacilitiesWriter(final ActivityFacilities facilities, final String filename) {
+	public FacilitiesWriter(final ActivityFacilitiesImpl facilities, final String filename) {
 		super();
 		this.facilities = facilities;
 		this.outfile = filename;
@@ -71,7 +71,7 @@ public class FacilitiesWriter extends Writer {
 	@Override
 	public final void write() {
 		this.writeOpenAndInit();
-		for (ActivityFacility f : this.facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
 			this.writeFacility(f);
 		}
 		this.writeFinish();
@@ -90,7 +90,7 @@ public class FacilitiesWriter extends Writer {
 		}
 	}
 
-	public final void writeFacility(final ActivityFacility f) {
+	public final void writeFacility(final ActivityFacilityImpl f) {
 		try {
 			this.handler.startFacility(f, this.out);
 			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();

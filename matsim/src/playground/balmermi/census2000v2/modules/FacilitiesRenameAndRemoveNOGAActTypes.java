@@ -24,8 +24,8 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 
 public class FacilitiesRenameAndRemoveNOGAActTypes {
 
@@ -49,20 +49,20 @@ public class FacilitiesRenameAndRemoveNOGAActTypes {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final ActivityFacilities facilities) {
+	public void run(final ActivityFacilitiesImpl facilities) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		log.info("      # facilities = " + facilities.getFacilities().size());
 
-		ArrayList<ActivityFacility> facs = new ArrayList<ActivityFacility>(facilities.getFacilities().values());
+		ArrayList<ActivityFacilityImpl> facs = new ArrayList<ActivityFacilityImpl>(facilities.getFacilities().values());
 		facilities.getFacilities().clear();
-		for (ActivityFacility f : facs) {
+		for (ActivityFacilityImpl f : facs) {
 			f.setId(new IdImpl(Integer.parseInt(f.getId().toString())+10000000));
 			ArrayList<String> types = new ArrayList<String>();
 			for (String type : f.getActivityOptions().keySet()) { types.add(type); }
 			for (int i=0; i<types.size(); i++) {
 				if (types.get(i).startsWith("B")) { f.getActivityOptions().remove(types.get(i)); }
 			}
-			ActivityFacility ff = facilities.createFacility(f.getId(),f.getCoord());
+			ActivityFacilityImpl ff = facilities.createFacility(f.getId(),f.getCoord());
 			ff.getActivityOptions().putAll(f.getActivityOptions());
 		}
 

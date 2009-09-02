@@ -28,8 +28,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime;
@@ -41,12 +41,12 @@ public class FacilitiesOpentimesKTIYear1 {
 	
 	private final static Logger log = Logger.getLogger(FacilitiesOpentimesKTIYear1.class);
 
-	public void run(ActivityFacilities facilities) {
+	public void run(ActivityFacilitiesImpl facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		this.loadOpeningTimes();
 
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
 

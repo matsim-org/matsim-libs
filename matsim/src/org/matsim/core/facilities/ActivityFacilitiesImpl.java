@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.core.gbl.Gbl;
@@ -37,7 +38,7 @@ import org.matsim.world.MappedLocation;
 
 import visad.data.netcdf.UnsupportedOperationException;
 
-public class ActivityFacilities extends LayerImpl {
+public class ActivityFacilitiesImpl extends LayerImpl implements ActivityFacilities {
 
 	@Deprecated
 	public static final Id LAYER_TYPE = new IdImpl("facility");
@@ -54,15 +55,15 @@ public class ActivityFacilities extends LayerImpl {
 	public static final boolean FACILITIES_USE_STREAMING = true;
 	public static final boolean FACILITIES_NO_STREAMING = false;
 	
-	private boolean isStreaming = ActivityFacilities.FACILITIES_NO_STREAMING;
+	private boolean isStreaming = ActivityFacilitiesImpl.FACILITIES_NO_STREAMING;
 	
-	private static final Logger log = Logger.getLogger(ActivityFacilities.class);
+	private static final Logger log = Logger.getLogger(ActivityFacilitiesImpl.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public ActivityFacilities(final String name, final boolean isStreaming) {
+	public ActivityFacilitiesImpl(final String name, final boolean isStreaming) {
 		super(LAYER_TYPE, name);
 		this.isStreaming = isStreaming;
 	}
@@ -70,7 +71,7 @@ public class ActivityFacilities extends LayerImpl {
 	/**
 	 * Creates a new Facilities object with streaming switched off.
 	 */
-	public ActivityFacilities() {
+	public ActivityFacilitiesImpl() {
 		this(null, false);
 	}
 
@@ -78,11 +79,11 @@ public class ActivityFacilities extends LayerImpl {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final ActivityFacility createFacility(final Id id, final Coord center) {
+	public final ActivityFacilityImpl createFacility(final Id id, final Coord center) {
 		if (this.getLocations().containsKey(id)) {
 			Gbl.errorMsg("Facility id=" + id + " already exists.");
 		}
-		ActivityFacility f = new ActivityFacility(this,id,center);
+		ActivityFacilityImpl f = new ActivityFacilityImpl(this,id,center);
 		Map<Id,MappedLocation> locations = (Map<Id, MappedLocation>) this.getLocations();
 		locations.put(f.getId(),f);
 
@@ -116,7 +117,7 @@ public class ActivityFacilities extends LayerImpl {
 		if (!this.isStreaming) {
 			for (int i = 0; i < this.algorithms.size(); i++) {
 				FacilityAlgorithm algo = this.algorithms.get(i);
-				for (ActivityFacility f : getFacilities().values()) {
+				for (ActivityFacilityImpl f : getFacilities().values()) {
 					algo.run(f);
 				}
 			}
@@ -129,7 +130,7 @@ public class ActivityFacilities extends LayerImpl {
 	// finish methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void finishFacility(final ActivityFacility f) {
+	public final void finishFacility(final ActivityFacilityImpl f) {
 		if (this.isStreaming) {
 			// run algorithms
 			for (FacilityAlgorithm facilitiesAlgo : this.algorithms) {
@@ -157,16 +158,16 @@ public class ActivityFacilities extends LayerImpl {
 	//////////////////////////////////////////////////////////////////////
 
 	@SuppressWarnings("unchecked")
-	public final Map<Id, ActivityFacility> getFacilities() {
-		return (Map<Id, ActivityFacility>) getLocations();
+	public final Map<Id, ActivityFacilityImpl> getFacilities() {
+		return (Map<Id, ActivityFacilityImpl>) getLocations();
 	}
 
 	//Added 27.03.08 JH for random secondary location changes
-	public final TreeMap<Id,ActivityFacility> getFacilitiesForActivityType(final String act_type) {
-		TreeMap<Id,ActivityFacility> facs = new TreeMap<Id, ActivityFacility>();
-		Iterator<? extends ActivityFacility> iter = this.getFacilities().values().iterator();
+	public final TreeMap<Id,ActivityFacilityImpl> getFacilitiesForActivityType(final String act_type) {
+		TreeMap<Id,ActivityFacilityImpl> facs = new TreeMap<Id, ActivityFacilityImpl>();
+		Iterator<? extends ActivityFacilityImpl> iter = this.getFacilities().values().iterator();
 		while (iter.hasNext()){
-			ActivityFacility f = iter.next();
+			ActivityFacilityImpl f = iter.next();
 			Map<String, ActivityOption> a = f.getActivityOptions();
 			if(a.containsKey(act_type)){
 				facs.put(f.getId(),f);

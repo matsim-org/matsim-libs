@@ -25,7 +25,7 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -34,7 +34,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
  * The collection of zone objects in MATSim.
  * @see LayerImpl
  * @see NetworkLayer
- * @see ActivityFacilities
+ * @see ActivityFacilitiesImpl
  * @author Michael Balmer
  */
 public class ZoneLayer extends LayerImpl {

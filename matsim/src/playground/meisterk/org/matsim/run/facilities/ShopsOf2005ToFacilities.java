@@ -60,9 +60,9 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -228,7 +228,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void transformGeocodedKMLToFacilities() {
 
-		ActivityFacilities shopsOf2005 = new ActivityFacilities("shopsOf2005", ActivityFacilities.FACILITIES_NO_STREAMING);
+		ActivityFacilitiesImpl shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
 
 		JAXBElement<KmlType> kmlElement = null;
 
@@ -667,7 +667,7 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
-	private static void extractPlacemarks(final FolderType folderType, final ActivityFacilities facilities) {
+	private static void extractPlacemarks(final FolderType folderType, final ActivityFacilitiesImpl facilities) {
 
 		List<JAXBElement<? extends AbstractFeatureType>> featureGroup = folderType.getAbstractFeatureGroup();
 		Iterator it = featureGroup.iterator();
@@ -709,7 +709,7 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
-	private static void addOpentimesToFacilities(final ActivityFacilities facilities) {
+	private static void addOpentimesToFacilities(final ActivityFacilitiesImpl facilities) {
 
 		ShopsOf2005ToFacilities.processPickPayOpenTimes(facilities);
 		ShopsOf2005ToFacilities.processMigrosZHOpenTimes(facilities);
@@ -720,7 +720,7 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
-	private static void processPickPayOpenTimes(final ActivityFacilities facilities) {
+	private static void processPickPayOpenTimes(final ActivityFacilitiesImpl facilities) {
 
 		System.out.println("Setting up Pickpay open times...");
 
@@ -770,7 +770,7 @@ public class ShopsOf2005ToFacilities {
 
 			facilityId = shopId.getShopId();
 			//System.out.println(facilityId);
-			ActivityFacility theCurrentPickpay = facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacilityImpl theCurrentPickpay = facilities.getFacilities().get(new IdImpl(facilityId));
 			if (theCurrentPickpay != null) {
 
 				// yeah, we can use the open times
@@ -844,7 +844,7 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
-	private static void processMigrosZHOpenTimes(final ActivityFacilities facilities) {
+	private static void processMigrosZHOpenTimes(final ActivityFacilitiesImpl facilities) {
 
 		System.out.println("Setting up Migros ZH open times...");
 
@@ -877,7 +877,7 @@ public class ShopsOf2005ToFacilities {
 			System.out.println(facilityId);
 			System.out.flush();
 
-			ActivityFacility theCurrentMigrosZH = facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacilityImpl theCurrentMigrosZH = facilities.getFacilities().get(new IdImpl(facilityId));
 			if (theCurrentMigrosZH != null) {
 				ActivityOption shopping = theCurrentMigrosZH.createActivityOption(ACTIVITY_TYPE_SHOP);
 				String openTimeString = tokens[6];
@@ -986,7 +986,7 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
-	private static void processMigrosOstschweizOpenTimes(final ActivityFacilities facilities) {
+	private static void processMigrosOstschweizOpenTimes(final ActivityFacilitiesImpl facilities) {
 
 		System.out.println("Setting up Migros Ostschwiiz open times...");
 
@@ -1050,7 +1050,7 @@ public class ShopsOf2005ToFacilities {
 			addressLinePointer++;
 
 			//System.out.println(facilityId);
-			ActivityFacility theCurrentMigrosOstschweiz = facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacilityImpl theCurrentMigrosOstschweiz = facilities.getFacilities().get(new IdImpl(facilityId));
 			if (theCurrentMigrosOstschweiz != null) {
 
 				ActivityOption shopping = theCurrentMigrosOstschweiz.createActivityOption(ACTIVITY_TYPE_SHOP);
@@ -1109,7 +1109,7 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
-	private static void processCoopZHOpenTimes(final ActivityFacilities facilities) {
+	private static void processCoopZHOpenTimes(final ActivityFacilitiesImpl facilities) {
 
 		System.out.println("Setting up Coop ZH open times...");
 
@@ -1144,7 +1144,7 @@ public class ShopsOf2005ToFacilities {
 			shopId = new ShopId(COOP, tokens[7], tokens[8], COOP_ZH, tokens[43], tokens[44], tokens[42]);
 			String facilityId = shopId.getShopId();
 			System.out.println(facilityId);
-			ActivityFacility theCurrentCoopZH = facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacilityImpl theCurrentCoopZH = facilities.getFacilities().get(new IdImpl(facilityId));
 			if (theCurrentCoopZH != null) {
 
 				ActivityOption shopping = theCurrentCoopZH.createActivityOption(ACTIVITY_TYPE_SHOP);
@@ -1186,7 +1186,7 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
-	private static void processCoopTGOpenTimes(final ActivityFacilities facilities) {
+	private static void processCoopTGOpenTimes(final ActivityFacilitiesImpl facilities) {
 
 		System.out.println("Setting up Coop TG open times...");
 
@@ -1226,7 +1226,7 @@ public class ShopsOf2005ToFacilities {
 
 			String facilityId = shopId.getShopId();
 			System.out.println(facilityId);
-			ActivityFacility theCurrentCoopTG = facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacilityImpl theCurrentCoopTG = facilities.getFacilities().get(new IdImpl(facilityId));
 			if (theCurrentCoopTG != null) {
 				ActivityOption shopping = theCurrentCoopTG.createActivityOption(ACTIVITY_TYPE_SHOP);
 
@@ -1296,7 +1296,7 @@ public class ShopsOf2005ToFacilities {
 		System.out.println("Setting up Coop TG open times...done.");
 	}
 
-	private static void processDennerOpenTimes(final ActivityFacilities facilities) {
+	private static void processDennerOpenTimes(final ActivityFacilitiesImpl facilities) {
 
 		System.out.println("Setting up Denner open times...");
 
@@ -1386,7 +1386,7 @@ public class ShopsOf2005ToFacilities {
 				System.out.println(saturdayToken);
 				System.out.println();
 
-				ActivityFacility theCurrentDenner = facilities.getFacilities().get(new IdImpl(shopId.getShopId()));
+				ActivityFacilityImpl theCurrentDenner = facilities.getFacilities().get(new IdImpl(shopId.getShopId()));
 				if (theCurrentDenner != null) {
 					ActivityOption shopping = theCurrentDenner.createActivityOption(ACTIVITY_TYPE_SHOP);
 					for (String openTimeString : new String[]{weekDayToken, saturdayToken}) {
@@ -1448,7 +1448,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void shopsToTXT() {
 
-		ActivityFacilities shopsOf2005 = new ActivityFacilities("shopsOf2005", ActivityFacilities.FACILITIES_NO_STREAMING);
+		ActivityFacilitiesImpl shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
 		ArrayList<String> txtLines = new ArrayList<String>();
 		ShopId shopId = null;
 		String aShopLine = null;
@@ -1489,7 +1489,7 @@ public class ShopsOf2005ToFacilities {
 
 		while (facilityIterator.hasNext()) {
 
-			ActivityFacility facility = (ActivityFacility) facilityIterator.next();
+			ActivityFacilityImpl facility = (ActivityFacilityImpl) facilityIterator.next();
 			facilityId = facility.getId().toString();
 			System.out.println(facilityId);
 
@@ -1604,9 +1604,9 @@ public class ShopsOf2005ToFacilities {
 		shopIconScales.put(SHOPS_OF_2005, 1.0);
 		shopIconScales.put(SHOPS_FROM_ENTERPRISE_CENSUS, 2.0);
 
-		ActivityFacilities facilities = null;
+		ActivityFacilitiesImpl facilities = null;
 		for (int dataSetIndex : new int[]{SHOPS_OF_2005/*, SHOPS_FROM_ENTERPRISE_CENSUS*/}) {
-			facilities = new ActivityFacilities(shopsNames.get(new Integer(dataSetIndex)), ActivityFacilities.FACILITIES_NO_STREAMING);
+			facilities = new ActivityFacilitiesImpl(shopsNames.get(new Integer(dataSetIndex)), ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
 
 			System.out.println("Reading facilities xml file... ");
 			FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilities);
@@ -1643,10 +1643,10 @@ public class ShopsOf2005ToFacilities {
 			shopIconLink.setHref("http://maps.google.com/mapfiles/kml/paddle/S.png");
 			System.out.println("Initializing KML...done.");
 
-			Iterator<? extends ActivityFacility> facilityIterator = facilities.getFacilities().values().iterator();
+			Iterator<? extends ActivityFacilityImpl> facilityIterator = facilities.getFacilities().values().iterator();
 
 			while (facilityIterator.hasNext()) {
-				ActivityFacility facility = facilityIterator.next();
+				ActivityFacilityImpl facility = facilityIterator.next();
 				facilityId = facility.getId().toString();
 //				System.out.println(facility.toString());
 				//System.out.println(facilityId);
@@ -1710,9 +1710,9 @@ public class ShopsOf2005ToFacilities {
 
 	private static void applyOpentimesToEnterpriseCensus() {
 
-		ActivityFacilities facilities_input = new ActivityFacilities("Switzerland based on Enterprise census 2000.", ActivityFacilities.FACILITIES_USE_STREAMING);
+		ActivityFacilitiesImpl facilities_input = new ActivityFacilitiesImpl("Switzerland based on Enterprise census 2000.", ActivityFacilitiesImpl.FACILITIES_USE_STREAMING);
 
-		ActivityFacilities facilities_output = new ActivityFacilities("Facilities KTI Year 2", ActivityFacilities.FACILITIES_NO_STREAMING);
+		ActivityFacilitiesImpl facilities_output = new ActivityFacilitiesImpl("Facilities KTI Year 2", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
 
 		// init algorithms
 		FacilitiesOpentimesKTIYear2 facilitiesOpentimesKTIYear2 = new FacilitiesOpentimesKTIYear2();

@@ -56,8 +56,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 
 
 
@@ -318,7 +318,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	
 	protected void modifyLocation (ActivityImpl act){
 		log.info("Start modify.");
-		ActivityFacilities afImpl = (ActivityFacilities) this.controler.getFacilities();
+		ActivityFacilitiesImpl afImpl = (ActivityFacilitiesImpl) this.controler.getFacilities();
 		
 		String actType = null;
 		if (act.getType().equalsIgnoreCase("w")) actType = "work_sector2";
@@ -327,8 +327,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		else if (act.getType().equalsIgnoreCase("l")) actType = "leisure";
 		else log.warn("Unerkannter act type: "+act.getType());
 		
-		List <ActivityFacility> facs = new ArrayList<ActivityFacility>(afImpl.getFacilitiesForActivityType(actType).values());
-		ActivityFacility fac;
+		List <ActivityFacilityImpl> facs = new ArrayList<ActivityFacilityImpl>(afImpl.getFacilitiesForActivityType(actType).values());
+		ActivityFacilityImpl fac;
 		do {
 			int position = (int) (MatsimRandom.getRandom().nextDouble()*facs.size());
 			fac = facs.get(position);

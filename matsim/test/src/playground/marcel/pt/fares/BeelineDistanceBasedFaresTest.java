@@ -21,18 +21,18 @@
 package playground.marcel.pt.fares;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public final class BeelineDistanceBasedFaresTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost_DifferentCostsPerKilometer() {
-		final ActivityFacilities facilities = new ActivityFacilities();
-		final ActivityFacility fromStop = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
-		final ActivityFacility toStop = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
+		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
+		final ActivityFacilityImpl fromStop = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
+		final ActivityFacilityImpl toStop = facilities.createFacility(new IdImpl(2), new CoordImpl(2100, 200));
 
 		assertEquals(2.0, new BeelineDistanceBasedFares(1.0).getSingleTripCost(fromStop, toStop), EPSILON);
 		assertEquals(1.0, new BeelineDistanceBasedFares(0.5).getSingleTripCost(fromStop, toStop), EPSILON);
@@ -40,8 +40,8 @@ public final class BeelineDistanceBasedFaresTest extends MatsimTestCase {
 	}
 
 	public void testGetSingleTripCost_SameFromAsTo() {
-		final ActivityFacilities facilities = new ActivityFacilities();
-		final ActivityFacility fromStop = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
+		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
+		final ActivityFacilityImpl fromStop = facilities.createFacility(new IdImpl(1), new CoordImpl(100, 200));
 
 		assertEquals(0.0, new BeelineDistanceBasedFares(1.0).getSingleTripCost(fromStop, fromStop), EPSILON);
 	}

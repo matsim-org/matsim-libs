@@ -26,8 +26,8 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -53,7 +53,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 	private static final String L = "l";
 	private static final String S = "s";
 
-	private final ActivityFacilities facilities;
+	private final ActivityFacilitiesImpl facilities;
 
 	private QuadTree<ActivityOption> shopActQuadTree = null;
 	private QuadTree<ActivityOption> leisActQuadTree = null;
@@ -62,7 +62,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignShopLeisureLocations(final ActivityFacilities facilities) {
+	public PersonAssignShopLeisureLocations(final ActivityFacilitiesImpl facilities) {
 		super();
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
@@ -82,7 +82,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
-		for (ActivityFacility f : this.facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
 			for (ActivityOption a : f.getActivityOptions().values()) {
 				if (a.getType().equals(CAtts.ACT_S1) || a.getType().equals(CAtts.ACT_S2) || a.getType().equals(CAtts.ACT_S3) ||
 				    a.getType().equals(CAtts.ACT_S4) || a.getType().equals(CAtts.ACT_S5) || a.getType().equals(CAtts.ACT_SOTHR)) {
@@ -113,7 +113,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
-		for (ActivityFacility f : this.facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
 			for (ActivityOption a : f.getActivityOptions().values()) {
 				if (a.getType().equals(CAtts.ACT_LC) || a.getType().equals(CAtts.ACT_LG) || a.getType().equals(CAtts.ACT_LS)) {
 					acts.add(a);
@@ -204,7 +204,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void assignRemainingLocations(ActivityImpl act, ActivityFacility start, ActivityFacility end) {
+	private final void assignRemainingLocations(ActivityImpl act, ActivityFacilityImpl start, ActivityFacilityImpl end) {
 		Coord c_start = start.getCoord();
 		Coord c_end   = end.getCoord();
 
@@ -284,13 +284,13 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			if (act.getFacility() == null) {
 				// get the prev act with a facility
-				ActivityFacility start = null;
+				ActivityFacilityImpl start = null;
 				for (int b=i-2; b>=0; b=b-2) {
 					ActivityImpl b_act = (ActivityImpl)plan.getPlanElements().get(b);
 					if (b_act.getFacility() != null) { start = b_act.getFacility(); break; }
 				}
 				// get the next act with a facility
-				ActivityFacility end = null;
+				ActivityFacilityImpl end = null;
 				for (int a=i+2; a<plan.getPlanElements().size(); a=a+2) {
 					ActivityImpl a_act = (ActivityImpl)plan.getPlanElements().get(a);
 					if (a_act.getFacility() != null) { end = a_act.getFacility(); break; }

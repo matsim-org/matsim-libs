@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
@@ -83,7 +83,7 @@ public class PlansFilterPersons {
 		for (PersonImpl p : plans.getPersons().values()) {
 			Object o = p.getCustomAttributes().get(CAtts.HH_Z);
 			if (o != null) {
-				ActivityFacility f = ((Household)o).getFacility();
+				ActivityFacilityImpl f = ((Household)o).getFacility();
 
 				((Household)o).removePersonZ(p.getId());
 				p.getCustomAttributes().remove(CAtts.HH_Z);

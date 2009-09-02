@@ -60,7 +60,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
 
 	private final static Logger log = Logger.getLogger(MatsimFacilitiesReader.class);
 	
-	private final ActivityFacilities facilities;
+	private final ActivityFacilitiesImpl facilities;
 	private MatsimXmlParser delegate = null;
 
 	/**
@@ -68,7 +68,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser {
 	 *
 	 * @param facilities The Facilities-object to store the facilities in.
 	 */
-	public MatsimFacilitiesReader(final ActivityFacilities facilities) {
+	public MatsimFacilitiesReader(final ActivityFacilitiesImpl facilities) {
 		this.facilities = facilities;
 	}
 

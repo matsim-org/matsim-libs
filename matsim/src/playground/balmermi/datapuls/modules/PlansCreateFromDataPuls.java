@@ -34,8 +34,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
@@ -61,14 +61,14 @@ public class PlansCreateFromDataPuls {
 	private final PopulationImpl censusPopulation;
 	private final ArrayList<QuadTree<PersonImpl>> censusPersonGroups;
 	private final Knowledges censusKnowledges;
-	private final ActivityFacilities datapulsFacilities;
-	private final Map<String,QuadTree<ActivityFacility>> datapulsFacilityGroups;
+	private final ActivityFacilitiesImpl datapulsFacilities;
+	private final Map<String,QuadTree<ActivityFacilityImpl>> datapulsFacilityGroups;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PlansCreateFromDataPuls(String infile, ScenarioImpl censusScenario, ActivityFacilities datapulsFacilities) {
+	public PlansCreateFromDataPuls(String infile, ScenarioImpl censusScenario, ActivityFacilitiesImpl datapulsFacilities) {
 		log.info("init " + this.getClass().getName() + " module...");
 		this.infile = infile;
 		this.censusPopulation = censusScenario.getPopulation();
@@ -134,18 +134,18 @@ public class PlansCreateFromDataPuls {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private Map<String,QuadTree<ActivityFacility>> buildFacilityGroups(ActivityFacilities facilities) {
+	private Map<String,QuadTree<ActivityFacilityImpl>> buildFacilityGroups(ActivityFacilitiesImpl facilities) {
 		log.info("  building a quadtree for each activity option group...");
 		String[] types = { "education_higher","education_kindergarten","education_other","education_primary",
 				"education_secondary","home","leisure","shop","tta","work_sector2","work_sector3" };
-		Map<String,QuadTree<ActivityFacility>> facilityGroups = new TreeMap<String,QuadTree<ActivityFacility>>();
+		Map<String,QuadTree<ActivityFacilityImpl>> facilityGroups = new TreeMap<String,QuadTree<ActivityFacilityImpl>>();
 		for (int i=0; i<types.length; i++) {
 			log.info("    building a quadtree for type '"+types[i]+"'...");
 			double minx = Double.POSITIVE_INFINITY;
 			double miny = Double.POSITIVE_INFINITY;
 			double maxx = Double.NEGATIVE_INFINITY;
 			double maxy = Double.NEGATIVE_INFINITY;
-			for (ActivityFacility f : facilities.getFacilities().values()) {
+			for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 				if (f.getActivityOption(types[i]) != null) {
 					if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 					if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
@@ -155,8 +155,8 @@ public class PlansCreateFromDataPuls {
 			}
 			minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 			log.info("    => type="+types[i]+": xrange("+minx+","+maxx+"); yrange("+miny+","+maxy+")");
-			QuadTree<ActivityFacility> qt = new QuadTree<ActivityFacility>(minx,miny,maxx,maxy);
-			for (ActivityFacility f : facilities.getFacilities().values()) {
+			QuadTree<ActivityFacilityImpl> qt = new QuadTree<ActivityFacilityImpl>(minx,miny,maxx,maxy);
+			for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 				if (f.getActivityOption(types[i]) != null) { qt.put(f.getCoord().getX(),f.getCoord().getY(),f); }
 			}
 			log.info("    => "+qt.size()+" facilities of type="+types[i]+" added.");
@@ -195,7 +195,7 @@ public class PlansCreateFromDataPuls {
 				else if (gender == 2) { sex = "f"; }
 				else { throw new RuntimeException("line "+line_cnt+": gender is not 0,1 or 2."); }
 				Id fid = new IdImpl(entries[19].trim());
-				ActivityFacility af = datapulsFacilities.getFacilities().get(fid);
+				ActivityFacilityImpl af = datapulsFacilities.getFacilities().get(fid);
 				if (af == null) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" not found in facilities."); }
 				if (af.getActivityOptions().size() != 1) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" must have only one activity option."); }
 				ActivityOption a = af.getActivityOption("home");
@@ -273,8 +273,8 @@ public class PlansCreateFromDataPuls {
 		// knowledge
 		for (ActivityOption cActivityOption : cKnowledge.getActivities(true)) {
 			if (!cActivityOption.getType().equals("home")) {
-				ActivityFacility cFacility = cActivityOption.getFacility();
-				ActivityFacility dFacility = this.datapulsFacilityGroups.get(cActivityOption.getType()).get(cFacility.getCoord().getX(),cFacility.getCoord().getY());
+				ActivityFacilityImpl cFacility = cActivityOption.getFacility();
+				ActivityFacilityImpl dFacility = this.datapulsFacilityGroups.get(cActivityOption.getType()).get(cFacility.getCoord().getX(),cFacility.getCoord().getY());
 				if (dFacility == null) { throw new RuntimeException("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+": no dFacility found."); }
 				double distance = CoordUtils.calcDistance(cFacility.getCoord(),dFacility.getCoord());
 				if (distance > 500.0) {
@@ -286,8 +286,8 @@ public class PlansCreateFromDataPuls {
 		}
 		for (ActivityOption cActivityOption : cKnowledge.getActivities(false)) {
 			if (!cActivityOption.getType().equals("home")) {
-				ActivityFacility cFacility = cActivityOption.getFacility();
-				ActivityFacility dFacility = this.datapulsFacilityGroups.get(cActivityOption.getType()).get(cFacility.getCoord().getX(),cFacility.getCoord().getY());
+				ActivityFacilityImpl cFacility = cActivityOption.getFacility();
+				ActivityFacilityImpl dFacility = this.datapulsFacilityGroups.get(cActivityOption.getType()).get(cFacility.getCoord().getX(),cFacility.getCoord().getY());
 				if (dFacility == null) { throw new RuntimeException("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+": no dFacility found."); }
 				double distance = CoordUtils.calcDistance(cFacility.getCoord(),dFacility.getCoord());
 				if (distance > 500.0) {
@@ -308,7 +308,7 @@ public class PlansCreateFromDataPuls {
 				ActivityImpl a = (ActivityImpl)e;
 				ArrayList<ActivityOption> acts = dKnowledge.getActivities(a.getType());
 				if (acts.isEmpty()) { throw new RuntimeException("pid="+dPerson.getId()+", aType="+a.getType()+": not defined in knowledge!"); }
-				ActivityFacility f = acts.get(random.nextInt(acts.size())).getFacility();
+				ActivityFacilityImpl f = acts.get(random.nextInt(acts.size())).getFacility();
 				a.setCoord(f.getCoord());
 				a.setFacility(f);
 			}

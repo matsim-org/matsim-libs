@@ -25,8 +25,8 @@ import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 
 public class FacilitiesScenarioCut {
 
@@ -43,14 +43,14 @@ public class FacilitiesScenarioCut {
 		this.maxY = max.getY();
 	}
 
-	public void run(ActivityFacilities facilities) {
+	public void run(ActivityFacilitiesImpl facilities) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
 		TreeSet<Id> fid_set = new TreeSet<Id>();
 		Iterator<Id> fid_it = facilities.getFacilities().keySet().iterator();
 		while (fid_it.hasNext()) {
 			Id fid = fid_it.next();
-			ActivityFacility f = facilities.getFacilities().get(fid);
+			ActivityFacilityImpl f = facilities.getFacilities().get(fid);
 			Coord coord = f.getCoord();
 			double x = coord.getX();
 			double y = coord.getY();

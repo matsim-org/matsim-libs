@@ -29,7 +29,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
@@ -37,7 +37,7 @@ import org.matsim.world.World;
 
 public class AnalyzeFacilities {
 
-	private ActivityFacilities facilities;
+	private ActivityFacilitiesImpl facilities;
 	private final static Logger log = Logger.getLogger(AnalyzeFacilities.class);
 	
 	
@@ -48,7 +48,7 @@ public class AnalyzeFacilities {
 		
 		World world = Gbl.createWorld();
 		log.info("reading the facilities ...");
-		ActivityFacilities facilities =(ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities =(ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(facilities).readFile("input/facilities/facilities_KTIYear2.xml.gz");
 				
 		analyzer.run(facilities);
@@ -57,7 +57,7 @@ public class AnalyzeFacilities {
 	
 	
 		
-	public void run(ActivityFacilities facilities) {
+	public void run(ActivityFacilitiesImpl facilities) {
 		this.facilities = facilities;
 		this.write("./output/facilities/");
 		log.info("finished");

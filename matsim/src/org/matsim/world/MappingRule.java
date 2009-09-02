@@ -26,13 +26,13 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
 
 /**
  * Connects two {@link Layer layers} such that for all layers in the {@link World world}
  * a hierarchy is defined. The bottom layer is usually the {@link NetworkLayer network}, the next higher is
- * the {@link ActivityFacilities facility layer}, followed by an open number of {@link ZoneLayer zone layers}.
+ * the {@link ActivityFacilitiesImpl facility layer}, followed by an open number of {@link ZoneLayer zone layers}.
  * 
  * <p><b>Note:</b> The concept of the mapping cardinality is deprecated. It will be always treated as an 
  * <code>[m]-[m]</code> cardinality (undefined/unchecked cardinality).</p>

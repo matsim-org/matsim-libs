@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.MatsimRandom;
 
 public class FacilitiesMakeSample {
@@ -36,7 +36,7 @@ public class FacilitiesMakeSample {
 		this.pct = pct;
 	}
 
-	public void run(ActivityFacilities facilities) {
+	public void run(ActivityFacilitiesImpl facilities) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
 		TreeSet<Id> fid_set = new TreeSet<Id>();

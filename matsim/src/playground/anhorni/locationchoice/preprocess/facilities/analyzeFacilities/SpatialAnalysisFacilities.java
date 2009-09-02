@@ -8,9 +8,9 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 
 import playground.anhorni.locationchoice.cs.depr.filters.AreaReader;
@@ -35,18 +35,18 @@ public class SpatialAnalysisFacilities {
 	
 	public void run(String facilitiesFile, String areaShapeFile) {
 
-		TreeMap<Id,ActivityFacility> shop_facilities = this.readAndFilterFacilities(facilitiesFile);
+		TreeMap<Id,ActivityFacilityImpl> shop_facilities = this.readAndFilterFacilities(facilitiesFile);
 		
 		// Read area
 		AreaReader areaReader = new AreaReader();
 		areaReader.readShapeFile(areaShapeFile);
 		this.area = areaReader.getAreaPolygons();
 		
-		List<ActivityFacility> zhShopFacilities = this.filterStores(shop_facilities);
+		List<ActivityFacilityImpl> zhShopFacilities = this.filterStores(shop_facilities);
 		this.print(zhShopFacilities);
 	}
 	
-	private void print(List<ActivityFacility> facilities) {
+	private void print(List<ActivityFacilityImpl> facilities) {
 		log.info(facilities.size());
 		FacilitiesWriter writer = new FacilitiesWriter();
 		int [] numberOfFacilities = writer.write(facilities);
@@ -59,11 +59,11 @@ public class SpatialAnalysisFacilities {
 		log.info("Number of shop_other: " + numberOfFacilities[5]);	
 	}
 	
-	private TreeMap<Id,ActivityFacility> readAndFilterFacilities(String facilitiesFile) {
-		ActivityFacilities facilities  = new ActivityFacilities();//(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+	private TreeMap<Id,ActivityFacilityImpl> readAndFilterFacilities(String facilitiesFile) {
+		ActivityFacilitiesImpl facilities  = new ActivityFacilitiesImpl();//(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(facilities).readFile(facilitiesFile);
 		
-		TreeMap<Id,ActivityFacility> shop_facilities = new TreeMap<Id,ActivityFacility>();
+		TreeMap<Id,ActivityFacilityImpl> shop_facilities = new TreeMap<Id,ActivityFacilityImpl>();
 		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_retail_gt2500sqm"));
 		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_retail_get1000sqm"));
 		shop_facilities.putAll(facilities.getFacilitiesForActivityType("shop_retail_get400sqm"));
@@ -74,13 +74,13 @@ public class SpatialAnalysisFacilities {
 		return shop_facilities;
 	}
 	
-	private List<ActivityFacility> filterStores(TreeMap<Id,ActivityFacility> shop_facilities) {
+	private List<ActivityFacilityImpl> filterStores(TreeMap<Id,ActivityFacilityImpl> shop_facilities) {
 		
-		List<ActivityFacility> zhShopFacilities = new Vector<ActivityFacility>();
+		List<ActivityFacilityImpl> zhShopFacilities = new Vector<ActivityFacilityImpl>();
 		
-		Iterator<ActivityFacility> shop_iter = shop_facilities.values().iterator();
+		Iterator<ActivityFacilityImpl> shop_iter = shop_facilities.values().iterator();
 		while (shop_iter.hasNext()) {
-			ActivityFacility facility = shop_iter.next();
+			ActivityFacilityImpl facility = shop_iter.next();
 			
 			if (this.insideArea(facility.getCoord())) {
 				zhShopFacilities.add(facility);

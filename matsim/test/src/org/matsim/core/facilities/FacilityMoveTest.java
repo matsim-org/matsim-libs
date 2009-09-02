@@ -60,8 +60,8 @@ public class FacilityMoveTest extends MatsimTestCase {
 		return world;
 	}
 	
-	private final ActivityFacilities buildFacilities(World world) {
-		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE,null);
+	private final ActivityFacilitiesImpl buildFacilities(World world) {
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE,null);
 		facilities.createFacility(new IdImpl("f11"), new CoordImpl(1, 1));
 		return facilities;
 	}
@@ -81,7 +81,7 @@ public class FacilityMoveTest extends MatsimTestCase {
 	}
 	
 	private final void validate(World world, int i) {
-		ActivityFacility f = (ActivityFacility)world.getLayer(ActivityFacilities.LAYER_TYPE).getLocations().values().iterator().next();
+		ActivityFacilityImpl f = (ActivityFacilityImpl)world.getLayer(ActivityFacilitiesImpl.LAYER_TYPE).getLocations().values().iterator().next();
 		if (world.getLayer(ZONE_ID) != null) {
 			if (f.getUpMapping().isEmpty()) { assertNull(F_UP_ZONEID[i]); }
 			else { assertEquals(F_UP_ZONEID[i],f.getUpMapping().values().iterator().next().getId().toString()); }
@@ -100,10 +100,10 @@ public class FacilityMoveTest extends MatsimTestCase {
 		System.out.println("running testMoveFacility1()...");
 		
 		World world = new World();
-		ActivityFacilities facilities = buildFacilities(world);
+		ActivityFacilitiesImpl facilities = buildFacilities(world);
 		world.complete();
 
-		ActivityFacility f = facilities.getFacilities().values().iterator().next();
+		ActivityFacilityImpl f = facilities.getFacilities().values().iterator().next();
 		for (int i=0; i<COORDS.length; i++) {
 			f.moveTo(COORDS[i]);
 			validate(world,i);
@@ -118,10 +118,10 @@ public class FacilityMoveTest extends MatsimTestCase {
 		System.out.println("running testMoveFacility2()...");
 		
 		World world = buildWorld();
-		ActivityFacilities facilities = buildFacilities(world);
+		ActivityFacilitiesImpl facilities = buildFacilities(world);
 		world.complete();
 		
-		ActivityFacility f = facilities.getFacilities().values().iterator().next();
+		ActivityFacilityImpl f = facilities.getFacilities().values().iterator().next();
 		for (int i=0; i<COORDS.length; i++) {
 			f.moveTo(COORDS[i]);
 			validate(world,i);
@@ -136,11 +136,11 @@ public class FacilityMoveTest extends MatsimTestCase {
 		System.out.println("running testMoveFacility3()...");
 		
 		World world = new World();
-		ActivityFacilities facilities = buildFacilities(world);
+		ActivityFacilitiesImpl facilities = buildFacilities(world);
 		buildNetwork(world);
 		world.complete();
 		
-		ActivityFacility f = facilities.getFacilities().values().iterator().next();
+		ActivityFacilityImpl f = facilities.getFacilities().values().iterator().next();
 		for (int i=0; i<COORDS.length; i++) {
 			f.moveTo(COORDS[i]);
 			validate(world,i);
@@ -155,11 +155,11 @@ public class FacilityMoveTest extends MatsimTestCase {
 		System.out.println("running testMoveFacility4()...");
 		
 		World world = buildWorld();
-		ActivityFacilities facilities = buildFacilities(world);
+		ActivityFacilitiesImpl facilities = buildFacilities(world);
 		buildNetwork(world);
 		world.complete();
 		
-		ActivityFacility f = facilities.getFacilities().values().iterator().next();
+		ActivityFacilityImpl f = facilities.getFacilities().values().iterator().next();
 		for (int i=0; i<COORDS.length; i++) {
 			f.moveTo(COORDS[i]);
 			validate(world,i);
