@@ -21,14 +21,14 @@
 package org.matsim.transitSchedule.api;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.facilities.Facility;
+import org.matsim.core.facilities.FacilityWRefs;
 
 /**
  * A facility (infrastructure) describing a public transport stop.
  *
  * @author mrieser
  */
-public interface TransitStopFacility extends Facility {
+public interface TransitStopFacility extends FacilityWRefs {
 
 	boolean getIsBlockingLane();
 

@@ -9,7 +9,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.Facility;
+import org.matsim.core.facilities.FacilityWRefs;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
