@@ -302,7 +302,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 		return null;
 	}
 
-	private int getActLegIndex(final Object o) {
+	public int getActLegIndex(final Object o) {
 		if ((o instanceof LegImpl) || (o instanceof ActivityImpl)) {
 			for (int i = 0; i < getPlanElements().size(); i++) {
 				if (getPlanElements().get(i).equals(o)) {
