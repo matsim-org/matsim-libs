@@ -11,7 +11,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -367,10 +367,10 @@ public class CreateKnowledgeForDatabase {
 	
 	private void loadFacilities()
 	{
-		facilities = new ActivityFacilitiesImpl();
+		facilities = new ActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(facilitiesFile);
 		
-		Gbl.getWorld().setFacilityLayer((ActivityFacilitiesImpl)facilities);
+		Gbl.getWorld().setFacilityLayer((ActivityFacilities)facilities);
 		
 		log.info("Loading Facilities ... done");
 	}

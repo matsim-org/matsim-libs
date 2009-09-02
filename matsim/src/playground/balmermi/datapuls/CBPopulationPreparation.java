@@ -21,7 +21,7 @@
 package playground.balmermi.datapuls;
 
 import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -60,7 +60,7 @@ public class CBPopulationPreparation {
 		PopulationReader plansReader = new MatsimPopulationReader(population,null);
 		PopulationWriter plansWriter = new PopulationWriter(population,args[1].trim());
 		
-		ActivityFacilities afs = new ActivityFacilitiesImpl();
+		ActivityFacilities afs = new ActivityFacilities();
 
 		System.out.println("adding algorithms...");
 		population.addAlgorithm(new PersonAdaptPlanAndCreateFacilities(afs));

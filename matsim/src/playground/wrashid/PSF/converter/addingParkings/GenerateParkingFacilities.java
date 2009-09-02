@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.Facility;
@@ -38,7 +38,7 @@ public class GenerateParkingFacilities {
 
 		// generate facilities
 
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities = new ActivityFacilities();
 
 		for (Person person : inPop.getPersons().values()) {
 

@@ -30,7 +30,7 @@ import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -70,7 +70,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 
 	@Override
 	public void run(final PersonImpl person) {
-		BasicOpeningTime ot = new OpeningTimeImpl(DayType.wkday,0,24*3600);
+		BasicOpeningTime ot = new OpeningTime(DayType.wkday,0,24*3600);
 		if (person.getPlans().size() != 1) { throw new RuntimeException("Each person must have one plan."); }
 		PlanImpl plan = person.getPlans().get(0);
 		Desires desires = person.createDesires("");

@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicActivityOption;
 import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.knowledges.Knowledge;
@@ -131,7 +131,7 @@ public class KnowledgeTest extends MatsimTestCase {
 		log.info("running testKnowledge()...");
 		
 		log.info("  creating test facilities...");
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities = new ActivityFacilities();
 		ActivityFacility f1 = facilities.createFacility(new IdImpl(1),new CoordImpl(1,1));
 		f1.createActivityOption(H);
 		f1.createActivityOption(W);

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilityI.java
+ * Facility.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,27 +20,71 @@
 
 package org.matsim.core.facilities;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.basic.v01.facilities.BasicActivityFacility;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.world.AbstractLocation;
 import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
+import org.matsim.world.Zone;
 import org.matsim.world.ZoneLayer;
 
-public interface ActivityFacility extends BasicActivityFacility, MappedLocation, Facility {
+public class ActivityFacility extends AbstractLocation {
 
-	public ActivityOption createActivityOption(final String type);
-	// TODO [MR] move to Builder
+	//////////////////////////////////////////////////////////////////////
+	// member variables
+	//////////////////////////////////////////////////////////////////////
 
-	public Map<String, ActivityOption> getActivityOptions();
-
-	public ActivityOption getActivityOption(final String type);
-
+	private final static Logger log = Logger.getLogger(ActivityFacility.class);
 	
+	private final TreeMap<String, ActivityOption> activities = new TreeMap<String, ActivityOption>();
+	private String desc = null;
+	
+	//////////////////////////////////////////////////////////////////////
+	// constructor
+	//////////////////////////////////////////////////////////////////////
+
+	protected ActivityFacility(final ActivityFacilities layer, final Id id, final Coord center) {
+		super(layer,id,center);
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	// calc methods
+	//////////////////////////////////////////////////////////////////////
+
+	@Override
+	public double calcDistance(Coord coord) {
+		return CoordUtils.calcDistance(this.center, coord);
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	// create methods
+	//////////////////////////////////////////////////////////////////////
+
+	public final ActivityOption createActivityOption(final String type) {
+		if (this.activities.containsKey(type)) {
+			Gbl.errorMsg(this + "[type=" + type + " already exists]");
+		}
+		String type2 = type.intern();
+		ActivityOption a = new ActivityOption(type2, this);
+		this.activities.put(type2, a);
+		return a;
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	// move methods
+	//////////////////////////////////////////////////////////////////////
+
 	/**
 	 * Moves a facility to a new {@link Coord coordinate}. It also takes care that
 	 * the up- and down-mapping to the neighbor layers (up-layer: {@link ZoneLayer}
@@ -58,13 +102,84 @@ public interface ActivityFacility extends BasicActivityFacility, MappedLocation,
 	 * 
 	 * @param newCoord the now coordinate of the facility
 	 */
-	@Deprecated
-	public void moveTo(Coord newCoord);
+	public final void moveTo(Coord newCoord) {
+		log.info("moving facility id="+id+" from "+center+" to "+newCoord+"...");
+		center.setXY(newCoord.getX(),newCoord.getY());
+		if (layer.getUpRule() != null) {
+			log.info("  removed "+up_mapping.size()+" up-mappings (zone).");
+			removeAllUpMappings();
+			ZoneLayer zones = (ZoneLayer)layer.getUpRule().getUpLayer();
+			ArrayList<MappedLocation> nearestZones = zones.getNearestLocations(center);
+			if (nearestZones.isEmpty()) { /* facility does not belong to a zone */ }
+			else {
+				// choose the first of the list (The list is generated via a defined order of the zones,
+				// therefore the chosen zone is deterministic). 
+				Zone z = (Zone)nearestZones.get(0);
+				if (!z.contains(center)) { /* f is not located IN any of the nearest zones */ }
+				else {
+					addUpMapping(z);
+					z.addDownMapping(this);
+					log.info("  added "+up_mapping.size()+" new up-mappings (zone):");
+					log.info("  - zone id="+z.getId());
+				}
+			}
+		}
+		if (layer.getDownRule() != null) {
+			log.info("  removed "+down_mapping.size()+" down-mappings (link).");
+			removeAllDownMappings();
+			NetworkLayer network = (NetworkLayer)layer.getDownRule().getDownLayer();
+			LinkImpl l = network.getNearestRightEntryLink(center);
+			addDownMapping(l);
+			l.addUpMapping(this);
+			log.info("  added "+down_mapping.size()+" down-mapping (link):");
+			log.info("  - link id="+l.getId());
+		}
+		log.info("done.");
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+	// set methods
+	//////////////////////////////////////////////////////////////////////
 
-	@Deprecated
-	public void setDesc(String desc);
+	public void setDesc(String desc) {
+		if (desc == null) { this.desc = null; }
+		else { this.desc = desc.intern(); }
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+	// get methods
+	//////////////////////////////////////////////////////////////////////
 
-	@Deprecated
-	public String getDesc();
+	public final String getDesc() {
+		return this.desc;
+	}
+	
+	public final TreeMap<String,ActivityOption> getActivityOptions() {
+		return this.activities;
+	}
+
+	public final ActivityOption getActivityOption(final String type) {
+		return this.activities.get(type);
+	}
+
+	public final LinkImpl getLink() {
+		if (this.down_mapping.isEmpty()) { return null; }
+		if (this.down_mapping.size() > 1) { Gbl.errorMsg("Something is wrong!!! A facility contains at most one Link (as specified for the moment)!"); }
+		return (LinkImpl)this.getDownMapping().get(this.down_mapping.firstKey());
+	}
+	
+	public Id getLinkId() {
+		return getLink().getId();
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	// print methods
+	//////////////////////////////////////////////////////////////////////
+
+	@Override
+	public final String toString() {
+		return super.toString() +
+		       "[nof_activities=" + this.activities.size() + "]";
+	}
 
 }

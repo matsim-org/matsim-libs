@@ -3,7 +3,7 @@ package playground.wrashid.lib;
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
@@ -69,7 +69,7 @@ public class GeneralLib {
 	}
 
 	public static ActivityFacilities readActivityFacilities(String facilitiesFile){		
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities = new ActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(facilitiesFile);
 		return facilities;	
 	}

@@ -30,7 +30,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.knowledges.BasicKnowledge;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 
@@ -258,12 +258,12 @@ public class Knowledge implements BasicKnowledge<ActivityOption> {
 	 * @param isPrimary To define which of the {@link ActivityOption Activities} should be returned
 	 * @return The list of {@link ActivityOption Activities} of the given flag. The list may be empty
 	 */
-	public final ArrayList<ActivityOptionImpl> getActivities(boolean isPrimary) {
-		if (activities == null) { return new ArrayList<ActivityOptionImpl>(0); }
-		ArrayList<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>(INIT_ACTIVITY_CAPACITY);
+	public final ArrayList<ActivityOption> getActivities(boolean isPrimary) {
+		if (activities == null) { return new ArrayList<ActivityOption>(0); }
+		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>(INIT_ACTIVITY_CAPACITY);
 		for (KActivity ka : activities) {
 			if (ka.isPrimary == isPrimary) {
-				acts.add((ActivityOptionImpl) ka.activity);
+				acts.add((ActivityOption) ka.activity);
 			}
 		}
 		return acts;

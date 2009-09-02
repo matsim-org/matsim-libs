@@ -37,7 +37,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -198,7 +198,7 @@ public class MyRuns {
 		
 		// - facilities
 		logger.info("Reading facilities xml file...");
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities = new ActivityFacilities();
 		try {
 			new MatsimFacilitiesReader(facilities).parse(config.facilities().getInputFile());
 		} catch (SAXException e) {

@@ -26,7 +26,7 @@ import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 
@@ -87,27 +87,27 @@ public class FacilitiesDefineCapAndOpentime {
 				ActivityOption a = a_it.next();
 				if (a.getType().equals("home")) {
 					a.setCapacity(this.nof_persons/home_cnt);
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wk, TIME_0000, TIME_2400));
+					a.addOpeningTime(new OpeningTime(DayType.wk, TIME_0000, TIME_2400));
 				}
 				else if (a.getType().equals("work")) {
 					a.setCapacity(this.nof_persons/work_cnt);
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_0800, TIME_1800));
+					a.addOpeningTime(new OpeningTime(DayType.wkday, TIME_0800, TIME_1800));
 				}
 				else if (a.getType().equals("education")) {
 					a.setCapacity(this.nof_persons/educ_cnt);
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_0800, TIME_1200));
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_1300, TIME_1700));
+					a.addOpeningTime(new OpeningTime(DayType.wkday, TIME_0800, TIME_1200));
+					a.addOpeningTime(new OpeningTime(DayType.wkday, TIME_1300, TIME_1700));
 				}
 				else if (a.getType().equals("shop")) {
 					a.setCapacity(this.nof_persons/shop_cnt);
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_0830, TIME_1200));
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_1330, TIME_2000));
-					a.addOpeningTime(new OpeningTimeImpl(DayType.sat, TIME_0900, TIME_1700));
+					a.addOpeningTime(new OpeningTime(DayType.wkday, TIME_0830, TIME_1200));
+					a.addOpeningTime(new OpeningTime(DayType.wkday, TIME_1330, TIME_2000));
+					a.addOpeningTime(new OpeningTime(DayType.sat, TIME_0900, TIME_1700));
 				}
 				else if (a.getType().equals("leisure")) {
 					a.setCapacity(this.nof_persons/leis_cnt);
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_1700, TIME_2400));
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wkend, TIME_2000, TIME_2400));
+					a.addOpeningTime(new OpeningTime(DayType.wkday, TIME_1700, TIME_2400));
+					a.addOpeningTime(new OpeningTime(DayType.wkend, TIME_2000, TIME_2400));
 				}
 				else { Gbl.errorMsg("[something is wrong!]"); }
 			}

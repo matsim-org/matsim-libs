@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -67,7 +67,7 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 		Knowledge k = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId());
 		if (k == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no knowledge defined!"); }
 		if (!k.setPrimaryFlag(true)) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no activities defined!"); }
-		ArrayList<ActivityOptionImpl> prim_acts = k.getActivities(true);
+		ArrayList<ActivityOption> prim_acts = k.getActivities(true);
 		for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			String curr_type = act.getType();

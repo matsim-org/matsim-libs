@@ -25,7 +25,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
@@ -94,8 +94,8 @@ public class ScenarioImpl implements Scenario {
 		this.getWorld().setNetworkLayer((NetworkLayer) this.network);
 		this.getWorld().complete();
 		this.population = new PopulationImpl();
-		this.facilities = new ActivityFacilitiesImpl();
-		this.getWorld().setFacilityLayer((ActivityFacilitiesImpl) this.facilities);
+		this.facilities = new ActivityFacilities();
+		this.getWorld().setFacilityLayer((ActivityFacilities) this.facilities);
 	
 		if (this.config.scenario().isUseHouseholds()){
 			this.createHouseholdsContainer();

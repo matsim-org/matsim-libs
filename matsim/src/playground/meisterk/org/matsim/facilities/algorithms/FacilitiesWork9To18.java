@@ -28,7 +28,7 @@ import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;
@@ -89,7 +89,7 @@ public class FacilitiesWork9To18 {
 				jobsPerFacility = Math.max(B01EQTS2 / B01S2, 1);
 				a.setCapacity(jobsPerFacility);
 
-				a.addOpeningTime(new OpeningTimeImpl(DayType.wk, 9*3600, 18*3600));
+				a.addOpeningTime(new OpeningTime(DayType.wk, 9*3600, 18*3600));
 			}
 
 			for (int i=0; i<B01S3; i++) {
@@ -103,7 +103,7 @@ public class FacilitiesWork9To18 {
 				jobsPerFacility = Math.max(B01EQTS3 / B01S3, 1);
 				a.setCapacity(jobsPerFacility);
 
-				a.addOpeningTime(new OpeningTimeImpl(DayType.wk, 9*3600, 18*3600));
+				a.addOpeningTime(new OpeningTime(DayType.wk, 9*3600, 18*3600));
 			}
 
 			hectareCnt++;

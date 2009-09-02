@@ -35,7 +35,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -74,7 +74,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	private static final DayType DEFAULT_DAY = DayType.wed;
 	private static final SortedSet<BasicOpeningTime> DEFAULT_OPENING_TIME = new TreeSet<BasicOpeningTime>();
 	static {
-		BasicOpeningTime defaultOpeningTime = new OpeningTimeImpl(ActivityScoringFunction.DEFAULT_DAY, Double.MIN_VALUE, Double.MAX_VALUE);
+		BasicOpeningTime defaultOpeningTime = new OpeningTime(ActivityScoringFunction.DEFAULT_DAY, Double.MIN_VALUE, Double.MAX_VALUE);
 		ActivityScoringFunction.DEFAULT_OPENING_TIME.add(defaultOpeningTime);
 	}
 

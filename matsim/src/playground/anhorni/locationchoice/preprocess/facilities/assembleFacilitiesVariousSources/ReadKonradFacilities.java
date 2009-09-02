@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 
@@ -21,7 +21,7 @@ public class ReadKonradFacilities {
 		
 		List<ZHFacilityComposed> zhfacilities = new Vector<ZHFacilityComposed>();
 		
-		ActivityFacilities facilities=new ActivityFacilitiesImpl();//(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		ActivityFacilities facilities=new ActivityFacilities();//(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(facilities).readFile(file);
 		
 		Iterator<? extends ActivityFacility> facilities_it = facilities.getFacilities().values().iterator();

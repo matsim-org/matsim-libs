@@ -32,7 +32,7 @@ import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.utils.misc.Time;
 
 public class FacilitiesOpentimesKTIYear1 {
@@ -68,9 +68,9 @@ public class FacilitiesOpentimesKTIYear1 {
 	}
 
 	private void loadOpeningTimes() {
-		openingTimes.put("work", new OpeningTimeImpl(DayType.wkday, Time.parseTime("7:00"), Time.parseTime("18:00")));
-		openingTimes.put("shop", new OpeningTimeImpl(DayType.wkday, Time.parseTime("8:00"), Time.parseTime("20:00")));
-		openingTimes.put("education", new OpeningTimeImpl(DayType.wkday, Time.parseTime("7:00"), Time.parseTime("18:00")));
-		openingTimes.put("leisure", new OpeningTimeImpl(DayType.wkday, Time.parseTime("6:00"), Time.parseTime("24:00")));
+		openingTimes.put("work", new OpeningTime(DayType.wkday, Time.parseTime("7:00"), Time.parseTime("18:00")));
+		openingTimes.put("shop", new OpeningTime(DayType.wkday, Time.parseTime("8:00"), Time.parseTime("20:00")));
+		openingTimes.put("education", new OpeningTime(DayType.wkday, Time.parseTime("7:00"), Time.parseTime("18:00")));
+		openingTimes.put("leisure", new OpeningTime(DayType.wkday, Time.parseTime("6:00"), Time.parseTime("24:00")));
 	}
 }

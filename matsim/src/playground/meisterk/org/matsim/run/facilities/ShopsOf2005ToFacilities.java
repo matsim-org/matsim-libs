@@ -61,13 +61,13 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimResource;
@@ -228,7 +228,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void transformGeocodedKMLToFacilities() {
 
-		ActivityFacilities shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
+		ActivityFacilities shopsOf2005 = new ActivityFacilities("shopsOf2005", ActivityFacilities.FACILITIES_NO_STREAMING);
 
 		JAXBElement<KmlType> kmlElement = null;
 
@@ -823,7 +823,7 @@ public class ShopsOf2005ToFacilities {
 
 						previousOpenSeconds = openSeconds;
 
-						opentime = new OpeningTimeImpl(days[dayPointer].getAbbrevEnglish(), openSeconds, closeSeconds);
+						opentime = new OpeningTime(days[dayPointer].getAbbrevEnglish(), openSeconds, closeSeconds);
 
 						shopping.addOpeningTime(opentime);
 
@@ -949,14 +949,14 @@ public class ShopsOf2005ToFacilities {
 								case FRIDAY:
 									System.out.println("Adding times to weekdays...");
 									for (int weekday = 0; weekday <= 4; weekday++) {
-										opentime = new OpeningTimeImpl(days[weekday].getAbbrevEnglish(), oldTime, time);
+										opentime = new OpeningTime(days[weekday].getAbbrevEnglish(), oldTime, time);
 										shopping.addOpeningTime(opentime);
 									}
 									break;
 								default:
 									DayType englishDayString = day.getAbbrevEnglish();
 								System.out.println("Adding times to " + englishDayString + "...");
-								opentime = new OpeningTimeImpl(
+								opentime = new OpeningTime(
 										englishDayString,
 										oldTime,
 										time);
@@ -1076,7 +1076,7 @@ public class ShopsOf2005ToFacilities {
 
 									DayType englishDayString = days[dayPointer].getAbbrevEnglish();
 									System.out.println("Adding times to " + englishDayString + "...");
-									opentime = new OpeningTimeImpl(
+									opentime = new OpeningTime(
 											englishDayString,
 											openingHour,
 											time);
@@ -1164,7 +1164,7 @@ public class ShopsOf2005ToFacilities {
 							System.out.println("Open: " + openingHour);
 							System.out.println("Close: " + time);
 							System.out.println("Adding times to " + englishDayString + "...");
-							opentime = new OpeningTimeImpl(
+							opentime = new OpeningTime(
 									englishDayString,
 									Time.parseTime(openingHour),
 									Time.parseTime(time));
@@ -1258,7 +1258,7 @@ public class ShopsOf2005ToFacilities {
 										case START_OPEN_TOKEN_INDEX + 1:
 											System.out.println("Adding times to weekdays...");
 											for (int weekday = 0; weekday <= 4; weekday++) {
-												opentime = new OpeningTimeImpl(
+												opentime = new OpeningTime(
 														days[weekday].getAbbrevEnglish(),
 														openingHour,
 														time);
@@ -1268,7 +1268,7 @@ public class ShopsOf2005ToFacilities {
 										case START_OPEN_TOKEN_INDEX + 2:
 										case START_OPEN_TOKEN_INDEX + 3:
 											System.out.println("Adding times to saturday...");
-											opentime = new OpeningTimeImpl(
+											opentime = new OpeningTime(
 													Day.getDayByGermanAbbrev("Sa").getAbbrevEnglish(),
 													openingHour,
 													time);
@@ -1410,7 +1410,7 @@ public class ShopsOf2005ToFacilities {
 										if (openTimeString.equals(weekDayToken)) {
 											System.out.println("Adding times to weekdays...");
 											for (int weekday = 0; weekday <= 4; weekday++) {
-												opentime = new OpeningTimeImpl(
+												opentime = new OpeningTime(
 														days[weekday].getAbbrevEnglish(),
 														openingHour,
 														time);
@@ -1418,7 +1418,7 @@ public class ShopsOf2005ToFacilities {
 											}
 										} else if (openTimeString.equals(saturdayToken)) {
 											System.out.println("Adding times to saturday...");
-											opentime = new OpeningTimeImpl(
+											opentime = new OpeningTime(
 													Day.getDayByGermanAbbrev("Sa").getAbbrevEnglish(),
 													openingHour,
 													time);
@@ -1448,7 +1448,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void shopsToTXT() {
 
-		ActivityFacilities shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
+		ActivityFacilities shopsOf2005 = new ActivityFacilities("shopsOf2005", ActivityFacilities.FACILITIES_NO_STREAMING);
 		ArrayList<String> txtLines = new ArrayList<String>();
 		ShopId shopId = null;
 		String aShopLine = null;
@@ -1606,7 +1606,7 @@ public class ShopsOf2005ToFacilities {
 
 		ActivityFacilities facilities = null;
 		for (int dataSetIndex : new int[]{SHOPS_OF_2005/*, SHOPS_FROM_ENTERPRISE_CENSUS*/}) {
-			facilities = new ActivityFacilitiesImpl(shopsNames.get(new Integer(dataSetIndex)), ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
+			facilities = new ActivityFacilities(shopsNames.get(new Integer(dataSetIndex)), ActivityFacilities.FACILITIES_NO_STREAMING);
 
 			System.out.println("Reading facilities xml file... ");
 			FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilities);
@@ -1710,9 +1710,9 @@ public class ShopsOf2005ToFacilities {
 
 	private static void applyOpentimesToEnterpriseCensus() {
 
-		ActivityFacilitiesImpl facilities_input = new ActivityFacilitiesImpl("Switzerland based on Enterprise census 2000.", ActivityFacilitiesImpl.FACILITIES_USE_STREAMING);
+		ActivityFacilities facilities_input = new ActivityFacilities("Switzerland based on Enterprise census 2000.", ActivityFacilities.FACILITIES_USE_STREAMING);
 
-		ActivityFacilitiesImpl facilities_output = new ActivityFacilitiesImpl("Facilities KTI Year 2", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
+		ActivityFacilities facilities_output = new ActivityFacilities("Facilities KTI Year 2", ActivityFacilities.FACILITIES_NO_STREAMING);
 
 		// init algorithms
 		FacilitiesOpentimesKTIYear2 facilitiesOpentimesKTIYear2 = new FacilitiesOpentimesKTIYear2();

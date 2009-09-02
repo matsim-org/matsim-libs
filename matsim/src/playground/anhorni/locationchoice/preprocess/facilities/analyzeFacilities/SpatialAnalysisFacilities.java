@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 
@@ -60,7 +60,7 @@ public class SpatialAnalysisFacilities {
 	}
 	
 	private TreeMap<Id,ActivityFacility> readAndFilterFacilities(String facilitiesFile) {
-		ActivityFacilities facilities  = new ActivityFacilitiesImpl();//(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
+		ActivityFacilities facilities  = new ActivityFacilities();//(Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(facilities).readFile(facilitiesFile);
 		
 		TreeMap<Id,ActivityFacility> shop_facilities = new TreeMap<Id,ActivityFacility>();

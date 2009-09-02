@@ -37,7 +37,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -280,7 +280,7 @@ public class PlansCreateFromDataPuls {
 				if (distance > 500.0) {
 					log.warn("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+", dfid="+dFacility.getId()+", acttype="+cActivityOption.getType()+": distance="+distance+" > 500 meters.");
 				}
-				ActivityOption dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),dFacility);
+				ActivityOption dActivityOption = new ActivityOption(cActivityOption.getType(),dFacility);
 				dKnowledge.addActivity(dActivityOption,true);
 			}
 		}
@@ -293,7 +293,7 @@ public class PlansCreateFromDataPuls {
 				if (distance > 500.0) {
 					log.warn("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+", dfid="+dFacility.getId()+", acttype="+cActivityOption.getType()+": distance="+distance+" > 500 meters.");
 				}
-				ActivityOption dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),dFacility);
+				ActivityOption dActivityOption = new ActivityOption(cActivityOption.getType(),dFacility);
 				dKnowledge.addActivity(dActivityOption,false);
 			}
 		}

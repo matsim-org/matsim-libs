@@ -65,7 +65,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -172,7 +172,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			// Change the knowledge of the person
 			if( overwriteKnowledge )
 				knowledge.removeActivities( primaryActivityName );
-			knowledge.addActivity(new ActivityOptionImpl(primaryActivityName, workplace), true);
+			knowledge.addActivity(new ActivityOption(primaryActivityName, workplace), true);
 		}
 	}
 

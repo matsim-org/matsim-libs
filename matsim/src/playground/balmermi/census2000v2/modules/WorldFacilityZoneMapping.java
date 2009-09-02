@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -72,7 +72,7 @@ public class WorldFacilityZoneMapping {
 		world.complete();
 		
 		if (world.getLayers().size() != 2) { Gbl.errorMsg("World must contian 2 layers!"); }
-		ActivityFacilitiesImpl fs = (ActivityFacilitiesImpl)world.getBottomLayer();
+		ActivityFacilities fs = (ActivityFacilities)world.getBottomLayer();
 		ZoneLayer ms = (ZoneLayer)world.getTopLayer();
 		if (!fs.getUpRule().getUpLayer().equals(ms)) { Gbl.errorMsg("Incorrect mapping!"); }
 

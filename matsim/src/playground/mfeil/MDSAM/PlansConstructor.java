@@ -56,7 +56,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacility;
 
 
@@ -318,7 +318,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	
 	protected void modifyLocation (ActivityImpl act){
 		log.info("Start modify.");
-		ActivityFacilitiesImpl afImpl = (ActivityFacilitiesImpl) this.controler.getFacilities();
+		ActivityFacilities afImpl = (ActivityFacilities) this.controler.getFacilities();
 		
 		String actType = null;
 		if (act.getType().equalsIgnoreCase("w")) actType = "work_sector2";

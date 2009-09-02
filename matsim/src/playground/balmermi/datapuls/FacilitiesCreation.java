@@ -22,7 +22,7 @@ package playground.balmermi.datapuls;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 
@@ -55,14 +55,14 @@ public class FacilitiesCreation {
 	public static void main(String[] args) {
 		if (args.length != 4) { printUsage(); return; }
 		
-		ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities = new ActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(args[0].trim());
 		log.info("number of facilities ec2000: "+facilities.getFacilities().size());
 
 		new FacilitiesPrepareEC2000().run(facilities);
 		log.info("number of facilities ec2000: "+facilities.getFacilities().size());
 
-		ActivityFacilities facilities_tta = new ActivityFacilitiesImpl();
+		ActivityFacilities facilities_tta = new ActivityFacilities();
 		new MatsimFacilitiesReader(facilities_tta).readFile(args[1].trim());
 		log.info("number of facilities tta: "+facilities_tta.getFacilities().size());
 		

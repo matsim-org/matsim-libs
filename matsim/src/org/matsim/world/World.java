@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilities;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
@@ -209,7 +209,7 @@ public class World {
 		if (this.layers.containsKey(type)) {
 			throw new IllegalArgumentException("Layer type=" + type + " already exixts.");
 		}
-		if (type.equals(ActivityFacilities.LAYER_TYPE)) { return (ActivityFacilitiesImpl) this.createFacilityLayer(); }
+		if (type.equals(ActivityFacilities.LAYER_TYPE)) { return (ActivityFacilities) this.createFacilityLayer(); }
 		if (type.equals(NetworkLayer.LAYER_TYPE)) { return this.createNetworkLayer(); }
 		return this.createZoneLayer(type,name);
 	}
@@ -230,7 +230,7 @@ public class World {
 
 	@Deprecated
 	private final ActivityFacilities createFacilityLayer() {
-		ActivityFacilitiesImpl f = new ActivityFacilitiesImpl();
+		ActivityFacilities f = new ActivityFacilities();
 		this.setFacilityLayer(f);
 		return f;
 	}
@@ -247,7 +247,7 @@ public class World {
 	//////////////////////////////////////////////////////////////////////
 
 	@Deprecated
-	public void setFacilityLayer(final ActivityFacilitiesImpl facilityLayer) {
+	public void setFacilityLayer(final ActivityFacilities facilityLayer) {
 		if (facilityLayer == null) { 
 			throw new IllegalArgumentException("facilityLayer=null not allowed!");
 		}
