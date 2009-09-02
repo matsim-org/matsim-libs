@@ -11,17 +11,25 @@ import org.matsim.core.basic.v01.IdImpl;
 public class Mobsim {
 	private static final Logger log = Logger.getLogger(Mobsim.class);
 	
+	private Scenario sc ;
+	private Events ev ;
+	
 	public Mobsim( Scenario sc, Events ev ) {
-		EventsBuilder eb = ev.getBuilder();
+		this.sc = sc ;
+		this.ev = ev ;
+	}
+	
+	public void run() {
+		EventsBuilder eb = this.ev.getBuilder();
 		
 		// finally, we need to be able to generate events:
 		Id agentId = new IdImpl("agentId");
 		Id linkId = new IdImpl("linkId");
 		double time = 1. ;
 		
-//		ActivityEndEvent aee = eb.createActivityEndEvent( time, agentId, linkId, "actType" ) ); 
+//		ActivityEndEvent aee = eb.createActivityEndEvent( time, agentId, linkId, "actType" ) ; 
 //		ev.processEvent( aee ) ;
-//
+
 //		AgentDepartureEvent ade = eb.createAgentDepartureEvent( time, agentId, linkId ) ;
 //
 //		AgentWait2LinkEvent aw2le = eb.createAgentWait2LinkEvent(time,agentId,linkId) ;
