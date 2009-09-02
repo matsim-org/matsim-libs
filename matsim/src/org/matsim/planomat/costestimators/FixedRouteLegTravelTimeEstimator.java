@@ -53,7 +53,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	private final PlansCalcRoute plansCalcRoute;
 	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 
-	private HashMap<LegImpl, HashMap<TransportMode, Double>> travelTimeCache = new HashMap<LegImpl, HashMap<TransportMode, Double>>();
+	private HashMap<Integer, HashMap<TransportMode, Double>> travelTimeCache = new HashMap<Integer, HashMap<TransportMode, Double>>();
 
 	protected FixedRouteLegTravelTimeEstimator(
 			TravelTime linkTravelTimeEstimator,
@@ -74,17 +74,19 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 
 		double legTravelTimeEstimation = 0.0;
 
-		if (legIntermediate.getMode().equals(TransportMode.car)) {
+		int legIndex = this.currentPlan.getActLegIndex(legIntermediate);
 
+		if (legIntermediate.getMode().equals(TransportMode.car)) {
+			
 			// if no fixed route is given, generate free speed route for that leg in a lazy manner
-			if (!this.fixedRoutes.containsKey(legIntermediate)) {
+			if (!this.fixedRoutes.containsKey(legIndex)) {
 				
 				// calculate free speed route and cache it
 				Path path = this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
 						actOrigin.getLink().getToNode(), 
 						actDestination.getLink().getFromNode(), 
 						0.0);
-				this.fixedRoutes.put(legIntermediate, path.links);
+				this.fixedRoutes.put(legIndex, path.links);
 				
 			}
 			
@@ -92,17 +94,17 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 			now = this.processDeparture(actOrigin.getLink(), now);
 
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-				now = this.processRouteTravelTime(this.fixedRoutes.get(legIntermediate), now);
+				now = this.processRouteTravelTime(this.fixedRoutes.get(legIndex), now);
 				now = this.processLink(actDestination.getLink(), now);
 			} else if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
 				now = this.processLink(actOrigin.getLink(), now);
-				now = this.processRouteTravelTime(this.fixedRoutes.get(legIntermediate), now);
+				now = this.processRouteTravelTime(this.fixedRoutes.get(legIndex), now);
 			}
 
 			if (doModifyLeg) {
 				// TODO where do I know from the type of the NetworkRoute to be constructed? (node or link)
 				NodeNetworkRouteImpl nodeNetworkRoute = new NodeNetworkRouteImpl(actOrigin.getLink(), actDestination.getLink());
-				nodeNetworkRoute.setLinks(actOrigin.getLink(), this.fixedRoutes.get(legIntermediate), actDestination.getLink());
+				nodeNetworkRoute.setLinks(actOrigin.getLink(), this.fixedRoutes.get(legIndex), actDestination.getLink());
 				legIntermediate.setRoute(nodeNetworkRoute);
 			}
 			
@@ -111,11 +113,11 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 		} else {
 
 			HashMap<TransportMode, Double> legInformation = null; 
-			if (this.travelTimeCache.containsKey(legIntermediate)) {
-				legInformation = this.travelTimeCache.get(legIntermediate);
+			if (this.travelTimeCache.containsKey(legIndex)) {
+				legInformation = this.travelTimeCache.get(legIndex);
 			} else {
 				legInformation = new HashMap<TransportMode, Double>();
-				this.travelTimeCache.put(legIntermediate, legInformation);
+				this.travelTimeCache.put(legIndex, legInformation);
 			}
 			if (legInformation.containsKey(legIntermediate.getMode())) {
 				legTravelTimeEstimation = legInformation.get(legIntermediate.getMode()).doubleValue();
@@ -163,19 +165,25 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	public void resetPlanSpecificInformation() {
 		this.travelTimeCache.clear();
 		this.fixedRoutes.clear();
+		this.currentPlan = null;
 	}
 
-	private HashMap<LegImpl, List<Link>> fixedRoutes = new HashMap<LegImpl, List<Link>>();
+	private HashMap<Integer, List<Link>> fixedRoutes = new HashMap<Integer, List<Link>>();
+	private PlanImpl currentPlan;
 	
 	public void initPlanSpecificInformation(PlanImpl plan) {
 
+		this.currentPlan = plan;
+		
 		for (PlanElement planElement : plan.getPlanElements()) {
 			
 			if (planElement instanceof BasicLeg) {
 				
 				LegImpl leg = (LegImpl) planElement;
 				if (leg.getRoute() instanceof NetworkRouteWRefs) {
-					this.fixedRoutes.put(leg, ((NetworkRouteWRefs) leg.getRoute()).getLinks());
+					this.fixedRoutes.put(
+							this.currentPlan.getActLegIndex(leg), 
+							((NetworkRouteWRefs) leg.getRoute()).getLinks());
 				}
 				
 			}
