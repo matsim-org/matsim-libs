@@ -1,27 +1,24 @@
 package playground.wrashid.lib;
 
-import org.matsim.api.basic.v01.BasicScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationReaderMatsimV4;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.world.World;
+import org.matsim.core.scenario.ScenarioLoader;
 
 public class GeneralLib {
 
 	/*
-	 * Reads the population from the plans file. TODO: is it possible to remove
-	 * the networkFile parameter (it was added, because else some error is
-	 * caused).
+	 * Reads the population from the plans file. 
 	 * 
 	 * Note: use the other method with the same name, if this poses problems.
 	 */
@@ -38,34 +35,29 @@ public class GeneralLib {
 	}
 	
 	/*
-	 * Reads the population from the plans file. TODO: is it possible to remove
-	 * the networkFile parameter (it was added, because else some error is
-	 * caused).
+	 * Reads the population from the plans file.
 	 */
 	public static Population readPopulation(String plansFile, String networkFile, String facilititiesPath) {
-
-		Population population = new PopulationImpl();
-
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkFile);
-
-		PopulationReader popReader = new PopulationReaderMatsimV4(population,	network, readActivityFacilities(facilititiesPath) ,null);
-		popReader.readFile(plansFile);
-
-		return population;
+		Scenario sc=new ScenarioImpl(); 
+		
+		sc.getConfig().setParam("plans", "inputPlansFile", plansFile);
+		sc.getConfig().setParam("network", "inputNetworkFile", networkFile);
+		sc.getConfig().setParam("facilities", "inputFacilitiesFile", facilititiesPath);
+		
+		ScenarioLoader sl=new ScenarioLoader((ScenarioImpl) sc);
+		
+		sl.loadScenario();
+		
+		return sc.getPopulation();
 	}
 
 	/*
 	 * Write the population to the specified file.
 	 */
 	public static void writePopulation(Population population, String plansFile) {
-		// these two lines are needed, because else there would be an error...
-		BasicScenarioImpl sc = new BasicScenarioImpl();
-		Gbl.setConfig(sc.getConfig());
+		MatsimWriter populationWriter = new PopulationWriter(population);
 		
-		PopulationWriter populationWriter = new PopulationWriter(population, plansFile, "v4");
-		
-		populationWriter.write();
+		populationWriter.write(plansFile);
 	}
 
 	public static ActivityFacilitiesImpl readActivityFacilities(String facilitiesFile){		
@@ -82,4 +74,5 @@ public class GeneralLib {
 		facilitiesWriter.write();
 	}
 	 
-} 
+}   
+ 
