@@ -9,8 +9,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
@@ -25,14 +25,14 @@ import org.matsim.core.utils.misc.Counter;
 
 public class LocationModifier extends Modifier {
 
-	private TreeMap<Id,ActivityFacility> shop_facilities=new TreeMap<Id,ActivityFacility>();
-	private TreeMap<Id,ActivityFacility> leisure_facilities=new TreeMap<Id,ActivityFacility>();
-	private QuadTree<ActivityFacility> shopFacQuadTree = null;
-	private QuadTree<ActivityFacility> leisFacQuadTree = null;
+	private TreeMap<Id,ActivityFacilityImpl> shop_facilities=new TreeMap<Id,ActivityFacilityImpl>();
+	private TreeMap<Id,ActivityFacilityImpl> leisure_facilities=new TreeMap<Id,ActivityFacilityImpl>();
+	private QuadTree<ActivityFacilityImpl> shopFacQuadTree = null;
+	private QuadTree<ActivityFacilityImpl> leisFacQuadTree = null;
 
 	private final static Logger log = Logger.getLogger(LocationModifier.class);
 
-	public LocationModifier(PopulationImpl plans, NetworkLayer network, ActivityFacilities  facilities) {
+	public LocationModifier(PopulationImpl plans, NetworkLayer network, ActivityFacilitiesImpl  facilities) {
 		super(plans, network, facilities);
 		this.initShopLeisure();
 	}
@@ -72,8 +72,8 @@ public class LocationModifier extends Modifier {
 		Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
 
-		ArrayList<ActivityFacility> zhShopFacilities = (ArrayList<ActivityFacility>)this.shopFacQuadTree.get(coords.getX(), coords.getY(), radius);
-		ArrayList<ActivityFacility> zhLeisureFacilities = (ArrayList<ActivityFacility>)this.leisFacQuadTree.get(coords.getX(), coords.getY(), radius);
+		ArrayList<ActivityFacilityImpl> zhShopFacilities = (ArrayList<ActivityFacilityImpl>)this.shopFacQuadTree.get(coords.getX(), coords.getY(), radius);
+		ArrayList<ActivityFacilityImpl> zhLeisureFacilities = (ArrayList<ActivityFacilityImpl>)this.leisFacQuadTree.get(coords.getX(), coords.getY(), radius);
 		log.info("Total number of zh shop facilities:" + zhShopFacilities.size());
 		log.info("Total number of zh leisure facilities:" + zhLeisureFacilities.size());
 		
@@ -99,7 +99,7 @@ public class LocationModifier extends Modifier {
 		log.info("assignRandomLocation done.");
 	}
 
-	private void exchangeFacilities(final String type, ArrayList<ActivityFacility>  exchange_facilities,
+	private void exchangeFacilities(final String type, ArrayList<ActivityFacilityImpl>  exchange_facilities,
 			final PlanImpl plan) {
 
 			final List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
@@ -107,7 +107,7 @@ public class LocationModifier extends Modifier {
 				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 				if (act.getType().startsWith(type)) {
 
-					ActivityFacility facility=exchange_facilities.get(
+					ActivityFacilityImpl facility=exchange_facilities.get(
 							MatsimRandom.getRandom().nextInt(exchange_facilities.size()));
 
 					act.setFacility(facility);
@@ -123,14 +123,14 @@ public class LocationModifier extends Modifier {
 			}
 		}
 
-	private QuadTree<ActivityFacility> builFacQuadTree(TreeMap<Id,ActivityFacility> facilities_of_type) {
+	private QuadTree<ActivityFacilityImpl> builFacQuadTree(TreeMap<Id,ActivityFacilityImpl> facilities_of_type) {
 		Gbl.startMeasurement();
 		System.out.println("      building facility quad tree...");
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (final ActivityFacility f : facilities_of_type.values()) {
+		for (final ActivityFacilityImpl f : facilities_of_type.values()) {
 			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -141,8 +141,8 @@ public class LocationModifier extends Modifier {
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-		for (final ActivityFacility f : facilities_of_type.values()) {
+		QuadTree<ActivityFacilityImpl> quadtree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
+		for (final ActivityFacilityImpl f : facilities_of_type.values()) {
 			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 		}
 		System.out.println("      done.");

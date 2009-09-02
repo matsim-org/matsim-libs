@@ -6,8 +6,8 @@ import java.util.Iterator;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
@@ -41,7 +41,7 @@ public class CreatePlans1 {
 		final World world = Gbl.createWorld();
 
 		// read facilities
-		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE,null);
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile("C:/data/SandboxCVS/ivt/studies/triangle/facilities/facilities.xml");
 
 
@@ -49,7 +49,7 @@ public class CreatePlans1 {
 		ActivityOption home=null;
 		ActivityOption work=null;
 		ActivityOption shop=null;
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
 				ActivityOption a = a_it.next();
@@ -81,9 +81,9 @@ public class CreatePlans1 {
 			k.addActivity(shop,false);
 
 			PlanImpl plan = person.createPlan(true);
-			ActivityFacility home_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("home").get(0).getFacility();
-			ActivityFacility work_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("work").get(0).getFacility();
-			ActivityFacility shop_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("shop").get(0).getFacility();
+			ActivityFacilityImpl home_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("home").get(0).getFacility();
+			ActivityFacilityImpl work_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("work").get(0).getFacility();
+			ActivityFacilityImpl shop_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("shop").get(0).getFacility();
 			ArrayList<ActivityOption> acts = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities();
 
 			double depTimeHome=3600*8;

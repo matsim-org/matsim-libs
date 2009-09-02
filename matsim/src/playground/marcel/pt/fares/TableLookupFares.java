@@ -22,24 +22,24 @@ package playground.marcel.pt.fares;
 
 import java.util.Map;
 
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.marcel.pt.fares.api.TransitFares;
 
 public class TableLookupFares implements TransitFares {
 
-	private final Map<Tuple<ActivityFacility, ActivityFacility>, Double> costs;
+	private final Map<Tuple<ActivityFacilityImpl, ActivityFacilityImpl>, Double> costs;
 
-	public TableLookupFares(final Map<Tuple<ActivityFacility, ActivityFacility>, Double> costs) {
+	public TableLookupFares(final Map<Tuple<ActivityFacilityImpl, ActivityFacilityImpl>, Double> costs) {
 		this.costs = costs;
 	}
 
-	public double getSingleTripCost(final ActivityFacility fromStop, final ActivityFacility toStop) {
-		Double cost = this.costs.get(new Tuple<ActivityFacility, ActivityFacility>(fromStop, toStop));
+	public double getSingleTripCost(final ActivityFacilityImpl fromStop, final ActivityFacilityImpl toStop) {
+		Double cost = this.costs.get(new Tuple<ActivityFacilityImpl, ActivityFacilityImpl>(fromStop, toStop));
 		if (cost == null) {
 			// not clear if this is a feature or a bug...
-			cost = this.costs.get(new Tuple<ActivityFacility, ActivityFacility>(toStop, fromStop));
+			cost = this.costs.get(new Tuple<ActivityFacilityImpl, ActivityFacilityImpl>(toStop, fromStop));
 		}
 		if (cost == null) {
 			if (fromStop == toStop) {

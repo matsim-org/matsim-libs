@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
@@ -29,7 +29,7 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 	public final static String CONFIG_RAD_CATCHMENT = "radius_catchment";
 	private Controler controler;
 	private int alternatives;
-	private Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
+	private Map<Id,ActivityFacilityImpl> movedFacilities = new TreeMap<Id,ActivityFacilityImpl>();
 		
 	public CatchmentAreaRetailerStrategy (Controler controler) {
 		this.controler = controler;
@@ -38,9 +38,9 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 		this.alternatives = alternatives;
 	}
 
-		public Map<Id, ActivityFacility> moveFacilities(Map<Id, ActivityFacility> facilities, ArrayList<LinkRetailersImpl> allowedLinks) {
+		public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> facilities, ArrayList<LinkRetailersImpl> allowedLinks) {
 
-			for (ActivityFacility f : facilities.values()) {
+			for (ActivityFacilityImpl f : facilities.values()) {
 				
 				log.info("allowed links are = " + allowedLinks );
 				// example of the use of a bad code style, but works anyway....

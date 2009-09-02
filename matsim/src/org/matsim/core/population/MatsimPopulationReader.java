@@ -31,7 +31,7 @@ import org.xml.sax.SAXException;
 
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -53,7 +53,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	
 	private final BasicPopulation plans;
 	private final NetworkLayer network;
-	private final ActivityFacilities facilities;
+	private final ActivityFacilitiesImpl facilities;
 	private MatsimXmlParser delegate = null;
 	private Knowledges knowledges;
 
@@ -68,7 +68,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	public MatsimPopulationReader(final BasicPopulation plans, final NetworkLayer network) {
 		this.plans = plans;
 		this.network = network;
-		this.facilities = (ActivityFacilities) Gbl.getWorld().getLayer(ActivityFacilities.LAYER_TYPE);
+		this.facilities = (ActivityFacilitiesImpl) Gbl.getWorld().getLayer(ActivityFacilitiesImpl.LAYER_TYPE);
 		this.knowledges = new KnowledgesImpl();
 	}
 	

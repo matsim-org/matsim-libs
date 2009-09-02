@@ -27,8 +27,8 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -48,9 +48,9 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	private boolean constrained = false;
 	
-	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
+	protected TreeMap<String, QuadTreeRing<ActivityFacilityImpl>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacilityImpl>>();
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
-	protected TreeMap<String, ActivityFacility []> facilitiesOfType = new TreeMap<String, ActivityFacility []>();
+	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	private Knowledges knowledges;
 	
 	
@@ -104,7 +104,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	/*
 	 * Initialize the quadtrees of all available activity types
 	 */
-	private void initTrees(ActivityFacilities facilities) {
+	private void initTrees(ActivityFacilitiesImpl facilities) {
 		DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges);
 		log.info("Doing location choice for activities: " + defineFlexibleActivities.getFlexibleTypes().toString());
 		TreesBuilder treesBuilder = new TreesBuilder(defineFlexibleActivities.getFlexibleTypes(), this.network);

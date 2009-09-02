@@ -24,7 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
@@ -164,9 +164,9 @@ public abstract class Scenario {
 		return world;
 	}
 
-	public static final ActivityFacilities readFacilities() {
+	public static final ActivityFacilitiesImpl readFacilities() {
 		System.out.println("  reading facilities xml file... ");
-		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 		return facilities;
@@ -283,7 +283,7 @@ public abstract class Scenario {
 		System.out.println("  done.");
 	}
 
-	public static final void writeFacilities(final ActivityFacilities facilities) {
+	public static final void writeFacilities(final ActivityFacilitiesImpl facilities) {
 		System.out.println("  writing facilities xml file... ");
 		new FacilitiesWriter(facilities).write();
 		System.out.println("  done.");

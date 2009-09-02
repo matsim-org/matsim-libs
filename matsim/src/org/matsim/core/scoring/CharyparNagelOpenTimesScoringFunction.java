@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -55,7 +55,7 @@ public class CharyparNagelOpenTimesScoringFunction extends ActivityScoringFuncti
 
 		boolean foundAct = false;
 
-		ActivityFacility facility = act.getFacility();
+		ActivityFacilityImpl facility = act.getFacility();
 		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
 		String facilityActType = null;
 		Set<BasicOpeningTime> opentimes = null;

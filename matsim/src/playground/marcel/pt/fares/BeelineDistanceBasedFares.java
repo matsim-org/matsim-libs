@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.fares;
 
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 
 import playground.marcel.pt.fares.api.TransitFares;
 
@@ -32,7 +32,7 @@ public class BeelineDistanceBasedFares implements TransitFares {
 		this.costPerKilometer = costPerKilometer;
 	}
 
-	public double getSingleTripCost(final ActivityFacility fromStop, final ActivityFacility toStop) {
+	public double getSingleTripCost(final ActivityFacilityImpl fromStop, final ActivityFacilityImpl toStop) {
 		return this.costPerKilometer * (fromStop.calcDistance(toStop.getCoord()) / 1000.0);
 	}
 

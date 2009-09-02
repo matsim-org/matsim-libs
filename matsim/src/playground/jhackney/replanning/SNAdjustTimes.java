@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -57,7 +57,7 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		person.setSelectedPlan(newPlan);
 	}
 	private double getAvgFriendArrTime(ActivityImpl act) {
-		LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm = controler.getTwm();
+		LinkedHashMap<ActivityFacilityImpl,ArrayList<TimeWindow>> twm = controler.getTwm();
 		int count=0;
 		double avgStartTime=0;
 		TimeWindow tw1 = null;
@@ -65,7 +65,7 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		PersonImpl p1 = null;
 		PersonImpl p2 = null;
 
-		ActivityFacility actFacility=act.getFacility();
+		ActivityFacilityImpl actFacility=act.getFacility();
 
 		if(!twm.keySet().contains(actFacility)){
 			log.error(" activityMap does not contain myActivity");

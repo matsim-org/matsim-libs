@@ -3,7 +3,7 @@ package playground.ciarif.retailers.utils;
 
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -11,9 +11,9 @@ import org.matsim.core.population.PlanImpl;
 public class CountFacilityCustomers {
 	
 	private Controler controler;
-	private ActivityFacility facility;
+	private ActivityFacilityImpl facility;
 
-	public CountFacilityCustomers(ActivityFacility facility,Controler controler) {
+	public CountFacilityCustomers(ActivityFacilityImpl facility,Controler controler) {
 		this.controler=controler;
 		this.facility=facility;
 	}

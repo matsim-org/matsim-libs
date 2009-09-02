@@ -32,8 +32,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -80,7 +80,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 
 	private final BasicPopulation plans;
 	private final NetworkLayer network;
-	private final ActivityFacilities facilities;
+	private final ActivityFacilitiesImpl facilities;
 	private Knowledges knowledges;
 
 	private PersonImpl currperson = null;
@@ -88,7 +88,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private Knowledge currknowledge = null;
 	private ActivitySpace curractspace = null;
 	private String curracttype = null;
-	private ActivityFacility currfacility = null;
+	private ActivityFacilityImpl currfacility = null;
 	private ActivityOption curractivity = null;
 	private PlanImpl currplan = null;
 	private ActivityImpl curract = null;
@@ -109,7 +109,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	 * @deprecated use PoopulationReaderMatsimV4(Scenario)
 	 */
 	@Deprecated
-	public PopulationReaderMatsimV4(final BasicPopulation pop, final NetworkLayer network, final ActivityFacilities facilities, final Knowledges knowledges) {
+	public PopulationReaderMatsimV4(final BasicPopulation pop, final NetworkLayer network, final ActivityFacilitiesImpl facilities, final Knowledges knowledges) {
 		this.plans = pop;
 		this.network = network;
 		this.facilities = facilities;
@@ -376,7 +376,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		this.curract.setEndTime(Time.parseTime(atts.getValue("end_time")));
 		String fId = atts.getValue("facility");
 		if (fId != null) {
-			ActivityFacility f = this.facilities.getFacilities().get(new IdImpl(fId));
+			ActivityFacilityImpl f = this.facilities.getFacilities().get(new IdImpl(fId));
 			if (f == null) {
 				Gbl.errorMsg("facility id=" + fId + " does not exist!");
 			}

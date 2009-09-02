@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.StrategyManager;
@@ -23,7 +23,7 @@ import playground.jhackney.socialnetworks.replanning.SNPickFacilityFromAlter;
 public class SNController4 extends Controler {
 
 	private final Logger log = Logger.getLogger(SNController4.class);
-	protected LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm;
+	protected LinkedHashMap<ActivityFacilityImpl,ArrayList<TimeWindow>> twm;
 	protected SNControllerListener4 snControllerListener;
 		
 	public SNController4(String args[]){
@@ -74,10 +74,10 @@ public class SNController4 extends Controler {
 		return manager;
 	}
 	
-	public LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> getTwm() {
+	public LinkedHashMap<ActivityFacilityImpl,ArrayList<TimeWindow>> getTwm() {
 		return this.twm;
 	}
-	public void setTwm(LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm){
+	public void setTwm(LinkedHashMap<ActivityFacilityImpl,ArrayList<TimeWindow>> twm){
 		this.twm=twm;
 	}
 }

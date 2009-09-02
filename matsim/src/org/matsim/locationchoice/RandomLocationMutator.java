@@ -25,7 +25,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -45,8 +45,8 @@ public class RandomLocationMutator extends LocationMutator {
 	}
 	
 	public RandomLocationMutator(final NetworkLayer network, Controler controler, Knowledges kn,
-			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
-			TreeMap<String, ActivityFacility []> facilities_of_type) {
+			TreeMap<String, QuadTreeRing<ActivityFacilityImpl>> quad_trees,
+			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
 		super(network, controler, kn, quad_trees, facilities_of_type);
 	}
 
@@ -108,7 +108,7 @@ public class RandomLocationMutator extends LocationMutator {
 	}
 	
 	private void setNewLocationForAct(ActivityImpl act, int length) {
-		ActivityFacility facility = this.facilitiesOfType.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];				
+		ActivityFacilityImpl facility = this.facilitiesOfType.get(act.getType())[MatsimRandom.getRandom().nextInt(length)];				
 		act.setFacility(facility);
 		act.setLink(this.network.getNearestLink(facility.getCoord()));
 		act.setCoord(facility.getCoord());	

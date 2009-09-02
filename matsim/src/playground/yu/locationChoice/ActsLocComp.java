@@ -32,7 +32,7 @@ import java.util.Map.Entry;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -125,7 +125,7 @@ public class ActsLocComp {
 		NetworkLayer net = scenarioA.getNetwork();
 		new MatsimNetworkReader(net).readFile(netFile);
 
-		ActivityFacilities af = scenarioA.getActivityFacilities();
+		ActivityFacilitiesImpl af = scenarioA.getActivityFacilities();
 		new MatsimFacilitiesReader(af).readFile(facFile);
 
 		PopulationImpl popA = scenarioA.getPopulation();
@@ -139,7 +139,7 @@ public class ActsLocComp {
 
 		scenarioB.setNetwork((NetworkLayer) net);
 
-		ActivityFacilities afB = scenarioB.getActivityFacilities();
+		ActivityFacilitiesImpl afB = scenarioB.getActivityFacilities();
 		new MatsimFacilitiesReader(afB).readFile(facFile);
 
 		PopulationImpl popB = scenarioB.getPopulation();

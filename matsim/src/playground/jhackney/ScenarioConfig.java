@@ -27,7 +27,7 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -223,9 +223,9 @@ public abstract class ScenarioConfig {
 		return world;
 	}
 
-	public static final ActivityFacilities readFacilities() {
+	public static final ActivityFacilitiesImpl readFacilities() {
 		System.out.println("  reading facilities xml file... ");
-		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
 //		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
 		new MatsimFacilitiesReader(facilities).readFile(facsFileName);
 		System.out.println("  done.");

@@ -38,7 +38,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -335,7 +335,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 	 * private methods
 	 * =================================================================== */
 
-	void initializeKnowledge(final PopulationImpl plans, ActivityFacilities facilities ) {
+	void initializeKnowledge(final PopulationImpl plans, ActivityFacilitiesImpl facilities ) {
 
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)

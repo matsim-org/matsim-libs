@@ -5,7 +5,7 @@ import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -48,7 +48,7 @@ public class KeepOnlyMIVPlans extends NewPopulation {
 		//String facilitiesPath = "./test/scenarios/chessboard/facilities.xml";
 		
 		
-		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
 		new MatsimFacilitiesReader(facilities).readFile(facilitiesPath);
 		world.complete();
 		

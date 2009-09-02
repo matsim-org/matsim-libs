@@ -22,7 +22,7 @@ package playground.jhackney.postprocessing;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsImpl;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
@@ -45,7 +45,7 @@ public class AnalyzeTimeCorrelations {
 	//////////////////////////////////////////////////////////////////////
 
 	static PopulationImpl plans;
-	static ActivityFacilities facilities;
+	static ActivityFacilitiesImpl facilities;
 	static Knowledges knowledges;
 	
 	public static void run() throws Exception {

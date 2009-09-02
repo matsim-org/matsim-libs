@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -139,7 +139,7 @@ public class RandomChangeLocationK  implements PlanAlgorithm{
 
 			List<ActivityOption> actList = k.getActivities(factype);
 			if(actList.size()>0){
-				ActivityFacility fFromKnowledge = actList.get(MatsimRandom.getRandom().nextInt( actList.size())).getFacility();
+				ActivityFacilityImpl fFromKnowledge = actList.get(MatsimRandom.getRandom().nextInt( actList.size())).getFacility();
 
 //				And replace the activity in the chain with it (only changes the facility)
 

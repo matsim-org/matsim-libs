@@ -24,8 +24,8 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -108,7 +108,7 @@ public class WorldCompletionTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  reading facilites xml file as a layer of the world...");
-		ActivityFacilities facilities = (ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE,null);
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE,null);
 		new MatsimFacilitiesReader(facilities).readFile(this.config.facilities().getInputFile());
 		log.info("  done.");
 

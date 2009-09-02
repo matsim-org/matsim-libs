@@ -34,8 +34,8 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -82,7 +82,7 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 	 */
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Controler controler = event.getControler();
-		ActivityFacilities facilities = controler.getFacilities();
+		ActivityFacilitiesImpl facilities = controler.getFacilities();
 				
 		if (event.getIteration() % 10 == 0) {
 			this.printStatistics(facilities, Controler.getIterationPath(), event.getIteration(), 
@@ -93,7 +93,7 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 	/*
 	 * Print daily load of every facility and aggregated hourly load 
 	 */	
-	private void printStatistics(ActivityFacilities facilities, String iterationPath, int iteration, 
+	private void printStatistics(ActivityFacilitiesImpl facilities, String iterationPath, int iteration, 
 			TreeMap<Id, FacilityPenalty> facilityPenalties) {
 
 		try {
@@ -108,9 +108,9 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 							
 				double loadPerHourSum[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	
-				Iterator<? extends ActivityFacility> iter = facilities.getFacilities().values().iterator();
+				Iterator<? extends ActivityFacilityImpl> iter = facilities.getFacilities().values().iterator();
 				while (iter.hasNext()){
-					ActivityFacility facility = iter.next();
+					ActivityFacilityImpl facility = iter.next();
 					
 					FacilityPenalty facilityPenalty = facilityPenalties.get(facility.getId());													
 					out.write(facility.getId().toString() + "\t"+

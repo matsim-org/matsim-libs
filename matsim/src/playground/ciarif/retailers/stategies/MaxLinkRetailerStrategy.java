@@ -13,7 +13,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.network.BasicLinkImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 
@@ -27,7 +27,7 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 	private final static Logger log = Logger.getLogger(MaxLinkRetailerStrategy.class);
 	public static final String NAME = "maxLinkRetailerStrategy";
 	private Controler controler;
-	private Map<Id,ActivityFacility> movedFacilities;
+	private Map<Id,ActivityFacilityImpl> movedFacilities;
 	// TODO balmermi: do the same speed optimization here
 
 	public MaxLinkRetailerStrategy(Controler controler) {
@@ -35,9 +35,9 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 	}
 	
 	
-	public Map<Id, ActivityFacility> moveFacilities(Map<Id, ActivityFacility> facilities, ArrayList<LinkRetailersImpl> allowedLinks) {
+	public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> facilities, ArrayList<LinkRetailersImpl> allowedLinks) {
 
-		for (ActivityFacility f : facilities.values()) {
+		for (ActivityFacilityImpl f : facilities.values()) {
 			
 			//Object[] links = controler.getNetwork().getLinks().values().toArray();
 			//double rd1 = MatsimRandom.getRandom().nextDouble();
@@ -63,11 +63,11 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 			}
 			Collection<PersonImpl> persons_actual = Utils.getPersonQuadTree().get(f.getLink().getCoord().getX(),f.getLink().getCoord().getY(),150);
 			Collection<PersonImpl> persons_new = Utils.getPersonQuadTree().get(link.getCoord().getX(),link.getCoord().getY(),150);
-			Collection<ActivityFacility> facilities_actual = Utils.getFacilityQuadTree().get(f.getCoord().getX(),f.getCoord().getY(),150);
-			Collection<ActivityFacility> facilities_new = Utils.getFacilityQuadTree().get(link.getCoord().getX(),link.getCoord().getY(),150);
+			Collection<ActivityFacilityImpl> facilities_actual = Utils.getFacilityQuadTree().get(f.getCoord().getX(),f.getCoord().getY(),150);
+			Collection<ActivityFacilityImpl> facilities_new = Utils.getFacilityQuadTree().get(link.getCoord().getX(),link.getCoord().getY(),150);
 			boolean move_facilities = false;
 			
-			for (ActivityFacility f1:facilities_new) {
+			for (ActivityFacilityImpl f1:facilities_new) {
 				if (facilities.values().contains(f1)){
 					log.info("Around the proposed new link a facility of this retailer already exists ");
 					break;

@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 
 
 public class MakeATableFromXMLFacilities {
@@ -56,11 +56,11 @@ public class MakeATableFromXMLFacilities {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void write(Map<Id,ActivityFacility> facilities) {
+	public void write(Map<Id,ActivityFacilityImpl> facilities) {
 		try {
 			//this.facilities = facilities;
 			
-			for (ActivityFacility f : facilities.values()) {
+			for (ActivityFacilityImpl f : facilities.values()) {
 				if (f.getActivityOption("shop")!=null){
 					out.write(f.getId()+ "\t");
 					out.write(f.getCoord().getX()+ "\t");

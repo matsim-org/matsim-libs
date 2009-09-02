@@ -30,8 +30,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -56,16 +56,16 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class NewDemandWithFacilities4Zrh {
 	public static class CreateActFacility extends AbstractPersonAlgorithm
 			implements PlanAlgorithm {
-		private ActivityFacilities afs = null;
-		private Map<Coord, ActivityFacility> afMap = null;
+		private ActivityFacilitiesImpl afs = null;
+		private Map<Coord, ActivityFacilityImpl> afMap = null;
 		private PersonImpl currentPerson = null;
 		private Knowledge currentKnowledge = null;
 		private long facCnt = 0;
 		private Knowledges knowledges;
 
-		public CreateActFacility(final ActivityFacilities activityFacilities, Knowledges knowledges) {
+		public CreateActFacility(final ActivityFacilitiesImpl activityFacilities, Knowledges knowledges) {
 			afs = activityFacilities;
-			afMap = new HashMap<Coord, ActivityFacility>();
+			afMap = new HashMap<Coord, ActivityFacilityImpl>();
 			this.knowledges = knowledges;
 		}
 
@@ -95,7 +95,7 @@ public class NewDemandWithFacilities4Zrh {
 		private void allocateFacility2PrimaryActs4Zrh(final String type,
 				final ActivityImpl act) {
 			Coord coord = act.getCoord();
-			ActivityFacility af = afMap.get(coord);
+			ActivityFacilityImpl af = afMap.get(coord);
 			if (af == null) {
 				af = afs.createFacility(new IdImpl(facCnt++), coord);
 				afMap.put(coord, af);
@@ -140,7 +140,7 @@ public class NewDemandWithFacilities4Zrh {
 		PopulationImpl pop = scenario.getPopulation();
 		new MatsimPopulationReader(pop, net, knowledges).readFile(inputPopFilename);
 
-		ActivityFacilities afs = scenario.getActivityFacilities();
+		ActivityFacilitiesImpl afs = scenario.getActivityFacilities();
 
 		new CreateActFacility(afs, knowledges).run(pop);
 

@@ -24,7 +24,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.utils.misc.Time;
 
 public class BasicActivityImpl implements BasicActivity {
@@ -37,7 +37,7 @@ public class BasicActivityImpl implements BasicActivity {
 	private String type;
 	private Coord coord = null;
 	protected BasicLink link = null;
-	protected ActivityFacility facility = null;
+	protected ActivityFacilityImpl facility = null;
 
 	protected BasicActivityImpl(String type) {
 		// this is deliberately "protected"
@@ -91,7 +91,7 @@ public class BasicActivityImpl implements BasicActivity {
 		return null;
 	}
 	
-	public final void setFacility(final ActivityFacility facility) {
+	public final void setFacility(final ActivityFacilityImpl facility) {
 		this.facility = facility;
 	}
 
@@ -104,7 +104,7 @@ public class BasicActivityImpl implements BasicActivity {
 		return this.link;
 	}
 
-	public ActivityFacility getFacility() {
+	public ActivityFacilityImpl getFacility() {
 		return this.facility;
 	}
 }

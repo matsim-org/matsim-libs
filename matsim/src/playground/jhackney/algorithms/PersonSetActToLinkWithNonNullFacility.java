@@ -24,8 +24,8 @@ import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -50,13 +50,13 @@ public class PersonSetActToLinkWithNonNullFacility extends AbstractPersonAlgorit
 	private static final String LEISURE = "leisure";
 	private static final String SHOP = "shop";
 
-	private final ActivityFacilities facilities;
+	private final ActivityFacilitiesImpl facilities;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonSetActToLinkWithNonNullFacility(final ActivityFacilities facilities) {
+	public PersonSetActToLinkWithNonNullFacility(final ActivityFacilitiesImpl facilities) {
 		super();
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
@@ -103,10 +103,10 @@ public class PersonSetActToLinkWithNonNullFacility extends AbstractPersonAlgorit
 				Coord coord = act.getCoord();
 				if (coord == null) { Gbl.errorMsg("Each act must have a coord!"); }
 				double nearest_dist = Double.MAX_VALUE;
-				ActivityFacility nearest_f = null;
-				Iterator<? extends ActivityFacility> f_it = this.facilities.getFacilities().values().iterator();
+				ActivityFacilityImpl nearest_f = null;
+				Iterator<? extends ActivityFacilityImpl> f_it = this.facilities.getFacilities().values().iterator();
 				while (f_it.hasNext()) {
-					ActivityFacility f = f_it.next();
+					ActivityFacilityImpl f = f_it.next();
 					if (f.getActivityOptions().containsKey(type)) {
 						double dist = f.calcDistance(coord);
 						if (dist < nearest_dist) {

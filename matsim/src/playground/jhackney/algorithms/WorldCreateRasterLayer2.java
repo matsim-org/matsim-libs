@@ -24,7 +24,7 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.world.World;
@@ -54,13 +54,13 @@ public class WorldCreateRasterLayer2 {
 
 	private final Id layerid = new IdImpl("raster");
 	private final int cellsize;
-	private final ActivityFacilities facilities;
+	private final ActivityFacilitiesImpl facilities;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public WorldCreateRasterLayer2(final int cellsize, final ActivityFacilities facilities) {
+	public WorldCreateRasterLayer2(final int cellsize, final ActivityFacilitiesImpl facilities) {
 		super();
 		this.cellsize = cellsize;
 		this.facilities = facilities;
@@ -80,7 +80,7 @@ public class WorldCreateRasterLayer2 {
 		int nof_layers = world.getLayers().size();
 		if (nof_layers == 0) { Gbl.errorMsg("      The world must have a facilities layer first."); }
 
-		if (!(world.getLayers().containsKey(ActivityFacilities.LAYER_TYPE))) { Gbl.errorMsg("      World must contain a Facilities layer."); }
+		if (!(world.getLayers().containsKey(ActivityFacilitiesImpl.LAYER_TYPE))) { Gbl.errorMsg("      World must contain a Facilities layer."); }
 
 		for (Id lid : world.getLayers().keySet()) {
 			if (lid.toString().equals(layerid.toString())) { Gbl.errorMsg("      A layer with type " + layerid + " already exists."); }

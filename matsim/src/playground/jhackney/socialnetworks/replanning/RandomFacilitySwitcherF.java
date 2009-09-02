@@ -20,7 +20,7 @@
 
 package playground.jhackney.socialnetworks.replanning;
 
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.TravelCost;
@@ -40,7 +40,7 @@ public class RandomFacilitySwitcherF extends AbstractMultithreadedModule {
 	private NetworkLayer network=null;
 	private TravelCost tcost=null;
 	private TravelTime ttime=null;
-	private ActivityFacilities facs=null;
+	private ActivityFacilitiesImpl facs=null;
 	/** 
 	 * TODO [JH] Activity types are hard-coded here but have to match the
 	 * standard facility types in the facilities object as well as plans object.
@@ -48,7 +48,7 @@ public class RandomFacilitySwitcherF extends AbstractMultithreadedModule {
 	 */
 	private String[] factypes={"home","work","shop","education","leisure"};
 	
-    public RandomFacilitySwitcherF(NetworkLayer network, TravelCost tcost, TravelTime ttime, ActivityFacilities facs) {
+    public RandomFacilitySwitcherF(NetworkLayer network, TravelCost tcost, TravelTime ttime, ActivityFacilitiesImpl facs) {
 
 		System.out.println("initializing RandomFacilitySwitcher");
     	this.network=network;

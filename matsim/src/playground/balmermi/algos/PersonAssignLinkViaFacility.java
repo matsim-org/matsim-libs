@@ -23,8 +23,8 @@ package playground.balmermi.algos;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -52,20 +52,20 @@ public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {
 	private static final String SHOP = "shop";
 	private static final String LEISURE = "leisure";
 
-	private QuadTree<ActivityFacility> hfacs = null;
-	private QuadTree<ActivityFacility> wfacs = null;
-	private QuadTree<ActivityFacility> efacs = null;
-	private QuadTree<ActivityFacility> sfacs = null;
-	private QuadTree<ActivityFacility> lfacs = null;
+	private QuadTree<ActivityFacilityImpl> hfacs = null;
+	private QuadTree<ActivityFacilityImpl> wfacs = null;
+	private QuadTree<ActivityFacilityImpl> efacs = null;
+	private QuadTree<ActivityFacilityImpl> sfacs = null;
+	private QuadTree<ActivityFacilityImpl> lfacs = null;
 
 	private final NetworkLayer network;
-	private final ActivityFacilities facilities;
+	private final ActivityFacilitiesImpl facilities;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignLinkViaFacility(NetworkLayer network, ActivityFacilities facilities) {
+	public PersonAssignLinkViaFacility(NetworkLayer network, ActivityFacilitiesImpl facilities) {
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.network = network;
 		this.facilities = facilities;
@@ -84,7 +84,7 @@ public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (ActivityFacility f : this.facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
 			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -92,12 +92,12 @@ public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {
 		}
 		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		this.hfacs = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-		this.wfacs = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-		this.efacs = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-		this.sfacs = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-		this.lfacs = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-		for (ActivityFacility f : this.facilities.getFacilities().values()) {
+		this.hfacs = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
+		this.wfacs = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
+		this.efacs = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
+		this.sfacs = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
+		this.lfacs = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
+		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOption(HOME) != null) { this.hfacs.put(f.getCoord().getX(),f.getCoord().getY(),f); }
 			if (f.getActivityOption(WORK) != null) { this.wfacs.put(f.getCoord().getX(),f.getCoord().getY(),f); }
 			if (f.getActivityOption(EDUCATION) != null) { this.efacs.put(f.getCoord().getX(),f.getCoord().getY(),f); }
@@ -129,7 +129,7 @@ public class PersonAssignLinkViaFacility extends AbstractPersonAlgorithm {
 					Coord coord = a.getCoord();
 					if (coord == null) { throw new RuntimeException("Something is wrong!"); }
 					char type = a.getType().charAt(0);
-					ActivityFacility f = null;
+					ActivityFacilityImpl f = null;
 					if (type == H) { f = this.hfacs.get(coord.getX(),coord.getY()); }
 					else if (type == W) { f = this.wfacs.get(coord.getX(),coord.getY()); }
 					else if (type == E) { f = this.efacs.get(coord.getX(),coord.getY()); }

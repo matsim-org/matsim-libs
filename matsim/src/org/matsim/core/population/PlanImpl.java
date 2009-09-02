@@ -26,7 +26,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.population.BasicPlanImpl;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRoute;
@@ -69,7 +69,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 		return a;
 	}
 
-	public final ActivityImpl createActivity(final String type, final ActivityFacility fac) {
+	public final ActivityImpl createActivity(final String type, final ActivityFacilityImpl fac) {
 		verifyCreateAct();
 		ActivityImpl a = new ActivityImpl(type, fac);
 		getPlanElements().add(a);

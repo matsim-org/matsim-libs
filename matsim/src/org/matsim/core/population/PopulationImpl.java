@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationBuilder;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.PersonAlgorithm;
@@ -67,7 +67,7 @@ public class PopulationImpl implements Population {
 	
 	public PopulationImpl() { 
 		this.sc = null ;
-		this.pb = new PopulationBuilderImpl((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE), this, (ActivityFacilities) Gbl.getWorld().getLayer(ActivityFacilities.LAYER_TYPE));
+		this.pb = new PopulationBuilderImpl((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE), this, (ActivityFacilitiesImpl) Gbl.getWorld().getLayer(ActivityFacilitiesImpl.LAYER_TYPE));
 	}
 	
 	public PopulationImpl(ScenarioImpl sc) {

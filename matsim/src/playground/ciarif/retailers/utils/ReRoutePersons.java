@@ -4,7 +4,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -17,7 +17,7 @@ public class ReRoutePersons {
 	private final static Logger log = Logger.getLogger(ReRoutePersons.class);
 	//private Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
 	
-	public void run (Map<Id,ActivityFacility> movedFacilities, NetworkLayer network, Map<Id,PersonImpl> persons,PlansCalcRoute pcrl){ 
+	public void run (Map<Id,ActivityFacilityImpl> movedFacilities, NetworkLayer network, Map<Id,PersonImpl> persons,PlansCalcRoute pcrl){ 
 		
 			
 		int counter = 0;

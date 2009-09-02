@@ -22,7 +22,7 @@ package org.matsim.examples;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -96,7 +96,7 @@ public abstract class TriangleScenario {
 		System.out.println("  done.");
 	}
 
-	public static final void writeFacilities(ActivityFacilities facilities) {
+	public static final void writeFacilities(ActivityFacilitiesImpl facilities) {
 		System.out.println("  writing facilities xml file... ");
 		FacilitiesWriter facilities_writer = new FacilitiesWriter(facilities);
 		facilities_writer.write();

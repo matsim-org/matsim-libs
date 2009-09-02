@@ -29,7 +29,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import playground.balmermi.algos.*;
 import org.apache.log4j.Logger;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.*;
@@ -48,7 +48,7 @@ public class AssignFacs {
 	
 
 
-	public AssignFacs(ActivityFacilities facs, PopulationImpl population, final String outputDir) {
+	public AssignFacs(ActivityFacilitiesImpl facs, PopulationImpl population, final String outputDir) {
 		this.outputDir = outputDir;
 		PersonSetNearestFacCoord f = new PersonSetNearestFacCoord(facs);
 		

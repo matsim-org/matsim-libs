@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -78,7 +78,7 @@ public class InitDemandCreation {
 
 		System.out.println("  reading facilities xml file... ");
 		sl.loadActivityFacilities();
-		ActivityFacilities facilities = sl.getScenario().getActivityFacilities();
+		ActivityFacilitiesImpl facilities = sl.getScenario().getActivityFacilities();
 		System.out.println("  done.");
 
 		System.out.println("  reading matrices xml file... ");

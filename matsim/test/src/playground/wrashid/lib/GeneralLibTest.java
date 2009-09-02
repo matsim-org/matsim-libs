@@ -1,7 +1,7 @@
 package playground.wrashid.lib;
 
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class GeneralLibTest extends MatsimTestCase {
@@ -18,7 +18,7 @@ public class GeneralLibTest extends MatsimTestCase {
 	}
 	
 	public void testReadWriteFacilities(){
-		ActivityFacilities facilities=GeneralLib.readActivityFacilities("test/scenarios/equil/facilities.xml");
+		ActivityFacilitiesImpl facilities=GeneralLib.readActivityFacilities("test/scenarios/equil/facilities.xml");
 		
 		GeneralLib.writeActivityFacilities(facilities, "output/facilities.xml");
 		

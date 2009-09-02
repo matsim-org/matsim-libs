@@ -22,8 +22,8 @@ package playground.balmermi.census2000.modules;
 
 import java.util.Iterator;
 
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 
 /**
@@ -55,10 +55,10 @@ public class FacilitiesSetCapacity {
 		System.out.println("    done.");
 	}
 
-	public void run(ActivityFacilities facilities) {
+	public void run(ActivityFacilitiesImpl facilities) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			Iterator<ActivityOption> act_it = f.getActivityOptions().values().iterator();
 			while (act_it.hasNext()) {
 				ActivityOption activity = act_it.next();

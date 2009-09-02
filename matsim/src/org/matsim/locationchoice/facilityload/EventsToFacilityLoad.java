@@ -29,8 +29,8 @@ import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 
 /*
@@ -43,16 +43,16 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);
 
-	public EventsToFacilityLoad(final ActivityFacilities facilities, double scaleNumberOfPersons,
+	public EventsToFacilityLoad(final ActivityFacilitiesImpl facilities, double scaleNumberOfPersons,
 			TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		super();
 		
 		this.facilityPenalties = facilityPenalties;
 		
 		log.info("facilities size: " + facilities.getFacilities().values().size());
-		Iterator<? extends ActivityFacility> iter_fac = facilities.getFacilities().values().iterator();
+		Iterator<? extends ActivityFacilityImpl> iter_fac = facilities.getFacilities().values().iterator();
 		while (iter_fac.hasNext()){
-			ActivityFacility f = iter_fac.next();
+			ActivityFacilityImpl f = iter_fac.next();
 			
 			double capacity = Double.MAX_VALUE;
 			Iterator<? extends ActivityOption> iter_act = f.getActivityOptions().values().iterator();
@@ -71,7 +71,7 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 	 * Home activities are excluded.
 	 */
 	public void handleEvent(final ActivityStartEventImpl event) {
-		ActivityFacility facility = event.getAct().getFacility();
+		ActivityFacilityImpl facility = event.getAct().getFacility();
 		if (!(event.getAct().getType().startsWith("h") || event.getAct().getType().startsWith("tta"))) {
 			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addArrival(event.getTime());
 		}
@@ -82,7 +82,7 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 	 * Home activities are excluded
 	 */
 	public void handleEvent(final ActivityEndEventImpl event) {
-		ActivityFacility facility = event.getAct().getFacility();
+		ActivityFacilityImpl facility = event.getAct().getFacility();
 		if (!(event.getAct().getType().startsWith("h") || event.getAct().getType().startsWith("tta"))) {
 			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addDeparture(event.getTime());
 		}

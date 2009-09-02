@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -33,10 +33,10 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 	public static final String NAME = "gravityModelRetailerStrategy";
 	private final static Logger log = Logger.getLogger(GravityModelRetailerStrategy.class);
 	private Controler controler;
-	private Map<Id,ActivityFacility> shops;
+	private Map<Id,ActivityFacilityImpl> shops;
 	private RetailZones retailZones;
-	private Map<Id, ActivityFacility> retailerFacilities;
-	private Map<Id, ActivityFacility> movedFacilities = new TreeMap<Id, ActivityFacility>();
+	private Map<Id, ActivityFacilityImpl> retailerFacilities;
+	private Map<Id, ActivityFacilityImpl> movedFacilities = new TreeMap<Id, ActivityFacilityImpl>();
 
 	public GravityModelRetailerStrategy(Controler controler) { //TODO think better if it is necessary to give to all strategies the controler
 		
@@ -47,7 +47,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		
 		ArrayList<Integer> locations = new ArrayList<Integer> ();
 		
-		for (ActivityFacility af:retailerFacilities.values()){
+		for (ActivityFacilityImpl af:retailerFacilities.values()){
 			locations.add(Integer.parseInt(af.getLink().getId().toString()));
 		}
 		
@@ -78,7 +78,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		for (Consumer c:consumers) {
 			int consumer_index = Integer.parseInt(c.getId().toString());
 	    	int zone_index = Integer.parseInt(c.getRzId().toString());
-	    	ActivityFacility af = c.getShoppingFacility();
+	    	ActivityFacilityImpl af = c.getShoppingFacility();
     		double prob= prob_zone_shop.get(zone_index,shops_keys.get(af.getId()));
     		regressand_matrix.set(consumer_index, Math.log(prob/prob_zone_shop.viewRow(zone_index).zSum()));
     		double dist1 = (af.getActivityOption("shop").getFacility().calcDistance(c.getPerson().getSelectedPlan().getFirstActivity().getCoord()));
@@ -90,7 +90,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 	        double sumDim = 0;
 	        double dist2 = 0;
 	        double dim = 0;
-    		for (ActivityFacility aaff:this.shops.values()) {
+    		for (ActivityFacilityImpl aaff:this.shops.values()) {
     			dist2 = aaff.calcDistance(c.getPerson().getSelectedPlan().getFirstActivity().getCoord());
     			sumDist = sumDist + dist2;
     			dim = aaff.getActivityOption("shop").getCapacity().doubleValue();
@@ -114,13 +114,13 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 	    return b;
 	  }
 
-	public Map<Id, ActivityFacility> getMovedFacilities() {
+	public Map<Id, ActivityFacilityImpl> getMovedFacilities() {
 		log.info("moved Facilities are: " + movedFacilities);
 		return this.movedFacilities;		
 	}
 
 	
-	public Map<Id, ActivityFacility> moveFacilities(Map<Id, ActivityFacility> retailerFacilities,ArrayList<LinkRetailersImpl> freeLinks) {
+	public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> retailerFacilities,ArrayList<LinkRetailersImpl> freeLinks) {
 		
 		this.retailerFacilities = retailerFacilities;
 		GravityModel gm = new GravityModel(this.controler, retailerFacilities); 
@@ -133,7 +133,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		int consumer_count=0;
 		int j=0;
 		log.info("This scenario has " + shops.size() +" shops");
-		for (ActivityFacility f:this.shops.values()) { 
+		for (ActivityFacilityImpl f:this.shops.values()) { 
 			shops_keys.put(f.getId(),j);
 			
 			// gets the average probability of a person from a given zone going to a given shop 
@@ -178,7 +178,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		ArrayList<Integer> solution = rrGA.runGA(this.createInitialLocationsForGA(this.mergeLinks(freeLinks)),gm);		
 		log.info("The optimized solution is: " + solution);
 		int count=0;
-		for (ActivityFacility af:this.retailerFacilities.values()) {
+		for (ActivityFacilityImpl af:this.retailerFacilities.values()) {
 			if (solution.get(count) != Integer.parseInt(af.getLink().getId().toString())) {
 				Utils.moveFacility(af,controler.getNetwork().getLink(solution.get(count).toString()),this.controler.getWorld());
 				log.info("The facility " + af.getId() + " has been moved");
@@ -193,7 +193,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 	private ArrayList<LinkRetailersImpl> mergeLinks(ArrayList<LinkRetailersImpl> freeLinks) {
 		
 		ArrayList<LinkRetailersImpl> availableLinks = new ArrayList<LinkRetailersImpl>();
-		for (ActivityFacility af: this.retailerFacilities.values()){
+		for (ActivityFacilityImpl af: this.retailerFacilities.values()){
 			Id id = af.getLink().getId();
 			LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLink(id),controler.getNetwork());
 			availableLinks.add(link);

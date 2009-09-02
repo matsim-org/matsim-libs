@@ -7,8 +7,8 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -32,7 +32,7 @@ public class ActivityDifferentiationShop {
 	private double groceryShare = 0.66;
 	private int numberOfShopActs;
 	
-	private ActivityFacilities facilitiesActDiff;
+	private ActivityFacilitiesImpl facilitiesActDiff;
 	private String facilitiesActDifffilePath = "input/facilities/facilitiesActDiff.xml.gz";
 	
 	public ActivityDifferentiationShop(PopulationImpl plans) {
@@ -50,7 +50,7 @@ public class ActivityDifferentiationShop {
 		
 		log.info("reading facilitiesActDiff ...");
 		World world = Gbl.getWorld();
-		this.facilitiesActDiff =(ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
+		this.facilitiesActDiff =(ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilitiesActDiff).readFile(facilitiesActDifffilePath);		
 	}
 	
@@ -134,24 +134,24 @@ public class ActivityDifferentiationShop {
 		
 		NOGATypes nogatypes = new NOGATypes();
 		
-		List<ActivityFacility> groceryFacilities = new Vector<ActivityFacility>();
+		List<ActivityFacilityImpl> groceryFacilities = new Vector<ActivityFacilityImpl>();
 		for (int i = 0; i < nogatypes.shopGrocery.length; i++) {
 			groceryFacilities.addAll(this.facilitiesActDiff.getFacilitiesForActivityType(nogatypes.shopGrocery[i]).values());
 		}
 				
-		List<ActivityFacility> nonGroceryFacilities = new Vector<ActivityFacility>();
+		List<ActivityFacilityImpl> nonGroceryFacilities = new Vector<ActivityFacilityImpl>();
 		for (int i = 0; i < nogatypes.shopNonGrocery.length; i++) {
 			nonGroceryFacilities.addAll(this.facilitiesActDiff.getFacilitiesForActivityType(nogatypes.shopNonGrocery[i]).values());
 		}
 
 		FacilityQuadTreeBuilder builder = new FacilityQuadTreeBuilder();
-		QuadTree<ActivityFacility> groceryTree = builder.buildFacilityQuadTree("shop_grocery", groceryFacilities);
-		QuadTree<ActivityFacility> nongroceryTree = builder.buildFacilityQuadTree("shop_nongrocery", nonGroceryFacilities);
+		QuadTree<ActivityFacilityImpl> groceryTree = builder.buildFacilityQuadTree("shop_grocery", groceryFacilities);
+		QuadTree<ActivityFacilityImpl> nongroceryTree = builder.buildFacilityQuadTree("shop_nongrocery", nonGroceryFacilities);
 		
-		AssignLocations assignShops = new AssignLocations((QuadTreeRing<ActivityFacility>)nongroceryTree);
+		AssignLocations assignShops = new AssignLocations((QuadTreeRing<ActivityFacilityImpl>)nongroceryTree);
 		assignShops.run(this.plans, "shop_nongrocery");
 		
-		assignShops = new AssignLocations((QuadTreeRing<ActivityFacility>) groceryTree);
+		assignShops = new AssignLocations((QuadTreeRing<ActivityFacilityImpl>) groceryTree);
 		assignShops.run(this.plans, "shop_grocery");	
 	}
 	

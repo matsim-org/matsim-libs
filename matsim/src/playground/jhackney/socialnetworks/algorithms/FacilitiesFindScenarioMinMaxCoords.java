@@ -21,8 +21,8 @@
 package playground.jhackney.socialnetworks.algorithms;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class FacilitiesFindScenarioMinMaxCoords {
@@ -34,7 +34,7 @@ public class FacilitiesFindScenarioMinMaxCoords {
 		super();
 	}
 
-	public void run(ActivityFacilities facilities) {
+	public void run(ActivityFacilitiesImpl facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 //		System.out.println("  NOTE you could get these limits from world");
 
@@ -43,7 +43,7 @@ public class FacilitiesFindScenarioMinMaxCoords {
 		double max_x = Double.MIN_VALUE;
 		double max_y = Double.MIN_VALUE;
 
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			Coord c = f.getCoord();
 			if(c.getX()<=min_x){
 				min_x=c.getX();

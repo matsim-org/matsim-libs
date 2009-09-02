@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
@@ -108,7 +108,7 @@ public class LinksRetailerReader {
 	private void detectRetailersActualLinks(){
 		ArrayList<LinkRetailersImpl> links =  new ArrayList<LinkRetailersImpl>();
 		for (Retailer r:retailers.getRetailers().values()) {
-			for (ActivityFacility af: r.getFacilities().values()){
+			for (ActivityFacilityImpl af: r.getFacilities().values()){
 				LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)af.getLink(), controler.getNetwork());
 				links.add(link);
 			}

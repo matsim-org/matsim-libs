@@ -69,7 +69,7 @@ import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -411,7 +411,7 @@ public class Controler {
 			// dump config
 			new ConfigWriter(this.config, this.getNameForOutputFilename("output_config.xml.gz")).write();
 			// dump facilities
-			ActivityFacilities facilities = this.getFacilities();
+			ActivityFacilitiesImpl facilities = this.getFacilities();
 			if (facilities != null) {
 				new FacilitiesWriter(facilities, this.getNameForOutputFilename("output_facilities.xml.gz")).write();
 			}
@@ -1041,7 +1041,7 @@ public class Controler {
 		return this.scenarioData.getWorld();
 	}
 
-	public final ActivityFacilities getFacilities() {
+	public final ActivityFacilitiesImpl getFacilities() {
 		return this.scenarioData.getActivityFacilities();
 	}
 

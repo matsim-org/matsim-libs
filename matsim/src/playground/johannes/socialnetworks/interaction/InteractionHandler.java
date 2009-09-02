@@ -36,8 +36,8 @@ import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -54,20 +54,20 @@ public class InteractionHandler implements ActivityStartEventHandler,
 	
 	private Interactor interactor;
 	
-	private Map<ActivityFacility, PhysicalFacility> pfacilities;
+	private Map<ActivityFacilityImpl, PhysicalFacility> pfacilities;
 	
-	public InteractionHandler(InteractionSelector selector, Interactor interactor, ActivityFacilities facilities) {
+	public InteractionHandler(InteractionSelector selector, Interactor interactor, ActivityFacilitiesImpl facilities) {
 		this.selector = selector;
 		this.interactor = interactor;
-		this.pfacilities = new HashMap<ActivityFacility, PhysicalFacility>();
+		this.pfacilities = new HashMap<ActivityFacilityImpl, PhysicalFacility>();
 		
-		for(ActivityFacility f : facilities.getFacilities().values()) {
+		for(ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			this.pfacilities.put(f, new PhysicalFacility());
 		}
 	}
 	
 	public void handleEvent(ActivityStartEventImpl event) {
-		ActivityFacility f = event.getAct().getFacility();
+		ActivityFacilityImpl f = event.getAct().getFacility();
 		PhysicalFacility pf = pfacilities.get(f);
 //		if(pf == null) {
 //			pf = new PhysicalFacility();
@@ -85,7 +85,7 @@ public class InteractionHandler implements ActivityStartEventHandler,
 
 	public void handleEvent(ActivityEndEventImpl event) {
 		if(!event.getAct().getType().equalsIgnoreCase("home")) {
-		ActivityFacility f = event.getAct().getFacility();
+		ActivityFacilityImpl f = event.getAct().getFacility();
 		PhysicalFacility pf = pfacilities.get(f);
 		
 		if(pf == null)
@@ -104,7 +104,7 @@ public class InteractionHandler implements ActivityStartEventHandler,
 		
 		final String TAB = "\t"; 
 		final String WSPACE = " "; 
-		for(ActivityFacility f : pfacilities.keySet()) {
+		for(ActivityFacilityImpl f : pfacilities.keySet()) {
 			PhysicalFacility pf = pfacilities.get(f);
 			writer.write(f.getId().toString());
 			writer.write(TAB);

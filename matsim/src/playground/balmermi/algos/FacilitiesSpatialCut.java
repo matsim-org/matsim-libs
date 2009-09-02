@@ -25,8 +25,8 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class FacilitiesSpatialCut {
@@ -35,11 +35,11 @@ public class FacilitiesSpatialCut {
 	private final CoordImpl min = new CoordImpl(669000.0,223900.0);
 	private final CoordImpl max = new CoordImpl(717000.0,283400.0);
 
-	public void run(ActivityFacilities facilities) {
+	public void run(ActivityFacilitiesImpl facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		ArrayList<ActivityFacility> f_array = new ArrayList<ActivityFacility>();
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		ArrayList<ActivityFacilityImpl> f_array = new ArrayList<ActivityFacilityImpl>();
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			Coord c = f.getCoord();
 			if ((c.getX() >= this.min.getX()) && (c.getY() >= this.min.getY()) &&
 			    (c.getX() <= this.max.getX()) && (c.getY() <= this.max.getY())) {
@@ -50,11 +50,11 @@ public class FacilitiesSpatialCut {
 			}
 		}
 
-		TreeMap<Id, ActivityFacility> fs = (TreeMap<Id, ActivityFacility>) facilities.getFacilities();
+		TreeMap<Id, ActivityFacilityImpl> fs = (TreeMap<Id, ActivityFacilityImpl>) facilities.getFacilities();
 		fs.clear();
 
 		for (int i=0; i<f_array.size(); i++) {
-			ActivityFacility f = f_array.get(i);
+			ActivityFacilityImpl f = f_array.get(i);
 			fs.put(f.getId(), f);
 		}
 

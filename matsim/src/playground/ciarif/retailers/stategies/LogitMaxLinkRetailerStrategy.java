@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
@@ -23,7 +23,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	public final static String CONFIG_N_ALTERNATIVES = "alternatives";
 	private Controler controler;
 	private int alternatives;	
-	private Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
+	private Map<Id,ActivityFacilityImpl> movedFacilities = new TreeMap<Id,ActivityFacilityImpl>();
 	
 	public LogitMaxLinkRetailerStrategy (Controler controler) {
 		this.controler = controler;
@@ -32,13 +32,13 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 		this.alternatives = alternatives;
 	}
 
-	public Map<Id, ActivityFacility> moveFacilities(Map<Id, ActivityFacility> facilities, ArrayList<LinkRetailersImpl> Allowedlinks) {
+	public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> facilities, ArrayList<LinkRetailersImpl> Allowedlinks) {
 		
 		// example to get the facilities (locations) of a link 
 //		controler.getNetwork().getLink("").getUpMapping();
 		
 
-		for (ActivityFacility f : facilities.values()) { //francesco: TODO check again this loop (or one of the internal one), it seems that too many 
+		for (ActivityFacilityImpl f : facilities.values()) { //francesco: TODO check again this loop (or one of the internal one), it seems that too many 
 			// facility relocations are performed, if this might not influence the results it is certainly a waste of memory
 			
 			double[] utils = new double[alternatives];

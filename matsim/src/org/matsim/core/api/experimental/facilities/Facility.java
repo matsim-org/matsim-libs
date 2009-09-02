@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilityAlgorithmI.java
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,10 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities.algorithms;
+package org.matsim.core.api.experimental.facilities;
 
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.api.basic.v01.BasicLocation;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.Identifiable;
 
-public interface FacilityAlgorithm {
-	public void run(ActivityFacilityImpl facility);
+/**
+ * @author nagel
+ *
+ */
+public interface Facility extends BasicLocation, Identifiable {
+	
+	public Id getLinkId() ;
+
 }

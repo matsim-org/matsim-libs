@@ -39,8 +39,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -127,7 +127,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	private EventsMapStartEndTimes epp=null;
 	private MakeTimeWindowsFromEvents teo=null;
 	private LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats=null;
-	private LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm=null;
+	private LinkedHashMap<ActivityFacilityImpl,ArrayList<TimeWindow>> twm=null;
 	private EventsToScore scoring =null;
 
 	private final Logger log = Logger.getLogger(SNControllerListener.class);
@@ -357,7 +357,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	 * private methods
 	 * =================================================================== */
 
-	void initializeKnowledge(final PopulationImpl plans, ActivityFacilities facilities, Knowledges knowledges ) {
+	void initializeKnowledge(final PopulationImpl plans, ActivityFacilitiesImpl facilities, Knowledges knowledges ) {
 
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)

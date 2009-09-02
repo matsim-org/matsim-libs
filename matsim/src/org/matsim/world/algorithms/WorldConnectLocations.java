@@ -31,8 +31,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -130,7 +130,7 @@ public class WorldConnectLocations {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final void connect(ActivityFacilities facilities, NetworkLayer network, World world, String file, Set<Id> remainingFacilities) {
+	private final void connect(ActivityFacilitiesImpl facilities, NetworkLayer network, World world, String file, Set<Id> remainingFacilities) {
 		log.info("    connecting facilities with links via "+CONFIG_F2L_INPUTF2LFile+"="+file);
 		try {
 			FileReader fr = new FileReader(file);
@@ -144,7 +144,7 @@ public class WorldConnectLocations {
 				// 0    1
 				Id fid = new IdImpl(entries[0].trim());
 				Id lid = new IdImpl(entries[1].trim());
-				ActivityFacility f = facilities.getFacilities().get(fid);
+				ActivityFacilityImpl f = facilities.getFacilities().get(fid);
 				MappedLocation l = network.getLink(lid);
 				if ((f != null) && (l != null)) {
 					// add the nearest right entry link mapping to the facility f
@@ -165,13 +165,13 @@ public class WorldConnectLocations {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final void writeF2LFile(ActivityFacilities facilities, String file) {
+	private final void writeF2LFile(ActivityFacilitiesImpl facilities, String file) {
 		log.info("    writing f<-->l connections to  "+CONFIG_F2L_OUTPUTF2LFile+"="+file);
 		try {
 			FileWriter fw = new FileWriter(file);
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write("fid\tlid\n");
-			for (ActivityFacility f : facilities.getFacilities().values()) {
+			for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 				bw.write(f.getId().toString()+"\t"+f.getLink().getId().toString()+"\n");
 			}
 			bw.close();
@@ -185,13 +185,13 @@ public class WorldConnectLocations {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Sets the mapping between each {@link ActivityFacility facility} of the given {@link ActivityFacilities facility layer} and
+	 * Sets the mapping between each {@link ActivityFacilityImpl facility} of the given {@link ActivityFacilitiesImpl facility layer} and
 	 * the {@link LinkImpl links} of the {@link NetworkLayer network layer}. The facilities layer should be part of the
 	 * given {@link World world}, but the {@link NetworkLayer network} does not have to be necessarily part of the
 	 * world. It could also be a sub-network of the network of the {@link World world} as created by the method {@link #extractSubNetwork(NetworkLayer)}.
 	 * In both cases the facility layer will be connected with the network in the same world.
 	 * 
-	 * <p><b>Mapping rule:</b> each {@link ActivityFacility facility} of the {@link ActivityFacilities facilities layer} will be
+	 * <p><b>Mapping rule:</b> each {@link ActivityFacilityImpl facility} of the {@link ActivityFacilitiesImpl facilities layer} will be
 	 * connected with <em>exactly</em> one link of the {@link NetworkLayer network layer}. the links of the network will get zero, one or many mappings to
 	 * facilities of the facilities layer. (facilities[*]-[1]links)</p>
 	 * 
@@ -199,10 +199,10 @@ public class WorldConnectLocations {
 	 * @param network either a layer of the world or a network created with {@link #extractSubNetwork(NetworkLayer)} from a network layer of the world.
 	 * @param world the world in which the facility and the network layer will be mapped
 	 */
-	private final void connect(ActivityFacilities facilities, NetworkLayer network, World world) {
+	private final void connect(ActivityFacilitiesImpl facilities, NetworkLayer network, World world) {
 		log.info("  connecting facilities with links...");
 		log.info("    remove all given connections f<==>l...");
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			// remove previous mappings for facility f
 			if (!f.removeAllDownMappings()) { throw new RuntimeException("could not remove old factivity<-->link mappings"); }
 		}
@@ -219,7 +219,7 @@ public class WorldConnectLocations {
 		
 		log.info("    connecting remaining facilities with links ("+remainingFacilities.size()+" remaining)...");
 		for (Id fid : remainingFacilities) {
-			ActivityFacility f = facilities.getFacilities().get(fid);
+			ActivityFacilityImpl f = facilities.getFacilities().get(fid);
 			// add the nearest right entry link mapping to the facility f
 			// note: network could be a temporal copy of the one in the world. Therefore, get the original one.
 			MappedLocation l = network.getNearestRightEntryLink(f.getCoord());
@@ -240,9 +240,9 @@ public class WorldConnectLocations {
 	
 	/**
 	 * Sets the mapping between each {@link Zone zone} of the given {@link ZoneLayer zone layer} and
-	 * the {@link ActivityFacility facilities} of the {@link ActivityFacilities facility layer} as part of a {@link World world}.
+	 * the {@link ActivityFacilityImpl facilities} of the {@link ActivityFacilitiesImpl facility layer} as part of a {@link World world}.
 	 * 
-	 * <p><b>Mapping rule:</b> each {@link ActivityFacility facility} of the {@link ActivityFacilities facilities layer} will be
+	 * <p><b>Mapping rule:</b> each {@link ActivityFacilityImpl facility} of the {@link ActivityFacilitiesImpl facilities layer} will be
 	 * connected with zero or one zone. A zone will only be assigned if the facility is located within the zone.
 	 * If more than one zone exists for which the facility is located in, the first one (smallest zone {@link Id id})
 	 * will be chosen. (zones[?]-[*]facilities)</p>
@@ -251,9 +251,9 @@ public class WorldConnectLocations {
 	 * @param facilities a layer of the world
 	 * @param world the world in which the zone and the facility layer will be mapped
 	 */
-	private final void connect(ZoneLayer zones, ActivityFacilities facilities, World world) {
+	private final void connect(ZoneLayer zones, ActivityFacilitiesImpl facilities, World world) {
 		log.info("  connecting zones with facilities...");
-		for (ActivityFacility f : facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			// remove previous mappings for facility f
 			if (!f.removeAllUpMappings()) { throw new RuntimeException("could not remove old zone<-->facility mappings"); }
 			// add the zone mapping to facility f
@@ -322,20 +322,20 @@ public class WorldConnectLocations {
 					         ": mapping cannot be set since at least one of the layers does not contain any locations. (this may not be fatal)");
 				}
 				else {
-					if ((downLayer instanceof NetworkLayer) && (upLayer instanceof ActivityFacilities)) {
+					if ((downLayer instanceof NetworkLayer) && (upLayer instanceof ActivityFacilitiesImpl)) {
 						if (excludingLinkTypes.isEmpty()) {
-							connect((ActivityFacilities)upLayer,(NetworkLayer)downLayer,world);
+							connect((ActivityFacilitiesImpl)upLayer,(NetworkLayer)downLayer,world);
 						}
 						else {
 							NetworkLayer subNetwork = extractSubNetwork((NetworkLayer)downLayer);
-							connect((ActivityFacilities)upLayer,subNetwork,world);
+							connect((ActivityFacilitiesImpl)upLayer,subNetwork,world);
 						}
 					}
 					else if ((downLayer instanceof NetworkLayer) && (upLayer instanceof ZoneLayer)) {
 						connect((ZoneLayer)upLayer,(NetworkLayer)downLayer,world);
 					}
-					else if ((downLayer instanceof ActivityFacilities) && (upLayer instanceof ZoneLayer)) {
-						connect((ZoneLayer)upLayer,(ActivityFacilities)downLayer,world);
+					else if ((downLayer instanceof ActivityFacilitiesImpl) && (upLayer instanceof ZoneLayer)) {
+						connect((ZoneLayer)upLayer,(ActivityFacilitiesImpl)downLayer,world);
 					}
 					else { /* zone<-->zone: nothing to do (keep it as it is) */ }
 				}

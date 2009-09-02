@@ -24,8 +24,8 @@ import java.util.LinkedHashMap;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsImpl;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -56,7 +56,7 @@ public class AnalyzeScores {
 	//////////////////////////////////////////////////////////////////////
 
 	static PopulationImpl plans;
-	static ActivityFacilities facilities;
+	static ActivityFacilitiesImpl facilities;
 	static Knowledges knowledges;
 	
 	public static void run() throws Exception {
@@ -93,7 +93,7 @@ public class AnalyzeScores {
 		EventsMapStartEndTimes epp;
 		MakeTimeWindowsFromEvents teo=null;
 		LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats=null;
-		LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm=null;
+		LinkedHashMap<ActivityFacilityImpl,ArrayList<TimeWindow>> twm=null;
 		playground.jhackney.scoring.EventsToScoreAndReport scoring =null;
 //		EventsToScore scoring=null;
 		

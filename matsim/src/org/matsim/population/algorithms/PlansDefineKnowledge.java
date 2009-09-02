@@ -23,8 +23,8 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
@@ -34,10 +34,10 @@ import org.matsim.knowledges.Knowledges;
 
 public class PlansDefineKnowledge {
 
-	private final ActivityFacilities facilities;
+	private final ActivityFacilitiesImpl facilities;
 	private Knowledges knowledges;
 	
-	public PlansDefineKnowledge(final ActivityFacilities facilities, Knowledges knowledges) {
+	public PlansDefineKnowledge(final ActivityFacilitiesImpl facilities, Knowledges knowledges) {
 		this.facilities = facilities;
 		this.knowledges = knowledges;
 	}
@@ -49,7 +49,7 @@ public class PlansDefineKnowledge {
 		ArrayList<ActivityOption> home_acts = new ArrayList<ActivityOption>();
 		ArrayList<ActivityOption> work_acts = new ArrayList<ActivityOption>();
 		ArrayList<ActivityOption> other_acts = new ArrayList<ActivityOption>();
-		for (ActivityFacility f : this.facilities.getFacilities().values()) {
+		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
 			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
 				ActivityOption a = a_it.next();

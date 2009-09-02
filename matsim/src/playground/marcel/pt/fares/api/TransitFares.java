@@ -20,7 +20,7 @@
 
 package playground.marcel.pt.fares.api;
 
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 
 public interface TransitFares {
 
@@ -31,7 +31,7 @@ public interface TransitFares {
 	 * @param toStop
 	 * @return cost for single trip
 	 */
-	public double getSingleTripCost(final ActivityFacility fromStop, final ActivityFacility toStop); // TODO [MR] how to handle different paths between from/to? and what about time of day?
+	public double getSingleTripCost(final ActivityFacilityImpl fromStop, final ActivityFacilityImpl toStop); // TODO [MR] how to handle different paths between from/to? and what about time of day?
 
 	/**
 	 * Returns the total cost for multiple trips. This could allow the agents to choose a ticket

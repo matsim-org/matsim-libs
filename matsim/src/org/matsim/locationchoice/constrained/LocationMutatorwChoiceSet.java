@@ -28,7 +28,7 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -48,8 +48,8 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	protected int maxRecursions = 10;
 	
 	public LocationMutatorwChoiceSet(final NetworkLayer network, Controler controler, Knowledges kn,
-			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
-			TreeMap<String, ActivityFacility []> facilities_of_type) {
+			TreeMap<String, QuadTreeRing<ActivityFacilityImpl>> quad_trees,
+			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
 		super(network, controler, kn, quad_trees, facilities_of_type);
 		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
 		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
@@ -158,13 +158,13 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	
 	protected boolean modifyLocation(ActivityImpl act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
 		
-		ArrayList<ActivityFacility> choiceSet = this.computeChoiceSetCircle
+		ArrayList<ActivityFacilityImpl> choiceSet = this.computeChoiceSetCircle
 		(startCoord, endCoord, radius, act.getType());
 		
 		if (choiceSet.size()>1) {
 			//final Facility facility=(Facility)choiceSet.toArray()[
            	//		           MatsimRandom.random.nextInt(choiceSet.size())];
-			final ActivityFacility facility = choiceSet.get(MatsimRandom.getRandom().nextInt(choiceSet.size()));
+			final ActivityFacilityImpl facility = choiceSet.get(MatsimRandom.getRandom().nextInt(choiceSet.size()));
 			
 			act.setFacility(facility);
        		act.setLink(this.network.getNearestLink(facility.getCoord()));
@@ -244,11 +244,11 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		}
 	}
 		
-	public ArrayList<ActivityFacility>  computeChoiceSetCircle(Coord coordStart, Coord coordEnd, 
+	public ArrayList<ActivityFacilityImpl>  computeChoiceSetCircle(Coord coordStart, Coord coordEnd, 
 			double radius, String type) {
 		double midPointX = (coordStart.getX()+coordEnd.getX())/2.0;
 		double midPointY = (coordStart.getY()+coordEnd.getY())/2.0;
-		return (ArrayList<ActivityFacility>) this.quadTreesOfType.get(type).get(midPointX, midPointY, radius);
+		return (ArrayList<ActivityFacilityImpl>) this.quadTreesOfType.get(type).get(midPointX, midPointY, radius);
 	}
 	
 	// for test cases:

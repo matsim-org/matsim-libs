@@ -23,7 +23,7 @@ package playground.marcel.pt.fares;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 
 import playground.marcel.pt.fares.api.TransitFares;
 
@@ -35,7 +35,7 @@ public class MultipleFareSystems implements TransitFares {
 		this.allFares.add(fares);
 	}
 
-	public double getSingleTripCost(final ActivityFacility fromStop, final ActivityFacility toStop) {
+	public double getSingleTripCost(final ActivityFacilityImpl fromStop, final ActivityFacilityImpl toStop) {
 		double minFare = Double.NaN;
 		for (TransitFares fareSystem : this.allFares) {
 			double fare = fareSystem.getSingleTripCost(fromStop, toStop);

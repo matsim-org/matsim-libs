@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -20,7 +20,7 @@ import org.matsim.world.World;
 
 public class AssignShopAndLeisure {
 	private PopulationImpl plans = new PopulationImpl();
-	private ActivityFacilities facilities;
+	private ActivityFacilitiesImpl facilities;
 	private NetworkLayer network;
 	
 	private String plansfilePath;
@@ -74,7 +74,7 @@ public class AssignShopAndLeisure {
 		World world = Gbl.getWorld();
 				
 		log.info("reading the facilities ...");
-		this.facilities =(ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
+		this.facilities =(ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 			
 		log.info("reading the network ...");

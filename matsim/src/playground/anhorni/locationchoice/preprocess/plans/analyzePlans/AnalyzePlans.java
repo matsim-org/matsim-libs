@@ -30,7 +30,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -52,7 +52,7 @@ import playground.anhorni.locationchoice.preprocess.helper.Utils;
 public class AnalyzePlans {
 
 	private PopulationImpl plans = new PopulationImpl();
-	private ActivityFacilities facilities;
+	private ActivityFacilitiesImpl facilities;
 	private NetworkLayer network;
 	
 	String plansfilePath;
@@ -91,7 +91,7 @@ public class AnalyzePlans {
 		World world = Gbl.getWorld();
 				
 		log.info("reading the facilities ...");
-		this.facilities =(ActivityFacilities)world.createLayer(ActivityFacilities.LAYER_TYPE, null);
+		this.facilities =(ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 			
 		log.info("reading the network ...");
@@ -505,11 +505,11 @@ public class AnalyzePlans {
 		this.plans = plans;
 	}
 
-	public ActivityFacilities getFacilities() {
+	public ActivityFacilitiesImpl getFacilities() {
 		return facilities;
 	}
 
-	public void setFacilities(ActivityFacilities facilities) {
+	public void setFacilities(ActivityFacilitiesImpl facilities) {
 		this.facilities = facilities;
 	}
 

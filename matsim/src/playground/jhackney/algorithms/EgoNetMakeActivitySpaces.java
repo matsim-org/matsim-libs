@@ -22,7 +22,7 @@ package playground.jhackney.algorithms;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilities;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -63,7 +63,7 @@ public class EgoNetMakeActivitySpaces {
 		new MatsimPopulationReader(plans, network, knowledges).readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 		
-		ActivityFacilities facilities = Scenario.readFacilities();
+		ActivityFacilitiesImpl facilities = Scenario.readFacilities();
 		//read in social network
 		System.out.println(" Initializing the social network ...");
 		new SocialNetwork(plans);

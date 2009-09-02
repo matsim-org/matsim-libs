@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
@@ -58,9 +58,9 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 	private TravelCost tcost;
 	private TravelTime ttime;
 	private String[] factypes;
-	private ActivityFacilities facs;
+	private ActivityFacilitiesImpl facs;
 
-	public RandomChangeLocationF(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime, ActivityFacilities facs) {
+	public RandomChangeLocationF(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime, ActivityFacilitiesImpl facs) {
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;
@@ -137,7 +137,7 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 
 			if(facs.getFacilitiesForActivityType(newAct.getType()).size()>0){
 				int index=MatsimRandom.getRandom().nextInt(facs.getFacilitiesForActivityType(newAct.getType()).size());
-				ActivityFacility fFromFacilities=(ActivityFacility) facs.getFacilitiesForActivityType(newAct.getType()).values().toArray()[index];
+				ActivityFacilityImpl fFromFacilities=(ActivityFacilityImpl) facs.getFacilitiesForActivityType(newAct.getType()).values().toArray()[index];
 
 //				And replace the activity in the chain with it (only changes the facility)
 
