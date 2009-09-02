@@ -27,7 +27,6 @@ import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
@@ -304,8 +303,10 @@ public class PlanomatTest extends MatsimTestCase {
 		// run the method
 		Planomat testee = new Planomat(ltte, null, this.scenario.getConfig().planomat());
 
-		testee.stepThroughPlan(Planomat.StepThroughPlanAction.WRITE_BACK, testChromosome, testPlan, null, null);
-
+		double score = testee.stepThroughPlan(Planomat.StepThroughPlanAction.WRITE_BACK, testChromosome, testPlan, null, null);
+		assertEquals(0.0, score, MatsimTestCase.EPSILON);
+		
+		
 		// write out the test person and the modified plan into a file
 		PopulationImpl outputPopulation = new PopulationImpl();
 		outputPopulation.getPersons().put(testPerson.getId(), testPerson);
