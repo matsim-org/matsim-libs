@@ -30,6 +30,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.router.PlansCalcRoute;
@@ -59,9 +60,9 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 	                      
 	public PlansEvaluator (Controler controler) {
 		super (controler);
-		this.inputFile = "/home/baug/mfeil/data/largeSet/it1/output_plans_mz1.xml.gz";	
-		this.outputFile = "/home/baug/mfeil/data/largeSet/it0/output_plans_mz0.xml.gz";	
-		this.outputFileBiogeme = "/home/baug/mfeil/data/largeSet/it0/output_plans0.dat";	
+		this.inputFile = "/home/baug/mfeil/data/largeSet/it1/run16/output_plans.xml";	
+		this.outputFile = "/home/baug/mfeil/data/largeSet/it1/output_plans_mz16.xml.gz";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/largeSet/it0/output_plans16.dat";	
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
@@ -89,8 +90,14 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 	
 	private void evaluatePlans (){
 		log.info("Evaluating plans...");
+		int counter=0;
 		for (Iterator<PersonImpl> iterator1 = this.population.getPersons().values().iterator(); iterator1.hasNext();){
 			PersonImpl person = iterator1.next();
+			counter++;
+			if (counter%10==0) {
+				log.info("Handled "+counter+" persons");
+				Gbl.printMemoryUsage();
+			}			
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
 				

@@ -107,7 +107,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.linker = new XY2Links (this.controler.getNetwork());
 	}
 	
-	public PlansConstructor (PopulationImpl population, List<List<Double>> sims) {
+	public PlansConstructor (PopulationImpl population, List<List<Double>> sims, List<Double> simsActs, List<Double> simsModes, List<Double> simsLocations) {
 		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
 		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
 		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
@@ -122,9 +122,9 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.outputFileMod = "./plans/model.mod";
 	*/	this.population = population;
 		this.sims = sims;
-		this.simsActs = this.mdsam.getSimsActs();
-		this.simsModes = this.mdsam.getSimsModes();
-		this.simsLocations = this.mdsam.getSimsLocations();
+		this.simsActs = simsActs;
+		this.simsModes = simsModes;
+		this.simsLocations = simsLocations;
 	}
 	
 	private void init(final NetworkLayer network) {
@@ -447,27 +447,30 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		PrintStream stream2;
 		try {
-			stream2 = new PrintStream (new File(outputFile1));
+			stream2 = new PrintStream (new File(outputFile2));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;
 		}
 		PrintStream stream3;
 		try {
-			stream3 = new PrintStream (new File(outputFile1));
+			stream3 = new PrintStream (new File(outputFile3));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;
 		}
 		
 		
-		for (int i=0;i<this.sims.size();i++){
+		for (int i=0;i<this.sims.get(0).size();i++){
 			stream.print("alt"+(i+1)+"\t");
 			stream1.print("alt"+(i+1)+"\t");
 			stream2.print("alt"+(i+1)+"\t");
 			stream3.print("alt"+(i+1)+"\t");
 		}		
 		stream.println();
+		stream1.println();
+		stream2.println();
+		stream3.println();
 		
 		int counter1 = 0;
 		int counter2 = 0;

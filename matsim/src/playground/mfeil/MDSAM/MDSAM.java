@@ -62,7 +62,7 @@ public class MDSAM {
 
 	public MDSAM(final PopulationImpl population) {
 		this.population=population;
-		this.GWact = 1.0;
+		this.GWact = 2.0;
 		this.GWmode = 1.0;
 		this.GWlocation = 1.0;
 	//	this.outputFile = "./plans/plans_similarity.xls";	
@@ -349,11 +349,11 @@ public class MDSAM {
 				final String networkFilename = "./plans/network.xml";
 				final String facilitiesFilename = "./plans/facilities.xml";
 		*/
-				final String outputFileBiogeme = "/home/baug/mfeil/data/largeSet/it0/output_plans08.dat";
-				final String outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims08.xls";
-				final String outputFileSimsActs = "/home/baug/mfeil/data/largeSet/it0/sims08acts.xls";
-				final String outputFileSimsModes = "/home/baug/mfeil/data/largeSet/it0/sims08modes.xls";
-				final String outputFileSimsLocations = "/home/baug/mfeil/data/largeSet/it0/sims08locations.xls";
+				final String outputFileBiogeme = "/home/baug/mfeil/data/largeSet/it0/output_plans082.dat";
+				final String outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims082.xls";
+				final String outputFileSimsActs = "/home/baug/mfeil/data/largeSet/it0/sims082acts.xls";
+				final String outputFileSimsModes = "/home/baug/mfeil/data/largeSet/it0/sims082modes.xls";
+				final String outputFileSimsLocations = "/home/baug/mfeil/data/largeSet/it0/sims082locations.xls";
 		//		final String outputFile = "./plans/output_plans.dat";
 
 				ScenarioImpl scenario = new ScenarioImpl();
@@ -361,9 +361,11 @@ public class MDSAM {
 				new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenario).readFile(populationFilename);
 				
-				List<List<Double>> sims = new MDSAM(scenario.getPopulation()).runPopulation();
+				MDSAM mdsam = new MDSAM(scenario.getPopulation());
+				
+				List<List<Double>> sims = mdsam.runPopulation();
 
-				PlansConstructor pc = new PlansConstructor(scenario.getPopulation(), sims);
+				PlansConstructor pc = new PlansConstructor(scenario.getPopulation(), sims, mdsam.getSimsActs(), mdsam.getSimsModes(), mdsam.getSimsLocations());
 				pc.writePlansForBiogeme(outputFileBiogeme);
 				pc.writeSims(outputFileSims, outputFileSimsActs, outputFileSimsModes, outputFileSimsLocations);
 				log.info("Process finished.");
