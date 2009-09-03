@@ -35,7 +35,7 @@ public class HubPriceInfo {
 			for (int i=0;i<numberOfHubs;i++){
 				token = tokenizer.nextToken();
 				double parsedNumber=Double.parseDouble(token);
-				hubPrice[i][rowId]=Double.parseDouble(token);
+				hubPrice[i][rowId]=parsedNumber;
 			}
 			
 			if (tokenizer.hasMoreTokens()){

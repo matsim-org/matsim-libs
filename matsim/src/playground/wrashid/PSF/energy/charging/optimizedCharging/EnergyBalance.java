@@ -223,7 +223,6 @@ public class EnergyBalance {
 
 			// get the parking index, where this car will charge
 			int parkingIndex = bestEnergyPrice.getEnergyBalanceParkingIndex();
-			Id facilityId = parkingTimes.get(parkingIndex).getActivity().getFacilityId();
 
 			// the maximum energy, that can be charged at a parking (because we
 			// can only charge as much as the car has driven previously)

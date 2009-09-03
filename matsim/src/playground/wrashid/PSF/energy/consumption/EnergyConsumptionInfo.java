@@ -22,8 +22,8 @@ public class EnergyConsumptionInfo {
 		// TODO: The following code needs to be programmed from scratch...
 		// Make this somehow modular, so that different strategies could be used here (and different types of vehicles
 		
-		double freeSpeed=link.getFreespeed(Time.UNDEFINED_TIME); //[m/s]
-		double vehicleSpeed=link.getLength()/travelTime; //[m/s]
+		//double freeSpeed=link.getFreespeed(Time.UNDEFINED_TIME); //[m/s]
+		//double vehicleSpeed=link.getLength()/travelTime; //[m/s]
 		
 		// TODO: read some data a file. For example for different velocities there is a different
 		// energy consumption

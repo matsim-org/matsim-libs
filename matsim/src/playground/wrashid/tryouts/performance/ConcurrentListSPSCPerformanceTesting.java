@@ -75,7 +75,7 @@ public class ConcurrentListSPSCPerformanceTesting {
 					count++;
 				}
 				try {
-					Thread.currentThread().sleep(1);
+					Thread.sleep(1);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

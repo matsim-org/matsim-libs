@@ -175,7 +175,6 @@ public class Lists {
 	public static void testMixedAddAll(){
 		
 		ArrayList<Integer> list = new ArrayList<Integer>(10000000);
-		LinkedList<Integer> list1 = new LinkedList<Integer>();
 		LinkedList<Integer> list2 = new LinkedList<Integer>();
 
 		for (int i = 0; i < 10000000; i++) {

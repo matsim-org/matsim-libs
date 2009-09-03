@@ -80,7 +80,6 @@ public class AddParkingsToPlans {
 					// home-walk-parkingDeparuture-car-parkingArrival-walk-work
 
 					ActivityImpl previousActivity = (ActivityImpl)planElements.get(i - 1);
-					Leg carLeg = (Leg) planElements.get(i);
 					ActivityImpl nextActivity = (ActivityImpl) planElements.get(i + 1);
 
 					// add leg from previous Activity to parking

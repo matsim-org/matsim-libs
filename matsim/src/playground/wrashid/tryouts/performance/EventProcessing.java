@@ -66,7 +66,7 @@ public class EventProcessing {
 	private class Handler1 implements LinkLeaveEventHandler {
 
 		public void handleEvent(LinkLeaveEventImpl event) {
-			LinkedList list=new LinkedList();
+			LinkedList<Double> list=new LinkedList<Double>();
 			for (int i = 0; i < 100; i++) {
 				list.add(Math.sin(i));
 			}

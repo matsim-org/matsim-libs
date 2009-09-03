@@ -45,7 +45,6 @@ public class Test2 {
 
 	static class ARunnable implements Runnable {
 		private Test2 t2;
-		private int parameter;
 		private int endTime;
 
 		public void run() {
@@ -75,7 +74,6 @@ public class Test2 {
 		public ARunnable(Test2 t2, int parameter, int endTime) {
 			super();
 			this.t2 = t2;
-			this.parameter = parameter;
 			this.endTime = endTime;
 		}
 	}
