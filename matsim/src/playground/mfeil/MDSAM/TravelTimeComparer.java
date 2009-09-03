@@ -35,6 +35,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.api.basic.v01.TransportMode;
+//import org.matsim.core.population.ActivityImpl;
+//import org.matsim.core.population.LegImpl;
 
 
 /**
@@ -53,14 +55,18 @@ public class TravelTimeComparer {
 		this.populationOrig = populationOrig;
 		this.populationNew = populationNew;
 	//	this.outputFile = "./plans/plans_similarity.xls";	
-		this.outputFile = "/home/baug/mfeil/data/largeSet/it0/ttcompare0.xls";	
+		this.outputFile = "/home/baug/mfeil/data/largeSet/it1/ttcompare11.xls";	
 	}
 	
 	public void run(){
 		log.info("Calculating travel time differences...");
+		log.info("populationOrig: "+this.populationOrig.getPersons().size());
+		log.info("populationNew: "+this.populationNew.getPersons().size());
+		
 		if (this.populationNew.getPersons().size()!=this.populationOrig.getPersons().size()){
 			log.warn("Different populations! Using the latter iteration's population.");
 			this.runSpecial();
+			return;
 		}		
 		
 		PrintStream stream;
@@ -89,6 +95,10 @@ public class TravelTimeComparer {
 		counter = 0;
 		
 		// Filling plans
+		double value=0;
+		double valueSelected=0;
+		double diffSelected=0;
+		int numberSelected=0;
 		for (Iterator<PersonImpl> iterator = this.populationOrig.getPersons().values().iterator(); iterator.hasNext();){
 			
 			int counterIn=0;
@@ -111,9 +121,15 @@ public class TravelTimeComparer {
 				PlanImpl planNew = personNew.getPlans().get(i);
 				for (int j=1;j<planOrig.getPlanElements().size();j+=2){
 					if (((LegImpl)(planOrig.getPlanElements().get(j))).getMode().equals(TransportMode.car)){
-						double value = (((LegImpl)(planNew.getPlanElements().get(j))).getTravelTime()-((LegImpl)(planOrig.getPlanElements().get(j))).getTravelTime());
-						stream.print(value+"\t");
-						stats[counter][counterIn]=value;
+						value += ((LegImpl)(planOrig.getPlanElements().get(j))).getTravelTime();
+						double diff = (((LegImpl)(planNew.getPlanElements().get(j))).getTravelTime()-((LegImpl)(planOrig.getPlanElements().get(j))).getTravelTime());
+						if (planNew.isSelected()){
+							valueSelected+=((LegImpl)(planOrig.getPlanElements().get(j))).getTravelTime();
+							diffSelected+=diff;
+							numberSelected++;
+						}						
+						stream.print(diff+"\t");
+						stats[counter][counterIn]=diff;
 						counterIn++;
 					}
 				}
@@ -167,15 +183,22 @@ public class TravelTimeComparer {
 		stream.println();
 		
 		//Delta
-		stream.print("\tdelta\t");
+		stream.print("\tsumDeltaPerTrip\t");
+		double deltaPerTrip=0;
 		for (int j=0;j<stats[0].length;j++){
 			int delta=0;
 			for (int i=0;i<stats.length;i++){
 				delta+=stats[i][j];
 			}
-			stream.print(delta+"\t");
+			stream.print((delta/stats[0].length)+"\t");
+			deltaPerTrip += delta;
 		}
-		stream.println();		
+		stream.println();
+		stream.println("\taveValuePerTrip\t"+(value/(stats.length*stats[0].length)));	
+		stream.println("\taveDeltaPerTrip\t"+(deltaPerTrip/(stats.length*stats[0].length)));	
+		stream.println();
+		stream.println("\taveValuePerSelectedTrip\t"+(valueSelected/numberSelected));	
+		stream.println("\taveDeltaPerSelectedTrip\t"+(diffSelected/numberSelected));	
 		
 		stream.close();
 		log.info("done.");
@@ -196,26 +219,30 @@ public class TravelTimeComparer {
 			int sizeIn = iterator.next().getSelectedPlan().getPlanElements().size()/2;
 			if (sizeIn>size) size= sizeIn;
 		}		
+		stream.print("PersonI\t");
 		for (int i=1;i<size+1;i++){
 			stream.print("x'x'"+(i*2)+"\t");
 		}
 		stream.println("increase\tdecrease\tsame\tsum_delta");
 		
-		double [][] stats = new double[this.populationNew.getPersons().size()][size];
 		int counter = 0;
 		
+		double Car=0;
 		int increaseCar=0;
 		int decreaseCar=0;
 		int sameCar=0;
 		double valueCar=0;
+		double PT=0;
 		int increasePT=0;
 		int decreasePT=0;
 		int samePT=0;
 		double valuePT=0;
+		double Walk=0;
 		int increaseWalk=0;
 		int decreaseWalk=0;
 		int sameWalk=0;
 		double valueWalk=0;
+		double Bike=0;
 		int increaseBike=0;
 		int decreaseBike=0;
 		int sameBike=0;
@@ -223,81 +250,110 @@ public class TravelTimeComparer {
 		
 		// compare populations
 		for (Iterator<PersonImpl> iterator = this.populationNew.getPersons().values().iterator(); iterator.hasNext();){
-			PlanImpl planNew = iterator.next().getSelectedPlan();
-			PlanImpl planOrig = this.populationOrig.getPersons().get(iterator.next().getId()).getSelectedPlan();
+			PersonImpl person = iterator.next();
+			PlanImpl planNew = person.getSelectedPlan();
+			PlanImpl planOrig = this.populationOrig.getPersons().get(person.getId()).getSelectedPlan();
 			
-			stream.print(iterator.next().getId()+"\t");
+			stream.print(person.getId()+"\t");
+			/*
+			for (int i=0;i<planOrig.getPlanElements().size();i++){
+				if (i%2==0) log.info("Orig Act"+i+": "+((ActivityImpl)(planOrig.getPlanElements().get(i))).getType());
+				else log.info("Orig Act"+i+": "+((LegImpl)(planOrig.getPlanElements().get(i))).getMode());
+			}
 			
-			for (int j=1;j<planOrig.getPlanElements().size();j+=2){
-				double value = (((LegImpl)(planNew.getPlanElements().get(j))).getTravelTime()-((LegImpl)(planOrig.getPlanElements().get(j))).getTravelTime());
-				stream.print(value+"\t");	
-				stats[counter][j/2]=value;
-				if (((LegImpl)(planNew.getPlanElements().get(j))).getMode().equals(TransportMode.car)){
-					if (value>0)increaseCar++;
-					else if (value<0)decreaseCar++;
-					else sameCar++;
-					valueCar+=value;
-				}
-				else if (((LegImpl)(planNew.getPlanElements().get(j))).getMode().equals(TransportMode.pt)){
-					if (value>0)increasePT++;
-					else if (value<0)decreasePT++;
-					else samePT++;
-					valuePT+=value;
-				}
-				else if (((LegImpl)(planNew.getPlanElements().get(j))).getMode().equals(TransportMode.walk)){
-					if (value>0)increaseWalk++;
-					else if (value<0)decreaseWalk++;
-					else sameWalk++;
-					valueWalk+=value;
-				}
-				else if (((LegImpl)(planNew.getPlanElements().get(j))).getMode().equals(TransportMode.bike)){
-					if (value>0)increaseBike++;
-					else if (value<0)decreaseBike++;
-					else sameBike++;
-					valueBike+=value;
-				}
-				else {
-					log.warn("Unknown mode: "+((LegImpl)(planNew.getPlanElements().get(j))).getMode());
-				}
+			for (int i=0;i<planNew.getPlanElements().size();i++){
+				if (i%2==0) log.info("New Act"+i+": "+((ActivityImpl)(planNew.getPlanElements().get(i))).getType());
+				else log.info("New Act"+i+": "+((LegImpl)(planNew.getPlanElements().get(i))).getMode());
 			}
-			for (int j=planOrig.getPlanElements().size()/2+1;j<size;j++){
-				stream.print("\t");
-				stats[counter][j]=Double.NaN;
-			}
+			*/
+			
 			int increase=0;
 			int decrease=0;
 			int same=0;
 			double delta=0;
-			for (int i=0;i<stats[counter].length;i++){
-				if(stats[counter][i]!=Double.NaN){
-					if(stats[counter][i]>0) increase++;
-					else if (stats[counter][i]<0) decrease++;
+			
+			if (planOrig.getPlanElements().size()>1){
+				for (int j=1;j<planOrig.getPlanElements().size();j+=2){
+					double value = ((LegImpl)(planOrig.getPlanElements().get(j))).getTravelTime();
+					double diff = (((LegImpl)(planNew.getPlanElements().get(j))).getTravelTime()-((LegImpl)(planOrig.getPlanElements().get(j))).getTravelTime());
+					stream.print(diff+"\t");	
+					if (diff>0)increase++;
+					else if (diff<0)decrease++;
 					else same++;
-					delta+=stats[counter][i];
+					delta+=diff;
+					
+					if (((LegImpl)(planNew.getPlanElements().get(j))).getMode().equals(TransportMode.car)){
+						if (diff>0)increaseCar++;
+						else if (diff<0)decreaseCar++;
+						else sameCar++;
+						valueCar+=diff;
+						Car+=value;
+					}
+					else if (((LegImpl)(planNew.getPlanElements().get(j))).getMode().equals(TransportMode.pt)){
+						if (diff>0)increasePT++;
+						else if (diff<0)decreasePT++;
+						else samePT++;
+						valuePT+=diff;
+						PT+=value;
+					}
+					else if (((LegImpl)(planNew.getPlanElements().get(j))).getMode().equals(TransportMode.walk)){
+						if (diff>0)increaseWalk++;
+						else if (diff<0)decreaseWalk++;
+						else sameWalk++;
+						valueWalk+=diff;
+						Walk+=value;
+					}
+					else if (((LegImpl)(planNew.getPlanElements().get(j))).getMode().equals(TransportMode.bike)){
+						if (diff>0)increaseBike++;
+						else if (diff<0)decreaseBike++;
+						else sameBike++;
+						valueBike+=diff;
+						Bike+=value;
+					}
+					else {
+						log.warn("Unknown mode: "+((LegImpl)(planNew.getPlanElements().get(j))).getMode());
+					}
 				}
+			}/*
+			if (planOrig.getPlanElements().size()==1){
+				stream.print("\t");
+			}*/
+			for (int j=planOrig.getPlanElements().size()/2+1;j<=size;j++){
+				stream.print("\t");
 			}
+
 			stream.println(increase+"\t"+decrease+"\t"+same+"\t"+delta);			
 			counter++;
 		}
+		stream.println();
 		stream.println("increaseCar\t"+increaseCar);
 		stream.println("decreaseCar\t"+decreaseCar);
 		stream.println("sameCar\t"+sameCar);
 		stream.println("valueCar\t"+valueCar);
-		
+		stream.println("valuePerTrip\t"+(Car/(increaseCar+decreaseCar+sameCar)));
+		stream.println("deltaPerTrip\t"+(valueCar/(increaseCar+decreaseCar+sameCar)));
+		stream.println();
 		stream.println("increasePT\t"+increasePT);
 		stream.println("decreasePT\t"+decreasePT);
 		stream.println("samePT\t"+samePT);
 		stream.println("valuePT\t"+valuePT);
-		
+		stream.println("valuePerTrip\t"+(PT/(increasePT+decreasePT+samePT)));
+		stream.println("deltaPerTrip\t"+(valuePT/(increasePT+decreasePT+samePT)));
+		stream.println();
 		stream.println("increaseWalk\t"+increaseWalk);
 		stream.println("decreaseWalk\t"+decreaseWalk);
 		stream.println("sameWalk\t"+sameWalk);
 		stream.println("valueWalk\t"+valueWalk);
-		
+		stream.println("valuePerTrip\t"+(Walk/(increaseWalk+decreaseWalk+sameWalk)));
+		stream.println("deltaPerTrip\t"+(valueWalk/(increaseWalk+decreaseWalk+sameWalk)));
+		stream.println();
 		stream.println("increaseBike\t"+increaseBike);
 		stream.println("decreaseBike\t"+decreaseBike);
 		stream.println("sameBike\t"+sameBike);
 		stream.println("valueBike\t"+valueBike);
+		stream.println("valuePerTrip\t"+(Bike/(increaseBike+decreaseBike+sameBike)));
+		stream.println("deltaPerTrip\t"+(valueBike/(increaseBike+decreaseBike+sameBike)));
+
 		
 		stream.close();
 		log.info("done.");
@@ -308,7 +364,7 @@ public class TravelTimeComparer {
 	public static void main(final String [] args) {
 				final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 				final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-				final String populationFilenameOrig = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";
+				final String populationFilenameOrig = "/home/baug/mfeil/data/largeSet/it0/output_plans_mz02.xml";
 				final String populationFilenameNew = "/home/baug/mfeil/data/largeSet/it1/output_plans_mz16.xml";
 		/*		final String populationFilename = "./plans/output_plans.xml";
 				final String networkFilename = "./plans/network.xml";
