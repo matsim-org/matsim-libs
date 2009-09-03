@@ -36,7 +36,7 @@ public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEv
 				/*
 				 * this is not the first time we are departing, which means that the car was parked before 
 				 */ 
-				pTime.addParkLog(new ParkLog(event.getAct().getFacilityId(),pTime.getLastParkingArrivalTime(),event.getTime()));
+				pTime.addParkLog(new ParkLog(event.getAct(),pTime.getLastParkingArrivalTime(),event.getTime()));
 			} else {
 				/*
 				 * this means, that this is the first time the car departs (e.g.
@@ -69,7 +69,7 @@ public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEv
 			}
 	
 			pTime.setCarLastTimeParked(event.getTime());
-			pTime.setCarLastTimeParkedFacilityId(event.getAct().getFacilityId());
+			pTime.setCarLastTimeParkedActivity(event.getAct());
 		}
 	}
 

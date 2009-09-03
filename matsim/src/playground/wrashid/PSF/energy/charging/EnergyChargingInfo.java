@@ -17,7 +17,7 @@ public class EnergyChargingInfo {
 	 * can charge for lesser money.
 	 * 
 	 */
-	public static double getEnergyPrice(double time, Id facility) {
+	public static double getEnergyPrice(double time, Id linkId) {
 
 		// fit time into 24 hours
 		time = Math.round(time) % 86400;
@@ -33,9 +33,8 @@ public class EnergyChargingInfo {
 			}
 		} else {
 			// read price from file
-			// CONTINUE: remove the null from down there => need to get hold of link id... - how?
 			HubLinkMapping hubLinkMapping=ParametersPSF.getHubLinkMapping();
-			return ParametersPSF.getHubPriceInfo().getPrice(time, hubLinkMapping.getHubNumber(null));
+			return ParametersPSF.getHubPriceInfo().getPrice(time, hubLinkMapping.getHubNumber(linkId.toString()));
 		}	
 	}
 

@@ -47,7 +47,7 @@ public class EnergyBalance {
 		// prepare parking times
 		parkingTimes = (LinkedList<ParkLog>) parkTimes.getParkingTimes().clone();
 		// add the last parking event of the day to the queue
-		parkingTimes.add(new ParkLog(parkTimes.getCarLastTimeParkedFacilityId(), parkTimes.getLastParkingArrivalTime(), parkTimes
+		parkingTimes.add(new ParkLog(parkTimes.getCarLastTimeParkedActivity(), parkTimes.getLastParkingArrivalTime(), parkTimes
 				.getFirstParkingDepartTime()));
 
 		int maxIndex = parkingTimes.size();
@@ -140,10 +140,10 @@ public class EnergyBalance {
 		double tempPrice;
 		for (int j = 0; j < maxTimeSlotNumber - minTimeSlotNumber; j++) {
 			double time = Math.floor(parkingTimes.get(parkingIndex).getStartParkingTime() / 900) * 900 + j * 900;
-			tempPrice = EnergyChargingInfo.getEnergyPrice(time, parkingTimes.get(parkingIndex).getFacilityId());
+			tempPrice = EnergyChargingInfo.getEnergyPrice(time, parkingTimes.get(parkingIndex).getActivity().getLinkId());
 
 			FacilityChargingPrice tempFacilityChPrice = new FacilityChargingPrice(tempPrice, minTimeSlotNumber + j, parkingIndex,
-					time, parkingTimes.get(parkingIndex).getFacilityId(), parkingTimes.get(parkingIndex).getStartParkingTime(),
+					time, parkingTimes.get(parkingIndex).getActivity().getFacilityId(), parkingTimes.get(parkingIndex).getStartParkingTime(),
 					parkingTimes.get(parkingIndex).getEndParkingTime());
 			chargingPrice.add(tempFacilityChPrice);
 		}
@@ -223,7 +223,7 @@ public class EnergyBalance {
 
 			// get the parking index, where this car will charge
 			int parkingIndex = bestEnergyPrice.getEnergyBalanceParkingIndex();
-			Id facilityId = parkingTimes.get(parkingIndex).getFacilityId();
+			Id facilityId = parkingTimes.get(parkingIndex).getActivity().getFacilityId();
 
 			// the maximum energy, that can be charged at a parking (because we
 			// can only charge as much as the car has driven previously)
