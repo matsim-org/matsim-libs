@@ -21,12 +21,12 @@
 package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
-public class AgentWait2LinkEventImpl extends AgentEventImpl implements BasicAgentWait2LinkEvent {
+public class AgentWait2LinkEventImpl extends AgentEventImpl implements AgentWait2LinkEvent {
 
 	public static final String EVENT_TYPE = "wait2link";
 

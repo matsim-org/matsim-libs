@@ -21,12 +21,12 @@
 package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
-public class AgentStuckEventImpl extends AgentEventImpl implements BasicAgentStuckEvent {
+public class AgentStuckEventImpl extends AgentEventImpl implements AgentStuckEvent {
 
 	public static final String EVENT_TYPE = "stuckAndAbort";
 

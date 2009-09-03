@@ -20,15 +20,6 @@
 package org.matsim.core.api.experimental.events;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 
 
 /**
@@ -38,23 +29,23 @@ import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
  */
 public interface EventsBuilder {
 
-	BasicLinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId);
+	LinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId);
 
-	BasicLinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId);
+	LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId);
 
-	BasicAgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId);
+	AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId);
 
-	BasicAgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId);
+	AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId);
 
-	BasicAgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId);
+	AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId);
 
-	BasicAgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId);
+	AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId);
 
-	BasicActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, String acttype);
+	ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, String acttype);
 
-	BasicActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, String acttype);
+	ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, String acttype);
 
-	BasicAgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney);
+	AgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney);
 
 	// the following are not (yet) in the api?
 	

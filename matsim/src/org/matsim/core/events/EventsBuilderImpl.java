@@ -20,16 +20,16 @@
 package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsBuilder;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.events.BasicPersonEntersVehicleEvent;
 import org.matsim.core.basic.v01.events.BasicPersonLeavesVehicleEvent;
 import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
@@ -44,39 +44,39 @@ import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEventImpl;
  */
 public class EventsBuilderImpl implements EventsBuilder {
 
-	public BasicActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, String acttype) {
+	public ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, String acttype) {
 		return new ActivityEndEventImpl(time, agentId, linkId, acttype);
 	}
 
-	public BasicActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, String acttype) {
+	public ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, String acttype) {
 		return new ActivityStartEventImpl(time, agentId, linkId, acttype);
 	}
 
-	public BasicAgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId) {
+	public AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId) {
 		return new AgentArrivalEventImpl(time, agentId, linkId);
 	}
 
-	public BasicAgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId) {
+	public AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId) {
 		return new AgentDepartureEventImpl(time, agentId, linkId);
 	}
 
-	public BasicAgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney) {
+	public AgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney) {
 		return new AgentMoneyEventImpl(time, agentId, amountMoney);
 	}
 
-	public BasicAgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId) {
+	public AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId) {
 		return new AgentStuckEventImpl(time, agentId, linkId);
 	}
 
-	public BasicAgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId) {
+	public AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId) {
 		return new AgentWait2LinkEventImpl(time, agentId, linkId);
 	}
 
-	public BasicLinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId) {
+	public LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId) {
 		return new LinkEnterEventImpl(time, agentId, linkId);
 	}
 
-	public BasicLinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId) {
+	public LinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId) {
 		return new LinkLeaveEventImpl(time, agentId, linkId);
 	}
 	

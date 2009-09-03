@@ -117,8 +117,8 @@ public class EventsImpl implements MatsimToplevelContainer, Events {
 
 	private final Map<Class<?>, HandlerInfo[]> cacheHandlers = new ConcurrentHashMap<Class<?>, HandlerInfo[]>(15);
 
-	private long counter = 0;
-	private long nextCounterMsg = 1;
+	public long counter = 0;
+	public long nextCounterMsg = 1;
 
 	private EventsBuilder builder;
 	
@@ -246,7 +246,7 @@ public class EventsImpl implements MatsimToplevelContainer, Events {
 		}
 	}
 
-	private void computeEvent(final BasicEvent event) {
+	public void computeEvent(final BasicEvent event) {
 		for (HandlerInfo info : getHandlersForClass(event.getClass())) {
 			synchronized(info.eventHandler) {
 				if (callHandlerFast(info.eventClass, event, info.eventHandler)) {
