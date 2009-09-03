@@ -12,7 +12,7 @@ import java.util.StringTokenizer;
  */
 public class HubPriceInfo {
 
-	// first index: , second index: price (max 96 entries, for the 15 min bins)
+	// first index: , second index: price (96 entries, for the 15 min bins)
 	double hubPrice[][];
 
 	public HubPriceInfo(String fileName, int numberOfHubs) {

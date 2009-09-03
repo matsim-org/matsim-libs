@@ -4,6 +4,9 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 
+import playground.wrashid.PSF.data.HubLinkMapping;
+import playground.wrashid.PSF.data.HubPriceInfo;
+
 public class ParametersPSF {
 
 	private static final Logger log = Logger.getLogger(ParametersPSF.class);
@@ -17,6 +20,18 @@ public class ParametersPSF {
 	private static String default_chargingPowerAtParking = "default.chargingPowerAtParking";
 	private static double defaultChargingPowerAtParking;
 	// in [W]
+	private static String main_numberOfHubs = "main.numberOfHubs";
+	private static int numberOfHubs;
+	// number of hubs the network is divided into
+	private static String main_hubPricesPath = "main.hubPricesPath";
+	private static HubPriceInfo hubPriceInfo;
+	// path of the file, where the electricity price of each hub during the day
+	// is specified
+	private static String main_hubLinkMapping = "main.hubLinkMapping";
+	private static HubLinkMapping hubLinkMapping;
+	// path of the file, where the electricity price of each hub during the day
+	// is specified
+	
 
 	// testing parameters
 
@@ -35,7 +50,7 @@ public class ParametersPSF {
 	private static String testing_lowTariffElectrictyPrice = "testing.lowTariffElectrictyPrice";
 	private static double testingLowTariffElectrictyPrice;
 	// in utils/J lowTariff: from 20:00 to 07:00
-	
+
 	private static double testingPeakPriceStartTime = 25200;
 	private static double testingPeakPriceEndTime = 72000;
 
@@ -56,6 +71,27 @@ public class ParametersPSF {
 			errorReadingParameter(default_chargingPowerAtParking);
 		}
 
+		tempStringValue = controler.getConfig().findParam(PSFModule, main_numberOfHubs);
+		if (tempStringValue != null) {
+			numberOfHubs = Integer.parseInt(tempStringValue);
+		} else {
+			errorReadingParameter(main_numberOfHubs);
+		}
+
+		tempStringValue = controler.getConfig().findParam(PSFModule, main_hubPricesPath);
+		if (tempStringValue != null) {
+			hubPriceInfo = new HubPriceInfo(tempStringValue, numberOfHubs);
+		} else {
+			errorReadingParameter(main_hubPricesPath);
+		}
+		
+		tempStringValue = controler.getConfig().findParam(PSFModule, main_hubLinkMapping);
+		if (tempStringValue != null) {
+			hubLinkMapping = new HubLinkMapping(tempStringValue, numberOfHubs);
+		} else {
+			errorReadingParameter(main_hubLinkMapping);
+		}
+
 		tempStringValue = controler.getConfig().findParam(PSFModule, testing_ModeOn);
 		if (tempStringValue != null) {
 			testingModeOn = Boolean.parseBoolean(tempStringValue);
@@ -74,29 +110,33 @@ public class ParametersPSF {
 			tempStringValue = controler.getConfig().findParam(PSFModule, testing_maxEnergyPriceWillingToPay);
 			if (tempStringValue != null) {
 				testingMaxEnergyPriceWillingToPay = Double.parseDouble(tempStringValue);
-			}else {
+			} else {
 				errorReadingParameter(testing_maxEnergyPriceWillingToPay);
 			}
 
 			tempStringValue = controler.getConfig().findParam(PSFModule, testing_peakHourElectricityPrice);
 			if (tempStringValue != null) {
 				testingPeakHourElectricityPrice = Double.parseDouble(tempStringValue);
-			}else {
+			} else {
 				errorReadingParameter(testing_peakHourElectricityPrice);
 			}
 
 			tempStringValue = controler.getConfig().findParam(PSFModule, testing_lowTariffElectrictyPrice);
 			if (tempStringValue != null) {
 				testingLowTariffElectrictyPrice = Double.parseDouble(tempStringValue);
-			}else {
+			} else {
 				errorReadingParameter(testing_lowTariffElectrictyPrice);
 			}
 		}
-		
+
 		resetInternalParameters();
 	}
-	
-	private static void resetInternalParameters(){
+
+	public static HubLinkMapping getHubLinkMapping() {
+		return hubLinkMapping;
+	}
+
+	private static void resetInternalParameters() {
 		testingPeakPriceStartTime = 25200;
 		testingPeakPriceEndTime = 72000;
 	}
@@ -175,6 +215,14 @@ public class ParametersPSF {
 
 	public static void setTestingPeakPriceEndTime(double testingPeakPriceEndTime) {
 		ParametersPSF.testingPeakPriceEndTime = testingPeakPriceEndTime;
+	}
+
+	public static int getNumberOfHubs() {
+		return numberOfHubs;
+	}
+
+	public static HubPriceInfo getHubPriceInfo() {
+		return hubPriceInfo;
 	}
 
 }
