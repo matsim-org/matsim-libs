@@ -1,6 +1,5 @@
 package playground.wrashid.tryouts.events;
 
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 

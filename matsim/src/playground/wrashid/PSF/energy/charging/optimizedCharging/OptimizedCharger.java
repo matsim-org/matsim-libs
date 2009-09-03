@@ -7,7 +7,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
-import playground.wrashid.PSF.energy.charging.EnergyChargingInfo;
 import playground.wrashid.PSF.energy.consumption.EnergyConsumption;
 import playground.wrashid.PSF.parking.ParkingTimes;
 

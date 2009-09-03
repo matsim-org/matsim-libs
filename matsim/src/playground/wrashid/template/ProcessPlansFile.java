@@ -1,20 +1,14 @@
 package playground.wrashid.template;
 
-import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.api.basic.v01.BasicScenarioImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationReaderMatsimV4;
-import org.matsim.core.population.PopulationWriter;
 
-import playground.andreas.bln.DuplicatePlans;
 import playground.andreas.bln.NewPopulation;
 
 /*

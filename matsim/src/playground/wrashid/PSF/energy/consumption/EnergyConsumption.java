@@ -2,8 +2,6 @@ package playground.wrashid.PSF.energy.consumption;
 
 import java.util.LinkedList;
 
-import playground.wrashid.PSF.parking.ParkLog;
-
 public class EnergyConsumption {
 
 	private LinkedList<LinkEnergyConsumptionLog> linkEnergyConsumption=new LinkedList<LinkEnergyConsumptionLog>();

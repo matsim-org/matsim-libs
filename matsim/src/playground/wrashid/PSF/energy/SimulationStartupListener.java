@@ -6,10 +6,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
-
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.ParametersPSFMutator;
-import playground.wrashid.PSF.parking.LogParkingTimes;
 
 public class SimulationStartupListener implements StartupListener {
 

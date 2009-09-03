@@ -1,10 +1,8 @@
 package playground.wrashid.tryouts.plan;
 
-import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
@@ -15,13 +13,9 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationReaderMatsimV4;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.world.World;
 
-import playground.andreas.bln.DuplicatePlans;
 import playground.andreas.bln.NewPopulation;
 
 /*

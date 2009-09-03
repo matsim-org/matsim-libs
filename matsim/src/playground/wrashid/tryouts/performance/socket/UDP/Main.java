@@ -1,8 +1,5 @@
 package playground.wrashid.tryouts.performance.socket.UDP;
 
-import org.matsim.core.mobsim.jdeqsim.util.Timer;
-
-import playground.wrashid.tryouts.performance.Test2;
 
 public class Main {
 
