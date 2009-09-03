@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.balmermi.algos;
+package playground.mfeil.analysis;
 
 import java.util.Iterator;
 
