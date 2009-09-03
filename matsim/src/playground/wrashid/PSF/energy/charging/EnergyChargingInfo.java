@@ -4,6 +4,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
 import playground.wrashid.PSF.ParametersPSF;
+import playground.wrashid.PSF.data.HubLinkMapping;
 
 public class EnergyChargingInfo {
 
@@ -30,10 +31,12 @@ public class EnergyChargingInfo {
 				// if peak hour
 				return ParametersPSF.getTestingPeakHourElectricityPrice();
 			}
-		}
-
-		// TODO: make the real implementation here
-		return 1.0;
+		} else {
+			// read price from file
+			// CONTINUE: remove the null from down there => need to get hold of link id... - how?
+			HubLinkMapping hubLinkMapping=ParametersPSF.getHubLinkMapping();
+			return ParametersPSF.getHubPriceInfo().getPrice(time, hubLinkMapping.getHubNumber(null));
+		}	
 	}
 
 }
