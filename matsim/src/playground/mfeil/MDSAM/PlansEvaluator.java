@@ -60,9 +60,9 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 	                      
 	public PlansEvaluator (Controler controler) {
 		super (controler);
-		this.inputFile = "/home/baug/mfeil/data/largeSet/it1/run16/output_plans.xml";	
+		this.inputFile = "/home/baug/mfeil/data/largeSet/it0/output_plans_mz02.xml";	
 		this.outputFile = "/home/baug/mfeil/data/largeSet/it1/output_plans_mz16.xml.gz";	
-		this.outputFileBiogeme = "/home/baug/mfeil/data/largeSet/it0/output_plans16.dat";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/largeSet/it1/output_plans16.dat";	
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
