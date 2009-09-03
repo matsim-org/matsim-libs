@@ -25,5 +25,6 @@ public class GeneralLibTest extends MatsimTestCase {
 		facilities=GeneralLib.readActivityFacilities("output/facilities.xml");
 		
 		assertEquals(23, facilities.getFacilities().size());
+		  
 	}
-} 
+}       
