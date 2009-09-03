@@ -26,9 +26,13 @@ public class Mobsim {
 	}
 	
 	public void run() {
-		EventsBuilder eb = this.ev.getBuilder();
+		// getting the network info should be w/o problems
 		
-		// finally, we need to be able to generate events:
+		// getting the plans info should be w/o problems
+				
+		// the following tests the events generation
+		EventsBuilder eb = this.ev.getBuilder();
+
 		Id agentId = sc.createId("agentId");
 		Id linkId = sc.createId("linkId");
 		double time = 1. ;
