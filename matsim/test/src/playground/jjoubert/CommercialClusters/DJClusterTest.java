@@ -21,6 +21,7 @@
 package playground.jjoubert.CommercialClusters;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.testcases.MatsimTestCase;
 
@@ -47,7 +48,7 @@ public class DJClusterTest extends MatsimTestCase{
 	 
 	public void testDJCluster(){
 //		QuadTree<Point> qt = buildTestQuadTree();
-		ArrayList<Point> al = buildTestArrayList();
+		List<Point> al = buildTestArrayList();
 		DJCluster djc = new DJCluster(2, 3, al);
 		djc.clusterInput();
 		
@@ -57,9 +58,9 @@ public class DJClusterTest extends MatsimTestCase{
 		assertEquals("The right cluster must have 4 points.", 4, djc.getClusterList().get(1).getPoints().size());
 		
 	}
-	private static ArrayList<Point> buildTestArrayList(){
+	private static List<Point> buildTestArrayList(){
 		// Build the test QuadTree
-		ArrayList<Point> al = new ArrayList<Point>();
+		List<Point> al = new ArrayList<Point>();
 		GeometryFactory gf = new GeometryFactory();
 		
 		// Cluster 1

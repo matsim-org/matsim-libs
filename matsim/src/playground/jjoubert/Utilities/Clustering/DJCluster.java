@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -59,9 +60,9 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author jwjoubert
  */
 public class DJCluster {
-	private ArrayList<Point> inputPoints;
+	private List<Point> inputPoints;
 	private QuadTree<ClusterPoint> clusteredPoints;
-	private ArrayList<Cluster> clusterList;
+	private List<Cluster> clusterList;
 	private float radius;
 	private int minimumPoints;
 	private final static Logger log = Logger.getLogger(DJCluster.class);
@@ -77,7 +78,7 @@ public class DJCluster {
 	 * 			case of commercial activities in South Africa, these points were generated
 	 * 			from the activity locations file. 
 	 */
-	public DJCluster(float radius, int minimumPoints, ArrayList<Point> pointsToCluster){
+	public DJCluster(float radius, int minimumPoints, List<Point> pointsToCluster){
 		this.radius = radius;
 		this.minimumPoints = minimumPoints;
 		this.inputPoints = pointsToCluster;		
@@ -115,13 +116,13 @@ public class DJCluster {
 		 * Initially all ClusterPoints will have a NULL reference to its cluster. An 
 		 * ArrayList of Points is also kept as iterator for unclustered points.
 		 */
-		QuadTree<ClusterPoint> qt = new QuadTree<ClusterPoint>(xMin, yMin, xMax, yMax);
-		ArrayList<ClusterPoint> ul = new ArrayList<ClusterPoint>();
+		clusteredPoints = new QuadTree<ClusterPoint>(xMin, yMin, xMax, yMax);
+		List<ClusterPoint> ul = new ArrayList<ClusterPoint>();
 		for (int i = 0; i < this.inputPoints.size(); i++) {
 			double x = inputPoints.get(i).getX();
 			double y = inputPoints.get(i).getY();
 			ClusterPoint cp = new ClusterPoint(i, inputPoints.get(i), null);
-			qt.put(x, y, cp);
+			clusteredPoints.put(x, y, cp);
 			ul.add(cp);
 		}
 		
@@ -132,9 +133,9 @@ public class DJCluster {
 			
 			if(p.getCluster() == null){
 				// Compute the density-based neighbourhood, N(p), of the point p
-				Collection<ClusterPoint> neighbourhood = qt.get(p.getPoint().getX(), p.getPoint().getY(), radius);
-				ArrayList<ClusterPoint> uN = new ArrayList<ClusterPoint>(neighbourhood.size());
-				ArrayList<ClusterPoint> cN = new ArrayList<ClusterPoint>(neighbourhood.size());
+				Collection<ClusterPoint> neighbourhood = clusteredPoints.get(p.getPoint().getX(), p.getPoint().getY(), radius);
+				List<ClusterPoint> uN = new ArrayList<ClusterPoint>(neighbourhood.size());
+				List<ClusterPoint> cN = new ArrayList<ClusterPoint>(neighbourhood.size());
 				for (ClusterPoint cp : neighbourhood) {
 					if(cp.getCluster() == null){
 						uN.add(cp);
@@ -151,7 +152,7 @@ public class DJCluster {
 					 * value as the remaining cluster.
 					 */
 					
-					ArrayList<Cluster> localClusters = new ArrayList<Cluster>();
+					List<Cluster> localClusters = new ArrayList<Cluster>();
 					Cluster smallestCluster = cN.get(0).getCluster();
 					for(int i = 1; i < cN.size(); i++){
 						if(Integer.parseInt(cN.get(i).getCluster().getClusterId()) < 
@@ -164,7 +165,7 @@ public class DJCluster {
 					}
 					for (Cluster cluster : localClusters) {
 						if(!cluster.equals(smallestCluster)){
-							ArrayList<ClusterPoint> thisClusterList = (ArrayList<ClusterPoint>) cluster.getPoints().clone();
+							List<ClusterPoint> thisClusterList = (List<ClusterPoint>) cluster.getPoints().clone();
 							for(int j = 0; j < thisClusterList.size(); j++){
 								// Change the Cluster reference of the ClusterPoint.
 								thisClusterList.get(j).setCluster(smallestCluster);
@@ -206,6 +207,7 @@ public class DJCluster {
 		log.info("   Points clustered: " + pointCounter + " (Done)");	
 		log.info("Sum should add up: " + cPointCounter + " (clustered) + " 
 									   + uPointCounter + " (unclustered) = "
+
 									   + pointCounter);
 				
 		/* 
@@ -215,12 +217,15 @@ public class DJCluster {
 		 * when determining adjacency in Social Network Analysis.
 		 */
 		log.info("Building the cluster list.");
-		Map<Cluster, ArrayList<ClusterPoint>> clusterMap = new TreeMap<Cluster, ArrayList<ClusterPoint>>();
+		Map<Cluster, List<ClusterPoint>> clusterMap = new TreeMap<Cluster, List<ClusterPoint>>();
 		for (ClusterPoint cp : ul) {
 			Cluster theCluster = cp.getCluster();
 			if(theCluster != null){
+				theCluster.setCenterOfGravity();
+			}
+			if(theCluster != null){
 				if(!clusterMap.containsKey(theCluster)){
-					ArrayList<ClusterPoint> newList = new ArrayList<ClusterPoint>();
+					List<ClusterPoint> newList = new ArrayList<ClusterPoint>();
 					clusterMap.put(theCluster, newList);
 				}
 				clusterMap.get(theCluster).add(cp);
@@ -228,8 +233,8 @@ public class DJCluster {
 		}
 		int clusterNumber = 0;
 		for (Cluster cluster : clusterMap.keySet()) {
-			ArrayList<ClusterPoint> listOfClusterPoints = clusterMap.get(cluster);
-			if(listOfClusterPoints.size() > minimumPoints){
+			List<ClusterPoint> listOfClusterPoints = clusterMap.get(cluster);
+			if(listOfClusterPoints.size() >= minimumPoints){
 				cluster.setClusterId(String.valueOf(clusterNumber));
 				clusterNumber++;
 				cluster.setCenterOfGravity();
@@ -296,7 +301,7 @@ public class DJCluster {
 		}
 	}
 
-	public ArrayList<Cluster> getClusterList() {
+	public List<Cluster> getClusterList() {
 		return clusterList;
 	}
 	
@@ -539,7 +544,7 @@ public class DJCluster {
 		GeometryFactory gf = new GeometryFactory();
 		Polygon result = null;
 		Coordinate[] coordinates = polygon.getCoordinates();
-		ArrayList<Coordinate> al = new ArrayList<Coordinate>(coordinates.length);
+		List<Coordinate> al = new ArrayList<Coordinate>(coordinates.length);
 		al.add(coordinates[0]);
 		for(int i = 1; i < coordinates.length-1; i++){
 			if(!coordinates[i].equals2D(coordinates[i-1])){
@@ -560,7 +565,7 @@ public class DJCluster {
 	private LineString findLongestSegmentIndex(Coordinate[] hullCoordinates) {
 		GeometryFactory gf = new GeometryFactory();
 		Map<Double, LineString> lengthMap = new HashMap<Double, LineString>();
-		ArrayList<Double> lengths = new ArrayList<Double>(hullCoordinates.length);
+		List<Double> lengths = new ArrayList<Double>(hullCoordinates.length);
 		for(int i = 0; i < hullCoordinates.length; i++){
 			Coordinate [] linePoints = new Coordinate [2];
 			if(i < hullCoordinates.length-1 ){

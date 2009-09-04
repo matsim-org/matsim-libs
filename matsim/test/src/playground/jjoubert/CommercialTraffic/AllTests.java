@@ -18,21 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert;
+package playground.jjoubert.CommercialTraffic;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 
 public class AllTests {
-	
+
 	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.jjoubert");
+		TestSuite suite = new TestSuite("Tests for playground.jjoubert.CommercialTraffic");
 		
-		suite.addTest(playground.jjoubert.CommercialClusters.AllTests.suite());
-		suite.addTest(playground.jjoubert.CommercialDemand.AllTests.suite());
-		suite.addTest(playground.jjoubert.CommercialTraffic.AllTests.suite());
-		suite.addTest(playground.jjoubert.Utilities.AllTests.suite());
+		suite.addTest(playground.jjoubert.CommercialTraffic.ActivityAnalysis.AllTests.suite());
+		
+		suite.addTestSuite(SelectVehiclesTest.class);
 		
 		return suite;
 	}

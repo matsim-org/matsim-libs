@@ -26,7 +26,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.TreeMap;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
@@ -55,7 +55,7 @@ public class MyAdjancencyMatrixBuilder {
 
 	private QuadTree<ClusterPoint> clusteredPoints;
 	
-	public MyAdjancencyMatrixBuilder(ArrayList<Cluster> clusterList){
+	public MyAdjancencyMatrixBuilder(List<Cluster> clusterList){
 		matrixDimension = clusterList.size();
 		distanceAdjacency = new SparseDoubleMatrix2D(matrixDimension, matrixDimension);
 		inOrderAdjacency = new SparseDoubleMatrix1D(matrixDimension);
@@ -69,7 +69,7 @@ public class MyAdjancencyMatrixBuilder {
 	}
 	
 	
-	public MyAdjancencyMatrixBuilder(ArrayList<Cluster> clusterList, QuadTree<ClusterPoint> clusteredPoints){
+	public MyAdjancencyMatrixBuilder(List<Cluster> clusterList, QuadTree<ClusterPoint> clusteredPoints){
 		matrixDimension = clusterList.size();
 		distanceAdjacency = new SparseDoubleMatrix2D(matrixDimension, matrixDimension);
 		inOrderAdjacency = new SparseDoubleMatrix1D(matrixDimension);
@@ -83,7 +83,7 @@ public class MyAdjancencyMatrixBuilder {
 	}
 
 	
-	private QuadTree<ClusterPoint> buildQuadTree(ArrayList<Cluster> clusterList) {
+	private QuadTree<ClusterPoint> buildQuadTree(List<Cluster> clusterList) {
 		log.info("Building QuadTree.");
 		double xMin = Double.MAX_VALUE;
 		double yMin = Double.MAX_VALUE;
@@ -108,19 +108,19 @@ public class MyAdjancencyMatrixBuilder {
 	}
 
 
-	public void buildAdjacency(ArrayList<Chain> chains){
+	public void buildAdjacency(List<Chain> chains){
 		GeometryFactory gf = new GeometryFactory();
 		log.info("Building adjacency for " + chains.size() + " chains.");
 		int chainCounter = 0;
 		int chainMultiplier = 1;
 		
 		for(Chain chain : chains ){
-			ArrayList<Activity> al = chain.getActivities();
+			List<Activity> al = chain.getActivities();
 			if(al.size() > 3){
 				for(int a = 1; a < al.size() - 2; a++){
 					Point p1 = gf.createPoint(al.get(a).getLocation().getCoordinate());
 					Point p2 = gf.createPoint(al.get(a+1).getLocation().getCoordinate());
-					ArrayList<Cluster> link = testValidLink(p1,p2);
+					List<Cluster> link = testValidLink(p1,p2);
 					if(link != null){
 						int row = Integer.parseInt(link.get(0).getClusterId());
 						int col = Integer.parseInt(link.get(1).getClusterId());
@@ -142,19 +142,19 @@ public class MyAdjancencyMatrixBuilder {
 	}
 
 
-	private ArrayList<Cluster> testValidLink(Point p1, Point p2) {
-		ArrayList<Cluster> result = null;
+	private List<Cluster> testValidLink(Point p1, Point p2) {
+		List<Cluster> result = null;
 		Collection<ClusterPoint> c1List = clusteredPoints.get(p1.getX(), p1.getY(), 0.0);
 		Collection<ClusterPoint> c2List = clusteredPoints.get(p2.getX(), p2.getY(), 0.0);
 		Cluster c1 = null;
 		Cluster c2 = null;
 		if(c1List.size() > 0){
-			c1 = ((ArrayList<ClusterPoint>) c1List).get(0).getCluster();
+			c1 = ((List<ClusterPoint>) c1List).get(0).getCluster();
 			int pos = Integer.parseInt(c1.getClusterId());
 			inOrderAdjacency.setQuick(pos, inOrderAdjacency.getQuick(pos)+1);
 		}
 		if(c2List.size() > 0){
-			c2 = ((ArrayList<ClusterPoint>) c2List).get(0).getCluster();
+			c2 = ((List<ClusterPoint>) c2List).get(0).getCluster();
 			int pos = Integer.parseInt(c2.getClusterId());
 			outOrderAdjacency.setQuick(pos, outOrderAdjacency.getQuick(pos)+1);			
 		}

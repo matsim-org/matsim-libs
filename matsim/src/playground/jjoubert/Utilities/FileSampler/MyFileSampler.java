@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -94,10 +95,15 @@ public class MyFileSampler {
 	 * 		used to filter the files from the source folder. In my case, I have written
 	 * 		my own <code>playground.jjoubert.Utilities.FileSampler.MyFileFilter</code>
 	 * 		that uses the file extension as filter.
-	 * @return an <code>ArrayList</code> of <code>File</code>s containing the 
+	 * @return a <code>List</code> of <code>File</code>s sampled.
+	 * @author jwjoubert
 	 */
-	public ArrayList<File> sampleFiles(int number, FilenameFilter filter){
-		ArrayList<File> result = null;
+	public List<File> sampleFiles(int number, FilenameFilter filter){
+		log.info("Sampling " + number + " files from " + fromFolder.toString());
+		if(toFolder != null){
+			log.info("Copying sampled files to " + toFolder.toString());
+		}
+		List<File> result = null;
 		File[] fileList = fromFolder.listFiles(filter);
 		if(fileList.length > 0){
 			result = new ArrayList<File>();
@@ -119,6 +125,7 @@ public class MyFileSampler {
 		} else{
 			log.warn("The folder contains no relevant files. A null list is returned!");
 		}
+		log.info("File sampling complete.");
 		return result;
 	}
 	

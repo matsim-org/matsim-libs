@@ -20,11 +20,11 @@ public class Activity {
 	
 	/**
 	 * Constructs an activity with following minimum parameters
-	 * 
+	 * <p>
 	 * @param startTime		expressed as a GregorianCalendar
 	 * @param endTime		expressed as a GregorianCalendar
 	 * @param point			the GPS location, should be created using UTM35S coordinate 
-	 * 						system for South Africa
+	 * 						system for South Africa.</p>
 	 * 
 	 *  Once constructed, the activity's duration is calculated (in minutes), and the 
 	 *  hour of the day is established. 				
@@ -34,20 +34,34 @@ public class Activity {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.location = point;
-		this.duration = (int)((endTime.getTimeInMillis() - startTime.getTimeInMillis())/(1000 * 60));
 		this.startHour = startTime.get( GregorianCalendar.HOUR_OF_DAY );
+		setDuration();
 	}
 
 	public GregorianCalendar getStartTime() {
 		return startTime;
 	}
 
+	public void setStartTime(GregorianCalendar startTime) {
+		this.startTime = startTime;
+		setDuration();
+	}
+
 	public GregorianCalendar getEndTime() {
 		return endTime;
+	}
+	
+	public void setEndTime(GregorianCalendar endTime) {
+		this.endTime = endTime;
+		setDuration();
 	}
 
 	public int getDuration() {
 		return duration;
+	}
+	
+	private void setDuration(){
+		this.duration = (int)((endTime.getTimeInMillis() - startTime.getTimeInMillis())/(1000 * 60));
 	}
 
 	public GPSPoint getLocation() {

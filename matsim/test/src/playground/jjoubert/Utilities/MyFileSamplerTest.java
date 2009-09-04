@@ -24,13 +24,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.jfree.util.Log;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
 import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
+import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
 
 
 public class MyFileSamplerTest extends MatsimTestCase{
@@ -58,7 +58,7 @@ public class MyFileSamplerTest extends MatsimTestCase{
 		// Sample the files
 		MyFileSampler textSampler = new MyFileSampler(textInputFolder.getAbsolutePath());
 		int numberToSample = (int) Math.max(1, Math.round(0.5*rightFiles));
-		ArrayList<File> files = textSampler.sampleFiles(numberToSample, txtFilter);
+		List<File> files = textSampler.sampleFiles(numberToSample, txtFilter);
 
 		assertEquals("Incorrect number of files sampled.", numberToSample, files.size());
 		assertEquals("Files should not have been copied.", 0, textOutputFolder.listFiles().length);
@@ -86,7 +86,7 @@ public class MyFileSamplerTest extends MatsimTestCase{
 		// Sample the files
 		MyFileSampler textSampler = new MyFileSampler(textInputFolder.getAbsolutePath());
 		int numberToSample = 2*rightFiles;
-		ArrayList<File> files = textSampler.sampleFiles(numberToSample, txtFilter);
+		List<File> files = textSampler.sampleFiles(numberToSample, txtFilter);
 
 		assertEquals("Incorrect number of files sampled.", rightFiles, files.size());
 		assertEquals("Files should not have been copied.", 0, textOutputFolder.listFiles().length);
@@ -115,7 +115,7 @@ public class MyFileSamplerTest extends MatsimTestCase{
 		// Sample and copy the files
 		MyFileSampler textSampler = new MyFileSampler(textInputFolder.getAbsolutePath(), textOutputFolder.getAbsolutePath());
 		int numberToSample = (int) Math.max(1, Math.round(0.5*rightFiles));
-		ArrayList<File> files = textSampler.sampleFiles(numberToSample, txtFilter);
+		List<File> files = textSampler.sampleFiles(numberToSample, txtFilter);
 
 		assertEquals("Incorrect number of files sampled.", numberToSample, files.size());
 		assertEquals("Incorrect number of files copied.", numberToSample, textOutputFolder.listFiles().length);
@@ -147,7 +147,7 @@ public class MyFileSamplerTest extends MatsimTestCase{
 		// Sample and copy the files
 		MyFileSampler textSampler = new MyFileSampler(textInputFolder.getAbsolutePath(), textOutputFolder.getAbsolutePath());
 		int numberToSample = 2*rightFiles;
-		ArrayList<File> files = textSampler.sampleFiles(numberToSample, txtFilter);
+		List<File> files = textSampler.sampleFiles(numberToSample, txtFilter);
 
 		assertEquals("Incorrect number of files sampled.", rightFiles, files.size());
 		assertEquals("Incorrect number of files copied.", rightFiles, textOutputFolder.listFiles().length);
