@@ -53,12 +53,13 @@ public class GravityModel
  
 public void init() {
 	  
-	String type_of_partition = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_PARTITION);
+	//String type_of_partition = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_PARTITION);
 	int number_of_zones =0;
 	int n = (int)Double.parseDouble(controler.getConfig().findParam(CONFIG_GROUP,CONFIG_ZONES));
-	if (type_of_partition.equals("symmetric")){
-		number_of_zones = (int) Math.pow(n,2);}
-	else {throw new RuntimeException("In config file, param = "+CONFIG_ZONES+" in module = "+CONFIG_GROUP+" at the moment can only take the value 'symmetric'!"); }
+	//if (type_of_partition.equals("symmetric")){
+	number_of_zones = (int) Math.pow(n,2);
+	//}
+	//else {throw new RuntimeException("In config file, param = "+CONFIG_ZONES+" in module = "+CONFIG_GROUP+" at the moment can only take the value 'symmetric'!"); }
 	//TODO Define the asymmetric version, at the moment only the symmetric is possible
 	if (number_of_zones == 0) { throw new RuntimeException("In config file, param = "+CONFIG_ZONES+" in module = "+CONFIG_GROUP+" not defined!");}
 	this.createZonesFromPersonsShops(n);
@@ -73,14 +74,14 @@ public void init() {
 
 public double computePotential(ArrayList<Integer> solution){
 	
-	System.out.println("The current solution is " + solution);
+	//System.out.println("The current solution is " + solution);
 	
 	double global_likelihood = 0;
     int a = 0;
     
     for (ActivityFacilityImpl c : this.retailersFacilities.values()) {
     String linkId = (solution.get(a)).toString();
-    System.out.println("The link " + linkId + " is now processed");
+    //System.out.println("The link " + linkId + " is now processed");
     Coord coord = this.controler.getNetwork().getLink(linkId).getCoord();
 	++a;
 	double loc_likelihood = 0.0D;
@@ -179,6 +180,10 @@ public double computePotential(ArrayList<Integer> solution){
 		log.info("Min y = " + miny );
 		log.info("Max x = " + maxx );
 		log.info("Max y = " + maxy );
+		minx= minx*0.75;
+		miny= miny*0.75;
+		maxx= maxx*0.75;
+		maxy= maxy*0.75;
 			double x_width = (maxx - minx)/n;
 			double y_width = (maxy - miny)/n;
 			int a = 0;
@@ -232,6 +237,10 @@ public double computePotential(ArrayList<Integer> solution){
 		log.info("Min y = " + miny );
 		log.info("Max x = " + maxx );
 		log.info("Max y = " + maxy );
+		/*minx= minx*0.75;
+		miny= miny*0.75;
+		maxx= maxx*0.75;
+		maxy= maxy*0.75;*/
 		double x_width = (maxx - minx)/n;
 		double y_width = (maxy - miny)/n;
 		int a = 0;

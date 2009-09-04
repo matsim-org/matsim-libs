@@ -40,6 +40,7 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 	public final static String CONFIG_GROUP = "Retailers";
 	public final static String CONFIG_RETAILERS = "retailers";
 	public final static String CONFIG_STRATEGY_TYPE = "strategyType";
+	public final static String CONFIG_MODEL_ITERATION = "modelIteration";
 	//public final static String CONFIG_POP_SUM_TABLE = "populationSummaryTable";
 	//public final static String CONFIG_RET_SUM_TABLE = "retailersSummaryTable";
 	
@@ -82,9 +83,17 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 	}
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		
+		int gravityModelIter =0;
+		String modelIterParam = (controler.getConfig().findParam(CONFIG_GROUP, CONFIG_MODEL_ITERATION));
+		if (modelIterParam == null) {
+			log.warn("The iteration in which the model should be run has not been set, the model will be performed at the last iteration");
+			gravityModelIter = controler.getLastIteration();
+		}
+		else {
+			gravityModelIter = Integer.parseInt (modelIterParam);
+		}
 		// The model is run only every "n" iterations
-		if (controler.getIteration()%2==0 && controler.getIteration()>0){
+		if (controler.getIteration()%gravityModelIter ==0 && controler.getIteration()>0){//TODO should come from the confing file
 			// TODO maybe need to add if sequential statement
 			for (Retailer r : this.retailers.getRetailers().values()) {
 				r.runStrategy(lrr.getFreeLinks());

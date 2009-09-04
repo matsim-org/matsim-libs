@@ -17,6 +17,7 @@ public class RetailZones {
 		if (this.retailZones.containsKey(retailZone.getId())) { return false; }
 		this.retailZones.put(retailZone.getId(),retailZone);
 		log.info("In the retail zone " + retailZone.getId() + " are living " + retailZone.getPersonsQuadTree().size() + " persons, and are based " + retailZone.getShopsQuadTree().size() + " shops");
+		log.info("The retail zone " + retailZone.getId() + " has coordinates  minX = " + retailZone.getMinCoord().getX() + ", minY = " + retailZone.getMinCoord().getY()+", maxX = "+ retailZone.getMaxCoord().getX() +", maxY = "+retailZone.getMaxCoord().getY());
 		return true;
 	}
 	

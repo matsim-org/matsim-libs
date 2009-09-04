@@ -10,11 +10,16 @@ import java.util.ArrayList;
 import playground.ciarif.retailers.models.GravityModel;
 import playground.jjoubert.Utilities.DateString;
 
+
 public class RunRetailerGA
 {
+ public final static String CONFIG_GROUP = "Retailers";
+ public final static String CONFIG_MATRICES_FOLDER = "matricesFolder";
+ 
  public ArrayList<Integer> runGA(ArrayList<Integer> first, GravityModel gm)
  
   {
+	 
     int genomeLength = first.size();
     int populationSize = 10;
     int numberOfGenerations = 10;
@@ -47,9 +52,11 @@ public class RunRetailerGA
     System.out.printf("\tAverage time per generation (ms):  %6.2f\n", new Object[] { Double.valueOf(avgTime) });
 
     DateString ds = new DateString();
-    String fileName = "C:/Documents and Settings/ciarif/My Documents/output/triangle/GA_results/GA-Progress-" + ds.toString() + ".txt";
-
-    writeSolutionProgressToFile(solutionProgress, fileName);
+    
+    //String fileName = "C:/Documents and Settings/ciarif/My Documents/output/triangle/GA_results/GA-Progress-" + ds.toString() + ".txt";
+    //String fileName = "/scr/baug/ciarif/output/zurich_10pc/GA_results/GA-Progress-" + ds.toString() + ".txt"; //change in a way that it 
+    //is taken from the config file
+    //writeSolutionProgressToFile(solutionProgress, fileName);
     ArrayList<Integer> solution = ga.getIncumbent().getGenome();
     return solution;
   }

@@ -48,7 +48,8 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		ArrayList<Integer> locations = new ArrayList<Integer> ();
 		
 		for (ActivityFacilityImpl af:retailerFacilities.values()){
-			locations.add(Integer.parseInt(af.getLink().getId().toString()));
+			Integer integer = new Integer(Integer.parseInt(af.getLink().getId().toString()));
+			locations.add(integer);
 		}
 		
 		for (LinkRetailersImpl l:links) {

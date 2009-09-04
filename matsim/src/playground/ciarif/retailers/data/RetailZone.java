@@ -7,6 +7,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 public class RetailZone {
 	
@@ -17,13 +18,15 @@ public class RetailZone {
 	private QuadTree<ActivityFacilityImpl> shopsQuadTree;
 	private ArrayList<PersonImpl> persons = new ArrayList<PersonImpl>();
 	private ArrayList<ActivityFacilityImpl> shops = new ArrayList<ActivityFacilityImpl>();
-
+	private CoordImpl minCoord;
+	private CoordImpl maxCoord;
 	
 	public RetailZone(Id id,final Double minx,final Double miny,final Double maxx,final Double maxy) { 
 		this.id = id;
 		this.personsQuadTree = new QuadTree<PersonImpl>(minx, miny, maxx, maxy);
 		this.shopsQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
-		
+		this.minCoord = new CoordImpl (minx.toString(),miny.toString());
+		this.maxCoord = new CoordImpl (maxx.toString(), maxy.toString());		
 	}
 
 	public Id getId() {
@@ -56,6 +59,11 @@ public class RetailZone {
 	public QuadTree<ActivityFacilityImpl> getShopsQuadTree (){
 		return this.shopsQuadTree;
 	}
-
+	public CoordImpl getMaxCoord (){
+		return this.maxCoord;
+	}
+	public CoordImpl getMinCoord (){
+		return this.minCoord;
+	}
 }
 
