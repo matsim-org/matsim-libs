@@ -4,7 +4,7 @@ import org.matsim.api.basic.v01.Id;
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.data.HubLinkMapping;
 
-public class EnergyChargingInfo {
+public class EnergyChargingPriceInfo {
 
 	/*
 	 * time in seconds - get the energy price at the specified facility and time

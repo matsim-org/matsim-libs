@@ -12,7 +12,7 @@ import playground.wrashid.PSF.parking.ParkLog;
 import playground.wrashid.PSF.parking.ParkingTimes;
 import playground.wrashid.PSF.energy.charging.ChargeLog;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
-import playground.wrashid.PSF.energy.charging.EnergyChargingInfo;
+import playground.wrashid.PSF.energy.charging.EnergyChargingPriceInfo;
 
 public class EnergyBalance {
 
@@ -140,7 +140,7 @@ public class EnergyBalance {
 		double tempPrice;
 		for (int j = 0; j < maxTimeSlotNumber - minTimeSlotNumber; j++) {
 			double time = Math.floor(parkingTimes.get(parkingIndex).getStartParkingTime() / 900) * 900 + j * 900;
-			tempPrice = EnergyChargingInfo.getEnergyPrice(time, parkingTimes.get(parkingIndex).getActivity().getLinkId());
+			tempPrice = EnergyChargingPriceInfo.getEnergyPrice(time, parkingTimes.get(parkingIndex).getActivity().getLinkId());
 
 			FacilityChargingPrice tempFacilityChPrice = new FacilityChargingPrice(tempPrice, minTimeSlotNumber + j, parkingIndex,
 					time, parkingTimes.get(parkingIndex).getActivity().getFacilityId(), parkingTimes.get(parkingIndex).getStartParkingTime(),

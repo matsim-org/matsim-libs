@@ -71,7 +71,15 @@ public class HubPriceInfo {
 		return  hubPrice[hubNumber][(int)  Math.floor(time/(15*60))];
 	}
 	
-	
+	/**
+	 * time in seconds
+	 * @param peakHourStartTime
+	 * @param peakHourStartTime
+	 */
+	public HubPriceInfo(double peakHourStartTime, double peakHourEndTime){
+		
+	}
+	// TODO: test if it works, with different types of peakHourTimes
 	
 
 }
