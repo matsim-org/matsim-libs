@@ -58,5 +58,21 @@ public class HubPriceInfoTest extends TestCase {
 		}
 	}
 	
+	// peak hours between 0:00 and 0:15 in the morning
+	public void testPeakOffPeakConstructor1(){
+		HubPriceInfo hubPriceInfo=new HubPriceInfo(0,900,1,2);
+		assertEquals(2.0,hubPriceInfo.getPrice(899));
+		assertEquals(2.0,hubPriceInfo.getPrice(0));
+		assertEquals(1.0,hubPriceInfo.getPrice(900));
+	}
+	
+	// peak hours between: 23 and 3 in the morning
+	public void testPeakOffPeakConstructor2(){
+		HubPriceInfo hubPriceInfo=new HubPriceInfo(82800,10800,1,2);
+		assertEquals(2.0,hubPriceInfo.getPrice(0));
+		assertEquals(1.0,hubPriceInfo.getPrice(43200));
+		assertEquals(2.0,hubPriceInfo.getPrice(82800));
+		assertEquals(1.0,hubPriceInfo.getPrice(10800));
+	}
 } 
  

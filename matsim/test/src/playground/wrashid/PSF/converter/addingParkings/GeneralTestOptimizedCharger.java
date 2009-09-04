@@ -63,6 +63,6 @@ public class GeneralTestOptimizedCharger extends MatsimTestCase implements
 		// per link is set very low in the scenario and there is no need to
 		// charge during peak time.
 		assertEquals(1, chargingTimesOfAgentOne.getChargingTimes().size());
-	}
+	}  
 
-}
+} 

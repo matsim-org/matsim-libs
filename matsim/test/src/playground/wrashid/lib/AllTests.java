@@ -1,4 +1,4 @@
-package playground.wrashid.PSF.converter.addingParkings;
+package playground.wrashid.lib;
 
 
 
@@ -10,10 +10,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
-		suite.addTestSuite(AddParkingsToPlansTest.class);
-		suite.addTestSuite(GenerateParkingFacilitiesTest.class);
-		suite.addTestSuite(TestConfig3.class);
-		suite.addTestSuite(TestConfig4.class);
+		suite.addTestSuite(GeneralLibTest.class);
 
 		return suite;
 	}

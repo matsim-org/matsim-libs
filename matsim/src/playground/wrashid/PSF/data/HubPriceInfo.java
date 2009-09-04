@@ -13,11 +13,16 @@ import java.util.StringTokenizer;
 public class HubPriceInfo {
 
 	// first index: , second index: price (96 entries, for the 15 min bins)
+	// bins: [0,15), [15,30),...
 	double hubPrice[][];
+	private static final int numberOfTimeBins=96; 
+	// 24 hours has 96 bins
+	private static final double binInterval=900; 
+	// (in seconds = 15min)
 
 	public HubPriceInfo(String fileName, int numberOfHubs) {
 		//this.numberOfHubs = numberOfHubs;
-		hubPrice=new double[numberOfHubs][96];
+		hubPrice=new double[numberOfHubs][numberOfTimeBins];
 		
 		try {
 		
@@ -71,15 +76,28 @@ public class HubPriceInfo {
 		return  hubPrice[hubNumber][(int)  Math.floor(time/(15*60))];
 	}
 	
-	/**
-	 * time in seconds
-	 * @param peakHourStartTime
-	 * @param peakHourStartTime
-	 */
-	public HubPriceInfo(double peakHourStartTime, double peakHourEndTime){
-		
+	// if only one hub
+	public double getPrice(double time) {
+		return  getPrice(time,0);
 	}
-	// TODO: test if it works, with different types of peakHourTimes
 	
-
-}
+	/**
+	 * time in seconds, assumption: only one hub
+	 * [peakHourStatTime,peakHourEndTime)
+	 * the method expects multiples of 900 seconds as input for the times
+	 * @param peakHourStartTime
+	 * @param peakHourEndTime
+	 */
+	public HubPriceInfo(double peakHourStartTime, double peakHourEndTime, double offPeakRate, double peakRate){
+		hubPrice=new double[1][numberOfTimeBins];
+		
+		for (int i=0;i<numberOfTimeBins;i++){
+			if ((i*binInterval>=peakHourStartTime && i*binInterval<peakHourEndTime) || ((i*binInterval>=peakHourStartTime || i*binInterval<peakHourEndTime)&& peakHourEndTime<peakHourStartTime)){
+				hubPrice[0][i]=peakRate;
+			} else {
+				hubPrice[0][i]=offPeakRate;
+			}
+		}
+	}
+  
+} 
