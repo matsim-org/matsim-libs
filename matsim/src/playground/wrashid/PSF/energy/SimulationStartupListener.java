@@ -36,6 +36,11 @@ public class SimulationStartupListener implements StartupListener {
 		if (parametersPSFMutator!=null){
 			parametersPSFMutator.mutateParameters();
 		}
+		
+		// if any thing needs to be processed after mutation of the parameters,
+		// process it
+		ParametersPSF.postMutationProcessing();
+		
 	}
 	
 	public void addParameterPSFMutator(ParametersPSFMutator parametersPSFMutator){

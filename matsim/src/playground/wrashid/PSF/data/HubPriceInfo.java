@@ -73,7 +73,7 @@ public class HubPriceInfo {
 	 * @param hubNumber
 	 */
 	public double getPrice(double time, int hubNumber) {
-		return  hubPrice[hubNumber][(int)  Math.floor(time/(15*60))];
+		return  hubPrice[hubNumber][(int)  Math.floor(time/(binInterval))];
 	}
 	
 	// if only one hub

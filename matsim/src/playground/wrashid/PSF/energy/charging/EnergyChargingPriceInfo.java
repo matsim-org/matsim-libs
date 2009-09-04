@@ -19,27 +19,16 @@ public class EnergyChargingPriceInfo {
 	public static double getEnergyPrice(double time, Id linkId) {
 
 		// fit time into 24 hours
-		time = Math.round(time) % 86400;
+		time = Math.floor(time) % 86400;
 
 		// testing scenario
 		if (ParametersPSF.isTestingModeOn()) {
-			
-			
-			if (time < ParametersPSF.getTestingPeakPriceStartTime() || time >= ParametersPSF.getTestingPeakPriceEndTime()) {
-				// if low tariff
-				return ParametersPSF.getTestingLowTariffElectrictyPrice();
-			} else {
-				// if peak hour
-				return ParametersPSF.getTestingPeakHourElectricityPrice();
-			}
-			
-			// turn this on, turn above off => get tests still running
-			//return ParametersPSF.getHubPriceInfo().getPrice(time);
+			// this means, 
+			return ParametersPSF.getHubPriceInfo().getPrice(time);
 		} else {
 			// read price from file
 			HubLinkMapping hubLinkMapping=ParametersPSF.getHubLinkMapping();
 			return ParametersPSF.getHubPriceInfo().getPrice(time, hubLinkMapping.getHubNumber(linkId.toString()));
 		}	
 	}
-
 }

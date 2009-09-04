@@ -128,8 +128,6 @@ public class ParametersPSF {
 				errorReadingParameter(testing_lowTariffElectrictyPrice);
 			}
 			
-			// set hub price info
-			hubPriceInfo = new HubPriceInfo(ParametersPSF.getTestingPeakPriceStartTime(), ParametersPSF.getTestingPeakPriceEndTime(), ParametersPSF.getTestingLowTariffElectrictyPrice(), ParametersPSF.getTestingPeakHourElectricityPrice());
 		}
 
 		resetInternalParameters();
@@ -226,6 +224,17 @@ public class ParametersPSF {
 
 	public static HubPriceInfo getHubPriceInfo() {
 		return hubPriceInfo;
+	}
+
+	
+	// if any thing needs to be processed after mutation of the parameters,
+	// put it here
+	public static void postMutationProcessing() {
+		// set hub price info
+		if (testingModeOn) {
+			hubPriceInfo = new HubPriceInfo(ParametersPSF.getTestingPeakPriceStartTime(), ParametersPSF.getTestingPeakPriceEndTime(), ParametersPSF.getTestingLowTariffElectrictyPrice(), ParametersPSF.getTestingPeakHourElectricityPrice());	
+		}
+		
 	}
 
 }
