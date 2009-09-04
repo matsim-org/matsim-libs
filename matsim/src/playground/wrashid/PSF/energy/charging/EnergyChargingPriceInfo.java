@@ -3,9 +3,10 @@ package playground.wrashid.PSF.energy.charging;
 import org.matsim.api.basic.v01.Id;
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.data.HubLinkMapping;
+import playground.wrashid.PSF.data.HubPriceInfo;
 
 public class EnergyChargingPriceInfo {
-
+	
 	/*
 	 * time in seconds - get the energy price at the specified facility and time
 	 * of day
@@ -22,6 +23,8 @@ public class EnergyChargingPriceInfo {
 
 		// testing scenario
 		if (ParametersPSF.isTestingModeOn()) {
+			
+			
 			if (time < ParametersPSF.getTestingPeakPriceStartTime() || time >= ParametersPSF.getTestingPeakPriceEndTime()) {
 				// if low tariff
 				return ParametersPSF.getTestingLowTariffElectrictyPrice();
@@ -29,6 +32,9 @@ public class EnergyChargingPriceInfo {
 				// if peak hour
 				return ParametersPSF.getTestingPeakHourElectricityPrice();
 			}
+			
+			// turn this on, turn above off => get tests still running
+			//return ParametersPSF.getHubPriceInfo().getPrice(time);
 		} else {
 			// read price from file
 			HubLinkMapping hubLinkMapping=ParametersPSF.getHubLinkMapping();

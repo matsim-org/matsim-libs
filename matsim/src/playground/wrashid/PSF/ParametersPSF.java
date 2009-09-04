@@ -127,6 +127,9 @@ public class ParametersPSF {
 			} else {
 				errorReadingParameter(testing_lowTariffElectrictyPrice);
 			}
+			
+			// set hub price info
+			hubPriceInfo = new HubPriceInfo(ParametersPSF.getTestingPeakPriceStartTime(), ParametersPSF.getTestingPeakPriceEndTime(), ParametersPSF.getTestingLowTariffElectrictyPrice(), ParametersPSF.getTestingPeakHourElectricityPrice());
 		}
 
 		resetInternalParameters();
