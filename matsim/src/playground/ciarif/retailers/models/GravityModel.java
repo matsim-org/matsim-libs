@@ -100,7 +100,7 @@ public double computePotential(ArrayList<Integer> solution){
         pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(c.getActivityOption("shop").getCapacity().doubleValue(), this.betas[1]);
         
         if (pr.getGlobalShopsUtility()==0) {
-        	this.processPerson();//System.out.println("The global utility is computed for the person " + pr.getId());
+        	this.processPerson();
         	
         	for (ActivityFacilityImpl s : this.shops.values()) {
 	          double dist = 0.0D;
@@ -180,10 +180,11 @@ public double computePotential(ArrayList<Integer> solution){
 		log.info("Min y = " + miny );
 		log.info("Max x = " + maxx );
 		log.info("Max y = " + maxy );
-		minx= minx*0.75;
+		/*minx= minx*0.75;
 		miny= miny*0.75;
 		maxx= maxx*0.75;
-		maxy= maxy*0.75;
+		maxy= maxy*0.75;*/ // TODO attention! This way it dosn't work (it works just by coincidence in the test scenario), but a way to avoid
+		// too many retail zones with no, or just few, customers would be nice. Need to think again about it
 			double x_width = (maxx - minx)/n;
 			double y_width = (maxy - miny)/n;
 			int a = 0;
