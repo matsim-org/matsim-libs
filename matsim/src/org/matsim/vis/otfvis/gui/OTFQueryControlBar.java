@@ -28,6 +28,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Double;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -72,6 +73,23 @@ import org.matsim.vis.otfvis.opengl.queries.QuerySpinneNOW;
  */
 public class OTFQueryControlBar extends JToolBar implements ActionListener, ItemListener, ChangeListener, OTFQueryHandler {
 
+	public interface IdResolver {
+		List<String> resolveId(Double origRect);
+	}
+	
+	public class myIdResolver implements IdResolver {
+
+		public List<String> resolveId(Double origRect) {
+			QueryAgentId agentIdQuery = (QueryAgentId)handler.doQuery( new QueryAgentId(origRect));
+			if ((agentIdQuery != null) && (agentIdQuery.agentIds.size() != 0)) return agentIdQuery.agentIds; 
+
+			return null;
+		}
+		
+	}
+	
+	public static IdResolver agentIdResolver = null;
+	
 	private static class QueryEntry {
 		public QueryEntry(String string, String string2, Class class1) {
 			this.shortName = string;
@@ -107,6 +125,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	
 	public OTFQueryControlBar(String name, OTFHostControlBar handler, final OTFVisConfig config) {
 		super(name);
+		if(agentIdResolver == null) agentIdResolver  = new myIdResolver();
 		this.handler = handler;
 		pane = new JTabbedPane();
 		this.add(pane);
@@ -281,10 +300,10 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 			OTFQuery query = createQuery(queryName);
 			
 			if (query.getType() == OTFQuery.Type.AGENT) {
-				QueryAgentId agentIdQuery = (QueryAgentId)handler.doQuery( new QueryAgentId(origRect));
-				if ((agentIdQuery != null) && (agentIdQuery.agentIds.size() != 0)) {
-					System.out.println("AgentId = " + agentIdQuery.agentIds);
-					handleIdQuery(agentIdQuery.agentIds, queryName);
+				List<String> agentIds = agentIdResolver.resolveId(origRect);
+				if ((agentIds != null) && (agentIds.size() != 0)) {
+					System.out.println("AgentId = " + agentIds);
+					handleIdQuery(agentIds, queryName);
 				} else {
 					System.out.println("No AgentId found!");
 				}

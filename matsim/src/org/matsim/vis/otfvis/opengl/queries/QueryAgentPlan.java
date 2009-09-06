@@ -33,6 +33,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.Events;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.Gbl;
@@ -61,7 +62,12 @@ import com.sun.opengl.util.BufferUtil;
  *
  */
 public class QueryAgentPlan implements OTFQuery {
+	public interface AgentCoordProvider {
+		public Point2D.Double getAgentCoords(char [] id) ;
+	}
 
+	public static AgentCoordProvider coordProvider = null;
+	
 	private static final long serialVersionUID = -8415337571576184768L;
 
 	private static class MyInfoText implements Serializable{
@@ -201,8 +207,13 @@ public class QueryAgentPlan implements OTFQuery {
 	public void draw(OTFOGLDrawer drawer) {
 		if(this.vertex == null) return;
 
-		OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
-		Point2D.Double pos = layer.getAgentCoords(this.agentId.toCharArray());
+		Point2D.Double pos;
+		if(coordProvider != null) {
+			pos = coordProvider.getAgentCoords(this.agentId.toCharArray());
+		} else {
+			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
+			pos = layer.getAgentCoords(this.agentId.toCharArray());
+		}
 
 		if( this.calcOffset == true) {
 			float east = (float)drawer.getQuad().offsetEast;
