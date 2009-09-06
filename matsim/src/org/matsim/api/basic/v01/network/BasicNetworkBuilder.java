@@ -25,17 +25,21 @@ import org.matsim.api.basic.v01.Id;
 /**
  * Builder for network elements
  * @author dgrether
- * @deprecated don't use this class yet because the method signatures are still under heavy discussion and might be changed in the near future
+ * @deprecated use version in org.matsim.api.core
  */
-@Deprecated
+@Deprecated // use version in org.matsim.api.core
 public interface BasicNetworkBuilder {
 	/**
 	 * creates a node
 	 * @param id
 	 * @return
+	 * @deprecated use version in org.matsim.core
 	 */
+	@Deprecated // use version in org.matsim.api.core
 	public BasicNode createNode(final Id id);
-	
+
+	/** @deprecated use version in org.matsim.api.core */
+	@Deprecated // use version in org.matsim.api.core
 	public BasicLink createLink(final Id id, final Id fromNodeId, final Id toNodeId);
 	
 }
