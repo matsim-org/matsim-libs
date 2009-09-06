@@ -24,17 +24,30 @@ import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.config.Config;
 /**
  * @author dgrether
+ * 
+ * @deprecated use org.matsim.api.core.v01.Scenario
  */
+@Deprecated // use org.matsim.api.core.v01.Scenario
 public interface BasicScenario {
 
+	/** @deprecated use org.matsim.api.core.v01.Scenario */
+	@Deprecated // use org.matsim.api.core.v01.Scenario
 	public BasicNetwork getNetwork() ;
 
+	/** @deprecated use org.matsim.api.core.v01.Scenario */
+	@Deprecated // use org.matsim.api.core.v01.Scenario
 	public BasicPopulation getPopulation() ;
 
+	/** @deprecated use org.matsim.api.core.v01.Scenario */
+	@Deprecated // use org.matsim.api.core.v01.Scenario
 	public Config getConfig();
 
+	/** @deprecated use org.matsim.api.core.v01.Scenario */
+	@Deprecated // use org.matsim.api.core.v01.Scenario
 	public Id createId(String string);
 
+	/** @deprecated use org.matsim.api.core.v01.Scenario */
+	@Deprecated // use org.matsim.api.core.v01.Scenario
 	public Coord createCoord(double x, double y);
 
 }
