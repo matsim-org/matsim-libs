@@ -142,7 +142,7 @@ public class Controler {
 
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout("%d{ISO8601} %5p %C{1}:%L %m%n");
 
-	private boolean overwriteFiles = false;
+	private boolean overwriteFiles = true;
 	private static int iteration = -1;
 
 	/** The Config instance the Controler uses. */

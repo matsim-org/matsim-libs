@@ -37,15 +37,21 @@ public class EnergyConsumptionSamples{
 				return getInterpolatedValue(zeroSpeedConsumption,averageConsumption,speed)*distance;
 			}
 			
-			if (averageConsumption.getSpeed()<speed){
-				// iterpolate with next averageConsumption, if there are more
-				if (iter.hasNext()){
-					return getInterpolatedValue(averageConsumption,iter.next(),speed)*distance;
-				} else {
-					// do iterpolation through zero point
-					return getInterpolatedValue(zeroSpeedConsumption,averageConsumption,speed)*distance;
-				}
+			AverageSpeedEnergyConsumption previousConsumption=null;
+			
+			while (averageConsumption.getSpeed()<speed && iter.hasNext()){
+				previousConsumption=averageConsumption;
+				averageConsumption=iter.next();
 			}
+			
+			if (iter.hasNext()){
+				// if there are more elements in the list, then interpolate at that point
+				return getInterpolatedValue(previousConsumption,averageConsumption,speed)*distance;
+			} else {
+				// if last element, then interpolat last and first point
+				return getInterpolatedValue(zeroSpeedConsumption,averageConsumption,speed)*distance;
+			}
+			
 		}
 		
 		// this case should never happen (if precondition fulfilled)
@@ -65,7 +71,8 @@ public class EnergyConsumptionSamples{
 		
 		double differenceEnergyConsumption=consumption2.getEnergyConsumption()-consumption1.getEnergyConsumption();
 		
-		return consumption1.getEnergyConsumption()+interpolationFactor*differenceEnergyConsumption;
+		double result=consumption1.getEnergyConsumption()+interpolationFactor*differenceEnergyConsumption;
+		return result;
 	}
 	
 }
