@@ -16,7 +16,7 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 public class Berlin implements ParametersPSFMutator {
 
 	public static void main(String[] args) {
-		Controler controler = new Controler("c:\\data\\matsim\\input\\runRW1001\\config.xml");
+		Controler controler = new Controler("c:\\data\\matsim\\input\\runRW1002\\config.xml");
 		controler.addControlerListener(new AddEnergyScoreListener());
 		controler.setOverwriteFiles(true);
 
@@ -37,7 +37,6 @@ public class Berlin implements ParametersPSFMutator {
 		HashMap<Id, ChargingTimes> chargingTimes=optimizedCharger.getChargingTimes();
 	}
 
-//	@Override // does not work in java5.  kai, aug09
 	public void mutateParameters() {
 		// TODO Auto-generated method stub
 		
