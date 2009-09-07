@@ -59,7 +59,7 @@ public class HubLinkMapping {
 			}
 			
 			if (tokenizer.hasMoreTokens()){
-				// if there are more coloumns than expected, throw an excpetion
+				// if there are more columns than expected, throw an exception
 				
 				throw new RuntimeException("the number of hubs is wrong");
 			}
@@ -68,7 +68,7 @@ public class HubLinkMapping {
 		}
 		
 		} catch (RuntimeException e){
-			// just forward the runtine exception
+			// just forward the runtime exception
 			throw e;
 		} catch (Exception e){
 			throw new RuntimeException("Error reading the hub link mapping file");

@@ -60,11 +60,7 @@ public class AdvancedTests extends MatsimTestCase {
 
 		controler.run();
 
-		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes
-				.getParkingTimes());
-		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
-
-		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(new IdImpl("1"));
+		ChargingTimes chargingTimesOfAgentOne = getChargingTimesOfAgent("1");
 		ChargeLog chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(0);
 
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 22989, 1);
@@ -125,11 +121,7 @@ public class AdvancedTests extends MatsimTestCase {
 
 		controler.run();
 
-		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes
-				.getParkingTimes());
-		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
-
-		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(new IdImpl("1"));
+		ChargingTimes chargingTimesOfAgentOne = getChargingTimesOfAgent("1");
 		ChargeLog chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(0);
 
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 22989, 1);
@@ -162,11 +154,7 @@ public class AdvancedTests extends MatsimTestCase {
 
 		controler.run();
 
-		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes
-				.getParkingTimes());
-		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
-
-		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(new IdImpl("1"));
+		ChargingTimes chargingTimesOfAgentOne = getChargingTimesOfAgent("1");
 		ChargeLog chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(0);
 
 		// the vehicle should start charging immediately at work 20M Joules,
@@ -247,11 +235,12 @@ public class AdvancedTests extends MatsimTestCase {
 
 		controler.run();
 
-		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes
-				.getParkingTimes());
-		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
-
-		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(new IdImpl("1"));
+		assertionsTest5();
+		
+	}
+	
+	public void assertionsTest5(){
+		ChargingTimes chargingTimesOfAgentOne = getChargingTimesOfAgent("1");
 		ChargeLog chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(0);
 
 		// the vehicle should start charging immediately at work 12M Joules,
@@ -323,4 +312,46 @@ public class AdvancedTests extends MatsimTestCase {
 		// make sure, this is the last charging of the agent
 		assertEquals(20, chargingTimesOfAgentOne.getChargingTimes().size());
 	}
+	
+	public ChargingTimes getChargingTimesOfAgent(String agentId){
+		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes
+				.getParkingTimes());
+		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
+
+		ChargingTimes chargingTimesOfAgent = chargingTimes.get(new IdImpl(agentId));
+		return chargingTimesOfAgent;
+	}
+	
+	
+	/*
+	 * testingModeOn=false => test mode turned off in config file and therefore using explicit hub link mappings
+	 * and hub energy prices.
+	 */
+	public void test6OptimizedCharger() {
+		initTest("test/input/playground/wrashid/PSF/singleAgent/config3.xml");
+		
+		simulationStartupListener.addParameterPSFMutator(new ParametersPSFMutator() {
+			public void mutateParameters() {
+			
+			}
+		});
+
+		controler.run();
+		
+		ChargingTimes chargingTimesOfAgentOne = getChargingTimesOfAgent("1");
+		
+		ChargeLog chargeLogOfAgentOne;
+		
+		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(0);
+		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 22989.899208063354, 1);
+		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 23400.0, 1);
+
+		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(9);
+		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 29700.0, 1);
+		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 30492.901121572733, 1);
+		
+		//chargingTimesOfAgentOne.print();
+	} 
+	
+	 
 }

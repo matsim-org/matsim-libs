@@ -29,7 +29,7 @@ public class ParametersPSF {
 	private static HubPriceInfo hubPriceInfo;
 	// path of the file, where the electricity price of each hub during the day
 	// is specified
-	private static String main_hubLinkMapping = "main.hubLinkMapping";
+	private static String main_hubLinkMappingPath = "main.hubLinkMappingPath";
 	private static HubLinkMapping hubLinkMapping;
 	// path of the file, where the electricity price of each hub during the day
 	// is specified
@@ -87,11 +87,11 @@ public class ParametersPSF {
 			errorReadingParameter(main_hubPricesPath);
 		}
 		
-		tempStringValue = controler.getConfig().findParam(PSFModule, main_hubLinkMapping);
+		tempStringValue = controler.getConfig().findParam(PSFModule, main_hubLinkMappingPath);
 		if (tempStringValue != null) {
 			hubLinkMapping = new HubLinkMapping(tempStringValue, numberOfHubs);
 		} else {
-			errorReadingParameter(main_hubLinkMapping);
+			errorReadingParameter(main_hubLinkMappingPath);
 		}
 
 		tempStringValue = controler.getConfig().findParam(PSFModule, testing_ModeOn);
