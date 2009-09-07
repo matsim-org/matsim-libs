@@ -6,6 +6,8 @@ import org.matsim.core.gbl.Gbl;
 
 import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF.data.HubPriceInfo;
+import playground.wrashid.PSF.data.energyConsumption.AverageEnergyConsumptionBins;
+import playground.wrashid.PSF.data.energyConsumption.AverageEnergyConsumptionGalus;
 
 public class ParametersPSF {
 
@@ -31,7 +33,7 @@ public class ParametersPSF {
 	private static HubLinkMapping hubLinkMapping;
 	// path of the file, where the electricity price of each hub during the day
 	// is specified
-	
+	private static AverageEnergyConsumptionBins averageEnergyConsumptionBins;
 
 	// testing parameters
 
@@ -130,6 +132,9 @@ public class ParametersPSF {
 			
 		}
 
+		// TODO: adapt this later, when we have better models (e.g. consider car type also)
+		averageEnergyConsumptionBins=new AverageEnergyConsumptionGalus();
+		
 		resetInternalParameters();
 	}
 
@@ -152,6 +157,12 @@ public class ParametersPSF {
 
 	public static void setDefaultMaxBatteryCapacity(double defaultMaxBatteryCapacity) {
 		ParametersPSF.defaultMaxBatteryCapacity = defaultMaxBatteryCapacity;
+	}
+
+	// testing parameters
+	
+	public static AverageEnergyConsumptionBins getAverageEnergyConsumptionBins() {
+		return averageEnergyConsumptionBins;
 	}
 
 	public static double getDefaultChargingPowerAtParking() {

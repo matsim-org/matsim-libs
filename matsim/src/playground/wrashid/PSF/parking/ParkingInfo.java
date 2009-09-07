@@ -22,14 +22,9 @@ public class ParkingInfo {
 	 */
 	public static double getParkingElectricityPower(Id facilityId) {
 		
-		// testing scenario
-		if (ParametersPSF.isTestingModeOn()){
-			return ParametersPSF.getDefaultChargingPowerAtParking();
-		}
-		
 		// TODO: incorporate also possibility of individual charging power plugs at each parking facility
 		
-		return 0.0;
+		return ParametersPSF.getDefaultChargingPowerAtParking();
 	}
 	
 }

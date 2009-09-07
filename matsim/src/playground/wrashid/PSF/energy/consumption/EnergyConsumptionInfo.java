@@ -19,25 +19,12 @@ public class EnergyConsumptionInfo {
 		}
 		
 		
-		// TODO: The following code needs to be programmed from scratch...
-		// Make this somehow modular, so that different strategies could be used here (and different types of vehicles
+		// TODO: Also consider different types of vehciles here...
 		
-		//double freeSpeed=link.getFreespeed(Time.UNDEFINED_TIME); //[m/s]
-		//double vehicleSpeed=link.getLength()/travelTime; //[m/s]
+		double freeSpeed=link.getFreespeed(Time.UNDEFINED_TIME); //[m/s]
+		double vehicleSpeed=link.getLength()/travelTime; //[m/s]
 		
-		// TODO: read some data a file. For example for different velocities there is a different
-		// energy consumption
-		
-		// how much energy in Jules is consumed by driving the vehicleType one meter
-		// with the given speed
-		
-		// see playground.wrashid.PHEV.Utility.AverageSpeedEnergyConsumption
-		
-		// TODO: this is speed dependent!!!
-		double energyConsumptionPerMeter=4.784535E+02; // [J/m] 
-		
-		// TODO: change this, the speed should get a role here!!!
-		return link.getLength()*energyConsumptionPerMeter;
+		return ParametersPSF.getAverageEnergyConsumptionBins().getEnergyConsumption(vehicleSpeed, link.getLength());
 	}
 	
 	/**

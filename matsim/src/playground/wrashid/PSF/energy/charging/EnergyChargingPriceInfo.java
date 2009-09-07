@@ -23,10 +23,10 @@ public class EnergyChargingPriceInfo {
 
 		// testing scenario
 		if (ParametersPSF.isTestingModeOn()) {
-			// this means, 
+			// in the testing scenario, there is only one hub
 			return ParametersPSF.getHubPriceInfo().getPrice(time);
 		} else {
-			// read price from file
+			// get hub and time specific electricity price
 			HubLinkMapping hubLinkMapping=ParametersPSF.getHubLinkMapping();
 			return ParametersPSF.getHubPriceInfo().getPrice(time, hubLinkMapping.getHubNumber(linkId.toString()));
 		}	
