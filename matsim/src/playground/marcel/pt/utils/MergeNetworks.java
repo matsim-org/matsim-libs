@@ -40,6 +40,7 @@ import org.matsim.core.utils.misc.Time;
 public class MergeNetworks {
 
 	public static void merge(final Network networkA, final String prefixA, final Network networkB, final String prefixB, final NetworkImpl mergedNetwork) {
+		double capacityFactor = mergedNetwork.getCapacityPeriod() / networkA.getCapacityPeriod();
 		NetworkBuilder builder = mergedNetwork.getBuilder();
 		for (Node node : networkA.getNodes().values()) {
 			NodeImpl node2 = (NodeImpl) builder.createNode(new IdImpl(prefixA + node.getId().toString()));
@@ -52,7 +53,7 @@ public class MergeNetworks {
 			Link link2 = builder.createLink(new IdImpl(prefixA + link.getId().toString()),
 					fromNodeId, toNodeId);
 			link2.setAllowedModes(link.getAllowedModes());
-			link2.setCapacity(link.getCapacity(Time.UNDEFINED_TIME));
+			link2.setCapacity(link.getCapacity(Time.UNDEFINED_TIME) * capacityFactor);
 			link2.setFreespeed(link.getFreespeed(Time.UNDEFINED_TIME));
 			link2.setLength(link.getLength());
 			link2.setNumberOfLanes(link.getNumberOfLanes(Time.UNDEFINED_TIME));
@@ -60,6 +61,7 @@ public class MergeNetworks {
 			mergedNetwork.getNodes().get(fromNodeId).addOutLink(link2);
 			mergedNetwork.getNodes().get(toNodeId).addInLink(link2);
 		}
+		capacityFactor = mergedNetwork.getCapacityPeriod() / networkB.getCapacityPeriod();
 		for (Node node : networkB.getNodes().values()) {
 			NodeImpl node2 = (NodeImpl) builder.createNode(new IdImpl(prefixB + node.getId().toString()));
 			node2.setCoord(node.getCoord());
@@ -71,7 +73,7 @@ public class MergeNetworks {
 			Link link2 = builder.createLink(new IdImpl(prefixB + link.getId().toString()),
 					fromNodeId, toNodeId);
 			link2.setAllowedModes(link.getAllowedModes());
-			link2.setCapacity(link.getCapacity(Time.UNDEFINED_TIME));
+			link2.setCapacity(link.getCapacity(Time.UNDEFINED_TIME) * capacityFactor);
 			link2.setFreespeed(link.getFreespeed(Time.UNDEFINED_TIME));
 			link2.setLength(link.getLength());
 			link2.setNumberOfLanes(link.getNumberOfLanes(Time.UNDEFINED_TIME));
