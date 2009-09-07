@@ -40,12 +40,12 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 		this.geofac = new GeometryFactory();
 		initFeatureType();
 		
-		this.compareResultMap = EvaluateLinkstats.compareLinkstatFiles("c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\763.500.linkstats.txt", "c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\762.500.linkstats.txt");
+		this.compareResultMap = EvaluateLinkstats.compareLinkstatFiles("c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\763.1000.linkstats.txt", "c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\762.1000.linkstats.txt");
 	}
 
 	private void initFeatureType() {
 
-		AttributeType [] attribs = new AttributeType[9+24];
+		AttributeType [] attribs = new AttributeType[9+8+24];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Polygon",Polygon.class, true, null, null, this.crs);
 		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("fromID", String.class);
@@ -55,9 +55,13 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 		attribs[6] = AttributeTypeFactory.newAttributeType("capacity", Double.class);
 		attribs[7] = AttributeTypeFactory.newAttributeType("lanes", Double.class);
 		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);
+
+		for (int i = 0; i < 8; i++) {
+			attribs[9 + i] = AttributeTypeFactory.newAttributeType("HRS" + (i + i * 2) + "-" + (i + i * 2 + 3) + "avg", Double.class);			
+		}
 		
 		for (int i = 0; i < 24; i++) {
-			attribs[9 + i] = AttributeTypeFactory.newAttributeType("HRS" + i + "-" + (i+1) + "avg", Double.class);			
+			attribs[9 + 8 + i] = AttributeTypeFactory.newAttributeType("HRS" + i + "-" + (i+1) + "avg", Double.class);			
 		}			
 
 		try {
@@ -103,7 +107,7 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 		Coordinate to2 = new Coordinate(xto2,yto2);
 
 		Polygon p = this.geofac.createPolygon(this.geofac.createLinearRing(new Coordinate[] {from, to, to2, from2, from}), null);
-		Object [] attribs = new Object[9+24];
+		Object [] attribs = new Object[9+8+24];
 		attribs[0] = p;
 		attribs[1] = link.getId().toString();
 		attribs[2] = link.getFromNode().getId().toString();
@@ -116,8 +120,15 @@ public class LinksstatsPolygonBasedFeatureGenerator implements FeatureGenerator{
 		
 		if(this.compareResultMap.get(link.getId().toString()) != null){
 			ArrayList<Double> tempArray = this.compareResultMap.get(link.getId().toString());
+			for (int i = 0; i < 8; i++) {
+				attribs[9 + i] = Double.valueOf((tempArray.get(i + i * 2).doubleValue() + tempArray.get(i + 1 + i * 2).doubleValue() + tempArray.get(i + 2 + i * 2).doubleValue()) / 3);
+			}			
+		}	
+		
+		if(this.compareResultMap.get(link.getId().toString()) != null){
+			ArrayList<Double> tempArray = this.compareResultMap.get(link.getId().toString());
 			for (int i = 0; i < tempArray.size(); i++) {
-				attribs[9 + i] = tempArray.get(i);
+				attribs[9 + 8 + i] = tempArray.get(i);
 			}			
 		}
 

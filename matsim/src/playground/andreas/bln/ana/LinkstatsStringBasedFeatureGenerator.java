@@ -38,14 +38,14 @@ public class LinkstatsStringBasedFeatureGenerator implements FeatureGenerator{
 		this.geofac = new GeometryFactory();
 		initFeatureType();
 		
-		this.compareResultMap = EvaluateLinkstats.compareLinkstatFiles("c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\763.500.linkstats.txt", "c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\762.500.linkstats.txt");
+		this.compareResultMap = EvaluateLinkstats.compareLinkstatFiles("c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\763.1000.linkstats.txt", "c:\\Users\\aneumann\\Documents\\VSP_Extern\\Berlin\\berlin-sharedsvn\\network\\A100\\762.1000.linkstats.txt");
 		
 	}
 
 
 	private void initFeatureType() {
 
-		AttributeType [] attribs = new AttributeType[10+24];
+		AttributeType [] attribs = new AttributeType[10+8+24];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, this.crs);
 		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("fromID", String.class);
@@ -57,8 +57,12 @@ public class LinkstatsStringBasedFeatureGenerator implements FeatureGenerator{
 		attribs[8] = AttributeTypeFactory.newAttributeType("visWidth", Double.class);		
 		attribs[9] = AttributeTypeFactory.newAttributeType("type", String.class);
 
+		for (int i = 0; i < 8; i++) {
+			attribs[10 + i] = AttributeTypeFactory.newAttributeType("HRS" + (i + i * 2) + "-" + (i + i * 2 + 3) + "avg", Double.class);			
+		}
+		
 		for (int i = 0; i < 24; i++) {
-			attribs[10 + i] = AttributeTypeFactory.newAttributeType("HRS" + i + "-" + (i+1) + "avg", Double.class);			
+			attribs[10 + 8 + i] = AttributeTypeFactory.newAttributeType("HRS" + i + "-" + (i+1) + "avg", Double.class);			
 		}
 		
 		try {
@@ -79,7 +83,7 @@ public class LinkstatsStringBasedFeatureGenerator implements FeatureGenerator{
 		LineString ls = this.geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()),
 				MGC.coord2Coordinate(link.getToNode().getCoord())});
 
-		Object [] attribs = new Object[10+24];
+		Object [] attribs = new Object[10+8+24];
 		attribs[0] = ls;
 		attribs[1] = link.getId().toString();
 		attribs[2] = link.getFromNode().getId().toString();
@@ -93,8 +97,15 @@ public class LinkstatsStringBasedFeatureGenerator implements FeatureGenerator{
 		
 		if(this.compareResultMap.get(link.getId().toString()) != null){
 			ArrayList<Double> tempArray = this.compareResultMap.get(link.getId().toString());
+			for (int i = 0; i < 8; i++) {
+				attribs[10 + i] = Double.valueOf((tempArray.get(i + i * 2).doubleValue() + tempArray.get(i + 1 + i * 2).doubleValue() + tempArray.get(i + 2 + i * 2).doubleValue()) / 3);
+			}			
+		}		
+		
+		if(this.compareResultMap.get(link.getId().toString()) != null){
+			ArrayList<Double> tempArray = this.compareResultMap.get(link.getId().toString());
 			for (int i = 0; i < tempArray.size(); i++) {
-				attribs[10 + i] = tempArray.get(i);
+				attribs[10 + 8 + i] = tempArray.get(i);
 			}			
 		}
 
