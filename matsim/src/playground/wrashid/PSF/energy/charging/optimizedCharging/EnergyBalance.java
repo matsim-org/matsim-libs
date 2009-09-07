@@ -144,7 +144,7 @@ public class EnergyBalance {
 
 			FacilityChargingPrice tempFacilityChPrice = new FacilityChargingPrice(tempPrice, minTimeSlotNumber + j, parkingIndex,
 					time, parkingTimes.get(parkingIndex).getActivity().getFacilityId(), parkingTimes.get(parkingIndex).getStartParkingTime(),
-					parkingTimes.get(parkingIndex).getEndParkingTime());
+					parkingTimes.get(parkingIndex).getEndParkingTime(),parkingTimes.get(parkingIndex).getActivity().getLinkId());
 			chargingPrice.add(tempFacilityChPrice);
 		}
 	}

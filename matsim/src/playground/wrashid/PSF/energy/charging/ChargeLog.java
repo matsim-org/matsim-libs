@@ -4,13 +4,13 @@ import org.matsim.api.basic.v01.Id;
 
 public class ChargeLog {
 
-	private Id facilityId;
+	private Id linkId;
 
 	private double startChargingTime;
 	private double endChargingTime;
 
-	public Id getFacilityId() {
-		return facilityId;
+	public Id getLinkId() {
+		return linkId;
 	}
 
 	public double getStartChargingTime() {
@@ -21,9 +21,9 @@ public class ChargeLog {
 		return endChargingTime;
 	}
 
-	public ChargeLog(Id facilityId, double startChargingTime, double endChargingTime) {
+	public ChargeLog(Id linkId, double startChargingTime, double endChargingTime) {
 		super();
-		this.facilityId = facilityId;
+		this.linkId = linkId;
 		this.startChargingTime = startChargingTime;
 		this.endChargingTime = endChargingTime;
 	}
@@ -33,7 +33,7 @@ public class ChargeLog {
 	
 	
 	public void print(){
-		System.out.println("startChargingTime: " + startChargingTime + ", endChargingTime: " + endChargingTime + ", facilityId: " + facilityId);
+		System.out.println("startChargingTime: " + startChargingTime + ", endChargingTime: " + endChargingTime + ", linkId: " + linkId);
 	}
 	
 }

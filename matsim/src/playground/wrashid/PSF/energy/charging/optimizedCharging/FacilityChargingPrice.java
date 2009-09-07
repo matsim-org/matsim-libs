@@ -17,6 +17,7 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	private double startParkingTime;
 	
 	private double endTimeOfSlot;
+	private Id linkId;
 	
 	/*
 	 * the time starts with the first car leg of the person. When the car is
@@ -37,7 +38,7 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	}
 
 	public FacilityChargingPrice(double price, int timeSlotNumber, int energyBalanceParkingIndex, double slotStartTime,
-			Id facilityId, double startParkingTime, double endParkingTime) {
+			Id facilityId, double startParkingTime, double endParkingTime, Id linkId) {
 		super();
 		this.price = price;
 		this.timeSlotNumber = timeSlotNumber;
@@ -46,6 +47,7 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 		this.facilityId = facilityId;
 		this.endParkingTime = endParkingTime;
 		this.startParkingTime = startParkingTime;
+		this.linkId=linkId;
 		endTimeOfSlot=slotStartTime+900;
 	}
 
@@ -71,7 +73,7 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	public ChargeLog getChargeLog(double minimumEnergyThatNeedsToBeCharged,double maxChargableEnergy) {
 		double startChargingTime = slotStartTime<startParkingTime?startParkingTime:slotStartTime;
 
-		return new ChargeLog(facilityId, startChargingTime, getEndTimeOfCharge(minimumEnergyThatNeedsToBeCharged,maxChargableEnergy));
+		return new ChargeLog(linkId, startChargingTime, getEndTimeOfCharge(minimumEnergyThatNeedsToBeCharged,maxChargableEnergy));
 	}
 
 	// how much energy will be charged through this slot and facility

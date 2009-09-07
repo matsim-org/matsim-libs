@@ -77,7 +77,7 @@ public class OptimizedCharger {
 		return chargingTimes;
 	}
 
-	// TODO: also check at parking, if we can really charge there...
+	// TODO: also check at parking, if charging plug is available at charging at all...
 	// 
 
 }
