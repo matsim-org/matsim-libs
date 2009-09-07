@@ -45,17 +45,20 @@ public class KTIControler extends Controler {
 	@Override
 	protected void setUp() {
 
-		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
-				super.config.charyparNagelScoring(), 
-				this.getFacilityPenalties(),
-				this.ktiConfigGroup);
-		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
-
 		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
 			this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
 			this.plansCalcRouteKtiInfo.prepare(this.ktiConfigGroup, this.getNetwork());
 		}
-		
+
+		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
+				super.config.charyparNagelScoring(), 
+				this.getFacilityPenalties(),
+				this.ktiConfigGroup,
+				this.plansCalcRouteKtiInfo,
+				this.network,
+				config.plansCalcRoute());
+		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
+
 		super.setUp();
 	}
 

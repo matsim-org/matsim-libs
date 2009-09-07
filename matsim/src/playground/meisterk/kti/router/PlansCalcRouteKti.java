@@ -35,7 +35,6 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.matrices.Entry;
-import org.matsim.matrices.Matrix;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
@@ -45,17 +44,16 @@ import org.matsim.world.MappedLocation;
  * Special Routing Module for finding (more or less) realistic public transit travel times.
  * 
  * The travel time of a leg with mode 'pt' (meaning pseudo/public transport) 
- * is estimated by a municipality-to-municipality travel time matrix, plus walk-speed access to and egress from the next pt stop.
+ * is estimated by a municipality-to-municipality travel time matrix, plus walk-speed access to and egress from the closest pt stop.
  * 
  * @author mrieser
+ * @author meisterk
  *
  */
 public class PlansCalcRouteKti extends PlansCalcRoute {
 
 	private final NetworkLayer network;
-	private final Matrix ptTravelTimes;
-	private final SwissHaltestellen haltestellen;
-	private final Layer municipalities;
+	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	
 	public PlansCalcRouteKti(
 			final PlansCalcRouteConfigGroup group,
@@ -66,9 +64,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			final PlansCalcRouteKtiInfo ptRoutingInfo) {
 		super(group, network, costCalculator, timeCalculator, factory);
 		this.network = network;
-		this.ptTravelTimes = ptRoutingInfo.getPtTravelTimes();
-		this.haltestellen = ptRoutingInfo.getHaltestellen();
-		this.municipalities = ptRoutingInfo.getLocalWorld().getLayer("municipality");
+		this.plansCalcRouteKtiInfo = ptRoutingInfo;
 	}
 	
 	@Override
@@ -79,53 +75,109 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		return super.handleLeg(leg, fromAct, toAct, depTime);
 	}
 
+	/**
+	 * 
+	 * @param fromAct
+	 * @param leg
+	 * @param toAct
+	 * @return
+	 */
 	public double handleSwissPtLeg(final ActivityImpl fromAct, final LegImpl leg, final ActivityImpl toAct) {
-		Coord fromStop = this.haltestellen.getClosestLocation(fromAct.getCoord());
-		Coord toStop = this.haltestellen.getClosestLocation(toAct.getCoord());
+		
+		double travelTime = 0.0;
+		double distance = 0.0;
 
-		final List<MappedLocation> froms = this.municipalities.getNearestLocations(fromStop);
-		final List<MappedLocation> tos = this.municipalities.getNearestLocations(toStop);
+		for (LegImpl pseudoLeg : new LegImpl[]{
+				PlansCalcRouteKti.getPseudoAccessLeg(fromAct, this.plansCalcRouteKtiInfo.getHaltestellen(), this.network, this.configGroup),
+				PlansCalcRouteKti.getPseudoPtLeg(fromAct, toAct, this.plansCalcRouteKtiInfo, this.network),
+				PlansCalcRouteKti.getPseudoEgressLeg(toAct, this.plansCalcRouteKtiInfo.getHaltestellen(), this.network, this.configGroup)
+		}) {
+			travelTime += pseudoLeg.getTravelTime();
+			distance += pseudoLeg.getRoute().getDistance();
+		}
+		
+		RouteWRefs newRoute = this.network.getFactory().createRoute(TransportMode.pt, fromAct.getLink(), toAct.getLink());;
+		/*
+		 * TODO
+		 * to stay consistent with outer routers, crow-fly distances are multiplied with 1.5
+		 * but why is it not multiplied BEFORE traveltime calculation?
+		 */
+		newRoute.setDistance(distance * 1.5);
+		leg.setRoute(newRoute);
+		leg.setTravelTime(travelTime);
+		
+		return travelTime;
+	}
+
+	public static LegImpl getPseudoAccessLeg(
+			final ActivityImpl fromAct, 
+			final SwissHaltestellen haltestellen, 
+			final NetworkLayer network,
+			final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
+		
+		LegImpl pseudoLeg = new LegImpl(TransportMode.undefined);
+		
+		Coord fromStop = haltestellen.getClosestLocation(fromAct.getCoord());
+		pseudoLeg.setRoute(network.getFactory().createRoute(TransportMode.undefined, null, null));
+		
+		double distance = CoordUtils.calcDistance(fromAct.getCoord(), fromStop);
+		pseudoLeg.getRoute().setDistance(distance);
+		
+		pseudoLeg.setTravelTime(distance / plansCalcRouteConfigGroup.getWalkSpeedFactor());
+		
+		return pseudoLeg;
+		
+	}
+	
+	public static LegImpl getPseudoPtLeg(
+			final ActivityImpl fromAct, 
+			final ActivityImpl toAct,
+			final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo,
+			final NetworkLayer network) { 
+
+		LegImpl pseudoLeg = new LegImpl(TransportMode.undefined);
+
+		Coord fromStop = plansCalcRouteKtiInfo.getHaltestellen().getClosestLocation(fromAct.getCoord());
+		Coord toStop = plansCalcRouteKtiInfo.getHaltestellen().getClosestLocation(toAct.getCoord());
+
+		Layer municipalities = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality");
+		final List<MappedLocation> froms = municipalities.getNearestLocations(fromStop);
+		final List<MappedLocation> tos = municipalities.getNearestLocations(toStop);
 		Location from = froms.get(0);
 		Location to = tos.get(0);
-		Entry traveltime = this.ptTravelTimes.getEntry(from, to);
+		Entry traveltime = plansCalcRouteKtiInfo.getPtTravelTimes().getEntry(from, to);
 		if (traveltime == null) {
 			throw new RuntimeException("No entry found for " + from.getId() + " --> " + to.getId());
 		}
-		final double timeInVehicle = traveltime.getValue() * 60.0;
-		/*
-		 * TODO travel time is computed with bee-line distance, but the distance that is written into the route object is bee-line distance * 1.5
-		 * this is inconsistent
-		 */
-		final double beeLineWalkDistance = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
-		final double beeLineWalkTime = beeLineWalkDistance / this.configGroup.getWalkSpeedFactor();
+		
+		pseudoLeg.setTravelTime(traveltime.getValue() * 60.0);
 
-		final double walkAccessEgressDistance = CoordUtils.calcDistance(fromAct.getCoord(), fromStop) + CoordUtils.calcDistance(toAct.getCoord(), toStop);
-		final double walkAccessEgressTime = walkAccessEgressDistance / this.configGroup.getWalkSpeedFactor();
-//		System.out.println(from.getId() + " > " + to.getId() + ": " + timeInVehicle/60 + "min + " + (walkTime / 60) + "min (" + walkDistance + "m walk); beeLine: " + beeLineWalkTime/60 + "min walk");
-
-		RouteWRefs newRoute;
-		if (beeLineWalkTime < (timeInVehicle + walkAccessEgressTime)) {
-			
-			newRoute = this.network.getFactory().createRoute(TransportMode.walk, fromAct.getLink(), toAct.getLink());
-			leg.setRoute(newRoute);
-			newRoute.setTravelTime(beeLineWalkTime);
-			newRoute.setDistance(beeLineWalkDistance * 1.5);
-			
-		} else {
-			
-			newRoute = this.network.getFactory().createRoute(TransportMode.pt, fromAct.getLink(), toAct.getLink());
-			leg.setRoute(newRoute);
-			newRoute.setTravelTime(timeInVehicle + walkAccessEgressTime);
-			/*
-			 * TODO the distance that should be used here is:
-			 * (walkAccessEgressDistance + bee-line distance(fromStop, toStop)) * 1.5
-			 */
-			newRoute.setDistance(beeLineWalkDistance * 1.5);
-			
-		}
-		leg.setTravelTime(newRoute.getTravelTime());
-//		System.out.println("cmpr:\t" + Time.writeTime(oldRoute.getTravTime()) + "\t" + Time.writeTime(leg.getRoute().getTravTime()) + "\t" + beeLineWalkTime);
-		return newRoute.getTravelTime();
+		pseudoLeg.setRoute(network.getFactory().createRoute(TransportMode.undefined, null, null));
+		double distance = CoordUtils.calcDistance(fromStop, toStop);
+		pseudoLeg.getRoute().setDistance(distance);
+		
+		return pseudoLeg;
+		
 	}
-
+	
+	public static LegImpl getPseudoEgressLeg(
+			final ActivityImpl toAct, 
+			final SwissHaltestellen haltestellen, 
+			final NetworkLayer network,
+			final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
+		
+		LegImpl pseudoLeg = new LegImpl(TransportMode.undefined);
+		
+		Coord toStop = haltestellen.getClosestLocation(toAct.getCoord());
+		pseudoLeg.setRoute(network.getFactory().createRoute(TransportMode.undefined, null, null));
+		
+		double distance = CoordUtils.calcDistance(toAct.getCoord(), toStop);
+		pseudoLeg.getRoute().setDistance(distance);
+		
+		pseudoLeg.setTravelTime(distance / plansCalcRouteConfigGroup.getWalkSpeedFactor());
+		
+		return pseudoLeg;
+		
+	}
+	
 }

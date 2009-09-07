@@ -34,7 +34,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
@@ -238,7 +237,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		ScoringFunctionFactory scoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				this.config.charyparNagelScoring(),
 				facilityPenalties,
-				this.ktiConfigGroup);
+				this.ktiConfigGroup, null, network, null);
 		// init Planomat, which loads config!
 		Planomat testee = new Planomat(ltte, scoringFunctionFactory, this.config.planomat());
 
@@ -386,7 +385,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		KTIYear3ScoringFunctionFactory factory = new KTIYear3ScoringFunctionFactory(
 				this.config.charyparNagelScoring(),
 				emptyFacilityPenalties,
-				this.ktiConfigGroup);
+				this.ktiConfigGroup, null, network, null);
 		ScoringFunction testee = factory.getNewScoringFunction(this.plan);
 
 		assertTrue(testee instanceof ScoringFunctionAccumulator);

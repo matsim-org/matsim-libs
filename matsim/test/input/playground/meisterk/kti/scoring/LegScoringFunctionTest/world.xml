@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE world SYSTEM "http://matsim.org/files/dtd/world_v2.dtd">
+
+<world name="Zones of Wonderland">
+
+	<layer type="municipality" is_raster="false">
+		<zone id="26101" center_x="1001.0" center_y="1001.0" min_x="1001.0" min_y="1001.0" max_x="1001.0" max_y="1001.0" name="Ixwil" />
+		<zone id="26102" center_x="1201.0" center_y="1201.0" min_x="1201.0" min_y="1201.0" max_x="1201.0" max_y="1201.0" name="Ypslikon" />
+	</layer>
+
+</world>
