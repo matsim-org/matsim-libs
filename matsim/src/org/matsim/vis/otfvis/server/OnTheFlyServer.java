@@ -387,21 +387,9 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	public OTFQuery answerQuery(OTFQuery query) throws RemoteException {
 		OTFQuery result = null;
-		if (status == PAUSE) {
+		synchronized (updateFinished) {
 			OTFServerQuad quad = quads.values().iterator().next().quad;
 			result = query.query(network, pop, events, quad);
-		} else {
-			// otherwise == PLAY, we need to sort this into the array of demanding queries and then they will be answered next when updateStatus() is called
-			try {
-				synchronized (updateFinished) {
-					queryThis.put(query,query);
-					updateFinished.wait();
-					result = queryThis.get(query);
-					queryThis.remove(query);
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 		}
 
 		return result;
