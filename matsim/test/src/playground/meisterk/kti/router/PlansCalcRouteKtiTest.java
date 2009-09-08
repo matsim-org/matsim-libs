@@ -108,7 +108,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		testee.handleLeg(leg, home, work, Time.parseTime("12:34:56"));
 		
 		String actualRouteDescription = ((GenericRoute) leg.getRoute()).getRouteDescription();
-		String expectedRouteDescription = "8503006 26101 26102 8503015";
+		String expectedRouteDescription = "kti 8503006 26101 26102 8503015";
 		assertEquals(expectedRouteDescription, actualRouteDescription);
 		
 	}
@@ -117,7 +117,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		
 		double expectedTimeInVehicle = 300.0;
 
-		String routeDescription = "8503006 26101 26102 8503015";
+		String routeDescription = "kti 8503006 26101 26102 8503015";
 		double actualTimeInVehicle = PlansCalcRouteKti.getTimeInVehicle(routeDescription, this.plansCalcRouteKtiInfo); 
 		
 		assertEquals(expectedTimeInVehicle, actualTimeInVehicle);

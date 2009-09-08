@@ -90,7 +90,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 
 			String routeDescription = ((GenericRoute) leg.getRoute()).getRouteDescription();
 
-			if (this.ktiConfigGroup.isUsePlansCalcRouteKti() && routeDescription != null) {
+			if (this.ktiConfigGroup.isUsePlansCalcRouteKti() && routeDescription.startsWith("kti")) {
 
 				dist = PlansCalcRouteKti.getAccessEgressDistance(
 						routeDescription, 

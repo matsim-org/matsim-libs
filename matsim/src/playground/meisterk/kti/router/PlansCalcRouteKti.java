@@ -99,6 +99,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		leg.setRoute(newRoute);
 		
 		String routeDescription = 
+			"kti " +
 			fromStop.getId().toString() + " " + 
 			fromMunicipality.getId().toString() + " " + 
 			toMunicipality.getId().toString() + " " + 
@@ -120,10 +121,10 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		
 		String[] routeDescriptionArray = StringUtils.explode(routeDescription, ' ');
 		
-		SwissHaltestelle fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[0]));
-		Location fromMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[1]));
-		Location toMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[2]));
-		SwissHaltestelle toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[3]));
+		SwissHaltestelle fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[1]));
+		Location fromMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[2]));
+		Location toMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[3]));
+		SwissHaltestelle toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[4]));
 		
 		return PlansCalcRouteKti.getTimeInVehicle(fromStop, fromMunicipality, toMunicipality, toStop, plansCalcRouteKtiInfo);
 		
@@ -151,10 +152,10 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 
 		String[] routeDescriptionArray = StringUtils.explode(routeDescription, ' ');
 		
-		SwissHaltestelle fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[0]));
-		Location fromMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[1]));
-		Location toMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[2]));
-		SwissHaltestelle toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[3]));
+		SwissHaltestelle fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[1]));
+		Location fromMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[2]));
+		Location toMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[3]));
+		SwissHaltestelle toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[4]));
 
 		return PlansCalcRouteKti.getInVehicleDistance(fromStop, fromMunicipality, toMunicipality, toStop);
 		
@@ -177,8 +178,8 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
 		
 		String[] routeDescriptionArray = StringUtils.explode(routeDescription, ' ');
-		SwissHaltestelle fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[0]));
-		SwissHaltestelle toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[3]));
+		SwissHaltestelle fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[1]));
+		SwissHaltestelle toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[4]));
 
 		return PlansCalcRouteKti.getAccessEgressDistance(fromAct, fromStop, toStop, toAct);
 		

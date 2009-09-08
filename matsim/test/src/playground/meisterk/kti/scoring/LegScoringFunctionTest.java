@@ -150,7 +150,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		if (TransportMode.pt.equals(mode)) {
 			((GenericRoute) route).setRouteDescription(
 					testPlan.getPreviousActivity(testLeg).getLink(), 
-					"8503006 26101 26102 8503015", 
+					"kti 8503006 26101 26102 8503015", 
 					testPlan.getNextActivity(testLeg).getLink());
 		}
 		route.setDistance(10000.0);

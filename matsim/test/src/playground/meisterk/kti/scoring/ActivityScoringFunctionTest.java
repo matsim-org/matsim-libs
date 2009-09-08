@@ -43,6 +43,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.ScoringFunction;
@@ -148,6 +149,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		leg = this.plan.createLeg(TransportMode.pt);
 		route = network.getFactory().createRoute(TransportMode.pt, this.network.getLink("3040"), this.network.getLink("4050"));
 		route.setDistance(100.0);
+		((GenericRoute) route).setRouteDescription(this.network.getLink("3040"), "bla", this.network.getLink("4050"));
 		leg.setRoute(route);
 
 		act = plan.createActivity("leisure", facilityLeisure);
@@ -157,6 +159,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		leg = this.plan.createLeg(TransportMode.pt);
 		route = network.getFactory().createRoute(TransportMode.pt, this.network.getLink("4050"), this.network.getLink("3040"));
 		route.setDistance(100.0);
+		((GenericRoute) route).setRouteDescription(this.network.getLink("3040"), "bla", this.network.getLink("4050"));
 		leg.setRoute(route);
 
 		act = plan.createActivity("work_sector3", facilityWork);
