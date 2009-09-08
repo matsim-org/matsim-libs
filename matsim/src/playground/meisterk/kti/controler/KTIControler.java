@@ -51,12 +51,11 @@ public class KTIControler extends Controler {
 		}
 
 		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
-				super.config.charyparNagelScoring(), 
-				this.getFacilityPenalties(),
+				super.config, 
 				this.ktiConfigGroup,
-				this.plansCalcRouteKtiInfo,
-				this.network,
-				config.plansCalcRoute());
+				this.getFacilityPenalties(),
+				this.plansCalcRouteKtiInfo
+				);
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
 		super.setUp();

@@ -21,7 +21,6 @@
 package playground.meisterk.kti.scoring;
 
 import java.util.HashMap;
-import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -32,12 +31,10 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -46,22 +43,13 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
-import org.matsim.planomat.Planomat;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.FixedRouteLegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.Desires;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -150,27 +138,26 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		LegImpl leg = this.plan.createLeg(TransportMode.car);
-		NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.network.getLink("2030"), this.network.getLink("3040"));
+		RouteWRefs route = network.getFactory().createRoute(TransportMode.car, this.network.getLink("2030"), this.network.getLink("3040"));
 		leg.setRoute(route);
-		route.setTravelTime(Time.parseTime("00:30:00"));
 
 		act = plan.createActivity("work_sector3", facilityWork);
 		link = this.network.getLink("3040");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createLeg(TransportMode.pt);
-		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.network.getLink("3040"), this.network.getLink("4050"));
+		route = network.getFactory().createRoute(TransportMode.pt, this.network.getLink("3040"), this.network.getLink("4050"));
+		route.setDistance(100.0);
 		leg.setRoute(route);
-		route.setTravelTime(Time.parseTime("00:05:00"));
 
 		act = plan.createActivity("leisure", facilityLeisure);
 		link = this.network.getLink("4050");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createLeg(TransportMode.pt);
-		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.network.getLink("4050"), this.network.getLink("3040"));
+		route = network.getFactory().createRoute(TransportMode.pt, this.network.getLink("4050"), this.network.getLink("3040"));
+		route.setDistance(100.0);
 		leg.setRoute(route);
-		route.setTravelTime(Time.parseTime("00:05:00"));
 
 		act = plan.createActivity("work_sector3", facilityWork);
 		link = this.network.getLink("3040");
@@ -179,95 +166,27 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		leg = this.plan.createLeg(TransportMode.car);
 		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.network.getLink("3040"), this.network.getLink("2030"));
 		leg.setRoute(route);
-		route.setTravelTime(Time.parseTime("00:30:00"));
 
 		act = plan.createActivity("home", facilityHome);
 		link = this.network.getLink("2030");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createLeg(TransportMode.bike);
-		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.network.getLink("2030"), this.network.getLink("1020"));
+		route = network.getFactory().createRoute(TransportMode.bike, this.network.getLink("2030"), this.network.getLink("1020"));
 		leg.setRoute(route);
-		route.setTravelTime(Time.parseTime("04:00:00"));
-		leg.setTravelTime(Time.parseTime("04:00:00"));
 
 		act = plan.createActivity("shop", facilityShop);
 		link = this.network.getLink("1020");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createLeg(TransportMode.bike);
-		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.network.getLink("1020"), this.network.getLink("2030"));
+		route = network.getFactory().createRoute(TransportMode.bike, this.network.getLink("1020"), this.network.getLink("2030"));
 		leg.setRoute(route);
-		route.setTravelTime(Time.parseTime("04:00:00"));
-		leg.setTravelTime(Time.parseTime("04:00:00"));
 
 		act = plan.createActivity("home", facilityHome);
 		link = this.network.getLink("2030");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
-	}
-
-	public void xtestPlanomatPerformance() {
-		/* disabled this test as it does not contain a single assert-statement.
-		 * So, besides that the code doesn't crash, it doesn'r really test anything.
-		 * JUnit is (sadly) not suitable for performance tests. This method could
-		 * be run more or less the same way also in its own main-class. marcel/29may2009
-		 */
-
-		final int TEST_PLAN_NR = 0;
-
-		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-		TravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.config.charyparNagelScoring());
-		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.network, this.config.travelTimeCalculator().getTraveltimeBinSize());
-
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCostEstimator, tTravelEstimator);
-
-		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(tTravelEstimator, depDelayCalc);
-
-		FixedRouteLegTravelTimeEstimator ltte = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
-				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
-				PlanomatConfigGroup.RoutingCapability.fixedRoute,
-				plansCalcRoute);
-		TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
-
-		PersonImpl testPerson = this.population.getPersons().get(TEST_PERSON_ID);
-		// only plan of that person
-		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
-
-		ScoringFunctionFactory scoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
-				this.config.charyparNagelScoring(),
-				facilityPenalties,
-				this.ktiConfigGroup, null, network, null);
-		// init Planomat, which loads config!
-		Planomat testee = new Planomat(ltte, scoringFunctionFactory, this.config.planomat());
-
-		Random random = MatsimRandom.getLocalInstance();
-
-		int check = 1;
-		for (int i = 0; i < 1000; i++) {
-			testee.getSeedGenerator().setSeed(random.nextLong());
-			tTravelEstimator.reset(0);
-			depDelayCalc.resetDepartureDelays();
-
-			// actual test
-			testee.run(testPlan);
-
-			if (i % check == 0) {
-				logger.info("Processed test person " + check + " times.");
-				check *= 2;
-
-			}
-		}
-		// write out the test person and the modified plan into a file
-		PopulationImpl outputPopulation = new PopulationImpl();
-		outputPopulation.getPersons().put(testPerson.getId(), testPerson);
-
-		logger.info("Writing plans file...");
-		PopulationWriter plans_writer = new PopulationWriter(outputPopulation, this.getOutputDirectory() + "output_plans.xml.gz", "v4");
-		plans_writer.write();
-		logger.info("Writing plans file...DONE.");
-
-
 	}
 
 	public void testAlwaysOpen() {
@@ -383,9 +302,10 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		TreeMap<Id, FacilityPenalty> emptyFacilityPenalties = new TreeMap<Id, FacilityPenalty>();
 		KTIYear3ScoringFunctionFactory factory = new KTIYear3ScoringFunctionFactory(
-				this.config.charyparNagelScoring(),
+				this.config,
+				this.ktiConfigGroup,
 				emptyFacilityPenalties,
-				this.ktiConfigGroup, null, network, null);
+				null);
 		ScoringFunction testee = factory.getNewScoringFunction(this.plan);
 
 		assertTrue(testee instanceof ScoringFunctionAccumulator);

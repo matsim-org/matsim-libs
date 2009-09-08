@@ -29,6 +29,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -41,6 +42,7 @@ import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 public class LegScoringFunctionTest extends MatsimTestCase {
 
 	private Config config = null;
+	private KtiConfigGroup ktiConfigGroup = null;
 	private NetworkLayer network = null;
 	private PersonImpl testPerson = null;
 	private PlanImpl testPlan = null;
@@ -50,8 +52,8 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		super.setUp();
 		this.config = super.loadConfig(null);
 		
-		KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
-		ktiConfigGroup.setUsePlansCalcRouteKti(true);
+		ktiConfigGroup = new KtiConfigGroup();
+		ktiConfigGroup.setUsePlansCalcRouteKti(false);
 		ktiConfigGroup.setPtHaltestellenFilename(this.getClassInputDirectory() + "haltestellen.txt");
 		ktiConfigGroup.setPtTraveltimeMatrixFilename(this.getClassInputDirectory() + "pt_Matrix.mtx");
 		ktiConfigGroup.setWorldInputFilename(this.getClassInputDirectory() + "world.xml");
@@ -103,15 +105,20 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		this.testPlan = null;
 		this.testPerson = null;
 		this.network = null;
+		this.ktiConfigGroup = null;
 		this.config = null;
 		super.tearDown();
 	}
 
 	public void testCalcLegScorePt() {
+		this.runATest(TransportMode.pt, null, -10.0);
+		this.ktiConfigGroup.setUsePlansCalcRouteKti(true);
 		this.runATest(TransportMode.pt, null, -5.688799);
 	}
 
 	public void testCalcLegScorePtUnknown() {
+		this.runATest(TransportMode.pt, "unknown", -7.5);
+		this.ktiConfigGroup.setUsePlansCalcRouteKti(true);
 		this.runATest(TransportMode.pt, "unknown", -5.618089);
 	}	
 	
@@ -140,16 +147,21 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 				testPlan.getPreviousActivity(testLeg).getLink(), 
 				testPlan.getNextActivity(testLeg).getLink());
 		testLeg.setRoute(route);
+		if (TransportMode.pt.equals(mode)) {
+			((GenericRoute) route).setRouteDescription(
+					testPlan.getPreviousActivity(testLeg).getLink(), 
+					"8503006 26101 26102 8503015", 
+					testPlan.getNextActivity(testLeg).getLink());
+		}
 		route.setDistance(10000.0);
 
 		CharyparNagelScoringParameters charyparNagelParams = new CharyparNagelScoringParameters(config.charyparNagelScoring());
 		LegScoringFunction testee = new LegScoringFunction(
 				testPlan, 
-				charyparNagelParams, 
-				(KtiConfigGroup) config.getModule(KtiConfigGroup.GROUP_NAME), 
-				this.plansCalcRouteKtiInfo, 
-				network, 
-				config.plansCalcRoute());
+				charyparNagelParams,
+				config,
+				this.ktiConfigGroup, 
+				this.plansCalcRouteKtiInfo);
 		double actualLegScore = testee.calcLegScore(Time.parseTime("06:00:00"), Time.parseTime("06:30:00"), testLeg);
 
 		assertEquals(expectedScore, actualLegScore, 1e-6);

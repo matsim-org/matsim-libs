@@ -23,9 +23,7 @@ package playground.meisterk.kti.scoring;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.config.Config;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -37,39 +35,37 @@ import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 
 public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory {
 
-	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
+	private final Config config;
 	private final KtiConfigGroup ktiConfigGroup;
+	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
-	private final NetworkLayer network;
-	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	
 	public KTIYear3ScoringFunctionFactory(
-			CharyparNagelScoringConfigGroup config, 
-			final TreeMap<Id, FacilityPenalty> facilityPenalties,
+			final Config config, 
 			final KtiConfigGroup ktiConfigGroup,
-			PlansCalcRouteKtiInfo plansCalcRouteKtiInfo,
-			NetworkLayer network,
-			PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
-		super(config);
-		this.facilityPenalties = facilityPenalties;
+			final TreeMap<Id, FacilityPenalty> facilityPenalties,
+			PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
+		super(config.charyparNagelScoring());
+		this.config = config;
 		this.ktiConfigGroup = ktiConfigGroup;
+		this.facilityPenalties = facilityPenalties;
 		this.plansCalcRouteKtiInfo = plansCalcRouteKtiInfo;
-		this.network = network;
-		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
 	}
 
 	public ScoringFunction getNewScoringFunction(PlanImpl plan) {
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
-		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, super.getParams(), this.facilityPenalties));
-		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
+		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(
 				plan, 
 				super.getParams(), 
+				this.facilityPenalties));
+		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
+				plan, 
+				super.getParams(),
+				config,
 				this.ktiConfigGroup,
-				this.plansCalcRouteKtiInfo,
-				this.network,
-				this.plansCalcRouteConfigGroup));
+				this.plansCalcRouteKtiInfo));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.MoneyScoringFunction(super.getParams()));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction(super.getParams()));
 		

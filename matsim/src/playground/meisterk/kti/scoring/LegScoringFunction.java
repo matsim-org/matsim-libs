@@ -23,10 +23,11 @@ package playground.meisterk.kti.scoring;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
@@ -50,25 +51,21 @@ import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
  * @author meisterk
  *
  */
-public class LegScoringFunction extends
-org.matsim.core.scoring.charyparNagel.LegScoringFunction {
+public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.LegScoringFunction {
 
 	private final KtiConfigGroup ktiConfigGroup;
-	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
-	private final NetworkLayer network;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 
 	public LegScoringFunction(PlanImpl plan,
 			CharyparNagelScoringParameters params,
+			Config config,
 			KtiConfigGroup ktiConfigGroup,
-			PlansCalcRouteKtiInfo plansCalcRouteKtiInfo,
-			NetworkLayer network,
-			PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
+			PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
 		super(plan, params);
 		this.ktiConfigGroup = ktiConfigGroup;
+		this.plansCalcRouteConfigGroup = config.plansCalcRoute();
 		this.plansCalcRouteKtiInfo = plansCalcRouteKtiInfo;
-		this.network = network;
-		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
 	}
 
 	@Override
@@ -91,47 +88,29 @@ org.matsim.core.scoring.charyparNagel.LegScoringFunction {
 			
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 
-			if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
+			String routeDescription = ((GenericRoute) leg.getRoute()).getRouteDescription();
 
-				// true pt access leg with mode "walk"
-				LegImpl pseudoLeg = null;
-				pseudoLeg = PlansCalcRouteKti.getPseudoAccessLeg(
-						this.plan.getPreviousActivity(leg), 
-						this.plansCalcRouteKtiInfo.getHaltestellen(), 
-						this.network,
-						this.plansCalcRouteConfigGroup);
-				dist = pseudoLeg.getRoute().getDistance();
-				travelTime = pseudoLeg.getTravelTime();
-				tmpScore += this.getWalkScore(dist, travelTime);
-				
-				// true pt leg
-				pseudoLeg = PlansCalcRouteKti.getPseudoPtLeg(
+			if (this.ktiConfigGroup.isUsePlansCalcRouteKti() && routeDescription != null) {
+
+				dist = PlansCalcRouteKti.getAccessEgressDistance(
+						routeDescription, 
 						this.plan.getPreviousActivity(leg), 
 						this.plan.getNextActivity(leg), 
-						this.plansCalcRouteKtiInfo,
-						this.network);
-				dist = pseudoLeg.getRoute().getDistance();
-				travelTime = pseudoLeg.getTravelTime();
-				tmpScore += this.getPtScore(dist, travelTime);
-				
-				// true pt egress leg with mode "walk"
-				pseudoLeg = PlansCalcRouteKti.getPseudoEgressLeg(this.plan
-						.getNextActivity(leg), this.plansCalcRouteKtiInfo
-						.getHaltestellen(), this.network,
-						this.plansCalcRouteConfigGroup);
-				dist = pseudoLeg.getRoute().getDistance();
-				travelTime = pseudoLeg.getTravelTime();
+						plansCalcRouteKtiInfo);
+				travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
 				tmpScore += this.getWalkScore(dist, travelTime);
 				
-			} else {
-			
-				if (this.params.marginalUtilityOfDistancePt != 0.0) {
-					dist = leg.getRoute().getDistance();
-				}
+				dist = PlansCalcRouteKti.getInVehicleDistance(routeDescription, plansCalcRouteKtiInfo);
+				travelTime = PlansCalcRouteKti.getTimeInVehicle(routeDescription, this.plansCalcRouteKtiInfo);
 				tmpScore += this.getPtScore(dist, travelTime);
-				
+
+			} else {
+
+				dist = leg.getRoute().getDistance();
+				tmpScore += this.getPtScore(dist, travelTime);
+
 			}
-			
+
 		} else if (TransportMode.walk.equals(leg.getMode())) {
 			
 			if (this.params.marginalUtilityOfDistanceWalk != 0.0) {
@@ -179,7 +158,7 @@ org.matsim.core.scoring.charyparNagel.LegScoringFunction {
 		} else {
 			throw new RuntimeException("Person " + this.plan.getPerson().getId() + " has an invalid travelcard. This should never happen.");
 		}
-		score += this.params.marginalUtilityOfDistancePt	* distanceCost / 1000d * distance;
+		score += this.params.marginalUtilityOfDistancePt * distanceCost / 1000d * distance;
 		score += travelTime * this.params.marginalUtilityOfTravelingPT;
 
 		return score;

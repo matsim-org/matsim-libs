@@ -23,9 +23,12 @@ package playground.meisterk.kti.router;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
 import org.matsim.core.utils.collections.QuadTree;
@@ -35,14 +38,35 @@ import org.matsim.core.utils.misc.StringUtils;
 
 public class SwissHaltestellen {
 
-	private final QuadTree<Coord> haltestellen;
+	public class SwissHaltestelle {
+		
+		private final Id id;
+		private final Coord coord;
+		
+		private SwissHaltestelle(Id id, Coord coord) {
+			super();
+			this.id = id;
+			this.coord = coord;
+		}
+
+		public Id getId() {
+			return id;
+		}
+
+		public Coord getCoord() {
+			return coord;
+		}
+		
+	}
+	
+	private final QuadTree<SwissHaltestelle> haltestellen;
 
 	private static final Logger log = Logger.getLogger(SwissHaltestellen.class);
 
 	public SwissHaltestellen(final NetworkLayer network) {
 		CalcBoundingBox bbox = new CalcBoundingBox();
 		bbox.run(network);
-		this.haltestellen = new QuadTree<Coord>(bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY());
+		this.haltestellen = new QuadTree<SwissHaltestelle>(bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY());
 	}
 
 	public void readFile(final String filename) throws FileNotFoundException, IOException {
@@ -52,14 +76,33 @@ public class SwissHaltestellen {
 			String[] parts = StringUtils.explode(line, '\t');
 			if (parts.length == 7) {
 				CoordImpl coord = new CoordImpl(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
-				this.haltestellen.put(coord.getX(), coord.getY(), coord);
+				SwissHaltestelle swissStop = new SwissHaltestelle(new IdImpl(parts[0]), coord);
+				this.haltestellen.put(coord.getX(), coord.getY(), swissStop);
 			} else {
 				log.warn("Could not parse line: " + line);
 			}
 		}
 	}
 
-	public Coord getClosestLocation(final Coord coord) {
+	public SwissHaltestelle getClosestLocation(final Coord coord) {
 		return this.haltestellen.get(coord.getX(), coord.getY());
 	}
+	
+	public SwissHaltestelle getHaltestelle(Id id) {
+		
+		SwissHaltestelle swissStop = null;
+		
+		Iterator<SwissHaltestelle> it = haltestellen.values().iterator();
+		boolean notFound = true;
+		while (notFound && it.hasNext()) {
+			swissStop = it.next();
+			if (id.equals(swissStop.getId())) {
+				notFound = false;
+			}
+		}
+		
+		return swissStop;
+		
+	}
+	
 }
