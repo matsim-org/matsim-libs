@@ -246,7 +246,7 @@ public class VertexIntervalls {
 	 *  the node is reachable from the source
 	 * @return specified Intervall or null if none exist
 	 */
-	private VertexIntervall getFirstPossible(){
+	public VertexIntervall getFirstPossible(){
 		VertexIntervall result = this.getIntervallAt(0);
 		while(!this.isLast(result)){
 			if (result.getDist()){
@@ -282,13 +282,13 @@ public class VertexIntervalls {
 	 * @param arrive Intervalls at which node is reachable
 	 * @return true iff anything was changed
 	 */
-	public boolean setTrue(ArrayList<Intervall> arrive,Link link) {
+	public boolean setTrue(ArrayList<VertexIntervall> arrive,Link link) {
 		boolean changed = false;
-		ArrayList<Intervall> arrivecondensed = new ArrayList<Intervall>();
+		ArrayList<VertexIntervall> arrivecondensed = new ArrayList<VertexIntervall>();
 		if(!arrive.isEmpty()){
-			Intervall last= arrive.get(0);
+			VertexIntervall last= arrive.get(0);
 			for(int j=1; j< arrive.size(); j++){
-				Intervall present = arrive.get(j);
+				VertexIntervall present = arrive.get(j);
 				if(last.getHighBound()==present.getLowBound() ){
 					last.setHighBound(present.getHighBound());
 					//System.out.println("blub---------------------------------------------");
@@ -327,27 +327,29 @@ public class VertexIntervalls {
 	 * @param arrive Intervall at which node is reachable
 	 * @return true iff anything was changed
 	 */
-	public LinkedList<VertexIntervall> setTrue(Intervall arrive,Link link){
+	public LinkedList<VertexIntervall> setTrue(VertexIntervall arrive,Link link){
 		boolean changed = false;
 		LinkedList<VertexIntervall> change = new LinkedList<VertexIntervall>();
-		VertexIntervall test = this.getIntervallAt(arrive.getLowBound());
-		int t= test.getHighBound();
-		while(test.getLowBound()<arrive.getHighBound()){
-			t=test.getHighBound();
-			if(!test.getDist()){
+		VertexIntervall ourIntervall = this.getIntervallAt(arrive.getLowBound());
+		int t= ourIntervall.getHighBound();
+		while(ourIntervall.getLowBound()<arrive.getHighBound()){
+			t=ourIntervall.getHighBound();
+			if(!ourIntervall.getDist()){
 				// just relabel since it is contained
-				if(arrive.contains(test)){
-					test.setDist(true);
-					test.setPredecessor(link);
-					changed=true;
-					change.add(test);
-					if(VertexIntervalls._debug){
-						System.out.println("blub1");
-					}	
+				if(arrive.contains(ourIntervall)){
+					//we dont need to change anything
+//					TODO changed!
+//					test.setPredecessor(link);
+//					changed=true;
+//					change.add(test);
+//					if(VertexIntervalls._debug){
+//						System.out.println("blub1");
+//					}	
 				}else{
 					//upper part of test must be relabeld
-					if(test.getLowBound()<arrive.getLowBound()&& test.getHighBound()<=arrive.getHighBound()){
+					if(ourIntervall.getLowBound()<arrive.getLowBound()&& ourIntervall.getHighBound()<=arrive.getHighBound()){
 						VertexIntervall temp= this.splitAt(arrive.getLowBound());
+						temp.setStartTime(arrive.getStartTime());
 						temp.setDist(true);
 						temp.setPredecessor(link);
 						changed=true;
@@ -357,10 +359,11 @@ public class VertexIntervalls {
 						}
 					}else{
 						//lower part of test must be relabeld
-						if(test.getLowBound()>=arrive.getLowBound()&& test.getHighBound()>arrive.getHighBound()){
-							int temptime=test.getLowBound();
+						if(ourIntervall.getLowBound()>=arrive.getLowBound()&& ourIntervall.getHighBound()>arrive.getHighBound()){
+							int temptime=ourIntervall.getLowBound();
 							this.splitAt(arrive.getHighBound());
 							VertexIntervall temp= this.getIntervallAt(temptime);
+							temp.setStartTime(arrive.getStartTime());
 							temp.setDist(true);
 							temp.setPredecessor(link);
 							changed=true;
@@ -370,13 +373,14 @@ public class VertexIntervalls {
 							}
 							
 						}else{
-							//middle of tet must be relabeld
-							if(test.contains(arrive)){
+							//middle of test must be relabeld
+							if(ourIntervall.contains(arrive)){
 								int temptime = arrive.getLowBound();
 								this.splitAt(arrive.getLowBound());
 								this.splitAt(arrive.getHighBound());
 								VertexIntervall temp= this.getIntervallAt(temptime);
 								temp.setDist(true);
+								temp.setStartTime(arrive.getStartTime());
 								temp.setPredecessor(link);
 								changed=true;
 								change.add(temp);
@@ -392,7 +396,7 @@ public class VertexIntervalls {
 			if(Integer.MAX_VALUE==t){
 				break;
 			}
-			test= this.getIntervallAt(t);
+			ourIntervall= this.getIntervallAt(t);
 		}	
 		return change;
 	}
@@ -441,6 +445,7 @@ public class VertexIntervalls {
 			  VertexIntervall ni = new VertexIntervall(i.getLowBound(),j.getHighBound(),i.getDist(), i.getPredecessor());
 			  _tree.remove(i);
 			  _tree.remove(j);
+			  ni.setStartTime(i.getStartTime());
 			  _tree.insert(ni);
 			  i = ni;
 			  gain++;
@@ -453,6 +458,29 @@ public class VertexIntervalls {
 		_last = (VertexIntervall) _tree._getLast().obj;
 		
 		return gain;
+	}
+	
+	public VertexIntervall getFirstIntervallWithDistTrue()
+	{
+		int lowBound = this.firstPossibleTime();
+		if(lowBound == Integer.MAX_VALUE)
+			return null;
+		for(this._tree.goToNodeAt(lowBound); !this._tree.isAtEnd(); this._tree.increment())
+		{
+			VertexIntervall vIntervall = (VertexIntervall)(this._tree.currentData()); 
+			if(vIntervall.getDist())
+				return vIntervall;
+		}
+		return null;
+	}
+	
+	public Integer getFirstTimePointWithDistTrue()
+	{
+		VertexIntervall vIntervall = this.getFirstIntervallWithDistTrue();
+		if(vIntervall == null)
+			return null;
+		else
+			return vIntervall.getLowBound();
 	}
 	
 	

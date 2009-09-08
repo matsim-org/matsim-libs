@@ -355,6 +355,8 @@ implements Comparable<Intervall>
 	 */
 	public Intervall Intersection(Intervall other){
 		if (other!=null){
+			if(other.getHighBound() == 8 && other.getLowBound() == 5)
+				System.out.println("jasfcbsofbv");
 			if(this.intersects(other)){
 				int l = Math.max(this._l, other._l);
 				int r = Math.min(this._r, other._r);

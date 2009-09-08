@@ -44,12 +44,22 @@ public class VertexIntervall extends Intervall {
 	//TODO predecessor
 	private Link _predecessor=null;
 	
+	private int startTime;
+	
 
 //---------------------------METHODS----------------------------//
 //**************************************************************//
 	
 
-//--------------------------CONSTUCTORS-------------------------//
+public int getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(int startTime) {
+		this.startTime = startTime;
+	}
+
+	//--------------------------CONSTUCTORS-------------------------//
 	/**
 	 * Default costructor creates an (0,1) Intervall 
 	 * with Integer.MAX_VALUE as initial distance to the sink
@@ -162,6 +172,14 @@ public class VertexIntervall extends Intervall {
 		k._dist =newdist;
 		k._predecessor= this._predecessor;
 		return k;
+	}
+	
+	public String toString()
+	{
+		if(this._predecessor != null)
+			return super.toString() + "; pred: " + this._predecessor.getId().toString() + "; latestStartTime: " + this.startTime;
+		else
+			return super.toString() + "; dist: " + this._dist;
 	}
 
 	

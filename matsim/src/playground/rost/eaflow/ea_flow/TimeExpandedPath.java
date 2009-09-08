@@ -22,6 +22,7 @@ package playground.rost.eaflow.ea_flow;
 
 //java imports
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.matsim.api.core.v01.network.Link;
@@ -77,7 +78,13 @@ public class TimeExpandedPath {
 		/**
 		 * time upon which the flow enters the edge
 		 */
-		private final int time;
+		private final int startTime;
+		
+		/**
+		 * time upon the flow arrivs at the toNode
+		 */
+		private final int arrivalTime;
+		
 		
 		/**
 		 * reminder if this is a forward edge or not
@@ -90,8 +97,9 @@ public class TimeExpandedPath {
 		 * @param time starting time
 		 * @param forward flag if edge is forward or backward
 		 */
-		PathEdge(Link edge,int time, boolean forward){
-			this.time = time;
+		PathEdge(Link edge, int startTime, int arrivalTime, boolean forward){
+			this.startTime = startTime;
+			this.arrivalTime = arrivalTime;
 			this.edge = edge;
 			this.forward = forward;
 		}
@@ -101,9 +109,9 @@ public class TimeExpandedPath {
 		 */
 		public String toString(){
 			if(!this.forward){
-				return (edge.getId().toString() + " t: " + this.time + "backwards!");
+				return (edge.getId().toString() + " t: " + this.startTime + "backwards!");
 			}
-			return (edge.getId().toString() + " t: " + this.time );
+			return (edge.getId().toString() + " t: " + this.startTime );
 		}
 
 		/**
@@ -126,8 +134,13 @@ public class TimeExpandedPath {
 		 * getter for the time at which an edge is entered
 		 * @return the time
 		 */
-		public int getTime() {
-			return time;
+		public int getStartTime() {
+			return startTime;
+		}
+		
+		public int getArrivalTime()
+		{
+			return arrivalTime;
 		}
 	}
 	
@@ -146,14 +159,14 @@ public class TimeExpandedPath {
 	 * @param forward flag if edge is forward or backward
 	 * @exception throws an IllegalArgumentException if the new edge is not adjacent to te last edge in the path
 	 */
-	public void append(Link edge, int time, boolean forward){
+	public void append(Link edge, int startTime, int arrivalTime, boolean forward){
 		//adding first PathEdge
 		if(this._edges.isEmpty()){
-			PathEdge temp =new PathEdge(edge, time, forward);
+			PathEdge temp =new PathEdge(edge, startTime, arrivalTime, forward);
 			this._edges.addLast(temp);
 		}else{
 			PathEdge old = this._edges.getLast();
-			PathEdge temp =new PathEdge(edge, time, forward);
+			PathEdge temp =new PathEdge(edge, startTime, arrivalTime, forward);
 			if(checkPair(old,temp)){
 				this._edges.addLast(temp);
 			}else{
@@ -169,13 +182,13 @@ public class TimeExpandedPath {
 	 * @param forward flag if edge is forward or backward
 	 * @exception throws an IllegalArgumentException if the new edge is not adjacent to te first edge in the path
 	 */
-	public void push(Link edge, int time, boolean forward){
+	public void push(Link edge, int startTime, int arrivalTime, boolean forward){
 		if(this._edges.isEmpty()){
-			PathEdge temp =new PathEdge(edge, time, forward);
+			PathEdge temp =new PathEdge(edge, startTime, arrivalTime, forward);
 			this._edges.addFirst(temp);
 		}else{
 			PathEdge old = this._edges.getFirst();
-			PathEdge temp =new PathEdge(edge, time, forward);
+			PathEdge temp =new PathEdge(edge, startTime, arrivalTime, forward);
 			if(checkPair(temp,old)){
 				this._edges.addFirst(temp);
 			}else{
@@ -265,7 +278,7 @@ public class TimeExpandedPath {
 				if((to < this._edges.size()) && (to >= 0)){
 					result = new TimeExpandedPath();
 					for(int i = from; i <= to; i++){
-						result.append(this._edges.get(i).edge, this._edges.get(i).time, this._edges.get(i).isForward());
+						result.append(this._edges.get(i).edge, this._edges.get(i).startTime, this._edges.get(i).arrivalTime, this._edges.get(i).isForward());
 					}
 				}
 			}
@@ -289,7 +302,8 @@ public class TimeExpandedPath {
 		boolean result = false;
 		for(PathEdge pathEdge : this._edges){
 			if(pathEdge.getEdge().equals(edge.getEdge())){
-				if(pathEdge.getTime() == edge.getTime()){
+				if(pathEdge.getStartTime() == edge.getStartTime()
+						&& pathEdge.getArrivalTime() == edge.getArrivalTime()){
 					result = true;
 					break;
 				}
@@ -315,7 +329,8 @@ public class TimeExpandedPath {
 		PathEdge result = null;
 		for(PathEdge pathEdge : this._edges){
 			if(pathEdge.getEdge().equals(edge.getEdge())){
-				if(pathEdge.getTime() == edge.getTime()){
+				if(pathEdge.getStartTime() == edge.getStartTime()
+						&& pathEdge.getArrivalTime() == edge.getArrivalTime()){
 					result = pathEdge;
 					break;
 				}
@@ -341,7 +356,8 @@ public class TimeExpandedPath {
 		Integer result = 0;
 		for(PathEdge pathEdge : this._edges){
 			if(pathEdge.getEdge().equals(edge.getEdge())){
-				if(pathEdge.getTime() == edge.getTime()){
+				if(pathEdge.getStartTime() == edge.getStartTime()
+						&& pathEdge.getArrivalTime() == edge.getArrivalTime()){
 					break;
 				}
 			}
@@ -459,5 +475,73 @@ public class TimeExpandedPath {
 		System.out.println("Path has flow " + this._flow);
 		System.out.println();
 	}
-
+	
+	public List<TimeExpandedPath> splitPathAtEdge(PathEdge pathEdgeToSplitAt)
+	{
+		List<TimeExpandedPath> result = new LinkedList<TimeExpandedPath>();
+		TimeExpandedPath head = new TimeExpandedPath();
+		TimeExpandedPath tail = new TimeExpandedPath();
+		head.setArrival(this._arrival);
+		tail.setArrival(this._arrival);
+		head.setFlow(this._flow);
+		tail.setFlow(this._flow);
+		boolean preSplit = true;
+		for(PathEdge pE : this._edges)
+		{
+			if(pE.equals(pathEdgeToSplitAt))
+			{
+				preSplit = false;
+				continue;
+			}
+			if(preSplit)
+			{
+				head.append(pE.edge, pE.getStartTime(), pE.getArrivalTime(), pE.isForward());
+			}
+			else
+			{
+				tail.append(pE.edge, pE.getStartTime(), pE.getArrivalTime(), pE.isForward());
+			}
+		}
+		result.add(head);
+		result.add(tail);
+		return result;
+	}
+	
+	public void addTailToPath(TimeExpandedPath other)
+	{
+		for(PathEdge pE : other.getPathEdges())
+		{
+			this.append(pE);
+		}
+		this.setArrival(other.getArrival());
+	}
+	
+	public void append(PathEdge pE)
+	{
+		this.append(pE.getEdge(), pE.getArrivalTime(), pE.getStartTime(), pE.isForward());
+	}
+	
+	public static TimeExpandedPath clone(TimeExpandedPath original)
+	{
+		TimeExpandedPath copy = new TimeExpandedPath();
+		copy.setArrival(original.getArrival());
+		copy.setFlow(original.getArrival());
+		copy.setWait(original.getWait());
+		for(PathEdge pE : original.getPathEdges())
+		{
+			copy.append(pE);
+		}
+		return copy;
+	}
+	
+	public void addFlow(int flow)
+	{
+		this._flow += flow;
+	}
+	
+	public void subtractFlow(int flow)
+	{
+		this._flow -= flow;
+	}
+	
 }
