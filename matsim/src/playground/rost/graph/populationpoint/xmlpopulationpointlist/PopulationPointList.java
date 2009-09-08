@@ -41,8 +41,6 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.xml.sax.Locator;
 
-import com.sun.xml.internal.bind.Locatable;
-import com.sun.xml.internal.bind.annotation.XmlLocation;
 
 
 /**
@@ -70,12 +68,10 @@ import com.sun.xml.internal.bind.annotation.XmlLocation;
 })
 @XmlRootElement
 public class PopulationPointList
-    implements Locatable
 {
 
     @XmlElement(name = "PopPoint")
     protected List<SinglePopulationPoint> popPoint;
-    @XmlLocation
     @XmlTransient
     protected Locator locator;
 
