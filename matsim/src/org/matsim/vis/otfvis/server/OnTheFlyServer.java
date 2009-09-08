@@ -440,7 +440,8 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	public int getControllerStatus() {
-		return controllerStatus;
+		if ((controllerStatus == OTFVisController.RUNNING) && (status == PAUSE)) return  OTFVisController.RUNNING + OTFVisController.PAUSED;
+		else return controllerStatus;
 	}
 
 	public int getRequestStatus() {

@@ -71,7 +71,7 @@ import org.matsim.vis.otfvis.server.OTFTVehServer;
 
 /**
  * This class is most important for the OTFVis client. It serves as the connector to the actual server.
- * Additionally it is responsible for all actions assosiated with the control bar on top of the OTFVis' screen.
+ * Additionally it is responsible for all actions associated with the control bar on top of the OTFVis' screen.
  * Any communication with the server will run through this class.
  * 
  * @author dstrippgen
@@ -410,9 +410,28 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	protected void updateTimeLabel() throws RemoteException {
 		if(controllerStatus != OTFVisController.NOCONTROL){
 			controllerStatus = liveHost.getControllerStatus();
-			timeField.setText(OTFVisController.getIteration(controllerStatus) +"#" +Time.writeTime(simTime));
 		}
-		else timeField.setText(Time.writeTime(simTime));
+
+		switch (OTFVisController.getStatus(controllerStatus)) {
+		case OTFVisController.STARTUP:
+			timeField.setText(OTFVisController.getIteration(controllerStatus) +"#Preparing...#");
+			break;
+		case (OTFVisController.RUNNING + OTFVisController.PAUSED):
+			if(movieTimer != null && !synchronizedPlay) stopMovie();
+		case OTFVisController.RUNNING:
+			timeField.setText(OTFVisController.getIteration(controllerStatus) +"#" +Time.writeTime(simTime));
+			break;
+		case OTFVisController.REPLANNING:
+			timeField.setText(OTFVisController.getIteration(controllerStatus) +"#Replanning...#");
+			break;
+		case OTFVisController.CANCEL:
+			timeField.setText(OTFVisController.getIteration(controllerStatus) +"#Cancelling...#");
+			break;
+
+		default:
+			timeField.setText(Time.writeTime(simTime));
+			break;
+		}
 	}
 
 	// ---------- IMPLEMENTATION OF ActionListener INTERFACE ----------
@@ -726,8 +745,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 							slave.host.requestNewTime(simTime, OTFServerRemote.TimePreference.LATER);
 						}
 						
+						updateTimeLabel();
 						if (simTime != actTime) {
-							updateTimeLabel();
 							repaint();
 							if (isActive)  {
 								invalidateHandlers();

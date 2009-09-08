@@ -170,7 +170,8 @@ public class OnTheFlyClientQuad extends Thread {
 	}
 
 	public static void main(String[] args) {
-		OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019");
+		if(args.length==0) {args = new String[] {"rmi:127.0.0.1:4019"};};
+		OnTheFlyClientQuad client = new OnTheFlyClientQuad(args[0]);
 		client.start();
 	}
 
