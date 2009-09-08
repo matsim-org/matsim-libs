@@ -2,26 +2,37 @@ package playground.mmoyo.PTRouter;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelTime;
 
 /**
- * Calculates the cost of travel in different travel zones of the city
+ * Calculates the cost of travel
  */
 public class PTTravelCost implements TravelCost {
 	PTTimeTable ptTimeTable;
-	TravelTime ptTravelTime;
 	
 	public PTTravelCost(final PTTimeTable ptTimeTable) {
 		this.ptTimeTable = ptTimeTable; 
-		this.ptTravelTime= new PTTravelTime(ptTimeTable);
 	}
 
 	public double getLinkTravelCost(Link link, double time) {
-		//return 1;
-		//return link.getLength();
-		return ptTravelTime.getLinkTravelTime(link, time);
-		//--> Compare fare zone from toNode and fromNode. If They are different then a extra cost is to be charged 
+		double cost;
+		
+		//////////////////////objective values
+		double travelTime = ptTimeTable.getLinkTravelTime(link, time) ;
+		double travelDistance = link.getLength();
+		
+		//////////////////////subjective values
+		double timeValue = travelTime * 1;
+		double distanceValue = travelDistance * 1;
+		double transferValue = travelTime + 60;
+		double walkValue = travelTime * 1;
+		
+		cost = travelTime;     
+		return cost;
 	}
+
+
+	
+	
 	
 	
 }

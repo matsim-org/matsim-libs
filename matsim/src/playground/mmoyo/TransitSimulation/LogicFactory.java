@@ -48,6 +48,8 @@ public class LogicFactory{
 	
 	private Map<Id,List<Node>> facilityNodeMap = new TreeMap<Id,List<Node>>(); /* <key =PlainStop, value = List of logicStops to be joined by transfer links>*/
 	public Map<Id,Node> logicToPlanStopMap = new TreeMap<Id,Node>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
+	public Map<Id,LinkImpl> logicToPlanLinkMap = new TreeMap<Id,LinkImpl>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
+	public Map<Id,LinkImpl> lastLinkMap = new TreeMap<Id,LinkImpl>();    //stores the head node as key and the link as value //usefful to fand lastStandardlink of transfer links
 	private Map<Id,Id> nodeLineMap = new TreeMap<Id,Id>();                  
 	
 	long newLinkId=0;
@@ -59,7 +61,7 @@ public class LogicFactory{
 	public LogicFactory(final TransitSchedule transitSchedule){
 		this.transitSchedule = transitSchedule;
 		createLogicNet();
-		this.logicToPlainTranslator = new LogicIntoPlainTranslator(plainNet,  logicToPlanStopMap);
+		this.logicToPlainTranslator = new LogicIntoPlainTranslator(plainNet,  logicToPlanStopMap, logicToPlanLinkMap, lastLinkMap);
 	}
 	
 	//Creates a logic network file and a logic TransitSchedule file with individualized id's for nodes and stops*/
@@ -72,7 +74,7 @@ public class LogicFactory{
 				List<TransitRouteStop> logicTransitStops = new ArrayList<TransitRouteStop>();
 				NodeImpl lastLogicNode = null;
 				NodeImpl lastPlainNode=null;
-				boolean first= true;
+				boolean first=true;
 				
 				//iterates in each transit stop to create nodes and links */
 				for (TransitRouteStop transitRouteStop: transitRoute.getStops()) { 
@@ -95,8 +97,13 @@ public class LogicFactory{
 
 					//Creates links
 					if (!first){
-						createLogicLink(new IdImpl(newLinkId++), lastLogicNode, logicNode, "Standard");
-						createPlainLink(lastPlainNode, plainNode);
+						LinkImpl plainLink= createPlainLink(lastPlainNode, plainNode);
+						
+						Id id = new IdImpl(newLinkId++);
+						LinkImpl logicLink = createLogicLink(id, lastLogicNode, logicNode, STANDARDLINK);  
+						logicToPlanLinkMap.put(id, plainLink);  //stores here the correspondent plainLink!! it will help to the translation!
+						lastLinkMap.put(logicNode.getId(), logicLink);   // stores the inStandardLink of a Node. Will be used in translation for transfers link
+
 					}else{
 						first=false;
 					}
@@ -144,6 +151,7 @@ public class LogicFactory{
 		facilityNodeMap = null;
 	}
 	
+	
 	public void createDetachedTransferLinks (final double distance){
 		for (NodeImpl centerNode: logicNet.getNodes().values()){
 			Collection<NodeImpl> nearNodes= logicNet.getNearestNodes(centerNode.getCoord(), distance);
@@ -159,35 +167,44 @@ public class LogicFactory{
 		}
 		//NodeLineMap= null;??
 	}
-	
-	/**Asks if the fromNode has at least one standard inLink and also if the toNode has at least a standard outLink
-	 * Otherwise it is senseless to create a transfer link between them */
+
+	/**return TRUE the new transfer link will join two Standard links otherwise it is senseless to create a transfer link between the nodes */
 	private boolean willJoin2StandardLinks(NodeImpl fromNode, NodeImpl toNode){
 		int numInGoingStandards =0;
-		for (LinkImpl inLink : fromNode.getInLinks().values()){
-			if (inLink.getType().equals(STANDARDLINK)) 	numInGoingStandards++;
-		}	
-		
 		int numOutgoingStandards =0;
-		for (LinkImpl outLink : toNode.getOutLinks().values()){
-			if (outLink.getType().equals(STANDARDLINK)) numOutgoingStandards++;
-		}
 		
+		for (LinkImpl inLink : fromNode.getInLinks().values())
+			if (inLink.getType().equals(STANDARDLINK)) 	numInGoingStandards++;
+
+		for (LinkImpl outLink : toNode.getOutLinks().values())
+			if (outLink.getType().equals(STANDARDLINK)) numOutgoingStandards++;
+	
 		return (numInGoingStandards>0) && (numOutgoingStandards>0); 
-	}
-	
+	}	
+
 	/**Creates the links for the logical network, one for transitRoute*/
-	private void createLogicLink(Id id, NodeImpl fromNode, NodeImpl toNode, String type){
+	private LinkImpl createLogicLink(Id id, NodeImpl fromNode, NodeImpl toNode, String type){
 		double length= CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
-		logicNet.createLink(id, fromNode, toNode, length , 1.0 , 1.0, 1.0, "0", type);	
+		return logicNet.createLink(id, fromNode, toNode, length , 1.0 , 1.0, 1.0, "0", type);	
 	}
 	
-	/**Creates the links for the plain network, only one between two stations*/
-	private void createPlainLink(NodeImpl fromNode, NodeImpl toNode){
+	/**returns -or creates if does not exist- a plain link between two nodes*/
+	private LinkImpl createPlainLink(NodeImpl fromNode, NodeImpl toNode){
+		LinkImpl linkImpl = null;
 		if (!fromNode.getOutNodes().containsValue(toNode)){
 			double length= CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
-			plainNet.createLink(new IdImpl(newPlainLinkId++), fromNode, toNode, length, 1.0, 1.0 , 1);
+			linkImpl= plainNet.createLink(new IdImpl(newPlainLinkId++), fromNode, toNode, length, 1.0, 1.0 , 1);
 		}
+		
+		else{
+			//-> make better method : store and read in map
+			for (LinkImpl outLink : fromNode.getOutLinks().values()){
+				if (outLink.getToNode().equals(toNode)){
+					return outLink;
+				}
+			}
+		}
+		return linkImpl;
 	}
 	
 	private NodeImpl createPlainNode(TransitStopFacility transitStopFacility){

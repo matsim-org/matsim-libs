@@ -39,7 +39,7 @@ public class Main {
 	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
 	//private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
 	private static final String CONFIG =  PATH  + "config.xml";
-	private static final String PLANFILE = PATH +  "_input_file.xml"; // "plans.xml";
+	private static final String PLANFILE = PATH +  "plans.xml"; ///"_input_file.xml"; // "plans.xml";
 	private static final String OUTPUTPLANS = PATH + "output_plans.xml";
 	private static final String NETWORK = PATH + "network.xml";
 	private static final String PLAINNETWORK = PATH + "plainNetwork.xml";
@@ -69,7 +69,7 @@ public class Main {
 		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
 		NetworkLayer plainNetwork=logicFactory.getPlainNet();
 		
-		int option =7;
+		int option =3;
 		switch (option){
 			case 1:    //writes logicElement files
 				logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);
@@ -92,12 +92,14 @@ public class Main {
 				break;
 				
 			case 3: //Routes a population/
-				ptActWriter = new PTActWriter(transitSchedule, CONFIG, PLANFILE, OUTPUTPLANS);
+				double startTime = System.currentTimeMillis();
+				ptActWriter = new PTActWriter(logicFactory, CONFIG, PLANFILE, OUTPUTPLANS);
 				ptActWriter.findRouteForActivities();
+				System.out.println("total process duration: " + (System.currentTimeMillis()-startTime));
 				break;
 
 			case 4:  //tests the TransitRouteFinder class with the population of PTActWriter class
-				ptActWriter = new PTActWriter(transitSchedule, CONFIG, PLANFILE, OUTPUTPLANS);
+				ptActWriter = new PTActWriter(logicFactory, CONFIG, PLANFILE, OUTPUTPLANS);
 				ptActWriter.printPTLegs(transitSchedule);
 				break;
 
@@ -113,7 +115,7 @@ public class Main {
 			case 6:  //simplifies a plan
 				String planToSimplify = "output_plan.xml";
 				String simplifiedPlan = "simplfied_plan.xml";
-				ptActWriter = new PTActWriter(transitSchedule, CONFIG, PATH + planToSimplify , PATH + simplifiedPlan);
+				ptActWriter = new PTActWriter(logicFactory, CONFIG, PATH + planToSimplify , PATH + simplifiedPlan);
 				ptActWriter.simplifyPtLegs();
 				break;
 			

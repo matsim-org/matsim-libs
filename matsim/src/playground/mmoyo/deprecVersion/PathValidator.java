@@ -1,4 +1,4 @@
-package playground.mmoyo.Validators;
+package playground.mmoyo.deprecVersion;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
@@ -15,7 +15,7 @@ public class PathValidator {
 	final String TRANSFER = "Transfer";
 	final String STANDARD = "Standard";
 	final String DETTRANSFER = "DetTransfer";
-	final String WALKING = "Walking";
+	final String EGRESS = "Egress";
 	final String ACCESS = "Access";
 	
 	public PathValidator (){
@@ -45,23 +45,15 @@ public class PathValidator {
 	public boolean canPassLink(final LinkImpl lastLink, final LinkImpl link){
 		boolean pass = false;
 		String type= link.getType();
-		
-		if (lastLink==null){
-			pass = type.equals(ACCESS);
-		}else{
-			String lastType = lastLink.getType();	
-			
-			if (type.equals(DETTRANSFER)){
-				pass = lastType.equals(STANDARD);
-			}else if (type.equals(TRANSFER)){
-				pass= lastType.equals(STANDARD);
-			}else if (type.equals(STANDARD)){
-				//lastType null and walk are rejected
-				pass= (lastType.equals(DETTRANSFER) || lastType.equals(TRANSFER) || lastType.equals(STANDARD) || lastType.equals(ACCESS)); 
-			}else if (type.equals(WALKING)){
-				pass= lastType.equals(STANDARD);
-			}
-		}
+		if (lastLink!=null){
+			String lastType = lastLink.getType();
+			if (type.equals(DETTRANSFER))  {pass = lastType.equals(STANDARD); }
+			else if (type.equals(TRANSFER)){pass = lastType.equals(STANDARD); }
+			else if (type.equals(STANDARD)){pass = !lastType.equals(EGRESS);  }
+			else if (type.equals(EGRESS))  {pass = lastType.equals(STANDARD); }
+       }else{
+    	   pass = type.equals(ACCESS);
+       }
 		return pass;
 	}
 

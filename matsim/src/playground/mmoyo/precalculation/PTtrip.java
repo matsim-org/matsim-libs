@@ -6,7 +6,7 @@ import org.matsim.transitSchedule.api.TransitRoute;
 
 /**Describes simply a trip in a pt-vechicle*/
 public class PTtrip {
-
+	//-> use leg with infinite time values instead?
 	private TransitRoute transitRoute;
 	private NetworkRouteWRefs subRoute;
 	private double travelTime;

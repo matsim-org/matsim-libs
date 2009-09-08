@@ -63,15 +63,13 @@ public class TransitTravelTimeCalculator {
 					Arrays.sort(nodeDeparturesArray);
 					nodeDeparturesMap.put(transitStopFacility.getId(), nodeDeparturesArray);
 					
-					
 					/**finds the link that joins both stations, calculates and saves its travel time*/ 
 					if (!first){
 						for (LinkImpl lastLink : node.getInLinks().values()){
 							if (lastLink.getFromNode().equals(lastNode)){
 								departureDelay= transitRouteStop.getDepartureOffset();
-								linkTravelTime= departureDelay- lastDepartureDelay;
-								linkTravelTime = linkTravelTime/60;
-								linkTravelTimeMap.put(lastLink.getId(), linkTravelTime);
+								linkTravelTime= (departureDelay- lastDepartureDelay)/60; //stored in minutes
+								linkTravelTimeMap.put(lastLink.getId(), linkTravelTime);   //this must be eliminated
 							}
 						}
 					}else{

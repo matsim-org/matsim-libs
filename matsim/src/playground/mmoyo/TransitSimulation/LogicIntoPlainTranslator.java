@@ -3,9 +3,6 @@ package playground.mmoyo.TransitSimulation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.collections.map.LRUMap;
-import org.apache.commons.collections.map.MultiKeyMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
@@ -26,22 +23,16 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
  */
 public class LogicIntoPlainTranslator {
 	private NetworkLayer plainNet;
-	private MultiKeyMap joiningLinkMap;
 	private Map<Id,Node> logicToPlainStopMap;
+	private Map<Id,LinkImpl> logicToPlainLinkMap;  
+	private Map<Id,LinkImpl> lastLinkMap;
 	
 	/**the constructor creates the joiningLinkMap that stores the relation between logic and plain Nodes*/ 
-	public LogicIntoPlainTranslator(final NetworkLayer plainNetwork,  final Map<Id,Node> logicToPlanStopMap) {
+	public LogicIntoPlainTranslator(final NetworkLayer plainNetwork,  final Map<Id,Node> logicToPlanStopMap, Map<Id,LinkImpl> logicToPlanLinkMap, Map<Id,LinkImpl> lastLinkMap) {
 		this.plainNet= plainNetwork;
 		this.logicToPlainStopMap = logicToPlanStopMap;
-		
-		/**creates the JoiningLinkMap, it contains fromNode and toNode as keys, and the link between them as value */
-		int linkNum = plainNet.getLinks().size();
-		joiningLinkMap = MultiKeyMap.decorate(new LRUMap(linkNum));
-		for (Link plainLink : plainNet.getLinks().values()){
-			Node fromPlainNode= plainLink.getFromNode();
-			Node toPlainNode= plainLink.getToNode();
-			joiningLinkMap.put(fromPlainNode, toPlainNode, plainLink);
-		}
+		this.logicToPlainLinkMap = logicToPlanLinkMap;
+		this.lastLinkMap = lastLinkMap;
 	}
 
 	public Node convertToPlain(Id logicNodeId){
@@ -60,25 +51,10 @@ public class LogicIntoPlainTranslator {
 	private Link convertToPlain(final Link logicLink){
 		Link logicAliasLink = logicLink;
 		if (((LinkImpl)logicLink).getType().equals("Transfer") || ((LinkImpl)logicLink).getType().equals("DetTransfer"))
-			logicAliasLink= findLastStandardLink(logicLink);
-		Node fromPlainNode = convertToPlain(logicAliasLink.getFromNode().getId());
-		Node toPlainNode = convertToPlain(logicAliasLink.getToNode().getId());
-		Link planLink = (Link)joiningLinkMap.get(fromPlainNode, toPlainNode); 
-		return planLink;
+			logicAliasLink= lastLinkMap.get(logicLink.getFromNode().getId());
+		return logicToPlainLinkMap.get(logicAliasLink.getId());
 	}
 	
-	/**in case of a transfer link of the logic Network, the last standard link is returned, because transfer links do not exist in the plain network*/
-	private Link findLastStandardLink (Link transferLink){
-		Link standardLink = null;
-		for (Link inLink: transferLink.getFromNode().getInLinks().values()){
-			if (((LinkImpl)inLink).getType().equals("Standard"))
-				standardLink = inLink;
-		}
-		if (standardLink==null)
-			throw new java.lang.NullPointerException(this +  transferLink.getId().toString() + "Does not exist");
-		return standardLink;
-	}
-
 	public List<Link> convertToPlain(List<Link> logicLinks){
 		List<Link> plainLinks  = new ArrayList<Link>();
 		for (Link logicLink: logicLinks){

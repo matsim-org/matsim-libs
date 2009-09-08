@@ -11,8 +11,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
-
 import playground.mmoyo.deprecVersion.PTLinesReader;
+
 
 /**
  * Contains the information of departures for every station and PTLine
@@ -24,7 +24,17 @@ public class PTTimeTable{
 	private Map<Id,Double> linkTravelTimeMap = new TreeMap<Id,Double>();
 	private Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
 	private Map <Id, LinkImpl> nextLinkMap = new TreeMap <Id, LinkImpl>();
+	private Map <Id, String> typeMap;
 	private static Time time;
+	
+	private Link lastLink;
+	private String type;
+	double lastTime;
+	double lastTravelTime;
+	double walkTime;
+	double waitingTime;
+	double travelTime;
+	double walkSpeed =  Walk.getAvgWalkSpeed();
 	
 	@Deprecated
 	public PTTimeTable(final String TimeTableFile){
@@ -34,7 +44,6 @@ public class PTTimeTable{
 	}
 
 	public PTTimeTable(){
-		
 	}
 	
 	@Deprecated
@@ -77,11 +86,36 @@ public class PTTimeTable{
 			}
 		}
 	}
-	
-	public double getTravelTime(Link link){
-		return linkTravelTimeMap.get(link.getId())*60; // stored in minutes, returned in seconds
+		
+	/**
+	 * Calculation of travel time for each link type:
+	 * 1 Detached transfer And Access: (distance*walk speed) + (veh departure - walk arrival)
+	 * 2 Transfer link: (second veh departure - first veh arrival)
+	 * 3 Standard link: (toNode arrival- fromNode arrival)
+	 * 4 Egress link : (distance * walk speed)  
+	 */
+	public double getLinkTravelTime(final Link link, final double time){
+		if (lastLink==link && lastTime==time) return lastTravelTime;
+		type = ((LinkImpl) link).getType();
+		if (type.equals("DetTransfer") || type.equals("Access")){
+			walkTime=link.getLength()* walkSpeed;
+			waitingTime= getTransferTime(link, time+walkTime);
+			travelTime= walkTime + waitingTime; 
+		}else if (type.equals("Transfer")){
+			travelTime= getTransferTime(link,time)+ 120;   //2 minutes to allow the passenger walk between ptv's 
+		}else if (type.equals("Standard")){
+			travelTime = linkTravelTimeMap.get(link.getId())*60; // stored in minutes, returned in seconds
+			//travelTime= ((StandardLink)link).getTravelTime();
+		}else if (type.equals("Egress")){
+			travelTime= (link.getLength()* walkSpeed);
+		}
+		
+		lastLink= link;
+		lastTime = time;
+		lastTravelTime = travelTime;
+		return travelTime;
 	}
-
+	
 	/**
 	 * Returns the waiting time in a transfer link head node after a given time //minutes */
 	public double getTransferTime(Link link, double time){
@@ -92,6 +126,13 @@ public class PTTimeTable{
 		}else{
 			//wait till next day first departure
 			transferTime= 86400-time+ nodeDeparturesMap.get(link.getToNode().getId())[0];
+		}
+		//in case if a invalid negative value, it should be catched or corrected
+		if (transferTime<0) {
+			//costValidator.pushNegativeValue(link.getId(), time, transTime);
+			//transTime= 86400-time+ transTime;//first departure of next day
+			transferTime=6000;
+			//if (transTime<0) System.out.println("negative value at" + link.getId().toString() + " " + time);
 		}
 		return transferTime;
 	}

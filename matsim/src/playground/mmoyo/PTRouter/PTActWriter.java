@@ -46,8 +46,8 @@ public class PTActWriter {
 	private String plansFile;
 	private NodeImpl originNode;
 	private NodeImpl destinationNode;
-	private LinkImpl walkLink1;
-	private LinkImpl walkLink2;
+	private LinkImpl accessLink;
+	private LinkImpl egressLink;
 	
 	private NetworkLayer logicNet;
 	private NetworkLayer plainNet;
@@ -57,7 +57,7 @@ public class PTActWriter {
 	
 	private final String ACCESS = "Access";
 	private final String STANDARD = "Standard";
-	private final String WALKING = "Walking";
+	private final String EGRESS = "Egress";
 	private final String TRANSFER = "Transfer";
 	private final String DETTRANSFER = "DetTransfer";
 	
@@ -82,12 +82,12 @@ public class PTActWriter {
 	}
 	
 	/** Constructor with Transit Schedule*/
-	public PTActWriter(TransitSchedule transitSchedule, final String configFile, final String plansFile, final String outputFile){
+	public PTActWriter(LogicFactory logicFactory, final String configFile, final String plansFile, final String outputFile){
 		withTransitSchedule= true;
 		this.outputFile= outputFile;
 		this.plansFile= plansFile;
 		
-		LogicFactory logicFactory = new LogicFactory(transitSchedule);
+		//LogicFactory logicFactory = new LogicFactory(transitSchedule);
 		this.logicNet= logicFactory.getLogicNet();
 		this.plainNet= logicFactory.getPlainNet();
 		this.ptRouter = logicFactory.getPTRouter();
@@ -122,9 +122,9 @@ public class PTActWriter {
 	public void printPTLegs(final TransitSchedule transitSchedule){
 		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule);
 		
-		//for (PersonImpl person: this.population.getPersons().values()) {
-		if (true){	
-			PersonImpl person = population.getPersons().get(new IdImpl("2180188"));   //2180188
+		for (PersonImpl person: this.population.getPersons().values()) {
+		//if (true){	
+			//PersonImpl person = population.getPersons().get(new IdImpl("2180188"));   //2180188
 	
 			PlanImpl plan = person.getPlans().get(0);
 	 		ActivityImpl act1 = (ActivityImpl)plan.getPlanElements().get(0);
@@ -157,7 +157,7 @@ public class PTActWriter {
 		
 		for (PersonImpl person: this.population.getPersons().values()) {
 			//if ( true ) {
-			//PersonImpl person = population.getPersons().get(new IdImpl("35420")); // 5636428  2949483 
+			//PersonImpl person = population.getPersons().get(new IdImpl("905449")); // 5228308   5636428  2949483 
  			System.out.println(numPlans + " id:" + person.getId());
 			PlanImpl plan = person.getPlans().get(0);
 
@@ -194,6 +194,12 @@ public class PTActWriter {
 				    		
 				    		if(path!=null){
 
+				    			/*
+				    			for (Link link : path.links ){
+				    				System.out.print (((LinkImpl)link).getId() + " ");
+				    			}
+				    			*/
+				    			
 				    			this.costMap.put(person.getId(), path.travelTime);
 				    			if (path.nodes.size()>1){
 					    			createWlinks(lastActCoord, path, actCoord);
@@ -226,7 +232,9 @@ public class PTActWriter {
 			numPlans++;
 		}//for person
 
+		double startTime = System.currentTimeMillis();
 		if (withTransitSchedule)logicToPlainConverter.convertToPlain(newPopulation);
+		System.out.println("translation lasted: " + (System.currentTimeMillis()-startTime));
 		
 		System.out.println("writing output plan file...");
 		new PopulationWriter(newPopulation, outputFile, "v4").write();
@@ -358,7 +366,7 @@ public class PTActWriter {
 				newPlan.addActivity(newPTAct("transf on", link.getToNode().getCoord(), link, arrTime, endTime));
 				first=false;
 			
-			}else if (link.getType().equals(WALKING)){
+			}else if (link.getType().equals(EGRESS)){
 				legRouteLinks.clear();
 				legRouteLinks.add(link);
 				arrTime= accumulatedTime+ linkTravelTime;
@@ -431,8 +439,8 @@ public class PTActWriter {
 		destinationNode= createWalkingNode(new IdImpl("W2"), coord2);
 		path.nodes.add(0, originNode);
 		path.nodes.add(destinationNode);
-		walkLink1 = createPTLink("linkW1", originNode , path.nodes.get(1), "Access");
-		walkLink2 = createPTLink("linkW2", path.nodes.get(path.nodes.size()-2) , destinationNode, "Walking");
+		accessLink = createPTLink(ACCESS, originNode , path.nodes.get(1), ACCESS);
+		egressLink = createPTLink(EGRESS, path.nodes.get(path.nodes.size()-2) , destinationNode, EGRESS);
 	}
 	
 	/**
@@ -451,10 +459,10 @@ public class PTActWriter {
 	}
 	
 	private void removeWlinks(){
-		logicNet.removeLink(walkLink1);
-		logicNet.removeLink(walkLink2);
-		logicNet.removeNode(originNode);
-		logicNet.removeNode(destinationNode);
+		logicNet.removeLink(accessLink);
+		logicNet.removeLink(egressLink);
+		//logicNet.removeNode(originNode);
+		//logicNet.removeNode(destinationNode);
 	}
 
 }

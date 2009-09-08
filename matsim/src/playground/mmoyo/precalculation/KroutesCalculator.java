@@ -77,9 +77,10 @@ public class KroutesCalculator {
 			stations = plainNet.getNearestNodes(coord, walkRange);
 			walkRange= walkRange + 300;
 		} while (stations.size()<2);
+		/* Coord is not comparable =(
 		if (!nearStopMap.containsKey(coord)){
 			nearStopMap.put(coord, stations);
-		}
+		}*/
 		return stations;
 	}
 	

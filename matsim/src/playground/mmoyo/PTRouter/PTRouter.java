@@ -34,12 +34,16 @@ public class PTRouter{
 	private LeastCostPathCalculator myDijkstra;
 	private TravelCost ptTravelCost;
 	public TravelTime ptTravelTime;   //> make private 
+	NodeImpl origin;
+	NodeImpl destination;
 	
 	public PTRouter(NetworkLayer logicNet, PTTimeTable ptTimetable) {
 		this.logicNet = logicNet;
 		this.ptTravelCost = new PTTravelCost(ptTimetable);
 		this.ptTravelTime =new PTTravelTime(ptTimetable);
 		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);	
+		origin= createWalkingNode(new IdImpl("W1"), null);   //this is faster than network.createNode but uses PTNode
+		destination= createWalkingNode(new IdImpl("W2"), null);
 	}
 	
 	public PTRouter(NetworkLayer logicNet, PTTimeTable ptTimetable, LogicIntoPlainTranslator logicToPlainConverter) {
@@ -47,12 +51,15 @@ public class PTRouter{
 		this.ptTravelCost = new PTTravelCost(ptTimetable);
 		this.ptTravelTime =new PTTravelTime(ptTimetable);
 		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);		
+		origin= createWalkingNode(new IdImpl("W1"), null);   //this is faster than network.createNode but uses PTNode
+		destination= createWalkingNode(new IdImpl("W2"), null);
 	}
 	
 	public Path findPTPath(Coord coord1, Coord coord2, double time, final double distToWalk){
 		double walkRange= distToWalk; 
-		NodeImpl origin= createWalkingNode(new IdImpl("W1"), coord1);   //this is faster than network.createNode but uses PTNode
-		NodeImpl destination= createWalkingNode(new IdImpl("W2"), coord2);
+		
+		origin.setCoord(coord1);
+		destination.setCoord(coord2);
 		
 		Collection <NodeImpl> nearOriginStops = findnStations (coord1, walkRange);
 		Collection <NodeImpl> nearDestinationStops = findnStations (coord2, walkRange);
@@ -68,8 +75,8 @@ public class PTRouter{
 			path.nodes.remove(origin);
 			path.nodes.remove(destination);
 		}
-		logicNet.removeNode(origin);
-		logicNet.removeNode(destination);
+		//logicNet.removeNode(origin);
+		//logicNet.removeNode(destination);
 		
 		return path;
 	}
@@ -88,9 +95,11 @@ public class PTRouter{
 	 * avoids the method net.createNode because it is not necessary to rebuild the quadtree
 	 */
 	public NodeImpl createWalkingNode(Id id, Coord coord) {
+		
 		NodeImpl node = new PTNode(id, coord, "Walking");
 		logicNet.getNodes().put(id, node);
 		return node;
+		
 	}
 	
 	public List <LinkImpl> createWalkingLinks(NodeImpl walkNode, Collection <NodeImpl> nearNodes, boolean to){
@@ -111,12 +120,10 @@ public class PTRouter{
 				fromNode= node;
 				toNode=  walkNode;
 				idLink = new IdImpl("WLD" + x++);
-				type = "Walking";
+				type = "Egress";
 			}
 			
 			LinkImpl link= logicNet.createLink(idLink, fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()) , 1, 1, 1, "0", type);
-			//-->check if this improves the performance
-			//link.setFreespeed(link.getLength()* WALKING_SPEED);
 			newWalkLinks.add(link);
 		}
 		return newWalkLinks;

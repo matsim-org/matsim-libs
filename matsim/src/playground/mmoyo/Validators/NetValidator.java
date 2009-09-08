@@ -24,7 +24,7 @@ public class NetValidator {
 		boolean found=false;
 		for(LinkImpl link: net.getLinks().values()){
 			if(link.getType().equals("Standard")){ 
-				double cost= ptTimeTable.getTravelTime(link);
+				double cost= ptTimeTable.getLinkTravelTime(link,0);
 				if (cost<0){
 					System.out.println(link.getId() + " link has negative cost: " + cost);
 					found=true;
