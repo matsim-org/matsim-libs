@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	
+	<xs:complexType name="SinglePopulationPoint">
+		<xs:sequence>
+			<xs:element name="x" type="xs:double" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="y" type="xs:double" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="population" type="xs:int" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="PopulationPointList">
+	  <xs:sequence>
+	  	<xs:element name="PopPoint" type="SinglePopulationPoint" minOccurs="0" maxOccurs="unbounded"/>
+	  </xs:sequence>
+	</xs:complexType>
+	
+</xs:schema>
+
+
+
+

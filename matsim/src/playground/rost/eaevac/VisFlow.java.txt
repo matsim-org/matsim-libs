@@ -1,0 +1,93 @@
+package playground.rost.EAEvac;
+
+import java.io.IOException;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.events.Events;
+import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
+import org.xml.sax.SAXException;
+
+import playground.rost.Graph.EvacArea.EvacArea;
+import playground.rost.Util.PathTracker;
+
+public class VisFlow {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		//get Map
+		
+		//get Information on Boundary
+		EvacArea eArea = null;
+		try {
+			eArea = EvacArea.readXMLFile(PathTracker.resolve("evacArea"));
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
+		
+		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(network);
+		try {
+			nReader.parse("F:/work/matsim/src/playground/rost/res/berlin2osmMatExtract.xml");
+		} catch (SAXException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ParserConfigurationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(PathTracker.resolve("plan"));
+		
+		// TODO Auto-generated method stub
+		if (true) {
+			Events events = new Events();
+
+			EventWriterTXT eventWriter = new EventWriterTXT(PathTracker.resolve("events"));
+			events.addHandler(eventWriter);
+
+			QueueSimulation sim = new QueueSimulation(network, population, events);
+			sim.openNetStateWriter("./output/simout", PathTracker.resolve("matExtract"), 10);
+			sim.run();
+
+			eventWriter.closeFile();
+			System.out.println("Simulation done.");
+		}
+
+		if (true) {
+			QueueNetwork qnet = new QueueNetwork(network);
+			
+			String eventFile = "./output/events.txt";
+			OTFEvent2MVI mviconverter = new OTFEvent2MVI(qnet, eventFile, "./output/otfvis.mvi", 60);
+			mviconverter.convert();
+
+			String[] visargs = {"./output/otfvis.mvi"};
+			OTFVis.main(visargs);
+		}
+
+	}
+
+}

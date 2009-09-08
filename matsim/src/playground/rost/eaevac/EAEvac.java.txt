@@ -1,0 +1,201 @@
+package playground.rost.EAEvac;
+
+import java.io.IOException;
+import java.util.HashMap;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.xml.sax.SAXException;
+
+import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
+import playground.dressler.ea_flow.BellmanFordVertexIntervalls;
+import playground.dressler.ea_flow.FakeTravelTimeCost;
+import playground.dressler.ea_flow.Flow;
+import playground.dressler.ea_flow.MBFdynamic_withFlowClass;
+import playground.dressler.ea_flow.TimeExpandedPath;
+import playground.rost.Graph.EvacArea.EvacArea;
+import playground.rost.Util.PathTracker;
+
+public class EAEvac {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		
+		//get Map
+		NetworkLayer network = new NetworkLayer();
+		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(network);
+		try {
+			nReader.parse(PathTracker.resolve("matExtract"));
+		} catch (SAXException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ParserConfigurationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		//get Information on Boundary
+		EvacArea eArea = null;
+		try {
+			eArea = EvacArea.readXMLFile(PathTracker.resolve("evacArea"));
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//add supersink and create links
+		Id superSID = new IdImpl("SUPERSINK");
+		Coord superSCOORD = new CoordImpl(0,0);
+		network.createNode(superSID,superSCOORD);
+		Node sink = network.getNode(superSID);
+		if(eArea != null)
+		{
+			long streetId = 80000000;
+			for(String s : eArea.evacBorderNodeIds)
+			{
+				network.createLink(new IdImpl(String.valueOf(++streetId)), 
+						network.getNode(s),
+						network.getNode(superSID),
+						0, 
+						1.5, //TODO 
+						Integer.MAX_VALUE,  //TODO
+						1);  //TODO!
+			}
+		}
+		
+		//setup demands
+		HashMap<Node, Integer> demands = new HashMap<Node,Integer>();
+		long totaldemands = 0;
+		for(String s: eArea.evacAreaNodeIds)
+		{
+			Node node = network.getNode(s);
+			demands.put(node,200);
+			totaldemands += 200;
+			
+		}
+		
+		//DUMMY SETUP
+		boolean _debug = true;
+		int rounds = 100000;
+		String tempstr = "";
+		int timeHorizon = 2000000;
+		if(!demands.isEmpty() && (sink != null)) {
+			
+			TimeExpandedPath result = null;
+			FakeTravelTimeCost travelcost = new FakeTravelTimeCost();
+			Flow fluss = new Flow( network, travelcost, demands, sink, timeHorizon );
+
+			if(_debug){
+				System.out.println("starting calculations");
+			}
+
+
+			long timeMBF = 0;
+			long timeAugment = 0;
+			long timer1, timer2, timer3;
+			long timeStart = System.currentTimeMillis();
+
+			//main loop for calculations
+			if(true){
+				BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
+
+				int i;
+				int gain = 0;
+				for (i=0; i<rounds; i++){
+					timer1 = System.currentTimeMillis();
+					result = routingAlgo.doCalculations();
+					timer2 = System.currentTimeMillis();
+					timeMBF += timer2 - timer1;
+					if (result==null){
+						break;
+					}
+					if(_debug){
+						tempstr = "found path " + result;
+						//System.out.println("found path: " +  result);
+					}
+					fluss.augment(result);
+					timer3 = System.currentTimeMillis();
+					gain += fluss.cleanUp();
+
+					timeAugment += timer3 - timer2;
+					if (_debug) {
+						if (i % 100 == 0) {
+							System.out.println("Iteration " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+							//System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
+							//System.out.println("last " + tempstr);
+							System.out.println(routingAlgo.measure());
+							System.out.println("");
+						}
+					}
+				}
+				if (_debug) {
+					long timeStop = System.currentTimeMillis();
+					System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");				  
+					System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
+					System.out.println("last " + tempstr);
+				}
+				System.out.println("Removed " + routingAlgo.gain + " intervals.");
+				System.out.println("removed on the fly:" + VertexIntervalls.rem);
+			}
+			else{ // use the other algo
+				FakeTravelTimeCost length = new FakeTravelTimeCost();
+				fluss = new Flow(network, length, demands, sink, timeHorizon);
+				TravelCost travelCost = length;
+				TravelTime travelTime = length;
+				MBFdynamic_withFlowClass routingAlgo = new MBFdynamic_withFlowClass(travelCost, travelTime, fluss);
+				fluss = routingAlgo.calcLeastCostFlow(0.0, fluss);
+			}
+			if(_debug){
+				System.out.println(fluss.arrivalsToString());
+				System.out.println(fluss.arrivalPatternToString());
+				System.out.println("unsatisfied demands:");
+				for (Node node : demands.keySet()){
+					if (demands.get(node) > 0) {
+						System.out.println("node:" + node.getId().toString()+ " demand:" + demands.get(node));
+					}
+				}
+			}
+			String plansfile = PathTracker.resolve("plan");
+			String outputplansfile = PathTracker.resolve("plan");
+			//new FlowAnalyzer(fluss, superSID);
+//			PopulationImpl output = fluss.createPoulation(plansfile);
+			// TODO remove emptylegs from Flow.java ... not needed anymore
+//			if (emptylegs) {
+//				Config config = Gbl.createConfig(new String[] {});
+//
+//				World world = Gbl.getWorld();
+//				world.setNetworkLayer(network);
+//				world.complete();
+//
+//				CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
+//				PlansCalcRoute router = new PlansCalcRoute(network, new FakeTravelTimeCost(), new FakeTravelTimeCost());
+//				//PlansCalcRoute router = new PlansCalcRouteDijkstra(network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), new FakeTravelTimeCost());
+//				for (Object O_person : output.getPersons().values()) {
+//					Person person = (Person) O_person;
+//					Plan plan = person.getPlans().get(0);
+//					router.run(plan);
+//				}
+//			}
+			
+		}
+
+	}
+}

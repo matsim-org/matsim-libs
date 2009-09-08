@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	
+	<xs:complexType name="atomicNodeInArea">
+		<xs:sequence>
+			<xs:element name="nodeId" type="xs:string"/>
+			<xs:element name="inArea" type="xs:boolean"/>
+			<xs:element name="borderOrder" type="xs:int"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="areaMapping">
+	  <xs:sequence>
+	  	<xs:element name="atomicNodeEntry" type="atomicNodeInArea" minOccurs="0" maxOccurs="unbounded"/>
+	  </xs:sequence>
+	</xs:complexType>
+	
+</xs:schema>
+
+
+
+
