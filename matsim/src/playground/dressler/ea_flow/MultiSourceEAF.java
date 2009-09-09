@@ -291,13 +291,13 @@ public class MultiSourceEAF {
 				System.out.println("Removed " + routingAlgo.gain + " intervals.");
 				System.out.println("removed on the fly:" + VertexIntervalls.rem);
 			}
-			else{ // use the other algo
-				FakeTravelTimeCost length = new FakeTravelTimeCost();
+			else{ // dont use the other algo
+				/* FakeTravelTimeCost length = new FakeTravelTimeCost();
 				fluss = new Flow(network, length, demands, sink, timeHorizon);
 				TravelCost travelCost = length;
 				TravelTime travelTime = length;
 				MBFdynamic_withFlowClass routingAlgo = new MBFdynamic_withFlowClass(travelCost, travelTime, fluss);
-				fluss = routingAlgo.calcLeastCostFlow(0.0, fluss);
+				fluss = routingAlgo.calcLeastCostFlow(0.0, fluss); */
 			}
 			if(_debug){
 				System.out.println(fluss.arrivalsToString());
