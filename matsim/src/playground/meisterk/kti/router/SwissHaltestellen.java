@@ -38,27 +38,6 @@ import org.matsim.core.utils.misc.StringUtils;
 
 public class SwissHaltestellen {
 
-	public class SwissHaltestelle {
-		
-		private final Id id;
-		private final Coord coord;
-		
-		private SwissHaltestelle(Id id, Coord coord) {
-			super();
-			this.id = id;
-			this.coord = coord;
-		}
-
-		public Id getId() {
-			return id;
-		}
-
-		public Coord getCoord() {
-			return coord;
-		}
-		
-	}
-	
 	private final QuadTree<SwissHaltestelle> haltestellen;
 
 	private static final Logger log = Logger.getLogger(SwissHaltestellen.class);

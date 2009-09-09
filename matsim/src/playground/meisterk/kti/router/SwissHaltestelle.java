@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * SwissHaltestelle.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,30 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.kti;
+package playground.meisterk.kti.router;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import playground.meisterk.kti.config.KtiConfigGroupTest;
-import playground.meisterk.kti.router.KtiPtRouteTest;
-import playground.meisterk.kti.router.PlansCalcRouteKtiTest;
-import playground.meisterk.kti.scoring.ActivityScoringFunctionTest;
-import playground.meisterk.kti.scoring.LegScoringFunctionTest;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
 
-public class AllTests {
+public class SwissHaltestelle {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.meisterk.kti");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(KtiConfigGroupTest.class);
-//		suite.addTestSuite(KtiControlerTest.class);
-		suite.addTestSuite(ActivityScoringFunctionTest.class);
-		suite.addTestSuite(LegScoringFunctionTest.class);
-		suite.addTestSuite(PlansCalcRouteKtiTest.class);
-		suite.addTestSuite(KtiPtRouteTest.class);
-		//$JUnit-END$
-		return suite;
+	private final Id id;
+	private final Coord coord;
+
+	/*package*/ SwissHaltestelle(Id id, Coord coord) {
+		super();
+		this.id = id;
+		this.coord = coord;
 	}
 
+	public Id getId() {
+		return id;
+	}
+
+	public Coord getCoord() {
+		return coord;
+	}
 
 }
