@@ -23,7 +23,7 @@ public class PathValidator {
 	}
 	
 	@Deprecated
-	public boolean isValid(Path path) {
+	public boolean isValid999(Path path) {
 		boolean valid = true;
 		if (path!=null){
 			Link lastLink = null;

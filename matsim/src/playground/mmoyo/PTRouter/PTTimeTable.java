@@ -24,7 +24,6 @@ public class PTTimeTable{
 	private Map<Id,Double> linkTravelTimeMap = new TreeMap<Id,Double>();
 	private Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
 	private Map <Id, LinkImpl> nextLinkMap = new TreeMap <Id, LinkImpl>();
-	private Map <Id, String> typeMap;
 	private static Time time;
 	
 	private Link lastLink;

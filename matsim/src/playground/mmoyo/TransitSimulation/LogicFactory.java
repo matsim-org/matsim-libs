@@ -49,7 +49,7 @@ public class LogicFactory{
 	private Map<Id,List<Node>> facilityNodeMap = new TreeMap<Id,List<Node>>(); /* <key =PlainStop, value = List of logicStops to be joined by transfer links>*/
 	public Map<Id,Node> logicToPlanStopMap = new TreeMap<Id,Node>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
 	public Map<Id,LinkImpl> logicToPlanLinkMap = new TreeMap<Id,LinkImpl>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
-	public Map<Id,LinkImpl> lastLinkMap = new TreeMap<Id,LinkImpl>();    //stores the head node as key and the link as value //usefful to fand lastStandardlink of transfer links
+	public Map<Id,LinkImpl> lastLinkMap = new TreeMap<Id,LinkImpl>();    //stores the head node as key and the link as value //useful to find lastStandardlink of transfer links
 	private Map<Id,Id> nodeLineMap = new TreeMap<Id,Id>();                  
 	
 	long newLinkId=0;
@@ -128,7 +128,7 @@ public class LogicFactory{
 		}
 		
 		createTransferLinks();
-		createDetachedTransferLinks(400);
+		createDetachedTransferLinks(300);
 	}
 	
 	//Created a new id for a new node. the nodeLinMap stores the transitLine of each node. */ 

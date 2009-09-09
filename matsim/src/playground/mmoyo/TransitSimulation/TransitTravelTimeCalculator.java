@@ -83,7 +83,6 @@ public class TransitTravelTimeCalculator {
 		}
 	}
 
-	
 	public void fillTimeTable(PTTimeTable ptTimeTable2){
 		ptTimeTable2.setLinkTravelTimeMap(linkTravelTimeMap);
 		ptTimeTable2.setNodeDeparturesMap(nodeDeparturesMap);

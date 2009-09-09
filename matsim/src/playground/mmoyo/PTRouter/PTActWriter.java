@@ -2,8 +2,8 @@ package playground.mmoyo.PTRouter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+//import java.util.Map;
+//import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
@@ -61,8 +61,7 @@ public class PTActWriter {
 	private final String TRANSFER = "Transfer";
 	private final String DETTRANSFER = "DetTransfer";
 	
-	Map <Id, Double> costMap = new TreeMap <Id, Double>();
-	
+	//Map <Id, Double> costMap999 = new TreeMap <Id, Double>();
 	//public Population detouredPopulation = new PopulationImpl();  //temporal to find plans with detoured trips
 	
 	@Deprecated
@@ -147,7 +146,7 @@ public class PTActWriter {
 		PopulationImpl newPopulation = new PopulationImpl();
 		
 		int numPlans=0;
-
+		int found =0;
 		int trips=0;
 		int inWalkRange=0;
 		int lessThan2Node =0;
@@ -193,16 +192,10 @@ public class PTActWriter {
 				    		duration= System.currentTimeMillis()-startTime;
 				    		
 				    		if(path!=null){
-
-				    			/*
-				    			for (Link link : path.links ){
-				    				System.out.print (((LinkImpl)link).getId() + " ");
-				    			}
-				    			*/
-				    			
-				    			this.costMap.put(person.getId(), path.travelTime);
+				    			//this.costMap.put(person.getId(), path.travelTime);
 				    			if (path.nodes.size()>1){
-					    			createWlinks(lastActCoord, path, actCoord);
+					    			found++;
+				    				createWlinks(lastActCoord, path, actCoord);
 				    			    durations.add(duration);
 				    				insertLegActs(path, lastAct.getEndTime(), newPlan);
 				    				removeWlinks();
@@ -240,7 +233,7 @@ public class PTActWriter {
 		new PopulationWriter(newPopulation, outputFile, "v4").write();
 		System.out.println("Done");
 		System.out.println("plans:        " + numPlans + "\n--------------");
-		System.out.println("\nTrips:      " + trips +  "\ninWalkRange:  "+ inWalkRange + "\nnulls:        " + nulls + "\nlessThan2Node:" + lessThan2Node);
+		System.out.println("\nTrips:      " + trips +  "\nfound: "  +  found +  "\ninWalkRange:  "+ inWalkRange + "\nnulls:        " + nulls + "\nlessThan2Node:" + lessThan2Node);
 		
 		System.out.println("printing routing durations");
 		double total=0;

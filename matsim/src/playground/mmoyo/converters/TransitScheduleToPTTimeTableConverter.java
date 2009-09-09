@@ -75,9 +75,6 @@ public class TransitScheduleToPTTimeTableConverter {
 			}
 		}
 		ptTimeTable.setptLineList(ptLineList);
-//      ptTimeTable.calculateTravelTimes(net);
-//		new PTNetworkFactory2().readTimeTable(net, ptTimeTable); // TODO [Manuel] this must work without explicit ptNetwork. If really needed, construct it from transitSchedule
-		
 		return ptTimeTable;
 	}
 	

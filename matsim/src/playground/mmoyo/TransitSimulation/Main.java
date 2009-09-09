@@ -16,21 +16,14 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.xml.sax.SAXException;
-
 import playground.mmoyo.PTRouter.PTActWriter;
 import playground.mmoyo.PTRouter.PTRouter;
-import playground.mmoyo.precalculation.KroutesCalculator;
-import playground.mmoyo.precalculation.StaticConnection;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
-import org.matsim.api.basic.v01.Id;
-import java.util.List;
-
+import org.matsim.api.basic.v01.TransportMode;
 
 /**
  * This class contains the options to route with a TransitSchedule object 
@@ -39,7 +32,7 @@ public class Main {
 	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
 	//private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
 	private static final String CONFIG =  PATH  + "config.xml";
-	private static final String PLANFILE = PATH +  "plans.xml"; ///"_input_file.xml"; // "plans.xml";
+	private static final String PLANFILE = PATH +  "plans.xml"; //"_input_file.xml"; // 
 	private static final String OUTPUTPLANS = PATH + "output_plans.xml";
 	private static final String NETWORK = PATH + "network.xml";
 	private static final String PLAINNETWORK = PATH + "plainNetwork.xml";
@@ -132,9 +125,30 @@ public class Main {
 				System.out.println("duration: " + (System.currentTimeMillis()-startTime));
 				*/
 				break;
-			
+			case 8 :
+				/**counts the trains and tram routes*/
+				short trains=0;
+				short trams=0;
+				for (TransitLine transitLine : transitSchedule.getTransitLines().values()){
+					for (TransitRoute transitRoute : transitLine.getRoutes().values()){
+						System.out.println(transitRoute.getId());
+						if (transitRoute.getTransportMode().equals(TransportMode.train)) trains++;
+						if (transitRoute.getTransportMode().equals(TransportMode.tram)) trams++;
+					}
+				}
+				System.out.println("trains: " + trains +  "   trams: "  + trams);
 				
-	
+				break;
+			case 9:
+				/**Counts transfer links*/
+				NetworkLayer logicNetwork=logicFactory.getLogicNet();
+				String TRANSFER = "Transfer"; 
+				int transfers=0;
+				for (LinkImpl linkImpl : logicNetwork.getLinks().values()){
+					if (linkImpl.getType().equals(TRANSFER)) transfers++;
+				}
+				System.out.println("Transfers: " +  transfers);
+				break;
 		}
 	}
 }
