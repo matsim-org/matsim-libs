@@ -478,6 +478,27 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	protected static volatile GLContext motherContext = null;
 
+	private static Object isPainting = new Object();
+
+	public static class MyGLCanvas2 extends GLCanvas {
+
+		public MyGLCanvas2(GLCapabilities caps) {
+			super(caps);
+		}
+
+		public MyGLCanvas2(GLCapabilities caps, GLCapabilitiesChooser object,
+				GLContext motherContext, GraphicsDevice object2) {
+			super(caps, object,motherContext, object2);
+		}
+
+		@Override
+		public void paint(Graphics arg0) {
+			synchronized (newItems) {
+				super.paint(arg0);
+			}
+		}
+		
+	}
 
 	public static class MyGLCanvas extends GLJPanel {
 
@@ -514,10 +535,10 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	protected Component createGLCanvas(final OTFOGLDrawer drawer, final GLCapabilities caps, final GLContext motherContext) {
 		GLCanvas canvas = null;
 		if (motherContext == null) {
-			canvas = new GLCanvas(caps);
+			canvas = new MyGLCanvas2(caps);
 //			motherContext = canvas.getContext();
 		} else {
-			canvas = new GLCanvas(caps, null, motherContext, null);
+			canvas = new MyGLCanvas2(caps, null, motherContext, null);
 		}
 		
 		canvas.addGLEventListener(drawer);
