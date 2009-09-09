@@ -28,7 +28,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -66,6 +65,9 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 
 		plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
 		plansCalcRouteKtiInfo.prepare(ktiConfigGroup, network);
+
+		KtiPtRouteFactory ktiPtRouteFactory = new KtiPtRouteFactory(plansCalcRouteKtiInfo);
+		network.getFactory().setRouteFactory(TransportMode.pt, ktiPtRouteFactory);
 		
 	}
 	
@@ -107,8 +109,8 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		
 		testee.handleLeg(leg, home, work, Time.parseTime("12:34:56"));
 		
-		String actualRouteDescription = ((GenericRoute) leg.getRoute()).getRouteDescription();
-		String expectedRouteDescription = "kti 8503006 26101 26102 8503015";
+		String actualRouteDescription = ((KtiPtRoute) leg.getRoute()).getRouteDescription();
+		String expectedRouteDescription = "kti=8503006=26101=26102=8503015";
 		assertEquals(expectedRouteDescription, actualRouteDescription);
 		
 	}
@@ -117,10 +119,11 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		
 		double expectedTimeInVehicle = 300.0;
 
-		String routeDescription = "kti 8503006 26101 26102 8503015";
-		double actualTimeInVehicle = PlansCalcRouteKti.getTimeInVehicle(routeDescription, this.plansCalcRouteKtiInfo); 
+		KtiPtRoute route = new KtiPtRoute(null, null, this.plansCalcRouteKtiInfo);
+		route.setRouteDescription(null, "kti=8503006=26101=26102=8503015", null);
+//		double actualTimeInVehicle = PlansCalcRouteKti.getTimeInVehicle(route, this.plansCalcRouteKtiInfo); 
 		
-		assertEquals(expectedTimeInVehicle, actualTimeInVehicle);
+		assertEquals(expectedTimeInVehicle, route.calcInVehicleTime());
 		
 	}
 	

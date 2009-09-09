@@ -30,7 +30,6 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
-import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 
 
 public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory {
@@ -38,18 +37,15 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.char
 	private final Config config;
 	private final KtiConfigGroup ktiConfigGroup;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
-	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	
 	public KTIYear3ScoringFunctionFactory(
 			final Config config, 
 			final KtiConfigGroup ktiConfigGroup,
-			final TreeMap<Id, FacilityPenalty> facilityPenalties,
-			PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
+			final TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		super(config.charyparNagelScoring());
 		this.config = config;
 		this.ktiConfigGroup = ktiConfigGroup;
 		this.facilityPenalties = facilityPenalties;
-		this.plansCalcRouteKtiInfo = plansCalcRouteKtiInfo;
 	}
 
 	public ScoringFunction getNewScoringFunction(PlanImpl plan) {
@@ -64,8 +60,7 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.char
 				plan, 
 				super.getParams(),
 				config,
-				this.ktiConfigGroup,
-				this.plansCalcRouteKtiInfo));
+				this.ktiConfigGroup));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.MoneyScoringFunction(super.getParams()));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction(super.getParams()));
 		

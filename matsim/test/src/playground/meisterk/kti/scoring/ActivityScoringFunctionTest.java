@@ -45,6 +45,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -55,6 +56,7 @@ import org.matsim.population.Desires;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
+import playground.meisterk.kti.router.KtiPtRouteFactory;
 
 public class ActivityScoringFunctionTest extends MatsimTestCase {
 
@@ -124,6 +126,9 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		network.createLink(new IdImpl(4050), node4, node5, 500, 25, 3600, 1);
 		network.createLink(new IdImpl(5040), node5, node4, 500, 25, 3600, 1);
 
+		RouteFactory ptRouteFactory = new KtiPtRouteFactory(null);
+		this.network.getFactory().setRouteFactory(TransportMode.pt, ptRouteFactory);
+		
 		// generate desires
 		Desires desires = person.createDesires("test desires");
 		desires.putActivityDuration("home", Time.parseTime("15:40:00"));
@@ -307,8 +312,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		KTIYear3ScoringFunctionFactory factory = new KTIYear3ScoringFunctionFactory(
 				this.config,
 				this.ktiConfigGroup,
-				emptyFacilityPenalties,
-				null);
+				emptyFacilityPenalties);
 		ScoringFunction testee = factory.getNewScoringFunction(this.plan);
 
 		assertTrue(testee instanceof ScoringFunctionAccumulator);

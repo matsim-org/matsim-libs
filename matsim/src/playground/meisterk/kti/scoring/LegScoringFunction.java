@@ -27,13 +27,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
+import playground.meisterk.kti.router.KtiPtRoute;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
-import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 
 
 /**
@@ -55,17 +54,14 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 
 	private final KtiConfigGroup ktiConfigGroup;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
-	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 
 	public LegScoringFunction(PlanImpl plan,
 			CharyparNagelScoringParameters params,
 			Config config,
-			KtiConfigGroup ktiConfigGroup,
-			PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
+			KtiConfigGroup ktiConfigGroup) {
 		super(plan, params);
 		this.ktiConfigGroup = ktiConfigGroup;
 		this.plansCalcRouteConfigGroup = config.plansCalcRoute();
-		this.plansCalcRouteKtiInfo = plansCalcRouteKtiInfo;
 	}
 
 	@Override
@@ -88,20 +84,16 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 
-			String routeDescription = ((GenericRoute) leg.getRoute()).getRouteDescription();
+			KtiPtRoute ktiPtRoute = (KtiPtRoute) leg.getRoute();
+			
+			if (ktiPtRoute.getFromStop() != null) {
 
-			if (this.ktiConfigGroup.isUsePlansCalcRouteKti() && routeDescription.startsWith("kti")) {
-
-				dist = PlansCalcRouteKti.getAccessEgressDistance(
-						routeDescription, 
-						this.plan.getPreviousActivity(leg), 
-						this.plan.getNextActivity(leg), 
-						plansCalcRouteKtiInfo);
+				dist = ((KtiPtRoute) leg.getRoute()).calcAccessEgressDistance(this.plan.getPreviousActivity(leg), this.plan.getNextActivity(leg));
 				travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
 				tmpScore += this.getWalkScore(dist, travelTime);
 				
-				dist = PlansCalcRouteKti.getInVehicleDistance(routeDescription, plansCalcRouteKtiInfo);
-				travelTime = PlansCalcRouteKti.getTimeInVehicle(routeDescription, this.plansCalcRouteKtiInfo);
+				dist = ((KtiPtRoute) leg.getRoute()).calcInVehicleDistance();
+				travelTime = ((KtiPtRoute) leg.getRoute()).calcInVehicleTime();
 				tmpScore += this.getPtScore(dist, travelTime);
 
 			} else {

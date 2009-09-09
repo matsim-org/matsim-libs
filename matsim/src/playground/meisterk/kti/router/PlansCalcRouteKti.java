@@ -23,19 +23,14 @@ package playground.meisterk.kti.router;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.StringUtils;
-import org.matsim.matrices.Entry;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
@@ -88,24 +83,15 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		Location fromMunicipality = froms.get(0);
 		Location toMunicipality = tos.get(0);
 
-		final double timeInVehicle = PlansCalcRouteKti.getTimeInVehicle(fromStop, fromMunicipality, toMunicipality, toStop, this.plansCalcRouteKtiInfo);
+		KtiPtRoute newRoute = new KtiPtRoute(fromAct.getLink(), toAct.getLink(), plansCalcRouteKtiInfo, fromStop, fromMunicipality, toMunicipality, toStop);
+		leg.setRoute(newRoute);
+
+		final double timeInVehicle = newRoute.calcInVehicleTime();
 		
-		final double walkAccessEgressDistance = PlansCalcRouteKti.getAccessEgressDistance(fromAct, fromStop, toStop, toAct);
+		final double walkAccessEgressDistance = newRoute.calcAccessEgressDistance(fromAct, toAct);
 		final double walkAccessEgressTime = PlansCalcRouteKti.getAccessEgressTime(walkAccessEgressDistance, this.configGroup);
 
-		GenericRoute newRoute = (GenericRoute) this.network.getFactory().createRoute(TransportMode.pt, fromAct.getLink(), toAct.getLink());
-		leg.setRoute(newRoute);
-		
-		String routeDescription = 
-			"kti " +
-			fromStop.getId().toString() + " " + 
-			fromMunicipality.getId().toString() + " " + 
-			toMunicipality.getId().toString() + " " + 
-			toStop.getId().toString();
-		newRoute.setRouteDescription(fromAct.getLink(), routeDescription, toAct.getLink());
-		
-		newRoute.setDistance(
-				(walkAccessEgressDistance + PlansCalcRouteKti.getInVehicleDistance(fromStop, fromMunicipality, toMunicipality, toStop)) * 1.5);
+		newRoute.setDistance((walkAccessEgressDistance + newRoute.calcInVehicleDistance()));
 		
 		travelTime = walkAccessEgressTime + timeInVehicle;
 		leg.setTravelTime(travelTime);
@@ -113,82 +99,6 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		return travelTime;
 	}
 
-	public static double getTimeInVehicle(
-			final String routeDescription, 
-			final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
-		
-		String[] routeDescriptionArray = StringUtils.explode(routeDescription, ' ');
-		
-		SwissHaltestelle fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[1]));
-		Location fromMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[2]));
-		Location toMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[3]));
-		SwissHaltestelle toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[4]));
-		
-		return PlansCalcRouteKti.getTimeInVehicle(fromStop, fromMunicipality, toMunicipality, toStop, plansCalcRouteKtiInfo);
-		
-	}
-	
-	public static double getTimeInVehicle(
-			final SwissHaltestelle fromStop, 
-			final Location fromMunicipality, 
-			final Location toMunicipality, 
-			final SwissHaltestelle toStop, 
-			final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
-		
-		Entry traveltime = plansCalcRouteKtiInfo.getPtTravelTimes().getEntry(fromMunicipality, toMunicipality);
-		if (traveltime == null) {
-			throw new RuntimeException("No entry found for " + fromMunicipality.getId() + " --> " + toMunicipality.getId());
-		}
-		
-		return traveltime.getValue() * 60.0;
-		
-	}
-	
-	public static double getInVehicleDistance(
-			final String routeDescription, 
-			final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
-
-		String[] routeDescriptionArray = StringUtils.explode(routeDescription, ' ');
-		
-		SwissHaltestelle fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[1]));
-		Location fromMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[2]));
-		Location toMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[3]));
-		SwissHaltestelle toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[4]));
-
-		return PlansCalcRouteKti.getInVehicleDistance(fromStop, fromMunicipality, toMunicipality, toStop);
-		
-	}
-	
-	public static double getInVehicleDistance(
-			SwissHaltestelle fromStop, 
-			Location fromMunicipality, 
-			Location toMunicipality, 
-			SwissHaltestelle toStop) {
-		
-		return CoordUtils.calcDistance(fromStop.getCoord(), toStop.getCoord());
-		
-	}
-
-	public static double getAccessEgressDistance(
-			String routeDescription, 
-			ActivityImpl fromAct, 
-			ActivityImpl toAct, 
-			PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
-		
-		String[] routeDescriptionArray = StringUtils.explode(routeDescription, ' ');
-		SwissHaltestelle fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[1]));
-		SwissHaltestelle toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[4]));
-
-		return PlansCalcRouteKti.getAccessEgressDistance(fromAct, fromStop, toStop, toAct);
-		
-	}
-	
-	public static double getAccessEgressDistance(ActivityImpl fromAct, SwissHaltestelle fromStop, SwissHaltestelle toStop, ActivityImpl toAct) {
-		return 
-		CoordUtils.calcDistance(fromAct.getCoord(), fromStop.getCoord()) + 
-		CoordUtils.calcDistance(toAct.getCoord(), toStop.getCoord());
-	}
-	
 	public static double getAccessEgressTime(final double distance, final PlansCalcRouteConfigGroup group) {
 		return distance / group.getWalkSpeedFactor();
 	}

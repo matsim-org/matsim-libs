@@ -1,5 +1,6 @@
 package playground.meisterk.kti.controler;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -10,6 +11,7 @@ import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
 import playground.meisterk.kti.controler.listeners.LegDistanceDistributionWriter;
 import playground.meisterk.kti.controler.listeners.ScoreElements;
+import playground.meisterk.kti.router.KtiPtRouteFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
@@ -30,7 +32,7 @@ public class KTIControler extends Controler {
 	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 	
-	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = null;
+	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
 
 	private final KtiConfigGroup ktiConfigGroup;
 
@@ -40,22 +42,21 @@ public class KTIControler extends Controler {
 		this.ktiConfigGroup = new KtiConfigGroup();
 		super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 
+		this.getNetworkFactory().setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
+
 	}
 	
 	@Override
 	protected void setUp() {
 
 		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
 			this.plansCalcRouteKtiInfo.prepare(this.ktiConfigGroup, this.getNetwork());
 		}
-
+		
 		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				super.config, 
 				this.ktiConfigGroup,
-				this.getFacilityPenalties(),
-				this.plansCalcRouteKtiInfo
-				);
+				this.getFacilityPenalties());
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
 		super.setUp();

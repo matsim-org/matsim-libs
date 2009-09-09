@@ -21,6 +21,7 @@
 package playground.meisterk.kti.scoring;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -29,7 +30,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -37,6 +38,8 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
+import playground.meisterk.kti.router.KtiPtRoute;
+import playground.meisterk.kti.router.KtiPtRouteFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 
 public class LegScoringFunctionTest extends MatsimTestCase {
@@ -47,11 +50,11 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 	private PersonImpl testPerson = null;
 	private PlanImpl testPlan = null;
 	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = null;
-	
+
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.config = super.loadConfig(null);
-		
+
 		ktiConfigGroup = new KtiConfigGroup();
 		ktiConfigGroup.setUsePlansCalcRouteKti(false);
 		ktiConfigGroup.setPtHaltestellenFilename(this.getClassInputDirectory() + "haltestellen.txt");
@@ -62,7 +65,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		ktiConfigGroup.setDistanceCostPtUnknownTravelCard(0.5);
 		ktiConfigGroup.setTravelingBike(-2.0);
 		this.config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
-		
+
 		CharyparNagelScoringConfigGroup charyparNagelConfigGroup = this.config.charyparNagelScoring();
 		charyparNagelConfigGroup.setMarginalUtlOfDistancePt(-0.5);
 		charyparNagelConfigGroup.setMarginalUtlOfDistanceCar(-0.1);
@@ -71,7 +74,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		charyparNagelConfigGroup.setTravelingWalk(-100.0);
 
 		network = new NetworkLayer();
-		
+
 		network.createNode(new IdImpl(1), new CoordImpl(1000.0, 1000.0));
 		network.createNode(new IdImpl(2), new CoordImpl(1100.0, 1100.0));
 		network.createNode(new IdImpl(3), new CoordImpl(1200.0, 1200.0));
@@ -82,7 +85,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		testPerson = new PersonImpl(new IdImpl("123"));
 		testPlan = new PlanImpl();
 		testPerson.addPlan(testPlan);
-		
+
 		ActivityImpl home = new ActivityImpl("home", network.getLink("1"));
 		home.setCoord(new CoordImpl(1050.0, 1050.0));
 		ActivityImpl work = new ActivityImpl("work", network.getLink("2"));
@@ -93,9 +96,6 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		testPlan.addActivity(home);
 		testPlan.addLeg(testLeg);
 		testPlan.addActivity(work);
-		
-		this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
-		this.plansCalcRouteKtiInfo.prepare(ktiConfigGroup, this.network);
 
 	}
 
@@ -111,61 +111,64 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 	}
 
 	public void testCalcLegScorePt() {
-		this.runATest(TransportMode.pt, null, -10.0);
+		this.runATest(TransportMode.pt, null, "\n\tabcd", -10.0);
 		this.ktiConfigGroup.setUsePlansCalcRouteKti(true);
-		this.runATest(TransportMode.pt, null, -5.688799);
+		this.runATest(TransportMode.pt, null, "kti=8503006=26101=26102=8503015", -8.116533);
 	}
 
 	public void testCalcLegScorePtUnknown() {
-		this.runATest(TransportMode.pt, "unknown", -7.5);
+		this.runATest(TransportMode.pt, "unknown", "", -7.5);
 		this.ktiConfigGroup.setUsePlansCalcRouteKti(true);
-		this.runATest(TransportMode.pt, "unknown", -5.618089);
+		this.runATest(TransportMode.pt, "unknown", "kti=8503006=26101=26102=8503015", -8.010467);
 	}	
-	
+
 	public void testCalcLegScoreCar() {
-		this.runATest(TransportMode.car, null, -1.6);
+		this.runATest(TransportMode.car, null, null, -1.6);
 	}
-	
+
 	public void testCalcLegScoreBike() {
-		this.runATest(TransportMode.bike, null, -1.0);
+		this.runATest(TransportMode.bike, null, null, -1.0);
 	}
-	
+
 	public void testCalcLegScoreWalk() {
-		this.runATest(TransportMode.walk, null, -50.0);
+		this.runATest(TransportMode.walk, null, null, -50.0);
 	}
-	
-	private void runATest(final TransportMode mode, final String travelCard, final double expectedScore) {
-		
+
+	private void runATest(final TransportMode mode, final String travelCard, final String routeDescription, final double expectedScore) {
+
 		if (travelCard != null) {
 			this.testPerson.addTravelcard(travelCard);
 		}
-		
+
 		LegImpl testLeg = (LegImpl) this.testPlan.getPlanElements().get(1);
 		testLeg.setMode(mode);
-		RouteWRefs route = network.getFactory().createRoute(
-				mode, 
-				testPlan.getPreviousActivity(testLeg).getLink(), 
-				testPlan.getNextActivity(testLeg).getLink());
-		testLeg.setRoute(route);
-		if (TransportMode.pt.equals(mode)) {
-			((GenericRoute) route).setRouteDescription(
-					testPlan.getPreviousActivity(testLeg).getLink(), 
-					"kti 8503006 26101 26102 8503015", 
-					testPlan.getNextActivity(testLeg).getLink());
+
+		Link startLink = testPlan.getPreviousActivity(testLeg).getLink();
+		Link endLink = testPlan.getNextActivity(testLeg).getLink();
+
+		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
+			this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
+			this.plansCalcRouteKtiInfo.prepare(ktiConfigGroup, this.network);
 		}
+		RouteFactory ptRouteFactory = new KtiPtRouteFactory(this.plansCalcRouteKtiInfo);
+		this.network.getFactory().setRouteFactory(TransportMode.pt, ptRouteFactory);
+
+		RouteWRefs route = network.getFactory().createRoute(mode, startLink, endLink);
+		testLeg.setRoute(route);
 		route.setDistance(10000.0);
+		if (route instanceof KtiPtRoute) {
+			((KtiPtRoute) route).setRouteDescription(startLink, routeDescription, endLink);
+		}
 
 		CharyparNagelScoringParameters charyparNagelParams = new CharyparNagelScoringParameters(config.charyparNagelScoring());
 		LegScoringFunction testee = new LegScoringFunction(
 				testPlan, 
 				charyparNagelParams,
 				config,
-				this.ktiConfigGroup, 
-				this.plansCalcRouteKtiInfo);
+				this.ktiConfigGroup);
 		double actualLegScore = testee.calcLegScore(Time.parseTime("06:00:00"), Time.parseTime("06:30:00"), testLeg);
 
 		assertEquals(expectedScore, actualLegScore, 1e-6);
-
 
 	}
 

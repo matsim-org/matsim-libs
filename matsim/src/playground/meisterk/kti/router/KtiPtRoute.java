@@ -22,19 +22,25 @@ package playground.meisterk.kti.router;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.StringUtils;
+import org.matsim.matrices.Entry;
 import org.matsim.world.Location;
 
 public class KtiPtRoute extends GenericRouteImpl {
 
 	public static final char SEPARATOR = '=';
+	public static final String IDENTIFIER = "kti";
+	
+	public static final double CROW_FLY_FACTOR = 1.5;
 	
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
-	private SwissHaltestelle fromStop;
-	private Location fromMunicipality;
-	private Location toMunicipality;
-	private SwissHaltestelle toStop;
+	private SwissHaltestelle fromStop = null;
+	private Location fromMunicipality = null;
+	private Location toMunicipality = null;
+	private SwissHaltestelle toStop = null;
 	
 	public KtiPtRoute(Link startLink, Link endLink, PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
 		super(startLink, endLink);
@@ -55,13 +61,22 @@ public class KtiPtRoute extends GenericRouteImpl {
 		this.toMunicipality = toMunicipality;
 		this.toStop = toStop;
 	}
-
-	
 	
 	@Override
 	public String getRouteDescription() {
-		// TODO Auto-generated method stub
-		return super.getRouteDescription();
+		
+		if (this.fromStop == null) {
+			return super.getRouteDescription();
+		}
+		String routeDescription = 
+			IDENTIFIER + SEPARATOR + 
+			this.fromStop.getId() + SEPARATOR + 
+			this.fromMunicipality.getId() + SEPARATOR +
+			this.toMunicipality.getId() + SEPARATOR +
+			this.toStop.getId(); 
+		
+		return routeDescription;
+		
 	}
 
 	@Override
@@ -71,14 +86,44 @@ public class KtiPtRoute extends GenericRouteImpl {
 			Link endLink) {
 		
 		super.setRouteDescription(startLink, routeDescription, endLink);
-		String[] routeDescriptionArray = StringUtils.explode(routeDescription, SEPARATOR);
-		this.fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[0]));
-		this.fromMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[1]));
-		this.toMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[2]));
-		this.toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[3]));
+		if (routeDescription.startsWith(IDENTIFIER)) {
+			String[] routeDescriptionArray = StringUtils.explode(routeDescription, SEPARATOR);
+			this.fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[1]));
+			this.fromMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[2]));			
+			this.toMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[3]));
+			this.toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[4]));
+		} else {
+			this.fromStop = null;
+			this.fromMunicipality = null;			
+			this.toMunicipality = null;
+			this.toStop = null;
+		}
 		
 	}
 
+	public double calcInVehicleDistance() {
+		return CoordUtils.calcDistance(this.getFromStop().getCoord(), this.getToStop().getCoord()) * CROW_FLY_FACTOR;
+	}
+	
+	public double calcInVehicleTime() {
+
+		Entry traveltime = plansCalcRouteKtiInfo.getPtTravelTimes().getEntry(this.fromMunicipality, this.toMunicipality);
+		if (traveltime == null) {
+			throw new RuntimeException("No entry found for " + this.fromMunicipality.getId() + " --> " + this.toMunicipality.getId());
+		}
+		return traveltime.getValue() * 60.0;
+		
+	}
+
+	public double calcAccessEgressDistance(final ActivityImpl fromAct, final ActivityImpl toAct) {
+		
+		return 
+		(CoordUtils.calcDistance(fromAct.getCoord(), this.getFromStop().getCoord()) + 
+		CoordUtils.calcDistance(toAct.getCoord(), this.getToStop().getCoord()))
+		* CROW_FLY_FACTOR;
+		
+	}
+	
 	public SwissHaltestelle getFromStop() {
 		return fromStop;
 	}
