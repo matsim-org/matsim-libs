@@ -370,4 +370,8 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		return travTime;
 	}
 
+	public NetworkFactory getRouteFactory() {
+		return routeFactory;
+	}
+
 }

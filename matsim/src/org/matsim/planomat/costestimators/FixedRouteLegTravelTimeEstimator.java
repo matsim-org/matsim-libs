@@ -34,7 +34,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -102,10 +101,12 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 			}
 
 			if (doModifyLeg) {
-				// TODO where do I know from the type of the NetworkRoute to be constructed? (node or link)
-				NodeNetworkRouteImpl nodeNetworkRoute = new NodeNetworkRouteImpl(actOrigin.getLink(), actDestination.getLink());
-				nodeNetworkRoute.setLinks(actOrigin.getLink(), this.fixedRoutes.get(legIndex), actDestination.getLink());
-				legIntermediate.setRoute(nodeNetworkRoute);
+				NetworkRouteWRefs networkRoute = (NetworkRouteWRefs) this.plansCalcRoute.getRouteFactory().createRoute(
+						TransportMode.car, 
+						actOrigin.getLink(), 
+						actDestination.getLink());
+				networkRoute.setLinks(actOrigin.getLink(), this.fixedRoutes.get(legIndex), actDestination.getLink());
+				legIntermediate.setRoute(networkRoute);
 			}
 			
 			legTravelTimeEstimation = now - departureTime;
