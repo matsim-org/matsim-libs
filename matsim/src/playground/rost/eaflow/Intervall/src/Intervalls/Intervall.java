@@ -542,7 +542,6 @@ implements Comparable<Intervall>
 		if(legalBounds(l,r)){
 			return new Intervall(l,r);
 		}else return null;
-		
 	}
 
 //-------------------------MAIN METHOD------------------------------------------//

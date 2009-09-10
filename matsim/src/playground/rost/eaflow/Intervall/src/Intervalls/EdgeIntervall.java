@@ -216,6 +216,14 @@ public class EdgeIntervall extends Intervall
 		return super.equals(other);
 	}
 	
+	public EdgeIntervall shiftPositive(int tau){
+		int l,r;
+		Intervall tmp = super.shiftPositive(tau);
+		if(tmp == null)
+			return null;
+		return new EdgeIntervall(tmp, this.getFlow());
+	}
+	
 //	-----------------------------MAIN METHOD-------------------------//	
 	
 }

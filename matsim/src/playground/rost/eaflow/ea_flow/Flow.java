@@ -43,7 +43,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
-import playground.rost.eaflow.BowGraph.BowTravelTimeCost;
+import playground.rost.eaflow.BowGraph.SimpleEdgeTravelTimeCost;
 import playground.rost.eaflow.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.rost.eaflow.ea_flow.TimeExpandedPath.PathEdge;
 /**
@@ -65,7 +65,7 @@ public class Flow {
 	/**
 	 * used to calculate the length of every edge in the network
 	 */
-	private Map<Link, BowTravelTimeCost> _lengths = new HashMap<Link, BowTravelTimeCost>(); 
+	private Map<Link, FlowEdgeTraversalCalculator> _lengths = new HashMap<Link, FlowEdgeTraversalCalculator>(); 
 	
 	/**
 	 * Edge representation of flow on the network  
@@ -133,7 +133,7 @@ public class Flow {
 		
 		// initialize distances
 		for(Link link : network.getLinks().values()){
-			BowTravelTimeCost bTT = new BowTravelTimeCost(link);
+			FlowEdgeTraversalCalculator bTT = new SimpleEdgeTravelTimeCost(link);
 			_lengths.put(link, bTT);
 			this._flow.put(link, new EdgeIntervalls(bTT));
 		}
@@ -236,7 +236,7 @@ public class Flow {
 			//check forward capacity
 			if(edge.isForward()){
 				int flow = this._flow.get(link).getFlowAt(startTime);
-				int cap = _lengths.get(link).getRemainingCapacityWithThisTravelTime(flow);
+				int cap = _lengths.get(link).getRemainingForwardCapacityWithThisTravelTime(flow);
 				System.out.println("startTime: " + startTime + "; " + edge.getEdge().getFromNode().getId().toString()+  "-->" + edge.getEdge().getToNode().getId().toString() + " " + edge.getArrivalTime());
 				if (cap<0){
 					throw new IllegalArgumentException("too much flow on " + edge);
