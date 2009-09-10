@@ -280,6 +280,7 @@ public class Planomat implements PlanAlgorithm {
 					destination,
 					plan.getActLegIndex(leg),
 					now);
+			// TODO here the LegImpl copy constructor should be used.
 			leg.setMode(newLeg.getMode());
 			leg.setRoute(newLeg.getRoute());
 			double anticipatedTravelTime = Math.rint(newLeg.getTravelTime());
