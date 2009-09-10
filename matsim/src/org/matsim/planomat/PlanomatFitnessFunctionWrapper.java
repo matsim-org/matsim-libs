@@ -25,6 +25,7 @@ import org.jgap.IChromosome;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.planomat.Planomat.StepThroughPlanAction;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 /**
@@ -54,19 +55,33 @@ public class PlanomatFitnessFunctionWrapper extends FitnessFunction {
 	private transient final PlanImpl plan;
 	private transient final PlanAnalyzeSubtours planAnalyzeSubtours;
 	private transient final TransportMode[] possibleModes;
+	private transient final LegTravelTimeEstimator legTravelTimeEstimator;
 
-	public PlanomatFitnessFunctionWrapper(Planomat planomat, PlanImpl plan, PlanAnalyzeSubtours planAnalyzeSubtours, TransportMode[] possibleModes) {
+	public PlanomatFitnessFunctionWrapper(
+			Planomat planomat, 
+			PlanImpl plan, 
+			PlanAnalyzeSubtours planAnalyzeSubtours, 
+			TransportMode[] possibleModes, 
+			LegTravelTimeEstimator legTravelTimeEstimator) {
 		super();
 		this.planomat = planomat;
 		this.plan = plan;
 		this.planAnalyzeSubtours = planAnalyzeSubtours;
 		this.possibleModes = possibleModes;
+		this.legTravelTimeEstimator = legTravelTimeEstimator;
+		
 	}
 
 	@Override
 	protected double evaluate(final IChromosome a_subject) {
 
-		double planScore = this.planomat.stepThroughPlan(StepThroughPlanAction.EVALUATE, a_subject, this.plan, this.planAnalyzeSubtours, this.possibleModes);
+		double planScore = this.planomat.stepThroughPlan(
+				StepThroughPlanAction.EVALUATE, 
+				a_subject, 
+				this.plan, 
+				this.planAnalyzeSubtours, 
+				this.legTravelTimeEstimator, 
+				this.possibleModes);
 
 		return planScore;
 	}

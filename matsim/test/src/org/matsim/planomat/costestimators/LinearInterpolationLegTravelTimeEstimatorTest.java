@@ -70,6 +70,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 		LinearInterpolationLegTravelTimeEstimator testee = (LinearInterpolationLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+				null,
 				config.planomat().getSimLegInterpretation(),
 				PlanomatConfigGroup.RoutingCapability.linearInterpolation,
 				plansCalcRoute);

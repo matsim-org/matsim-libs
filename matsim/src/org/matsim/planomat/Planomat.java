@@ -36,9 +36,11 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
@@ -67,18 +69,25 @@ public class Planomat implements PlanAlgorithm {
 	private final int numTimeIntervals;
 	protected final double timeIntervalSize;
 
-	private final LegTravelTimeEstimator legTravelTimeEstimator;
+	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final ScoringFunctionFactory scoringFunctionFactory;
+	private final PlansCalcRoute router;
+
 	private final Random seedGenerator;
 
 	private final static Logger logger = Logger.getLogger(Planomat.class);
 	private final boolean doLogging;
 
-	public Planomat(final LegTravelTimeEstimator legTravelTimeEstimator, final ScoringFunctionFactory scoringFunctionFactory, final PlanomatConfigGroup config) {
+	public Planomat(
+			final LegTravelTimeEstimatorFactory legTravelTimeEstimatorfactory, 
+			final ScoringFunctionFactory scoringFunctionFactory, 
+			final PlanomatConfigGroup config,
+			final PlansCalcRoute router) {
 
-		this.legTravelTimeEstimator = legTravelTimeEstimator;
+		this.legTravelTimeEstimatorFactory = legTravelTimeEstimatorfactory;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.planomatConfigGroup = config;
+		this.router = router;
 		
 		this.numTimeIntervals = (int) Math.pow(2, this.planomatConfigGroup.getLevelOfTimeResolution());
 		this.timeIntervalSize = Planomat.SCENARIO_DURATION / numTimeIntervals;
@@ -93,8 +102,11 @@ public class Planomat implements PlanAlgorithm {
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...");
 		}
 		
-		// cache car routes in case routes are not modified by the used implementation of the LegTravelTimeEstimator 
-		this.legTravelTimeEstimator.initPlanSpecificInformation(plan);
+		LegTravelTimeEstimator legTravelTimeEstimator = this.legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+				plan,
+				this.planomatConfigGroup.getSimLegInterpretation(), 
+				this.planomatConfigGroup.getRoutingCapability(), 
+				this.router);
 		
 		// perform subtour analysis only if mode choice on subtour basis is optimized
 		// (if only times are optimized, subtour analysis is not necessary)
@@ -126,7 +138,7 @@ public class Planomat implements PlanAlgorithm {
 				possibleModes,
 				this.planomatConfigGroup);
 
-		PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper(this, plan, planAnalyzeSubtours, possibleModes);		
+		PlanomatFitnessFunctionWrapper fitnessFunction = new PlanomatFitnessFunctionWrapper(this, plan, planAnalyzeSubtours, possibleModes, legTravelTimeEstimator);		
 
 		Genotype population = null;
 		try {
@@ -144,13 +156,11 @@ public class Planomat implements PlanAlgorithm {
 			logger.info("Running evolution...done.");
 			logger.info("Writing solution back to Plan object...");
 		}
-		/*double score =*/ this.stepThroughPlan(StepThroughPlanAction.WRITE_BACK, fittest, plan, planAnalyzeSubtours, possibleModes);
+		/*double score =*/ this.stepThroughPlan(StepThroughPlanAction.WRITE_BACK, fittest, plan, planAnalyzeSubtours, legTravelTimeEstimator, possibleModes);
 		if (this.doLogging) {
 			logger.info("Writing solution back to Plan object...done.");
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...done.");
 		}
-		// reset leg travel time estimator
-		this.legTravelTimeEstimator.resetPlanSpecificInformation();
 		// invalidate score information
 		plan.setScore(null);
 	}
@@ -179,15 +189,8 @@ public class Planomat implements PlanAlgorithm {
 	
 	private IChromosome evolveAndReturnFittest(final Genotype population) {
 
-//		IChromosome fittest = null;
-//		String logMessage = null;
 		for (int i = 0, n = this.planomatConfigGroup.getJgapMaxGenerations(); i < n; i++) {
 			population.evolve();
-//			if (Gbl.getConfig().planomat().isDoLogging()) {
-//			fittest = population.getFittestChromosome();
-//			logMessage = "Generation #" + Integer.toString(i) + " : Max: " + fittest.getFitnessValue();
-//			logger.info(logMessage);
-//			}
 		}
 		return population.getFittestChromosome();
 
@@ -198,6 +201,7 @@ public class Planomat implements PlanAlgorithm {
 			final IChromosome individual, 
 			final PlanImpl plan, 
 			final PlanAnalyzeSubtours planAnalyzeSubtours,
+			final LegTravelTimeEstimator legTravelTimeEstimator,
 			final TransportMode[] possibleModes) {
 
 		// TODO comment this
@@ -269,7 +273,7 @@ public class Planomat implements PlanAlgorithm {
 				leg.setMode(possibleModes[modeIndex]);
 			} // otherwise leave modes untouched
 
-			double anticipatedTravelTime = Math.rint(this.legTravelTimeEstimator.getLegTravelTimeEstimation(
+			double anticipatedTravelTime = Math.rint(legTravelTimeEstimator.getLegTravelTimeEstimation(
 					plan.getPerson().getId(),
 					now,
 					origin,
@@ -323,7 +327,6 @@ public class Planomat implements PlanAlgorithm {
 
 		if (action.equals(StepThroughPlanAction.EVALUATE)) {
 			scoringFunction.finish();
-//			logger.info("score: " + scoringFunction.getScore());
 			return scoringFunction.getScore();
 		}
 

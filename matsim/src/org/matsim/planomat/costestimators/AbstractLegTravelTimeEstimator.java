@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LegTravelTimeEstimatorFactory.java
+ * AbstractLegTravelTimeEstimator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,48 +20,30 @@
 
 package org.matsim.planomat.costestimators;
 
-import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.TravelTime;
 
-public class LegTravelTimeEstimatorFactory {
+public abstract class AbstractLegTravelTimeEstimator implements
+		LegTravelTimeEstimator {
 
-	private final TravelTime travelTime;
-	private final DepartureDelayAverageCalculator tDepDelayCalc;
-
-	public LegTravelTimeEstimatorFactory(TravelTime travelTime, DepartureDelayAverageCalculator depDelayCalc) {
-		super();
-		this.travelTime = travelTime;
-		this.tDepDelayCalc = depDelayCalc;
-	}
-
-	public LegTravelTimeEstimator getLegTravelTimeEstimator(
-			PlanImpl plan,
-			PlanomatConfigGroup.SimLegInterpretation simLegInterpretation,
-			PlanomatConfigGroup.RoutingCapability routingCapability,
-			PlansCalcRoute routingAlgorithm) {
-		
-		LegTravelTimeEstimator legTravelTimeEstimator = null;
-		if (routingCapability.equals(PlanomatConfigGroup.RoutingCapability.fixedRoute)) {
-			legTravelTimeEstimator = new FixedRouteLegTravelTimeEstimator(
-					plan,
-					this.travelTime, 
-					this.tDepDelayCalc, 
-					routingAlgorithm,
-					simLegInterpretation);
-			
-		} else if (routingCapability.equals(PlanomatConfigGroup.RoutingCapability.linearInterpolation)) {
-			
-			legTravelTimeEstimator = new LinearInterpolationLegTravelTimeEstimator(
-					this.travelTime,
-					this.tDepDelayCalc,
-					routingAlgorithm,
-					simLegInterpretation);
-			
-		}
-		
-		return legTravelTimeEstimator;
-	}
+	protected PlanImpl plan;
 	
+	public AbstractLegTravelTimeEstimator(PlanImpl plan) {
+		super();
+		this.plan = plan;
+	}
+
+	public abstract double getLegTravelTimeEstimation(Id personId, double departureTime,
+			ActivityImpl actOrigin, ActivityImpl actDestination,
+			LegImpl legIntermediate, boolean doModifyLeg);
+
+	public abstract LegImpl getNewLeg(TransportMode mode, ActivityImpl actOrigin,
+			ActivityImpl actDestination, double departureTime);
+
+//	public abstract void initPlanSpecificInformation(PlanImpl plan);
+//	
+//	public abstract void resetPlanSpecificInformation();
 }

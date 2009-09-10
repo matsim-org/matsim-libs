@@ -26,10 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -42,7 +40,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.FixedRouteLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -84,12 +81,12 @@ public class AgentsAssigner implements PlanAlgorithm{
 		PlansCalcRoute router 		= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
-		FixedRouteLegTravelTimeEstimator legTravelTimeEstimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
-				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
-				PlanomatConfigGroup.RoutingCapability.fixedRoute,
-				router);
+//		FixedRouteLegTravelTimeEstimator legTravelTimeEstimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+//				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+//				PlanomatConfigGroup.RoutingCapability.fixedRoute,
+//				router);
 
-		this.timer					= new TimeModeChoicer2(controler, legTravelTimeEstimator, scorer);
+		this.timer					= new TimeModeChoicer2(controler, legTravelTimeEstimatorFactory, scorer);
 		this.locator 				= locator;
 		this.finder					= finder;
 		this.module					= recyclingModule;

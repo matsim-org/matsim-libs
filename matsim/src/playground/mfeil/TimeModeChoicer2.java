@@ -21,8 +21,6 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
@@ -35,14 +33,9 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
-
-import playground.mfeil.config.TimeModeChoicerConfigGroup;
 
 
 /**
@@ -62,9 +55,9 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TimeModeChoicer2 (Controler controler, LegTravelTimeEstimator estimator, PlanScorer scorer){
+	public TimeModeChoicer2 (Controler controler, LegTravelTimeEstimatorFactory estimatorFactory, PlanScorer scorer){
 		
-		super (controler, estimator, scorer);
+		super (controler, estimatorFactory, scorer);
 		
 		this.MAX_ITERATIONS 		= 30;
 		this.STOP_CRITERION			= 5;	
@@ -105,7 +98,11 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		this.routes = routes;
 		
 		// meisterk
-		this.estimator.initPlanSpecificInformation(plan);
+		this.estimator = this.legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+				plan, 
+				this.config.getSimLegInterpretation(), 
+				this.config.getRoutingCapability(), 
+				this.router);
 		
 		/* Replace delivered plan by copy since delivered plan must not be changed until valid solution has been found */
 		//PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());
@@ -324,9 +321,6 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 			}
 		}
 		this.cleanRoutes(basePlan);
-		
-		/* reset legEstimator (clear hash map) */
-		this.estimator.resetPlanSpecificInformation();
 	}
 	
 }

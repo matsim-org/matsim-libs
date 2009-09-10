@@ -16,7 +16,7 @@ import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.Planomat;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 
@@ -27,14 +27,14 @@ public class TimeOptimizerPerformanceT implements org.matsim.population.algorith
 	private final PlansCalcRoute router;
 	private final PreProcessLandmarks		preProcessRoutingData;
 	
-	public TimeOptimizerPerformanceT (Controler controler, LegTravelTimeEstimator estimator, PlanScorer scorer, ScoringFunctionFactory factory){
+	public TimeOptimizerPerformanceT (Controler controler, LegTravelTimeEstimatorFactory estimatorFactory, PlanScorer scorer, ScoringFunctionFactory scoringFunctionFactory){
 
 		//this.timeOptAlgorithm 		= new TimeOptimizer (controler, estimator, scorer);
-		this.timeOptAlgorithm 	= new Planomat (estimator, factory, controler.getConfig().planomat());
 		this.scorer			  		= scorer;
 		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		this.preProcessRoutingData.run(controler.getNetwork());
 		this.router 				= new PlansCalcRoute(controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), new AStarLandmarksFactory(this.preProcessRoutingData));
+		this.timeOptAlgorithm 	= new Planomat (estimatorFactory, scoringFunctionFactory, controler.getConfig().planomat(), this.router);
 		
 	}
 	

@@ -27,7 +27,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
@@ -43,8 +42,6 @@ import org.matsim.locationchoice.constrained.ManageSubchains;
 import org.matsim.locationchoice.constrained.SubChain;
 import org.matsim.planomat.Planomat;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.FixedRouteLegTravelTimeEstimator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -73,7 +70,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	private final String					finalOpt;
 	private final ActivityTypeFinder 		finder;
 	
-	private final LegTravelTimeEstimator legTravelTimeEstimator;
+	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private Knowledges knowledges;
 	
 	
@@ -87,11 +84,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
 
-		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
-		this.legTravelTimeEstimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
-				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
-				PlanomatConfigGroup.RoutingCapability.fixedRoute,
-				this.router);
+		this.legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
 		
 		this.finder 				= finder;	
 		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(PlanomatXConfigGroup.getNeighbourhoodSize());
@@ -107,20 +100,20 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		this.finalOpt				= PlanomatXConfigGroup.getFinalTimer();
 		
 		if (PlanomatXConfigGroup.getTimer().equals("TimeModeChoicer")){
-			this.timer				= new TimeModeChoicer1(controler, legTravelTimeEstimator, this.scorer);
+			this.timer				= new TimeModeChoicer1(controler, legTravelTimeEstimatorFactory, this.scorer);
 		}
 		else if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
-			this.timer				= new Planomat (legTravelTimeEstimator, controler.getScoringFunctionFactory(), controler.getConfig().planomat()); 
+			this.timer				= new Planomat (legTravelTimeEstimatorFactory, controler.getScoringFunctionFactory(), controler.getConfig().planomat(), this.router); 
 		}
-		else this.timer				= new TimeOptimizer(controler, this.legTravelTimeEstimator, this.scorer);
+		else this.timer				= new TimeOptimizer(controler, this.legTravelTimeEstimatorFactory, this.scorer);
 		
 		if (this.finalOpt.equals("TimeModeChoicer")){
-			this.finalTimer			= new TimeModeChoicer1(controler, legTravelTimeEstimator, this.scorer);
+			this.finalTimer			= new TimeModeChoicer1(controler, legTravelTimeEstimatorFactory, this.scorer);
 		}
 		else if (this.finalOpt.equals("Planomat")){
-			this.finalTimer			= new Planomat(legTravelTimeEstimator, controler.getScoringFunctionFactory(), controler.getConfig().planomat()); 
+			this.finalTimer			= new Planomat(legTravelTimeEstimatorFactory, controler.getScoringFunctionFactory(), controler.getConfig().planomat(), this.router); 
 		}
-		else this.finalTimer		= new TimeOptimizerWIGIC(controler, legTravelTimeEstimator, this.scorer);		
+		else this.finalTimer		= new TimeOptimizerWIGIC(controler, legTravelTimeEstimatorFactory, this.scorer);		
 		
 		this.locator				= locator;	
 		

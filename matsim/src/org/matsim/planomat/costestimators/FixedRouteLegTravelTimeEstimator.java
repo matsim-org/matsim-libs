@@ -44,7 +44,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
  * @author meisterk
  *
  */
-public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator {
+public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstimator {
 
 	protected final TravelTime linkTravelTimeEstimator;
 	protected final DepartureDelayAverageCalculator tDepDelayCalc;
@@ -52,16 +52,21 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 
 	protected FixedRouteLegTravelTimeEstimator(
+			PlanImpl plan,
 			TravelTime linkTravelTimeEstimator,
 			DepartureDelayAverageCalculator depDelayCalc,
 			PlansCalcRoute plansCalcRoute,
 			PlanomatConfigGroup.SimLegInterpretation simLegInterpretation) {
-
+		super(plan);
 		this.linkTravelTimeEstimator = linkTravelTimeEstimator;
 		this.tDepDelayCalc = depDelayCalc;
 		this.plansCalcRoute = plansCalcRoute;
 		this.simLegInterpretation = simLegInterpretation;
 
+		if (plan != null) {
+			this.initPlanSpecificInformation(plan);
+		}
+		
 	}
 
 	public LegImpl getNewLeg(
@@ -79,7 +84,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 
 		double legTravelTimeEstimation = 0.0;
 
-		int legIndex = this.currentPlan.getActLegIndex(legIntermediate);
+		int legIndex = this.plan.getActLegIndex(legIntermediate);
 
 		if (legIntermediate.getMode().equals(TransportMode.car)) {
 
@@ -168,17 +173,17 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 		return this.getClass().getSimpleName();
 	}
 
-	public void resetPlanSpecificInformation() {
-		this.fixedRoutes.clear();
-		this.currentPlan = null;
-	}
+//	public void resetPlanSpecificInformation() {
+//		this.fixedRoutes.clear();
+////		this.currentPlan = null;
+//	}
 
 	private HashMap<Integer, HashMap<TransportMode, LegImpl>> fixedRoutes = new HashMap<Integer, HashMap<TransportMode, LegImpl>>();
-	private PlanImpl currentPlan;
+//	private PlanImpl currentPlan;
 
-	public void initPlanSpecificInformation(PlanImpl plan) {
+	private void initPlanSpecificInformation(PlanImpl plan) {
 
-		this.currentPlan = plan;
+//		this.currentPlan = plan;
 
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof LegImpl) {
@@ -186,7 +191,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 				if (leg.getRoute() instanceof NetworkRouteWRefs) {
 					HashMap<TransportMode, LegImpl> legInformation = new HashMap<TransportMode, LegImpl>();
 					legInformation.put(leg.getMode(), new LegImpl(leg));
-					this.fixedRoutes.put(this.currentPlan.getActLegIndex(leg), legInformation);
+					this.fixedRoutes.put(this.plan.getActLegIndex(leg), legInformation);
 				}
 			}
 		}

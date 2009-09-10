@@ -24,7 +24,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 
 /**
  * Interface for the estimation of the travel time of a leg. Implement it
@@ -41,7 +40,7 @@ public interface LegTravelTimeEstimator {
 	 * 
 	 * @param plan
 	 */
-	public void initPlanSpecificInformation(final PlanImpl plan);
+//	public void initPlanSpecificInformation(final PlanImpl plan);
 	
 	/**
 	 * Implement your assumption on travel time estimation here.
@@ -76,6 +75,6 @@ public interface LegTravelTimeEstimator {
 	 * 
 	 * @param plan
 	 */
-	public void resetPlanSpecificInformation();
+//	public void resetPlanSpecificInformation();
 	
 }

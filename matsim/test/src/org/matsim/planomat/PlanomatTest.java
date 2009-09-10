@@ -144,17 +144,17 @@ public class PlanomatTest extends MatsimTestCase {
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator);
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(tTravelEstimator, depDelayCalc);
-		LegTravelTimeEstimator ltte = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
-				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
-				this.scenario.getConfig().planomat().getRoutingCapability(),
-				plansCalcRoute);
+//		LegTravelTimeEstimator ltte = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+//				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
+//				this.scenario.getConfig().planomat().getRoutingCapability(),
+//				plansCalcRoute);
 
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().charyparNagelScoring());
 
 		log.info("Testing " + testRun.toString() + "...");
 
 		// init Planomat
-		Planomat testee = new Planomat(ltte, scoringFunctionFactory, this.scenario.getConfig().planomat());
+		Planomat testee = new Planomat(legTravelTimeEstimatorFactory, scoringFunctionFactory, this.scenario.getConfig().planomat(), plansCalcRoute);
 		testee.getSeedGenerator().setSeed(this.scenario.getConfig().global().getRandomSeed());
 
 		tTravelEstimator.reset(1);
@@ -207,7 +207,7 @@ public class PlanomatTest extends MatsimTestCase {
 		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		PlanomatConfigGroup planomatConfigGroup = this.scenario.getConfig().planomat();
-		Planomat testee = new Planomat(null, null, planomatConfigGroup);
+		Planomat testee = new Planomat(null, null, planomatConfigGroup, null);
 
 		TransportMode[] possibleModes = testee.getPossibleModes(testPlan);
 		
@@ -294,16 +294,15 @@ public class PlanomatTest extends MatsimTestCase {
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(tTravelEstimator, depDelayCalc);
 		ltte = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+				testPlan,
 				PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible, 
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
-
-		ltte.initPlanSpecificInformation(testPlan);
 		
 		// run the method
-		Planomat testee = new Planomat(ltte, null, this.scenario.getConfig().planomat());
+		Planomat testee = new Planomat(legTravelTimeEstimatorFactory, null, this.scenario.getConfig().planomat(), plansCalcRoute);
 
-		double score = testee.stepThroughPlan(Planomat.StepThroughPlanAction.WRITE_BACK, testChromosome, testPlan, null, null);
+		double score = testee.stepThroughPlan(Planomat.StepThroughPlanAction.WRITE_BACK, testChromosome, testPlan, null, ltte, null);
 		assertEquals(0.0, score, MatsimTestCase.EPSILON);
 		
 		

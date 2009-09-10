@@ -30,7 +30,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 
@@ -50,9 +50,9 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TimeOptimizer (Controler controler, LegTravelTimeEstimator estimator, PlanScorer scorer){
+	public TimeOptimizer (Controler controler, LegTravelTimeEstimatorFactory estimatorFactory, PlanScorer scorer){
 		
-		super(controler, estimator, scorer);
+		super(controler, estimatorFactory, scorer);
 		
 		this.OFFSET					= 1800;
 		this.MAX_ITERATIONS 		= 30;
@@ -83,7 +83,11 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 	public void run (PlanImpl basePlan){
 		
 		// meisterk
-		this.estimator.initPlanSpecificInformation(basePlan);
+		this.estimator = this.legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+				basePlan,
+				this.config.getSimLegInterpretation(),
+				this.config.getRoutingCapability(),
+				this.router);
 		
 		if (basePlan.getPlanElements().size()==1) return;
 		
@@ -244,9 +248,6 @@ public class TimeOptimizer extends TimeModeChoicer1 implements PlanAlgorithm {
 				((LegImpl)al.get(i)).setArrivalTime(time);
 			}
 		}
-		
-		/* reset legEstimator (clear hash map) */
-		this.estimator.resetPlanSpecificInformation();
 	}
 	
 	//////////////////////////////////////////////////////////////////////

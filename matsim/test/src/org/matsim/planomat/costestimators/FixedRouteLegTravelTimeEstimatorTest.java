@@ -123,11 +123,12 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 			LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 			FixedRouteLegTravelTimeEstimator testee = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+					this.testPlan,
 					simLegInterpretation,
 					PlanomatConfigGroup.RoutingCapability.fixedRoute,
 					plansCalcRoute);
 			
-			testee.initPlanSpecificInformation(this.testPlan);
+//			testee.initPlanSpecificInformation(this.testPlan);
 			
 			EventsImpl events = new EventsImpl();
 			events.addHandler(tDepDelayCalc);
@@ -280,6 +281,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 		
 		FixedRouteLegTravelTimeEstimator testee = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+				null,
 				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
@@ -341,6 +343,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 		
 		FixedRouteLegTravelTimeEstimator testee = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+				null,
 				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
@@ -424,6 +427,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 
 		FixedRouteLegTravelTimeEstimator testee = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+				null,
 				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);

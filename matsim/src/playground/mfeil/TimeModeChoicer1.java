@@ -29,6 +29,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.basic.v01.network.BasicLegImpl;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -60,22 +61,23 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	protected final Map<String, Double>		introTime;
 	protected final PlansCalcRoute		 	router;
 	protected final PlanScorer 				scorer;
-	protected final LegTravelTimeEstimator	estimator;
+	protected LegTravelTimeEstimator	estimator;
+	protected final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
+	protected final PlanomatConfigGroup config;
 	protected static final Logger 			log = Logger.getLogger(TimeModeChoicer1.class);
 	protected final double					maxWalkingDistance;
 	protected final String					modeChoice;
 	protected final TransportMode[]			possibleModes;
-	protected List<LinkNetworkRouteImpl> 			routes;
+	protected List<LinkNetworkRouteImpl> 	routes;
 	
 	//////////////////////////////////////////////////////////////////////
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TimeModeChoicer1 (Controler controler, LegTravelTimeEstimator estimator, PlanScorer scorer){
+	public TimeModeChoicer1 (Controler controler, LegTravelTimeEstimatorFactory estimatorFactory, PlanScorer scorer){
 		
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer 				= scorer;
-		this.estimator				= estimator;
 		this.OFFSET					= Double.parseDouble(TimeModeChoicerConfigGroup.getOffset());
 		this.MAX_ITERATIONS 		= Integer.parseInt(TimeModeChoicerConfigGroup.getMaxIterations());
 		this.STOP_CRITERION			= Integer.parseInt(TimeModeChoicerConfigGroup.getStopCriterion());
@@ -101,6 +103,10 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.possibleModes			= TimeModeChoicerConfigGroup.getPossibleModes();
 		this.modeChoice				= TimeModeChoicerConfigGroup.getModeChoice();
 		this.routes					= null;
+
+		// meisterk
+		this.legTravelTimeEstimatorFactory = estimatorFactory;
+		this.config					= controler.getConfig().planomat();
 	}
 	
 	public TimeModeChoicer1 (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc){
@@ -109,10 +115,6 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
 		
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
-		this.estimator = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
-				controler.getConfig().planomat().getSimLegInterpretation(),
-				controler.getConfig().planomat().getRoutingCapability(),
-				this.router);
 		
 		this.OFFSET					= Double.parseDouble(TimeModeChoicerConfigGroup.getOffset());
 		this.MAX_ITERATIONS 		= Integer.parseInt(TimeModeChoicerConfigGroup.getMaxIterations());
@@ -139,6 +141,10 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.possibleModes			= TimeModeChoicerConfigGroup.getPossibleModes();
 		this.modeChoice				= TimeModeChoicerConfigGroup.getModeChoice();
 		this.routes					= null;
+		
+		//meisterk
+		this.config 				= controler.getConfig().planomat();
+		this.legTravelTimeEstimatorFactory = null;
 	}
 	
 		
@@ -178,8 +184,12 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.routes = routes;
 		
 		// meisterk
-		this.estimator.initPlanSpecificInformation(plan);
-		
+		this.estimator = this.legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+				plan,
+				this.config.getSimLegInterpretation(),
+				this.config.getRoutingCapability(),
+				this.router);
+
 		/* Replace delivered plan by copy since delivered plan must not be changed until valid solution has been found */
 		//PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());
 		//plan.copyPlan(basePlan);
@@ -398,8 +408,6 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		}
 		this.cleanRoutes(basePlan);
 		
-		/* reset legEstimator (clear hash map) */
-		this.estimator.resetPlanSpecificInformation();
 	}
 	
 	

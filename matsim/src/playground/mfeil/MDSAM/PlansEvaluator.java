@@ -22,15 +22,16 @@ package playground.mfeil.MDSAM;
 
 
 
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import java.util.Iterator;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.router.PlansCalcRoute;
@@ -54,7 +55,7 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 	private final String outputFileBiogeme, outputFile, inputFile;
 	private final DepartureDelayAverageCalculator tDepDelayCalc;
 	private final PlansCalcRoute router;
-	private final LegTravelTimeEstimator estimator;
+	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private static final Logger log = Logger.getLogger(PlansEvaluator.class);
 	
 	                      
@@ -66,11 +67,7 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
-		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), this.tDepDelayCalc);
-		this.estimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
-				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
-				PlanomatConfigGroup.RoutingCapability.fixedRoute,
-				this.router);
+		this.legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), this.tDepDelayCalc);
 		
 	}
 	
@@ -101,13 +98,18 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
 				
-				this.estimator.initPlanSpecificInformation(plan);
+				LegTravelTimeEstimator estimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+						plan,
+						PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 
+						PlanomatConfigGroup.RoutingCapability.fixedRoute,
+						this.router);
+				
 				// Start from first leg
 				for (int i=1;i<plan.getPlanElements().size();i++){
 					if (i%2==1){
 						LegImpl leg = ((LegImpl)(plan.getPlanElements().get(i)));
 						leg.setDepartureTime(plan.getPreviousActivity(leg).getEndTime());
-						double travelTime = this.estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), plan.getPreviousActivity(leg).getEndTime(), plan.getPreviousActivity(leg), plan.getNextActivity(leg), leg, false);
+						double travelTime = estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), plan.getPreviousActivity(leg).getEndTime(), plan.getPreviousActivity(leg), plan.getNextActivity(leg), leg, false);
 						leg.setTravelTime(travelTime);
 						leg.setArrivalTime(leg.getDepartureTime()+leg.getTravelTime());
 					}
