@@ -634,7 +634,7 @@ public class Controler {
 	 */
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new StrategyManager();
-		StrategyManagerConfigLoader.load(this, this.config, manager);
+		StrategyManagerConfigLoader.load(this, manager);
 		return manager;
 	}
 
@@ -1090,7 +1090,7 @@ public class Controler {
 	 *         pricing is simulated.
 	 */
 	public final RoadPricing getRoadPricing() {
-		// TODO integrate roadPricing (Scheme) better in scenario 
+		// TODO integrate roadPricing (Scheme) better in scenario
 		return this.roadPricing;
 	}
 
@@ -1185,7 +1185,7 @@ public class Controler {
 	 *         controler config module (if set) to a file in the
 	 *         output-directory  of the current iteration
 	 */
-	public final String getNameForIterationFilename(String filename){
+	public final String getNameForIterationFilename(final String filename){
 		StringBuilder s = new StringBuilder(getIterationPath(iteration));
 		s.append('/');
 		if (this.config.controler().getRunId() != null) {

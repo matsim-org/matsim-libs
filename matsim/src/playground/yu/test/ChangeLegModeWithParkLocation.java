@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package playground.yu.test;
 
@@ -28,7 +28,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
@@ -47,9 +46,9 @@ import playground.yu.utils.io.SimpleWriter;
 
 /**
  * this class contains some codes from ChangeLegMode
- * 
+ *
  * @author ychen
- * 
+ *
  */
 public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 	private final static String CONFIG_MODULE = "changeLegModeWithParkLocation";
@@ -82,11 +81,11 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new ChooseRandomLegModeWithParkLink(availableModes, MatsimRandom
+		return new ChooseRandomLegModeWithParkLink(this.availableModes, MatsimRandom
 				.getLocalInstance());
 	}
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Controler ctl = new ChangeLegModeWithParkLocationControler(args);
 		ctl.addControlerListener(new LegChainModesListener());
 		ctl.setCreateGraphs(false);
@@ -100,17 +99,17 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 
 	private static class ChooseRandomLegModeWithParkLink implements
 			PlanAlgorithm {
-		private TransportMode[] possibleModes;
+		private final TransportMode[] possibleModes;
 
-		private Random rnd;
+		private final Random rnd;
 
-		public ChooseRandomLegModeWithParkLink(TransportMode[] possibleModes,
-				Random rnd) {
+		public ChooseRandomLegModeWithParkLink(final TransportMode[] possibleModes,
+				final Random rnd) {
 			this.possibleModes = possibleModes;
 			this.rnd = rnd;
 		}
 
-		public void run(PlanImpl plan) {
+		public void run(final PlanImpl plan) {
 			List<PlanElement> pes = plan.getPlanElements();
 			int peSize = pes.size();
 			for (int i = 0; i < peSize; i += 2)
@@ -126,14 +125,14 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 					// Idx for leg in PlanElements, whose TransportMode
 					// would be
 					// changed.
-					int legIdx = rnd.nextInt(peSize / 2) * 2 + 1;
+					int legIdx = this.rnd.nextInt(peSize / 2) * 2 + 1;
 
 					TransportMode crtMode = ((LegImpl) copyPlan.getPlanElements()
 							.get(legIdx)).getMode();
 					TransportMode newMode = crtMode;
 					while (newMode.equals(crtMode)) {
-						newMode = possibleModes[rnd
-								.nextInt(possibleModes.length)];
+						newMode = this.possibleModes[this.rnd
+								.nextInt(this.possibleModes.length)];
 					}
 
 					if (crtMode.equals(TransportMode.car)) {
@@ -151,8 +150,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 
 		}
 
-		private boolean changeUnCar2UnCar(PlanImpl plan, int legIdx,
-				TransportMode mode) {
+		private boolean changeUnCar2UnCar(final PlanImpl plan, final int legIdx,
+				final TransportMode mode) {
 			PlanElement pe = plan.getPlanElements().get(legIdx);
 			if (pe != null) {
 				((LegImpl) pe).setMode(mode);
@@ -161,8 +160,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			return false;
 		}
 
-		private boolean changeCar2UnCar(PlanImpl plan, int legIdx,
-				TransportMode mode) {
+		private boolean changeCar2UnCar(final PlanImpl plan, final int legIdx,
+				final TransportMode mode) {
 			CarLegChain clc = new CarLegChain(plan);
 
 			// System.out.println("personId:\t" + personId + "\tcarChain:\t"
@@ -262,21 +261,21 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		 * && setLegMode(plan, i, newMode); } return toReturn; }
 		 */
 
-		private boolean setLegRandomModeWithoutModeA(PlanImpl plan,
-				Tuple<Integer, Integer> tuple, TransportMode modeA) {
+		private boolean setLegRandomModeWithoutModeA(final PlanImpl plan,
+				final Tuple<Integer, Integer> tuple, final TransportMode modeA) {
 			boolean toReturn = true;
 			for (int i = tuple.getFirst() + 1; i < tuple.getSecond(); i += 2) {
-				TransportMode newMode = possibleModes[rnd
-						.nextInt(possibleModes.length)];
+				TransportMode newMode = this.possibleModes[this.rnd
+						.nextInt(this.possibleModes.length)];
 				while (modeA.equals(newMode))
-					newMode = possibleModes[rnd.nextInt(possibleModes.length)];
+					newMode = this.possibleModes[this.rnd.nextInt(this.possibleModes.length)];
 				toReturn = toReturn && setLegMode(plan, i, newMode);
 			}
 			return toReturn;
 		}
 
 		private Tuple<Integer, Integer> getShortestLegTuple(
-				Set<Tuple<Integer, Integer>> legTuples) {
+				final Set<Tuple<Integer, Integer>> legTuples) {
 			List<Tuple<Integer, Integer>> tmpTpls = new ArrayList<Tuple<Integer, Integer>>();
 			int shortestLegActIdxDiff = 10000;
 			if (legTuples.size() > 1) {
@@ -294,7 +293,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 					return tmpTpls.iterator().next();
 				else {
 					int cnt = 0;
-					int rndInt = rnd.nextInt(tmpTpls.size());
+					int rndInt = this.rnd.nextInt(tmpTpls.size());
 					for (Iterator<Tuple<Integer, Integer>> itr = tmpTpls
 							.iterator(); itr.hasNext();) {
 						if (cnt == rndInt)
@@ -307,7 +306,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			return null;
 		}
 
-		private boolean changeUnCar2Car(PlanImpl plan, int legIdx) {
+		private boolean changeUnCar2Car(final PlanImpl plan, final int legIdx) {
 			CarLegChain clc = new CarLegChain(plan);
 			List<PlanElement> pes = plan.getPlanElements();
 			int firstCarActIdx = clc.getFirstActIdx();
@@ -453,8 +452,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			return false;
 		}
 
-		private static boolean setLegChainMode(PlanImpl plan, int leftActIdx,
-				int rightActIdx, TransportMode mode) {
+		private static boolean setLegChainMode(final PlanImpl plan, final int leftActIdx,
+				final int rightActIdx, final TransportMode mode) {
 			if (leftActIdx % 2 != 0 || rightActIdx % 2 != 0 || leftActIdx < 0
 					|| rightActIdx > plan.getPlanElements().size()) {
 				throw new RuntimeException(
@@ -465,8 +464,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			return rightActIdx >= leftActIdx + 2;
 		}
 
-		private static boolean setLegMode(PlanImpl plan, int legIdx,
-				TransportMode mode) {
+		private static boolean setLegMode(final PlanImpl plan, final int legIdx,
+				final TransportMode mode) {
 			List<PlanElement> pes = plan.getPlanElements();
 			int size = pes.size();
 			if (legIdx % 2 == 0 || legIdx < 0 || legIdx > size) {
@@ -480,16 +479,16 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		/*
 		 * private static boolean checkParkSensible(Plan plan) { int carLegCnt =
 		 * 0; Id OrigPark = null, lastNextPark = null;
-		 * 
+		 *
 		 * for (PlanElement pe : plan.getPlanElements()) { if (pe instanceof
 		 * Leg) { Leg leg = (Leg) pe; if
 		 * (leg.getMode().equals(TransportMode.car)) { Id prePark =
 		 * plan.getPreviousActivity(leg).getLinkId(); Id nextPark =
 		 * plan.getNextActivity(leg).getLinkId();
-		 * 
+		 *
 		 * if (carLegCnt == 0) OrigPark = prePark; else if
 		 * (!prePark.equals(lastNextPark)) return false;
-		 * 
+		 *
 		 * lastNextPark = nextPark; carLegCnt++; } } } return
 		 * OrigPark.equals(lastNextPark); }
 		 */
@@ -497,23 +496,24 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 
 	/**
 	 * contains act/ park location information
-	 * 
+	 *
 	 * @author ychen
-	 * 
+	 *
 	 */
 	public static class ParkLocation {
-		private ActivityImpl act;
+		private final ActivityImpl act;
 
 		// private Coord coord=null;
 		// private Link link=null;
 
-		public ParkLocation(ActivityImpl act) {
+		public ParkLocation(final ActivityImpl act) {
 			this.act = act;
 			// coord=act.getCoord();
 			// link=act.getLink();
 		}
 
-		public boolean equals(Object pl) {
+		@Override
+		public boolean equals(final Object pl) {
 			if (pl == null || !(pl instanceof ParkLocation))
 				return false;
 			Coord plCoord = ((ParkLocation) pl).act.getCoord();
@@ -540,6 +540,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			}
 		}
 
+		@Override
 		public int hashCode() {
 			assert false : "hashCode not designed";
 			return 42; // any arbitrary constant will do
@@ -554,18 +555,18 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 	/**
 	 * contains activity indexs of car-leg-chain, e.g. a plan has leg chain:
 	 * car-car-pt-walk-car, then the activity indexs looks like: [0-4, 8-10]
-	 * 
+	 *
 	 * @author ychen
-	 * 
+	 *
 	 */
 	public static class CarLegChain {
 
-		private List<Tuple<Integer, Integer>> actIdxs4CarLegs = new ArrayList<Tuple<Integer, Integer>>();
+		private final List<Tuple<Integer, Integer>> actIdxs4CarLegs = new ArrayList<Tuple<Integer, Integer>>();
 
 		private int firstActIdx = Integer.MIN_VALUE,
 				lastActIdx = Integer.MAX_VALUE;
 
-		public CarLegChain(PlanImpl plan) {
+		public CarLegChain(final PlanImpl plan) {
 			int actIdxA = -1, actIdxB = -1;
 			List<PlanElement> pes = plan.getPlanElements();
 			for (int i = 1; i <= pes.size() - 2; i += 2) {
@@ -575,47 +576,48 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 					actIdxB = i + 1;
 				} else {
 					if (actIdxA != -1)
-						actIdxs4CarLegs.add(new Tuple<Integer, Integer>(
+						this.actIdxs4CarLegs.add(new Tuple<Integer, Integer>(
 								actIdxA, actIdxB));
 					actIdxA = -1;
 				}
 			}
 			if (actIdxA != -1)// if the last leg is a "car" leg
-				actIdxs4CarLegs.add(new Tuple<Integer, Integer>(actIdxA,
+				this.actIdxs4CarLegs.add(new Tuple<Integer, Integer>(actIdxA,
 						actIdxB));
 
-			int actIdxs4CarLegsSize = actIdxs4CarLegs.size();
+			int actIdxs4CarLegsSize = this.actIdxs4CarLegs.size();
 			// System.out.println("----->actIdxs4CarLegsSize: "
 			// + actIdxs4CarLegsSize);
 			if (actIdxs4CarLegsSize > 0) {
-				firstActIdx = actIdxs4CarLegs.get(0).getFirst();
-				lastActIdx = actIdxs4CarLegs.get(actIdxs4CarLegsSize - 1)
+				this.firstActIdx = this.actIdxs4CarLegs.get(0).getFirst();
+				this.lastActIdx = this.actIdxs4CarLegs.get(actIdxs4CarLegsSize - 1)
 						.getSecond();
 			}
 		}
 
 		public List<Tuple<Integer, Integer>> getActIdxs4CarLegs() {
-			return actIdxs4CarLegs;
+			return this.actIdxs4CarLegs;
 		}
 
 		public int getFirstActIdx() {
-			return firstActIdx;
+			return this.firstActIdx;
 		}
 
 		public int getLastActIdx() {
-			return lastActIdx;
+			return this.lastActIdx;
 		}
 	}
 
 	private static class ChangeLegModeWithParkLocationControler extends
 			Controler {
-		public ChangeLegModeWithParkLocationControler(String[] args) {
+		public ChangeLegModeWithParkLocationControler(final String[] args) {
 			super(args);
 		}
 
+		@Override
 		protected StrategyManager loadStrategyManager() {
 			StrategyManager manager = new StrategyManager();
-			StrategyManagerConfigLoader.load(this, this.config, manager);
+			StrategyManagerConfigLoader.load(this, manager);
 
 			manager.setMaxPlansPerAgent(4);
 
@@ -649,14 +651,14 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		private SimpleWriter writer = null;
 		private Set<String> patterns;
 
-		public void notifyStartup(StartupEvent event) {
-			writer = new SimpleWriter(Controler
+		public void notifyStartup(final StartupEvent event) {
+			this.writer = new SimpleWriter(Controler
 					.getOutputFilename("legModesPattern.txt"));
-			writer.writeln("iteration\tlegModesPatterns");
-			patterns = new HashSet<String>();
+			this.writer.writeln("iteration\tlegModesPatterns");
+			this.patterns = new HashSet<String>();
 		}
 
-		public void notifyIterationEnds(IterationEndsEvent event) {
+		public void notifyIterationEnds(final IterationEndsEvent event) {
 			Controler ctl = event.getControler();
 			// int itr = event.getIteration();
 
@@ -670,16 +672,16 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 						legChainModes.append(((LegImpl) pe).getMode() + "|");
 				// writer.writeln(itr + "\t" + legChainModes.toString());
 				// writer.flush();
-				patterns.add(legChainModes.toString());
+				this.patterns.add(legChainModes.toString());
 			}
 		}
 
-		public void notifyShutdown(ShutdownEvent event) {
-			writer.writeln("--------------------------------");
-			for (String s : patterns) {
-				writer.writeln(s);
+		public void notifyShutdown(final ShutdownEvent event) {
+			this.writer.writeln("--------------------------------");
+			for (String s : this.patterns) {
+				this.writer.writeln(s);
 			}
-			writer.close();
+			this.writer.close();
 		}
 	}
 

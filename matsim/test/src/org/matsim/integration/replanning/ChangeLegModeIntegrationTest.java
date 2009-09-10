@@ -78,7 +78,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 //		controler.setFreespeedTravelTimeCost(new FreespeedTravelTimeCost());
 		controler.setLeastCostPathCalculatorFactory(new DijkstraFactory());
 		final StrategyManager manager = new StrategyManager();
-		StrategyManagerConfigLoader.load(controler, config, manager);
+		StrategyManagerConfigLoader.load(controler, manager);
 		manager.run(population);
 
 		// test that everything worked as expected

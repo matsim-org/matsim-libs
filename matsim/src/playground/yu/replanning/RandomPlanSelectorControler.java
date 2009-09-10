@@ -35,7 +35,7 @@ public class RandomPlanSelectorControler extends Controler {
 	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new StrategyManager();
-		StrategyManagerConfigLoader.load(this, config, manager);
+		StrategyManagerConfigLoader.load(this, manager);
 
 		PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
 		manager.addStrategy(strategy, 0.0);

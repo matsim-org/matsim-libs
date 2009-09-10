@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.replanning;
 
@@ -29,9 +29,9 @@ import org.matsim.core.replanning.StrategyManagerConfigLoader;
 
 /**
  * test the effect with "removeOldestPlan"
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class ControlerWithRemoveOldestPlan extends Controler {
 
@@ -45,7 +45,7 @@ public class ControlerWithRemoveOldestPlan extends Controler {
 	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new StrategyManagerWithRemoveOldestPlan();
-		StrategyManagerConfigLoader.load(this, this.config, manager);
+		StrategyManagerConfigLoader.load(this, manager);
 		return manager;
 	}
 

@@ -240,7 +240,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		@Override
 		protected StrategyManager loadStrategyManager() {
 			StrategyManager manager = new StrategyManager();
-			StrategyManagerConfigLoader.load(this, this.config, manager);
+			StrategyManagerConfigLoader.load(this, manager);
 			manager.setMaxPlansPerAgent(5);
 			//
 			// PlanStrategy strategy1 = new PlanStrategy(new
