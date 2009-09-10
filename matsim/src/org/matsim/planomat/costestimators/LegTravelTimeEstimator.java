@@ -21,6 +21,7 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -63,6 +64,12 @@ public interface LegTravelTimeEstimator {
 			ActivityImpl actDestination,
 			LegImpl legIntermediate,
 			boolean doModifyLeg);
+	
+	public LegImpl getNewLeg(
+			TransportMode mode, 
+			ActivityImpl actOrigin,
+			ActivityImpl actDestination,
+			double departureTime);
 	
 	/**
 	 * Override this method to reset plan specific information.

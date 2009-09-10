@@ -42,9 +42,9 @@ import org.matsim.world.Location;
  * Travel times for modes with variable travel times are approximated via a linear interpolation with sampling points at the full hours,
  * based on the travel times approximated by a routing algorithm.
  * 
- * TODO simplify code, especially data structures
- * 
  * @author meisterk
+ * 
+ * @deprecated This class is marked as deprecated because the algorithm has too a long computation time to be useful.
  *
  */
 public class LinearInterpolationLegTravelTimeEstimator implements
@@ -248,6 +248,12 @@ LegTravelTimeEstimator {
 
 		return legTravelTimeEstimation;
 
+	}
+
+	public LegImpl getNewLeg(TransportMode mode, ActivityImpl actOrigin,
+			ActivityImpl actDestination, double departureTime) {
+		// not implemented here
+		return null;
 	}
 
 	public void initPlanSpecificInformation(PlanImpl plan) {

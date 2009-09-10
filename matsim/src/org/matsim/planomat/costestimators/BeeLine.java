@@ -21,6 +21,7 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -34,7 +35,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * of the origin and destination links, at a speed of 20 km/h.
  * 
  * @author meisterk
- *
+ * 
+ * @deprecated This estimator is marked as deprecated because there are better estimators, and it is referenced nowhere.
  */
 public class BeeLine implements LegTravelTimeEstimator {
 	
@@ -62,6 +64,12 @@ public class BeeLine implements LegTravelTimeEstimator {
 
 	public void initPlanSpecificInformation(PlanImpl plan) {
 		// not implemented here
+	}
+
+	public LegImpl getNewLeg(TransportMode mode, ActivityImpl actOrigin,
+			ActivityImpl actDestination, double departureTime) {
+		// not implemented here
+		return null;
 	}
 	
 }

@@ -51,6 +51,9 @@ public class PlanomatConfigGroup extends Module {
 
 	public static enum RoutingCapability {
 		fixedRoute,
+		/**
+		 * @deprecated The related algorithm should not be used because it has too a long computation time to be useful.
+		 */
 		linearInterpolation;
 	}
 

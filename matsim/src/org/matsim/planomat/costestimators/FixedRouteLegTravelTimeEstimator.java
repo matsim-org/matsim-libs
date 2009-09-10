@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -67,6 +66,15 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 
 	}
 
+	public LegImpl getNewLeg(
+			TransportMode mode, 
+			ActivityImpl actOrigin,
+			ActivityImpl actDestination, 
+			double departureTime) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			ActivityImpl actOrigin, ActivityImpl actDestination,
 			LegImpl legIntermediate, boolean doModifyLeg) {
@@ -80,24 +88,37 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 			// if no fixed route is given, generate free speed route for that leg in a lazy manner
 			if (!this.fixedRoutes.containsKey(legIndex)) {
 				
+				LegImpl newLeg = new LegImpl(TransportMode.car);
+				Link startLink = actOrigin.getLink();
+				Link endLink = actDestination.getLink();
+				NetworkRouteWRefs newRoute = (NetworkRouteWRefs) this.plansCalcRoute.getRouteFactory().createRoute(TransportMode.car, startLink, endLink);
+				
 				// calculate free speed route and cache it
 				Path path = this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
 						actOrigin.getLink().getToNode(), 
 						actDestination.getLink().getFromNode(), 
 						0.0);
-				this.fixedRoutes.put(legIndex, path.links);
+//				this.fixedRoutes.put(legIndex, path.links);
+
+				newRoute.setLinks(startLink, path.links, endLink);
+				newLeg.setRoute(newRoute);
 				
+				this.fixedRoutes.put(legIndex, newLeg);
+
 			}
 			
 			double now = departureTime;
 			now = this.processDeparture(actOrigin.getLink(), now);
 
+			NetworkRouteWRefs route = ((NetworkRouteWRefs) this.fixedRoutes.get(legIndex).getRoute());
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-				now = this.processRouteTravelTime(this.fixedRoutes.get(legIndex), now);
+//				now = this.processRouteTravelTime(this.fixedRoutes.get(legIndex), now);
+				now = this.processRouteTravelTime(route.getLinks(), now);
 				now = this.processLink(actDestination.getLink(), now);
 			} else if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
 				now = this.processLink(actOrigin.getLink(), now);
-				now = this.processRouteTravelTime(this.fixedRoutes.get(legIndex), now);
+				now = this.processRouteTravelTime(route.getLinks(), now);
+//				now = this.processRouteTravelTime(this.fixedRoutes.get(legIndex), now);
 			}
 
 			if (doModifyLeg) {
@@ -105,7 +126,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 						TransportMode.car, 
 						actOrigin.getLink(), 
 						actDestination.getLink());
-				networkRoute.setLinks(actOrigin.getLink(), this.fixedRoutes.get(legIndex), actDestination.getLink());
+				networkRoute.setLinks(actOrigin.getLink(), route.getLinks(), actDestination.getLink());
 				legIntermediate.setRoute(networkRoute);
 			}
 			
@@ -169,7 +190,7 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 		this.currentPlan = null;
 	}
 
-	private HashMap<Integer, List<Link>> fixedRoutes = new HashMap<Integer, List<Link>>();
+	private HashMap<Integer, LegImpl> fixedRoutes = new HashMap<Integer, LegImpl>();
 	private PlanImpl currentPlan;
 	
 	public void initPlanSpecificInformation(PlanImpl plan) {
@@ -178,13 +199,13 @@ public class FixedRouteLegTravelTimeEstimator implements LegTravelTimeEstimator 
 		
 		for (PlanElement planElement : plan.getPlanElements()) {
 			
-			if (planElement instanceof BasicLeg) {
+			if (planElement instanceof LegImpl) {
 				
 				LegImpl leg = (LegImpl) planElement;
 				if (leg.getRoute() instanceof NetworkRouteWRefs) {
 					this.fixedRoutes.put(
-							this.currentPlan.getActLegIndex(leg), 
-							((NetworkRouteWRefs) leg.getRoute()).getLinks());
+							this.currentPlan.getActLegIndex(leg),
+							new LegImpl(leg));
 				}
 				
 			}

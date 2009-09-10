@@ -23,6 +23,7 @@ package org.matsim.planomat.costestimators;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
 import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
@@ -31,6 +32,12 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 
+/**
+ * @author meisterk
+ *
+ * @deprecated This estimator is deprecated because it leads to wrong results, and it is referenced nowhere. 
+ * It's (possibly wrong) results were reported in STRC and IATBR papers of 2006.
+ */
 public class MyRecentEventsBasedEstimator
 implements LegTravelTimeEstimator, BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler {
 
@@ -124,6 +131,12 @@ implements LegTravelTimeEstimator, BasicAgentDepartureEventHandler, BasicAgentAr
 			ActivityImpl actOrigin, ActivityImpl actDestination,
 			LegImpl legIntermediate, boolean doModifyLeg) {
 		return this.legTravelTimeEstimations.get(new LegTravelTimeEntry(personId, actOrigin.getLinkId(), actDestination.getLinkId(), "car"));
+	}
+
+	public LegImpl getNewLeg(TransportMode mode, ActivityImpl actOrigin,
+			ActivityImpl actDestination, double departureTime) {
+		// not implemented here
+		return null;
 	}
 
 	public void initPlanSpecificInformation(PlanImpl plan) {
