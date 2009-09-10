@@ -32,6 +32,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -41,6 +42,7 @@ import org.xml.sax.SAXException;
 
 import playground.marcel.pt.config.TransitConfigGroup;
 import playground.marcel.pt.queuesim.TransitQueueSimulation;
+import playground.marcel.pt.replanning.TransitStrategyManagerConfigLoader;
 import playground.marcel.pt.router.PlansCalcTransitRoute;
 import playground.marcel.pt.routes.ExperimentalTransitRouteFactory;
 
@@ -54,8 +56,6 @@ public class TransitControler extends Controler {
 	public TransitControler(final String[] args) {
 		super(args);
 
-		setOverwriteFiles(true); // FIXME [MR] debug only
-
 		this.transitConfig = new TransitConfigGroup();
 		this.config.addModule(TransitConfigGroup.GROUP_NAME, this.transitConfig);
 		this.config.scenario().setUseTransit(true);
@@ -66,12 +66,19 @@ public class TransitControler extends Controler {
 
 		ActivityParams params = new ActivityParams(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE);
 		params.setTypicalDuration(120.0);
-		config.charyparNagelScoring().addActivityParams(params);
-		
+		this.config.charyparNagelScoring().addActivityParams(params);
+
 		this.getNetworkFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
-		
+
 		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
 		addControlerListener(cl);
+	}
+
+	@Override
+	protected StrategyManager loadStrategyManager() {
+		StrategyManager manager = new StrategyManager();
+		TransitStrategyManagerConfigLoader.load(this, this.config, manager);
+		return manager;
 	}
 
 	@Override
