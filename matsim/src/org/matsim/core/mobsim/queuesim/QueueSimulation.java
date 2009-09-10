@@ -124,15 +124,15 @@ public class QueueSimulation {
 	protected Scenario scenario = null;
 
 	private BasicLaneDefinitions laneDefintions;
-	
+
 	/** @see #setTeleportVehicles(boolean) */
 	private boolean teleportVehicles = true;
 	private int cntTeleportVehicle = 0;
 
 	private boolean useActivityDurations = true;
-	
+
 	private QueueSimSignalEngine signalEngine = null;
-	
+
 	/**
 	 * Initialize the QueueSimulation without signal systems
 	 * @param network
@@ -170,10 +170,10 @@ public class QueueSimulation {
 	 * listener to this QueueSimulation instance.
 	 * @param listeners
 	 */
-	public void addQueueSimulationListeners(QueueSimulationListener listener){
+	public void addQueueSimulationListeners(final QueueSimulationListener listener){
 				this.listenerManager.addQueueSimulationListener(listener);
 	}
-	
+
 	/**
 	 * Set the lanes used in the simulation
 	 * @param laneDefs
@@ -309,7 +309,7 @@ public class QueueSimulation {
 //					connect.add(DgOtfLaneReader.class, DgLaneSignalDrawer.class);
 //					// drawer -> layer
 //					connect.add(DgLaneSignalDrawer.class, DgOtfLaneLayer.class);
-//				
+//
 //				}
 				this.snapshotWriters.add(writer);
 			}
@@ -340,7 +340,7 @@ public class QueueSimulation {
 
 		// Initialize Snapshot file
 		this.snapshotPeriod = (int) this.config.simulation().getSnapshotPeriod();
-		
+
 		double startTime = this.config.simulation().getStartTime();
 		this.stopTime = this.config.simulation().getEndTime();
 
@@ -381,7 +381,7 @@ public class QueueSimulation {
 					throw new IllegalStateException(message);
 				}
 				link.createLanes(laneToLink.getLanesList());
-			}	
+			}
 		}
 	}
 
@@ -501,7 +501,7 @@ public class QueueSimulation {
 				driver.teleportToLink(destinationLink);
 
 				getEvents().processEvent(new AgentArrivalEventImpl(now, driver.getPerson(),
-						(LinkImpl)destinationLink, driver.getCurrentLeg()));
+						destinationLink, driver.getCurrentLeg()));
 				driver.legEnds(now);
 			} else break;
 		}
@@ -642,16 +642,16 @@ public class QueueSimulation {
 		return this.scenario;
 	}
 
-	
+
 	public boolean isUseActivityDurations() {
-		return useActivityDurations;
+		return this.useActivityDurations;
 	}
-	
-	public void setUseActivityDurations(boolean useActivityDurations) {
+
+	public void setUseActivityDurations(final boolean useActivityDurations) {
 		this.useActivityDurations = useActivityDurations;
 		log.info("QueueSimulation is working with activity durations: " + this.isUseActivityDurations());
 	}
-	
+
 	public SignalEngine getQueueSimSignalEngine() {
 		return this.signalEngine;
 	}
