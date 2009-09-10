@@ -39,9 +39,8 @@ public class InvalidPtRouteCleaner extends AbstractPersonAlgorithm {
 				if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
 					if (leg.getMode().equals(TransportMode.pt)) {
-						KtiPtRoute route = ((KtiPtRoute) leg.getRoute());
-						if (route.getFromStop() == null) {
-							route = null;
+						if (((KtiPtRoute) leg.getRoute()).getFromStop() == null) {
+							leg.setRoute(null);
 						}
 					}
 				}
