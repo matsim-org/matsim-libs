@@ -65,12 +65,12 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	@Override
 	public double handleLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
 		if (TransportMode.pt.equals(leg.getMode())) {
-			return handleSwissPtLeg(fromAct, leg, toAct);
+			return handleSwissPtLeg(fromAct, leg, toAct, depTime);
 		}
 		return super.handleLeg(leg, fromAct, toAct, depTime);
 	}
 
-	public double handleSwissPtLeg(final ActivityImpl fromAct, final LegImpl leg, final ActivityImpl toAct) {
+	public double handleSwissPtLeg(final ActivityImpl fromAct, final LegImpl leg, final ActivityImpl toAct, final double depTime) {
 		
 		double travelTime = 0.0;
 		
@@ -94,7 +94,10 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		newRoute.setDistance((walkAccessEgressDistance + newRoute.calcInVehicleDistance()));
 		
 		travelTime = walkAccessEgressTime + timeInVehicle;
+		
+		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travelTime);
+		leg.setArrivalTime(depTime + travelTime);
 		
 		return travelTime;
 	}
