@@ -68,13 +68,68 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 		
 	}
 
+	private HashMap<Integer, EnumMap<TransportMode, LegImpl>> fixedRoutes = new HashMap<Integer, EnumMap<TransportMode, LegImpl>>();
+
 	public LegImpl getNewLeg(
 			TransportMode mode, 
 			ActivityImpl actOrigin,
-			ActivityImpl actDestination, 
+			ActivityImpl actDestination,
+			int legPlanElementIndex,
 			double departureTime) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		EnumMap<TransportMode, LegImpl> legInformation = null;
+		if (this.fixedRoutes.containsKey(legPlanElementIndex)) {
+			legInformation = this.fixedRoutes.get(legPlanElementIndex);
+		} else {
+			legInformation = new EnumMap<TransportMode, LegImpl>(TransportMode.class);
+			this.fixedRoutes.put(legPlanElementIndex, legInformation);
+		}
+		
+		LegImpl newLeg = null;
+		if (legInformation.containsKey(mode)) {
+			newLeg = legInformation.get(mode);
+		} else {
+			newLeg = new LegImpl(mode);
+			
+			if (mode.equals(TransportMode.car)) {
+				Link startLink = actOrigin.getLink();
+				Link endLink = actDestination.getLink();
+				NetworkRouteWRefs newRoute = (NetworkRouteWRefs) this.plansCalcRoute.getRouteFactory().createRoute(TransportMode.car, startLink, endLink);
+
+				// calculate free speed route and cache it
+				Path path = this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
+						startLink.getToNode(), 
+						endLink.getFromNode(), 
+						0.0);
+
+				newRoute.setLinks(startLink, path.links, endLink);
+				newLeg.setRoute(newRoute);
+			} else {
+				this.plansCalcRoute.handleLeg(newLeg, actOrigin, actDestination, departureTime);
+			}
+			
+			legInformation.put(mode, newLeg);
+		}
+		
+		if (mode.equals(TransportMode.car)) {
+
+			double now = departureTime;
+			now = this.processDeparture(actOrigin.getLink(), now);
+
+			NetworkRouteWRefs route = ((NetworkRouteWRefs) newLeg.getRoute());
+			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
+				now = this.processRouteTravelTime(route.getLinks(), now);
+				now = this.processLink(actDestination.getLink(), now);
+			} else if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
+				now = this.processLink(actOrigin.getLink(), now);
+				now = this.processRouteTravelTime(route.getLinks(), now);
+			}
+
+			newLeg.setTravelTime(now - departureTime);
+			
+		} 
+
+		return newLeg;
 	}
 
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
@@ -97,8 +152,8 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 
 				// calculate free speed route and cache it
 				Path path = this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
-						actOrigin.getLink().getToNode(), 
-						actDestination.getLink().getFromNode(), 
+						startLink.getToNode(), 
+						endLink.getFromNode(), 
 						0.0);
 
 				newRoute.setLinks(startLink, path.links, endLink);
@@ -172,19 +227,18 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 		return this.getClass().getSimpleName();
 	}
 
-	private HashMap<Integer, EnumMap<TransportMode, LegImpl>> fixedRoutes = new HashMap<Integer, EnumMap<TransportMode, LegImpl>>();
-
 	private void initPlanSpecificInformation() {
 
 		if (this.plan != null) {
 			for (PlanElement planElement : this.plan.getPlanElements()) {
 				if (planElement instanceof LegImpl) {
 					LegImpl leg = (LegImpl) planElement;
+					// TODO this should be possible for all types of routes. Then we could cache e.g. the original pt routes, too.
+					// however, LegImpl cloning constructor does not yet handle generic routes correctly
 					if (leg.getRoute() instanceof NetworkRouteWRefs) {
 						EnumMap<TransportMode, LegImpl> legInformation = new EnumMap<TransportMode, LegImpl>(TransportMode.class);
 						legInformation.put(leg.getMode(), new LegImpl(leg));
-						this.fixedRoutes.put(this.plan.getActLegIndex(leg),
-								legInformation);
+						this.fixedRoutes.put(this.plan.getActLegIndex(leg), legInformation);
 					}
 				}
 			}

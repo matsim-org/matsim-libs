@@ -133,8 +133,12 @@ implements LegTravelTimeEstimator, BasicAgentDepartureEventHandler, BasicAgentAr
 		return this.legTravelTimeEstimations.get(new LegTravelTimeEntry(personId, actOrigin.getLinkId(), actDestination.getLinkId(), "car"));
 	}
 
-	public LegImpl getNewLeg(TransportMode mode, ActivityImpl actOrigin,
-			ActivityImpl actDestination, double departureTime) {
+	public LegImpl getNewLeg(
+			TransportMode mode, 
+			ActivityImpl actOrigin,
+			ActivityImpl actDestination,
+			int legPlanElementIndex,
+			double departureTime) {
 		// not implemented here
 		return null;
 	}

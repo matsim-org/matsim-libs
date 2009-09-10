@@ -128,8 +128,6 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 					PlanomatConfigGroup.RoutingCapability.fixedRoute,
 					plansCalcRoute);
 			
-//			testee.initPlanSpecificInformation(this.testPlan);
-			
 			EventsImpl events = new EventsImpl();
 			events.addHandler(tDepDelayCalc);
 			events.addHandler(linkTravelTimeEstimator);
@@ -141,13 +139,12 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			// let's test a route without events first
 			// should result in free speed travel time, without departure delay
 			double departureTime = Time.parseTime("06:03:00");
-			double legTravelTime = testee.getLegTravelTimeEstimation(
-					testPerson.getId(),
-					departureTime,
-					originAct,
-					destinationAct,
-					testLeg,
-					false);
+			
+			LegImpl newLeg = null;
+			newLeg = testee.getNewLeg(testLeg.getMode(), originAct, destinationAct, this.testPlan.getActLegIndex(testLeg), departureTime);
+
+			double legTravelTime = 0.0;
+			legTravelTime = newLeg.getTravelTime();
 
 			double expectedLegEndTime = departureTime;
 
@@ -175,13 +172,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				events.processEvent(event);
 			}
 
-			legTravelTime = testee.getLegTravelTimeEstimation(
-					TEST_PERSON_ID,
-					departureTime,
-					originAct,
-					destinationAct,
-					testLeg,
-					false);
+			newLeg = testee.getNewLeg(testLeg.getMode(), originAct, destinationAct, this.testPlan.getActLegIndex(testLeg), departureTime);
+			legTravelTime = newLeg.getTravelTime();
 
 			expectedLegEndTime = departureTime;
 			expectedLegEndTime += depDelay;
@@ -221,13 +213,10 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			}
 
 			departureTime = Time.parseTime("06:10:00");
-			legTravelTime = testee.getLegTravelTimeEstimation(
-					TEST_PERSON_ID,
-					departureTime,
-					originAct,
-					destinationAct,
-					testLeg,
-					false);
+			
+			newLeg = testee.getNewLeg(testLeg.getMode(), originAct, destinationAct, this.testPlan.getActLegIndex(testLeg), departureTime);
+			legTravelTime = newLeg.getTravelTime();
+
 			expectedLegEndTime = departureTime;
 			expectedLegEndTime += depDelay;
 
@@ -244,16 +233,9 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			// test public transport mode
 			departureTime = Time.parseTime("06:10:00");
 			
-			LegImpl ptLeg = new LegImpl(this.testLeg);
+			newLeg = testee.getNewLeg(TransportMode.pt, originAct, destinationAct, this.testPlan.getActLegIndex(testLeg), departureTime);
+			legTravelTime = newLeg.getTravelTime();
 			
-			ptLeg.setMode(TransportMode.pt);
-			legTravelTime = testee.getLegTravelTimeEstimation(
-					TEST_PERSON_ID,
-					departureTime,
-					originAct,
-					destinationAct,
-					ptLeg,
-					false);
 			// the free speed travel time from h to w in equil-test, as simulated by Cetin, is 15 minutes
 			expectedLegEndTime = departureTime + (2 * Time.parseTime("00:15:00"));
 

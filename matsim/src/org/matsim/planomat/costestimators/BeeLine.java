@@ -66,8 +66,12 @@ public class BeeLine implements LegTravelTimeEstimator {
 		// not implemented here
 	}
 
-	public LegImpl getNewLeg(TransportMode mode, ActivityImpl actOrigin,
-			ActivityImpl actDestination, double departureTime) {
+	public LegImpl getNewLeg(
+			TransportMode mode, 
+			ActivityImpl actOrigin,
+			ActivityImpl actDestination, 
+			int legPlanElementIndex,
+			double departureTime) {
 		// not implemented here
 		return null;
 	}

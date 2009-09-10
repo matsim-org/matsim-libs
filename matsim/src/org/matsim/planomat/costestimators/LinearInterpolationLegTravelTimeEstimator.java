@@ -251,7 +251,7 @@ LegTravelTimeEstimator {
 	}
 
 	public LegImpl getNewLeg(TransportMode mode, ActivityImpl actOrigin,
-			ActivityImpl actDestination, double departureTime) {
+			ActivityImpl actDestination, int legPlanElementIndex, double departureTime) {
 		// not implemented here
 		return null;
 	}

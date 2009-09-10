@@ -40,8 +40,12 @@ public abstract class AbstractLegTravelTimeEstimator implements
 			ActivityImpl actOrigin, ActivityImpl actDestination,
 			LegImpl legIntermediate, boolean doModifyLeg);
 
-	public abstract LegImpl getNewLeg(TransportMode mode, ActivityImpl actOrigin,
-			ActivityImpl actDestination, double departureTime);
+	public abstract LegImpl getNewLeg(
+			TransportMode mode, 
+			ActivityImpl actOrigin,
+			ActivityImpl actDestination, 
+			int legPlanElementIndex,
+			double departureTime);
 
 //	public abstract void initPlanSpecificInformation(PlanImpl plan);
 //	

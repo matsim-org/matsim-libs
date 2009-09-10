@@ -68,6 +68,7 @@ public interface LegTravelTimeEstimator {
 			TransportMode mode, 
 			ActivityImpl actOrigin,
 			ActivityImpl actDestination,
+			int legPlanElementIndex,
 			double departureTime);
 	
 	/**
