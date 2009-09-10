@@ -21,7 +21,6 @@
 package org.matsim.examples;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -52,7 +51,7 @@ public class PlanomatRunTest extends MatsimTestCase {
 	 * checksums of actual test results are not stable even in repeated runs of this test on one machine 
 	 */
 	public void testMainCarPt() {
-//		this.runControlerTest(this.config); // commented this out because I don't really like non-deterministic tests. kai, aug09
+		this.runControlerTest(this.config); // commented this out because I don't really like non-deterministic tests. kai, aug09
 	}
 
 	private void runControlerTest(final Config config) {

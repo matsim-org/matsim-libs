@@ -20,6 +20,7 @@
 
 package org.matsim.planomat.costestimators;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 
@@ -63,9 +64,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 		this.plansCalcRoute = plansCalcRoute;
 		this.simLegInterpretation = simLegInterpretation;
 
-		if (plan != null) {
-			this.initPlanSpecificInformation(plan);
-		}
+		this.initPlanSpecificInformation();
 		
 	}
 
@@ -105,7 +104,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 				newRoute.setLinks(startLink, path.links, endLink);
 				newLeg.setRoute(newRoute);
 
-				HashMap<TransportMode, LegImpl> legInformation = new HashMap<TransportMode, LegImpl>();
+				EnumMap<TransportMode, LegImpl> legInformation = new EnumMap<TransportMode, LegImpl>(TransportMode.class);
 				legInformation.put(legIntermediate.getMode(), newLeg);
 
 				this.fixedRoutes.put(legIndex, legInformation);
@@ -173,25 +172,20 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 		return this.getClass().getSimpleName();
 	}
 
-//	public void resetPlanSpecificInformation() {
-//		this.fixedRoutes.clear();
-////		this.currentPlan = null;
-//	}
+	private HashMap<Integer, EnumMap<TransportMode, LegImpl>> fixedRoutes = new HashMap<Integer, EnumMap<TransportMode, LegImpl>>();
 
-	private HashMap<Integer, HashMap<TransportMode, LegImpl>> fixedRoutes = new HashMap<Integer, HashMap<TransportMode, LegImpl>>();
-//	private PlanImpl currentPlan;
+	private void initPlanSpecificInformation() {
 
-	private void initPlanSpecificInformation(PlanImpl plan) {
-
-//		this.currentPlan = plan;
-
-		for (PlanElement planElement : plan.getPlanElements()) {
-			if (planElement instanceof LegImpl) {
-				LegImpl leg = (LegImpl) planElement;
-				if (leg.getRoute() instanceof NetworkRouteWRefs) {
-					HashMap<TransportMode, LegImpl> legInformation = new HashMap<TransportMode, LegImpl>();
-					legInformation.put(leg.getMode(), new LegImpl(leg));
-					this.fixedRoutes.put(this.plan.getActLegIndex(leg), legInformation);
+		if (this.plan != null) {
+			for (PlanElement planElement : this.plan.getPlanElements()) {
+				if (planElement instanceof LegImpl) {
+					LegImpl leg = (LegImpl) planElement;
+					if (leg.getRoute() instanceof NetworkRouteWRefs) {
+						EnumMap<TransportMode, LegImpl> legInformation = new EnumMap<TransportMode, LegImpl>(TransportMode.class);
+						legInformation.put(leg.getMode(), new LegImpl(leg));
+						this.fixedRoutes.put(this.plan.getActLegIndex(leg),
+								legInformation);
+					}
 				}
 			}
 		}
