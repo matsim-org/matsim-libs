@@ -100,14 +100,19 @@ public class UnweightedDijkstra<V extends Vertex> {
 				dvertex.setSettled(true);
 				reachedVertices.add(dvertex);
 				
-				int cnt = dvertex.getNeighbours().size();
+//				int cnt = dvertex.getNeighbours().size();
+				int cnt = dvertex.getEdges().size();
 				for(int i = 0; i < cnt; i++) {
+					EdgeDecorator<Edge> egde = (EdgeDecorator<Edge>) dvertex.getEdges().get(i);
+//					Vertex neighbour = egde.getOpposite(dvertex);
 					Vertex neighbour = dvertex.getNeighbours().get(i);
+					
 					DijkstraVertex dneighbour = (DijkstraVertex)neighbour;
 					if(!dneighbour.isSettled()) {
 						int d = dvertex.getDistance() + 1; 
 						if(d < dneighbour.getDistance()) {
-							dneighbour.setPredecessor(dvertex);
+							dneighbour.setPrecedingVertex(dvertex);
+							dneighbour.setPrecedingEdge(egde);
 							dneighbour.setDistance(d);
 							if(dneighbour.isVisited())
 								unsettledVertices.remove(neighbour);
@@ -117,7 +122,8 @@ public class UnweightedDijkstra<V extends Vertex> {
 							unsettledVertices.add(dneighbour);
 							
 						} else if(d == dneighbour.getDistance()) {
-							dneighbour.addPredecessor(dvertex);
+							dneighbour.addPrecedingVertex(dvertex);
+							dneighbour.addPrecedingEdge(egde);
 						}
 					}
 				}
@@ -150,14 +156,14 @@ public class UnweightedDijkstra<V extends Vertex> {
 			return path;
 		
 		DijkstraVertex v = projection.getVertex(target);
-		if(v.getPredecessors().length == 0)
+		if(v.getPrecedingVertices().length == 0)
 			return null;
 		
 		DijkstraVertex dsource = projection.getVertex(source);
 		while(v != dsource) {
 			path.addFirst(v.getDelegate());
-			if(v.getPredecessors().length > 0)
-				v = v.getPredecessors()[0];
+			if(v.getPrecedingVertices().length > 0)
+				v = v.getPrecedingVertices()[0];
 			else
 				return null;
 		}
@@ -213,7 +219,9 @@ public class UnweightedDijkstra<V extends Vertex> {
 
 		private int distance;
 
-		private DijkstraVertex[] predecessors;
+		private DijkstraVertex[] precedingNodes;
+		
+		private EdgeDecorator<Edge>[] precedingLinks;
 
 		/**
 		 * Creates a new DijkstraVertex.
@@ -267,32 +275,51 @@ public class UnweightedDijkstra<V extends Vertex> {
 		 * 
 		 * @return an array of predecessors of this vertex.
 		 */
-		public DijkstraVertex[] getPredecessors() {
-			return predecessors;
+		public DijkstraVertex[] getPrecedingVertices() {
+			return precedingNodes;
+		}
+		
+		public EdgeDecorator<?>[] getPrecedingEdges() {
+			return precedingLinks;
 		}
 
 		@SuppressWarnings("unchecked")
-		private void setPredecessor(DijkstraVertex v) {
-			if (predecessors.length != 1)
-				predecessors = new UnweightedDijkstra.DijkstraVertex[1];
-			predecessors[0] = v;
+		private void setPrecedingVertex(DijkstraVertex v) {
+			if (precedingNodes.length != 1)
+				precedingNodes = new UnweightedDijkstra.DijkstraVertex[1];
+			precedingNodes[0] = v;
 		}
 
 		@SuppressWarnings("unchecked")
-		private void addPredecessor(DijkstraVertex v) {
-			DijkstraVertex[] newPredecessors = new UnweightedDijkstra.DijkstraVertex[predecessors.length + 1];
-			for (int i = 0; i < predecessors.length; i++)
-				newPredecessors[i] = predecessors[i];
-			newPredecessors[predecessors.length] = v;
-			predecessors = newPredecessors;
+		private void addPrecedingVertex(DijkstraVertex v) {
+			DijkstraVertex[] newPredecessors = new UnweightedDijkstra.DijkstraVertex[precedingNodes.length + 1];
+			for (int i = 0; i < precedingNodes.length; i++)
+				newPredecessors[i] = precedingNodes[i];
+			newPredecessors[precedingNodes.length] = v;
+			precedingNodes = newPredecessors;
+		}
+		
+		private void setPrecedingEdge(EdgeDecorator<Edge>  e) {
+			if( precedingLinks.length != 1)
+				precedingLinks = new EdgeDecorator[1];
+			precedingLinks[0] = e;
 		}
 
+		private void addPrecedingEdge(EdgeDecorator<Edge> e) {
+			EdgeDecorator<Edge>[] newPredecessors = new EdgeDecorator[precedingLinks.length + 1];
+			for (int i = 0; i < precedingLinks.length; i++)
+				newPredecessors[i] = precedingLinks[i];
+			newPredecessors[precedingLinks.length] = e;
+			precedingLinks = newPredecessors;
+		}
+		
 		@SuppressWarnings("unchecked")
 		private void reset() {
 			isSettled = false;
 			isVisited = false;
 			distance = Integer.MAX_VALUE;
-			predecessors = new UnweightedDijkstra.DijkstraVertex[0];
+			precedingNodes = new UnweightedDijkstra.DijkstraVertex[0];
+			precedingLinks = new EdgeDecorator[0];
 		}
 
 		/**

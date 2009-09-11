@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityImpl.java
+ * KMLCommunityStlyle.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,57 +17,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.plans.view.impl;
+package playground.johannes.socialnetworks.graph.spatial.io;
 
-import org.matsim.api.core.v01.network.Link;
+import gnu.trove.TDoubleObjectHashMap;
+import gnu.trove.TObjectDoubleHashMap;
 
-import playground.johannes.plans.plain.impl.PlainActivityImpl;
-import playground.johannes.plans.view.Activity;
-import playground.johannes.plans.view.Facility;
+import java.util.Set;
+
+import net.opengis.kml._2.LinkType;
+import playground.johannes.socialnetworks.graph.Graph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class ActivityView extends PlanElementView<PlainActivityImpl> implements Activity {
+public class KMLCommunityStlyle <G extends Graph, V extends SpatialVertex> extends KMLVertexColorStyle<G, V> {
+
+	private Set<Set<V>> clusters;
 	
-	public ActivityView(PlainActivityImpl rawAct) {
-		super(rawAct);
-	}
-
-	public Facility getFacility() {
-		return IdMapping.getFacility(delegate.getFacilityId());
-	}
-
-	public void setFacility(Facility facility) {
-		delegate.setFacilityId(facility.getId());
+	private TObjectDoubleHashMap<V> values = new TObjectDoubleHashMap<V>();
+	
+	private static final String VERTEX_STYLE_PREFIX = "vertex.style.";
+	
+	public KMLCommunityStlyle(LinkType vertexIconLink, Set<Set<V>> clusters) {
+		super(vertexIconLink);
+		this.clusters = clusters;
 	}
 
 	@Override
-	protected void update() {
+	protected double getValue(V vertex) {
+		return values.get(vertex);
 	}
 
-	public Link getLink() {
-		Facility f = getFacility();
-		if(f != null) {
-			return f.getLink();
-		} else
-			return IdMapping.getLink(delegate.getLinkId());
-	}
-
-	public String getType() {
-		return delegate.getType();
-	}
-
-	public void setLink(Link link) {
-		if(getFacility() == null)
-			delegate.setLinkId(link.getId());
-		else
-			throw new UnsupportedOperationException("Link can only be modified via the facility.");
-	}
-
-	public void setType(String type) {
-		delegate.setType(type);
+	@Override
+	protected TDoubleObjectHashMap<String> getValues(G graph) {
+		TDoubleObjectHashMap<String> styles = new TDoubleObjectHashMap<String>();
+		
+		double value = 20;
+		for(Set<V> cluster : clusters) {
+			for(V vertex : cluster) {
+				values.put(vertex, value);
+			}
+			value--;
+			value = Math.max(value, 0);
+			
+			styles.put(value, VERTEX_STYLE_PREFIX+value);
+		}
+		
+		return styles;
 	}
 
 }

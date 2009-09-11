@@ -41,8 +41,10 @@ public abstract class AbstractView <T extends ModCount> {
 	}
 	
 	protected void synchronize() {
-		if(delegate.getModCount() > delegateVersion)
+		if(delegate.getModCount() > delegateVersion) {
 			update();
+			delegateVersion = delegate.getModCount();
+		}
 	}
 	
 	protected abstract void update();
@@ -59,15 +61,17 @@ public abstract class AbstractView <T extends ModCount> {
 		for(S e : source) {
 //			if(removedElements.contains(e))
 			boolean contains = false;
+			V element = null;
 			for(V e2 : removedElements) {
 				if(e2.getDelegate().equals(e)) {
 					contains = true;
+					element = e2;
 					break;
 				}
 					
 			}
 			if(contains)
-				removedElements.remove(e);
+				removedElements.remove(element);
 			else
 				newElements.add(e);
 		}

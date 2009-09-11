@@ -102,10 +102,10 @@ public class Partitions {
 	 * @return a sorted set containing the disconnected components descending in
 	 *         size. A component is represented through a set of its vertices.
 	 */
-	public static SortedSet<Set<Vertex>> disconnectedComponents(Graph g) {
-		UnweightedDijkstra<Vertex> dijkstra = new UnweightedDijkstra<Vertex>(g);
-		Queue<Vertex> vertices = new LinkedList<Vertex>(g.getVertices());
-		SortedSet<Set<Vertex>> components = new TreeSet<Set<Vertex>>(new Comparator<Collection<?>>() {
+	public static <V extends Vertex> SortedSet<Set<V>> disconnectedComponents(Graph g) {
+		UnweightedDijkstra<V> dijkstra = new UnweightedDijkstra<V>(g);
+		Queue<V> vertices = new LinkedList<V>((Collection<? extends V>) g.getVertices());
+		SortedSet<Set<V>> components = new TreeSet<Set<V>>(new Comparator<Collection<?>>() {
 			public int compare(Collection<?> o1, Collection<?> o2) {
 				int result = o2.size() - o1.size();
 				if(result == 0) {
@@ -122,17 +122,17 @@ public class Partitions {
 			}
 		});
 		
-		Vertex v;
+		V v;
 		while((v = vertices.poll()) != null) {
-			List<? extends VertexDecorator<Vertex>> component = dijkstra.run(v);
-			Set<Vertex> componentPlain = new HashSet<Vertex>();
+			List<? extends VertexDecorator<V>> component = dijkstra.run(v);
+			Set<V> componentPlain = new HashSet<V>();
 			int cnt = component.size();
 			for(int i = 0; i < cnt; i++) {
 				vertices.remove(component.get(i).getDelegate());
 				componentPlain.add(component.get(i).getDelegate());
 			}
 			componentPlain.add(v);
-			components.add(new HashSet<Vertex>(componentPlain));
+			components.add(new HashSet<V>(componentPlain));
 		}
 		
 		return components;
@@ -187,4 +187,6 @@ public class Partitions {
 		
 		return subGraphs;
 	}
+	
+	
 }

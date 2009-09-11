@@ -21,7 +21,7 @@ package playground.johannes.plans.view.impl;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
@@ -37,7 +37,7 @@ import playground.johannes.plans.view.Population;
  */
 public class PopulationView extends AbstractView<PlainPopulationImpl> implements Population {
 
-	private Map<Id, PersonView> persons = new HashMap<Id, PersonView>();
+	private Map<Id, PersonView> persons = new LinkedHashMap<Id, PersonView>();
 	
 	private Map<Id, PersonView> unmodifiablePersons;
 	
@@ -53,6 +53,7 @@ public class PopulationView extends AbstractView<PlainPopulationImpl> implements
 	
 	@Override
 	protected void update() {
+		System.err.println("Updated called");
 		Collection<? extends PlainPersonImpl> newPersons = synchronizeCollections(delegate.getPersons().values(), persons.values());
 		
 		for(PlainPersonImpl p : newPersons) {
@@ -62,14 +63,24 @@ public class PopulationView extends AbstractView<PlainPopulationImpl> implements
 	}
 
 	public void addPerson(Person person) {
-		delegate.addPerson(((PersonView) person).getDelegate());
-		persons.put(person.getId(), (PersonView) person);
+//		if(delegateVersion == delegate.getModCount()) {
+//			delegate.addPerson(((PersonView) person).getDelegate());
+//			persons.put(person.getId(), (PersonView) person);
+//			delegateVersion = delegate.getModCount();
+//		} else {
+			delegate.addPerson(((PersonView) person).getDelegate());
+			persons.put(person.getId(), (PersonView) person);
+//		}
 	}
 
 	public void removePerson(Person person) {
 		delegate.removePerson(((PersonView) person).getDelegate());
-		persons.remove(person);
+		persons.remove(person.getId());
 	}
 	
+	public void removePerson(Id id) {
+		delegate.removePerson(id);
+		persons.remove(id);
+	}
 	
 }

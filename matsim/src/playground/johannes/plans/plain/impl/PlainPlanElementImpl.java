@@ -27,13 +27,13 @@ import playground.johannes.plans.plain.PlainPlanElement;
  */
 public class PlainPlanElementImpl extends AbstractModifiable implements PlainPlanElement {
 
-	private double endTime;
+	private Double endTime;
 	
 	public double getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(double endTime) {
+	public void setEndTime(Double endTime) {
 		this.endTime = endTime;
 		modified();
 	}

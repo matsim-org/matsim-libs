@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityImpl.java
+ * PlainPopulationBuilderImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,57 +17,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.plans.view.impl;
+package playground.johannes.plans.plain.impl;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.basic.v01.Id;
 
-import playground.johannes.plans.plain.impl.PlainActivityImpl;
-import playground.johannes.plans.view.Activity;
-import playground.johannes.plans.view.Facility;
+import playground.johannes.plans.plain.PlainActivity;
+import playground.johannes.plans.plain.PlainLeg;
+import playground.johannes.plans.plain.PlainPerson;
+import playground.johannes.plans.plain.PlainPlan;
+import playground.johannes.plans.plain.PlainPopulation;
+import playground.johannes.plans.plain.PlainPopulationBuilder;
+import playground.johannes.plans.plain.PlainRoute;
 
 /**
  * @author illenberger
  *
  */
-public class ActivityView extends PlanElementView<PlainActivityImpl> implements Activity {
-	
-	public ActivityView(PlainActivityImpl rawAct) {
-		super(rawAct);
+public class PlainPopulationBuilderImpl implements PlainPopulationBuilder {
+
+	public PlainActivity createActivity() {
+		return new PlainActivityImpl();
 	}
 
-	public Facility getFacility() {
-		return IdMapping.getFacility(delegate.getFacilityId());
+	public PlainLeg createLeg() {
+		return new PlainLegImpl();
 	}
 
-	public void setFacility(Facility facility) {
-		delegate.setFacilityId(facility.getId());
+	public PlainPerson createPerson(Id id) {
+		return new PlainPersonImpl(id);
 	}
 
-	@Override
-	protected void update() {
+	public PlainPlan createPlan() {
+		return new PlainPlanImpl();
 	}
 
-	public Link getLink() {
-		Facility f = getFacility();
-		if(f != null) {
-			return f.getLink();
-		} else
-			return IdMapping.getLink(delegate.getLinkId());
+	public PlainPopulation createPopulation() {
+		return new PlainPopulationImpl();
 	}
 
-	public String getType() {
-		return delegate.getType();
-	}
-
-	public void setLink(Link link) {
-		if(getFacility() == null)
-			delegate.setLinkId(link.getId());
-		else
-			throw new UnsupportedOperationException("Link can only be modified via the facility.");
-	}
-
-	public void setType(String type) {
-		delegate.setType(type);
+	public PlainRoute createRoute() {
+		return new PlainRouteImpl();
 	}
 
 }

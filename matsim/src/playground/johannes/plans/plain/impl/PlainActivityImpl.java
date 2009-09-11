@@ -29,8 +29,23 @@ import playground.johannes.plans.plain.PlainActivity;
  */
 public class PlainActivityImpl extends PlainPlanElementImpl implements PlainActivity {
 
+//	public static final List<String> ACTIVITY_TYPES = new ArrayList<String>();
+	
+	private Id linkId;
+	
 	private Id facilityId;
+	
+	private String type;
 
+	public Id getLinkId() {
+		return linkId;
+	}
+	
+	public void setLinkId(Id id) {
+		linkId = id;
+		modified();
+	}
+	
 	public Id getFacilityId() {
 		return facilityId;
 	}
@@ -40,5 +55,13 @@ public class PlainActivityImpl extends PlainPlanElementImpl implements PlainActi
 		modified();
 	}
 
+	public String getType() {
+		return type;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
+		modified();
+	}
 
 }

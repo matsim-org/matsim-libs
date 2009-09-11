@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityImpl.java
+ * IdMapping.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,55 +19,43 @@
  * *********************************************************************** */
 package playground.johannes.plans.view.impl;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 
-import playground.johannes.plans.plain.impl.PlainActivityImpl;
-import playground.johannes.plans.view.Activity;
 import playground.johannes.plans.view.Facility;
 
 /**
  * @author illenberger
  *
  */
-public class ActivityView extends PlanElementView<PlainActivityImpl> implements Activity {
+public class IdMapping {
+
+	public static Network network;
 	
-	public ActivityView(PlainActivityImpl rawAct) {
-		super(rawAct);
+	public static Node getNode(Id id) {
+		return network.getNodes().get(id);
 	}
-
-	public Facility getFacility() {
-		return IdMapping.getFacility(delegate.getFacilityId());
+	
+	public static Id getId(Node node) {
+		return node.getId();
 	}
-
-	public void setFacility(Facility facility) {
-		delegate.setFacilityId(facility.getId());
+	
+	public static Link getLink(Id id) {
+		return network.getLinks().get(id);
 	}
-
-	@Override
-	protected void update() {
+	
+	public static Id getId(Link link) {
+		return link.getId();
 	}
-
-	public Link getLink() {
-		Facility f = getFacility();
-		if(f != null) {
-			return f.getLink();
-		} else
-			return IdMapping.getLink(delegate.getLinkId());
+	
+	public static Facility getFacility(Id id) {
+		return null;
 	}
-
-	public String getType() {
-		return delegate.getType();
+	
+	public static Id getId(Facility facility) {
+		return null;
 	}
-
-	public void setLink(Link link) {
-		if(getFacility() == null)
-			delegate.setLinkId(link.getId());
-		else
-			throw new UnsupportedOperationException("Link can only be modified via the facility.");
-	}
-
-	public void setType(String type) {
-		delegate.setType(type);
-	}
-
+	
 }

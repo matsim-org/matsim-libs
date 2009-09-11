@@ -49,7 +49,11 @@ public class LegView extends PlanElementView<PlainLegImpl> implements Leg {
 
 	@Override
 	protected void update() {
-		route = new RouteView(delegate.getRoute());
+//		route = new RouteView(delegate.getRoute());
+		if(route == null)
+			route = new RouteView(delegate.getRoute());
+		else
+			route.update();
 	}
 
 	public TransportMode getMode() {

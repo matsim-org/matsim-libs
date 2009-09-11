@@ -37,7 +37,7 @@ import playground.johannes.plans.view.PlanElement;
  */
 public class PlanView extends AbstractView<PlainPlanImpl> implements Plan {
 
-	private List<PlanElementView<?>> planElements = new ArrayList<PlanElementView<?>>();
+	private ArrayList<PlanElementView<?>> planElements = new ArrayList<PlanElementView<?>>(0);
 
 	private List<PlanElementView<?>> unmodifiabelElements;
 	
@@ -59,6 +59,7 @@ public class PlanView extends AbstractView<PlainPlanImpl> implements Plan {
 			}
 			planElements.add(view);
 		}
+		planElements.trimToSize();
 	}
 
 	public void addPlanElement(PlanElement element) {
@@ -67,6 +68,7 @@ public class PlanView extends AbstractView<PlainPlanImpl> implements Plan {
 	}
 
 	public List<? extends PlanElement> getPlanElements() {
+		synchronize();
 		return unmodifiabelElements;
 	}
 

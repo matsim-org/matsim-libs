@@ -26,9 +26,17 @@ import org.matsim.api.basic.v01.Id;
  *
  */
 public interface PlainActivity extends PlainPlanElement {
+	
+	public Id getLinkId();
+	
+	public void setLinkId(Id id);
 
 	public Id getFacilityId();
 	
 	public void setFacilityId(Id id);
+	
+	public String getType();
+	
+	public void setType(String type);
 	
 }

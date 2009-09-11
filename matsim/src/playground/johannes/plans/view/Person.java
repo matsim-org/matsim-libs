@@ -36,5 +36,9 @@ public interface Person {
 	public void addPlan(Plan plan);
 	
 	public void removePlan(Plan plan);
+
+	public Plan getSelectedPlan();
+	
+	public void setSelectedPlan(Plan plan);
 	
 }

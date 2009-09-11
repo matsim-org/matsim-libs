@@ -35,4 +35,6 @@ public interface PlainPopulation {
 	
 	public void removePerson(PlainPerson person);
 	
+	public void removePerson(Id id);
+	
 }

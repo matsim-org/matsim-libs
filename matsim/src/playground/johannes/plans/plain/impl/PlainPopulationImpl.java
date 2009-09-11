@@ -53,7 +53,12 @@ public class PlainPopulationImpl extends AbstractModifiable implements PlainPopu
 	}
 
 	public void removePerson(PlainPerson person) {
-		persons.remove((PlainPersonImpl) person);
+		persons.remove(person.getId());
+		modified();
+	}
+	
+	public void removePerson(Id id) {
+		persons.remove(id);
 		modified();
 	}
 }

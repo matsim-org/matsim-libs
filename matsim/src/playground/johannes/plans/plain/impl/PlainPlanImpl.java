@@ -32,7 +32,7 @@ import playground.johannes.plans.plain.PlainPlanElement;
  */
 public class PlainPlanImpl extends AbstractModifiable implements PlainPlan {
 	
-	private List<PlainPlanElementImpl> elements;
+	private ArrayList<PlainPlanElementImpl> elements;
 
 	private List<PlainPlanElementImpl> unmodifiableElements;
 	
@@ -45,11 +45,13 @@ public class PlainPlanImpl extends AbstractModifiable implements PlainPlan {
 	
 	public void addPlanElement(PlainPlanElement element) {
 		elements.add((PlainPlanElementImpl) element);
+		elements.trimToSize();
 		modified();
 	}
 
 	public List<? extends PlainPlanElementImpl> getPlanElements() {
 		return unmodifiableElements;
+//		return elements;
 	}
 
 	public Double getScore() {

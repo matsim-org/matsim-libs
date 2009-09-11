@@ -135,4 +135,13 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<BasicPe
 		
 //		Distribution.writeHistogram(colorizer.distribution.absoluteDistribution(), "/Users/fearonni/vsp-work/runs-svn/run669/sorces.hist");
 	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle#getValue(playground.johannes.socialnetworks.graph.Vertex)
+	 */
+	@Override
+	protected double getValue(Ego<BasicPerson<?>> vertex) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

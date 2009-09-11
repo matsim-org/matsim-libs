@@ -29,8 +29,8 @@ import org.matsim.api.basic.v01.Id;
  */
 public interface PlainRoute {
 
-	public List<Id> getLinkIds();
+	public List<Id> getNodeIds();
 	
-	public void setLinkIds(List<Id> linkIds);
+	public void setNodeIds(List<Id> linkIds);
 	
 }

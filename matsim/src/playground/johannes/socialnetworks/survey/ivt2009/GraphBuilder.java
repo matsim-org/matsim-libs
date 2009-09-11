@@ -44,10 +44,9 @@ import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLDegreeStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLEgoNetWriter;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
@@ -193,6 +192,7 @@ public class GraphBuilder {
 					 */
 					String name = egoData.get(keyGenerator.alter1Key(i));
 					if (name != null && name.length() > 0) {
+						name = cleanName(name);
 						if (buildAlter(KeyGenerator.ALTER_1_KEY, name, userId,
 								ego, i, egoData))
 							valid++;
@@ -207,6 +207,7 @@ public class GraphBuilder {
 					 */
 					String name = egoData.get(keyGenerator.alter2Key(i));
 					if (name != null && name.length() > 0) {
+						name = cleanName(name);
 						if (buildAlter(KeyGenerator.ALTER_2_KEY, name, userId,
 								ego, i, egoData))
 							valid++;
@@ -270,8 +271,22 @@ public class GraphBuilder {
 		StringBuilder builder = new StringBuilder(surname.length() + name.length());
 		builder.append(surname);
 		builder.append(" ");
+		/*
+		 * reduce Doppelnamen
+		 */
+		name = cleanName(name);
+		
 		builder.append(name);
 		return new IdImpl(builder.toString());
+	}
+	
+	private String cleanName(String name) {
+//		int idx = name.indexOf("-"); 
+//		if(idx > -1) {
+//			name = name.substring(0, idx);
+//		}
+//		TODO: Need to think about that...
+		return name;
 	}
 	
 	private BasicPerson<?> createPerson(Id id, Coord coord) {
@@ -307,14 +322,14 @@ public class GraphBuilder {
 		Distribution.writeHistogram(SampledGraphStatistics.degreeDistribution(socialnet).absoluteDistribution(), "/Users/fearonni/Desktop/degree.hist.txt");
 		Distribution.writeHistogram(SampledGraphStatistics.edgeLenghtDistribution(socialnet).absoluteDistribution(500), "/Users/fearonni/Desktop/edgelength.hist.txt");
 //		
-//		Population2SpatialGraph pop2graph = new Population2SpatialGraph();
-//		SpatialGraph g2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/plans/plans.10.xml");
-//		Set<Coord> coords = new HashSet<Coord>();
-//		for(SpatialVertex v : g2.getVertices()) {
-//			coords.add(v.getCoordinate());
-//		}
-//		Distribution edgelength = SampledGraphStatistics.normalizedEdgeLengthDistribution(socialnet, g2, 1000);
-//		Distribution.writeHistogram(edgelength.absoluteDistribution(500), "/Users/fearonni/Desktop/edgelength.norm.hist.txt");
+		Population2SpatialGraph pop2graph = new Population2SpatialGraph();
+		SpatialGraph g2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/plans/plans.10.xml");
+		Set<Coord> coords = new HashSet<Coord>();
+		for(SpatialVertex v : g2.getVertices()) {
+			coords.add(v.getCoordinate());
+		}
+		Distribution edgelength = SampledGraphStatistics.normalizedEdgeLengthDistribution(socialnet, g2, 1000);
+		Distribution.writeHistogram(edgelength.absoluteDistribution(500), "/Users/fearonni/Desktop/edgelength.norm.hist.txt");
 //		
 		KMLEgoNetWriter writer = new KMLEgoNetWriter();
 		writer.setCoordinateTransformation(new CH1903LV03toWGS84());
@@ -322,5 +337,8 @@ public class GraphBuilder {
 		writer.setVertexStyle(new KMLSnowballVertexStyle(writer.getVertexIconLink()));
 		writer.setVertexDescriptor(new KMLSnowballDescriptor());
 		writer.write(socialnet, (Set) SnowballPartitions.createSampledPartition(socialnet, 0), 10, "/Users/fearonni/vsp-work/work/socialnets/data/ivt2009-pretest/egonets.kmz");
+		
+		SpatialPajekWriter pwriter = new SpatialPajekWriter();
+		pwriter.write(socialnet, "/Users/fearonni/Desktop/egonet.net");
 	}
 }

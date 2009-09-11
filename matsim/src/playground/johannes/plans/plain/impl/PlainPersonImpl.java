@@ -36,7 +36,7 @@ public class PlainPersonImpl extends AbstractModifiable implements PlainPerson {
 
 	private final Id id;
 	
-	private List<PlainPlanImpl> plans;
+	private ArrayList<PlainPlanImpl> plans;
 	
 	private List<PlainPlanImpl> unmodifiablePlans;
 	
@@ -54,6 +54,8 @@ public class PlainPersonImpl extends AbstractModifiable implements PlainPerson {
 
 	public void addPlan(PlainPlan plan) {
 		plans.add((PlainPlanImpl) plan);
+		plans.trimToSize();
+		modified();
 	}
 
 	public Id getId() {
@@ -66,12 +68,14 @@ public class PlainPersonImpl extends AbstractModifiable implements PlainPerson {
 
 	public void removePlan(PlainPlan plan) {
 		plans.remove(plan);
+		modified();
 	}
 
 	public void setSelectedPlan(PlainPlan plan) {
-		if(plans.contains(plan))
+		if(plans.contains(plan)) {
 			selectedPlan = (PlainPlanImpl) plan;
-		else
+			modified();
+		} else
 			throw new IllegalArgumentException("Plan is not part of the person's plan list. Add the plan to the person before!");
 	}
 

@@ -27,6 +27,6 @@ public interface PlainPlanElement {
 
 	public double getEndTime();
 	
-	public void setEndTime(double endTime);
+	public void setEndTime(Double endTime);
 	
 }

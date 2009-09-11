@@ -56,4 +56,13 @@ public class KMLSnowballVertexStyle extends KMLVertexColorStyle<SampledGraph, Sa
 		return String.valueOf(object.getIterationSampled());
 	}
 
+	/* (non-Javadoc)
+	 * @see playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle#getValue(playground.johannes.socialnetworks.graph.Vertex)
+	 */
+	@Override
+	protected double getValue(SampledVertex vertex) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

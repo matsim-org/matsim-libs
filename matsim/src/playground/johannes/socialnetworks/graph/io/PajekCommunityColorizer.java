@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityImpl.java
+ * PajekCommunityColorizer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,57 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.plans.view.impl;
+package playground.johannes.socialnetworks.graph.io;
 
-import org.matsim.api.core.v01.network.Link;
+import gnu.trove.TObjectDoubleHashMap;
 
-import playground.johannes.plans.plain.impl.PlainActivityImpl;
-import playground.johannes.plans.view.Activity;
-import playground.johannes.plans.view.Facility;
+import java.util.Set;
+
+import playground.johannes.socialnetworks.graph.Edge;
+import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class ActivityView extends PlanElementView<PlainActivityImpl> implements Activity {
+public class PajekCommunityColorizer <V extends Vertex, E extends Edge> extends PajekColorizer<V, E> {
+
+	private TObjectDoubleHashMap<V> values = new TObjectDoubleHashMap<V>();
 	
-	public ActivityView(PlainActivityImpl rawAct) {
-		super(rawAct);
+	public PajekCommunityColorizer(Set<Set<V>> clusters) {
+		double value = 1;
+		for(Set<V> cluster : clusters) {
+			for(V vertex : cluster) {
+				values.put(vertex, value);
+			}
+			value -= 0.05;
+			value = Math.max(value, 0);
+		}
 	}
-
-	public Facility getFacility() {
-		return IdMapping.getFacility(delegate.getFacilityId());
-	}
-
-	public void setFacility(Facility facility) {
-		delegate.setFacilityId(facility.getId());
+	
+	@Override
+	public String getEdgeColor(E e) {
+		return getColor(-1);
 	}
 
 	@Override
-	protected void update() {
-	}
-
-	public Link getLink() {
-		Facility f = getFacility();
-		if(f != null) {
-			return f.getLink();
-		} else
-			return IdMapping.getLink(delegate.getLinkId());
-	}
-
-	public String getType() {
-		return delegate.getType();
-	}
-
-	public void setLink(Link link) {
-		if(getFacility() == null)
-			delegate.setLinkId(link.getId());
-		else
-			throw new UnsupportedOperationException("Link can only be modified via the facility.");
-	}
-
-	public void setType(String type) {
-		delegate.setType(type);
+	public String getVertexFillColor(V v) {
+		return getColor(values.get(v));
 	}
 
 }

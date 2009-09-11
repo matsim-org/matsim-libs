@@ -37,14 +37,6 @@ public class KMLDegreeStyle extends KMLVertexColorStyle<Graph, Vertex> {
 
 	private static final String VERTEX_STYLE_PREFIX = "vertex.style.";
 	
-//	private ObjectFactory objectFactory = new ObjectFactory();
-//	
-//	private TIntObjectHashMap<String> styleIdMappings;
-//	
-//	private LinkType vertexIconLink;
-//	
-//	private boolean logscale;
-
 	public KMLDegreeStyle(LinkType vertexIconLink) {
 		super(vertexIconLink);
 	}
@@ -54,63 +46,18 @@ public class KMLDegreeStyle extends KMLVertexColorStyle<Graph, Vertex> {
 		double[] degrees = GraphStatistics.degreeDistribution(graph).absoluteDistribution().keys();
 		TDoubleObjectHashMap<String> values = new TDoubleObjectHashMap<String>();
 		for(double k : degrees) {
-			values.put(k, getVertexStyleId((int)k));
+			values.put(k, VERTEX_STYLE_PREFIX + Integer.toString((int)k));
 		}
 		
 		return values;
 	}
 
-//	public KMLDegreeStyle(LinkType vertexIconLink) {
-//		this.vertexIconLink = vertexIconLink;
-//	}
-	
-//	public void setLogscale(boolean logscale) {
-//		this.logscale = logscale;
-//	}
-//	
-//	public List<StyleType> getObjectStyle(Graph graph) {
-//		double[] degrees = GraphStatistics.degreeDistribution(graph).absoluteDistribution().keys();
-//		double k_min = StatUtils.min(degrees);
-//		double k_max = StatUtils.max(degrees);
-//		
-//		List<StyleType> styleTypes = new ArrayList<StyleType>(degrees.length);
-//		styleIdMappings = new TIntObjectHashMap<String>();
-//		
-//		
-//		for(double k : degrees) {
-//			StyleType styleType = objectFactory.createStyleType();
-//			styleType.setId(getVertexStyleId((int)k));
-//			
-//			IconStyleType iconStyle = objectFactory.createIconStyleType();
-//			iconStyle.setIcon(vertexIconLink);
-//			iconStyle.setScale(0.5);
-//			
-//			double color = -1;
-//			if(logscale) {
-//				double min = Math.log(k_min + 1);
-//				double max = Math.log(k_max + 1);
-//				color = (Math.log(k + 1) - min) / (max - min);
-//			} else {
-//				color = (k - k_min) / (k_max - k_min);
-//			}
-//			
-//			Color c = ColorUtils.getHeatmapColor(color);
-//			iconStyle.setColor(new byte[]{(byte)c.getAlpha(), (byte)c.getBlue(), (byte)c.getGreen(), (byte)c.getRed()});
-//			
-//			styleType.setIconStyle(iconStyle);
-//			
-//			styleTypes.add(styleType);
-//			styleIdMappings.put((int)k, styleType.getId());
-//		}
-//		
-//		return styleTypes;
+//	private String getVertexStyleId(int k) {
+//		return ;
 //	}
 
-//	public String getObjectSytleId(Vertex object) {
-//		return styleIdMappings.get(object.getEdges().size());
-//	}
-//	
-	private String getVertexStyleId(int k) {
-		return VERTEX_STYLE_PREFIX + Integer.toString(k);
+	@Override
+	protected double getValue(Vertex vertex) {
+		return vertex.getEdges().size();
 	}
 }

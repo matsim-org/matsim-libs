@@ -32,14 +32,14 @@ import playground.johannes.plans.plain.PlainRoute;
  */
 public class PlainRouteImpl extends AbstractModifiable implements PlainRoute {
 
-	private List<Id> linkIds;
+	private List<Id> nodeIds;
 	
-	public List<Id> getLinkIds() {
-		return linkIds;
+	public List<Id> getNodeIds() {
+		return nodeIds;
 	}
 
-	public void setLinkIds(List<Id> linkIds) {
-		this.linkIds = Collections.unmodifiableList(linkIds);
+	public void setNodeIds(List<Id> linkIds) {
+		this.nodeIds = Collections.unmodifiableList(linkIds);
 		modified();
 	}
 

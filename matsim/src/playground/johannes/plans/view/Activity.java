@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.plans.view;
 
+import org.matsim.api.core.v01.network.Link;
+
 
 /**
  * @author illenberger
@@ -26,6 +28,15 @@ package playground.johannes.plans.view;
  */
 public interface Activity extends PlanElement {
 	
+	public Link getLink();
+	
+	public void setLink(Link link);
+	
 	public Facility getFacility();
 	
+	public void setFacility(Facility facility);
+	
+	public String getType();
+	
+	public void setType(String type);
 }

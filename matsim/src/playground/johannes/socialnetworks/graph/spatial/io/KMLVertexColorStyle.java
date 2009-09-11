@@ -51,7 +51,7 @@ public abstract class KMLVertexColorStyle<G extends Graph, V extends Vertex> imp
 	
 	private ObjectFactory objectFactory = new ObjectFactory();
 	
-	private TIntObjectHashMap<String> styleIdMappings;
+	private TDoubleObjectHashMap<String> styleIdMappings;
 	
 	private LinkType vertexIconLink;
 	
@@ -72,7 +72,7 @@ public abstract class KMLVertexColorStyle<G extends Graph, V extends Vertex> imp
 		double max = StatUtils.max(keys);
 		
 		List<StyleType> styleTypes = new ArrayList<StyleType>(keys.length);
-		styleIdMappings = new TIntObjectHashMap<String>();
+		styleIdMappings = new TDoubleObjectHashMap<String>();
 		
 		
 		for(double val : keys) {
@@ -89,13 +89,15 @@ public abstract class KMLVertexColorStyle<G extends Graph, V extends Vertex> imp
 			styleType.setIconStyle(iconStyle);
 			
 			styleTypes.add(styleType);
-			styleIdMappings.put((int)val, styleType.getId());
+			styleIdMappings.put(val, styleType.getId());
 		}
 		
 		return styleTypes;
 	}
 
 	protected abstract TDoubleObjectHashMap<String> getValues(G graph);
+	
+	protected abstract double getValue(V vertex);
 	
 	protected Color colorForValue(double val, double min, double max) {
 		double color = -1;
@@ -111,7 +113,7 @@ public abstract class KMLVertexColorStyle<G extends Graph, V extends Vertex> imp
 	}
 	
 	public String getObjectSytleId(V object) {
-		return styleIdMappings.get(object.getEdges().size());
+		return styleIdMappings.get(getValue(object));
 	}
 	
 //	private String getVertexStyleId(double k) {

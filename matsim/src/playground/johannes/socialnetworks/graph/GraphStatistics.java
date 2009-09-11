@@ -25,6 +25,8 @@ package playground.johannes.socialnetworks.graph;
 
 
 import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TIntIntHashMap;
+import gnu.trove.TIntIntIterator;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 
@@ -38,6 +40,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 
+import playground.johannes.socialnetworks.graph.matrix.Centrality;
+import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
@@ -303,7 +307,7 @@ public class GraphStatistics {
 	 */
 	public static GraphDistance centrality(Graph g) {
 		logger.info("Initializing graph for centrality calculation...");
-		CentralityGraph<Vertex> cGraph = new CentralityGraph<Vertex>(g);
+		CentralityGraph<Vertex, Edge> cGraph = new CentralityGraph<Vertex, Edge>(g);
 		Queue<CentralityVertex<Vertex>> vertexQueue = new ConcurrentLinkedQueue<CentralityVertex<Vertex>>();
 		vertexQueue.addAll(cGraph.getVertices());
 		
@@ -356,6 +360,11 @@ public class GraphStatistics {
 		}
 		meanCc /= cGraph.getVertices().size();
 		
+		TObjectDoubleHashMap<Edge> bcEdgeMap = new TObjectDoubleHashMap<Edge>();
+		for(CentralityEdge<Vertex, Edge> e : cGraph.getEdges()) {
+			bcEdgeMap.put(e.getDelegate(), e.getBetweenness());
+		}
+		
 		GraphDistance d = new GraphDistance();
 		d.diatmeter = diameter;
 		d.radius = radius;
@@ -365,6 +374,18 @@ public class GraphStatistics {
 		d.graphCloseness = meanCc;
 		d.graphBetweenness = meanBc;
 		d.graphBetweennessNormalized = meanBcNorm;
+		
+		d.edgeBetweeness = bcEdgeMap;
+		//************************************
+//		d.edgeBetweeness = new TObjectDoubleHashMap<Edge>();
+//		for(CentralityThread thread : threads) {
+//			TObjectDoubleIterator<EdgeDecorator<?>> it = thread.edgeCentrality.iterator();
+//			for(int i = 0; i < thread.edgeCentrality.size(); i++) {
+//				it.advance();
+//				d.edgeBetweeness.adjustOrPutValue(it.key().getDelegate(), it.value(), it.value());
+//			}
+//		}
+		//************************************
 		
 		return d;
 	}
@@ -387,7 +408,7 @@ public class GraphStatistics {
 		return Correlations.correlationMean(values1, values2);
 	}
 	
-	private static class CentralityGraph<V extends Vertex> extends GraphProjection<Graph, V, Edge> {
+	private static class CentralityGraph<V extends Vertex, E extends Edge> extends GraphProjection<Graph, V, E> {
 
 		public CentralityGraph(Graph delegate) {
 			super(delegate);
@@ -404,6 +425,21 @@ public class GraphStatistics {
 		@Override
 		public Set<? extends CentralityVertex<V>> getVertices() {
 			return (Set<? extends CentralityVertex<V>>) super.getVertices();
+		}
+
+		@Override
+		public EdgeDecorator<E> addEdge(VertexDecorator<V> v1,
+				VertexDecorator<V> v2, E delegate) {
+			EdgeDecorator<E> e = new CentralityEdge<V, E>((CentralityVertex<V>)v1, (CentralityVertex<V>)v2, delegate);
+			if (insertEdge(e, v1, v2))
+				return e;
+			else
+				return null;
+		}
+
+		@Override
+		public Set<? extends CentralityEdge<V, E>> getEdges() {
+			return (Set<? extends CentralityEdge<V, E>>) super.getEdges();
 		}
 		
 		
@@ -440,6 +476,24 @@ public class GraphStatistics {
 		}
 	}
 	
+	private static class CentralityEdge<V extends Vertex, E extends Edge> extends EdgeDecorator<E> {
+		
+		private double betweenness;
+		
+		protected CentralityEdge(CentralityVertex<V> v1, CentralityVertex<V> v2, E delegate) {
+			super(v1, v2,delegate);
+		}
+		
+		public double getBetweenness() {
+			return betweenness;
+		}
+
+		public synchronized void addBetweenness(double value) {
+			betweenness += value;
+		}
+
+	}
+	
 	private static class CentralityThread extends Thread {
 	
 		private static int numVProcessed;
@@ -452,11 +506,15 @@ public class GraphStatistics {
 		
 		private int radius;
 		
-		public CentralityThread(CentralityGraph<Vertex> cGraph, Queue<CentralityVertex<Vertex>> vertexQueue) {
+//		private TObjectDoubleHashMap<EdgeDecorator<?>> edgeCentrality;
+		
+		public CentralityThread(CentralityGraph<Vertex, Edge> cGraph, Queue<CentralityVertex<Vertex>> vertexQueue) {
 			this.vertexQueue = vertexQueue;
 			dijkstra = new UnweightedDijkstra<CentralityVertex<Vertex>>(cGraph);
 			diameter = 0;
 			radius = Integer.MAX_VALUE;
+			
+//			edgeCentrality = new TObjectDoubleHashMap<EdgeDecorator<?>>(cGraph.getEdges().size());
 		}
 		
 		public void run() {
@@ -474,16 +532,18 @@ public class GraphStatistics {
 				int numPaths;
 				int eccentricity = 0;//Integer.MAX_VALUE;
 				List<CentralityVertex<Vertex>> passedVertices = new ArrayList<CentralityVertex<Vertex>>();
+				List<CentralityEdge<?,?>> passedEdges = new ArrayList<CentralityEdge<?,?>>();
 				int size2 = vertices.size();
 				for(int k = 0; k < size2; k++) {
 					int size;
 
 					UnweightedDijkstra<CentralityVertex<Vertex>>.DijkstraVertex target = vertices.get(k);
 					passedVertices.clear();
+					passedEdges.clear();
 					numPaths = 0;
-					size = target.getPredecessors().length;
+					size = target.getPrecedingVertices().length;
 					for(int i = 0; i < size; i++) {
-						numPaths += getNumPaths(target.getPredecessors()[i], passedVertices);					
+						numPaths += getNumPaths(target.getPrecedingVertices()[i], passedVertices, passedEdges);					
 					}
 					
 					double bc = 1 / (double)numPaths;
@@ -491,7 +551,16 @@ public class GraphStatistics {
 					for(int i = 0; i < size; i++) {
 						passedVertices.get(i).addBetweenness(bc);
 					}
-					
+					size = passedEdges.size();
+					for(int i = 0; i < size; i++) {
+						passedEdges.get(i).addBetweenness(bc);
+					}
+					//**************************************************************
+//					size = passedEdges.size();
+//					for(int i = 0; i < size; i++) {
+//						edgeCentrality.adjustOrPutValue(passedEdges.get(i), bc, bc);
+//					}
+					//**************************************************************
 					int distance = (passedVertices.size() + numPaths)/numPaths; 
 					aplsum += distance;
 					eccentricity = Math.max(eccentricity, distance);
@@ -517,15 +586,25 @@ public class GraphStatistics {
 			}
 		}
 
-		private int getNumPaths(UnweightedDijkstra<CentralityVertex<Vertex>>.DijkstraVertex v, List<CentralityVertex<Vertex>> vertices) {
-			if (v.getPredecessors().length == 0)
+		private int getNumPaths(UnweightedDijkstra<CentralityVertex<Vertex>>.DijkstraVertex v, List<CentralityVertex<Vertex>> vertices, List<CentralityEdge<?,?>> edges) {
+			if (v.getPrecedingVertices().length == 0)
 				return 1;
 			else {
 				int numPaths = 0;
-				int size = v.getPredecessors().length;
+				int size = v.getPrecedingVertices().length;
 				for(int i = 0; i < size; i++) {
 					vertices.add(v.getDelegate());
-					numPaths += getNumPaths(v.getPredecessors()[i], vertices);
+					edges.add((CentralityEdge<?, ?>) v.getPrecedingEdges()[i].getDelegate());
+					//****************************************************************
+//					List<? extends Edge> adjacentEdges = v.getDelegate().getDelegate().getEdges();
+//					Vertex toNode = v.getPrecedingVertices()[i].getDelegate().getDelegate();
+//					for(int k = 0; k < adjacentEdges.size(); k++) {
+//						if(adjacentEdges.get(k).getOpposite(v.getDelegate().getDelegate()).equals(toNode)) {
+//							edges.add(adjacentEdges.get(k));
+//						}
+//					}
+					//****************************************************************
+					numPaths += getNumPaths(v.getPrecedingVertices()[i], vertices, edges);
 				}
 				return numPaths;
 			}
@@ -547,6 +626,8 @@ public class GraphStatistics {
 		private TObjectDoubleHashMap<Vertex> vertexBetweenness;
 
 		private TObjectDoubleHashMap<Vertex> vertexBetweennessNormalized;
+		
+		private TObjectDoubleHashMap<Edge> edgeBetweeness;
 
 		private double graphBetweenness;
 
@@ -586,6 +667,10 @@ public class GraphStatistics {
 			return vertexBetweenness;
 		}
 
+		public TObjectDoubleHashMap<Edge> getEdgeBetweeness() {
+			return edgeBetweeness;
+		}
+		
 		/**
 		 * Returns the betweenness centrality of the graph.
 		 * 

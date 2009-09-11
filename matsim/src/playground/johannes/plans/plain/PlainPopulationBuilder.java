@@ -19,13 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.plans.plain;
 
+import org.matsim.api.basic.v01.Id;
+
 /**
  * @author illenberger
  *
  */
 public interface PlainPopulationBuilder {
 
-	public PlainPerson createPerson(String id);
+	public PlainPopulation createPopulation();
+	
+	public PlainPerson createPerson(Id id);
 	
 	public PlainPlan createPlan();
 	

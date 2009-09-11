@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityImpl.java
+ * CentralitySpeedTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,57 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.plans.view.impl;
+package playground.johannes.socialnetworks.graph.matrix;
 
-import org.matsim.api.core.v01.network.Link;
+import junit.framework.TestCase;
 
-import playground.johannes.plans.plain.impl.PlainActivityImpl;
-import playground.johannes.plans.view.Activity;
-import playground.johannes.plans.view.Facility;
+import org.apache.log4j.Logger;
+
+import playground.johannes.socialnetworks.graph.SparseEdge;
+import playground.johannes.socialnetworks.graph.SparseGraph;
+import playground.johannes.socialnetworks.graph.SparseGraphFactory;
+import playground.johannes.socialnetworks.graph.SparseVertex;
+import playground.johannes.socialnetworks.graph.generators.ErdosRenyiGenerator;
+import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
 
 /**
  * @author illenberger
  *
  */
-public class ActivityView extends PlanElementView<PlainActivityImpl> implements Activity {
+public class CentralitySpeedTest extends TestCase {
+
+	private static final Logger logger = Logger.getLogger(CentralitySpeedTest.class);
 	
-	public ActivityView(PlainActivityImpl rawAct) {
-		super(rawAct);
+	public void test() {
+		ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge>(new SparseGraphFactory());
+		logger.info("Generating grah...");
+		SparseGraph graph = generator.generate(1000, 0.1, 4711);
+		logger.info("Converting matrix...");
+		AdjacencyMatrixDecorator<SparseVertex> y = new AdjacencyMatrixDecorator<SparseVertex>(graph);
+		
+		logger.info("Calculation centrality measures...");
+		long time = System.currentTimeMillis();
+		Centrality c = new Centrality();
+		c.run(y);
+		logger.info("Done. Took " + (System.currentTimeMillis() - time) + " ms");
 	}
-
-	public Facility getFacility() {
-		return IdMapping.getFacility(delegate.getFacilityId());
-	}
-
-	public void setFacility(Facility facility) {
-		delegate.setFacilityId(facility.getId());
-	}
-
-	@Override
-	protected void update() {
-	}
-
-	public Link getLink() {
-		Facility f = getFacility();
-		if(f != null) {
-			return f.getLink();
-		} else
-			return IdMapping.getLink(delegate.getLinkId());
-	}
-
-	public String getType() {
-		return delegate.getType();
-	}
-
-	public void setLink(Link link) {
-		if(getFacility() == null)
-			delegate.setLinkId(link.getId());
-		else
-			throw new UnsupportedOperationException("Link can only be modified via the facility.");
-	}
-
-	public void setType(String type) {
-		delegate.setType(type);
-	}
-
 }

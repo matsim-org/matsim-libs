@@ -34,5 +34,7 @@ public interface Population {
 	public void addPerson(Person person);
 	
 	public void removePerson(Person person);
+	
+ 	public void removePerson(Id id);
 
 }

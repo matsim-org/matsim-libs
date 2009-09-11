@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityImpl.java
+ * GML2Pajek.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,57 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.plans.view.impl;
+package playground.johannes.socialnetworks.graph.io;
 
-import org.matsim.api.core.v01.network.Link;
+import java.io.IOException;
 
-import playground.johannes.plans.plain.impl.PlainActivityImpl;
-import playground.johannes.plans.view.Activity;
-import playground.johannes.plans.view.Facility;
+import playground.johannes.socialnetworks.graph.Edge;
+import playground.johannes.socialnetworks.graph.Graph;
+import playground.johannes.socialnetworks.graph.SparseGraphFactory;
+import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class ActivityView extends PlanElementView<PlainActivityImpl> implements Activity {
-	
-	public ActivityView(PlainActivityImpl rawAct) {
-		super(rawAct);
-	}
+public class GML2Pajek {
 
-	public Facility getFacility() {
-		return IdMapping.getFacility(delegate.getFacilityId());
-	}
-
-	public void setFacility(Facility facility) {
-		delegate.setFacilityId(facility.getId());
-	}
-
-	@Override
-	protected void update() {
-	}
-
-	public Link getLink() {
-		Facility f = getFacility();
-		if(f != null) {
-			return f.getLink();
-		} else
-			return IdMapping.getLink(delegate.getLinkId());
-	}
-
-	public String getType() {
-		return delegate.getType();
-	}
-
-	public void setLink(Link link) {
-		if(getFacility() == null)
-			delegate.setLinkId(link.getId());
-		else
-			throw new UnsupportedOperationException("Link can only be modified via the facility.");
-	}
-
-	public void setType(String type) {
-		delegate.setType(type);
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		Graph g = new GMLReader().read(args[0], new SparseGraphFactory());
+		PajekWriter<Graph, Vertex, Edge> writer = new PajekWriter<Graph, Vertex, Edge>();
+		writer.write(g, args[1]);
 	}
 
 }

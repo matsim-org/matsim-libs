@@ -37,7 +37,7 @@ import playground.johannes.plans.view.Plan;
  */
 public class PersonView extends AbstractView<PlainPersonImpl> implements Person {
 	
-	private List<PlanView> plans = new ArrayList<PlanView>();
+	private ArrayList<PlanView> plans = new ArrayList<PlanView>();
 	
 	private List<? extends PlanView> unmodifiablePlans;
 	
@@ -59,11 +59,18 @@ public class PersonView extends AbstractView<PlainPersonImpl> implements Person 
 			PlanView view = new PlanView(p);
 			plans.add(view);
 		}
+		plans.trimToSize();
 	}
 
 	public void addPlan(Plan plan) {
-		delegate.addPlan(((PlanView) plan).getDelegate());
-		plans.add((PlanView)plan);
+//		if(delegateVersion == delegate.getModCount()) {
+//			delegate.addPlan(((PlanView) plan).getDelegate());
+//			plans.add((PlanView)plan);
+//			delegateVersion = delegate.getModCount();
+//		} else {
+			delegate.addPlan(((PlanView) plan).getDelegate());
+			plans.add((PlanView)plan);
+//		}
 	}
 
 	public Id getId() {
@@ -73,6 +80,19 @@ public class PersonView extends AbstractView<PlainPersonImpl> implements Person 
 	public void removePlan(Plan plan) {
 		delegate.removePlan(((PlanView)plan).getDelegate());
 		plans.remove(plan);
+	}
+
+	public Plan getSelectedPlan() {
+		for(PlanView plan : plans) {
+			if(plan.getDelegate().equals(delegate.getSelectedPlan())) {
+				return plan;
+			}
+		}
+		return null;
+	}
+
+	public void setSelectedPlan(Plan plan) {
+		delegate.setSelectedPlan(((PlanView)plan).getDelegate());
 	}
 
 }
