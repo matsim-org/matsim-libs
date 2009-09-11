@@ -27,8 +27,6 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.xml.sax.SAXException;
-
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsImpl;
@@ -45,6 +43,7 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
+import org.xml.sax.SAXException;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
 import playground.yu.analysis.CalcNetAvgSpeed;
@@ -88,7 +87,8 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 		final String netFilename = args[2];
 
 		String[] tmp = args[3].split("it.");
-		String outputBase = args[3] + "/" + tmp[tmp.length - 1] + ".";
+		String outputBase = args[3] + "/" + args[1] + "." + tmp[tmp.length - 1]
+				+ ".";
 		final String eventsFilename = outputBase + "events.txt.gz";
 
 		boolean hasPop = Boolean.parseBoolean(args[4]);
