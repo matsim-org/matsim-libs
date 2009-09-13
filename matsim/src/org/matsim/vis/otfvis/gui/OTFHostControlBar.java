@@ -547,13 +547,17 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	private int gotoIter = 0;
 	private transient OTFAbortGoto progressBar = null;
 	public void gotoTime() {
+		boolean restart = (OTFVisController.getIteration(controllerStatus) == gotoIter) && (gotoTime < simTime);
+		
 		try {
 			// in case of live host, additionally request iteration
 			if(liveHost != null) liveHost.requestControllerStatus(gotoIter);
 			
 			synchronized(blockReading) {
-			if (!requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER))
+			if(restart)requestTimeStep(gotoTime, OTFServerRemote.TimePreference.RESTART);
+			else if (!requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER))
 				requestTimeStep(gotoTime, OTFServerRemote.TimePreference.LATER);
+			
 			if (progressBar != null) progressBar.terminate = true;
 			simTime = host.getLocalTime();
 			updateTimeLabel();
@@ -649,8 +653,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	public void itemStateChanged(ItemEvent e) {
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
 		if (source.getText().equals(TOGGLE_SYNCH)) {
-			synchronizedPlay = e.getStateChange() != ItemEvent.DESELECTED;
-			if (movieTimer != null) movieTimer.updateSyncPlay();
+			if (movieTimer != null) movieTimer.updateSyncPlay(e.getStateChange() != ItemEvent.DESELECTED);
 		}
 		repaint();
 	}
@@ -698,24 +701,27 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			return isActive;
 		}
 
-		private synchronized void updateSyncPlay() {
-			if (!isActive) return;
-
+		private synchronized void updateSyncPlay(boolean sync) {
 			try {
-				if(!host.isLive()) return;
-				// this is only calles for Live Servers!
-				// before we sent the host sleeping, we make sure, there i no pending getTimeStep waiting for results
-				if (synchronizedPlay) ((OTFLiveServerRemote)host).pause();
-				else ((OTFLiveServerRemote)host).play();
+				if (isActive) {
+					if(!host.isLive()) return;
+					// this is only calles for Live Servers!
+					// before we sent the host sleeping, we make sure, there i no pending getTimeStep waiting for results
+					if (sync)((OTFLiveServerRemote)host).pause();
+					else ((OTFLiveServerRemote)host).play();
+				}
+				simTime = host.getLocalTime();
+				synchronizedPlay = sync; 
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
+
 		}
 
 		public synchronized void setActive(boolean isActive) {
 			this.isActive = isActive;
 
-			updateSyncPlay();
+			updateSyncPlay(synchronizedPlay);
 		}
 
 		public synchronized void terminate() {

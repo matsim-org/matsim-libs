@@ -70,7 +70,7 @@ public class ExeViaListener {
 		protected boolean useResetable = true;
 		
 		public static class MyEvents extends EventsImpl{
-			List<BasicEvent> events = new ArrayList<BasicEvent>();
+			public List<BasicEvent> events = new ArrayList<BasicEvent>();
 
 			@Override
 			public void processEvent(BasicEvent event) {
@@ -211,6 +211,7 @@ QueueSimulationAfterSimStepListener {
 	protected void startupClient(String url) {
 		PreferencesDialog.preDialogClass = PreferencesDialog2.class;
 		OnTheFlyClientFileQuad client = new OnTheFlyClientFileQuad(url);
+		client.setFilename( Gbl.getConfig().network().getInputFile());
 		client.start();
 
 	}
@@ -231,6 +232,7 @@ QueueSimulationAfterSimStepListener {
 
 		PreferencesDialog.preDialogClass = PreferencesDialog2.class;
 		OnTheFlyClientFileQuad client = new OTFVisDualView(url, null, false);
+		client.setFilename( Gbl.getConfig().network().getInputFile());
 		client.start();
 		while(client.getQueryControl() == null) try {Thread.sleep(500);}catch(Exception e){};
 		if(

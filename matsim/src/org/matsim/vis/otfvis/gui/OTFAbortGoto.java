@@ -67,9 +67,14 @@ public class OTFAbortGoto extends Thread  {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		int from = actTime+3600*30*actIter;
+		int to = toTime+ 3600*30*toIter;
+		// this is a reset! start from 00:00:00
+		if(from > to) from = 3600*30*actIter;
+		
 		progressMonitor = new ProgressMonitor(null,
                 "Running Simulation forward to " + Time.writeTime(toTime),
-                "hat", actTime+3600*30*actIter, toTime+ 3600*30*toIter);
+                "hat", from, to);
 
 		while (!terminate) {
 			try {
@@ -103,7 +108,7 @@ public class OTFAbortGoto extends Thread  {
 					host.requestNewTime(actTime, TimePreference.EARLIER);
 				}
 			} catch (RemoteException e) {
-				terminate = true;;
+				terminate = true;
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -129,6 +129,11 @@ public class OnTheFlyClientFileQuad extends Thread {
 	protected OTFHostControlBar hostControl = null;
 
 	protected String filename;
+	
+	public void setFilename(String filename) {
+		this.filename = filename;
+	}
+
 	private boolean splitLayout = true;
 	public OTFQueryControlBar getQueryControl() {
 		return queryControl;

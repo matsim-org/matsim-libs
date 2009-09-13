@@ -70,6 +70,7 @@ public class OTFVisDualView extends OnTheFlyClientFileQuad{
 	private static final String BG_IMG_ROOT = "../vsp-cvs/studies/padang/imagery/sliced/";
 	protected String url;
 	protected PopDrawer popD;
+	protected String id1 = null;
 	
 	public OTFVisDualView(String filename2, OTFConnectionManager connect, boolean split) {
 		super(filename2, connect, split);
@@ -84,7 +85,7 @@ public class OTFVisDualView extends OnTheFlyClientFileQuad{
 	}
 
 	protected SimpleBackgroundDrawer background = null;
-	static OTFConnectionManager connect1 = new OTFConnectionManager();
+	protected static OTFConnectionManager connect1 = new OTFConnectionManager();
 	static OTFConnectionManager connect2 = new OTFConnectionManager();
 
 	public class PopDrawer extends TreeView {
@@ -175,7 +176,7 @@ public class OTFVisDualView extends OnTheFlyClientFileQuad{
 		connect1.add(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
 		connect1.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
 
-		OTFClientQuad clientQ = hostControl.createNewView(null, connect1);
+		OTFClientQuad clientQ = hostControl.createNewView(id1, connect1);
 		//clientQ.setCachingAllowed(false);
 		
 		OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);

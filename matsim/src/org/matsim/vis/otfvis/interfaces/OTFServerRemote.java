@@ -37,7 +37,7 @@ import org.matsim.vis.otfvis.data.OTFServerQuad;
  *
  */
 public interface OTFServerRemote extends Remote {
-	public enum TimePreference{EARLIER, LATER};
+	public enum TimePreference{EARLIER, LATER, RESTART};
 	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException;
 	
 	public OTFServerQuad getQuad(String id, OTFConnectionManager connect) throws RemoteException;

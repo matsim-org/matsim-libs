@@ -153,27 +153,31 @@ public class OTFFileSettingsSaver implements OTFSettingsSaver {
 	 }
 
 	public OTFVisConfig openAndReadConfig() {
-		ZipFile zipFile;
-		ObjectInputStream inFile;
-		// open file
-		try {
-			File sourceZipFile = new File(fileName);
-			// Open Zip file for reading
-			zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
-			ZipEntry infoEntry = zipFile.getEntry("config.bin");
-			if(infoEntry != null) {
-				//load config settings
-				inFile = new OTFQuadFileHandler.Reader.OTFObjectInputStream(zipFile.getInputStream(infoEntry));
-				Gbl.getConfig().removeModule(OTFVisConfig.GROUP_NAME);
-				OTFVisConfig cfg = (OTFVisConfig)inFile.readObject();
-				// force this to 30 if zero!
-				cfg.setDelay_ms(cfg.getDelay_ms() == 0 ? 30: cfg.getDelay_ms());
-				Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, cfg);
-			} 
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+		if(!fileName.toLowerCase().endsWith("mvi")){
+			readDefaultSettings();			
+		} else {
+			ZipFile zipFile;
+			ObjectInputStream inFile;
+			// open file
+			try {
+				File sourceZipFile = new File(fileName);
+				// Open Zip file for reading
+				zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+				ZipEntry infoEntry = zipFile.getEntry("config.bin");
+				if(infoEntry != null) {
+					//load config settings
+					inFile = new OTFQuadFileHandler.Reader.OTFObjectInputStream(zipFile.getInputStream(infoEntry));
+					Gbl.getConfig().removeModule(OTFVisConfig.GROUP_NAME);
+					OTFVisConfig cfg = (OTFVisConfig)inFile.readObject();
+					// force this to 30 if zero!
+					cfg.setDelay_ms(cfg.getDelay_ms() == 0 ? 30: cfg.getDelay_ms());
+					Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, cfg);
+				} 
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 		// Test if loading worked, otherwise create default
 		if(Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME) == null) {

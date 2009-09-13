@@ -150,8 +150,13 @@ public class QueryAgentEvents extends QueryAgentPlan {
 	public void draw(OTFOGLDrawer drawer) {
 		if(this.vertex == null) return;
 
-		OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
-		Point2D.Double pos = layer.getAgentCoords(this.agentId.toCharArray());
+		Point2D.Double pos;
+		if(coordProvider != null) {
+			pos = coordProvider.getAgentCoords(this.agentId.toCharArray());
+		} else {
+			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
+			pos = layer.getAgentCoords(this.agentId.toCharArray());
+		}
 
 		if( this.calcOffset == true) {
 			float east = (float)drawer.getQuad().offsetEast;

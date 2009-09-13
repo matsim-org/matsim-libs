@@ -182,17 +182,20 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public void reset() {
 		status = PAUSE;
 		localTime = 0;
-		controllerStatus = OTFVisController.RUNNING;
-		controllerIteration = 0;
+		controllerStatus = OTFVisController.RUNNING | controllerIteration;
 		stepToIteration = 0;
 		requestStatus = 0;
-		stepToTime = 0;
+//		stepToTime = 0;
 		synchronized (paused) {
 			paused.notifyAll();
 		}
-		synchronized (stepDone) {
+		if(stepToTime != 0) {
+			status = STEP;
+		}else 		synchronized (stepDone) {
 			stepDone.notifyAll();
-		}
+		};
+
+
 	}
 	public void cleanup() {
 		try {
@@ -283,14 +286,22 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	double stepToTime = 0;
 	
 	public boolean requestNewTime(int time, final TimePreference searchDirection) throws RemoteException {
+		if( ((searchDirection == TimePreference.RESTART) && (time < localTime))){
+			requestStatus = OTFVisController.CANCEL;
+			doStep(time);
+			return true;
+		}
 		// if requested time lies in the past, sorry we cannot do that right now
-		if ((stepToIteration < controllerIteration) || ((stepToIteration == controllerIteration) && (time < localTime))) {
-			// time = localTime;
+		if ((stepToIteration < controllerIteration) || ((stepToIteration == controllerIteration) && (time < localTime)) ) {
+			time = localTime;
 			stepToTime = 0;
 			// if forward search is OK, then the actual timestep is the BEST fit
 			return (searchDirection != TimePreference.EARLIER);
 		}
-		if ((stepToIteration == controllerIteration) && (time == localTime)) return true;
+		if ((stepToIteration == controllerIteration) && (time == localTime)) {
+			stepToTime = 0;
+			return true;
+		}
 		doStep(time);
 		return true;
 	}
@@ -421,7 +432,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		stepToIteration = status & 0xffffff;
 		requestStatus = status & OTFVisController.ALL_FLAGS;
 		if(requestStatus == OTFVisController.CANCEL) {
-			reset();
+			//reset();
 			requestStatus = OTFVisController.CANCEL;
 		}
 		return true;
