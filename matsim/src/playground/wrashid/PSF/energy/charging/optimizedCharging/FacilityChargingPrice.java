@@ -14,6 +14,10 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	private double slotStartTime; // for finding out the bin / charge log
 	private Id facilityId;
 	private double endParkingTime;
+	public double getEndParkingTime() {
+		return endParkingTime;
+	}
+
 	private double startParkingTime;
 	
 	private double endTimeOfSlot;
