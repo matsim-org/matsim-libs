@@ -50,19 +50,19 @@ public class BatchRun {
 											 {0, 6, 3, 1}};
 */
 	// no replanning, initial replanning, act end replanning, leave link replanning
-	protected static int[][] Versuchsplan = {{0, 0, 0, 10},
-											 {0, 1, 0, 9},
-											 {0, 2, 0, 8},
-											 {0, 3, 0, 7},
-											 {0, 4, 0, 6},
-											 {0, 5, 0, 5},
-											 {0, 6, 0, 4},
-											 {0, 7, 0, 3},
-											 {0, 8, 0, 2},
-											 {0, 9, 0, 1},
-											 {0, 10, 0, 0}};
+//	protected static int[][] Versuchsplan = {{0, 0, 0, 10},
+//											 {0, 1, 0, 9},
+//											 {0, 2, 0, 8},
+//											 {0, 3, 0, 7},
+//											 {0, 4, 0, 6},
+//											 {0, 5, 0, 5},
+//											 {0, 6, 0, 4},
+//											 {0, 7, 0, 3},
+//											 {0, 8, 0, 2},
+//											 {0, 9, 0, 1},
+//											 {0, 10, 0, 0}};
 	
-//	protected static int[][] Versuchsplan = {{0, 10, 0, 0}};
+	protected static int[][] Versuchsplan = {{0, 0, 0, 10}};
 	
 	
 	// Default Config

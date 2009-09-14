@@ -37,7 +37,6 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.christoph.network.util.SubNetworkTools;
 import playground.christoph.router.KnowledgePlansCalcRoute;
 
 /*
@@ -131,10 +130,6 @@ public class LeaveLinkReplanner {
 	 */
 	protected void routing()
 	{	
-		if(this.personAgent.getPerson().getId().toString().equals("2116372"))
-		{
-			log.error("Replanning wrong Agent!");
-		}
 		/*
 		 * Get the index and the currently next Node on the route.
 		 * Entries with a lower index have already been visited!

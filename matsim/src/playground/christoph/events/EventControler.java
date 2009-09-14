@@ -308,7 +308,7 @@ public class EventControler extends Controler {
 	protected void runMobSim() {
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
 
-		sim.setControler(this);
+//		sim.setControler(this);
 
 		// create & add LinkVehiclesCounter
 		linkVehiclesCounter = new LinkVehiclesCounter();

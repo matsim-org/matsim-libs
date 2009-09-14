@@ -25,7 +25,6 @@ import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
@@ -40,7 +39,6 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 
 	private final static Logger log = Logger.getLogger(ReplanningQueueSimulation.class);
 	
-	protected Controler controler;
 	protected KnowledgeDBStorageHandler knowledgeDBStorageHandler;
 	
 	/*
@@ -58,7 +56,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 		super(network, population, events);
 		
 		/*
-		 * Use a MyQueueNetwork with MyQueueNodes - we need it for our Replanning! 
+		 * Use a MyQueueNetwork - we need it for our Replanning! 
 		 */
 		this.network = new MyQueueNetwork(network);
 		this.networkLayer = network;
@@ -109,24 +107,6 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 		return super.doSimStep(time);		
 	}
 
-/*	
-	public QueueNetwork getQueueNetwork()
-	{
-		return this.network;
-	}
-*/
-	public void setControler(final Controler controler)
-	{
-		this.controler = controler;
-
-		// Referenz auf den Controler mit dem Replanning Algorithmus hinterlegen
-		((MyQueueNetwork)this.network).setControler(controler);
-	}
-
-	public Controler getControler()
-	{
-		return this.controler;
-	}
 
 	/**
 	 * Registers this agent as performing an activity and makes sure that the

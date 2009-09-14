@@ -22,7 +22,6 @@ package playground.christoph.mobsim;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.NetworkLayer;
 
@@ -31,16 +30,11 @@ import playground.christoph.events.LinkVehiclesCounter;
 
 public class MyQueueNetwork extends QueueNetwork{
 	
-	protected Controler controler;
 	protected LinkVehiclesCounter linkVehiclesCounter;
 	protected LinkReplanningMap linkReplanningMap;
 	
 	final private static Logger log = Logger.getLogger(MyQueueNetwork.class);
-/*	
-	public MyQueueNetwork(NetworkLayer networkLayer, QueueNetworkFactory<QueueNode, QueueLink> factory) {
-		super(networkLayer, factory);
-	}
-*/
+
 	public MyQueueNetwork(NetworkLayer networkLayer)
 	{
 		super(networkLayer);
@@ -64,16 +58,6 @@ public class MyQueueNetwork extends QueueNetwork{
 	public LinkReplanningMap getLinkReplanningMap()
 	{
 		return this.linkReplanningMap;
-	}
-	
-	public void setControler(Controler controler) 
-	{
-		this.controler = controler;
-	}
-
-	public Controler getControler()
-	{
-		return controler;
 	}
 
 }
