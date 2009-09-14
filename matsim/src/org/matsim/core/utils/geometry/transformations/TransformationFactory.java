@@ -37,6 +37,7 @@ public abstract class TransformationFactory {
 	public final static String WGS84_UTM47S = "WGS84_UTM47S"; // indonesia
 	public final static String WGS84_UTM35S = "WGS84_UTM35S"; // south-africa
 	public final static String DHDN_GK4 = "DHDN_GK4"; // berlin/germany, for GeoTools
+	public final static String WGS84_UTM29N = "WGS84_UTM29N"; // coimbra/portugal
 
 	/**
 	 * Returns a coordinate transformation to transform coordinates from one
