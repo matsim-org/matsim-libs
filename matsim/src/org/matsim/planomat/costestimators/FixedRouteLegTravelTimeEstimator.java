@@ -33,6 +33,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
@@ -94,7 +95,8 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 			if (mode.equals(TransportMode.car)) {
 				Link startLink = actOrigin.getLink();
 				Link endLink = actDestination.getLink();
-				NetworkRouteWRefs newRoute = (NetworkRouteWRefs) this.plansCalcRoute.getRouteFactory().createRoute(TransportMode.car, startLink, endLink);
+//				NetworkRouteWRefs newRoute = (NetworkRouteWRefs) this.plansCalcRoute.getRouteFactory().createRoute(TransportMode.car, startLink, endLink);
+				NetworkRouteWRefs newRoute = new LinkNetworkRouteImpl(startLink, endLink);
 
 				// calculate free speed route and cache it
 				Path path = this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
@@ -236,8 +238,18 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 					// TODO this should be possible for all types of routes. Then we could cache e.g. the original pt routes, too.
 					// however, LegImpl cloning constructor does not yet handle generic routes correctly
 					if (leg.getRoute() instanceof NetworkRouteWRefs) {
+						
+						NetworkRouteWRefs originalRoute = (NetworkRouteWRefs) leg.getRoute();
+						
 						EnumMap<TransportMode, LegImpl> legInformation = new EnumMap<TransportMode, LegImpl>(TransportMode.class);
-						legInformation.put(leg.getMode(), new LegImpl(leg));
+						
+						LegImpl newLeg = new LegImpl(leg.getMode());
+						
+						LinkNetworkRouteImpl linkNetworkRoute = new LinkNetworkRouteImpl(originalRoute.getStartLink(), originalRoute.getEndLink());
+						linkNetworkRoute.setLinks(originalRoute.getStartLink(), originalRoute.getLinks(), originalRoute.getEndLink());
+						newLeg.setRoute(linkNetworkRoute);
+						
+						legInformation.put(leg.getMode(), newLeg);
 						this.fixedRoutes.put(this.plan.getActLegIndex(leg), legInformation);
 					}
 				}
