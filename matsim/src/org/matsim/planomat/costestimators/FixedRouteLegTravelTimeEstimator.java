@@ -251,19 +251,6 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 						
 						legInformation.put(leg.getMode(), newLeg);
 						this.fixedRoutes.put(this.plan.getActLegIndex(leg), legInformation);
-					} else {
-						
-						LegImpl newLeg = new LegImpl(leg.getMode());
-						
-						ActivityImpl actOrigin = this.plan.getPreviousActivity(leg);
-						ActivityImpl actDestination = this.plan.getNextActivity(leg);
-						
-						this.plansCalcRoute.handleLeg(newLeg, actOrigin, actDestination, 0.0);
-						
-						EnumMap<TransportMode, LegImpl> legInformation = new EnumMap<TransportMode, LegImpl>(TransportMode.class);
-						legInformation.put(leg.getMode(), newLeg);
-						this.fixedRoutes.put(this.plan.getActLegIndex(leg), legInformation);
-						
 					}
 				}
 			}
