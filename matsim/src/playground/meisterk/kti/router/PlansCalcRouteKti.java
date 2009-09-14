@@ -86,7 +86,8 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		KtiPtRoute newRoute = new KtiPtRoute(fromAct.getLink(), toAct.getLink(), plansCalcRouteKtiInfo, fromStop, fromMunicipality, toMunicipality, toStop);
 		leg.setRoute(newRoute);
 
-		final double timeInVehicle = newRoute.calcInVehicleTime();
+//		final double timeInVehicle = newRoute.calcInVehicleTime();
+		final double timeInVehicle = newRoute.getPtMatrixInVehicleTime();
 		
 		final double walkAccessEgressDistance = newRoute.calcAccessEgressDistance(fromAct, toAct);
 		final double walkAccessEgressTime = PlansCalcRouteKti.getAccessEgressTime(walkAccessEgressDistance, this.configGroup);

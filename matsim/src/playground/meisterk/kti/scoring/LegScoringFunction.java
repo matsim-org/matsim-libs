@@ -22,6 +22,7 @@ package playground.meisterk.kti.scoring;
 
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -54,6 +55,8 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 
 	private final KtiConfigGroup ktiConfigGroup;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+
+	private final static Logger log = Logger.getLogger(LegScoringFunction.class);
 
 	public LegScoringFunction(PlanImpl plan,
 			CharyparNagelScoringParameters params,
@@ -88,13 +91,33 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			
 			if (ktiPtRoute.getFromStop() != null) {
 
+				String nanoMsg = "Scoring kti pt:\t";
+				
+				long nanos = System.nanoTime();
 				dist = ((KtiPtRoute) leg.getRoute()).calcAccessEgressDistance(this.plan.getPreviousActivity(leg), this.plan.getNextActivity(leg));
+				nanos = System.nanoTime() - nanos;
+				nanoMsg += Long.toString(nanos) + "\t";
+				
+				nanos = System.nanoTime();
 				travelTime = PlansCalcRouteKti.getAccessEgressTime(dist, this.plansCalcRouteConfigGroup);
+				nanos = System.nanoTime() - nanos;
+				nanoMsg += Long.toString(nanos) + "\t";
+
 				tmpScore += this.getWalkScore(dist, travelTime);
 				
+				nanos = System.nanoTime();
 				dist = ((KtiPtRoute) leg.getRoute()).calcInVehicleDistance();
-				travelTime = ((KtiPtRoute) leg.getRoute()).calcInVehicleTime();
+				nanos = System.nanoTime() - nanos;
+				nanoMsg += Long.toString(nanos) + "\t";
+
+				nanos = System.nanoTime();
+				travelTime = ((KtiPtRoute) leg.getRoute()).getPtMatrixInVehicleTime();
+//				travelTime = ((KtiPtRoute) leg.getRoute()).calcInVehicleTime();
+				nanos = System.nanoTime() - nanos;
+				nanoMsg += Long.toString(nanos) + "\t";
+
 				tmpScore += this.getPtScore(dist, travelTime);
+				log.info(nanoMsg);
 
 			} else {
 

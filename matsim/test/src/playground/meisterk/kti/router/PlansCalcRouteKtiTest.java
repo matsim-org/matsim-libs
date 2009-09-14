@@ -110,7 +110,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		testee.handleLeg(leg, home, work, Time.parseTime("12:34:56"));
 		
 		String actualRouteDescription = ((KtiPtRoute) leg.getRoute()).getRouteDescription();
-		String expectedRouteDescription = "kti=8503006=26101=26102=8503015";
+		String expectedRouteDescription = "kti=8503006=26101=300.0=26102=8503015";
 		assertEquals(expectedRouteDescription, actualRouteDescription);
 		
 	}
@@ -120,10 +120,9 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		double expectedTimeInVehicle = 300.0;
 
 		KtiPtRoute route = new KtiPtRoute(null, null, this.plansCalcRouteKtiInfo);
-		route.setRouteDescription(null, "kti=8503006=26101=26102=8503015", null);
-//		double actualTimeInVehicle = PlansCalcRouteKti.getTimeInVehicle(route, this.plansCalcRouteKtiInfo); 
+		route.setRouteDescription(null, "kti=8503006=26101=300.0=26102=8503015", null);
 		
-		assertEquals(expectedTimeInVehicle, route.calcInVehicleTime());
+		assertEquals(expectedTimeInVehicle, route.getPtMatrixInVehicleTime());
 		
 	}
 	

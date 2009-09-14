@@ -74,6 +74,7 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		assertEquals(link2, testee.getEndLink());
 		assertEquals(null, testee.getFromStop());
 		assertEquals(null, testee.getFromMunicipality());
+		assertEquals(null, testee.getPtMatrixInVehicleTime());
 		assertEquals(null, testee.getToMunicipality());
 		assertEquals(null, testee.getToStop());
 		
@@ -89,9 +90,9 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		World world = new World();
 		ZoneLayer municipalities = (ZoneLayer) world.createLayer(new IdImpl("municipality"), "municipalities");
 		
-		Coord dummyMuniCoord = new CoordImpl(1001.0, 1001.0);
+		Coord dummyMuniCoord = new CoordImpl(3003.0, 3003.0);
 		Location fromMunicipality = new Zone(municipalities, new IdImpl("30000"), dummyMuniCoord, dummyMuniCoord, dummyMuniCoord, 0.0, "Ixwil");
-		dummyMuniCoord.setXY(2002.0, 2002.0);
+		dummyMuniCoord.setXY(4004.0, 4004.0);
 		Location toMunicipality = new Zone(municipalities, new IdImpl("30001"), dummyMuniCoord, dummyMuniCoord, dummyMuniCoord, 0.0, "Ypslikon");
 		
 		KtiPtRoute testee = new KtiPtRoute(link1, link2, this.plansCalcRouteKtiInfo, fromStop, fromMunicipality, toMunicipality, toStop);
@@ -101,21 +102,22 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		assertEquals(toStop, testee.getToStop());
 		assertEquals(fromMunicipality, testee.getFromMunicipality());
 		assertEquals(toMunicipality, testee.getToMunicipality());
+		assertEquals(330.0, testee.getPtMatrixInVehicleTime().doubleValue());
 		
-		assertEquals("kti=123=30000=30001=456", testee.getRouteDescription());
+		assertEquals("kti=123=30000=330.0=30001=456", testee.getRouteDescription());
 		
 	}
 	
 	public void testRouteDescription_KtiPtRoute() {
 		
-		String expectedRouteDescription = "kti=321=40000=40001=654";
+		String expectedRouteDescription = "kti=321=40000=456.78=40001=654";
 		KtiPtRoute testee = new KtiPtRoute(null, null, this.plansCalcRouteKtiInfo);
 		testee.setRouteDescription(null, expectedRouteDescription, null);
 		assertEquals(new IdImpl("321"), testee.getFromStop().getId());
 		assertEquals(new IdImpl("654"), testee.getToStop().getId());
 		assertEquals(new IdImpl("40000"), testee.getFromMunicipality().getId());
 		assertEquals(new IdImpl("40001"), testee.getToMunicipality().getId());
-//		assertEquals(expectedRouteDescription, testee.getRouteDescription());
+		assertEquals(456.78, testee.getPtMatrixInVehicleTime().doubleValue());
 		
 	}
 	
@@ -128,7 +130,7 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		assertNull(testee.getToStop());
 		assertNull(testee.getFromMunicipality());
 		assertNull(testee.getToMunicipality());
-//		assertEquals(expectedRouteDescription, testee.getRouteDescription());
+		assertNull(testee.getPtMatrixInVehicleTime());
 		
 	}
 	

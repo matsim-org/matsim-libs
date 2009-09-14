@@ -20,6 +20,7 @@
 
 package playground.meisterk.kti.router;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -36,11 +37,14 @@ public class KtiPtRoute extends GenericRouteImpl {
 	
 	public static final double CROW_FLY_FACTOR = 1.5;
 	
+	private final static Logger log = Logger.getLogger(KtiPtRoute.class);
+
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	private SwissHaltestelle fromStop = null;
 	private Location fromMunicipality = null;
 	private Location toMunicipality = null;
 	private SwissHaltestelle toStop = null;
+	private Double ptMatrixInvehicleTime = null;
 	
 	public KtiPtRoute(Link startLink, Link endLink, PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
 		super(startLink, endLink);
@@ -60,6 +64,7 @@ public class KtiPtRoute extends GenericRouteImpl {
 		this.fromMunicipality = fromMunicipality;
 		this.toMunicipality = toMunicipality;
 		this.toStop = toStop;
+		this.ptMatrixInvehicleTime = this.calcInVehicleTime();
 	}
 	
 	@Override
@@ -72,6 +77,7 @@ public class KtiPtRoute extends GenericRouteImpl {
 			IDENTIFIER + SEPARATOR + 
 			this.fromStop.getId() + SEPARATOR + 
 			this.fromMunicipality.getId() + SEPARATOR +
+			Double.toString(this.ptMatrixInvehicleTime) + SEPARATOR +
 			this.toMunicipality.getId() + SEPARATOR +
 			this.toStop.getId(); 
 		
@@ -90,8 +96,9 @@ public class KtiPtRoute extends GenericRouteImpl {
 			String[] routeDescriptionArray = StringUtils.explode(routeDescription, SEPARATOR);
 			this.fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[1]));
 			this.fromMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[2]));			
-			this.toMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[3]));
-			this.toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[4]));
+			this.ptMatrixInvehicleTime = Double.parseDouble(routeDescriptionArray[3]);
+			this.toMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[4]));
+			this.toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[5]));
 		} else {
 			this.fromStop = null;
 			this.fromMunicipality = null;			
@@ -105,9 +112,9 @@ public class KtiPtRoute extends GenericRouteImpl {
 		return CoordUtils.calcDistance(this.getFromStop().getCoord(), this.getToStop().getCoord()) * CROW_FLY_FACTOR;
 	}
 	
-	public double calcInVehicleTime() {
+	protected double calcInVehicleTime() {
 
-		Entry traveltime = plansCalcRouteKtiInfo.getPtTravelTimes().getEntry(this.fromMunicipality, this.toMunicipality);
+		Entry traveltime = this.plansCalcRouteKtiInfo.getPtTravelTimes().getEntry(this.fromMunicipality, this.toMunicipality);
 		if (traveltime == null) {
 			throw new RuntimeException("No entry found for " + this.fromMunicipality.getId() + " --> " + this.toMunicipality.getId());
 		}
@@ -138,6 +145,10 @@ public class KtiPtRoute extends GenericRouteImpl {
 
 	public SwissHaltestelle getToStop() {
 		return toStop;
+	}
+
+	public Double getPtMatrixInVehicleTime() {
+		return this.ptMatrixInvehicleTime;
 	}
 	
 }
