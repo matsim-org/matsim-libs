@@ -92,7 +92,11 @@ public class HubLinkMapping {
 
 
 	public int getHubNumber(String linkId) {
-		// TODO Auto-generated method stub
+		// just for debugging
+		if (linkHubMapping.get(linkId)==null){
+			System.out.println(linkId);
+		}
+		
 		return linkHubMapping.get(linkId).intValue();
 	}
 	
