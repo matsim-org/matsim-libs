@@ -17,7 +17,7 @@ import playground.wrashid.PSF.energy.charging.EnergyChargingPriceInfo;
 public class EnergyBalance {
 
 	private static final Logger log = Logger.getLogger(EnergyBalance.class);
-	
+
 	// for each parking log element we have the energy consumption, preceding it
 	// stored under the same index value in the lists.
 	LinkedList<ParkLog> parkingTimes = new LinkedList<ParkLog>();
@@ -77,7 +77,6 @@ public class EnergyBalance {
 		 * update the maxChargableEnergy(i) means, how much energy can be
 		 * charged at maximum at parking with index i (because of the battery
 		 * contstraint.
-		 * 
 		 */
 
 		// initialize the first element
@@ -143,8 +142,9 @@ public class EnergyBalance {
 			tempPrice = EnergyChargingPriceInfo.getEnergyPrice(time, parkingTimes.get(parkingIndex).getActivity().getLinkId());
 
 			FacilityChargingPrice tempFacilityChPrice = new FacilityChargingPrice(tempPrice, minTimeSlotNumber + j, parkingIndex,
-					time, parkingTimes.get(parkingIndex).getActivity().getFacilityId(), parkingTimes.get(parkingIndex).getStartParkingTime(),
-					parkingTimes.get(parkingIndex).getEndParkingTime(),parkingTimes.get(parkingIndex).getActivity().getLinkId());
+					time, parkingTimes.get(parkingIndex).getActivity().getFacilityId(), parkingTimes.get(parkingIndex)
+							.getStartParkingTime(), parkingTimes.get(parkingIndex).getEndParkingTime(), parkingTimes.get(
+							parkingIndex).getActivity().getLinkId());
 			chargingPrice.add(tempFacilityChPrice);
 		}
 	}
@@ -165,18 +165,20 @@ public class EnergyBalance {
 	}
 
 	/*
-	 * - positive value: the energy, that mus be charged, so that the car does not run out of gasoline on its way - negative value:
-	 * only little energy is needed for driving, therefore the next parking station could be reached without problems
+	 * - positive value: the energy, that mus be charged, so that the car does
+	 * not run out of gasoline on its way - negative value: only little energy
+	 * is needed for driving, therefore the next parking station could be
+	 * reached without problems
 	 */
 	private double getMinimumEnergyThatNeedsToBeCharged() {
 
 		if (lastChargingPriceParkingIndex == maxChargableEnergy.size()) {
 			// if last parking reached, then we must recharge the car fully
-			return maxChargableEnergy.get(lastChargingPriceParkingIndex-1);
+			return maxChargableEnergy.get(lastChargingPriceParkingIndex - 1);
 		} else {
 			// find out how much we would run out of electricity, if we would go
 			// to the next parking
-			return maxChargableEnergy.get(lastChargingPriceParkingIndex)- batteryCapacity;
+			return maxChargableEnergy.get(lastChargingPriceParkingIndex) - batteryCapacity;
 		}
 	}
 
@@ -218,7 +220,7 @@ public class EnergyBalance {
 				// destination, because the electricity was finished
 				// there should be some input here to the utility function
 				log.info("if this is an electric vehicle, then it has run out of power");
-				break;	
+				break;
 			}
 
 			// get the parking index, where this car will charge
@@ -228,10 +230,11 @@ public class EnergyBalance {
 			// can only charge as much as the car has driven previously)
 			double maximumEnergyThatCanBeCharged = maxChargableEnergy.get(parkingIndex);
 
-			// the minimum energy that needs to be charged, either to reach the next parking or
+			// the minimum energy that needs to be charged, either to reach the
+			// next parking or
 			// to fillup the electricity at the end of the day
 			double minimumEnergyThatNeedsToBeCharged = getMinimumEnergyThatNeedsToBeCharged();
-			
+
 			// skip the charging slot, if no charging at the current parking is
 			// needed
 			// TODO: this can be made more efficient later (perhaps)
@@ -239,44 +242,43 @@ public class EnergyBalance {
 				continue;
 			}
 
-			double energyCharged = bestEnergyPrice.getEnergyCharge(minimumEnergyThatNeedsToBeCharged,maximumEnergyThatCanBeCharged);
+			double energyCharged = bestEnergyPrice
+					.getEnergyCharge(minimumEnergyThatNeedsToBeCharged, maximumEnergyThatCanBeCharged);
 
-			
-			
 			// set energyCharged to maximumEnergyThatNeedsToBeCharged, if they
 			// are very close, to counter
 			// rounding errors.
-			double estimatedAmountOfEnergyCharged=Math.min(minimumEnergyThatNeedsToBeCharged,maximumEnergyThatCanBeCharged);
+			double estimatedAmountOfEnergyCharged = Math.min(minimumEnergyThatNeedsToBeCharged, maximumEnergyThatCanBeCharged);
 			int precision = 100000;
 			if (Math.abs(estimatedAmountOfEnergyCharged * precision - energyCharged * precision) <= 1) {
 				energyCharged = estimatedAmountOfEnergyCharged;
 			}
 
-			
-		
-			
-			
-			ChargeLog chargeLog = bestEnergyPrice.getChargeLog(minimumEnergyThatNeedsToBeCharged,maximumEnergyThatCanBeCharged);
+			ChargeLog chargeLog = bestEnergyPrice.getChargeLog(minimumEnergyThatNeedsToBeCharged, maximumEnergyThatCanBeCharged);
 
 			chargingTimes.addChargeLog(chargeLog);
 
 			updateMaxChargableEnergy(parkingIndex, energyCharged);
 
 			/*
-			 * We want to make sure, that unused parts of a slot can later be used.
+			 * We want to make sure, that unused parts of a slot can later be
+			 * used.
 			 * 
-			 * This means, if getEndTimeOfCharge < getEndTimeOfSlot then we should put this FacilityChargingPrice 
-			 * again into the queue and update its 
+			 * This means, if getEndTimeOfCharge < getEndTimeOfSlot then we
+			 * should put this FacilityChargingPrice again into the queue and
+			 * update it. But we should not add such FacilityChargingPrice into
+			 * the queue, which are at the end of the parking and their first
+			 * part has been used and the rest cannot be used.
 			 */
-			
-			double endTimeOfCharge=bestEnergyPrice.getEndTimeOfCharge(minimumEnergyThatNeedsToBeCharged, maximumEnergyThatCanBeCharged);
-			
-			if (endTimeOfCharge<bestEnergyPrice.getEndTimeOfSlot()){
+
+			double endTimeOfCharge = bestEnergyPrice.getEndTimeOfCharge(minimumEnergyThatNeedsToBeCharged,
+					maximumEnergyThatCanBeCharged);
+
+			if (endTimeOfCharge < bestEnergyPrice.getEndTimeOfSlot() && bestEnergyPrice.getSlotStartTime()!=bestEnergyPrice.getEndParkingTime()) {
 				bestEnergyPrice.setSlotStartTime(endTimeOfCharge);
 				chargingPrice.add(bestEnergyPrice);
 			}
-			
-			
+
 			// if possible, more parkings should be taken into consideration
 			updateChargingPrice(chargingPrice);
 		}
