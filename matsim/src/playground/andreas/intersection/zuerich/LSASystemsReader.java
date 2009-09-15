@@ -42,6 +42,7 @@ public class LSASystemsReader implements TabularFileHandler {
 			lsa.setDefaultInterGreenTime(3.0);
 			lsa.setDefaultSynchronizationOffset(0.0);
 			this.signals.addSignalSystemDefinition(lsa);
+			log.info("created signalSystemDefinition id " + signalSystemId);
 		}
 
 	}
