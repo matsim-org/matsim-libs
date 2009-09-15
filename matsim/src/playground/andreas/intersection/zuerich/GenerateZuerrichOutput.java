@@ -4,16 +4,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
 import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
@@ -22,6 +19,7 @@ import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.lanes.LanesConsistencyChecker;
+import playground.dgrether.signalsystems.SignalSystemsConsistencyChecker;
 
 public class GenerateZuerrichOutput {
 
@@ -35,6 +33,8 @@ public class GenerateZuerrichOutput {
 	private 	String sgGreentime = inputDir  + "sg_greentime.txt";
 	// node id \t suprnr \t linkid teleatlas \t linkid navteq \t linkid ivtch
 	private 	String spurLinkMappingFile = inputDir + "spur_link_mapping_ivtch.txt";
+	// knoten id -> lsa id
+	private String knotenLsaMappingFile = inputDir + "LSAs.txt";
 	//node id \t lsanr??? \t spurnr
 	private 	String lsaSpurMappingFile = inputDir + "lsa_spur_mapping.txt";
 	//node id \t vonspur \t nachspur
@@ -45,7 +45,7 @@ public class GenerateZuerrichOutput {
 	private 	String signalSystemsOutputFile = outputDir + "signalSystems.xml";
 	
 	private 	boolean generateLanes = true;
-	private 	boolean generateSignalSystems = false;
+	private 	boolean generateSignalSystems = true;
 	private 	boolean generateSignalSystemsConfig = false;
 	private 	boolean removeDuplicates = false;
 	
@@ -54,19 +54,19 @@ public class GenerateZuerrichOutput {
 		MatsimNetworkReader netReader = new MatsimNetworkReader((NetworkLayer) net);
 		netReader.readFile(DgPaths.IVTCHNET);
 		
-		Map<Integer, Map<Integer,  List<Integer>>> spurSpurMapping = null;
-		Map<Integer, Map<Integer, String>> spurLinkMapping = null;
+		Map<Integer, Map<Integer,  List<Integer>>> knotenVonSpurNachSpurMap = null;
+		Map<Integer, Map<Integer, String>> knotenSpurLinkMap = null;
 		BasicLaneDefinitions laneDefs = null;
 		if (generateLanes){
 			//knotennummer -> (vonspur 1->n nachspur)
-			spurSpurMapping = SpurSpurMappingReader.readBasicLightSignalSystemDefinition(spurSpurMappingFile);
+			knotenVonSpurNachSpurMap = SpurSpurMappingReader.readBasicLightSignalSystemDefinition(spurSpurMappingFile);
 			//knotennummer -> (spurnummer -> linkid)
-			spurLinkMapping = new SpurLinkMappingReader().readBasicLightSignalSystemDefinition(spurLinkMappingFile);
+			knotenSpurLinkMap = new SpurLinkMappingReader().readBasicLightSignalSystemDefinition(spurLinkMappingFile);
 			
 			//create the lanes
 			LanesGenerator laneGeneratior = new LanesGenerator();
 			laneGeneratior.setNetwork(net);
-			laneDefs = laneGeneratior.processLaneDefinitions(spurSpurMapping, spurLinkMapping);
+			laneDefs = laneGeneratior.processLaneDefinitions(knotenVonSpurNachSpurMap, knotenSpurLinkMap);
 			
 			new LanesConsistencyChecker(net, laneDefs).checkConsistency();
 			
@@ -76,14 +76,24 @@ public class GenerateZuerrichOutput {
 		}
 
 		if (generateSignalSystems){
+			//first generate the signal systems itself 
 			BasicSignalSystems signalSystems = new BasicSignalSystemsImpl();
 			//read the mappings
 			//read the system id <-> cycle time mapping
-			new LSASystemsReader(signalSystems).readBasicLightSignalSystemDefinition(lsaTu);			
+			new LSASystemsReader(signalSystems).readBasicLightSignalSystemDefinition(lsaTu);
+			
+			Map<Integer, Integer> knotenLsaMap = new KnotenLsaMapReader().readFile(knotenLsaMappingFile);
+			
+			//next generate the signal group definitions
 			//node id \t lsanr??? \t spurnr
-			Map<Integer, Map<Integer,  List<Integer>>> lsaSpurMapping = LSASpurMappingReader.readBasicLightSignalSystemDefinition(lsaSpurMappingFile);
+			Map<Integer, Map<Integer,  List<Integer>>> knotenLsaSpurMap = LSASpurMappingReader.readBasicLightSignalSystemDefinition(lsaSpurMappingFile);
+			
 			//create the signals
-			processSignalSystems(lsaSpurMapping, spurLinkMapping, signalSystems);
+			SignalSystemsGenerator signalsGenerator = new SignalSystemsGenerator(net, laneDefs, signalSystems);
+			signalsGenerator.processSignalSystems(knotenLsaSpurMap, knotenSpurLinkMap, knotenLsaMap);
+			
+			new SignalSystemsConsistencyChecker(net, laneDefs, signalSystems).checkConsistency();
+			
 			MatsimSignalSystemsWriter signalSytemswriter = new MatsimSignalSystemsWriter(signalSystems);
 			signalSytemswriter.writeFile(signalSystemsOutputFile );
 
@@ -106,47 +116,7 @@ public class GenerateZuerrichOutput {
 
 	}
 	
-	private void processSignalSystems(Map<Integer, Map<Integer, List<Integer>>> lsaSpurMapping, Map<Integer, Map<Integer, String>> laneLinkMapping, BasicSignalSystems signalSystems){
-		//create the signal groups
-		for (Integer nodeId : lsaSpurMapping.keySet()) {
-			Map<Integer,  List<Integer>> nodeCombos = lsaSpurMapping.get(nodeId);
-			
-			for (Integer fromSGId : nodeCombos.keySet()) {
-				String signalGroupDefIdString = laneLinkMapping.get(nodeId).get(fromSGId);
-				if ((signalGroupDefIdString != null) && signalGroupDefIdString.matches("[\\d]+")){
-					Id signalGroupDefId = new IdImpl(signalGroupDefIdString);
-					BasicSignalGroupDefinition sg = signalSystems.getSignalGroupDefinitions().get(signalGroupDefId);
-					if (sg == null){
-						Id linkRefId = new IdImpl(laneLinkMapping.get(nodeId).get(lsaSpurMapping.get(nodeId).get(fromSGId).get(0)));
-						//old signalGroupDefId was new IdImpl(fromSGId.intValue())
-						sg = signalSystems.getBuilder().createSignalGroupDefinition(linkRefId, signalGroupDefId);
-						//TODO check if exists
-						sg.setSignalSystemDefinitionId(new IdImpl(fromSGId.intValue()));
-					}
-					
-					//add lanes and toLinks
-//					sg = basicSGs.get(new IdImpl(laneLinkMapping.get(nodeId).get(fromSGId)));
-					List<Integer> toLanes = nodeCombos.get(fromSGId);
-					for (Integer toLaneId : toLanes) {
-						if (!laneLinkMapping.get(nodeId).get(toLaneId).equalsIgnoreCase("-")){
-							if((sg.getLaneIds() == null) || !sg.getLaneIds().contains(new IdImpl(toLaneId.intValue()))){
-								sg.addLaneId(new IdImpl(toLaneId.intValue()));
-							}
-							if((sg.getToLinkIds() == null) || !sg.getToLinkIds().contains(new IdImpl(laneLinkMapping.get(nodeId).get(toLaneId)))){
-								sg.addToLinkId(new IdImpl(laneLinkMapping.get(nodeId).get(toLaneId)));	
-							}
-						}
-					}
-					if(sg.getLaneIds() != null){
-							signalSystems.addSignalGroupDefinition(sg);
-					}
-				} //end if
-				else {
-					log.error("Cannot create signalGroupDefinition for id string " + signalGroupDefIdString);
-				}
-			} //end for			
-		}
-	}
+
 	
 	private BasicSignalSystemConfigurations processSignalSystemConfigurations(String sgGreentime) {
 		Map<Integer, BasicSignalSystemConfiguration> basicLightSignalSystemConfiguration = GreenTimeReader.readBasicLightSignalSystemDefinition(sgGreentime);
