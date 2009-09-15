@@ -39,7 +39,7 @@ public class DgOtfLaneWriter extends OTFDataWriter<QueueLink> implements OTFWrit
 	
   public static final boolean DRAW_LINK_TO_LINK_LINES = true;	
 	
-  private double linkScale = 0.9;
+  private double linkScale = 1.0;
   
   private double calculateLinkLength(Point2D.Double deltaLink) {
   	return Math.sqrt(Math.pow(deltaLink.x, 2) + Math.pow(deltaLink.y, 2));
