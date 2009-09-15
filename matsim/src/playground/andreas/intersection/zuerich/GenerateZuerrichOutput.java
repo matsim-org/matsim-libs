@@ -7,8 +7,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
+import org.matsim.lanes.basic.BasicLaneDefinitionsImpl;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
@@ -57,12 +59,13 @@ public class GenerateZuerrichOutput {
 		Map<Integer, Map<Integer,  List<Integer>>> knotenVonSpurNachSpurMap = null;
 		Map<Integer, Map<Integer, String>> knotenSpurLinkMap = null;
 		BasicLaneDefinitions laneDefs = null;
+		
+		//lane generation
 		if (generateLanes){
 			//knotennummer -> (vonspur 1->n nachspur)
 			knotenVonSpurNachSpurMap = SpurSpurMappingReader.readBasicLightSignalSystemDefinition(spurSpurMappingFile);
 			//knotennummer -> (spurnummer -> linkid)
 			knotenSpurLinkMap = new SpurLinkMappingReader().readBasicLightSignalSystemDefinition(spurLinkMappingFile);
-			
 			//create the lanes
 			LanesGenerator laneGeneratior = new LanesGenerator();
 			laneGeneratior.setNetwork(net);
@@ -73,6 +76,11 @@ public class GenerateZuerrichOutput {
 			//write data
 			MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(laneDefs);
 			laneWriter.writeFile(lanesOutputFile);
+		}
+		else {
+			laneDefs = new BasicLaneDefinitionsImpl();
+			MatsimLaneDefinitionsReader laneReader = new MatsimLaneDefinitionsReader(laneDefs);
+			laneReader.readFile(lanesOutputFile);
 		}
 
 		if (generateSignalSystems){
