@@ -78,23 +78,22 @@ public class SignalSystemsGenerator {
 	}
 
 	private void preprocessSystemDefinitions(Map<Integer, Map<Integer, List<Integer>>> knotenLsaSpurMap) {
-		List<Integer> malformedNodeIds = new ArrayList<Integer>();
-		
-		for (Integer knotenId : knotenLsaSpurMap.keySet()){
-			Map<Integer, List<Integer>> lsaSpurMap = knotenLsaSpurMap.get(knotenId);
-			for (Integer lsaIdInt : lsaSpurMap.keySet()){
-				Id lsaId = new IdImpl(lsaIdInt);
-				if (!this.signalSystems.getSignalSystemDefinitions().containsKey(lsaId)){
-					log.error("No signal system definition found for node id " + knotenId + " -> lsa id " 
-							+ lsaId + " ! removing node data!");
-					malformedNodeIds.add(knotenId);
-				}
+		List<Id> malformedSignalSystems = new ArrayList<Id>();
+		//check if for each created signal system a knotenLsaSpur mapping exists
+		for (Id signalSystemId : this.signalSystems.getSignalSystemDefinitions().keySet()) {
+			Integer id = Integer.valueOf(signalSystemId.toString());
+			if (!knotenLsaSpurMap.containsKey(id)) {
+				malformedSignalSystems.add(signalSystemId);
 			}
 		}
-		for (Integer knotenId : malformedNodeIds){
-			log.warn("removed knoten id " + knotenId + " because no signal system definition can be found for knoten -> lsa mapping ");
-			knotenLsaSpurMap.remove(knotenId);
+		// remove malformed
+		for (Id signalSystemId : malformedSignalSystems){
+			log.warn("removed signal system id " + signalSystemId + " from signalSystemDefinitions because no knotenLsaSpurMapping can be found");
+			this.signalSystems.getSignalSystemDefinitions().remove(signalSystemId);
 		}
+		
+		
+		
 	}
 
 	
