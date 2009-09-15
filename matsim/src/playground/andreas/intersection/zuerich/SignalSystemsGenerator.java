@@ -28,6 +28,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
+import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 
@@ -121,72 +122,59 @@ public class SignalSystemsGenerator {
 
 		preprocessData(knotenLsaSpurMap, knotenSpurLinkMap);
 		
+		
 		//create the signal groups
-		for (Integer nodeId : knotenLsaSpurMap.keySet()) {
+		for (Id signalSystemId : this.signalSystems.getSignalSystemDefinitions().keySet()){
 			System.out.println();
 			log.info("##########################################################");
-			log.info("processing node id " + nodeId);
+			log.info("processing signalSystemDefinition " + signalSystemId);
 			log.info("##########################################################");
+			Integer nodeId = Integer.parseInt(signalSystemId.toString());
 			Map<Integer,  List<Integer>> lsaSpurMap = knotenLsaSpurMap.get(nodeId);
 			Map<Integer, String> spurLinkMap = knotenSpurLinkMap.get(nodeId);
+
 			
-			for (Integer lsaId : lsaSpurMap.keySet()) {				
+			for (Integer signalGroupNr : lsaSpurMap.keySet()) {				
+				Id signalGroupId = new IdImpl(signalGroupNr);
 				//first we get the link id for the spur
-				String linkIdString = spurLinkMap.get(lsaId);
+				String linkIdString = spurLinkMap.get(signalGroupNr);
 				
 				if ((linkIdString != null) && linkIdString.matches("[\\d]+")){
 					//if this is valid....
 					Id linkId = new IdImpl(linkIdString);
 					//check if there is already a SignalGroupDefinition
-					BasicSignalGroupDefinition sg = signalSystems.getSignalGroupDefinitions().get(linkId);
-					// if not, create one SingalGroupDefinition for each link
-					if (sg == null){
-						/* this was a rather complicated way of doing the same twice
-//						Integer spurId = knotenLsaSpurMap.get(nodeId).get(lsaId).get(0);
-//						String spurLinkId = knotenSpurLinkMap.get(nodeId).get(spurId);
-//						Id linkRefId = new IdImpl(spurLinkId);
-						//old signalGroupDefId was new IdImpl(fromSGId.intValue())*/
-						//this is much easier
-						Id signalSystemDefinitionId = new IdImpl(lsaId.intValue());
-						//if the signalSystem is not existing abort
-						if (!this.signalSystems.getSignalSystemDefinitions().containsKey(signalSystemDefinitionId)){
-							log.error("Cannot create SignalGroupDefinition id " + linkId + 
-									" for link " + linkId + " cause the referenced signal system id " + signalSystemDefinitionId + " is not existing!");
-							continue;
-						}
-						sg = signalSystems.getBuilder().createSignalGroupDefinition(linkId, linkId);
-						sg.setSignalSystemDefinitionId(signalSystemDefinitionId);
-					}
-					
-					//add lanes and toLinks
-//					sg = basicSGs.get(new IdImpl(laneLinkMapping.get(nodeId).get(fromSGId)));
-					List<Integer> spuren = lsaSpurMap.get(lsaId);
-					for (Integer spurIdInteger : spuren) {
-						String spurLinkIdString = spurLinkMap.get(spurIdInteger);
-						if ((spurLinkIdString != null) && spurLinkIdString.matches("[\\d]+")){
+					if (!this.signalSystems.getSignalGroupDefinitions().containsKey(signalGroupId)){
+						BasicSignalGroupDefinition sg	= signalSystems.getBuilder().createSignalGroupDefinition(linkId, signalGroupId);
+						sg.setSignalSystemDefinitionId(signalSystemId);
+						
+						//add lanes and toLinks
+						List<Integer> spuren = lsaSpurMap.get(signalGroupNr);
+						for (Integer spurIdInteger : spuren) {
 							//lanes 
 							Id spurId = new IdImpl(spurIdInteger);
-							if((sg.getLaneIds() == null) || !sg.getLaneIds().contains(spurId)){
-								sg.addLaneId(spurId);
-							}
-							//toLinks
-							if((sg.getToLinkIds() == null) || !sg.getToLinkIds().contains(new IdImpl(spurLinkMap.get(spurIdInteger)))){
-								sg.addToLinkId(new IdImpl(spurLinkMap.get(spurIdInteger)));	
+							BasicLanesToLinkAssignment l2lAssignment = this.laneDefinitions.getLanesToLinkAssignments().get(linkId);
+							if ((l2lAssignment != null) 
+									&& l2lAssignment.getLanes().containsKey(spurId)){
+								if((sg.getLaneIds() == null) || !sg.getLaneIds().contains(spurId)){
+									sg.addLaneId(spurId);
+								}
+								
+								//toLinks
+								for (Id toLinkId : l2lAssignment.getLanes().get(spurId).getToLinkIds()){
+									sg.addToLinkId(toLinkId);
+								}
 							}
 						}
-						else {
-							log.error("Cannot find spur -> link mapping for spur id " + spurIdInteger);
-						}
 					}
-					if(sg.getLaneIds() != null){
-							signalSystems.addSignalGroupDefinition(sg);
+					else {
+						log.error("cannot create signalGroup twice for signal system id " + signalSystemId + " and signalGroupId " + signalGroupId);
 					}
-				} //end if
+				}
 				else {
-					log.error("Cannot create signalGroupDefinition for nodeId " + nodeId + " and lsaId " + lsaId + " cause the " +
+					log.error("Cannot create signalGroupDefinition for node/signalSystem Id " + nodeId + " and signalGroupNr " + signalGroupNr + " cause the " +
 							" link id string is" + linkIdString);
 				}
-			} //end for			
+			}
 		}
 	}
 	

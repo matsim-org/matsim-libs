@@ -48,7 +48,7 @@ public class GenerateZuerrichOutput {
 	
 	private 	boolean generateLanes = true;
 	private 	boolean generateSignalSystems = true;
-	private 	boolean generateSignalSystemsConfig = false;
+	private 	boolean generateSignalSystemsConfig = true;
 	private 	boolean removeDuplicates = false;
 	
 	public GenerateZuerrichOutput() {
@@ -120,7 +120,7 @@ public class GenerateZuerrichOutput {
 			RemoveDuplicates.readBasicLightSignalSystemDefinition(signalConfigOutputFile);
 			RemoveDuplicates.readBasicLightSignalSystemDefinition(signalSystemsOutputFile);
 		}
-		log.info("Everything finshed");
+		log.info("Everything finished");
 
 	}
 	
