@@ -48,6 +48,8 @@ public class FourWaysVis {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().network().setInputFile(netFile);
 		scenario.getConfig().plans().setInputFile(popFile);
+		scenario.getConfig().simulation().setSnapshotStyle("queue");
+		
 		
 		scenario.getConfig().network().setLaneDefinitionsFile(lanesFile);
 		scenario.getConfig().scenario().setUseLanes(true);
