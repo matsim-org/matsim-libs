@@ -45,7 +45,6 @@ public class FourWaysVis {
 //		OTFVis.playNetwork(netArray);
 		
 		
-		//this is hack
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().network().setInputFile(netFile);
 		scenario.getConfig().plans().setInputFile(popFile);
@@ -63,6 +62,7 @@ public class FourWaysVis {
 		EventsImpl events = new EventsImpl();
 		
 		
+		//this is hack
 		DgOnTheFlyQueueSimQuad client = new DgOnTheFlyQueueSimQuad(scenario, events);
 		client.setLaneDefinitions(scenario.getLaneDefinitions());
 		client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
