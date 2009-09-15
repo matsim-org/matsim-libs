@@ -100,7 +100,7 @@ public class SignalSystemsGenerator {
 	
 	
 	private void preprocessData(Map<Integer, Map<Integer, List<Integer>>> knotenLsaSpurMap, 
-			Map<Integer, Map<Integer, String>> knotenSpurLinkMap, Map<Integer, Integer> knotenLsaMap){
+			Map<Integer, Map<Integer, String>> knotenSpurLinkMap){
 		log.info("starting preprocessing...");
 		
 		preprocessKnotenLsaSpurMap(knotenLsaSpurMap, knotenSpurLinkMap);
@@ -114,13 +114,13 @@ public class SignalSystemsGenerator {
 	
 
 	public void processSignalSystems(Map<Integer, Map<Integer, List<Integer>>> knotenLsaSpurMap, 
-			Map<Integer, Map<Integer, String>> knotenSpurLinkMap, Map<Integer, Integer> knotenLsaMap){
+			Map<Integer, Map<Integer, String>> knotenSpurLinkMap){
 		System.out.println();
 		log.info("##########################################################");
 		log.info("Creating signal systems group definitions");
 		log.info("##########################################################");
 
-		preprocessData(knotenLsaSpurMap, knotenSpurLinkMap, knotenLsaMap);
+		preprocessData(knotenLsaSpurMap, knotenSpurLinkMap);
 		
 		//create the signal groups
 		for (Integer nodeId : knotenLsaSpurMap.keySet()) {

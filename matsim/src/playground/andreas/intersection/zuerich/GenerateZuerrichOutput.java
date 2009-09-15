@@ -34,7 +34,7 @@ public class GenerateZuerrichOutput {
 	// node id \t suprnr \t linkid teleatlas \t linkid navteq \t linkid ivtch
 	private 	String spurLinkMappingFile = inputDir + "spur_link_mapping_ivtch.txt";
 	// knoten id -> lsa id
-	private String knotenLsaMappingFile = inputDir + "LSAs.txt";
+//	private String knotenLsaMappingFile = inputDir + "LSAs.txt";
 	//node id \t lsanr??? \t spurnr
 	private 	String lsaSpurMappingFile = inputDir + "lsa_spur_mapping.txt";
 	//node id \t vonspur \t nachspur
@@ -82,7 +82,7 @@ public class GenerateZuerrichOutput {
 			//read the system id <-> cycle time mapping
 			new LSASystemsReader(signalSystems).readBasicLightSignalSystemDefinition(lsaTu);
 			
-			Map<Integer, Integer> knotenLsaMap = new KnotenLsaMapReader().readFile(knotenLsaMappingFile);
+//			Map<Integer, Integer> knotenLsaMap = new KnotenLsaMapReader().readFile(knotenLsaMappingFile);
 			
 			//next generate the signal group definitions
 			//node id \t lsanr??? \t spurnr
@@ -90,7 +90,7 @@ public class GenerateZuerrichOutput {
 			
 			//create the signals
 			SignalSystemsGenerator signalsGenerator = new SignalSystemsGenerator(net, laneDefs, signalSystems);
-			signalsGenerator.processSignalSystems(knotenLsaSpurMap, knotenSpurLinkMap, knotenLsaMap);
+			signalsGenerator.processSignalSystems(knotenLsaSpurMap, knotenSpurLinkMap);
 			
 			new SignalSystemsConsistencyChecker(net, laneDefs, signalSystems).checkConsistency();
 			
