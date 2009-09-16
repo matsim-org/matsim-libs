@@ -10,6 +10,8 @@ import java.util.PriorityQueue;
 import org.matsim.api.basic.v01.Id;
 
 import playground.wrashid.PSF.ParametersPSF;
+import playground.wrashid.PSF.energy.consumption.EnergyConsumption;
+import playground.wrashid.PSF.energy.consumption.LinkEnergyConsumptionLog;
 import playground.wrashid.PSF.parking.ParkLog;
 
 public class ChargingTimes {
@@ -57,14 +59,37 @@ public class ChargingTimes {
 	 * - Attention, this cannot work, because the ChargeLogs are not ordered! -
 	 * The energy consumption needs to be taken into account => this should be
 	 * directly done via the constructed instead!!!!
+	 * @param energyConsumption 
 	 * 
 	 */
-	/*
-	 * public void updateSOCs(){ double
-	 * startSOC=ParametersPSF.getDefaultMaxBatteryCapacity(); for (int i = 0; i
-	 * < chargingTimes.size(); i++) { chargingTimes.get(i).updateSOC(startSOC);
-	 * startSOC=chargingTimes.get(i).getEndSOC(); } }
-	 */
+
+	public void updateSOCs(EnergyConsumption energyConsumption) {
+		double startSOC = ParametersPSF.getDefaultMaxBatteryCapacity();
+		
+		LinkedList<LinkEnergyConsumptionLog> consumptionLog= (LinkedList<LinkEnergyConsumptionLog>) energyConsumption.getLinkEnergyConsumption().clone();
+		LinkEnergyConsumptionLog curConsumptionLog= consumptionLog.poll();
+		
+		// take both energy consumption and charging into consideration for calculating the SOC
+		
+		Iterator<ChargeLog> iterator = chargingTimes.iterator();
+
+		while (iterator.hasNext()) {
+			ChargeLog curChargeLog = iterator.next();
+			
+			// we must check if curConsumptionLog is not null, because if the agent only charges at home
+			// in the evening, then all energy consumption happens before that...
+			while (curConsumptionLog !=null && curConsumptionLog.getEnterTime()<curChargeLog.getEndChargingTime()){
+				startSOC-=curConsumptionLog.getEnergyConsumption();
+				curConsumptionLog= consumptionLog.poll();
+			}
+			
+			curChargeLog.updateSOC(startSOC);
+			startSOC = curChargeLog.getEndSOC();
+		}
+		
+		
+	}
+
 	/**
 	 * This writes out charging events. TODO: add columns at the end for
 	 * SOC_start and SOC_end Dependencies: Of course the link ids etc. must be

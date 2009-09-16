@@ -53,7 +53,7 @@ public class EnergyBalance {
 		int maxIndex = parkingTimes.size();
 
 		double sumEnergyConsumption;
-		LinkedList<LinkEnergyConsumptionLog> energyConsumptionLog = energyConsumption.getLinkEnergyConsumption();
+		LinkedList<LinkEnergyConsumptionLog> energyConsumptionLog = (LinkedList<LinkEnergyConsumptionLog>) energyConsumption.getLinkEnergyConsumption().clone();
 		LinkEnergyConsumptionLog tempEnergyConsumptionLog = null;
 		/*
 		 * - we compare the starting parking time, because if we would use the

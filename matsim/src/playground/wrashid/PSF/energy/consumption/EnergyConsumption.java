@@ -19,6 +19,10 @@ public class EnergyConsumption {
 		this.tempEnteranceTimeOfLastLink = tempEnteranceTimeOfLastLink;
 	}
 
+	/**
+	 * The list of energy consumption is ordered by time...
+	 * @return
+	 */
 	public LinkedList<LinkEnergyConsumptionLog> getLinkEnergyConsumption() {
 		return linkEnergyConsumption;
 	}

@@ -24,8 +24,6 @@ public class ParametersPSF {
 	private static String default_chargingPowerAtParking = "default.chargingPowerAtParking";
 	private static double defaultChargingPowerAtParking;
 	private static FacilityChargingPowerMapper facilityChargingPowerMapper;
-	
-
 
 	// in [W]
 	private static String main_numberOfHubs = "main.numberOfHubs";
@@ -40,8 +38,7 @@ public class ParametersPSF {
 	// path of the file, where the electricity price of each hub during the day
 	// is specified
 	private static AverageEnergyConsumptionBins averageEnergyConsumptionBins;
-	
-	
+
 	// testing parameters
 
 	private static String testing_ModeOn = "testingModeOn";
@@ -76,7 +73,7 @@ public class ParametersPSF {
 		tempStringValue = controler.getConfig().findParam(PSFModule, default_chargingPowerAtParking);
 		if (tempStringValue != null) {
 			defaultChargingPowerAtParking = Double.parseDouble(tempStringValue);
-			facilityChargingPowerMapper=new DefaultChargingPower(defaultChargingPowerAtParking);
+			facilityChargingPowerMapper = new DefaultChargingPower(defaultChargingPowerAtParking);
 		} else {
 			errorReadingParameter(default_chargingPowerAtParking);
 		}
@@ -94,7 +91,7 @@ public class ParametersPSF {
 		} else {
 			errorReadingParameter(main_hubPricesPath);
 		}
-		
+
 		tempStringValue = controler.getConfig().findParam(PSFModule, main_hubLinkMappingPath);
 		if (tempStringValue != null) {
 			hubLinkMapping = new HubLinkMapping(tempStringValue, numberOfHubs);
@@ -137,12 +134,13 @@ public class ParametersPSF {
 			} else {
 				errorReadingParameter(testing_lowTariffElectrictyPrice);
 			}
-			
+
 		}
 
-		// TODO: adapt this later, when we have better models (e.g. consider car type also)
-		averageEnergyConsumptionBins=new AverageEnergyConsumptionGalus();
-		
+		// TODO: adapt this later, when we have better models (e.g. consider car
+		// type also)
+		averageEnergyConsumptionBins = new AverageEnergyConsumptionGalus();
+
 		resetInternalParameters();
 	}
 
@@ -159,6 +157,13 @@ public class ParametersPSF {
 		log.error("parameter '" + parameterName + "' could not be read");
 	}
 
+	/**
+	 * TODO: This needs to be replaced by a method, which gives back an Object,
+	 * which gives back the max energy for a particular agent. Implement an
+	 * interface, which handles the default case.
+	 * 
+	 * @return
+	 */
 	public static double getDefaultMaxBatteryCapacity() {
 		return defaultMaxBatteryCapacity;
 	}
@@ -168,7 +173,7 @@ public class ParametersPSF {
 	}
 
 	// testing parameters
-	
+
 	public static AverageEnergyConsumptionBins getAverageEnergyConsumptionBins() {
 		return averageEnergyConsumptionBins;
 	}
@@ -245,19 +250,20 @@ public class ParametersPSF {
 		return hubPriceInfo;
 	}
 
-	
 	public static FacilityChargingPowerMapper getFacilityChargingPowerMapper() {
 		return facilityChargingPowerMapper;
 	}
-	
+
 	// if any thing needs to be processed after mutation of the parameters,
 	// put it here
 	public static void postMutationProcessing() {
 		// set hub price info
 		if (testingModeOn) {
-			hubPriceInfo = new HubPriceInfo(ParametersPSF.getTestingPeakPriceStartTime(), ParametersPSF.getTestingPeakPriceEndTime(), ParametersPSF.getTestingLowTariffElectrictyPrice(), ParametersPSF.getTestingPeakHourElectricityPrice());	
+			hubPriceInfo = new HubPriceInfo(ParametersPSF.getTestingPeakPriceStartTime(), ParametersPSF
+					.getTestingPeakPriceEndTime(), ParametersPSF.getTestingLowTariffElectrictyPrice(), ParametersPSF
+					.getTestingPeakHourElectricityPrice());
 		}
-		
+
 	}
 
 }

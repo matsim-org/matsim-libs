@@ -71,14 +71,13 @@ public class BasicTests extends MatsimTestCase {
 		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 72085, 1);
 		
 		
-		//System.exit(0);
-		// after charging the battery of the agent is full
-		//assertEquals(chargeLogOfAgentOne.getEndSOC(), ParametersPSF.getDefaultMaxBatteryCapacity());
+		// after charging the battery of the agent is full (allow for small rounding error)
+		assertEquals(chargeLogOfAgentOne.getEndSOC(), ParametersPSF.getDefaultMaxBatteryCapacity(), 0.1);
 		
 		
 		// the agent should charge twice.
 		assertEquals(2, chargingTimesOfAgentOne.getChargingTimes().size());
-	}  
+	}   
 
 	public void testLogParkingTime() {
 		LogParkingTimes logParkingTimes = new LogParkingTimes(controler);

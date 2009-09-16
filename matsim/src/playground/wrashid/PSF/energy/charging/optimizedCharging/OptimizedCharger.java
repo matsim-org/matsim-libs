@@ -58,16 +58,18 @@ public class OptimizedCharger {
 			// initialize the Charging times
 			// TODO: later for each individual car we should be able to read the
 			// max Battery capacities
+			
+			EnergyConsumption agentEnergyConsumption=energyConsumption.get(personId);
 			double maxBatteryCapacity = defaultMaxBatteryCapacity;
 			ChargingTimes chargingTimes = new ChargingTimes();
 			this.chargingTimes.put(personId, chargingTimes);
 
-			EnergyBalance eb = new EnergyBalance(parkingTimes.get(personId), energyConsumption.get(personId), maxBatteryCapacity,
+			EnergyBalance eb = new EnergyBalance(parkingTimes.get(personId), agentEnergyConsumption, maxBatteryCapacity,
 					chargingTimes);
 
 			chargingTimes = eb.getChargingTimes();
 			
-			//chargingTimes.updateSOCs();
+			chargingTimes.updateSOCs(agentEnergyConsumption);
 
 			chargingTimes.print();
 
