@@ -3,7 +3,9 @@ package playground.wrashid.PSF.energy.charging;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 
 import org.matsim.api.basic.v01.Id;
 
@@ -12,43 +14,57 @@ import playground.wrashid.PSF.parking.ParkLog;
 
 public class ChargingTimes {
 
-	private LinkedList<ChargeLog> chargingTimes = new LinkedList<ChargeLog>();
+	private PriorityQueue<ChargeLog> chargingTimes = new PriorityQueue<ChargeLog>();
 
 	public void addChargeLog(ChargeLog chargeLog) {
 		chargingTimes.add(chargeLog);
 	}
 
+	/**
+	 * This method does not give back the original list, but a copy.
+	 * 
+	 * @return
+	 */
 	public LinkedList<ChargeLog> getChargingTimes() {
-		return chargingTimes;
+		LinkedList<ChargeLog> list = new LinkedList<ChargeLog>();
+		Iterator<ChargeLog> iterator = chargingTimes.iterator();
+
+		while (iterator.hasNext()) {
+			ChargeLog curItem = iterator.next();
+			list.add(curItem);
+		}
+
+		return list;
 	}
 
 	public void print() {
-		for (int i = 0; i < chargingTimes.size(); i++) {
-			chargingTimes.get(i).print();
+		Iterator<ChargeLog> iterator = chargingTimes.iterator();
+
+		while (iterator.hasNext()) {
+			ChargeLog curItem = iterator.next();
+			curItem.print();
 		}
 	}
-	
+
 	/**
-	 * TODO: replace default max battery capacity with a class, which maps max battery of vehicles on 
-	 * an individual vehicle basis.
-	 * TODO - refactor: this is not neat design, because inconsitencies are possible, if this method is not invoked
+	 * TODO: replace default max battery capacity with a class, which maps max
+	 * battery of vehicles on an individual vehicle basis. TODO - refactor: this
+	 * is not neat design, because inconsitencies are possible, if this method
+	 * is not invoked
 	 * 
 	 * Appraoche: think through, if this could works????
 	 * 
-	 * - Attention, this cannot work, because the ChargeLogs are not ordered!
-	 * - The energy consumption needs to be taken into account
-	 * => this should be directly done via the constructed instead!!!!
+	 * - Attention, this cannot work, because the ChargeLogs are not ordered! -
+	 * The energy consumption needs to be taken into account => this should be
+	 * directly done via the constructed instead!!!!
 	 * 
 	 */
 	/*
-	public void updateSOCs(){
-		double startSOC=ParametersPSF.getDefaultMaxBatteryCapacity();
-		for (int i = 0; i < chargingTimes.size(); i++) {
-			chargingTimes.get(i).updateSOC(startSOC);
-			startSOC=chargingTimes.get(i).getEndSOC();
-		}
-	}
-*/
+	 * public void updateSOCs(){ double
+	 * startSOC=ParametersPSF.getDefaultMaxBatteryCapacity(); for (int i = 0; i
+	 * < chargingTimes.size(); i++) { chargingTimes.get(i).updateSOC(startSOC);
+	 * startSOC=chargingTimes.get(i).getEndSOC(); } }
+	 */
 	/**
 	 * This writes out charging events. TODO: add columns at the end for
 	 * SOC_start and SOC_end Dependencies: Of course the link ids etc. must be
@@ -76,7 +92,7 @@ public class ChargingTimes {
 					chargingOutput.write("\n");
 				}
 			}
-			
+
 			chargingOutput.flush();
 			chargingOutput.close();
 		} catch (Exception e) {

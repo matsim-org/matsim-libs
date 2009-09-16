@@ -1,11 +1,15 @@
 package playground.wrashid.PSF.energy.charging;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 
 import playground.wrashid.PSF.ParametersPSF;
+import playground.wrashid.PSF.energy.charging.optimizedCharging.EnergyBalance;
 
-public class ChargeLog {
+public class ChargeLog implements Comparable<ChargeLog> {
 
+	private static final Logger log = Logger.getLogger(ChargeLog.class);
+	
 	private Id linkId;
 
 	private double startChargingTime;
@@ -67,6 +71,24 @@ public class ChargeLog {
 	public void print() {
 		System.out.println("linkId: " + linkId + ", startChargingTime: " + startChargingTime + ", endChargingTime: " + endChargingTime + ", startSOC: "
 				+ startSOC + ", endSOC: " + endSOC);
+	}
+
+	/**
+	 * Two ChargeLogs are equal, if their chargeStartTime is equal... => That throws an error, because
+	 * this should not be possible for the same agent... => that would mean a wrong usage of this class...
+	 * @param otherChargeLog
+	 * @return
+	 */
+	public int compareTo(ChargeLog otherChargeLog) {
+		if (startChargingTime > otherChargeLog.getStartChargingTime()) {
+			return 1;
+		} else if (startChargingTime < otherChargeLog.getStartChargingTime()) {
+			return -1;
+		} else {
+			log.error("A car cannot charge using the same starting time twice...");
+			System.exit(-1);
+			return 0;
+		}
 	}
 
 }
