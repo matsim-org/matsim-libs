@@ -83,7 +83,7 @@ public class BasicTests extends MatsimTestCase {
 		File outputChargingLog= new File(ParametersPSF.getMainChargingTimesOutputFilePath());
 		assertTrue(outputChargingLog.exists());
 	}
-	
+	 
 	
 
 	public void testLogParkingTime() {

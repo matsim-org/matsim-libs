@@ -65,7 +65,7 @@ public class AdvancedTests extends MatsimTestCase {
 
 		// after the first charge, the battery should be full
 		assertEquals(chargeLogOfAgentOne.getEndSOC(), ParametersPSF.getDefaultMaxBatteryCapacity());
-		
+
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 22989, 1);
 		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 23104, 1);
 
@@ -74,12 +74,13 @@ public class AdvancedTests extends MatsimTestCase {
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 61449, 1);
 		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 61535, 1);
 
-		// after charging the battery of the agent is full (allow for small rounding error)
+		// after charging, the battery of the agent is full (allow for small
+		// rounding error)
 		assertEquals(chargeLogOfAgentOne.getEndSOC(), ParametersPSF.getDefaultMaxBatteryCapacity(), 0.1);
-		
+
 		// the agent should charge twice.
 		assertEquals(2, chargingTimesOfAgentOne.getChargingTimes().size());
-	} 
+	}
 
 	/*
 	 * The agent arrives at work after starting of peak hour tariff, therefore
@@ -103,13 +104,14 @@ public class AdvancedTests extends MatsimTestCase {
 
 		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(new IdImpl("1"));
 		ChargeLog chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(0);
-		
+
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 72000, 1);
 		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 72200, 1);
 
-		// after charging the battery of the agent is full (allow for small rounding error)
+		// after charging the battery of the agent is full (allow for small
+		// rounding error)
 		assertEquals(chargeLogOfAgentOne.getEndSOC(), ParametersPSF.getDefaultMaxBatteryCapacity(), 0.1);
-		
+
 		// the agent should charge only using one slot
 		assertEquals(1, chargingTimesOfAgentOne.getChargingTimes().size());
 	}
@@ -135,7 +137,7 @@ public class AdvancedTests extends MatsimTestCase {
 
 		// after the first charge, the battery should be full
 		assertEquals(chargeLogOfAgentOne.getEndSOC(), ParametersPSF.getDefaultMaxBatteryCapacity());
-		
+
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 22989, 1);
 		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 23104, 1);
 
@@ -144,9 +146,10 @@ public class AdvancedTests extends MatsimTestCase {
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 61449, 1);
 		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 61535, 1);
 
-		// after charging the battery of the agent is full (allow for small rounding error)
+		// after charging the battery of the agent is full (allow for small
+		// rounding error)
 		assertEquals(chargeLogOfAgentOne.getEndSOC(), ParametersPSF.getDefaultMaxBatteryCapacity(), 0.1);
-		
+
 		// the agent should charge twice.
 		assertEquals(2, chargingTimesOfAgentOne.getChargingTimes().size());
 	}
@@ -220,9 +223,10 @@ public class AdvancedTests extends MatsimTestCase {
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 81900, 1);
 		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 82285, 1);
 
-		// after charging the battery of the agent is full (allow for small rounding error)
+		// after charging the battery of the agent is full (allow for small
+		// rounding error)
 		assertEquals(chargeLogOfAgentOne.getEndSOC(), ParametersPSF.getDefaultMaxBatteryCapacity(), 0.1);
-		
+
 		// make sure, this is the last charging of the agent
 		assertEquals(19, chargingTimesOfAgentOne.getChargingTimes().size());
 	}
@@ -254,10 +258,10 @@ public class AdvancedTests extends MatsimTestCase {
 		controler.run();
 
 		assertionsTest5();
-		
+
 	}
-	
-	public void assertionsTest5(){
+
+	public void assertionsTest5() {
 		ChargingTimes chargingTimesOfAgentOne = getChargingTimesOfAgent("1");
 		ChargeLog chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(0);
 
@@ -327,14 +331,15 @@ public class AdvancedTests extends MatsimTestCase {
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 81900, 1);
 		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 82285, 1);
 
-		// after charging the battery of the agent is full (allow for small rounding error)
+		// after charging the battery of the agent is full (allow for small
+		// rounding error)
 		assertEquals(chargeLogOfAgentOne.getEndSOC(), ParametersPSF.getDefaultMaxBatteryCapacity(), 0.1);
-		
+
 		// make sure, this is the last charging of the agent
 		assertEquals(20, chargingTimesOfAgentOne.getChargingTimes().size());
 	}
-	
-	public ChargingTimes getChargingTimesOfAgent(String agentId){
+
+	public ChargingTimes getChargingTimesOfAgent(String agentId) {
 		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes
 				.getParkingTimes());
 		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
@@ -342,27 +347,26 @@ public class AdvancedTests extends MatsimTestCase {
 		ChargingTimes chargingTimesOfAgent = chargingTimes.get(new IdImpl(agentId));
 		return chargingTimesOfAgent;
 	}
-	
-	
+
 	/*
-	 * testingModeOn=false => test mode turned off in config file and therefore using explicit hub link mappings
-	 * and hub energy prices.
+	 * testingModeOn=false => test mode turned off in config file and therefore
+	 * using explicit hub link mappings and hub energy prices.
 	 */
 	public void test6OptimizedCharger() {
 		initTest("test/input/playground/wrashid/PSF/singleAgent/config3.xml");
-		
+
 		simulationStartupListener.addParameterPSFMutator(new ParametersPSFMutator() {
 			public void mutateParameters() {
-			
+
 			}
 		});
 
 		controler.run();
-		
+
 		ChargingTimes chargingTimesOfAgentOne = getChargingTimesOfAgent("1");
-		
+
 		ChargeLog chargeLogOfAgentOne;
-		
+
 		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(0);
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 22989.899208063354, 1);
 		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 23400.0, 1);
@@ -370,9 +374,43 @@ public class AdvancedTests extends MatsimTestCase {
 		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(9);
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 29700.0, 1);
 		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 30492.901121572733, 1);
+
+		// chargingTimesOfAgentOne.print();
+	}
+
+	/*
+	 * This is a special boundary case, because the owner of the car leaves his
+	 * car at his working place and walks home. This case actually occurs in the
+	 * berlin 1% scenario (agentId="193077"). But his does not cause the error. The error is caused,
+	 * because the car arrives at work very fast (within the first charging bin, available at work).
+	 * => This caused a negative energy value. => bug resolved now in FacilityChargingPrice.getEndTimeOfCharge(...)
+	 * 
+	 * As the peak is during the night, the agent should start charging immediatly upon arriving.
+	 */
+	public void test7OptimizedCharger() {
+		initTest("test/input/playground/wrashid/PSF/singleAgent/config6.xml");
+
+		simulationStartupListener.addParameterPSFMutator(new ParametersPSFMutator() {
+			public void mutateParameters() {
+				ParametersPSF.setTestingPeakPriceStartTime(600);
+				ParametersPSF.setTestingPeakPriceEndTime(1200);
+			}
+		});
+
+		controler.run();
+
+		ChargingTimes chargingTimesOfAgentOne = getChargingTimesOfAgent("1");
+
+		ChargeLog chargeLogOfAgentOne;
+
+		// the agent starts charging in the night and the link, where he charges, is not the home link, but the working place link
+		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(0);
+		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 21721.0, 1.0);
+		assertEquals(chargeLogOfAgentOne.getLinkId().toString(), "20");
 		
-		//chargingTimesOfAgentOne.print();
-	} 
-	
-	 
-}
+		// after charging, the battery of the agent is full (allow for small
+		// rounding error)
+		assertEquals(chargingTimesOfAgentOne.getChargingTimes().getLast().getEndSOC(), ParametersPSF.getDefaultMaxBatteryCapacity(), 0.1);
+	}  
+  
+} 

@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<plans>
+
+<!-- For documentation, see the test, which uses it.  -->
+
+<person id="1">
+	<plan>
+		<act type="h" x="-25000" facility="myHomeFacility" y="0" link="23" end_time="06:00" />
+		<leg mode="walk" trav_time="00:00:01">
+				<route trav_time="00:00:01">
+					
+				</route>
+		</leg>
+		<act type="parkingDeparture" facility="myHomeFacility" x="-25000" y="0" link="23" dur="00:01" />
+		<leg mode="car">
+			<route>1 2 7 12</route>
+		</leg>
+		<act type="parkingArrival" x="-25000" y="0" link="20" facility="parkingAtWorkWithElectricity" dur="00:01" />
+		<leg mode="walk" trav_time="00:01">
+				<route trav_time="00:01">
+					
+				</route>
+		</leg>
+		<act type="w" facility="myWorkFacility"  x="5000" y="-5000" link="21" dur="10:00" />
+		<leg mode="walk" trav_time="00:33">
+				<route trav_time="00:33">
+					
+				</route>
+		</leg>
+		<act type="h" x="-25000" y="0" link="23" />
+	</plan>
+</person>
+</plans>

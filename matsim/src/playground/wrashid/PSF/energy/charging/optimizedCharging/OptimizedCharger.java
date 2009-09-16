@@ -68,6 +68,11 @@ public class OptimizedCharger {
 			EnergyBalance eb = new EnergyBalance(parkingTimes.get(personId), agentEnergyConsumption, maxBatteryCapacity,
 					chargingTimes);
 
+			
+			if (personId.toString().equalsIgnoreCase("193077")){
+				System.out.println();
+			}
+			
 			chargingTimes = eb.getChargingTimes(agentEnergyConsumption);
 
 			// write out charging events to the console and also to a file (if specified)
