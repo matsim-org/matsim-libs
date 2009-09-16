@@ -66,6 +66,8 @@ public class OptimizedCharger {
 					chargingTimes);
 
 			chargingTimes = eb.getChargingTimes();
+			
+			//chargingTimes.updateSOCs();
 
 			chargingTimes.print();
 

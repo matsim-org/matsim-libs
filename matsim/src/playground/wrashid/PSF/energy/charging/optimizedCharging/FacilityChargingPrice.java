@@ -77,7 +77,7 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	public ChargeLog getChargeLog(double minimumEnergyThatNeedsToBeCharged,double maxChargableEnergy) {
 		double startChargingTime = slotStartTime<startParkingTime?startParkingTime:slotStartTime;
 
-		return new ChargeLog(linkId, startChargingTime, getEndTimeOfCharge(minimumEnergyThatNeedsToBeCharged,maxChargableEnergy));
+		return new ChargeLog(linkId,facilityId, startChargingTime, getEndTimeOfCharge(minimumEnergyThatNeedsToBeCharged,maxChargableEnergy));
 	}
 
 	// how much energy will be charged through this slot and facility

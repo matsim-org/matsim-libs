@@ -7,6 +7,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.energy.AddEnergyScoreListener;
 import playground.wrashid.PSF.energy.SimulationStartupListener;
 import playground.wrashid.PSF.energy.charging.ChargeLog;
@@ -68,10 +69,16 @@ public class BasicTests extends MatsimTestCase {
 		// immediately, but waits until low tariff starts)
 		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 72000, 1);
 		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 72085, 1);
-
+		
+		
+		//System.exit(0);
+		// after charging the battery of the agent is full
+		//assertEquals(chargeLogOfAgentOne.getEndSOC(), ParametersPSF.getDefaultMaxBatteryCapacity());
+		
+		
 		// the agent should charge twice.
 		assertEquals(2, chargingTimesOfAgentOne.getChargingTimes().size());
-	}
+	}  
 
 	public void testLogParkingTime() {
 		LogParkingTimes logParkingTimes = new LogParkingTimes(controler);

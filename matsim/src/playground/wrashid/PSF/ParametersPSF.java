@@ -8,6 +8,8 @@ import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF.data.HubPriceInfo;
 import playground.wrashid.PSF.data.energyConsumption.AverageEnergyConsumptionBins;
 import playground.wrashid.PSF.data.energyConsumption.AverageEnergyConsumptionGalus;
+import playground.wrashid.PSF.data.powerCharging.DefaultChargingPower;
+import playground.wrashid.PSF.data.powerCharging.FacilityChargingPowerMapper;
 
 public class ParametersPSF {
 
@@ -21,6 +23,10 @@ public class ParametersPSF {
 	// in [J]
 	private static String default_chargingPowerAtParking = "default.chargingPowerAtParking";
 	private static double defaultChargingPowerAtParking;
+	private static FacilityChargingPowerMapper facilityChargingPowerMapper;
+	
+
+
 	// in [W]
 	private static String main_numberOfHubs = "main.numberOfHubs";
 	private static int numberOfHubs;
@@ -34,7 +40,8 @@ public class ParametersPSF {
 	// path of the file, where the electricity price of each hub during the day
 	// is specified
 	private static AverageEnergyConsumptionBins averageEnergyConsumptionBins;
-
+	
+	
 	// testing parameters
 
 	private static String testing_ModeOn = "testingModeOn";
@@ -69,6 +76,7 @@ public class ParametersPSF {
 		tempStringValue = controler.getConfig().findParam(PSFModule, default_chargingPowerAtParking);
 		if (tempStringValue != null) {
 			defaultChargingPowerAtParking = Double.parseDouble(tempStringValue);
+			facilityChargingPowerMapper=new DefaultChargingPower(defaultChargingPowerAtParking);
 		} else {
 			errorReadingParameter(default_chargingPowerAtParking);
 		}
@@ -237,6 +245,10 @@ public class ParametersPSF {
 		return hubPriceInfo;
 	}
 
+	
+	public static FacilityChargingPowerMapper getFacilityChargingPowerMapper() {
+		return facilityChargingPowerMapper;
+	}
 	
 	// if any thing needs to be processed after mutation of the parameters,
 	// put it here
