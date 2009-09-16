@@ -119,11 +119,7 @@ public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimList
 			}
 
 			log.info("Writing results file...");
-			for (boolean isCumulative : new boolean[]{false, true}) {
-				for (CrosstabFormat crosstabFormat : CrosstabFormat.values()) {
-					this.calcLegTimesKTI.printClasses(crosstabFormat, isCumulative, timeBins, out);
-				}
-			}
+			this.calcLegTimesKTI.printClasses(CrosstabFormat.ABSOLUTE, false, timeBins, out);
 			this.calcLegTimesKTI.printDeciles(true, out);
 			out.close();
 			log.info("Writing results file...done.");
