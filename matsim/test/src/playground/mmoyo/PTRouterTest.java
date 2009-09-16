@@ -28,9 +28,11 @@ import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.PTRouter.PTRouter;
+import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.TransitSimulation.LogicFactory;
 import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
+
 
 /** makes tests with the transit router on the 5x5 scenario*/
 public class PTRouterTest extends MatsimTestCase {
@@ -39,6 +41,7 @@ public class PTRouterTest extends MatsimTestCase {
 	private static final String NETWORK= PATH + "network.xml";
 	private static final String TRANSITSCHEDULE= PATH + "TransitSchedule.xml";
 	private static final String PLANFILE = PATH +  "plans.xml";
+	private static PTValues ptvalues;
 	
 	public void testRouter() throws SAXException, ParserConfigurationException, IOException {
 		/**read transit schedule, plain net create logic elements */
@@ -47,9 +50,10 @@ public class PTRouterTest extends MatsimTestCase {
 		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(transitSchedule, network).readFile(TRANSITSCHEDULE);
-		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
+		LogicFactory logicFactory = new LogicFactory(transitSchedule, ptvalues); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
 		NetworkLayer logicNet= logicFactory.getLogicNet();
-		PTRouter ptRouter = logicFactory.getPTRouter();
+		PTRouter ptRouter = new PTRouter (logicNet, logicFactory.getLogicPTTimeTable(), ptvalues);
+		
 		NetworkLayer plainNetwork= logicFactory.getPlainNet();
 		LogicIntoPlainTranslator logicIntoPlainTranslator = logicFactory.getLogicToPlainTranslator();
 
@@ -76,7 +80,7 @@ public class PTRouterTest extends MatsimTestCase {
 		assertEquals( plainPathNodes.get(7).getId() , new IdImpl("24"));
 	
 		/**tests TransitRouteFinder class*/
-		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule);
+		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule,ptvalues);
 		PopulationImpl population = new PopulationImpl();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, plainNetwork);
 		plansReader.readFile(PLANFILE);

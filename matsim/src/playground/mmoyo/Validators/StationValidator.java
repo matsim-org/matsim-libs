@@ -1,13 +1,7 @@
 package playground.mmoyo.Validators;
 
-import java.util.List;
-
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-
-import playground.mmoyo.deprecVersion.PTStation;
 
 /**
  * Validates that all nodes in an intersection have the same coordinate and correct id`s
@@ -17,21 +11,6 @@ public class StationValidator {
 	
 	public StationValidator(final NetworkLayer net){
 		this.net = net;
-	}
-	
-	public boolean hasValidCoordinates(final PTStation ptStation){
-		for (List<Id> list : ptStation.getIntersecionMap().values()) {
-			Id firstId= list.get(0);
-			NodeImpl firstNode=  net.getNode(firstId);
-			Coord firstCoord = firstNode.getCoord();
-			for (Id id : list){
-				NodeImpl node=  net.getNode(id);
-				Coord coord = node.getCoord();
-				if(!firstCoord.equals(coord))
-					throw new java.lang.NullPointerException(id + "PTNode does not have the same coordinates as their sibling PTNodes ");
-			}
-		}
-		return true;
 	}
 	
 	public void validateIds(final NetworkLayer netDiv){

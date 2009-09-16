@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -21,9 +22,9 @@ import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.xml.sax.SAXException;
-import playground.mmoyo.PTRouter.PTActWriter;
-import playground.mmoyo.PTRouter.PTRouter;
-import org.matsim.api.basic.v01.TransportMode;
+
+import playground.mmoyo.PTRouter.*;
+import playground.mmoyo.Validators.TransitRouteValidator;
 
 /**
  * This class contains the options to route with a TransitSchedule object 
@@ -32,7 +33,7 @@ public class Main {
 	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
 	//private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
 	private static final String CONFIG =  PATH  + "config.xml";
-	private static final String PLANFILE = PATH +  "plans.xml"; //"_input_file.xml"; // 
+	private static final String PLANFILE = PATH + "plans.xml";// "plans.xml"; //"_input_file.xml"; // 
 	private static final String OUTPUTPLANS = PATH + "output_plans.xml";
 	private static final String NETWORK = PATH + "network.xml";
 	private static final String PLAINNETWORK = PATH + "plainNetwork.xml";
@@ -45,6 +46,7 @@ public class Main {
 		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		PTActWriter ptActWriter;
+		PTValues ptValues = new PTValues();
 		
 		/***************reads the transitSchedule file**********/
 		new MatsimNetworkReader(network).readFile(NETWORK);
@@ -59,10 +61,10 @@ public class Main {
 		}
 		/*******************************************************/
 	
-		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
+		LogicFactory logicFactory = new LogicFactory(transitSchedule, ptValues); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
 		NetworkLayer plainNetwork=logicFactory.getPlainNet();
 		
-		int option =3;
+		int option =10;
 		switch (option){
 			case 1:    //writes logicElement files
 				logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);
@@ -70,12 +72,11 @@ public class Main {
 			
 			case 2:  //searches and shows a PT path between two coordinates or nodes */  
 				plainNetwork=logicFactory.getPlainNet();
-				PTRouter ptRouter = logicFactory.getPTRouter();
-				
+				PTRouter ptRouter = new PTRouter(logicFactory.getLogicNet(), logicFactory.getLogicPTTimeTable(), ptValues);
 				Coord coord1 = new CoordImpl(686897, 250590);
 				Coord coord2 = new CoordImpl(684854, 254079);
-				NodeImpl nodeA = plainNetwork.getNode("299598");
-				NodeImpl nodeB = plainNetwork.getNode("8503309");
+				//NodeImpl nodeA = plainNetwork.getNode("299598");
+				//NodeImpl nodeB = plainNetwork.getNode("8503309");
 				Path path = ptRouter.findPTPath (coord1, coord2, 37075, 400);
 				System.out.println(path.links.size());
 				for (Link l : path.links){
@@ -86,14 +87,14 @@ public class Main {
 				
 			case 3: //Routes a population/
 				double startTime = System.currentTimeMillis();
-				ptActWriter = new PTActWriter(logicFactory, CONFIG, PLANFILE, OUTPUTPLANS);
+				ptActWriter = new PTActWriter(logicFactory, ptValues, CONFIG, PLANFILE, OUTPUTPLANS);
 				ptActWriter.findRouteForActivities();
 				System.out.println("total process duration: " + (System.currentTimeMillis()-startTime));
 				break;
 
 			case 4:  //tests the TransitRouteFinder class with the population of PTActWriter class
-				ptActWriter = new PTActWriter(logicFactory, CONFIG, PLANFILE, OUTPUTPLANS);
-				ptActWriter.printPTLegs(transitSchedule);
+				ptActWriter = new PTActWriter(logicFactory, ptValues, CONFIG, PLANFILE, OUTPUTPLANS);
+				ptActWriter.printPTLegs(transitSchedule, ptValues);
 				break;
 
 			case 5:
@@ -108,7 +109,7 @@ public class Main {
 			case 6:  //simplifies a plan
 				String planToSimplify = "output_plan.xml";
 				String simplifiedPlan = "simplfied_plan.xml";
-				ptActWriter = new PTActWriter(logicFactory, CONFIG, PATH + planToSimplify , PATH + simplifiedPlan);
+				ptActWriter = new PTActWriter(logicFactory, ptValues, CONFIG, PATH + planToSimplify , PATH + simplifiedPlan);
 				ptActWriter.simplifyPtLegs();
 				break;
 			
@@ -142,12 +143,19 @@ public class Main {
 			case 9:
 				/**Counts transfer links*/
 				NetworkLayer logicNetwork=logicFactory.getLogicNet();
-				String TRANSFER = "Transfer"; 
 				int transfers=0;
 				for (LinkImpl linkImpl : logicNetwork.getLinks().values()){
-					if (linkImpl.getType().equals(TRANSFER)) transfers++;
+					if (linkImpl.getType().equals("Transfer")) transfers++;
 				}
-				System.out.println("Transfers: " +  transfers);
+				System.out.println("Transferlinks: " +  transfers);
+				break;
+			
+			case 10:
+				/**shows statistics of population routing */
+				Counter counter= new Counter(PLANFILE, logicFactory, ptValues);
+				break;
+			case 11:
+				TransitRouteValidator transitRouteValidator = new TransitRouteValidator(logicFactory, ptValues);
 				break;
 		}
 	}

@@ -16,7 +16,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.PTRouter.PTRouter;
-import playground.mmoyo.PTRouter.Walk;
+import playground.mmoyo.PTRouter.PTValues;
 
 /**
  * Receives two acts and returns a list of PT legs connecting their coordinates 
@@ -24,24 +24,20 @@ import playground.mmoyo.PTRouter.Walk;
 public class TransitRouteFinder {
 	private PTRouter ptRouter;
 	private LogicIntoPlainTranslator logicToPlainTranslator;
-	private static Walk walk = new Walk();
+	private PTValues ptValues ;
 	
-	public TransitRouteFinder(final TransitSchedule transitSchedule){
-		LogicFactory logicFactory = new LogicFactory(transitSchedule);
-		this.ptRouter = logicFactory.getPTRouter();
+	public TransitRouteFinder(final TransitSchedule transitSchedule, PTValues ptValues){
+		this.ptValues = ptValues;
+		LogicFactory logicFactory = new LogicFactory(transitSchedule, ptValues);
+		this.ptRouter = new PTRouter(logicFactory.getLogicNet(), logicFactory.getLogicPTTimeTable(), ptValues);
 		this.logicToPlainTranslator = logicFactory.getLogicToPlainTranslator();
-	}
-	
-	@Deprecated
-	public TransitRouteFinder(PTRouter ptRouter ){
-		this.ptRouter = ptRouter;
 	}
 	
 	/**returns a list of legs that represent a PT connection between two activities locations*/ 
 	public List<LegImpl> calculateRoute (final ActivityImpl fromAct, final ActivityImpl toAct, final PersonImpl person ){
 		List<LegImpl> legList = new ArrayList<LegImpl>();
 		
-		double distToWalk = walk.distToWalk(person.getAge());
+		double distToWalk = ptValues.distToWalk(person.getAge());
 		Path path = ptRouter.findPTPath(fromAct.getCoord(), toAct.getCoord(), fromAct.getEndTime(), distToWalk);
 
 		if (path!= null){

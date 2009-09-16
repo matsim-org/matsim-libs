@@ -5,6 +5,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.mmoyo.PTRouter.PTTimeTable;
+import playground.mmoyo.PTRouter.PTValues;
 
 /**
  * Validates all links in a network for correct cost values and lengths
@@ -13,7 +14,6 @@ public class NetValidator {
 	
 	private NetworkLayer net;
 	private PTTimeTable ptTimeTable;
-	
 	
 	public NetValidator (final NetworkLayer net, final PTTimeTable ptTimeTable){
 		this.net = net;
@@ -39,7 +39,7 @@ public class NetValidator {
 		int x=0;
 		for(LinkImpl link: net.getLinks().values()){
 			if(link.getType().equals("Transfer")){ 
-				double cost= ptTimeTable.getTransferTime(link, time);
+				double cost= ptTimeTable.getTransferTime(link.getToNode().getId(), time);
 				if (cost<0){
 					System.out.println(link.getId() + " link has negative transfer time: " + cost);
 					x++;

@@ -8,36 +8,47 @@ import org.matsim.core.network.LinkImpl;
  * Calculates the cost of links for the routing algorithm
  */
 public class PTTravelCost implements TravelCost {
-	PTTimeTable ptTimeTable;
-	String type;
+	private PTTimeTable ptTimeTable;
+	private String type;
 	double cost;
 	double travelTime;
 	double travelDistance;
-	double timeValue = .3;
-	double distanceValue =.7;
-	double transferValue = 60;
-	double walkValue = 1.3;
+
+	////coefficients with original values set to count only travelTime///
+	double timeCoeficient =.9;
+	double distanceCoeficient=.1;
+	double transferPenalty=60;
+	double walkCoefficient= 0; 
 	
 	public PTTravelCost(final PTTimeTable ptTimeTable) {
 		this.ptTimeTable = ptTimeTable; 
 	}
+	
+	public PTTravelCost(final PTTimeTable ptTimeTable, double timeCoeficient, double distanceCoeficient, double transferPenalty) {
+		this.ptTimeTable = ptTimeTable; 
+		this.timeCoeficient =timeCoeficient ; 
+		this.distanceCoeficient = distanceCoeficient ; 
+		this.transferPenalty = transferPenalty;
+	}
 
 	public double getLinkTravelCost(Link link, double time) {
-				
-		//////////////set objective values/////////////////////////////////////
+		cost=0;
+		
+		////set objective values
 		travelTime = ptTimeTable.getLinkTravelTime(link, time) ;
-		travelDistance = link.getLength();
+		//travelDistance = link.getLength();
 		
-		//////////////set subjective values ////////////////////////////////////
-		type = ((LinkImpl) link).getType();
-		if (type.equals("DetTransfer") || type.equals("Transfer")){
-			cost = (travelTime + transferValue);
-		}else if (type.equals("Standard")){
-			cost = (travelTime * timeValue) + (travelDistance * distanceValue) ;
-		}else if (type.equals("Access") || type.equals("Egress")){
-			cost = travelTime * walkValue;
-		}////////////////////////////////////////////////////////////////////////
+		////with Coefficient values
+		//cost = (travelTime * timeCoeficient) + (travelDistance * distanceCoeficient) ;
+
+		////Time as only criterion
+		//cost= travelTime;
 		
-		return cost;
+		////penalty for changing vehicle
+		//type = ((LinkImpl) link).getType();
+		//if (type.equals("DetTransfer") || type.equals("Transfer")){
+		//	cost = travelTime + transferPenalty;
+		//}
+		return travelTime;
 	}
 }

@@ -2,8 +2,6 @@ package playground.mmoyo.PTRouter;
 
 import java.util.ArrayList;
 import java.util.List;
-//import java.util.Map;
-//import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
@@ -34,16 +32,15 @@ import playground.mmoyo.TransitSimulation.LogicFactory;
 import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
-import playground.mmoyo.deprecVersion.PTOb;
+
 /**
  * Reads a plan file, finds a PT connection between two acts creating new PT legs and acts between them
  * and writes a output_plan file
  */
 public class PTActWriter {
-	private Walk walk = new Walk();
+	private PTValues ptValues;
 	private final PopulationImpl population;
 	private String outputFile;
-	private String plansFile;
 	private NodeImpl originNode;
 	private NodeImpl destinationNode;
 	private LinkImpl accessLink;
@@ -53,43 +50,15 @@ public class PTActWriter {
 	private NetworkLayer plainNet;
 	private PTRouter ptRouter;
 	private LogicIntoPlainTranslator logicToPlainConverter;
-	private boolean withTransitSchedule = false;
 	
-	private final String ACCESS = "Access";
-	private final String STANDARD = "Standard";
-	private final String EGRESS = "Egress";
-	private final String TRANSFER = "Transfer";
-	private final String DETTRANSFER = "DetTransfer";
+//public Population detouredPopulation = new PopulationImpl();  //temporal to find plans with detoured trips
 	
-	//Map <Id, Double> costMap999 = new TreeMap <Id, Double>();
-	//public Population detouredPopulation = new PopulationImpl();  //temporal to find plans with detoured trips
-	
-	@Deprecated
-	public PTActWriter(final PTOb ptOb){
-		this.ptRouter = ptOb.getPtRouter();
-		this.logicNet= ptOb.getPtNetworkLayer();
-		this.outputFile = ptOb.getOutPutFile();
-		this.plansFile =  ptOb.getPlansFile();
-		
-		String strConf = ptOb.getConfig();
-		Config config = new Config();
-		config = Gbl.createConfig(new String[]{ strConf, "http://www.matsim.org/files/dtd/plans_v4.dtd"});
-		
-		this.population = new PopulationImpl();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(this.population, logicNet);
-		plansReader.readFile(plansFile);
-	}
-	
-	/** Constructor with Transit Schedule*/
-	public PTActWriter(LogicFactory logicFactory, final String configFile, final String plansFile, final String outputFile){
-		withTransitSchedule= true;
+	public PTActWriter(final LogicFactory logicFactory, final PTValues ptValues, final String configFile, final String plansFile, final String outputFile){
 		this.outputFile= outputFile;
-		this.plansFile= plansFile;
-		
-		//LogicFactory logicFactory = new LogicFactory(transitSchedule);
+		this.ptValues= ptValues;
 		this.logicNet= logicFactory.getLogicNet();
 		this.plainNet= logicFactory.getPlainNet();
-		this.ptRouter = logicFactory.getPTRouter();
+		this.ptRouter = new PTRouter(logicNet, logicFactory.getLogicPTTimeTable(),ptValues);
 		this.logicToPlainConverter = logicFactory.getLogicToPlainTranslator();
 		
 		Config config = new Config();
@@ -118,8 +87,8 @@ public class PTActWriter {
 	/**
 	 * Shows in console the legs that are created between the plan activities 
 	 */
-	public void printPTLegs(final TransitSchedule transitSchedule){
-		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule);
+	public void printPTLegs(final TransitSchedule transitSchedule, PTValues ptValues){
+		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule, ptValues);
 		
 		for (PersonImpl person: this.population.getPersons().values()) {
 		//if (true){	
@@ -170,9 +139,9 @@ public class PTActWriter {
 			
 			PlanImpl newPlan = new PlanImpl(person);
 			
-			//for (PlanElement pe : plan.getPlanElements()) {   		//temporarily commented in order to find only the first leg
-			for	(int elemIndex=0; elemIndex<3; elemIndex++){            //jun09  finds only
-				PlanElement pe= plan.getPlanElements().get(elemIndex);  //jun09  the first trip
+			for (PlanElement pe : plan.getPlanElements()) {   		//temporarily commented in order to find only the first leg
+			//for	(int elemIndex=0; elemIndex<3; elemIndex++){            //jun09  finds only
+				//PlanElement pe= plan.getPlanElements().get(elemIndex);  //jun09  the first trip
 				if (pe instanceof ActivityImpl) {  				
 					thisAct= (ActivityImpl) pe;					
 					if (!first) {								
@@ -181,7 +150,7 @@ public class PTActWriter {
 	
 						trips++;
 			    		double distanceToDestination = CoordUtils.calcDistance(lastActCoord, actCoord);
-			    		double distToWalk= walk.distToWalk(person.getAge());
+			    		double distToWalk= ptValues.distToWalk(person.getAge());
 			    		if (distanceToDestination<= distToWalk){
 			    		//if (true){
 			    			newPlan.addLeg(walkLeg(lastAct,thisAct));
@@ -190,14 +159,12 @@ public class PTActWriter {
 				    		startTime = System.currentTimeMillis();
 				    		Path path = ptRouter.findPTPath(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
 				    		duration= System.currentTimeMillis()-startTime;
-				    		
 				    		if(path!=null){
-				    			//this.costMap.put(person.getId(), path.travelTime);
 				    			if (path.nodes.size()>1){
 					    			found++;
 				    				createWlinks(lastActCoord, path, actCoord);
 				    			    durations.add(duration);
-				    				insertLegActs(path, lastAct.getEndTime(), newPlan);
+				    			    insertLegActs(path, lastAct.getEndTime(), newPlan);
 				    				removeWlinks();
 				    			}else{
 				    				newPlan.addLeg(walkLeg(lastAct, thisAct));
@@ -226,7 +193,7 @@ public class PTActWriter {
 		}//for person
 
 		double startTime = System.currentTimeMillis();
-		if (withTransitSchedule)logicToPlainConverter.convertToPlain(newPopulation);
+		logicToPlainConverter.convertToPlain(newPopulation);
 		System.out.println("translation lasted: " + (System.currentTimeMillis()-startTime));
 		
 		System.out.println("writing output plan file...");
@@ -288,7 +255,6 @@ public class PTActWriter {
 		double linkDistance=0;
 		double walkTime=0;
 		int linkIndex=1;
-		boolean first=true;
 		LinkImpl lastLink = null;
 		
 		for(Link link2: routeLinks){
@@ -296,8 +262,8 @@ public class PTActWriter {
 			linkTravelTime=this.ptRouter.ptTravelTime.getLinkTravelTime(link,accumulatedTime);
 			linkDistance = link.getLength();
 			
-			if (link.getType().equals(STANDARD)){
-				if (!lastLink.getType().equals(STANDARD)){  //reset to start a new ptLeg
+			if (link.getType().equals("Standard")){
+				if (!lastLink.getType().equals("Standard")){  //reset to start a new ptLeg
 					legRouteLinks.clear();
 					depTime=accumulatedTime;
 					legTravelTime=0;
@@ -312,7 +278,7 @@ public class PTActWriter {
 					newPlan.addActivity(newPTAct("exit pt veh", link.getToNode().getCoord(), link, arrTime, arrTime)); //describes the location
 				}
 
-			}else if(link.getType().equals(TRANSFER) ){  //add the PTleg and a Transfer Act
+			}else if(link.getType().equals("Transfer") ){  //add the PTleg and a Transfer Act
 				//if (lastLink.getType().equals(STANDARD)){
 					arrTime= depTime+ legTravelTime;
 					legDistance= legDistance+ linkDistance;
@@ -320,8 +286,7 @@ public class PTActWriter {
 					//newPlan.addAct(newPTAct("wait pt", link.getFromNode().getCoord(), link, accumulatedTime, linkTravelTime, accumulatedTime + linkTravelTime));
 					double endTime = accumulatedTime + linkTravelTime;
 					newPlan.addActivity(newPTAct("transf", link.getFromNode().getCoord(), link, accumulatedTime, endTime));
-					first=false;
-					
+						
 					/*
 					////////////////////////////// find roundabout connections
 					NodeImpl nodeA = path.nodes.get(0);
@@ -337,7 +302,7 @@ public class PTActWriter {
 					///////////////////////////*/
 					
 				//}
-			}else if (link.getType().equals(DETTRANSFER)){
+			}else if (link.getType().equals("DetTransfer")){
 				/**standard links*/
 				arrTime= depTime+ legTravelTime;
 				legDistance= legDistance + linkDistance;
@@ -347,7 +312,7 @@ public class PTActWriter {
 				newPlan.addActivity(newPTAct("transf off", link.getFromNode().getCoord(), link, arrTime, arrTime));
 				
 				/**like a Walking leg*/
-				walkTime= walk.walkTravelTime(link.getLength());
+				walkTime= ptValues.walkTravelTime(link.getLength());
 				legRouteLinks.clear();
 				legRouteLinks.add(link);
 				depTime=arrTime;
@@ -357,18 +322,17 @@ public class PTActWriter {
 				/**wait pt*/
 				double endTime= depTime + linkTravelTime; // The ptTravelTime must be calculated like this: travelTime = walk + transferTime;
 				newPlan.addActivity(newPTAct("transf on", link.getToNode().getCoord(), link, arrTime, endTime));
-				first=false;
 			
-			}else if (link.getType().equals(EGRESS)){
+			}else if (link.getType().equals("Egress")){
 				legRouteLinks.clear();
 				legRouteLinks.add(link);
 				arrTime= accumulatedTime+ linkTravelTime;
 				newPlan.addLeg(newPTLeg(TransportMode.walk, legRouteLinks, linkDistance, accumulatedTime, linkTravelTime, arrTime));
 			
-			}else if (link.getType().equals(ACCESS)){
+			}else if (link.getType().equals("Access")){
 					
 				/**like a Walking leg*/
-				walkTime= walk.walkTravelTime(link.getLength());
+				walkTime= ptValues.walkTravelTime(link.getLength());
 				legRouteLinks.clear();
 				legRouteLinks.add(link);
 				depTime=accumulatedTime;
@@ -378,7 +342,7 @@ public class PTActWriter {
 				/**wait pt*/
 				double endTime= depTime + linkTravelTime; 
 				newPlan.addActivity(newPTAct("wait pt", link.getToNode().getCoord(), link, arrTime, endTime));
-				first=false;
+
 			}		
 					/*
 					double waitTime  = ((PTTravelTime)ptRouter.ptTravelTime).transferTime(lastLink, accumulatedTime);					
@@ -399,7 +363,7 @@ public class PTActWriter {
 		return ptAct;
 	}
 
-	private LegImpl newPTLeg(TransportMode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
+	private LegImpl newPTLeg(final TransportMode mode, final List<Link> routeLinks, final double distance, final double depTime, final double travTime, final double arrTime){
 		NetworkRouteWRefs legRoute = new LinkNetworkRouteImpl(null, null); 
 		
 		if (mode!=TransportMode.walk){
@@ -420,32 +384,32 @@ public class PTActWriter {
 
 	private LegImpl walkLeg(final ActivityImpl act1, final ActivityImpl act2){
 		double distance= CoordUtils.calcDistance(act1.getCoord(), act2.getCoord());
-		double walkTravelTime = walk.walkTravelTime(distance);
+		double walkTravelTime = ptValues.walkTravelTime(distance);
 		double depTime = act1.getEndTime();
 		double arrTime = depTime + walkTravelTime;
 		return newPTLeg(TransportMode.walk, new ArrayList<Link>(), distance, depTime, walkTravelTime, arrTime);
 	}
 	
-	private void createWlinks(final Coord coord1, Path path, final Coord coord2){
+	private void createWlinks(final Coord coord1, final Path path, final Coord coord2){
 		//-> move and use it in Link factory
 		originNode= createWalkingNode(new IdImpl("W1"), coord1);
 		destinationNode= createWalkingNode(new IdImpl("W2"), coord2);
 		path.nodes.add(0, originNode);
 		path.nodes.add(destinationNode);
-		accessLink = createPTLink(ACCESS, originNode , path.nodes.get(1), ACCESS);
-		egressLink = createPTLink(EGRESS, path.nodes.get(path.nodes.size()-2) , destinationNode, EGRESS);
+		accessLink = createPTLink("Access", originNode , path.nodes.get(1), "Access");
+		egressLink = createPTLink("Egress", path.nodes.get(path.nodes.size()-2) , destinationNode, "Egress");
 	}
 	
 	/**
 	 * Creates a temporary origin or destination node
 	 * avoids the method net.createNode because it is not necessary to rebuild the Quadtree*/
-	public NodeImpl createWalkingNode(Id id, Coord coord){
+	public NodeImpl createWalkingNode(final Id id, final Coord coord){
 		NodeImpl node = new PTNode(id, coord, "Walking");
 		logicNet.getNodes().put(id, node);
 		return node;
 	}
 	
-	public LinkImpl createPTLink(String strIdLink, Node fromNode, Node toNode, String type){
+	public LinkImpl createPTLink(final String strIdLink, final Node fromNode, final Node toNode, final String type){
 		//->use link factory
 		double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
 		return logicNet.createLink( new IdImpl(strIdLink), (NodeImpl) fromNode, (NodeImpl) toNode, length, 1, 1, 1, "0", type); 

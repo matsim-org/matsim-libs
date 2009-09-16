@@ -17,18 +17,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
-/** 
- * Second version of Router using Matsims Class Dijkstra  
- * We avoid the relationship with the city network and use coordinate search instead
- *  *
- * @param nodeList PTNodes in stored a a Node-List
- * @param linkList Collection of org.matsim.network.Link
- * @param OriginNode Node where the trip begins
- * @param DestinationNode Node where the trip must finish
- * @param ptLinkCostCalculator Class that contains the weight information of links
- * @param time Milliseconds after the midnight in which the trip must begin
- */
 public class PTRouter{
 	private NetworkLayer logicNet;
 	private LeastCostPathCalculator myDijkstra;
@@ -36,26 +24,51 @@ public class PTRouter{
 	public TravelTime ptTravelTime;   //> make private 
 	NodeImpl origin;
 	NodeImpl destination;
+	PTValues ptValues;
 	
-	public PTRouter(NetworkLayer logicNet, PTTimeTable ptTimetable) {
+	public PTRouter(final NetworkLayer logicNet, final PTTimeTable ptTimetable, PTValues ptValues) {
 		this.logicNet = logicNet;
 		this.ptTravelCost = new PTTravelCost(ptTimetable);
 		this.ptTravelTime =new PTTravelTime(ptTimetable);
+		this.ptValues = ptValues;
 		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);	
 		origin= createWalkingNode(new IdImpl("W1"), null);   //this is faster than network.createNode but uses PTNode
 		destination= createWalkingNode(new IdImpl("W2"), null);
 	}
 	
-	public PTRouter(NetworkLayer logicNet, PTTimeTable ptTimetable, LogicIntoPlainTranslator logicToPlainConverter) {
+	/////////////////// Methods for Counter/////////////////
+	double timeCoeficient;
+	double distanceCoeficient;
+	double transferPenalty;
+	
+	public PTRouter(final NetworkLayer logicNet, final PTTimeTable ptTimetable, final PTValues ptValues, final double timeCoeficient, final double distanceCoeficient, final double transferPenalty) {
 		this.logicNet = logicNet;
-		this.ptTravelCost = new PTTravelCost(ptTimetable);
+		this.ptTravelCost = new PTTravelCost(ptTimetable, timeCoeficient, distanceCoeficient, transferPenalty);
 		this.ptTravelTime =new PTTravelTime(ptTimetable);
-		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);		
+	
+		this.timeCoeficient = timeCoeficient;
+		this.distanceCoeficient = distanceCoeficient; 
+		this.transferPenalty = transferPenalty;
+		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);	
 		origin= createWalkingNode(new IdImpl("W1"), null);   //this is faster than network.createNode but uses PTNode
 		destination= createWalkingNode(new IdImpl("W2"), null);
 	}
 	
-	public Path findPTPath(Coord coord1, Coord coord2, double time, final double distToWalk){
+	public double getTimeCoeficient(){
+		return this.timeCoeficient;		
+	}
+			 
+	public double getDistanceCoeficient(){
+		return this.distanceCoeficient;
+	}
+	
+	public double getTransferPenalty(){
+		return this.transferPenalty;
+	}
+	////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	public Path findPTPath(final Coord coord1, final Coord coord2, final double time, final double distToWalk){
 		double walkRange= distToWalk; 
 		
 		origin.setCoord(coord1);
@@ -81,7 +94,7 @@ public class PTRouter{
 		return path;
 	}
 
-	private Collection <NodeImpl> findnStations(Coord coord, double walkRange){
+	private Collection <NodeImpl> findnStations(final Coord coord, double walkRange){
 		Collection <NodeImpl> stations;
 		do{
 			stations = logicNet.getNearestNodes(coord, walkRange);
@@ -95,11 +108,9 @@ public class PTRouter{
 	 * avoids the method net.createNode because it is not necessary to rebuild the quadtree
 	 */
 	public NodeImpl createWalkingNode(Id id, Coord coord) {
-		
 		NodeImpl node = new PTNode(id, coord, "Walking");
 		logicNet.getNodes().put(id, node);
 		return node;
-		
 	}
 	
 	public List <LinkImpl> createWalkingLinks(NodeImpl walkNode, Collection <NodeImpl> nearNodes, boolean to){
@@ -169,24 +180,7 @@ public class PTRouter{
 			System.out.println("The route is null");
 		}
 	}	
+
 }
-
-
-
-/*
- * searches nodes in walk range or else the nearest one
-*/
-/*
-private Collection <Node> findNearStops (final Coord coord, final double walkDistance){
-	Collection <Node> NearStops = net.getNearestNodes(coord, walkDistance);
-	if (NearStops.size()==0){
-		Node nearNode = net.getNearestNode(coord);
-		if (CoordUtils.calcDistance(coord, nearNode.getCoord())< walkDistance){
-			NearStops.add(nearNode);
-		}
-	}
-	return NearStops;
-}
-*/
 
 

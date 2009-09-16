@@ -24,13 +24,9 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -38,7 +34,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
@@ -47,37 +42,11 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.xml.sax.SAXException;
 
-import playground.mmoyo.deprecVersion.PTOb;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
+import playground.mmoyo.PTRouter.PTValues;
 
 public class RouterTest extends MatsimTestCase {
 
-	private static final String path = "../shared-svn/studies/schweiz-ivtch/pt-experimental/"; 
-
-	private static final String CONFIG=  path  + "config.xml";
-	private static final String ZURICHPTN= path + "network.xml";
-	private static final String ZURICHPTTIMETABLE= path + "PTTimetable.xml";
-	private static final String ZURICHPTPLANS= path + "plans.xml";
-	private static final String OUTPUTPLANS= path + "output_plans.xml";
-
-	public void test1() {
-		PTOb pt= new PTOb(CONFIG, ZURICHPTN, ZURICHPTTIMETABLE,ZURICHPTPLANS, OUTPUTPLANS); 
-		pt.readPTNet(ZURICHPTN);
-
-		// searches and shows a PT path between two coordinates 
-		Coord coord1 = new CoordImpl(747420, 262794);   
-		Coord coord2 = new CoordImpl(685862, 254136);
-		Path path2 = pt.getPtRouter().findPTPath (coord1, coord2, 24372, 300);
-		System.out.println(path2.links.size());
-		for (Link link : path2.links){
-			System.out.println(link.getId()+ ": " + link.getFromNode().getId() + " " + ((LinkImpl)link).getType() + link.getToNode().getId() );
-		}
-
-		assertEquals( 31, path2.links.size() ) ;
-		assertEquals( "1311" , path2.links.get(10).getId().toString() ) ;
-		assertEquals( "250" , path2.links.get(20).getId().toString() ) ;
-	}
-	
 	public void testWithVerySimpleTransitSchedule() throws SAXException, ParserConfigurationException, IOException {
 		/* for integration into MATSim, the following must work */
 		
@@ -103,7 +72,7 @@ public class RouterTest extends MatsimTestCase {
 		toAct.setCoord(new CoordImpl(4700.0, 700.0));
 		
 		// now run the essential thing:
-		TransitRouteFinder routeFinder = new TransitRouteFinder(schedule);
+		TransitRouteFinder routeFinder = new TransitRouteFinder(schedule, new PTValues());
 		List<LegImpl> legs = routeFinder.calculateRoute(fromAct, toAct, person);
 		
 		for (Leg leg : legs) {

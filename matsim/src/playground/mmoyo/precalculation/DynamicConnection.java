@@ -11,7 +11,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
-import playground.mmoyo.PTRouter.Walk;
+import playground.mmoyo.PTRouter.PTValues;
 
 /**Converts a staticConnection into leg*/
 public class DynamicConnection {
@@ -21,7 +21,7 @@ public class DynamicConnection {
 	private double walkDistance2= Double.NEGATIVE_INFINITY;
 	private double walkTime1 =  Double.NEGATIVE_INFINITY;
 	private double walkTime2 =  Double.NEGATIVE_INFINITY;
-	private double avgWalkSpeed = new Walk().getAvgWalkSpeed();
+	private double avgWalkSpeed = new PTValues().getAvgWalkSpeed();
 	private TransitSchedule transitSchedule;
 	private PlainTimeTable plainTimeTable;
 	private Map <Coord, Collection<NodeImpl>> nearStopMap; 

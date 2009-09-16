@@ -12,11 +12,11 @@ import org.matsim.core.router.util.TravelTime;
  */
 
 public class MyDijkstra extends Dijkstra{
-	final String TRANSFER = "Transfer";
-	final String STANDARD = "Standard";
-	final String DETTRANSFER = "DetTransfer";
-	final String EGRESS = "Egress";
-	final String ACCESS = "Access"; 
+	final static String DETTRANSFER = "DetTransfer";
+	final static String TRANSFER = "Transfer";
+	final static String STANDARD = "Standard";
+	final static String ACCESS = "Access";
+	final static String EGRESS = "Egress";
 	
 	public MyDijkstra(final NetworkLayer network, final TravelCost costFunction, final TravelTime timeFunction) {
 		super(network, costFunction, timeFunction);
@@ -31,7 +31,7 @@ public class MyDijkstra extends Dijkstra{
 		String type= thisLink.getType();
 		if (lastLink!=null){
 			String lastType = lastLink.getType();
-			if (type.equals(DETTRANSFER))  {pass = lastType.equals(STANDARD); }
+			if (type.equals(DETTRANSFER))  {pass = lastType.equals(STANDARD);}
 			else if (type.equals(TRANSFER)){pass = lastType.equals(STANDARD); }
 			else if (type.equals(STANDARD)){pass = !lastType.equals(EGRESS);  }
 			else if (type.equals(EGRESS))  {pass = lastType.equals(STANDARD); }

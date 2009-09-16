@@ -110,7 +110,7 @@ public class LogicIntoPlainTranslator {
 			List<Link> plainLinkList = new ArrayList<Link>();
 			
 			for (Link link: logicNetworkRoute.getLinks()){
-				//if (link.getType().equals("Standard"))
+				//if (link.getType().equals(ptValues.STANDARD))
 					plainLinkList.add(link);
 			}
 			if(plainLinkList.size()>0){

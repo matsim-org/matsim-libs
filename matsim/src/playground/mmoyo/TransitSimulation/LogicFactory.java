@@ -25,9 +25,8 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleBuilder;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-
-import playground.mmoyo.PTRouter.PTRouter;
 import playground.mmoyo.PTRouter.PTTimeTable;
+import playground.mmoyo.PTRouter.PTValues;
 
 /**
  * Reads a TransitSchedule and creates from it:
@@ -45,23 +44,23 @@ public class LogicFactory{
 	private TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
 	private TransitSchedule logicTransitSchedule = builder.createTransitSchedule();
 	private LogicIntoPlainTranslator logicToPlainTranslator; 
+	private PTTimeTable logicPTTimeTable;
+	private PTValues ptValues;
 	
 	private Map<Id,List<Node>> facilityNodeMap = new TreeMap<Id,List<Node>>(); /* <key =PlainStop, value = List of logicStops to be joined by transfer links>*/
-	public Map<Id,Node> logicToPlanStopMap = new TreeMap<Id,Node>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
-	public Map<Id,LinkImpl> logicToPlanLinkMap = new TreeMap<Id,LinkImpl>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
-	public Map<Id,LinkImpl> lastLinkMap = new TreeMap<Id,LinkImpl>();    //stores the head node as key and the link as value //useful to find lastStandardlink of transfer links
+	private Map<Id,Node> logicToPlanStopMap = new TreeMap<Id,Node>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
+	private Map<Id,LinkImpl> logicToPlanLinkMap = new TreeMap<Id,LinkImpl>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
+	private Map<Id,LinkImpl> lastLinkMap = new TreeMap<Id,LinkImpl>();    //stores the head node as key and the link as value //useful to find lastStandardlink of transfer links
 	private Map<Id,Id> nodeLineMap = new TreeMap<Id,Id>();                  
 	
 	long newLinkId=0;
 	long newPlainLinkId=0;
 	long newStopId=0;
-	
-	final String STANDARDLINK = "Standard";
-	
-	public LogicFactory(final TransitSchedule transitSchedule){
+
+	public LogicFactory(final TransitSchedule transitSchedule, PTValues ptValues){
 		this.transitSchedule = transitSchedule;
+		this.ptValues = ptValues;
 		createLogicNet();
-		this.logicToPlainTranslator = new LogicIntoPlainTranslator(plainNet,  logicToPlanStopMap, logicToPlanLinkMap, lastLinkMap);
 	}
 	
 	//Creates a logic network file and a logic TransitSchedule file with individualized id's for nodes and stops*/
@@ -100,7 +99,7 @@ public class LogicFactory{
 						LinkImpl plainLink= createPlainLink(lastPlainNode, plainNode);
 						
 						Id id = new IdImpl(newLinkId++);
-						LinkImpl logicLink = createLogicLink(id, lastLogicNode, logicNode, STANDARDLINK);  
+						LinkImpl logicLink = createLogicLink(id, lastLogicNode, logicNode, "Standard");  
 						logicToPlanLinkMap.put(id, plainLink);  //stores here the correspondent plainLink!! it will help to the translation!
 						lastLinkMap.put(logicNode.getId(), logicLink);   // stores the inStandardLink of a Node. Will be used in translation for transfers link
 
@@ -174,10 +173,10 @@ public class LogicFactory{
 		int numOutgoingStandards =0;
 		
 		for (LinkImpl inLink : fromNode.getInLinks().values())
-			if (inLink.getType().equals(STANDARDLINK)) 	numInGoingStandards++;
+			if (inLink.getType().equals("Standard")) 	numInGoingStandards++;
 
 		for (LinkImpl outLink : toNode.getOutLinks().values())
-			if (outLink.getType().equals(STANDARDLINK)) numOutgoingStandards++;
+			if (outLink.getType().equals("Standard")) numOutgoingStandards++;
 	
 		return (numInGoingStandards>0) && (numOutgoingStandards>0); 
 	}	
@@ -236,20 +235,37 @@ public class LogicFactory{
 		return this.logicNet;
 	}
 
+	public TransitSchedule getLogicTransitSchedule(){
+		return this.logicTransitSchedule;
+	}
+
 	public NetworkLayer getPlainNet(){
 		return this.plainNet;
 	}
 	
 	public LogicIntoPlainTranslator getLogicToPlainTranslator(){
-		return this.logicToPlainTranslator ;
+		if (this.logicToPlainTranslator==null){
+			this.logicToPlainTranslator = new LogicIntoPlainTranslator(plainNet,  logicToPlanStopMap, logicToPlanLinkMap, lastLinkMap);
+		}
+		return this.logicToPlainTranslator;
 	}
 
+	/*
 	public PTRouter getPTRouter(){
-		PTTimeTable logicPTTimeTable = new PTTimeTable();
+		logicPTTimeTable = new PTTimeTable();
 		TransitTravelTimeCalculator transitTravelTimeCalculator = new TransitTravelTimeCalculator(logicTransitSchedule,logicNet);
 		transitTravelTimeCalculator.fillTimeTable(logicPTTimeTable);
-		PTRouter ptRouter = new PTRouter(logicNet, logicPTTimeTable, logicToPlainTranslator);
+		PTRouter ptRouter = new PTRouter(logicNet, logicPTTimeTable);
 		return ptRouter; 
+	}
+	*/
+	public PTTimeTable getLogicPTTimeTable (){
+		if(this.logicPTTimeTable==null){
+			logicPTTimeTable = new PTTimeTable();
+			TransitTravelTimeCalculator transitTravelTimeCalculator = new TransitTravelTimeCalculator(logicTransitSchedule,logicNet);
+			transitTravelTimeCalculator.fillTimeTable(logicPTTimeTable);
+		}
+		return this.logicPTTimeTable;
 	}
 
 }

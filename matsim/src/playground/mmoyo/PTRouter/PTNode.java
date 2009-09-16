@@ -50,7 +50,7 @@ public class PTNode extends NodeImpl {
 		return lineSequenceindex;
 	}
 
-	public void setLineSequenceindex(int lineSequenceindex) {
+	public void setLineSequenceindex(final int lineSequenceindex) {
 		this.lineSequenceindex = lineSequenceindex;
 	}
 
@@ -58,7 +58,7 @@ public class PTNode extends NodeImpl {
 		return minutesAfterDeparture;
 	}
 
-	public void setMinutesAfterDeparture(int minutesAfterDeparture) {
+	public void setMinutesAfterDeparture(final int minutesAfterDeparture) {
 		this.minutesAfterDeparture = minutesAfterDeparture;
 	}
 
@@ -99,7 +99,7 @@ public class PTNode extends NodeImpl {
 	 * This is an attempt to speed up the calculaton of waiting time in a transfer
 	 * It must be determined if it is faster to do it here or at timetable class
 	 */
-	public double getTransferTime (double time){//,
+	public double getTransferTime (final double time){//,
 		int length = arrDep.length;
 		int index =  Arrays.binarySearch(arrDep, time);
 		if (index<0){
