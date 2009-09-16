@@ -45,6 +45,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.analysis.wardrop.ActTimesCollector;
 import playground.christoph.analysis.wardrop.Wardrop;
+import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
+import playground.christoph.events.algorithms.LookupTableUpdater;
 import playground.christoph.events.algorithms.ParallelActEndReplanner;
 import playground.christoph.events.algorithms.ParallelInitialReplanner;
 import playground.christoph.events.algorithms.ParallelLeaveLinkReplanner;
@@ -57,7 +59,8 @@ import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
 import playground.christoph.knowledge.nodeselection.SelectionReaderMatsim;
 import playground.christoph.knowledge.nodeselection.SelectionWriter;
-import playground.christoph.mobsim.MyQueueSimEngine;
+import playground.christoph.mobsim.ActEndReplanningModule;
+import playground.christoph.mobsim.LeaveLinkReplanningModule;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.network.SubNetwork;
@@ -65,7 +68,6 @@ import playground.christoph.replanning.MyStrategyManagerConfigLoader;
 import playground.christoph.router.CompassRoute;
 import playground.christoph.router.DijkstraWrapper;
 import playground.christoph.router.KnowledgePlansCalcRoute;
-import playground.christoph.router.MyDijkstra;
 import playground.christoph.router.RandomCompassRoute;
 import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
@@ -125,6 +127,7 @@ public class EventControler extends Controler {
 
 	protected LinkVehiclesCounter linkVehiclesCounter;
 	protected LinkReplanningMap linkReplanningMap;
+	protected LookupTableUpdater lookupTableUpdater;
 
 	private static final Logger log = Logger.getLogger(EventControler.class);
 
@@ -177,7 +180,7 @@ public class EventControler extends Controler {
 	protected void initReplanningRouter() {
 		replanners = new ArrayList<PlanAlgorithm>();
 
-		KnowledgeTravelTimeCalculator travelTimeCalculator = new KnowledgeTravelTimeCalculator(sim.getMyQueueNetwork());
+		KnowledgeTravelTimeCalculator travelTimeCalculator = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
 		TravelTimeDistanceCostCalculator travelCostCalculator = new TravelTimeDistanceCostCalculator(travelTimeCalculator, new CharyparNagelScoringConfigGroup());
 
 		// Dijkstra
@@ -195,19 +198,19 @@ public class EventControler extends Controler {
 		// BasicReplanners (Random, Tabu, Compass, ...)
 		// each replanner can handle an arbitrary number of persons
 		KnowledgePlansCalcRoute randomRouter = new KnowledgePlansCalcRoute(network, new RandomRoute(), new RandomRoute());
-		randomRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
+		randomRouter.setQueueNetwork(sim.getQueueNetwork());
 		replanners.add(randomRouter);
 
 		KnowledgePlansCalcRoute tabuRouter = new KnowledgePlansCalcRoute(network, new TabuRoute(), new TabuRoute());
-		tabuRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
+		tabuRouter.setQueueNetwork(sim.getQueueNetwork());
 		replanners.add(tabuRouter);
 
 		KnowledgePlansCalcRoute compassRouter = new KnowledgePlansCalcRoute(network, new CompassRoute(), new CompassRoute());
-		compassRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
+		compassRouter.setQueueNetwork(sim.getQueueNetwork());
 		replanners.add(compassRouter);
 
 		KnowledgePlansCalcRoute randomCompassRouter = new KnowledgePlansCalcRoute(network, new RandomCompassRoute(), new RandomCompassRoute());
-		randomCompassRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
+		randomCompassRouter.setQueueNetwork(sim.getQueueNetwork());
 		replanners.add(randomCompassRouter);
 
 		// Dijkstra for Replanning
@@ -222,10 +225,16 @@ public class EventControler extends Controler {
 		// Use a Wrapper - by doing this, already available MATSim
 		// CostCalculators can be used
 		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
+		travelTime.setQueueNetwork(sim.getQueueNetwork());
 		KnowledgeTravelTimeWrapper travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
+		travelTimeWrapper.setQueueNetwork(sim.getQueueNetwork());
+		travelTimeWrapper.setLinkVehiclesCounter(linkVehiclesCounter);
+		
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
-
+		travelCostWrapper.setQueueNetwork(sim.getQueueNetwork());
+		travelCostWrapper.setLinkVehiclesCounter(linkVehiclesCounter);
+		
 		travelTimeWrapper.checkNodeKnowledge(false);
 		travelCostWrapper.checkNodeKnowledge(false);
 		travelTimeWrapper.useLookupTable(false);
@@ -252,7 +261,7 @@ public class EventControler extends Controler {
 */
 		
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
-		dijkstraRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
+		dijkstraRouter.setQueueNetwork(sim.getQueueNetwork());
 
 		replanners.add(dijkstraRouter);
 
@@ -304,30 +313,64 @@ public class EventControler extends Controler {
 		nodeSelectors.add(selectNodesDijkstra);
 	}
 
+	/*
+	 * Creates the Handler and Listener Object so that
+	 * they can be handed over to the Within Day
+	 * Replanning Modules (TravelCostWrapper, etc).
+	 * 
+	 * The full initialization of them is done later
+	 * (we don't have all necessary Objects yet).
+	 */
+	protected void createHandlersAndListeners()
+	{
+		linkVehiclesCounter = new LinkVehiclesCounter();
+		linkReplanningMap = new LinkReplanningMap();
+		lookupTableUpdater = new LookupTableUpdater();
+		
+	}
+	
 	@Override
-	protected void runMobSim() {
+	protected void runMobSim() 
+	{
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
 
-//		sim.setControler(this);
+		createHandlersAndListeners();
 
-		// create & add LinkVehiclesCounter
-		linkVehiclesCounter = new LinkVehiclesCounter();
+		// fully initialize & add LinkVehiclesCounter
 		linkVehiclesCounter.setQueueNetwork(sim.getQueueNetwork());
+		
+		/*
+		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
+		 * ensure that they are started in the needed order.
+		 */
+		FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
+		
+		foqsl.addQueueSimulationInitializedListener(linkVehiclesCounter);
+		foqsl.addQueueSimulationAfterSimStepListener(linkVehiclesCounter);
+		
+		foqsl.addQueueSimulationInitializedListener(lookupTableUpdater);
+		foqsl.addQueueSimulationAfterSimStepListener(lookupTableUpdater);
+
+		sim.addQueueSimulationListeners(foqsl);
+		
+//		sim.addQueueSimulationListeners(lookupTableUpdater);
+//		sim.addQueueSimulationListeners(linkVehiclesCounter);
+		
 		this.events.addHandler(linkVehiclesCounter);
-		sim.getMyQueueNetwork().setLinkVehiclesCounter(linkVehiclesCounter);
-
-		sim.addQueueSimulationListeners(linkVehiclesCounter);
-
-		// create & add LinkReplanningMap
-		linkReplanningMap = new LinkReplanningMap();
+		
+		// fully initialize & add LinkReplanningMap
 		linkReplanningMap.setQueueNetwork(sim.getQueueNetwork());
 		this.events.addHandler(linkReplanningMap);
-		sim.getMyQueueNetwork().setLinkReplanningMap(linkReplanningMap);
 
 		// set QueueNetwork in the Traveltime Calculator
-		if (knowledgeTravelTime != null)
-			knowledgeTravelTime.setMyQueueNetwork(sim.getMyQueueNetwork());
+		if (knowledgeTravelTime != null) knowledgeTravelTime.setQueueNetwork(sim.getQueueNetwork());
 
+		ActEndReplanningModule actEndReplanning = new ActEndReplanningModule(sim);
+		LeaveLinkReplanningModule leaveLinkReplanning = new LeaveLinkReplanningModule(linkReplanningMap);
+		
+		sim.setActEndReplanningModule(actEndReplanning);
+		sim.setLeaveLinkReplanningModule(leaveLinkReplanning);
+		
 //		log.info("Remove not selected Plans");
 //		clearPlans();
 
@@ -440,11 +483,11 @@ public class EventControler extends Controler {
 			}
 			
 			// (de)activate replanning
-			if (actEndReplanningCounter == 0) MyQueueSimEngine.doActEndReplanning(false);
-			else MyQueueSimEngine.doActEndReplanning(true);
+			if (actEndReplanningCounter == 0) ReplanningQueueSimulation.doActEndReplanning(false);
+			else ReplanningQueueSimulation.doActEndReplanning(true);
 
-			if (leaveLinkReplanningCounter == 0) MyQueueSimEngine.doLeaveLinkReplanning(false);
-			else MyQueueSimEngine.doLeaveLinkReplanning(true);
+			if (leaveLinkReplanningCounter == 0) ReplanningQueueSimulation.doLeaveLinkReplanning(false);
+			else ReplanningQueueSimulation.doLeaveLinkReplanning(true);
 
 		}
 

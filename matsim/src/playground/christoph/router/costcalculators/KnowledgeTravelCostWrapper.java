@@ -7,15 +7,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.LinkIdComparator;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.Time;
 
+import playground.christoph.events.LinkVehiclesCounter;
 import playground.christoph.knowledge.container.NodeKnowledge;
-import playground.christoph.mobsim.MyQueueNetwork;
-import playground.christoph.network.SubLink;
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelCost;
 
@@ -27,6 +27,7 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	protected boolean checkNodeKnowledge = true;
 	protected double lastUpdate = Time.UNDEFINED_TIME; 
 	protected KnowledgeTools knowledgeTools;
+	protected LinkVehiclesCounter linkVehiclesCounter;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelCostWrapper.class);
 	
@@ -38,6 +39,11 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 		linkTravelCosts = new TreeMap<Link, Double>(linkComparator);
 		
 		this.knowledgeTools = new KnowledgeTools();
+	}
+	
+	public void setLinkVehiclesCounter(LinkVehiclesCounter linkVehiclesCounter)
+	{
+		this.linkVehiclesCounter = linkVehiclesCounter;
 	}
 	
 	public void setTravelCostCalculator(TravelCost travelCost)
@@ -61,12 +67,12 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 	}
 	
 	@Override
-	public void setMyQueueNetwork(MyQueueNetwork myQueueNetwork)
+	public void setQueueNetwork(QueueNetwork queueNetwork)
 	{
-		super.setMyQueueNetwork(myQueueNetwork);
+		super.setQueueNetwork(queueNetwork);
 		if (travelCostCalculator instanceof KnowledgeTravelCost)
 		{
-			((KnowledgeTravelCost)travelCostCalculator).setMyQueueNetwork(myQueueNetwork);
+			((KnowledgeTravelCost)travelCostCalculator).setQueueNetwork(queueNetwork);
 		}
 	}
 
@@ -115,7 +121,7 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 //		log.info("Creating LookupTable for LinkTravelTimes. Time: " + time);
 		resetLookupTable();
 		
-		for (QueueLink queueLink : myQueueNetwork.getLinks().values())
+		for (QueueLink queueLink : queueNetwork.getLinks().values())
 		{
 			LinkImpl link = queueLink.getLink();
 			linkTravelCosts.put(link, travelCostCalculator.getLinkTravelCost(link, time));
@@ -136,11 +142,11 @@ public class KnowledgeTravelCostWrapper extends KnowledgeTravelCost{
 				this.setPerson(null);
 				
 //				log.info("Updating LookupTable for LinkTravelTimes. Time: " + time);
-				Map<Id, Integer> links2Update = this.myQueueNetwork.getLinkVehiclesCounter().getChangedLinkVehiclesCounts();
+				Map<Id, Integer> links2Update = linkVehiclesCounter.getChangedLinkVehiclesCounts();
 			
 				for (Id id : links2Update.keySet())
 				{
-					LinkImpl link = this.myQueueNetwork.getNetworkLayer().getLink(id);
+					LinkImpl link = this.queueNetwork.getNetworkLayer().getLink(id);
 					linkTravelCosts.put(link, travelCostCalculator.getLinkTravelCost(link, time));
 				}
 				lastUpdate = time;

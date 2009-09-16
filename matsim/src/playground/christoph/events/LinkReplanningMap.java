@@ -21,19 +21,31 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.jdeqsim.Vehicle;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.Tuple;
+
+/*
+ * This Module is used by a LeaveLinkReplanner. It calculates the time
+ * when an agent should do LeaveLinkReplanning.
+ * 
+ * The time is estimated as following:
+ * When an LinkEnterEvent is thrown the Replanning Time is set to
+ * the current time + the Freespeed Travel Time. This guarantees that
+ * the replanning will be done while the agent is on the Link.
+ * 
+ * Additionally a Replanning Interval can be set. This allows an Agent
+ * to do multiple Replanning on a single Link. This may be useful if the
+ * Traffic System is congested and the Link Travel Times are much longer
+ * than the Freespeed Travel Times. 
+ */
 
 public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 		BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler,
 		BasicAgentDepartureEventHandler, BasicAgentWait2LinkEventHandler,
 		BasicAgentStuckEventHandler {
-
+	
 	private QueueNetwork queueNetwork;
 
 	// Repeated replanning if a person gets stuck in a Link

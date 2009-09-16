@@ -449,7 +449,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 
 	public synchronized void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e) {
 //		log.info("SimStep done..." + e.getSimulationTime());
-
+//		System.out.println("LinkVehiclesCounter QueueSimulationAfterSimStepEvent " + e.getSimulationTime() + "-------------------------------------------------------------------------------");
 		// Check the vehicle count every Hour
 		if (((int)e.getSimulationTime()) % 3600 == 0) checkVehicleCount(e);
 		
@@ -459,6 +459,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 
 	public void notifySimulationInitialized(QueueSimulationInitializedEvent e)
 	{	
+//		System.out.println("LinkVehiclesCounter QueueSimulationInitializedEvent-------------------------------------------------------------------------------");
 		createInitialCounts();
 		filterChangedLinks();
 		updateLinkVehicleCounts();

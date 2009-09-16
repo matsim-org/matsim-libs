@@ -1,27 +1,21 @@
 package playground.christoph.network;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.utils.misc.Time;
@@ -30,7 +24,6 @@ import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
-import playground.christoph.mobsim.MyQueueNetwork;
 import playground.christoph.network.util.SubNetworkCreator;
 import playground.christoph.network.util.SubNetworkTools;
 import playground.christoph.router.DijkstraWrapper;
@@ -62,7 +55,7 @@ public class TestSubNetwork {
 	private DijkstraWrapper dijkstraWrapper;
 	private KnowledgePlansCalcRoute dijkstraRouter;
 	private NetworkFactory networkFactory;
-	private MyQueueNetwork myQueueNetwork;
+	private QueueNetwork queueNetwork;
 	
 	private final String configFileName = "mysimulations/kt-zurich/config.xml";
 	private final String dtdFileName = null;
@@ -131,10 +124,15 @@ public class TestSubNetwork {
 	
 	private void initReplanner()
 	{
+		queueNetwork = new QueueNetwork(network);
+		
 		travelTime = new KnowledgeTravelTimeCalculator();
 		travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
+		travelTimeWrapper.setQueueNetwork(queueNetwork);
+		
 		travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
 		travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
+		travelCostWrapper.setQueueNetwork(queueNetwork);
 		
 		travelTimeWrapper.checkNodeKnowledge(false);
 		travelCostWrapper.checkNodeKnowledge(false);
@@ -143,13 +141,10 @@ public class TestSubNetwork {
 		
 		// Don't use Knowledge for CostCalculations
 		dijkstra = new MyDijkstra(network, travelCostWrapper, travelTimeWrapper);
-		// dijkstra = new Dijkstra(network, travelCostWrapper, travelTimeWrapper);
 		dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTimeWrapper, network);
 	
 		dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
-		
-		myQueueNetwork = new MyQueueNetwork(network);
-		dijkstraRouter.setMyQueueNetwork(myQueueNetwork);
+		dijkstraRouter.setQueueNetwork(queueNetwork);
 	}
 	
 	private void createSubNetworks()
@@ -205,7 +200,6 @@ public class TestSubNetwork {
 	
 	private void replanRoute(PersonImpl person)
 	{
-//		dijkstraRouter.setPerson(person);
 		dijkstraRouter.setTime(Time.UNDEFINED_TIME);
 		
 		dijkstraRouter.run(person.getSelectedPlan());

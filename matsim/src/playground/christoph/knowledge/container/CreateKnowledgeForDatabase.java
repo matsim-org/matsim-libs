@@ -29,7 +29,6 @@ import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.knowledge.nodeselection.SelectNodesCircular;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
-import playground.christoph.mobsim.MyQueueNetwork;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.router.CompassRoute;
 import playground.christoph.router.DijkstraWrapper;
@@ -196,7 +195,7 @@ public class CreateKnowledgeForDatabase {
 		linkVehiclesCounter = new LinkVehiclesCounter();
 		linkVehiclesCounter.setQueueNetwork(sim.getQueueNetwork());
 		this.events.addHandler(linkVehiclesCounter);
-		sim.getMyQueueNetwork().setLinkVehiclesCounter(linkVehiclesCounter);
+//		sim.getMyQueueNetwork().setLinkVehiclesCounter(linkVehiclesCounter);
 		
 		sim.addQueueSimulationListeners(linkVehiclesCounter);
 	}
@@ -230,8 +229,8 @@ public class CreateKnowledgeForDatabase {
 		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCost, travelTime, network);
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
 		
-		dijkstraRouter.setMyQueueNetwork(new MyQueueNetwork(network));
-		//dijkstraRouter.setMyQueueNetwork(sim.getMyQueueNetwork());
+//		dijkstraRouter.setMyQueueNetwork(new MyQueueNetwork(network));
+		dijkstraRouter.setQueueNetwork(sim.getQueueNetwork());
 		replanners.add(dijkstraRouter);
 	}
 	

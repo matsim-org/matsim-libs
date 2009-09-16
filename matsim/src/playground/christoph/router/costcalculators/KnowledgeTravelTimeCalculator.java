@@ -23,9 +23,9 @@ package playground.christoph.router.costcalculators;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.LinkImpl;
 
-import playground.christoph.mobsim.MyQueueNetwork;
 import playground.christoph.network.MyLinkImpl;
 import playground.christoph.network.SubLink;
 import playground.christoph.router.util.KnowledgeTravelTime;
@@ -39,22 +39,22 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelTimeCalculator.class);
 	
-	public KnowledgeTravelTimeCalculator(MyQueueNetwork myQueueNetwork)
+	public KnowledgeTravelTimeCalculator(QueueNetwork queueNetwork)
 	{
-		this.myQueueNetwork = myQueueNetwork;
+		this.queueNetwork = queueNetwork;
 	}
 	
 	public KnowledgeTravelTimeCalculator()
 	{
-		log.info("No MyQueueNetwork was commited - FreeSpeedTravelTimes will be calculated and returned!");
+		log.info("No QueueNetwork was commited - FreeSpeedTravelTimes will be calculated and returned!");
 	}
 	
 	// return travel time without account for the actual traffic
 	public double getLinkTravelTime(Link link, double time)
 	{
-		if(myQueueNetwork == null)
+		if(queueNetwork == null)
 		{
-			log.info("No MyQueueNetwork found - FreeSpeedTravelTime is calculated and returned!");
+			log.info("No QueueNetwork found - FreeSpeedTravelTime is calculated and returned!");
 			return link.getLength()/link.getFreespeed(time);
 		}
 			
@@ -117,7 +117,7 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 
 	protected double getVehiclesOnLink(Link link)
 	{
-//		QueueLink queueLink = myQueueNetwork.getQueueLink(link.getId());
+//		QueueLink queueLink = queueNetwork.getQueueLink(link.getId());
 				
 		// maximum number of vehicles on the link
 //		double maxVehiclesOnLink = queueLink.getSpaceCap();
@@ -134,7 +134,7 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 		
 		// number of vehicles that are on the link or that are already waiting to enter the link
 		//double vehicles = queueLink.getAllVehicles().size() - queueLink.vehParkingCount();// - queueLink.getVehiclesOnParkingList().size();
-//		double vehicles2 = myQueueNetwork.getLinkVehiclesCounter().getLinkDrivingVehiclesCount(link.getId());
+//		double vehicles2 = queueNetwork.getLinkVehiclesCounter().getLinkDrivingVehiclesCount(link.getId());
 	
 		// now we have MyLinkImpls that have a VehiclesCount variable :)
 		double vehicles;
@@ -167,7 +167,7 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 	@Override
 	public KnowledgeTravelTimeCalculator clone()
 	{
-		KnowledgeTravelTimeCalculator clone = new KnowledgeTravelTimeCalculator(this.myQueueNetwork);
+		KnowledgeTravelTimeCalculator clone = new KnowledgeTravelTimeCalculator(this.queueNetwork);
 
 		clone.tbuffer = this.tbuffer;
 		clone.vehicleLength = this.vehicleLength;

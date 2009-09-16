@@ -22,6 +22,7 @@ package playground.christoph.router;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -32,7 +33,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.christoph.mobsim.MyQueueNetwork;
 import playground.christoph.network.util.SubNetworkCreator;
 import playground.christoph.network.util.SubNetworkTools;
 import playground.christoph.router.util.KnowledgeTools;
@@ -41,7 +41,8 @@ import playground.christoph.router.util.PersonLeastCostPathCalculator;
 public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable{
 	
 	protected PersonImpl person;
-	protected MyQueueNetwork myQueueNetwork;
+	protected QueueNetwork queueNetwork;
+	protected NetworkLayer network;
 	protected double time;
 	protected PlansCalcRouteConfigGroup configGroup;
 	protected SubNetworkTools subNetworkTools = new SubNetworkTools();
@@ -65,6 +66,8 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	{
 		super(network, router, routerFreeflow);
 		configGroup = new PlansCalcRouteConfigGroup();
+		
+		this.network = network;
 		
 		subNetworkCreator = new SubNetworkCreator(network);
 	}
@@ -124,26 +127,26 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	}
 	
 	/*
-	 * We have to hand over the MyQueueNetwork to the Cost- and TimeCalculators of the Router.
+	 * We have to hand over the QueueNetwork to the Cost- and TimeCalculators of the Router.
 	 */
-	public void setMyQueueNetwork(MyQueueNetwork myQueueNetwork)
+	public void setQueueNetwork(QueueNetwork queueNetwork)
 	{
-		this.myQueueNetwork = myQueueNetwork;
+		this.queueNetwork = queueNetwork;
 		
 		if(this.getLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
 		{
-			((PersonLeastCostPathCalculator)this.getLeastCostPathCalculator()).setMyQueueNetwork(myQueueNetwork);
+			((PersonLeastCostPathCalculator)this.getLeastCostPathCalculator()).setQueueNetwork(queueNetwork);
 		}
 		
 		if(this.getPtFreeflowLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
 		{
-			((PersonLeastCostPathCalculator)this.getPtFreeflowLeastCostPathCalculator()).setMyQueueNetwork(myQueueNetwork);
+			((PersonLeastCostPathCalculator)this.getPtFreeflowLeastCostPathCalculator()).setQueueNetwork(queueNetwork);
 		}
 	}
 	
-	public MyQueueNetwork getMyQueueNetwork()
+	public QueueNetwork getQueueNetwork()
 	{
-		return this.myQueueNetwork;
+		return this.queueNetwork;
 	}
 
 	/*
@@ -202,15 +205,14 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		KnowledgePlansCalcRoute clone;
 		if(this.getLeastCostPathCalculator() == this.getPtFreeflowLeastCostPathCalculator())
 		{
-			clone = new KnowledgePlansCalcRoute(this.myQueueNetwork.getNetworkLayer(), routeAlgoClone, routeAlgoClone);
+			clone = new KnowledgePlansCalcRoute(network, routeAlgoClone, routeAlgoClone);
 		}
 		else
 		{
-			clone = new KnowledgePlansCalcRoute(this.myQueueNetwork.getNetworkLayer(), routeAlgoClone, routeAlgoFreeflowClone);
+			clone = new KnowledgePlansCalcRoute(network, routeAlgoClone, routeAlgoFreeflowClone);
 		}
 		
-		clone.setMyQueueNetwork(this.myQueueNetwork);
-		//clone.queueNetwork = this.queueNetwork;
+		clone.setQueueNetwork(this.queueNetwork);
 /*		
 		log.info(routeAlgo.getClass());
 		log.info("org   " + this);

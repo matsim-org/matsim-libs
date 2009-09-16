@@ -23,13 +23,13 @@ package playground.christoph.router;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.christoph.mobsim.MyQueueNetwork;
 import playground.christoph.network.SubNetwork;
 import playground.christoph.network.util.SubNetworkCreator;
 import playground.christoph.network.util.SubNetworkTools;
@@ -147,18 +147,18 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 	 * We have to hand over the queueNetwork to the Cost- and TimeCalculators of the Router.
 	 */
 	@Override
-	public void setMyQueueNetwork(MyQueueNetwork myQueueNetwork)
+	public void setQueueNetwork(QueueNetwork queueNetwork)
 	{
-		this.myQueueNetwork = myQueueNetwork;
+		this.queueNetwork = queueNetwork;
 		
 		if(costFunction instanceof KnowledgeTravelCost)
 		{
-			((KnowledgeTravelCost)costFunction).setMyQueueNetwork(myQueueNetwork);
+			((KnowledgeTravelCost)costFunction).setQueueNetwork(queueNetwork);
 		}
 		
 		if(timeFunction instanceof KnowledgeTravelTime)
 		{
-			((KnowledgeTravelTime)timeFunction).setMyQueueNetwork(myQueueNetwork);
+			((KnowledgeTravelTime)timeFunction).setQueueNetwork(queueNetwork);
 		}
 	}
 	
@@ -200,7 +200,7 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 		else dijkstraClone = new Dijkstra(network, costFunctionClone, timeFunctionClone);
 				
 		DijkstraWrapper clone = new DijkstraWrapper(dijkstraClone, costFunctionClone, timeFunctionClone, network);
-		clone.setMyQueueNetwork(this.myQueueNetwork);
+//		clone.setMyQueueNetwork(this.myQueueNetwork);
 		//clone.queueNetwork = this.queueNetwork;
 		
 		// TODO: how to handle an A*-Algorithm???

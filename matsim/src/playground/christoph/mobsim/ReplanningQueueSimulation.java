@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KnowledgeQueueSimulation.java
+ * ReplanningQueueSimulation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,20 +26,24 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.events.EventsImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 
-import playground.christoph.events.algorithms.ParallelReplanner;
 import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
 
 public class ReplanningQueueSimulation extends QueueSimulation{
 
 	private final static Logger log = Logger.getLogger(ReplanningQueueSimulation.class);
 	
+	protected static boolean actEndReplanning = true;
+	protected static boolean leaveLinkReplanning = true;
+	
 	protected KnowledgeDBStorageHandler knowledgeDBStorageHandler;
+	
+	protected ActEndReplanningModule actEndReplanningModule;
+	protected LeaveLinkReplanningModule leaveLinkReplanningModule;
 	
 	/*
 	 * Basically a 1:1 copy of the activityEndsList of the QueueSimulation.
@@ -54,31 +58,43 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	public ReplanningQueueSimulation(final NetworkLayer network, final PopulationImpl population, final EventsImpl events)
 	{
 		super(network, population, events);
-		
-		/*
-		 * Use a MyQueueNetwork - we need it for our Replanning! 
-		 */
-		this.network = new MyQueueNetwork(network);
-		this.networkLayer = network;
-		
-		// replace the QueueSimEngine with a MyQueueSimEngine
-		this.simEngine = new MyQueueSimEngine(this.network, MatsimRandom.getRandom());
-		
-		// set the QueueSimulation in the SimEngine
-		((MyQueueSimEngine)this.simEngine).setQueueSimulation(this);
-		
-		//setAgentFactory(new MyAgentFactory(this));
-		
+				
 		this.knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(population);
 		this.knowledgeDBStorageHandler.start();
 		getEvents().addHandler(knowledgeDBStorageHandler);
 	}
-
-	public MyQueueNetwork getMyQueueNetwork()
+	
+	public static void doActEndReplanning(boolean value)
 	{
-		return (MyQueueNetwork) this.getQueueNetwork();
+		actEndReplanning = value;
 	}
 	
+	public static boolean isActEndReplanning()
+	{
+		return actEndReplanning;
+	}
+	
+	public void setActEndReplanningModule(ActEndReplanningModule module)
+	{
+		this.actEndReplanningModule = module;	
+	}
+	
+	public static void doLeaveLinkReplanning(boolean value)
+	{
+		leaveLinkReplanning = value;
+	}
+	
+	public static boolean isLeaveLinkReplanning()
+	{
+		return leaveLinkReplanning;
+	}
+	
+	public void setLeaveLinkReplanningModule(LeaveLinkReplanningModule module)
+	{
+		this.leaveLinkReplanningModule = module;
+//		((MyQueueSimEngine)this.simEngine).setLeaveLinkReplanningModule(module);
+	}
+		
 	public PriorityBlockingQueue<DriverAgent> getActivityEndsList()
 	{
 		return super.activityEndsList;
@@ -91,15 +107,22 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 		 * Update the LookupTables for the LinkTravelTimes and LinkTravelCosts.
 		 * Update the LinkTravelTimes first because the LinkTravelCosts may use
 		 * them already!
+		 * 
+		 * Now we use QueueSimulationListeners to do that...
 		 */
-//		log.info("Updating LookupTable...");
-		ParallelReplanner.updateLinkTravelTimesLookupTables(time);
-		ParallelReplanner.updateLinkTravelCostsLookupTables(time);
+//		log.info("Updating LookupTables...");
+//		LookupTableUpdater.updateLinkTravelTimesLookupTables(time);
+//		LookupTableUpdater.updateLinkTravelCostsLookupTables(time);
 //		log.info("done");
 		
-		if (MyQueueSimEngine.isActEndReplanning())
+		if (isActEndReplanning())
 		{
-			((MyQueueSimEngine)this.simEngine).actEndReplanning(time);
+			actEndReplanningModule.doActEndReplanning(time);
+		}
+		
+		if (isLeaveLinkReplanning())
+		{
+			leaveLinkReplanningModule.doLeaveLinkReplanning(time);
 		}
 		
 		handleOffsetActivityEnds(time);
