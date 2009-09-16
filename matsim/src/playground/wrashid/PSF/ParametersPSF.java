@@ -39,7 +39,10 @@ public class ParametersPSF {
 	// is specified
 	private static AverageEnergyConsumptionBins averageEnergyConsumptionBins;
 
-	// testing parameters
+	private static String main_chargingTimesOutputFilePath = "main.chargingTimesOutputFilePath";
+	private static String mainChargingTimesOutputFilePath = null;
+	
+	// TESTING PARAMETERS
 
 	private static String testing_ModeOn = "testingModeOn";
 	private static boolean testingModeOn = false;
@@ -105,6 +108,13 @@ public class ParametersPSF {
 		} else {
 			errorReadingParameter(default_chargingPowerAtParking);
 		}
+		
+		tempStringValue = controler.getConfig().findParam(PSFModule, main_chargingTimesOutputFilePath);
+		if (tempStringValue != null) {
+			mainChargingTimesOutputFilePath = tempStringValue;
+		} else {
+			errorReadingParameter(main_chargingTimesOutputFilePath);
+		}		
 
 		if (testingModeOn) {
 			tempStringValue = controler.getConfig().findParam(PSFModule, testing_energyConsumptionPerLink);
@@ -254,6 +264,10 @@ public class ParametersPSF {
 		return facilityChargingPowerMapper;
 	}
 
+	public static String getMainChargingTimesOutputFilePath() {
+		return mainChargingTimesOutputFilePath;
+	}
+	
 	// if any thing needs to be processed after mutation of the parameters,
 	// put it here
 	public static void postMutationProcessing() {

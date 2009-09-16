@@ -1,5 +1,6 @@
 package playground.wrashid.PSF.singleAgent;
 
+import java.io.File;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
@@ -77,7 +78,13 @@ public class BasicTests extends MatsimTestCase {
 		
 		// the agent should charge twice.
 		assertEquals(2, chargingTimesOfAgentOne.getChargingTimes().size());
-	}   
+		
+		// check, if charging events are written out
+		File outputChargingLog= new File(ParametersPSF.getMainChargingTimesOutputFilePath());
+		assertTrue(outputChargingLog.exists());
+	}
+	
+	
 
 	public void testLogParkingTime() {
 		LogParkingTimes logParkingTimes = new LogParkingTimes(controler);

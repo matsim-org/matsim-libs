@@ -89,9 +89,9 @@
 	<module name="PSF">
 		<param name="default.maxBatteryCapacity" value="36000000" /> <!-- in [J]  -->
 		<param name="default.chargingPowerAtParking" value="3500" /> <!-- in [W]  -->
+		<param name="main.chargingTimesOutputFilePath" value="./output/PSF/singleAgent/chargingLog.txt" />
 	
 		<param name="testingModeOn" value="true" /> <!-- this is the main switch for all testing values -->
-		
 	
 		<param name="testing.energyConsumptionPerLink" value="100000" /> <!-- in Joule [J] -->
 		<param name="testing.maxEnergyPriceWillingToPay" value="1" /> <!-- in utils per [J]  -->

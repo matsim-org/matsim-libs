@@ -185,6 +185,7 @@ public class EnergyBalance {
 	/**
 	 * TODO: Test also, if the first parking is already so far, that we would
 	 * run out of electricity, if we can handle this case properly...
+	 * @param agentEnergyConsumption 
 	 * 
 	 * @return
 	 */
@@ -193,7 +194,7 @@ public class EnergyBalance {
 	// day
 	// TODO: for more general case
 	// TODO: need to take min Energy into consideration!!!
-	public ChargingTimes getChargingTimes() {
+	public ChargingTimes getChargingTimes(EnergyConsumption agentEnergyConsumption) {
 
 		// this should only be called once (return immediatly if already
 		// populated)
@@ -283,6 +284,9 @@ public class EnergyBalance {
 			updateChargingPrice(chargingPrice);
 		}
 
+		// update the state of charge...
+		chargingTimes.updateSOCs(agentEnergyConsumption);
+		
 		return chargingTimes;
 	}
 

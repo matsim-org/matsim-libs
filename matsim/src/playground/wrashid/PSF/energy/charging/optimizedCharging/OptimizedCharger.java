@@ -6,6 +6,7 @@ import java.util.Iterator;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
+import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF.energy.consumption.EnergyConsumption;
 import playground.wrashid.PSF.parking.ParkingTimes;
@@ -67,15 +68,20 @@ public class OptimizedCharger {
 			EnergyBalance eb = new EnergyBalance(parkingTimes.get(personId), agentEnergyConsumption, maxBatteryCapacity,
 					chargingTimes);
 
-			chargingTimes = eb.getChargingTimes();
-			
-			chargingTimes.updateSOCs(agentEnergyConsumption);
+			chargingTimes = eb.getChargingTimes(agentEnergyConsumption);
 
+			// write out charging events to the console and also to a file (if specified)
 			chargingTimes.print();
+					
 
 		}
+		
+		// write out charging events to file, if specified
+		if (ParametersPSF.getMainChargingTimesOutputFilePath()!=null){
+			ChargingTimes.writeChargingTimes(chargingTimes, ParametersPSF.getMainChargingTimesOutputFilePath());
+		}	
 
-	}
+	} 
 
 	public HashMap<Id, ChargingTimes> getChargingTimes() {
 		return chargingTimes;

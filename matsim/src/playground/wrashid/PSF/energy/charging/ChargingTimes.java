@@ -50,44 +50,42 @@ public class ChargingTimes {
 
 	/**
 	 * TODO: replace default max battery capacity with a class, which maps max
-	 * battery of vehicles on an individual vehicle basis. TODO - refactor: this
-	 * is not neat design, because inconsitencies are possible, if this method
-	 * is not invoked
+	 * battery of vehicles on an individual vehicle basis.
 	 * 
-	 * Appraoche: think through, if this could works????
+	 * This
 	 * 
-	 * - Attention, this cannot work, because the ChargeLogs are not ordered! -
-	 * The energy consumption needs to be taken into account => this should be
-	 * directly done via the constructed instead!!!!
-	 * @param energyConsumption 
+	 * @param energyConsumption
 	 * 
 	 */
 
 	public void updateSOCs(EnergyConsumption energyConsumption) {
 		double startSOC = ParametersPSF.getDefaultMaxBatteryCapacity();
-		
-		LinkedList<LinkEnergyConsumptionLog> consumptionLog= (LinkedList<LinkEnergyConsumptionLog>) energyConsumption.getLinkEnergyConsumption().clone();
-		LinkEnergyConsumptionLog curConsumptionLog= consumptionLog.poll();
-		
-		// take both energy consumption and charging into consideration for calculating the SOC
-		
+
+		LinkedList<LinkEnergyConsumptionLog> consumptionLog = (LinkedList<LinkEnergyConsumptionLog>) energyConsumption
+				.getLinkEnergyConsumption().clone();
+		LinkEnergyConsumptionLog curConsumptionLog = consumptionLog.poll();
+
+		// take both energy consumption and charging into consideration for
+		// calculating the SOC
+
 		Iterator<ChargeLog> iterator = chargingTimes.iterator();
 
 		while (iterator.hasNext()) {
 			ChargeLog curChargeLog = iterator.next();
-			
-			// we must check if curConsumptionLog is not null, because if the agent only charges at home
-			// in the evening, then all energy consumption happens before that...
-			while (curConsumptionLog !=null && curConsumptionLog.getEnterTime()<curChargeLog.getEndChargingTime()){
-				startSOC-=curConsumptionLog.getEnergyConsumption();
-				curConsumptionLog= consumptionLog.poll();
+
+			// we must check if curConsumptionLog is not null, because if the
+			// agent only charges at home
+			// in the evening, then all energy consumption happens before
+			// that...
+			while (curConsumptionLog != null && curConsumptionLog.getEnterTime() < curChargeLog.getEndChargingTime()) {
+				startSOC -= curConsumptionLog.getEnergyConsumption();
+				curConsumptionLog = consumptionLog.poll();
 			}
-			
+
 			curChargeLog.updateSOC(startSOC);
 			startSOC = curChargeLog.getEndSOC();
 		}
-		
-		
+
 	}
 
 	/**
@@ -104,7 +102,7 @@ public class ChargingTimes {
 		try {
 			FileOutputStream fos = new FileOutputStream(outputFilePath);
 			OutputStreamWriter chargingOutput = new OutputStreamWriter(fos, "UTF8");
-			chargingOutput.write("linkId\tagentId\tstartChargingTime\tendChargingTime\n");
+			chargingOutput.write("linkId\tagentId\tstartChargingTime\tendChargingTime\tstartSOC\tendSOC\n");
 
 			for (Id personId : chargingTimes.keySet()) {
 				ChargingTimes curChargingTime = chargingTimes.get(personId);
@@ -114,6 +112,8 @@ public class ChargingTimes {
 					chargingOutput.write(personId.toString() + "\t");
 					chargingOutput.write(chargeLog.getStartChargingTime() + "\t");
 					chargingOutput.write(chargeLog.getEndChargingTime() + "\t");
+					chargingOutput.write(chargeLog.getStartSOC() + "\t");
+					chargingOutput.write(chargeLog.getEndSOC() + "\t");
 					chargingOutput.write("\n");
 				}
 			}
