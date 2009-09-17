@@ -252,12 +252,12 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 	
 		out.println();
 	
-		long millis;
+//		long millis;
 		
 		/*
 		 * header - start
 		 */
-		millis = System.currentTimeMillis();
+//		millis = System.currentTimeMillis();
 		out.print("#p");
 		for (TransportMode mode : this.frequencies.keySet()) {
 			out.print("\t" + mode);
@@ -266,8 +266,8 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 		/*
 		 * header - end
 		 */
-		millis = System.currentTimeMillis() - millis;
-		log.info("Writing header took: " + Long.toString(millis));
+//		millis = System.currentTimeMillis() - millis;
+//		log.info("Writing header took: " + Long.toString(millis));
 		
 		/*
 		 * table - start
@@ -280,11 +280,11 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 		for (int ii = 0; ii < numberOfQuantiles; ii++) {
 			out.print(percentFormat.format(quantiles[ii]));
 			for (TransportMode mode : this.frequencies.keySet()) {
-				millis = System.currentTimeMillis();
+//				millis = System.currentTimeMillis();
 				out.print("\t");
 				out.print(classFormat.format(StatUtils.percentile(this.rawData.get(mode).getInternalValues(), quantiles[ii] * 100.0)));
-				millis = System.currentTimeMillis() - millis;
-				log.info("Writing and calculatin percentiles took: " + Long.toString(millis));
+//				millis = System.currentTimeMillis() - millis;
+//				log.info("Writing and calculatin percentiles took: " + Long.toString(millis));
 			}
 			out.println();
 		}
