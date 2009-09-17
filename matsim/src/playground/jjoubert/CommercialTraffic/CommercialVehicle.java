@@ -3,61 +3,57 @@ package playground.jjoubert.CommercialTraffic;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
+
 /**
  * A vehicle container class for the commercial vehicle study in South Africa. Each 
- * vehicle contains major activity locations, minor activity locations, and a list of 
- * all minor activities in the given study area.
+ * vehicle contains a unique vehicle Id (as provided by <i>DigiCore</i>); a <code>List</code>
+ * of <code>Chain</code>s, and some summary statistics about the activities and the chains.
  *  
  * @author jwjoubert
  */
 public class CommercialVehicle {
-	private final Logger log = Logger.getLogger(CommercialVehicle.class);
-	private int vehID;
-	private List<Coordinate> majorLocationList;
+	private int vehID;	
 	private List<Chain> chains;
-	private List<Activity> studyAreaActivities;
 	private int avgActivitesPerChain;
 	private int avgChainDuration;
 	private int avgChainDistance; 
-	private int numberOfStudyAreaActivities;
-	private double percentageStudyAreaActivities;
-	private int studyAreaChainDistance;
-	private int totalActivities;
+	private double fractionMinorInStudyArea;
+	private double fractionMajorInStudyArea;
+	private double kilometerPerAreaActivityStat;
 		
 	/**
 	 * Creates a new vehicle with the ID as obtained from the DigiCore data set.
 	 * 
-	 * @param id is the unique vehicle identification number used by DigiCore
+	 * @param id is the unique vehicle identification number used by <i>DigiCore<i>.
 	 */
 	public CommercialVehicle(int id){
 
 		this.vehID = id;
-		this.majorLocationList = new ArrayList<Coordinate>();
 		this.chains = new ArrayList<Chain>();
-		this.studyAreaActivities = new ArrayList<Activity>();
 		this.avgActivitesPerChain = 0;
 		this.avgChainDuration = 0;
 		this.avgChainDistance = 0;
-		this.numberOfStudyAreaActivities = 0;
-		this.percentageStudyAreaActivities = 0;
-		this.totalActivities = 0;
+		this.fractionMinorInStudyArea = 0;
+		this.fractionMajorInStudyArea = 0;
+		this.kilometerPerAreaActivityStat = 0;
 	}
 	
 	/**
-	 * Updates a number of statistics for the vehicle:
+	 * Calculates a number of statistics for the vehicle. If the study area parameters is
+	 * passed as <code>null</code>, then the associated statistics will not be calculated.
+	 * Rather, it is then suggested the <code>updateVehicleStatistics()</code> method be 
+	 * used.
 	 * <ul>
 	 * <li> calculates the average number of activities per chain;
 	 * <li> calculates the average chain duration (in minutes);
 	 * <li> calculates the average chain distance (in meters); 
-	 * <li> extracts all the <code>major</code> location coordinates; and
-	 * <li> calculates the average number of activities in the study area.
+	 * <li> calculates the fraction of <i>minor</i> activities in the study area;
+	 * <li> calculates the fraction of <i>major</i> activities in the study area;
 	 * </ul>
 	 *
 	 * @param studyArea of type <code>MultiPolygon</code>, assumed to be given in the 
@@ -70,17 +66,15 @@ public class CommercialVehicle {
 		if(studyArea != null){
 			setStudyAreaActivities(studyArea);
 		}
-		setMajorLocations();
 	}
 	
 	
 	/**
-	 * Updates a number of statistics for the vehicle:
+	 * Calculates a number of statistics for the vehicle:
 	 * <ul>
 	 * <li> calculates the average number of activities per chain;
 	 * <li> calculates the average chain duration (in minutes);
 	 * <li> calculates the average chain distance (in meters); and
-	 * <li> extracts all the <code>major</code> location coordinates.
 	 * </ul>
 	 */
 	public void updateVehicleStatistics(){
@@ -96,9 +90,7 @@ public class CommercialVehicle {
 			this.avgActivitesPerChain = (int) ( totalActivities / (double) this.chains.size() );
 		} else{
 			this.avgActivitesPerChain = (0);
-			log.warn("Vehicle " + vehID + " has an empty chain!");
 		}
-		this.totalActivities = totalActivities;
 	}
 
 	private void setAverageChainDuration(){
@@ -107,7 +99,7 @@ public class CommercialVehicle {
 			for (Chain chain : this.chains){
 				duration += chain.getDuration();
 			}
-			this.avgChainDuration = ((int) (duration / this.chains.size() ));
+			this.avgChainDuration = (int) (duration / (double) this.chains.size());
 		} else{
 			this.avgChainDuration = (0);
 		}
@@ -134,116 +126,84 @@ public class CommercialVehicle {
 	 */
 	private void setStudyAreaActivities(MultiPolygon studyArea){
 		GeometryFactory gf = new GeometryFactory();
-
-		/*
-		 * Calculate the maximum distance that any corner of the envelope of the study 
-		 * area is from the centroid of the study area.  
-		 */
 		Geometry studyAreaEnvelope = studyArea.getEnvelope();
-		Point studyAreaCentroid = studyArea.getCentroid();
-		Coordinate[] cornerPoints = studyAreaEnvelope.getCoordinates();
-		double maxDistance = 0.0;
-		for (Coordinate c : cornerPoints) {
-			maxDistance = Math.max(maxDistance, c.distance(studyAreaCentroid.getCoordinate()));
-		}
+		
+		List<Coordinate> majorList = new ArrayList<Coordinate>();
+
+		int totalMinor = 0;
+		int minorInStudyArea = 0;
+		double studyAreaDistance = 0;
+		
 		if(this.chains.size() > 0){
 			for (Chain chain : this.chains) {
 				if(chain.getActivities().size() > 0){
 					for (int i = 1; i < chain.getActivities().size() - 1; i++ ) { // don't count first and last major locations
 						Activity thisActivity = chain.getActivities().get(i);
-						Point p = gf.createPoint( thisActivity.getLocation().getCoordinate() );
-						/*
-						 * For efficiency (well, I HOPE), I first check if the point is 
-						 * closer than the calculated maximum distance. This is a 
-						 * 'cheaper' calculation than immediately checking if the point 
-						 * is within the study area. 
-						 */
-						if(p.distance(studyAreaCentroid) < maxDistance){
-							if( studyArea.contains(p) ){
-								this.studyAreaActivities.add( thisActivity );
-								chain.setInStudyArea(true);
+						if(i == 1){
+							/*
+							 * Check for 'major' activities.
+							 */
+							Coordinate c = thisActivity.getLocation().getCoordinate();
+							if(!majorList.contains(c)){
+								majorList.add(c);
 							}
+				
+						} else{
+							/*
+							 * Check for 'minor' activities.
+							 */
+							Point p = gf.createPoint( thisActivity.getLocation().getCoordinate() );
+							/*
+							 * For efficiency, I first check if the point is within the 
+							 * envelope of the study area. This is a 'cheaper' calculation 
+							 * than immediately checking if the point is within the study 
+							 * area. 
+							 */
+							if(studyAreaEnvelope.contains(p)){
+								if( studyArea.contains(p) ){
+									minorInStudyArea++;
+									chain.setInStudyArea(true);
+								}
+							}
+							totalMinor++;
 						}
 					}
 				}
-				if( chain.isInStudyArea() ){
-					/*
-					 * TODO Currently the total chain length is added to the study area
-					 * distance. In future we can/could revisit to ensure that only the
-					 * portion INSIDE the study are is actually added.
-					 */					
-					this.studyAreaChainDistance += chain.getDistance();
+				if(chain.isInStudyArea()){
+					studyAreaDistance += chain.getDistance();
 				}
 			}
 		}
-		this.numberOfStudyAreaActivities = this.studyAreaActivities.size();
-		this.percentageStudyAreaActivities = (((double) this.numberOfStudyAreaActivities) / 
-										((double) this.totalActivities ) );
-	}
+		fractionMinorInStudyArea = minorInStudyArea / ((double) totalMinor );
 		
-	/**
-	 * <p>This method extract all the <code>major</code> activity locations. The first 
-	 * activity of each chain is added, as well as the last activity of the last chain.
-	 */
-	private void setMajorLocations(){
-		for (Chain chain : this.chains) {
-			majorLocationList.add(chain.getActivities().get(0).getLocation().getCoordinate());
+		// Calculate the descriptive statistic I developed.
+		if(minorInStudyArea > 0){
+			kilometerPerAreaActivityStat = ((double) studyAreaDistance) / ((double) minorInStudyArea);
 		}
-		majorLocationList.add(this.chains.get(this.chains.size()-1).getActivities().get(0).getLocation().getCoordinate());
-	}
+		
 
-	/**
-	 * Considers each chain of the vehicle. If a chain does not start <i><b>AND</b></i> 
-	 * end at a major location, or if a chain does not contain at least one minor 
-	 * activity between two major activities, the chain is removed.
-	 */
-	public void cleanChains() {
-		int i = 0;
-		while (i < this.getChains().size() ){
-			Activity first = this.getChains().get(i).getActivities().get(0);
-			Activity last = this.getChains().get(i).getActivities().get(this.getChains().get(i).getActivities().size() - 1);
-			if( (first.getDuration() < ActivityLocations.getMajorActivityMinimumDuration()) ||
-			    (last.getDuration() < ActivityLocations.getMajorActivityMinimumDuration()) ||
-			    (this.getChains().get(i).getActivities().size() <= 2 ) ){
-				this.getChains().remove(i);
-			} else{
-				this.getChains().get(i).setDuration();
-				this.getChains().get(i).setDistance();
-				i++;
+		/*
+		 * Second, we check the 'major' activities.
+		 */
+		int majorInStudyArea = 0;
+		for (Coordinate c : majorList) {
+			Point p = gf.createPoint(c);
+			if(studyAreaEnvelope.contains(p)){
+				if(studyArea.contains(p)){
+					majorInStudyArea++;
+				}
 			}
 		}
+		fractionMajorInStudyArea = majorInStudyArea / ((double) majorList.size());
 	}
-	
-
-	/**
-	 * Returns the list of major activities. 
-	 * 
-	 * @return ArrayList < Activity > where <code>Activity<code> represents major activities.
-	 */
-	public List<Coordinate> getMajorLocationList() {
-		return majorLocationList;
-	}
-
+			
 	/**
 	 * Returns the list of chains.
 	 * 
-	 * @return ArrayList < Chain >
+	 * @return {@code ArrayList<Chain>}
 	 */
 	public List<Chain> getChains() {
 		return chains;
-	}
-
-	/**
-	 * Returns the list of all activities in Gauteng.
-	 * 
-	 * @return {@code ArrayList<Activity>}
-	 */
-	public List<Activity> getStudyAreaActivities() {
-		return studyAreaActivities;
-	}
-	
-	public int getTotalActivities() {
-		return totalActivities;
 	}
 
 	public int getVehID() {
@@ -262,16 +222,16 @@ public class CommercialVehicle {
 		return avgChainDistance;
 	}
 
-	public double getPercentStudyAreaActivities() {
-		return percentageStudyAreaActivities;
+	public double getFractionMinorInStudyArea() {
+		return fractionMinorInStudyArea;
 	}
 		
-	public int getNumberOfStudyAreaActivities() {
-		return numberOfStudyAreaActivities;
+	public double getFractionMajorInStudyArea() {
+		return fractionMajorInStudyArea;
 	}
-
-	public int getStudyAreaChainDistance() {
-		return studyAreaChainDistance;
+	
+	public double getKilometerPerAreaActivityStat() {
+		return kilometerPerAreaActivityStat;
 	}
 
 }
