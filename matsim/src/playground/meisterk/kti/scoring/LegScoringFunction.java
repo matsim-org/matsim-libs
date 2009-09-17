@@ -78,6 +78,8 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 
 		if (TransportMode.car.equals(leg.getMode())) {
 			
+			tmpScore += this.ktiConfigGroup.getConstCar();
+			
 			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
 				RouteWRefs route = leg.getRoute();
 				dist = route.getDistance();
@@ -133,6 +135,8 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			tmpScore += this.getWalkScore(dist, travelTime);
 			
 		} else if (TransportMode.bike.equals(leg.getMode())) {
+			
+			tmpScore += this.ktiConfigGroup.getConstBike();
 			
 			tmpScore += travelTime * this.ktiConfigGroup.getTravelingBike() / 3600d;
 			

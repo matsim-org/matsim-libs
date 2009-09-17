@@ -208,5 +208,13 @@ public class KtiConfigGroup extends Module {
 	public double getConstCar() {
 		return Double.parseDouble(KtiConfigParameter.CONST_CAR.getActualValue());
 	}
+
+	public void setConstBike(double newValue) {
+		KtiConfigParameter.CONST_BIKE.setActualValue(Double.toString(newValue));
+	}
+
+	public void setConstCar(double newValue) {
+		KtiConfigParameter.CONST_CAR.setActualValue(Double.toString(newValue));
+	}
 	
 }

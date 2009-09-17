@@ -64,6 +64,8 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		ktiConfigGroup.setDistanceCostPtNoTravelCard(1.0);
 		ktiConfigGroup.setDistanceCostPtUnknownTravelCard(0.5);
 		ktiConfigGroup.setTravelingBike(-2.0);
+		ktiConfigGroup.setConstBike(-0.5);
+		ktiConfigGroup.setConstCar(-0.6);
 		this.config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
 
 		CharyparNagelScoringConfigGroup charyparNagelConfigGroup = this.config.charyparNagelScoring();
@@ -123,11 +125,11 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 	}	
 
 	public void testCalcLegScoreCar() {
-		this.runATest(TransportMode.car, null, null, -1.6);
+		this.runATest(TransportMode.car, null, null, -2.2);
 	}
 
 	public void testCalcLegScoreBike() {
-		this.runATest(TransportMode.bike, null, null, -1.0);
+		this.runATest(TransportMode.bike, null, null, -1.5);
 	}
 
 	public void testCalcLegScoreWalk() {
