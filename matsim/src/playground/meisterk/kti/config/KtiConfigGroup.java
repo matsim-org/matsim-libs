@@ -43,7 +43,7 @@ public class KtiConfigGroup extends Module {
 		 * represents fixed costs of walk access/egress to the bike
 		 * value is calculated as marginalUtilityOfTravelTimeWalk divided by assumed sum of accces and egress time
 		 * TODO should be replaced by actual access/egress walk legs, 
-		 * which take time in the activity plan and thus generate additional opportunity costs 
+		 * which take time in the activity plan and thus generates exact additional opportunity costs 
 		 */
 		CONST_BIKE("constBike", "0.0", ""),
 		/**
