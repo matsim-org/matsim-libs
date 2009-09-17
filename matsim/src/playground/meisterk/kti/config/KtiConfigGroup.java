@@ -38,6 +38,13 @@ public class KtiConfigGroup extends Module {
 	 */
 	public enum KtiConfigParameter {
 		
+		/**
+		 * constant to be added to the score of a bike leg.
+		 * represents fixed costs of walk access/egress to the bike
+		 * value is calculated as marginalUtilityOfTravelTimeWalk divided by assumed sum of accces and egress time
+		 * TODO should be replaced by actual access/egress walk legs, 
+		 * which take time in the activity plan and thus generate additional opportunity costs 
+		 */
 		CONST_BIKE("constBike", "0.0", ""),
 		/**
 		 * the path to the file with the travel-time matrix (VISUM-format)
@@ -75,6 +82,13 @@ public class KtiConfigGroup extends Module {
 		 * unit: 1/h
 		 */
 		TRAVELING_BIKE("travelingBike", "0.0", ""), 
+		/**
+		 * constant to be added to the score of a car leg.
+		 * represents fixed costs of walk access/egress to the car
+		 * value is calculated as marginalUtilityOfTravelTimeWalk divided by assumed sum of accces and egress time
+		 * TODO should be replaced by actual access/egress walk legs, 
+		 * which take time in the activity plan and thus generate additional opportunity costs 
+		 */
 		CONST_CAR("constCar", "0.0", "");
 		
 		private final String parameterName;
