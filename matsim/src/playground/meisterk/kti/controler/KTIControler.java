@@ -12,6 +12,7 @@ import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
 import playground.meisterk.kti.controler.listeners.KtiPopulationPreparation;
 import playground.meisterk.kti.controler.listeners.LegDistanceDistributionWriter;
 import playground.meisterk.kti.controler.listeners.ScoreElements;
+import playground.meisterk.kti.router.KtiNodeNetworkRouteFactory;
 import playground.meisterk.kti.router.KtiPtRouteFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
@@ -43,6 +44,7 @@ public class KTIControler extends Controler {
 		this.ktiConfigGroup = new KtiConfigGroup();
 		super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 
+		this.getNetworkFactory().setRouteFactory(TransportMode.car, new KtiNodeNetworkRouteFactory());
 		this.getNetworkFactory().setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
 
 	}
