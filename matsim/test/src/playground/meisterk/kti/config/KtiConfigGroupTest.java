@@ -39,6 +39,9 @@ public class KtiConfigGroupTest extends MatsimTestCase {
 		assertEquals(
 				Double.parseDouble(KtiConfigGroup.KtiConfigParameter.CONST_BIKE.getDefaultValue()), 
 				testee.getConstBike());
+		assertEquals(
+				Double.parseDouble(KtiConfigGroup.KtiConfigParameter.CONST_CAR.getDefaultValue()), 
+				testee.getConstCar());
 		assertEquals(KtiConfigGroup.KtiConfigParameter.PT_HALTESTELLEN_FILENAME.getDefaultValue(), testee.getPtHaltestellenFilename());
 		assertEquals(KtiConfigGroup.KtiConfigParameter.PT_TRAVEL_TIME_MATRIX_FILENAME.getDefaultValue(), testee.getPtTraveltimeMatrixFilename());
 		assertEquals(KtiConfigGroup.KtiConfigParameter.WORLD_INPUT_FILENAME.getDefaultValue(), testee.getWorldInputFilename());
@@ -63,6 +66,7 @@ public class KtiConfigGroupTest extends MatsimTestCase {
 		}
 
 		assertEquals(999.9, testee.getConstBike());
+		assertEquals(-888.8, testee.getConstCar());
 		assertEquals("filename2", testee.getPtHaltestellenFilename());
 		assertEquals("filename1", testee.getPtTraveltimeMatrixFilename());
 		assertEquals("filename3", testee.getWorldInputFilename());

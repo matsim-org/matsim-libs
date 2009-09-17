@@ -10,6 +10,7 @@
 		<param name="pt_haltestellen_filename" value="filename2" />
 		<param name="worldInputFilename" value="filename3" />
 		<param name="constBike" value="999.9" />
+		<param name="constCar" value="-888.8" />
 		<param name="distanceCostCar" value="0.1" />
 		<param name="distanceCostPtNoTravelCard" value="-0.2" />
 		<param name="distanceCostPtUnknownTravelCard" value="0.3" />

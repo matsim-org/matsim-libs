@@ -74,7 +74,8 @@ public class KtiConfigGroup extends Module {
 		 * marginal utility of travel time for mode "bike"
 		 * unit: 1/h
 		 */
-		TRAVELING_BIKE("travelingBike", "0.0", "");
+		TRAVELING_BIKE("travelingBike", "0.0", ""), 
+		CONST_CAR("constCar", "0.0", "");
 		
 		private final String parameterName;
 		private final String defaultValue;
@@ -140,8 +141,6 @@ public class KtiConfigGroup extends Module {
 		return Double.parseDouble(KtiConfigParameter.CONST_BIKE.getActualValue());
 	}
 
-
-
 	public String getPtHaltestellenFilename() {
 		return KtiConfigParameter.PT_HALTESTELLEN_FILENAME.getActualValue();
 	}
@@ -204,6 +203,10 @@ public class KtiConfigGroup extends Module {
 
 	public void setTravelingBike(double newValue) {
 		KtiConfigParameter.TRAVELING_BIKE.setActualValue(Double.toString(newValue));
+	}
+
+	public double getConstCar() {
+		return Double.parseDouble(KtiConfigParameter.CONST_CAR.getActualValue());
 	}
 	
 }
