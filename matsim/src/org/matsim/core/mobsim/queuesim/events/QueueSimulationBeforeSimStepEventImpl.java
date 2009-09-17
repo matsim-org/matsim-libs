@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * QueueSimulationBeforeSimStepEventImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.mobsim.queuesim.events;
 
-package org.matsim.core.mobsim.queuesim.listener;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
-public class AllTests {
+/**
+ * @author dgrether
+ */
+public class QueueSimulationBeforeSimStepEventImpl extends AbstractQueueSimulationEvent  
+	implements QueueSimulationBeforeSimStepEvent {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
-		//$JUnit-BEGIN$
-		suite.addTestSuite(QueueSimulationBeforeAfterSimStepListenerTest.class);
-		//$JUnit-END$
-		return suite;
+	private double time;
+
+	public QueueSimulationBeforeSimStepEventImpl(QueueSimulation queuesim, double time) {
+		super(queuesim);
+		this.time = time;
 	}
 
+	/**
+	 * @see org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent#getSimulationTime()
+	 */
+	public double getSimulationTime() {
+		return this.time;
+	}
 }

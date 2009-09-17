@@ -20,6 +20,7 @@
 
 package org.matsim.core.mobsim.queuesim.listener;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsImpl;
@@ -29,7 +30,7 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.testcases.MatsimTestCase;
 
-public class QueueSimulationAfterSimStepListenerTest extends MatsimTestCase {
+public class QueueSimulationBeforeAfterSimStepListenerTest extends MatsimTestCase {
 
 	public void testEventIsFired() {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
@@ -40,8 +41,11 @@ public class QueueSimulationAfterSimStepListenerTest extends MatsimTestCase {
 		
 		MockQueueSimStepListener mockListener = new MockQueueSimStepListener(1.0);
 		qsim.addQueueSimulationListeners(mockListener);
+		MockBeforeQueueSimStepListener beforeStepMockListener = new MockBeforeQueueSimStepListener(1.0);
+		qsim.addQueueSimulationListeners(beforeStepMockListener);
 		qsim.run();
 		assertEquals("wrong number of invocations.", 11, mockListener.getCount());
+		assertEquals("wrong number of invocations.", 11, beforeStepMockListener.getCount());
 		
 		// redo the test with different settings
 		config.simulation().setEndTime(6.0 * 3600 + 50);
@@ -52,12 +56,47 @@ public class QueueSimulationAfterSimStepListenerTest extends MatsimTestCase {
 		
 		mockListener = new MockQueueSimStepListener(10.0);
 		qsim.addQueueSimulationListeners(mockListener);
+		beforeStepMockListener = new MockBeforeQueueSimStepListener(10.0);
+		qsim.addQueueSimulationListeners(beforeStepMockListener);
 		qsim.run();
 		assertEquals("wrong number of invocations.", 6, mockListener.getCount());
+		assertEquals("wrong number of invocations.", 6, beforeStepMockListener.getCount());
+	}
+	
+	public static class MockBeforeQueueSimStepListener implements QueueSimulationAfterSimStepListener {
+
+		
+		private static final Logger log = Logger
+				.getLogger(QueueSimulationBeforeAfterSimStepListenerTest.MockBeforeQueueSimStepListener.class);
+		
+		private final double expectedTimeDiff;
+		private double previousTime = -1.0;
+		private int counter = 0;
+		
+		public MockBeforeQueueSimStepListener(final double expectedTimeDifference) {
+			this.expectedTimeDiff = expectedTimeDifference;
+		}
+		
+		public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e) {
+			if (this.previousTime >= 0.0) {
+				assertEquals("wrong time difference between two BeforeSimStepEvents.", 
+						this.expectedTimeDiff, e.getSimulationTime() - this.previousTime, EPSILON);
+			}
+			this.previousTime = e.getSimulationTime();
+			log.info(this.previousTime);
+			this.counter++;
+		}
+		
+		public int getCount() {
+			return this.counter;
+		}
 	}
 	
 	public static class MockQueueSimStepListener implements QueueSimulationAfterSimStepListener {
 
+		private static final Logger log = Logger
+				.getLogger(QueueSimulationBeforeAfterSimStepListenerTest.MockQueueSimStepListener.class);
+		
 		private final double expectedTimeDiff;
 		private double previousTime = -1.0;
 		private int counter = 0;
@@ -72,7 +111,7 @@ public class QueueSimulationAfterSimStepListenerTest extends MatsimTestCase {
 						this.expectedTimeDiff, e.getSimulationTime() - this.previousTime, EPSILON);
 			}
 			this.previousTime = e.getSimulationTime();
-			System.out.println(this.previousTime);
+			log.info(this.previousTime);
 			this.counter++;
 		}
 		

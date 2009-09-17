@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * QueueSimulationBeforeSimStepListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.core.mobsim.queuesim.listener;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
 
-public class AllTests {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
-		//$JUnit-BEGIN$
-		suite.addTestSuite(QueueSimulationBeforeAfterSimStepListenerTest.class);
-		//$JUnit-END$
-		return suite;
-	}
+/**
+ *  Listeners of QueueSimulation should implement this if they want to be 
+ *  notified after QueueSimulation.beforeSimStep() was invoked.
+ * @author dgrether
+ *
+ */
+public interface QueueSimulationBeforeSimStepListener extends QueueSimulationListener {
 
+	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent e);
+	
 }

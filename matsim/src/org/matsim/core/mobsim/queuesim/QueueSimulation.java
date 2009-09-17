@@ -200,8 +200,10 @@ public class QueueSimulation {
 		while (cont) {
 			double time = SimulationTimer.getTime();
 			beforeSimStep(time);
+			this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
 			cont = doSimStep(time);
 			afterSimStep(time);
+			this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
 			if (cont) {
 				SimulationTimer.incTime();
 			}
@@ -454,7 +456,6 @@ public class QueueSimulation {
 			this.snapshotTime += this.snapshotPeriod;
 			doSnapshot(time);
 		}
-		this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
 	}
 
 	private void doSnapshot(final double time) {

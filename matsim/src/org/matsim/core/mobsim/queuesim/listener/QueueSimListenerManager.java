@@ -27,6 +27,8 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEventImpl;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEventImpl;
+import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEventImpl;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEventImpl;
 
@@ -98,6 +100,14 @@ public class QueueSimListenerManager {
 		QueueSimulationBeforeCleanupListener[] listener = this.listenerList.getListeners(QueueSimulationBeforeCleanupListener.class);
 		for (int i = 0; i < listener.length; i++){
 			listener[i].notifySimulationBeforeCleanup(event);
+		}
+	}
+
+	public void fireQueueSimulationBeforeSimStepEvent(double time) {
+		QueueSimulationBeforeSimStepEvent event = new QueueSimulationBeforeSimStepEventImpl(queuesim, time);
+		QueueSimulationBeforeSimStepListener[] listener = this.listenerList.getListeners(QueueSimulationBeforeSimStepListener.class);
+		for (int i = 0; i < listener.length; i++) {
+			listener[i].notifySimulationBeforeSimStep(event);
 		}
 	}
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * QueueSimulationBeforeSimStepEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.mobsim.queuesim.events;
 
-package org.matsim.core.mobsim.queuesim.listener;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+/**
+ * Is thrown by QueueSimulation after QueueSimulation.beforeSimStep() was invoked.
+ * @author dgrether
+ */
+public interface QueueSimulationBeforeSimStepEvent extends QueueSimulationEvent {
 
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
-		//$JUnit-BEGIN$
-		suite.addTestSuite(QueueSimulationBeforeAfterSimStepListenerTest.class);
-		//$JUnit-END$
-		return suite;
-	}
+	public double getSimulationTime();
 
 }
