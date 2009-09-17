@@ -51,13 +51,11 @@ public class ActEndReplanningModule {
 	}
 	
 	public void doActEndReplanning(double time)
-	{
-//		Date start = new Date();
-		
+	{		
 		// Act End Replanning Objects
-		ArrayList<QueueVehicle> vehiclesToReplanActEnd = new ArrayList<QueueVehicle>();
-		ArrayList<PersonImpl> personsToReplanActEnd = new ArrayList<PersonImpl>();
-		ArrayList<ActivityImpl> fromActActEnd = new ArrayList<ActivityImpl>();
+		List<QueueVehicle> vehiclesToReplanActEnd = new ArrayList<QueueVehicle>();
+		List<PersonImpl> personsToReplanActEnd = new ArrayList<PersonImpl>();
+		List<ActivityImpl> fromActActEnd = new ArrayList<ActivityImpl>();
 		/*
 		 * Checking only Links that leed to active Nodes is not allowed here!
 		 * If a Person enters an inative Link, this Link is reactivated - but
@@ -123,20 +121,9 @@ public class ActEndReplanningModule {
 			
 		if (vehiclesToReplanActEnd.size() > 0)
 		{	
-//			log.info("Time: " + time  + ", " + vehiclesToReplanActEnd.size() + " vehicles will end their current activity now and need a replanning!");
-//			System.out.println("Time: " + time  + ", " + vehiclesToReplanActEnd.size() + " vehicles will end their current activity now and need a replanning!");
-//			Date startReplanning = new Date();
-
 			parallelActEndReplanner.run(fromActActEnd, vehiclesToReplanActEnd, time);
-			
-//			log.info("Done parallel Act End Replanning in this step!");
-			
+					
 			replanningCounter = replanningCounter + vehiclesToReplanActEnd.size();
-			
-//			long totalTime = new Date().getTime() - start.getTime();
-//			long replanningTime = new Date().getTime() - startReplanning.getTime();
-//			double ratio = Double.valueOf(replanningTime) / Double.valueOf(totalTime);
-//			log.info("Total Time: " + totalTime + ", Replanning Time: " + replanningTime + ", Ratio: " + ratio);
 		}
 	}	// actEndReplanning
 }

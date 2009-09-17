@@ -156,7 +156,6 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 				else entries.remove();
 				
 				vehiclesToReplanLeaveLink.add(vehicle);
-				//vehiclesToReplanLeaveLink.add(this.queueNetwork.getQueueLink(linkId).getVehicle(personId));
 			}
 		}
 		

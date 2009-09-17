@@ -20,7 +20,6 @@
 
 package playground.christoph.events.algorithms;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -37,6 +36,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.christoph.mobsim.MyPersonAgent;
 import playground.christoph.router.KnowledgePlansCalcRoute;
 
 /*
@@ -110,7 +110,6 @@ public class LeaveLinkReplanner {
 		if(nextAct != null)
 		{
 //			log.info("Id: " + person.getId());
-//			routingOld();
 			routing();
 		}
 		else
@@ -118,7 +117,6 @@ public class LeaveLinkReplanner {
 			log.error("An agents next activity is null - this should not happen! Id: " + person.getId());
 		}
 	}
-	
 	
 	/*
 	 * Replan Route every time the End of a Link is reached.
@@ -199,128 +197,11 @@ public class LeaveLinkReplanner {
 		// Merge already driven parts of the Route with the new routed parts.
 		// The changes will be made in the original list, so they will be directly in the Route.
 		nodesBuffer.addAll(newRoute.getNodes());
+		
+		// finally reset the cached next Link of the PersonAgent - it may have changed!
+		((MyPersonAgent)this.personAgent).ResetCachedNextLink();
 	}
-	
-	
-	protected void routingOld()
-	{
-//		Date date = new Date();
-		/*
-		 * Get the index and the currently next Node on the route.
-		 * Entries with a lower index have already been visited!
-		 */ 
-		int currentNodeIndex = this.personAgent.getCurrentNodeIndex();
-		NetworkRouteWRefs route = (NetworkRouteWRefs) this.leg.getRoute();
 		
-		// create dummy data for the "new" activities
-		String type = "w";
-		// This would be the "correct" Type - but it is slower and is not necessary
-		//String type = this.plan.getPreviousActivity(leg).getType();
-		
-		ActivityImpl newFromAct = new ActivityImpl(type, this.vehicle.getCurrentLink().getToNode().getCoord(), this.vehicle.getCurrentLink());
-
-		newFromAct.setStartTime(time);
-		newFromAct.setEndTime(time);
-		
-		// Create a copy of the ArrayList - don't edit the ArrayList itself! 
-		ArrayList<Node> nodesRoute = new ArrayList<Node>();
-		nodesRoute.addAll(route.getNodes());
-
-		ArrayList<Node> nodeBuffer = new ArrayList<Node>();
-		
-		/*
-		 *  Remove all Nodes from the Route that have already been passed.
-		 *  Correct index here because only already passed Nodes should be moved
-		 *  to the nodesBuffer.
-		 */
-		for (int i = 0; i < currentNodeIndex - 1; i++)
-		{
-			Node node = nodesRoute.get(0);
-			
-			nodeBuffer.add(node);
-			nodesRoute.remove(0);
-		}
-
-		// create new, shortend Route
-		//NetworkRoute subRoute = new NodeNetworkRoute();
-		//subRoute.setNodes(nodesRoute);
-		NodeNetworkRouteImpl subRoute = new NodeNetworkRouteImpl(this.vehicle.getCurrentLink(), route.getEndLink());
-		subRoute.setNodes(subRoute.getStartLink(), nodesRoute, subRoute.getEndLink());
-
-		// put the new route in a new leg
-		LegImpl newLeg = new LegImpl(leg.getMode());
-		newLeg.setDepartureTime(leg.getDepartureTime());
-		newLeg.setTravelTime(leg.getTravelTime());
-		newLeg.setArrivalTime(leg.getArrivalTime());
-		newLeg.setRoute(subRoute);
-		
-		// currently selected Plan
-		PlanImpl currentPlan = person.getSelectedPlan();
-		
-		// create new plan and select it
-		PlanImpl newPlan = new PlanImpl(person);
-		person.addPlan(newPlan);
-		person.setSelectedPlan(newPlan);
-			
-		// here we are at the moment
-		newPlan.addActivity(newFromAct);
-		
-		// Route from the current position to the next destination.
-		newPlan.addLeg(newLeg);
-		
-		// next Activity
-		newPlan.addActivity(nextAct);
-
-		/*
-		 *  If it's a PersonPlansCalcRoute Object -> set the current Person.
-		 *  The router may need their knowledge (activity room, ...).
-		 */
-		if (replanner instanceof KnowledgePlansCalcRoute)
-		{
-//			((KnowledgePlansCalcRoute)replanner).setPerson(this.person);
-			((KnowledgePlansCalcRoute)replanner).setTime(this.time);
-		}
-			
-		replanner.run(newPlan);			
-		
-		// get new calculated Route
-		NetworkRouteWRefs newRoute = (NetworkRouteWRefs) newLeg.getRoute();
-			
-		// Merge already driven parts of the Route with the new routed parts.
-		nodeBuffer.addAll(newRoute.getNodes());
-		
-		//NetworkRoute mergedRoute = new NodeNetworkRoute();
-		//mergedRoute.setNodes(nodeBuffer);
-		NetworkRouteWRefs mergedRoute = new NodeNetworkRouteImpl(route.getStartLink(), route.getEndLink());
-		mergedRoute.setNodes(route.getStartLink(), nodeBuffer, route.getEndLink());
-		
-		// replace Route
-		leg.setRoute(mergedRoute);
-//		((NetworkRoute) leg.getRoute()).getNodes().clear();
-//		((NetworkRoute) leg.getRoute()).getNodes().addAll(mergedRoute.getNodes());
-		
-		// check new created Route
-//		checkRoute(mergedRoute);
-		
-		// Reselect previous selected plan... 
-		person.setSelectedPlan(currentPlan);
-		
-		// ... and remove temporary used plan.
-		person.removePlan(newPlan);
-/*		
-		String newRouteString = "PersonId: " + person.getId();
-		newRouteString = newRouteString + "; LinkId: " + this.vehicle.getCurrentLink().getId();
-		newRouteString = newRouteString + "; LinkCount: " + mergedRoute.getLinks().size() + ";";
-		for (Link link : mergedRoute.getLinks())
-		{
-			newRouteString = newRouteString + " " + link.getId();
-		}
-		
-		log.info(newRouteString);
-*/
-//		log.info("Calculation Time old =  " + (new Date().getTime() - date.getTime()));
-	}
-	
 	/*
 	 * Checks, whether a new created Route is valid or not.
 	 */

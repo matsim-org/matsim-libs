@@ -1,5 +1,6 @@
 package playground.christoph.events.algorithms;
 
+import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
@@ -111,13 +112,12 @@ public class LookupTableUpdater implements QueueSimulationAfterSimStepListener, 
 	{
 //		System.out.println("LookupTableUpdater QueueSimulationAfterSimStepEvent " + e.getSimulationTime() + "-------------------------------------------------------------------------------");
 		/*
-		 *  We update our LookupTables for the next Timestep and we
-		 *  assume that the timesteps are 1 second.
+		 *  We update our LookupTables for the next Timestep.
   		 * Update the LinkTravelTimes first because the LinkTravelCosts may use
 		 * them already!
 		 */
-		updateLinkTravelTimesLookupTables(e.getSimulationTime() + 1.0);
-		updateLinkTravelCostsLookupTables(e.getSimulationTime() + 1.0);
+		updateLinkTravelTimesLookupTables(e.getSimulationTime() + SimulationTimer.getSimTickTime());
+		updateLinkTravelCostsLookupTables(e.getSimulationTime() + SimulationTimer.getSimTickTime());
 	}
 
 	public void notifySimulationInitialized(QueueSimulationInitializedEvent e)
@@ -128,8 +128,7 @@ public class LookupTableUpdater implements QueueSimulationAfterSimStepListener, 
   		 * Update the LinkTravelTimes first because the LinkTravelCosts may use
 		 * them already!
 		 */
-		updateLinkTravelTimesLookupTables(0.0);
-		updateLinkTravelCostsLookupTables(0.0);	
+		updateLinkTravelTimesLookupTables(SimulationTimer.getSimStartTime());
+		updateLinkTravelCostsLookupTables(SimulationTimer.getSimStartTime());	
 	}
-
 }

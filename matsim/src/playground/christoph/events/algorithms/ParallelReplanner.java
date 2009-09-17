@@ -35,7 +35,6 @@ import playground.christoph.router.KnowledgePlansCalcRoute;
  * split up of the replanning actions have to be implemented in 
  * the subclasses.
  */
-
 public abstract class ParallelReplanner {
 	
 	private final static Logger log = Logger.getLogger(ParallelReplanner.class);
@@ -92,10 +91,8 @@ public abstract class ParallelReplanner {
 					log.error("replanner class " + replanner.getClass());
 					log.error("Could not clone the Replanner - use reference to the existing Replanner and hope the best...");
 					replannerArray[i][j] = replanner;
-				}
-				
+				}	
 			}
-			
 		}
 	}
 	

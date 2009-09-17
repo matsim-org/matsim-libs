@@ -21,6 +21,7 @@ package playground.christoph.events.algorithms;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
@@ -48,7 +49,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 	 * @param time
 	 */
 	//public static void run(ArrayList<QueueNode> currentNodes, ArrayList<QueueVehicle> vehicles, double time)
-	public void run(ArrayList<QueueVehicle> vehicles, double time)
+	public void run(List<QueueVehicle> vehicles, double time)
 	{	
 //		log.info("Start Replanning");
 		// distribute workload between threads

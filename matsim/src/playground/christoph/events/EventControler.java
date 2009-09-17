@@ -61,6 +61,8 @@ import playground.christoph.knowledge.nodeselection.SelectionReaderMatsim;
 import playground.christoph.knowledge.nodeselection.SelectionWriter;
 import playground.christoph.mobsim.ActEndReplanningModule;
 import playground.christoph.mobsim.LeaveLinkReplanningModule;
+import playground.christoph.mobsim.MyAgentFactory;
+import playground.christoph.mobsim.ReplanningManager;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.network.SubNetwork;
@@ -85,27 +87,22 @@ import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
  * @author Christoph Dobler
  */
 
-// mysimulations/kt-zurich/config10pct_factor_0.075_replanning.xml
-// mysimulations/kt-zurich/config10pct_factor_0.05.xml
-// mysimulations/kt-zurich/config10pct_factor_0.075.xml
-// mysimulations/kt-zurich/config10pct_factor_0.10.xml
-// mysimulations/census2000_dilZh30km_miv_transitincl_10pct/config.xml
-// mysimulations/berlin/config.xml
+
 /*
  * Example for the new entries in a config.xml file to read / write selected
- * nodes from / to files. <module name="selection"> <param name="readSelection"
- * value="true"/> <param name="inputSelectionFile"
- * value="mysimulations/berlin/selection.xml.gz" /> <param name="writeSelection"
- * value="true"/> <param name="outputSelectionFile"
- * value="./output/berlin/selection.xml.gz" /> <param name="dtdFile"
- * value="./src/playground/christoph/knowledge/nodeselection/Selection.dtd" />
+ * nodes from / to files. 
+ * <module name="selection"> 
+ * 		<param name="readSelection" value="true"/> 
+ * 		<param name="inputSelectionFile" value="mysimulations/berlin/selection.xml.gz" />
+ * 		<param name="writeSelection" value="true"/>
+ * 		<param name="outputSelectionFile" value="./output/berlin/selection.xml.gz" />
+ * 		<param name="dtdFile" value="./src/playground/christoph/knowledge/nodeselection/Selection.dtd" />
  * </module>
  */
 public class EventControler extends Controler {
 
 	protected ReplanningQueueSimulation sim;
-	// protected TravelTimeDistanceCostCalculator travelCostCalculator;
-	// protected KnowledgeTravelTimeCalculator travelTimeCalculator;
+
 	protected ArrayList<PlanAlgorithm> replanners;
 	protected ArrayList<SelectNodes> nodeSelectors;
 
@@ -128,6 +125,7 @@ public class EventControler extends Controler {
 	protected LinkVehiclesCounter linkVehiclesCounter;
 	protected LinkReplanningMap linkReplanningMap;
 	protected LookupTableUpdater lookupTableUpdater;
+	protected ReplanningManager replanningManager;
 
 	private static final Logger log = Logger.getLogger(EventControler.class);
 
@@ -326,14 +324,17 @@ public class EventControler extends Controler {
 		linkVehiclesCounter = new LinkVehiclesCounter();
 		linkReplanningMap = new LinkReplanningMap();
 		lookupTableUpdater = new LookupTableUpdater();
-		
+		replanningManager = new ReplanningManager();
 	}
 	
 	@Override
 	protected void runMobSim() 
 	{
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
-
+		
+		// use MyAgentFactory that creates MyPersonAgents who can reset their chachedNextLink
+		sim.setAgentFactory(new MyAgentFactory(sim));
+		
 		createHandlersAndListeners();
 
 		// fully initialize & add LinkVehiclesCounter
@@ -351,6 +352,8 @@ public class EventControler extends Controler {
 		foqsl.addQueueSimulationInitializedListener(lookupTableUpdater);
 		foqsl.addQueueSimulationAfterSimStepListener(lookupTableUpdater);
 
+		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
+		
 		sim.addQueueSimulationListeners(foqsl);
 		
 //		sim.addQueueSimulationListeners(lookupTableUpdater);
@@ -368,8 +371,12 @@ public class EventControler extends Controler {
 		ActEndReplanningModule actEndReplanning = new ActEndReplanningModule(sim);
 		LeaveLinkReplanningModule leaveLinkReplanning = new LeaveLinkReplanningModule(linkReplanningMap);
 		
-		sim.setActEndReplanningModule(actEndReplanning);
-		sim.setLeaveLinkReplanningModule(leaveLinkReplanning);
+		replanningManager.setActEndReplanningModule(actEndReplanning);
+		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanning);
+		
+//		replanningManager.doActEndReplanning(false);
+//		replanningManager.doLeaveLinkReplanning(false);
+		
 		
 //		log.info("Remove not selected Plans");
 //		clearPlans();
@@ -417,8 +424,8 @@ public class EventControler extends Controler {
 		 * results of a relaxed solution of a standard MATSim simulation.
 		 */
 		log.info("do initial Replanning");
-		doInitialReplanning();
-
+		doInitialReplanning();	
+		
 		sim.run();
 	}
 
@@ -483,11 +490,11 @@ public class EventControler extends Controler {
 			}
 			
 			// (de)activate replanning
-			if (actEndReplanningCounter == 0) ReplanningQueueSimulation.doActEndReplanning(false);
-			else ReplanningQueueSimulation.doActEndReplanning(true);
+			if (actEndReplanningCounter == 0) replanningManager.doActEndReplanning(false);
+			else replanningManager.doActEndReplanning(true);
 
-			if (leaveLinkReplanningCounter == 0) ReplanningQueueSimulation.doLeaveLinkReplanning(false);
-			else ReplanningQueueSimulation.doLeaveLinkReplanning(true);
+			if (leaveLinkReplanningCounter == 0) replanningManager.doLeaveLinkReplanning(false);
+			else replanningManager.doLeaveLinkReplanning(true);
 
 		}
 
@@ -823,8 +830,7 @@ public class EventControler extends Controler {
 			 */
 			// without length Correction
 			wardrop.setUseLengthCorrection(false);
-			wardrop
-					.fillMatrixViaActTimesCollectorObject(this.actTimesCollector);
+			wardrop.fillMatrixViaActTimesCollectorObject(this.actTimesCollector);
 			wardrop.getResults();
 			log.info("");
 		}

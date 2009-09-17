@@ -19,10 +19,8 @@
  * *********************************************************************** */
 package playground.christoph.mobsim;
 
-
 import org.apache.log4j.Logger;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.population.PersonImpl;
@@ -36,22 +34,27 @@ public class MyPersonAgent extends PersonAgent{
 		super(p, simulation);
 	}
 
-	public void UpdateCachedNextLink()
+	/*
+	 * Reset cached next Link. If a Person is in the Waiting Queue to leave a
+	 * Link he/she may replan his/her Route so the cached Link would be wrong.
+	 * This should be more efficient that resetting it in chooseNextLink()
+	 * because it can be called from the Replanning Module and isn't done for
+	 * every Agent even it is not necessary.
+	 */
+	public void ResetCachedNextLink()
 	{
-
-	}
-
-	@Override
-	public Link chooseNextLink()
-	{
-		/*
-		 * Delete cached Link. If a Person is in the Waiting Queue to leave a
-		 * Link he/she may replan his/her Route so the cached Link would be wrong.
-		 */
 		super.cachedNextLink = null;
-
-		return super.chooseNextLink();
-
 	}
 
+//	@Override
+//	public Link chooseNextLink()
+//	{
+//		/*
+//		 * Delete cached Link. If a Person is in the Waiting Queue to leave a
+//		 * Link he/she may replan his/her Route so the cached Link would be wrong.
+//		 */
+//		super.cachedNextLink = null;
+//
+//		return super.chooseNextLink();
+//	}
 }

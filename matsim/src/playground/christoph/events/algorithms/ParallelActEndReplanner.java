@@ -21,6 +21,7 @@ package playground.christoph.events.algorithms;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
@@ -40,9 +41,8 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 	private static ReplannerThread[] replannerThreads;
 	private static ThreadLocker threadLocker;
 	
-	public void run(ArrayList<ActivityImpl> fromActs, ArrayList<QueueVehicle> vehicles, double time)
+	public void run(List<ActivityImpl> fromActs, List<QueueVehicle> vehicles, double time)
 	{	
-
 		// distribute workload between threads
 		// as long as threads are waiting we don't need synchronized data structures
 		for(int i = 0; i < vehicles.size(); i++)
@@ -134,7 +134,6 @@ public class ParallelActEndReplanner extends ParallelReplanner {
 			if(count == 0)
 			{
 //				log.info("Notify " + time);
-//				alreadyNotified = true;
 				notify();
 			}
 		}

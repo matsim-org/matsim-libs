@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
+import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
+import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
 
 /*
@@ -15,15 +17,36 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListen
  * something like ParallelListenerHandling
  * should not able to break the order. 
  */
-public class FixedOrderQueueSimulationListener implements QueueSimulationAfterSimStepListener, QueueSimulationInitializedListener{
+public class FixedOrderQueueSimulationListener implements QueueSimulationAfterSimStepListener, 
+		QueueSimulationInitializedListener, QueueSimulationBeforeSimStepListener {
 
+	List<QueueSimulationBeforeSimStepListener> queueSimulationBeforeSimStepListener;
 	List<QueueSimulationAfterSimStepListener> queueSimulationAfterSimStepListener;
 	List<QueueSimulationInitializedListener> queueSimulationInitializedListener;
 	
 	public FixedOrderQueueSimulationListener()
 	{
+		queueSimulationBeforeSimStepListener = new ArrayList<QueueSimulationBeforeSimStepListener>();
 		queueSimulationAfterSimStepListener = new ArrayList<QueueSimulationAfterSimStepListener>();
 		queueSimulationInitializedListener = new ArrayList<QueueSimulationInitializedListener>();
+	}
+	
+	public void addQueueSimulationBeforeSimStepListener(QueueSimulationBeforeSimStepListener listener)
+	{
+		queueSimulationBeforeSimStepListener.add(listener);
+	}
+	
+	public void removeQueueSimulationBeforeSimStepListener(QueueSimulationBeforeSimStepListener listener)
+	{
+		queueSimulationBeforeSimStepListener.remove(listener);
+	}
+	
+	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent e)
+	{
+		for(QueueSimulationBeforeSimStepListener listener : queueSimulationBeforeSimStepListener)
+		{
+			listener.notifySimulationBeforeSimStep(e);
+		}
 	}
 	
 	public void addQueueSimulationAfterSimStepListener(QueueSimulationAfterSimStepListener listener)
@@ -35,6 +58,14 @@ public class FixedOrderQueueSimulationListener implements QueueSimulationAfterSi
 	{
 		queueSimulationAfterSimStepListener.remove(listener);
 	}
+
+	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e)
+	{
+		for(QueueSimulationAfterSimStepListener listener : queueSimulationAfterSimStepListener)
+		{
+			listener.notifySimulationAfterSimStep(e);
+		}
+	}
 	
 	public void addQueueSimulationInitializedListener(QueueSimulationInitializedListener listener)
 	{
@@ -45,14 +76,6 @@ public class FixedOrderQueueSimulationListener implements QueueSimulationAfterSi
 	{
 		queueSimulationInitializedListener.remove(listener);
 	}
-	
-	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e)
-	{
-		for(QueueSimulationAfterSimStepListener listener : queueSimulationAfterSimStepListener)
-		{
-			listener.notifySimulationAfterSimStep(e);
-		}
-	}
 
 	public void notifySimulationInitialized(QueueSimulationInitializedEvent e)
 	{
@@ -61,6 +84,5 @@ public class FixedOrderQueueSimulationListener implements QueueSimulationAfterSi
 			listener.notifySimulationInitialized(e);
 		}
 	}
-
 	
 }

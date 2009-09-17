@@ -20,7 +20,7 @@
 
 package playground.christoph.mobsim;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 
@@ -47,7 +47,7 @@ public class LeaveLinkReplanningModule {
 	
 	public void doLeaveLinkReplanning(double time)
 	{
-		ArrayList<QueueVehicle> vehiclesToReplanLeaveLink = (ArrayList<QueueVehicle>)linkReplanningMap.getReplanningVehicles(time);
+		List<QueueVehicle> vehiclesToReplanLeaveLink = linkReplanningMap.getReplanningVehicles(time);
 		if (vehiclesToReplanLeaveLink.size() > 0)
 		{
 			replanningCounter = replanningCounter + vehiclesToReplanLeaveLink.size();
