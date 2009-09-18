@@ -36,8 +36,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -284,21 +282,7 @@ public class Planomat implements PlanAlgorithm {
 					now);
 			// TODO here the LegImpl copy constructor should be used.
 			leg.setMode(newLeg.getMode());
-
-			if (newLeg.getRoute() instanceof LinkNetworkRouteImpl) {
-				NetworkRouteWRefs newLinkRoute = (NetworkRouteWRefs) newLeg.getRoute();
-				NetworkRouteWRefs newNodeRoute = (NetworkRouteWRefs) this.router.getRouteFactory().createRoute(newLeg.getMode(), newLinkRoute.getStartLink(), newLinkRoute.getEndLink());
-				if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
-					newNodeRoute.setLinks(newLinkRoute.getStartLink(), newLinkRoute.getLinks(), newLinkRoute.getEndLink());
-				}
-				newNodeRoute.setDistance(newLinkRoute.getDistance());
-				newNodeRoute.setTravelTime(newLinkRoute.getTravelTime());
-				leg.setRoute(newNodeRoute);
-				
-			} else {
-				leg.setRoute(newLeg.getRoute());
-			}
-			
+			leg.setRoute(newLeg.getRoute());
 			double anticipatedTravelTime = Math.rint(newLeg.getTravelTime());
 			now += anticipatedTravelTime;
 
