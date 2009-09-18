@@ -33,6 +33,7 @@ public class AllTests {
 		suite.addTestSuite(LinkImplTest.class);
 		suite.addTestSuite(NetworkChangeEventsParserWriterTest.class);
 		suite.addTestSuite(NetworkFactoryTest.class);
+		suite.addTestSuite(NetworkImplTest.class);
 		suite.addTestSuite(NetworkParserWriterTest.class);
 		suite.addTestSuite(NetworkReaderMatsimV1Test.class);
 		suite.addTestSuite(NetworkWriterReaderV1Test.class);

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -47,7 +46,7 @@ import org.matsim.world.MappedLocation;
  */
 public class NetworkImpl implements Network {
 	private final static Logger log = Logger.getLogger(NetworkImpl.class);
-	
+
 	protected Layer layerDelegate = new LayerImpl( LAYER_TYPE, null ) ;
 
 	// ////////////////////////////////////////////////////////////////////
@@ -75,29 +74,37 @@ public class NetworkImpl implements Network {
 	// ////////////////////////////////////////////////////////////////////
 	// creational methods
 	// ////////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * All creational methods are in NetworkLayer, since the creational methods interact with the Layer functionality
 	 * (mostly: links get registered as locations).
 	 */
-	protected NetworkImpl() {} 
+	protected NetworkImpl() {}
 
 	// ////////////////////////////////////////////////////////////////////
 	// add methods
 	// ////////////////////////////////////////////////////////////////////
-	
-	public void addLink( Link link ) {
+
+	public void addLink(final Link link) {
+		Map<Id,MappedLocation> locations = (Map<Id, MappedLocation>) this.layerDelegate.getLocations() ;
+		Link testLink = (Link) locations.get(link.getId());
+		if (testLink != null) {
+			if (testLink == link) {
+				log.warn("Trying to add a link a second time to the network. link id = " + link.getId().toString());
+				return;
+			}
+			throw new RuntimeException("There exists already a link with id = " + link.getId().toString() +
+					".\nExisting link: " + testLink + "\nLink to be added: " + link +
+					"\nLink is not added to the network.");
+		}
 		Node fromNode = link.getFromNode() ;
 		fromNode.addOutLink(link);
 		Node toNode = link.getToNode() ;
 		toNode.addInLink(link);
-		Map<Id,MappedLocation> locations = (Map<Id, MappedLocation>) layerDelegate.getLocations() ;
 		locations.put( link.getId(), (LinkImpl) link);
 	}
-		
 
-
-	public void addNode( Node nn ) {
+	public void addNode(final Node nn) {
 		Id id = nn.getId() ;
 		this.nodes.put(id, (NodeImpl) nn);
 		if (this.nodeQuadTree != null) {
@@ -156,7 +163,7 @@ public class NetworkImpl implements Network {
 	public boolean removeLink(final LinkImpl link) {
 		// yy should eventually be added to the api.  kai, jul09
 		Id id = link.getId();
-		LinkImpl l = (LinkImpl)layerDelegate.getLocations().get(id);
+		LinkImpl l = (LinkImpl)this.layerDelegate.getLocations().get(id);
 
 		if ((l == null) || (link != l)) {
 			// there is no link with the specified id, or there is another link than the requested one.
@@ -168,7 +175,7 @@ public class NetworkImpl implements Network {
 		NodeImpl to = link.getToNode();
 		to.removeInLink(link);
 
-		return layerDelegate.getLocations().remove(id) != null;
+		return this.layerDelegate.getLocations().remove(id) != null;
 	}
 
 
@@ -176,7 +183,7 @@ public class NetworkImpl implements Network {
 	// ////////////////////////////////////////////////////////////////////
 	// set methods
 	// ////////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * @param capPeriod the capacity-period in seconds
 	 */
@@ -512,19 +519,19 @@ public class NetworkImpl implements Network {
 
 	@SuppressWarnings("unchecked")
 	public Map<Id, LinkImpl> getLinks() {
-		return (Map<Id, LinkImpl>) layerDelegate.getLocations();
+		return (Map<Id, LinkImpl>) this.layerDelegate.getLocations();
 	}
 
 	public LinkImpl getLink(final String linkId) {
 		IdImpl i = new IdImpl(linkId);
-		return (LinkImpl) layerDelegate.getLocations().get(i);
+		return (LinkImpl) this.layerDelegate.getLocations().get(i);
 	}
 
 	public LinkImpl getLink(final Id linkId) {
-		return (LinkImpl) layerDelegate.getLocations().get(linkId);
+		return (LinkImpl) this.layerDelegate.getLocations().get(linkId);
 	}
 
-	public void setFactory(NetworkFactory networkFactory) {
+	public void setFactory(final NetworkFactory networkFactory) {
 		this.factory = networkFactory;
 	}
 
