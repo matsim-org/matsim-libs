@@ -282,7 +282,7 @@ public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPerson
 			for (TransportMode mode : this.frequencies.keySet()) {
 //				millis = System.currentTimeMillis();
 				out.print("\t");
-				out.print(classFormat.format(StatUtils.percentile(this.rawData.get(mode).getInternalValues(), quantiles[ii] * 100.0)));
+				out.print(classFormat.format(StatUtils.percentile(this.rawData.get(mode).getElements(), quantiles[ii] * 100.0)));
 //				millis = System.currentTimeMillis() - millis;
 //				log.info("Writing and calculatin percentiles took: " + Long.toString(millis));
 			}
