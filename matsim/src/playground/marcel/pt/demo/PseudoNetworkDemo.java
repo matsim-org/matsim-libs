@@ -59,6 +59,7 @@ public class PseudoNetworkDemo {
 			transitScheduleFile = args[0]	;
 		} else {
 //			networkFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/network.xml";
+			networkFile = "../thesis-data/application/network.oevModellZH.xml";
 //			transitScheduleFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml";
 //			transitScheduleFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitScheduleNoLinks.xml";
 //			transitScheduleFile = "../thesis-data/examples/berta/schedule.xml";
@@ -104,7 +105,7 @@ public class PseudoNetworkDemo {
 //		NetworkFromTransitSchedule.createNetwork(schedule, network);
 
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
-		LinkImpl link1 = network.getLink(scenario.createId("1"));
+		LinkImpl link1 = network.getLinks().values().iterator().next();//getLink(scenario.createId("1"));
 
 		PopulationImpl population = scenario.getPopulation();
 		Person person = population.getBuilder().createPerson(new IdImpl(1));

@@ -65,6 +65,8 @@ public class Application1 {
 	private final static String MERGED_NETWORK_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/network.multimodal.xml";
 	private final static String DILUTED_PT_1PCT_PLANS_FILENAME = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.pt.xml.gz";
 	private final static String DILUTED_PT_ROUTED_1PCT_PLANS_FILENAME = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.pt-routedOevModell.xml.gz";
+	private final static String DILUTED_1PCT_PLANS_FILENAME = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.sample.xml.gz";
+	private final static String DILUTED_ROUTED_1PCT_PLANS_FILENAME = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.routedOevModell.xml.gz";
 
 	private final ScenarioImpl scenario;
 	private final Config config;
@@ -156,7 +158,7 @@ public class Application1 {
 		PopulationImpl pop = this.scenario.getPopulation();
 		try {
 //			new MatsimNetworkReader(this.scenario.getNetwork()).parse(NETWORK_FILE);
-			new MatsimPopulationReader(this.scenario).parse(DILUTED_PT_1PCT_PLANS_FILENAME);
+			new MatsimPopulationReader(this.scenario).parse(DILUTED_1PCT_PLANS_FILENAME);
 			pop.printPlansCount();
 		} catch (SAXException e) {
 			e.printStackTrace();
@@ -177,7 +179,7 @@ public class Application1 {
 		log.info("start pt-router");
 		router.run(pop);
 		log.info("write routed plans out.");
-		new PopulationWriter(pop).write(DILUTED_PT_ROUTED_1PCT_PLANS_FILENAME);
+		new PopulationWriter(pop).write(DILUTED_ROUTED_1PCT_PLANS_FILENAME);
 	}
 
 	protected void visualizeRouterNetwork() {
