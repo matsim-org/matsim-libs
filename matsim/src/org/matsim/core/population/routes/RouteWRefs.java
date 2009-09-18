@@ -35,5 +35,11 @@ public interface RouteWRefs extends Route {
 
 	public Link getEndLink();
 	public void setEndLink(final Link link);
-	
+
+	/* make the clone method public, but do NOT implement Cloneable
+	 * so that implementations can decide on their own if they support
+	 * clone() or not.
+	 */
+	public RouteWRefs clone();
+
 }

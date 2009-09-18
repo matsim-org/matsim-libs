@@ -25,11 +25,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkBuilder;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkIdComparator;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author mrieser
@@ -148,6 +153,65 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		// NO route.setLinks() here!
 
 		assertEquals("expected 0 links.", 0, route.getNodes().size());
+	}
+
+	public void testClone() {
+		Id id1 = new IdImpl(1);
+		Id id2 = new IdImpl(2);
+		Id id3 = new IdImpl(3);
+		Id id4 = new IdImpl(4);
+		Id id5 = new IdImpl(5);
+		Id id6 = new IdImpl(6);
+
+		Network network = new NetworkLayer();
+		NetworkBuilder builder = network.getBuilder();
+
+		Node node1 = builder.createNode(id1, new CoordImpl(0, 1000));
+		Node node2 = builder.createNode(id2, new CoordImpl(0, 2000));
+		Node node3 = builder.createNode(id3, new CoordImpl(0, 3000));
+		Node node4 = builder.createNode(id4, new CoordImpl(0, 4000));
+		Node node5 = builder.createNode(id5, new CoordImpl(0, 5000));
+		Node node6 = builder.createNode(id6, new CoordImpl(0, 6000));
+
+		network.addNode(node1);
+		network.addNode(node2);
+		network.addNode(node3);
+		network.addNode(node4);
+		network.addNode(node5);
+		network.addNode(node6);
+
+		Link startLink = builder.createLink(id1, node1.getId(), node2.getId());
+		Link link3 = builder.createLink(id3, node2.getId(), node3.getId());
+		Link link4 = builder.createLink(id4, node3.getId(), node4.getId());
+		Link link5 = builder.createLink(id5, node4.getId(), node5.getId());
+		Link endLink = builder.createLink(id2, node5.getId(), node6.getId());
+
+		network.addLink(startLink);
+		network.addLink(link3);
+		network.addLink(link4);
+		network.addLink(link5);
+		network.addLink(endLink);
+
+		Map<Link, Link> subsequentLinks = new TreeMap<Link, Link>(new LinkIdComparator());
+		subsequentLinks.put(startLink, link3);
+		subsequentLinks.put(link3, link4);
+		subsequentLinks.put(link4, link5);
+		subsequentLinks.put(link5, endLink);
+
+		CompressedNetworkRouteImpl route1 = new CompressedNetworkRouteImpl(startLink, endLink, subsequentLinks);
+		ArrayList<Link> srcRoute = new ArrayList<Link>();
+		srcRoute.add(link3);
+		srcRoute.add(link4);
+		route1.setLinks(startLink, srcRoute, link5);
+		assertEquals(2, route1.getLinks().size());
+
+		CompressedNetworkRouteImpl route2 = route1.clone();
+
+		srcRoute.add(link5);
+		route1.setLinks(startLink, srcRoute, endLink);
+
+		assertEquals(3, route1.getLinks().size());
+		assertEquals(2, route2.getLinks().size());
 	}
 
 }

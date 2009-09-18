@@ -54,6 +54,11 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 		this.egressStopId = egressFacility.getId();
 	}
 
+	@Override
+	public ExperimentalTransitRoute clone() {
+		return (ExperimentalTransitRoute) super.clone();
+	}
+
 	public Id getAccessStopId() {
 		return this.accessStopId;
 	}

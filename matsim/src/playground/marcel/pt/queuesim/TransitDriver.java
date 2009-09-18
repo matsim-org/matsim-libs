@@ -320,6 +320,15 @@ public class TransitDriver implements TransitDriverAgent {
 			public void setTravelTime(final double travelTime) {
 				throw new UnsupportedOperationException("read only route.");
 			}
+
+			@Override
+			public NetworkRouteWrapper clone() {
+				try {
+					return (NetworkRouteWrapper) super.clone();
+				} catch (CloneNotSupportedException e) {
+					throw new AssertionError(e);
+				}
+			}
 		}
 
 }

@@ -65,28 +65,36 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		assertTrue(route instanceof GenericRoute);
 
 	}
-	
+
 	/*package*/ static class CarRouteMock extends AbstractRoute {
-		CarRouteMock(Link startLink, Link endLink){
+		CarRouteMock(final Link startLink, final Link endLink){
 			super(startLink, endLink);
+		}
+		@Override
+		public CarRouteMock clone() {
+			return (CarRouteMock) super.clone();
 		}
 	}
 
 	/*package*/ static class PtRouteMock extends AbstractRoute {
-		PtRouteMock(Link startLink, Link endLink){
+		PtRouteMock(final Link startLink, final Link endLink){
 			super(startLink, endLink);
 		}
+		@Override
+		public PtRouteMock clone() {
+			return (PtRouteMock) super.clone();
+		}
 	}
-	
+
 	/*package*/ static class CarRouteMockFactory implements RouteFactory {
-		public RouteWRefs createRoute(Link startLink, Link endLink) {
+		public RouteWRefs createRoute(final Link startLink, final Link endLink) {
 			return new CarRouteMock(startLink, endLink);
 		}
 
 	}
 
 	/*package*/ static class PtRouteMockFactory implements RouteFactory {
-		public RouteWRefs createRoute(Link startLink, Link endLink) {
+		public RouteWRefs createRoute(final Link startLink, final Link endLink) {
 			return new PtRouteMock(startLink, endLink);
 		}
 

@@ -33,17 +33,17 @@ public abstract class AbstractRoute extends BasicRouteImpl implements RouteWRefs
 
 	private Link startLink = null;
 	private Link endLink = null;
-	
+
 	/**
 	 * This constructor is only needed for backwards compatibility reasons and thus is
 	 * set to deprecated. New code should make use of the constructor which sets the
 	 * start and the end link of a Route correctly.
 	 */
-	@Deprecated 
+	@Deprecated
 	protected AbstractRoute(){
 	}
-	
-	public AbstractRoute(Link startLink, Link endLink) {
+
+	public AbstractRoute(final Link startLink, final Link endLink) {
 		super((startLink == null ? null : startLink.getId()), (endLink == null ? null : endLink.getId()));
 		this.startLink = startLink;
 		this.endLink = endLink;
@@ -75,4 +75,12 @@ public abstract class AbstractRoute extends BasicRouteImpl implements RouteWRefs
 		return (this.endLink == null ? null : this.endLink.getId());
 	}
 
+	@Override
+	public AbstractRoute clone() {
+		try {
+			return (AbstractRoute) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError(e);
+		}
+	}
 }

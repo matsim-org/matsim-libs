@@ -36,14 +36,22 @@ import org.matsim.core.network.NetworkLayer;
  *
  * @author mrieser
  */
-public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteWRefs,LinkNetworkRoute {
+public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteWRefs, LinkNetworkRoute, Cloneable {
 
-	private final ArrayList<Link> route = new ArrayList<Link>();
+	private ArrayList<Link> route = new ArrayList<Link>();
 	private double travelCost = Double.NaN;
 	private Id vehicleId = null;
 
 	public LinkNetworkRouteImpl(final Link startLink, final Link endLink){
 		super(startLink, endLink);
+	}
+
+	@Override
+	public LinkNetworkRouteImpl clone() {
+		LinkNetworkRouteImpl cloned = (LinkNetworkRouteImpl) super.clone();
+		ArrayList<Link> tmp = cloned.route;
+		cloned.route = new ArrayList<Link>(tmp); // deep copy of route
+		return cloned;
 	}
 
 	@Override

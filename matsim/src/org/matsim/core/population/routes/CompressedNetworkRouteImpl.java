@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -40,11 +39,11 @@ import org.matsim.api.core.v01.network.Node;
  *
  * @author mrieser
  */
-public class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkRouteWRefs {
+public class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkRouteWRefs, Cloneable {
 
 	private final static Logger log = Logger.getLogger(CompressedNetworkRouteImpl.class);
 
-	private final ArrayList<Link> route = new ArrayList<Link>(0);
+	private ArrayList<Link> route = new ArrayList<Link>(0);
 	private final Map<Link, Link> subsequentLinks;
 	private double travelCost = Double.NaN;
 	/** number of links in uncompressed route */
@@ -56,6 +55,14 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 	public CompressedNetworkRouteImpl(final Link startLink, final Link endLink, final Map<Link, Link> subsequentLinks) {
 		super(startLink, endLink);
 		this.subsequentLinks = subsequentLinks;
+	}
+
+	@Override
+	public CompressedNetworkRouteImpl clone() {
+		CompressedNetworkRouteImpl cloned = (CompressedNetworkRouteImpl) super.clone();
+		ArrayList<Link> tmpRoute = cloned.route;
+		cloned.route = new ArrayList<Link>(tmpRoute); // deep copy
+		return cloned;
 	}
 
 	public List<Link> getLinks() {
@@ -86,7 +93,7 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 		Link link = startLink;
 		while (true) { // loop until we hit "return;"
 			for (Link outLink : link.getToNode().getOutLinks().values()) {
-				if (outLink == nextLink) {
+				if (outLink == nextLink) { // TODO [MR] check for performance improvement: if link.getToNode == nextLink.getFromNode
 					return;
 				}
 			}

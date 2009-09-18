@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.misc.Time;
 
-public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteWRefs {
+public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteWRefs, Cloneable {
 
-	protected final ArrayList<Node> route = new ArrayList<Node>();
+	protected ArrayList<Node> route = new ArrayList<Node>();
 
 	private double cost = Double.NaN;
 
@@ -56,6 +56,14 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		super.setTravelTime(route.getTravelTime());
 		this.route.addAll(route.getNodes());
 		this.route.trimToSize();
+	}
+
+	@Override
+	public NodeNetworkRouteImpl clone() {
+		NodeNetworkRouteImpl cloned = (NodeNetworkRouteImpl) super.clone();
+		ArrayList<Node> tmp = cloned.route;
+		cloned.route = new ArrayList<Node>(tmp); // deep copy of route
+		return cloned;
 	}
 
 	@Override
