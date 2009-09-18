@@ -177,7 +177,7 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		return links;
 	}
 
-	public double calcDistance() {
+	protected double calcDistance() {
 		/* TODO we cannot calculate the real distance, as we do not know the
 		 * very first or the very last link of the route, only the links in between.
 		 * fix this somehow, but how?? MR, jan07
