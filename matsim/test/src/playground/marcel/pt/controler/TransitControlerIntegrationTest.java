@@ -93,7 +93,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		TransitLine tLine1 = sBuilder.createTransitLine(id1);
 
 		TransitRouteStop stop1 = sBuilder.createTransitRouteStop(stopF1, 0, 0);
-		TransitRouteStop stop2 = sBuilder.createTransitRouteStop(stopF1, 100, 100);
+		TransitRouteStop stop2 = sBuilder.createTransitRouteStop(stopF2, 100, 100);
 		ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		stops.add(stop1);
 		stops.add(stop2);
