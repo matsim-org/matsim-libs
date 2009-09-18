@@ -28,11 +28,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.population.BasicPlanImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.GenericRoute;
-import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
 public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be better with inheritance because of protected c'tor of BasicPlanImpl, but BasicPlanImpl.getPlanElements() is read only
@@ -41,7 +36,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 	 */
 	@Deprecated
 	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED}
-	
+
 	/**
 	 * Constant describing the score of an unscored plan. <b>Do not use this constant in
 	 * comparisons</b>, but use <code>getScore() == null</code>
@@ -49,7 +44,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 	 */
 	@Deprecated
 	public static final double UNDEF_SCORE = Double.NaN;
-	
+
 	private final static Logger log = Logger.getLogger(PlanImpl.class);
 
 	private final static String ACT_ERROR = "The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.";
@@ -187,21 +182,21 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 	public final boolean isSelected() {
 		return this.getPerson().getSelectedPlan() == this;
 	}
-	
+
 
 	@Override
 	public void setSelected(final boolean selected) {
-		this.getPerson().setSelectedPlan(this); 
+		this.getPerson().setSelectedPlan(this);
 	}
 
 	@Override
 	public final String toString() {
-		
+
 		String scoreString = "undefined";
 		if (this.getScore() != null) {
 			scoreString = this.getScore().toString();
 		}
-		
+
 		return "[score=" + scoreString + "]" +
 				"[selected=" + this.isSelected() + "]" +
 				"[nof_acts_legs=" + getPlanElements().size() + "]";
@@ -225,24 +220,8 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 				l2.setDepartureTime(l.getDepartureTime());
 				l2.setTravelTime(l.getTravelTime());
 				l2.setArrivalTime(l.getArrivalTime());
-				RouteWRefs route = l.getRoute();
-				if (route != null) {
-					if (route instanceof NetworkRouteWRefs) {
-						NetworkLayer net = (NetworkLayer) route.getStartLink().getLayer();
-						NetworkRouteWRefs r2 = (NetworkRouteWRefs) net.getFactory().createRoute(TransportMode.car, route.getStartLink(), route.getEndLink());
-						r2.setLinks(route.getStartLink(), ((NetworkRouteWRefs) route).getLinks(), route.getEndLink());
-						r2.setDistance(route.getDistance());
-						r2.setTravelTime(route.getTravelTime());
-						l2.setRoute(r2);
-					} else if (route instanceof GenericRoute) {
-						GenericRoute r = new GenericRouteImpl(route.getStartLink(), route.getEndLink());
-						r.setRouteDescription(route.getStartLink(), ((GenericRoute) route).getRouteDescription(), route.getEndLink());
-						r.setDistance(route.getDistance());
-						r.setTravelTime(route.getTravelTime());
-						l2.setRoute(r);
-					} else {
-						log.warn("could not fully copy plan to agent " + this.getPerson().getId() + " because of unknown Route-type.");
-					}
+				if (l.getRoute() != null) {
+					l2.setRoute(l.getRoute().clone());
 				}
 			}
 		}
