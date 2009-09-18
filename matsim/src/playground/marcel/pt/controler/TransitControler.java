@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.controler.Controler;
@@ -55,8 +56,17 @@ public class TransitControler extends Controler {
 
 	public TransitControler(final String[] args) {
 		super(args);
-
 		this.transitConfig = new TransitConfigGroup();
+		init();
+	}
+
+	public TransitControler(final ScenarioImpl scenario) {
+		super(scenario);
+		this.transitConfig = new TransitConfigGroup();
+		init();
+	}
+
+	private final void init() {
 		this.config.addModule(TransitConfigGroup.GROUP_NAME, this.transitConfig);
 		this.config.scenario().setUseTransit(true);
 		this.config.scenario().setUseVehicles(true);
@@ -102,23 +112,27 @@ public class TransitControler extends Controler {
 		}
 
 		public void notifyStartup(final StartupEvent event) {
-			try {
-				new TransitScheduleReaderV1(event.getControler().getScenarioData().getTransitSchedule(), event.getControler().getScenarioData().getNetwork()).readFile(this.config.getTransitScheduleFile());
-			} catch (SAXException e) {
-				throw new RuntimeException("could not read transit schedule.", e);
-			} catch (ParserConfigurationException e) {
-				throw new RuntimeException("could not read transit schedule.", e);
-			} catch (IOException e) {
-				throw new RuntimeException("could not read transit schedule.", e);
+			if (this.config.getTransitScheduleFile() != null) {
+				try {
+					new TransitScheduleReaderV1(event.getControler().getScenarioData().getTransitSchedule(), event.getControler().getScenarioData().getNetwork()).readFile(this.config.getTransitScheduleFile());
+				} catch (SAXException e) {
+					throw new RuntimeException("could not read transit schedule.", e);
+				} catch (ParserConfigurationException e) {
+					throw new RuntimeException("could not read transit schedule.", e);
+				} catch (IOException e) {
+					throw new RuntimeException("could not read transit schedule.", e);
+				}
 			}
-			try {
-				new BasicVehicleReaderV1(event.getControler().getScenarioData().getVehicles()).parse(this.config.getVehiclesFile());
-			} catch (SAXException e) {
-				throw new RuntimeException("could not read transit schedule.", e);
-			} catch (ParserConfigurationException e) {
-				throw new RuntimeException("could not read transit schedule.", e);
-			} catch (IOException e) {
-				throw new RuntimeException("could not read transit schedule.", e);
+			if (this.config.getVehiclesFile() != null) {
+				try {
+					new BasicVehicleReaderV1(event.getControler().getScenarioData().getVehicles()).parse(this.config.getVehiclesFile());
+				} catch (SAXException e) {
+					throw new RuntimeException("could not read transit schedule.", e);
+				} catch (ParserConfigurationException e) {
+					throw new RuntimeException("could not read transit schedule.", e);
+				} catch (IOException e) {
+					throw new RuntimeException("could not read transit schedule.", e);
+				}
 			}
 		}
 
