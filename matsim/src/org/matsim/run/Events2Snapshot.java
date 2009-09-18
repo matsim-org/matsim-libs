@@ -165,7 +165,14 @@ public class Events2Snapshot {
 
 		loadSnapshotWriters(outputDir);
 
-		new MatsimEventsReader(this.events).readFile(this.eventsfile);
+		try {
+			new MatsimEventsReader(this.events).readFile(this.eventsfile);
+		}
+		catch (OutOfMemoryError e) {
+			System.err.println("OutOfMemoryError while reading all events:");
+			e.printStackTrace();
+			System.err.println("Trying to close visualizer file up to this state, it may not be complete though.");
+		}
 		this.visualizer.finish();
 		System.out.println("done.");
 	}
