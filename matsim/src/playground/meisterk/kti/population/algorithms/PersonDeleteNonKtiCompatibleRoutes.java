@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InvalidPtRouteCleaner.java
+ * PersonDeleteNonKtiCompatibleRoutes.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -29,7 +29,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 import playground.meisterk.kti.router.KtiPtRoute;
 
-public class InvalidPtRouteCleaner extends AbstractPersonAlgorithm {
+public class PersonDeleteNonKtiCompatibleRoutes extends AbstractPersonAlgorithm {
 
 	@Override
 	public void run(PersonImpl person) {

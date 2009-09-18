@@ -28,7 +28,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
-import playground.meisterk.kti.population.algorithms.InvalidPtRouteCleaner;
+import playground.meisterk.kti.population.algorithms.PersonDeleteNonKtiCompatibleRoutes;
 
 public class KtiPopulationPreparation implements StartupListener {
 
@@ -53,7 +53,7 @@ public class KtiPopulationPreparation implements StartupListener {
 					config.global().getNumberOfThreads(),
 					new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 						public AbstractPersonAlgorithm getPersonAlgorithm() {
-							return new InvalidPtRouteCleaner();
+							return new PersonDeleteNonKtiCompatibleRoutes();
 						}
 					});
 		}
