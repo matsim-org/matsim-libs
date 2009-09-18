@@ -33,6 +33,14 @@ import org.matsim.core.population.PopulationImpl;
 
 import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
 
+/*
+ * This extended QueueSimulation contains some methods that
+ * are needed for the WithinDay Replanning Modules.
+ * 
+ * Some other methods are used for the Knowledge Modules. They
+ * should be separated somewhen but at the moment this seems
+ * to be difficult so they remain here for now...
+ */
 public class ReplanningQueueSimulation extends QueueSimulation{
 
 	private final static Logger log = Logger.getLogger(ReplanningQueueSimulation.class);
@@ -52,7 +60,12 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	public ReplanningQueueSimulation(final NetworkLayer network, final PopulationImpl population, final EventsImpl events)
 	{
 		super(network, population, events);
-				
+		
+		// use WithinDayAgentFactory that creates WithinDayPersonAgents who can reset their chachedNextLink
+		super.setAgentFactory(new WithinDayAgentFactory(this));
+
+//		this.simEngine = new ParallelQueueSimEngine(this.getQueueNetwork(), MatsimRandom.getRandom());
+		
 		this.knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(population);
 		this.knowledgeDBStorageHandler.start();
 		getEvents().addHandler(knowledgeDBStorageHandler);
@@ -71,13 +84,8 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 		return super.doSimStep(time);		
 	}
 
-	/**
-	 * Registers this agent as performing an activity and makes sure that the
-	 * agent will be informed once his departure time has come.
-	 * 
-	 * @param agent
-	 * 
-	 * @see DriverAgent#getDepartureTime()
+	/*
+	 * for the Knowledge Modules
 	 */
 	@Override
 	protected void scheduleActivityEnd(final DriverAgent agent)
@@ -86,6 +94,9 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 		super.scheduleActivityEnd(agent);
 	}
 	
+	/*
+	 * for the Knowledge Modules
+	 */
 	private void handleOffsetActivityEnds(final double time)
 	{		
 		while (this.offsetActivityEndsList.peek() != null)
@@ -103,6 +114,9 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 		} 
 	}
 	
+	/*
+	 * for the Knowledge Modules
+	 */
 	/*package*/ class DriverAgentDepartureTimeComparator implements Comparator<DriverAgent>, Serializable {
 
 		private static final long serialVersionUID = 1L;

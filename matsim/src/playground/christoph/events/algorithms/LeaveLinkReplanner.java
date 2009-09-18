@@ -36,7 +36,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.christoph.mobsim.MyPersonAgent;
+import playground.christoph.mobsim.WithinDayPersonAgent;
 import playground.christoph.router.KnowledgePlansCalcRoute;
 
 /*
@@ -199,7 +199,7 @@ public class LeaveLinkReplanner {
 		nodesBuffer.addAll(newRoute.getNodes());
 		
 		// finally reset the cached next Link of the PersonAgent - it may have changed!
-		((MyPersonAgent)this.personAgent).ResetCachedNextLink();
+		((WithinDayPersonAgent)this.personAgent).ResetCachedNextLink();
 	}
 		
 	/*

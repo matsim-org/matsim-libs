@@ -61,7 +61,7 @@ import playground.christoph.knowledge.nodeselection.SelectionReaderMatsim;
 import playground.christoph.knowledge.nodeselection.SelectionWriter;
 import playground.christoph.mobsim.ActEndReplanningModule;
 import playground.christoph.mobsim.LeaveLinkReplanningModule;
-import playground.christoph.mobsim.MyAgentFactory;
+import playground.christoph.mobsim.WithinDayAgentFactory;
 import playground.christoph.mobsim.ReplanningManager;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.network.MyLinkFactoryImpl;
@@ -331,10 +331,7 @@ public class EventControler extends Controler {
 	protected void runMobSim() 
 	{
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
-		
-		// use MyAgentFactory that creates MyPersonAgents who can reset their chachedNextLink
-		sim.setAgentFactory(new MyAgentFactory(sim));
-		
+				
 		createHandlersAndListeners();
 
 		// fully initialize & add LinkVehiclesCounter
@@ -372,11 +369,7 @@ public class EventControler extends Controler {
 		LeaveLinkReplanningModule leaveLinkReplanning = new LeaveLinkReplanningModule(linkReplanningMap);
 		
 		replanningManager.setActEndReplanningModule(actEndReplanning);
-		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanning);
-		
-//		replanningManager.doActEndReplanning(false);
-//		replanningManager.doLeaveLinkReplanning(false);
-		
+		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanning);	
 		
 //		log.info("Remove not selected Plans");
 //		clearPlans();
@@ -425,6 +418,9 @@ public class EventControler extends Controler {
 		 */
 		log.info("do initial Replanning");
 		doInitialReplanning();	
+		
+		replanningManager.doActEndReplanning(false);
+		replanningManager.doLeaveLinkReplanning(false);
 		
 		sim.run();
 	}

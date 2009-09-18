@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyPersonAgent.java
+ * WithinDayAgentFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,42 +19,22 @@
  * *********************************************************************** */
 package playground.christoph.mobsim;
 
-import org.apache.log4j.Logger;
-
+import org.matsim.core.mobsim.queuesim.AgentFactory;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.population.PersonImpl;
 
-public class MyPersonAgent extends PersonAgent{
+public class WithinDayAgentFactory extends AgentFactory {
 
-	private static final Logger log = Logger.getLogger(MyPersonAgent.class);
-
-	public MyPersonAgent(final PersonImpl p, final QueueSimulation simulation)
-	{
-		super(p, simulation);
+	public WithinDayAgentFactory(final QueueSimulation simulation) {
+		super(simulation);
 	}
 
-	/*
-	 * Reset cached next Link. If a Person is in the Waiting Queue to leave a
-	 * Link he/she may replan his/her Route so the cached Link would be wrong.
-	 * This should be more efficient that resetting it in chooseNextLink()
-	 * because it can be called from the Replanning Module and isn't done for
-	 * every Agent even it is not necessary.
-	 */
-	public void ResetCachedNextLink()
+	@Override
+	public PersonAgent createPersonAgent(final PersonImpl p)
 	{
-		super.cachedNextLink = null;
+		WithinDayPersonAgent agent = new WithinDayPersonAgent(p, this.simulation);
+		return agent;
 	}
 
-//	@Override
-//	public Link chooseNextLink()
-//	{
-//		/*
-//		 * Delete cached Link. If a Person is in the Waiting Queue to leave a
-//		 * Link he/she may replan his/her Route so the cached Link would be wrong.
-//		 */
-//		super.cachedNextLink = null;
-//
-//		return super.chooseNextLink();
-//	}
 }
