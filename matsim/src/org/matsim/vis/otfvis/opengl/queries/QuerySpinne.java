@@ -345,7 +345,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 	private void drawCaption(OTFOGLDrawer drawer) {
 		QuadTree.Rect bounds = drawer.getViewBounds();
 		
-		double maxX = bounds.minX + (bounds.maxX -bounds.minX)*0.12;
+		double maxX = bounds.minX + (bounds.maxX -bounds.minX)*0.22;
 		double minX = bounds.minX + (bounds.maxX -bounds.minX)*0.01;
 		double maxY = bounds.minY + (bounds.maxY -bounds.minY)*0.15;
 		double minY = bounds.minY + (bounds.maxY -bounds.minY)*0.01;
