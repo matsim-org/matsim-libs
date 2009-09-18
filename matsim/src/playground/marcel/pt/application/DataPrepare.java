@@ -40,7 +40,6 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
-import org.matsim.transitSchedule.api.TransitScheduleReader;
 import org.matsim.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
@@ -55,23 +54,30 @@ import playground.mohit.converter.Visum2TransitSchedule;
 import playground.mohit.converter.VisumNetwork;
 import playground.mohit.converter.VisumNetworkReader;
 
-public class Application1 {
+public class DataPrepare {
 
-	private static final Logger log = Logger.getLogger(Application1.class);
+	private static final Logger log = Logger.getLogger(DataPrepare.class);
 
+	// INPUT FILES
+	private final static String VISUM_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/input/oev_modell.net";
 	private final static String NETWORK_FILE = "/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
+	private final static String INPUT_PLANS_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.sample.xml.gz";
+
+	// INTERMEDIARY FILES
 	private final static String TRANSIT_NETWORK_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/network.oevModellZH.xml";
+	private final static String TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/transitSchedule.OevModellZH.xml";
+
+	// OUTPUT FILES
 	private final static String TRANSIT_SCHEDULE_WITH_NETWORK_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/transitSchedule.networkOevModellZH.xml";
-	private final static String MERGED_NETWORK_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/network.multimodal.xml";
-	private final static String DILUTED_PT_1PCT_PLANS_FILENAME = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.pt.xml.gz";
-	private final static String DILUTED_PT_ROUTED_1PCT_PLANS_FILENAME = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.pt-routedOevModell.xml.gz";
-	private final static String DILUTED_1PCT_PLANS_FILENAME = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.sample.xml.gz";
-	private final static String DILUTED_ROUTED_1PCT_PLANS_FILENAME = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.routedOevModell.xml.gz";
+	private final static String VEHICLE_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/vehicles.oevModellZH.xml";
+	private final static String MULTIMODAL_NETWORK_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/network.multimodal.xml";
+	private final static String ROUTED_PLANS_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.routedOevModell.xml.gz";
+
 
 	private final ScenarioImpl scenario;
 	private final Config config;
 
-	public Application1() {
+	public DataPrepare() {
 		this.scenario = new ScenarioImpl();
 		this.config = this.scenario.getConfig();
 	}
@@ -85,30 +91,14 @@ public class Application1 {
 		final VisumNetwork vNetwork = new VisumNetwork();
 		try {
 			log.info("reading visum network.");
-//			new VisumNetworkReader(vNetwork).read("/Volumes/Data/VSP/coding/eclipse35/thesis-data/networks/yalcin/ptzh_orig.net");
-			new VisumNetworkReader(vNetwork).read("/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/input/oev_modell.net");
+			new VisumNetworkReader(vNetwork).read(VISUM_FILE);
 			log.info("converting visum data to TransitSchedule.");
 			new Visum2TransitSchedule(vNetwork, this.scenario.getTransitSchedule(), this.scenario.getVehicles()).convert();
 			log.info("writing TransitSchedule to file.");
-			new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write("../thesis-data/application/transitSchedule.oevModellZH.xml");
+			new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write(TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE);
 			log.info("writing vehicles to file.");
-			new VehicleWriterV1(this.scenario.getVehicles()).writeFile("../thesis-data/application/vehicles.oevModellZH.xml");
+			new VehicleWriterV1(this.scenario.getVehicles()).writeFile(VEHICLE_FILE);
 		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	protected void readSchedule() {
-		log.info("reading TransitSchedule from file.");
-		try {
-			new TransitScheduleReader(this.scenario).readFile("../thesis-data/application/transitSchedule.oevModellZH.xml");
-//			new TransitScheduleReader(this.scenario).readFile("../thesis-data/application/zuerichSchedule.xml");
-//			new TransitScheduleReader(this.scenario).readFile("../shared-svn/studies/schweiz-ivtch/pt-experimental/TransitSim/transitSchedule.xml");
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
 	}
@@ -124,19 +114,6 @@ public class Application1 {
 		}
 	}
 
-	protected void readScheduleWithNetwork() {
-		log.info("reading TransitSchedule from file.");
-		try {
-			new TransitScheduleReader(this.scenario).readFile(TRANSIT_SCHEDULE_WITH_NETWORK_FILE);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
-	}
-
 	protected void mergeNetworks() {
 		NetworkLayer transitNetwork = new NetworkLayer();
 		NetworkLayer streetNetwork = new NetworkLayer();
@@ -144,7 +121,7 @@ public class Application1 {
 			new MatsimNetworkReader(transitNetwork).parse(TRANSIT_NETWORK_FILE);
 			new MatsimNetworkReader(streetNetwork).parse(NETWORK_FILE);
 			MergeNetworks.merge(streetNetwork, "", transitNetwork, "", this.scenario.getNetwork());
-			new NetworkWriter(this.scenario.getNetwork(), MERGED_NETWORK_FILE).write();
+			new NetworkWriter(this.scenario.getNetwork(), MULTIMODAL_NETWORK_FILE).write();
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -157,8 +134,7 @@ public class Application1 {
 	protected void routePopulation() {
 		PopulationImpl pop = this.scenario.getPopulation();
 		try {
-//			new MatsimNetworkReader(this.scenario.getNetwork()).parse(NETWORK_FILE);
-			new MatsimPopulationReader(this.scenario).parse(DILUTED_1PCT_PLANS_FILENAME);
+			new MatsimPopulationReader(this.scenario).parse(INPUT_PLANS_FILE);
 			pop.printPlansCount();
 		} catch (SAXException e) {
 			e.printStackTrace();
@@ -167,8 +143,6 @@ public class Application1 {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-//		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), this.scenario.getNetwork()).run();
 
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(this.scenario.getConfig().charyparNagelScoring());
@@ -179,7 +153,7 @@ public class Application1 {
 		log.info("start pt-router");
 		router.run(pop);
 		log.info("write routed plans out.");
-		new PopulationWriter(pop).write(DILUTED_ROUTED_1PCT_PLANS_FILENAME);
+		new PopulationWriter(pop).write(ROUTED_PLANS_FILE);
 	}
 
 	protected void visualizeRouterNetwork() {
@@ -202,19 +176,16 @@ public class Application1 {
 		new NetworkWriter(visNet, "visNet.xml").write();
 
 		log.info("start visualizer");
-//		OTFVis.main(new String[] {"visNet.xml"});
 		EventsImpl events = new EventsImpl();
 		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(visScenario, events);
 		client.run();
 	}
 
 	public static void main(final String[] args) {
-		Application1 app = new Application1();
+		DataPrepare app = new DataPrepare();
 		app.prepareConfig();
 		app.convertSchedule();
-//		app.readSchedule(); // either convert, or read, but not both!
 		app.createNetworkFromSchedule();
-		// app.readScheduleWithNetwork(); // either create Network from schedule, or read it in that way
 		app.mergeNetworks();
 		app.routePopulation();
 //		app.visualizeRouterNetwork();
