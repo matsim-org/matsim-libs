@@ -26,6 +26,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -60,6 +61,8 @@ import playground.marcel.pt.fakes.FakeAgent;
  * @author mrieser
  */
 public class TransitDriverTest extends TestCase {
+
+	private static final Logger log = Logger.getLogger(TransitDriverTest.class);
 
 	public void testInitializationNetworkRoute() {
 		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
@@ -151,7 +154,7 @@ public class TransitDriverTest extends TestCase {
 		driver.setVehicle(new TransitQueueVehicle(vehicle, 3.0));
 
 		new TransitQueueSimulation(new ScenarioImpl(), new EventsImpl()); // required for Events to be set
-		
+
 		assertEquals(stop1, driver.getNextTransitStop());
 		assertEquals(0, driver.handleTransitStop(stop1, 60), MatsimTestCase.EPSILON);
 		assertEquals(stop2, driver.getNextTransitStop());
@@ -170,8 +173,10 @@ public class TransitDriverTest extends TestCase {
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
 		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("3"), new CoordImpl(1500, 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
+		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
 		NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
@@ -188,11 +193,11 @@ public class TransitDriverTest extends TestCase {
 		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
 		driver.setVehicle(queueVehicle);
 
-		PassengerAgent agent1 = new FakeAgent(null, null);
-		PassengerAgent agent2 = new FakeAgent(null, null);
-		PassengerAgent agent3 = new FakeAgent(null, null);
-		PassengerAgent agent4 = new FakeAgent(null, null);
-		PassengerAgent agent5 = new FakeAgent(null, null);
+		PassengerAgent agent1 = new FakeAgent(null, stop3);
+		PassengerAgent agent2 = new FakeAgent(null, stop3);
+		PassengerAgent agent3 = new FakeAgent(null, stop3);
+		PassengerAgent agent4 = new FakeAgent(null, stop3);
+		PassengerAgent agent5 = new FakeAgent(null, stop3);
 
 		tracker.addAgentToStop(agent1, stop1);
 		tracker.addAgentToStop(agent2, stop1);
@@ -358,6 +363,57 @@ public class TransitDriverTest extends TestCase {
 
 		// stop3 has no departure time
 		assertEquals(0.0, driver.handleTransitStop(stop3, departureTime + 210), MatsimTestCase.EPSILON);
+	}
+
+	public void testExceptionWhenNotEmptyAfterLastStop() {
+		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+
+		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("3"), new CoordImpl(2500, 0), false);
+		stop1.setLink(new FakeLink(new IdImpl("dummy")));
+		stop2.setLink(new FakeLink(new IdImpl("dummy")));
+		stop3.setLink(new FakeLink(new IdImpl("dummy")));
+		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
+		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
+		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
+		NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null);
+		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, TransportMode.bus);
+		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
+		TransitQueueSimulation tqsim = new TransitQueueSimulation(new ScenarioImpl(), new EventsImpl());
+
+		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
+		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
+		capacity.setSeats(Integer.valueOf(5));
+		vehType.setCapacity(capacity);
+		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
+
+		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
+		driver.setVehicle(queueVehicle);
+
+		PassengerAgent agent1 = new FakeAgent(stop2, stop1);
+		tracker.addAgentToStop(agent1, stop2);
+
+		assertEquals(0, queueVehicle.getPassengers().size());
+		assertEquals(stop1, driver.getNextTransitStop());
+		driver.handleTransitStop(stop1, 60);
+		assertEquals(stop2, driver.getNextTransitStop());
+		assertTrue(driver.handleTransitStop(stop2, 160) > 0);
+		assertEquals(stop2, driver.getNextTransitStop());
+		assertEquals(1, queueVehicle.getPassengers().size());
+		assertEquals(0, driver.handleTransitStop(stop2, 160), MatsimTestCase.EPSILON);
+		assertEquals(stop3, driver.getNextTransitStop());
+		try {
+			assertEquals(0, driver.handleTransitStop(stop3, 260), MatsimTestCase.EPSILON);
+			fail("missing exception: driver still has passengers, although it handled the last stop.");
+		}
+		catch (RuntimeException e) {
+			log.info("catched expected exception.", e);
+		}
 	}
 
 	protected static class SpyAgent implements PassengerAgent {

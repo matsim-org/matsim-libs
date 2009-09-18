@@ -1058,7 +1058,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			capacity.setStandingRoom(Integer.valueOf(0));
 			vehicleType.setCapacity(capacity);
 
-			TransitDriver tDriver = new TransitDriver(tLine, tRoute, dep, tracker, qsim);
+			TransitDriver tDriver = new FakeTransitDriver(tLine, tRoute, dep, tracker, qsim);
 			this.transitVehicle = new TransitQueueVehicle(new BasicVehicleImpl(tDriver.getPerson().getId(), vehicleType), 1.0);
 			this.qlink1.addParkedVehicle(this.transitVehicle);
 			this.transitVehicle.setEarliestLinkExitTime(100);
@@ -1103,6 +1103,33 @@ public class TransitQueueNetworkTest extends TestCase {
 				this.normalVehicle2 = null;
 			}
 		}
+	}
+
+	/**
+	 * A simple extension of {@link TransitDriver} that ignores the fact
+	 * when there are still people in the vehicle after the last stop is
+	 * handled.
+	 *
+	 * @author mrieser
+	 */
+	private static class FakeTransitDriver extends TransitDriver {
+
+		public FakeTransitDriver(final TransitLine line, final TransitRoute route, final Departure departure,
+				final TransitStopAgentTracker agentTracker, final TransitQueueSimulation sim) {
+			super(line, route, departure, agentTracker, sim);
+		}
+
+		@Override
+		public double handleTransitStop(final TransitStopFacility stop, final double now) {
+			try {
+				return super.handleTransitStop(stop, now);
+			} catch (RuntimeException e) {
+				/* the Exception is most likely thrown when there are still agents after the last stop
+				 * we don't care about that, so just return 0.0. */
+				return 0.0;
+			}
+		}
+
 	}
 
 }
