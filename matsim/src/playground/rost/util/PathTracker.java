@@ -43,6 +43,7 @@ public class PathTracker {
 			{"flatNetworkBlocks", resOutput + "flatNetworkBlocks.xml"},
 			{"flatNetworkBorder", resOutput + "flatNetworkBorder.xml"},
 			{"populationPoints", resOutput + "populationPoints.xml"},
+			{"populationForNodes", resOutput + "populationForNodes.xml"}
 	     };
 
 	
@@ -66,5 +67,10 @@ public class PathTracker {
 			System.out.println();
 			System.out.println(fileMap[i][0] + " --> " + fileMap[i][1]);
 		}
+	}
+	
+	public static final String[][] getFiles()
+	{
+		return fileMap;
 	}
 }

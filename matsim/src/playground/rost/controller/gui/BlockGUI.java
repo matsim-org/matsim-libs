@@ -126,12 +126,17 @@ public class BlockGUI extends AbstractBasicMapGUIImpl {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		createBlocksAndShowGUI();
+	}
+	
+	public static BlockGUI createBlocksAndShowGUI()
+	{
 		// TODO Auto-generated method stub
 		NetworkLayer network = new NetworkLayer();
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(network);
 		try {
 			nReader.parse(PathTracker.resolve("matExtract"));
-			new BlockGUI(network);
+			return(new BlockGUI(network));
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -142,7 +147,7 @@ public class BlockGUI extends AbstractBasicMapGUIImpl {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		return null;
 	}
 
 }

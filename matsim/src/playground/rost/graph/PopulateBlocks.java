@@ -41,7 +41,6 @@ public class PopulateBlocks {
 		//calc min distance for every node
 		for(Node node : network.getNodes().values())
 		{
-			
 			calcDensityForNode(node, popPointCollection);
 		}
 		

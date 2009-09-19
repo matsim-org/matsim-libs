@@ -24,14 +24,18 @@ package playground.rost.controller.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.xml.sax.SAXException;
@@ -46,19 +50,28 @@ import playground.rost.controller.vismodule.implementations.PopulationBlockVisMo
 import playground.rost.controller.vismodule.implementations.PopulationDistributionPointVisModule;
 import playground.rost.graph.BlockCreator;
 import playground.rost.graph.BoundingBox;
+import playground.rost.graph.PopulateBlocks;
+import playground.rost.graph.block.Block;
 import playground.rost.graph.block.Blocks;
+import playground.rost.graph.evacarea.EvacArea;
+import playground.rost.graph.nodepopulation.PopulationNodeMap;
 import playground.rost.util.PathTracker;
 
 public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
 
+	private static final Logger log = Logger.getLogger(PopulationDistributionGUI.class);
+	
 	protected NetworkLayer network;
 	protected BlockCreator popDistri;
 	protected PopulationDensity popVis;
+	protected Blocks blocks;
+	protected PlacePplMap pplMap;
 	
 	public PopulationDistributionGUI(NetworkLayer network, Blocks blocks) {
 		super("PPL Distribution");
 		
 		this.network = network;
+		this.blocks = blocks;
 		
 		this.vMContainer = new VisModuleContainerImpl(this);
 		this.vMContainer.addVisModule(new NodeVisModule(vMContainer, network));
@@ -75,7 +88,19 @@ public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
 				writePopulationPoints(PathTracker.resolve("populationPoints"));
 			}
 		});
+		
+		JButton outputNodePopulation = new JButton("write population for nodes in original network");
+		
+		outputNodePopulation.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{
+				outputDistributionForNodes(PathTracker.resolve("populationForNodes"));
+			}
+		});
+		
+		
 		btnPanel.add(outputPopPoints);
+		btnPanel.add(outputNodePopulation);
 		mainPanel.add(btnPanel);
 		
 		popVis = new PopulationDensity(this, 10000);
@@ -84,6 +109,7 @@ public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
 		
 		
 		this.map = new PlacePplMap(10000, network, popVis);
+		this.pplMap = (PlacePplMap)this.map;
 		this.vMContainer.addVisModule(new PopulationDistributionPointVisModule(vMContainer, (PlacePplMap)this.map));
 		this.vMContainer.addVisModule(new PopulationBlockVisModule(vMContainer, blocks));
 		
@@ -109,6 +135,61 @@ public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
 		}
 	}
 	
+	protected void outputDistributionForNodes(String fileName)
+	{
+		//load evacuation area of original network
+		EvacArea evacArea = null;
+		try {
+			evacArea = EvacArea.readXMLFile(PathTracker.resolve("evacArea"));
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(evacArea != null)
+		{
+			//calculate the population for every block
+			Map<Block, Integer> populationOfBlock = PopulateBlocks.getPopulation(pplMap.getPplPoints(), blocks, pplMap.getNetwork());
+			
+			//calculate the population for every single Node
+			PopulationNodeMap nodePopulationMap = new PopulationNodeMap();
+			
+			for(Block b : populationOfBlock.keySet())
+			{
+				Set<String> ids = new HashSet<String>();
+				for(Node n : b.border)
+				{
+					String id = n.getId().toString();
+					if(evacArea.evacAreaNodeIds.contains(id) ||
+						evacArea.evacBorderNodeIds.contains(id))
+					{
+						ids.add(id);
+					}
+				}
+				for(String id : ids)
+				{
+					Integer population = (int)(populationOfBlock.get(b) * b.area_size / ids.size());
+					if(nodePopulationMap.populationForNode.containsKey(id))
+					{
+						population += nodePopulationMap.populationForNode.get(id);
+					}
+					nodePopulationMap.populationForNode.put(id, population);
+				}
+			}
+			try {
+				nodePopulationMap.writeXMLFile(PathTracker.resolve("populationForNodes"));
+			} catch (JAXBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -116,20 +197,40 @@ public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
 	 * @throws SAXException 
 	 * @throws JAXBException 
 	 */
-	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException, JAXBException {
+	public static void main(String[] args) {
+		parseNetworkAndBlocksAndShowGUI();
+	}
+	
+	public static PopulationDistributionGUI parseNetworkAndBlocksAndShowGUI()
+	{
 		NetworkLayer network = new NetworkLayer();
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(network);
-		nReader.parse(PathTracker.resolve("flatNetwork"));
+		try {
+			nReader.parse(PathTracker.resolve("flatNetwork"));
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		//read blocks
-		Blocks blocks = Blocks.readXMLFile(network, PathTracker.resolve("flatNetworkBlocks"));
+		Blocks blocks = null;
+		try {
+			blocks = Blocks.readXMLFile(network, PathTracker.resolve("flatNetworkBlocks"));
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		
-		new PopulationDistributionGUI(network, blocks);
-		
-		String[] formats = ImageIO.getReaderFormatNames();
-		for(String s : formats)
-			System.out.println(s);
+		return(new PopulationDistributionGUI(network, blocks));
 
 	}
 }

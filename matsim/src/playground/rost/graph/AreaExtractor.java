@@ -19,7 +19,7 @@
  ******************************************************************************/
 
 
-package playground.rost.controller;
+package playground.rost.graph;
 
 import java.util.HashMap;
 import java.util.HashSet;

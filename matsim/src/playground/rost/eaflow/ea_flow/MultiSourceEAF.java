@@ -28,38 +28,64 @@ package playground.rost.eaflow.ea_flow;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.rost.eaflow.Intervall.src.Intervalls.EdgeIntervalls;
+import playground.rost.controller.gui.helpers.progressinformation.ProgressInformationProvider;
 import playground.rost.eaflow.Intervall.src.Intervalls.VertexIntervalls;
-import playground.rost.eaflow.TestNetworks.NetworkWithDemands;
-import playground.rost.eaflow.TestNetworks.TestNetwork;
+import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
+import playground.rost.graph.evacarea.EvacArea;
+import playground.rost.graph.nodepopulation.PopulationNodeMap;
+import playground.rost.graph.shortestdistances.LengthCostFunction;
+import playground.rost.graph.shortestdistances.ShortestDistanceFromSupersource;
 
 /**
  * @author Manuel Schneider
  *
  */
-public class MultiSourceEAF {
+public class MultiSourceEAF implements ProgressInformationProvider{
 
 	/**
 	 * debug flag
 	 */
 	private static boolean _debug = true;
-	private static boolean vertexAlgo = true;
+	private int lastArrival;
+	
+	private EdgeTypeEnum edgeTypeToUse = EdgeTypeEnum.SIMPLE;
 
+
+	public EdgeTypeEnum getEdgeTypeToUse() {
+		return edgeTypeToUse;
+	}
+
+	public void setEdgeTypeToUse(EdgeTypeEnum edgeTypeToUse) {
+		this.edgeTypeToUse = edgeTypeToUse;
+	}
 
 	public static void debug(final boolean debug){
 		_debug=debug;
+	}
+	
+	public MultiSourceEAF()
+	{
+		this.setupStatusInfo();
 	}
 
 	/**
@@ -124,131 +150,90 @@ public class MultiSourceEAF {
 	 *
 	 */
 	public static void main(final String[] args) {
-
-		//set debuging modes
-		MultiSourceEAF.debug(true);
-		BellmanFordVertexIntervalls.debug(5);
-		VertexIntervalls.debug(true);
-		//VertexIntervall.debug(false);
-		EdgeIntervalls.debug(true);
-		//EdgeIntervall.debug(false);
-		Flow.debug(5);
-//		BellmanFordVertexIntervalls.warmstart(3);
-//		System.out.println("Warmstart: 3");
-
+		//TODO somehow access calcEAFlow (copy old code?)
+		
+	}
+	
+	public Flow calcEAFlow(EvacArea evacArea, NetworkLayer network, PopulationNodeMap populationNodeMap)
+	{
+		Map<Node, Integer> demands = new HashMap<Node, Integer>();
+		for(String id : populationNodeMap.populationForNode.keySet())
+		{
+			Node node = network.getNode(id);
+			if(node != null)
+			{
+				int demand = populationNodeMap.populationForNode.get(id);
+				demands.put(node, demand);
+			}
+		}
+		
+		//create sink
+		network.createNode(new IdImpl(GlobalFlowCalculationSettings.superSinkId), new CoordImpl(0,0));
+		Node sink = network.getNode(GlobalFlowCalculationSettings.superSinkId);
+		int counter = 0;
+		//create links from real sinks to supersink!
+		for(String id : evacArea.evacBorderNodeIds)
+		{
+			Id linkId = new IdImpl("borderNode->sink" + (++counter));
+			network.createLink( linkId, 
+								network.getNode(id), 
+								network.getNode(GlobalFlowCalculationSettings.superSinkId),
+								0,
+								Integer.MAX_VALUE, //freespeed 
+								Integer.MAX_VALUE, //capacity
+								1);
+		}
+		
+		ShortestDistanceFromSupersource sd = new ShortestDistanceFromSupersource(new LengthCostFunction(), network, evacArea);
+		sd.calcShortestDistances();
+		sd.getNodes(Double.MAX_VALUE);
+		
+		Flow fluss = calcEAFlow(network, demands);
+		return fluss;
+	}
+	
+	
+	/**
+	 * THE ONLY FUNCTION WHICH REALLY CALCULATES A FLOW
+	 * and provides status info
+	 * 
+	 * @param network
+	 * @param demands
+	 * @return
+	 */
+	public Flow calcEAFlow(NetworkLayer network, Map<Node, Integer> demands)
+	{
+		Set<Link> toRemove = new HashSet<Link>();
+		for(Link link : network.getLinks().values())
+		{
+			if(link.getFromNode().equals(link.getToNode()))
+				toRemove.add(link);
+		}
+		for(Link link : toRemove)
+		{
+			network.removeLink((LinkImpl)link);
+		}
 		if(_debug){
 			System.out.println("starting to read input");
 		}
-
-//		String networkfile = null;
-//		//networkfile = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_100p_flow_2s_cap.xml";
-//		//networkfile  = "/homes/combi/Projects/ADVEST/padang/network/padang_net_evac_v20080618_10p_5s.xml";
-//		//networkfile = "/Users/manuel/Documents/meine_EA/manu/manu2.xml";
-//		//networkfile = "./examples/meine_EA/swissold_network_5s.xml";
-//		//networkfile = "/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_network_60s_EAF.xml";
-//		//networkfile = "./examples/meine_EA/siouxfalls_network_5s.xml";
-//
-//		//***---------MANU------**//
-//		//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
-//		//networkfile = "/Users/manuel/testdata/simple/line_net.xml";
-//		networkfile = "/Users/manuel/testdata/simple/elfen_net.xml";
-//		//networkfile = "/Users/manuel/testdata/padangcomplete/network/padang_net_evac_v20080618_100p_1s_EAF.xml";
-//		
-//		String plansfile = null;		
-//		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
-//		//plansfile ="/homes/combi/Projects/ADVEST/code/matsim/examples/meine_EA/siouxfalls_plans.xml";
-//		//plansfile = "/homes/combi/dressler/V/Project/testcases/swiss_old/matsimevac/swiss_old_plans_evac.xml";
-//		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
-//		//plansfile = "/Users/manuel/testdata/simple/elfen_1_plan.xml";
-//		//plansfile = "/Users/manuel/testdata/padangcomplete/plans/padang_plans_10p.xml";
-//
-//
-//		String demandsfile = null;
-//		//demandsfile = "/Users/manuel/Documents/meine_EA/manu/manu2.dem";
-//
-//		String outputplansfile = null;
-//		//outputplansfile = "/homes/combi/dressler/V/code/workspace/matsim/examples/meine_EA/padangplans_10p_5s.xml";
-//		//outputplansfile = "./examples/meine_EA/swissold_plans_5s_demands_100.xml";
-//		//outputplansfile = "./examples/meine_EA/padang_plans_100p_flow_2s.xml";
-//		//outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_euclid_demands_100_empty.xml";
-//
-//		//outputplansfile = "./examples/meine_EA/siouxfalls_plans_5s_demand_100_emptylegs.xml";
-//		//outputplansfile = "/homes/combi/dressler/stuff/testplans.xml";
-//		//outputplansfile = "/homes/combi/schneide/fricke/testplans.xml";
-//		outputplansfile = "/Users/manuel/tester/ws3_testoutput.xml";
-//		
-//		int uniformDemands = 50;
-//
-//		//set parameters
-//		int timeHorizon = 200000;
-//		int rounds = 100000;
-//		//String sinkid = "supersink";
-//		String sinkid = "en2";  //padang sink , line sink
-//		//String sinkid ="supersink"; //siouxsink
-//		//boolean emptylegs = false; // really bad! use EmptyPlans.class instead 		
-//
-//		//read network
-//		NetworkLayer network = new NetworkLayer();
-//		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
-//		networkReader.readFile(networkfile);
-//		Node sink = network.getNode(sinkid);		
-//
-//		//read demands
-//		HashMap<Node, Integer> demands;
-//		if(plansfile!=null){
-//			demands = readPopulation(network, plansfile);			
-//		}else if (demandsfile != null){
-//			try {
-//				demands = readDemands(network,demandsfile);
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//				return;
-//			}
-//		} else {
-//			// uniform demands
-//			demands = new HashMap<Node, Integer>();
-//			for (NodeImpl node : network.getNodes().values()) {
-//				if (!node.getId().equals(sink.getId())) {
-//					demands.put(node, Math.max(uniformDemands,0));
-//				}
-//			}
-//		}
-//
-//		int totaldemands = 0;
-//		for (int i : demands.values()) {
-//			totaldemands += i;
-//		}
-//		System.out.println("Total demand is " + totaldemands);		
-//
-//		//check if demands and sink are set
-//		if (demands.isEmpty() ) {
-//			System.out.println("demands not found");
-//		}
-//		if (sink == null){
-//			System.out.println("sink not found");
-//		}
-//		if(_debug){
-//			System.out.println("reading input done");
-//		}
-//
-//
-//		String tempstr = null;
 		
-		NetworkWithDemands nWD = TestNetwork.get2SourceNetworkWithBackwardEdgeUse();
-		Map<Node, Integer> demands = nWD.demands;
-		NetworkLayer network = nWD.network;
-		Node sink = nWD.superSink;
-		int totaldemands = nWD.getTotalDemands();
+		int totaldemands = 0;
+		for(Integer count : demands.values())
+		{
+			totaldemands += count;
+		}
 		
+		//create sink
+		Node sink = network.getNode(GlobalFlowCalculationSettings.superSinkId);
 		
 		int timeHorizon = 10000;
 		int rounds = 10000;
 		String tempstr = "";
-	
-
+		Flow fluss = null;
+		lastArrival = 0;
 		if(!demands.isEmpty() && (sink != null)) {
-			TimeExpandedPath result = null;
-			Flow fluss = new Flow( network, demands, sink, timeHorizon );
+			Collection<TimeExpandedPath> result = null;
+			fluss = new Flow( network, demands, sink, timeHorizon, this.edgeTypeToUse);
 
 			if(_debug){
 				System.out.println("starting calculations");
@@ -260,101 +245,148 @@ public class MultiSourceEAF {
 			long timer1, timer2, timer3;
 			long timeStart = System.currentTimeMillis();
 
-			//main loop for calculations
-			if(vertexAlgo){
-				BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
-				//BellmanFordIntervallBased routingAlgo = new BellmanFordIntervallBased(fluss);
-				int i;
-				int gain = 0;
-				for (i=0; i<rounds && fluss.getTotalFlow() < totaldemands; i++){
-					if(i == 1996)
-						System.out.println("windows 96 problem!");
-					timer1 = System.currentTimeMillis();
-					result = routingAlgo.doCalculations();
-					timer2 = System.currentTimeMillis();
-					timeMBF += timer2 - timer1;
-					if (result==null){
-						break;
+			BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
+			//BellmanFordIntervallBased routingAlgo = new BellmanFordIntervallBased(fluss);
+			int i;
+			int gain = 0;
+			for (i=1; i<=rounds && fluss.getTotalFlow() < totaldemands; i++){
+				timer1 = System.currentTimeMillis();
+				result = routingAlgo.doCalculations();
+				timer2 = System.currentTimeMillis();
+				timeMBF += timer2 - timer1;
+				if (result==null){
+					break;
+				}
+				if(_debug){
+					tempstr = "found path " + result;
+					//System.out.println("found path: " +  result);
+				}
+				if(result.size() == 0)
+					throw new RuntimeException("NO PATH FOUND!");
+				int gammaSum = 0;
+				int currentArrival = -1;
+				System.out.println("new paths!");
+				
+				for(TimeExpandedPath tEPath : result)
+				{
+					int arrive = tEPath.getArrival();
+					if(arrive != currentArrival && currentArrival != -1)
+					{
+						throw new RuntimeException("the found augmenting paths arrive at different times");
 					}
-					if(_debug){
-						tempstr = "found path " + result;
-						//System.out.println("found path: " +  result);
-					}
-					fluss.augment(result);
-					timer3 = System.currentTimeMillis();
-					gain += fluss.cleanUp();
+					currentArrival = arrive;
+					int foobar = 0;
+					int gamma = fluss.augment(tEPath);
+					gammaSum += gamma;
+					if(_debug)
+						System.out.println("path found with " + gamma + " of flow");
+				}
+				System.out.println(""+currentArrival);
+				if(currentArrival < lastArrival)
+					throw new RuntimeException("the found paths are shorter than the last found shortest path!");
+				lastArrival = currentArrival;
+				if(gammaSum == 0)
+					throw new RuntimeException("no flow could be transported over any augmenting path!");
+				
+				timer3 = System.currentTimeMillis();
+				gain += fluss.cleanUp();
 
-					timeAugment += timer3 - timer2;
-					if (_debug) {
-						if (i % 1 == 0) {
-							System.out.println("Iteration " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
-							//System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
-							//System.out.println("last " + tempstr);
-							System.out.println(routingAlgo.measure());
-							System.out.println("");
-						}
+				timeAugment += timer3 - timer2;
+				if (true) {
+					if (i % 1 == 0) {
+						System.out.println("Iteration " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+						//System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
+						//System.out.println("last " + tempstr);
+						System.out.println(routingAlgo.measure());
+						System.out.println("");
 					}
 				}
-				if (_debug) {
-					long timeStop = System.currentTimeMillis();
-					System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");				  
-					System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
-					System.out.println("last " + tempstr);
-				}
-				System.out.println("Removed " + routingAlgo.gain + " intervals.");
-				System.out.println("removed on the fly:" + VertexIntervalls.rem);
+				this.setProgressInfo("Iteration", "" + i);
+				this.setProgressInfo("Time", ""+ (timeMBF / 1000) );
+				this.setProgressInfo("Last Arrival", ""+this.lastArrival );
+				this.setProgressInfo("Total Flow", "" + fluss.getTotalFlow());
+				this.setProgressInfo("Found Paths", "" + fluss.getPaths().size());
+				this.setProgressInfo("Paths / Iteration", ""+ (fluss.getPaths().size() / (double)i));
+				
 			}
-			else{ // use the other algo
-				//TODO ROST not working yet
-				FakeTravelTimeCost length = new FakeTravelTimeCost();
-				fluss = new Flow(network, demands, sink, timeHorizon);
-				TravelCost travelCost = length;
-				TravelTime travelTime = length;
-				//MBFdynamic_withFlowClass routingAlgo = new MBFdynamic_withFlowClass(travelCost, travelTime, fluss);
-				//fluss = routingAlgo.calcLeastCostFlow(0.0, fluss);
+			if (true) {
+				long timeStop = System.currentTimeMillis();
+				System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");				  
+				System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
+				System.out.println("last " + tempstr);
 			}
-			if(_debug){
-				System.out.println(fluss.arrivalsToString());
-				System.out.println(fluss.arrivalPatternToString());
-				System.out.println("unsatisfied demands:");
-				for (Node node : demands.keySet()){
-					if (demands.get(node) > 0) {
-						System.out.println("node:" + node.getId().toString()+ " demand:" + demands.get(node));
-					}
+			System.out.println("Removed " + routingAlgo.gain + " intervals.");
+			System.out.println("removed on the fly:" + VertexIntervalls.rem);
+		}
+		if(_debug){
+			System.out.println(fluss.arrivalsToString());
+			System.out.println(fluss.arrivalPatternToString());
+			System.out.println("unsatisfied demands:");
+			for (Node node : demands.keySet()){
+				if (demands.get(node) > 0) {
+					System.out.println("node:" + node.getId().toString()+ " demand:" + demands.get(node));
 				}
 			}
-			//TODO ROST not needed now
-//			if(outputplansfile!=null){
-//				PopulationImpl output = fluss.createPoulation(plansfile);
-//				// TODO remove emptylegs from Flow.java ... not needed anymore
-////				if (emptylegs) {
-////					Config config = Gbl.createConfig(new String[] {});
-////
-////					World world = Gbl.getWorld();
-////					world.setNetworkLayer(network);
-////					world.complete();
-////
-////					CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
-////					PlansCalcRoute router = new PlansCalcRoute(network, new FakeTravelTimeCost(), new FakeTravelTimeCost());
-////					//PlansCalcRoute router = new PlansCalcRouteDijkstra(network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), new FakeTravelTimeCost());
-////					for (Object O_person : output.getPersons().values()) {
-////						Person person = (Person) O_person;
-////						Plan plan = person.getPlans().get(0);
-////						router.run(plan);
-////					}
-////				}
-//				PopulationWriter popwriter = new PopulationWriter(output, outputplansfile);
-//
-//				try {
-//				  popwriter.write();
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-			}
-		//}
+		}
+		this.isFinished = true;
 		if(_debug){
 			System.out.println("done");
 		}
+		return fluss;
+	}
+	
+
+	protected List<String> progressTitles;
+	
+	/**
+	 * 	must not (!) get accessed unsychronized
+	 */
+	protected Map<String, String> progressInfos;
+	
+	protected boolean isFinished;
+	
+	protected void setupStatusInfo()
+	{
+		isFinished = false;
+		progressTitles = new LinkedList<String>();
+		progressTitles.add("Iteration");
+		progressTitles.add("Time");
+		progressTitles.add("Last Arrival");
+		progressTitles.add("Total Flow");
+		progressTitles.add("Found Paths");
+		progressTitles.add("Paths / Iteration");
+		progressInfos = new HashMap<String, String>();
+		for(String key : progressTitles)
+		{
+			progressInfos.put(key, "");
+		}
+	}
+	
+	protected void setProgressInfo(String key, String value)
+	{
+		synchronized(progressInfos)
+		{
+			progressInfos.put(key, value);
+		}
+	}
+
+	public List<String> getListOfKeys() {
+		return progressTitles;
+	}
+
+	public String getProgressInformation(String key) {
+		synchronized(progressInfos)
+		{
+			return progressInfos.get(key);
+		}
+	}
+
+	public String getTitle() {
+		return "Flow Calculation";
+	}
+
+	public boolean isFinished() {
+		return isFinished;
 	}
 
 }

@@ -26,6 +26,8 @@ import java.util.Collection;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
 
+import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings;
+
 public class BoundingBox {
 
 	private double minX = Double.POSITIVE_INFINITY;
@@ -44,6 +46,8 @@ public class BoundingBox {
 	public void run(Collection<Node> collection) {
 		this.clear();
 		for (Node n : collection) {
+			if(n.getId().toString().equals(GlobalFlowCalculationSettings.superSinkId))
+				continue;
 			if (n.getCoord().getX() < this.minX) { this.minX = n.getCoord().getX(); }
 			if (n.getCoord().getY() < this.minY) { this.minY = n.getCoord().getY(); }
 			if (n.getCoord().getX() > this.maxX) { this.maxX = n.getCoord().getX(); }
@@ -62,8 +66,11 @@ public class BoundingBox {
 	public void run(NetworkLayer network)
 	{
 		this.clear();
+		Node sink = network.getNode(GlobalFlowCalculationSettings.superSinkId);
 		for (Node n : network.getNodes().values())
 		{
+			if(n == sink)
+				continue;
 			if (n.getCoord().getX() < this.minX) { this.minX = n.getCoord().getX(); }
 			if (n.getCoord().getY() < this.minY) { this.minY = n.getCoord().getY(); }
 			if (n.getCoord().getX() > this.maxX) { this.maxX = n.getCoord().getX(); }

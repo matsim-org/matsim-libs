@@ -37,6 +37,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings;
 import playground.rost.graph.evacarea.EvacArea;
 
 
@@ -49,7 +50,7 @@ public class ShortestDistanceFromSupersource {
 	NetworkLayer network;
 	EvacArea evacArea;
 	
-	Id sSID = new IdImpl("SUPERSINK");
+	Id sSID = new IdImpl(GlobalFlowCalculationSettings.superSinkId);
 	
 	public Map<Node, Double> costs = new HashMap<Node, Double>();
 	

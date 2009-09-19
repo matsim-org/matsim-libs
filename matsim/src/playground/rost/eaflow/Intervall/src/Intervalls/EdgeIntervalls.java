@@ -254,8 +254,9 @@ public class EdgeIntervalls {
 			throw new IllegalArgumentException("capacity shold be positive");
 		}
 		boolean wasAtEnd = false;
-		//search for the next intervall, in which flow can be send!
-		for(_tree.goToNodeAt(earliestStartTimeAtFromNode); !wasAtEnd;_tree.increment()){
+		//search for the next intervall, at which flow can be send!
+		for(_tree.goToNodeAt(earliestStartTimeAtFromNode); !wasAtEnd; _tree.increment()){
+			
 			if(_debug){
 				System.out.println("f: " + ((EdgeIntervall)_tree._curr.obj).getFlow()+" on: "+((EdgeIntervall)_tree._curr.obj));
 			}
@@ -264,20 +265,32 @@ public class EdgeIntervalls {
 				if(_debug){
 					System.out.println("capacity left: " + (capacity-currentIntervall.getFlow()));
 				}
-				return new EdgeIntervall(Math.max(earliestStartTimeAtFromNode, currentIntervall.getLowBound()), currentIntervall.getHighBound(), currentIntervall.getFlow());
+				int earliestPossibleStart = Math.max(earliestStartTimeAtFromNode, currentIntervall.getLowBound());
+				return new EdgeIntervall(earliestPossibleStart, currentIntervall.getHighBound(), currentIntervall.getFlow());
 			}
+			//to iterate over the intervalls
 			if(_tree.isAtEnd())
+			{
 				wasAtEnd = true;
+			}
 		}
 		return null;
 	}
 	
+	/**
+	 * used to constrain the bounds of the intervall eIntervall, so that no Holdover is needed
+	 * 
+	 * @param eIntervall
+	 * @param latestStartTimeAtFromNode the last, time (included) at which flow can be send
+	 * @return	null, if holdover is needed; a new Intervall otherwise which forbids holdover
+	 */
 	public EdgeIntervall forbidHoldoverForwards(EdgeIntervall eIntervall, int latestStartTimeAtFromNode){
 		if(eIntervall == null)
 			return null;
 		if(latestStartTimeAtFromNode >= eIntervall.getLowBound())
 		{
-			return new EdgeIntervall(eIntervall.getLowBound(), Math.min(latestStartTimeAtFromNode+1, eIntervall.getHighBound()), eIntervall.getFlow());
+			int latestPossibleStart = Math.min(latestStartTimeAtFromNode +1, eIntervall.getHighBound());
+			return new EdgeIntervall(eIntervall.getLowBound(), latestPossibleStart, eIntervall.getFlow());
 		}
 		return null;
 	}
@@ -291,27 +304,31 @@ public class EdgeIntervalls {
 	 */
 	public EdgeIntervall minPossibleBackwards(int earliestStartTimeAtFromNode){
 		
+		//calc earliest start time at the to node 
 		int earliestStartTimeAtToNode = earliestStartTimeAtFromNode - this._traveltime.getMaximalTravelTime();
 		earliestStartTimeAtToNode = Math.max(0, earliestStartTimeAtToNode);
-		boolean wasAtEnd = false;
-		for(_tree.goToNodeAt(earliestStartTimeAtToNode); _tree._curr.obj != null ;_tree.increment())
+		EdgeIntervall forwardIntervall = (EdgeIntervall)this.getIntervallAt(earliestStartTimeAtToNode);
+		while(forwardIntervall != null)
 		{
-			EdgeIntervall eIntervall = (EdgeIntervall)_tree._curr.obj;
-			int flow = this.getFlowAt(eIntervall.getLowBound());
+			int flow = this.getFlowAt(forwardIntervall.getLowBound());
 			//we need flow to reverse it!
 			if(flow > 0)
 			{
 				int traveltime = this._traveltime.getTravelTimeForFlow(flow);
-				//we have to arrive after or at the arrivalTime
-				if(eIntervall.getLowBound() + traveltime >= earliestStartTimeAtFromNode)
+				//we have to arrive after or at the minimal time at which we can send flow
+				if(forwardIntervall.getHighBound() + traveltime > earliestStartTimeAtFromNode)
 				{
-					//the flow can be send after the earliestStartTime from the from node of the intervall with the flow 	
-					if(earliestStartTimeAtFromNode - traveltime >= eIntervall.getLowBound())
-					{
-						return new EdgeIntervall(earliestStartTimeAtFromNode-traveltime, eIntervall.getHighBound(), eIntervall.getFlow());
-					}
+					int earliestStartTimeForward = Math.max(earliestStartTimeAtFromNode - traveltime, forwardIntervall.getLowBound());
+					//if the flow can be send before the highbound of the forwardIntervall, we have found the first
+					//valid intervall
+					if(earliestStartTimeForward < forwardIntervall.getHighBound())
+						return new EdgeIntervall(earliestStartTimeForward, forwardIntervall.getHighBound(), forwardIntervall.getFlow());
 				}
+				
 			}
+			if(forwardIntervall.getHighBound() == Integer.MAX_VALUE)
+				break;
+			forwardIntervall = this.getIntervallAt(forwardIntervall.getHighBound());
 		}
 		return null;
 	}
@@ -330,14 +347,14 @@ public class EdgeIntervalls {
 		int traveltime = _traveltime.getTravelTimeForFlow(eIntervall.getFlow());
 		//the flow has to be negated before the latest possible arrival time at 
 		//the from node
-		if(latestStartTimeAtFromNode - traveltime <= eIntervall.getHighBound())
-			return new EdgeIntervall(eIntervall.getLowBound(), latestStartTimeAtFromNode-traveltime+1, eIntervall.getFlow());
-		return null;
-		
+		if(latestStartTimeAtFromNode < eIntervall.getLowBound() + traveltime)
+			return null;
+		int latestPossibleSend = Math.min(latestStartTimeAtFromNode-traveltime + 1, eIntervall.getHighBound());
+		return new EdgeIntervall(eIntervall.getLowBound(), latestPossibleSend, eIntervall.getFlow());
 	}
 		
 	/**
-	 * TODO comment
+	 * TODO ROST really needs comment (and explanaition ;-)) MORE EFFICIENT!
 	 * @param arrivaleIntervall
 	 * @param u
 	 * @param forward
@@ -347,7 +364,7 @@ public class EdgeIntervalls {
 		ArrayList<VertexIntervall> result = new ArrayList<VertexIntervall>();
 		int earliestStartPossible = arrivaleIntervall.getLowBound();
 		//-1 is important!
-		int latestStartPossible =arrivaleIntervall.getHighBound() - 1;
+		int latestStartPossible = arrivaleIntervall.getHighBound() - 1;
 		
 		VertexIntervall foundIntervall;
 		EdgeIntervall currentIntervall = this.getIntervallAt(earliestStartPossible);
@@ -358,29 +375,29 @@ public class EdgeIntervalls {
 				
 				EdgeIntervall nextPossibleIntervall;
 				
-				nextPossibleIntervall = this.minPossibleForwards(earliestStartPossible,u);
+				nextPossibleIntervall = this.minPossibleForwards(Math.max(currentIntervall.getLowBound(), earliestStartPossible),u);
+				
 				if(nextPossibleIntervall==null){
 					if(_debug){
 						System.out.println("no possible interval after:" + earliestStartPossible+ "with cap: " +u);
 					}
 					break;
 				}
-				
 				if(!GlobalFlowCalculationSettings.useHoldover)
 					nextPossibleIntervall = this.forbidHoldoverForwards(nextPossibleIntervall, latestStartPossible);
-				
+				int nextHigh = Integer.MAX_VALUE;
+				if(nextPossibleIntervall != null)
+					nextHigh = nextPossibleIntervall.getHighBound();
 				if(_debug){
 					System.out.println("kapazitaet frei");
 					System.out.println("old i: " +arrivaleIntervall);
 					System.out.println("old j: " +nextPossibleIntervall);
 				}
 				
-				
-				
 				if(nextPossibleIntervall!=null)
 				{
 					int currentFlow = nextPossibleIntervall.getFlow();
-					Integer travelTime = this._traveltime.getTravelTimeForAdditionalFlow(currentFlow);
+					Integer travelTime = this._traveltime.getTravelTimeForAdditionalFlow(currentFlow);					
 					nextPossibleIntervall = nextPossibleIntervall.shiftPositive(travelTime);
 					if(_debug)
 					{
@@ -390,8 +407,7 @@ public class EdgeIntervalls {
 						System.out.println("tau:" +this._traveltime);
 					}
 					foundIntervall = new VertexIntervall(nextPossibleIntervall);
-					foundIntervall.setStartTime(Math.min(arrivaleIntervall.getHighBound()-1, nextPossibleIntervall.getLowBound()-travelTime));
-					//foundIntervall.setStartTime(arrivaleIntervall.getHighBound()-1);
+					foundIntervall.setTravelTimeToPredecessor(travelTime);
 					result.add(foundIntervall);
 				}
 				if(GlobalFlowCalculationSettings.useHoldover)
@@ -402,9 +418,12 @@ public class EdgeIntervalls {
 				}
 				else
 				{
-					int tmp = nextPossibleIntervall == null ? 0 : nextPossibleIntervall.getHighBound();
-					//we get the next edgeintervall
-					int nextTimeStep = Math.max(currentIntervall.getHighBound(), tmp );
+					int nextTimeStep = currentIntervall.getHighBound();
+					if(nextHigh < nextTimeStep)
+					{
+						nextTimeStep = nextHigh;
+						earliestStartPossible = nextHigh;
+					}
 					if(nextTimeStep > latestStartPossible)
 						//if the next intervall starts after our latestArrivalTime, we are finished
 						break;
@@ -415,20 +434,23 @@ public class EdgeIntervalls {
 		if(!forward){
 			while(currentIntervall != null)
 			{	
-				EdgeIntervall nextPossibleIntervall = minPossibleBackwards(earliestStartPossible);
+				EdgeIntervall nextPossibleIntervall = minPossibleBackwards(Math.max(earliestStartPossible, currentIntervall.getLowBound()));
 				if(nextPossibleIntervall == null)
 				{
 					//no intervall can be found after this!
 					break;
 				}
+				
 				if(!GlobalFlowCalculationSettings.useHoldover)
 					nextPossibleIntervall = this.forbidHoldoverBackward(nextPossibleIntervall, latestStartPossible);
 				
+				int nextHigh = Integer.MAX_VALUE;
+				if(nextPossibleIntervall != null)
+					nextHigh = nextPossibleIntervall.getHighBound() + this._traveltime.getTravelTimeForFlow(nextPossibleIntervall.getFlow());
 				if(nextPossibleIntervall!=null){
-					System.out.println("i: " + arrivaleIntervall);
-					System.out.println("j: " + nextPossibleIntervall);
 					foundIntervall = new VertexIntervall(nextPossibleIntervall);
-					foundIntervall.setStartTime(arrivaleIntervall.getLowBound());
+					int traveltime = _traveltime.getTravelTimeForFlow(nextPossibleIntervall.getFlow());
+					foundIntervall.setTravelTimeToPredecessor(traveltime);
 					result.add(foundIntervall);
 				}
 				if(GlobalFlowCalculationSettings.useHoldover)
@@ -440,9 +462,12 @@ public class EdgeIntervalls {
 				else
 				{
 					//we get the next edgeintervall
-					int tmp = nextPossibleIntervall == null ? 0 : nextPossibleIntervall.getHighBound();
-					//we get the next edgeintervall
-					int nextTimeStep = Math.max(currentIntervall.getHighBound(), tmp );
+					int nextTimeStep = currentIntervall.getHighBound();
+					if(nextHigh < nextTimeStep)
+					{
+						nextTimeStep = nextHigh;
+						earliestStartPossible = nextHigh;
+					}
 					if(nextTimeStep > latestStartPossible)
 						//if the next intervall starts after our latestArrivalTime, we are finished
 						break;
@@ -451,7 +476,6 @@ public class EdgeIntervalls {
 			}
 		}
 		return result;
-		
 	}
 
 //------------------------Clean Up--------------------------------//
@@ -465,15 +489,14 @@ public class EdgeIntervalls {
 		i = getIntervallAt(0);
 		while (i != null) {
 		  if (i.getHighBound() == timestop) break;	
-		  j = getNext(i);
+		  j = this.getIntervallAt(i.getHighBound());
 		  
 		  if ((i.getHighBound() == j.getLowBound()) && 
 				  (i.getFlow() == j.getFlow())) {
-			  EdgeIntervall ni = new EdgeIntervall(i.getLowBound(),j.getHighBound(),i.getFlow());
+			  //TODO ROST MORE EFFICIENT!
 			  _tree.remove(i);
 			  _tree.remove(j);
-			  _tree.insert(ni);
-			  i = ni;
+			  _tree.insert(new EdgeIntervall(i.getLowBound(), j.getHighBound(), i.getFlow()));
 			  gain++;
 
 		  } else {
@@ -502,14 +525,14 @@ public class EdgeIntervalls {
 		if (i.getFlow()+f<0){
 			throw new IllegalArgumentException("negative flow! flow: " + i.getFlow() + " + " + f + " < 0");
 		}
-		if(!(i.getLowBound()==t)){
+		//TODO ROST CHANGED
+		if(i.getLowBound() < t){
 			i= splitAt(t);
 		}
-		i.changeFlow(f, u);
 		if(i.getHighBound() > (t+1)){
-			i= splitAt(t+1);
-			i.changeFlow((-f), u);
+			splitAt(t+1);
 		}
+		i.changeFlow(f, u);
 	}
 	/**
 	 * dencreeases the flow into an edge from time t to t+1 by f if flow remains nonnegative
@@ -520,15 +543,7 @@ public class EdgeIntervalls {
 		if (t<0){
 			throw new IllegalArgumentException("negative time : "+ t);
 		}
-		EdgeIntervall before =null;
-		EdgeIntervall after =null;
 		EdgeIntervall i= getIntervallAt(t);
-		if(i.getLowBound()>0 ){
-			before = getIntervallAt(i.getLowBound()-1);
-		}
-		if(i.getHighBound()< Integer.MAX_VALUE ){
-			after= getIntervallAt(i.getHighBound());
-		}
 		if(f<0){
 			throw new IllegalArgumentException("can not rduce flow by an negative amount without specified capacity");
 		}
@@ -536,19 +551,14 @@ public class EdgeIntervalls {
 		if(oldflow-f <0){
 			throw new IllegalArgumentException("flow would get negative");
 		}
+		//TODO ROST CHANGED
+		if(i.getLowBound() < t){
+			i= splitAt(t);
+		}
+		if(i.getHighBound() > t+1){
+			splitAt(t+1);
+		}
 		i.setFlow(oldflow-f);
-		if (before!=null){
-			if(before.getFlow()== i.getFlow() ){
-				_tree.remove(before);
-				i.setLowBound(before.getLowBound());
-			}
-		}
-		if(after!=null){
-			if( after.getFlow() == i.getFlow() ){
-				_tree.remove(i);
-				after.setLowBound(i.getLowBound());
-			}
-		}
 	}
 	
 	public int getCurrentForwardTravelTime(int time)
@@ -589,22 +599,7 @@ public class EdgeIntervalls {
 //			}
 //		}
 //	}
-	
-	public int getLatestPossibleStartTime(int arrivalTime)
-	{
-		int bestPossibleStartTime = arrivalTime - _traveltime.getMinimalTravelTime();
-		EdgeIntervall eIntervall = this.getIntervallAt(bestPossibleStartTime);
-		for(;;)
-		{
-			int flow = eIntervall.getFlow();
-			Integer traveltime = _traveltime.getTravelTimeForAdditionalFlow(flow);
-			
-			if(traveltime != null && arrivalTime - traveltime >= eIntervall.getLowBound())
-				return arrivalTime - traveltime;
-			eIntervall = this.getPrevious(eIntervall);
-		}
-	}
-	
+		
 	public int getRemainingBackwardCapacityWithThisTravelTime(int arrivalTime)
 	{
 		int flow = this.getFlowAt(arrivalTime);

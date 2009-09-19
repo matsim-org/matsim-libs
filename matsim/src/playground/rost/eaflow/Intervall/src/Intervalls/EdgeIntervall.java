@@ -224,6 +224,11 @@ public class EdgeIntervall extends Intervall
 		return new EdgeIntervall(tmp, this.getFlow());
 	}
 	
+	public String toString()
+	{
+		return "[" + this.getLowBound() + "," + this.getHighBound() + "): f: " + this.getFlow(); 
+	}
+	
 //	-----------------------------MAIN METHOD-------------------------//	
 	
 }

@@ -34,9 +34,12 @@ public class VertexIntervall extends Intervall {
 //---------------------------FIELDS----------------------------//	
 	
 	/**
-	 * shows weateher the vertex is reacheable during the time intervall
+	 * shows whether the vertex is reacheable during the time intervall
 	 */
-	private boolean _dist = false;
+	private boolean reachable = false;
+	
+	private boolean scanned = false;
+
 
 	/**
 	 * predecessor in a shortest path
@@ -44,19 +47,19 @@ public class VertexIntervall extends Intervall {
 	//TODO predecessor
 	private Link _predecessor=null;
 	
-	private int startTime;
+	private int travelTimeToPredecessor;
 	
 
 //---------------------------METHODS----------------------------//
 //**************************************************************//
 	
 
-public int getStartTime() {
-		return startTime;
+	public int getTravelTimeToPredecessor() {
+		return travelTimeToPredecessor;
 	}
 
-	public void setStartTime(int startTime) {
-		this.startTime = startTime;
+	public void setTravelTimeToPredecessor(int travelTimeToPredecessor) {
+		this.travelTimeToPredecessor = travelTimeToPredecessor;
 	}
 
 	//--------------------------CONSTUCTORS-------------------------//
@@ -89,7 +92,7 @@ public int getStartTime() {
 	 */
 	public VertexIntervall(int l, int r, boolean d) {
 		super(l, r);
-		this.setDist(d);
+		this.setReachable(d);
 	}
 	
 	/**
@@ -103,7 +106,7 @@ public int getStartTime() {
 	 */
 	public VertexIntervall(int l, int r, boolean d, Link pred) {
 		super(l, r);
-		this.setDist(d);
+		this.setReachable(d);
 		this.setPredecessor(pred);
 		
 	}
@@ -123,16 +126,16 @@ public int getStartTime() {
 	 * Setter for the min distance to the sink at time lowbound
 	 * @param d min distance to sink
 	 */
-	public void setDist(boolean d){
-		this._dist=d;
+	public void setReachable(boolean d){
+		this.reachable=d;
 	}
 	
 	/**
 	 * Getter for the min distance to the sink at time lowbound
 	 * @return min distance to sink
 	 */
-	public boolean getDist(){
-		return this._dist;
+	public boolean getReachable(){
+		return this.reachable;
 	}
 	
 	
@@ -166,20 +169,30 @@ public int getStartTime() {
 	 *@return new Interval 
 	 */
 	public VertexIntervall splitAt(int t){
-		boolean newdist = this.getDist();
+		boolean newdist = this.getReachable();
 		Intervall j =super.splitAt(t);
 		VertexIntervall k = new VertexIntervall(j);
-		k._dist =newdist;
+		k.reachable = newdist;
+		k.scanned = this.isScanned();
 		k._predecessor= this._predecessor;
+		k.travelTimeToPredecessor = this.travelTimeToPredecessor;
 		return k;
 	}
 	
 	public String toString()
 	{
 		if(this._predecessor != null)
-			return super.toString() + "; pred: " + this._predecessor.getId().toString() + "; latestStartTime: " + this.startTime;
+			return super.toString() + "; reachable: " + this.reachable + "; scanned: " + this.scanned + "; pred: " + this._predecessor.getId().toString() + "; travelTime: " + this.travelTimeToPredecessor;
 		else
-			return super.toString() + "; dist: " + this._dist;
+			return super.toString() + "; reachable: " + this.reachable + "; scanned: " + this.scanned;
+	}
+	
+	public boolean isScanned() {
+		return scanned;
+	}
+
+	public void setScanned(boolean scanned) {
+		this.scanned = scanned;
 	}
 
 	

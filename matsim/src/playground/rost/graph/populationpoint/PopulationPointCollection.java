@@ -93,7 +93,6 @@ public class PopulationPointCollection {
 		sPP.setY(p.point.y);
 		sPP.setPopulation(p.population);
 		return sPP;
-		
 	}
 		
 }

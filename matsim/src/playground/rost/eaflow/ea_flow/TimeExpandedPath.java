@@ -57,6 +57,12 @@ public class TimeExpandedPath {
 	
 	
 	/**
+	 * currently aequivalent to _wait, will change in future!
+	 */
+	private int startTime;
+	
+
+	/**
 	 * class variable to turn on debug mode, default is off
 	 */
 	
@@ -68,7 +74,7 @@ public class TimeExpandedPath {
 	 * @author Manuel Schneider
 	 *
 	 */
-	class PathEdge {
+	public class PathEdge {
 		
 		/**
 		 * Edge in a path
@@ -108,10 +114,11 @@ public class TimeExpandedPath {
 		 * Method returning a String representation of the PathEdge
 		 */
 		public String toString(){
+			String s = this.startTime + " " + edge.getFromNode().getId().toString()+"-->" + edge.getToNode().getId().toString() + " " +this.arrivalTime;
 			if(!this.forward){
-				return (edge.getId().toString() + " t: " + this.startTime + "backwards!");
+				s += " backwards";
 			}
-			return (edge.getId().toString() + " t: " + this.startTime );
+			return s;
 		}
 
 		/**
@@ -141,6 +148,18 @@ public class TimeExpandedPath {
 		public int getArrivalTime()
 		{
 			return arrivalTime;
+		}
+		
+		public boolean equals(PathEdge other)
+		{
+			if(this.getStartTime() == other.startTime
+					&& this.getEdge().equals(other.getEdge())
+					&& this.getArrivalTime() == other.getArrivalTime())
+			{
+				return true;
+			}
+			return false;
+			
 		}
 	}
 	
@@ -466,9 +485,11 @@ public class TimeExpandedPath {
 	public void print(){
 		Link edge;
 		System.out.println("Path waits at source " + this._wait);
-		for(int i = 0; i < this._edges.size(); i++){
-			edge = this._edges.get(i).getEdge();
-			System.out.print("(" + edge.getFromNode().getId() + "," + edge.getToNode().getId() + ")");
+		for(PathEdge pE : this.getPathEdges())
+		{
+			System.out.println("startTime: " + pE.getStartTime() + "; " + pE.getEdge().getFromNode().getId().toString()+  "-->" + pE.getEdge().getToNode().getId().toString() + " " + pE.getArrivalTime());
+			if(!pE.isForward())
+				System.out.println("(backward above)");
 		}
 		System.out.println();
 		System.out.println("Path arrives at sink at " + this._arrival);
@@ -476,7 +497,7 @@ public class TimeExpandedPath {
 		System.out.println();
 	}
 	
-	public List<TimeExpandedPath> splitPathAtEdge(PathEdge pathEdgeToSplitAt)
+	public List<TimeExpandedPath> splitPathAtEdge(PathEdge pathEdgeToSplitAt, boolean testForward)
 	{
 		List<TimeExpandedPath> result = new LinkedList<TimeExpandedPath>();
 		TimeExpandedPath head = new TimeExpandedPath();
@@ -488,18 +509,32 @@ public class TimeExpandedPath {
 		boolean preSplit = true;
 		for(PathEdge pE : this._edges)
 		{
-			if(pE.equals(pathEdgeToSplitAt))
+			if(pE.equals(pathEdgeToSplitAt) && (!testForward || pE.isForward() == pathEdgeToSplitAt.forward))
 			{
 				preSplit = false;
 				continue;
 			}
 			if(preSplit)
 			{
-				head.append(pE.edge, pE.getStartTime(), pE.getArrivalTime(), pE.isForward());
+				if(pE.isForward())
+				{
+					head.append(pE.edge, pE.getStartTime(), pE.getArrivalTime(), pE.isForward());
+				}
+				else
+				{
+					head.append(pE.edge, pE.getStartTime(), pE.getArrivalTime(), pE.isForward());
+				}
 			}
 			else
 			{
-				tail.append(pE.edge, pE.getStartTime(), pE.getArrivalTime(), pE.isForward());
+				if(pE.isForward())
+				{
+					tail.append(pE.edge, pE.getStartTime(), pE.getArrivalTime(), pE.isForward());
+				}
+				else
+				{
+					tail.append(pE.edge, pE.getStartTime() , pE.getArrivalTime(), pE.isForward());
+				}
 			}
 		}
 		result.add(head);
@@ -518,7 +553,7 @@ public class TimeExpandedPath {
 	
 	public void append(PathEdge pE)
 	{
-		this.append(pE.getEdge(), pE.getArrivalTime(), pE.getStartTime(), pE.isForward());
+		this.append(pE.getEdge(), pE.getStartTime(), pE.getArrivalTime(), pE.isForward());
 	}
 	
 	public static TimeExpandedPath clone(TimeExpandedPath original)
@@ -542,6 +577,15 @@ public class TimeExpandedPath {
 	public void subtractFlow(int flow)
 	{
 		this._flow -= flow;
+	}
+	
+	
+	public int getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(int startTime) {
+		this.startTime = startTime;
 	}
 	
 }

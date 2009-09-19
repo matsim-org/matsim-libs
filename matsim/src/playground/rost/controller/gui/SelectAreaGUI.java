@@ -32,12 +32,13 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.xml.sax.SAXException;
 
-import playground.rost.controller.AreaExtractor;
 import playground.rost.controller.map.SelectBorderMap;
 import playground.rost.controller.vismodule.VisModuleContainerImpl;
 import playground.rost.controller.vismodule.implementations.AreaNodeVisModule;
 import playground.rost.controller.vismodule.implementations.BorderVisModule;
 import playground.rost.controller.vismodule.implementations.LinkVisModule;
+import playground.rost.controller.vismodule.implementations.MarkNodeVisModule;
+import playground.rost.graph.AreaExtractor;
 import playground.rost.graph.Border;
 import playground.rost.graph.BoundingBox;
 import playground.rost.util.PathTracker;
@@ -67,6 +68,7 @@ public class SelectAreaGUI extends AbstractBasicMapGUIImpl {
 		this.vMContainer.addVisModule(new AreaNodeVisModule(vMContainer, border, network));
 		this.vMContainer.addVisModule(new LinkVisModule(vMContainer, network));
 		this.vMContainer.addVisModule(new BorderVisModule(vMContainer, border));
+		this.vMContainer.addVisModule(new MarkNodeVisModule(vMContainer, network));
 		
 		btnExtract = new JButton("Extract Area!");
 		this.ownContainer.add(btnExtract);
@@ -87,12 +89,17 @@ public class SelectAreaGUI extends AbstractBasicMapGUIImpl {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		readNetworkAndShowGUI();
+	}
+	
+	public static SelectAreaGUI readNetworkAndShowGUI()
+	{
 		// TODO Auto-generated method stub
 		NetworkLayer network = new NetworkLayer();
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(network);
 		try {
 			nReader.parse(PathTracker.resolve("matMap"));
-			new SelectAreaGUI(network);
+			return (new SelectAreaGUI(network));
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -103,7 +110,7 @@ public class SelectAreaGUI extends AbstractBasicMapGUIImpl {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		return null;
 	}
 
 }

@@ -146,4 +146,93 @@ public class TestNetwork {
 		nWD.addDemand(source2, 100);
 		return nWD;
 	}
+	
+	public static NetworkWithDemands getCrazyNetwork()
+	{
+		//create network
+		NetworkLayer network = new NetworkLayer();
+		network.createNode(new IdImpl("source1"), new CoordImpl(0,2));
+		network.createNode(new IdImpl("source2"), new CoordImpl(0,0));
+		network.createNode(new IdImpl("source3"), new CoordImpl(0,0));
+		network.createNode(new IdImpl("bAbove"), new CoordImpl(1,2));
+		network.createNode(new IdImpl("bBeneath"), new CoordImpl(1,0));
+		network.createNode(new IdImpl("superSink"), new CoordImpl(2,1));
+		
+		network.createLink(new IdImpl("s1 -> s2"),
+				network.getNode("source1"),
+				network.getNode("source2"),
+				1,
+				1, // freespeed
+				2, // cap
+				1);
+		
+		network.createLink(new IdImpl("s2 -> s1"),
+				network.getNode("source2"),
+				network.getNode("source1"),
+				1,
+				1, // freespeed
+				2, // cap
+				1);
+		
+		network.createLink(new IdImpl("s1 -> bAbove"),
+				network.getNode("source1"),
+				network.getNode("bAbove"),
+				100,
+				1, // freespeed
+				2, // cap
+				1);
+		
+		network.createLink(new IdImpl("s2 -> bBeneath"),
+				network.getNode("source2"),
+				network.getNode("bBeneath"),
+				300,
+				1, // freespeed
+				2, // cap
+				1);
+		
+		network.createLink(new IdImpl("s3 -> bAbove"),
+				network.getNode("source3"),
+				network.getNode("bAbove"),
+				3,
+				1, // freespeed
+				2, // cap
+				1);
+		
+		
+		
+		network.createLink(new IdImpl("bAbove -> bBeneath"),
+				network.getNode("bAbove"),
+				network.getNode("bBeneath"),
+				2,
+				1, // freespeed
+				2, // cap
+				1);
+		
+		network.createLink(new IdImpl("bAbove -> sink"),
+							network.getNode("bAbove"),
+							network.getNode("superSink"),
+							5,
+							1, // freespeed
+							2, // cap
+							1);
+
+		network.createLink(new IdImpl("bBeneath -> sink"),
+				network.getNode("bBeneath"),
+				network.getNode("superSink"),
+				1,
+				1, // freespeed
+				2, // cap
+				1);
+		
+		Node sink = network.getNode("superSink");
+		NetworkWithDemands nWD = new NetworkWithDemands(network, sink);
+		
+		Node source1 = network.getNode("source1");
+		nWD.addDemand(source1, 10000);
+		Node source2 = network.getNode("source2");
+		nWD.addDemand(source2, 10000);
+		Node source3 = network.getNode("source3");
+		nWD.addDemand(source3, 10);
+		return nWD;
+	}
 }

@@ -60,24 +60,14 @@ public class OSM2MATConverter {
 	public static NetworkLayer readOSM(String filename) throws JAXBException, IOException {
 		
 		long kreuzungId = 99999;
-	
 		Osm osmdata;
-		
 		NetworkLayer network = new NetworkLayer();
-
 		JAXBContext context = JAXBContext.newInstance("playground.rost.osm2matconverter.xmlosmbase");
-
 		Unmarshaller unmarshaller = context.createUnmarshaller();
-		
 		osmdata = (Osm)unmarshaller.unmarshal(new FileReader(filename));
-		
 		mapNd2Node = createNodeMap(osmdata);
-		
 		Map<BigInteger, Node> strassenKnoten = parseNodes(network, osmdata);
-		
 		parseStrassen(network, osmdata, strassenKnoten);
-		
-		
 		return network;
 	}
 	
@@ -153,12 +143,12 @@ public class OSM2MATConverter {
 				}
 				++debug_count;
 				//erzeuge Straße
-				double capacity = haMap.getWidth(highwayType) * laenge / 0.5;
+				double capacity = Math.max(haMap.getWidth(highwayType) / 1.25, 1);
 				network.createLink(new IdImpl(String.valueOf(++streetId)), 
 									network.getNode(String.valueOf(startNode.getId())), 
 									network.getNode(String.valueOf(endNode.getId())), 
 									laenge, 
-									1.5, //TODO 
+									1.3, //TODO 
 									capacity,  //TODO
 									1);  //TODO!
 				
@@ -167,7 +157,7 @@ public class OSM2MATConverter {
 									network.getNode(String.valueOf(endNode.getId())), 
 									network.getNode(String.valueOf(startNode.getId())), 
 									laenge, 
-									1.5, //TODO 
+									1.3, //TODO 
 									capacity,  //TODO
 									1);  //TODO!
 				//endknoten wird neuer startknoten:
@@ -304,23 +294,16 @@ public class OSM2MATConverter {
 		} 
 		return result;
 	}
-	
-	public static void main(String[] args) {
-		if (args.length == 0 && args.length > 2) {
-			System.out
-					.println("usage: 1. argument inputfile 2. argument outfile (optional)");
-			return;
-		}
-		
+
+	public static void parseAndWrite()
+	{
 		HighwayAttributeMapping.writeDefaultValuesXMLFile(PathTracker.resolve("highwayMappingDefault"));
 		
-		String inputfile = args[0].trim();
+		String inputfile = PathTracker.resolve("osmMap");
 		String outfile = PathTracker.resolve("matMap");
-		if (args.length == 2) {
-			outfile = args[1];
-		}
 		try {
 			NetworkLayer network = readOSM(inputfile);
+			network.setCapacityPeriod(1); //TODO changed
 			NetworkWriter writer = new NetworkWriter(network, outfile);
 			writer.write();
 			System.out.println(inputfile + "  converted successfully \n"
@@ -330,5 +313,9 @@ public class OSM2MATConverter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void main(String[] args) {
+		parseAndWrite();
 	}
 }

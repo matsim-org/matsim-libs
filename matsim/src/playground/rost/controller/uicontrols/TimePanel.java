@@ -21,120 +21,266 @@
 
 package playground.rost.controller.uicontrols;
 
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashSet;
-import java.util.Set;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
-import playground.rost.controller.TimeHandler;
+import playground.rost.controller.gui.BasicMapGUI;
 
-public class TimePanel extends JPanel {
-	JButton start = new JButton("start");
-	JButton stop= new JButton("stop");
-	JButton pause= new JButton("pause");
+public class TimePanel extends JPanel implements TimeControl{
+		
+	protected JPanel btnPanel;
+	protected JPanel sliderPanel;
+	protected JPanel lblPanel;
 	
-	class PlayBack implements Runnable
+	
+	protected JButton stepBack;
+	protected JButton start;
+	protected JButton stop;
+	protected JButton stepForward;
+	protected JTextField fieldMsToSleep;
+	protected JTextField fieldCurrentTime;	
+	protected JTextField fieldStepSize;	
+	protected JSlider slider;
+	
+	protected int currentTime;
+	protected int startTime;
+	protected int endTime;
+	
+	protected BasicMapGUI mapGUI;
+	
+	public class TimePlayback implements Runnable
 	{
-		final int stepSize = 1;
-		int steps;
-		int msToSleep;
-		TimePanel tPanel;
-		public PlayBack(TimePanel tPanel, int steps, int msToSleep)
-		{
-			this.tPanel = tPanel;
-			this.steps = steps;
-			this.msToSleep = msToSleep;
-		}
-	
+		public boolean abortPlayback = false;
+		public boolean finished = false;
 		
 		
-		public void run()
-		{
-			for(int i = 0; i < steps;++i)
+		public void run() {
+			int sleepTime = Integer.parseInt(fieldMsToSleep.getText());
+			changeEditableForStart();
+			while(currentTime < endTime && !abortPlayback)
 			{
-				tPanel.time = tPanel.time + 1;
-				tPanel.callCallbacks();
+				setTime(++currentTime);
 				try {
-					Thread.sleep(msToSleep);
+					Thread.sleep(sleepTime);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 			
+			finished = true;
+			changeEditableForEnd();
 		}
-	}
-	
-	protected int time;
-	
-	protected Set<TimeHandler> callbacks = new HashSet<TimeHandler>();
-	
-	public void forwardTime()
-	{
-		time += 1;
-		callCallbacks();
-	}
-	
-	public void backwardTime()
-	{
-		time -= 1;
-		callCallbacks();
-	}
-	
-	public void subscribeTimeEvents(TimeHandler tHandler)
-	{
-		callbacks.add(tHandler);
-	}
-	
-	public void unsubscribeTimeEvents(TimeHandler tHandler)
-	{
-		callbacks.remove(tHandler);
-	}
-	
-	protected void play()
-	{
-		(new Thread(new PlayBack(this, 1000, 100))).start();
-	}
-
-	protected void callCallbacks()
-	{
-		for(TimeHandler tHandler : callbacks)
+		
+		protected void changeEditableForStart()
 		{
-			tHandler.timeChanged(time);
+			start.setEnabled(false);
+			stop.setEnabled(true);
+			stepForward.setEnabled(false);
+			stepBack.setEnabled(false);
+			fieldMsToSleep.setEditable(false);
+		}
+		
+		protected void changeEditableForEnd()
+		{
+			start.setEnabled(true);
+			stop.setEnabled(false);
+			stepForward.setEnabled(true);
+			stepBack.setEnabled(true);
+			fieldMsToSleep.setEditable(true);
 		}
 	}
 	
+	protected TimePlayback playback;
 	
-	
-	
-	public TimePanel(int time)
+	public TimePanel(BasicMapGUI mapGUI, int startTime, int endTime)
 	{
 		super();
-		this.time = time;
-		this.add(start);
-		start.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				forwardTime();
+		this.mapGUI = mapGUI;
+
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.currentTime = startTime;
+
+		this.setLayout(new BorderLayout());
+		btnPanel = createBtnPanel();
+		this.add(btnPanel, BorderLayout.WEST);
+		
+		lblPanel = createLblPanel();
+		this.add(lblPanel, BorderLayout.EAST);
+
+		slider = createSlider();
+		this.add(slider, BorderLayout.CENTER);
+	}
+	
+	protected JPanel createBtnPanel()
+	{
+		JPanel result = new JPanel();
+		ImageIcon imgStepBack = new ImageIcon("./src/playground/rost/res/images/rewind.png");
+		stepBack = new JButton(imgStepBack);
+		
+		ImageIcon imgPlay = new ImageIcon("./src/playground/rost/res/images/play.png");
+		start = new JButton(imgPlay);
+		ImageIcon imgStop = new ImageIcon("./src/playground/rost/res/images/stop.png");
+		stop = new JButton(imgStop);
+		stop.setEnabled(false);
+		
+		ImageIcon imgStepForward = new ImageIcon("./src/playground/rost/res/images/forward.png");
+		stepForward = new JButton(imgStepForward);
+		result.add(stepBack);
+		result.add(start);
+		result.add(stop);
+		result.add(stepForward);
+		
+		//add callbacks
+		start.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				startPlayback();
 			}
 		});
 		
-		stop.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				backwardTime();
+		stop.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				stopPlayback();
 			}
 		});
-		
-		pause.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				play();
+
+		stepForward.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				stepForward();
 			}
 		});
+
 		
-		this.add(stop);
-		this.add(pause);
+		stepBack.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				stepBack();
+			}
+		});
+
+		
+		
+		return result;
+	}
+	
+	protected JSlider createSlider()
+	{
+		slider = new JSlider();
+		slider.setMinimum(startTime);
+		slider.setMaximum(endTime);
+		int diff = endTime - startTime;
+		slider.setMajorTickSpacing(diff / 20);
+		slider.setMinorTickSpacing(1);
+		slider.setPaintTicks(true);
+		slider.setPaintLabels(true);
+		slider.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e) {
+				if(!slider.getValueIsAdjusting())
+					sliderChanged();
+			}});
+		slider.setValue(startTime);
+		return slider;
+	}
+	
+	protected JPanel createLblPanel()
+	{
+		JPanel result = new JPanel();
+		
+		result.setLayout(new GridLayout(0,2));
+		JLabel lblCurrentTime = new JLabel("current time: ");
+		result.add(lblCurrentTime);
+		fieldCurrentTime = new JTextField(""+startTime);
+		fieldCurrentTime.setEditable(false);
+		result.add(fieldCurrentTime);
+		
+		
+		fieldMsToSleep = new JTextField("100");
+		JLabel lblMsToSleep = new JLabel("ms to sleep: ");
+		result.add(lblMsToSleep);
+
+		result.add(lblMsToSleep);
+		result.add(fieldMsToSleep);
+		
+		JLabel lblStepSize = new JLabel("step size: ");
+		fieldStepSize = new JTextField("1");
+		result.add(lblStepSize);
+		result.add(fieldStepSize);
+		
+		return result;
+
+	}
+
+	public int getTime() {
+		return currentTime;
+	}
+
+	public void setTime(int time) {
+		this.currentTime = time;
+		if(currentTime < startTime)
+			currentTime = startTime;
+		if(currentTime > endTime)
+			currentTime = endTime;
+		timeHasChanged();
+	}
+	
+	public void sliderChanged()
+	{
+		this.currentTime = slider.getValue();
+		timeHasChanged();
+	}
+	
+	public void timeHasChanged()
+	{
+		slider.setValue(currentTime);
+		fieldCurrentTime.setText("" + currentTime);
+		mapGUI.UIChange();
+	}
+	
+	public void startPlayback()
+	{
+		if(this.playback != null && this.playback.finished == false)
+			return;
+		this.playback = new TimePlayback();
+		Thread thread = new Thread(this.playback);
+		thread.start();
+	}
+	
+	public void stopPlayback()
+	{
+		if(this.playback != null)
+			this.playback.abortPlayback = true;
+	}
+	
+	public void stepForward()
+	{
+		int stepSize = Integer.parseInt(fieldStepSize.getText());
+		setTime(currentTime + stepSize);
+	}
+	
+	public void stepBack()
+	{
+		int stepSize = Integer.parseInt(fieldStepSize.getText());
+		setTime(currentTime - stepSize);
 	}
 	
 	

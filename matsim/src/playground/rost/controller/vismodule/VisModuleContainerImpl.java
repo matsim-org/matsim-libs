@@ -103,6 +103,7 @@ public class VisModuleContainerImpl implements
 		{
 			vM.refreshAttributes();
 		}
+		gui.UIChange();
 	}
 
 	public void paint(BasicMap map, Graphics g) {
