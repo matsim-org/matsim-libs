@@ -52,7 +52,7 @@ public class VisumNetworkReader {
 	private final String[] TABLE_VEHJOURNEY = {"$VEHJOURNEY:", "$FZGFAHRT:"};
 	private final String[] TABLE_VEHUNIT = {"$VEHUNIT:", "$FZGEINHEIT:"};
 	private final String[] TABLE_VEHCOMB = {"$VEHCOMB:", "$FZGKOMB:"};
-	private final String[] TABLE_VEHUNITTIVEHCOMB = {"$VEHUNITTIVEHCOMB:", "$FZGEINHEITZUFZGKOMB:"};
+	private final String[] TABLE_VEHUNITTOVEHCOMB = {"$VEHUNITTOVEHCOMB:", "$FZGEINHEITZUFZGKOMB:"};
 
 	private final String[] ATTRIBUTE_STOP_NO = {"NO", "NR"};
 	private final String[] ATTRIBUTE_STOP_NAME = {"NAME", "NAME"};
@@ -163,7 +163,7 @@ public class VisumNetworkReader {
 					readVehicleUnits(line, reader);
 				} else if (line.startsWith(this.TABLE_VEHCOMB[this.language])) {
 					readVehicleCombinations(line, reader);
-				} else if (line.startsWith(this.TABLE_VEHUNITTIVEHCOMB[this.language])) {
+				} else if (line.startsWith(this.TABLE_VEHUNITTOVEHCOMB[this.language])) {
 					readVehicleUnitToVehicleCombination(line, reader);
 				} else if (line.startsWith("$")) {
 					readUnknownTable(line, reader);
@@ -405,7 +405,7 @@ public class VisumNetworkReader {
 	}
 
 	private void readVehicleUnitToVehicleCombination(final String tableAttributes, final BufferedReader reader) throws IOException {
-		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_VEHUNITTIVEHCOMB[this.language].length()), ';');
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_VEHUNITTOVEHCOMB[this.language].length()), ';');
 		final int idxVehicleUnit = getAttributeIndex(this.ATTRIBUTE_VEHUNITTOVEHCOMB_VEHUNITNO[this.language], attributes);
 		final int idxVehicleComb = getAttributeIndex(this.ATTRIBUTE_VEHUNITTOVEHCOMB_VEHCOMBNO[this.language], attributes);
 		final int idxVehicleNumber = getAttributeIndex(this.ATTRIBUTE_VEHUNITTOVEHCOMB_NUMVEHUNITS[this.language], attributes);
