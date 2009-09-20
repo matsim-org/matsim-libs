@@ -49,6 +49,8 @@ public class VertexIntervall extends Intervall {
 	
 	private int travelTimeToPredecessor;
 	
+	private int lastDepartureAtFromNode;
+	
 
 //---------------------------METHODS----------------------------//
 //**************************************************************//
@@ -195,6 +197,14 @@ public class VertexIntervall extends Intervall {
 		this.scanned = scanned;
 	}
 
+	public int getLastDepartureAtFromNode() {
+		return lastDepartureAtFromNode;
+	}
+
+	public void setLastDepartureAtFromNode(int lastArrivalAtThisNode) {
+		this.lastDepartureAtFromNode = lastArrivalAtThisNode;
+	}
+	
 	
 //----------------------------MAIN METHOD--------------------------//
 	

@@ -55,6 +55,7 @@ import playground.rost.graph.block.Block;
 import playground.rost.graph.block.Blocks;
 import playground.rost.graph.evacarea.EvacArea;
 import playground.rost.graph.nodepopulation.PopulationNodeMap;
+import playground.rost.graph.populationpoint.PopulationPointCollection;
 import playground.rost.util.PathTracker;
 
 public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
@@ -81,6 +82,16 @@ public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 		JPanel btnPanel = new JPanel();
+		
+		JButton readPopPoints = new JButton("read population points");
+		readPopPoints.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{
+				readPopulationPoints(PathTracker.resolve("populationPoints"));
+			}
+		});
+		btnPanel.add(readPopPoints);
+		
 		JButton outputPopPoints = new JButton("write population points");
 		outputPopPoints.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e)
@@ -119,6 +130,22 @@ public class PopulationDistributionGUI extends AbstractBasicMapGUIImpl {
 		this.buildUI();
 		this.map.addMapPaintCallback(this.vMContainer);
 		this.map.addMapPaintCallback(this.popVis);
+	}
+	
+	protected void readPopulationPoints(String filename)
+	{
+		PopulationPointCollection pplPoints;
+		try {
+			pplPoints = PopulationPointCollection.readXMLFile(filename);
+			if(pplPoints.get().size() > 0)
+				((PlacePplMap)this.map).setPplPoints(pplPoints);
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	

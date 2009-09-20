@@ -249,11 +249,6 @@ public class BellmanFordVertexIntervalls {
 			totime = arrivalAtSuperSink;
 			to = realSink;
 			VertexIntervall tolabel = tolabels.getIntervallAt(totime);
-			if(realSink.getId().toString().equals("29790227"))
-			{
-				int foobar = 1;
-			}
-			
 			int fromtime = 0;
 			while(tolabel.getPredecessor()!=null){
 				Link edge = tolabel.getPredecessor();
@@ -268,18 +263,22 @@ public class BellmanFordVertexIntervalls {
 						throw new IllegalArgumentException("edge: " + edge.getId().toString()+ " is not incident to node: "+ to.getId().toString());
 					}
 				}
-				//find next node and edge
-				if(tolabel.getTravelTimeToPredecessor() == 0)
-				{
-					int foobar = 203;
-				}
 				if(forward){
 					fromtime = totime - tolabel.getTravelTimeToPredecessor();
+					if(fromtime > tolabel.getLastDepartureAtFromNode())
+					{
+						fromtime = tolabel.getLastDepartureAtFromNode();
+						totime = fromtime + tolabel.getTravelTimeToPredecessor();
+					}
 					timeExpandedPath.push(edge, fromtime, totime, forward);
 					to= edge.getFromNode();
-				}else{
-					
+				}else{					
+					if(totime > tolabel.getLastDepartureAtFromNode())
+					{
+						totime = tolabel.getLastDepartureAtFromNode();
+					}
 					fromtime = totime + tolabel.getTravelTimeToPredecessor();
+					
 					timeExpandedPath.push(edge, totime, fromtime, forward);
 					to = edge.getToNode();
 				}
@@ -431,10 +430,7 @@ public class BellmanFordVertexIntervalls {
 //				{
 //					int foobar = 0;
 //				}
-				if(v.getId().toString().equals("29275992") && w.getId().toString().equals("29785478") && start.contains(45));
-				{
-					int foobar = 0;
-				}
+				
 				boolean changed = relabel(start,v,w,link,true);
 				if (changed) {
 					queue.remove(w);
@@ -445,6 +441,10 @@ public class BellmanFordVertexIntervalls {
 			// link is incoming edge of v => backward edge
 			for (Link link : v.getInLinks().values()) {
 				w=link.getFromNode();
+				if(v.getId().toString().equals("26736471") && w.getId().toString().equals("26736469") && start.contains(178))
+				{
+					int foobar = 0;
+				}
 				boolean changed = relabel(start,v,w,link,false);
 				if (changed) {
 					queue.remove(w);
@@ -479,7 +479,11 @@ public class BellmanFordVertexIntervalls {
 			this._prepend= System.currentTimeMillis();
 			this._totalpreptime+=(this._prepend-this._prepstart);
 		}
-
+		VertexIntervalls vIs;
+		System.out.println("labels for 26736469");
+		vIs = _labels.get(network.getNode("26736469"));
+		System.out.println(vIs.toString());
+		
 		return this._timeexpandedpath;
 	}
 	

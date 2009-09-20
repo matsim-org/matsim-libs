@@ -80,6 +80,11 @@ public class PlacePplMap extends BasicMapImpl {
 		return pplPoints;
 	}
 	
+	public void setPplPoints(PopulationPointCollection pplPoints)
+	{
+		this.pplPoints = pplPoints;
+	}
+	
 	public int getDensity(Node n)
 	{
 		return nodeDensity.get(n);

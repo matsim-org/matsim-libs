@@ -15,16 +15,10 @@ public class BowTravelTimeCost implements FlowEdgeTraversalCalculator
 	protected ArrayList<BowEdge> bowEdges = new ArrayList<BowEdge>();
 	protected final int bowEdgeSizeMinus1;
 	
+	protected SimpleEdgeTravelTimeCost sETTC;
 	
-	public BowTravelTimeCost(Link link)
-	{
-		this.link = link;
-		maxCapacity = (int)link.getCapacity(1.);
-		bowEdges.add(new BowEdge(maxCapacity / 2, (int)link.getLength() / (int)link.getFreespeed(1.), 0,maxCapacity/2));
-		bowEdges.add(new BowEdge(maxCapacity / 2, 2*(int)link.getLength() / (int)link.getFreespeed(1.),maxCapacity/2+1,maxCapacity));
-		bowEdgeSizeMinus1 = bowEdges.size()-1;
-	}	
 	
+
 	
 	/**
 	 * represents a single BowEdge with a capacity, a traveltime
@@ -50,6 +44,26 @@ public class BowTravelTimeCost implements FlowEdgeTraversalCalculator
 			this.maxFlowToUseThisEdge = maxFlowToUseThisEdge;
 		}
 	}
+	
+	public BowTravelTimeCost(Link link)
+	{
+		this.link = link;
+		maxCapacity = (int)link.getCapacity(1.);
+		if(maxCapacity == 1)
+		{
+			//add only 1 (then simple) edge
+			bowEdges.add(new BowEdge(maxCapacity, (int)((double)link.getLength() / (double)link.getFreespeed(1.)), 0, maxCapacity));
+		}
+		else
+		{
+			int lowCap = maxCapacity / 2;
+			int highCap = maxCapacity - lowCap;
+			bowEdges.add(new BowEdge(lowCap, (int)((double)link.getLength() / (double)link.getFreespeed(1.)), 0,lowCap));
+			bowEdges.add(new BowEdge(highCap, 2*(int)((double)link.getLength() / (double)link.getFreespeed(1.)),lowCap+1,maxCapacity));
+		}
+		bowEdgeSizeMinus1 = bowEdges.size()-1;
+	}	
+	
 	
 	public Integer getTravelTimeForFlow(int flow)
 	{
@@ -85,7 +99,7 @@ public class BowTravelTimeCost implements FlowEdgeTraversalCalculator
 	
 	public int getRemainingBackwardCapacityWithThisTravelTime(int currentFlow)
 	{
-		BowEdge bEdge = getBowEdge(currentFlow);
+		BowEdge bEdge = getBowEdge(currentFlow-1);
 		if(bEdge == null)
 			return 0;
 		else return currentFlow - bEdge.minFlowToUseThisEdge;

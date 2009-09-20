@@ -399,6 +399,7 @@ public class VertexIntervalls {
 		ourIntervall.setReachable(true);
 		ourIntervall.setScanned(false);
 		ourIntervall.setPredecessor(link);
+		ourIntervall.setLastDepartureAtFromNode(arrive.getLastDepartureAtFromNode());
 		ourIntervall.setTravelTimeToPredecessor(arrive.getTravelTimeToPredecessor());
 	}
 	
@@ -443,7 +444,8 @@ public class VertexIntervalls {
 			  throw new RuntimeException("error in cleanup!");
 		  if ((i.getHighBound() == j.getLowBound()) && (i.getReachable() == j.getReachable()) &&
 				  (i.getPredecessor() == j.getPredecessor()) && (i.isScanned() == j.isScanned())
-				  && (i.getTravelTimeToPredecessor() == j.getTravelTimeToPredecessor())) {
+				  && (i.getTravelTimeToPredecessor() == j.getTravelTimeToPredecessor())
+				  && (i.getLastDepartureAtFromNode() == j.getLastDepartureAtFromNode())) {
 			 
 			  //TODO ROST dont remove both intervalls, no new insert needed MORE EFFICIENT!
 			  _tree.remove(i);
@@ -453,6 +455,7 @@ public class VertexIntervalls {
 			  vI.setScanned(i.isScanned());
 			  vI.setTravelTimeToPredecessor(i.getTravelTimeToPredecessor());
 			  vI.setPredecessor(i.getPredecessor());
+			  vI.setLastDepartureAtFromNode(i.getLastDepartureAtFromNode());
 			  _tree.insert(vI);
 			  i = vI;
 			  gain++;

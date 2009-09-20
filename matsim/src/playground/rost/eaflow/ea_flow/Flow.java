@@ -114,6 +114,8 @@ public class Flow {
 	@SuppressWarnings("unused")
 	private static int _debug = 0;
 	
+	private final EdgeTypeEnum edgeType;
+	
 ///////////////////////////////////////////////////////////////////////////////////	
 //-----------------------------Constructors--------------------------------------//	
 ///////////////////////////////////////////////////////////////////////////////////
@@ -130,6 +132,7 @@ public class Flow {
 	public Flow(final NetworkLayer network, Map<Node, Integer> demands, final Node sink, final int horizon, EdgeTypeEnum edgeTypeToUse) {
 		this._network = network;
 		this._flow = new HashMap<Link,EdgeIntervalls>();
+		this.edgeType = edgeTypeToUse;
 		
 		// initialize distances
 		for(Link link : network.getLinks().values()){
@@ -210,9 +213,20 @@ public class Flow {
 			Link link = edge.getEdge();
 			int startTime = edge.getStartTime();
 			int arrivalTime = edge.getArrivalTime();
+			int neededTravelTime = arrivalTime-startTime;
 			//check forward capacity
 			if(edge.isForward()){
 				int flow = this._flow.get(link).getFlowAt(startTime);
+				if(_lengths.get(link).getTravelTimeForAdditionalFlow(flow) == null)
+				{
+					return 0;
+				}
+				int traveltime = _lengths.get(link).getTravelTimeForAdditionalFlow(flow);
+				if(traveltime != neededTravelTime)
+				{
+					System.out.println("path not feasible anymore");
+					return 0;
+				}
 				int cap = _lengths.get(link).getRemainingForwardCapacityWithThisTravelTime(flow);
 				if (cap<0){
 					throw new IllegalArgumentException("too much flow on " + edge);
@@ -228,6 +242,12 @@ public class Flow {
 					int debug = 0;
 				}
 				int flow = this._flow.get(link).getFlowAt(startTime);
+				int traveltime = _lengths.get(link).getTravelTimeForFlow(flow);
+				if(traveltime != neededTravelTime)
+				{
+					System.out.println("path not feasible anymore");
+					return 0;
+				}
 				flow = _lengths.get(link).getRemainingBackwardCapacityWithThisTravelTime(flow);
 				if(flow<result){
 					result= flow;
@@ -379,32 +399,14 @@ public class Flow {
 				break;
 			}
 		}
-		if(backward)
-		{
-			System.out.println("BACKWARD, OMG!");
-			for(PathEdge pE : timeExpandedPath.getPathEdges())
-			{
-				System.out.println("startTime: " + pE.getStartTime() + "; " + pE.getEdge().getFromNode().getId().toString()+  "-->" + pE.getEdge().getToNode().getId().toString() + " " + pE.getArrivalTime());
-				if(!pE.isForward())
-					System.out.println("(backward above)");
-			}
-			
-		}
 		int dummy = 0;
 		int gamma = bottleNeckCapacity(timeExpandedPath);
 		if(gamma == 0)
 			return 0;
 		this.totalflow += gamma;
 		timeExpandedPath.setFlow(gamma);
-		LinkedList<PathEdge> backwardLinks = new LinkedList<PathEdge>();
-		// find backwardLinks in the new path
-		for(PathEdge edge : timeExpandedPath.getPathEdges()){
-			if(!edge.isForward()){
-				backwardLinks.add(edge);
-			}
-		}
 		// no backward links
-		if(backwardLinks.isEmpty()){
+		if(backward){
 			for(PathEdge edge : timeExpandedPath.getPathEdges()){
 				Link link = edge.getEdge();
 				int startTime = edge.getStartTime();
@@ -904,4 +906,8 @@ public class Flow {
 		return _lengths.get(l).getMaximalTravelTime();
 	}
 
+	public EdgeTypeEnum getEdgeType()
+	{
+		return this.edgeType;
+	}
 }

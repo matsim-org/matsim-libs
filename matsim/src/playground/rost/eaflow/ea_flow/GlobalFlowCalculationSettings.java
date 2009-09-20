@@ -51,4 +51,17 @@ public class GlobalFlowCalculationSettings {
 		}
 		throw new RuntimeException("edgeType null or no FlowEdgeTraversalCalculator defined for edgeType!");
 	}
+	
+	public static String edgeTypeToString(EdgeTypeEnum edgeType)
+	{
+		if(edgeType == EdgeTypeEnum.SIMPLE)
+		{
+			return "_Simple";
+		}
+		else if(edgeType == EdgeTypeEnum.BOWEDGES_ADD)
+		{
+			return "_Bow_Add";
+		}
+		throw new RuntimeException("edgeType null or no FlowEdgeTraversalCalculator defined for edgeType!");
+	}
 }

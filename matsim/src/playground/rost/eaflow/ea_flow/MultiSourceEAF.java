@@ -51,6 +51,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import playground.rost.controller.gui.helpers.progressinformation.ProgressInformationProvider;
 import playground.rost.eaflow.Intervall.src.Intervalls.VertexIntervalls;
 import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
+import playground.rost.eaflow.ea_flow.TimeExpandedPath.PathEdge;
 import playground.rost.graph.evacarea.EvacArea;
 import playground.rost.graph.nodepopulation.PopulationNodeMap;
 import playground.rost.graph.shortestdistances.LengthCostFunction;
@@ -251,6 +252,10 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 			int gain = 0;
 			for (i=1; i<=rounds && fluss.getTotalFlow() < totaldemands; i++){
 				timer1 = System.currentTimeMillis();
+				if(i == 738)
+				{
+					int foobar = 0;
+				}
 				result = routingAlgo.doCalculations();
 				timer2 = System.currentTimeMillis();
 				timeMBF += timer2 - timer1;
@@ -278,6 +283,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 					int foobar = 0;
 					int gamma = fluss.augment(tEPath);
 					gammaSum += gamma;
+					//tEPath.print();
 					if(_debug)
 						System.out.println("path found with " + gamma + " of flow");
 				}
@@ -304,7 +310,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 				this.setProgressInfo("Iteration", "" + i);
 				this.setProgressInfo("Time", ""+ (timeMBF / 1000) );
 				this.setProgressInfo("Last Arrival", ""+this.lastArrival );
-				this.setProgressInfo("Total Flow", "" + fluss.getTotalFlow());
+				this.setProgressInfo("Total Flow", fluss.getTotalFlow() + " / " + totaldemands);
 				this.setProgressInfo("Found Paths", "" + fluss.getPaths().size());
 				this.setProgressInfo("Paths / Iteration", ""+ (fluss.getPaths().size() / (double)i));
 				
@@ -332,7 +338,39 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 		if(_debug){
 			System.out.println("done");
 		}
+		calculateTotalHoldover(fluss);
 		return fluss;
+	}
+	
+	protected void calculateTotalHoldover(Flow fluss)
+	{
+		int time = 0;
+		int flow = 0;
+		int multiSum = 0;
+		for(TimeExpandedPath tEPath : fluss.getPaths())
+		{
+			int last = -1;
+			for(PathEdge pE : tEPath.getPathEdges())
+			{
+				if(last == -1)
+				{
+					last = pE.getArrivalTime();
+				}
+				else
+				{
+					int diff = pE.getStartTime() - last;
+					if(diff > 0)
+					{
+						time += diff;
+						flow += tEPath.getFlow();
+						multiSum += diff * tEPath.getFlow();
+					}
+				}
+			}
+		}
+		System.out.println("time: " + time);
+		System.out.println("flow:" + flow);
+		System.out.println("multi: " + multiSum);
 	}
 	
 

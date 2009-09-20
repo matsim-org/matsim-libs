@@ -5,6 +5,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -12,6 +13,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -23,11 +25,14 @@ import playground.rost.controller.gui.BlockGUI;
 import playground.rost.controller.gui.PopulationDistributionGUI;
 import playground.rost.controller.gui.SelectAreaGUI;
 import playground.rost.controller.gui.VisualizeFlowGUI;
+import playground.rost.controller.gui.VisualizeTimeExpandedPathsGUI;
 import playground.rost.controller.gui.helpers.ShowHighwayAttributeSettings;
 import playground.rost.controller.gui.helpers.ShowPathTracker;
 import playground.rost.controller.gui.helpers.progressinformation.ShowProgressInformationGUI;
+import playground.rost.controller.marketplace.FlowMarketPlaceImpl;
 import playground.rost.eaflow.ea_flow.Flow;
 import playground.rost.eaflow.ea_flow.MultiSourceEAF;
+import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
 import playground.rost.graph.evacarea.EvacArea;
 import playground.rost.graph.nodepopulation.PopulationNodeMap;
 import playground.rost.osm2matconverter.OSM2MATConverter;
@@ -42,6 +47,9 @@ public class MainGUI extends JFrame {
 	JMenu mnuBlocks;
 	JMenu placePpl;
 	JMenu mnuFlow;
+	JMenu mnuVis;
+	
+	FlowMarketPlaceImpl fMarket = new FlowMarketPlaceImpl();
 	
 	JDesktopPane desktop;
 
@@ -76,6 +84,7 @@ public class MainGUI extends JFrame {
 		createBlocksMenu();
 		createPlacePplMenu();
 		createFlowMenu();
+		createVisMenu();
 		
 		return menuBar;
 	}
@@ -179,11 +188,18 @@ public class MainGUI extends JFrame {
 			}
 		});
 		mnuFlow.add(calcEarliestArrivalFlowWithBowEdges);
+		
+		mnuFlow.addSeparator();
 
 		menuBar.add(mnuFlow);
 	}
 	
 	protected void calcEAFlowWithBowEdges()
+	{
+		startCalcEAFlow(EdgeTypeEnum.BOWEDGES_ADD);
+	}
+	
+	protected void startCalcEAFlow(EdgeTypeEnum edgeType)
 	{
 		EvacArea evacArea = null;
 		try {
@@ -222,7 +238,7 @@ public class MainGUI extends JFrame {
 		}
 
 		//parse Network
-		CalcEAFlow ttCEAF = new CalcEAFlow(evacArea, network, populationNodeMap);
+		CalcEAFlow ttCEAF = new CalcEAFlow(evacArea, network, populationNodeMap, edgeType);
 		ShowProgressInformationGUI progInfo = new ShowProgressInformationGUI(this, ttCEAF.getMsEAF());
 		progInfo.setVisible(true);
 		desktop.add(progInfo);
@@ -235,7 +251,7 @@ public class MainGUI extends JFrame {
 	
 	protected void calcEAFlowWithoutBowEdges()
 	{
-		
+		startCalcEAFlow(EdgeTypeEnum.SIMPLE);	
 	}
 	
 	protected void createSelectAreaMenu()
@@ -287,6 +303,46 @@ public class MainGUI extends JFrame {
 		
 	}
 	
+	protected void createVisMenu()
+	{
+		mnuVis = new JMenu("Visualization");
+		
+		JMenuItem flowVis = new JMenuItem("Visualize Flow");
+		flowVis.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String id = selectFlow();
+				if(id  != null && id.length() > 0)
+				{
+					Flow flow = fMarket.getElement(id);
+					JInternalFrame newFrame = new VisualizeFlowGUI(flow.getNetwork(),flow);
+			        addFrame(newFrame);
+				}
+			}
+		});
+		mnuVis.add(flowVis);
+		
+		JMenuItem pathVis = new JMenuItem("Visualize Paths");
+		pathVis.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String id = selectFlow();
+				if(id  != null && id.length() > 0)
+				{
+					Flow flow = fMarket.getElement(id);
+					JInternalFrame newFrame = new VisualizeTimeExpandedPathsGUI(flow.getNetwork(),flow);
+			        addFrame(newFrame);
+				}
+			}
+		});
+		mnuVis.add(pathVis);
+		
+		menuBar.add(mnuVis);
+		
+	}
+	
 	/**
 	 * @param args
 	 */
@@ -318,21 +374,27 @@ public class MainGUI extends JFrame {
 		protected NetworkLayer network;
 		protected PopulationNodeMap populationNodeMap;
 		
-		public CalcEAFlow(EvacArea evacArea, NetworkLayer network, PopulationNodeMap populationNodeMap)
+		public CalcEAFlow(EvacArea evacArea, NetworkLayer network, PopulationNodeMap populationNodeMap, EdgeTypeEnum edgeType)
 		{
 			this.evacArea = evacArea;
 			this.network = network;
 			this.populationNodeMap = populationNodeMap;
 			this.isFinished = false;
 			this.msEAF = new MultiSourceEAF();
+			this.msEAF.setEdgeTypeToUse(edgeType);
 		}
 		
 		public void run() {
 			result = msEAF.calcEAFlow(evacArea, network, populationNodeMap);
 			isFinished = true;
-
-	        JInternalFrame newFrame = new VisualizeFlowGUI(network, result);
-	        addFrame(newFrame);
+			
+			String id = fMarket.addElement(result);
+			JOptionPane.showMessageDialog(getMainFrame(),
+				     id + " added!",
+				    "Calculation Completed",
+				    JOptionPane.INFORMATION_MESSAGE);
+			
+			createMenuItemForFlow(id);
 		}
 	}
 	
@@ -343,6 +405,72 @@ public class MainGUI extends JFrame {
 	    try {
             newFrame.setSelected(true);
         } catch (java.beans.PropertyVetoException exception){}
+	}
+	
+	protected JFrame getMainFrame()
+	{
+		return this;
+	}
+	
+	protected void createMenuItemForFlow(String id)
+	{
+		JMenuItem removeFlow = new JMenuItem("remove: " + id);
+		removeFlow.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(e.getSource() != null)
+				{
+					if(e.getSource() instanceof JMenuItem)
+					{
+						JMenuItem item = (JMenuItem)e.getSource();
+						String text = item.getText();
+						int i = text.indexOf(": ", 0);
+						String id  = text.substring(i+2);
+						removeFlow(id);
+						mnuFlow.remove(item);
+					}
+				}
+			}
+		});
+		mnuFlow.add(removeFlow);
+	}
+	
+	protected void removeFlow(String id)
+	{
+		if(!fMarket.removeElement(id))
+		{
+			JOptionPane.showMessageDialog(this, "Remove Flow", "Flow could not be find!", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	protected String selectFlow()
+	{
+		Collection<String> ids = fMarket.getIds();
+		if(ids.size() > 0)
+		{
+			String[] idsArray = new String[ids.size()];
+			int i = 0;
+			for(String id : ids)
+			{
+				idsArray[i++] = id;
+			}
+			String s = (String)JOptionPane.showInputDialog(
+			                    this,
+			                    "Complete the sentence:\n"
+			                    + "\"Green eggs and...\"",
+			                    "Customized Dialog",
+			                    JOptionPane.PLAIN_MESSAGE,
+			                    null,
+			                    idsArray,
+			                    idsArray[0]);
+			if(s != null && s.length() > 0)
+			{
+				return s;
+			}
+		}
+		return null;
+
 	}
 	
 }

@@ -354,13 +354,13 @@ public class EdgeIntervalls {
 	}
 		
 	/**
-	 * TODO ROST really needs comment (and explanaition ;-)) MORE EFFICIENT!
+	 * TODO ROST really needs comment (and explanation ;-)) MORE EFFICIENT!
 	 * @param arrivaleIntervall
 	 * @param u
 	 * @param forward
 	 * @return
 	 */
-	public ArrayList<VertexIntervall> propagate(Intervall arrivaleIntervall, int u ,boolean forward){
+	public ArrayList<VertexIntervall> propagate(VertexIntervall arrivaleIntervall, int u ,boolean forward){
 		ArrayList<VertexIntervall> result = new ArrayList<VertexIntervall>();
 		int earliestStartPossible = arrivaleIntervall.getLowBound();
 		//-1 is important!
@@ -373,7 +373,16 @@ public class EdgeIntervalls {
 			//	is not null
 			while(currentIntervall != null){
 				
+				if(arrivaleIntervall.getLowBound() > 0
+						&& arrivaleIntervall.getHighBound() < Integer.MAX_VALUE
+						&& currentIntervall.getHighBound() < latestStartPossible)
+				{
+					int foobar = 0;
+				}
+				
 				EdgeIntervall nextPossibleIntervall;
+				
+				int test = 0;
 				
 				nextPossibleIntervall = this.minPossibleForwards(Math.max(currentIntervall.getLowBound(), earliestStartPossible),u);
 				
@@ -383,11 +392,13 @@ public class EdgeIntervalls {
 					}
 					break;
 				}
+				
 				if(!GlobalFlowCalculationSettings.useHoldover)
 					nextPossibleIntervall = this.forbidHoldoverForwards(nextPossibleIntervall, latestStartPossible);
 				int nextHigh = Integer.MAX_VALUE;
 				if(nextPossibleIntervall != null)
 					nextHigh = nextPossibleIntervall.getHighBound();
+				
 				if(_debug){
 					System.out.println("kapazitaet frei");
 					System.out.println("old i: " +arrivaleIntervall);
@@ -396,6 +407,7 @@ public class EdgeIntervalls {
 				
 				if(nextPossibleIntervall!=null)
 				{
+					int lastPossibleDeparture = nextPossibleIntervall.getHighBound()-1;
 					int currentFlow = nextPossibleIntervall.getFlow();
 					Integer travelTime = this._traveltime.getTravelTimeForAdditionalFlow(currentFlow);					
 					nextPossibleIntervall = nextPossibleIntervall.shiftPositive(travelTime);
@@ -408,6 +420,7 @@ public class EdgeIntervalls {
 					}
 					foundIntervall = new VertexIntervall(nextPossibleIntervall);
 					foundIntervall.setTravelTimeToPredecessor(travelTime);
+					foundIntervall.setLastDepartureAtFromNode(lastPossibleDeparture);
 					result.add(foundIntervall);
 				}
 				if(GlobalFlowCalculationSettings.useHoldover)
@@ -430,8 +443,49 @@ public class EdgeIntervalls {
 					currentIntervall = this.getIntervallAt(nextTimeStep);
 				}
 			}
+			//aggregate found intervalls
+			ArrayList<VertexIntervall> orderedResult = new ArrayList<VertexIntervall>(result.size());
+			for(int i = 0; i < result.size(); ++i)
+			{
+				if(result.size() > 1)
+				{
+					int fooobar = 0;
+				}
+				VertexIntervall toAdd = result.get(i);
+				int insertAt = 0;
+				if(orderedResult.size() > 0)
+				{
+					//search for insert position
+					for(; insertAt < orderedResult.size(); ++insertAt)
+					{
+						if(toAdd.getLowBound() < orderedResult.get(insertAt).getLowBound())
+						{
+							break;
+						}
+					}
+				}
+				orderedResult.add(insertAt, toAdd);
+			}
+			//if space between: fill up
+			for(int i = 0; i < orderedResult.size()-1; ++i)
+			{
+				VertexIntervall current = orderedResult.get(i);
+				VertexIntervall next = orderedResult.get(i+1);
+				if(current.getHighBound() < next.getLowBound())
+				{
+					//add some holdover time (if necessary)
+					current.setHighBound(next.getLowBound());
+				}
+			}
+			if(orderedResult.size() > 0)
+			{
+				VertexIntervall last = orderedResult.get(orderedResult.size()-1);
+				last.setHighBound(Integer.MAX_VALUE);
+				result = orderedResult;
+			}
 		}
 		if(!forward){
+			//latestStartPossible = arrivaleIntervall.getLastDepartureAtFromNode();
 			while(currentIntervall != null)
 			{	
 				EdgeIntervall nextPossibleIntervall = minPossibleBackwards(Math.max(earliestStartPossible, currentIntervall.getLowBound()));
@@ -448,9 +502,11 @@ public class EdgeIntervalls {
 				if(nextPossibleIntervall != null)
 					nextHigh = nextPossibleIntervall.getHighBound() + this._traveltime.getTravelTimeForFlow(nextPossibleIntervall.getFlow());
 				if(nextPossibleIntervall!=null){
+					
 					foundIntervall = new VertexIntervall(nextPossibleIntervall);
 					int traveltime = _traveltime.getTravelTimeForFlow(nextPossibleIntervall.getFlow());
 					foundIntervall.setTravelTimeToPredecessor(traveltime);
+					foundIntervall.setLastDepartureAtFromNode(nextPossibleIntervall.getHighBound() - 1);
 					result.add(foundIntervall);
 				}
 				if(GlobalFlowCalculationSettings.useHoldover)
@@ -474,6 +530,47 @@ public class EdgeIntervalls {
 					currentIntervall = this.getIntervallAt(nextTimeStep);
 				}
 			}
+			//aggregate found intervalls
+			ArrayList<VertexIntervall> orderedResult = new ArrayList<VertexIntervall>(result.size());
+			for(int i = 0; i < result.size(); ++i)
+			{
+				if(result.size() > 1)
+				{
+					int fooobar = 0;
+				}
+				VertexIntervall toAdd = result.get(i);
+				int insertAt = 0;
+				if(orderedResult.size() > 0)
+				{
+					//search for insert position
+					for(; insertAt < orderedResult.size(); ++insertAt)
+					{
+						if(toAdd.getLowBound() < orderedResult.get(insertAt).getLowBound())
+						{
+							break;
+						}
+					}
+				}
+				orderedResult.add(insertAt, toAdd);
+			}
+			//if space between: fill up
+			for(int i = 0; i < orderedResult.size()-1; ++i)
+			{
+				VertexIntervall current = orderedResult.get(i);
+				VertexIntervall next = orderedResult.get(i+1);
+				if(current.getHighBound() < next.getLowBound())
+				{
+					//add some holdover time (if necessary)
+					current.setHighBound(next.getLowBound());
+				}
+			}
+			if(orderedResult.size() > 0)
+			{
+				VertexIntervall last = orderedResult.get(orderedResult.size()-1);
+				last.setHighBound(Integer.MAX_VALUE);
+				result = orderedResult;
+			}
+			result = orderedResult;
 		}
 		return result;
 	}
@@ -561,27 +658,6 @@ public class EdgeIntervalls {
 		i.setFlow(oldflow-f);
 	}
 	
-	public int getCurrentForwardTravelTime(int time)
-	{
-		int flow = this.getFlowAt(time);
-		return getTravelTimeByFlow(flow);
-	}
-	
-	public int getTravelTimeByFlow(int flow)
-	{
-		return (int)this._traveltime.getTravelTimeForFlow(flow);
-	}
-	
-	public int getTravelTimeForAdditionalFlow(int currentFlow)
-	{
-		return (int)this._traveltime.getTravelTimeForAdditionalFlow(currentFlow);
-	}
-	
-	public int getTravelTimeForAdditionalFlowByTime(int time)
-	{
-		int flow = this.getFlowAt(time);
-		return getTravelTimeForAdditionalFlow(flow);
-	}
 	
 //------------------------MAIN METHOD--------------------------------//
 	//TODO ROST CANT WORK THIS WAY!
