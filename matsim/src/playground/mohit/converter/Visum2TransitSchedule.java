@@ -1,6 +1,7 @@
 package playground.mohit.converter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -39,6 +40,7 @@ public class Visum2TransitSchedule {
 	private final BasicVehicles vehicles;
 	//	private final CoordinateTransformation coordinateTransformation = new Kilometer2MeterTransformation();
 	private final CoordinateTransformation coordinateTransformation = new IdentityTransformation();
+	private final Map<String, TransportMode> transportModes = new HashMap<String, TransportMode>();
 
 	public Visum2TransitSchedule(final VisumNetwork visum, final TransitSchedule schedule, final BasicVehicles vehicles) {
 		this.visum = visum;
@@ -46,35 +48,13 @@ public class Visum2TransitSchedule {
 		this.vehicles = vehicles;
 	}
 
+	public void registerTransportMode(final String visumTransportMode, final TransportMode transportMode) {
+		this.transportModes.put(visumTransportMode, transportMode);
+	}
+
 	public void convert() {
 
 		long vehId = 0;
-
-		// Giving all Transport Modes used inside the Visum network
-
-		// the ones for Berlin
-		//		this.visum.transportModes.put("B", TransportMode.bus);
-		//		this.visum.transportModes.put("F", TransportMode.walk);
-		//		this.visum.transportModes.put("K", TransportMode.bus);
-		//		this.visum.transportModes.put("L", TransportMode.other);
-		//		this.visum.transportModes.put("P", TransportMode.car);
-		//		this.visum.transportModes.put("R", TransportMode.bike);
-		//		this.visum.transportModes.put("S", TransportMode.train);
-		//		this.visum.transportModes.put("T", TransportMode.tram);
-		//		this.visum.transportModes.put("U", TransportMode.train);
-		//		this.visum.transportModes.put("V", TransportMode.other);
-		//		this.visum.transportModes.put("W", TransportMode.bus);
-		//		this.visum.transportModes.put("Z", TransportMode.train);
-
-		// the ones for Zurich
-		this.visum.transportModes.put("B", TransportMode.bus); // BUS
-		this.visum.transportModes.put("F", TransportMode.walk); // BUSS
-		this.visum.transportModes.put("I", TransportMode.car); // IV-PW
-		this.visum.transportModes.put("R", TransportMode.train); // REGIONALVERKEHR
-		this.visum.transportModes.put("S", TransportMode.other); // SCHIFF
-		this.visum.transportModes.put("T", TransportMode.tram); // TRAM
-		this.visum.transportModes.put("Y", TransportMode.train); // BERGBAHN
-		this.visum.transportModes.put("Z", TransportMode.train); // FERNVERKEHR
 
 		TransitScheduleBuilder builder = this.schedule.getBuilder();
 
@@ -124,7 +104,7 @@ public class Visum2TransitSchedule {
 								stops.add(s);
 							}
 						}
-						TransportMode mode = this.visum.transportModes.get(line.tCode);
+						TransportMode mode = this.transportModes.get(line.tCode);
 						if (mode == null) {
 							System.err.println("Could not find TransportMode for " + line.tCode + ", more info: " + line.id);
 						}

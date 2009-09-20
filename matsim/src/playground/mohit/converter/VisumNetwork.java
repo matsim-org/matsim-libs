@@ -20,7 +20,6 @@
 
 package playground.mohit.converter;
 
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,8 +27,6 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
-
 
 /**
  * @author mrieser
@@ -46,10 +43,8 @@ public class VisumNetwork {
 	public final Map<String , TimeProfile> timeProfiles = new TreeMap<String, TimeProfile>();
 	public final Map<String , TimeProfileItem> timeProfileItems = new LinkedHashMap<String, TimeProfileItem>();
 	public final Map<String , Departure> departures = new TreeMap<String, Departure>();
-	public final Map<String, TransportMode> transportModes = new HashMap<String, TransportMode>();
 	public final Map<String, VehicleUnit> vehicleUnits = new HashMap<String, VehicleUnit>();
 	public final Map<String, VehicleCombination> vehicleCombinations = new HashMap<String, VehicleCombination>();
-
 
 	public void addStop(final Stop stop) {
 		Stop oldStop = this.stops.put(stop.id, stop);
