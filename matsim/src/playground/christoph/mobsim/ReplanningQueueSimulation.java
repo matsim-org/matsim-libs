@@ -26,6 +26,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.events.EventsImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
@@ -65,6 +66,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 		super.setAgentFactory(new WithinDayAgentFactory(this));
 
 //		this.simEngine = new ParallelQueueSimEngine(this.getQueueNetwork(), MatsimRandom.getRandom());
+//		this.simEngine = new ParallelQueueSimEngine2(this.getQueueNetwork(), MatsimRandom.getRandom());
 		
 		this.knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(population);
 		this.knowledgeDBStorageHandler.start();
