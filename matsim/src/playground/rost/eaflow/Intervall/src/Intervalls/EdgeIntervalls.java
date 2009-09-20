@@ -371,6 +371,121 @@ public class EdgeIntervalls {
 		if(forward){
 			//iterate over our edge intervalls as long as the intervall
 			//	is not null
+			while(currentIntervall != null)
+			{
+				int nextHighBound = currentIntervall.getHighBound();
+				if(currentIntervall.getFlow() < u)
+				{
+					EdgeIntervall nextPossibleIntervall = new EdgeIntervall(currentIntervall);
+					nextPossibleIntervall.setFlow(currentIntervall.getFlow());
+					nextPossibleIntervall.setLowBound(Math.max(earliestStartPossible, currentIntervall.getLowBound()));
+						
+					if(!GlobalFlowCalculationSettings.useHoldover)
+						nextPossibleIntervall = this.forbidHoldoverForwards(nextPossibleIntervall, latestStartPossible);
+					
+					if(_debug){
+						System.out.println("kapazitaet frei");
+						System.out.println("old i: " +arrivaleIntervall);
+						System.out.println("old j: " +nextPossibleIntervall);
+					}
+					
+					if(nextPossibleIntervall!=null)
+					{
+						int lastPossibleDeparture = nextPossibleIntervall.getHighBound()-1;
+						int currentFlow = nextPossibleIntervall.getFlow();
+						Integer travelTime = this._traveltime.getTravelTimeForAdditionalFlow(currentFlow);					
+						nextPossibleIntervall = nextPossibleIntervall.shiftPositive(travelTime);
+						if(_debug)
+						{
+							System.out.println("shifted by: " + travelTime+ " -> " +  nextPossibleIntervall);
+							System.out.println("new i: " +arrivaleIntervall);
+							System.out.println("new j: " +nextPossibleIntervall);
+							System.out.println("tau:" +this._traveltime);
+						}
+						foundIntervall = new VertexIntervall(nextPossibleIntervall);
+						foundIntervall.setTravelTimeToPredecessor(travelTime);
+						//foundIntervall.setLastDepartureAtFromNode(lastPossibleDeparture);
+						result.add(foundIntervall);
+					}
+				}
+				if(GlobalFlowCalculationSettings.useHoldover)
+				{
+					//if we use holdover, we dont need to propagate any intervall
+					//after the first one found!
+					break;
+				}
+				{
+					if(nextHighBound > latestStartPossible)
+						//if the next intervall starts after our latestArrivalTime, we are finished
+						break;
+					currentIntervall = this.getIntervallAt(nextHighBound);
+				}
+			}
+			//result = addHoldover(result);
+		}
+		if(!forward){
+			//latestStartPossible = arrivaleIntervall.getLastDepartureAtFromNode();
+			while(currentIntervall != null)
+			{	
+				int nextHigh = currentIntervall.getHighBound();
+				
+				EdgeIntervall nextPossibleIntervall = minPossibleBackwards(Math.max(earliestStartPossible, currentIntervall.getLowBound()));
+				if(nextPossibleIntervall == null)
+				{
+					//no intervall can be found after this!
+					break;
+				}
+				
+				if(!GlobalFlowCalculationSettings.useHoldover)
+					nextPossibleIntervall = this.forbidHoldoverBackward(nextPossibleIntervall, latestStartPossible);
+				
+				if(nextPossibleIntervall!=null){
+					nextHigh = nextPossibleIntervall.getHighBound() + this._traveltime.getTravelTimeForFlow(nextPossibleIntervall.getFlow());
+					foundIntervall = new VertexIntervall(nextPossibleIntervall);
+					int traveltime = _traveltime.getTravelTimeForFlow(nextPossibleIntervall.getFlow());
+					foundIntervall.setTravelTimeToPredecessor(traveltime);
+					//foundIntervall.setLastDepartureAtFromNode(nextPossibleIntervall.getHighBound() - 1);
+					result.add(foundIntervall);
+				}
+				if(GlobalFlowCalculationSettings.useHoldover)
+				{
+					//if we use holdover, we dont need to propagate any intervall
+					//after the first one found!
+					break;
+				}
+				else
+				{
+					//we get the next edgeintervall
+					if(nextHigh > latestStartPossible)
+						//if the next intervall starts after our latestArrivalTime, we are finished
+						break;
+					earliestStartPossible = nextHigh;
+					currentIntervall = this.getIntervallAt(nextHigh);
+				}
+			}
+			//result = addHoldover(result);
+		}
+		return result;
+	}
+	
+	/**
+	 * TODO ROST really needs comment (and explanation ;-)) MORE EFFICIENT!
+	 * @param arrivaleIntervall
+	 * @param u
+	 * @param forward
+	 * @return
+	 */
+	public ArrayList<VertexIntervall> propagateBowEdge(VertexIntervall arrivaleIntervall, int u ,boolean forward){
+		ArrayList<VertexIntervall> result = new ArrayList<VertexIntervall>();
+		int earliestStartPossible = arrivaleIntervall.getLowBound();
+		//-1 is important!
+		int latestStartPossible = arrivaleIntervall.getHighBound() - 1;
+		
+		VertexIntervall foundIntervall;
+		EdgeIntervall currentIntervall = this.getIntervallAt(earliestStartPossible);
+		if(forward){
+			//iterate over our edge intervalls as long as the intervall
+			//	is not null
 			while(currentIntervall != null){
 				
 				if(arrivaleIntervall.getLowBound() > 0
@@ -443,46 +558,7 @@ public class EdgeIntervalls {
 					currentIntervall = this.getIntervallAt(nextTimeStep);
 				}
 			}
-			//aggregate found intervalls
-			ArrayList<VertexIntervall> orderedResult = new ArrayList<VertexIntervall>(result.size());
-			for(int i = 0; i < result.size(); ++i)
-			{
-				if(result.size() > 1)
-				{
-					int fooobar = 0;
-				}
-				VertexIntervall toAdd = result.get(i);
-				int insertAt = 0;
-				if(orderedResult.size() > 0)
-				{
-					//search for insert position
-					for(; insertAt < orderedResult.size(); ++insertAt)
-					{
-						if(toAdd.getLowBound() < orderedResult.get(insertAt).getLowBound())
-						{
-							break;
-						}
-					}
-				}
-				orderedResult.add(insertAt, toAdd);
-			}
-			//if space between: fill up
-			for(int i = 0; i < orderedResult.size()-1; ++i)
-			{
-				VertexIntervall current = orderedResult.get(i);
-				VertexIntervall next = orderedResult.get(i+1);
-				if(current.getHighBound() < next.getLowBound())
-				{
-					//add some holdover time (if necessary)
-					current.setHighBound(next.getLowBound());
-				}
-			}
-			if(orderedResult.size() > 0)
-			{
-				VertexIntervall last = orderedResult.get(orderedResult.size()-1);
-				last.setHighBound(Integer.MAX_VALUE);
-				result = orderedResult;
-			}
+			result = addHoldover(result);
 		}
 		if(!forward){
 			//latestStartPossible = arrivaleIntervall.getLastDepartureAtFromNode();
@@ -530,50 +606,66 @@ public class EdgeIntervalls {
 					currentIntervall = this.getIntervallAt(nextTimeStep);
 				}
 			}
-			//aggregate found intervalls
-			ArrayList<VertexIntervall> orderedResult = new ArrayList<VertexIntervall>(result.size());
-			for(int i = 0; i < result.size(); ++i)
-			{
-				if(result.size() > 1)
-				{
-					int fooobar = 0;
-				}
-				VertexIntervall toAdd = result.get(i);
-				int insertAt = 0;
-				if(orderedResult.size() > 0)
-				{
-					//search for insert position
-					for(; insertAt < orderedResult.size(); ++insertAt)
-					{
-						if(toAdd.getLowBound() < orderedResult.get(insertAt).getLowBound())
-						{
-							break;
-						}
-					}
-				}
-				orderedResult.add(insertAt, toAdd);
-			}
-			//if space between: fill up
-			for(int i = 0; i < orderedResult.size()-1; ++i)
-			{
-				VertexIntervall current = orderedResult.get(i);
-				VertexIntervall next = orderedResult.get(i+1);
-				if(current.getHighBound() < next.getLowBound())
-				{
-					//add some holdover time (if necessary)
-					current.setHighBound(next.getLowBound());
-				}
-			}
-			if(orderedResult.size() > 0)
-			{
-				VertexIntervall last = orderedResult.get(orderedResult.size()-1);
-				last.setHighBound(Integer.MAX_VALUE);
-				result = orderedResult;
-			}
-			result = orderedResult;
+			
+			result = addHoldover(result);
 		}
 		return result;
 	}
+	
+	
+	protected ArrayList<VertexIntervall> addHoldover(ArrayList<VertexIntervall> oldIntervalls)
+	{
+		//order intervalls
+		ArrayList<VertexIntervall> orderedResult = new ArrayList<VertexIntervall>(oldIntervalls.size());
+		for(int i = 0; i < oldIntervalls.size(); ++i)
+		{
+			if(oldIntervalls.size() > 1)
+			{
+				int fooobar = 0;
+			}
+			VertexIntervall toAdd = oldIntervalls.get(i);
+			int insertAt = 0;
+			if(orderedResult.size() > 0)
+			{
+				//search for insert position
+				for(; insertAt < orderedResult.size(); ++insertAt)
+				{
+					if(toAdd.getLowBound() < orderedResult.get(insertAt).getLowBound())
+					{
+						break;
+					}
+				}
+			}
+			orderedResult.add(insertAt, toAdd);
+		}
+		//if space between: fill up
+		for(int i = 0; i < orderedResult.size()-1; ++i)
+		{
+			VertexIntervall current = orderedResult.get(i);
+			VertexIntervall next = orderedResult.get(i+1);
+			if(current.getHighBound() < next.getLowBound())
+			{
+				//split up intervall
+				VertexIntervall spaceIntervall = new VertexIntervall(current.getHighBound(), next.getLowBound(), current);
+				spaceIntervall.setOverridable(true);
+				orderedResult.add(i+1, spaceIntervall);
+				++i;
+			}
+		}
+		if(orderedResult.size() > 0)
+		{
+			VertexIntervall last = orderedResult.get(orderedResult.size()-1);
+			if(last.getHighBound() < Integer.MAX_VALUE)
+			{
+				//split up intervall
+				VertexIntervall spaceIntervall = new VertexIntervall(last.getHighBound(), Integer.MAX_VALUE, last);
+				spaceIntervall.setOverridable(true);
+				orderedResult.add(spaceIntervall);
+			}
+		}
+		return orderedResult;
+	}
+
 
 //------------------------Clean Up--------------------------------//
 	/**

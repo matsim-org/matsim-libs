@@ -406,7 +406,7 @@ public class Flow {
 		this.totalflow += gamma;
 		timeExpandedPath.setFlow(gamma);
 		// no backward links
-		if(backward){
+		if(!backward){
 			for(PathEdge edge : timeExpandedPath.getPathEdges()){
 				Link link = edge.getEdge();
 				int startTime = edge.getStartTime();

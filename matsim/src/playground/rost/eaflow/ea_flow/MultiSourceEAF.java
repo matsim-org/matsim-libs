@@ -365,6 +365,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 						flow += tEPath.getFlow();
 						multiSum += diff * tEPath.getFlow();
 					}
+					last = pE.getArrivalTime();
 				}
 			}
 		}

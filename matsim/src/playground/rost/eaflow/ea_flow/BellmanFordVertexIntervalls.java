@@ -38,6 +38,7 @@ import playground.rost.eaflow.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.rost.eaflow.Intervall.src.Intervalls.Intervall;
 import playground.rost.eaflow.Intervall.src.Intervalls.VertexIntervall;
 import playground.rost.eaflow.Intervall.src.Intervalls.VertexIntervalls;
+import playground.rost.eaflow.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
 
 
 /**
@@ -149,7 +150,7 @@ public class BellmanFordVertexIntervalls {
 	 * Constructor using all the data initialized in the Flow object use recommended
 	 * @param flow 
 	 */
-	public BellmanFordVertexIntervalls( Flow flow) {
+	public BellmanFordVertexIntervalls(Flow flow) {
 		this._flow = flow;
 		this.network = flow.getNetwork();
 		this._flowlabels = flow.getFlow();
@@ -303,7 +304,6 @@ public class BellmanFordVertexIntervalls {
 	 * @return true if any label of Node to has changed
 	 */
 	private boolean relabel(VertexIntervall start, Node from, Node to, Link over,boolean forward){
-		VertexIntervalls labelfrom = _labels.get(from);
 		VertexIntervalls labelto = _labels.get(to);
 		EdgeIntervalls	flowover = _flowlabels.get(over);
 		boolean changed=false;
@@ -315,7 +315,19 @@ public class BellmanFordVertexIntervalls {
 			if((int)over.getCapacity(1.)==0){
 				return false;
 			}
-			ArrayList<VertexIntervall> arrive = flowover.propagate(start, (int)over.getCapacity(1.),forward);
+			ArrayList<VertexIntervall> arrive;
+			if(_flow.getEdgeType() == EdgeTypeEnum.SIMPLE)
+			{
+				arrive = flowover.propagate(start, (int)over.getCapacity(1.),forward);
+			}
+			else if(_flow.getEdgeType() == EdgeTypeEnum.BOWEDGES_ADD)
+			{
+				arrive = flowover.propagateBowEdge(start, (int)over.getCapacity(1.),forward);
+			}
+			else
+			{
+				throw new RuntimeException("No Propagate Function for edgeType");
+			}
 			if(!arrive.isEmpty()){
 				if(_debug>0){
 					System.out.println("wir kommen weiter: "+ to.getId());
@@ -441,10 +453,6 @@ public class BellmanFordVertexIntervalls {
 			// link is incoming edge of v => backward edge
 			for (Link link : v.getInLinks().values()) {
 				w=link.getFromNode();
-				if(v.getId().toString().equals("26736471") && w.getId().toString().equals("26736469") && start.contains(178))
-				{
-					int foobar = 0;
-				}
 				boolean changed = relabel(start,v,w,link,false);
 				if (changed) {
 					queue.remove(w);
@@ -479,11 +487,6 @@ public class BellmanFordVertexIntervalls {
 			this._prepend= System.currentTimeMillis();
 			this._totalpreptime+=(this._prepend-this._prepstart);
 		}
-		VertexIntervalls vIs;
-		System.out.println("labels for 26736469");
-		vIs = _labels.get(network.getNode("26736469"));
-		System.out.println(vIs.toString());
-		
 		return this._timeexpandedpath;
 	}
 	

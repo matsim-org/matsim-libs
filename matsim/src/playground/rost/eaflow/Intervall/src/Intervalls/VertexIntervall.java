@@ -49,7 +49,13 @@ public class VertexIntervall extends Intervall {
 	
 	private int travelTimeToPredecessor;
 	
-	private int lastDepartureAtFromNode;
+	//VERY IMPORTANT DEFAULT SETTING.
+	//the variable may not be used..
+	private int lastDepartureAtFromNode = Integer.MAX_VALUE;
+	
+	//VERY IMPORTANT DEFAULT SETTING.
+	//the variable may not be used..
+	private boolean overridable = false;
 	
 
 //---------------------------METHODS----------------------------//
@@ -110,7 +116,17 @@ public class VertexIntervall extends Intervall {
 		super(l, r);
 		this.setReachable(d);
 		this.setPredecessor(pred);
-		
+	}
+	
+	public VertexIntervall(int l, int r, VertexIntervall other)
+	{
+		super(l,r);
+		this.setLastDepartureAtFromNode(other.lastDepartureAtFromNode);
+		this.setPredecessor(other._predecessor);
+		this.setReachable(other.reachable);
+		this.setScanned(other.isScanned());
+		this.setOverridable(other.overridable);
+		this.setTravelTimeToPredecessor(other.travelTimeToPredecessor);
 	}
 
 	/**
@@ -178,6 +194,8 @@ public class VertexIntervall extends Intervall {
 		k.scanned = this.isScanned();
 		k._predecessor= this._predecessor;
 		k.travelTimeToPredecessor = this.travelTimeToPredecessor;
+		k.lastDepartureAtFromNode = this.lastDepartureAtFromNode;
+		k.overridable = this.overridable;
 		return k;
 	}
 	
@@ -204,7 +222,14 @@ public class VertexIntervall extends Intervall {
 	public void setLastDepartureAtFromNode(int lastArrivalAtThisNode) {
 		this.lastDepartureAtFromNode = lastArrivalAtThisNode;
 	}
-	
+
+	public boolean isOverridable() {
+		return overridable;
+	}
+
+	public void setOverridable(boolean overridable) {
+		this.overridable = overridable;
+	}
 	
 //----------------------------MAIN METHOD--------------------------//
 	

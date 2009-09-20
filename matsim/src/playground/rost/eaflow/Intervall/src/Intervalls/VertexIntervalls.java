@@ -326,8 +326,11 @@ public class VertexIntervalls {
 		boolean changed = false;
 		VertexIntervall ourIntervall = this.getIntervallAt(arrive.getLowBound());
 		int t= ourIntervall.getHighBound();
-		while(ourIntervall.getLowBound() < arrive.getHighBound()){			
-			if(!ourIntervall.getReachable() && !ourIntervall.isScanned())
+		while(ourIntervall.getLowBound() < arrive.getHighBound()){
+			//either ourIntervall was never reachable before and is not scanned
+			//or ourIntervall is overridable but arrive is not overridable
+			//reason for the last condition: we do not want to replace an overridable intervall with another one (never ever!)
+			if((!ourIntervall.getReachable() && !ourIntervall.isScanned()) || (ourIntervall.isOverridable() && !arrive.isOverridable()))
 			{
 				//test if the intervalls intersect at all (using the condition in while head above)
 				if(arrive.getLowBound() >= ourIntervall.getLowBound()
@@ -396,8 +399,13 @@ public class VertexIntervalls {
 	
 	protected void setArrivalAttributes(VertexIntervall ourIntervall, VertexIntervall arrive, Link link)
 	{
+		//we might have already scanned this intervall
+		if(!ourIntervall.isOverridable())
+		{	
+			ourIntervall.setScanned(false);
+		}
 		ourIntervall.setReachable(true);
-		ourIntervall.setScanned(false);
+		ourIntervall.setOverridable(false);
 		ourIntervall.setPredecessor(link);
 		ourIntervall.setLastDepartureAtFromNode(arrive.getLastDepartureAtFromNode());
 		ourIntervall.setTravelTimeToPredecessor(arrive.getTravelTimeToPredecessor());
@@ -445,7 +453,8 @@ public class VertexIntervalls {
 		  if ((i.getHighBound() == j.getLowBound()) && (i.getReachable() == j.getReachable()) &&
 				  (i.getPredecessor() == j.getPredecessor()) && (i.isScanned() == j.isScanned())
 				  && (i.getTravelTimeToPredecessor() == j.getTravelTimeToPredecessor())
-				  && (i.getLastDepartureAtFromNode() == j.getLastDepartureAtFromNode())) {
+				  && (i.getLastDepartureAtFromNode() == j.getLastDepartureAtFromNode())
+				  && (i.isOverridable() == j.isOverridable())) {
 			 
 			  //TODO ROST dont remove both intervalls, no new insert needed MORE EFFICIENT!
 			  _tree.remove(i);
@@ -456,6 +465,7 @@ public class VertexIntervalls {
 			  vI.setTravelTimeToPredecessor(i.getTravelTimeToPredecessor());
 			  vI.setPredecessor(i.getPredecessor());
 			  vI.setLastDepartureAtFromNode(i.getLastDepartureAtFromNode());
+			  vI.setOverridable(i.isOverridable());
 			  _tree.insert(vI);
 			  i = vI;
 			  gain++;
