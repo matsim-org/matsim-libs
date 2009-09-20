@@ -63,10 +63,10 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		// test pt again
 		route = factory.createRoute(TransportMode.pt, null, null);
 		assertTrue(route instanceof GenericRoute);
-
 	}
 
-	/*package*/ static class CarRouteMock extends AbstractRoute {
+	/*package*/ static class CarRouteMock extends AbstractRoute implements Cloneable {
+		private static final long serialVersionUID = 1L;
 		CarRouteMock(final Link startLink, final Link endLink){
 			super(startLink, endLink);
 		}
@@ -76,7 +76,8 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		}
 	}
 
-	/*package*/ static class PtRouteMock extends AbstractRoute {
+	/*package*/ static class PtRouteMock extends AbstractRoute implements Cloneable {
+		private static final long serialVersionUID = 1L;
 		PtRouteMock(final Link startLink, final Link endLink){
 			super(startLink, endLink);
 		}
@@ -87,6 +88,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 	}
 
 	/*package*/ static class CarRouteMockFactory implements RouteFactory {
+		private static final long serialVersionUID = 1L;
 		public RouteWRefs createRoute(final Link startLink, final Link endLink) {
 			return new CarRouteMock(startLink, endLink);
 		}
@@ -94,6 +96,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 	}
 
 	/*package*/ static class PtRouteMockFactory implements RouteFactory {
+		private static final long serialVersionUID = 1L;
 		public RouteWRefs createRoute(final Link startLink, final Link endLink) {
 			return new PtRouteMock(startLink, endLink);
 		}
