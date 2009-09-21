@@ -84,6 +84,11 @@ public class TransitStrategyManagerConfigLoader extends StrategyManagerConfigLoa
 		strategy.addStrategyModule(new TransitActsRemoverStrategy());
 		strategy.addStrategyModule(new ChangeLegMode(controler.getConfig()));
 		strategy.addStrategyModule(new ReRoute(controler));
+	} else if (name.equals("TimeAllocationMutator")) {
+		strategy = new PlanStrategy(new RandomPlanSelector());
+		TransitTimeAllocationMutator tam = new TransitTimeAllocationMutator();
+		tam.setUseActivityDurations(controler.getConfig().vspExperimental().isUseActivityDurations());
+		strategy.addStrategyModule(tam);
 	} else {
 		strategy = StrategyManagerConfigLoader.loadStrategy(controler, name, settings);
 	}
