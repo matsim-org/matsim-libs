@@ -95,7 +95,7 @@ public class Visum2TransitSchedule {
 				} else {
 					BasicVehicleType vehType = this.vehicles.getVehicleTypes().get(new IdImpl(vehCombination.id));
 					// convert line routes
-					if (timeProfile.lineName.compareTo(line.id) == 0 ){
+					if (timeProfile.lineName.equals(line.id)) {
 						List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 						//  convert route profile
 						for (VisumNetwork.TimeProfileItem tpi : this.visum.timeProfileItems.values()){
@@ -106,12 +106,12 @@ public class Visum2TransitSchedule {
 						}
 						TransportMode mode = this.transportModes.get(line.tCode);
 						if (mode == null) {
-							System.err.println("Could not find TransportMode for " + line.tCode + ", more info: " + line.id);
+							log.error("Could not find TransportMode for " + line.tCode + ", more info: " + line.id);
 						}
 						TransitRoute tRoute = builder.createTransitRoute(new IdImpl(timeProfile.lineName.toString()+"."+timeProfile.lineRouteName.toString()+"."+ timeProfile.index.toString()+"."+timeProfile.DCode.toString()),null,stops,mode);
 						//  convert departures
 						for (VisumNetwork.Departure d : this.visum.departures.values()){
-							if (d.lineName.compareTo(line.id.toString())== 0 && d.lineRouteName.compareTo(timeProfile.lineRouteName.toString())== 0 && d.TRI.compareTo(timeProfile.index.toString())==0){
+							if (d.lineName.equals(line.id.toString()) && d.lineRouteName.equals(timeProfile.lineRouteName.toString()) && d.TRI.equals(timeProfile.index.toString())) {
 								Departure departure = builder.createDeparture(new IdImpl(d.index), Time.parseTime(d.dep));
 								BasicVehicle veh = vb.createVehicle(new IdImpl(vehId++), vehType);
 								this.vehicles.getVehicles().put(veh.getId(), veh);
@@ -119,11 +119,19 @@ public class Visum2TransitSchedule {
 								tRoute.addDeparture(departure);
 							}
 						}
-						tLine.addRoute(tRoute);
+						if (tRoute.getDepartures().size() > 0) {
+							tLine.addRoute(tRoute);
+						} else {
+							log.warn("The route " + tRoute.getId() + " was not added to the line " + tLine.getId() + " because it does not contain any departures.");
+						}
 					}
 				}
 			}
-			this.schedule.addTransitLine(tLine);
+			if (tLine.getRoutes().size() > 0) {
+				this.schedule.addTransitLine(tLine);
+			} else {
+				log.warn("The line " + tLine.getId() + " was not added to the transit schedule because it does not contain any routes.");
+			}
 		}
 	}
 }
