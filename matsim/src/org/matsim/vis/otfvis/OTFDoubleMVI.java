@@ -73,9 +73,10 @@ public class OTFDoubleMVI extends OnTheFlyClientFileQuad {
 			OTFOGLDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
 			drawer2.invalidate((int)hostControl.getTime());
 			drawer2.replaceMouseHandler(((OTFOGLDrawer)rightComp).getMouseHandler());
-			this.hostControl.addHandler("test", drawer2);
+			hostControl.addHandler("test", drawer2);
 			this.pane.setLeftComponent(drawer2.getComponent());
 			pane.setDividerLocation(0.5);
+			pane.setResizeWeight(0.5);
 			//do not call for slave hosts!
 			
 			hostControl.finishedInitialisition();
