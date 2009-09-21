@@ -131,7 +131,9 @@ public class OTFVisDualView extends OnTheFlyClientFileQuad{
 //		String filename = "../OnTheFlyVis/test/padang.mvi"; //Flooding.mvi";
 //		String filename = "../OnTheFlyVis/test/testPadabang1.3.mvi"; //Flooding.mvi";
 //		String filename = "../vsp-cvs/runs/run306/output/ITERS/it.100/100.movie.mvi";
-		String filename = "output/testrun301.mvi";
+//		String filename = "output/testrun301.mvi";
+//		String filename = "../../tmp/750.vis.mvi";
+		String filename = "output/3.otfvis.mvi";
 
 		connect1.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect1.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
