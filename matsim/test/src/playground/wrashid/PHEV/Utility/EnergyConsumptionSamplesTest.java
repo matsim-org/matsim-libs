@@ -27,5 +27,5 @@ public class EnergyConsumptionSamplesTest extends TestCase {
 		assertEquals(91.0, EnergyConsumptionSamples.getInterpolatedValue(new AverageSpeedEnergyConsumption(20, 100),
 				new AverageSpeedEnergyConsumption(30, 10), 21));
 
-	}
-}
+	} 
+} 

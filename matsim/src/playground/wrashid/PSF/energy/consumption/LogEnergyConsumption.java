@@ -39,8 +39,7 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 	}
 
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-
+		energyConsumption = new HashMap<Id, EnergyConsumption>();
 	}
 
 	public void handleEvent(LinkLeaveEventImpl event) {

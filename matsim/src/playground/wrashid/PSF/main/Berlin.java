@@ -35,7 +35,7 @@ public class Berlin implements ParametersPSFMutator {
 		
 		OptimizedCharger optimizedCharger= new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(),logParkingTimes.getParkingTimes());
 		HashMap<Id, ChargingTimes> chargingTimes=optimizedCharger.getChargingTimes();
-	}
+	} 
 
 	public void mutateParameters() {
 		// TODO Auto-generated method stub

@@ -54,8 +54,7 @@ public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEv
 	}
 
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-
+		parkingTimes = new HashMap<Id, ParkingTimes>();
 	}
 
 	public void handleEvent(ActivityEndEventImpl event) {
