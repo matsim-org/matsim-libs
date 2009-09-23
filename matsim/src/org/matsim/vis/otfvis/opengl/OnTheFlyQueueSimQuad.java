@@ -29,6 +29,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimEngine;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
@@ -42,6 +43,8 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 	protected OnTheFlyServer myOTFServer = null;
 	private boolean ownServer = true;
 
+	private OTFConnectionManager connectionManager = null;
+	
 	public void setServer(OnTheFlyServer server) {
 		this.myOTFServer = server;
 		ownServer = false;
@@ -56,7 +59,13 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 
 			// FOR TESTING ONLY!
 			PreferencesDialog.preDialogClass = PreferencesDialog2.class;
-			OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString());
+			OnTheFlyClientQuad client = null;
+			if (connectionManager == null) {
+				client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString());
+			}
+			else {
+				client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
+			}
 			client.start();
 
 			try {
@@ -97,6 +106,14 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 	public void setQueueNetwork(QueueNetwork net) {
 		this.network = net;
 		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
+	}
+	
+	public OTFConnectionManager getConnectionManager() {
+		return this.connectionManager;
+	}
+	
+	public void setConnectionManager(OTFConnectionManager connectionManager) {
+		this.connectionManager = connectionManager;
 	}
 
 }
