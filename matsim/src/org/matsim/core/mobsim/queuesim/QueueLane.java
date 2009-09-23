@@ -49,6 +49,7 @@ import org.matsim.lanes.basic.BasicLane;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.netvis.DrawableAgentI;
+import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 
@@ -724,6 +725,8 @@ public class QueueLane {
 	 */
 	class VisDataImpl implements VisData {
 
+		private double linkScale =  OTFDefaultLinkHandler.LINK_SCALE;
+		
 		/**
 		 * @return The value for coloring the link in NetVis. Actual: veh count / space capacity
 		 */
@@ -869,7 +872,7 @@ public class QueueLane {
 				int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLane.this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp) ? 0.0 : QueueLane.this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
 
-				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(), queueEnd,
+				PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(), queueEnd,
 						lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
 				queueEnd -= vehLen;
@@ -914,7 +917,7 @@ public class QueueLane {
 					tmpLane = veh.getId().hashCode() ;
 				}
 				int lane = 1 + (tmpLane % QueueLane.this.queueLink.getLink().getLanesAsInt(Time.UNDEFINED_TIME));
-				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(), distanceOnLink,
+				PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(), distanceOnLink,
 						lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
 				lastDistance = distanceOnLink;
@@ -927,7 +930,7 @@ public class QueueLane {
 			 */
 			int lane = QueueLane.this.queueLink.getLink().getLanesAsInt(Time.UNDEFINED_TIME) + 1; // place them next to the link
 			for (QueueVehicle veh : QueueLane.this.waitingList) {
-				PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(),
+				PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(),
 						/*positionOnLink*/cellSize, lane, 0.0, PositionInfo.VehicleState.Parking, null);
 				positions.add(position);
 			}
@@ -939,7 +942,7 @@ public class QueueLane {
 				lane++; // place them one lane further away
 				double vehPosition = QueueLane.this.queueLink.getLink().getLength();
 				for (QueueVehicle veh : QueueLane.this.transitVehicleStopQueue) {
-					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(),
+					PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(),
 							vehPosition, lane, 0.0, 	PositionInfo.VehicleState.Driving, null);
 					positions.add(position);
 					vehPosition -= veh.getSizeInEquivalents() * cellSize;

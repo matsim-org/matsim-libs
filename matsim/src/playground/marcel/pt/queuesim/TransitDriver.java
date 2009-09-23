@@ -29,11 +29,11 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.Events;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
@@ -120,7 +120,7 @@ public class TransitDriver implements TransitDriverAgent {
 			throw new RuntimeException("Expected different stop.");
 		}
 
-		EventsImpl events = TransitQueueSimulation.getEvents();
+		Events events = TransitQueueSimulation.getEvents();
 		if (this.lastHandledStop != stop) {
 			events.processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
 		}
@@ -151,7 +151,7 @@ public class TransitDriver implements TransitDriverAgent {
 		double stopTime = 0.0;
 		int cntEgress = passengersLeaving.size();
 		int cntAccess = passengersEntering.size();
-		if (cntAccess > 0 || cntEgress > 0) {
+		if ((cntAccess > 0) || (cntEgress > 0)) {
 			stopTime = cntAccess * 4 + cntEgress * 2;
 			if (this.lastHandledStop != stop) {
 				stopTime += 15.0; // add fixed amount of time for door-operations and similar stuff

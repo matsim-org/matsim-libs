@@ -26,7 +26,6 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.events.EventsImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
@@ -70,7 +69,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 		
 		this.knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(population);
 		this.knowledgeDBStorageHandler.start();
-		getEvents().addHandler(knowledgeDBStorageHandler);
+		((EventsImpl)getEvents()).addHandler(knowledgeDBStorageHandler);
 	}
 			
 	public PriorityBlockingQueue<DriverAgent> getActivityEndsList()

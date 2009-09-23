@@ -37,13 +37,13 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.Events;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
@@ -95,7 +95,7 @@ public class QueueSimulation {
 	protected QueueNetwork network;
 	protected NetworkLayer networkLayer;
 
-	private static EventsImpl events = null;
+	private static Events events = null;
 	protected  SimStateWriterI netStateWriter = null;
 
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
@@ -140,7 +140,7 @@ public class QueueSimulation {
 	 * @param plans
 	 * @param events
 	 */
-	public QueueSimulation(final NetworkLayer network, final PopulationImpl plans, final EventsImpl events) {
+	public QueueSimulation(final NetworkLayer network, final PopulationImpl plans, final Events events) {
 		// In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
 		this.listenerManager = new QueueSimListenerManager(this);
 		Simulation.reset();
@@ -161,7 +161,7 @@ public class QueueSimulation {
 	 * @param scenario
 	 * @param events
 	 */
-	public QueueSimulation(final ScenarioImpl scenario, final EventsImpl events) {
+	public QueueSimulation(final ScenarioImpl scenario, final Events events) {
 		this(scenario.getNetwork(), scenario.getPopulation(), events);
 		this.scenario = scenario;
 	}
@@ -480,11 +480,11 @@ public class QueueSimulation {
 		}
 	}
 
-	public static final EventsImpl getEvents() {
+	public static final Events getEvents() {
 		return events;
 	}
 
-	private static final void setEvents(final EventsImpl events) {
+	private static final void setEvents(final Events events) {
 		QueueSimulation.events = events;
 	}
 

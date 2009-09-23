@@ -29,7 +29,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
@@ -61,7 +60,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		super.prepareSim();
 
 		this.hist = new LegHistogram(300);
-		getEvents().addHandler(this.hist);
+		((EventsImpl)getEvents()).addHandler(this.hist);
 
 		// FOR TESTING ONLY!
 		new Thread(){@Override

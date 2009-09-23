@@ -28,7 +28,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.api.experimental.events.Events;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.evacuation.shelters.signalsystems.SheltersDoorBlockerController;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
@@ -74,7 +74,7 @@ public class QueueSimSignalEngine implements SignalEngine {
 
 	private QueueSimulation simulation;
 
-	private EventsImpl events;
+	private Events events;
 
 	public QueueSimSignalEngine(QueueSimulation sim) {
 		this.simulation = sim;
@@ -247,7 +247,7 @@ public class QueueSimSignalEngine implements SignalEngine {
 		controler.setDefaultSynchronizationOffset(systemDef.getDefaultSynchronizationOffset());
 	}
 
-	public EventsImpl getEvents() {
+	public Events getEvents() {
 		return this.events;
 	}
 	

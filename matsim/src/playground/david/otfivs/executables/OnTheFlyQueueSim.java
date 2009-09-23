@@ -69,7 +69,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		super.prepareSim();
 
 		this.hist = new LegHistogram(300);
-		getEvents().addHandler(this.hist);
+		((EventsImpl)getEvents()).addHandler(this.hist);
 
 		// FOR TESTING ONLY!
 		new Thread(){@Override
