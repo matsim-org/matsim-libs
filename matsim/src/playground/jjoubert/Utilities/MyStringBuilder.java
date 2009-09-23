@@ -67,5 +67,20 @@ public class MyStringBuilder {
 		return root + "/DigiCore/Signals.txt";
 	}
 	
+	public String getGapInputMinor(String studyArea, String version, String threshold, String sample){
+		return root + "/" + studyArea + "/" + version + "/" + threshold + "/Sample" + sample + "/Activities/" + studyArea + "_" + threshold + "_MinorLocations.txt";
+	}
+	
+	public String getGapInputMajor(String studyArea, String version, String threshold, String sample){
+		return root + "/" + studyArea + "/" + version + "/" + threshold + "/Sample" + sample + "/Activities/" + studyArea + "_" + threshold + "_MajorLocations.txt";
+	}
+	
+	public String getGapOutputMinor(String studyArea, String version, String threshold, String sample){
+		return root + "/" + studyArea + "/" + version + "/" + threshold + "/Sample" + sample + "/Activities/" + studyArea + "_" + threshold + "_MinorGapStats.txt";
+	}
+	
+	public String getGapOutputMajor(String studyArea, String version, String threshold, String sample){
+		return root + "/" + studyArea + "/" + version + "/" + threshold + "/Sample" + sample + "/Activities/" + studyArea + "_" + threshold + "_MajorGapStats.txt";
+	}
 	
 }

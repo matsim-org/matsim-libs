@@ -37,11 +37,11 @@ public class RunCommercialActivityAnalyser {
 	// Parameters that must be set
 	//----------------------------------------------------		
 	private static int numberOfSamples = 1;
-	private static int sampleSize = 500;
+	private static int sampleSize = 1000;
 	private static float clusterRadius = 10;
 	private static int clusterCount = 20;
-	private static double[] majorThresholds = {179.6, 339.4, 628.8, 931.5, 2062.5};
-//	private static double[] majorThresholds = {179.6, 339.4, 628.8};
+//	private static double[] majorThresholds = {179.6, 339.4, 628.8, 931.5, 2062.5};
+	private static double[] majorThresholds = {300};
 	private static double withinThreshold = 0.60;
 	//====================================================
 	// Processes that must be run
