@@ -23,6 +23,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.world.World;
 
 
 public class SpatialSubtourAnalyzer {
@@ -51,7 +52,7 @@ public class SpatialSubtourAnalyzer {
 		Gbl.startMeasurement();
 		log.info("Analyzig plans: " + plansfilePath);
 		
-		String outpath = "output/plans/analysis/";
+		String outpath = "output/kti/";
 		
 		this.extractSubtours();		
 		this.printStartLocationofSubtours(outpath);
@@ -64,10 +65,13 @@ public class SpatialSubtourAnalyzer {
 		log.info("reading the network ...");
 		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
+				
+		World world = Gbl.getWorld();
 		
 		log.info("reading the facilities ...");
-		this.facilities =new ActivityFacilitiesImpl();
+		this.facilities =(ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
+		
 		
 		log.info("  reading file " + plansfilePath);
 		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, network);
@@ -84,8 +88,8 @@ public class SpatialSubtourAnalyzer {
 			this.subtourStartLocations.get(mode).put(facilityId, new Integer(0));
 		}
 		
-		int cnt = this.subtourStartLocations.get(mode).get(facilityId).intValue();
-		this.subtourStartLocations.get(mode).put(facilityId, cnt++);
+		int cnt = this.subtourStartLocations.get(mode).get(facilityId).intValue() + 1;
+		this.subtourStartLocations.get(mode).put(facilityId, cnt);
 	}
 	
 	private void extractSubtours() {
@@ -99,6 +103,8 @@ public class SpatialSubtourAnalyzer {
 			
 			subtourStartLocationsExtractor.run(selectedPlan);
 			TreeMap<Id, Integer> subtourStartLocations = subtourStartLocationsExtractor.getSubtourStartLocations();
+			
+			log.info("Number of subtour start locations : " + subtourStartLocations.size());
 						
 			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 			
@@ -117,15 +123,19 @@ public class SpatialSubtourAnalyzer {
 
 	private void printStartLocationofSubtours(String outpath) {
 
+		log.info("Generate output files ...");
+		
 		try {
 			BufferedWriter out;			
 			
 			Iterator<TransportMode> mode_it = subtourStartLocations.keySet().iterator();
 			while (mode_it.hasNext()) {
 				TransportMode mode = mode_it.next();
+				
+				log.info("Writing : " + outpath + "subtourStartLocations_" + mode + ".txt");
 
 				out = IOUtils.getBufferedWriter(outpath + "subtourStartLocations_" + mode + ".txt");
-				out.write("x\ty\tnbrofSubtourStarts");
+				out.write("facility\tx\ty\tnbrofSubtourStarts\n");
 				
 				TreeMap<Id, Integer> locations = subtourStartLocations.get(mode);
 				
@@ -135,8 +145,10 @@ public class SpatialSubtourAnalyzer {
 					
 					ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
 				
-					out.write(facility.getCoord().getX() + "\t" + facility.getCoord().getY() +
-							locations.get(facilityId).intValue() +  "\n");
+					out.write(facility.getId() + "\t" + 
+							facility.getCoord().getX() + "\t" + facility.getCoord().getY() + "\t" +
+							locations.get(facilityId).intValue() +  
+							"\n");
 				}
 				out.flush();
 				out.close();

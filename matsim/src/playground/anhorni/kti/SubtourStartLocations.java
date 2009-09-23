@@ -3,6 +3,7 @@ package playground.anhorni.kti;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.population.ActivityImpl;
@@ -12,6 +13,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class SubtourStartLocations implements PlanAlgorithm {
 
 	private TreeMap<Id, Integer> locationIds = null;
+	
+	private final static Logger log = Logger.getLogger(SpatialSubtourAnalyzer.class);
 
 	public void run(final PlanImpl plan) {
 
@@ -19,16 +22,19 @@ public class SubtourStartLocations implements PlanAlgorithm {
 
 		Id locationId = null;
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
-		for (int ii=0; ii < actsLegs.size(); ii++) {
-			if (actsLegs.get(ii) instanceof ActivityImpl) {
-				locationId = ((ActivityImpl) actsLegs.get(ii)).getFacilityId();
+		for (int i=0; i < actsLegs.size(); i++) {
+			if (actsLegs.get(i) instanceof ActivityImpl) {
+				locationId = ((ActivityImpl) actsLegs.get(i)).getFacilityId();
 				
 				if (this.locationIds.get(locationId) == null) {
 					this.locationIds.put(locationId, new Integer(0));
 				}
 				
-				int cnt = this.locationIds.get(locationId);
-				this.locationIds.put(locationId, cnt++);
+				int cnt = this.locationIds.get(locationId).intValue() + 1;
+				this.locationIds.put(locationId, cnt);
+				
+				log.info("location id + cnt : " + locationId + " " +cnt);
+				
 			}
 		}
 	}
@@ -41,7 +47,7 @@ public class SubtourStartLocations implements PlanAlgorithm {
 			if (this.locationIds.get(facilityId).intValue() > 1) {
 				subtourStartLocations.put(facilityId, this.locationIds.get(facilityId).intValue() -1);
 			}
-		}	
+		}
 		return subtourStartLocations;
 	}
 }
