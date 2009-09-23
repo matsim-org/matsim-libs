@@ -76,6 +76,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
 
 /**
  * Implementation of a queue-based transport simulation.
+ * Lanes and SignalSystems are not initialized unless the setter are invoked.
  *
  * @author dstrippgen
  * @author mrieser
