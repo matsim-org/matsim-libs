@@ -68,6 +68,8 @@ public class KTIControler extends Controler {
 	
 	/**
 	 * workaround in order to have {@link PlansCalcRouteKtiInfo} data available when loading a population which contains {@link KtiPtRoute}s
+	 * 
+	 * TODO integrate PlansCalcRouteKti(Info) into scenarioImpl, and scenario config
 	 */
 	private void initPlansCalcRouteKtiInfo(String configFilename) {
 		// workaround in order to have PlansCalcRouteKtiInfo data available
@@ -101,7 +103,6 @@ public class KTIControler extends Controler {
 		logger.info("Loading PlansCalcRouteKtiInfo...");
 		this.plansCalcRouteKtiInfo.prepare(this.ktiConfigGroup, tempNetwork);
 		logger.info("Loading PlansCalcRouteKtiInfo...done.");
-		// TODO integrate PlansCalcRouteKti(Info) into scenarioImpl, and scenario config
 	}
 	
 	@Override
