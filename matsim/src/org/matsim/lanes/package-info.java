@@ -1,5 +1,7 @@
 /**
- * This package contains classes to add lanes at the end of links.
+ *  This package contains classes to add lanes at the end of links.
+ *  There is no extra test package for the lanes implementation. However
+ *  tests for lanes can be found in the signalsystems test package.
  *
  * <h2>Usage restrictions:</h2>
  * <ul>
