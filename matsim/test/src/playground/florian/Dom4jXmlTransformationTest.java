@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.florian.JFreeTest.Dom4jTest;
@@ -39,16 +40,7 @@ public class Dom4jXmlTransformationTest extends MatsimTestCase{
 		BufferedWriter fileWriter = new BufferedWriter(new FileWriter(new File(outputFile)));
 		fileWriter.write(output);
 		fileWriter.close();
-		
-		BufferedReader compareFile = new BufferedReader(new FileReader(new File(compfile)));
-		BufferedReader transformedFile = new BufferedReader(new FileReader(new File(outputFile)));
-		
-		
-    int expected, actual;		
-		do{
-			expected = compareFile.read();
-			actual = transformedFile.read();
-			assertEquals(expected, actual);
-		} while ((actual != -1) && (expected != -1));
+
+		assertEquals(CRCChecksum.getCRCFromFile(compfile), CRCChecksum.getCRCFromFile(outputFile));
 	}
 }

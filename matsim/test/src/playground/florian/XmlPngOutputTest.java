@@ -10,6 +10,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -43,7 +44,9 @@ public class XmlPngOutputTest extends MatsimTestCase {
 		assertNotNull(scorePNG);
 		scorePNG.close();
 		scoreXML.close();
-		//The Files exist, now check, whether the Scores are the expected SCores
+		//The Files exist, now check if the created PNG equals the InputPNG
+		assertEquals(CRCChecksum.getCRCFromFile(getOutputDirectory() + "scores.xml.png"), CRCChecksum.getCRCFromFile(getPackageInputDirectory() + "scores.xml.png"));
+		//now check, whether the Scores are the expected SCores
 		ScoreXMLReader actualScore = new ScoreXMLReader(SCHEMALOCATION);
 		ScoreXMLReader exScore = new ScoreXMLReader(SCHEMALOCATION);
 		actualScore.readFile(outputFile);
