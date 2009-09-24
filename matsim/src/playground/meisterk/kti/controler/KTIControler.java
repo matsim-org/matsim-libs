@@ -1,11 +1,22 @@
 package playground.meisterk.kti.controler;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.xml.sax.SAXException;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
@@ -13,6 +24,7 @@ import playground.meisterk.kti.controler.listeners.KtiPopulationPreparation;
 import playground.meisterk.kti.controler.listeners.LegDistanceDistributionWriter;
 import playground.meisterk.kti.controler.listeners.ScoreElements;
 import playground.meisterk.kti.router.KtiNodeNetworkRouteFactory;
+import playground.meisterk.kti.router.KtiPtRoute;
 import playground.meisterk.kti.router.KtiPtRouteFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
@@ -38,24 +50,63 @@ public class KTIControler extends Controler {
 
 	private final KtiConfigGroup ktiConfigGroup;
 
+	private static final Logger logger = Logger.getLogger(KTIControler.class);
+
 	public KTIControler(String[] args) {
 		super(args);
 
 		this.ktiConfigGroup = new KtiConfigGroup();
 		super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 
+		String tempConfigFilename = args[0];
+		this.initPlansCalcRouteKtiInfo(tempConfigFilename);
+		
 		this.getNetworkFactory().setRouteFactory(TransportMode.car, new KtiNodeNetworkRouteFactory());
 		this.getNetworkFactory().setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
 
 	}
 	
+	/**
+	 * workaround in order to have {@link PlansCalcRouteKtiInfo} data available when loading a population which contains {@link KtiPtRoute}s
+	 */
+	private void initPlansCalcRouteKtiInfo(String configFilename) {
+		// workaround in order to have PlansCalcRouteKtiInfo data available
+		// when loading a population which contains kti pt routes
+		logger.info("Loading temporary config in order to get network filename...");
+		Config tempConfig = new Config();
+		tempConfig.addCoreModules();
+		tempConfig.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
+		if (configFilename != null) {
+			new MatsimConfigReader(this.config).readFile(configFilename);
+		}
+		logger.info("Loading temporary config in order to get network filename...done.");
+		logger.info("Checking consistency of temporary config...");
+		this.config.checkConsistency();
+		logger.info("Checking consistency of temporary config...done.");
+		
+		logger.info("Loading temporary network...");
+		String networkFileName = this.config.network().getInputFile();
+		NetworkLayer tempNetwork = new NetworkLayer();
+		try {
+			new MatsimNetworkReader(tempNetwork).parse(networkFileName);
+		} catch (SAXException e) {
+			throw new RuntimeException(e);
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		logger.info("Loading temporary network...done.");
+		
+		logger.info("Loading PlansCalcRouteKtiInfo...");
+		this.plansCalcRouteKtiInfo.prepare(this.ktiConfigGroup, tempNetwork);
+		logger.info("Loading PlansCalcRouteKtiInfo...done.");
+		// TODO integrate PlansCalcRouteKti(Info) into scenarioImpl, and scenario config
+	}
+	
 	@Override
 	protected void setUp() {
 
-		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			this.plansCalcRouteKtiInfo.prepare(this.ktiConfigGroup, this.getNetwork());
-		}
-		
 		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				super.config, 
 				this.ktiConfigGroup,
