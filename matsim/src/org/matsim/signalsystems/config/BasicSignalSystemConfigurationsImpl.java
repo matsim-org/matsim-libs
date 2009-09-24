@@ -50,4 +50,8 @@ public class BasicSignalSystemConfigurationsImpl implements
 		return this.builder;
 	}
 
+	public void addSignalSystemConfiguration(BasicSignalSystemConfiguration systemConfig) {
+		this.signalSystemConfigs.put(systemConfig.getSignalSystemId(), systemConfig);
+	}
+
 }

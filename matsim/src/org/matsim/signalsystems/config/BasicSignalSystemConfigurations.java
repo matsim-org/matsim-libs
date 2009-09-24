@@ -24,21 +24,24 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 
-
-
 /**
  * @author dgrether
- *
+ * 
  */
 public interface BasicSignalSystemConfigurations extends MatsimToplevelContainer {
-	
-	
+
 	public BasicSignalSystemConfigurationsBuilder getBuilder();
+
 	/**
 	 * 
-	 * @return a map containing all signal system configurations organized 
-	 * by the Id of the SignalSystem
+	 * @return a map containing all signal system configurations organized by the
+	 *         Id of the SignalSystem
 	 */
 	public Map<Id, BasicSignalSystemConfiguration> getSignalSystemConfigurations();
-	
+
+	/**
+	 * adds the given SignalSystemConfiguration to the map of this container.
+	 * @param systemConfig
+	 */
+	public void addSignalSystemConfiguration(BasicSignalSystemConfiguration systemConfig);
 }
