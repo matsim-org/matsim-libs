@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneLeaveEventHandler
+ * LaneEnterEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,17 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.events.handler;
-
-import org.matsim.core.events.LaneLeaveEvent;
-
+package org.matsim.core.events;
 
 
 /**
+ * Thrown if a Lane is entered. 
  * @author dgrether
- *
  */
-public interface LaneLeaveEventHandler extends EventHandler {
+public interface LaneEnterEvent extends LaneEvent {
 
-	public void handleEvent (LaneLeaveEvent event);
 }

@@ -28,7 +28,7 @@ import org.matsim.core.population.PersonImpl;
  * @author dgrether
  *
  */
-public class LaneLeaveEventImpl extends LaneEventImpl {
+public class LaneLeaveEventImpl extends LaneEventImpl implements LaneLeaveEvent {
 	
 	public static final String EVENT_TYPE = "entered lane";
 	

@@ -30,12 +30,11 @@ import org.matsim.core.population.PersonImpl;
  * @author dgrether
  *
  */
-public abstract class LaneEventImpl extends LinkEventImpl {
+public abstract class LaneEventImpl extends LinkEventImpl implements LaneEvent {
 
 	public static final String ATTRIBUTE_LANE = "lane";
 	
 	private final Id laneId;
-	
 
 	/**
 	 * @param time

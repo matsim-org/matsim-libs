@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneLeaveEventHandler
+ * LaneEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,17 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.events.handler;
+package org.matsim.core.events;
 
-import org.matsim.core.events.LaneLeaveEvent;
-
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.events.LinkEvent;
 
 
 /**
+ * Super interface for lane events
  * @author dgrether
- *
  */
-public interface LaneLeaveEventHandler extends EventHandler {
-
-	public void handleEvent (LaneLeaveEvent event);
+public interface LaneEvent extends LinkEvent {
+	/**
+	 * @return the LaneId of the lane the event is thrown for.
+	 */
+	public Id getLaneId();
 }
