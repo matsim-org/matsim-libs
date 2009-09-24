@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
 import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
@@ -167,6 +166,7 @@ public class EventsImpl implements MatsimToplevelContainer, Events {
 			test = test.getSuperclass();
 		}
 		this.cacheHandlers.clear();
+		log.info("");
 	}
 
 	public void removeHandler(final EventHandler handler) {
