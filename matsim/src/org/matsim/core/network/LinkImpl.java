@@ -21,7 +21,6 @@
 package org.matsim.core.network;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNode;
@@ -37,7 +36,7 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final double flowCapacity;
+	private double flowCapacity;
 
 	protected String type = null;
 
@@ -51,37 +50,57 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 	static private double fsWarnCnt = 0 ;
 	static private double cpWarnCnt = 0 ;
 	static private double plWarnCnt = 0 ;
+	static private double lengthWarnCnt = 0;
 	
 	public LinkImpl(final Id id, final BasicNode from, final BasicNode to,
 			final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
 		super(network, id, from, to);
 
-		super.length = length;
-		super.freespeed = freespeed;
-		super.capacity = capacity;
-		super.nofLanes = lanes;
-
-		this.flowCapacity = this.capacity / ((NetworkLayer)this.getLayer()).getCapacityPeriod();
+		// set attributes and do semantic checks
+		this.setLength(length);
+		this.setFreespeed(freespeed);
+		this.setCapacity(capacity);
+		this.setNumberOfLanes(lanes);
 
 		this.euklideanDist = CoordUtils.calcDistance(this.from.getCoord(), this.to.getCoord());
 
-		// do some semantic checks
 		if (this.from.equals(this.to)) { log.warn("[from=to=" + this.to + " link is a loop]"); }
+	}
+	
+	private void calculateFlowCapacity() {
+		this.flowCapacity = this.capacity / ((NetworkLayer)this.getLayer()).getCapacityPeriod();
+		this.checkCapacitiySemantics();
+	}
+	
+	private void checkCapacitiySemantics() {
 		/*
 		 * I see no reason why a freespeed and a capacity of zero should not be
 		 * allowed! joh 9may2008
 		 */
-		if (this.freespeed <= 0.0 && fsWarnCnt <= 0 ) { 
-			fsWarnCnt++ ;
-			log.warn("[freespeed="+this.freespeed+" may cause problems. Future occurences of this warning are suppressed.]"); 
-		}
-		if (this.capacity <= 0.0 && cpWarnCnt <= 0 ) { 
+		if ((this.capacity <= 0.0) && (cpWarnCnt <= 0) ) { 
 			cpWarnCnt++ ;
 			log.warn("[capacity="+this.capacity+" may cause problems. Future occurences of this warning are suppressed.]"); 
 		}
-		if (this.nofLanes < 1 && plWarnCnt <= 0 ) { 
+	}
+	
+	private void checkFreespeedSemantics() {
+		if ((this.freespeed <= 0.0) && (fsWarnCnt <= 0) ) { 
+			fsWarnCnt++ ;
+			log.warn("[freespeed="+this.freespeed+" may cause problems. Future occurences of this warning are suppressed.]"); 
+		}
+	}
+	
+	private void checkNumberOfLanesSemantics(){
+		if ((this.nofLanes < 1) && (plWarnCnt <= 0) ) { 
 			plWarnCnt++ ;
 			log.warn("[permlanes="+this.nofLanes+" may cause problems. Future occurences of this warning are suppressed.]"); 
+		}
+	}
+	
+	private void checkLengthSemantics(){
+		if ((this.getLength() <= 0.0) && (lengthWarnCnt <= 0)) {
+			lengthWarnCnt++;
+			log.warn("[length=" + this.length + " of link id " + this.getId() + " may cause problems. Future occurences of this warning are suprressed.]");
 		}
 	}
 
@@ -164,6 +183,30 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Override
+	public final void setCapacity(double capacityPerNetworkCapcityPeriod){
+		super.setCapacity(capacityPerNetworkCapcityPeriod);
+		this.calculateFlowCapacity();
+	}
+	
+	@Override
+	public final void setFreespeed(double freespeed) {
+		super.setFreespeed(freespeed);
+		this.checkFreespeedSemantics();
+	}
+
+	@Override
+	public final void setLength(double length) {
+		super.setLength(length);
+		this.checkLengthSemantics();
+	}
+
+	@Override
+	public final void setNumberOfLanes(double lanes) {
+		super.setNumberOfLanes(lanes);
+		this.checkNumberOfLanesSemantics();
+	}
+	
 	public final void setOrigId(final String id) {
 		this.origid = id;
 	}
@@ -184,4 +227,6 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		"[origid=" + this.origid + "]" +
 		"[type=" + this.type + "]";
 	}
+
+
 }

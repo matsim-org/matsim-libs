@@ -28,6 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		suite.addTestSuite(DemandGenerationTest.class);
+		suite.addTestSuite(NetworkCreationTest.class);
 		return suite;
 	}
 

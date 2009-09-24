@@ -101,7 +101,7 @@ implements BasicLink
 		return this.capacity;
 	}
 
-	public final void setCapacity(final double capacity) { // NOT needed in TimeVariantLinkImpl.  Sets "base" capacity (time-indep)
+	public void setCapacity(final double capacity) { // NOT needed in TimeVariantLinkImpl.  Sets "base" capacity (time-indep)
 		this.capacity = capacity;
 	}
 	/**
@@ -116,7 +116,7 @@ implements BasicLink
 	/**
 	 * Sets the freespeed velocity of the link in meter per seconds.
 	 */
-	public final void setFreespeed(final double freespeed) {
+	public void setFreespeed(final double freespeed) {
 		this.freespeed = freespeed;
 	}
 
@@ -124,7 +124,7 @@ implements BasicLink
 		return this.length;
 	}
 
-	public final void setLength(final double length) {
+	public void setLength(final double length) {
 		this.length = length;
 	}
 
@@ -132,7 +132,7 @@ implements BasicLink
 		return this.nofLanes;
 	}
 
-	public final void setNumberOfLanes(final double lanes) {
+	public void setNumberOfLanes(final double lanes) {
 		this.nofLanes = lanes;
 	}
 	
