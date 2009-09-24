@@ -3,7 +3,7 @@ package playground.anhorni.kti;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.population.ActivityImpl;
@@ -14,7 +14,7 @@ public class SubtourStartLocations implements PlanAlgorithm {
 
 	private TreeMap<Id, Integer> locationIds = null;
 	
-	private final static Logger log = Logger.getLogger(SpatialSubtourAnalyzer.class);
+	//private final static Logger log = Logger.getLogger(SpatialSubtourAnalyzer.class);
 
 	public void run(final PlanImpl plan) {
 
@@ -31,10 +31,7 @@ public class SubtourStartLocations implements PlanAlgorithm {
 				}
 				
 				int cnt = this.locationIds.get(locationId).intValue() + 1;
-				this.locationIds.put(locationId, cnt);
-				
-				log.info("location id + cnt : " + locationId + " " +cnt);
-				
+				this.locationIds.put(locationId, cnt);				
 			}
 		}
 	}

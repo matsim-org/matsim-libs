@@ -44,6 +44,12 @@ public class SpatialSubtourAnalyzer {
 	public static void main(final String[] args) {		
 		final SpatialSubtourAnalyzer analyzer = new SpatialSubtourAnalyzer();
 		
+		if (args.length != 3) {
+			printHelp();
+			log.error("Execution aborted");
+			return;
+		}
+		
 		analyzer.init(args[0], args[1], args[2]);
 		analyzer.run(args[2]);	
 	}
@@ -61,21 +67,23 @@ public class SpatialSubtourAnalyzer {
 	}
 		
 	private void init(String networkfilePath, String facilitiesfilePath, String plansfilePath) {
-									
+		
+		log.info(" \n---------------------------- \nStart init" );
 		log.info("reading the network ...");
 		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 				
 		World world = Gbl.getWorld();
 		
-		log.info("reading the facilities ...");
+		log.info("Reading the facilities ...");
 		this.facilities =(ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 		
 		
-		log.info("  reading file " + plansfilePath);
+		log.info("Reading file " + plansfilePath);
 		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, network);
-		plansReader.readFile(plansfilePath);				
+		plansReader.readFile(plansfilePath);
+		log.info("Init finished \n ----------------------------");
 	}
 	
 	private void incrementCounter(Id facilityId, TransportMode mode) {
@@ -103,9 +111,7 @@ public class SpatialSubtourAnalyzer {
 			
 			subtourStartLocationsExtractor.run(selectedPlan);
 			TreeMap<Id, Integer> subtourStartLocations = subtourStartLocationsExtractor.getSubtourStartLocations();
-			
-			log.info("Number of subtour start locations : " + subtourStartLocations.size());
-						
+									
 			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 			
 			if (actslegs.size() < 6) continue;
@@ -157,5 +163,12 @@ public class SpatialSubtourAnalyzer {
 		catch (final IOException e) {
 			Gbl.errorMsg(e);
 		}
+	}
+	
+	private static void printHelp() {
+		log.info("This tool needs the following three config arguments: ");
+		log.info("  - path to a network file");
+		log.info("  - path to a facilities file");
+		log.info("  - path to a plans file");
 	}
 }
