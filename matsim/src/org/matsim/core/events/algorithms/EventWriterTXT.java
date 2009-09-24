@@ -40,6 +40,7 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
@@ -172,7 +173,7 @@ public class EventWriterTXT implements EventWriter, BasicActivityEndEventHandler
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 3, AgentStuckEventImpl.EVENT_TYPE);
 	}
 
-	public void handleEvent(AgentMoneyEventImpl event) {
+	public void handleEvent(AgentMoneyEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), null, 9, AgentMoneyEventImpl.EVENT_TYPE + "\t" + event.getAmount());
 	}
 
