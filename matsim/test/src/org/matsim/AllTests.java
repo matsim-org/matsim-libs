@@ -44,6 +44,7 @@ public class AllTests {
 
 		// first run api tests
 		suite.addTest(org.matsim.api.basic.v01.AllTests.suite());
+		suite.addTest(org.matsim.api.core.v01.AllTests.suite());
 		
 		// second run core test
 		suite.addTest(org.matsim.core.AllTests.suite());
