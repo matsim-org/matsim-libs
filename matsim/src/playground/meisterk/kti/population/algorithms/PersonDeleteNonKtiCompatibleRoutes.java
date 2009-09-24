@@ -20,6 +20,7 @@
 
 package playground.meisterk.kti.population.algorithms;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -38,26 +39,27 @@ public class PersonDeleteNonKtiCompatibleRoutes extends AbstractPersonAlgorithm 
 	public void run(PersonImpl person) {
 
 		/*
-		 * All routes are deleted:
-		 * - Car routes are deleted because their distance is not calculated as actually simulated in the traffic simulation.
-		 * - Pt routes are deleted because
-		 * -- if they are non kti pt routes, they might survive in the evolutionary process when they are shorter/cheaper than the correct routes. 
-		 * They are not "automagically" replaced by the
-		 * strategic modules that only generate correct routes.
-		 * -- if they are kti pt routes, it takes too a long time to read them in
+		 * Modify routes as follows:
+		 * - Delete all "pt" routes independent of whether they are valid kti pt routes or not.
+		 * -- Delete all non-kti pt routes because they are invalid for this scenario (e.g. they might survive the evolutionary optimization
+		 * due to lower costs)
+		 * -- Delete all kti pt routes because reading them in is still much too slow. Initial rerouting is ok because it is not time-dependent.
+		 * - Set new distance of car routes because the value is probably not correct (see KtiNodeNetworkRouteImpl).
 		 */
 		for (PlanImpl plan : person.getPlans()) {
 			for (BasicPlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
-					leg.setRoute(null);
-//					if (leg.getMode().equals(TransportMode.pt)) {
-//						if (((KtiPtRoute) leg.getRoute()).getFromStop() == null) {
-//							leg.setRoute(null);
-//						}
-//					} else {
-//						leg.setRoute(null);
-//					}
+					if (leg.getMode().equals(TransportMode.pt)) {
+						leg.setRoute(null);
+					} else if (leg.getMode().equals(TransportMode.car)) {
+						// invalidate distance information
+						leg.getRoute().setDistance(Double.NaN);
+						// set new distance information
+						leg.getRoute().setDistance(leg.getRoute().getDistance());
+					} else {
+						// do nothing
+					}
 				}
 			}
 		}
