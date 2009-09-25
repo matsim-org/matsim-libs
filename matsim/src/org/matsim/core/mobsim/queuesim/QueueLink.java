@@ -159,7 +159,7 @@ public class QueueLink {
 		this.queueNetwork = queueNetwork;
 		this.toQueueNode = toNode;
 
-		this.originalLane = new QueueLane(this, true);
+		this.originalLane = new QueueLane(this, null);
 		this.queueLanes = new ArrayList<QueueLane>();
 		this.queueLanes.add(this.originalLane);
 	}
@@ -167,19 +167,18 @@ public class QueueLink {
 
 	/**
 	 * Initialize the QueueLink with more than one QueueLane
-	 * @param lanes
+	 * @param map
 	 */
-	/*package*/ void createLanes(List<BasicLane> lanes) {
+	/*package*/ void createLanes(Map<Id, BasicLane> map) {
 		this.hasLanes = true;
 		boolean firstNodeLinkInitialized = false;
 		
-		for (BasicLane signalLane : lanes) {
+		for (BasicLane signalLane : map.values()) {
 			if (signalLane.getLength() > this.link.getLength()) {
 				throw new IllegalStateException("Link Id " + this.link.getId() + " is shorter than Lane Id " + signalLane.getId() + " on this link!");
 			}
 			QueueLane lane = null;
-			lane = new QueueLane(this, false);
-			lane.setLaneData(signalLane);
+			lane = new QueueLane(this, signalLane);
 			lane.setMetersFromLinkEnd(0.0);
 			lane.setLaneLength(signalLane.getLength());
 			lane.calculateCapacities();
@@ -220,7 +219,7 @@ public class QueueLink {
 	
 	protected void addSignalGroupDefinition(BasicSignalGroupDefinition basicSignalGroupDefinition) {
 		for (QueueLane lane : this.toNodeQueueLanes) {
-			lane.addLightSignalGroupDefinition(basicSignalGroupDefinition);
+			lane.addSignalGroupDefinition(basicSignalGroupDefinition);
 		}				
 	}
 	

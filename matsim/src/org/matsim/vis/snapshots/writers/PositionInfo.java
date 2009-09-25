@@ -20,9 +20,12 @@
 
 package org.matsim.vis.snapshots.writers;
 
-import org.matsim.api.basic.v01.Coord;
+import java.awt.geom.Point2D;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.vis.vecmathutils.VectorUtils;
 
 /**
  * A helper class to store information about agents (id, position, speed), mainly used to create
@@ -56,10 +59,10 @@ public class PositionInfo {
 
 	final private Id agentId;
 
-	final private double easting;
-	final private double northing;
-	final private double elevation;
-	final private double azimuth;
+	private double easting;
+	private double northing;
+	private double elevation;
+	private double azimuth;
 	final private double distanceOnLink;
 	final private String visualizerData;
 
@@ -70,7 +73,6 @@ public class PositionInfo {
 
 
 
-	// the constructor does all the work:
 	/**
 	 * Creates a new PositionInfo based on the agent's position between to nodes.
 	 *
@@ -88,33 +90,34 @@ public class PositionInfo {
 		this.link = link;
 		this.speed = speed;
 		this.distanceOnLink = distanceOnLink;
-		Coord fromCoord = link.getFromNode().getCoord();
-		double dx = -fromCoord.getX() + link.getToNode().getCoord().getX();
-		double dy = -fromCoord.getY() + link.getToNode().getCoord().getY();
-		double theta = 0.0;
-		if (dx > 0) {
-			theta = Math.atan(dy/dx);
-		} else if (dx < 0) {
-			theta = Math.PI + Math.atan(dy/dx);
-		} else { // i.e. DX==0
-			if (dy > 0) {
-				theta = PI_HALF;
-			} else {
-				theta = -PI_HALF;
-			}
-		}
-		if (theta < 0.0) theta += TWO_PI;
-		double correction = link.getEuklideanDistance() / link.getLength();
-		this.easting  = fromCoord.getX() + Math.cos(theta) * distanceOnLink * correction 
-		                + Math.sin(theta) * (0.5*WIDTH_OF_MEDIAN + LANE_WIDTH * lane ) ;
-		this.northing = fromCoord.getY() + Math.sin(theta) * distanceOnLink * correction 
-		                - Math.cos(theta) * (0.5*WIDTH_OF_MEDIAN + LANE_WIDTH * lane ) ;
-		this.elevation = 0.0;
-		this.azimuth = theta / (TWO_PI) * 360;
 		this.vehicleState = vehicleState;
 		this.visualizerData = visualizerData;
+		this.calculatePosition(1.0, lane);
 	}
-
+	
+	/**
+	 * Creates a new PositionInfo based on the agent's position between to nodes
+	 * and scales the position by the given scale parameter.
+	 *
+	 * @param agentId The id of the agent.
+	 * @param link The link the vehicle is currently driving or parking on.
+	 * @param distanceOnLink The distance of the agent from the fromNode of the link (measured on the link's real length, not its euklidean length)
+	 * @param lane The number of the lane the agent is on.
+	 * 		Lanes are counted from the middle of a bi-directional link, beginning with 1.
+	 * @param speed The speed the agent is traveling with.
+	 * @param vehicleState The state of the vehicle (Parking,Driving)
+	 * @param visualizerData additional data (null allowed) that may be used by some visualizers
+	 */
+	public PositionInfo(double linkScale, final Id agentId, final LinkImpl link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState, final String visualizerData) {
+		this.agentId = agentId;
+		this.link = link;
+		this.speed = speed;
+		this.distanceOnLink = distanceOnLink;
+		this.vehicleState = vehicleState;
+		this.visualizerData = visualizerData;
+		this.calculatePosition(linkScale, lane);
+	}
+	
 	/**
 	 * Creates a new PositionInfo with the specified position and speed.
 	 *
@@ -140,6 +143,39 @@ public class PositionInfo {
 		this.visualizerData = visualizerData;
 	}
 
+	
+	private void calculatePosition(double linkScale, int lane){
+		Point2D.Double linkStart = new Point2D.Double(this.link.getFromNode().getCoord().getX(), this.link.getFromNode().getCoord().getY());
+		Point2D.Double linkEnd = new Point2D.Double(this.link.getToNode().getCoord().getX(), this.link.getToNode().getCoord().getY());
+		double dx = -linkStart.getX() + linkEnd.getX();
+		double dy = -linkStart.getY() + linkEnd.getY();
+		double theta = 0.0;
+		if (dx > 0) {
+			theta = Math.atan(dy/dx);
+		} else if (dx < 0) {
+			theta = Math.PI + Math.atan(dy/dx);
+		} else { // i.e. DX==0
+			if (dy > 0) {
+				theta = PI_HALF;
+			} else {
+				theta = -PI_HALF;
+			}
+		}
+		if (theta < 0.0) theta += TWO_PI;
+		double correction = link.getEuklideanDistance() / link.getLength();
+		if (linkScale != 1.0) {
+			Tuple<Point2D.Double, Point2D.Double> scaledLinkTuple = VectorUtils.scaleVector(linkStart, linkEnd, linkScale);
+			linkStart = scaledLinkTuple.getFirst();
+		}
+		this.easting  = linkStart.getX() + Math.cos(theta) * (distanceOnLink * linkScale) * correction 
+		                + Math.sin(theta) * (0.5*WIDTH_OF_MEDIAN + LANE_WIDTH * lane ) ;
+		this.northing = linkStart.getY() + Math.sin(theta) * (distanceOnLink * linkScale) * correction 
+		                - Math.cos(theta) * (0.5*WIDTH_OF_MEDIAN + LANE_WIDTH * lane ) ;
+		this.elevation = 0.0;
+		this.azimuth = theta / (TWO_PI) * 360;
+	}
+
+	
 	public Id getAgentId() {
 		return this.agentId;
 	}

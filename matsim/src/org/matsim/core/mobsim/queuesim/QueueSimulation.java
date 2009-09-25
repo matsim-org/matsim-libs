@@ -383,7 +383,7 @@ public class QueueSimulation {
 					log.error(message);
 					throw new IllegalStateException(message);
 				}
-				link.createLanes(laneToLink.getLanesList());
+				link.createLanes(laneToLink.getLanes());
 			}
 		}
 	}

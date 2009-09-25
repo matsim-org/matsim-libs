@@ -26,7 +26,6 @@ import java.nio.ByteBuffer;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
 
@@ -51,10 +50,7 @@ public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 		public void writeConstData(ByteBuffer out) throws IOException {
 			String id = this.src.getLink().getId().toString();
 			ByteBufferUtils.putString(out, id);
-			out.putFloat((float)(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad.offsetEast)); //subtract minEasting/Northing somehow!
-			out.putFloat((float)(this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad.offsetNorth));
-			out.putFloat((float)(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad.offsetEast)); //subtract minEasting/Northing somehow!
-			out.putFloat((float)(this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad.offsetNorth));
+			super.writeConstData(out);
 			out.putInt(this.src.getLink().getLanesAsInt(0));
 		}
 
