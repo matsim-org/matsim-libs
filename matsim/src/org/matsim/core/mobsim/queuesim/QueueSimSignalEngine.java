@@ -118,15 +118,21 @@ public class QueueSimSignalEngine implements SignalEngine {
 	private void initSignalSystems(final BasicSignalSystems signalSystems) {
 		//store the signalSystemDefinitions in a Map
 		this.signalSystemDefinitions = new TreeMap<Id, BasicSignalSystemDefinition>();
-		for (BasicSignalSystemDefinition signalSystem : signalSystems.getSignalSystemDefinitionsList()) {
-			this.signalSystemDefinitions.put(signalSystem.getId(), signalSystem);
-		}
+		this.signalSystemDefinitions.putAll(signalSystems.getSignalSystemDefinitions());
 		//init the signalGroupDefinitions
 		this.signalGroupDefinitionsBySystemId= new TreeMap<Id, List<BasicSignalGroupDefinition>>();
-		for (BasicSignalGroupDefinition signalGroupDefinition : signalSystems.getSignalGroupDefinitionsList()) {
+		for (BasicSignalGroupDefinition signalGroupDefinition : signalSystems.getSignalGroupDefinitions().values()) {
 			QueueLink queueLink = this.network.getQueueLink(signalGroupDefinition.getLinkRefId());
 			if (queueLink == null) {
 				throw new IllegalStateException("SignalGroupDefinition Id: " + signalGroupDefinition.getId() + " of SignalSystem Id:  " + signalGroupDefinition.getSignalSystemDefinitionId() + " is set to non existing Link with Id: " + signalGroupDefinition.getLinkRefId());
+			}
+			if (signalGroupDefinition.getSignalSystemDefinitionId() == null) {
+				log.warn("SignalGroupDefinition Id: " + signalGroupDefinition.getId() + " is not attached to a SignalSystem (SignalSystemDefinitionId not set). SignalGroup will not be used!");
+				continue;
+			}
+			if (signalGroupDefinition.getLaneIds() == null) {
+				log.warn("SignalGroupDefinition Id: " + signalGroupDefinition.getId() + " of SignalSystem Id:  " + signalGroupDefinition.getSignalSystemDefinitionId() + " is not attached to a lane. SignalGroup will not be used!");
+				continue;
 			}
 			List<BasicSignalGroupDefinition> list = this.signalGroupDefinitionsBySystemId.get(signalGroupDefinition.getSignalSystemDefinitionId());
 			if (list == null) {
