@@ -37,6 +37,7 @@ public class AllTests {
 		suite.addTestSuite(SignalSystemsOneAgentTest.class);
 		suite.addTestSuite(TravelTimeOneWayTest.class);
 		suite.addTestSuite(TravelTimeFourWaysTest.class);
+		suite.addTestSuite(MixedLaneTest.class);
 		//$JUnit-END$
 		return suite;
 	}
