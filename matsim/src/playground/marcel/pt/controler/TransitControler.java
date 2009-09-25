@@ -127,11 +127,11 @@ public class TransitControler extends Controler {
 				try {
 					new BasicVehicleReaderV1(event.getControler().getScenarioData().getVehicles()).parse(this.config.getVehiclesFile());
 				} catch (SAXException e) {
-					throw new RuntimeException("could not read transit schedule.", e);
+					throw new RuntimeException("could not read vehicles.", e);
 				} catch (ParserConfigurationException e) {
-					throw new RuntimeException("could not read transit schedule.", e);
+					throw new RuntimeException("could not read vehicles.", e);
 				} catch (IOException e) {
-					throw new RuntimeException("could not read transit schedule.", e);
+					throw new RuntimeException("could not read vehicles.", e);
 				}
 			}
 		}
