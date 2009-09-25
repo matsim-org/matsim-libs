@@ -178,7 +178,7 @@ public class CommercialVehicle {
 		
 		// Calculate the descriptive statistic I developed.
 		if(minorInStudyArea > 0){
-			kilometerPerAreaActivityStat = ((double) studyAreaDistance) / ((double) minorInStudyArea);
+			kilometerPerAreaActivityStat = ((double) (studyAreaDistance / (double) 1000)) / ((double) minorInStudyArea);
 		}
 		
 
