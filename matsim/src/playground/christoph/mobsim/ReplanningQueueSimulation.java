@@ -64,8 +64,11 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 		// use WithinDayAgentFactory that creates WithinDayPersonAgents who can reset their chachedNextLink
 		super.setAgentFactory(new WithinDayAgentFactory(this));
 
+		// New QueueSimeEngines that do some parts of the simulation parallel
 //		this.simEngine = new ParallelQueueSimEngine(this.getQueueNetwork(), MatsimRandom.getRandom());
 //		this.simEngine = new ParallelQueueSimEngine2(this.getQueueNetwork(), MatsimRandom.getRandom());
+//		this.simEngine = new ParallelQueueSimEngine3(this.getQueueNetwork(), MatsimRandom.getRandom());
+//		this.simEngine = new ParallelQueueSimEngine4(this.getQueueNetwork(), MatsimRandom.getRandom());
 		
 		this.knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(population);
 		this.knowledgeDBStorageHandler.start();

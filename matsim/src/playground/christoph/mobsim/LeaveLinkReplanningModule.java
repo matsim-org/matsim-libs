@@ -39,10 +39,10 @@ public class LeaveLinkReplanningModule {
 	protected ParallelLeaveLinkReplanner parallelLeaveLinkReplanner;
 	protected LinkReplanningMap linkReplanningMap;
 	
-	public LeaveLinkReplanningModule(LinkReplanningMap linkReplanningMap)
+	public LeaveLinkReplanningModule(ParallelLeaveLinkReplanner parallelLeaveLinkReplanner, LinkReplanningMap linkReplanningMap)
 	{
+		this.parallelLeaveLinkReplanner = parallelLeaveLinkReplanner;
 		this.linkReplanningMap = linkReplanningMap;
-		parallelLeaveLinkReplanner = new ParallelLeaveLinkReplanner();
 	}
 	
 	public void doLeaveLinkReplanning(double time)

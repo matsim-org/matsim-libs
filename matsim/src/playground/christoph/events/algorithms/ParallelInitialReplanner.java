@@ -40,6 +40,10 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 	
 	protected static boolean removeKnowledge = false;
 	
+	public void init()
+	{
+	}
+	
 	/** 
 	 * The Method uses the same structure as the LeaveLinkReplanner but instead of single node and vehicles
 	 * Objects now ArrayLists are handed over.
@@ -47,9 +51,9 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 	 * @param population
 	 * @param time
 	 */	
-	public static void run(List<PersonImpl> persons, double time)
+	public void run(List<PersonImpl> persons, double time)
 	{		
-		Thread[] threads = new Thread[numOfThreads];
+		Thread[] threads = new Thread[this.numOfThreads];
 		ReplannerThread[] replannerThreads = new ReplannerThread[numOfThreads];
 		
 		// setup threads
@@ -91,7 +95,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 	}
 	
 	
-	public static void run(PopulationImpl population, double time)
+	public void run(PopulationImpl population, double time)
 	{
 		ArrayList<PersonImpl> persons = new ArrayList<PersonImpl>();
 		
@@ -103,7 +107,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 		run(persons, time);
 	}
 	
-	public static void setRemoveKnowledge(boolean value)
+	public void setRemoveKnowledge(boolean value)
 	{
 		removeKnowledge = value;
 	}

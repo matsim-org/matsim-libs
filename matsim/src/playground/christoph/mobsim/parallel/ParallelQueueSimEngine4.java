@@ -1,6 +1,6 @@
 ///* *********************************************************************** *
 // * project: org.matsim.*
-// * ParallelQueueSimEngine2.java
+// * ParallelQueueSimEngine4.java
 // *                                                                         *
 // * *********************************************************************** *
 // *                                                                         *
@@ -20,11 +20,18 @@
 //package playground.christoph.mobsim.parallel;
 //
 //import java.util.ArrayList;
+//import java.util.HashMap;
+//import java.util.Iterator;
 //import java.util.List;
+//import java.util.Map;
 //import java.util.Random;
 //
-//import org.matsim.core.mobsim.queuesim.QueueLink;
+//import org.apache.log4j.Logger;
+//import org.matsim.api.basic.v01.Id;
+//import org.matsim.api.core.v01.network.Node;
+//import org.matsim.core.gbl.MatsimRandom;
 //import org.matsim.core.mobsim.queuesim.QueueNetwork;
+//import org.matsim.core.mobsim.queuesim.QueueNode;
 //import org.matsim.core.mobsim.queuesim.QueueSimEngine;
 //
 ///**
@@ -39,98 +46,41 @@
 // * Race Conditions is the destination link has / has not 
 // * already been processed?
 // */
-//public class ParallelQueueSimEngine2 extends QueueSimEngine{
+//public class ParallelQueueSimEngine4 extends QueueSimEngine{
 //
-//	/** This is the collection of links that have to be moved in the simulation */
-//	private List<List<QueueLink>> parallelSimLinksArray;
-//		
+//	private static final Logger log = Logger.getLogger(ParallelQueueSimEngine4.class);
+//	
+//	private ParallelMoveNodes5 parallelMoveNodes5;
+//
 //	private int numOfThreads = 2;
-//	private ParallelMoveLinks2 parallelMoveLinks;
 //	
-//	private int distributor = 0;
-//	
-//	public ParallelQueueSimEngine2(final QueueNetwork network, final Random random) 
+//	public ParallelQueueSimEngine4(final QueueNetwork network, final Random random) 
 //	{
 //		super(network, random);
-//			
-//		parallelSimLinksArray = new ArrayList<List<QueueLink>>();
+//				
+//		parallelMoveNodes5 = new ParallelMoveNodes5();
 //		
-//		createLinkLists();
+//		List<QueueNodeDependencies> list = new ArrayList<QueueNodeDependencies>();
 //		
-//		parallelMoveLinks = new ParallelMoveLinks2(simulateAllLinks);
-//		parallelMoveLinks.init(parallelSimLinksArray);
+//		for (QueueNode queueNode : simNodesArray)
+//		{
+//			list.add(new QueueNodeDependencies(queueNode, MatsimRandom.getLocalInstance()));
+//		}
+//		
+//		parallelMoveNodes5.init(list, numOfThreads, simulateAllNodes);
 //	}
 //
-//	private void createLinkLists()
-//	{
-//		for (int i = 0; i < numOfThreads; i++)
-//		{
-//			parallelSimLinksArray.add(new ArrayList<QueueLink>());
-//		}
-///*
-// *  We don't have to distribute the Links! This happens when they
-// *  are activated!		
-// */
-////		int i = 0;
-////		for(QueueLink link : this.allLinks)
-////		{
-////			parallelSimLinksArray.get(i % numOfThreads).add(link);
-////			i++;
-////		}
-//	}
-//	
 //	/*
-//	 * Parallel movement of the Links. The results of the simulation
+//	 * Parallel movement of the Nodes. The results of the simulation
 //	 * are deterministic but the order of the LinkEvents within a
 //	 * single TimeStep are not!
 //	 */
 //	@Override
-//	protected void moveLinks(final double time)
+//	protected void moveNodes(final double time)
 //	{
-//		reactivateLinks();
-//		
 //		/*
 //		 * Now split it up to different threads...
 //		 */
-//		parallelMoveLinks.run(time);
-//	}
-//	
-//	/*
-//	 * We do the load balancing between the threads using some kind
-//	 * of round robin.
-//	 * 
-//	 * Additionally we should check from time to time whether the load
-//	 * is really still balanced. This is not guaranteed due to the fact
-//	 * that some Links get deactivated while other don't. If the number
-//	 * of Links is high enough statistically the difference shouldn't
-//	 * be to significant.
-//	 */
-//	@Override
-//	protected void reactivateLinks() {
-//		if (!simulateAllLinks) {
-//			if (!this.simActivateThis.isEmpty()) {
-//				for(QueueLink link : this.simActivateThis)
-//				{
-//					parallelSimLinksArray.get(distributor % numOfThreads).add(link);
-//					distributor++;
-//				}
-//				this.simActivateThis.clear();
-//			}
-//		}
-//	}
-//
-//	/**
-//	 * @return Returns the simLinksArray.
-//	 */
-//	@Override
-//	protected int getNumberOfSimulatedLinks()
-//	{
-//		int size = 0;
-//		for (int i = 0; i < numOfThreads; i++)
-//		{
-//			size = size + this.parallelSimLinksArray.get(i).size();
-//		}
-//		
-//		return size;
+//		parallelMoveNodes5.run(time);
 //	}
 //}

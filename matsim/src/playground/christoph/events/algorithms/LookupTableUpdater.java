@@ -1,5 +1,8 @@
 package playground.christoph.events.algorithms;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
@@ -23,43 +26,66 @@ import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
 public class LookupTableUpdater implements QueueSimulationAfterSimStepListener, QueueSimulationInitializedListener{
 	
 	/*
+	 * We can handle different Replanner Arrays.
+	 * For Example the LeaveLinkReplanner could use
+	 * another Replanner than the ActEndReplanner.
+	 */
+	private List<PlanAlgorithm[][]> replannerArrays;
+	
+	public LookupTableUpdater()
+	{
+		this.replannerArrays = new ArrayList<PlanAlgorithm[][]>();
+	}
+	
+	public void addReplannerArray(PlanAlgorithm[][] array)
+	{
+		this.replannerArrays.add(array);
+	}
+	
+	public void removeReplannerArray(PlanAlgorithm[][] array)
+	{
+		this.replannerArrays.remove(array);
+	}
+	
+	/*
 	 * Using LookupTables for the LinktravelTimes should speed up the WithinDayReplanning.
 	 */
-	public static void updateLinkTravelTimesLookupTables(double time)
+	public void updateLinkTravelTimesLookupTables(double time)
 	{	
-		PlanAlgorithm[][] replannerArray = ParallelReplanner.getReplannerArray();
-		
-		/*
-		 * We update the LookupTables only in the "Parent Replanners".
-		 * Their Children are clones that use the same Maps to store
-		 * the LinkTravelTimes.
-		 */
-		for(int i = 0; i < replannerArray.length; i++)
-		{	
-			// insert clone
-			if (replannerArray[i][0] instanceof KnowledgePlansCalcRoute)
-			{
-				KnowledgePlansCalcRoute replanner = (KnowledgePlansCalcRoute)replannerArray[i][0];
-				
-				if (replanner.getLeastCostPathCalculator() instanceof DijkstraWrapper)
+		for (PlanAlgorithm[][] replannerArray : replannerArrays)
+		{
+			/*
+			 * We update the LookupTables only in the "Parent Replanners".
+			 * Their Children are clones that use the same Maps to store
+			 * the LinkTravelTimes.
+			 */
+			for(int i = 0; i < replannerArray.length; i++)
+			{	
+				// insert clone
+				if (replannerArray[i][0] instanceof KnowledgePlansCalcRoute)
 				{
-					DijkstraWrapper dijstraWrapper = (DijkstraWrapper)replanner.getLeastCostPathCalculator();
+					KnowledgePlansCalcRoute replanner = (KnowledgePlansCalcRoute)replannerArray[i][0];
 					
-					if (dijstraWrapper.getTravelTimeCalculator() instanceof KnowledgeTravelTimeWrapper)
+					if (replanner.getLeastCostPathCalculator() instanceof DijkstraWrapper)
 					{
-						((KnowledgeTravelTimeWrapper)dijstraWrapper.getTravelTimeCalculator()).updateLookupTable(time);
+						DijkstraWrapper dijstraWrapper = (DijkstraWrapper)replanner.getLeastCostPathCalculator();
+						
+						if (dijstraWrapper.getTravelTimeCalculator() instanceof KnowledgeTravelTimeWrapper)
+						{
+							((KnowledgeTravelTimeWrapper)dijstraWrapper.getTravelTimeCalculator()).updateLookupTable(time);
+						}
 					}
+					
+					if (replanner.getPtFreeflowLeastCostPathCalculator() instanceof DijkstraWrapper)
+					{
+						DijkstraWrapper dijstraWrapper = (DijkstraWrapper)replanner.getPtFreeflowLeastCostPathCalculator();
+						
+						if (dijstraWrapper.getTravelTimeCalculator() instanceof KnowledgeTravelTimeWrapper)
+						{
+							((KnowledgeTravelTimeWrapper)dijstraWrapper.getTravelTimeCalculator()).updateLookupTable(time);
+						}
+					} 
 				}
-				
-				if (replanner.getPtFreeflowLeastCostPathCalculator() instanceof DijkstraWrapper)
-				{
-					DijkstraWrapper dijstraWrapper = (DijkstraWrapper)replanner.getPtFreeflowLeastCostPathCalculator();
-					
-					if (dijstraWrapper.getTravelTimeCalculator() instanceof KnowledgeTravelTimeWrapper)
-					{
-						((KnowledgeTravelTimeWrapper)dijstraWrapper.getTravelTimeCalculator()).updateLookupTable(time);
-					}
-				} 
 			}
 		}
 	}
@@ -67,43 +93,44 @@ public class LookupTableUpdater implements QueueSimulationAfterSimStepListener, 
 	/*
 	 * Using LookupTables for the LinktravelCosts should speed up the WithinDayReplanning.
 	 */
-	public static void updateLinkTravelCostsLookupTables(double time)
+	public void updateLinkTravelCostsLookupTables(double time)
 	{	
-		PlanAlgorithm[][] replannerArray = ParallelReplanner.getReplannerArray();
-		
-		/*
-		 * We update the LookupTables only in the "Parent Replanners".
-		 * Their Children are clones that use the same Maps to store
-		 * the LinkTravelTimes.
-		 */
-		for(int i = 0; i < replannerArray.length; i++)
-		{	
-			// insert clone
-			if (replannerArray[i][0] instanceof KnowledgePlansCalcRoute)
-			{
-				KnowledgePlansCalcRoute replanner = (KnowledgePlansCalcRoute)replannerArray[i][0];
-				
-				//if (replanner.getLeastCostPathCalculator() instanceof KnowledgeTravelCostWrapper)
-				if (replanner.getLeastCostPathCalculator() instanceof DijkstraWrapper)
+		for (PlanAlgorithm[][] replannerArray : replannerArrays)
+		{
+			/*
+			 * We update the LookupTables only in the "Parent Replanners".
+			 * Their Children are clones that use the same Maps to store
+			 * the LinkTravelTimes.
+			 */
+			for(int i = 0; i < replannerArray.length; i++)
+			{	
+				// insert clone
+				if (replannerArray[i][0] instanceof KnowledgePlansCalcRoute)
 				{
-					DijkstraWrapper dijstraWrapper = (DijkstraWrapper)replanner.getLeastCostPathCalculator();
+					KnowledgePlansCalcRoute replanner = (KnowledgePlansCalcRoute)replannerArray[i][0];
 					
-					if (dijstraWrapper.getTravelCostCalculator() instanceof KnowledgeTravelCostWrapper)
+					//if (replanner.getLeastCostPathCalculator() instanceof KnowledgeTravelCostWrapper)
+					if (replanner.getLeastCostPathCalculator() instanceof DijkstraWrapper)
 					{
-						((KnowledgeTravelCostWrapper)dijstraWrapper.getTravelCostCalculator()).updateLookupTable(time);
+						DijkstraWrapper dijstraWrapper = (DijkstraWrapper)replanner.getLeastCostPathCalculator();
+						
+						if (dijstraWrapper.getTravelCostCalculator() instanceof KnowledgeTravelCostWrapper)
+						{
+							((KnowledgeTravelCostWrapper)dijstraWrapper.getTravelCostCalculator()).updateLookupTable(time);
+						}
 					}
+					
+					//if (replanner.getPtFreeflowLeastCostPathCalculator() instanceof KnowledgeTravelCostWrapper)
+					if (replanner.getPtFreeflowLeastCostPathCalculator() instanceof DijkstraWrapper)
+					{
+						DijkstraWrapper dijstraWrapper = (DijkstraWrapper)replanner.getPtFreeflowLeastCostPathCalculator();
+						
+						if (dijstraWrapper.getTravelCostCalculator() instanceof KnowledgeTravelCostWrapper)
+						{
+							((KnowledgeTravelCostWrapper)dijstraWrapper.getTravelCostCalculator()).updateLookupTable(time);
+						}
+					} 
 				}
-				
-				//if (replanner.getPtFreeflowLeastCostPathCalculator() instanceof KnowledgeTravelCostWrapper)
-				if (replanner.getPtFreeflowLeastCostPathCalculator() instanceof DijkstraWrapper)
-				{
-					DijkstraWrapper dijstraWrapper = (DijkstraWrapper)replanner.getPtFreeflowLeastCostPathCalculator();
-					
-					if (dijstraWrapper.getTravelCostCalculator() instanceof KnowledgeTravelCostWrapper)
-					{
-						((KnowledgeTravelCostWrapper)dijstraWrapper.getTravelCostCalculator()).updateLookupTable(time);
-					}
-				} 
 			}
 		}
 	}

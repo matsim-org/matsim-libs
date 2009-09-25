@@ -44,10 +44,10 @@ public class ActEndReplanningModule {
 	
 	public static int replanningCounter = 0;
 	
-	public ActEndReplanningModule(ReplanningQueueSimulation simulation)
+	public ActEndReplanningModule(ParallelActEndReplanner parallelActEndReplanner, ReplanningQueueSimulation simulation)
 	{
 		this.simulation = simulation;
-		parallelActEndReplanner = new ParallelActEndReplanner();
+		this.parallelActEndReplanner = parallelActEndReplanner;
 	}
 	
 	public void doActEndReplanning(double time)

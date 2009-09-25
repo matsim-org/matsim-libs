@@ -50,7 +50,6 @@ import playground.christoph.events.algorithms.LookupTableUpdater;
 import playground.christoph.events.algorithms.ParallelActEndReplanner;
 import playground.christoph.events.algorithms.ParallelInitialReplanner;
 import playground.christoph.events.algorithms.ParallelLeaveLinkReplanner;
-import playground.christoph.events.algorithms.ParallelReplanner;
 import playground.christoph.knowledge.KMLPersonWriter;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.nodeselection.ParallelCreateKnownNodesMap;
@@ -61,7 +60,6 @@ import playground.christoph.knowledge.nodeselection.SelectionReaderMatsim;
 import playground.christoph.knowledge.nodeselection.SelectionWriter;
 import playground.christoph.mobsim.ActEndReplanningModule;
 import playground.christoph.mobsim.LeaveLinkReplanningModule;
-import playground.christoph.mobsim.WithinDayAgentFactory;
 import playground.christoph.mobsim.ReplanningManager;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.network.MyLinkFactoryImpl;
@@ -120,8 +118,13 @@ public class EventControler extends Controler {
 	protected int actEndReplanningCounter = 0;
 	protected int leaveLinkReplanningCounter = 0;
 
+	protected int numReplanningThreads = 2;
+	
 	protected KnowledgeTravelTimeCalculator knowledgeTravelTime;
 
+	protected ParallelInitialReplanner parallelInitialReplanner;
+	protected ParallelActEndReplanner parallelActEndReplanner;
+	protected ParallelLeaveLinkReplanner parallelLeaveLinkReplanner;
 	protected LinkVehiclesCounter linkVehiclesCounter;
 	protected LinkReplanningMap linkReplanningMap;
 	protected LookupTableUpdater lookupTableUpdater;
@@ -276,20 +279,25 @@ public class EventControler extends Controler {
 	/*
 	 * Hands over the ArrayList to the ParallelReplanner
 	 */
-	protected void initParallelReplanningModules() {
-		ParallelReplanner.init(replanners);
-		ParallelReplanner.setNumberOfThreads(4);
+	protected void initParallelReplanningModules()
+	{	
+		this.parallelInitialReplanner = new ParallelInitialReplanner();
+		this.parallelInitialReplanner.setNumberOfThreads(numReplanningThreads);
+		this.parallelInitialReplanner.setReplannerArrayList(replanners);
+		this.parallelInitialReplanner.createReplannerArray();
+		this.parallelInitialReplanner.init();
+		
+		this.parallelActEndReplanner = new ParallelActEndReplanner();
+		this.parallelActEndReplanner.setNumberOfThreads(numReplanningThreads);
+		this.parallelActEndReplanner.setReplannerArrayList(replanners);
+		this.parallelActEndReplanner.setReplannerArray(parallelInitialReplanner.getReplannerArray());
+		this.parallelActEndReplanner.init();
 
-		ParallelActEndReplanner.init();
-		ParallelLeaveLinkReplanner.init();
-		/*
-		 * ParallelLeaveLinkReplanner.init(replanners);
-		 * ParallelLeaveLinkReplanner.setNumberOfThreads(2);
-		 * ParallelActEndReplanner.init(replanners);
-		 * ParallelActEndReplanner.setNumberOfThreads(2);
-		 * 
-		 * // more Modules to come...
-		 */
+		this.parallelLeaveLinkReplanner = new ParallelLeaveLinkReplanner();
+		this.parallelLeaveLinkReplanner.setNumberOfThreads(numReplanningThreads);
+		this.parallelLeaveLinkReplanner.setReplannerArrayList(replanners);
+		this.parallelLeaveLinkReplanner.setReplannerArray(parallelInitialReplanner.getReplannerArray());
+		this.parallelLeaveLinkReplanner.init();
 	}
 
 	/*
@@ -364,12 +372,6 @@ public class EventControler extends Controler {
 
 		// set QueueNetwork in the Traveltime Calculator
 		if (knowledgeTravelTime != null) knowledgeTravelTime.setQueueNetwork(sim.getQueueNetwork());
-
-		ActEndReplanningModule actEndReplanning = new ActEndReplanningModule(sim);
-		LeaveLinkReplanningModule leaveLinkReplanning = new LeaveLinkReplanningModule(linkReplanningMap);
-		
-		replanningManager.setActEndReplanningModule(actEndReplanning);
-		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanning);	
 		
 //		log.info("Remove not selected Plans");
 //		clearPlans();
@@ -419,8 +421,16 @@ public class EventControler extends Controler {
 		log.info("do initial Replanning");
 		doInitialReplanning();	
 		
-		replanningManager.doActEndReplanning(false);
-		replanningManager.doLeaveLinkReplanning(false);
+		lookupTableUpdater.addReplannerArray(parallelInitialReplanner.getReplannerArray());
+		
+		ActEndReplanningModule actEndReplanning = new ActEndReplanningModule(parallelActEndReplanner, sim);
+		LeaveLinkReplanningModule leaveLinkReplanning = new LeaveLinkReplanningModule(parallelLeaveLinkReplanner, linkReplanningMap);
+		
+		replanningManager.setActEndReplanningModule(actEndReplanning);
+		replanningManager.setLeaveLinkReplanningModule(leaveLinkReplanning);
+		
+//		replanningManager.doActEndReplanning(false);
+//		replanningManager.doLeaveLinkReplanning(false);
 		
 		sim.run();
 	}
@@ -735,9 +745,10 @@ public class EventControler extends Controler {
 
 		double time = 0.0;
 		// Remove Knowledge after replanning to save memory.
-		ParallelInitialReplanner.setRemoveKnowledge(true);
+		this.parallelInitialReplanner.setRemoveKnowledge(true);
+
 		// Run Replanner.
-		ParallelInitialReplanner.run(personsToReplan, time);
+		this.parallelInitialReplanner.run(personsToReplan, time);
 
 		// Number of Routes that could not be created...
 		log.info(RandomRoute.getErrorCounter() + " Routes could not be created by RandomRoute.");

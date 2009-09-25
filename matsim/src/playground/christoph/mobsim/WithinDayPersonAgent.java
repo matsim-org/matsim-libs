@@ -35,8 +35,9 @@ public class WithinDayPersonAgent extends PersonAgent{
 	}
 
 	/*
-	 * Reset cached next Link. If a Person is in the Waiting Queue to leave a
+	 * Resets cached next Link. If a Person is in the Waiting Queue to leave a
 	 * Link he/she may replan his/her Route so the cached Link would be wrong.
+	 * 
 	 * This should be more efficient that resetting it in chooseNextLink()
 	 * because it can be called from the Replanning Module and isn't done for
 	 * every Agent even it is not necessary.
@@ -45,16 +46,4 @@ public class WithinDayPersonAgent extends PersonAgent{
 	{
 		super.cachedNextLink = null;
 	}
-
-//	@Override
-//	public Link chooseNextLink()
-//	{
-//		/*
-//		 * Delete cached Link. If a Person is in the Waiting Queue to leave a
-//		 * Link he/she may replan his/her Route so the cached Link would be wrong.
-//		 */
-//		super.cachedNextLink = null;
-//
-//		return super.chooseNextLink();
-//	}
 }

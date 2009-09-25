@@ -39,20 +39,31 @@ public abstract class ParallelReplanner {
 	
 	private final static Logger log = Logger.getLogger(ParallelReplanner.class);
 	
-	protected static ArrayList<PlanAlgorithm> replanners;
-	protected static int numOfThreads = 1;	// use by default only one thread
-	protected static PlanAlgorithm[][] replannerArray;
+	protected ArrayList<PlanAlgorithm> replanners;
+	protected int numOfThreads = 1;	// use by default only one thread
+	protected PlanAlgorithm[][] replannerArray;
 	
+	public abstract void init();
+	
+	/**
+	 * The Number of Threads must have been set before this call!
+	 * @param replannerArrayList
+	 */
 	// Set the Replanners ArrayList here - this can be done once from the Controler
-	public static void init(ArrayList<PlanAlgorithm> replannerArrayList)
+	public void setReplannerArrayList(ArrayList<PlanAlgorithm> replannerArrayList)
 	{
 		replanners = replannerArrayList;
-		
-		// create new Array of Replanners
-		createReplannerArray();
 	}
 	
-	public static PlanAlgorithm[][] getReplannerArray()
+	/*
+	 * We also can use the same Array in different Replanners. 
+	 */
+	public void setReplannerArray(PlanAlgorithm[][] array)
+	{
+		this.replannerArray = array;
+	}
+	
+	public PlanAlgorithm[][] getReplannerArray()
 	{
 		return replannerArray;
 	}
@@ -66,7 +77,7 @@ public abstract class ParallelReplanner {
 	 * If the Replanners from the replanners ArrayList have changed, an update of the
 	 * ArrayList can be initiated by using this method.
 	 */
-	public static void createReplannerArray()
+	public void createReplannerArray()
 	{	
 		// create and fill Array of PlanAlgorithms used in the threads
 		replannerArray = new PlanAlgorithm[replanners.size()][numOfThreads];
@@ -96,19 +107,19 @@ public abstract class ParallelReplanner {
 		}
 	}
 	
-	public static void setNumberOfThreads(int numberOfThreads)
+	public void setNumberOfThreads(int numberOfThreads)
 	{
-		int currentNumOfThreads = numOfThreads;
+//		int currentNumOfThreads = numOfThreads;
 		
 		numOfThreads = Math.max(numberOfThreads, 1); // it should be at least 1 here; we allow 0 in other places for "no threads"
 		
 		log.info("Using " + numOfThreads + " parallel threads to replan routes.");
 		
-		// if the number of used threads has changed -> PlanAlgorithms Array has to be recreated
-		if (numOfThreads != currentNumOfThreads)
-		{
-			createReplannerArray();
-		}
+//		// if the number of used threads has changed -> PlanAlgorithms Array has to be recreated
+//		if (numOfThreads != currentNumOfThreads)
+//		{
+//			createReplannerArray();
+//		}
 		
 		/*
 		 *  Throw error message if the number of threads is bigger than the number of available CPUs.

@@ -4,6 +4,13 @@ import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeSimStepListener;
 
+/*
+ * This Class implements a QueueSimulationBeforeSimStepListener.
+ * 
+ * Each time a ListenerEvent is created it is checked
+ * whether a WithinDayReplanning of the Agents Plans should
+ * be done and / or is necessary.
+ */
 public class ReplanningManager implements QueueSimulationBeforeSimStepListener{
 
 	protected boolean actEndReplanning = false;

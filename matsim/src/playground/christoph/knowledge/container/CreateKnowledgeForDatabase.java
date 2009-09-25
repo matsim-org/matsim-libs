@@ -57,6 +57,7 @@ public class CreateKnowledgeForDatabase {
 	private ReplanningQueueSimulation sim;
 	private EventsImpl events;
 	private LinkVehiclesCounter linkVehiclesCounter;
+	private ParallelInitialReplanner parallelInitialReplanner;
 	
 	private final String dtdFileName = null;
 	
@@ -256,8 +257,11 @@ public class CreateKnowledgeForDatabase {
 	 */
 	private void initParallelReplanningModules()
 	{
-		ParallelReplanner.init(replanners);
-		ParallelReplanner.setNumberOfThreads(parallelThreads);	
+		this.parallelInitialReplanner = new ParallelInitialReplanner();
+		this.parallelInitialReplanner.setNumberOfThreads(parallelThreads);
+		this.parallelInitialReplanner.setReplannerArrayList(replanners);
+		this.parallelInitialReplanner.createReplannerArray();
+		this.parallelInitialReplanner.init();
 	}
 	
 	/*
@@ -274,7 +278,7 @@ public class CreateKnowledgeForDatabase {
 		double time = 0.0;
 		
 		// Run Replanner
-		ParallelInitialReplanner.run(personsToReplan, time);
+		this.parallelInitialReplanner .run(personsToReplan, time);
 
 		// Number of Routes that could not be created...
 		log.info(RandomRoute.getErrorCounter() + " Routes could not be created by RandomRoute.");

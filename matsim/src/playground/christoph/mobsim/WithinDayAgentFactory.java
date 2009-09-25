@@ -24,9 +24,15 @@ import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.population.PersonImpl;
 
+/*
+ * Creates WithinDayPersonAgents instead of PersonAgents.
+ * They are able to reset their cachedNextLink what is
+ * necessary when doing LeaveLinkReplanning.
+ */
 public class WithinDayAgentFactory extends AgentFactory {
 
-	public WithinDayAgentFactory(final QueueSimulation simulation) {
+	public WithinDayAgentFactory(final QueueSimulation simulation)
+	{
 		super(simulation);
 	}
 
@@ -36,5 +42,4 @@ public class WithinDayAgentFactory extends AgentFactory {
 		WithinDayPersonAgent agent = new WithinDayPersonAgent(p, this.simulation);
 		return agent;
 	}
-
 }

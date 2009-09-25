@@ -22,6 +22,8 @@ package playground.christoph.events.algorithms;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
@@ -37,8 +39,9 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 	
 	private final static Logger log = Logger.getLogger(ParallelLeaveLinkReplanner.class);
 	
-	private static ReplannerThread[] replannerThreads;
-	private static ThreadLocker threadLocker;
+	private CyclicBarrier timeStepStartBarrier;
+	private CyclicBarrier timeStepEndBarrier;
+	private ReplannerThread[] replannerThreads;
 	
 	/** 
 	 * The Method uses the same structure as the LeaveLinkReplanner but instead of single node and vehicles
@@ -48,12 +51,12 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 	 * @param vehicles
 	 * @param time
 	 */
-	//public static void run(ArrayList<QueueNode> currentNodes, ArrayList<QueueVehicle> vehicles, double time)
 	public void run(List<QueueVehicle> vehicles, double time)
 	{	
-//		log.info("Start Replanning");
-		// distribute workload between threads
-		// as long as threads are waiting we don't need synchronized data structures
+		/*
+		 *  distribute workload between threads
+		 *  as long as threads are waiting we don't need synchronized data structures
+		 */
 		for(int i = 0; i < vehicles.size(); i++)
 		{
 			QueueVehicle vehicle = vehicles.get(i);
@@ -63,34 +66,27 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		
 		try
 		{
-			// lock threadLocker until wait() statement listens for the notifies
-			synchronized(threadLocker) 
-			{
-				// set current Time
-				ReplannerThread.setTime(time);
-	
-				threadLocker.setCounter(replannerThreads.length);
-				threadLocker.time = time;
+			ReplannerThread.setTime(time);
 				
-				for (ReplannerThread replannerThread : replannerThreads)
-				{
-					replannerThread.startReplanning();		
-				}
-				threadLocker.wait();
-			}		
+			this.timeStepStartBarrier.await();
+				
+			this.timeStepEndBarrier.await();
+	
 		} 
 		catch (InterruptedException e)
 		{
 			Gbl.errorMsg(e);
 		}
-//		log.info("done");
+		catch (BrokenBarrierException e)
+		{
+	      	Gbl.errorMsg(e);
+		}
 	}
 	
-	public static void init()
-	{
-		threadLocker = new ThreadLocker();
-		
-		ReplannerThread.setThreadLocker(threadLocker);
+	public void init()
+	{		
+		this.timeStepStartBarrier = new CyclicBarrier(numOfThreads + 1);
+		this.timeStepEndBarrier = new CyclicBarrier(numOfThreads + 1);
 		
 		replannerThreads = new ReplannerThread[numOfThreads];
 		
@@ -99,45 +95,39 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		{
 			ReplannerThread replannerThread = new ReplannerThread(i, replannerArray, replanners);
 			replannerThread.setName("ParallelLeaveLinkReplanner" + i);
+			replannerThread.setCyclicTimeStepStartBarrier(this.timeStepStartBarrier);
+			replannerThread.setCyclicTimeStepEndBarrier(this.timeStepEndBarrier);
+			
 			replannerThreads[i] = replannerThread;
 			
 			replannerThread.start();
 		}
-	}
-	
-	private static class ThreadLocker
-	{
-		private int count = 0;
-		public double time;
 		
-		public synchronized void setCounter(int i)
+		/*
+		 * After initialization the Threads are waiting at the
+		 * TimeStepEndBarrier. We trigger this Barrier once so 
+		 * they wait at the TimeStepStartBarrier what has to be
+		 * their state if the run() method is called.
+		 */
+		try
 		{
-			this.count = i;
-		}
-				
-		public synchronized void incCounter()
+			this.timeStepEndBarrier.await();
+		} 
+		catch (InterruptedException e) 
 		{
-			count++;
-		}
-		
-		public synchronized void decCounter()
+			Gbl.errorMsg(e);
+		} 
+		catch (BrokenBarrierException e)
 		{
-			count--;
-			if(count == 0)
-			{
-//				log.info("Notify " + time);
-				notify();
-			}
+			Gbl.errorMsg(e);
 		}
 	}
-	
-	
+		
 	/**
 	 * The thread class that really handles the persons.
 	 */
 	private static class ReplannerThread extends Thread 
 	{
-		private static ThreadLocker threadLocker;
 		private static double time = 0.0;
 		private static boolean simulationRunning = true;
 		
@@ -146,16 +136,14 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		private final PlanAlgorithm[][] replannerArray;
 		private final LinkedList<QueueVehicle> vehicles = new LinkedList<QueueVehicle>();
 
+		private CyclicBarrier timeStepStartBarrier;
+		private CyclicBarrier timeStepEndBarrier;
+		
 		public ReplannerThread(final int i, final PlanAlgorithm replannerArray[][], final ArrayList<PlanAlgorithm> replanners)
 		{
 			this.threadId = i;
 			this.replannerArray = replannerArray;
 			this.replanners = replanners;
-		}
-
-		public static void setThreadLocker (ThreadLocker tl)
-		{
-			threadLocker = tl;
 		}
 		
 		public static void setTime(final double t)
@@ -168,14 +156,16 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 			this.vehicles.add(vehicle);
 		}
 
-		public void startReplanning()
+		public void setCyclicTimeStepStartBarrier(CyclicBarrier barrier)
 		{
-			synchronized(this)
-			{
-				notify();
-			}
+			this.timeStepStartBarrier = barrier;
 		}
 		
+		public void setCyclicTimeStepEndBarrier(CyclicBarrier barrier)
+		{
+			this.timeStepEndBarrier = barrier;
+		}
+				
 		@Override
 		public void run()
 		{
@@ -183,23 +173,20 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 			{
 				try
 				{
-//					log.info("Thread " + threadId + " done");
 					/*
-					 * thradLocker.decCounter() and wait() have to be
-					 * executed in a synchronized block! Otherwise it could
-					 * happen, that the replanning ends and the replanning of
-					 * the next SimStep executes the notify command before
-					 * wait() is called -> we have a DeadLock!
+					 * The End of the Replanning is synchronized with 
+					 * the TimeStepEndBarrier. If all Threads reach this Barrier
+					 * the main run() Thread can go on.
+					 * 
+					 * The Threads wait now at the TimeStepStartBarrier until
+					 * they are triggered again in the next TimeStep by the main run()
+					 * method.
 					 */
-					synchronized(this)
-					{
-						threadLocker.decCounter();
-						wait();
-					}
-//					log.info("Thread " + threadId + " started");
-					//log.info("Runnning: " + time);
+					timeStepEndBarrier.await();
+						
+					timeStepStartBarrier.await();
 
-					int numRuns = 0;
+//					int numRuns = 0;
 					
 					while(vehicles.peek() != null)
 					{
@@ -214,23 +201,25 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 						// get the replanner or a clone if it, if it's not the first running thread
 						replanner = this.replannerArray[index][threadId];
 
-//						new LeaveLinkReplanner(queueNode, vehicle, time, replanner);
 						new LeaveLinkReplanner(vehicle, time, replanner);
 						//log.info("Did Leave Link Replanning...");
 						
-						numRuns++;
-						if (numRuns % 500 == 0) log.info("created new Plan for " + numRuns + " persons in thread " + threadId);
+//						numRuns++;
+//						if (numRuns % 500 == 0) log.info("created new Plan for " + numRuns + " persons in thread " + threadId);
 					}
 					
 //					log.info("Thread " + threadId + " done.");
 				}
-				catch (InterruptedException ie)
+				catch (InterruptedException e)
 				{
 					log.error("Something is going wrong here...");
+					Gbl.errorMsg(e);
 				}
-			}	// while Simulation Running
-			
+	            catch (BrokenBarrierException e)
+	            {
+	            	Gbl.errorMsg(e);
+	            }
+			}	// while Simulation Running			
 		}	// run()
 	}	// ReplannerThread
-	
 }
