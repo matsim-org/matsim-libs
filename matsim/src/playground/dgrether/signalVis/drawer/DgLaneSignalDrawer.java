@@ -44,6 +44,7 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 	private int numberOfQueueLanes;
 
 	private Point2D.Double branchPoint;
+	private DgOtfLaneData originalLaneData = null;
 	private Map<String, DgOtfLaneData> laneData = new LinkedHashMap<String, DgOtfLaneData>();
 	
 	public DgLaneSignalDrawer() {
@@ -86,15 +87,11 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 	  			gl.glVertex3d(branchPoint.x, branchPoint.y, zCoord); 
 		  		gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord); 
   			gl.glEnd();
+
+  			//draw link to link lines
   			
-  			gl.glColor3d(1.0, 1.0, 0.5);
   			if (DgOtfLaneWriter.DRAW_LINK_TO_LINK_LINES){
-  				for (Point2D.Double point : ld.getToLinkStartPoints()){
-  					gl.glBegin(GL.GL_LINES);
-  					  gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord); 
-  	  			  gl.glVertex3d(point.x, point.y, zCoord); 
-    			  gl.glEnd();
-  				}
+  				this.drawLinkToLinkLines(gl, ld, zCoord);
   			}
   			
 				if (ld.isGreen()) {
@@ -112,9 +109,24 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
    		  gl.glEnd();
 			}
 		}
+		//also draw link to link lines if there is only one lane
+		else if (DgOtfLaneWriter.DRAW_LINK_TO_LINK_LINES) {
+			this.originalLaneData.setEndPoint(branchPoint.x, branchPoint.y);
+			this.drawLinkToLinkLines(gl, this.originalLaneData, zCoord);
+		}
 	}
 	
 
+	private void drawLinkToLinkLines(GL gl, DgOtfLaneData ld, double zCoord){
+		gl.glColor3d(1.0, 0.86, 0.0);
+		for (Point2D.Double point : ld.getToLinkStartPoints()){
+			gl.glBegin(GL.GL_LINES);
+			  gl.glVertex3d(ld.getEndPoint().x, ld.getEndPoint().y, zCoord); 
+			  gl.glVertex3d(point.x, point.y, zCoord); 
+		  gl.glEnd();
+		}
+	}
+	
 	
 	@Override
 	public void invalidate(SceneGraph graph) {
@@ -142,5 +154,10 @@ public class DgLaneSignalDrawer extends OTFGLDrawableImpl {
 	
 	public Map<String, DgOtfLaneData> getLaneData() {
 		return laneData;
+	}
+
+	
+	public void setOriginalLaneData(DgOtfLaneData originalLaneData) {
+		this.originalLaneData = originalLaneData;
 	}
 }

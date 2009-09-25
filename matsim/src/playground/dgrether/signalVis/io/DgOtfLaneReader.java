@@ -54,13 +54,23 @@ public class DgOtfLaneReader extends OTFDataReader {
 		this.drawer.setMiddleOfLinkStart(in.getDouble(), in.getDouble());
 		this.drawer.setBranchPoint(in.getDouble(), in.getDouble());
 
-		if (nrToNodeLanes != 1){
+		if (nrToNodeLanes == 1){
+			if (DgOtfLaneWriter.DRAW_LINK_TO_LINK_LINES){
+				DgOtfLaneData data = new DgOtfLaneData();
+				int numberOfToLinks = in.getInt();
+				for (int j = 0; j < numberOfToLinks; j++) {
+					data.getToLinkStartPoints().add(new Point2D.Double(in.getDouble(), in.getDouble()));
+				}
+				this.drawer.setOriginalLaneData(data);
+			}
+		}
+		else {
 			for (int i = 0; i < nrToNodeLanes; i++){
 				DgOtfLaneData data = new DgOtfLaneData();
 				data.setId(ByteBufferUtils.getString(in));
 				data.setEndPoint(in.getDouble(), in.getDouble());
 				this.drawer.getLaneData().put(data.getId(), data);
-
+				
 				if (DgOtfLaneWriter.DRAW_LINK_TO_LINK_LINES){
 					int numberOfToLinks = in.getInt();
 					for (int j = 0; j < numberOfToLinks; j++) {
@@ -69,7 +79,6 @@ public class DgOtfLaneReader extends OTFDataReader {
 				}
 			}
 		}
-		
 	}
 
 	@Override
