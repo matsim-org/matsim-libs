@@ -72,11 +72,11 @@
     <param name="writeEventsInterval" value="1" />
   </module>
 
- <module name="simulation">
+ <!--<module name="simulation">
     <param name="snapshotFormat" value="otfvis" />
     <param name="snapshotStyle" value="queue" />
     <param name="snapshotperiod" value="00:00:10" />
-  </module>
+  </module>-->
 
   <module name="travelTimeCalculator">
     <param name="calculateLinkToLinkTravelTimes" value="true" />
