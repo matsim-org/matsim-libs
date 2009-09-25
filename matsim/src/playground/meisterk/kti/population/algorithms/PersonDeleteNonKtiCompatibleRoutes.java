@@ -44,6 +44,7 @@ public class PersonDeleteNonKtiCompatibleRoutes extends AbstractPersonAlgorithm 
 		 * -- Delete all non-kti pt routes because they are invalid for this scenario (e.g. they might survive the evolutionary optimization
 		 * due to lower costs)
 		 * -- Delete all kti pt routes because reading them in is still much too slow. Initial rerouting is ok because it is not time-dependent.
+		 * (TODO) consider integration of PlansCalcRouteKti(Info) into org.matsim scenario
 		 * - Set new distance of car routes because the value is probably not correct (see KtiNodeNetworkRouteImpl).
 		 */
 		for (PlanImpl plan : person.getPlans()) {
