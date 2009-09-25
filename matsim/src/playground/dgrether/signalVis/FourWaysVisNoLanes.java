@@ -44,35 +44,6 @@ public class FourWaysVisNoLanes {
 		OTFVisController controller = new OTFVisController(configFile);
 		controller.setOverwriteFiles(true);
 		controller.run();
-		
-		//this is run
-//		OTFVis.playNetwork(netArray);
-		
-		
-		//this is hack
-//		ScenarioImpl scenario = new ScenarioImpl();
-//		scenario.getConfig().network().setInputFile(netFile);
-//		scenario.getConfig().plans().setInputFile(popFile);
-//		
-//		scenario.getConfig().network().setLaneDefinitionsFile(lanesFile);
-//		scenario.getConfig().scenario().setUseLanes(true);
-//		
-//		scenario.getConfig().signalSystems().setSignalSystemFile(signalFile);
-//		scenario.getConfig().signalSystems().setSignalSystemConfigFile(signalConfigFile);
-//		scenario.getConfig().scenario().setUseSignalSystems(true);
-//		
-//		ScenarioLoader loader = new ScenarioLoader(scenario);
-//		loader.loadScenario();
-//		
-//		Events events = new Events();
-//		
-//		
-//		DgOnTheFlyQueueSimQuad client = new DgOnTheFlyQueueSimQuad(scenario, events);
-//		client.setLaneDefinitions(scenario.getLaneDefinitions());
-//		client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
-//		client.run();
-		
-		
 	}
 
 }

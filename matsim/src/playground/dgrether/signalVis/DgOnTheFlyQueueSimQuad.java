@@ -19,30 +19,9 @@
  * *********************************************************************** */
 package playground.dgrether.signalVis;
 
-import java.rmi.RemoteException;
-import java.util.UUID;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsImpl;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.gui.PreferencesDialog;
-import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
-import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
-import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
-import org.matsim.vis.otfvis.server.OnTheFlyServer;
-
-import playground.dgrether.signalVis.drawer.DgLaneSignalDrawer;
-import playground.dgrether.signalVis.io.DgOtfLaneReader;
-import playground.dgrether.signalVis.io.DgOtfLaneWriter;
-import playground.dgrether.signalVis.io.DgOtfSignalWriter;
-import playground.dgrether.signalVis.io.DgSignalReader;
-import playground.dgrether.signalVis.layer.DgOtfLaneLayer;
-import playground.dgrether.signalVis.layer.DgOtfSignalLayer;
+import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
 
 /**
  * This is actually a more or less direct copy of OnTheFlyQueueSimQuad, because
@@ -53,129 +32,130 @@ import playground.dgrether.signalVis.layer.DgOtfSignalLayer;
  * @author dgrether
  * 
  */
-public class DgOnTheFlyQueueSimQuad extends QueueSimulation {
+public class DgOnTheFlyQueueSimQuad extends OnTheFlyQueueSimQuad {
 
-	protected OnTheFlyServer myOTFServer = null;
+//	protected OnTheFlyServer myOTFServer = null;
 
 	/**
 	 * @param net
 	 * @param plans
 	 * @param events
-	 * @param laneDefs
+	 * @param laneDefsvoid
 	 */
 	public DgOnTheFlyQueueSimQuad(ScenarioImpl scenario, EventsImpl events) {
 		super(scenario, events);
-		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
-		if (isMac) {
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-		}
+		this.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
+//		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
+//		if (isMac) {
+//			System.setProperty("apple.laf.useScreenMenuBar", "true");
+//		}
 	}
 
-	@Override
-	protected void prepareSim() {
-		super.prepareSim();
-		UUID idOne = UUID.randomUUID();
-		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.network, this.plans,
-				getEvents(), false);
-
-		OTFConnectionManager connectionManager = setupConnectionManager();
-
-		// FOR TESTING ONLY!
-		PreferencesDialog.preDialogClass = PreferencesDialog2.class;
-		OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(),
-				connectionManager);
-		client.start();
-
-		try {
-			this.myOTFServer.pause();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private OTFConnectionManager setupConnectionManager() {
-		OTFConnectionManager connectionManager = new OTFConnectionManager();
-		boolean drawLanes = false;
-		boolean drawSignals = true;
-		
-		if (drawLanes){
-			// data source to writer
-			connectionManager.add(QueueLink.class, DgOtfLaneWriter.class);
-			// writer -> reader: from server to client
-			connectionManager
-			.add(DgOtfLaneWriter.class, DgOtfLaneReader.class);
-			// reader to drawer (or provider to receiver)
-			connectionManager.add(DgOtfLaneReader.class, DgLaneSignalDrawer.class);
-			// drawer -> layer
-			connectionManager.add(DgLaneSignalDrawer.class, DgOtfLaneLayer.class);
-		}
-		else if (drawSignals) {
-			// data source to writer
-			connectionManager.add(QueueLink.class, DgOtfSignalWriter.class);
-			// writer -> reader: from server to client
-			connectionManager
-			.add(DgOtfSignalWriter.class, DgSignalReader.class);
-			// reader to drawer (or provider to receiver)
-			connectionManager.add(DgSignalReader.class, DgLaneSignalDrawer.class);
-			// drawer -> layer
-			connectionManager.add(DgLaneSignalDrawer.class, DgOtfSignalLayer.class);
-		}
-
-		//agent code
-		// reader -> drawer
-		connectionManager.add(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
-		//drawer -> layer
-		connectionManager.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
-
-		
-		//default network code
-  	// data source to writer
-		connectionManager.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
-		//writer -> reader
-		connectionManager
-		.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		//reader -> drawer
-		connectionManager.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		//drawer -> layer
-		connectionManager.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
-		
-		
-		
-
-		
-		
-		// //writer -> reader
-		// this.add(OTFDefaultLinkHandler.Writer.class,
-		// OTFDefaultLinkHandler.class);
-		// this.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-		// this.add(OTFLinkAgentsNoParkingHandler.Writer.class,
-		// OTFLinkAgentsHandler.class);
-		//	
-		// this.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-		// this.add(OTFDefaultNodeHandler.Writer.class,
-		// OTFDefaultNodeHandler.class);
-		//
-		// //reader -> drawer
-		// this.add(OTFLinkAgentsHandler.class,
-		// SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		//	
-		//	
-		// this.add(OTFLinkAgentsHandler.class, AgentPointDrawer.class);
-		// this.add(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
-		return connectionManager;
-	}
-
-	@Override
-	protected void cleanupSim() {
-		this.myOTFServer.cleanup();
-		this.myOTFServer = null;
-		super.cleanupSim();
-	}
-
-	@Override
-	protected void afterSimStep(final double time) {
-		super.afterSimStep(time);
-		this.myOTFServer.updateStatus(time);
-	}
+//	@Override
+//	protected void prepareSim() {
+//		super.prepareSim();
+//		UUID idOne = UUID.randomUUID();
+//		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.network, this.plans,
+//				getEvents(), false);
+//
+//		OTFConnectionManager connectionManager = setupConnectionManager();
+//
+//		// FOR TESTING ONLY!
+//		PreferencesDialog.preDialogClass = PreferencesDialog2.class;
+//		OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(),
+//				connectionManager);
+//		client.start();
+//
+//		try {
+//			this.myOTFServer.pause();
+//		} catch (RemoteException e) {
+//			e.printStackTrace();
+//		}
+//	}
+//
+//	private OTFConnectionManager setupConnectionManager() {
+//		OTFConnectionManager connectionManager = new OTFConnectionManager();
+//		boolean drawLanes = false;
+//		boolean drawSignals = true;
+//		
+//		if (drawLanes){
+//			// data source to writer
+//			connectionManager.add(QueueLink.class, DgOtfLaneWriter.class);
+//			// writer -> reader: from server to client
+//			connectionManager
+//			.add(DgOtfLaneWriter.class, DgOtfLaneReader.class);
+//			// reader to drawer (or provider to receiver)
+//			connectionManager.add(DgOtfLaneReader.class, DgLaneSignalDrawer.class);
+//			// drawer -> layer
+//			connectionManager.add(DgLaneSignalDrawer.class, DgOtfLaneLayer.class);
+//		}
+//		else if (drawSignals) {
+//			// data source to writer
+//			connectionManager.add(QueueLink.class, DgOtfSignalWriter.class);
+//			// writer -> reader: from server to client
+//			connectionManager
+//			.add(DgOtfSignalWriter.class, DgSignalReader.class);
+//			// reader to drawer (or provider to receiver)
+//			connectionManager.add(DgSignalReader.class, DgLaneSignalDrawer.class);
+//			// drawer -> layer
+//			connectionManager.add(DgLaneSignalDrawer.class, DgOtfSignalLayer.class);
+//		}
+//
+//		//agent code
+//		// reader -> drawer
+//		connectionManager.add(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
+//		//drawer -> layer
+//		connectionManager.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
+//
+//		
+//		//default network code
+//  	// data source to writer
+//		connectionManager.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+//		//writer -> reader
+//		connectionManager
+//		.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+//		//reader -> drawer
+//		connectionManager.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+//		//drawer -> layer
+//		connectionManager.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+//		
+//		
+//		
+//
+//		
+//		
+//		// //writer -> reader
+//		// this.add(OTFDefaultLinkHandler.Writer.class,
+//		// OTFDefaultLinkHandler.class);
+//		// this.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
+//		// this.add(OTFLinkAgentsNoParkingHandler.Writer.class,
+//		// OTFLinkAgentsHandler.class);
+//		//	
+//		// this.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
+//		// this.add(OTFDefaultNodeHandler.Writer.class,
+//		// OTFDefaultNodeHandler.class);
+//		//
+//		// //reader -> drawer
+//		// this.add(OTFLinkAgentsHandler.class,
+//		// SimpleStaticNetLayer.SimpleQuadDrawer.class);
+//		//	
+//		//	
+//		// this.add(OTFLinkAgentsHandler.class, AgentPointDrawer.class);
+//		// this.add(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
+//		return connectionManager;
+//	}
+//
+//	@Override
+//	protected void cleanupSim() {
+//		this.myOTFServer.cleanup();
+//		this.myOTFServer = null;
+//		super.cleanupSim();
+//	}
+//
+//	@Override
+//	protected void afterSimStep(final double time) {
+//		super.afterSimStep(time);
+//		this.myOTFServer.updateStatus(time);
+//	}
 
 }

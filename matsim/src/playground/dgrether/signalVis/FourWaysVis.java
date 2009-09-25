@@ -22,6 +22,7 @@ package playground.dgrether.signalVis;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
 
 
 public class FourWaysVis {
@@ -49,7 +50,7 @@ public class FourWaysVis {
 		scenario.getConfig().network().setInputFile(netFile);
 		scenario.getConfig().plans().setInputFile(popFile);
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
-		
+		scenario.getConfig().simulation().setStuckTime(100.0);
 		
 		scenario.getConfig().network().setLaneDefinitionsFile(lanesFile);
 		scenario.getConfig().scenario().setUseLanes(true);
@@ -63,9 +64,8 @@ public class FourWaysVis {
 		
 		EventsImpl events = new EventsImpl();
 		
-		
-		//this is hack
-		DgOnTheFlyQueueSimQuad client = new DgOnTheFlyQueueSimQuad(scenario, events);
+		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(scenario, events);
+		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
 		client.setLaneDefinitions(scenario.getLaneDefinitions());
 		client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
 		client.run();
