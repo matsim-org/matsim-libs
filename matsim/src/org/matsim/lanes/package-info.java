@@ -14,6 +14,6 @@
  *   <li>Dominik Grether</li>
  * </ul>
  * 
- * Changes by non-maintainers are prohibited.
+ * Changes by non-maintainers are prohibited. Patches very welcome!
  */
 package org.matsim.lanes;
