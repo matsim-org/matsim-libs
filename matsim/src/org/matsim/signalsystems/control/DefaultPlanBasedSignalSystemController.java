@@ -104,18 +104,39 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 			dropping = sgc.getDropping();
 			endIntergreenRc = roughcast + sgc.getInterimGreenTimeRoughcast();
 			endIntergreenDrop = dropping + sgc.getInterGreenTimeDropping();
-			if ((roughcast <= currentSecondInPlan) && 
-					(currentSecondInPlan <  endIntergreenRc)) {
-				newState = SignalGroupState.REDYELLOW;
-			}
-			else if ((endIntergreenRc <= currentSecondInPlan) && (currentSecondInPlan < dropping)) {
-				newState = SignalGroupState.GREEN;
-			}
-			else if ((dropping <= currentSecondInPlan) && (currentSecondInPlan < endIntergreenDrop)) {
-				newState = SignalGroupState.YELLOW;
-			}
+			if(roughcast <= dropping){
+				if ((roughcast <= currentSecondInPlan) &&
+						(currentSecondInPlan <  endIntergreenRc)) {
+					newState = SignalGroupState.REDYELLOW;
+				}
+				else if ((endIntergreenRc <= currentSecondInPlan) && 
+						(currentSecondInPlan < dropping)) {
+					newState = SignalGroupState.GREEN;
+				}
+				else if ((dropping <= currentSecondInPlan) && (currentSecondInPlan < 
+						endIntergreenDrop)) {
+					newState = SignalGroupState.YELLOW;
+				}
+				else {
+					newState = SignalGroupState.RED;
+				}
+			} 
 			else {
-				newState = SignalGroupState.RED;
+				if ((roughcast <= currentSecondInPlan) &&
+						(currentSecondInPlan <  endIntergreenRc)) {
+					newState = SignalGroupState.REDYELLOW;
+				}
+				else if ((endIntergreenDrop <= currentSecondInPlan) && 
+						(currentSecondInPlan < roughcast)) {
+					newState = SignalGroupState.RED;
+				}
+				else if ((dropping <= currentSecondInPlan) && (currentSecondInPlan < 
+						endIntergreenDrop)) {
+					newState = SignalGroupState.YELLOW;
+				}
+				else {
+					newState = SignalGroupState.GREEN;
+				}
 			}
 			this.getSignalGroupStates().put(g, newState);
 			if (newState != currentState){
