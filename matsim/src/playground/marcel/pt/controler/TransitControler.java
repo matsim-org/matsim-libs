@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.controler.Controler;
@@ -67,7 +68,16 @@ public class TransitControler extends Controler {
 	}
 
 	private final void init() {
-		this.config.addModule(TransitConfigGroup.GROUP_NAME, this.transitConfig);
+		if (this.config.getModule(TransitConfigGroup.GROUP_NAME) == null) {
+			this.config.addModule(TransitConfigGroup.GROUP_NAME, this.transitConfig);
+		} else {
+			// this would not be necessary if TransitConfigGroup is part of core config
+			Module oldModule = this.config.getModule(TransitConfigGroup.GROUP_NAME);
+			this.config.removeModule(TransitConfigGroup.GROUP_NAME);
+			this.transitConfig.addParam("transitScheduleFile", oldModule.getValue("transitScheduleFile"));
+			this.transitConfig.addParam("vehiclesFile", oldModule.getValue("vehiclesFile"));
+			this.transitConfig.addParam("transitModes", oldModule.getValue("transitModes"));
+		}
 		this.config.scenario().setUseTransit(true);
 		this.config.scenario().setUseVehicles(true);
 		Set<EventsFileFormat> formats = EnumSet.copyOf(this.config.controler().getEventsFileFormats());
