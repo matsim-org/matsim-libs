@@ -565,6 +565,7 @@ public class QueueSimulation {
 			QueueLink qlink = this.network.getQueueLink(link.getId());
 			QueueVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 			if (vehicle == null) {
+				// try to fix it somehow
 				if (this.teleportVehicles) {
 					if (agent instanceof PersonAgent) {
 						vehicle = ((PersonAgent) agent).getVehicle();
@@ -580,13 +581,12 @@ public class QueueSimulation {
 							qlinkOld.removeParkedVehicle(vehicle.getId());
 						}
 					}
-				} else {
-					throw new RuntimeException("car not available for agent " + agent.getPerson().getId() + " on link " + link.getId());
 				}
 			}
-			if (vehicle != null) {
-				vehicle.setDriver(agent);
+			if (vehicle == null) {
+				throw new RuntimeException("vehicle not available for agent " + agent.getPerson().getId() + " on link " + link.getId());
 			}
+			vehicle.setDriver(agent);
 			if ((route.getEndLink() == link) && (agent.chooseNextLink() == null)) {
 				qlink.processVehicleArrival(now, vehicle);
 			} else {
