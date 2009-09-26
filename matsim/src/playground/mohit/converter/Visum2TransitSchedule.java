@@ -113,7 +113,7 @@ public class Visum2TransitSchedule {
 						for (VisumNetwork.Departure d : this.visum.departures.values()){
 							if (d.lineName.equals(line.id.toString()) && d.lineRouteName.equals(timeProfile.lineRouteName.toString()) && d.TRI.equals(timeProfile.index.toString())) {
 								Departure departure = builder.createDeparture(new IdImpl(d.index), Time.parseTime(d.dep));
-								BasicVehicle veh = vb.createVehicle(new IdImpl(vehId++), vehType);
+								BasicVehicle veh = vb.createVehicle(new IdImpl("tr_" + vehId++), vehType);
 								this.vehicles.getVehicles().put(veh.getId(), veh);
 								departure.setVehicleId(veh.getId());
 								tRoute.addDeparture(departure);
