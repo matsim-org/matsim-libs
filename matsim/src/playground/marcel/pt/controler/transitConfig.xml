@@ -17,13 +17,15 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="&INPUTBASE;/plans.census2000ivtch1pct.dilZh30km.pt-routedOevModell.xml.gz" />
+		<param name="inputPlansFile" value="&INPUTBASE;/plans.census2000ivtch1pct.dilZh30km.routedOevModell.xml.gz" />
 	</module>
 	
 	<module name="controler">
 		<param name="outputDirectory" value="&OUTPUTBASE;/" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="1" />
+		<param name="eventsFileFormat" value="xml" />
+		<param name="writeEventsInterval" value="10" />
 	</module>
 
 <module name="counts" >
