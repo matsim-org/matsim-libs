@@ -759,25 +759,35 @@ public class QuadTree<T> implements Serializable {
 
 		/* default */ boolean nextLeaf(final Leaf<T> currentLeaf, final MutableLeaf<T> nextLeaf) {
 			if (this.hasChilds) {
-				boolean found = this.southwest.nextLeaf(currentLeaf, nextLeaf);
-				if (found) {
-					if (nextLeaf.value == null) { nextLeaf.value = this.northwest.firstLeaf(); }
-					if (nextLeaf.value == null) { nextLeaf.value = this.southeast.firstLeaf(); }
-					if (nextLeaf.value == null) { nextLeaf.value = this.northeast.firstLeaf(); }
-					return true;
+				boolean found = false;
+				if (currentLeaf.x <= this.bounds.centerX && currentLeaf.y <= this.bounds.centerY) {
+					found = this.southwest.nextLeaf(currentLeaf, nextLeaf);
+					if (found) {
+						if (nextLeaf.value == null) { nextLeaf.value = this.northwest.firstLeaf(); }
+						if (nextLeaf.value == null) { nextLeaf.value = this.southeast.firstLeaf(); }
+						if (nextLeaf.value == null) { nextLeaf.value = this.northeast.firstLeaf(); }
+						return true;
+					}
 				}
-				found = this.northwest.nextLeaf(currentLeaf, nextLeaf);
-				if (found) {
-					if (nextLeaf.value == null) { nextLeaf.value = this.southeast.firstLeaf(); }
-					if (nextLeaf.value == null) { nextLeaf.value = this.northeast.firstLeaf(); }
-					return true;
+				if (currentLeaf.x <= this.bounds.centerX && currentLeaf.y >= this.bounds.centerY) {
+					found = this.northwest.nextLeaf(currentLeaf, nextLeaf);
+					if (found) {
+						if (nextLeaf.value == null) { nextLeaf.value = this.southeast.firstLeaf(); }
+						if (nextLeaf.value == null) { nextLeaf.value = this.northeast.firstLeaf(); }
+						return true;
+					}
 				}
-				found = this.southeast.nextLeaf(currentLeaf, nextLeaf);
-				if (found) {
-					if (nextLeaf.value == null) { nextLeaf.value = this.northeast.firstLeaf(); }
-					return true;
+				if (currentLeaf.x >= this.bounds.centerX && currentLeaf.y <= this.bounds.centerY) {
+					found = this.southeast.nextLeaf(currentLeaf, nextLeaf);
+					if (found) {
+						if (nextLeaf.value == null) { nextLeaf.value = this.northeast.firstLeaf(); }
+						return true;
+					}
 				}
-				return this.northeast.nextLeaf(currentLeaf, nextLeaf);
+				if (currentLeaf.x >= this.bounds.centerX && currentLeaf.y >= this.bounds.centerY) {
+					return this.northeast.nextLeaf(currentLeaf, nextLeaf);
+				}
+				return false;
 			}
 			return currentLeaf == this.leaf;
 		}
