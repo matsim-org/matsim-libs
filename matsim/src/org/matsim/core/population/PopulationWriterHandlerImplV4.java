@@ -48,11 +48,11 @@ import org.matsim.population.Desires;
 public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 
 
-	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException {
+	public void writeHeaderAndStartElement(final BufferedWriter out) throws IOException {
 		out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 		out.write("<!DOCTYPE plans SYSTEM \"" + MatsimXmlWriter.DEFAULT_DTD_LOCATION + "plans_v4.dtd\">\n\n");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// <plans ... > ... </plans>
 	//////////////////////////////////////////////////////////////////////
@@ -74,20 +74,36 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void startPerson(final BasicPerson p, final BufferedWriter out) throws IOException {
-		out.write("\t<person");
-		out.write(" id=\"" + p.getId() + "\"");
+		out.write("\t<person id=\"");
+		out.write(p.getId().toString());
+		out.write("\"");
 		if (p instanceof PersonImpl){
 			PersonImpl person = (PersonImpl)p;
-			if (person.getSex() != null)
-				out.write(" sex=\"" + person.getSex() + "\"");
-			if (person.getAge() != Integer.MIN_VALUE)
-				out.write(" age=\"" + person.getAge() + "\"");
-			if (person.getLicense() != null)
-				out.write(" license=\"" + person.getLicense() + "\"");
-			if (person.getCarAvail() != null)
-				out.write(" car_avail=\"" + person.getCarAvail() + "\"");
-			if (person.getEmployed() != null)
-				out.write(" employed=\"" + person.getEmployed() + "\"");
+			if (person.getSex() != null) {
+				out.write(" sex=\"");
+				out.write(person.getSex());
+				out.write("\"");
+			}
+			if (person.getAge() != Integer.MIN_VALUE) {
+				out.write(" age=\"");
+				out.write(Integer.toString(person.getAge()));
+				out.write("\"");
+			}
+			if (person.getLicense() != null) {
+				out.write(" license=\"");
+				out.write(person.getLicense());
+				out.write("\"");
+			}
+			if (person.getCarAvail() != null) {
+				out.write(" car_avail=\"");
+				out.write(person.getCarAvail());
+				out.write("\"");
+			}
+			if (person.getEmployed() != null) {
+				out.write(" employed=\"");
+				out.write(person.getEmployed());
+				out.write("\"");
+			}
 		}
 		out.write(">\n");
 	}
@@ -101,9 +117,9 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void startTravelCard(final String travelcard, final BufferedWriter out) throws IOException {
-		out.write("\t\t<travelcard");
-		out.write(" type=\"" + travelcard + "\"");
-		out.write(" />\n\n");
+		out.write("\t\t<travelcard type=\"");
+		out.write(travelcard);
+		out.write("\" />\n\n");
 	}
 
 	public void endTravelCard(final BufferedWriter out) throws IOException {
@@ -281,16 +297,22 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 
 	public void startPlan(final BasicPlan plan, final BufferedWriter out) throws IOException {
 		out.write("\t\t<plan");
-		if (plan.getScore() != null)
-			out.write(" score=\"" + plan.getScore().toString() + "\"");
+		if (plan.getScore() != null) {
+			out.write(" score=\"");
+			out.write(plan.getScore().toString());
+			out.write("\"");
+		}
 		if (plan.isSelected())
-			out.write(" selected=\"" + "yes" + "\"");
+			out.write(" selected=\"yes\"");
 		else
-			out.write(" selected=\"" + "no" + "\"");
+			out.write(" selected=\"no\"");
 		if (plan instanceof PlanImpl){
 			PlanImpl p = (PlanImpl)plan;
-			if ((p.getType() != null) && (p.getType() != PlanImpl.Type.UNDEFINED))
-				out.write(" type=\"" + p.getType() + "\"");
+			if ((p.getType() != null) && (p.getType() != PlanImpl.Type.UNDEFINED)) {
+				out.write(" type=\"");
+				out.write(p.getType().toString());
+				out.write("\"");
+			}
 		}
 		out.write(">\n");
 	}
@@ -304,24 +326,44 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void startAct(final BasicActivity act, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t<act");
-		out.write(" type=\"" + act.getType() + "\"");
-		if (act.getLinkId() != null)
-			out.write(" link=\"" + act.getLinkId() + "\"");
-		if (act.getFacilityId() != null)
-			out.write(" facility=\"" + act.getFacilityId() + "\"");
-		if (act.getCoord() != null) {
-			out.write(" x=\"" + act.getCoord().getX() + "\" y=\"" + act.getCoord().getY() + "\"");
+		out.write("\t\t\t<act type=\"");
+		out.write(act.getType());
+		out.write("\"");
+		if (act.getLinkId() != null) {
+			out.write(" link=\"");
+			out.write(act.getLinkId().toString());
+			out.write("\"");
 		}
-		if (act.getStartTime() != Time.UNDEFINED_TIME)
-			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
+		if (act.getFacilityId() != null) {
+			out.write(" facility=\"");
+			out.write(act.getFacilityId().toString());
+			out.write("\"");
+		}
+		if (act.getCoord() != null) {
+			out.write(" x=\"");
+			out.write(Double.toString(act.getCoord().getX()));
+			out.write("\" y=\"");
+			out.write(Double.toString(act.getCoord().getY()));
+			out.write("\"");
+		}
+		if (act.getStartTime() != Time.UNDEFINED_TIME) {
+			out.write(" start_time=\"");
+			out.write(Time.writeTime(act.getStartTime()));
+			out.write("\"");
+		}
 		if (act instanceof ActivityImpl){
 			ActivityImpl a = (ActivityImpl)act;
-			if (a.getDuration() != Time.UNDEFINED_TIME)
-				out.write(" dur=\"" + Time.writeTime(a.getDuration()) + "\"");
+			if (a.getDuration() != Time.UNDEFINED_TIME) {
+				out.write(" dur=\"");
+				out.write(Time.writeTime(a.getDuration()));
+				out.write("\"");
+			}
 		}
-		if (act.getEndTime() != Time.UNDEFINED_TIME)
-			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
+		if (act.getEndTime() != Time.UNDEFINED_TIME) {
+			out.write(" end_time=\"");
+			out.write(Time.writeTime(act.getEndTime()));
+			out.write("\"");
+		}
 		out.write(" />\n");
 	}
 
@@ -333,16 +375,26 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void startLeg(final BasicLeg leg, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t<leg");
-		out.write(" mode=\"" + leg.getMode() + "\"");
-		if (leg.getDepartureTime() != Time.UNDEFINED_TIME)
-			out.write(" dep_time=\"" + Time.writeTime(leg.getDepartureTime()) + "\"");
-		if (leg.getTravelTime() != Time.UNDEFINED_TIME)
-			out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime()) + "\"");
-		if (leg instanceof LegImpl){
+		out.write("\t\t\t<leg mode=\"");
+		out.write(leg.getMode().toString());
+		out.write("\"");
+		if (leg.getDepartureTime() != Time.UNDEFINED_TIME) {
+			out.write(" dep_time=\"");
+			out.write(Time.writeTime(leg.getDepartureTime()));
+			out.write("\"");
+		}
+		if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
+			out.write(" trav_time=\"");
+			out.write(Time.writeTime(leg.getTravelTime()));
+			out.write("\"");
+		}
+		if (leg instanceof LegImpl) {
 			LegImpl l = (LegImpl)leg;
-			if (l.getArrivalTime() != Time.UNDEFINED_TIME)
-				out.write(" arr_time=\"" + Time.writeTime(l.getArrivalTime()) + "\"");
+			if (l.getArrivalTime() != Time.UNDEFINED_TIME) {
+				out.write(" arr_time=\"");
+				out.write(Time.writeTime(l.getArrivalTime()));
+				out.write("\"");
+			}
 		}
 		out.write(">\n");
 	}
@@ -357,16 +409,23 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 
 	public void startRoute(final BasicRoute route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route");
-		if (!Double.isNaN(route.getDistance()))
-			out.write(" dist=\"" + route.getDistance() + "\"");
-		if (route.getTravelTime() != Time.UNDEFINED_TIME)
-			out.write(" trav_time=\"" + Time.writeTime(route.getTravelTime()) + "\"");
+		if (!Double.isNaN(route.getDistance())) {
+			out.write(" dist=\"");
+			out.write(Double.toString(route.getDistance()));
+			out.write("\"");
+		}
+		if (route.getTravelTime() != Time.UNDEFINED_TIME) {
+			out.write(" trav_time=\"");
+			out.write(Time.writeTime(route.getTravelTime()));
+			out.write("\"");
+		}
 		out.write(">\n");
 
 		out.write("\t\t\t\t\t");
 		if (route instanceof NetworkRouteWRefs) {
 			for (Node n : ((NetworkRouteWRefs) route).getNodes()) {
-				out.write(n.getId() + " ");
+				out.write(n.getId().toString());
+				out.write(" ");
 			}
 		} else if (route instanceof GenericRoute) {
 			String rd = ((GenericRoute) route).getRouteDescription();
@@ -387,8 +446,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	//////////////////////////////////////////////////////////////////////
 
 	public void writeSeparator(final BufferedWriter out) throws IOException {
-		out.write("<!-- =================================================" +
-							"===================== -->\n\n");
+		out.write("<!-- ====================================================================== -->\n\n");
 	}
 
 }

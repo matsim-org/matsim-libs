@@ -52,7 +52,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 
 	private final static Logger log = Logger.getLogger(PopulationWriter.class);
 
-	
+
 	/**
 	 * Creates a new PlansWriter to write out the specified plans to the file and with version
 	 * as specified in the {@linkplain org.matsim.core.config.groups.PlansConfigGroup configuration}.
@@ -105,7 +105,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 			}
 		}
 	}
-	
+
 	/**
 	 * Creates a new PlansWriter to write out the specified plans to the specified file and with
 	 * the specified version and also writes knowledges to the xml.
@@ -133,19 +133,19 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 			}
 		}
 	}
-	
-	public PopulationWriter(final BasicPopulation population, String filename) {
+
+	public PopulationWriter(final BasicPopulation population, final String filename) {
 		this(population, filename, "v4", 1.0);
 	}
-	
-	
 
-	public PopulationWriter(PopulationImpl pop, Knowledges knowledges2) {
+
+
+	public PopulationWriter(final PopulationImpl pop, final Knowledges knowledges2) {
 		this(pop);
 		this.knowledges = knowledges2;
 	}
 
-	public PopulationWriter(PopulationImpl population2, Knowledges knowledges2, String iterationFilename, String outversion) {
+	public PopulationWriter(final PopulationImpl population2, final Knowledges knowledges2, final String iterationFilename, final String outversion) {
 		this(population2, knowledges2, iterationFilename, outversion, 1.0);
 	}
 
@@ -160,7 +160,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 		} else if (version.equals("v0")) {
 			this.dtd = "http://www.matsim.org/files/dtd/plans_v0.dtd";
 			this.handler = new PopulationWriterHandlerImplV0();
-		} 
+		}
 		else {
 			throw new IllegalArgumentException("output version \"" + version + "\" not known.");
 		}
@@ -190,7 +190,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 
 	public final void writePerson(final BasicPerson person) {
 		//	 write only the defined fraction
-		if (MatsimRandom.getRandom().nextDouble() >= this.write_person_fraction) {
+		if ((this.write_person_fraction < 1.0) && (MatsimRandom.getRandom().nextDouble() >= this.write_person_fraction)) {
 			return;
 		}
 		try {
@@ -271,23 +271,23 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 					}
 					this.handler.endKnowledge(this.out);
 				}
-				
-				
-				
+
+
+
 			}
 			// plans
-			for (int ii = 0; ii < person.getPlans().size(); ii++) {
-				BasicPlan plan = (BasicPlan) person.getPlans().get(ii);
+			for (Object o : person.getPlans()) {
+				BasicPlan plan = (BasicPlan) o;
 				this.handler.startPlan(plan, this.out);
 				// act/leg
-				for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
-					if (jj % 2 == 0) {
-						BasicActivity act = (BasicActivity)plan.getPlanElements().get(jj);
+				for (Object pe : plan.getPlanElements()) {
+					if (pe instanceof BasicActivity) {
+						BasicActivity act = (BasicActivity) pe;
 						this.handler.startAct(act, this.out);
 						this.handler.endAct(this.out);
 					}
-					else {
-						BasicLeg leg = (BasicLeg)plan.getPlanElements().get(jj);
+					else if (pe instanceof BasicLeg) {
+						BasicLeg leg = (BasicLeg) pe;
 						this.handler.startLeg(leg, this.out);
 						// route
 						BasicRoute route = leg.getRoute();
@@ -310,10 +310,8 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	}
 
 	public final void writePersons() {
-		Iterator<PersonImpl> p_it = this.population.getPersons().values().iterator();
-		while (p_it.hasNext()) {
-			BasicPerson p = p_it.next();
-			writePerson(p);
+		for (Object p : this.population.getPersons().values()) {
+			writePerson((BasicPerson) p);
 		}
 	}
 
@@ -329,8 +327,8 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 			}
 		}
 	}
-	
-	
+
+
 
 	/**
 	 * Writes all plans to the file. If plans-streaming is on, this will end the writing and close the file.
@@ -341,19 +339,19 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 			log.info("PlansStreaming is on -- plans already written, just closing file if it's open.");
 			if (this.fileOpened) {
 				writeEndPlans();
-			}			
+			}
 		} else {
 			this.writeStartPlans();
 			this.writePersons();
 			this.writeEndPlans();
 		}
 	}
-	
+
 	/**
 	 * Writes to a file given as parameter.
 	 * @param filename path to the file.
 	 */
-	public void writeFile(String filename){
+	public void writeFile(final String filename){
 		this.outfile = filename;
 		write();
 		log.info("Population written to: " + filename);
