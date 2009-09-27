@@ -21,7 +21,7 @@
 package org.matsim.core.utils.misc;
 
 
-public class Time {
+public abstract class Time {
 
 	/* Never change this to NaN, as a compare of any valid time
 	 * to this should result to "greater" for some algorithms to work
@@ -31,12 +31,24 @@ public class Time {
 	 * The end of a day in MATSim in seconds
 	 */
 	public final static double MIDNIGHT = 24 * 3600.0;
-	
+
 	public static final String TIMEFORMAT_HHMM = "HH:mm";
 	public static final String TIMEFORMAT_HHMMSS = "HH:mm:ss";
 	public static final String TIMEFORMAT_SSSS = "ssss";
 
 	private static String defaultTimeFormat = TIMEFORMAT_HHMMSS;
+
+	private final static String[] timeElements;
+
+	static {
+		timeElements = new String[60];
+		for (int i = 0; i < 10; i++) {
+			timeElements[i] = "0" + i;
+		}
+		for (int i = 10; i < 60; i++) {
+			timeElements[i] = Integer.toString(i);
+		}
+	}
 
 	/**
 	 * Sets the default time format to be used for conversion of seconds to a string-representation
@@ -71,34 +83,36 @@ public class Time {
 	public static final String writeTime(final double seconds, final String timeformat, final char separator) {
 		if (TIMEFORMAT_SSSS.equals(timeformat)) {
 			return Long.toString((long)seconds);
-		} else if (seconds < 0) {
+		}
+		if (seconds < 0) {
 			if (seconds == UNDEFINED_TIME) return "undefined";
 			return "-" + writeTime(Math.abs(seconds), timeformat, separator);
 		}
-		/* else */
 		double s = seconds;
 		long h = (long)(s / 3600);
 		s = s % 3600;
 		int m = (int)(s / 60);
 		s = s % 60;
 
-		String str_h;
-		if (h < 10) { str_h = "0" + Long.toString(h); }
-		else { str_h = Long.toString(h); }
+		StringBuilder str = new StringBuilder(10);
 
-		String str_m;
-		if (m < 10) { str_m = "0" + Integer.toString(m); }
-		else { str_m = Integer.toString(m); }
+		if (h < timeElements.length) {
+			str.append(timeElements[(int) h]);
+		} else {
+			str.append(Long.toString(h));
+		}
+
+		str.append(separator);
+		str.append(timeElements[m]);
 
 		if (TIMEFORMAT_HHMM.equals(timeformat)) {
-			return str_h + separator + str_m;
-		} else if (TIMEFORMAT_HHMMSS.equals(timeformat)) {
-			String str_s;
-			if (s < 10) { str_s = "0" + Integer.toString((int)s); }
-			else { str_s = Integer.toString((int)s); }
-			return str_h + separator + str_m + separator + str_s;
+			return str.toString();
 		}
-		/* else */
+		if (TIMEFORMAT_HHMMSS.equals(timeformat)) {
+			str.append(separator);
+			str.append(timeElements[(int)s]);
+			return str.toString();
+		}
 		throw new IllegalArgumentException("The time format (" + timeformat + ") is not known.");
 	}
 
