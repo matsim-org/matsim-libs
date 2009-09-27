@@ -20,15 +20,14 @@
 
 package org.matsim.core.utils.misc;
 
-import org.matsim.core.utils.misc.Time;
-import org.matsim.testcases.MatsimTestCase;
+import junit.framework.TestCase;
 
 /**
  * Tests for {@link Time}.
- * 
+ *
  * @author mrieser
  */
-public class TimeTest extends MatsimTestCase {
+public class TimeTest extends TestCase {
 
 	public void testFormats() {
 		double time = 12*3600 + 34*60 + 56.789;
@@ -43,14 +42,14 @@ public class TimeTest extends MatsimTestCase {
 			String str = Time.writeTime(time, null);
 			fail("expected IllegalArgumentException, got result: " + str);
 		} catch (IllegalArgumentException expected) {}
-		
+
 		assertEquals(12*3600.0 + 34*60.0 + 56.0, Time.parseTime("12:34:56"), 0.0);//HHMMSS
 		assertEquals(12*3600.0 + 34*60.0 + 56.78, Time.parseTime("12:34:56.78"), 0.0);//HHMMSS, support parts of seconds
 		assertEquals(12*3600.0 + 34*60.0, Time.parseTime("12:34"), 0.0);//HHMM
 		assertEquals(12.0, Time.parseTime("12"), 0.0);//SSSS
 		assertEquals(123456.0, Time.parseTime("123456"), 0.0);//SSSS
 		assertEquals(123456.78, Time.parseTime("123456.78"), 0.0);//SSSS, support parts of seconds
-		
+
 		try { // test bad time-string with HHMMSS, bad part in Seconds
 			double t = Time.parseTime("12:34:-01");
 			fail("expected IllegalArgumentException, got result: " + t);
@@ -80,7 +79,7 @@ public class TimeTest extends MatsimTestCase {
 			fail("expected IllegalArgumentException, got result: " + t);
 		} catch (IllegalArgumentException expected) {}
 	}
-	
+
 	public void testSeparators() {
 		// test writing
 		double dTime = 12*3600 + 34*60 + 56.789;
@@ -99,26 +98,26 @@ public class TimeTest extends MatsimTestCase {
 		assertEquals(-iTime, Time.parseTime( "-12/34/56", '/'), 0.0);
 		assertEquals(-iTime, Time.parseTime( "-12-34-56", '-'), 0.0);
 	}
-	
+
 	public void testUndefined() {
 		// test writing
 		assertEquals("undefined", Time.writeTime(Time.UNDEFINED_TIME));
-		
+
 		// test reading
 		assertEquals(Time.UNDEFINED_TIME, Time.parseTime("undefined"), 0.0);
 		assertEquals(Time.UNDEFINED_TIME, Time.parseTime(""), 0.0);
 		assertEquals(Time.UNDEFINED_TIME, Time.parseTime(null), 0.0);
 	}
-	
+
 	public void testSetDefault() {
 		Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMMSS);
 		assertEquals("12:34:56", Time.writeTime(12*3600 + 34*60 + 56.789));
 		Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMM);
 		assertEquals("12:34", Time.writeTime(12*3600 + 34*60 + 56.789));
 		Time.setDefaultTimeFormat(Time.TIMEFORMAT_SSSS);
-		assertEquals(Integer.toString(12*3600 + 34*60 + 56), Time.writeTime(12*3600 + 34*60 + 56.789));		
+		assertEquals(Integer.toString(12*3600 + 34*60 + 56), Time.writeTime(12*3600 + 34*60 + 56.789));
 	}
-	
+
 	public void testWriting() {
 		Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMMSS);
 		assertEquals( "12:34:56", Time.writeTime( 12*3600 + 34*60 + 56.789));// positive
@@ -133,7 +132,7 @@ public class TimeTest extends MatsimTestCase {
 		 */
 		assertEquals("-596523:14:08", Time.writeTime(Integer.MIN_VALUE));
 	}
-	
+
 	public void testParsing() {
 		assertEquals( 12*3600.0 + 34*60.0 + 56.0, Time.parseTime( "12:34:56"), 0.0);
 		assertEquals( 12*3600.0 + 34*60.0 + 56.7, Time.parseTime( "12:34:56.7"), 0.0);
