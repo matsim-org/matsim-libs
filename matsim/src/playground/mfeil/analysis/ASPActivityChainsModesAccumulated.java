@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AnalysisSelectedPlansActivityChains.java
+ * AnalysisSelectedPlansActivityChainsAccumulated.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,9 +20,6 @@
 
 package playground.mfeil.analysis;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +30,6 @@ import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -46,21 +41,22 @@ import playground.mfeil.ActChainEqualityCheck;
 
 /**
  * Simple class to analyze the selected plans of a plans (output) file. Extracts the 
- * activity chains per modes and their number of occurrences.
+ * activity chains per modes and their number of occurrences. Does not differentiate the
+ * order of acts/legs within the plan (since not required for estimation)
  *
  * @author mfeil
  */
-public class AnalysisSelectedPlansActivityChainsModes extends AnalysisSelectedPlansActivityChains{
+public class ASPActivityChainsModesAccumulated extends ASPActivityChainsModes{
 
-	protected static final Logger log = Logger.getLogger(AnalysisSelectedPlansActivityChainsModes.class);
+	protected static final Logger log = Logger.getLogger(ASPActivityChainsModesAccumulated.class);
 	
 
 
-	public AnalysisSelectedPlansActivityChainsModes(final PopulationImpl population, Knowledges knowledges, final String outputDir) {
+	public ASPActivityChainsModesAccumulated(final PopulationImpl population, Knowledges knowledges, final String outputDir) {
 		super (population, knowledges, outputDir);
 	}
 	
-	public AnalysisSelectedPlansActivityChainsModes(final PopulationImpl population) {
+	public ASPActivityChainsModesAccumulated(final PopulationImpl population) {
 		super (population);
 		this.outputDir = "/home/baug/mfeil/data/largeSet";
 	//	this.outputDir = "./plans";
@@ -80,7 +76,7 @@ public class AnalysisSelectedPlansActivityChainsModes extends AnalysisSelectedPl
 		for (PersonImpl person:agents.values()){
 			boolean alreadyIn = false;
 			for (int i=0;i<this.activityChains.size();i++){
-				if (ac.checkEqualActChainsModes(person.getSelectedPlan().getPlanElements(), this.activityChains.get(i))){
+				if (ac.checkEqualActChainsModesAccumulated(person.getSelectedPlan().getPlanElements(), this.activityChains.get(i))){
 					plans.get(i).add(person.getSelectedPlan());
 					alreadyIn = true;
 					break;
@@ -93,34 +89,6 @@ public class AnalysisSelectedPlansActivityChainsModes extends AnalysisSelectedPl
 			}
 		}
 	}
-	
-	protected void analyze(){
-	
-		PrintStream stream1;
-		try {
-			stream1 = new PrintStream (new File(this.outputDir + "/analysis02.xls"));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-		
-		/* Analysis of activity chains */
-		double averageACLength=0;
-		stream1.println("Number of occurrences\tActivity chain");
-		for (int i=0; i<this.activityChains.size();i++){
-			double weight = this.plans.get(i).size();
-			stream1.print(weight+"\t");
-			double length = this.activityChains.get(i).size();
-			averageACLength+=weight*(java.lang.Math.ceil(length/2));
-			for (int j=0; j<length;j++){
-				if (j%2==0) stream1.print(((ActivityImpl)(this.activityChains.get(i).get(j))).getType()+"\t");
-				else stream1.print(((LegImpl)(this.activityChains.get(i).get(j))).getMode()+"\t");
-			}
-			stream1.println();
-		}
-		stream1.println((averageACLength/this.population.getPersons().size())+"\tAverage number of activities");
-		stream1.println();
-	}		
 	
 
 	public static void main(final String [] args) {
@@ -139,7 +107,7 @@ public class AnalysisSelectedPlansActivityChainsModes extends AnalysisSelectedPl
 		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
-		AnalysisSelectedPlansActivityChainsModes sp = new AnalysisSelectedPlansActivityChainsModes(scenario.getPopulation(), scenario.getKnowledges(), outputDir);
+		ASPActivityChainsModesAccumulated sp = new ASPActivityChainsModesAccumulated(scenario.getPopulation(), scenario.getKnowledges(), outputDir);
 		sp.run();
 		
 		log.info("Analysis of plan finished.");

@@ -43,9 +43,9 @@ import org.matsim.knowledges.Knowledges;
  * number of modes used.
  * @author mfeil
  */
-public class AnalysisSelectedPlansTimingsModes extends AnalysisSelectedPlansActivityChains {
+public class ASPTimingsModes extends ASPActivityChains {
 
-	public AnalysisSelectedPlansTimingsModes(final PopulationImpl population, final Knowledges knowledges, final String outputDir) {
+	public ASPTimingsModes(final PopulationImpl population, final Knowledges knowledges, final String outputDir) {
 		super (population, knowledges, outputDir);
 	}
 	
@@ -153,7 +153,7 @@ public class AnalysisSelectedPlansTimingsModes extends AnalysisSelectedPlansActi
 		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
-		AnalysisSelectedPlansTimingsModes sp = new AnalysisSelectedPlansTimingsModes(scenario.getPopulation(), scenario.getKnowledges(), outputDir);
+		ASPTimingsModes sp = new ASPTimingsModes(scenario.getPopulation(), scenario.getKnowledges(), outputDir);
 		sp.analyze();
 		sp.checkCorrectness();
 		
