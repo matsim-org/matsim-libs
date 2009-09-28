@@ -21,101 +21,101 @@
 package playground.mfeil;
 
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.core.population.PersonImpl;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.planomat.costestimators.*;
+import org.matsim.core.scoring.PlanScorer;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
-public class TimeOptimizerTest extends MatsimTestCase{
-	/*
-	private static final Logger log = Logger.getLogger(TimeOptimizerTest.class);
-	private NetworkLayer network = null;
-	private Facilities facilities = null;
-	private Population population = null;
+
+
+public class TimeModeChoicerTest extends MatsimTestCase{
+	
+	private static final Logger log = Logger.getLogger(TimeModeChoicerTest.class);
+	private Initializer initializer;
 	final String TEST_PERSON_ID = "1";
-	private PlansCalcRouteLandmarks router;
-	private PreProcessLandmarks	preProcessRoutingData;
-	private TravelTimeCalculator tTravelEstimator;
-	private TravelCost travelCostEstimator;
-	private DepartureDelayAverageCalculator depDelayCalc;
-	private Events events;
-	private LegTravelTimeEstimator ltte;
-	private TimeOptimizer testee;
+	private PlansCalcRoute router;
+	private LegTravelTimeEstimator estimator;
+	private TimeModeChoicer1 testee;
+	private ScenarioImpl scenario_input;
 
 	protected void setUp() throws Exception {
 
 		super.setUp();
+		
+		this.initializer = new Initializer();
+		this.initializer.init(this); 
+		
+		ScenarioLoader loader = new ScenarioLoader(this.initializer.getControler().getConfig());
+		loader.loadScenario();
+		this.scenario_input = loader.getScenario();
 	
-		super.loadConfig("input/config_chessboard.xml");
+		// no events are used, hence an empty road network
+		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario_input.getNetwork(), 900);
+       	
+		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario_input.getNetwork(), this.initializer.getControler().getConfig().travelTimeCalculator());
+		// Using charyparNagelScoring is okay since only travel values which are identical with JohScoring
+		TravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.initializer.getControler().getConfig().charyparNagelScoring());
+
+		this.router = new PlansCalcRoute(this.initializer.getControler().getConfig().plansCalcRoute(), this.scenario_input.getNetwork(), linkTravelCostEstimator, linkTravelTimeEstimator);
+
+		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 		
-		log.info("Reading facilities xml file...");
-		facilities = (Facilities)Gbl.getWorld().createLayer(Facilities.LAYER_TYPE,null);
-		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
-		log.info("Reading facilities xml file...done.");
-
-		log.info("Reading network xml file...");
-		network = (NetworkLayer)Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		log.info("Reading network xml file...done.");
-
-		log.info("Reading plans xml file...");
-		population = new Population(Population.NO_STREAMING);
-		PopulationReader plansReader = new MatsimPopulationReader(population);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
-		population.printPlansCount();
-		log.info("Reading plans xml file...done.");
+		this.estimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
+				((PersonImpl)(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)))).getSelectedPlan(),
+				PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
+				PlanomatConfigGroup.RoutingCapability.fixedRoute,
+				this.router);
 		
-		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
-		this.preProcessRoutingData.run(network);
-	
-		this.router = new PlansCalcRouteLandmarks (network, this.preProcessRoutingData, new FreespeedTravelTimeCost(), new FreespeedTravelTimeCost());
-	
-		this.tTravelEstimator = new TravelTimeCalculator(network, 900);
-		this.travelCostEstimator = new TravelTimeDistanceCostCalculator(this.tTravelEstimator);
-		this.depDelayCalc = new DepartureDelayAverageCalculator(network, 900);
-
-		this.events = new Events();
-		events.addHandler(tTravelEstimator);
-		events.addHandler(depDelayCalc);
-
-		this.ltte = new CetinCompatibleLegTravelTimeEstimator(this.tTravelEstimator, this.travelCostEstimator, this.depDelayCalc, this.network);
-		
-		this.testee = new TimeOptimizer (ltte, new PlanScorer(new JohScoringFunctionFactory()));
-		
-
+		this.testee = new TimeModeChoicer1 (legTravelTimeEstimatorFactory, new PlanScorer(new JohScoringTestFunctionFactory()), this.router);
 	}
 	
-	public void testCleanSchedule (){
+	
+	
+	public void testRun (){
 		
-		Plan origPlan = new Plan (population.getPerson(this.TEST_PERSON_ID));
-		origPlan.copyPlan(population.getPerson(this.TEST_PERSON_ID).getPlans().get(0));
-		this.router.run(origPlan);
-		Plan newPlan = new Plan (population.getPerson(this.TEST_PERSON_ID));
-		newPlan.copyPlan(population.getPerson(this.TEST_PERSON_ID).getPlans().get(0));
-		this.router.run(newPlan);
+		log.info("Running main test comparing processed plan with expected output plan...");
 		
-		this.testee.cleanSchedule(((Act)origPlan.getActsLegs().get(0)).getEndTime(), origPlan);
+		// Import plan of person 1, copy and delete original population
+		PlanImpl basePlan = ((PersonImpl)(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)))).getSelectedPlan();
+		PlanImpl plan = new PlanomatXPlan (basePlan.getPerson());
+		plan.copyPlan(basePlan);
+		this.scenario_input.getPopulation().getPersons().clear();
 		
-		for (int i=1;i<newPlan.getActsLegs().size();i++){
+		// Process plan
+		this.router.run(plan);
+		this.testee.run(plan);
+		
+		// Import expected output plan into population
+		new MatsimPopulationReader(scenario_input).readFile(this.getPackageInputDirectory()+"expected_output_person1.xml");
+			
+		// Compare the two plans; <1 because of double rounding errors
+		for (int i=0;i<plan.getPlanElements().size();i++){
 			if (i%2==0){
-				((Act)newPlan.getActsLegs().get(i)).setStartTime(MatsimRandom.random.nextDouble());
-				((Act)newPlan.getActsLegs().get(i)).setEndTime(MatsimRandom.random.nextDouble());
+				assert(((ActivityImpl)(plan.getPlanElements().get(i))).getStartTime()-((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getStartTime()<1);
+				assert(((ActivityImpl)(plan.getPlanElements().get(i))).getEndTime()-((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getEndTime()<1);
 			}
 			else {
-				((Leg)newPlan.getActsLegs().get(i)).setDepartureTime(MatsimRandom.random.nextDouble());
-				((Leg)newPlan.getActsLegs().get(i)).setArrivalTime(MatsimRandom.random.nextDouble());
+				assert(((LegImpl)(plan.getPlanElements().get(i))).getDepartureTime()-((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getDepartureTime()<1);
+				assert(((LegImpl)(plan.getPlanElements().get(i))).getArrivalTime()-((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getArrivalTime()<1);
 			}
-		}
-		
-		this.testee.cleanSchedule(((Act)newPlan.getActsLegs().get(0)).getEndTime(), newPlan);
-		for (int i=0;i<newPlan.getActsLegs().size();i++){
-			if (i%2==0){
-				assertEquals(((Act)origPlan.getActsLegs().get(i)).getStartTime(), ((Act)newPlan.getActsLegs().get(i)).getStartTime());
-				assertEquals(((Act)origPlan.getActsLegs().get(i)).getStartTime(), ((Act)newPlan.getActsLegs().get(i)).getStartTime());
-			}
-			else{
-				assertEquals(((Leg)origPlan.getActsLegs().get(i)).getDepartureTime(), ((Leg)newPlan.getActsLegs().get(i)).getDepartureTime());
-				assertEquals(((Leg)origPlan.getActsLegs().get(i)).getArrivalTime(), ((Leg)newPlan.getActsLegs().get(i)).getArrivalTime());
-			
-			}
-		}
+		}	
+		log.info("... done.");
 	}
+}/*
 	
 	public void testCopyActslegs (){
 		
@@ -243,5 +243,5 @@ public class TimeOptimizerTest extends MatsimTestCase{
 				System.out.println();
 			}
 		}
-	}*/
-}
+	}
+}*/
