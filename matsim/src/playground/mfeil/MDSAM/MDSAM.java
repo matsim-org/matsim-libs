@@ -51,13 +51,10 @@ public class MDSAM {
 
 	private final PopulationImpl population;
 	private List<List<Double>> sims;
-	private List<Double> simsActs;
-	private List<Double> simsLocations;
-	private List<Double> simsModes;
 	private final double GWact, GWmode, GWlocation; 
 	private static final Logger log = Logger.getLogger(MDSAM.class);
 	private final String outputFile;
-	private final boolean printing;
+	private boolean printing;
 
 
 	public MDSAM(final PopulationImpl population) {
@@ -67,19 +64,7 @@ public class MDSAM {
 		this.GWlocation = 1.0;
 	//	this.outputFile = "./plans/plans_similarity.xls";	
 		this.outputFile = "/home/baug/mfeil/data/mz/simlog.xls";	
-		this.printing = false;
-	}
-	
-	public List<Double> getSimsActs (){
-		return this.simsActs;
-	}
-	
-	public List<Double> getSimsLocations (){
-		return this.simsLocations;
-	}
-	
-	public List<Double> getSimsModes (){
-		return this.simsModes;
+		this.printing = true;
 	}
 	
 	public List<List<Double>> runPopulation () {
@@ -94,64 +79,76 @@ public class MDSAM {
 		}	
 		
 		this.sims = new ArrayList<List<Double>>();
-		this.simsActs = new ArrayList<Double>();
-		this.simsLocations = new ArrayList<Double>();
-		this.simsModes = new ArrayList<Double>();
 		
+		int counter=0;
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
-			this.sims.add(new ArrayList<Double>());
-			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				PlanImpl plan = iterator2.next();
+			
+			counter++;
+			if (counter>20) this.printing=false;
+			
+			this.sims.add(new ArrayList<Double>()); // store overall similarities of all persons' plans
+			double [][] matrix = new double [person.getPlans().size()][person.getPlans().size()]; //store a person's similarities among plans
+			
+			for (int i=0;i<person.getPlans().size();i++){
+				PlanImpl plan = person.getPlans().get(i);
 				
-				if (plan.equals(person.getSelectedPlan())) {
-					this.sims.get(this.sims.size()-1).add(0.0);
-					continue;
-				}
 				if (this.printing){
 					stream.println("Person "+person.getId());
 					stream.println("origPlan");
 					stream.print("Acts\t");
-					for (int i=0;i<person.getSelectedPlan().getPlanElements().size();i+=2){
-						stream.print(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(i))).getType()+"\t");
+					for (int k=0;k<person.getSelectedPlan().getPlanElements().size();k+=2){
+						stream.print(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(k))).getType()+"\t");
 					}
 					if (person.getSelectedPlan().getPlanElements().size()<plan.getPlanElements().size()){
 						for (int z=0;z<(plan.getPlanElements().size()-person.getSelectedPlan().getPlanElements().size())/2;z++) stream.print("\t");
 					}
 					stream.print("\tModes\t");
-					for (int i=1;i<person.getSelectedPlan().getPlanElements().size();i+=2){
-						stream.print(((LegImpl)(person.getSelectedPlan().getPlanElements().get(i))).getMode()+"\t");
+					for (int k=1;k<person.getSelectedPlan().getPlanElements().size();k+=2){
+						stream.print(((LegImpl)(person.getSelectedPlan().getPlanElements().get(k))).getMode()+"\t");
 					}
 					if (person.getSelectedPlan().getPlanElements().size()<plan.getPlanElements().size()){
 						for (int z=0;z<(plan.getPlanElements().size()-person.getSelectedPlan().getPlanElements().size())/2;z++) stream.print("\t");
 					}
 					stream.print("\tLocations\t");
-					for (int i=0;i<person.getSelectedPlan().getPlanElements().size();i+=2){
-						stream.print(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(i))).getLinkId()+"\t");
-					}
-					stream.println();
-					stream.println("comparePlan");
-					stream.print("Acts\t");
-					for (int i=0;i<plan.getPlanElements().size();i+=2){
-						stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).getType()+"\t");
-					}
-					if (person.getSelectedPlan().getPlanElements().size()>plan.getPlanElements().size()){
-						for (int z=0;z<(person.getSelectedPlan().getPlanElements().size()-plan.getPlanElements().size())/2;z++) stream.print("\t");
-					}
-					stream.print("\tModes\t");
-					for (int i=1;i<plan.getPlanElements().size();i+=2){
-						stream.print(((LegImpl)(plan.getPlanElements().get(i))).getMode()+"\t");
-					}
-					if (person.getSelectedPlan().getPlanElements().size()>plan.getPlanElements().size()){
-						for (int z=0;z<(person.getSelectedPlan().getPlanElements().size()-plan.getPlanElements().size())/2;z++) stream.print("\t");
-					}
-					stream.print("\tLocations\t");
-					for (int i=0;i<plan.getPlanElements().size();i+=2){
-						stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).getLinkId()+"\t");
+					for (int k=0;k<person.getSelectedPlan().getPlanElements().size();k+=2){
+						stream.print(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(k))).getLinkId()+"\t");
 					}
 					stream.println();
 				}
-				this.sims.get(this.sims.size()-1).add(this.runPlans(person.getSelectedPlan(), plan, stream));		
+				
+				double sim = 0;
+				for (int j=0;j<person.getPlans().size();j++){
+					if (i>j) sim += matrix[j][i];
+					else if (i==j)	matrix[i][j] = 0;
+					else {
+						if (this.printing){
+							stream.println("comparePlan");
+							stream.print("Acts\t");
+							for (int k=0;k<plan.getPlanElements().size();k+=2){
+								stream.print(((ActivityImpl)(plan.getPlanElements().get(k))).getType()+"\t");
+							}
+							if (person.getSelectedPlan().getPlanElements().size()>plan.getPlanElements().size()){
+								for (int z=0;z<(person.getSelectedPlan().getPlanElements().size()-plan.getPlanElements().size())/2;z++) stream.print("\t");
+							}
+							stream.print("\tModes\t");
+							for (int k=1;k<plan.getPlanElements().size();k+=2){
+								stream.print(((LegImpl)(plan.getPlanElements().get(k))).getMode()+"\t");
+							}
+							if (person.getSelectedPlan().getPlanElements().size()>plan.getPlanElements().size()){
+								for (int z=0;z<(person.getSelectedPlan().getPlanElements().size()-plan.getPlanElements().size())/2;z++) stream.print("\t");
+							}
+							stream.print("\tLocations\t");
+							for (int k=0;k<plan.getPlanElements().size();k+=2){
+								stream.print(((ActivityImpl)(plan.getPlanElements().get(k))).getLinkId()+"\t");
+							}
+							stream.println();
+						}
+						matrix[i][j] = this.runPlans(person.getPlans().get(j), plan, stream);
+						sim += matrix[i][j];
+					}
+				}
+				this.sims.get(this.sims.size()-1).add(sim/person.getPlans().size());	
 			}
 		}
 		stream.close();
@@ -164,7 +161,8 @@ public class MDSAM {
 		// Calculate tables per attribute dimension
 		// Length is number of acts minus last home plus 0th position, or number of legs respectively
 		
-		double [][][] table = new double [3][origPlan.getPlanElements().size()/2+1][comparePlan.getPlanElements().size()/2+1];
+		//double [][][] table = new double [3][origPlan.getPlanElements().size()/2+1][comparePlan.getPlanElements().size()/2+1];
+		double [][][] table = new double [1][origPlan.getPlanElements().size()/2+1][comparePlan.getPlanElements().size()/2+1];
 		
 		for (int k=0;k<table.length;k++){
 			double GW = 0;
@@ -212,10 +210,6 @@ public class MDSAM {
 			}
 			stream.println();
 		}
-		
-		this.simsActs.add(table[0][table[0].length-1][table[0][0].length-1]);
-		this.simsModes.add(table[1][table[0].length-1][table[0][0].length-1]);
-		this.simsLocations.add(table[2][table[0].length-1][table[0][0].length-1]);
 	
 		// Find one optimal trajectory close to the diagonal, for each attribute dimension
 		ArrayList<int[]> oset = new ArrayList<int[]>();	// contains the operation and position
@@ -349,11 +343,9 @@ public class MDSAM {
 				final String networkFilename = "./plans/network.xml";
 				final String facilitiesFilename = "./plans/facilities.xml";
 		*/
-				final String outputFileBiogeme = "/home/baug/mfeil/data/largeSet/it0/output_plans082.dat";
-				final String outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims082.xls";
-				final String outputFileSimsActs = "/home/baug/mfeil/data/largeSet/it0/sims082acts.xls";
-				final String outputFileSimsModes = "/home/baug/mfeil/data/largeSet/it0/sims082modes.xls";
-				final String outputFileSimsLocations = "/home/baug/mfeil/data/largeSet/it0/sims082locations.xls";
+				final String outputFileBiogeme = "/home/baug/mfeil/data/largeSet/it0/output_plans062.dat";
+				final String outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims062.xls";
+				final String outputFileMod = "/home/baug/mfeil/data/largeSet/it0/model062.mod";
 		//		final String outputFile = "./plans/output_plans.dat";
 
 				ScenarioImpl scenario = new ScenarioImpl();
@@ -365,9 +357,10 @@ public class MDSAM {
 				
 				List<List<Double>> sims = mdsam.runPopulation();
 
-				PlansConstructor pc = new PlansConstructor(scenario.getPopulation(), sims, mdsam.getSimsActs(), mdsam.getSimsModes(), mdsam.getSimsLocations());
-				pc.writePlansForBiogeme(outputFileBiogeme);
-				pc.writeSims(outputFileSims, outputFileSimsActs, outputFileSimsModes, outputFileSimsLocations);
+				PlansConstructor pc = new PlansConstructor(scenario.getPopulation(), sims);
+				pc.writeSims(outputFileSims);
+				pc.writePlansForBiogemeWithSequence(outputFileBiogeme);
+				pc.writeModFileWithSequence(outputFileMod);
 				log.info("Process finished.");
 			}
 }

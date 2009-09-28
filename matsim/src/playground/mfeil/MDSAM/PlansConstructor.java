@@ -27,7 +27,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import playground.mfeil.ActChainEqualityCheck;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import playground.mfeil.analysis.AnalysisSelectedPlansActivityChainsModes;
+import playground.mfeil.analysis.*;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -48,6 +48,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
@@ -70,7 +71,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 public class PlansConstructor implements PlanStrategyModule{
 		
 	protected Controler controler;
-	protected final String inputFile, outputFile, outputFileBiogeme, outputFileMod, outputFileSims, outputFileSimsActs, outputFileSimsModes, outputFileSimsLocations;
+	protected final String inputFile, outputFile, outputFileBiogeme, outputFileMod, outputFileSims;
 	protected PopulationImpl population;
 	protected ArrayList<List<PlanElement>> actChains;
 	protected NetworkLayer network;
@@ -83,18 +84,16 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected List<Double> simsLocations;
 	protected List<Double> simsModes;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
+	protected final int noOfAlternatives;
 	
 	                      
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
 		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
-		this.outputFile = "/home/baug/mfeil/data/largeSet/it0/output_plans_mz03.xml.gz";	
-		this.outputFileBiogeme = "/home/baug/mfeil/data/largeSet/it0/output_plans03.dat";
-		this.outputFileMod = "/home/baug/mfeil/data/largeSet/it0/model03.mod";
-		this.outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims03.xls";
-		this.outputFileSimsActs = "/home/baug/mfeil/data/largeSet/it0/sims03acts.xls";
-		this.outputFileSimsModes = "/home/baug/mfeil/data/largeSet/it0/sims03modes.xls";
-		this.outputFileSimsLocations = "/home/baug/mfeil/data/largeSet/it0/sims03locations.xls";
+		this.outputFile = "/home/baug/mfeil/data/fullSet/it0/output_plans_mz02.xml.gz";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/fullSet/it0/output_plans02.dat";
+		this.outputFileMod = "/home/baug/mfeil/data/fullSet/it0/model02.mod";
+		this.outputFileSims = "/home/baug/mfeil/data/fullSet/it0/sims02.xls";
 	/*	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
@@ -105,26 +104,22 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
 		this.linker = new XY2Links (this.controler.getNetwork());
+		this.noOfAlternatives = 50;
 	}
 	
-	public PlansConstructor (PopulationImpl population, List<List<Double>> sims, List<Double> simsActs, List<Double> simsModes, List<Double> simsLocations) {
+	public PlansConstructor (PopulationImpl population, List<List<Double>> sims) {
 		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
 		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
 		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
 		this.outputFileMod = "/home/baug/mfeil/data/mz/model.mod";
 		this.outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims03.xls";
-		this.outputFileSimsActs = "/home/baug/mfeil/data/largeSet/it0/sims03acts.xls";
-		this.outputFileSimsModes = "/home/baug/mfeil/data/largeSet/it0/sims03modes.xls";
-		this.outputFileSimsLocations = "/home/baug/mfeil/data/largeSet/it0/sims03locations.xls";
 	/*	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
 		this.outputFileMod = "./plans/model.mod";
 	*/	this.population = population;
 		this.sims = sims;
-		this.simsActs = simsActs;
-		this.simsModes = simsModes;
-		this.simsLocations = simsLocations;
+		this.noOfAlternatives = 50;
 	}
 	
 	private void init(final NetworkLayer network) {
@@ -143,23 +138,22 @@ public class PlansConstructor implements PlanStrategyModule{
 
 	public void finishReplanning(){
 	//	this.selectZurich10MZPlans();
-		this.reducePersons();
+	//	this.reducePersonsMostFrequentStructures();
+	//	this.reducePersonsRandomly();
+		this.reducePersonsIntelligently();
 		this.linkRouteOrigPlans();
 		this.enlargePlansSet();
 		this.writePlans(this.outputFile);
 		this.mdsam = new MDSAM(this.population);
 		this.sims = this.mdsam.runPopulation();
-		this.simsActs = this.mdsam.getSimsActs();
-		this.simsModes = this.mdsam.getSimsModes();
-		this.simsLocations = this.mdsam.getSimsLocations();
-		this.writeSims(this.outputFileSims, this.outputFileSimsActs, this.outputFileSimsModes, this.outputFileSimsLocations);
+		this.writeSims(this.outputFileSims);
 		this.writePlansForBiogeme(this.outputFileBiogeme);
 		this.writeModFile(this.outputFileMod);
 	}
 	
 	
 	// Method that filters only Zurich10% plans
-	private void selectZurich10MZPlans (){
+	protected void selectZurich10MZPlans (){
 		log.info("Creating Zurich10% population...");
 		// Quite strange coding but throws ConcurrentModificationException otherwise...
 		Object [] a = this.population.getPersons().values().toArray();
@@ -181,10 +175,10 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 	
 	
-	private void reducePersons (){
+	protected void reducePersonsMostFrequentStructures (){
 		// Drop those persons whose plans do not belong to x most frequent activity chains.
 		log.info("Analyzing activitiy chains...");
-		AnalysisSelectedPlansActivityChainsModes analyzer = new AnalysisSelectedPlansActivityChainsModes(this.population);
+		ASPActivityChainsModes analyzer = new ASPActivityChainsModes(this.population);
 		analyzer.run();
 		ArrayList<List<PlanElement>> ac = analyzer.getActivityChains();
 		ArrayList<ArrayList<PlanImpl>> pl = analyzer.getPlans();
@@ -206,6 +200,98 @@ public class PlansConstructor implements PlanStrategyModule{
 				}
 			}
 		}
+		log.info("Dropping persons from population...");
+		// Quite strange coding but throws ConcurrentModificationException otherwise...
+		Object [] a = this.population.getPersons().values().toArray();
+		for (int i=a.length-1;i>=0;i--){
+			PersonImpl person = (PersonImpl) a[i];
+			if (!agents.contains(person.getId())) this.population.getPersons().remove(person.getId());
+		}
+		log.info("done... Size of population is "+this.population.getPersons().size()+".");
+	}
+	
+	protected void reducePersonsRandomly (){
+		// Select randomly actchainsmodes accumulated.
+		log.info("Analyzing activitiy chains...");
+		ASPActivityChainsModesAccumulated analyzer = new ASPActivityChainsModesAccumulated(this.population);
+		analyzer.run();
+		ArrayList<List<PlanElement>> ac = analyzer.getActivityChains();
+		ArrayList<ArrayList<PlanImpl>> pl = analyzer.getPlans();
+		log.info("done.");
+		
+		this.actChains = new ArrayList<List<PlanElement>>();
+		List<Id> agents = new LinkedList<Id>();		
+		ArrayList<Integer> randomField = new ArrayList<Integer>();
+		
+		for (int i=0;i<this.noOfAlternatives;i++){
+			int random = ((int) (MatsimRandom.getRandom().nextDouble()*ac.size()));
+			while (randomField.contains(random)){
+				random = ((int) (MatsimRandom.getRandom().nextDouble()*ac.size()));
+			}
+			randomField.add(random);
+			this.actChains.add(ac.get(random));
+			for (Iterator<PlanImpl> iterator = pl.get(random).iterator(); iterator.hasNext();){
+				PlanImpl plan = iterator.next();
+				agents.add(plan.getPerson().getId());
+			}
+		}
+			
+		log.info("Dropping persons from population...");
+		// Quite strange coding but throws ConcurrentModificationException otherwise...
+		Object [] a = this.population.getPersons().values().toArray();
+		for (int i=a.length-1;i>=0;i--){
+			PersonImpl person = (PersonImpl) a[i];
+			if (!agents.contains(person.getId())) this.population.getPersons().remove(person.getId());
+		}
+		log.info("done... Size of population is "+this.population.getPersons().size()+".");
+	}
+	
+	protected void reducePersonsIntelligently (){
+		// Take 20 most frequent actchainmodes accumulated plus 40 longest ones.
+		log.info("Analyzing activitiy chains...");
+		ASPActivityChainsModesAccumulated analyzer = new ASPActivityChainsModesAccumulated(this.population);
+		analyzer.run();
+		ArrayList<List<PlanElement>> ac = analyzer.getActivityChains();
+		ArrayList<ArrayList<PlanImpl>> pl = analyzer.getPlans();
+		log.info("done.");
+		
+		List<Integer> ranking = new ArrayList<Integer>();
+		
+		// most frequent chains
+		for (int i=0;i<pl.size();i++){
+			ranking.add(pl.get(i).size());
+		}
+		java.util.Collections.sort(ranking);
+		this.actChains = new ArrayList<List<PlanElement>>();
+		List<Id> agents = new LinkedList<Id>();
+		for (int i=0;i<pl.size();i++){
+			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-20,0))){ 
+				this.actChains.add(ac.get(i));
+				for (Iterator<PlanImpl> iterator = pl.get(i).iterator(); iterator.hasNext();){
+					PlanImpl plan = iterator.next();
+					agents.add(plan.getPerson().getId());
+				}
+			}
+		}
+		ranking.clear();
+		
+		// longest chains
+		for (int i=0;i<ac.size();i++){
+			ranking.add(ac.get(i).size());
+		}
+		java.util.Collections.sort(ranking);
+		for (int i=0;i<ac.size();i++){
+			if (ac.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-40,0))  &&
+				!this.actChains.contains(ac.get(i))	){ 
+				this.actChains.add(ac.get(i));
+				for (Iterator<PlanImpl> iterator = pl.get(i).iterator(); iterator.hasNext();){
+					PlanImpl plan = iterator.next();
+					agents.add(plan.getPerson().getId());
+				}
+			}
+		}		
+	
+			
 		log.info("Dropping persons from population...");
 		// Quite strange coding but throws ConcurrentModificationException otherwise...
 		Object [] a = this.population.getPersons().values().toArray();
@@ -252,7 +338,8 @@ public class PlansConstructor implements PlanStrategyModule{
 			for (int i=0;i<this.actChains.size();i++){
 				
 				// Add all plans with activity chains different to the one of person's current plan
-				if (!acCheck.checkEqualActChainsModes(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))){
+				if (!acCheck.checkEqualActChainsModesAccumulated(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))){
+				//if (!acCheck.checkEqualActChainsModes(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))){
 					PlanImpl plan = new PlanImpl (person);
 			
 					for (int j=0;j<this.actChains.get(i).size();j++){
@@ -377,10 +464,16 @@ public class PlansConstructor implements PlanStrategyModule{
 		stream.println();
 		
 		// Filling plans
-		int counterOut = -1;
+		int counterPerson = -1;
+		boolean firstPersonFound = true;
+		Id firstPersonId = new IdImpl (1);
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
-			counterOut++;
+			if (firstPersonFound){
+				firstPersonId = person.getId();
+				firstPersonFound = false;
+			}
+			counterPerson++;
 			stream.print(person.getId()+"\t");
 			int position = -1;
 			for (int i=0;i<person.getPlans().size();i++){
@@ -390,21 +483,61 @@ public class PlansConstructor implements PlanStrategyModule{
 				}
 			}
 			stream.print(position+"\t");
-			int counterIn = -1;
+			int counterPlan = -1;
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
-				counterIn++;
+				counterPlan++;
+				PlanImpl planFirstPerson = this.population.getPersons().get(firstPersonId).getPlans().get(counterPlan);
+				
+				// Plan has only one act
 				if (plan.getPlanElements().size()==1) stream.print("24\t");
-				else stream.print((((ActivityImpl)(plan.getFirstActivity())).getEndTime()+86400-((ActivityImpl)(plan.getLastActivity())).getStartTime())/3600+"\t");
-				for (int i=1;i<plan.getPlanElements().size()-1;i++){
-					if (i%2==0) stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).calculateDuration()/3600+"\t");
-					else stream.print(((LegImpl)(plan.getPlanElements().get(i))).getTravelTime()/3600+"\t");
+				
+				else {
+					// First and last home act
+					stream.print((((ActivityImpl)(plan.getFirstActivity())).getEndTime()+86400-((ActivityImpl)(plan.getLastActivity())).getStartTime())/3600+"\t");
+				
+					// All inner acts
+					/*// Old version with fixed act/mode chain
+					for (int i=1;i<plan.getPlanElements().size()-1;i++){
+						if (i%2==0) stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).calculateDuration()/3600+"\t");
+						else stream.print(((LegImpl)(plan.getPlanElements().get(i))).getTravelTime()/3600+"\t");
+					}*/
+					// New version with just identical number of acts and modes but no regard to position
+					LinkedList<Integer> takenPositions = new LinkedList<Integer>();
+					for (int i=1;i<planFirstPerson.getPlanElements().size()-1;i++){
+						if (i%2==0){
+							for (int j=2;j<plan.getPlanElements().size()-2;j+=2){
+								if (((ActivityImpl)(planFirstPerson.getPlanElements().get(i))).getType().equals(((ActivityImpl)(plan.getPlanElements().get(j))).getType()) &&
+										!takenPositions.contains(j)){
+									stream.print(((ActivityImpl)(plan.getPlanElements().get(j))).calculateDuration()/3600+"\t");
+									takenPositions.add(j);
+									break;
+								}
+							}
+						}
+						else {
+							for (int j=1;j<plan.getPlanElements().size()-1;j+=2){
+								if (((LegImpl)(planFirstPerson.getPlanElements().get(i))).getMode().equals(((LegImpl)(plan.getPlanElements().get(j))).getMode()) &&
+										!takenPositions.contains(j)){
+									stream.print(((LegImpl)(plan.getPlanElements().get(j))).getTravelTime()/3600+"\t");	
+									takenPositions.add(j);
+									break;
+								}
+							}
+						}
+					}
 				}
-				stream.print(this.sims.get(counterOut).get(counterIn)+"\t");
+				
+				// Similarity attribute
+				stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
 			}
 			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
 				PlanImpl plan = iterator2.next();
+				
+				// Plan not executable, drop from choice set
 				if (plan.getScore()!=null && plan.getScore()==-100000.0)	stream.print(0+"\t");
+				
+				// Plan executable
 				else stream.print(1+"\t");
 			}
 			stream.println();
@@ -413,22 +546,135 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("done.");
 	}
 	
-	private void writeModFile(String outputFile){
-		new ModFileMaker (this.population, this.sims).write(this.outputFileMod);
+	public void writePlansForBiogemeWithSequence(String outputFile){
+		log.info("Writing plans for Biogeme...");
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputFile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		// First row
+		stream.print("Id\tChoice\t");
+		PersonImpl p = this.population.getPersons().values().iterator().next();
+		for (int i = 0;i<p.getPlans().size();i++){
+			int j=0;
+			for (j =0;j<java.lang.Math.max(p.getPlans().get(i).getPlanElements().size()-1,1);j++){//act/mode attributes
+				stream.print("x"+(i+1)+""+(j+1)+"\t");
+				if (j!=0 && j%2==0)stream.print("x"+(i+1)+""+(j+1)+"_1\t");
+			}
+			stream.print("x"+(i+1)+""+(j+1)+"\t");//Sim
+		}
+		for (int i = 0;i<p.getPlans().size();i++){//Availability
+			stream.print("av"+(i+1)+"\t");
+		}
+		stream.println();
+		
+		// Filling plans
+		int counterPerson = -1;
+		boolean firstPersonFound = true;
+		Id firstPersonId = new IdImpl (1);
+		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = iterator.next();
+			if (firstPersonFound){
+				firstPersonId = person.getId();
+				firstPersonFound = false;
+			}
+			counterPerson++;
+			stream.print(person.getId()+"\t");
+			int position = -1;
+			for (int i=0;i<person.getPlans().size();i++){
+				if (person.getPlans().get(i).equals(person.getSelectedPlan())) {
+					position = i+1;
+					break;
+				}
+			}
+			stream.print(position+"\t");
+			int counterPlan = -1;
+			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
+				PlanImpl plan = iterator2.next();
+				counterPlan++;
+				PlanImpl planFirstPerson = this.population.getPersons().get(firstPersonId).getPlans().get(counterPlan);
+				
+				// Plan has only one act
+				if (plan.getPlanElements().size()==1) stream.print("24\t");
+				
+				else {
+					// First and last home act
+					stream.print((((ActivityImpl)(plan.getFirstActivity())).getEndTime()+86400-((ActivityImpl)(plan.getLastActivity())).getStartTime())/3600+"\t");
+				
+					// All inner acts
+					// Old version with fixed act/mode chain
+					for (int i=1;i<plan.getPlanElements().size()-1;i++){
+						if (i%2==0) {
+							stream.print(((ActivityImpl)(plan.getPlanElements().get(i))).calculateDuration()/3600+"\t");
+							if (((ActivityImpl)(plan.getPlanElements().get(i))).getType().equals(((ActivityImpl)(plan.getPlanElements().get(i-2))).getType())) stream.print("1\t");
+							else stream.print("0\t");
+						}
+						else stream.print(((LegImpl)(plan.getPlanElements().get(i))).getTravelTime()/3600+"\t");
+					}
+					/*
+					// New version with just identical number of acts and modes but no regard to position
+					LinkedList<Integer> takenPositions = new LinkedList<Integer>();
+					for (int i=1;i<planFirstPerson.getPlanElements().size()-1;i++){
+						if (i%2==0){
+							for (int j=2;j<plan.getPlanElements().size()-2;j+=2){
+								if (((ActivityImpl)(planFirstPerson.getPlanElements().get(i))).getType().equals(((ActivityImpl)(plan.getPlanElements().get(j))).getType()) &&
+										!takenPositions.contains(j)){
+									stream.print(((ActivityImpl)(plan.getPlanElements().get(j))).calculateDuration()/3600+"\t");
+									takenPositions.add(j);
+									break;
+								}
+							}
+						}
+						else {
+							for (int j=1;j<plan.getPlanElements().size()-1;j+=2){
+								if (((LegImpl)(planFirstPerson.getPlanElements().get(i))).getMode().equals(((LegImpl)(plan.getPlanElements().get(j))).getMode()) &&
+										!takenPositions.contains(j)){
+									stream.print(((LegImpl)(plan.getPlanElements().get(j))).getTravelTime()/3600+"\t");	
+									takenPositions.add(j);
+									break;
+								}
+							}
+						}
+					}*/
+				}
+				
+				// Similarity attribute
+				stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
+			}
+			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
+				PlanImpl plan = iterator2.next();
+				
+				// Plan not executable, drop from choice set
+				if (plan.getScore()!=null && plan.getScore()==-100000.0)	stream.print(0+"\t");
+				
+				// Plan executable
+				else stream.print(1+"\t");
+			}
+			stream.println();
+		}
+		stream.close();
+		log.info("done.");
 	}
 	
-	public void writeSims (String outputFile, String outputFile1, String outputFile2, String outputFile3){
+	public void writeModFile(String outputFile){
+		new ModFileMaker (this.population, this.sims).write(outputFile);
+	}
+	
+	public void writeModFileWithSequence(String outputFile){
+		new ModFileMaker (this.population, this.sims).writeWithSequence(outputFile);
+	}
+	
+	public void writeSims (String outputFile){
 		log.info("Writing sims file...");
 		
-		int [] stats = new int [21];
-		int [] stats1 = new int [21];
-		int [] stats2 = new int [21];
-		int [] stats3 = new int [21];
+		int [] stats = new int [50];
+
 		for (int i=0;i<stats.length;i++){
 			stats[i]=0;
-			stats1[i]=0;
-			stats2[i]=0;
-			stats3[i]=0;
 		}
 		
 		PrintStream stream;
@@ -438,90 +684,26 @@ public class PlansConstructor implements PlanStrategyModule{
 			e.printStackTrace();
 			return;
 		}
-		PrintStream stream1;
-		try {
-			stream1 = new PrintStream (new File(outputFile1));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-		PrintStream stream2;
-		try {
-			stream2 = new PrintStream (new File(outputFile2));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-		PrintStream stream3;
-		try {
-			stream3 = new PrintStream (new File(outputFile3));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-		
 		
 		for (int i=0;i<this.sims.get(0).size();i++){
 			stream.print("alt"+(i+1)+"\t");
-			stream1.print("alt"+(i+1)+"\t");
-			stream2.print("alt"+(i+1)+"\t");
-			stream3.print("alt"+(i+1)+"\t");
 		}		
 		stream.println();
-		stream1.println();
-		stream2.println();
-		stream3.println();
-		
-		int counter1 = 0;
-		int counter2 = 0;
-		int counter3 = 0;
 		
 		for (int i=0;i<this.sims.size();i++){
 			for (int j=0;j<this.sims.get(i).size();j++){
 				stream.print(this.sims.get(i).get(j)+"\t");
-				stats [this.sims.get(i).get(j).intValue()]++;
-				if (this.sims.get(i).get(j)!=0){
-					stream1.print(this.simsActs.get(counter1)+"\t");
-					stream2.print(this.simsModes.get(counter2)+"\t");
-					stream3.print(this.simsLocations.get(counter3)+"\t");
-					stats1 [this.simsActs.get(counter1).intValue()]++;
-					stats2 [this.simsModes.get(counter2).intValue()]++;
-					stats3 [this.simsLocations.get(counter3).intValue()]++;
-					counter1++;
-					counter2++;
-					counter3++;
-				}
-				else {
-					stream1.print("0\t");
-					stream2.print("0\t");
-					stream3.print("0\t");
-					stats1 [0]++;
-					stats2 [0]++;
-					stats3 [0]++;
-				}
+				stats [this.sims.get(i).get(j).intValue()]++;				
 			}
 			stream.println();
-			stream1.println();
-			stream2.println();
-			stream3.println();
 		}
 		stream.println();
-		stream1.println();
-		stream2.println();
-		stream3.println();
 		
 		for (int i=0;i<stats.length;i++){
 			stream.println(i+"\t"+stats[i]);
-			stream1.println(i+"\t"+stats1[i]);
-			stream2.println(i+"\t"+stats2[i]);
-			stream3.println(i+"\t"+stats3[i]);
 		} 
 		
 		stream.close();
-		stream1.close();
-		stream2.close();
-		stream3.close();
 		log.info("done.");
-	}
-		
+	}		
 }

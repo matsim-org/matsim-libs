@@ -40,7 +40,8 @@ import org.matsim.api.basic.v01.TransportMode;
 
 
 /**
- * Compares two plans files with respect to the car travel times.
+ * Compares two plans files with respect to the car travel times. If the population sizes are different 
+ * (census data and extracted census file) all modes are compared.
  *
  * @author mfeil
  */
@@ -55,7 +56,7 @@ public class TravelTimeComparer {
 		this.populationOrig = populationOrig;
 		this.populationNew = populationNew;
 	//	this.outputFile = "./plans/plans_similarity.xls";	
-		this.outputFile = "/home/baug/mfeil/data/largeSet/it1/ttcompare11.xls";	
+		this.outputFile = "/home/baug/mfeil/data/largeSet/it1/ttcompare1929.xls";	
 	}
 	
 	public void run(){
@@ -183,7 +184,7 @@ public class TravelTimeComparer {
 		stream.println();
 		
 		//Delta
-		stream.print("\tsumDeltaPerTrip\t");
+		stream.print("\tsumDeltaPerCarTrip\t");
 		double deltaPerTrip=0;
 		for (int j=0;j<stats[0].length;j++){
 			int delta=0;
@@ -194,11 +195,11 @@ public class TravelTimeComparer {
 			deltaPerTrip += delta;
 		}
 		stream.println();
-		stream.println("\taveValuePerTrip\t"+(value/(stats.length*stats[0].length)));	
-		stream.println("\taveDeltaPerTrip\t"+(deltaPerTrip/(stats.length*stats[0].length)));	
+		stream.println("\taveValuePerCarTrip\t"+(value/(stats.length*stats[0].length)));	
+		stream.println("\taveDeltaPerCarTrip\t"+(deltaPerTrip/(stats.length*stats[0].length)));	
 		stream.println();
-		stream.println("\taveValuePerSelectedTrip\t"+(valueSelected/numberSelected));	
-		stream.println("\taveDeltaPerSelectedTrip\t"+(diffSelected/numberSelected));	
+		stream.println("\taveValuePerSelectedCarTrip\t"+(valueSelected/numberSelected));	
+		stream.println("\taveDeltaPerSelectedCarTrip\t"+(diffSelected/numberSelected));	
 		
 		stream.close();
 		log.info("done.");
@@ -364,8 +365,8 @@ public class TravelTimeComparer {
 	public static void main(final String [] args) {
 				final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 				final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-				final String populationFilenameOrig = "/home/baug/mfeil/data/largeSet/it0/output_plans_mz02.xml";
-				final String populationFilenameNew = "/home/baug/mfeil/data/largeSet/it1/output_plans_mz16.xml";
+				final String populationFilenameOrig = "/home/baug/mfeil/data/largeSet/it1/output_plans_mz19.xml";
+				final String populationFilenameNew = "/home/baug/mfeil/data/largeSet/it2/output_plans_mz29.xml";
 		/*		final String populationFilename = "./plans/output_plans.xml";
 				final String networkFilename = "./plans/network.xml";
 				final String facilitiesFilename = "./plans/facilities.xml";
