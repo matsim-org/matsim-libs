@@ -52,9 +52,9 @@ public class NetworkShiftFreespeed {
 			double fs = l.getFreespeed(Time.UNDEFINED_TIME);
 			// set standard speeds
 			if (fs < 10/3.6) { l.setFreespeed(5/3.6); }
-			else if (fs < 50/3.6) { l.setFreespeed(30/3.6); }
+			else if (fs < 40/3.6) { l.setFreespeed(30/3.6); }
 			else if (fs < 60/3.6) { l.setFreespeed(50/3.6); }
-			else if (fs < 80/3.6) { l.setFreespeed(60/3.6); }
+			else if (fs < 70/3.6) { l.setFreespeed(60/3.6); }
 			else if (fs < 100/3.6) { l.setFreespeed(80/3.6); }
 			else if (fs < 120/3.6) { l.setFreespeed(100/3.6); }
 			else { l.setFreespeed(120/3.6); }
