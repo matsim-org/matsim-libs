@@ -75,4 +75,27 @@ public class ActChainEqualityCheck {
 			return (actsmodes1.equals(actsmodes2));
 		}
 	}		
+	
+		public boolean checkEqualActChainsModesAccumulated (List<PlanElement> ac1, List<PlanElement> ac2){
+		
+		if (ac1.size()!=ac2.size()){
+			
+			return false;
+		}
+		else{
+			ArrayList<String> actsmodes1 = new ArrayList<String> ();
+			ArrayList<String> actsmodes2 = new ArrayList<String> ();
+			for (int i = 0;i<ac1.size();i++){
+				if (i%2==0)	actsmodes1.add(((ActivityImpl)(ac1.get(i))).getType().toString());		
+				else actsmodes1.add(((LegImpl)(ac1.get(i))).getMode().toString());
+			}
+			java.util.Collections.sort(actsmodes1);
+			for (int i = 0;i<ac2.size();i++){
+				if (i%2==0) actsmodes2.add(((ActivityImpl)(ac2.get(i))).getType().toString());	
+				else actsmodes2.add(((LegImpl)(ac2.get(i))).getMode().toString());
+			}		
+			java.util.Collections.sort(actsmodes2);
+			return (actsmodes1.equals(actsmodes2));
+		}
+	}		
 }	
