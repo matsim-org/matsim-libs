@@ -37,6 +37,7 @@ import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
+import org.matsim.counts.algorithms.CountsGraphWriter;
 
 import playground.dgrether.utils.DoubleArrayTableWriter;
 
@@ -149,8 +150,7 @@ public class CountsAnalyser {
 		System.out.println("Reading parameters...");
 		String linksAttributeFilename = this.linkstatsfile;
 		System.out.println("  Linkattribute File: " + linksAttributeFilename);
-		this.outputFormat = config.getParam(COUNTS, OUTPUTFORMAT);
-		System.out.println("  Output format: " + this.outputFormat);
+		this.outputFormat = "all";
 		this.outputFile = config.getParam(COUNTS, OUTFILE);
 		System.out.println("  Output file: " + this.outputFile);
 		this.distanceFilterCenterNode = config.counts().getDistanceFilterCenterNode();
@@ -205,8 +205,10 @@ public class CountsAnalyser {
 			writer.writeFile(filename);
 		}
 		else {
-			throw new IllegalArgumentException("Output format must be txt or kml");
+			CountsGraphWriter writer = new CountsGraphWriter("output", countsComparisonList, 0 , true , true);
+			writer.createGraphs();
 		}
+
 		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator(countsComparisonList);
 		
 		double[] hours = new double[24];
@@ -272,7 +274,6 @@ public class CountsAnalyser {
 		System.out.println("The config file must contain the following attributes:");
 
 		System.out.println("  - The path to the file to which the output is written (mandatory)");
-		System.out.println("  - The output format, can be kml or txt (mandatory)");
 		System.out.println("  - The time filter (mandatory) 0 for 0 to 1 am, 1 for 1 to 2 am...");
 		System.out.println("  - The distance filter (optional) the distance in km to filter the counts around a node that must be given in the subsequent argument.");
 		System.out.println("  - The node id for the center of the distance filter (optinal, however mandatory if distance filter is set)");
