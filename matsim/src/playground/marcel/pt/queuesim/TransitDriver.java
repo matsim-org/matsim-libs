@@ -241,7 +241,7 @@ public class TransitDriver implements TransitDriverAgent {
 	 *
 	 * @author mrieser
 	 */
-	protected class NetworkRouteWrapper implements NetworkRouteWRefs {
+	protected class NetworkRouteWrapper implements NetworkRouteWRefs, Cloneable {
 
 		private static final long serialVersionUID = 1L;
 		private final NetworkRouteWRefs delegate;
