@@ -49,15 +49,11 @@ import playground.dgrether.utils.DoubleArrayTableWriter;
  */
 public class CountsAnalyser {
 
+	private String linkstatsfile;
 	/**
 	 * name of the counts module in config
 	 */
 	public static final String COUNTS = "counts";
-
-	/**
-	 * name of the linkattribute parameter in config
-	 */
-	public static final String LINKATTS = "linkattributes";
 
 	/**
 	 * name of the output format parameter in config
@@ -120,9 +116,12 @@ public class CountsAnalyser {
 	 *
 	 * @param config
 	 */
-	public CountsAnalyser(final String config) {
+	public CountsAnalyser(final String linkstatsfile) {
+		
+		this.linkstatsfile = linkstatsfile;
+		
 		try {
-			this.readConfig(config);
+			this.readConfig("input/config.xml");
 			this.writeCountsComparisonList(this.outputFile, this.outputFormat);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -148,7 +147,7 @@ public class CountsAnalyser {
 		System.out.println("  done.");
 		// reading config parameters
 		System.out.println("Reading parameters...");
-		String linksAttributeFilename = "input/kti/linkstats.txt";
+		String linksAttributeFilename = this.linkstatsfile;
 		System.out.println("  Linkattribute File: " + linksAttributeFilename);
 		this.outputFormat = config.getParam(COUNTS, OUTPUTFORMAT);
 		System.out.println("  Output format: " + this.outputFormat);
@@ -268,8 +267,10 @@ public class CountsAnalyser {
 	 *
 	 */
 	private static void printHelp() {
-		System.out.println("This tool needs one config argument. The config file must contain the following parameters: ");
-		System.out.println("  - The path to the file with the link attributes (mandatory)");
+		System.out.println("This tool needs one config argument: The path to the linkstats.txt file!");
+		System.out.println("A config file must be provided under the following path: input/config.xml");
+		System.out.println("The config file must contain the following attributes:");
+
 		System.out.println("  - The path to the file to which the output is written (mandatory)");
 		System.out.println("  - The output format, can be kml or txt (mandatory)");
 		System.out.println("  - The time filter (mandatory) 0 for 0 to 1 am, 1 for 1 to 2 am...");
@@ -283,10 +284,7 @@ public class CountsAnalyser {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		String [] args2 = {"/Volumes/data/work/svnWorkspace/testData/schweiz-ivtch/ivtch-config620linkstats.xml"};
-//		String [] args2 = {"/Volumes/data/work/svnWorkspace/testData/schweiz-ivtch/ivtch-config621linkstats.xml"};
-//		args = args2;
-		
+				
 		CountsAnalyser ca = null;
 		if (args.length != 1) {
 			printHelp();
