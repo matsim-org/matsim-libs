@@ -38,6 +38,10 @@ import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.counts.algorithms.CountsGraphWriter;
+import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
+import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
+import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
+import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
 
 import playground.dgrether.utils.DoubleArrayTableWriter;
 
@@ -206,6 +210,11 @@ public class CountsAnalyser {
 		}
 		else {
 			CountsGraphWriter writer = new CountsGraphWriter("output", countsComparisonList, 0 , true , true);
+			writer.setGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
+			writer.setGraphsCreator(new CountsErrorGraphCreator("errors"));
+			writer.setGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
+			writer.setGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
+			writer.createGraphs();
 			writer.createGraphs();
 		}
 
