@@ -32,6 +32,7 @@ import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
 
 import playground.balmermi.modules.NetworkDoubleLinks;
+import playground.balmermi.modules.NetworkShiftFreespeed;
 import playground.balmermi.modules.NetworkThinner;
 
 public class CleanNetwork {
@@ -53,6 +54,8 @@ public class CleanNetwork {
 		new NetworkThinner().run(network,counts);
 		new NetworkCleaner().run(network);
 
+		new NetworkShiftFreespeed().run(network);
+		
 		NetworkWriteAsTable nwat = new NetworkWriteAsTable("../../output/");
 		nwat.run(network);
 		nwat.close();

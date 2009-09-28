@@ -32,22 +32,13 @@ public class NetworkShiftFreespeed {
 	//////////////////////////////////////////////////////////////////////
 
 	private static final Logger log = Logger.getLogger(NetworkShiftFreespeed.class);
-	private double shift = -10.0/3.6;
-	private double lowerBorder = 20.0/3.6;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
 	public NetworkShiftFreespeed() {
-		this(-10.0/3.6,20.0/3.6);
-	}
-
-	public NetworkShiftFreespeed(final double shift, final double lowerBorder) {
 		log.info("init "+this.getClass().getName()+" module...");
-		this.shift = shift;
-		this.lowerBorder = lowerBorder;
-		log.info("  shifting speed with shift="+this.shift+" and lowerBorder="+this.lowerBorder+".");
 		log.info("done. ("+this.getClass().getName()+")");
 	}
 
@@ -59,7 +50,18 @@ public class NetworkShiftFreespeed {
 		log.info("running "+this.getClass().getName()+" module...");
 		for (LinkImpl l : network.getLinks().values()) {
 			double fs = l.getFreespeed(Time.UNDEFINED_TIME);
-			if (fs > lowerBorder) { l.setFreespeed(fs+shift); }
+			// set standard speeds
+			if (fs < 10/3.6) { l.setFreespeed(5/3.6); }
+			else if (fs < 50/3.6) { l.setFreespeed(30/3.6); }
+			else if (fs < 60/3.6) { l.setFreespeed(50/3.6); }
+			else if (fs < 80/3.6) { l.setFreespeed(60/3.6); }
+			else if (fs < 100/3.6) { l.setFreespeed(80/3.6); }
+			else if (fs < 120/3.6) { l.setFreespeed(100/3.6); }
+			else { l.setFreespeed(120/3.6); }
+			
+			// reduce standard speeds by 10km/h except Major highways
+			fs = l.getFreespeed(Time.UNDEFINED_TIME);
+			if ((!l.getType().equals("0-4110-0")) && (fs > 20/3.6)) { l.setFreespeed(fs-(10/3.6)); }
 		}
 		log.info("done. ("+this.getClass().getName()+")");
 	}
