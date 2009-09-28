@@ -133,6 +133,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			
 			// All prim acts in potential agent's plan
 			for (int i=0;i<this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).size();i++){
+				//if (j==0) log.warn((i+1)+" act in prim acts of person "+plan.getPerson().getId()+" is "+this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true).get(i).getType());
 				boolean in = false;
 				for (int x=0;x<agents.getAgentPlan(j).getPlanElements().size()-2;x=x+2){
 					// try statement with print block to analyze some strange exceptions in Zurich scenario
