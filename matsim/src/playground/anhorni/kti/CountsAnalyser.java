@@ -286,7 +286,7 @@ public class CountsAnalyser {
 	public static void main(String[] args) {
 				
 		CountsAnalyser ca = null;
-		if (args.length != 1) {
+		if (args.length == 0) {
 			printHelp();
 		}
 		else {
