@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import org.matsim.core.gbl.Gbl;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
@@ -61,9 +62,9 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	protected final Map<String, Double>		introTime;
 	protected final PlansCalcRoute		 	router;
 	protected final PlanScorer 				scorer;
-	protected LegTravelTimeEstimator	estimator;
+	protected LegTravelTimeEstimator		estimator;
 	protected final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
-	protected final PlanomatConfigGroup config;
+	protected final PlanomatConfigGroup 	config;
 	protected static final Logger 			log = Logger.getLogger(TimeModeChoicer1.class);
 	protected final double					maxWalkingDistance;
 	protected final String					modeChoice;
@@ -147,6 +148,41 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.legTravelTimeEstimatorFactory = null;
 	}
 	
+	public TimeModeChoicer1 (LegTravelTimeEstimatorFactory estimatorFactory, PlanScorer scorer, PlansCalcRoute router){
+		
+		this.router 				= router;
+		this.scorer 				= scorer;
+		this.OFFSET					= Double.parseDouble(TimeModeChoicerConfigGroup.getOffset());
+		this.MAX_ITERATIONS 		= Integer.parseInt(TimeModeChoicerConfigGroup.getMaxIterations());
+		this.STOP_CRITERION			= Integer.parseInt(TimeModeChoicerConfigGroup.getStopCriterion());
+		this.minimumTime			= new TreeMap<String, Double>();
+		this.minimumTime.put("home", 7200.0);
+		this.minimumTime.put("work", 3600.0);
+		this.minimumTime.put("shopping", 3600.0);
+		this.minimumTime.put("leisure", 3600.0);
+		this.minimumTime.put("education_higher", 3600.0);
+		this.minimumTime.put("education_kindergarten", 3600.0);
+		this.minimumTime.put("education_other", 3600.0);
+		this.minimumTime.put("education_primary", 3600.0);
+		this.minimumTime.put("education_secondary", 3600.0);
+		this.minimumTime.put("shop", 3600.0);
+		this.minimumTime.put("work_sector2", 3600.0);
+		this.minimumTime.put("work_sector3", 3600.0);
+		this.minimumTime.put("tta", 3600.0);
+		this.minimumTime.put("w", 3600.0);
+		this.minimumTime.put("h", 7200.0);
+		this.introTime				= this.minimumTime;
+		this.NEIGHBOURHOOD_SIZE		= Integer.parseInt(TimeModeChoicerConfigGroup.getNeighbourhoodSize());
+		this.maxWalkingDistance		= Double.parseDouble(TimeModeChoicerConfigGroup.getMaximumWalkingDistance());
+		this.possibleModes			= TimeModeChoicerConfigGroup.getPossibleModes();
+		this.modeChoice				= TimeModeChoicerConfigGroup.getModeChoice();
+		this.routes					= null;
+
+		// meisterk
+		this.legTravelTimeEstimatorFactory = estimatorFactory;
+		this.config					= Gbl.getConfig().planomat();
+	}
+	
 		
 	//////////////////////////////////////////////////////////////////////
 	// run() method
@@ -184,6 +220,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.routes = routes;
 		
 		// meisterk
+		//for (int z=1;z<plan.getPlanElements().size();z+=2) System.out.println("initial leg "+plan.getActLegIndex(plan.getPlanElements().get(z)));
 		this.estimator = this.legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 				plan,
 				this.config.getSimLegInterpretation(),
@@ -817,6 +854,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			((LegImpl)(plan.getPlanElements().get(i))).setDepartureTime(now);
 //			statement was replaced by the one below
 //			travelTime = this.estimator.getInterpolation(plan.getPerson().getId(), now, (ActivityImpl)(plan.getPlanElements().get(i-1)), (ActivityImpl)(plan.getPlanElements().get(i+1)), (LegImpl)(plan.getPlanElements().get(i)));
+			//System.out.println("clean schedule leg "+plan.getActLegIndex(plan.getPlanElements().get(i)));
 			travelTime = this.estimator.getLegTravelTimeEstimation(
 					plan.getPerson().getId(), 
 					now, 
@@ -902,6 +940,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 //					((ActivityImpl)(plan.getPlanElements().get(i-1))), 
 //					((ActivityImpl)(plan.getPlanElements().get(i+1))), 
 //					((LegImpl)(plan.getPlanElements().get(i))));
+			//System.out.println("clean routes leg "+plan.getActLegIndex(plan.getPlanElements().get(i)));
 			double travelTime = this.estimator.getLegTravelTimeEstimation(
 					plan.getPerson().getId(), 
 					((LegImpl)(plan.getPlanElements().get(i))).getDepartureTime(), 
@@ -952,6 +991,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 //					(ActivityImpl)(actslegs.get(i+1)), 
 //					(LegImpl)(actslegs.get(i))
 //					);
+			//System.out.println("setTimes1 leg "+plan.getActLegIndex(actslegs.get(i)));
 			travelTime = this.estimator.getLegTravelTimeEstimation(
 					plan.getPerson().getId(), 
 					now, 
@@ -986,6 +1026,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 //					(ActivityImpl)(actslegs.get(i+1)), 
 //					(LegImpl)(actslegs.get(i))
 //					);
+			//System.out.println("setTimes2 leg "+plan.getActLegIndex(actslegs.get(i)));
 			travelTime = this.estimator.getLegTravelTimeEstimation(
 					plan.getPerson().getId(), 
 					now, 
@@ -1023,6 +1064,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 //								(ActivityImpl)(actslegs.get(i+3)), 
 //								(LegImpl)(actslegs.get(i+2))
 //								);
+						//System.out.println("setTimes3 leg "+plan.getActLegIndex(actslegs.get(i+2)));
 						travelTime = this.estimator.getLegTravelTimeEstimation(
 								plan.getPerson().getId(), 
 								now, 
@@ -1063,6 +1105,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 //						(ActivityImpl)(actslegs.get(i+1)), 
 //						(LegImpl)(actslegs.get(i))
 //						);
+				//System.out.println("setTimes4 leg "+plan.getActLegIndex(actslegs.get(i)));
 				travelTime = this.estimator.getLegTravelTimeEstimation(
 						plan.getPerson().getId(), 
 						now, 
@@ -1094,6 +1137,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 //								(ActivityImpl)(actslegs.get(i+3)), 
 //								(LegImpl)(actslegs.get(i+2))
 //								);
+						//System.out.println("setTimes5 leg "+plan.getActLegIndex(actslegs.get(i+2)));
 						travelTime = this.estimator.getLegTravelTimeEstimation(
 								plan.getPerson().getId(), 
 								now, 
