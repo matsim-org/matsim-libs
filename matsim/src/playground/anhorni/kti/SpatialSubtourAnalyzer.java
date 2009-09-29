@@ -24,73 +24,91 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.World;
 
 
-public class SpatialSubtourAnalyzer {
+public class SpatialSubtourAnalyzer extends AbstractPersonAlgorithm {
 
-	private PopulationImpl plans = new PopulationImpl();
-	private ActivityFacilitiesImpl facilities;
-	private NetworkLayer network;
+//	private PopulationImpl plans = new PopulationImpl();
+//	private ActivityFacilitiesImpl facilities;
+//	private NetworkLayer network;
 	
 	private TreeMap<TransportMode, TreeMap<Id, Integer>> subtourStartLocations = 
 		new TreeMap<TransportMode, TreeMap<Id, Integer>>();
 			
 	private final static Logger log = Logger.getLogger(SpatialSubtourAnalyzer.class);
 	
-	
-	/*
-	 * network, facilities, plans
-	 */
 	public static void main(final String[] args) {
 		
 		Config config = Gbl.createConfig(args);
 		
-		final SpatialSubtourAnalyzer analyzer = new SpatialSubtourAnalyzer();
-		
-//		if (args.length != 3) {
-//			printHelp();
-//			log.error("Execution aborted");
-//			return;
-//		}
-		
-		analyzer.init(config);
-		analyzer.run();	
-	}
-	
-	public void run() {			
-		Gbl.startMeasurement();
-		
-		String outpath = "output/kti/";
-		
-		this.extractSubtours();		
-		this.printStartLocationofSubtours(outpath);
-
-		Gbl.printElapsedTime();
-	}
-		
-//	private void init(String networkfilePath, String facilitiesfilePath, String plansfilePath) {
-	private void init(Config config) {
-		
-		log.info(" \n---------------------------- \nStart init" );
 		log.info("reading the network ...");
-		this.network = new NetworkLayer();
-		new MatsimNetworkReader(this.network).readFile(config.network().getInputFile());
+		NetworkLayer network = new NetworkLayer();
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		log.info("reading the network ...done.");
 				
 		World world = Gbl.getWorld();
 		
 		log.info("Reading the facilities ...");
-		this.facilities =(ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
-		new FacilitiesReaderMatsimV1(this.facilities).readFile(config.facilities().getInputFile());
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		new FacilitiesReaderMatsimV1(facilities).readFile(config.facilities().getInputFile());
 		log.info("Reading the facilities ...done.");
 		
-		log.info("Reading plans...");
-		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, network);
+		final SpatialSubtourAnalyzer analyzer = new SpatialSubtourAnalyzer();
+		PopulationImpl plans = new PopulationImpl();
+		plans.setIsStreaming(true);
+		plans.addAlgorithm(analyzer);
+		
+		Gbl.startMeasurement();
+		log.info("Processing plans...");
+		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		plansReader.readFile(config.plans().getInputFile());
-		log.info("Reading plans...done.");
-		log.info("Init finished \n ----------------------------");
+		log.info("Processing plans...done.");
+		Gbl.printElapsedTime();
+
+		String outpath = "output/kti/";
+		analyzer.printStartLocationofSubtours(facilities, outpath);
 	}
+	
+//	public void run(Config config) {			
+//
+//		Gbl.startMeasurement();
+//		this.init(config);
+//		Gbl.printElapsedTime();
+//		
+////		this.extractSubtours();
+////		this.run(this.plans);
+//		this.printStartLocationofSubtours(outpath);
+//
+//	}
+		
+//	private void init(Config config) {
+//		
+//		log.info(" \n---------------------------- \nStart init" );
+//		log.info("reading the network ...");
+//		this.network = new NetworkLayer();
+//		new MatsimNetworkReader(this.network).readFile(config.network().getInputFile());
+//		log.info("reading the network ...done.");
+//				
+//		World world = Gbl.getWorld();
+//		
+//		log.info("Reading the facilities ...");
+//		this.facilities =(ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+//		new FacilitiesReaderMatsimV1(this.facilities).readFile(config.facilities().getInputFile());
+//		log.info("Reading the facilities ...done.");
+//		
+//		
+//		
+//		PopulationImpl plans = new PopulationImpl();
+//		plans.setIsStreaming(true);
+//		
+//		log.info("Reading plans...");
+//		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, network);
+//		plansReader.readFile(config.plans().getInputFile());
+//		log.info("Reading plans...done.");
+//		log.info("Init finished \n ----------------------------");
+//	}
 	
 	private void incrementCounter(Id facilityId, TransportMode mode) {
 		
@@ -106,34 +124,34 @@ public class SpatialSubtourAnalyzer {
 		this.subtourStartLocations.get(mode).put(facilityId, cnt);
 	}
 	
-	private void extractSubtours() {
-		
-		SubtourStartLocations subtourStartLocationsExtractor = new SubtourStartLocations();
-		
-		Iterator<PersonImpl> person_it = this.plans.getPersons().values().iterator();
-		while (person_it.hasNext()) {
-			PersonImpl person = person_it.next();
-			PlanImpl selectedPlan = person.getSelectedPlan();
-			
-			subtourStartLocationsExtractor.run(selectedPlan);
-			TreeMap<Id, Integer> subtourStartLocations = subtourStartLocationsExtractor.getSubtourStartLocations();
-									
-			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
-			
-			if (actslegs.size() < 6) continue;
-			// do not handle the last two activities as they can not be a start for a subtour
-			for (int j = 0; j < actslegs.size() - 4; j=j+2) {
-				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
-				
-				if (subtourStartLocations.containsKey(act.getFacilityId())) {
-					this.incrementCounter(act.getFacilityId(), selectedPlan.getNextLeg(act).getMode());
-				}
-			}	
-		}
-	}
-	
+//	private void extractSubtours() {
+//		
+//		SubtourStartLocations subtourStartLocationsExtractor = new SubtourStartLocations();
+//		
+//		Iterator<PersonImpl> person_it = this.plans.getPersons().values().iterator();
+//		while (person_it.hasNext()) {
+//			PersonImpl person = person_it.next();
+//			PlanImpl selectedPlan = person.getSelectedPlan();
+//			
+//			subtourStartLocationsExtractor.run(selectedPlan);
+//			TreeMap<Id, Integer> subtourStartLocations = subtourStartLocationsExtractor.getSubtourStartLocations();
+//									
+//			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
+//			
+//			if (actslegs.size() < 6) continue;
+//			// do not handle the last two activities as they can not be a start for a subtour
+//			for (int j = 0; j < actslegs.size() - 4; j=j+2) {
+//				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
+//				
+//				if (subtourStartLocations.containsKey(act.getFacilityId())) {
+//					this.incrementCounter(act.getFacilityId(), selectedPlan.getNextLeg(act).getMode());
+//				}
+//			}	
+//		}
+//	}
+//	
 
-	private void printStartLocationofSubtours(String outpath) {
+	private void printStartLocationofSubtours(ActivityFacilitiesImpl facilities, String outpath) {
 
 		log.info("Generate output files ...");
 		
@@ -155,7 +173,7 @@ public class SpatialSubtourAnalyzer {
 				while (locations_it.hasNext()) {
 					Id facilityId = locations_it.next();
 					
-					ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
+					ActivityFacility facility = facilities.getFacilities().get(facilityId);
 				
 					out.write(facility.getId() + "\t" + 
 							facility.getCoord().getX() + "\t" + facility.getCoord().getY() + "\t" +
@@ -170,11 +188,30 @@ public class SpatialSubtourAnalyzer {
 			Gbl.errorMsg(e);
 		}
 	}
-	
-	private static void printHelp() {
-		log.info("This tool needs the following three config arguments: ");
-		log.info("  - path to a network file");
-		log.info("  - path to a facilities file");
-		log.info("  - path to a plans file");
+
+	@Override
+	public void run(PersonImpl person) {
+		PlanImpl selectedPlan = person.getSelectedPlan();
+		
+		SubtourStartLocations subtourStartLocationsExtractor = new SubtourStartLocations();
+
+		subtourStartLocationsExtractor.run(selectedPlan);
+		TreeMap<Id, Integer> subtourStartLocations = subtourStartLocationsExtractor.getSubtourStartLocations();
+								
+		final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
+		
+//		if (actslegs.size() < 6) continue;
+		if (actslegs.size() >= 6) {
+			// do not handle the last two activities as they can not be a start for a subtour
+			for (int j = 0; j < actslegs.size() - 4; j = j + 2) {
+				final ActivityImpl act = (ActivityImpl) actslegs.get(j);
+
+				if (subtourStartLocations.containsKey(act.getFacilityId())) {
+					this.incrementCounter(act.getFacilityId(), selectedPlan
+							.getNextLeg(act).getMode());
+				}
+			}
+		}	
 	}
+	
 }
