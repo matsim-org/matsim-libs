@@ -21,7 +21,6 @@
 package playground.dgrether.daganzosignal;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -72,7 +71,7 @@ public class DaganzoScenarioGenerator {
 
 	private static final String DAGANZOBASEDIR = DgPaths.SHAREDSVN + "studies/dgrether/daganzo/";
 	
-	private static final String DAGANZONETWORKFILE = DAGANZOBASEDIR
+	public static final String DAGANZONETWORKFILE = DAGANZOBASEDIR
 			+ "daganzoNetwork.xml";
 
 	public static final String NETWORKFILE = DAGANZONETWORKFILE;
