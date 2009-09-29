@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -39,6 +40,7 @@ import playground.christoph.router.TabuRoute;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import playground.christoph.router.util.DijkstraWrapperFactory;
 
 public class CreateKnowledgeForDatabase {
 
@@ -210,7 +212,7 @@ public class CreateKnowledgeForDatabase {
 		replanners = new ArrayList<PlanAlgorithm>();
 			
 		// Dijkstra for Replanning
-		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
+		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
 		KnowledgeTravelCostCalculator travelCost = new KnowledgeTravelCostCalculator(travelTime);
 		
 		// Use a Wrapper - by doing this, already available MATSim CostCalculators can be used
@@ -227,11 +229,10 @@ public class CreateKnowledgeForDatabase {
 //		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
 //		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime);
 		Dijkstra dijkstra = new Dijkstra(network, travelCost, travelTime);
-		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCost, travelTime, network);
-		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
-		
-//		dijkstraRouter.setMyQueueNetwork(new MyQueueNetwork(network));
-		dijkstraRouter.setQueueNetwork(sim.getQueueNetwork());
+//		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCost, travelTime, network);
+//		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
+		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime, new DijkstraWrapperFactory());	
+
 		replanners.add(dijkstraRouter);
 	}
 	

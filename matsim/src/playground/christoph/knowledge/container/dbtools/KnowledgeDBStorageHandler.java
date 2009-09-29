@@ -1,11 +1,17 @@
 package playground.christoph.knowledge.container.dbtools;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeSimStepListener;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
@@ -18,7 +24,7 @@ import playground.christoph.router.util.KnowledgeTools;
  * This Class takes care of the Data Exchange between the Persons 
  * and the Database that contains their Knowledge. 
  */
-public class KnowledgeDBStorageHandler extends Thread implements BasicActivityStartEventHandler{
+public class KnowledgeDBStorageHandler extends Thread implements BasicActivityStartEventHandler, QueueSimulationBeforeSimStepListener{
 
 	private ArrayList<PersonImpl> newPersons = new ArrayList<PersonImpl>();
 	private LinkedList<PersonImpl> personsToProcess = new LinkedList<PersonImpl>();
@@ -28,7 +34,17 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 	private SubNetworkTools subNetworkTools;
 	
 	private boolean stopHandler = false;
-		
+	
+	/*
+	 * Basically a 1:1 copy of the activityEndsList of the QueueSimulation.
+	 * The difference is, that this implementation uses a Time Offset. That means
+	 * that we are informed that an activity will end a few Time Steps before it
+	 * really ends. This allows us for example to read the known nodes of a Person
+	 * from a Database before they are needed what should speed up the Simulation.
+	 */
+	protected final PriorityBlockingQueue<DriverAgent> offsetActivityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
+	protected final double timeOffset = 120.0;
+	
 //	private int count = 0;
 
 	public KnowledgeDBStorageHandler(PopulationImpl population)
@@ -40,6 +56,15 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 		
 		knowledgeTools = new KnowledgeTools();
 		subNetworkTools = new SubNetworkTools();
+	}
+	
+	public void stopHandler()
+	{
+		stopHandler = true;
+		synchronized(personsToProcess)
+		{
+			personsToProcess.clear();
+		}
 	}
 	
 	@Override
@@ -95,7 +120,7 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 		}
 	}
 	
-	public void startProcessing()
+	private void startProcessing()
 	{		
 		while ((personsToProcess.peek() != null) && !stopHandler)
 		{
@@ -114,7 +139,7 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 					 *  The NodeKnowledge Class decides, whether reading the
 					 *  Knowledge from the Database is really neccessary or not.
 					 */
-//					((DBStorage) nodeKnowledge).readFromDB();
+					((DBStorage) nodeKnowledge).readFromDB();
 					
 //					count++;
 //					if (count % 1000 == 0) System.out.println("Read " + count + " Knowledges from DB");
@@ -142,4 +167,47 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 		
 	}
 	
+	public void scheduleActivityEnd(final DriverAgent agent)
+	{	
+		offsetActivityEndsList.add(agent);
+	}
+	
+	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent e) 
+	{
+		handleOffsetActivityEnds(e.getSimulationTime());
+	}
+	
+	private void handleOffsetActivityEnds(final double time)
+	{		
+		while (this.offsetActivityEndsList.peek() != null)
+		{
+			DriverAgent agent = this.offsetActivityEndsList.peek();
+			if (agent.getDepartureTime() <= time + timeOffset)
+			{
+				this.offsetActivityEndsList.poll();
+				this.addPerson(agent.getPerson());
+			} 
+			else
+			{
+				return;
+			}
+		} 
+	}
+	
+	/*
+	 * for the Knowledge Modules
+	 */
+	/*package*/ class DriverAgentDepartureTimeComparator implements Comparator<DriverAgent>, Serializable {
+
+		private static final long serialVersionUID = 1L;
+
+		public int compare(DriverAgent agent1, DriverAgent agent2) {
+			int cmp = Double.compare(agent1.getDepartureTime(), agent2.getDepartureTime());
+			if (cmp == 0) {
+				// Both depart at the same time -> let the one with the larger id be first (=smaller)
+				return agent2.getPerson().getId().compareTo(agent1.getPerson().getId());
+			}
+			return cmp;
+		}
+	}
 }

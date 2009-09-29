@@ -28,8 +28,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
@@ -72,8 +70,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
-		//ArrayList<Node> knownNodes = null;
-		Map<Id, NodeImpl> knownNodesMap = null;
+		Map<Id, Node> knownNodesMap = null;
 		
 		nodes.add(fromNode);
 		
@@ -115,7 +112,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 			// get the Link with the nearest direction to the destination node
 			for(int i = 0; i < linksArray.length; i++)
 			{
-				if(linksArray[i] instanceof LinkImpl)
+				if(linksArray[i] instanceof Link)
 				{
 					double newAngle = calcAngle (fromNode, toNode, linksArray[i].getToNode());
 					

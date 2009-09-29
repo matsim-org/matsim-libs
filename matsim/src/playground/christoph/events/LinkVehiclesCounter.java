@@ -231,7 +231,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 //				countChangedMap.put(id, vehCount);
 //			}
 		} else {
-			log.error("Unknown Leg Mode!");
+			log.warn("Unknown Leg Mode!");
 		}
 	}
 

@@ -28,9 +28,9 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -98,11 +98,11 @@ public class CreateKnownNodesMap {
 		}
 */		
 		// get Nodes from the Person's Knowledge
-		Map<Id, NodeImpl> nodesMap = null;
+		Map<Id, Node> nodesMap = null;
 		
 		if (p.getCustomAttributes().get("NodeKnowledge") == null)
 		{
-			nodesMap = new TreeMap<Id, NodeImpl>();
+			nodesMap = new TreeMap<Id, Node>();
 			
 			NodeKnowledge nodeKnowledge = new MapKnowledge();
 			nodeKnowledge.setPerson(p);
@@ -129,13 +129,13 @@ public class CreateKnownNodesMap {
 			
 			for(int j = 1; j < acts.size(); j++)
 			{			
-				NodeImpl startNode = acts.get(j-1).getLink().getToNode();
-				NodeImpl endNode = acts.get(j).getLink().getFromNode();
+				Node startNode = acts.get(j-1).getLink().getToNode();
+				Node endNode = acts.get(j).getLink().getFromNode();
 				
 				((SelectNodesDijkstra)nodeSelector).setStartNode(startNode);
 				((SelectNodesDijkstra)nodeSelector).setEndNode(endNode);
 
-				Map<Id, NodeImpl> newNodes = new HashMap<Id, NodeImpl>();
+				Map<Id, Node> newNodes = new HashMap<Id, Node>();
 				
 				nodeSelector.addNodesToMap(newNodes);
 				
@@ -146,8 +146,8 @@ public class CreateKnownNodesMap {
 				 *  This ensures that a Person knows at least the Link where the Activity
 				 *  takes place.
 				 */
-				NodeImpl startNodeFrom = acts.get(j-1).getLink().getFromNode();			
-				NodeImpl endNodeTo = acts.get(j).getLink().getToNode();
+				Node startNodeFrom = acts.get(j-1).getLink().getFromNode();			
+				Node endNodeTo = acts.get(j).getLink().getToNode();
 				newNodes.put(startNodeFrom.getId(), startNodeFrom);
 				newNodes.put(endNodeTo.getId(), endNodeTo);
 				

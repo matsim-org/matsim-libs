@@ -37,10 +37,9 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 
 public class GetAllIncludedLinks {
 
@@ -52,7 +51,7 @@ public class GetAllIncludedLinks {
 	 * @return A link from the network is included in the returned ArrayList, if its
 	 * start- and end node are included in the includedNodes ArrayList.
 	 */
-	public ArrayList<Link> getAllLinks(NetworkLayer network, ArrayList<NodeImpl> includedNodes)
+	public ArrayList<Link> getAllLinks(NetworkLayer network, ArrayList<Node> includedNodes)
 	{
 		ArrayList<Link> includedLinks = new ArrayList<Link>();
 		getAllLinks(network, includedNodes, includedLinks);
@@ -82,15 +81,15 @@ public class GetAllIncludedLinks {
 	 * @param ArrayList< Node > includedNodes
 	 * @param ArrayList< Link > includedLinks
 	 */
-	public void getAllLinks(NetworkLayer network, ArrayList<NodeImpl> includedNodes, ArrayList<Link> includedLinks)
+	public void getAllLinks(Network network, ArrayList<Node> includedNodes, ArrayList<Link> includedLinks)
 	{		
 		// get all links of the network
-		Map<Id, LinkImpl> linkMap = network.getLinks();
+		Map<Id, ? extends Link> linkMap = network.getLinks();
 		
-		for (LinkImpl link : linkMap.values()) 
+		for (Link link : linkMap.values()) 
 		{
-			NodeImpl fromNode = link.getFromNode();
-			NodeImpl toNode = link.getToNode();
+			Node fromNode = link.getFromNode();
+			Node toNode = link.getToNode();
 			
 			// check, if the node is contained in the given list
 			if(includedNodes.contains(fromNode) && includedNodes.contains(toNode))
@@ -114,12 +113,12 @@ public class GetAllIncludedLinks {
 	public void getAllLinks(NetworkLayer network, Map<Id, Node> includedNodesMap, ArrayList<Link> includedLinks)
 	{	
 		// get all links of the network
-		Map<Id, LinkImpl> linkMap = network.getLinks();
+		Map<Id, ? extends Link> linkMap = network.getLinks();
 		
-		for (LinkImpl link : linkMap.values()) 
+		for (Link link : linkMap.values()) 
 		{
-			NodeImpl fromNode = link.getFromNode();
-			NodeImpl toNode = link.getToNode();
+			Node fromNode = link.getFromNode();
+			Node toNode = link.getToNode();
 			
 			// check, if the node is contained in the given list
 			if(includedNodesMap.containsKey(fromNode.getId()) && includedNodesMap.containsKey(toNode.getId()))

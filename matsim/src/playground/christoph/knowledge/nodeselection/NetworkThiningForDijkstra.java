@@ -7,12 +7,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.Time;
@@ -28,14 +29,14 @@ public class NetworkThiningForDijkstra {
 
 	private static final Logger log = Logger.getLogger(NetworkThiningForDijkstra.class);
 	
-	private NetworkLayer network;
+	private Network network;
 	private double time = Time.UNDEFINED_TIME;
 	
 	// CostCalculator for the Dijkstra Algorithm
 	private TravelCost costCalculator = new FreespeedTravelTimeCost();
 	private DijkstraForSelectNodes dijkstra;
 	
-	private Map<Id, LinkImpl> notUsedLinks;
+	private Map<Id, Link> notUsedLinks;
 
 	private int numOfThreads = 2;
 	
@@ -63,13 +64,13 @@ public class NetworkThiningForDijkstra {
 		//ntfd.findLinks();	
 	}
 	
-	public void setNetwork(NetworkLayer network)
+	public void setNetwork(Network network)
 	{
 		this.network = network;
 		dijkstra = new DijkstraForSelectNodes(network);
 	}
 	
-	public NetworkLayer getNetwork()
+	public Network getNetwork()
 	{
 		return this.network;
 	}
@@ -89,14 +90,14 @@ public class NetworkThiningForDijkstra {
 		ThinningThread[] thinningThreads = new ThinningThread[numOfThreads];
 		
 		// split up the Nodes to distribute the workload between the threads
-		List<List<NodeImpl>> nodeLists = new ArrayList<List<NodeImpl>>();
+		List<List<Node>> nodeLists = new ArrayList<List<Node>>();
 		for (int i = 0; i < numOfThreads; i++)
 		{
-			nodeLists.add(new ArrayList<NodeImpl>());
+			nodeLists.add(new ArrayList<Node>());
 		}
 		
 		int i = 0;
-		for (NodeImpl node : this.network.getNodes().values())
+		for (Node node : this.network.getNodes().values())
 		{
 			nodeLists.get(i % numOfThreads).add(node);
 			i++;
@@ -128,7 +129,7 @@ public class NetworkThiningForDijkstra {
 		}
 		
 		// get not used Links from the Threads
-		notUsedLinks = new HashMap<Id, LinkImpl>();
+		notUsedLinks = new HashMap<Id, Link>();
 		for (ThinningThread thinningThread : thinningThreads) 
 		{
 			notUsedLinks.putAll(thinningThread.getNotUsedLinks());
@@ -140,27 +141,27 @@ public class NetworkThiningForDijkstra {
 	
 	public void findLinks()
 	{
-		notUsedLinks = new HashMap<Id, LinkImpl>();
+		notUsedLinks = new HashMap<Id, Link>();
 		
 		int nodeCount = 0;
 		
 		// for every Node of the Network
-		for (NodeImpl node : network.getNodes().values())
+		for (Node node : network.getNodes().values())
 		{
-			List<NodeImpl> outNodes = new ArrayList<NodeImpl>();
+			List<Node> outNodes = new ArrayList<Node>();
 			
-			for (LinkImpl outLink : node.getOutLinks().values())
+			for (Link outLink : node.getOutLinks().values())
 			{
 				outNodes.add(outLink.getToNode());
 			}
 			
 			dijkstra.executeRoute(node, outNodes);
 			
-			Map<NodeImpl, Double> travelCostsMap = dijkstra.getMinDistances();
+			Map<Node, Double> travelCostsMap = dijkstra.getMinDistances();
 			
-			for (LinkImpl outLink : node.getOutLinks().values())
+			for (Link outLink : node.getOutLinks().values())
 			{
-				NodeImpl outNode = outLink.getToNode();
+				Node outNode = outLink.getToNode();
 				
 				// calculate costs for OutLink
 				double linkCosts = costCalculator.getLinkTravelCost(outLink, time);
@@ -218,21 +219,21 @@ public class NetworkThiningForDijkstra {
 	 */
 	private static class ThinningThread extends Thread
 	{
-		private NetworkLayer network;
+		private Network network;
 		
 		// CostCalculator for the Dijkstra Algorithm
 		private TravelCost costCalculator = new FreespeedTravelTimeCost();
 		private DijkstraForSelectNodes dijkstra;
 		
-		private Map<Id, LinkImpl> notUsedLinks;
-		private List<NodeImpl> nodes;
+		private Map<Id, Link> notUsedLinks;
+		private List<Node> nodes;
 		
 		private double time = Time.UNDEFINED_TIME;
 		private int thread;
 		
 		private static int threadCounter = 0;
 		
-		public ThinningThread(NetworkLayer network, List<NodeImpl> nodes)
+		public ThinningThread(Network network, List<Node> nodes)
 		{
 			this.network = network;
 			this.nodes = nodes;
@@ -247,34 +248,34 @@ public class NetworkThiningForDijkstra {
 			findLinks();	
 		}
 		
-		public Map<Id, LinkImpl> getNotUsedLinks()
+		public Map<Id, Link> getNotUsedLinks()
 		{
 			return this.notUsedLinks;
 		}
 		
 		private void findLinks()
 		{
-			notUsedLinks = new HashMap<Id, LinkImpl>();
+			notUsedLinks = new HashMap<Id, Link>();
 			
 			int nodeCount = 0;
 			
 			// for every Node of the given List
-			for (NodeImpl node : nodes)
+			for (Node node : nodes)
 			{
-				List<NodeImpl> outNodes = new ArrayList<NodeImpl>();
+				List<Node> outNodes = new ArrayList<Node>();
 				
-				for (LinkImpl outLink : node.getOutLinks().values())
+				for (Link outLink : node.getOutLinks().values())
 				{
 					outNodes.add(outLink.getToNode());
 				}
 				
 				dijkstra.executeRoute(node, outNodes);
 				
-				Map<NodeImpl, Double> travelCostsMap = dijkstra.getMinDistances();
+				Map<Node, Double> travelCostsMap = dijkstra.getMinDistances();
 				
-				for (LinkImpl outLink : node.getOutLinks().values())
+				for (Link outLink : node.getOutLinks().values())
 				{
-					NodeImpl outNode = outLink.getToNode();
+					Node outNode = outLink.getToNode();
 					
 					// calculate costs for OutLink
 					double linkCosts = costCalculator.getLinkTravelCost(outLink, time);

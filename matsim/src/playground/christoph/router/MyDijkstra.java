@@ -10,12 +10,16 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.christoph.knowledge.container.MapKnowledge;
 import playground.christoph.network.SubLink;
-import playground.christoph.network.SubNetwork;
 import playground.christoph.network.SubNode;
-import playground.christoph.router.util.KnowledgeTools;
 
+/*
+ * This is an extended version of the Dijkstra Least
+ * Cost Path Algorithm.
+ * The used Network can be changed which allows to use
+ * different Networks for different Persons.
+ * -> Every Person can route in its personalized SubNetwork!
+ */
 public class MyDijkstra extends Dijkstra{
 	
 	public MyDijkstra(Network network, TravelCost costFunction, TravelTime timeFunction)

@@ -8,10 +8,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 
 import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
 
@@ -45,7 +44,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	}
 	
 	@Override
-	public boolean knowsNode(NodeImpl node)
+	public boolean knowsNode(Node node)
 	{
 		readFromDB();
 		
@@ -54,7 +53,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	
 	
 	@Override
-	public boolean knowsLink(LinkImpl link)
+	public boolean knowsLink(Link link)
 	{
 		readFromDB();
 		
@@ -63,7 +62,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	
 	
 	@Override
-	public Map<Id, NodeImpl> getKnownNodes()
+	public Map<Id, Node> getKnownNodes()
 	{
 		readFromDB();
 		
@@ -71,7 +70,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	}
 	
 	@Override
-	public void setKnownNodes(Map<Id, NodeImpl> nodes)
+	public void setKnownNodes(Map<Id, Node> nodes)
 	{
 		super.setKnownNodes(nodes);
 		
@@ -120,7 +119,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 					for (String id : nodeIds)
 					{
 						//NodeImpl node = this.network.getNode(new IdImpl(id));
-						NodeImpl node = this.network.getNodes().get(new IdImpl(id));
+						Node node = this.network.getNodes().get(new IdImpl(id));
 						super.addNode(node);
 					}
 					
@@ -146,7 +145,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		 *  We want the Nodes "as they are" -
 		 *  as White- or as BlackList.
 		 */
-		Map<Id, NodeImpl> nodes = super.getNodes();
+		Map<Id, Node> nodes = super.getNodes();
 		
 		String nodesString = createNodesString(nodes);
 //		Insert Into MapKnowledge SET NodeId='2', PersonId='12'
@@ -243,7 +242,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		return false;
 	}
 	
-	private String createNodesString(Map<Id, NodeImpl> nodes)
+	private String createNodesString(Map<Id, Node> nodes)
 	{
 		// if no Nodes are known -> just return a separator
 		if (nodes.values().size() == 0) return separator;

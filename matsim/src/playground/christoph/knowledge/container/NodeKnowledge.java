@@ -3,28 +3,28 @@ package playground.christoph.knowledge.container;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 
 public interface NodeKnowledge {
 
-	public PersonImpl getPerson();
+	public Person getPerson();
 	
-	public void setPerson(PersonImpl person);
+	public void setPerson(Person person);
 	
-	public void setNetwork(NetworkLayer network);
+	public void setNetwork(Network network);
 		
-	public NetworkLayer getNetwork();
+	public Network getNetwork();
 	
-	public boolean knowsNode(NodeImpl node);
+	public boolean knowsNode(Node node);
 	
-	public boolean knowsLink(LinkImpl link);
+	public boolean knowsLink(Link link);
 	
-	public Map<Id, NodeImpl> getKnownNodes();
+	public Map<Id, Node> getKnownNodes();
 	
-	public void setKnownNodes(Map<Id, NodeImpl> nodes);
+	public void setKnownNodes(Map<Id, Node> nodes);
 	
 	public void clearKnowledge();
 }

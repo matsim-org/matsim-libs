@@ -23,7 +23,7 @@ package playground.christoph.network.util;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.christoph.network.SubNetwork;
 
@@ -34,7 +34,7 @@ public class SubNetworkTools {
 	/*
 	 * Returns a Map of Nodes, if the Person has Knowledge about known Nodes. 
 	 */
-	public SubNetwork getSubNetwork(PersonImpl person)
+	public SubNetwork getSubNetwork(Person person)
 	{		
 		// Try getting knowledge from the current Person.
 		if(person != null)
@@ -67,7 +67,7 @@ public class SubNetworkTools {
 	 * Reset means, that Nodes, Links, etc. are deleted but the SubNetwork Object
 	 * still exists. It can be recreated by using the Person's NodeKnowledge.
 	 */ 
-	public void resetSubNetwork(PersonImpl person)
+	public void resetSubNetwork(Person person)
 	{		
 		// Try getting knowledge from the current Person.
 		if(person != null)
@@ -91,7 +91,7 @@ public class SubNetworkTools {
 	 * doing their routing. An Example would be a Random Router that does only an
 	 * initial planning before starting the mobsim.
 	 */ 
-	public void removeSubNetwork(PersonImpl person)
+	public void removeSubNetwork(Person person)
 	{		
 		// Try getting knowledge from the current Person.
 		if(person != null)

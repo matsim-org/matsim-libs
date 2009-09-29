@@ -115,14 +115,14 @@ public class SelectionWriterHandlerImpl implements SelectionWriterHandler {
 		out.write("\t\t\t\t<nodes>\n");
 	}
 
-	public void node(final NodeImpl node, final BufferedWriter out) throws IOException
+	public void node(final Node node, final BufferedWriter out) throws IOException
 	{
 		out.write("\t\t\t\t\t<node id=\"" + node.getId() + "\"/>\n");
 	}
 	
-	public void nodes(final Map<Id, NodeImpl> nodes, final BufferedWriter out) throws IOException
+	public void nodes(final Map<Id, Node> nodes, final BufferedWriter out) throws IOException
 	{
-		for(NodeImpl node:nodes.values())
+		for(Node node:nodes.values())
 		{
 			node(node, out);
 		}

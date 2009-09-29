@@ -20,11 +20,13 @@
 
 package playground.christoph.router.costcalculators;
 
+import java.lang.reflect.Method;
+
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -43,7 +45,6 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 	protected boolean checkNodeKnowledge = true;
 	
 	protected KnowledgeTools knowledgeTools;
-//	protected SubNetworkTools subNetworkTools;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelCostCalculator.class);
 	
@@ -68,7 +69,7 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 			NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
 			
 			// if the Person doesn't know the link -> return max costs 
-			if (!nodeKnowledge.knowsLink((LinkImpl)link))
+			if (!nodeKnowledge.knowsLink(link))
 			{
 //				log.info("Link is not part of the Persons knowledge!");
 				return Double.MAX_VALUE;
@@ -94,16 +95,36 @@ public class KnowledgeTravelCostCalculator extends KnowledgeTravelCost {
 	@Override
 	public KnowledgeTravelCostCalculator clone()
 	{
-		TravelTime timeCalculatorClone;
+//		TravelTime timeCalculatorClone;
+//		if(this.timeCalculator instanceof KnowledgeTravelTime)
+//		{
+//			timeCalculatorClone = ((KnowledgeTravelTime)timeCalculator).clone();
+//		}
+//		else
+//		{
+//			log.error("Could not clone the TimeCalculator - use reference to the existing Calculator and hope the best...");
+//			timeCalculatorClone = timeCalculator;
+//		}
 		
-		if(this.timeCalculator instanceof KnowledgeTravelTime)
+		TravelTime timeCalculatorClone = null;
+		if (timeCalculator instanceof Cloneable)
 		{
-			timeCalculatorClone = ((KnowledgeTravelTime)timeCalculator).clone();
+			try
+			{
+				Method method;
+				method = timeCalculator.getClass().getMethod("clone", new Class[]{});
+				timeCalculatorClone = timeCalculator.getClass().cast(method.invoke(timeCalculator, new Object[]{}));
+			}
+			catch (Exception e)
+			{
+				Gbl.errorMsg(e);
+			} 
 		}
-		else
+		// not cloneable or an Exception occured
+		if (timeCalculatorClone == null)
 		{
-			log.error("Could not clone the TimeCalculator - use reference to the existing Calculator and hope the best...");
 			timeCalculatorClone = timeCalculator;
+			log.warn("Could not clone the Travel Time Calculator - use reference to the existing Calculator and hope the best...");
 		}
 		
 		KnowledgeTravelCostCalculator clone = new KnowledgeTravelCostCalculator(timeCalculatorClone);

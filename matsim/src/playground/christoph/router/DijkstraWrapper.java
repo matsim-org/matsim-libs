@@ -20,12 +20,14 @@
 
 package playground.christoph.router;
 
+import java.lang.reflect.Method;
+
 import org.apache.log4j.Logger;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -41,21 +43,23 @@ import playground.christoph.router.util.PersonLeastCostPathCalculator;
 /*
  * This is a Wrapper-Class that is needed to forward the currently replanned Person
  * to the Cost- and TimeCalculator.
+ * 
+ * Can be maybe removed once if the Time- and CostCalculators have access to the
+ * Person they are calculating for (BackPointer, etc.).
  */
 
 public class DijkstraWrapper extends PersonLeastCostPathCalculator {
-//public class DijkstraWrapper extends PersonLeastCostPathCalculator, Dijkstra {
 
-	private final static Logger log = Logger.getLogger(KnowledgeTools.class);
+	private final static Logger log = Logger.getLogger(DijkstraWrapper.class);
 	
 	protected static int errorCounter = 0;
 
-	protected NetworkLayer network;
+	protected Network network;
 	
 	protected Dijkstra dijkstra;
 	
-	protected TravelCost costFunction;
-	protected TravelTime timeFunction;
+	protected TravelCost costCalculator;
+	protected TravelTime timeCalculator;
 
 	protected SubNetworkCreator subNetworkCreator;
 	protected SubNetworkTools subNetworkTools;
@@ -69,11 +73,11 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 	 * If the Calculators need information about the current traffic in the System, the
 	 * QueueNetwork has to be set.
 	 */
-	public DijkstraWrapper(Dijkstra dijkstra, TravelCost costFunction, TravelTime timeFunction, NetworkLayer network)
+	public DijkstraWrapper(Dijkstra dijkstra, TravelCost costFunction, TravelTime timeFunction, Network network)
 	{
 		this.dijkstra = dijkstra;
-		this.costFunction = costFunction;
-		this.timeFunction = timeFunction;
+		this.costCalculator = costFunction;
+		this.timeCalculator = timeFunction;
 		this.network = network;
 		
 		subNetworkCreator = new SubNetworkCreator(network);
@@ -90,18 +94,18 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 	 * We have to hand over the person to the Cost- and TimeCalculators of the Router.
 	 */
 	@Override
-	public void setPerson(PersonImpl person)
+	public void setPerson(Person person)
 	{
 		this.person = person;
 		
-		if(costFunction instanceof KnowledgeTravelCost)
+		if(costCalculator instanceof KnowledgeTravelCost)
 		{
-			((KnowledgeTravelCost)costFunction).setPerson(person);
+			((KnowledgeTravelCost)costCalculator).setPerson(person);
 		}
 		
-		if(timeFunction instanceof KnowledgeTravelTime)
+		if(timeCalculator instanceof KnowledgeTravelTime)
 		{
-			((KnowledgeTravelTime)timeFunction).setPerson(person);
+			((KnowledgeTravelTime)timeCalculator).setPerson(person);
 		}
 				
 		if (dijkstra instanceof MyDijkstra)
@@ -135,34 +139,14 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 	
 	public TravelCost getTravelCostCalculator()
 	{
-		return costFunction;
+		return costCalculator;
 	}
 	
 	public TravelTime getTravelTimeCalculator()
 	{
-		return timeFunction;
+		return timeCalculator;
 	}
-	
-	/*
-	 * We have to hand over the queueNetwork to the Cost- and TimeCalculators of the Router.
-	 */
-	@Override
-	public void setQueueNetwork(QueueNetwork queueNetwork)
-	{
-		this.queueNetwork = queueNetwork;
 		
-		if(costFunction instanceof KnowledgeTravelCost)
-		{
-			((KnowledgeTravelCost)costFunction).setQueueNetwork(queueNetwork);
-		}
-		
-		if(timeFunction instanceof KnowledgeTravelTime)
-		{
-			((KnowledgeTravelTime)timeFunction).setQueueNetwork(queueNetwork);
-		}
-	}
-	
-	
 	public Dijkstra getDijkstra()
 	{
 		return dijkstra;
@@ -171,37 +155,75 @@ public class DijkstraWrapper extends PersonLeastCostPathCalculator {
 	@Override
 	public DijkstraWrapper clone()
 	{
-		TravelCost costFunctionClone;
-		TravelTime timeFunctionClone;
-//		NetworkLayer networkClone = this.myQueueNetwork.getNetworkLayer();
+//		TravelCost travelCostClone;
+//		if(this.costFunction instanceof KnowledgeTravelCost)
+//		{
+//			travelCostClone = ((KnowledgeTravelCost)costCalculator).clone();
+//		}
+//		else
+//		{
+//			log.error("Could not clone the Cost Function - use reference to the existing Function and hope the best...");
+//			travelCostClone = costCalculator;
+//		}
 		
-		if(this.costFunction instanceof KnowledgeTravelCost)
+		TravelCost travelCostClone = null;
+		if (costCalculator instanceof Cloneable)
 		{
-			costFunctionClone = ((KnowledgeTravelCost)costFunction).clone();
+			try
+			{
+				Method method;
+				method = costCalculator.getClass().getMethod("clone", new Class[]{});
+				travelCostClone = costCalculator.getClass().cast(method.invoke(costCalculator, new Object[]{}));
+			}
+			catch (Exception e)
+			{
+				Gbl.errorMsg(e);
+			} 
 		}
-		else
+		// not cloneable or an Exception occured
+		if (travelCostClone == null)
 		{
-			log.error("Could not clone the Cost Function - use reference to the existing Function and hope the best...");
-			costFunctionClone = costFunction;
+			travelCostClone = costCalculator;
+			log.warn("Could not clone the Travel Cost Calculator - use reference to the existing Calculator and hope the best...");
 		}
 		
-		if(this.timeFunction instanceof KnowledgeTravelTime)
+//		TravelTime travelTimeClone;
+//		if(this.timeCalculator instanceof KnowledgeTravelTime)
+//		{
+//			travelTimeClone = ((KnowledgeTravelTime)timeCalculator).clone();
+//		}
+//		else
+//		{
+//			log.error("Could not clone the Time Function - use reference to the existing Function and hope the best...");
+//			travelTimeClone = timeCalculator;
+//		}
+				
+		TravelTime travelTimeClone = null;
+		if (timeCalculator instanceof Cloneable)
 		{
-			timeFunctionClone = ((KnowledgeTravelTime)timeFunction).clone();
+			try
+			{
+				Method method;
+				method = timeCalculator.getClass().getMethod("clone", new Class[]{});
+				travelTimeClone = timeCalculator.getClass().cast(method.invoke(timeCalculator, new Object[]{}));
+			}
+			catch (Exception e)
+			{
+				Gbl.errorMsg(e);
+			} 
 		}
-		else
+		// not cloneable or an Exception occured
+		if (travelTimeClone == null)
 		{
-			log.error("Could not clone the Time Function - use reference to the existing Function and hope the best...");
-			timeFunctionClone = timeFunction;
+			travelTimeClone = timeCalculator;
+			log.warn("Could not clone the Travel Time Calculator - use reference to the existing Calculator and hope the best...");
 		}
 		
 		Dijkstra dijkstraClone;
-		if (this.dijkstra instanceof MyDijkstra) dijkstraClone = new MyDijkstra(network, costFunctionClone, timeFunctionClone);
-		else dijkstraClone = new Dijkstra(network, costFunctionClone, timeFunctionClone);
+		if (this.dijkstra instanceof MyDijkstra) dijkstraClone = new MyDijkstra(network, travelCostClone, travelTimeClone);
+		else dijkstraClone = new Dijkstra(network, travelCostClone, travelTimeClone);
 				
-		DijkstraWrapper clone = new DijkstraWrapper(dijkstraClone, costFunctionClone, timeFunctionClone, network);
-//		clone.setMyQueueNetwork(this.myQueueNetwork);
-		//clone.queueNetwork = this.queueNetwork;
+		DijkstraWrapper clone = new DijkstraWrapper(dijkstraClone, travelCostClone, travelTimeClone, network);
 		
 		// TODO: how to handle an A*-Algorithm???
 		

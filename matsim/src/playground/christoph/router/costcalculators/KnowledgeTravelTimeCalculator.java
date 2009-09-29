@@ -23,8 +23,9 @@ package playground.christoph.router.costcalculators;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.queuesim.QueueLane;
+import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.network.LinkImpl;
 
 import playground.christoph.network.MyLinkImpl;
 import playground.christoph.network.SubLink;
@@ -36,25 +37,22 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 	protected double tbuffer = 35.0;		// time distance ("safety distance") between two vehicles
 	protected double vehicleLength = 7.5;	// length of a vehicle
 	protected boolean calcFreeSpeedTravelTimes = false;
+	protected QueueNetwork queueNetwork;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelTimeCalculator.class);
 	
 	public KnowledgeTravelTimeCalculator(QueueNetwork queueNetwork)
 	{
+		if (queueNetwork == null) log.warn("No QueueNetwork was commited - FreeSpeedTravelTimes will be calculated and returned!");
 		this.queueNetwork = queueNetwork;
 	}
 	
-	public KnowledgeTravelTimeCalculator()
-	{
-		log.info("No QueueNetwork was commited - FreeSpeedTravelTimes will be calculated and returned!");
-	}
-	
-	// return travel time without account for the actual traffic
+	// return travel time without account for the actual traffic load
 	public double getLinkTravelTime(Link link, double time)
 	{
 		if(queueNetwork == null)
 		{
-			log.info("No QueueNetwork found - FreeSpeedTravelTime is calculated and returned!");
+			log.warn("No QueueNetwork found - FreeSpeedTravelTime is calculated and returned!");
 			return link.getLength()/link.getFreespeed(time);
 		}
 			
@@ -115,10 +113,13 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 		return travelTime;
 	}
 
-	protected double getVehiclesOnLink(Link link)
+	protected int getVehiclesOnLink(Link link)
 	{
 //		QueueLink queueLink = queueNetwork.getQueueLink(link.getId());
-				
+//		queueLink.getOriginalLane().getAllVehicles().size();
+		
+//		queueLink.getAllVehicles().size();
+		
 		// maximum number of vehicles on the link
 //		double maxVehiclesOnLink = queueLink.getSpaceCap();
 
@@ -133,26 +134,38 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 //		buffer -> count
 		
 		// number of vehicles that are on the link or that are already waiting to enter the link
-		//double vehicles = queueLink.getAllVehicles().size() - queueLink.vehParkingCount();// - queueLink.getVehiclesOnParkingList().size();
+		//double vehicles = queueLink.getAllVehicles().size() - queueLink.vehParkingCount();//
 //		double vehicles2 = queueNetwork.getLinkVehiclesCounter().getLinkDrivingVehiclesCount(link.getId());
 	
 		// now we have MyLinkImpls that have a VehiclesCount variable :)
-		double vehicles;
+		int vehicles;
 		
 		// Do we use SubNetworks?
 		if (link instanceof SubLink)
 		{
-			LinkImpl parentLink = ((SubLink)link).getParentLink();
+			Link parentLink = ((SubLink)link).getParentLink();
 			vehicles = ((MyLinkImpl)parentLink).getVehiclesCount();
 		}
 		else
 		{
 			vehicles = ((MyLinkImpl)link).getVehiclesCount();
 		}
+
+		// It seems as this would also work...
+//		QueueLink queueLink = queueNetwork.getQueueLink(link.getId());
+//		int vehicleCount = 0;
+//		for (QueueLane queueLane : queueLink.getQueueLanes())
+//		{
+//			vehicleCount = vehicleCount + queueLane.getAllVehicles().size();
+//		}
+//		
+//		if (vehicles != vehicleCount)
+//		{
+//			log.warn("Values don't fit???");
+//		}
 		
 		return vehicles;
 	}
-	
 	
 	public void setCalcFreeSpeedTravelTimes(boolean value)
 	{

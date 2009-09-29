@@ -27,13 +27,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NodeImpl;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
 import playground.christoph.router.util.PersonLeastCostPathCalculator;
 import playground.christoph.router.util.TabuSelector;
-
 
 public class CompassRoute extends PersonLeastCostPathCalculator {
 
@@ -69,7 +67,7 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
-		Map<Id, NodeImpl> knownNodesMap = null;
+		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
 		knownNodesMap = knowledgeTools.getKnownNodes(this.person);
@@ -204,10 +202,10 @@ public class CompassRoute extends PersonLeastCostPathCalculator {
 		double phi = java.lang.Math.acos(cosPhi);
 
 		/* 
-		 * If the angle is exactly 180� return a value that is slightly smaller.
+		 * If the angle is exactly 180° return a value that is slightly smaller.
 		 * Reason: if there are only links that return to the current node and links
-		 * with an angle of 180� a loop could be generated.
-		 * Solution: slightly reduce angles of 180� so one of them is chosen. 
+		 * with an angle of 180° a loop could be generated.
+		 * Solution: slightly reduce angles of 180° so one of them is chosen. 
 		 */
 		if(phi == Math.PI) phi = Math.PI - Double.MIN_VALUE;
 		

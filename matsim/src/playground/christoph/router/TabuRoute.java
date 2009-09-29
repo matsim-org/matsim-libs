@@ -28,14 +28,11 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.LoopRemover;
 import playground.christoph.router.util.PersonLeastCostPathCalculator;
 import playground.christoph.router.util.TabuSelector;
-
 
 public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneable{
 
@@ -59,7 +56,6 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 		this.knowledgeTools = new KnowledgeTools();
 	}
 
-	
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
 	{
 		return findRoute(fromNode, toNode);
@@ -73,7 +69,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
-		Map<Id, NodeImpl> knownNodesMap = null;
+		Map<Id, Node> knownNodesMap = null;
 		
 		// try getting Nodes from the Persons Knowledge
 		knownNodesMap = knowledgeTools.getKnownNodes(this.person);
@@ -114,7 +110,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 			int nextLink = MatsimRandom.getRandom().nextInt(newLinks.length);
 			
 			// make the chosen link to the new current link
-			if(newLinks[nextLink] instanceof LinkImpl)
+			if(newLinks[nextLink] instanceof Link)
 			{
 				currentLink = newLinks[nextLink];
 				previousNode = currentNode;

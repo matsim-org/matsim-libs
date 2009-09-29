@@ -63,7 +63,7 @@ public class BatchRun {
 //											 {0, 9, 0, 1},
 //											 {0, 10, 0, 0}};
 	
-	protected static int[][] Versuchsplan = {{0, 0, 0, 10}};
+	protected static int[][] Versuchsplan = {{0, 0, 10, 0}};
 	
 	
 	// Default Config

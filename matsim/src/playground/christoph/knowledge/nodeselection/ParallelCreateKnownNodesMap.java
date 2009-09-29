@@ -27,10 +27,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
@@ -174,7 +174,7 @@ public class ParallelCreateKnownNodesMap {
 				 */
 				if(person.getCustomAttributes().get("NodeKnowledgeStorageType") == null) 
 				{	
-					Map<Id, NodeImpl> nodesMap = new TreeMap<Id, NodeImpl>();
+					Map<Id, Node> nodesMap = new TreeMap<Id, Node>();
 					
 					NodeKnowledge nodeKnowledge = new MapKnowledge();
 					nodeKnowledge.setPerson(person);
@@ -220,7 +220,7 @@ public class ParallelCreateKnownNodesMap {
 					if (MapKnowledgeDB.class.getName().equals(NodeKnowledgeStorageType))
 					{
 						NodeKnowledge nodeKnowledge = (NodeKnowledge)person.getCustomAttributes().get("NodeKnowledge");
-						Map<Id, NodeImpl> nodesMap = nodeKnowledge.getKnownNodes();
+						Map<Id, Node> nodesMap = nodeKnowledge.getKnownNodes();
 												
 						MapKnowledgeDB mapKnowledgeDB = new MapKnowledgeDB();
 						mapKnowledgeDB.setPerson(person);

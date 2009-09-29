@@ -31,7 +31,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.christoph.router.KnowledgePlansCalcRoute;
 import playground.christoph.router.util.KnowledgeTools;
 
 public class ParallelInitialReplanner extends ParallelReplanner {
@@ -159,17 +158,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 					
 				// get the replanner or a clone if it, if it's not the first running thread
 				replanner = this.replannerArray[index][threadId];
-	
-				/*
-				 *  If it's a PersonPlansCalcRoute Object -> set the current Person.
-				 *  The router may need their knowledge (activity room, ...).
-				 */
-				if (replanner instanceof KnowledgePlansCalcRoute)
-				{
-//					((KnowledgePlansCalcRoute)replanner).setPerson(person);
-					((KnowledgePlansCalcRoute)replanner).setTime(this.time);
-				}
-				
+					
 				replanner.run(person.getSelectedPlan());
 
 				// If flag is set, remove Knowledge after doing the replanning.

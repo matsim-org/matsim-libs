@@ -1,24 +1,35 @@
 package playground.christoph.router.costcalculators;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkIdComparator;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
-import playground.christoph.events.LinkVehiclesCounter;
+import playground.christoph.events.LinkVehiclesCounter2;
 import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelTime;
 
+/*
+ * Add two new Features to KnowledgeTravelTime:
+ * 1) A LookupTable can be used for the LinkTravelTimes
+ * If this Feature is used, a LookupTableUpdater and a
+ * LinkVehiclesCounter have to be used and the Network
+ * has to be set.
+ * 
+ * 2) The Knowledge of a Person can be taken in account. That means
+ * that it is checked if a Person knows a Link or not. If not, the
+ * returned TravelTime is Double.MAX_VALUE. 
+ */
 public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 	
 	protected TravelTime travelTimeCalculator;
@@ -27,7 +38,8 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 	protected boolean checkNodeKnowledge = true;
 	protected double lastUpdate = Time.UNDEFINED_TIME; 
 	protected KnowledgeTools knowledgeTools;
-	protected LinkVehiclesCounter linkVehiclesCounter;
+	protected LinkVehiclesCounter2 linkVehiclesCounter;
+	protected Network network;
 	
 	private static final Logger log = Logger.getLogger(KnowledgeTravelCostWrapper.class);
 	
@@ -41,7 +53,7 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 		this.knowledgeTools = new KnowledgeTools();
 	}
 	
-	public void setLinkVehiclesCounter(LinkVehiclesCounter linkVehiclesCounter)
+	public void setLinkVehiclesCounter(LinkVehiclesCounter2 linkVehiclesCounter)
 	{
 		this.linkVehiclesCounter = linkVehiclesCounter;
 	}
@@ -66,18 +78,13 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 		this.useLookupTable = value;
 	}
 	
-	@Override
-	public void setQueueNetwork(QueueNetwork queueNetwork)
+	public void setNetwork(Network network)
 	{
-		super.setQueueNetwork(queueNetwork);
-		if (travelTimeCalculator instanceof KnowledgeTravelTime)
-		{
-			((KnowledgeTravelTime)travelTimeCalculator).setQueueNetwork(queueNetwork);
-		}
+		this.network = network;
 	}
-
+	
 	@Override
-	public void setPerson(PersonImpl person)
+	public void setPerson(Person person)
 	{
 		super.setPerson(person);
 		if (travelTimeCalculator instanceof KnowledgeTravelTime)
@@ -87,7 +94,7 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 	}
 	
 	public double getLinkTravelTime(final Link link, final double time) 
-	{		
+	{	
 		NodeKnowledge nodeKnowledge = null;
 		
 		if (checkNodeKnowledge && person != null)
@@ -97,7 +104,7 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 		}
 		
 		// if the Person doesn't know the link -> return max costs 
-		if (nodeKnowledge != null && !nodeKnowledge.knowsLink((LinkImpl)link))
+		if (nodeKnowledge != null && !nodeKnowledge.knowsLink(link))
 		{
 //			log.info("Link is not part of the Persons knowledge!");
 			return Double.MAX_VALUE;
@@ -122,9 +129,8 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 //		log.info("Creating LookupTable for LinkTravelTimes. Time: " + time);
 		resetLookupTable();
 		
-		for (QueueLink queueLink : queueNetwork.getLinks().values())
+		for (Link link : network.getLinks().values())
 		{
-			LinkImpl link = queueLink.getLink();
 			linkTravelTimes.put(link, travelTimeCalculator.getLinkTravelTime(link, time));
 		}
 //		log.info("Done");
@@ -147,7 +153,7 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 			
 				for (Id id : links2Update.keySet())
 				{
-					LinkImpl link = this.queueNetwork.getNetworkLayer().getLink(id);
+					Link link = this.network.getLinks().get(id);
 					linkTravelTimes.put(link, travelTimeCalculator.getLinkTravelTime(link, time));
 				}
 				lastUpdate = time;
@@ -167,25 +173,45 @@ public class KnowledgeTravelTimeWrapper extends KnowledgeTravelTime{
 		linkTravelTimes.clear();
 	}
 	
-
 	@Override
 	public KnowledgeTravelTimeWrapper clone()
 	{
-		TravelTime travelTimeCalculatorClone;
+//		TravelTime travelTimeCalculatorClone;
+//		if(this.travelTimeCalculator instanceof KnowledgeTravelTime)
+//		{
+//			travelTimeCalculatorClone = ((KnowledgeTravelTime)this.travelTimeCalculator).clone();
+//		}
+//		else
+//		{
+//			log.error("Could not clone the TimeCalculator - use reference to the existing Calculator and hope the best...");
+//			travelTimeCalculatorClone = this.travelTimeCalculator;
+//		}
 		
-		if(this.travelTimeCalculator instanceof KnowledgeTravelTime)
+		TravelTime travelTimeCalculatorClone = null;
+		if (travelTimeCalculator instanceof Cloneable)
 		{
-			travelTimeCalculatorClone = ((KnowledgeTravelTime)this.travelTimeCalculator).clone();
+			try
+			{
+				Method method;
+				method = travelTimeCalculator.getClass().getMethod("clone", new Class[]{});
+				travelTimeCalculatorClone = travelTimeCalculator.getClass().cast(method.invoke(travelTimeCalculator, new Object[]{}));
+			}
+			catch (Exception e)
+			{
+				Gbl.errorMsg(e);
+			} 
 		}
-		else
+		// not cloneable or an Exception occured
+		if (travelTimeCalculatorClone == null)
 		{
-			log.error("Could not clone the TimeCalculator - use reference to the existing Calculator and hope the best...");
-			travelTimeCalculatorClone = this.travelTimeCalculator;
+			travelTimeCalculatorClone = travelTimeCalculator;
+			log.warn("Could not clone the Travel Time Calculator - use reference to the existing Calculator and hope the best...");
 		}
 		
 		KnowledgeTravelTimeWrapper clone = new KnowledgeTravelTimeWrapper(travelTimeCalculatorClone);
 		clone.useLookupTable = this.useLookupTable;
 		clone.linkTravelTimes = this.linkTravelTimes;
+		clone.setNetwork(this.network);
 		clone.checkNodeKnowledge = this.checkNodeKnowledge;
 		
 		return clone;

@@ -37,7 +37,7 @@ import playground.christoph.events.algorithms.ParallelActEndReplanner;
 
 public class ActEndReplanningModule {
 
-	private final static Logger log = Logger.getLogger(ReplanningQueueSimulation.class);
+	private final static Logger log = Logger.getLogger(ActEndReplanningModule.class);
 	
 	protected ReplanningQueueSimulation simulation;
 	protected ParallelActEndReplanner parallelActEndReplanner;

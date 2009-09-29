@@ -3,6 +3,7 @@ package playground.christoph.controler;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.StrategyManager;
@@ -16,6 +17,7 @@ import playground.christoph.router.DijkstraWrapper;
 import playground.christoph.router.KnowledgePlansCalcRoute;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import playground.christoph.router.util.DijkstraWrapperFactory;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 import playground.johannes.socialnetworks.ivtsurveys.FreespeedTravelTime;
 
@@ -69,9 +71,10 @@ public class IterativeKnowledgeControler extends Controler{
 		travelCostWrapper.checkNodeKnowledge(true);
 		travelCostWrapper.useLookupTable(false);
 
-		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
-		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime, network);	
-		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
+//		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
+//		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime, network);	
+//		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
+		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCostWrapper, travelTime, new DijkstraWrapperFactory());
 		
 //		FreespeedTravelTimeCost test = new FreespeedTravelTimeCost();
 //		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(test);

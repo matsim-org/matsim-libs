@@ -31,12 +31,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.Time;
@@ -52,13 +53,13 @@ public class DijkstraForSelectNodes {
 	private static final Logger log = Logger.getLogger(DijkstraForSelectNodes.class);
 	
 	// Traffic network
-	NetworkLayer network;
+	Network network;
 	
 	// mapping between nodes and dijkstraNodes
-	Map<NodeImpl, DijkstraNode> dijkstraNodeMap;
+	Map<Node, DijkstraNode> dijkstraNodeMap;
 	
 	// LookupTable for the TravelCosts of the various Links
-	Map<LinkImpl, Double> travelCostLookupTable;
+	Map<Link, Double> travelCostLookupTable;
 	
 	// CostCalculator for the Dijkstra Algorithm
 	TravelCost costCalculator = new FreespeedTravelTimeCost();
@@ -70,8 +71,7 @@ public class DijkstraForSelectNodes {
 	private static final int INITIAL_CAPACITY = 500;
 	
 	// all nodes of the network
-	Map<Id, NodeImpl> networkNodesMap;
-	
+	Map<Id,? extends Node> networkNodesMap;
 	
 	// List of nodes, sorted by their distance to the startnode.
 	private final Comparator<DijkstraNode> shortestDistanceComparator = new Comparator<DijkstraNode>()
@@ -97,40 +97,40 @@ public class DijkstraForSelectNodes {
 	private final PriorityQueue<DijkstraNode> unvisitedNodes = new PriorityQueue<DijkstraNode>(INITIAL_CAPACITY, shortestDistanceComparator);
 	
 	
-	public DijkstraForSelectNodes(Map<Id, NodeImpl> networkNodesMap)
+	public DijkstraForSelectNodes(Map<Id,? extends Node> networkNodesMap)
 	{
 		this.networkNodesMap = networkNodesMap;
 		
-		dijkstraNodeMap = new HashMap<NodeImpl, DijkstraNode>();
+		dijkstraNodeMap = new HashMap<Node, DijkstraNode>();
 		DijkstraNode.setNodeMap(dijkstraNodeMap);
 	}
 	
-	public DijkstraForSelectNodes(NetworkLayer network, Map<Id, NodeImpl> networkNodesMap)
+	public DijkstraForSelectNodes(Network network, Map<Id,? extends Node> networkNodesMap)
 	{
 		this.network = network;
 		this.networkNodesMap = networkNodesMap;
 		
-		dijkstraNodeMap = new HashMap<NodeImpl, DijkstraNode>();
+		dijkstraNodeMap = new HashMap<Node, DijkstraNode>();
 		DijkstraNode.setNodeMap(dijkstraNodeMap);
 		initDijkstraNodes();	
 	}
 	
-	public DijkstraForSelectNodes(NetworkLayer network)
+	public DijkstraForSelectNodes(Network network)
 	{
 		this.network = network;
 		this.networkNodesMap = network.getNodes();
 		
-		dijkstraNodeMap = new HashMap<NodeImpl, DijkstraNode>();
+		dijkstraNodeMap = new HashMap<Node, DijkstraNode>();
 		DijkstraNode.setNodeMap(dijkstraNodeMap);
 		initDijkstraNodes();	
 	}
 	
-	public void setNetwork(NetworkLayer network)
+	public void setNetwork(Network network)
 	{
 		this.network = network;
 	}
 	
-	public void setNetworkNodes(Map<Id, NodeImpl> networkNodesMap)
+	public void setNetworkNodes(Map<Id, Node> networkNodesMap)
 	{
 		this.networkNodesMap = networkNodesMap;
 	}
@@ -141,7 +141,7 @@ public class DijkstraForSelectNodes {
 		dijkstraNodeMap.clear();
 		
 		// iterate over Array or Iteratable 
-		for (NodeImpl node : networkNodesMap.values())
+		for (Node node : networkNodesMap.values())
 		{		
 			DijkstraNode dijkstraNode = new DijkstraNode(node);
 			
@@ -166,7 +166,7 @@ public class DijkstraForSelectNodes {
 	   
 	
 	// Search shortest Path for a Route. Break if distance has been found.
-	public void executeRoute(NodeImpl start, NodeImpl end)
+	public void executeRoute(Node start, Node end)
 	{	
 		DijkstraNode startNode = dijkstraNodeMap.get(start);
 		init(startNode);
@@ -192,14 +192,14 @@ public class DijkstraForSelectNodes {
 	}
 
 	// Search shortest Path for a List of Routes. Break if distances have been found.
-	public void executeRoute(NodeImpl start, List<NodeImpl> ends)
+	public void executeRoute(Node start, List<Node> ends)
 	{	
 		DijkstraNode startNode = dijkstraNodeMap.get(start);
 		init(startNode);
 	        
 		List<DijkstraNode> endNodes = new ArrayList<DijkstraNode>(); 
 		
-		for (NodeImpl end : ends)
+		for (Node end : ends)
 		{
 			endNodes.add(dijkstraNodeMap.get(end));
 		}
@@ -233,7 +233,7 @@ public class DijkstraForSelectNodes {
 	}
 	
 	// Search shortest Fowardpaths to all nodes within the network.
-	public void executeForwardNetwork(NodeImpl start)
+	public void executeForwardNetwork(Node start)
 	{		
 		DijkstraNode startNode = dijkstraNodeMap.get(start);
 		init(startNode);
@@ -254,7 +254,7 @@ public class DijkstraForSelectNodes {
 	}
 	
 	// Search shortest Backwardpaths to all nodes within the network.
-	public void executeBackwardNetwork(NodeImpl start)
+	public void executeBackwardNetwork(Node start)
 	{		
 		DijkstraNode startNode = dijkstraNodeMap.get(start);
 		init(startNode);
@@ -279,9 +279,9 @@ public class DijkstraForSelectNodes {
 	 * Is called from outside this class, so return nodes instead of
 	 * DijkstraNodes.
 	 */
-	public Map<NodeImpl, Double> getMinDistances()
+	public Map<Node, Double> getMinDistances()
 	{
-		Map<NodeImpl, Double> minDistances = new HashMap<NodeImpl, Double>();
+		Map<Node, Double> minDistances = new HashMap<Node, Double>();
 		
 		for (DijkstraNode node : dijkstraNodeMap.values()) 
 		{
@@ -295,11 +295,11 @@ public class DijkstraForSelectNodes {
 	// expand ingoing node
 	private void relaxIngoingNode(DijkstraNode node)
 	{		
-		ArrayList<LinkImpl> ingoingLinks = node.ingoingLinks();
+		ArrayList<Link> ingoingLinks = node.ingoingLinks();
 		for (int i = 0; i < ingoingLinks.size(); i++)
 		{
 			// get current link
-			LinkImpl link = ingoingLinks.get(i);
+			Link link = ingoingLinks.get(i);
 			
 			// get destination node
 			DijkstraNode fromNode = dijkstraNodeMap.get(link.getFromNode());
@@ -326,11 +326,11 @@ public class DijkstraForSelectNodes {
 	// expand outgoing node
 	private void relaxOutgoingNode(DijkstraNode node)
 	{		
-		ArrayList<LinkImpl> outgoingLinks = node.outgoingLinks();
+		ArrayList<Link> outgoingLinks = node.outgoingLinks();
 		for (int i = 0; i < outgoingLinks.size(); i++)
 		{
 			// get current link
-			LinkImpl link = outgoingLinks.get(i);
+			Link link = outgoingLinks.get(i);
 			
 			// get destination node
 			DijkstraNode toNode = dijkstraNodeMap.get(link.getToNode());
@@ -383,9 +383,9 @@ public class DijkstraForSelectNodes {
 	public void createTravelCostLookupTable()
 	{	
 		travelCostLookupTable = null;
-		Map<LinkImpl, Double> lookupTable = new HashMap<LinkImpl, Double>();
+		Map<Link, Double> lookupTable = new HashMap<Link, Double>();
 		
-		for (LinkImpl link : network.getLinks().values())
+		for (Link link : network.getLinks().values())
 		{
 			lookupTable.put(link, getLinkCost(link, time));
 		}
@@ -396,7 +396,7 @@ public class DijkstraForSelectNodes {
 	/*
 	 * Get cost of the given link. This can be for example its length or the time to pass the link.
 	 */
-	protected double getLinkCost(LinkImpl link, double time)
+	protected double getLinkCost(Link link, double time)
 	{   
 		if (travelCostLookupTable != null) return travelCostLookupTable.get(link);
 		
@@ -456,25 +456,25 @@ public class DijkstraForSelectNodes {
  */
 class DijkstraNode
 {
-	static private Map<NodeImpl, DijkstraNode> dijkstraNodeMap;
+	static private Map<Node, DijkstraNode> dijkstraNodeMap;
 	
-	NodeImpl node = null;
+	Node node = null;
 	DijkstraNode prevNode = null;
 	boolean visited;
 	double minDist;
 
-	static void setNodeMap(Map<NodeImpl, DijkstraNode> map)
+	static void setNodeMap(Map<Node, DijkstraNode> map)
 	{
 		dijkstraNodeMap = map;
 	}
 	
-	protected DijkstraNode(NodeImpl node) 
+	protected DijkstraNode(Node node) 
 	{
 		this.node = node;
 		reset();
 	}
 	
-	protected NodeImpl getNode()
+	protected Node getNode()
 	{
 		return node;
 	}
@@ -517,63 +517,85 @@ class DijkstraNode
 	{
 		ArrayList<DijkstraNode> ingoingNodes = new ArrayList<DijkstraNode>();
 		
-		Map<Id, NodeImpl> myMap = (Map<Id, NodeImpl>)node.getInNodes();
+		Map<Id, Node> myMap = getInNodes(node);
 		
-		Iterator nodeIterator = myMap.values().iterator();
+		Iterator<Node> nodeIterator = myMap.values().iterator();
 		while(nodeIterator.hasNext())
 		{
-			NodeImpl node = (NodeImpl)nodeIterator.next();
+			Node node = nodeIterator.next();
 
-			// zugeh�rigen DijsktraNode aus der Map holen
+			// zugehörigen DijsktraNode aus der Map holen
 			DijkstraNode dijkstraNode = dijkstraNodeMap.get(node);
 			ingoingNodes.add(dijkstraNode);
 		}
 		return ingoingNodes;
 	}
 	
+	private Map<Id, Node> getInNodes(Node node) 
+	{
+		Map<Id, Node> nodes = new TreeMap<Id, Node>();
+		for (Link link : node.getInLinks().values())
+		{
+			Node n = link.getFromNode();
+			nodes.put(n.getId(), n);
+		}
+		return nodes;
+	}
+	
 	protected ArrayList<DijkstraNode> outgoingNodes()
 	{
 		ArrayList<DijkstraNode> outgoingNodes = new ArrayList<DijkstraNode>();
 		
-		Map<Id, NodeImpl> myMap = (Map<Id, NodeImpl>)node.getOutNodes();
+		Map<Id, Node> myMap = getOutNodes(node);
 		
-		Iterator nodeIterator = myMap.values().iterator();
+		Iterator<Node> nodeIterator = myMap.values().iterator();
 		while(nodeIterator.hasNext())
 		{
-			NodeImpl node = (NodeImpl)nodeIterator.next();
+			Node node = nodeIterator.next();
 
-			// zugeh�rigen DijsktraNode aus der Map holen
+			// zugehörigen DijsktraNode aus der Map holen
 			DijkstraNode dijkstraNode = dijkstraNodeMap.get(node);
 			outgoingNodes.add(dijkstraNode);
 		}
 		return outgoingNodes;
 	}
-
-	protected ArrayList<LinkImpl> ingoingLinks()
+	
+	private Map<Id, Node> getOutNodes(Node node) 
 	{
-		ArrayList<LinkImpl> ingoingLinks = new ArrayList<LinkImpl>();
+		Map<Id, Node> nodes = new TreeMap<Id, Node>();
+		for (Link link : node.getOutLinks().values())
+		{
+			Node n = link.getToNode();
+			nodes.put(n.getId(), n);
+		}
+		return nodes;
+	}
+
+	protected ArrayList<Link> ingoingLinks()
+	{
+		ArrayList<Link> ingoingLinks = new ArrayList<Link>();
 		
-		Map<Id, LinkImpl> myMap = (Map<Id, LinkImpl>)node.getInLinks();
+		Map<Id,? extends Link> myMap = node.getInLinks();
 		
-		Iterator linkIterator = myMap.values().iterator();
+		Iterator<? extends Link> linkIterator = myMap.values().iterator();
 		while(linkIterator.hasNext())
 		{
-			LinkImpl link = (LinkImpl)linkIterator.next();
+			Link link = linkIterator.next();
 			ingoingLinks.add(link);
 		}
 		return ingoingLinks;
 	}
 	
-	protected ArrayList<LinkImpl> outgoingLinks()
+	protected ArrayList<Link> outgoingLinks()
 	{
-		ArrayList<LinkImpl> outgoingLinks = new ArrayList<LinkImpl>();
+		ArrayList<Link> outgoingLinks = new ArrayList<Link>();
 		
-		Map<Id, LinkImpl> myMap = (Map<Id, LinkImpl>)node.getOutLinks();
+		Map<Id,? extends Link> myMap = node.getOutLinks();
 		
-		Iterator linkIterator = myMap.values().iterator();
+		Iterator<? extends Link> linkIterator = myMap.values().iterator();
 		while(linkIterator.hasNext())
 		{
-			LinkImpl link = (LinkImpl)linkIterator.next();
+			Link link = linkIterator.next();
 			outgoingLinks.add(link);
 		}
 		return outgoingLinks;

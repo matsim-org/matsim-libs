@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -38,7 +39,7 @@ import playground.christoph.knowledge.utils.GetAllIncludedLinks;
 public class TestNodeSelection {
 	
 	NetworkLayer network;
-	Map<Id, NodeImpl> selectedNodesMap;
+	Map<Id, Node> selectedNodesMap;
 	
 	//final String networkFile = "C:/Master_Thesis_HLI/Workspace/TestNetz/network.xml";
 	final String networkFile = "C:/Master_Thesis_HLI/Workspace/myMATSIM/mysimulations/kt-zurich/input/network.xml";
@@ -47,7 +48,7 @@ public class TestNodeSelection {
 		
 	protected void init()
 	{
-		selectedNodesMap = new TreeMap<Id, NodeImpl>();
+		selectedNodesMap = new TreeMap<Id, Node>();
 	}
 	
 	protected void loadNetwork()
@@ -102,7 +103,7 @@ public class TestNodeSelection {
 	protected void getIncludedLinks()
 	{
 		GetAllIncludedLinks gail = new GetAllIncludedLinks();
-		ArrayList<NodeImpl> nodes = new ArrayList<NodeImpl>();
+		ArrayList<Node> nodes = new ArrayList<Node>();
 		nodes.addAll(selectedNodesMap.values());
 		gail.getAllLinks(network, nodes);
 	}

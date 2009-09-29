@@ -33,7 +33,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -68,6 +67,7 @@ import playground.christoph.replanning.MyStrategyManagerConfigLoader;
 import playground.christoph.router.CompassRoute;
 import playground.christoph.router.DijkstraWrapper;
 import playground.christoph.router.KnowledgePlansCalcRoute;
+import playground.christoph.router.MyDijkstra;
 import playground.christoph.router.RandomCompassRoute;
 import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
@@ -75,6 +75,8 @@ import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import playground.christoph.router.util.DijkstraWrapperFactory;
+import playground.christoph.router.util.SimpleRouterFactory;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 
 /**
@@ -125,7 +127,8 @@ public class EventControler extends Controler {
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ParallelActEndReplanner parallelActEndReplanner;
 	protected ParallelLeaveLinkReplanner parallelLeaveLinkReplanner;
-	protected LinkVehiclesCounter linkVehiclesCounter;
+//	protected LinkVehiclesCounter linkVehiclesCounter;
+	protected LinkVehiclesCounter2 linkVehiclesCounter;
 	protected LinkReplanningMap linkReplanningMap;
 	protected LookupTableUpdater lookupTableUpdater;
 	protected ReplanningManager replanningManager;
@@ -184,11 +187,6 @@ public class EventControler extends Controler {
 		KnowledgeTravelTimeCalculator travelTimeCalculator = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
 		TravelTimeDistanceCostCalculator travelCostCalculator = new TravelTimeDistanceCostCalculator(travelTimeCalculator, new CharyparNagelScoringConfigGroup());
 
-		// Dijkstra
-		// replanners.add(new PlansCalcRouteConfigGroup(), new
-		// PlansCalcRouteDijkstra(network, travelCostCalculator,
-		// travelTimeCalculator));
-
 		// AStarLandmarks
 		// PreProcessLandmarks landmarks = new PreProcessLandmarks(new
 		// FreespeedTravelTimeCost(new CharyparNagelScoringConfigGroup()));
@@ -198,25 +196,21 @@ public class EventControler extends Controler {
 
 		// BasicReplanners (Random, Tabu, Compass, ...)
 		// each replanner can handle an arbitrary number of persons
-		KnowledgePlansCalcRoute randomRouter = new KnowledgePlansCalcRoute(network, new RandomRoute(), new RandomRoute());
-		randomRouter.setQueueNetwork(sim.getQueueNetwork());
+		KnowledgePlansCalcRoute randomRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomRoute()));
 		replanners.add(randomRouter);
 
-		KnowledgePlansCalcRoute tabuRouter = new KnowledgePlansCalcRoute(network, new TabuRoute(), new TabuRoute());
-		tabuRouter.setQueueNetwork(sim.getQueueNetwork());
+		KnowledgePlansCalcRoute tabuRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomRoute()));
 		replanners.add(tabuRouter);
 
-		KnowledgePlansCalcRoute compassRouter = new KnowledgePlansCalcRoute(network, new CompassRoute(), new CompassRoute());
-		compassRouter.setQueueNetwork(sim.getQueueNetwork());
+		KnowledgePlansCalcRoute compassRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomRoute()));
 		replanners.add(compassRouter);
 
-		KnowledgePlansCalcRoute randomCompassRouter = new KnowledgePlansCalcRoute(network, new RandomCompassRoute(), new RandomCompassRoute());
-		randomCompassRouter.setQueueNetwork(sim.getQueueNetwork());
+		KnowledgePlansCalcRoute randomCompassRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomRoute()));
 		replanners.add(randomCompassRouter);
 
 		// Dijkstra for Replanning
 		// KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
-		// KnowledgeTravelCostCalculator travelCost = newKnowledgeTravelCostCalculator(travelTime);
+		// KnowledgeTravelCostCalculator travelCost = new KnowledgeTravelCostCalculator(travelTime);
 
 		// Use a Wrapper - by doing this, already available MATSim
 		// CostCalculators can be used
@@ -225,15 +219,14 @@ public class EventControler extends Controler {
 
 		// Use a Wrapper - by doing this, already available MATSim
 		// CostCalculators can be used
-		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator();
-		travelTime.setQueueNetwork(sim.getQueueNetwork());
+		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
 		KnowledgeTravelTimeWrapper travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
-		travelTimeWrapper.setQueueNetwork(sim.getQueueNetwork());
+		travelTimeWrapper.setNetwork(this.getNetwork());
 		travelTimeWrapper.setLinkVehiclesCounter(linkVehiclesCounter);
 		
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
-		travelCostWrapper.setQueueNetwork(sim.getQueueNetwork());
+		travelCostWrapper.setNetwork(this.getNetwork());
 		travelCostWrapper.setLinkVehiclesCounter(linkVehiclesCounter);
 		
 		travelTimeWrapper.checkNodeKnowledge(false);
@@ -243,8 +236,8 @@ public class EventControler extends Controler {
 
 		// Don't use Knowledge for CostCalculations
 //		Dijkstra dijkstra = new MyDijkstra(network, travelCostWrapper, travelTimeWrapper);
-		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTimeWrapper);
-		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTimeWrapper, network);
+//		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTimeWrapper);
+//		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTimeWrapper, network);
 
 /*
 		// Don't use Wrappers with LookupTables KnowledgeTravelTimeCalculator
@@ -260,16 +253,10 @@ public class EventControler extends Controler {
 		travelCostWrapper.useLookupTable(false); Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime); 
 		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime);
 */
+		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
+				travelCostWrapper, travelTimeWrapper, new DijkstraWrapperFactory());
 		
-		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
-		dijkstraRouter.setQueueNetwork(sim.getQueueNetwork());
-
 		replanners.add(dijkstraRouter);
-
-//		TravelTime travelTime2 = new FreespeedTravelTimeCost();
-//		TravelCost travelCost2 = new OnlyTimeDependentTravelCostCalculator(travelTime2);
-//		PlansCalcRoute dijkstraRouter2 = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost2, travelTime2, new DijkstraFactory());
-//		replanners.add(dijkstraRouter2);
 	}
 
 	public ArrayList<PlanAlgorithm> getReplanningRouters() {
@@ -329,7 +316,8 @@ public class EventControler extends Controler {
 	 */
 	protected void createHandlersAndListeners()
 	{
-		linkVehiclesCounter = new LinkVehiclesCounter();
+//		linkVehiclesCounter = new LinkVehiclesCounter();
+		linkVehiclesCounter = new LinkVehiclesCounter2();
 		linkReplanningMap = new LinkReplanningMap();
 		lookupTableUpdater = new LookupTableUpdater();
 		replanningManager = new ReplanningManager();
@@ -339,7 +327,9 @@ public class EventControler extends Controler {
 	protected void runMobSim() 
 	{
 		sim = new ReplanningQueueSimulation(this.network, this.population, this.events);
-				
+
+		sim.useKnowledgeStorageHandler(true);
+		
 		createHandlersAndListeners();
 
 		// fully initialize & add LinkVehiclesCounter
@@ -371,7 +361,7 @@ public class EventControler extends Controler {
 		this.events.addHandler(linkReplanningMap);
 
 		// set QueueNetwork in the Traveltime Calculator
-		if (knowledgeTravelTime != null) knowledgeTravelTime.setQueueNetwork(sim.getQueueNetwork());
+//		if (knowledgeTravelTime != null) knowledgeTravelTime.setQueueNetwork(sim.getQueueNetwork());
 		
 //		log.info("Remove not selected Plans");
 //		clearPlans();

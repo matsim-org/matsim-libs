@@ -20,73 +20,57 @@
 
 package playground.christoph.router;
 
+import java.lang.reflect.Method;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.christoph.network.util.SubNetworkCreator;
-import playground.christoph.network.util.SubNetworkTools;
-import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.PersonLeastCostPathCalculator;
 
 public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable{
 	
-	protected PersonImpl person;
-	protected QueueNetwork queueNetwork;
+	protected Person person;
 	protected NetworkLayer network;
-	protected double time;
 	protected PlansCalcRouteConfigGroup configGroup;
-	protected SubNetworkTools subNetworkTools = new SubNetworkTools();
-	protected KnowledgeTools knowledgeTools = new KnowledgeTools();
-	protected SubNetworkCreator subNetworkCreator;
-	
+	protected TravelCost costCalculator;
+	protected TravelTime timeCalculator;
+	protected LeastCostPathCalculatorFactory factory;
+		
 	private final static Logger log = Logger.getLogger(KnowledgePlansCalcRoute.class);
-	
-	@Deprecated
-	public KnowledgePlansCalcRoute(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) 
-	{
-//		super(network, costCalculator, timeCalculator);
-		super(new PlansCalcRouteConfigGroup(), network, costCalculator, timeCalculator, new DijkstraFactory());
-		configGroup = new PlansCalcRouteConfigGroup();
-		
-		subNetworkCreator = new SubNetworkCreator(network);
-	}
-	
-	@Deprecated
-	public KnowledgePlansCalcRoute(final NetworkLayer network, final LeastCostPathCalculator router, final LeastCostPathCalculator routerFreeflow) 
-	{
-		super(network, router, routerFreeflow);
-		configGroup = new PlansCalcRouteConfigGroup();
-		
-		this.network = network;
-		
-		subNetworkCreator = new SubNetworkCreator(network);
-	}
-		
+				
 	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		super(group, network, costCalculator, timeCalculator, factory);
-		configGroup = group;
 		
-		subNetworkCreator = new SubNetworkCreator(network);
+		this.configGroup = group;
+		this.network = network;
+		this.costCalculator = costCalculator;
+		this.timeCalculator = timeCalculator;
+		this.factory = factory;
 	}
 	
+	/*
+	 * If no LeastCostPathCalculatorFactory is given use by Default
+	 * a DijkstraFactory.
+	 */
 	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(group, network, costCalculator, timeCalculator, new DijkstraFactory());
-		configGroup = group;
-		
-		subNetworkCreator = new SubNetworkCreator(network);
 	}
 	
+	/*
+	 * Hand over the Person to the CostCalculators and then
+	 * run the super method.
+	 */
 	@Override
 	public void run(final PersonImpl person)
 	{
@@ -95,6 +79,10 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		super.run(person);
 	}
 
+	/*
+	 * Hand over the Person to the CostCalculators and then
+	 * run the super method.
+	 */
 	@Override
 	public void run(final PlanImpl plan)
 	{
@@ -106,7 +94,7 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	/*
 	 * We have to hand over the person to the Cost- and TimeCalculators of the Router.
 	 */
-	private void setPerson(PersonImpl person)
+	private void setPerson(Person person)
 	{
 		this.person = person;
 		
@@ -121,106 +109,59 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		}
 	}
 	
-	public PersonImpl getPerson()
+	public Person getPerson()
 	{
 		return this.person;
-	}
-	
-	/*
-	 * We have to hand over the QueueNetwork to the Cost- and TimeCalculators of the Router.
-	 */
-	public void setQueueNetwork(QueueNetwork queueNetwork)
-	{
-		this.queueNetwork = queueNetwork;
-		
-		if(this.getLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
-		{
-			((PersonLeastCostPathCalculator)this.getLeastCostPathCalculator()).setQueueNetwork(queueNetwork);
-		}
-		
-		if(this.getPtFreeflowLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
-		{
-			((PersonLeastCostPathCalculator)this.getPtFreeflowLeastCostPathCalculator()).setQueueNetwork(queueNetwork);
-		}
-	}
-	
-	public QueueNetwork getQueueNetwork()
-	{
-		return this.queueNetwork;
-	}
-
-	/*
-	 * We have to hand over the time to the Cost- and TimeCalculators of the Router.
-	 */
-	public void setTime(Double time)
-	{
-		this.time = time;
-		
-		if(this.getLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
-		{
-			((PersonLeastCostPathCalculator)this.getLeastCostPathCalculator()).setTime(time);
-		}
-		
-		if(this.getPtFreeflowLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
-		{
-			((PersonLeastCostPathCalculator)this.getPtFreeflowLeastCostPathCalculator()).setTime(time);
-		}
-	}
-	
-	public double getTime()
-	{
-		return this.time;
 	}
 	
 	@Override
 	public KnowledgePlansCalcRoute clone()
 	{
-		LeastCostPathCalculator routeAlgoClone;
-		LeastCostPathCalculator routeAlgoFreeflowClone;
-		
-		if(this.getLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
+		TravelCost travelCostClone = null;
+		if (costCalculator instanceof Cloneable)
 		{
-			routeAlgoClone = ((PersonLeastCostPathCalculator)this.getLeastCostPathCalculator()).clone();
+			try
+			{
+				Method method;
+				method = costCalculator.getClass().getMethod("clone", new Class[]{});
+				travelCostClone = costCalculator.getClass().cast(method.invoke(costCalculator, new Object[]{}));
+			}
+			catch (Exception e)
+			{
+				Gbl.errorMsg(e);
+			} 
 		}
-		else
+		// not cloneable or an Exception occured
+		if (travelCostClone == null)
 		{
-			log.error("Could not clone the Route Algorithm - use reference to the existing Algorithm and hope the best...");
-			routeAlgoClone = this.getLeastCostPathCalculator();
-		}
-		
-		if(this.getPtFreeflowLeastCostPathCalculator() instanceof PersonLeastCostPathCalculator)
-		{
-			routeAlgoFreeflowClone = ((PersonLeastCostPathCalculator)this.getPtFreeflowLeastCostPathCalculator()).clone();
-		}
-		else
-		{
-			log.error("Could not clone the Freeflow Route Algorithm - use reference to the existing Algorithm and hope the best...");
-			routeAlgoFreeflowClone = this.getPtFreeflowLeastCostPathCalculator();
+			travelCostClone = costCalculator;
+			log.warn("Could not clone the Travel Cost Calculator - use reference to the existing Calculator and hope the best...");
 		}
 		
-		/* 
-		 * routeAlgo and routeAlgoFreeflow may be the references to the same object.
-		 * In this case -> use only one clone.
-		 */
+		TravelTime travelTimeClone = null;
+		if (timeCalculator instanceof Cloneable)
+		{
+			try
+			{
+				Method method;
+				method = timeCalculator.getClass().getMethod("clone", new Class[]{});
+				travelTimeClone = timeCalculator.getClass().cast(method.invoke(timeCalculator, new Object[]{}));
+			}
+			catch (Exception e)
+			{
+				Gbl.errorMsg(e);
+			} 
+		}
+		// not cloneable or an Exception occured
+		if (travelTimeClone == null)
+		{
+			travelTimeClone = timeCalculator;
+			log.warn("Could not clone the Travel Time Calculator - use reference to the existing Calculator and hope the best...");
+		}
+		
 		KnowledgePlansCalcRoute clone;
-		if(this.getLeastCostPathCalculator() == this.getPtFreeflowLeastCostPathCalculator())
-		{
-			clone = new KnowledgePlansCalcRoute(network, routeAlgoClone, routeAlgoClone);
-		}
-		else
-		{
-			clone = new KnowledgePlansCalcRoute(network, routeAlgoClone, routeAlgoFreeflowClone);
-		}
-		
-		clone.setQueueNetwork(this.queueNetwork);
-/*		
-		log.info(routeAlgo.getClass());
-		log.info("org   " + this);
-		log.info("clone " + clone);
-		
-		log.info("org wrapper   " + this.routeAlgo);
-		log.info("clone wrapper " + clone.routeAlgo);
-*/		
+		clone = new KnowledgePlansCalcRoute(configGroup, network, costCalculator, timeCalculator, factory);
+	
 		return clone;
 	}
 }

@@ -4,24 +4,20 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.knowledge.container.MapKnowledge;
@@ -39,7 +35,7 @@ public class NetworkThinning {
 
 	private static final Logger log = Logger.getLogger(NetworkThinning.class);
 	
-	private NetworkLayer network;
+	private Network network;
 	private SubNetwork subNetwork;
 	
 	private Map<Id, Node> transformableNodes;
@@ -86,12 +82,12 @@ public class NetworkThinning {
 		}
 	}
 	
-	public void setNetwork(NetworkLayer network)
+	public void setNetwork(Network network)
 	{
 		this.network = network;
 	}
 	
-	public NetworkLayer getNetwork()
+	public Network getNetwork()
 	{
 		return this.network;
 	}
@@ -102,7 +98,7 @@ public class NetworkThinning {
 		
 		NodeKnowledge nodeKnowledge = new MapKnowledge();
 		nodeKnowledge.setNetwork(network);
-		nodeKnowledge.setKnownNodes(network.getNodes());
+		nodeKnowledge.setKnownNodes((Map<Id, Node>)network.getNodes());
 		
 		subNetwork = snc.createSubNetwork(nodeKnowledge);
 	}
@@ -112,14 +108,14 @@ public class NetworkThinning {
 		ThinningThread[] thinningThreads = new ThinningThread[numOfThreads];
 		
 		// split up the Nodes to distribute the workload between the threads
-		List<List<NodeImpl>> nodeLists = new ArrayList<List<NodeImpl>>();
+		List<List<Node>> nodeLists = new ArrayList<List<Node>>();
 		for (int i = 0; i < numOfThreads; i++)
 		{
-			nodeLists.add(new ArrayList<NodeImpl>());
+			nodeLists.add(new ArrayList<Node>());
 		}
 		
 		int i = 0;
-		for (NodeImpl node : this.network.getNodes().values())
+		for (Node node : this.network.getNodes().values())
 		{
 			nodeLists.get(i % numOfThreads).add(node);
 			i++;
@@ -869,17 +865,17 @@ public class NetworkThinning {
 	 */
 	private static class ThinningThread extends Thread
 	{
-		private NetworkLayer network;
+		private Network network;
 		
-		private Map<Id, NodeImpl> nodesToTransform;
-		private List<NodeImpl> nodes;
+		private Map<Id, Node> nodesToTransform;
+		private List<Node> nodes;
 		
 		private double time = Time.UNDEFINED_TIME;
 		private int thread;
 		
 		private static int threadCounter = 0;
 		
-		public ThinningThread(NetworkLayer network, List<NodeImpl> nodes)
+		public ThinningThread(Network network, List<Node> nodes)
 		{
 			this.network = network;
 			this.nodes = nodes;
@@ -892,23 +888,23 @@ public class NetworkThinning {
 			findNodes();	
 		}
 		
-		public Map<Id, NodeImpl> getTransformableNodes()
+		public Map<Id, Node> getTransformableNodes()
 		{
 			return this.nodesToTransform;
 		}
 		
 		private void findNodes()
 		{
-			nodesToTransform = new HashMap<Id, NodeImpl>();
+			nodesToTransform = new HashMap<Id, Node>();
 			
 			int nodeCount = 0;
 			
 			// for every Node of the given List
-			for (NodeImpl node : nodes)
+			for (Node node : nodes)
 			{
-				List<NodeImpl> outNodes = new ArrayList<NodeImpl>();
+				List<Node> outNodes = new ArrayList<Node>();
 				
-				for (LinkImpl outLink : node.getOutLinks().values())
+				for (Link outLink : node.getOutLinks().values())
 				{
 					outNodes.add(outLink.getToNode());
 				}

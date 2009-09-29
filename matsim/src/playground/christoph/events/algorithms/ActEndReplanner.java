@@ -21,13 +21,7 @@
 package playground.christoph.events.algorithms;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
-import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -35,11 +29,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.christoph.knowledge.container.NodeKnowledge;
-import playground.christoph.network.SubNetwork;
 import playground.christoph.network.util.SubNetworkTools;
-import playground.christoph.router.KnowledgePlansCalcRoute;
-import playground.christoph.router.util.KnowledgeTools;
 
 /*
  * This is a EventHandler that replans the Route of a Person every time an
@@ -52,9 +42,6 @@ import playground.christoph.router.util.KnowledgeTools;
  * contains this and the next Activity and the Leg between them.
  */
 
-
-//public class ActEndReplanner implements BasicActivityEndEventHandler {
-//public class ActEndReplanner implements ActivityEndEventHandler {
 public class ActEndReplanner {
 	
 	protected PlanAlgorithm replanner;
@@ -218,17 +205,7 @@ public class ActEndReplanner {
 		
 		// We still want to go there...
 		newPlan.addActivity(toAct);
-		
-		/*
-		 *  If it's a PersonPlansCalcRoute Object -> set the current Person.
-		 *  The router may need their knowledge (activity room, ...).
-		 */
-		if (replanner instanceof KnowledgePlansCalcRoute)
-		{
-//			((KnowledgePlansCalcRoute)replanner).setPerson(this.person);
-			((KnowledgePlansCalcRoute)replanner).setTime(this.time);
-		}
-			
+					
 //		NodeImpl startNode = fromAct.getLink().getToNode();	// start at the end of the "current" link
 //		NodeImpl endNode = toAct.getLink().getFromNode(); // the target is the start of the link
 //		

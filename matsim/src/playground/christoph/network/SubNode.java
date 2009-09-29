@@ -4,23 +4,22 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.network.BasicNodeImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 
 public class SubNode extends BasicNodeImpl implements Node{
 
-	private NodeImpl parentNode;
+	private Node parentNode;
 	private boolean equalsParent = false;
 	
-	public SubNode(NodeImpl node) 
+	public SubNode(Node node) 
 	{
 		super(node.getId(), node.getCoord());
 		this.parentNode = node;
 	}
 
-	public SubNode(NodeImpl node, boolean equalsParent) 
+	public SubNode(Node node, boolean equalsParent) 
 	{
 		super(node.getId(), node.getCoord());
 		this.parentNode = node;
@@ -34,7 +33,7 @@ public class SubNode extends BasicNodeImpl implements Node{
 		}
 	}
 	
-	public NodeImpl getParentNode()
+	public Node getParentNode()
 	{
 		return parentNode;
 	}
@@ -61,19 +60,19 @@ public class SubNode extends BasicNodeImpl implements Node{
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	public Map<Id, ? extends LinkImpl> getInLinks()
+	public Map<Id, ? extends Link> getInLinks()
 	{
 		if (equalsParent) return parentNode.getInLinks();
 			
-		return (Map<Id, LinkImpl>) super.getInLinks();
+		return (Map<Id, Link>) super.getInLinks();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Map<Id, ? extends LinkImpl> getOutLinks()
+	public Map<Id, ? extends Link> getOutLinks()
 	{
 		if (equalsParent) return parentNode.getInLinks();
 		
-		return (Map<Id, LinkImpl>)super.getOutLinks();
+		return (Map<Id, Link>)super.getOutLinks();
 	}
 }

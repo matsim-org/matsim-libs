@@ -6,8 +6,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -18,7 +20,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -33,6 +34,7 @@ import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeWrapper;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import playground.christoph.router.util.DijkstraWrapperFactory;
 import playground.christoph.router.util.KnowledgeTools;
 
 public class TestSubNetwork {
@@ -126,13 +128,13 @@ public class TestSubNetwork {
 	{
 		queueNetwork = new QueueNetwork(network);
 		
-		travelTime = new KnowledgeTravelTimeCalculator();
+		travelTime = new KnowledgeTravelTimeCalculator(queueNetwork);
 		travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
-		travelTimeWrapper.setQueueNetwork(queueNetwork);
+		travelTimeWrapper.setNetwork(network);
 		
 		travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
 		travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
-		travelCostWrapper.setQueueNetwork(queueNetwork);
+		travelCostWrapper.setNetwork(network);
 		
 		travelTimeWrapper.checkNodeKnowledge(false);
 		travelCostWrapper.checkNodeKnowledge(false);
@@ -141,10 +143,10 @@ public class TestSubNetwork {
 		
 		// Don't use Knowledge for CostCalculations
 		dijkstra = new MyDijkstra(network, travelCostWrapper, travelTimeWrapper);
-		dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTimeWrapper, network);
+//		dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTimeWrapper, network);
 	
-		dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
-		dijkstraRouter.setQueueNetwork(queueNetwork);
+		dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
+				travelCostWrapper, travelTimeWrapper, new DijkstraWrapperFactory());
 	}
 	
 	private void createSubNetworks()
@@ -184,7 +186,7 @@ public class TestSubNetwork {
 	
 	private boolean checkNodeKnowledge(SubNetwork subNetwork, NodeKnowledge nodeKnowledge)
 	{
-		for (NodeImpl node : nodeKnowledge.getKnownNodes().values())
+		for (Node node : nodeKnowledge.getKnownNodes().values())
 		{
 			if (!subNetwork.getNodes().containsKey(node.getId())) return false;
 		}
@@ -199,9 +201,7 @@ public class TestSubNetwork {
 	}
 	
 	private void replanRoute(PersonImpl person)
-	{
-		dijkstraRouter.setTime(Time.UNDEFINED_TIME);
-		
+	{	
 		dijkstraRouter.run(person.getSelectedPlan());
 	}
 	

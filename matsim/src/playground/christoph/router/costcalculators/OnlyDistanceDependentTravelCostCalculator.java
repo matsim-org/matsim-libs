@@ -22,11 +22,10 @@ package playground.christoph.router.costcalculators;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.TravelMinCost;
-import org.matsim.core.router.util.TravelTime;
 
-public class OnlyDistanceDependentTravelCostCalculator implements TravelMinCost {
+public class OnlyDistanceDependentTravelCostCalculator implements TravelMinCost, Cloneable {
 	
-	public OnlyDistanceDependentTravelCostCalculator(final TravelTime timeCalculator)
+	public OnlyDistanceDependentTravelCostCalculator()
 	{
 	}
 
@@ -38,5 +37,15 @@ public class OnlyDistanceDependentTravelCostCalculator implements TravelMinCost 
 	public double getLinkMinimumTravelCost(final Link link) 
 	{
 		return link.getLength();
+	}
+	
+	@Override
+	public OnlyDistanceDependentTravelCostCalculator clone()
+	{
+		OnlyDistanceDependentTravelCostCalculator clone;
+
+		clone = new OnlyDistanceDependentTravelCostCalculator();
+		
+		return clone;
 	}
 }

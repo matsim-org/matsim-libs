@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
 public class MapKnowledge extends BasicNodeKnowledge{
 
@@ -14,33 +14,33 @@ public class MapKnowledge extends BasicNodeKnowledge{
 	
 	public boolean isWhiteList = true;
 	
-	private Map<Id, NodeImpl> nodes;
+	private Map<Id, Node> nodes;
 	
 	public MapKnowledge()
 	{
-		this.nodes = new HashMap<Id, NodeImpl>();
+		this.nodes = new HashMap<Id, Node>();
 	}
 	
-	public void addNode(NodeImpl node)
+	public void addNode(Node node)
 	{
 		if (isWhiteList) nodes.put(node.getId(), node);
 		else nodes.remove(node.getId());
 	}
 	
-	public void removeNode(NodeImpl node)
+	public void removeNode(Node node)
 	{
 		if (isWhiteList) nodes.remove(node.getId());
 		else nodes.put(node.getId(), node);
 	}
 		
-	public boolean knowsNode(NodeImpl node)
+	public boolean knowsNode(Node node)
 	{
 		boolean knowsNode = nodes.containsKey(node.getId());
 		if (isWhiteList) return knowsNode;
 		else return !knowsNode;
 	}
 	
-	public boolean knowsLink(LinkImpl link)
+	public boolean knowsLink(Link link)
 	{
 		// if no Map found or the Map is empty -> Person knows the entire network, return true
 		if ( nodes == null ) return true;
@@ -50,16 +50,16 @@ public class MapKnowledge extends BasicNodeKnowledge{
 		else return false;
 	}
 	
-	public synchronized Map<Id, NodeImpl> getKnownNodes() 
+	public synchronized Map<Id, Node> getKnownNodes() 
 	{
 		if (isWhiteList) return nodes;
 		else
 		{
-			Map<Id, NodeImpl> invertedNodes = new HashMap<Id, NodeImpl>();
+			Map<Id, Node> invertedNodes = new HashMap<Id, Node>();
 			
 			invertedNodes.putAll(this.network.getNodes());
 			
-			for(NodeImpl node : nodes.values())
+			for(Node node : nodes.values())
 			{
 				invertedNodes.remove(node.getId());
 			}
@@ -73,12 +73,12 @@ public class MapKnowledge extends BasicNodeKnowledge{
 	 * Please note: this Map could be a White- or a BlackList.
 	 * To get always a WhiteList please use getKnownNodes()
 	 */
-	protected Map<Id, NodeImpl> getNodes()
+	protected Map<Id, Node> getNodes()
 	{
 		return nodes;
 	}
 		
-	public void setKnownNodes(Map<Id, NodeImpl> nodes)
+	public void setKnownNodes(Map<Id, Node> nodes)
 	{
 		// If we have a network, we can check, whether using a Black- or WhiteList would be better.
 		if (this.network != null)
@@ -90,7 +90,7 @@ public class MapKnowledge extends BasicNodeKnowledge{
 			{
 				this.isWhiteList = false;
 				
-				Map<Id, NodeImpl> blackList = new HashMap<Id, NodeImpl>();
+				Map<Id, Node> blackList = new HashMap<Id, Node>();
 				blackList.putAll(this.network.getNodes());
 				
 				for (Id id : nodes.keySet())
@@ -115,6 +115,6 @@ public class MapKnowledge extends BasicNodeKnowledge{
 	{
 		this.isWhiteList = true;
 		//this.nodes.clear();
-		this.nodes = new HashMap<Id, NodeImpl>();
+		this.nodes = new HashMap<Id, Node>();
 	}
 }

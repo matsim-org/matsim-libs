@@ -8,18 +8,17 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.world.Layer;
 
 public class SubLink implements BasicLink, Link{
 
-	private NetworkLayer network;
+	private Network network;
 	private BasicNode from;
 	private BasicNode to;
-	private LinkImpl parentLink;
+	private Link parentLink;
 	
-	public SubLink(NetworkLayer network, BasicNode from, BasicNode to, LinkImpl link)
+	public SubLink(Network network, BasicNode from, BasicNode to, Link link)
 	{
 		this.network = network;
 		this.from = from;
@@ -27,7 +26,7 @@ public class SubLink implements BasicLink, Link{
 		this.parentLink = link;
 	}
 	
-	public LinkImpl getParentLink()
+	public Link getParentLink()
 	{
 		return parentLink;
 	}

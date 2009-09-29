@@ -37,7 +37,6 @@ import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.mobsim.WithinDayPersonAgent;
-import playground.christoph.router.KnowledgePlansCalcRoute;
 
 /*
  * As the ActEndReplanner the LeaveLinkReplanner should be called when a
@@ -174,18 +173,8 @@ public class LeaveLinkReplanner {
 		// next Activity
 		newPlan.addActivity(nextAct);
 		
-		/*
-		 *  If it's a PersonPlansCalcRoute Object -> set the current Person.
-		 *  The router may need their knowledge (activity room, ...).
-		 */
-		if (replanner instanceof KnowledgePlansCalcRoute)
-		{
-//			((KnowledgePlansCalcRoute)replanner).setPerson(this.person);
-			((KnowledgePlansCalcRoute)replanner).setTime(this.time);
-		}	
-
 		replanner.run(newPlan);	
-		
+
 		// get new calculated Route
 		NetworkRouteWRefs newRoute = (NetworkRouteWRefs) newLeg.getRoute();
 		

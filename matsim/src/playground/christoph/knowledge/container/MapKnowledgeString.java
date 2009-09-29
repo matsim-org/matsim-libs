@@ -4,9 +4,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 
 /*
  * Reads and Writes a Person's known Nodes to a String.
@@ -35,7 +35,7 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 */	
 	
 	@Override
-	public boolean knowsNode(NodeImpl node)
+	public boolean knowsNode(Node node)
 	{
 		readFromDB();
 		
@@ -44,7 +44,7 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 	
 	
 	@Override
-	public boolean knowsLink(LinkImpl link)
+	public boolean knowsLink(Link link)
 	{
 		readFromDB();
 		
@@ -53,7 +53,7 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 	
 	
 	@Override
-	public Map<Id, NodeImpl> getKnownNodes()
+	public Map<Id, Node> getKnownNodes()
 	{
 		readFromDB();
 		
@@ -61,7 +61,7 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 	}
 	
 	@Override
-	public void setKnownNodes(Map<Id, NodeImpl> nodes)
+	public void setKnownNodes(Map<Id, Node> nodes)
 	{
 		super.setKnownNodes(nodes);
 		
@@ -82,7 +82,7 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 			for (String id : nodeIds)
 			{					
 				//NodeImpl node = this.network.getNode(new IdImpl(id));
-				NodeImpl node = this.network.getNodes().get(new IdImpl(id));
+				Node node = this.network.getNodes().get(new IdImpl(id));
 				super.addNode(node);
 			}
 		}
@@ -90,7 +90,7 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 	
 	public synchronized void writeToDB()
 	{
-		Map<Id, NodeImpl> nodes = super.getKnownNodes();
+		Map<Id, Node> nodes = super.getKnownNodes();
 		
 		nodesString = createNodesString(nodes);
 	}
@@ -107,14 +107,14 @@ public class MapKnowledgeString extends MapKnowledge implements DBStorage{
 	{
 	}
 		
-	private String createNodesString(Map<Id, NodeImpl> nodes)
+	private String createNodesString(Map<Id, Node> nodes)
 	{
 		// if no Nodes are known -> just return a separator
 		if (nodes.values().size() == 0) return this.separator;
 		
 		String string = "";
 		
-		for (NodeImpl node : nodes.values())
+		for (Node node : nodes.values())
 		{
 			string = string + node.getId() + this.separator;
 		}

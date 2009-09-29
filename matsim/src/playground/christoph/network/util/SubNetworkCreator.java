@@ -2,13 +2,10 @@ package playground.christoph.network.util;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
-
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.network.SubLink;
@@ -18,14 +15,14 @@ import playground.christoph.network.SubNode;
 public class SubNetworkCreator {
 
 //	private NodeKnowledge nodeKnowledge;
-	private NetworkLayer network;
+	private Network network;
 	
 //	private Map<Id, NodeImpl[]> inNodes;
 //	private Map<Id, NodeImpl[]> outNodes;
-	private Map<Id, LinkImpl[]> inLinks;	// <NodeId, LinkImpl[]>
-	private Map<Id, LinkImpl[]> outLinks;	// <NodeId, LinkImpl[]>
+	private Map<Id, Link[]> inLinks;	// <NodeId, LinkImpl[]>
+	private Map<Id, Link[]> outLinks;	// <NodeId, LinkImpl[]>
 	
-	public SubNetworkCreator(NetworkLayer network)
+	public SubNetworkCreator(Network network)
 	{
 		this.network = network;
 		
@@ -34,13 +31,13 @@ public class SubNetworkCreator {
 	
 	private void createLookupTables()
 	{
-		inLinks = new HashMap<Id, LinkImpl[]>((int)(this.network.getNodes().size() * 1.1), 0.95f);
-		outLinks = new HashMap<Id, LinkImpl[]>((int)(this.network.getNodes().size() * 1.1), 0.95f);
+		inLinks = new HashMap<Id, Link[]>((int)(this.network.getNodes().size() * 1.1), 0.95f);
+		outLinks = new HashMap<Id, Link[]>((int)(this.network.getNodes().size() * 1.1), 0.95f);
 		
-		for(NodeImpl node : this.network.getNodes().values())
+		for(Node node : this.network.getNodes().values())
 		{			
-			LinkImpl[] in = node.getInLinks().values().toArray(new LinkImpl[node.getInLinks().size()]);
-			LinkImpl[] out = node.getOutLinks().values().toArray(new LinkImpl[node.getOutLinks().size()]);
+			Link[] in = node.getInLinks().values().toArray(new Link[node.getInLinks().size()]);
+			Link[] out = node.getOutLinks().values().toArray(new Link[node.getOutLinks().size()]);
 		
 			Id id = node.getId();
 			
@@ -62,14 +59,14 @@ public class SubNetworkCreator {
 		{
 			synchronized(nodeKnowledge)
 			{	
-				Map<Id, NodeImpl> knownNodes = nodeKnowledge.getKnownNodes();
+				Map<Id, Node> knownNodes = nodeKnowledge.getKnownNodes();
 			
 				Map<Id, SubNode> nodesMapping = new HashMap<Id, SubNode>((int)(knownNodes.size() * 1.1), 0.95f);//new TreeMap<Id, SubNode>();
 				
 				subNetwork.initialize(knownNodes.size());
 				
 				// create all SubNodes
-				for (NodeImpl node : knownNodes.values())
+				for (Node node : knownNodes.values())
 				{
 					SubNode subNode = new SubNode(node);
 	
@@ -82,8 +79,8 @@ public class SubNetworkCreator {
 				for (SubNode subNode : nodesMapping.values())
 				{
 					// Get all known Links from and To the Node
-					LinkImpl[] in = inLinks.get(subNode.getId());
-					for (LinkImpl link : in)
+					Link[] in = inLinks.get(subNode.getId());
+					for (Link link : in)
 					{
 						// Check only the Node and not the Link - should be twice as fast. 
 						//if (nodeKnowledge.knowsNode(link.getFromNode()))
@@ -116,18 +113,18 @@ public class SubNetworkCreator {
 		int a = 0;
 		int b = 0;
 		
-		for (NodeImpl node : nodeKnowledge.getKnownNodes().values())
+		for (Node node : nodeKnowledge.getKnownNodes().values())
 		{
 			//SubNode subNode = new SubNode(node);
 			
-			LinkImpl[] in = inLinks.get(node.getId());
+			Link[] in = inLinks.get(node.getId());
 			//NodeImpl[] in = inNodes.get(node.getId());
 			
 			boolean knowsAllLinks = true;
 			
 			boolean[] knowsInLinks = new boolean[in.length];
 			int i = 0;
-			for (LinkImpl link : in)
+			for (Link link : in)
 			{
 				// Check only the Node and not the Link - should be twice as fast. 
 				if (nodeKnowledge.knowsNode(link.getFromNode()))
@@ -144,12 +141,12 @@ public class SubNetworkCreator {
 				i++;
 			}
 			
-			LinkImpl[] out = outLinks.get(node.getId());
+			Link[] out = outLinks.get(node.getId());
 			//NodeImpl[] out = outNodes.get(node.getId());
 			
 			boolean[] knowsOutLinks = new boolean[out.length];
 			i = 0;
-			for (LinkImpl link : out)
+			for (Link link : out)
 			{
 				// Check only the Node and not the Link - should be twice as fast.
 				if (nodeKnowledge.knowsNode(link.getToNode()))
