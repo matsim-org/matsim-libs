@@ -21,8 +21,6 @@ package playground.dgrether.activityendtimes;
 
 import org.matsim.core.controler.Controler;
 
-import playground.dgrether.DgPaths;
-
 
 
 /**
@@ -35,8 +33,9 @@ public class EndTimesStarter {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String config = DgPaths.STUDIESDG + "activityEndTimeConfig.xml";
-		
+		String config;
+//		config = DgPaths.STUDIESDG + "activityEndTimeConfig.xml";
+		config = args[0];
 		
 //		OTFVisController controller = new OTFVisController(config);
 		Controler controller = new Controler(config);
