@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+
+<plans>
+
+<!-- ====================================================================== -->
+
+	<person id="1" age="30">
+		<plan score="94.56545326889639" selected="yes">
+			<act type="home" link="91" facility="1" x="0.0" y="500.0" start_time="00:00:00" dur="08:00:00" end_time="08:00:00" />
+			<leg mode="car" dep_time="08:00:00" trav_time="00:22:13" arr_time="08:22:13">
+				<route dist="9000.0">
+					1 11 21 31 41 51 61 71 81 91 
+				</route>
+			</leg>
+			<act type="work" link="172" facility="10" x="9000.0" y="500.0" start_time="08:22:13" dur="11:06:39" end_time="19:28:53" />
+			<leg mode="car" dep_time="19:28:53" trav_time="00:15:33" arr_time="19:44:26">
+				<route dist="6000.0">
+					92 82 72 62 52 42 41 
+				</route>
+			</leg>
+			<act type="shopping" link="5" facility="37" x="4500.0" y="0.0" start_time="19:44:26" dur="01:00:00" end_time="20:44:26" />
+			<leg mode="car" dep_time="20:44:26" trav_time="00:15:33" arr_time="20:59:59">
+				<route dist="6000.0">
+					51 52 42 32 22 12 2 
+				</route>
+			</leg>
+			<act type="home" link="91" facility="1" x="0.0" y="500.0" start_time="20:59:59" dur="03:00:00" end_time="24:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+</plans>
