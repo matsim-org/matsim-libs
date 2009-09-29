@@ -39,6 +39,9 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 	private final double on;
 	private final double oe;
 	private TextRenderer textRenderer = null;
+	private int minTime = 3600 * 24;
+	private int oldTime = 0;
+	private int increment = 3600 * 24;
 
 	public OTFSheltersDrawer(final FeatureSource features, final Map<String,ArrayList<Tuple<Integer,Double>>> occupancy, double on, double oe){
 		this.oe = oe;
@@ -116,16 +119,17 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 		}
 		
 		
-		int relTime = ((((time - 3*3600)/60)));
-		
-		if (relTime < 0) {
-			return;
-		}
+		int timeSlotIdx = getTimeSlotIdx(time); 
+//		int relTime = ((((time - 3*3600)/60))); //FIXME 60 should be replaced by snapshot period!!
+//		
+//		if (this.timeSlotIdx < 0) {
+//			return;
+//		}
 		
 		
 		for (Shelter s : this.shelters) {
-			int sTime = relTime;
-			if (relTime >= s.occupancy.size()) {
+			int sTime = timeSlotIdx;
+			if (timeSlotIdx >= s.occupancy.size()) {
 				sTime = s.occupancy.size()-1;
 			}
 			Color color = this.colorizer.getColor(s.occupancy.get(sTime).getSecond());
@@ -152,6 +156,23 @@ public class OTFSheltersDrawer extends OTFTimeDependentDrawer  implements Serial
 	}
 
 	
+	private int getTimeSlotIdx(int time) {
+		if (this.minTime > time || this.minTime == 0) {
+			this.increment = Integer.MAX_VALUE; //needs to be initialized here, otherwise it won't work with older movies - GL sept. 2009
+			this.minTime = time;
+			return 0;
+		}
+		if (time > this.oldTime) {
+			this.increment  = Math.min(this.increment, time-this.oldTime);
+			this.oldTime = time;
+		}
+		
+		return (time - this.minTime) / this.increment;
+		
+	}
+
+
+
 	private void initTextRenderer() {
 		// Create the text renderer
 		Font font = new Font("SansSerif", Font.PLAIN, 30);
