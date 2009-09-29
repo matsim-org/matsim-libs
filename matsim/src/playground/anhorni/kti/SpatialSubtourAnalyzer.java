@@ -11,6 +11,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
@@ -41,22 +42,24 @@ public class SpatialSubtourAnalyzer {
 	/*
 	 * network, facilities, plans
 	 */
-	public static void main(final String[] args) {		
+	public static void main(final String[] args) {
+		
+		Config config = Gbl.createConfig(args);
+		
 		final SpatialSubtourAnalyzer analyzer = new SpatialSubtourAnalyzer();
 		
-		if (args.length != 3) {
-			printHelp();
-			log.error("Execution aborted");
-			return;
-		}
+//		if (args.length != 3) {
+//			printHelp();
+//			log.error("Execution aborted");
+//			return;
+//		}
 		
-		analyzer.init(args[0], args[1], args[2]);
-		analyzer.run(args[2]);	
+		analyzer.init(config);
+		analyzer.run();	
 	}
 	
-	public void run(String plansfilePath) {			
+	public void run() {			
 		Gbl.startMeasurement();
-		log.info("Analyzig plans: " + plansfilePath);
 		
 		String outpath = "output/kti/";
 		
@@ -66,23 +69,26 @@ public class SpatialSubtourAnalyzer {
 		Gbl.printElapsedTime();
 	}
 		
-	private void init(String networkfilePath, String facilitiesfilePath, String plansfilePath) {
+//	private void init(String networkfilePath, String facilitiesfilePath, String plansfilePath) {
+	private void init(Config config) {
 		
 		log.info(" \n---------------------------- \nStart init" );
 		log.info("reading the network ...");
 		this.network = new NetworkLayer();
-		new MatsimNetworkReader(this.network).readFile(networkfilePath);
+		new MatsimNetworkReader(this.network).readFile(config.network().getInputFile());
+		log.info("reading the network ...done.");
 				
 		World world = Gbl.getWorld();
 		
 		log.info("Reading the facilities ...");
 		this.facilities =(ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
-		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
+		new FacilitiesReaderMatsimV1(this.facilities).readFile(config.facilities().getInputFile());
+		log.info("Reading the facilities ...done.");
 		
-		
-		log.info("Reading file " + plansfilePath);
+		log.info("Reading plans...");
 		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, network);
-		plansReader.readFile(plansfilePath);
+		plansReader.readFile(config.plans().getInputFile());
+		log.info("Reading plans...done.");
 		log.info("Init finished \n ----------------------------");
 	}
 	
