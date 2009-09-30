@@ -35,7 +35,7 @@ public class DaganzoRunner {
 	private static final Logger log = Logger.getLogger(DaganzoRunner.class);
 	
 	private static final boolean visualizationOnly = false;
-
+	
 	public DaganzoRunner(){
 	}
 
@@ -53,8 +53,6 @@ public class DaganzoRunner {
 			config = controler.getConfig();
 			controler.run();
 		}
-		
-		
 		
 		//Visualize
 		String[] args = {config.controler().getOutputDirectory() + 

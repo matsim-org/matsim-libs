@@ -23,6 +23,8 @@ import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.linkanalysis.TTGraphWriter;
+import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
 
 
 /**

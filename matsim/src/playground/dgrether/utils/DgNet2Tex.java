@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -44,11 +45,14 @@ import playground.dgrether.daganzosignal.DaganzoScenarioGenerator;
  */
 public class DgNet2Tex {
 
+	private static final Logger log = Logger.getLogger(DgNet2Tex.class);
+	
 	public DgNet2Tex() {}
 
 	
 	
 	public void convert(NetworkLayer net, String texnet) {
+		log.info("starting conversion...");
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(texnet);
 			writer.write("\\begin{figure}[htp]");
@@ -79,7 +83,7 @@ public class DgNet2Tex {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		log.info("latex output written!");
 	}
 	
 	private void writeNetwork(NetworkLayer net, BufferedWriter writer) throws IOException {

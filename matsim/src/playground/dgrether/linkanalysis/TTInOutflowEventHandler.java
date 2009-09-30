@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.cmcf;
+package playground.dgrether.linkanalysis;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,17 +24,19 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
 public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	private Id linkIdIn;
 
-	private Map<Id, LinkEnterEventImpl> enterEvents;
+	private Map<Id, BasicLinkEnterEvent> enterEvents;
 	
 	private SortedMap<Double, Integer> inflow;
 	
@@ -52,7 +54,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	public TTInOutflowEventHandler(Id linkIdIn, Id linkIdOut) {
 		this.linkIdIn = linkIdIn;
 		this.linkIdOut = linkIdOut;
-		this.enterEvents = new HashMap<Id, LinkEnterEventImpl>();
+		this.enterEvents = new HashMap<Id, BasicLinkEnterEvent>();
 		this.inflow = new TreeMap<Double, Integer>();
 		this.outflow =  new TreeMap<Double, Integer>();
 		this.travelTimes = new TreeMap<Double, Double>();
@@ -64,19 +66,6 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	}
 	
 	public void handleEvent(LinkEnterEventImpl event) {
-		Id id = new IdImpl(event.getLinkId().toString());
-		if (linkIdIn.equals(id)) {
-			Integer in = getInflowMap().get(event.getTime());
-			if (in == null) {
-				in = Integer.valueOf(1);
-			  getInflowMap().put(event.getTime(), in);
-			}
-			else {
-				in = Integer.valueOf(in.intValue() + 1);
-			  getInflowMap().put(event.getTime(), in);
-			}
-			this.enterEvents.put(new IdImpl(event.getPersonId().toString()), event);
-		}
 	}
 
 
@@ -93,7 +82,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 				getOutflowMap().put(event.getTime(), out);
 			}
 			
-			LinkEnterEventImpl enterEvent = this.enterEvents.get(new IdImpl(event.getPersonId().toString()));
+			BasicLinkEnterEvent enterEvent = this.enterEvents.get(new IdImpl(event.getPersonId().toString()));
 			double tt = event.getTime() - enterEvent.getTime();
 			Double ttravel = getTravelTimesMap().get(enterEvent.getTime());
 			if (ttravel == null) {
@@ -130,6 +119,29 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 
 	public SortedMap<Double, Double> getTravelTimesMap() {
 		return travelTimes;
+	}
+
+
+	public void handleEvent(BasicLinkEnterEvent event) {
+		Id id = new IdImpl(event.getLinkId().toString());
+		if (linkIdIn.equals(id)) {
+			Integer in = getInflowMap().get(event.getTime());
+			if (in == null) {
+				in = Integer.valueOf(1);
+			  getInflowMap().put(event.getTime(), in);
+			}
+			else {
+				in = Integer.valueOf(in.intValue() + 1);
+			  getInflowMap().put(event.getTime(), in);
+			}
+			this.enterEvents.put(new IdImpl(event.getPersonId().toString()), event);
+		}
+	}
+
+
+	public void handleEvent(BasicLinkLeaveEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

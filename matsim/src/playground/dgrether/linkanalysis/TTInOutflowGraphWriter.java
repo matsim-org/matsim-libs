@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.cmcf;
+package playground.dgrether.linkanalysis;
 
 import org.matsim.core.utils.charts.XYLineChart;
 

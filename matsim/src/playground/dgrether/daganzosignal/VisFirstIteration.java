@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AdaptiveController
+ * VisFirstIteration
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,41 +19,35 @@
  * *********************************************************************** */
 package playground.dgrether.daganzosignal;
 
-import org.apache.log4j.Logger;
-import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
-import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
-import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
-import org.matsim.signalsystems.control.SignalGroupState;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.events.EventsImpl;
+import org.matsim.core.scenario.ScenarioLoader;
+
+import playground.dgrether.signalVis.DgOnTheFlyQueueSimQuad;
 
 
 /**
  * @author dgrether
  *
  */
-public class AdaptiveController extends
-		AdaptiveSignalSystemControlerImpl {
-	
-	private static final Logger log = Logger.getLogger(AdaptiveController.class);
+public class VisFirstIteration {
 
 	/**
-	 * @param controlInfo
+	 * @param args
 	 */
-	public AdaptiveController(BasicAdaptiveSignalSystemControlInfo controlInfo) {
-		super(controlInfo);
-	}
-
-	/**
-	 * @see org.matsim.signalsystems.control.SignalSystemController#givenSignalGroupIsGreen(org.matsim.signalsystems.basic.BasicSignalGroupDefinition)
-	 */
-	public boolean givenSignalGroupIsGreen(double time, BasicSignalGroupDefinition signalGroup) {
-//		log.info("isGreen?");
+	public static void main(String[] args) {
+		DaganzoScenarioGenerator scenarioGenerator = new DaganzoScenarioGenerator();
+		scenarioGenerator.createScenario();
+		ScenarioLoader loader = new ScenarioLoader(scenarioGenerator.configOut);
+		loader.loadScenario();
+		ScenarioImpl sc = loader.getScenario();
 		
-		return true;
-	}
-
-	public SignalGroupState getSignalGroupState(double time, BasicSignalGroupDefinition signalGroup) {
-		// TODO Auto-generated method stub
-		return null;
+		EventsImpl events = new EventsImpl();
+		DgOnTheFlyQueueSimQuad visSim = new DgOnTheFlyQueueSimQuad(sc, events);
+		visSim.setLaneDefinitions(sc.getLaneDefinitions());
+		visSim.setSignalSystems(sc.getSignalSystems(), sc.getSignalSystemConfigurations());
+		visSim.run();
+		
 	}
 
 }

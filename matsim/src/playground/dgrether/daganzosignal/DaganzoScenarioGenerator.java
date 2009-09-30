@@ -37,8 +37,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
@@ -106,11 +105,11 @@ public class DaganzoScenarioGenerator {
 	
 	public String configOut, plansOut, outputDirectory;
 
-	private static final boolean isAlternativeRouteEnabled = true;
+	private static final boolean isAlternativeRouteEnabled = false;
 	
 	private static final boolean isUseSignalSystems = true;
 
-	private static final int iterations = 0;
+	private static final int iterations = 10;
 
 	private static final int iterations2 = 0;
 
@@ -143,7 +142,7 @@ public class DaganzoScenarioGenerator {
 		id6 = sc.createId("6");
 	}
 
-	private void createScenario() {
+	public void createScenario() {
 		//create a scenario
 		ScenarioImpl scenario = new ScenarioImpl();
 		//get the config
@@ -188,22 +187,23 @@ public class DaganzoScenarioGenerator {
 	private void createPlans(ScenarioImpl scenario) {
 		NetworkLayer network = scenario.getNetwork();
 		PopulationImpl population = scenario.getPopulation();
-		int firstHomeEndTime = 0;// 6 * 3600;
+		int firstHomeEndTime =  1 * 3600;
 		int homeEndTime = firstHomeEndTime;
 		LinkImpl l1 = network.getLink(scenario.createId("1"));
 		LinkImpl l7 = network.getLink(scenario.createId("7"));
 		PopulationBuilder builder = population.getBuilder();
 
-		for (int i = 1; i <= 3600; i++) {
+		for (int i = 1; i <= 1000; i++) {
 			PersonImpl p = (PersonImpl) builder.createPerson(scenario.createId(Integer
 					.toString(i)));
 			PlanImpl plan = (PlanImpl) builder.createPlan(p);
 			p.addPlan(plan);
 			// home
 			// homeEndTime = homeEndTime + ((i - 1) % 3);
-			if ((i - 1) % 3 == 0) {
-				homeEndTime++;
-			}
+			homeEndTime+= 1;
+//			if ((i - 1) % 3 == 0) {
+//				homeEndTime++;
+//			}
 
 			ActivityImpl act1 = (ActivityImpl) builder.createActivityFromLinkId("h", l1.getId());
 			act1.setEndTime(homeEndTime);
@@ -211,13 +211,12 @@ public class DaganzoScenarioGenerator {
 			// leg to home
 			LegImpl leg = (LegImpl) builder.createLeg(TransportMode.car);
 			// TODO check this
-			NetworkRouteWRefs route = new NodeNetworkRouteImpl(l1, l7);
+			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(l1, l7);
 			if (isAlternativeRouteEnabled) {
-				route
-						.setNodes(l1, NetworkUtils.getNodes(network, "2 3 4 5 6"), l7);
+				route.setLinks(l1, NetworkUtils.getLinks(network, "2 3 5 6"), l7);
 			}
 			else {
-				route.setNodes(l1, NetworkUtils.getNodes(network, "2 3 5 6"), l7);
+				route.setLinks(l1, NetworkUtils.getLinks(network, "2 4 6"), l7);
 			}
 			leg.setRoute(route);
 
@@ -260,6 +259,7 @@ public class DaganzoScenarioGenerator {
 		config.simulation().setSnapshotFormat("otfvis");
 		config.simulation().setSnapshotFile("cmcf.mvi");
 		config.simulation().setSnapshotPeriod(60.0);
+		config.simulation().setSnapshotStyle("queue");
 		// configure strategies for replanning
 		config.strategy().setMaxAgentPlanMemorySize(4);
 		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(
