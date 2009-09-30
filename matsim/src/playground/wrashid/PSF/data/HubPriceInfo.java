@@ -25,9 +25,9 @@ public class HubPriceInfo {
 	public HubPriceInfo(String fileName, int numberOfHubs) {
 		// this.numberOfHubs = numberOfHubs;
 		hubPrice = new double[numberOfHubs][numberOfTimeBins];
-		
-		this.numberOfHubs=numberOfHubs;
-		
+
+		this.numberOfHubs = numberOfHubs;
+
 		try {
 
 			FileReader fr = new FileReader(fileName);
@@ -95,8 +95,8 @@ public class HubPriceInfo {
 	 * @param peakHourEndTime
 	 */
 	public HubPriceInfo(double peakHourStartTime, double peakHourEndTime, double offPeakRate, double peakRate) {
-		numberOfHubs=1;
-		
+		numberOfHubs = 1;
+
 		hubPrice = new double[1][numberOfTimeBins];
 
 		for (int i = 0; i < numberOfTimeBins; i++) {
@@ -120,6 +120,28 @@ public class HubPriceInfo {
 			}
 			System.out.println();
 		}
+	}
+
+	/**
+	 * Although we have just one price for the whole area, we want to make
+	 * several columns to pretend, we would have several hubs.
+	 * 
+	 * @param numberOfHubs
+	 */
+	public void printFakeHubs(int numberOfHubs) {
+		// copy the hub columns
+		for (int i = 0; i < numberOfTimeBins; i++) {
+			for (int j = 0; j < numberOfHubs; j++) {
+				System.out.print(hubPrice[0][i]);
+				System.out.print("\t");
+			}
+			System.out.println();
+		}
+	}
+
+	public static void main(String[] args) {
+		HubPriceInfo hubPriceInfo = new HubPriceInfo(18000, 75600, 9, 18);
+		hubPriceInfo.printFakeHubs(4);
 	}
 
 }
