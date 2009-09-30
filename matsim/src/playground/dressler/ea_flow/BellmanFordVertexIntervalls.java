@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FakeTravelTimeCost.java
+ * BellmanFordVertexIntervalls.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,20 +21,25 @@ package playground.dressler.ea_flow;
 
 // java imports
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Queue;
+import java.util.PriorityQueue;
+import java.util.Set;
 
+//matsim imports
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkLayer;
 
+//playground imports
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.Intervall.src.Intervalls.Intervall;
 import playground.dressler.Intervall.src.Intervalls.VertexIntervall;
 import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
+import playground.dressler.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
 
 
 /**
@@ -46,6 +51,31 @@ import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
 
 
 public class BellmanFordVertexIntervalls {
+	
+	public class NodeComparator implements Comparator<Node>
+	{
+
+		public int compare(Node first, Node second) {
+			if(_labels.containsKey(first) && _labels.containsKey(second))
+			{
+				//TODO ROST MAKE MORE EFFICIENT! (use a map to retrieve the intervalls..)
+				Integer firstPossibleNextRelabel = retrieveFirstNextPossibleTimeToPropagate(_labels.get(first));
+				Integer secondPossibleNextRelabel = retrieveFirstNextPossibleTimeToPropagate(_labels.get(second));
+				return firstPossibleNextRelabel.compareTo(secondPossibleNextRelabel);
+			}
+			else
+				throw new RuntimeException("nodes cannot be compared!");
+		}
+		
+		protected Integer retrieveFirstNextPossibleTimeToPropagate(VertexIntervalls vIntervalls)
+		{
+			VertexIntervall vIntervall = vIntervalls.getFirstUnscannedIntervall();
+			if(vIntervall == null)
+				return Integer.MAX_VALUE;
+			else 
+				return vIntervall.getLowBound();
+		}
+	}
 	
 	
 
@@ -82,7 +112,7 @@ public class BellmanFordVertexIntervalls {
 	/**
 	 * 
 	 */
-	private TimeExpandedPath _timeexpandedpath;
+	private Collection<TimeExpandedPath> _timeexpandedpath;
 	 /**
 	  * 
 	  */
@@ -97,10 +127,9 @@ public class BellmanFordVertexIntervalls {
 	 */
 	private static int _debug=0;
 
-	int gain = 0;
+	public int gain = 0;
 	
 	private long _totalpolls=0L;
-	
 	private int _roundpolls=0;
 	
 	private long _prepstart=0;
@@ -111,6 +140,9 @@ public class BellmanFordVertexIntervalls {
 	private long _calcend=0;
 	private long _totalcalctime=0;
 	
+	protected PriorityQueue<Node> queue;
+	protected int lastArrival = -1;
+	
 	
 	
 	//--------------------CONSTRUCTORS-------------------------------------//
@@ -119,7 +151,7 @@ public class BellmanFordVertexIntervalls {
 	 * Constructor using all the data initialized in the Flow object use recommended
 	 * @param flow 
 	 */
-	public BellmanFordVertexIntervalls( Flow flow) {
+	public BellmanFordVertexIntervalls(Flow flow) {
 		this._flow = flow;
 		this.network = flow.getNetwork();
 		this._flowlabels = flow.getFlow();
@@ -141,7 +173,6 @@ public class BellmanFordVertexIntervalls {
 	/**
 	 * Setter for warmstart mode 
 	 * @param warmstart > 0 is warmstart mode is on
-	 */
 	public static void warmstart(int warmstart){
 		BellmanFordVertexIntervalls._warmstart = warmstart;
 	}
@@ -155,9 +186,10 @@ public class BellmanFordVertexIntervalls {
 		for(Node node: network.getNodes().values()){
 			VertexIntervalls label = new VertexIntervalls();
 			_labels.put(node, label);
+			nodes.add(node);
 			if(isActiveSource(node)){
-				nodes.add(node);
-				_labels.get(node).getIntervallAt(0).setDist(true);
+				_labels.get(node).getIntervallAt(0).setReachable(true);
+				_labels.get(node).getIntervallAt(0).setScanned(false);
 			}
 		}
 		return nodes;
@@ -179,10 +211,13 @@ public class BellmanFordVertexIntervalls {
 	 * Constructs  a TimeExpandedPath based on the labels set by the algorithm 
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
-	private TimeExpandedPath constructRoute()throws BFException{
+	private Collection<TimeExpandedPath> constructRoutes()throws BFException{
+		Set<TimeExpandedPath> result = new HashSet<TimeExpandedPath>();
+		
 		Node to = _sink;
 		VertexIntervalls tolabels = this._labels.get(to);
-		int totime = tolabels.firstPossibleTime();
+		int totime = tolabels.getFirstUnscannedIntervall().getLowBound();
+		int arrivalAtSuperSink = totime;
 		//check if TimeExpandedPath can be constructed
 		if(Integer.MAX_VALUE==totime){
 			throw new BFException("sink can not be reached!");
@@ -190,42 +225,74 @@ public class BellmanFordVertexIntervalls {
 		if(totime>_timehorizon){
 			throw new BFException("sink can not be reached within timehorizon!");
 		}
-			
-		//start constructing the TimeExpandedPath
-		TimeExpandedPath TimeExpandedPath = new TimeExpandedPath();
-		TimeExpandedPath.setArrival(totime);
-		VertexIntervall tolabel = tolabels.getIntervallAt(totime);
-		while(tolabel.getPredecessor()!=null){
-			Link edge = tolabel.getPredecessor();
-			//find out weather forward or backwards edge is used
-			boolean forward;
-			if(edge.getFromNode().equals(to)){
-				forward = false;
-			}else{
-				if(edge.getToNode().equals(to)){
-					forward = true;
+		//collect all reachable sinks, that are connected by an zero transit time, infinite capacity
+		//arc.
+		Set<Node> realSinksToSendTo = new HashSet<Node>();
+		
+		for(Link link : _sink.getInLinks().values())
+		{
+			Node realSink = link.getFromNode();
+			VertexIntervall realSinkIntervall = this._labels.get(realSink).getIntervallAt(totime);
+			if(realSinkIntervall.getReachable() && realSinkIntervall.getLowBound() == arrivalAtSuperSink)
+				realSinksToSendTo.add(realSink);
+		}		
+		for(Node realSink : realSinksToSendTo)
+		{
+			//start constructing the TimeExpandedPath
+			TimeExpandedPath timeExpandedPath = new TimeExpandedPath();
+			timeExpandedPath.setArrival(totime);
+			for(Link link : realSink.getOutLinks().values())
+			{
+				if(link.getToNode().equals(_sink))
+					timeExpandedPath.push(link, arrivalAtSuperSink, arrivalAtSuperSink, true);
+			}
+			//now we can start at each real sink
+			tolabels = _labels.get(realSink);
+			totime = arrivalAtSuperSink;
+			to = realSink;
+			VertexIntervall tolabel = tolabels.getIntervallAt(totime);
+			int fromtime = 0;
+			while(tolabel.getPredecessor()!=null){
+				Link edge = tolabel.getPredecessor();
+				//find out weather forward or backwards edge is used
+				boolean forward;
+				if(edge.getFromNode().equals(to)){
+					forward = false;
 				}else{
-					throw new IllegalArgumentException("edge: " + edge.getId().toString()+ " is not incident to node: "+ to.getId().toString());
+					if(edge.getToNode().equals(to)){
+						forward = true;
+					}else{
+						throw new IllegalArgumentException("edge: " + edge.getId().toString()+ " is not incident to node: "+ to.getId().toString());
+					}
 				}
+				if(forward){
+					fromtime = totime - tolabel.getTravelTimeToPredecessor();
+					if(fromtime > tolabel.getLastDepartureAtFromNode())
+					{
+						fromtime = tolabel.getLastDepartureAtFromNode();
+						totime = fromtime + tolabel.getTravelTimeToPredecessor();
+					}
+					timeExpandedPath.push(edge, fromtime, totime, forward);
+					to= edge.getFromNode();
+				}else{					
+					if(totime > tolabel.getLastDepartureAtFromNode())
+					{
+						totime = tolabel.getLastDepartureAtFromNode();
+					}
+					fromtime = totime + tolabel.getTravelTimeToPredecessor();
+					
+					timeExpandedPath.push(edge, totime, fromtime, forward);
+					to = edge.getToNode();
+				}
+				tolabels = this._labels.get(to);
+				totime= fromtime;
+				tolabel = tolabels.getIntervallAt(totime);
 			}
-			//find next node and edge
-			int fromtime;
-			if(forward){
-				fromtime = (totime-_flowlabels.get(edge).getTravelTime());
-				TimeExpandedPath.push(edge, fromtime, forward);
-				to= edge.getFromNode();
-			}else{
-				fromtime = (totime+_flowlabels.get(edge).getTravelTime());
-				TimeExpandedPath.push(edge, fromtime, forward);
-				to =edge.getToNode();
-			}
-			tolabels = this._labels.get(to);
-			totime= fromtime;
-			tolabel = tolabels.getIntervallAt(totime);
+			timeExpandedPath.setArrival(arrivalAtSuperSink);
+			timeExpandedPath.setStartTime(fromtime);
+			result.add(timeExpandedPath);
 		}
-		
-		
-		return TimeExpandedPath;
+		return result;
 	}
 	
 	
@@ -237,44 +304,71 @@ public class BellmanFordVertexIntervalls {
 	 * @param forward indicates, weather we use a forward or backwards edge
 	 * @return true if any label of Node to has changed
 	 */
-	private boolean relabel(Node from, Node to, Link over,boolean forward){
-		VertexIntervalls labelfrom = _labels.get(from);
+	private boolean relabel(VertexIntervall start, Node from, Node to, Link over,boolean forward){
 		VertexIntervalls labelto = _labels.get(to);
 		EdgeIntervalls	flowover = _flowlabels.get(over);
 		boolean changed=false;
 		int t=0;
-		VertexIntervall i;
-		do{
-			i = labelfrom.getIntervallAt(t);
-			t=i.getHighBound();
-			if(i.getDist()){
-				if(_debug>0){
-					System.out.println("wir kommen los:"+ from.getId());
-				}	//TODO cast to int capacity handling!!!
-				if((int)over.getCapacity(1.)==0){
-					continue;
-				}
-				ArrayList<Intervall> arrive = flowover.propagate(i, (int)over.getCapacity(1.),forward);
-				if(!arrive.isEmpty()){
-					if(_debug>0){
-						System.out.println("wir kommen weiter: "+ to.getId());
-						for(Intervall inter: arrive){
-							System.out.println(forward);
-							System.out.println(inter);
-						}
-					}
-					boolean temp = labelto.setTrue( arrive , over );
-					if(temp){
-						changed = true;
-					}
-				}else{
-					if(_debug>0){
-						System.out.println("edge: " + over.getId() +" forward:"+forward+ " blocked " + flowover.toString());
-					}	
-				}
-					
+		if(start.getReachable() && !start.isScanned()){
+			if(_debug>0){
+				System.out.println("wir kommen los:"+ from.getId());
+			}	//TODO cast to int capacity handling!!!
+			if((int)over.getCapacity(1.)==0){
+				return false;
 			}
-		}while(!labelfrom.isLast(i));
+			ArrayList<VertexIntervall> arrive;
+			if(_flow.getEdgeType() == EdgeTypeEnum.SIMPLE)
+			{
+				arrive = flowover.propagate(start, (int)over.getCapacity(1.),forward);
+			}
+			else if(_flow.getEdgeType() == EdgeTypeEnum.BOWEDGES_ADD)
+			{
+				arrive = flowover.propagateBowEdge(start, (int)over.getCapacity(1.),forward);
+			}
+			else
+			{
+				throw new RuntimeException("No Propagate Function for edgeType");
+			}
+			if(!arrive.isEmpty()){
+				if(_debug>0){
+					System.out.println("wir kommen weiter: "+ to.getId());
+					for(Intervall inter: arrive){
+						System.out.println(forward);
+						System.out.println(inter);
+					}
+				}
+				//calc latest start time
+				boolean temp = labelto.setTrue( arrive , over);
+//					System.out.println("label from: ");
+//					int tmp = 0;
+//					VertexIntervall curr;
+//					do
+//					{
+//						curr  = labelfrom.getIntervallAt(tmp);
+//						tmp = curr.getHighBound();
+//						System.out.println(curr);
+//					}while(!labelfrom.isLast(curr));
+//					System.out.println();
+//					System.out.println("label to: ");
+//					tmp = 0;
+//					do
+//					{
+//						curr  = labelto.getIntervallAt(tmp);
+//						tmp = curr.getHighBound();
+//						System.out.println(curr);
+//					}while(!labelto.isLast(curr));
+//					System.out.println();
+				if(temp){
+					changed = true;
+				}
+			}else{
+				if(_debug>0){
+					System.out.println("edge: " + over.getId() +" forward:"+forward+ " blocked " + flowover.toString());
+				}	
+			}
+				
+		}
+	
 		return changed;
 	}
 	
@@ -282,11 +376,13 @@ public class BellmanFordVertexIntervalls {
 	 * main bellman ford algorithm calculating a shortest TimeExpandedPath
 	 * @return shortest TimeExpandedPath from one active source to the sink if it exists
 	 */
-	public TimeExpandedPath doCalculations() {
-		// queue to save nodes we have to scan
-		Queue<Node> queue = new LinkedList<Node>();
+	public Collection<TimeExpandedPath> doCalculations() {
 		//set the startLabels and add active sources to to the queue
 		LinkedList<Node> activesources = this.refreshLabels();
+		// queue to save nodes we have to scan
+		NodeComparator f = new NodeComparator();
+		queue = new PriorityQueue<Node>(activesources.size(), f);
+		
 		if(_warmstart>0 && _warmstartlist!=null){
 			queue.addAll(_warmstartlist);					
 			/* for( Node node : activesources){
@@ -312,36 +408,66 @@ public class BellmanFordVertexIntervalls {
 		this._roundpolls=0;
 		this._calcstart=System.currentTimeMillis();
 		while (!queue.isEmpty()) {
+			//sort!
+			//Collections.sort(queue, new NodeComparator());
+			
 			// gets the first vertex in the queue
-			v = queue.poll();
+			v = queue.remove();
+			if(v.equals(this._sink))
+				break;
+			//System.out.println(_labels.get(v).getFirstUnscannedIntervall() + "");
 			this._roundpolls++;
 			this._totalpolls++;
 			// Clean Up before we do anything!
 			//System.out.println("cleanupnode:"+v.getId().toString()+"\n old: \n"+_labels.get(v).toString());
-			gain += _labels.get(v).cleanup();
 			//System.out.println("new: \n"+_labels.get(v).toString());
 
 			// visit neighbors
+			gain += _labels.get(v).cleanup();
+			
+			//get intervall we have to propagate:
+			VertexIntervall start = _labels.get(v).getFirstUnscannedIntervall();
+			if(start == null)
+			{
+				start = _labels.get(v).getFirstUnscannedIntervall();
+			}
 			
 			// link is outgoing edge of v => forward edge
 			for (Link link : v.getOutLinks().values()) {
 				w=link.getToNode();
-				boolean changed = relabel(v,w,link,true);
-				if (changed && !queue.contains(w)) {
+//				if(v.getId().toString().equals("162491757") && w.getId().toString().equals("162491752"))
+//				{
+//					int foobar = 0;
+//				}
+//				if(v.getId().toString().equals("162491752") && w.getId().toString().equals("21306260"))
+//				{
+//					int foobar = 0;
+//				}
+				
+				boolean changed = relabel(start,v,w,link,true);
+				if (changed) {
+					queue.remove(w);
+					gain += _labels.get(w).cleanup();
 					queue.add(w);
 				}
 			}
 			// link is incoming edge of v => backward edge
 			for (Link link : v.getInLinks().values()) {
 				w=link.getFromNode();
-				boolean changed = relabel(v,w,link,false);
-				if (changed && !queue.contains(w)) {
+				boolean changed = relabel(start,v,w,link,false);
+				if (changed) {
+					queue.remove(w);
+					gain += _labels.get(w).cleanup();
 					queue.add(w);
 				}
 			}
+			start.setScanned(true);
 			if(_debug>3){
 				printStatus();
 			}
+			gain += this._labels.get(v).cleanup();
+			
+			queue.add(v);
 		}
 		this._calcend= System.currentTimeMillis();
 		this._totalcalctime+=(this._calcend-this._calcstart);
@@ -350,9 +476,9 @@ public class BellmanFordVertexIntervalls {
 		}
 		//System.out.println("finale labels: \n");
 		//printStatus();
-		this._timeexpandedpath = null;
+		this._timeexpandedpath = new HashSet<TimeExpandedPath>();
 		try{ 
-			this._timeexpandedpath = constructRoute();
+			this._timeexpandedpath = constructRoutes();
 		}catch (BFException e){
 			System.out.println("stop reason: " + e.getMessage());
 		}
@@ -363,7 +489,6 @@ public class BellmanFordVertexIntervalls {
 			this._totalpreptime+=(this._prepend-this._prepstart);
 		}
 		return this._timeexpandedpath;
-		
 	}
 	
 	
@@ -373,62 +498,7 @@ public class BellmanFordVertexIntervalls {
 	 */
 	private void createwarmstartList() {
 		// use cases of _warmstart to decide what to do
-		if (_warmstart == 1) { // add the found path
-		  _warmstartlist = new LinkedList<Node>();
-		  if (_timeexpandedpath != null)
-		  for (TimeExpandedPath.PathEdge edge : _timeexpandedpath.getPathEdges()) {
-			  _warmstartlist.add(edge.getEdge().getFromNode());
-			  //System.out.println(edge.getEdge().getFromNode().getId());
-		  }
-		} else if (_warmstart == 2) { // rebuild shortest path tree from last interval
-		  _warmstartlist = new LinkedList<Node>();
-		 
-		  _warmstartlist.addAll(_labels.keySet());
-		  
-		  Collections.sort(_warmstartlist, new Comparator<Node>() {
-		          public int compare(Node n1, Node n2) {
-		        	   int v1 = _labels.get(n1).getLast().getLowBound();		        	   
-		        	   int v2 = _labels.get(n2).getLast().getLowBound();
-		        	   if (v1 > v2) {
-		        		  return 1;
-		        	   } else if (v1 == v2) {
-		        		   return 0;
-		        	   } else {
-		        		   return -1;
-		        	   }
-		        	   		               
-		          }
-		     });
-		  
-		  /*for (Node node : _warmstartlist) {
-			  System.out.println(node.getId().toString() + " " + _labels.get(node).getLast().getLowBound());
-		  }*/
-		  
-		} else if (_warmstart == 3) { // rebuild shortest path tree from firstPossibleTime
-			  _warmstartlist = new LinkedList<Node>();
-				 
-			  _warmstartlist.addAll(_labels.keySet());
-			  
-			  Collections.sort(_warmstartlist, new Comparator<Node>() {
-			          public int compare(Node n1, Node n2) {
-			        	   int v1 = _labels.get(n1).firstPossibleTime();		        	   
-			        	   int v2 = _labels.get(n2).firstPossibleTime();
-			        	   if (v1 > v2) {
-			        		  return 1;
-			        	   } else if (v1 == v2) {
-			        		   return 0;
-			        	   } else {
-			        		   return -1;
-			        	   }
-			        	   		               
-			          }
-			     });
-			  
-			  /*for (Node node : _warmstartlist) {
-				  System.out.println(node.getId().toString() + " " + _labels.get(node).getLast().getLowBound());
-			  }*/
-			  
-			}
+	
 		
 	}
 
@@ -439,6 +509,9 @@ public class BellmanFordVertexIntervalls {
 	 *
 	 */
 	private void printStatus() {
+		int i = 3;
+		if(i +1 < 6)
+			return; //TODO
 		StringBuilder print = new StringBuilder();
 		for(Node node : network.getNodes().values()){
 			VertexIntervalls inter =_labels.get(node);

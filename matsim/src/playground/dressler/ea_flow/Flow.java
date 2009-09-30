@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FakeTravelTimeCost.java
+ * Flow.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,9 +23,13 @@ package playground.dressler.ea_flow;
 //java imports
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+//matsim imports
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -40,7 +44,9 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
+//playground imports
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
+import playground.dressler.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
 import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
 /**
  * Class representing a dynamic flow on an network with multiple sources and a single sink 
@@ -61,7 +67,7 @@ public class Flow {
 	/**
 	 * used to calculate the length of every edge in the network
 	 */
-	private final FakeTravelTimeCost _lengths; 
+	private Map<Link, FlowEdgeTraversalCalculator> _lengths = new HashMap<Link, FlowEdgeTraversalCalculator>(); 
 	
 	/**
 	 * Edge representation of flow on the network  
@@ -81,7 +87,7 @@ public class Flow {
 	/**
 	 * stores unsatisfied demands for each source
 	 */
-	private HashMap<Node,Integer> _demands;
+	private Map<Node,Integer> _demands;
 	
 	/**
 	 *stores for all nodes whether they are an non active source 
@@ -110,6 +116,8 @@ public class Flow {
 	@SuppressWarnings("unused")
 	private static int _debug = 0;
 	
+	private final EdgeTypeEnum edgeType;
+	
 ///////////////////////////////////////////////////////////////////////////////////	
 //-----------------------------Constructors--------------------------------------//	
 ///////////////////////////////////////////////////////////////////////////////////
@@ -123,14 +131,17 @@ public class Flow {
 	 * @param sink the sink for all the flow
 	 * @param horizon the time horizon in which flow is allowed
 	 */
-	public Flow(final NetworkLayer network,final FakeTravelTimeCost lengths, HashMap<Node, Integer> demands, final Node sink, final int horizon) {
+	public Flow(final NetworkLayer network, Map<Node, Integer> demands, final Node sink, final int horizon, EdgeTypeEnum edgeTypeToUse) {
 		this._network = network;
-		this._lengths = lengths;
 		this._flow = new HashMap<Link,EdgeIntervalls>();
+		this.edgeType = edgeTypeToUse;
+		
 		// initialize distances
 		for(Link link : network.getLinks().values()){
-			int l = (int) _lengths.getLinkTravelCost(link, 1.);
-			this._flow.put(link, new EdgeIntervalls(l));
+			
+			FlowEdgeTraversalCalculator bTT = GlobalFlowCalculationSettings.getFlowEdgeTraversalCalculator(edgeTypeToUse, link);
+			_lengths.put(link, bTT);
+			this._flow.put(link, new EdgeIntervalls(bTT));
 		}
 		this._TimeExpandedPaths = new LinkedList<TimeExpandedPath>();
 		this._demands = demands;
@@ -143,30 +154,6 @@ public class Flow {
 		
 	}
 	
-	/**
-	 * Constructor for flow which uses an already defined flow 
-	 * @param network network on which the flow will "live"
-	 * @param flow the preset flow on the network
-	 * @param sources the potential sources of the flow
-	 * @param demands demands the demands in the sources as nonnegative integers
-	 * @param sink the sink for all the flow
-	 * @param horizon the time horizon in which flow is allowed
-	 */
-	public Flow(final NetworkLayer network,final FakeTravelTimeCost lengths, HashMap<Link, EdgeIntervalls> flow,
-			HashMap<Node, Integer> demands,final Node sink,final int horizon) {
-		this._network = network;
-		this._lengths = lengths;
-		this._flow = flow;
-		this._TimeExpandedPaths = new LinkedList<TimeExpandedPath>();
-		this._demands = demands;
-		this._sources = new LinkedList<Node>();
-		this._sources.addAll(demands.keySet());
-		this._sink = sink;
-		_timeHorizon = horizon;
-		this._nonactives = this.nonActives();
-		this.totalflow = 0;
-	}
-
 	/**
 	 * for all Nodes it is specified if the node is an non active source
 	 */
@@ -220,214 +207,242 @@ public class Flow {
 			throw new IllegalArgumentException("Startnode is no source " + TimeExpandedPath);
 		}
 		int result = this._demands.get(source);
+		if(result == 0)
+			System.out.println("OMG NO DEMANDS FOR ME :(");
 		//go through the pat edges
+		//System.out.println("augmenting path: ");
 		for(PathEdge edge : TimeExpandedPath.getPathEdges()){
 			Link link = edge.getEdge();
-			int cap =(int) link.getCapacity(1.);
-			int time = edge.getTime();
+			int startTime = edge.getStartTime();
+			int arrivalTime = edge.getArrivalTime();
+			int neededTravelTime = arrivalTime-startTime;
 			//check forward capacity
 			if(edge.isForward()){
-				int flow = this._flow.get(link).getFlowAt(time);
-				int i = cap-flow;
-				if (i<0){
+				int flow = this._flow.get(link).getFlowAt(startTime);
+				if(_lengths.get(link).getTravelTimeForAdditionalFlow(flow) == null)
+				{
+					return 0;
+				}
+				int traveltime = _lengths.get(link).getTravelTimeForAdditionalFlow(flow);
+				if(traveltime != neededTravelTime)
+				{
+					System.out.println("path not feasible anymore");
+					return 0;
+				}
+				int cap = _lengths.get(link).getRemainingForwardCapacityWithThisTravelTime(flow);
+				if (cap<0){
 					throw new IllegalArgumentException("too much flow on " + edge);
 				}
-				if(i<result ){
-					result= i;
+				if(cap<result ){
+					result= cap;
 				}
 			}
 			// backwards capacity
 			else{
-				int flow = this._flow.get(link).getFlowAt(time-(this._flow.get(link).getTravelTime()));
+				if(link.getFromNode().getId().toString().equals("29218296") && startTime == 142)
+				{
+					int debug = 0;
+				}
+				int flow = this._flow.get(link).getFlowAt(startTime);
+				int traveltime = _lengths.get(link).getTravelTimeForFlow(flow);
+				if(traveltime != neededTravelTime)
+				{
+					System.out.println("path not feasible anymore");
+					return 0;
+				}
+				flow = _lengths.get(link).getRemainingBackwardCapacityWithThisTravelTime(flow);
 				if(flow<result){
 					result= flow;
 				}
+			}
+			
+			
+		}
+		//System.out.println(""+ result);
+		return result;
+	}
+	
+	public Set<TimeExpandedPath> augmentPathWithBackwardEdges(TimeExpandedPath pathWithBackwardEdges, int flowToAugment)
+	{
+		List<PathEdge> backwardEdges = new LinkedList<PathEdge>();
+		for(PathEdge pE : pathWithBackwardEdges.getPathEdges())
+		{
+			if(!pE.isForward())
+				backwardEdges.add(pE);
+		}
+		if(backwardEdges.size() > 1)
+		{
+			int foobar = 0;
+			foobar++;
+		}
+		Set<TimeExpandedPath> timeExpandedPathsWithBackwardEdges = new HashSet<TimeExpandedPath>();
+		timeExpandedPathsWithBackwardEdges.add(pathWithBackwardEdges);
+		int counter = 0;
+		while(backwardEdges.size() > 0)
+		{
+			PathEdge pE = backwardEdges.remove(0);
+//			System.out.println(++counter + "th backwaerd edge");
+//			System.out.println("pE: " + pE.toString());
+			//call it with all paths, that contains backward edges.
+			//the method returns an updated set with every path which contains a time expanded path
+			//after the operation.
+			timeExpandedPathsWithBackwardEdges = augmentSingleBackwardEdge(timeExpandedPathsWithBackwardEdges, pE, pathWithBackwardEdges.getFlow());
+		}
+		return timeExpandedPathsWithBackwardEdges;
+	}
+	
+	protected Set<TimeExpandedPath> augmentSingleBackwardEdge(Set<TimeExpandedPath> tEPathsWithBackwardEdges, PathEdge backwardEdgeToReplace, int flowToAugment)
+	{
+		Set<TimeExpandedPath> result = new HashSet<TimeExpandedPath>();
+		//get one backward edge and convert it!
+		Map<TimeExpandedPath, PathEdge> forwardEdges = getForwardPathEdges(backwardEdgeToReplace, flowToAugment);
+		for(TimeExpandedPath pathWithBackwardEdges : tEPathsWithBackwardEdges)
+		{
+			int tmpFlowToAugment = flowToAugment;
+			Set<TimeExpandedPath> forwardPathsToRemove = new HashSet<TimeExpandedPath>();
+			for(TimeExpandedPath tEPath : forwardEdges.keySet())
+			{
+				int foobar = 0;
+//				System.out.println("forward path: ");
+//				tEPath.print();
+//				System.out.println("path with backward edge: ");
+//				pathWithBackwardEdges.print();
+				int flowOnPath = tEPath.getFlow();
+				PathEdge forwardPathEdge = forwardEdges.get(tEPath);
+				//create new paths
+				List<TimeExpandedPath> splittedForwardPath = tEPath.splitPathAtEdge(forwardPathEdge, false);
+				List<TimeExpandedPath> splittedBackwardPath = pathWithBackwardEdges.splitPathAtEdge(backwardEdgeToReplace, true);
+				
+				TimeExpandedPath forwardHead = splittedForwardPath.get(0);
+//				System.out.println("forwardHead: ");
+//				forwardHead.print();
+				TimeExpandedPath forwardTail = splittedForwardPath.get(1);
+//				System.out.println("forwardTail: ");
+//				forwardTail.print();
+				
+				TimeExpandedPath backwardHead = splittedBackwardPath.get(0);
+//				System.out.println("backwardHead: ");
+//				backwardHead.print();
+				TimeExpandedPath backwardTail = splittedBackwardPath.get(1);
+//				System.out.println("backwardTail: ");
+//				backwardTail.print();
+				
+				forwardHead.addTailToPath(backwardTail);
+//				System.out.println("new backward path: ");
+//				forwardHead.print();
+				
+				backwardHead.addTailToPath(forwardTail);
+//				System.out.println("new forward path: ");
+//				backwardHead.print();
+				//adjust values
+				if(flowOnPath <= tmpFlowToAugment)
+				{
+					forwardHead.setFlow(flowOnPath);
+					backwardHead.setFlow(flowOnPath);
+					tmpFlowToAugment -= flowOnPath;
+					//remove orinigal forward path, because it is no flow left on this path.
+					_TimeExpandedPaths.remove(tEPath);
+					forwardPathsToRemove.add(tEPath);
+				}
+				else
+				{
+					//clone original forward Path
+					TimeExpandedPath copyOfForward = TimeExpandedPath.clone(tEPath);
+					copyOfForward.setFlow(flowOnPath-tmpFlowToAugment);
+					_TimeExpandedPaths.add(copyOfForward);
+					forwardHead.setFlow(tmpFlowToAugment);
+					backwardHead.setFlow(tmpFlowToAugment);
+					tmpFlowToAugment = 0;
+				}
+				_TimeExpandedPaths.add(backwardHead);
+				result.add(forwardHead);
+				if(tmpFlowToAugment == 0)
+					break;
+			}
+			for(TimeExpandedPath remove : forwardPathsToRemove)
+			{
+				forwardEdges.remove(remove);
 			}
 		}
 		return result;
 	}
 	
+	protected Map<TimeExpandedPath, PathEdge> getForwardPathEdges(PathEdge backwardPathEdge, int neededFlow)
+	{
+		Map<TimeExpandedPath, PathEdge> result = new HashMap<TimeExpandedPath, PathEdge>();
+		for(TimeExpandedPath tEPath : _TimeExpandedPaths)
+		{
+			LinkedList<PathEdge> list = tEPath.getPathEdges();
+			for(PathEdge pE : tEPath.getPathEdges())
+			{
+				if(pE.equals(backwardPathEdge))
+				{
+					result.put(tEPath, pE);
+					neededFlow -= Math.min(tEPath.getFlow(), neededFlow);						
+					break;
+				}
+			}
+			if(neededFlow == 0)
+				break;
+		}
+		return result;
+	}
 	/**
 	 * Method to add another TimeExpandedPath to the flow. The TimeExpandedPath will be added with flow equal to its bottleneck capacity
 	 * @param TimeExpandedPath the TimeExpandedPath on which the maximal flow possible is augmented 
 	 */
-	public void augment(TimeExpandedPath timeExpandedPath){
-		int gamma = bottleNeckCapacity(timeExpandedPath);
-		this.totalflow += gamma;
-		LinkedList<PathEdge> backwardLinks = new LinkedList<PathEdge>();
-		// find backwardLinks in the new path
-		for(PathEdge edge : timeExpandedPath.getPathEdges()){
-			if(!edge.isForward()){
-				backwardLinks.add(edge);
+	public int augment(TimeExpandedPath timeExpandedPath){
+		boolean backward = false;
+		for(PathEdge pE : timeExpandedPath.getPathEdges())
+		{
+			if(!pE.isForward())
+			{
+				backward = true;
+				break;
 			}
 		}
+		int dummy = 0;
+		int gamma = bottleNeckCapacity(timeExpandedPath);
+		if(gamma == 0)
+			return 0;
+		this.totalflow += gamma;
+		timeExpandedPath.setFlow(gamma);
 		// no backward links
-		if(backwardLinks.isEmpty()){
+		if(!backward){
 			for(PathEdge edge : timeExpandedPath.getPathEdges()){
 				Link link = edge.getEdge();
-				int time = edge.getTime();
+				int startTime = edge.getStartTime();
 				EdgeIntervalls flow = _flow.get(link);
 				if(edge.isForward()){
-					flow.augment(time, gamma, (int)link.getCapacity(1.));
+					flow.augment(startTime, gamma, (int)link.getCapacity(1.));
 				}else{
 					System.out.println("Unexpected error!");
 				}
 			}
-			timeExpandedPath.setFlow(gamma);
 			reduceDemand(timeExpandedPath);
 			this._TimeExpandedPaths.add(timeExpandedPath);
 		}
-		// TODO time des ausgewaehlten edges stimmt noch nicht!
-		// backward links
 		else{
-			for(PathEdge edge : timeExpandedPath.getPathEdges()){
-				Link link = edge.getEdge();
-				int time = edge.getTime();
-				EdgeIntervalls flow = _flow.get(link);
-				if(edge.isForward()){
-					flow.augment(time, gamma, (int)link.getCapacity(1.));
-				}
-				else{
-					flow.augmentreverse(time - (int)(this._lengths.getLinkTravelCost(link, time)), gamma);
-				}
+			//for every backward link 2 different paths will be created and will be added to _timeexpandedpaths
+			Set<TimeExpandedPath> newPaths = augmentPathWithBackwardEdges(timeExpandedPath, gamma);
+			//augment the single path:
+			int flow = timeExpandedPath.getFlow();
+			for(PathEdge pE : timeExpandedPath.getPathEdges())
+			{
+				if(pE.isForward())
+					_flow.get(pE.getEdge()).augment(pE.getStartTime(), flow, (int)pE.getEdge().getCapacity(1.));
+				else 
+					_flow.get(pE.getEdge()).augmentreverse(pE.getStartTime(), flow);
 			}
-			timeExpandedPath.setFlow(gamma);
-			
-			// TODO wait und arrival aendern beim tauschen, splitten etc.
-			Integer forwardPath = Integer.MAX_VALUE;
-			Integer forwardLink = Integer.MAX_VALUE;
-			boolean found = false;
-			// List with paths with backwardLinks
-			LinkedList<TimeExpandedPath> toDo = new LinkedList<TimeExpandedPath>();
-			toDo.add(timeExpandedPath);
-			// for each backward link do
-			for(PathEdge backwardLink : backwardLinks){
-				// go over each path with backwardLinks
-				// rest of gamma, we have to augment
-				int rest = gamma;
-				for(TimeExpandedPath toDoPath : toDo){
-					// index of path with forwardLink in the list of paths
-					forwardPath = Integer.MAX_VALUE;
-					// index of forwardLink in the path with index forwardPath
-					forwardLink = Integer.MAX_VALUE;
-					// boolean value, if found path and link index
-					found = false;
-					// search indices
-					for(int i = 0; i < this._TimeExpandedPaths.size(); i++){
-						if(this._TimeExpandedPaths.get(i).containsForwardLink(backwardLink)){
-							forwardPath = i;
-							forwardLink = this._TimeExpandedPaths.get(i).getIndexOfForwardLink(backwardLink);
-							// construct "new" paths
-							// flow of toDoPath to disentangle equals flow on given path
-							if(toDoPath.getFlow() == this._TimeExpandedPaths.get(forwardPath).getFlow()){
-								// index of backwardLink in the path
-								int index = 0;
-								for(int j = 0; j < toDoPath.getPathEdges().size(); j++){
-									if(toDoPath.getPathEdges().get(j).equals(backwardLink)){
-										index = j;
-									}
-								}
-								// construct "new" paths and add them
-								TimeExpandedPath path = this._TimeExpandedPaths.get(forwardPath);
-								LinkedList<TimeExpandedPath> PathList = new LinkedList<TimeExpandedPath>();
-								PathList.addLast(toDoPath.getSubPath(0, index - 1));
-								PathList.addLast(path.getSubPath(forwardLink + 1, path.length() - 1));
-								this._TimeExpandedPaths.set(forwardPath, constructPath(PathList));
-								this._TimeExpandedPaths.get(forwardPath).setFlow(toDoPath.getFlow());
-								this._TimeExpandedPaths.get(forwardPath).setWait(toDoPath.getWait());
-								this._TimeExpandedPaths.get(forwardPath).setArrival(path.getArrival());
-								PathList.clear();
-								PathList.addLast(path.getSubPath(0, forwardLink - 1));
-								PathList.addLast(toDoPath.getSubPath(index + 1, toDoPath.length() - 1));
-								int toDoIndex = toDo.indexOf(toDoPath);
-								toDo.set(toDoIndex, constructPath(PathList));
-								toDo.get(toDoIndex).setFlow(toDoPath.getFlow());
-								toDo.get(toDoIndex).setWait(path.getWait());
-								toDo.get(toDoIndex).setArrival(toDoPath.getArrival());
-								rest = rest - toDoPath.getFlow();
-							}
-							// flow of toDoPath to disentangle is less than flow on given path
-							else if(toDoPath.getFlow() < this._TimeExpandedPaths.get(0).getFlow()){
-								// split given path in two paths with less flow
-								int diff = this._TimeExpandedPaths.get(0).getFlow() - toDoPath.getFlow();
-								TimeExpandedPath path = this._TimeExpandedPaths.get(forwardPath);
-								path.setFlow(toDoPath.getFlow());
-								this._TimeExpandedPaths.get(forwardPath).setFlow(diff);
-								// index of backwardLink in the path
-								int index = 0;
-								for(int j = 0; j < timeExpandedPath.getPathEdges().size(); j++){
-									if(timeExpandedPath.getPathEdges().get(j).equals(backwardLink)){
-										index = j;
-									}
-								}
-								LinkedList<TimeExpandedPath> PathList = new LinkedList<TimeExpandedPath>();
-								PathList.addLast(toDoPath.getSubPath(0, index - 1));
-								PathList.addLast(path.getSubPath(forwardLink + 1, path.length() - 1));
-								this._TimeExpandedPaths.add(constructPath(PathList));
-								this._TimeExpandedPaths.getLast().setFlow(toDoPath.getFlow());
-								this._TimeExpandedPaths.get(forwardPath).setWait(toDoPath.getWait());
-								this._TimeExpandedPaths.get(forwardPath).setArrival(path.getArrival());
-								PathList.clear();
-								PathList.addLast(path.getSubPath(0, forwardLink - 1));
-								PathList.addLast(toDoPath.getSubPath(index + 1, timeExpandedPath.length() - 1));
-								int toDoIndex = toDo.indexOf(toDoPath);
-								toDo.set(toDoIndex, constructPath(PathList));
-								toDo.get(toDoIndex).setFlow(toDoPath.getFlow());
-								toDo.get(toDoIndex).setWait(path.getWait());
-								toDo.get(toDoIndex).setArrival(toDoPath.getArrival());
-								rest = rest - toDoPath.getFlow();
-							}
-							// flow of toDoPath to disentangle is more than flow on given path
-							else{
-								int flow = this._TimeExpandedPaths.get(forwardPath).getFlow();
-								int diff = toDoPath.getFlow() - flow;
-								// index of backwardLink in the path
-								int index = 0;
-								for(int j = 0; j < timeExpandedPath.getPathEdges().size(); j++){
-									if(timeExpandedPath.getPathEdges().get(j).equals(backwardLink)){
-										index = j;
-									}	
-								}
-								TimeExpandedPath path = this._TimeExpandedPaths.get(forwardPath);
-								LinkedList<TimeExpandedPath> PathList = new LinkedList<TimeExpandedPath>();
-								PathList.addLast(toDoPath.getSubPath(0, index - 1));
-								PathList.addLast(path.getSubPath(forwardLink + 1, path.length() - 1));
-								this._TimeExpandedPaths.set(forwardPath, constructPath(PathList));
-								this._TimeExpandedPaths.get(forwardPath).setFlow(flow);
-								this._TimeExpandedPaths.get(forwardPath).setWait(toDoPath.getWait());
-								this._TimeExpandedPaths.get(forwardPath).setArrival(path.getArrival());
-								PathList.clear();
-								PathList.addLast(path.getSubPath(0, forwardLink - 1));
-								PathList.addLast(toDoPath.getSubPath(index + 1, timeExpandedPath.length() - 1));
-								int toDoIndex = toDo.indexOf(toDoPath);
-								toDo.set(toDoIndex, constructPath(PathList));
-								toDo.get(toDoIndex).setFlow(flow);
-								toDo.get(toDoIndex).setWait(path.getWait());
-								toDo.get(toDoIndex).setArrival(toDoPath.getArrival());
-								// split toDoPath in two paths with less flow
-								toDo.add(toDoPath);
-								toDo.getLast().setFlow(diff);
-								rest = rest - flow;
-							}
-							// if the path is disentangled, break
-							found = false;
-							if(rest == 0){
-								found = true;
-								break;
-							}
-						}
-					}
-					// if we couldn't disentangle the path
-					if(!found){
-						System.out.println("Error, while trying to find path with forward edge.");
-						return;
-					}
-				}
+			for(TimeExpandedPath tEPath : newPaths)
+			{
+				this._TimeExpandedPaths.add(tEPath);
 			}
+						
 			// add rest of the paths and reduce demands
-			this._TimeExpandedPaths.addAll(toDo);
 			reduceDemand(timeExpandedPath);
 		}
+		return gamma;
 	}
 	
 	/**
@@ -453,12 +468,13 @@ public class Flow {
 			for(int i = 0; i < PathList.size(); i++){
 				for(int j = 0; j < PathList.get(i).length(); j++){
 					Link edge = PathList.get(i).getPathEdges().get(j).getEdge();
-					int time = PathList.get(i).getPathEdges().get(j).getTime();
+					int startTime = PathList.get(i).getPathEdges().get(j).getStartTime();
+					int arrivalTime = PathList.get(i).getPathEdges().get(j).getArrivalTime();
 					boolean forward = PathList.get(i).getPathEdges().get(j).isForward();
 					if(first){
 						node = edge.getFromNode();
 						if(this.isActiveSource(node)){
-							result.append(edge, time, forward);
+							result.append(edge, startTime, arrivalTime, forward);
 							node = edge.getToNode();
 							first = false;
 						}
@@ -469,11 +485,11 @@ public class Flow {
 					}
 					else if(node.equals(edge.getFromNode())){
 						node = edge.getToNode();
-						result.append(edge, time, forward);
+						result.append(edge, startTime, arrivalTime, forward);
 					}
 					else if(node.equals(edge.getToNode())){
 						node = edge.getFromNode();
-						result.append(edge, time, forward);
+						result.append(edge, startTime, arrivalTime, forward);
 					}
 					else{
 						System.out.println("Path isn't connected.");
@@ -801,7 +817,7 @@ public class Flow {
 	/**
 	 * @return the _demands
 	 */
-	public HashMap<Node, Integer> getDemands() {
+	public Map<Node, Integer> getDemands() {
 		return this._demands;
 	}
 
@@ -876,5 +892,24 @@ public class Flow {
 	public static void debug(int debug){
 		Flow._debug=debug;
 	}
+	
+	public int getStartTime()
+	{
+		return 0;
+	}
+	
+	public int getEndTime()
+	{
+		return this.arrivals().length-1;
+	}
+	
+	public int getMaxTravelTimeForLink(Link l)
+	{
+		return _lengths.get(l).getMaximalTravelTime();
+	}
 
+	public EdgeTypeEnum getEdgeType()
+	{
+		return this.edgeType;
+	}
 }

@@ -18,18 +18,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-
-/**
- *
- */
 package playground.dressler.ea_flow;
 
-
+//java imports
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
+// matsim imports
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -42,6 +39,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
+//playground imports
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
 
@@ -133,7 +131,7 @@ public class MultiSourceEAF {
 		EdgeIntervalls.debug(false);
 		//EdgeIntervall.debug(false);
 		Flow.debug(0);
-		BellmanFordVertexIntervalls.warmstart(3);
+		//BellmanFordVertexIntervalls.warmstart(3);
 		System.out.println("Warmstart: 3");
 
 		if(_debug){
@@ -151,8 +149,8 @@ public class MultiSourceEAF {
 		//***---------MANU------**//
 		//networkfile = "/Users/manuel/testdata/siouxfalls_network_5s_euclid.xml";
 		//networkfile = "/Users/manuel/testdata/simple/line_net.xml";
-		networkfile = "/Users/manuel/testdata/simple/elfen_net.xml";
-		//networkfile = "/Users/manuel/testdata/padangcomplete/network/padang_net_evac_v20080618_100p_1s_EAF.xml";
+		//networkfile = "/Users/manuel/testdata/simple/elfen_net.xml";
+		networkfile = "/Users/manuel/testdata/padangcomplete/network/padang_net_evac_v20080618_100p_1s_EAF.xml";
 		
 		String plansfile = null;		
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_10p.xml.gz";
@@ -161,7 +159,7 @@ public class MultiSourceEAF {
 		//plansfile = "/homes/combi/Projects/ADVEST/padang/plans/padang_plans_v20080618_reduced_10p.xml.gz";
 		//plansfile = "/Users/manuel/testdata/simple/elfen_1_plan.xml";
 		//plansfile = "/Users/manuel/testdata/padangcomplete/plans/padang_plans_10p.xml";
-
+		
 
 		String demandsfile = null;
 		//demandsfile = "/Users/manuel/Documents/meine_EA/manu/manu2.dem";
@@ -177,7 +175,7 @@ public class MultiSourceEAF {
 		//outputplansfile = "/homes/combi/schneide/fricke/testplans.xml";
 		outputplansfile = "/Users/manuel/tester/ws3_testoutput.xml";
 		
-		int uniformDemands = 50;
+		int uniformDemands = 5;
 
 		//set parameters
 		int timeHorizon = 200000;
@@ -237,7 +235,8 @@ public class MultiSourceEAF {
 		if(!demands.isEmpty() && (sink != null)) {
 			TimeExpandedPath result = null;
 			FakeTravelTimeCost travelcost = new FakeTravelTimeCost();
-			Flow fluss = new Flow( network, travelcost, demands, sink, timeHorizon );
+			Flow fluss = new Flow(network, demands, sink, totaldemands, null);
+			//Flow fluss = new Flow( network, travelcost, demands, sink, timeHorizon );
 
 			if(_debug){
 				System.out.println("starting calculations");
@@ -250,46 +249,46 @@ public class MultiSourceEAF {
 			long timeStart = System.currentTimeMillis();
 
 			//main loop for calculations
-			if(vertexAlgo){
-				BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
-				//BellmanFordIntervallBased routingAlgo = new BellmanFordIntervallBased(fluss);
-				int i;
-				int gain = 0;
-				for (i=0; i<rounds; i++){
-					timer1 = System.currentTimeMillis();
-					result = routingAlgo.doCalculations();
-					timer2 = System.currentTimeMillis();
-					timeMBF += timer2 - timer1;
-					if (result==null){
-						break;
-					}
-					if(_debug){
-						tempstr = "found path " + result;
-						//System.out.println("found path: " +  result);
-					}
-					fluss.augment(result);
-					timer3 = System.currentTimeMillis();
-					gain += fluss.cleanUp();
-
-					timeAugment += timer3 - timer2;
-					if (_debug) {
-						if (i % 100 == 0) {
-							System.out.println("Iteration " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
-							//System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
-							//System.out.println("last " + tempstr);
-							System.out.println(routingAlgo.measure());
-							System.out.println("");
-						}
-					}
-				}
-				if (_debug) {
-					long timeStop = System.currentTimeMillis();
-					System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");				  
-					System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
-					System.out.println("last " + tempstr);
-				}
-				System.out.println("Removed " + routingAlgo.gain + " intervals.");
-				System.out.println("removed on the fly:" + VertexIntervalls.rem);
+		if(vertexAlgo){
+//				//BellmanFordVertexIntervalls routingAlgo = new BellmanFordVertexIntervalls(fluss);
+//				BellmanFordIntervallBased routingAlgo = new BellmanFordVertexIntervalls(fluss);
+//				int i;
+//				int gain = 0;
+//				for (i=0; i<rounds; i++){
+//					timer1 = System.currentTimeMillis();
+//					result = routingAlgo.doCalculations();
+//					timer2 = System.currentTimeMillis();
+//					timeMBF += timer2 - timer1;
+//					if (result==null){
+//						break;
+//					}
+//					if(_debug){
+//						tempstr = "found path " + result;
+//						//System.out.println("found path: " +  result);
+//					}
+//					fluss.augment(result);
+//					timer3 = System.currentTimeMillis();
+//					gain += fluss.cleanUp();
+//
+//					timeAugment += timer3 - timer2;
+//					if (_debug) {
+//						if (i % 100 == 0) {
+//							System.out.println("Iteration " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
+//							//System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
+//							//System.out.println("last " + tempstr);
+//							System.out.println(routingAlgo.measure());
+//							System.out.println("");
+//						}
+//					}
+//				}
+//				if (_debug) {
+//					long timeStop = System.currentTimeMillis();
+//					System.out.println("Iterations: " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: Total: " + (timeStop - timeStart) / 1000 + ", MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");				  
+//					System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
+//					System.out.println("last " + tempstr);
+//				}
+//				System.out.println("Removed " + routingAlgo.gain + " intervals.");
+//				System.out.println("removed on the fly:" + VertexIntervalls.rem);
 			}
 			else{ // dont use the other algo
 				/* FakeTravelTimeCost length = new FakeTravelTimeCost();
