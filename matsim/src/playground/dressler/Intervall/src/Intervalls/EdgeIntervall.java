@@ -20,9 +20,6 @@
 
 
 package playground.dressler.Intervall.src.Intervalls;
-//import java.util.Collection;
-
-
 
 
 /**
@@ -214,6 +211,19 @@ public class EdgeIntervall extends Intervall
 	 */
 	public boolean sameIntervall(EdgeIntervall other){
 		return super.equals(other);
+	}
+	
+	public EdgeIntervall shiftPositive(int tau){
+		int l,r;
+		Intervall tmp = super.shiftPositive(tau);
+		if(tmp == null)
+			return null;
+		return new EdgeIntervall(tmp, this.getFlow());
+	}
+	
+	public String toString()
+	{
+		return "[" + this.getLowBound() + "," + this.getHighBound() + "): f: " + this.getFlow(); 
 	}
 	
 //	-----------------------------MAIN METHOD-------------------------//	

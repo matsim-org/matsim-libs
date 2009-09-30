@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EdgeIntervalls.java
+ * VertexIntervalls.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,13 +23,13 @@
  */
 package playground.dressler.Intervall.src.Intervalls;
 
-
+//java imports
 import java.util.ArrayList;
-import java.util.LinkedList;
 
+//mastim imports
 import org.matsim.api.core.v01.network.Link;
 
-//import playground.dressler.ea_flow.BellmanFordIntervallBased.IntervallNode;
+//import playground.rost.eaflow.ea_flow.BellmanFordIntervallBased.IntervallNode;
 
 /**
  * class representing the flow of an edge in a Time Expanded Network
@@ -102,7 +102,6 @@ public class VertexIntervalls {
 					j = i.splitAt(t);
 				}
 			}
-		
 		if (found){
 			_tree.insert(j);
 			return j;
@@ -173,10 +172,10 @@ public class VertexIntervalls {
 		for(_tree.reset();!_tree.isAtEnd();_tree.increment()){
 			VertexIntervall i= (VertexIntervall) _tree._curr.obj;
 			if(i.getPredecessor() != null){
-				str.append(l+i.getLowBound()+";"+i.getHighBound()+r+" d:"+i.getDist()+" pred:"+i.getPredecessor().getId().toString() +"\n");
+				str.append(l+i.getLowBound()+";"+i.getHighBound()+r+" d:"+i.getReachable()+ " scanned: " + i.isScanned() + " pred:"+i.getPredecessor().getId().toString() +"\n");
 			}else{
 				
-				str.append(l+i.getLowBound()+";"+i.getHighBound()+r+" d:"+i.getDist()+" pred: null"+"\n");
+				str.append(l+i.getLowBound()+";"+i.getHighBound()+r+" d:"+i.getReachable()+ " scanned: " + i.isScanned() + " pred: null"+"\n");
 			}
 		}
 			
@@ -246,17 +245,17 @@ public class VertexIntervalls {
 	 *  the node is reachable from the source
 	 * @return specified Intervall or null if none exist
 	 */
-	private VertexIntervall getFirstPossible(){
+	public VertexIntervall getFirstPossible(){
 		VertexIntervall result = this.getIntervallAt(0);
 		while(!this.isLast(result)){
-			if (result.getDist()){
+			if (result.getReachable()){
 				return result;
 			}else{
 				result=this.getNext(result);
 				//TODO more effcient
 			}
 		}
-		if (result.getDist()){
+		if (result.getReachable()){
 			return result;
 		}	
 		return null;
@@ -282,41 +281,37 @@ public class VertexIntervalls {
 	 * @param arrive Intervalls at which node is reachable
 	 * @return true iff anything was changed
 	 */
-	public boolean setTrue(ArrayList<Intervall> arrive,Link link) {
+	public boolean setTrue(ArrayList<VertexIntervall> arrive,Link link) {
 		boolean changed = false;
-		ArrayList<Intervall> arrivecondensed = new ArrayList<Intervall>();
+		ArrayList<VertexIntervall> arrivecondensed = new ArrayList<VertexIntervall>();
 		if(!arrive.isEmpty()){
-			Intervall last= arrive.get(0);
-			for(int j=1; j< arrive.size(); j++){
-				Intervall present = arrive.get(j);
-				if(last.getHighBound()==present.getLowBound() ){
-					last.setHighBound(present.getHighBound());
-					//System.out.println("blub---------------------------------------------");
-				}else{
-					arrivecondensed.add(last);
-					last=present;
-				}
-			}	
-			arrivecondensed.add(last);	
-			if(arrivecondensed.size()!=arrive.size()){
-				//System.out.println("new: "+arrivecondensed.size()+" old: "+arrive.size());
-			}
+			//TODO ROST review whether "condensing" the intervall is usefull (the intervalls are not ordered
+			//when using bow edges)
+			
+//			VertexIntervall last= arrive.get(0);
+//			for(int j=1; j< arrive.size(); j++){
+//				VertexIntervall present = arrive.get(j);
+//				if(last.getHighBound()==present.getLowBound() ){
+//					last.setHighBound(present.getHighBound());
+//					//System.out.println("blub---------------------------------------------");
+//				}else{
+//					arrivecondensed.add(last);
+//					last=present;
+//				}
+//			}	
+//			arrivecondensed.add(last);	
+//			if(arrivecondensed.size()!=arrive.size()){
+//				//System.out.println("new: "+arrivecondensed.size()+" old: "+arrive.size());
+//			}
 			//arrivecondensed=arrive;
 			rem+=arrive.size()-arrivecondensed.size();
 			
-			for(int i=0; i< arrivecondensed.size(); i++){
-				boolean temp= !setTrue(arrivecondensed.get(i),link).isEmpty();
+			for(int i=0; i< arrive.size(); i++){
+				boolean temp= setTrue(arrive.get(i),link);
 				if(temp){
 					changed=true;
 				}
 			}
-			/*for(int i=0; i< arrive.size(); i++){
-				boolean temp=setTrue(arrive.get(i),link);
-				if(temp){
-					changed=true;
-				}
-			}*/
-			
 		}
 		return changed;
 	}
@@ -327,74 +322,93 @@ public class VertexIntervalls {
 	 * @param arrive Intervall at which node is reachable
 	 * @return true iff anything was changed
 	 */
-	public LinkedList<VertexIntervall> setTrue(Intervall arrive,Link link){
+	public boolean setTrue(VertexIntervall arrive,Link link){
 		boolean changed = false;
-		LinkedList<VertexIntervall> change = new LinkedList<VertexIntervall>();
-		VertexIntervall test = this.getIntervallAt(arrive.getLowBound());
-		int t= test.getHighBound();
-		while(test.getLowBound()<arrive.getHighBound()){
-			t=test.getHighBound();
-			if(!test.getDist()){
-				// just relabel since it is contained
-				if(arrive.contains(test)){
-					test.setDist(true);
-					test.setPredecessor(link);
-					changed=true;
-					change.add(test);
-					if(VertexIntervalls._debug){
-						System.out.println("blub1");
-					}	
-				}else{
-					//upper part of test must be relabeld
-					if(test.getLowBound()<arrive.getLowBound()&& test.getHighBound()<=arrive.getHighBound()){
-						VertexIntervall temp= this.splitAt(arrive.getLowBound());
-						temp.setDist(true);
-						temp.setPredecessor(link);
-						changed=true;
-						change.add(temp);
-						if(VertexIntervalls._debug){
-							System.out.println("blub2");
+		VertexIntervall ourIntervall = this.getIntervallAt(arrive.getLowBound());
+		int t= ourIntervall.getHighBound();
+		while(ourIntervall.getLowBound() < arrive.getHighBound()){
+			//either ourIntervall was never reachable before and is not scanned
+			//or ourIntervall is overridable but arrive is not overridable
+			//reason for the last condition: we do not want to replace an overridable intervall with another one (never ever!)
+			if((!ourIntervall.getReachable() && !ourIntervall.isScanned()) || (ourIntervall.isOverridable() && !arrive.isOverridable()))
+			{
+				//test if the intervalls intersect at all (using the condition in while head above)
+				if(arrive.getLowBound() >= ourIntervall.getLowBound()
+						||
+						arrive.getHighBound() > ourIntervall.getLowBound())
+				{
+					//if arrive contains ourIntervall, we relabel it completely
+					if(arrive.contains(ourIntervall))
+					{
+						setArrivalAttributes(ourIntervall, arrive, link);
+						changed = true;
+					}
+					else if(ourIntervall.contains(arrive))
+					{
+						//if arrive is contained..
+						
+						//we adapt our intervall, so that our lowbound equals
+						//the low bound of the arrive intervall..
+						if(ourIntervall.getLowBound() < arrive.getLowBound())
+						{
+							ourIntervall = this.splitAt(arrive.getLowBound());
 						}
-					}else{
-						//lower part of test must be relabeld
-						if(test.getLowBound()>=arrive.getLowBound()&& test.getHighBound()>arrive.getHighBound()){
-							int temptime=test.getLowBound();
+						//or we set our highbound to the highbound of arrival
+						if(ourIntervall.getHighBound() > arrive.getHighBound())
+						{
 							this.splitAt(arrive.getHighBound());
-							VertexIntervall temp= this.getIntervallAt(temptime);
-							temp.setDist(true);
-							temp.setPredecessor(link);
-							changed=true;
-							change.add(temp);
-							if(VertexIntervalls._debug){
-								System.out.println("blub3");
-							}
-							
-						}else{
-							//middle of tet must be relabeld
-							if(test.contains(arrive)){
-								int temptime = arrive.getLowBound();
-								this.splitAt(arrive.getLowBound());
-								this.splitAt(arrive.getHighBound());
-								VertexIntervall temp= this.getIntervallAt(temptime);
-								temp.setDist(true);
-								temp.setPredecessor(link);
-								changed=true;
-								change.add(temp);
-								if(VertexIntervalls._debug){
-									System.out.println("blub4");
-								}
-							}
+							ourIntervall = this.getIntervallAt(arrive.getHighBound()-1);
 						}
+						//ourintervall has exactly the same bounds as arrive
+						//so relabel it completely
+						setArrivalAttributes(ourIntervall, arrive, link);
+						changed = true;
+					}
+					else
+					{
+						//ourIntervall intersects arrive, but is neither contained nor does it contain
+						//arrive. thus they overlap somewhere
+
+						//if the lowerBound of arrive, is greater than our lower bound
+						//we set our lower bound to the bound of arrive
+						if(arrive.getLowBound() > ourIntervall.getLowBound() && arrive.getLowBound() < ourIntervall.getHighBound())
+						{
+							ourIntervall = this.splitAt(arrive.getLowBound());
+						}
+						//we adapt our highbound, so that they are the same
+						if(arrive.getHighBound() < ourIntervall.getHighBound())
+						{
+							this.splitAt(arrive.getHighBound());
+							ourIntervall = this.getIntervallAt(arrive.getHighBound()-1);
+						}
+						//we set the attributes
+						setArrivalAttributes(ourIntervall, arrive, link);
+						changed = true;
 					}
 				}
 			}
+			t = ourIntervall.getHighBound();
 			//pick next Intervall
 			if(Integer.MAX_VALUE==t){
 				break;
 			}
-			test= this.getIntervallAt(t);
+			ourIntervall= this.getIntervallAt(t);
 		}	
-		return change;
+		return changed;
+	}
+	
+	protected void setArrivalAttributes(VertexIntervall ourIntervall, VertexIntervall arrive, Link link)
+	{
+		//we might have already scanned this intervall
+		if(!ourIntervall.isOverridable())
+		{	
+			ourIntervall.setScanned(false);
+		}
+		ourIntervall.setReachable(true);
+		ourIntervall.setOverridable(false);
+		ourIntervall.setPredecessor(link);
+		ourIntervall.setLastDepartureAtFromNode(arrive.getLastDepartureAtFromNode());
+		ourIntervall.setTravelTimeToPredecessor(arrive.getTravelTimeToPredecessor());
 	}
 	
 
@@ -433,19 +447,28 @@ public class VertexIntervalls {
 		i = getIntervallAt(0);
 		while (i != null) {
 		  if (i.getHighBound() == timestop) break;	
-		  j = getNext(i);
-		  
-		  if ((i.getHighBound() == j.getLowBound()) && (i.getDist() == j.getDist()) &&
-				  (i.getPredecessor() == j.getPredecessor())) {
-			  
-			  VertexIntervall ni = new VertexIntervall(i.getLowBound(),j.getHighBound(),i.getDist(), i.getPredecessor());
+		  j = this.getIntervallAt(i.getHighBound());
+		  if(i.getHighBound() != j.getLowBound())
+			  throw new RuntimeException("error in cleanup!");
+		  if ((i.getHighBound() == j.getLowBound()) && (i.getReachable() == j.getReachable()) &&
+				  (i.getPredecessor() == j.getPredecessor()) && (i.isScanned() == j.isScanned())
+				  && (i.getTravelTimeToPredecessor() == j.getTravelTimeToPredecessor())
+				  && (i.getLastDepartureAtFromNode() == j.getLastDepartureAtFromNode())
+				  && (i.isOverridable() == j.isOverridable())) {
+			 
+			  //TODO ROST dont remove both intervalls, no new insert needed MORE EFFICIENT!
 			  _tree.remove(i);
 			  _tree.remove(j);
-			  _tree.insert(ni);
-			  i = ni;
+			  VertexIntervall vI = new VertexIntervall(i.getLowBound(), j.getHighBound());
+			  vI.setReachable(i.getReachable());
+			  vI.setScanned(i.isScanned());
+			  vI.setTravelTimeToPredecessor(i.getTravelTimeToPredecessor());
+			  vI.setPredecessor(i.getPredecessor());
+			  vI.setLastDepartureAtFromNode(i.getLastDepartureAtFromNode());
+			  vI.setOverridable(i.isOverridable());
+			  _tree.insert(vI);
+			  i = vI;
 			  gain++;
-
-
 		  } else {
 			  i = j;
 		  }		 		 
@@ -453,6 +476,28 @@ public class VertexIntervalls {
 		_last = (VertexIntervall) _tree._getLast().obj;
 		
 		return gain;
+	}
+	
+	public VertexIntervall getFirstUnscannedIntervall()
+	{
+		int lowBound = 0;
+		while(lowBound < Integer.MAX_VALUE)
+		{
+			VertexIntervall vI = this.getIntervallAt(lowBound);
+			if(vI.getReachable() &&  !vI.isScanned())
+				return vI;
+			lowBound = vI.getHighBound();
+		}
+		return null;
+	}
+	
+	public Integer getFirstTimePointWithDistTrue()
+	{
+		VertexIntervall vIntervall = this.getFirstUnscannedIntervall();
+		if(vIntervall == null)
+			return null;
+		else
+			return vIntervall.getLowBound();
 	}
 	
 	

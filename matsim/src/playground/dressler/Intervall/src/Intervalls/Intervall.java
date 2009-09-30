@@ -21,10 +21,10 @@
 
 package playground.dressler.Intervall.src.Intervalls;
 
-//import java.util.Collection;
+
 
 /**
- * class representing intervalls in the reals boundary pionts are integral 
+ * class representing intervals in the reals boundary points are integral 
  * @author Manuel Schneider
  *
  */
@@ -355,6 +355,8 @@ implements Comparable<Intervall>
 	 */
 	public Intervall Intersection(Intervall other){
 		if (other!=null){
+			if(other.getHighBound() == 8 && other.getLowBound() == 5)
+				System.out.println("jasfcbsofbv");
 			if(this.intersects(other)){
 				int l = Math.max(this._l, other._l);
 				int r = Math.min(this._r, other._r);
@@ -540,7 +542,6 @@ implements Comparable<Intervall>
 		if(legalBounds(l,r)){
 			return new Intervall(l,r);
 		}else return null;
-		
 	}
 
 //-------------------------MAIN METHOD------------------------------------------//

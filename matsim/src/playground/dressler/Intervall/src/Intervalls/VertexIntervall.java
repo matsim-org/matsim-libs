@@ -20,6 +20,8 @@
 
 
 package playground.dressler.Intervall.src.Intervalls;
+
+//matsim imports
 import org.matsim.api.core.v01.network.Link;
 
 
@@ -27,16 +29,19 @@ import org.matsim.api.core.v01.network.Link;
  * @author Manuel Schneider
  * class representing a node in an time expanded network
  * between two integer Points of time
- * carries a prdecessor node and a min distance for shortest path computation
+ * carries a predecessor node and a minimal distance for shortest path computation
  */
 public class VertexIntervall extends Intervall {
 
 //---------------------------FIELDS----------------------------//	
 	
 	/**
-	 * shows weateher the vertex is reacheable during the time intervall
+	 * shows whether the vertex is reacheable during the time intervall
 	 */
-	private boolean _dist = false;
+	private boolean reachable = false;
+	
+	private boolean scanned = false;
+
 
 	/**
 	 * predecessor in a shortest path
@@ -44,12 +49,30 @@ public class VertexIntervall extends Intervall {
 	//TODO predecessor
 	private Link _predecessor=null;
 	
+	private int travelTimeToPredecessor;
+	
+	//VERY IMPORTANT DEFAULT SETTING.
+	//the variable may not be used..
+	private int lastDepartureAtFromNode = Integer.MAX_VALUE;
+	
+	//VERY IMPORTANT DEFAULT SETTING.
+	//the variable may not be used..
+	private boolean overridable = false;
+	
 
 //---------------------------METHODS----------------------------//
 //**************************************************************//
 	
 
-//--------------------------CONSTUCTORS-------------------------//
+	public int getTravelTimeToPredecessor() {
+		return travelTimeToPredecessor;
+	}
+
+	public void setTravelTimeToPredecessor(int travelTimeToPredecessor) {
+		this.travelTimeToPredecessor = travelTimeToPredecessor;
+	}
+
+	//--------------------------CONSTUCTORS-------------------------//
 	/**
 	 * Default costructor creates an (0,1) Intervall 
 	 * with Integer.MAX_VALUE as initial distance to the sink
@@ -79,7 +102,7 @@ public class VertexIntervall extends Intervall {
 	 */
 	public VertexIntervall(int l, int r, boolean d) {
 		super(l, r);
-		this.setDist(d);
+		this.setReachable(d);
 	}
 	
 	/**
@@ -93,9 +116,19 @@ public class VertexIntervall extends Intervall {
 	 */
 	public VertexIntervall(int l, int r, boolean d, Link pred) {
 		super(l, r);
-		this.setDist(d);
+		this.setReachable(d);
 		this.setPredecessor(pred);
-		
+	}
+	
+	public VertexIntervall(int l, int r, VertexIntervall other)
+	{
+		super(l,r);
+		this.setLastDepartureAtFromNode(other.lastDepartureAtFromNode);
+		this.setPredecessor(other._predecessor);
+		this.setReachable(other.reachable);
+		this.setScanned(other.isScanned());
+		this.setOverridable(other.overridable);
+		this.setTravelTimeToPredecessor(other.travelTimeToPredecessor);
 	}
 
 	/**
@@ -113,16 +146,16 @@ public class VertexIntervall extends Intervall {
 	 * Setter for the min distance to the sink at time lowbound
 	 * @param d min distance to sink
 	 */
-	public void setDist(boolean d){
-		this._dist=d;
+	public void setReachable(boolean d){
+		this.reachable=d;
 	}
 	
 	/**
 	 * Getter for the min distance to the sink at time lowbound
 	 * @return min distance to sink
 	 */
-	public boolean getDist(){
-		return this._dist;
+	public boolean getReachable(){
+		return this.reachable;
 	}
 	
 	
@@ -156,14 +189,49 @@ public class VertexIntervall extends Intervall {
 	 *@return new Interval 
 	 */
 	public VertexIntervall splitAt(int t){
-		boolean newdist = this.getDist();
+		boolean newdist = this.getReachable();
 		Intervall j =super.splitAt(t);
 		VertexIntervall k = new VertexIntervall(j);
-		k._dist =newdist;
+		k.reachable = newdist;
+		k.scanned = this.isScanned();
 		k._predecessor= this._predecessor;
+		k.travelTimeToPredecessor = this.travelTimeToPredecessor;
+		k.lastDepartureAtFromNode = this.lastDepartureAtFromNode;
+		k.overridable = this.overridable;
 		return k;
 	}
+	
+	public String toString()
+	{
+		if(this._predecessor != null)
+			return super.toString() + "; reachable: " + this.reachable + "; scanned: " + this.scanned + "; pred: " + this._predecessor.getId().toString() + "; travelTime: " + this.travelTimeToPredecessor;
+		else
+			return super.toString() + "; reachable: " + this.reachable + "; scanned: " + this.scanned;
+	}
+	
+	public boolean isScanned() {
+		return scanned;
+	}
 
+	public void setScanned(boolean scanned) {
+		this.scanned = scanned;
+	}
+
+	public int getLastDepartureAtFromNode() {
+		return lastDepartureAtFromNode;
+	}
+
+	public void setLastDepartureAtFromNode(int lastArrivalAtThisNode) {
+		this.lastDepartureAtFromNode = lastArrivalAtThisNode;
+	}
+
+	public boolean isOverridable() {
+		return overridable;
+	}
+
+	public void setOverridable(boolean overridable) {
+		this.overridable = overridable;
+	}
 	
 //----------------------------MAIN METHOD--------------------------//
 	

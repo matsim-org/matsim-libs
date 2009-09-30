@@ -282,6 +282,7 @@ abstract class BinTree
      */
     public void increment ( )
     {
+    	Intervall old = this._curr.obj;
 	if ( isAtEnd() )                             // stay in place if at end
 	    return ;
 
@@ -322,7 +323,12 @@ abstract class BinTree
 	    }  // switch ( origin )
 
 	} while ( origin != LEFT ) ;
-
+	Intervall newOne = this._curr.obj;
+	if(old != null && newOne != null && old.getHighBound() != newOne.getLowBound())
+	{
+		throw new RuntimeException("foobar!");
+	}
+	
     }  // increment()
 
 
