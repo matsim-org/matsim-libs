@@ -88,17 +88,23 @@ public class SignalSystemsWriter11 extends MatsimJaxbXmlWriter {
 			XMLSignalSystemDefinitionType xmllssd = fac.createXMLSignalSystemDefinitionType();
 			xmllssd.setId(lssd.getId().toString());
 			
-			XMLMatsimTimeAttributeType xmlcirculationtime = fac.createXMLMatsimTimeAttributeType();
-			xmlcirculationtime.setSeconds(lssd.getDefaultCycleTime());
-			xmllssd.setDefaultCycleTime(xmlcirculationtime);
-			
-			XMLMatsimTimeAttributeType xmlsyncoffset = fac.createXMLMatsimTimeAttributeType();
-			xmlsyncoffset.setSeconds(lssd.getDefaultSynchronizationOffset());
-			xmllssd.setDefaultSynchronizationOffset(xmlsyncoffset);
-			
-			XMLMatsimTimeAttributeType xmlinterimtime= fac.createXMLMatsimTimeAttributeType();
-			xmlinterimtime.setSeconds(lssd.getDefaultInterGreenTime());
-			xmllssd.setDefaultInterGreenTime(xmlinterimtime);
+			if (lssd.getDefaultCycleTime() != null) {
+				XMLMatsimTimeAttributeType xmlcirculationtime = fac.createXMLMatsimTimeAttributeType();
+				xmlcirculationtime.setSeconds(lssd.getDefaultCycleTime());
+				xmllssd.setDefaultCycleTime(xmlcirculationtime);
+			}
+
+			if (lssd.getDefaultSynchronizationOffset() != null) {
+				XMLMatsimTimeAttributeType xmlsyncoffset = fac.createXMLMatsimTimeAttributeType();
+				xmlsyncoffset.setSeconds(lssd.getDefaultSynchronizationOffset());
+				xmllssd.setDefaultSynchronizationOffset(xmlsyncoffset);
+			}
+
+			if (lssd.getDefaultInterGreenTime() != null) {
+				XMLMatsimTimeAttributeType xmlinterimtime= fac.createXMLMatsimTimeAttributeType();
+				xmlinterimtime.setSeconds(lssd.getDefaultInterGreenTime());
+				xmllssd.setDefaultInterGreenTime(xmlinterimtime);
+			}
 			
 			xmllss.getSignalSystemDefinition().add(xmllssd);
 		}
