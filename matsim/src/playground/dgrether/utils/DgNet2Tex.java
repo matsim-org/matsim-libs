@@ -91,19 +91,19 @@ public class DgNet2Tex {
 				l = it.next();
 				writer.write(l.getId().toString());
 				if (it.hasNext()) {
-					writer.write("\\&");
+					writer.write(" \\& ");
 				}
 			}
 			writer.write("\t & \t");
 			writer.write(Double.toString(l.getLength()));
+			writer.write("\t & \t");
+			writer.write(Double.toString(l.getNumberOfLanes(Time.UNDEFINED_TIME)));
 			writer.write("\t & \t");
 			writer.write(Double.toString(l.getFreespeed(Time.UNDEFINED_TIME)));
 			writer.write("\t & \t");
 			writer.write(Double.toString(l.getCapacity(Time.UNDEFINED_TIME)));
 			writer.write("\t & \t");
 			writer.write(Double.toString(l.getLength() * l.getNumberOfLanes(Time.UNDEFINED_TIME) / 7.5));
-			writer.write("\t & \t");
-			writer.write(Double.toString(l.getNumberOfLanes(Time.UNDEFINED_TIME)));
 			writer.write("\t & \t");
 			writer.write(Double.toString(l.getLength() / l.getFreespeed(Time.UNDEFINED_TIME)));
 			writer.write("\t \\\\");
