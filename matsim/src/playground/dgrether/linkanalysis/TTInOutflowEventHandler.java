@@ -29,8 +29,6 @@ import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 
 public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
@@ -61,15 +59,24 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	}
 
 	
-	public Id getLinkId() {
-		return this.linkIdIn;
+	
+	public void handleEvent(BasicLinkEnterEvent event) {
+		Id id = new IdImpl(event.getLinkId().toString());
+		if (linkIdIn.equals(id)) {
+			Integer in = getInflowMap().get(event.getTime());
+			if (in == null) {
+				in = Integer.valueOf(1);
+				getInflowMap().put(event.getTime(), in);
+			}
+			else {
+				in = Integer.valueOf(in.intValue() + 1);
+				getInflowMap().put(event.getTime(), in);
+			}
+			this.enterEvents.put(new IdImpl(event.getPersonId().toString()), event);
+		}
 	}
 	
-	public void handleEvent(LinkEnterEventImpl event) {
-	}
-
-
-	public void handleEvent(LinkLeaveEventImpl event) {
+	public void handleEvent(BasicLinkLeaveEvent event) {
 		Id id = new IdImpl(event.getLinkId().toString());
 		if (linkIdOut.equals(id)) {
 			Integer out = getOutflowMap().get(event.getTime());
@@ -101,48 +108,20 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 		this.getOutflowMap().clear();
 		this.getTravelTimesMap().clear();
 	}
-
+	
+	public Id getLinkId() {
+		return this.linkIdIn;
+	}
 
 	public SortedMap<Double, Integer> getInflowMap() {
 		return inflow;
 	}
 
-
-	
-
 	public SortedMap<Double, Integer> getOutflowMap() {
 		return outflow;
 	}
 
-
-	
-
 	public SortedMap<Double, Double> getTravelTimesMap() {
 		return travelTimes;
 	}
-
-
-	public void handleEvent(BasicLinkEnterEvent event) {
-		Id id = new IdImpl(event.getLinkId().toString());
-		if (linkIdIn.equals(id)) {
-			Integer in = getInflowMap().get(event.getTime());
-			if (in == null) {
-				in = Integer.valueOf(1);
-			  getInflowMap().put(event.getTime(), in);
-			}
-			else {
-				in = Integer.valueOf(in.intValue() + 1);
-			  getInflowMap().put(event.getTime(), in);
-			}
-			this.enterEvents.put(new IdImpl(event.getPersonId().toString()), event);
-		}
-	}
-
-
-	public void handleEvent(BasicLinkLeaveEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
 }
