@@ -302,6 +302,7 @@ public class Controler {
 	public void run() {
 		if (this.state == ControlerState.Init) {
 			init();
+			this.controlerListenerManager.fireControlerStartupEvent();
 			doIterations();
 			shutdown(false);
 		} else {
@@ -318,15 +319,6 @@ public class Controler {
 		setUp();
 		loadCoreListeners();
 		loadControlerListeners();
-		this.controlerListenerManager.fireControlerStartupEvent();
-
-		// make sure all routes are calculated.
-		ParallelPersonAlgorithmRunner.run(this.getPopulation(), this.config.global().getNumberOfThreads(),
-				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(getRoutingAlgorithm(), getNetwork());
-			}
-		});
 	}
 
 	/**
@@ -354,6 +346,14 @@ public class Controler {
 	}
 
 	private void doIterations() {
+		// make sure all routes are calculated.
+		ParallelPersonAlgorithmRunner.run(this.getPopulation(), this.config.global().getNumberOfThreads(),
+				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+			public AbstractPersonAlgorithm getPersonAlgorithm() {
+				return new PersonPrepareForSim(getRoutingAlgorithm(), getNetwork());
+			}
+		});
+		
 		int firstIteration = this.config.controler().getFirstIteration();
 		int lastIteration = this.config.controler().getLastIteration();
 		this.state = ControlerState.Running;
@@ -400,7 +400,6 @@ public class Controler {
 				log.info("S H U T D O W N   ---   start regular shutdown.");
 			}
 			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
-
 			// dump plans
 			new PopulationWriter(this.population, (this.getScenarioData()).getKnowledges(), this
 					.getNameForOutputFilename("output_plans.xml.gz"), this.config.plans().getOutputVersion()).write();
