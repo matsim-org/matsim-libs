@@ -39,6 +39,12 @@ import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.network.NodeImpl;
+import org.matsim.api.core.v01.network.Node;
+import java.util.ArrayList;
+import java.util.List;
+import org.matsim.api.basic.v01.population.BasicPlanElement;
 
 
 
@@ -51,6 +57,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 	private LegTravelTimeEstimator estimator;
 	private TimeModeChoicer1 testee;
 	private ScenarioImpl scenario_input;
+	private PlanImpl plan;
 
 	protected void setUp() throws Exception {
 
@@ -81,6 +88,10 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 				this.router);
 		
 		this.testee = new TimeModeChoicer1 (legTravelTimeEstimatorFactory, new PlanScorer(new JohScoringTestFunctionFactory()), this.router);
+		
+		PlanImpl basePlan = ((PersonImpl)(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)))).getSelectedPlan();
+		this.plan = new PlanImpl (basePlan.getPerson());
+		this.plan.copyPlan(basePlan);
 	}
 	
 	
@@ -90,60 +101,64 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		log.info("Running main test comparing processed plan with expected output plan...");
 		
 		// Import plan of person 1, copy and delete original population
-		PlanImpl basePlan = ((PersonImpl)(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)))).getSelectedPlan();
-		PlanImpl plan = new PlanImpl (basePlan.getPerson());
-		plan.copyPlan(basePlan);
 		this.scenario_input.getPopulation().getPersons().clear();
 		
 		// Process plan
-		this.router.run(plan);
-		this.testee.run(plan);
+		this.router.run(this.plan);
+		this.testee.run(this.plan);
 		
 		// Import expected output plan into population
 		new MatsimPopulationReader(scenario_input).readFile(this.getPackageInputDirectory()+"expected_output_person1.xml");
 				
 		// Compare the two plans; <1 because of double rounding errors
-		for (int i=0;i<plan.getPlanElements().size();i++){
+		for (int i=0;i<this.plan.getPlanElements().size();i++){
 			if (i%2==0){
-				assertEquals(Math.floor(((ActivityImpl)(plan.getPlanElements().get(i))).getStartTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getStartTime()));
-				assertEquals(Math.floor(((ActivityImpl)(plan.getPlanElements().get(i))).getEndTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getEndTime()));
+				assertEquals(Math.floor(((ActivityImpl)(this.plan.getPlanElements().get(i))).getStartTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getStartTime()));
+				assertEquals(Math.floor(((ActivityImpl)(this.plan.getPlanElements().get(i))).getEndTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getEndTime()));
 			}
 			else {
-				assertEquals(Math.floor(((LegImpl)(plan.getPlanElements().get(i))).getDepartureTime()), Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getDepartureTime()));
-				assertEquals(Math.floor(((LegImpl)(plan.getPlanElements().get(i))).getArrivalTime()),  Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getArrivalTime()));
+				assertEquals(Math.floor(((LegImpl)(this.plan.getPlanElements().get(i))).getDepartureTime()), Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getDepartureTime()));
+				assertEquals(Math.floor(((LegImpl)(this.plan.getPlanElements().get(i))).getArrivalTime()),  Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getArrivalTime()));
 			}
 		}	
 		log.info("... done.");
 	}
-}/*
+
 	
 	public void testCopyActslegs (){
 		
-		Plan plan = new Plan (population.getPerson(this.TEST_PERSON_ID));
-		plan.copyPlan(population.getPerson(this.TEST_PERSON_ID).getPlans().get(0));
+		PlanImpl newPlan = new PlanImpl (this.plan.getPerson());
+		newPlan.copyPlan(this.plan);
 		
-		NodeCarRoute route = new NodeCarRoute();
-		route.setNodes("1 2 3");
+		NodeNetworkRouteImpl route = new NodeNetworkRouteImpl();
+		List<Node> nodes1 = new ArrayList<Node>();
+		nodes1.add(new NodeImpl(new IdImpl("1")));
+		nodes1.add(new NodeImpl(new IdImpl("2")));
+		nodes1.add(new NodeImpl(new IdImpl("3")));
+		route.setNodes(nodes1);
+		((LegImpl)(newPlan.getPlanElements().get(1))).setRoute(route);
 		
-		// but flat copy of leg routes so that change in plan does also affect newPlan
-		((Leg)(plan.getActsLegs().get(1))).setRoute(route);
+		double planActTime = ((ActivityImpl)(newPlan.getPlanElements().get(0))).getEndTime();
 		
-		double planActTime = ((Act)(plan.getActsLegs().get(0))).getEndTime();
-		
-		ArrayList<Object> newPlanActsLegs = this.testee.copyActsLegs(plan.getActsLegs()); 
+		List<? extends BasicPlanElement> newPlanActsLegs = this.testee.copyActsLegs(newPlan.getPlanElements());
 		
 		// deep copy of acts (complete act) and leg times (only times!) so that time change in newPlan does not affect plan
-		((Act)(newPlanActsLegs.get(0))).setEndTime(0.0);
+		((ActivityImpl)(newPlanActsLegs.get(0))).setEndTime(0.0);
 		
 		// but flat copy of leg routes so that change in plan does also affect newPlan
-		route.setNodes("3 2 1");
+		List<Node> nodes2 = new ArrayList<Node>();
+		nodes2.add(new NodeImpl(new IdImpl("3")));
+		nodes2.add(new NodeImpl(new IdImpl("2")));
+		nodes2.add(new NodeImpl(new IdImpl("1")));
+		route.setNodes(nodes2);
 		
-		assertEquals(((Act)plan.getActsLegs().get(0)).getEndTime(), planActTime);
-		assertEquals(((Act)(newPlanActsLegs.get(0))).getEndTime(), 0.0);
-		assertEquals(((Leg)(plan.getActsLegs().get(1))).getRoute(), route);
-		assertEquals(((Leg)(newPlanActsLegs.get(1))).getRoute(), route);
+		assertEquals(((ActivityImpl)newPlan.getPlanElements().get(0)).getEndTime(), planActTime);
+		assertEquals(((ActivityImpl)(newPlanActsLegs.get(0))).getEndTime(), 0.0);
+		assertEquals(((LegImpl)(newPlan.getPlanElements().get(1))).getRoute(), route);
+		assertEquals(((LegImpl)(newPlanActsLegs.get(1))).getRoute(), route);
 	}
 	
+	/*
 	public void testIncreaseTime (){
 		
 		PlanomatXPlan plan = new PlanomatXPlan (population.getPerson(this.TEST_PERSON_ID));
@@ -243,5 +258,5 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 				System.out.println();
 			}
 		}
-	}
-}*/
+	}*/
+}
