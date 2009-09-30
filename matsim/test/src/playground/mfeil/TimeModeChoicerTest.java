@@ -91,7 +91,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		
 		// Import plan of person 1, copy and delete original population
 		PlanImpl basePlan = ((PersonImpl)(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)))).getSelectedPlan();
-		PlanImpl plan = new PlanomatXPlan (basePlan.getPerson());
+		PlanImpl plan = new PlanImpl (basePlan.getPerson());
 		plan.copyPlan(basePlan);
 		this.scenario_input.getPopulation().getPersons().clear();
 		
@@ -101,16 +101,16 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		
 		// Import expected output plan into population
 		new MatsimPopulationReader(scenario_input).readFile(this.getPackageInputDirectory()+"expected_output_person1.xml");
-			
+				
 		// Compare the two plans; <1 because of double rounding errors
 		for (int i=0;i<plan.getPlanElements().size();i++){
 			if (i%2==0){
-				assert(((ActivityImpl)(plan.getPlanElements().get(i))).getStartTime()-((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getStartTime()<1);
-				assert(((ActivityImpl)(plan.getPlanElements().get(i))).getEndTime()-((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getEndTime()<1);
+				assertEquals(Math.floor(((ActivityImpl)(plan.getPlanElements().get(i))).getStartTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getStartTime()));
+				assertEquals(Math.floor(((ActivityImpl)(plan.getPlanElements().get(i))).getEndTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getEndTime()));
 			}
 			else {
-				assert(((LegImpl)(plan.getPlanElements().get(i))).getDepartureTime()-((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getDepartureTime()<1);
-				assert(((LegImpl)(plan.getPlanElements().get(i))).getArrivalTime()-((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getArrivalTime()<1);
+				assertEquals(Math.floor(((LegImpl)(plan.getPlanElements().get(i))).getDepartureTime()), Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getDepartureTime()));
+				assertEquals(Math.floor(((LegImpl)(plan.getPlanElements().get(i))).getArrivalTime()),  Math.floor(((LegImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getArrivalTime()));
 			}
 		}	
 		log.info("... done.");
