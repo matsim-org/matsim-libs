@@ -47,17 +47,17 @@ public class RiskCostFromNetworkChangeEventsTest extends MatsimTestCase{
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		NetworkLayer net = new NetworkLayer(nf);
 		
-		NodeImpl n0 = net.createNode(new IdImpl(0), new CoordImpl(0.,0.));
-		NodeImpl n1 = net.createNode(new IdImpl(1), new CoordImpl(0.,1.));
-		NodeImpl n2 = net.createNode(new IdImpl(2), new CoordImpl(1.,0.));
-		NodeImpl n3 = net.createNode(new IdImpl(3), new CoordImpl(1.,1.));
-		NodeImpl n4 = net.createNode(new IdImpl(4), new CoordImpl(.5,.5));
+		NodeImpl n0 = net.createAndAddNode(new IdImpl(0), new CoordImpl(0.,0.));
+		NodeImpl n1 = net.createAndAddNode(new IdImpl(1), new CoordImpl(0.,1.));
+		NodeImpl n2 = net.createAndAddNode(new IdImpl(2), new CoordImpl(1.,0.));
+		NodeImpl n3 = net.createAndAddNode(new IdImpl(3), new CoordImpl(1.,1.));
+		NodeImpl n4 = net.createAndAddNode(new IdImpl(4), new CoordImpl(.5,.5));
 		
-		LinkImpl l0 = net.createLink(new IdImpl(0), n0, n1, 10., 5., 8., 5.4321);
-		LinkImpl l1 = net.createLink(new IdImpl(1), n1, n2, 10., 5., 8., 5.4321);
-		LinkImpl l2 = net.createLink(new IdImpl(2), n2, n3, 10., 5., 8., 5.4321);
-		LinkImpl l3 = net.createLink(new IdImpl(3), n3, n4, 10., 5., 8., 5.4321);
-		LinkImpl l4 = net.createLink(new IdImpl(4), n4, n0, 2.5, 5., 8., 5.4321);
+		LinkImpl l0 = net.createAndAddLink(new IdImpl(0), n0, n1, 10., 5., 8., 5.4321);
+		LinkImpl l1 = net.createAndAddLink(new IdImpl(1), n1, n2, 10., 5., 8., 5.4321);
+		LinkImpl l2 = net.createAndAddLink(new IdImpl(2), n2, n3, 10., 5., 8., 5.4321);
+		LinkImpl l3 = net.createAndAddLink(new IdImpl(3), n3, n4, 10., 5., 8., 5.4321);
+		LinkImpl l4 = net.createAndAddLink(new IdImpl(4), n4, n0, 2.5, 5., 8., 5.4321);
 		
 		List<NetworkChangeEvent> nc = new ArrayList<NetworkChangeEvent>();
 		
@@ -109,19 +109,19 @@ public class RiskCostFromNetworkChangeEventsTest extends MatsimTestCase{
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		NetworkLayer net = new NetworkLayer(nf);
 		
-		NodeImpl n0 = net.createNode(new IdImpl(0), new CoordImpl(0.,0.));
-		NodeImpl n1 = net.createNode(new IdImpl(1), new CoordImpl(0.,1.));
-		NodeImpl n2 = net.createNode(new IdImpl(2), new CoordImpl(1.,0.));
-		NodeImpl n3 = net.createNode(new IdImpl(3), new CoordImpl(1.,1.));
-		NodeImpl n4 = net.createNode(new IdImpl(4), new CoordImpl(.75,.75));
-		NodeImpl n5 = net.createNode(new IdImpl(5), new CoordImpl(.25,.25));
+		NodeImpl n0 = net.createAndAddNode(new IdImpl(0), new CoordImpl(0.,0.));
+		NodeImpl n1 = net.createAndAddNode(new IdImpl(1), new CoordImpl(0.,1.));
+		NodeImpl n2 = net.createAndAddNode(new IdImpl(2), new CoordImpl(1.,0.));
+		NodeImpl n3 = net.createAndAddNode(new IdImpl(3), new CoordImpl(1.,1.));
+		NodeImpl n4 = net.createAndAddNode(new IdImpl(4), new CoordImpl(.75,.75));
+		NodeImpl n5 = net.createAndAddNode(new IdImpl(5), new CoordImpl(.25,.25));
 		
-		LinkImpl l0 = net.createLink(new IdImpl(0), n0, n1, 2.5, 5., 8., 5.4321);
-		LinkImpl l1 = net.createLink(new IdImpl(1), n1, n2, 3.5, 5., 8., 5.4321);
-		LinkImpl l2 = net.createLink(new IdImpl(2), n2, n3, 4.5, 5., 8., 5.4321);
-		LinkImpl l3 = net.createLink(new IdImpl(3), n3, n4, 10., 5., 8., 5.4321);
-		LinkImpl l4 = net.createLink(new IdImpl(4), n4, n5, 10., 5., 8., 5.4321);
-		LinkImpl l5 = net.createLink(new IdImpl(5), n5, n0, 5.5, 5., 8., 5.4321);
+		LinkImpl l0 = net.createAndAddLink(new IdImpl(0), n0, n1, 2.5, 5., 8., 5.4321);
+		LinkImpl l1 = net.createAndAddLink(new IdImpl(1), n1, n2, 3.5, 5., 8., 5.4321);
+		LinkImpl l2 = net.createAndAddLink(new IdImpl(2), n2, n3, 4.5, 5., 8., 5.4321);
+		LinkImpl l3 = net.createAndAddLink(new IdImpl(3), n3, n4, 10., 5., 8., 5.4321);
+		LinkImpl l4 = net.createAndAddLink(new IdImpl(4), n4, n5, 10., 5., 8., 5.4321);
+		LinkImpl l5 = net.createAndAddLink(new IdImpl(5), n5, n0, 5.5, 5., 8., 5.4321);
 		
 		List<NetworkChangeEvent> nc = new ArrayList<NetworkChangeEvent>();
 		

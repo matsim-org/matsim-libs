@@ -288,7 +288,7 @@ public class BlnPlansGenerator {
 			PlanImpl curPlan;
 
 			if(curPerson.getSelectedPlan() == null){
-				curPlan = curPerson.createPlan(true);
+				curPlan = curPerson.createAndAddPlan(true);
 			} else {
 				curPlan = curPerson.getSelectedPlan();
 			}

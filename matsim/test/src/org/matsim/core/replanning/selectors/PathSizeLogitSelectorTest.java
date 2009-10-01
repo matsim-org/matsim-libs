@@ -321,19 +321,19 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		//             (5)
 		
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl n1 = network.createNode(new IdImpl(1), new CoordImpl(0,10));
-		NodeImpl n2 = network.createNode(new IdImpl(2), new CoordImpl(3,2));
-		NodeImpl n3 = network.createNode(new IdImpl(3), new CoordImpl(0,0));
-		NodeImpl n4 = network.createNode(new IdImpl(4), new CoordImpl(4,1));
-		NodeImpl n5 = network.createNode(new IdImpl(5), new CoordImpl(0,-1));
-		NodeImpl n6 = network.createNode(new IdImpl(6), new CoordImpl(0,11));
-		network.createLink(new IdImpl(1), n1, n3, 10, 1, 10, 1);
-		network.createLink(new IdImpl(2), n1, n2, 8, 1, 10, 1);
-		network.createLink(new IdImpl(3), n2, n3, 2, 1, 10, 1);
-		network.createLink(new IdImpl(4), n2, n4, 1, 1, 10, 1);
-		network.createLink(new IdImpl(5), n4, n3, 1, 1, 10, 1);
-		network.createLink(new IdImpl(6), n6, n1, 1, 1, 10, 1);
-		network.createLink(new IdImpl(7), n3, n5, 1, 1, 10, 1);
+		NodeImpl n1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0,10));
+		NodeImpl n2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(3,2));
+		NodeImpl n3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(0,0));
+		NodeImpl n4 = network.createAndAddNode(new IdImpl(4), new CoordImpl(4,1));
+		NodeImpl n5 = network.createAndAddNode(new IdImpl(5), new CoordImpl(0,-1));
+		NodeImpl n6 = network.createAndAddNode(new IdImpl(6), new CoordImpl(0,11));
+		network.createAndAddLink(new IdImpl(1), n1, n3, 10, 1, 10, 1);
+		network.createAndAddLink(new IdImpl(2), n1, n2, 8, 1, 10, 1);
+		network.createAndAddLink(new IdImpl(3), n2, n3, 2, 1, 10, 1);
+		network.createAndAddLink(new IdImpl(4), n2, n4, 1, 1, 10, 1);
+		network.createAndAddLink(new IdImpl(5), n4, n3, 1, 1, 10, 1);
+		network.createAndAddLink(new IdImpl(6), n6, n1, 1, 1, 10, 1);
+		network.createAndAddLink(new IdImpl(7), n3, n5, 1, 1, 10, 1);
 
 		return network;
 	}

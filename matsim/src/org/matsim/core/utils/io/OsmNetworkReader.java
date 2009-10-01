@@ -315,7 +315,7 @@ public class OsmNetworkReader {
 		// create the required nodes
 		for (OsmNode node : this.nodes.values()) {
 			if (node.used) {
-				this.network.createNode(node.id, node.coord);
+				this.network.createAndAddNode(node.id, node.coord);
 			}
 		}
 
@@ -446,12 +446,12 @@ public class OsmNetworkReader {
 		if(network.getNode(fromNode.id) != null && network.getNode(toNode.id) != null){
 		
 			if (!onewayReverse) {
-				LinkImpl l = network.createLink(new IdImpl(this.id), network.getNode(fromNode.id), network.getNode(toNode.id), length, freespeed, capacity, nofLanes);
+				LinkImpl l = network.createAndAddLink(new IdImpl(this.id), network.getNode(fromNode.id), network.getNode(toNode.id), length, freespeed, capacity, nofLanes);
 				l.setOrigId(origId);
 				this.id++;
 			}
 			if (!oneway) {
-				LinkImpl l = network.createLink(new IdImpl(this.id), network.getNode(toNode.id), network.getNode(fromNode.id), length, freespeed, capacity, nofLanes);
+				LinkImpl l = network.createAndAddLink(new IdImpl(this.id), network.getNode(toNode.id), network.getNode(fromNode.id), length, freespeed, capacity, nofLanes);
 				l.setOrigId(origId);
 				this.id++;
 			}

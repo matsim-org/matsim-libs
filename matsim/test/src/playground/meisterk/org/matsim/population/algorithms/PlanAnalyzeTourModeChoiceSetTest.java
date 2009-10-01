@@ -469,13 +469,13 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
 			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
-				act = plan.createActivity("actAtFacility" + locationIdSequence[aa], (ActivityFacilityImpl) location);
+				act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa], (ActivityFacilityImpl) location);
 			} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
-				act = plan.createActivity("actOnLink" + locationIdSequence[aa], (LinkImpl) location);
+				act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], (LinkImpl) location);
 			}
 			act.setEndTime(10*3600);
 			if (aa != (locationIdSequence.length - 1)) {
-				plan.createLeg(TransportMode.undefined);
+				plan.createAndAddLeg(TransportMode.undefined);
 			}
 		}
 		

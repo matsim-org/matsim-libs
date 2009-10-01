@@ -85,9 +85,9 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	public void testStopFacility_withLink() {
 		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(10, 5));
-		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(5, 11));
-		LinkImpl link3 = network.createLink(new IdImpl(3), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(5, 11));
+		LinkImpl link3 = network.createAndAddLink(new IdImpl(3), node1, node2, 1000, 10.0, 2000.0, 1.0);
 
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, network);
 		Stack<String> context = new Stack<String>();
@@ -115,9 +115,9 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	public void testStopFacility_withBadLink() {
 		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(10, 5));
-		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(5, 11));
-		network.createLink(new IdImpl(3), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(5, 11));
+		network.createAndAddLink(new IdImpl(3), node1, node2, 1000, 10.0, 2000.0, 1.0);
 
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, network);
 		Stack<String> context = new Stack<String>();
@@ -717,15 +717,15 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
 
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(10, 5));
-		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(5, 11));
-		NodeImpl node3 = network.createNode(new IdImpl(3), new CoordImpl(5, 11));
-		NodeImpl node4 = network.createNode(new IdImpl(4), new CoordImpl(5, 11));
-		NodeImpl node5 = network.createNode(new IdImpl(5), new CoordImpl(5, 11));
-		/*LinkImpl link1 =*/ network.createLink(new IdImpl(1), node1, node2, 1000, 10.0, 2000.0, 1.0);
-		LinkImpl link2 = network.createLink(new IdImpl(2), node2, node3, 1000, 10.0, 2000.0, 1.0);
-		/*LinkImpl link3 =*/network.createLink(new IdImpl(3), node3, node4, 1000, 10.0, 2000.0, 1.0);
-		/*LinkImpl link4 =*/network.createLink(new IdImpl(4), node4, node5, 1000, 10.0, 2000.0, 1.0);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(5, 11));
+		NodeImpl node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(5, 11));
+		NodeImpl node4 = network.createAndAddNode(new IdImpl(4), new CoordImpl(5, 11));
+		NodeImpl node5 = network.createAndAddNode(new IdImpl(5), new CoordImpl(5, 11));
+		/*LinkImpl link1 =*/ network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		LinkImpl link2 = network.createAndAddLink(new IdImpl(2), node2, node3, 1000, 10.0, 2000.0, 1.0);
+		/*LinkImpl link3 =*/network.createAndAddLink(new IdImpl(3), node3, node4, 1000, 10.0, 2000.0, 1.0);
+		/*LinkImpl link4 =*/network.createAndAddLink(new IdImpl(4), node4, node5, 1000, 10.0, 2000.0, 1.0);
 
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, network);
 		Stack<String> context = new Stack<String>();
@@ -776,15 +776,15 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
 
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(10, 5));
-		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(5, 11));
-		NodeImpl node3 = network.createNode(new IdImpl(3), new CoordImpl(5, 11));
-		NodeImpl node4 = network.createNode(new IdImpl(4), new CoordImpl(5, 11));
-		NodeImpl node5 = network.createNode(new IdImpl(5), new CoordImpl(5, 11));
-		/*LinkImpl link1 =*/network.createLink(new IdImpl(1), node1, node2, 1000, 10.0, 2000.0, 1.0);
-		/*LinkImpl link2 =*/network.createLink(new IdImpl(2), node2, node3, 1000, 10.0, 2000.0, 1.0);
-		LinkImpl link3 = network.createLink(new IdImpl(3), node3, node4, 1000, 10.0, 2000.0, 1.0);
-		LinkImpl link4 = network.createLink(new IdImpl(4), node4, node5, 1000, 10.0, 2000.0, 1.0);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(5, 11));
+		NodeImpl node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(5, 11));
+		NodeImpl node4 = network.createAndAddNode(new IdImpl(4), new CoordImpl(5, 11));
+		NodeImpl node5 = network.createAndAddNode(new IdImpl(5), new CoordImpl(5, 11));
+		/*LinkImpl link1 =*/network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		/*LinkImpl link2 =*/network.createAndAddLink(new IdImpl(2), node2, node3, 1000, 10.0, 2000.0, 1.0);
+		LinkImpl link3 = network.createAndAddLink(new IdImpl(3), node3, node4, 1000, 10.0, 2000.0, 1.0);
+		LinkImpl link4 = network.createAndAddLink(new IdImpl(4), node4, node5, 1000, 10.0, 2000.0, 1.0);
 
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, network);
 		Stack<String> context = new Stack<String>();
@@ -838,15 +838,15 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
 
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(10, 5));
-		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(5, 11));
-		NodeImpl node3 = network.createNode(new IdImpl(3), new CoordImpl(5, 11));
-		NodeImpl node4 = network.createNode(new IdImpl(4), new CoordImpl(5, 11));
-		NodeImpl node5 = network.createNode(new IdImpl(5), new CoordImpl(5, 11));
-		LinkImpl link1 = network.createLink(new IdImpl(1), node1, node2, 1000, 10.0, 2000.0, 1.0);
-		LinkImpl link2 = network.createLink(new IdImpl(2), node2, node3, 1000, 10.0, 2000.0, 1.0);
-		LinkImpl link3 = network.createLink(new IdImpl(3), node3, node4, 1000, 10.0, 2000.0, 1.0);
-		LinkImpl link4 = network.createLink(new IdImpl(4), node4, node5, 1000, 10.0, 2000.0, 1.0);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(5, 11));
+		NodeImpl node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(5, 11));
+		NodeImpl node4 = network.createAndAddNode(new IdImpl(4), new CoordImpl(5, 11));
+		NodeImpl node5 = network.createAndAddNode(new IdImpl(5), new CoordImpl(5, 11));
+		LinkImpl link1 = network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		LinkImpl link2 = network.createAndAddLink(new IdImpl(2), node2, node3, 1000, 10.0, 2000.0, 1.0);
+		LinkImpl link3 = network.createAndAddLink(new IdImpl(3), node3, node4, 1000, 10.0, 2000.0, 1.0);
+		LinkImpl link4 = network.createAndAddLink(new IdImpl(4), node4, node5, 1000, 10.0, 2000.0, 1.0);
 
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, network);
 		Stack<String> context = new Stack<String>();

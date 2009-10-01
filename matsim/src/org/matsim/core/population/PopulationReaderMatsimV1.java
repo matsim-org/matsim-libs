@@ -172,7 +172,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 			throw new NumberFormatException(
 					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
-		this.currplan = this.currperson.createPlan(selected);
+		this.currplan = this.currperson.createAndAddPlan(selected);
 		this.routeNodes = null;
 
 		String scoreString = atts.getValue("score");
@@ -189,14 +189,14 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 		ActivityImpl act = null;
 		if (atts.getValue("link") != null) {
 			link = this.network.getLinks().get(new IdImpl(atts.getValue("link")));
-			act = this.currplan.createActivity(atts.getValue("type"), link);
+			act = this.currplan.createAndAddActivity(atts.getValue("type"), link);
 			if (atts.getValue("x100") != null && atts.getValue("y100") != null) {
 				coord = new CoordImpl(atts.getValue("x100"), atts.getValue("y100"));
 				act.setCoord(coord);
 			}
 		} else if (atts.getValue("x100") != null && atts.getValue("y100") != null) {
 			coord = new CoordImpl(atts.getValue("x100"), atts.getValue("y100"));
-			act = this.currplan.createActivity(atts.getValue("type"), coord);
+			act = this.currplan.createAndAddActivity(atts.getValue("type"), coord);
 		} else {
 			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
 		}
@@ -213,7 +213,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startLeg(final Attributes atts) {
-		this.currleg = this.currplan.createLeg(TransportMode.valueOf(atts.getValue("mode").toLowerCase()));
+		this.currleg = this.currplan.createAndAddLeg(TransportMode.valueOf(atts.getValue("mode").toLowerCase()));
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
 		this.currleg.setArrivalTime(Time.parseTime(atts.getValue("arr_time")));

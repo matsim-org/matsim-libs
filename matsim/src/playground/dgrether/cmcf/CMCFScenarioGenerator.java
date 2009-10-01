@@ -177,11 +177,11 @@ public class CMCFScenarioGenerator {
 			if ((i-1) % 3 == 0){
 				homeEndTime++;
 			}
-			ActivityImpl act1 = plan.createActivity("h", l1.getCoord());
+			ActivityImpl act1 = plan.createAndAddActivity("h", l1.getCoord());
 			act1.setLink(l1);
 			act1.setEndTime(homeEndTime);
 			//leg to home
-			LegImpl leg = plan.createLeg(TransportMode.car);
+			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 			NetworkRouteWRefs route = new NodeNetworkRouteImpl(l1, l6);
 			if (isAlternativeRouteEnabled) {
 				route.setNodes(l1, NetworkUtils.getNodes(this.network, "2 3 4 5 6"), l6);
@@ -190,7 +190,7 @@ public class CMCFScenarioGenerator {
 				route.setNodes(l1, NetworkUtils.getNodes(this.network, "2 3 5 6"), l6);
 			}
 			leg.setRoute(route);
-			ActivityImpl act2 = plan.createActivity("h", l6.getCoord());
+			ActivityImpl act2 = plan.createAndAddActivity("h", l6.getCoord());
 			act2.setLink(l6);
 			this.plans.addPerson(p);
 		}

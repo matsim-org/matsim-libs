@@ -232,12 +232,12 @@ public class PopulationReaderKutter implements PopulationReader {
 			}
 
 			if (!skipActivity) {
-				LegImpl l = this.currPlan.createLeg(mode);
+				LegImpl l = this.currPlan.createAndAddLeg(mode);
 				l.setDepartureTime(this.currTime);
 				l.setTravelTime(travTime);
 				l.setArrivalTime(arrTime);
 				this.currTime = this.currTime + duration;
-				ActivityImpl a = this.currPlan.createActivity(activity, coord);
+				ActivityImpl a = this.currPlan.createAndAddActivity(activity, coord);
 				a.setStartTime(arrTime);
 				a.setEndTime(this.currTime);
 				a.setDuration(duration);
@@ -245,7 +245,7 @@ public class PopulationReaderKutter implements PopulationReader {
 		}
 
 		private void parsePlan(final String[] row) {
-			this.currPlan = this.currPerson.createPlan(true);
+			this.currPlan = this.currPerson.createAndAddPlan(true);
 
 			String homeCell = row[1];
 			Zone zone = (Zone)tvzLayer.getLocation(homeCell);
@@ -293,7 +293,7 @@ public class PopulationReaderKutter implements PopulationReader {
 			}
 
 
-			ActivityImpl a = this.currPlan.createActivity("home", this.currHome);
+			ActivityImpl a = this.currPlan.createAndAddActivity("home", this.currHome);
 			a.setEndTime(duration);
 			this.currTime = (int)duration;
 

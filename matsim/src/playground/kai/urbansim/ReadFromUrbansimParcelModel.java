@@ -176,7 +176,7 @@ public class ReadFromUrbansimParcelModel {
 					continue ;
 				}
 
-				PlanImpl plan = newPerson.createPlan(true);
+				PlanImpl plan = newPerson.createAndAddPlan(true);
 				plan.setSelected(true) ;
 				Utils.makeHomePlan(plan, homeCoord) ;
 

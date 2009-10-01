@@ -91,9 +91,9 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 	public void testReadActivity() {
 		final ScenarioImpl scenario = new ScenarioImpl();
 		final NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createNode(scenario.createId("1"), scenario.createCoord(0, 0));
-		NodeImpl node2 = network.createNode(scenario.createId("2"), scenario.createCoord(0, 1000));
-		Link link3 = network.createLink(scenario.createId("3"), node1, node2, 1000.0, 10.0, 2000.0, 1);
+		NodeImpl node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(0, 0));
+		NodeImpl node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(0, 1000));
+		Link link3 = network.createAndAddLink(scenario.createId("3"), node1, node2, 1000.0, 10.0, 2000.0, 1);
 		final PopulationImpl population = scenario.getPopulation();
 
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);

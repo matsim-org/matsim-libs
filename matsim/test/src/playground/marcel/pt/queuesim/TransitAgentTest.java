@@ -56,11 +56,11 @@ public class TransitAgentTest extends TestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 
 		NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createNode(new IdImpl("1"), new CoordImpl(   0, 0));
-		NodeImpl node2 = network.createNode(new IdImpl("2"), new CoordImpl(1000, 0));
-		NodeImpl node3 = network.createNode(new IdImpl("3"), new CoordImpl(2000, 0));
-		network.createLink(new IdImpl("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
-		network.createLink(new IdImpl("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
+		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));
+		network.createAndAddLink(new IdImpl("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
 
 		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
 		PopulationBuilder pb = scenario.getPopulation().getBuilder();
@@ -96,11 +96,11 @@ public class TransitAgentTest extends TestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 
 		NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createNode(new IdImpl("1"), new CoordImpl(   0, 0));
-		NodeImpl node2 = network.createNode(new IdImpl("2"), new CoordImpl(1000, 0));
-		NodeImpl node3 = network.createNode(new IdImpl("3"), new CoordImpl(2000, 0));
-		network.createLink(new IdImpl("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
-		network.createLink(new IdImpl("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
+		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));
+		network.createAndAddLink(new IdImpl("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
 
 		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
 		PopulationBuilder pb = scenario.getPopulation().getBuilder();

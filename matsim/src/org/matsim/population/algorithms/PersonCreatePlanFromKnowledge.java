@@ -43,7 +43,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 
 	@Override
 	public void run(final PersonImpl person) {
-		PlanImpl p = person.createPlan(true);
+		PlanImpl p = person.createAndAddPlan(true);
 		ActivityFacilityImpl home_facility = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("home").get(0).getFacility();
 		ArrayList<ActivityOption> acts = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities();
 
@@ -51,13 +51,13 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		int time = 7*3600 + (MatsimRandom.getRandom().nextInt(2*3600));
 
 		// first act (= home)
-		ActivityImpl a = p.createActivity("home", home_facility.getCoord());
+		ActivityImpl a = p.createAndAddActivity("home", home_facility.getCoord());
 		a.setLink(home_facility.getLink());
 		a.setStartTime(0.0);
 		a.setDuration(time);
 		a.setEndTime(time);
 		a.setFacility(home_facility);
-		LegImpl l = p.createLeg(TransportMode.car);
+		LegImpl l = p.createAndAddLeg(TransportMode.car);
 		l.setDepartureTime(time);
 		l.setTravelTime(0);
 		l.setArrivalTime(time);
@@ -70,21 +70,21 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 			int act_index = MatsimRandom.getRandom().nextInt(acts.size());
 			ActivityOption act = acts.get(act_index);
 			ActivityFacilityImpl f = act.getFacility();
-			a = p.createActivity(act.getType(),f.getCoord());
+			a = p.createAndAddActivity(act.getType(),f.getCoord());
 			a.setLink(f.getLink());
 			a.setStartTime(time);
 			a.setDuration(dur);
 			a.setEndTime(time + dur);
 			a.setFacility(f);
 			time += dur;
-			l = p.createLeg(TransportMode.car);
+			l = p.createAndAddLeg(TransportMode.car);
 			l.setDepartureTime(time);
 			l.setTravelTime(0);
 			l.setArrivalTime(time);
 		}
 
 		// last act (= home)
-		a = p.createActivity("home",home_facility.getCoord());
+		a = p.createAndAddActivity("home",home_facility.getCoord());
 		a.setLink(home_facility.getLink());
 		a.setStartTime(time);
 		a.setEndTime(24*3600);

@@ -115,7 +115,7 @@ public class TeleatlasIvtcheuMerger {
 		int nodeMapCnt = 0;
 		for (NodeImpl n : networkIvtcheu.getNodes().values()) {
 			if (!nodeMapping.containsKey(n.getId())) {
-				networkTeleatlas.createNode(n.getId(),n.getCoord(),n.getType());
+				networkTeleatlas.createAndAddNode(n.getId(),n.getCoord(),n.getType());
 			}
 			else { nodeMapCnt++; }
 		}
@@ -137,7 +137,7 @@ public class TeleatlasIvtcheuMerger {
 			else if (!nodeMapping.keySet().contains(fromNodeId) && !nodeMapping.keySet().contains(toNodeId)) {
 			}
 			else { throw new RuntimeException("HEAH?"); }
-			networkTeleatlas.createLink(
+			networkTeleatlas.createAndAddLink(
 					l.getId(),
 					networkTeleatlas.getNode(fromNodeId),
 					networkTeleatlas.getNode(toNodeId),

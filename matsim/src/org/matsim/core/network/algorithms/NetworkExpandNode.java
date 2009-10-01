@@ -240,10 +240,10 @@ public class NetworkExpandNode {
 			double lpc = Math.sqrt(pc.getX()*pc.getX()+pc.getY()*pc.getY());
 			double x = p.getX()+(1-d/lpc)*pc.getX()+e/lpc*pc.getY();
 			double y = p.getY()+(1-d/lpc)*pc.getY()-e/lpc*pc.getX();
-			NodeImpl n = network.createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
+			NodeImpl n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
 			newNodes.add(n);
 			nodeIdCnt++;
-			network.createLink(inlink.getId(),inlink.getFromNode(),n,inlink.getLength(),inlink.getFreespeed(Time.UNDEFINED_TIME),inlink.getCapacity(Time.UNDEFINED_TIME),inlink.getNumberOfLanes(Time.UNDEFINED_TIME),inlink.getOrigId(),inlink.getType());
+			network.createAndAddLink(inlink.getId(),inlink.getFromNode(),n,inlink.getLength(),inlink.getFreespeed(Time.UNDEFINED_TIME),inlink.getCapacity(Time.UNDEFINED_TIME),inlink.getNumberOfLanes(Time.UNDEFINED_TIME),inlink.getOrigId(),inlink.getType());
 		}
 		for (LinkImpl outlink : outlinks.values()) {
 			Coord c = node.getCoord();
@@ -252,10 +252,10 @@ public class NetworkExpandNode {
 			double lcp = Math.sqrt(cp.getX()*cp.getX()+cp.getY()*cp.getY());
 			double x = c.getX()+d/lcp*cp.getX()+e/lcp*cp.getY();
 			double y = c.getY()+d/lcp*cp.getY()-e/lcp*cp.getX();
-			NodeImpl n = network.createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
+			NodeImpl n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
 			newNodes.add(n);
 			nodeIdCnt++;
-			network.createLink(outlink.getId(),n,outlink.getToNode(),outlink.getLength(),outlink.getFreespeed(Time.UNDEFINED_TIME),outlink.getCapacity(Time.UNDEFINED_TIME),outlink.getNumberOfLanes(Time.UNDEFINED_TIME),outlink.getOrigId(),outlink.getType());
+			network.createAndAddLink(outlink.getId(),n,outlink.getToNode(),outlink.getLength(),outlink.getFreespeed(Time.UNDEFINED_TIME),outlink.getCapacity(Time.UNDEFINED_TIME),outlink.getNumberOfLanes(Time.UNDEFINED_TIME),outlink.getOrigId(),outlink.getType());
 		}
 		
 		// add virtual links for the turn restrictions
@@ -263,7 +263,7 @@ public class NetworkExpandNode {
 			Tuple<Id,Id> turn = turns.get(i);
 			LinkImpl fromLink = network.getLink(turn.getFirst());
 			LinkImpl toLink = network.getLink(turn.getSecond());
-			LinkImpl l = network.createLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()),fromLink.getFreespeed(Time.UNDEFINED_TIME),fromLink.getCapacity(Time.UNDEFINED_TIME),fromLink.getNumberOfLanes(Time.UNDEFINED_TIME),fromLink.getOrigId(),fromLink.getType());
+			LinkImpl l = network.createAndAddLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()),fromLink.getFreespeed(Time.UNDEFINED_TIME),fromLink.getCapacity(Time.UNDEFINED_TIME),fromLink.getNumberOfLanes(Time.UNDEFINED_TIME),fromLink.getOrigId(),fromLink.getType());
 			newLinks.add(l);
 		}
 		return new Tuple<ArrayList<NodeImpl>, ArrayList<LinkImpl>>(newNodes,newLinks);

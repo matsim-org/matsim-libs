@@ -46,10 +46,10 @@ public class KeepSelectedTest extends AbstractPlanSelectorTest {
 	 */
 	public void testSelected() {
 		PersonImpl person = new PersonImpl(new IdImpl(1));
-		PlanImpl plan1 = person.createPlan(false);
-		PlanImpl plan2 = person.createPlan(true);
+		PlanImpl plan1 = person.createAndAddPlan(false);
+		PlanImpl plan2 = person.createAndAddPlan(true);
 		plan2.setScore(10.0);
-		PlanImpl plan3 = person.createPlan(false);
+		PlanImpl plan3 = person.createAndAddPlan(false);
 		plan3.setScore(-50.0);
 		KeepSelected selector = new KeepSelected();
 

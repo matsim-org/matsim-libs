@@ -86,10 +86,10 @@ public abstract class ScoringFunctionTest extends MatsimTestCase {
 
 		// score the same plan twice
 		PersonImpl person1 = new PersonImpl(new IdImpl(1));
-		PlanImpl plan1 = person1.createPlan(true);
-		ActivityImpl act1a = plan1.createActivity("home", (LinkImpl)null);//, 0, 7.0*3600, 7*3600, false);
-		LegImpl leg1 = plan1.createLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
-		ActivityImpl act1b = plan1.createActivity("work", (LinkImpl)null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+		PlanImpl plan1 = person1.createAndAddPlan(true);
+		ActivityImpl act1a = plan1.createAndAddActivity("home", (LinkImpl)null);//, 0, 7.0*3600, 7*3600, false);
+		LegImpl leg1 = plan1.createAndAddLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
+		ActivityImpl act1b = plan1.createAndAddActivity("work", (LinkImpl)null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
 		ScoringFunction sf1 = getScoringFunctionInstance(plan1);
 		sf1.startActivity(0, act1a);
 		sf1.endActivity(7*3600);

@@ -95,12 +95,12 @@ public class BlockingStopDemo {
 		network.setCapacityPeriod(3600.0);
 		NodeImpl[] nodes = new NodeImpl[nOfLinks * 2 + 2];
 		for (int i = 0; i <= nOfLinks; i++) {
-			nodes[i           ] = network.createNode(this.ids[i           ], this.scenario.createCoord(i * 500, 0));
-			nodes[i+nOfLinks+1] = network.createNode(this.ids[i+nOfLinks+1], this.scenario.createCoord(i * 500, 500));
+			nodes[i           ] = network.createAndAddNode(this.ids[i           ], this.scenario.createCoord(i * 500, 0));
+			nodes[i+nOfLinks+1] = network.createAndAddNode(this.ids[i+nOfLinks+1], this.scenario.createCoord(i * 500, 500));
 		}
 		for (int i = 0; i < nOfLinks; i++) {
-			network.createLink(this.ids[i         ], nodes[i           ], nodes[i+1], 500.0, 10.0, 1000.0, 1);
-			network.createLink(this.ids[i+nOfLinks], nodes[i+nOfLinks+1], nodes[i+nOfLinks+2], 500.0, 10.0, 1000.0, 1);
+			network.createAndAddLink(this.ids[i         ], nodes[i           ], nodes[i+1], 500.0, 10.0, 1000.0, 1);
+			network.createAndAddLink(this.ids[i+nOfLinks], nodes[i+nOfLinks+1], nodes[i+nOfLinks+2], 500.0, 10.0, 1000.0, 1);
 		}
 	}
 

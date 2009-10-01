@@ -145,7 +145,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
 	private void startNode(final Attributes atts) {
 		//TODO dg refactor network to support factory and remove cast
-		NodeImpl node = ((NetworkLayer)this.network).createNode( new IdImpl(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
+		NodeImpl node = ((NetworkLayer)this.network).createAndAddNode( new IdImpl(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
 		node.setType(atts.getValue("type"));
 		if (atts.getValue("origid") != null) {
 			node.setOrigId(atts.getValue("origid"));
@@ -154,7 +154,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
 	private void startLink(final Attributes atts) {
 		//TODO dg refactor network to support factory/builder and remove cast
-		LinkImpl l = ((NetworkLayer)this.network).createLink(new IdImpl(atts.getValue("id")), this.network.getNode(new IdImpl(atts.getValue("from"))), this.network.getNode(new IdImpl(atts.getValue("to"))),
+		LinkImpl l = ((NetworkLayer)this.network).createAndAddLink(new IdImpl(atts.getValue("id")), this.network.getNode(new IdImpl(atts.getValue("from"))), this.network.getNode(new IdImpl(atts.getValue("to"))),
 				Double.parseDouble(atts.getValue("length")), Double.parseDouble(atts.getValue("freespeed")), Double.parseDouble(atts.getValue("capacity")),
 				Double.parseDouble(atts.getValue("permlanes")));
 		l.setOrigId(atts.getValue("origid"));

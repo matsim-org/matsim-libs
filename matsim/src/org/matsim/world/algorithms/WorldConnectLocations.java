@@ -116,13 +116,13 @@ public class WorldConnectLocations {
 		for (LinkImpl l : remainingLinks) {
 			NodeImpl fn = l.getFromNode();
 			NodeImpl nfn = subNetwork.getNode(fn.getId());
-			if (nfn == null) { nfn = subNetwork.createNode(fn.getId(),fn.getCoord()); }
+			if (nfn == null) { nfn = subNetwork.createAndAddNode(fn.getId(),fn.getCoord()); }
 
 			NodeImpl tn = l.getToNode();
 			NodeImpl ntn = subNetwork.getNode(tn.getId());
-			if (ntn == null) { ntn = subNetwork.createNode(tn.getId(),tn.getCoord()); }
+			if (ntn == null) { ntn = subNetwork.createAndAddNode(tn.getId(),tn.getCoord()); }
 
-			subNetwork.createLink(l.getId(),nfn,ntn,l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME));
+			subNetwork.createAndAddLink(l.getId(),nfn,ntn,l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME));
 		}
 		log.info("  done.");
 		return subNetwork;

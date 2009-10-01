@@ -55,15 +55,15 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		this.config.charyparNagelScoring().setBrainExpBeta(2.0);
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
-		PlanImpl plan1 = person.createPlan(false); // weight: 0.0003.35462627902512
+		PlanImpl plan1 = person.createAndAddPlan(false); // weight: 0.0003.35462627902512
 		plan1.setScore(96.0);
-		PlanImpl plan2 = person.createPlan(false); // weight: 0.0024787521766663594
+		PlanImpl plan2 = person.createAndAddPlan(false); // weight: 0.0024787521766663594
 		plan2.setScore(97.0);
-		PlanImpl plan3 = person.createPlan(false); // weight: 0.018315638888734186
+		PlanImpl plan3 = person.createAndAddPlan(false); // weight: 0.018315638888734186
 		plan3.setScore(98.0);
-		PlanImpl plan4 = person.createPlan(false); // weight: 0.1353352832366127
+		PlanImpl plan4 = person.createAndAddPlan(false); // weight: 0.1353352832366127
 		plan4.setScore(99.0);
-		PlanImpl plan5 = person.createPlan(false);// weight: 1
+		PlanImpl plan5 = person.createAndAddPlan(false);// weight: 1
 		plan5.setScore(100.0);
 		
 		ExpBetaPlanSelector selector = new ExpBetaPlanSelector();
@@ -108,19 +108,19 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		// weight: 0.018315638888734186
-		PlanImpl plan1 = person.createPlan(false); 
+		PlanImpl plan1 = person.createAndAddPlan(false); 
 		plan1.setScore(96.0);
 		// weight: 0.04978706836786395
-		PlanImpl plan2 = person.createPlan(false); 
+		PlanImpl plan2 = person.createAndAddPlan(false); 
 		plan2.setScore(97.0);
 		// weight: 0.1353352832366127
-		PlanImpl plan3 = person.createPlan(false); 
+		PlanImpl plan3 = person.createAndAddPlan(false); 
 		plan3.setScore(98.0);
 		// weight: 0.3678794411714423
-		PlanImpl plan4 = person.createPlan(false); 
+		PlanImpl plan4 = person.createAndAddPlan(false); 
 		plan4.setScore(99.0);
 		// weight: 1
-		PlanImpl plan5 = person.createPlan(false);
+		PlanImpl plan5 = person.createAndAddPlan(false);
 		plan5.setScore(100.0);
 
 		

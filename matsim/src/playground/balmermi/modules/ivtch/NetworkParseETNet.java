@@ -64,7 +64,7 @@ public class NetworkParseETNet {
 				String[] entries = curr_line.split("\t", -1);
 				// ID  X  Y
 				// 0   1  2
-				network.createNode(new IdImpl(entries[0]), new CoordImpl(entries[1],entries[2]));
+				network.createAndAddNode(new IdImpl(entries[0]), new CoordImpl(entries[1],entries[2]));
 			}
 			buffered_reader.close();
 			file_reader.close();
@@ -89,7 +89,7 @@ public class NetworkParseETNet {
 					double freespeed = Double.parseDouble(entries[5])/3.6;
 					double capacity = Double.parseDouble(entries[6]);
 					double nofLanes = Double.parseDouble(entries[7]);
-					network.createLink(new IdImpl(entries[1]), network.getNode(new IdImpl(entries[2])), network.getNode(new IdImpl(entries[3])),
+					network.createAndAddLink(new IdImpl(entries[1]), network.getNode(new IdImpl(entries[2])), network.getNode(new IdImpl(entries[3])),
 					                   length, freespeed, capacity, nofLanes, entries[8], entries[9]);
 				}
 			}

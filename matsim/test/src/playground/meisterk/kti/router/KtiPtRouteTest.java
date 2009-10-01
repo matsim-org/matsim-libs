@@ -51,8 +51,8 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
 		
 		NetworkLayer dummyNetwork = new NetworkLayer();
-		dummyNetwork.createNode(new IdImpl("1000"), new CoordImpl(900.0, 900.0));
-		dummyNetwork.createNode(new IdImpl("1001"), new CoordImpl(1300.0, 1300.0));
+		dummyNetwork.createAndAddNode(new IdImpl("1000"), new CoordImpl(900.0, 900.0));
+		dummyNetwork.createAndAddNode(new IdImpl("1001"), new CoordImpl(1300.0, 1300.0));
 		
 		this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
 		this.plansCalcRouteKtiInfo.prepare(ktiConfigGroup, dummyNetwork);

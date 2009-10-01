@@ -153,20 +153,20 @@ public class RandomPlansGenerator {
 			Coord homeCoord = lHome.getCoord(), workCoord = lWork.getCoord();
 
 			//create home act
-			ActivityImpl a = plan.createActivity("h", homeCoord);
+			ActivityImpl a = plan.createAndAddActivity("h", homeCoord);
 			a.setLink(lHome);
 			a.setStartTime(startTime);
 			a.setEndTime(endTime);
 
 			//create leg to work
-			LegImpl leg = plan.createLeg(TransportMode.car);
+			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 			leg.setDepartureTime(randTime);
 			NetworkRouteWRefs route = new NodeNetworkRouteImpl(lHome, lWork);
 			route.setNodes(lHome, lPath.nodes, lWork);
 			leg.setRoute(route);
 
 			//create work act
-			a = plan.createActivity("h", workCoord);
+			a = plan.createAndAddActivity("h", workCoord);
 			a.setLink(lWork);
 			a.setDuration(this.workDuration);
 

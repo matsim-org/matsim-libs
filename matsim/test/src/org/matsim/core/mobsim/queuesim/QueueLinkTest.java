@@ -221,11 +221,11 @@ public class QueueLinkTest extends MatsimTestCase {
 	public void testBuffer() {
 		NetworkLayer network = new NetworkLayer();
 		network.setCapacityPeriod(1.0);
-		NodeImpl node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createNode(new IdImpl("2"), new CoordImpl(1, 0));
-		NodeImpl node3 = network.createNode(new IdImpl("3"), new CoordImpl(2, 0));
-		LinkImpl link1 = network.createLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
-		LinkImpl link2 = network.createLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1, 0));
+		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2, 0));
+		LinkImpl link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
+		LinkImpl link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
 		QueueNetwork queueNetwork = new QueueNetwork(network);
 		QueueSimEngine simEngine = new QueueSimEngine(queueNetwork, MatsimRandom.getRandom());
 		QueueLink qlink = queueNetwork.getQueueLink(new IdImpl("1"));
@@ -235,15 +235,15 @@ public class QueueLinkTest extends MatsimTestCase {
 		QueueSimulation qsim = new QueueSimulation(network, null, new EventsImpl());
 		QueueVehicleImpl v1 = new QueueVehicleImpl(new BasicVehicleImpl(new IdImpl("1"), new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
-		PlanImpl plan = p.createPlan(true);
+		PlanImpl plan = p.createAndAddPlan(true);
 		try {
-			plan.createActivity("h", link1);
-			LegImpl leg = plan.createLeg(TransportMode.car);
+			plan.createAndAddActivity("h", link1);
+			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 			NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link2);
 			leg.setRoute(route);
 			route.setLinks(link1, null, link2);
 			leg.setRoute(route);
-			plan.createActivity("w", link2);
+			plan.createAndAddActivity("w", link2);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -355,11 +355,11 @@ public class QueueLinkTest extends MatsimTestCase {
 			this.scenario = new ScenarioImpl();
 			NetworkLayer network = (NetworkLayer) this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
-			NodeImpl node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
-			NodeImpl node2 = network.createNode(new IdImpl("2"), new CoordImpl(1, 0));
-			NodeImpl node3 = network.createNode(new IdImpl("3"), new CoordImpl(1001, 0));
-			this.link1 = network.createLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 3600.0, 1.0);
-			this.link2 = network.createLink(new IdImpl("2"), node2, node3, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0);
+			NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+			NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1, 0));
+			NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1001, 0));
+			this.link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 3600.0, 1.0);
+			this.link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0);
 			this.queueNetwork = new QueueNetwork(network);
 			QueueSimEngine engine = new QueueSimEngine(this.queueNetwork, MatsimRandom.getRandom());
 			this.qlink1 = this.queueNetwork.getQueueLink(new IdImpl("1"));

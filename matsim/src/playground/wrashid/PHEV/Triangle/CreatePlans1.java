@@ -80,7 +80,7 @@ public class CreatePlans1 {
 			k.addActivity(work,false);
 			k.addActivity(shop,false);
 
-			PlanImpl plan = person.createPlan(true);
+			PlanImpl plan = person.createAndAddPlan(true);
 			ActivityFacilityImpl home_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("home").get(0).getFacility();
 			ActivityFacilityImpl work_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("work").get(0).getFacility();
 			ActivityFacilityImpl shop_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("shop").get(0).getFacility();
@@ -98,32 +98,32 @@ public class CreatePlans1 {
 			// shop: 16-17.30
 			// home: 17.30-0:00
 
-			ActivityImpl a = plan.createActivity("home",home_facility.getCoord());
+			ActivityImpl a = plan.createAndAddActivity("home",home_facility.getCoord());
 			a.setLink(home_facility.getLink());
 			a.setEndTime(depTimeHome);
-			LegImpl l = plan.createLeg(TransportMode.car);
+			LegImpl l = plan.createAndAddLeg(TransportMode.car);
 			l.setArrivalTime(depTimeHome);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTimeHome);
-			a = plan.createActivity("work",work_facility.getCoord());
+			a = plan.createAndAddActivity("work",work_facility.getCoord());
 			a.setLink(work_facility.getLink());
 			a.setStartTime(depTimeHome);
 			a.setEndTime(depTimeWork);
 			a.setDuration(depTimeWork-depTimeHome);
-			l = plan.createLeg(TransportMode.car);
+			l = plan.createAndAddLeg(TransportMode.car);
 			l.setArrivalTime(depTimeWork);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTimeWork);
-			a = plan.createActivity("shop",shop_facility.getCoord());
+			a = plan.createAndAddActivity("shop",shop_facility.getCoord());
 			a.setLink(shop_facility.getLink());
 			a.setStartTime(depTimeWork);
 			a.setEndTime(depTimeShop);
 			a.setDuration(depTimeShop-depTimeWork);
-			l = plan.createLeg(TransportMode.car);
+			l = plan.createAndAddLeg(TransportMode.car);
 			l.setArrivalTime(depTimeShop);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTimeShop);
-			a = plan.createActivity("home",home_facility.getCoord());
+			a = plan.createAndAddActivity("home",home_facility.getCoord());
 			a.setLink(home_facility.getLink());
 			// assign home-work-home activities to each person
 

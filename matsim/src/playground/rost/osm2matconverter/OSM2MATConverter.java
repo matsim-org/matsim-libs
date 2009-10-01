@@ -94,7 +94,7 @@ public class OSM2MATConverter {
 		{
 			boolean isRoad = false;
 			String highwayType = "";
-			//überprüfe ob es sich wirklich um eine Straße handelt
+			//ï¿½berprï¿½fe ob es sich wirklich um eine Straï¿½e handelt
 			for(Tag tag : way.getTag())
 			{
 				if(tag.equals("highway"))
@@ -115,8 +115,8 @@ public class OSM2MATConverter {
 			{
 				roadStats.put(highwayType, ++countOfType);
 			}
-			//es handelt sich um eine Straße.
-			//extrahiere alle Teilstraßen, das sind Straßen, zwischen zwei straßenKnoten
+			//es handelt sich um eine Straï¿½e.
+			//extrahiere alle Teilstraï¿½en, das sind Straï¿½en, zwischen zwei straï¿½enKnoten
 			Nd start, intermediate, end;
 			Node startNode, intermediateNode, endNode;
 			int laenge;
@@ -134,7 +134,7 @@ public class OSM2MATConverter {
 					//greife auf vorherigen Node zu
 					intermediate = way.getNd().get(i-1);
 					intermediateNode = mapNd2Node.get(intermediate.getRef());
-					//und addiere die Teillänge
+					//und addiere die Teillï¿½nge
 					end = way.getNd().get(i);
 					endNode = mapNd2Node.get(end.getRef());
 					laenge += GraphAlgorithms.getDistanceMeter(intermediateNode.getLon(), intermediateNode.getLat(), endNode.getLon(), endNode.getLat());
@@ -142,9 +142,9 @@ public class OSM2MATConverter {
 						break;
 				}
 				++debug_count;
-				//erzeuge Straße
+				//erzeuge Straï¿½e
 				double capacity = Math.max(haMap.getWidth(highwayType) / 1.25, 1);
-				network.createLink(new IdImpl(String.valueOf(++streetId)), 
+				network.createAndAddLink(new IdImpl(String.valueOf(++streetId)), 
 									network.getNode(String.valueOf(startNode.getId())), 
 									network.getNode(String.valueOf(endNode.getId())), 
 									laenge, 
@@ -153,7 +153,7 @@ public class OSM2MATConverter {
 									1);  //TODO!
 				
 
-				network.createLink(new IdImpl(String.valueOf(++streetId)), 
+				network.createAndAddLink(new IdImpl(String.valueOf(++streetId)), 
 									network.getNode(String.valueOf(endNode.getId())), 
 									network.getNode(String.valueOf(startNode.getId())), 
 									laenge, 
@@ -169,7 +169,7 @@ public class OSM2MATConverter {
 				debug_iter = debug_count;
 			}
 		}
-		log.debug("Statistik: Haeufigkeit von Straßentypen");
+		log.debug("Statistik: Haeufigkeit von Straï¿½entypen");
 		while(roadStats.size() > 0)
 		{
 			Integer maxCount = Integer.MIN_VALUE;
@@ -192,10 +192,10 @@ public class OSM2MATConverter {
 	
 	/**
 	 * Aus den bestehenden Wegen des Osm-Materials werden diejenigen Knoten extrahiert,
-	 * welche auch wirklich Straßenkreuzungen darstellen und nicht etwa Gebäudebegrenzungen oder ähnliches sind.
-	 * Zurückgegeben wird eine Map der Straßenkreuzungen
+	 * welche auch wirklich Straï¿½enkreuzungen darstellen und nicht etwa Gebï¿½udebegrenzungen oder ï¿½hnliches sind.
+	 * Zurï¿½ckgegeben wird eine Map der Straï¿½enkreuzungen
 	 * 
-	 * @param network Das Netwerk, in dem die Knoten eingefügt werden sollen
+	 * @param network Das Netwerk, in dem die Knoten eingefï¿½gt werden sollen
 	 * @param osmdata Osm-Daten
 	 * @return Map von Knoten Id auf Knoten
 	 */
@@ -211,8 +211,8 @@ public class OSM2MATConverter {
 		{
 			Node node;
 			boolean isWay = false;
-			//wir interessieren uns nur für knoten die an Wegen hängen
-			//nicht an Gebäuden oder so
+			//wir interessieren uns nur fï¿½r knoten die an Wegen hï¿½ngen
+			//nicht an Gebï¿½uden oder so
 			for(Tag tag : way.getTag())
 			{
 				if(tag.equals("highway"))
@@ -276,10 +276,10 @@ public class OSM2MATConverter {
 			String id = node.getId().toString();
 			String x  = String.valueOf(node.getLon());
 			String y  = String.valueOf(node.getLat());
-			//erstelle Daten für das Netzwerk
+			//erstelle Daten fï¿½r das Netzwerk
 			Coord coord = new CoordImpl(x,y);
 			Id matsimid  = new IdImpl(id);
-			network.createNode(matsimid, coord);
+			network.createAndAddNode(matsimid, coord);
 		}
 		return strassenKnoten;
 	}

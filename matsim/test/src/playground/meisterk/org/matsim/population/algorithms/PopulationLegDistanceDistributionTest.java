@@ -53,25 +53,25 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 	public void testGenerationDistribution() {
 		
 		NetworkLayer testNetwork = new NetworkLayer();
-		NodeImpl node1 = testNetwork.createNode(new IdImpl("1"), new CoordImpl(0.0, 0.0));
-		NodeImpl node2 = testNetwork.createNode(new IdImpl("2"), new CoordImpl(500.0, 500.0));
-		NodeImpl node3 = testNetwork.createNode(new IdImpl("3"), new CoordImpl(1000.0, 1000.0));
-		LinkImpl startLink = testNetwork.createLink(new IdImpl("101"), node1, node2, 500.0, 27.7778, 2000.0, 1.0);
-		LinkImpl endLink = testNetwork.createLink(new IdImpl("102"), node2, node3, 1000.0, 27.7778, 2000.0, 1.0);
+		NodeImpl node1 = testNetwork.createAndAddNode(new IdImpl("1"), new CoordImpl(0.0, 0.0));
+		NodeImpl node2 = testNetwork.createAndAddNode(new IdImpl("2"), new CoordImpl(500.0, 500.0));
+		NodeImpl node3 = testNetwork.createAndAddNode(new IdImpl("3"), new CoordImpl(1000.0, 1000.0));
+		LinkImpl startLink = testNetwork.createAndAddLink(new IdImpl("101"), node1, node2, 500.0, 27.7778, 2000.0, 1.0);
+		LinkImpl endLink = testNetwork.createAndAddLink(new IdImpl("102"), node2, node3, 1000.0, 27.7778, 2000.0, 1.0);
 		
 		PersonImpl testPerson = new PersonImpl(new IdImpl("1000"));
-		PlanImpl testPlan = testPerson.createPlan(true);
+		PlanImpl testPlan = testPerson.createAndAddPlan(true);
 		
-		ActivityImpl act = testPlan.createActivity("startActivity", startLink);
+		ActivityImpl act = testPlan.createAndAddActivity("startActivity", startLink);
 		
-		Leg leg = testPlan.createLeg(TransportMode.car);
+		Leg leg = testPlan.createAndAddLeg(TransportMode.car);
 		
 		NodeNetworkRouteImpl route = new NodeNetworkRouteImpl(startLink, endLink);
 		route.setDistance(1200.0);
 		
 		leg.setRoute(route);
 		
-		act = testPlan.createActivity("endActivity", endLink);
+		act = testPlan.createAndAddActivity("endActivity", endLink);
 		
 		PopulationImpl pop = new PopulationImpl();
 		pop.setIsStreaming(true);

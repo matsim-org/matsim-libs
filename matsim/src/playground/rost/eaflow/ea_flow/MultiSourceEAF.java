@@ -169,14 +169,14 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 		}
 		
 		//create sink
-		network.createNode(new IdImpl(GlobalFlowCalculationSettings.superSinkId), new CoordImpl(0,0));
+		network.createAndAddNode(new IdImpl(GlobalFlowCalculationSettings.superSinkId), new CoordImpl(0,0));
 		Node sink = network.getNode(GlobalFlowCalculationSettings.superSinkId);
 		int counter = 0;
 		//create links from real sinks to supersink!
 		for(String id : evacArea.evacBorderNodeIds)
 		{
 			Id linkId = new IdImpl("borderNode->sink" + (++counter));
-			network.createLink( linkId, 
+			network.createAndAddLink( linkId, 
 								network.getNode(id), 
 								network.getNode(GlobalFlowCalculationSettings.superSinkId),
 								0,

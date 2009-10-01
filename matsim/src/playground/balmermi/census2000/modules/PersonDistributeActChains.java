@@ -200,7 +200,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 		ArrayList<ArrayList<Integer>> chains = this.actchains.getChains(bitcode);
 		int index = MatsimRandom.getRandom().nextInt(chains.size());
 		ArrayList<Integer> chain = chains.get(index);
-		PlanImpl plan =  p.createPlan(true);
+		PlanImpl plan =  p.createAndAddPlan(true);
 		int time_sum = 0;
 		for (int i=0; i<chain.size(); i=i+2) {
 			int val = chain.get(i);
@@ -217,7 +217,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 			if (i == chain.size()-1) {
 				int start_time = time_sum;
 				try {
-					ActivityImpl a = plan.createActivity(type, new CoordImpl(0.0,0.0));
+					ActivityImpl a = plan.createAndAddActivity(type, new CoordImpl(0.0,0.0));
 					a.setStartTime(start_time);
 				}
 				catch (Exception e) { Gbl.errorMsg(e); }
@@ -228,11 +228,11 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 				time_sum += dur;
 				int end_time = time_sum;
 				try {
-					ActivityImpl a = plan.createActivity(type, new CoordImpl(0.0,0.0));
+					ActivityImpl a = plan.createAndAddActivity(type, new CoordImpl(0.0,0.0));
 					a.setStartTime(start_time);
 					a.setEndTime(end_time);
 					a.setDuration(dur);
-					LegImpl l = plan.createLeg(TransportMode.undefined);
+					LegImpl l = plan.createAndAddLeg(TransportMode.undefined);
 					l.setArrivalTime(end_time);
 					l.setTravelTime(0);
 					l.setDepartureTime(end_time);

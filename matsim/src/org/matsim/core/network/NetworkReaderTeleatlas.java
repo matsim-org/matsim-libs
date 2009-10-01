@@ -208,7 +208,7 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 			if ((jncttyp < 0) || (jncttyp == 1) || (jncttyp > 6)) { throw new IllegalArgumentException(NODE_ID_NAME+"="+id+": "+NODE_JNCTTYP_NAME+"="+jncttyp+" not allowed."); }
 			if (id == null) { throw new IllegalArgumentException("In "+jcShpFileName+": There is at least one feature that does not have an ID set."); }
 			String type = feattyp+"-"+jncttyp;
-			network.createNode(new IdImpl(id.toString()),new CoordImpl(c.x,c.y),type);
+			network.createAndAddNode(new IdImpl(id.toString()),new CoordImpl(c.x,c.y),type);
 		}
 		nCnt = network.getNodes().size()-nCnt;
 		log.info("  "+nCnt+" nodes added to the network.");
@@ -338,14 +338,14 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 			if (ignore) { ignoreCnt++; }
 			else {
 				if (oneway.equals(" ") || oneway.equals("N")) {
-					network.createLink(new IdImpl(id.toString()+"FT"),fNode,tNode,length,speed/3.6,cap,lanes,id.toString(),linksType+"-"+featTyp+"-"+ferryType);
-					network.createLink(new IdImpl(id.toString()+"TF"),tNode,fNode,length,speed/3.6,cap,lanes,id.toString(),linksType+"-"+featTyp+"-"+ferryType);
+					network.createAndAddLink(new IdImpl(id.toString()+"FT"),fNode,tNode,length,speed/3.6,cap,lanes,id.toString(),linksType+"-"+featTyp+"-"+ferryType);
+					network.createAndAddLink(new IdImpl(id.toString()+"TF"),tNode,fNode,length,speed/3.6,cap,lanes,id.toString(),linksType+"-"+featTyp+"-"+ferryType);
 				}
 				else if (oneway.equals("FT")) {
-					network.createLink(new IdImpl(id.toString()+oneway),fNode,tNode,length,speed/3.6,cap,lanes,id.toString(),linksType+"-"+featTyp+"-"+ferryType);
+					network.createAndAddLink(new IdImpl(id.toString()+oneway),fNode,tNode,length,speed/3.6,cap,lanes,id.toString(),linksType+"-"+featTyp+"-"+ferryType);
 				}
 				else if (oneway.equals("TF")) {
-					network.createLink(new IdImpl(id.toString()+oneway),tNode,fNode,length,speed/3.6,cap,lanes,id.toString(),linksType+"-"+featTyp+"-"+ferryType);
+					network.createAndAddLink(new IdImpl(id.toString()+oneway),tNode,fNode,length,speed/3.6,cap,lanes,id.toString(),linksType+"-"+featTyp+"-"+ferryType);
 				}
 				else {
 					throw new IllegalArgumentException("linkId="+id.toString()+": "+LINK_ONEWAY_NAME+"="+oneway+" not known!");

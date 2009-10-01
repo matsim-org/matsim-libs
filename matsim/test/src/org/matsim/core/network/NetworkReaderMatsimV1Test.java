@@ -94,8 +94,8 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	 */
 	private LinkImpl prepareTestAllowedModes(final String modes) {
 		NetworkLayer network = new NetworkLayer();
-		network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
-		network.createNode(new IdImpl("2"), new CoordImpl(1000, 0));
+		network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
 
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(network);
 		Stack<String> context = new Stack<String>();

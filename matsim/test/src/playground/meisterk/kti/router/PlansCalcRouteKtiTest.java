@@ -55,12 +55,12 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 
 		network = new NetworkLayer();
 		
-		network.createNode(new IdImpl(1), new CoordImpl(1000.0, 1000.0));
-		network.createNode(new IdImpl(2), new CoordImpl(1100.0, 1100.0));
-		network.createNode(new IdImpl(3), new CoordImpl(1200.0, 1200.0));
+		network.createAndAddNode(new IdImpl(1), new CoordImpl(1000.0, 1000.0));
+		network.createAndAddNode(new IdImpl(2), new CoordImpl(1100.0, 1100.0));
+		network.createAndAddNode(new IdImpl(3), new CoordImpl(1200.0, 1200.0));
 
-		network.createLink(new IdImpl(1), network.getNode("1"), network.getNode("2"), 1.0, 1.0, 1.0, 1.0);
-		network.createLink(new IdImpl(2), network.getNode("2"), network.getNode("3"), 1.0, 1.0, 1.0, 1.0);
+		network.createAndAddLink(new IdImpl(1), network.getNode("1"), network.getNode("2"), 1.0, 1.0, 1.0, 1.0);
+		network.createAndAddLink(new IdImpl(2), network.getNode("2"), network.getNode("3"), 1.0, 1.0, 1.0, 1.0);
 
 
 		plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();

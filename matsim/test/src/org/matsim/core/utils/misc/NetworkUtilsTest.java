@@ -122,10 +122,10 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		NodeImpl[] nodes = new NodeImpl[numOfLinks+1];
 		for (int i = 0; i <= numOfLinks; i++) {
-			nodes[i] = network.createNode(new IdImpl(i), new CoordImpl(1000 * i, 0));
+			nodes[i] = network.createAndAddNode(new IdImpl(i), new CoordImpl(1000 * i, 0));
 		}
 		for (int i = 0; i < numOfLinks; i++) {
-			network.createLink(new IdImpl(i), nodes[i], nodes[i+1], 1000.0, 10.0, 3600.0, 1);
+			network.createAndAddLink(new IdImpl(i), nodes[i], nodes[i+1], 1000.0, 10.0, 3600.0, 1);
 		}
 		return network;
 	}

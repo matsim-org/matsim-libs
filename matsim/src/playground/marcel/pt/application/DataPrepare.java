@@ -193,10 +193,10 @@ public class DataPrepare {
 		NetworkLayer visNet = visScenario.getNetwork();
 
 		for (Node node : routerNet.getNodes().values()) {
-			visNet.createNode(node.getId(), node.getCoord());
+			visNet.createAndAddNode(node.getId(), node.getCoord());
 		}
 		for (Link link : routerNet.getLinks().values()) {
-			visNet.createLink(link.getId(), visNet.getNodes().get(link.getFromNode().getId()), visNet.getNodes().get(link.getToNode().getId()),
+			visNet.createAndAddLink(link.getId(), visNet.getNodes().get(link.getFromNode().getId()), visNet.getNodes().get(link.getToNode().getId()),
 					link.getLength(), link.getFreespeed(Time.UNDEFINED_TIME), link.getCapacity(Time.UNDEFINED_TIME), link.getNumberOfLanes(Time.UNDEFINED_TIME));
 		}
 

@@ -104,13 +104,13 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		// setup network
 		NetworkLayer network = new NetworkLayer();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
-		NodeImpl node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
-		NodeImpl node3 = network.createNode(new IdImpl("3"), new CoordImpl(200, 0));
-		NodeImpl node4 = network.createNode(new IdImpl("4"), new CoordImpl(300, 0));
-		LinkImpl link1 = network.createLink(new IdImpl("0"), node1, node2, 100, 5, 100, 1);
-		network.createLink(new IdImpl("1"), node2, node3, 100, 5, 100, 1);
-		network.createLink(new IdImpl("2"), node3, node4, 100, 5, 100, 1);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
+		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(200, 0));
+		NodeImpl node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(300, 0));
+		LinkImpl link1 = network.createAndAddLink(new IdImpl("0"), node1, node2, 100, 5, 100, 1);
+		network.createAndAddLink(new IdImpl("1"), node2, node3, 100, 5, 100, 1);
+		network.createAndAddLink(new IdImpl("2"), node3, node4, 100, 5, 100, 1);
 
 		// setup person
 		PlanImpl plan;
@@ -120,14 +120,14 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).
 			 */
 			PersonImpl person = new PersonImpl(new IdImpl("1"));
-			plan = person.createPlan(true);
-			act1 = plan.createActivity("h", link1);
+			plan = person.createAndAddPlan(true);
+			act1 = plan.createAndAddActivity("h", link1);
 			act1.setEndTime(4*3600);
-			plan.createLeg(TransportMode.car);
-			act2 = plan.createActivity("w", link1);
+			plan.createAndAddLeg(TransportMode.car);
+			act2 = plan.createAndAddActivity("w", link1);
 			act2.setDuration(14*3600);
-			plan.createLeg(TransportMode.car);
-			plan.createActivity("h", link1);
+			plan.createAndAddLeg(TransportMode.car);
+			plan.createAndAddActivity("h", link1);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -21,6 +21,7 @@
 package org.matsim.core.population;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
@@ -57,14 +58,14 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 		super();
 	}
 
-	public final ActivityImpl createActivity(final String type, final Coord coord) {
+	public final ActivityImpl createAndAddActivity(final String type, final Coord coord) {
 		verifyCreateAct();
 		ActivityImpl a = new ActivityImpl(type, coord);
 		getPlanElements().add(a);
 		return a;
 	}
 
-	public final ActivityImpl createActivity(final String type, final ActivityFacilityImpl fac) {
+	public final ActivityImpl createAndAddActivity(final String type, final ActivityFacilityImpl fac) {
 		verifyCreateAct();
 		ActivityImpl a = new ActivityImpl(type, fac);
 		getPlanElements().add(a);
@@ -72,7 +73,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 	}
 
 
-	public final ActivityImpl createActivity(final String type, final LinkImpl link) {
+	public final ActivityImpl createAndAddActivity(final String type, final LinkImpl link) {
 		verifyCreateAct();
 		ActivityImpl a = new ActivityImpl(type, link);
 		getPlanElements().add(a);
@@ -83,7 +84,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public LegImpl createLeg(final TransportMode mode) {
+	public LegImpl createAndAddLeg(final TransportMode mode) {
 		verifyCreateLeg();
 		LegImpl leg = new LegImpl(mode);
 		// Override leg number with an appropriate value
@@ -216,7 +217,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 				getPlanElements().add(new ActivityImpl(a));
 			} else if (pe instanceof LegImpl) {
 				LegImpl l = (LegImpl) pe;
-				LegImpl l2 = createLeg(l.getMode());
+				LegImpl l2 = createAndAddLeg(l.getMode());
 				l2.setDepartureTime(l.getDepartureTime());
 				l2.setTravelTime(l.getTravelTime());
 				l2.setArrivalTime(l.getArrivalTime());

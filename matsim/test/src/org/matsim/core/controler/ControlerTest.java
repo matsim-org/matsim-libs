@@ -65,28 +65,28 @@ public class ControlerTest extends MatsimTestCase {
 		PersonImpl person1 = null;
 
 		person1 = new PersonImpl(new IdImpl(1));
-		PlanImpl plan1 = person1.createPlan(true);
-		ActivityImpl a1 = plan1.createActivity("h", f.link1);
+		PlanImpl plan1 = person1.createAndAddPlan(true);
+		ActivityImpl a1 = plan1.createAndAddActivity("h", f.link1);
 		a1.setEndTime(7.0*3600);
-		LegImpl leg1 = plan1.createLeg(TransportMode.car);
+		LegImpl leg1 = plan1.createAndAddLeg(TransportMode.car);
 		NetworkRouteWRefs route1 = (NetworkRouteWRefs)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		leg1.setRoute(route1);
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		nodes.add(f.node2);
 		nodes.add(f.node3);
 		route1.setNodes(f.link1, nodes, f.link3);
-		plan1.createActivity("h", f.link3);
+		plan1.createAndAddActivity("h", f.link3);
 		population.getPersons().put(person1.getId(), person1);
 
 		PersonImpl person2 = new PersonImpl(new IdImpl(2));
-		PlanImpl plan2 = person2.createPlan(true);
-		ActivityImpl a2 = plan2.createActivity("h", f.link1);
+		PlanImpl plan2 = person2.createAndAddPlan(true);
+		ActivityImpl a2 = plan2.createAndAddActivity("h", f.link1);
 		a2.setEndTime(7.0*3600);
-		LegImpl leg2 = plan2.createLeg(TransportMode.car);
+		LegImpl leg2 = plan2.createAndAddLeg(TransportMode.car);
 		NetworkRouteWRefs route2 = (NetworkRouteWRefs)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
 		leg2.setRoute(route2);
 		route2.setNodes(f.link1, nodes, f.link3);
-		plan2.createActivity("h", f.link3);
+		plan2.createAndAddActivity("h", f.link3);
 		population.getPersons().put(person2.getId(), person2);
 
 		// Complete the configuration for our test case
@@ -142,9 +142,9 @@ public class ControlerTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		// create a very simple network with one link only and an empty population
 		NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(100, 0));
-		network.createLink(new IdImpl(1), node1, node2, 100, 1, 3600, 1);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(100, 0));
+		network.createAndAddLink(new IdImpl(1), node1, node2, 100, 1, 3600, 1);
 
 		final Controler controler = new Controler(scenario);
 		controler.setCreateGraphs(false);
@@ -176,20 +176,20 @@ public class ControlerTest extends MatsimTestCase {
 
 		person1 = new PersonImpl(new IdImpl(1));
 		// --- plan 1 ---
-		PlanImpl plan1 = person1.createPlan(true);
-		ActivityImpl a1 = plan1.createActivity("h", f.link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
+		PlanImpl plan1 = person1.createAndAddPlan(true);
+		ActivityImpl a1 = plan1.createAndAddActivity("h", f.link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 		a1.setEndTime(7.0*3600);
-		leg1 = plan1.createLeg(TransportMode.car);
+		leg1 = plan1.createAndAddLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		plan1.createActivity("h", f.link3);
+		plan1.createAndAddActivity("h", f.link3);
 		// --- plan 2 ---
-		PlanImpl plan2 = person1.createPlan(true);
-		ActivityImpl a2 = plan2.createActivity("h", f.link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
+		PlanImpl plan2 = person1.createAndAddPlan(true);
+		ActivityImpl a2 = plan2.createAndAddActivity("h", f.link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 		a2.setEndTime(7.0*3600);
 
-		leg2 = plan2.createLeg(TransportMode.car);
+		leg2 = plan2.createAndAddLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		plan2.createActivity("h", f.link3);
+		plan2.createAndAddActivity("h", f.link3);
 		population.getPersons().put(person1.getId(), person1);
 
 		// Complete the configuration for our test case
@@ -237,19 +237,19 @@ public class ControlerTest extends MatsimTestCase {
 
 		person1 = new PersonImpl(new IdImpl(1));
 		// --- plan 1 ---
-		PlanImpl plan1 = person1.createPlan(true);
-		act1a = plan1.createActivity("h", new CoordImpl(-50.0, 10.0));
+		PlanImpl plan1 = person1.createAndAddPlan(true);
+		act1a = plan1.createAndAddActivity("h", new CoordImpl(-50.0, 10.0));
 		act1a.setEndTime(7.0*3600);
-		leg1 = plan1.createLeg(TransportMode.car);
+		leg1 = plan1.createAndAddLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		act1b = plan1.createActivity("h", new CoordImpl(1075.0, -10.0));
+		act1b = plan1.createAndAddActivity("h", new CoordImpl(1075.0, -10.0));
 		// --- plan 2 ---
-		PlanImpl plan2 = person1.createPlan(true);
-		act2a = plan2.createActivity("h", new CoordImpl(-50.0, -10.0));
+		PlanImpl plan2 = person1.createAndAddPlan(true);
+		act2a = plan2.createAndAddActivity("h", new CoordImpl(-50.0, -10.0));
 		act2a.setEndTime(7.9*3600);
-		leg2 = plan2.createLeg(TransportMode.car);
+		leg2 = plan2.createAndAddLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		act2b = plan2.createActivity("h", new CoordImpl(1111.1, 10.0));
+		act2b = plan2.createAndAddActivity("h", new CoordImpl(1111.1, 10.0));
 		population.getPersons().put(person1.getId(), person1);
 
 		// Complete the configuration for our test case
@@ -466,13 +466,13 @@ public class ControlerTest extends MatsimTestCase {
 			 * (one having 100secs, the other having 200secs to cross the link).
 			 */
 			this.network.setCapacityPeriod(Time.parseTime("01:00:00"));
-			this.node1 = this.network.createNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
-			this.node2 = this.network.createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
-			this.node3 = this.network.createNode(new IdImpl(3), new CoordImpl(1000.0, 0.0));
-			this.node4 = this.network.createNode(new IdImpl(4), new CoordImpl(1100.0, 0.0));
-			this.link1 = this.network.createLink(new IdImpl(1), this.node1, this.node2, 100, 10, 7200, 1);
-			this.link2 = this.network.createLink(new IdImpl(2), this.node2, this.node3, 1000, 10, 36, 1);
-			this.link3 = this.network.createLink(new IdImpl(3), this.node3, this.node4, 100, 10, 7200, 1);
+			this.node1 = this.network.createAndAddNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
+			this.node2 = this.network.createAndAddNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
+			this.node3 = this.network.createAndAddNode(new IdImpl(3), new CoordImpl(1000.0, 0.0));
+			this.node4 = this.network.createAndAddNode(new IdImpl(4), new CoordImpl(1100.0, 0.0));
+			this.link1 = this.network.createAndAddLink(new IdImpl(1), this.node1, this.node2, 100, 10, 7200, 1);
+			this.link2 = this.network.createAndAddLink(new IdImpl(2), this.node2, this.node3, 1000, 10, 36, 1);
+			this.link3 = this.network.createAndAddLink(new IdImpl(3), this.node3, this.node4, 100, 10, 7200, 1);
 		}
 	}
 

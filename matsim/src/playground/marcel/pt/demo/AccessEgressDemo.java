@@ -94,10 +94,10 @@ public class AccessEgressDemo {
 		network.setCapacityPeriod(3600.0);
 		NodeImpl[] nodes = new NodeImpl[nOfLinks + 1];
 		for (int i = 0; i <= nOfLinks; i++) {
-			nodes[i] = network.createNode(this.ids[i], this.scenario.createCoord(i * 500, 0));
+			nodes[i] = network.createAndAddNode(this.ids[i], this.scenario.createCoord(i * 500, 0));
 		}
 		for (int i = 0; i < nOfLinks; i++) {
-			network.createLink(this.ids[i], nodes[i], nodes[i+1], 500.0, 10.0, 1000.0, 1);
+			network.createAndAddLink(this.ids[i], nodes[i], nodes[i+1], 500.0, 10.0, 1000.0, 1);
 		}
 	}
 

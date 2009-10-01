@@ -276,7 +276,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 
 		try {
 			route.getSubRoute(
-					network.createNode(new IdImpl("99"), new CoordImpl(-100, -100)),
+					network.createAndAddNode(new IdImpl("99"), new CoordImpl(-100, -100)),
 					network.getNode(new IdImpl("15")));
 			fail("expected IllegalArgumentException, but it did not happen.");
 		} catch (IllegalArgumentException expected) {
@@ -294,7 +294,7 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		try {
 			route.getSubRoute(
 					network.getNode(new IdImpl("15")),
-					network.createNode(new IdImpl("99"), new CoordImpl(-100, -100)));
+					network.createAndAddNode(new IdImpl("99"), new CoordImpl(-100, -100)));
 			fail("expected IllegalArgumentException, but it did not happen.");
 		} catch (IllegalArgumentException expected) {
 			log.info("catched expected exception: " + expected.getMessage());
@@ -400,35 +400,35 @@ public abstract class AbstractNetworkRouteTest extends MatsimTestCase {
 		 *  ( 1)-----1---->( 2)-----2---->( 3)-----3---->( 4)-----4---->( 5)
 		 */
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl node0 = network.createNode(new IdImpl("0"), new CoordImpl(   0, 500));
-		NodeImpl node1 = network.createNode(new IdImpl("1"), new CoordImpl(   0, 0));
-		NodeImpl node2 = network.createNode(new IdImpl("2"), new CoordImpl(1000, 0));
-		NodeImpl node3 = network.createNode(new IdImpl("3"), new CoordImpl(2000, 0));
-		NodeImpl node4 = network.createNode(new IdImpl("4"), new CoordImpl(3000, 0));
-		NodeImpl node5 = network.createNode(new IdImpl("5"), new CoordImpl(4000, 0));
-		NodeImpl node11 = network.createNode(new IdImpl("11"), new CoordImpl(   0, 1000));
-		NodeImpl node12 = network.createNode(new IdImpl("12"), new CoordImpl(1000, 1000));
-		NodeImpl node13 = network.createNode(new IdImpl("13"), new CoordImpl(2000, 1000));
-		NodeImpl node14 = network.createNode(new IdImpl("14"), new CoordImpl(3000, 1000));
-		NodeImpl node15 = network.createNode(new IdImpl("15"), new CoordImpl(4000, 1000));
-		NodeImpl node16 = network.createNode(new IdImpl("16"), new CoordImpl(5000, 1000));
+		NodeImpl node0 = network.createAndAddNode(new IdImpl("0"), new CoordImpl(   0, 500));
+		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
+		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));
+		NodeImpl node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(3000, 0));
+		NodeImpl node5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(4000, 0));
+		NodeImpl node11 = network.createAndAddNode(new IdImpl("11"), new CoordImpl(   0, 1000));
+		NodeImpl node12 = network.createAndAddNode(new IdImpl("12"), new CoordImpl(1000, 1000));
+		NodeImpl node13 = network.createAndAddNode(new IdImpl("13"), new CoordImpl(2000, 1000));
+		NodeImpl node14 = network.createAndAddNode(new IdImpl("14"), new CoordImpl(3000, 1000));
+		NodeImpl node15 = network.createAndAddNode(new IdImpl("15"), new CoordImpl(4000, 1000));
+		NodeImpl node16 = network.createAndAddNode(new IdImpl("16"), new CoordImpl(5000, 1000));
 
-		network.createLink(new IdImpl("0"), node0, node1,  500.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("1"), node1, node2, 1000.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("2"), node2, node3, 1000.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("3"), node3, node4, 1000.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("4"), node4, node5, 1000.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("11"), node11, node12, 1000.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("12"), node12, node13, 1000.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("13"), node13, node14, 1000.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("14"), node14, node15, 1000.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("15"), node15, node16, 1000.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("22"), node2, node12, 1000.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("23"), node3, node13, 1000.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("24"), node4, node14, 1000.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("-22"), node12, node2, 1000.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("-23"), node13, node3, 1000.0, 100.0, 3600.0, 1);
-		network.createLink(new IdImpl("-24"), node14, node4, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("0"), node0, node1,  500.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("1"), node1, node2, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("2"), node2, node3, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("3"), node3, node4, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("4"), node4, node5, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("11"), node11, node12, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("12"), node12, node13, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("13"), node13, node14, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("14"), node14, node15, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("15"), node15, node16, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("22"), node2, node12, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("23"), node3, node13, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("24"), node4, node14, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("-22"), node12, node2, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("-23"), node13, node3, 1000.0, 100.0, 3600.0, 1);
+		network.createAndAddLink(new IdImpl("-24"), node14, node4, 1000.0, 100.0, 3600.0, 1);
 
 		Gbl.createWorld().setNetworkLayer(network);
 

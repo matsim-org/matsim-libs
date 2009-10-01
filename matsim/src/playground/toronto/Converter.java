@@ -120,7 +120,7 @@ public class Converter {
 				endTime = convertTime(tabs[3]);
 				double dur = endTime - this.tmpEndTime;
 
-				LegImpl leg = pl.createLeg(TransportMode.car);
+				LegImpl leg = pl.createAndAddLeg(TransportMode.car);
 				leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 				Coord tmpCoord = getRandomCoordInZone(tabs[9]);
@@ -128,7 +128,7 @@ public class Converter {
 					tmpCoord = this.tmpHome;
 				}
 
-				ActivityImpl act = pl.createActivity(tabs[7], tmpCoord);
+				ActivityImpl act = pl.createAndAddActivity(tabs[7], tmpCoord);
 				act.setEndTime(convertTime(tabs[3]));
 				act.setDuration(dur);
 
@@ -141,7 +141,7 @@ public class Converter {
 					PersonImpl p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
 					PlanImpl tmpPl = p.getSelectedPlan();
 
-					LegImpl leg = tmpPl.createLeg(TransportMode.car);
+					LegImpl leg = tmpPl.createAndAddLeg(TransportMode.car);
 					leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 					// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 
@@ -149,7 +149,7 @@ public class Converter {
 					if (this.tmpTabs[10].equals("H")) {
 						tmpCoord2 = this.tmpHome;
 					}
-					ActivityImpl lastAct = tmpPl.createActivity(this.tmpTabs[10], tmpCoord2);
+					ActivityImpl lastAct = tmpPl.createAndAddActivity(this.tmpTabs[10], tmpCoord2);
 
 					// make a copy of the just finished plan and set it to use public transit mode
 					PlanImpl nonCarPlan = new org.matsim.core.population.PlanImpl(p);
@@ -168,7 +168,7 @@ public class Converter {
 				endTime = convertTime(tabs[3]);
 
 				this.tmpHome = getRandomCoordInZone(tabs[9]);
-				ActivityImpl homeAct = pl.createActivity(tabs[7], this.tmpHome);
+				ActivityImpl homeAct = pl.createAndAddActivity(tabs[7], this.tmpHome);
 				homeAct.setEndTime(convertTime(tabs[3]));
 				p.addPlan(pl);
 				this.pop.addPerson(p);

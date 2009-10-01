@@ -134,7 +134,7 @@ public class PTRouter{
 				type = "Egress";
 			}
 			
-			LinkImpl link= logicNet.createLink(idLink, fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()) , 1, 1, 1, "0", type);
+			LinkImpl link= logicNet.createAndAddLink(idLink, fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()) , 1, 1, 1, "0", type);
 			newWalkLinks.add(link);
 		}
 		return newWalkLinks;

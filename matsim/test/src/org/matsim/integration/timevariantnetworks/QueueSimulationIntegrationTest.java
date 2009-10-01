@@ -173,13 +173,13 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		network.setCapacityPeriod(3600.0);
 
 		// the network has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		NodeImpl node1 = network.createNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createNode(new IdImpl("2"), new CoordImpl(100, 0));
-		NodeImpl node3 = network.createNode(new IdImpl("3"), new CoordImpl(200, 0));
-		NodeImpl node4 = network.createNode(new IdImpl("4"), new CoordImpl(300, 0));
-		network.createLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
-		network.createLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
-		network.createLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
+		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(200, 0));
+		NodeImpl node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(300, 0));
+		network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
+		network.createAndAddLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
+		network.createAndAddLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
 
 		return network;
 	}
@@ -201,16 +201,16 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		List<PersonImpl> persons = new ArrayList<PersonImpl>(count);
 		for(int i = 0; i < count; i++) {
 			PersonImpl person = new PersonImpl(new IdImpl(i + (int)departureTime));
-			PlanImpl plan1 = person.createPlan(true);
-			ActivityImpl a1 = plan1.createActivity("h", depLink);
+			PlanImpl plan1 = person.createAndAddPlan(true);
+			ActivityImpl a1 = plan1.createAndAddActivity("h", depLink);
 			a1.setEndTime(departureTime);
-			LegImpl leg1 = plan1.createLeg(TransportMode.car);
+			LegImpl leg1 = plan1.createAndAddLeg(TransportMode.car);
 			leg1.setDepartureTime(departureTime);
 			leg1.setTravelTime(10);
 			NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, depLink, destLink);
 			route.setNodes(depLink, NetworkUtils.getNodes(network, "2 3"), destLink);
 			leg1.setRoute(route);
-			plan1.createActivity("w", destLink);
+			plan1.createAndAddActivity("w", destLink);
 
 			persons.add(person);
 			departureTime++;

@@ -80,24 +80,24 @@ public class Plansgenerator {
 			p.addPlan(plan);
 			//home
 			homeEndtime += 0.5 * 60;
-			ActivityImpl a = plan.createActivity("h", homeCoord);
+			ActivityImpl a = plan.createAndAddActivity("h", homeCoord);
 			a.setLink(link1);
 			a.setEndTime(homeEndtime);
 			//leg to work
-			LegImpl leg = plan.createLeg(TransportMode.car);
+			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 			NetworkRouteWRefs route = new NodeNetworkRouteImpl(link1, link20);
 			route.setNodes(link1, NetworkUtils.getNodes(network, "2 4 5"), link20);
 			leg.setRoute(route);
 			//work
-			a = plan.createActivity("w", workCoord);
+			a = plan.createAndAddActivity("w", workCoord);
 			a.setLink(link20);
 			a.setDuration(2.5 * 3600);
 			//leg to work
-			leg = plan.createLeg(TransportMode.car);
+			leg = plan.createAndAddLeg(TransportMode.car);
 			route = new NodeNetworkRouteImpl(link20, link1);
 			route.setNodes(link20, NetworkUtils.getNodes(network, "13 14 15 1"), link1);
 			leg.setRoute(route);
-			a = plan.createActivity("h", homeCoord);
+			a = plan.createAndAddActivity("h", homeCoord);
 			a.setLink(link1);
 
 

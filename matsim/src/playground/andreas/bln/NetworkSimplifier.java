@@ -80,7 +80,7 @@ public class NetworkSimplifier {
 								if(this.mergeLinkStats){
 									
 									// Try to merge both links by guessing the resulting links attributes
-									network.createLink(
+									network.createAndAddLink(
 											new IdImpl(inLink.getId() + "-" + outLink.getId()),
 											inLink.getFromNode(),
 											outLink.getToNode(),
@@ -112,7 +112,7 @@ public class NetworkSimplifier {
 									
 									// Only merge links with same attributes									
 									if(bothLinksHaveSameLinkStats(inLink, outLink)){
-										LinkImpl newLink = network.createLink(
+										LinkImpl newLink = network.createAndAddLink(
 												new IdImpl(inLink.getId() + "-" + outLink.getId()),
 												inLink.getFromNode(),
 												outLink.getToNode(),

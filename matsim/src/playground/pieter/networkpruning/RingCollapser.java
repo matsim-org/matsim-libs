@@ -135,7 +135,7 @@ public class RingCollapser {
 			averageX /= nodeCount;
 			averageY /= nodeCount;
 	//		create centroidNode;
-			NodeImpl centroidNode = this.network.createNode(new IdImpl(++this.maxNodeId), new CoordImpl(averageX, averageY));
+			NodeImpl centroidNode = this.network.createAndAddNode(new IdImpl(++this.maxNodeId), new CoordImpl(averageX, averageY));
 			return centroidNode;
 		}
 

@@ -58,9 +58,9 @@ public class ChangeLegModeTest extends MatsimTestCase {
 		module.prepareReplanning();
 
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
-		plan.createActivity("home", new CoordImpl(0, 0));
-		LegImpl leg = plan.createLeg(TransportMode.car);
-		plan.createActivity("work", new CoordImpl(0, 0));
+		plan.createAndAddActivity("home", new CoordImpl(0, 0));
+		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+		plan.createAndAddActivity("work", new CoordImpl(0, 0));
 
 		HashMap<TransportMode, Integer> counter = new HashMap<TransportMode, Integer>();
 		for (TransportMode mode : possibleModes) {

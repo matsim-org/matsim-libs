@@ -50,9 +50,9 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		double fromY = 100.0;
 		double toX = 100.0;
 		double toY = 200.0;
-		NodeImpl fromNode = network.createNode(new IdImpl("1"), new CoordImpl(fromX, fromY));
-		NodeImpl toNode = network.createNode(new IdImpl("2"), new CoordImpl(toX, toY));
-		network.createLink(LINK_ID, fromNode, toNode, 999.9, 50.0 / 3.6, 1000, 1);
+		NodeImpl fromNode = network.createAndAddNode(new IdImpl("1"), new CoordImpl(fromX, fromY));
+		NodeImpl toNode = network.createAndAddNode(new IdImpl("2"), new CoordImpl(toX, toY));
+		network.createAndAddLink(LINK_ID, fromNode, toNode, 999.9, 50.0 / 3.6, 1000, 1);
 	}
 
 	@Override

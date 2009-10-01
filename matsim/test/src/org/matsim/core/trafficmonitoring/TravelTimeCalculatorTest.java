@@ -165,9 +165,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		NetworkLayer network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(1000, 0));
-		LinkImpl link1 = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
+		LinkImpl link1 = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
 
 		int timeBinSize = 15*60;
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());

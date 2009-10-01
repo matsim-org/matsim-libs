@@ -57,20 +57,20 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		this.population = new PopulationImpl();
 		PersonImpl person = new PersonImpl(DEFAULT_PERSON_ID);
 		this.population.getPersons().put(person.getId(), person);
-		PlanImpl plan = person.createPlan(true);
-		plan.createActivity("act1", new CoordImpl(100.0, 100.0));
-		plan.createLeg(TransportMode.undefined);
-		plan.createActivity("act2", new CoordImpl(200.0, 200.0));
-		plan.createLeg(TransportMode.undefined);
-		plan.createActivity("act3", new CoordImpl(200.0, 200.0));
-		plan.createLeg(TransportMode.undefined);
-		plan.createActivity("act4", new CoordImpl(200.0, 200.0));
-		plan.createLeg(TransportMode.undefined);
-		plan.createActivity("act5", new CoordImpl(200.0, 200.0));
+		PlanImpl plan = person.createAndAddPlan(true);
+		plan.createAndAddActivity("act1", new CoordImpl(100.0, 100.0));
+		plan.createAndAddLeg(TransportMode.undefined);
+		plan.createAndAddActivity("act2", new CoordImpl(200.0, 200.0));
+		plan.createAndAddLeg(TransportMode.undefined);
+		plan.createAndAddActivity("act3", new CoordImpl(200.0, 200.0));
+		plan.createAndAddLeg(TransportMode.undefined);
+		plan.createAndAddActivity("act4", new CoordImpl(200.0, 200.0));
+		plan.createAndAddLeg(TransportMode.undefined);
+		plan.createAndAddActivity("act5", new CoordImpl(200.0, 200.0));
 		this.network = new NetworkLayer();
-		NodeImpl fromNode = this.network.createNode(new IdImpl("123456"), new CoordImpl(100.0, 100.0));
-		NodeImpl toNode = this.network.createNode(new IdImpl("789012"), new CoordImpl(200.0, 200.0));
-		this.network.createLink(DEFAULT_LINK_ID, fromNode, toNode, Math.sqrt(20000.0), 13.333, 2000, 1);
+		NodeImpl fromNode = this.network.createAndAddNode(new IdImpl("123456"), new CoordImpl(100.0, 100.0));
+		NodeImpl toNode = this.network.createAndAddNode(new IdImpl("789012"), new CoordImpl(200.0, 200.0));
+		this.network.createAndAddLink(DEFAULT_LINK_ID, fromNode, toNode, Math.sqrt(20000.0), 13.333, 2000, 1);
 	}
 
 	@Override

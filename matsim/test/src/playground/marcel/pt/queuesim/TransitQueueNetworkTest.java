@@ -987,14 +987,14 @@ public class TransitQueueNetworkTest extends TestCase {
 
 			// setup: network
 			NetworkLayer network = scenario.getNetwork();
-			NodeImpl node1 = network.createNode(id1, scenario.createCoord(   0, 0));
-			NodeImpl node2 = network.createNode(id2, scenario.createCoord(1000, 0));
-			NodeImpl node3 = network.createNode(id3, scenario.createCoord(2000, 0));
-			NodeImpl node4 = network.createNode(id4, scenario.createCoord(3000, 0));
+			NodeImpl node1 = network.createAndAddNode(id1, scenario.createCoord(   0, 0));
+			NodeImpl node2 = network.createAndAddNode(id2, scenario.createCoord(1000, 0));
+			NodeImpl node3 = network.createAndAddNode(id3, scenario.createCoord(2000, 0));
+			NodeImpl node4 = network.createAndAddNode(id4, scenario.createCoord(3000, 0));
 			Link[] links = new Link[4];
-			links[1] = network.createLink(id1, node1, node2, 1000.0, 10.0, 3600.0, 1);
-			links[2] = network.createLink(id2, node2, node3, 1000.0, 10.0, 3600.0, 1);
-			links[3] = network.createLink(id3, node3, node4, 1000.0, 10.0, 3600.0, 1);
+			links[1] = network.createAndAddLink(id1, node1, node2, 1000.0, 10.0, 3600.0, 1);
+			links[2] = network.createAndAddLink(id2, node2, node3, 1000.0, 10.0, 3600.0, 1);
+			links[3] = network.createAndAddLink(id3, node3, node4, 1000.0, 10.0, 3600.0, 1);
 
 			// setup: population
 			Population population = scenario.getPopulation();

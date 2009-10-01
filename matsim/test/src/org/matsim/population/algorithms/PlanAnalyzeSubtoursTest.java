@@ -175,13 +175,13 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 			for (int aa=0; aa < locationIdSequence.length; aa++) {
 				location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
 				if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
-					act = plan.createActivity("actAtFacility" + locationIdSequence[aa], (ActivityFacilityImpl) location);
+					act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa], (ActivityFacilityImpl) location);
 				} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(subtourAnalysisLocationType)) {
-					act = plan.createActivity("actOnLink" + locationIdSequence[aa], (LinkImpl) location);
+					act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], (LinkImpl) location);
 				}
 				act.setEndTime(10*3600);
 				if (aa != (locationIdSequence.length - 1)) {
-					plan.createLeg(TransportMode.car);
+					plan.createAndAddLeg(TransportMode.car);
 				}
 			}
 			testee.run(plan);

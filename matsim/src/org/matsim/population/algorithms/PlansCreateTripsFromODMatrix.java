@@ -79,7 +79,7 @@ public class PlansCreateTripsFromODMatrix {
 					PersonImpl person = new PersonImpl(new IdImpl(counter));
 					person.setCarAvail("yes");
 					person.setEmployed("yes");
-					PlanImpl plan = person.createPlan(true);
+					PlanImpl plan = person.createAndAddPlan(true);
 					Coord coord = WorldUtils.getRandomCoordInZone((Zone)entry.getFromLocation(), layer);
 					int endTime = -1;
 
@@ -90,10 +90,10 @@ public class PlansCreateTripsFromODMatrix {
 						}
 					}
 
-					ActivityImpl a = plan.createActivity("work", coord);
+					ActivityImpl a = plan.createAndAddActivity("work", coord);
 					a.setEndTime(endTime);
-					plan.createLeg(TransportMode.car);
-					a = plan.createActivity("work", coord);
+					plan.createAndAddLeg(TransportMode.car);
+					a = plan.createAndAddActivity("work", coord);
 
 					plans.addPerson(person); // add person should be last for when plans-streaming is one, because in this moment the plans are written to file.
 				}

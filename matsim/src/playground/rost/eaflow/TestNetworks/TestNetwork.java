@@ -10,12 +10,12 @@ public class TestNetwork {
 	{
 		//create network
 		NetworkLayer network = new NetworkLayer();
-		network.createNode(new IdImpl("source"), new CoordImpl(0,0));
-		network.createNode(new IdImpl("between node"), new CoordImpl(1,0));
-		network.createNode(new IdImpl("superSink"), new CoordImpl(2,0));
+		network.createAndAddNode(new IdImpl("source"), new CoordImpl(0,0));
+		network.createAndAddNode(new IdImpl("between node"), new CoordImpl(1,0));
+		network.createAndAddNode(new IdImpl("superSink"), new CoordImpl(2,0));
 		
 		
-		network.createLink(new IdImpl("s -> bN"),
+		network.createAndAddLink(new IdImpl("s -> bN"),
 							network.getNode("source"),
 							network.getNode("between node"),
 							8,
@@ -24,7 +24,7 @@ public class TestNetwork {
 							1);
 		
 
-		network.createLink(new IdImpl("bN -> sink"),
+		network.createAndAddLink(new IdImpl("bN -> sink"),
 							network.getNode("between node"),
 							network.getNode("superSink"),
 							4,
@@ -44,13 +44,13 @@ public class TestNetwork {
 	{
 		//create network
 		NetworkLayer network = new NetworkLayer();
-		network.createNode(new IdImpl("source1"), new CoordImpl(0,2));
-		network.createNode(new IdImpl("source2"), new CoordImpl(0,0));
-		network.createNode(new IdImpl("between node"), new CoordImpl(1,1));
-		network.createNode(new IdImpl("superSink"), new CoordImpl(2,1));
+		network.createAndAddNode(new IdImpl("source1"), new CoordImpl(0,2));
+		network.createAndAddNode(new IdImpl("source2"), new CoordImpl(0,0));
+		network.createAndAddNode(new IdImpl("between node"), new CoordImpl(1,1));
+		network.createAndAddNode(new IdImpl("superSink"), new CoordImpl(2,1));
 		
 		
-		network.createLink(new IdImpl("s1 -> bN"),
+		network.createAndAddLink(new IdImpl("s1 -> bN"),
 				network.getNode("source1"),
 				network.getNode("between node"),
 				16,
@@ -58,7 +58,7 @@ public class TestNetwork {
 				10, // cap
 				1);
 		
-		network.createLink(new IdImpl("s2 -> bN"),
+		network.createAndAddLink(new IdImpl("s2 -> bN"),
 				network.getNode("source2"),
 				network.getNode("between node"),
 				2,
@@ -67,7 +67,7 @@ public class TestNetwork {
 				1);
 		
 
-		network.createLink(new IdImpl("bN -> sink"),
+		network.createAndAddLink(new IdImpl("bN -> sink"),
 							network.getNode("between node"),
 							network.getNode("superSink"),
 							8,
@@ -90,14 +90,14 @@ public class TestNetwork {
 	{
 		//create network
 		NetworkLayer network = new NetworkLayer();
-		network.createNode(new IdImpl("source1"), new CoordImpl(0,2));
-		network.createNode(new IdImpl("source2"), new CoordImpl(0,0));
-		network.createNode(new IdImpl("bAbove"), new CoordImpl(1,2));
-		network.createNode(new IdImpl("bBeneath"), new CoordImpl(1,0));
-		network.createNode(new IdImpl("superSink"), new CoordImpl(2,1));
+		network.createAndAddNode(new IdImpl("source1"), new CoordImpl(0,2));
+		network.createAndAddNode(new IdImpl("source2"), new CoordImpl(0,0));
+		network.createAndAddNode(new IdImpl("bAbove"), new CoordImpl(1,2));
+		network.createAndAddNode(new IdImpl("bBeneath"), new CoordImpl(1,0));
+		network.createAndAddNode(new IdImpl("superSink"), new CoordImpl(2,1));
 		
 		
-		network.createLink(new IdImpl("s1 -> bAbove"),
+		network.createAndAddLink(new IdImpl("s1 -> bAbove"),
 				network.getNode("source1"),
 				network.getNode("bAbove"),
 				1,
@@ -105,7 +105,7 @@ public class TestNetwork {
 				2, // cap
 				1);
 		
-		network.createLink(new IdImpl("s2 -> bBeneath"),
+		network.createAndAddLink(new IdImpl("s2 -> bBeneath"),
 				network.getNode("source2"),
 				network.getNode("bBeneath"),
 				3,
@@ -113,7 +113,7 @@ public class TestNetwork {
 				2, // cap
 				1);
 		
-		network.createLink(new IdImpl("bAbove -> bBeneath"),
+		network.createAndAddLink(new IdImpl("bAbove -> bBeneath"),
 				network.getNode("bAbove"),
 				network.getNode("bBeneath"),
 				2,
@@ -121,7 +121,7 @@ public class TestNetwork {
 				2, // cap
 				1);
 		
-		network.createLink(new IdImpl("bAbove -> sink"),
+		network.createAndAddLink(new IdImpl("bAbove -> sink"),
 							network.getNode("bAbove"),
 							network.getNode("superSink"),
 							5,
@@ -129,7 +129,7 @@ public class TestNetwork {
 							2, // cap
 							1);
 
-		network.createLink(new IdImpl("bBeneath -> sink"),
+		network.createAndAddLink(new IdImpl("bBeneath -> sink"),
 				network.getNode("bBeneath"),
 				network.getNode("superSink"),
 				1,
@@ -151,14 +151,14 @@ public class TestNetwork {
 	{
 		//create network
 		NetworkLayer network = new NetworkLayer();
-		network.createNode(new IdImpl("source1"), new CoordImpl(0,2));
-		network.createNode(new IdImpl("source2"), new CoordImpl(0,0));
-		network.createNode(new IdImpl("source3"), new CoordImpl(0,0));
-		network.createNode(new IdImpl("bAbove"), new CoordImpl(1,2));
-		network.createNode(new IdImpl("bBeneath"), new CoordImpl(1,0));
-		network.createNode(new IdImpl("superSink"), new CoordImpl(2,1));
+		network.createAndAddNode(new IdImpl("source1"), new CoordImpl(0,2));
+		network.createAndAddNode(new IdImpl("source2"), new CoordImpl(0,0));
+		network.createAndAddNode(new IdImpl("source3"), new CoordImpl(0,0));
+		network.createAndAddNode(new IdImpl("bAbove"), new CoordImpl(1,2));
+		network.createAndAddNode(new IdImpl("bBeneath"), new CoordImpl(1,0));
+		network.createAndAddNode(new IdImpl("superSink"), new CoordImpl(2,1));
 		
-		network.createLink(new IdImpl("s1 -> s2"),
+		network.createAndAddLink(new IdImpl("s1 -> s2"),
 				network.getNode("source1"),
 				network.getNode("source2"),
 				1,
@@ -166,7 +166,7 @@ public class TestNetwork {
 				2, // cap
 				1);
 		
-		network.createLink(new IdImpl("s2 -> s1"),
+		network.createAndAddLink(new IdImpl("s2 -> s1"),
 				network.getNode("source2"),
 				network.getNode("source1"),
 				1,
@@ -174,7 +174,7 @@ public class TestNetwork {
 				2, // cap
 				1);
 		
-		network.createLink(new IdImpl("s1 -> bAbove"),
+		network.createAndAddLink(new IdImpl("s1 -> bAbove"),
 				network.getNode("source1"),
 				network.getNode("bAbove"),
 				100,
@@ -182,7 +182,7 @@ public class TestNetwork {
 				2, // cap
 				1);
 		
-		network.createLink(new IdImpl("s2 -> bBeneath"),
+		network.createAndAddLink(new IdImpl("s2 -> bBeneath"),
 				network.getNode("source2"),
 				network.getNode("bBeneath"),
 				300,
@@ -190,7 +190,7 @@ public class TestNetwork {
 				2, // cap
 				1);
 		
-		network.createLink(new IdImpl("s3 -> bAbove"),
+		network.createAndAddLink(new IdImpl("s3 -> bAbove"),
 				network.getNode("source3"),
 				network.getNode("bAbove"),
 				3,
@@ -200,7 +200,7 @@ public class TestNetwork {
 		
 		
 		
-		network.createLink(new IdImpl("bAbove -> bBeneath"),
+		network.createAndAddLink(new IdImpl("bAbove -> bBeneath"),
 				network.getNode("bAbove"),
 				network.getNode("bBeneath"),
 				2,
@@ -208,7 +208,7 @@ public class TestNetwork {
 				2, // cap
 				1);
 		
-		network.createLink(new IdImpl("bAbove -> sink"),
+		network.createAndAddLink(new IdImpl("bAbove -> sink"),
 							network.getNode("bAbove"),
 							network.getNode("superSink"),
 							5,
@@ -216,7 +216,7 @@ public class TestNetwork {
 							2, // cap
 							1);
 
-		network.createLink(new IdImpl("bBeneath -> sink"),
+		network.createAndAddLink(new IdImpl("bBeneath -> sink"),
 				network.getNode("bBeneath"),
 				network.getNode("superSink"),
 				1,

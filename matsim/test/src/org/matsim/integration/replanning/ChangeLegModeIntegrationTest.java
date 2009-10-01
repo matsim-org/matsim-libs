@@ -57,20 +57,20 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 		// setup network
 		NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(1000, 0));
-		LinkImpl link = network.createLink(new IdImpl(1), node1, node2, 1000, 10, 3600, 1);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
+		LinkImpl link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10, 3600, 1);
 
 		// setup population with one person
 		PopulationImpl population = scenario.getPopulation();
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		population.getPersons().put(person.getId(), person);
-		PlanImpl plan = person.createPlan(true);
-		ActivityImpl act = plan.createActivity("home", new CoordImpl(0, 0));
+		PlanImpl plan = person.createAndAddPlan(true);
+		ActivityImpl act = plan.createAndAddActivity("home", new CoordImpl(0, 0));
 		act.setLink(link);
 		act.setEndTime(8.0 * 3600);
-		plan.createLeg(TransportMode.car);
-		act = plan.createActivity("work", new CoordImpl(0, 500));
+		plan.createAndAddLeg(TransportMode.car);
+		act = plan.createAndAddActivity("work", new CoordImpl(0, 500));
 		act.setLink(link);
 
 		// setup strategy manager and load from config

@@ -412,7 +412,7 @@ public class PTActWriter {
 	public LinkImpl createPTLink(final String strIdLink, final Node fromNode, final Node toNode, final String type){
 		//->use link factory
 		double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
-		return logicNet.createLink( new IdImpl(strIdLink), (NodeImpl) fromNode, (NodeImpl) toNode, length, 1, 1, 1, "0", type); 
+		return logicNet.createAndAddLink( new IdImpl(strIdLink), (NodeImpl) fromNode, (NodeImpl) toNode, length, 1, 1, 1, "0", type); 
 	}
 	
 	private void removeWlinks(){

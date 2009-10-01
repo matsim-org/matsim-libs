@@ -184,22 +184,22 @@ public class StrategyManagerTest extends MatsimTestCase {
 		PlanImpl[] plans = new PlanImpl[10];
 		// create a person with 4 unscored plans
 		person = new PersonImpl(new IdImpl(1));
-		plans[0] = person.createPlan(false);
-		plans[1] = person.createPlan(false);
+		plans[0] = person.createAndAddPlan(false);
+		plans[1] = person.createAndAddPlan(false);
 		plans[1].setScore(Double.valueOf(0.0));
-		plans[2] = person.createPlan(false);
-		plans[3] = person.createPlan(false);
+		plans[2] = person.createAndAddPlan(false);
+		plans[3] = person.createAndAddPlan(false);
 		plans[3].setScore(Double.valueOf(-50.0));
-		plans[4] = person.createPlan(false);
+		plans[4] = person.createAndAddPlan(false);
 		plans[4].setScore(Double.valueOf(50.0));
-		plans[5] = person.createPlan(false);
+		plans[5] = person.createAndAddPlan(false);
 		plans[5].setScore(Double.valueOf(50.0));
-		plans[6] = person.createPlan(false);
+		plans[6] = person.createAndAddPlan(false);
 		plans[6].setScore(Double.valueOf(60.0));
-		plans[7] = person.createPlan(false);
-		plans[8] = person.createPlan(false);
+		plans[7] = person.createAndAddPlan(false);
+		plans[8] = person.createAndAddPlan(false);
 		plans[8].setScore(Double.valueOf(-10.0));
-		plans[9] = person.createPlan(false);
+		plans[9] = person.createAndAddPlan(false);
 		population.getPersons().put(person.getId(), person);
 
 		StrategyManager manager = new StrategyManager();
@@ -235,7 +235,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		PersonImpl p = new PersonImpl(new IdImpl(1));
 		PlanImpl[] plans = new PlanImpl[7];
 		for (int i = 0; i < plans.length; i++) {
-			plans[i] = p.createPlan(false);
+			plans[i] = p.createAndAddPlan(false);
 			plans[i].setScore(Double.valueOf(i*10));
 		}
 		PopulationImpl pop = new PopulationImpl();

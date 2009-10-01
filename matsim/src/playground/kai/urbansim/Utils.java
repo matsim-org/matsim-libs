@@ -133,7 +133,7 @@ public class Utils {
 	 * @param homeCoord
 	 */
 	public static void makeHomePlan( PlanImpl plan, Coord homeCoord ) {
-		plan.createActivity(ACT_HOME, homeCoord) ;
+		plan.createAndAddActivity(ACT_HOME, homeCoord) ;
 	}
 
 	public static void makeHomePlan( BasicPopulationBuilder pb, BasicPlan plan, Coord homeCoord ) {
@@ -152,12 +152,12 @@ public class Utils {
 		act.setEndTime( 7.*3600. ) ;
 		Coord homeCoord = act.getCoord();
 
-		plan.createLeg(TransportMode.car);
-		act = plan.createActivity(ACT_WORK, workCoord ) ;
+		plan.createAndAddLeg(TransportMode.car);
+		act = plan.createAndAddActivity(ACT_WORK, workCoord ) ;
 		act.setDuration( 8.*3600. ) ;
 
-		plan.createLeg(TransportMode.car) ;
-		plan.createActivity(ACT_HOME, homeCoord ) ;				
+		plan.createAndAddLeg(TransportMode.car) ;
+		plan.createAndAddActivity(ACT_HOME, homeCoord ) ;				
 	}
 
 }

@@ -145,7 +145,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 
 					population.addPerson(person) ;
 
-					PlanImpl plan = person.createPlan(true);
+					PlanImpl plan = person.createAndAddPlan(true);
 					plan.setSelected(true) ;
 					Utils.makeHomePlan(plan, homeCoord) ;
 

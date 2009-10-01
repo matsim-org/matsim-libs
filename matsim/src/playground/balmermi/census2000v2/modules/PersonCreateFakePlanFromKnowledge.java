@@ -92,10 +92,10 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 			if (!educ_acts.isEmpty()) { educ = educ_acts.get(0); }
 		}
 		
-		PlanImpl p = person.createPlan(true);
+		PlanImpl p = person.createAndAddPlan(true);
 		try {
 			if ((work==null)&&(educ==null)) {
-				ActivityImpl act = p.createActivity(home.getType(),home.getFacility().getCoord());
+				ActivityImpl act = p.createAndAddActivity(home.getType(),home.getFacility().getCoord());
 				act.setStartTime(0);
 				act.setEndTime(24*3600);
 				act.setDuration(24*3600);
@@ -107,12 +107,12 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				double end_time = 6*3600 + (MatsimRandom.getRandom().nextInt(2*3600));
 				double sum_dur = end_time;
 				int leg_cnt = 0;
-				ActivityImpl act = p.createActivity(home.getType(),home.getFacility().getCoord());
+				ActivityImpl act = p.createAndAddActivity(home.getType(),home.getFacility().getCoord());
 				act.setStartTime(start_time);
 				act.setEndTime(end_time);
 				act.setDuration(end_time);
 				act.setFacility(home.getFacility());
-				LegImpl leg = p.createLeg(TransportMode.car);
+				LegImpl leg = p.createAndAddLeg(TransportMode.car);
 				leg.setDepartureTime(end_time);
 				leg.setTravelTime(0.0);
 				leg.setArrivalTime(end_time);
@@ -123,12 +123,12 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					start_time = end_time;
 					end_time = end_time + 7*3600 + (MatsimRandom.getRandom().nextInt(1*3600));
 					sum_dur = sum_dur + (end_time-start_time);
-					act = p.createActivity(work.getType(),work.getFacility().getCoord());
+					act = p.createAndAddActivity(work.getType(),work.getFacility().getCoord());
 					act.setStartTime(start_time);
 					act.setEndTime(end_time);
 					act.setDuration(end_time-start_time);
 					act.setFacility(work.getFacility());
-					LegImpl leg2 = p.createLeg(TransportMode.car);
+					LegImpl leg2 = p.createAndAddLeg(TransportMode.car);
 					leg2.setDepartureTime(end_time);
 					leg2.setTravelTime(0.0);
 					leg2.setArrivalTime(end_time);
@@ -140,12 +140,12 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					start_time = end_time;
 					end_time = end_time + 4*3600 + (MatsimRandom.getRandom().nextInt(2*3600));
 					sum_dur = sum_dur + (end_time-start_time);
-					act = p.createActivity(educ.getType(),educ.getFacility().getCoord());
+					act = p.createAndAddActivity(educ.getType(),educ.getFacility().getCoord());
 					act.setStartTime(start_time);
 					act.setEndTime(end_time);
 					act.setDuration(end_time-start_time);
 					act.setFacility(educ.getFacility());
-					LegImpl leg2 = p.createLeg(TransportMode.car);
+					LegImpl leg2 = p.createAndAddLeg(TransportMode.car);
 					leg2.setDepartureTime(end_time);
 					leg2.setTravelTime(0.0);
 					leg2.setArrivalTime(end_time);
@@ -154,7 +154,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				start_time = end_time;
 				end_time = 24*3600;
 				sum_dur = sum_dur + (end_time-start_time);
-				act = p.createActivity(home.getType(),home.getFacility().getCoord());
+				act = p.createAndAddActivity(home.getType(),home.getFacility().getCoord());
 				act.setStartTime(start_time);
 				act.setEndTime(end_time);
 				act.setDuration(end_time-start_time);

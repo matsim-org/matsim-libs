@@ -79,34 +79,34 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		scoring.addActivityParams(params);
 		
 		this.network = new NetworkLayer();
-		NodeImpl node1 = this.network.createNode(new IdImpl("1"), new CoordImpl(    0.0, 0.0));
-		NodeImpl node2 = this.network.createNode(new IdImpl("2"), new CoordImpl(  500.0, 0.0));
-		NodeImpl node3 = this.network.createNode(new IdImpl("3"), new CoordImpl( 5500.0, 0.0));
-		NodeImpl node4 = this.network.createNode(new IdImpl("4"), new CoordImpl( 6000.0, 0.0));
-		NodeImpl node5 = this.network.createNode(new IdImpl("5"), new CoordImpl(11000.0, 0.0));
-		NodeImpl node6 = this.network.createNode(new IdImpl("6"), new CoordImpl(11500.0, 0.0));
-		LinkImpl link1 = this.network.createLink(new IdImpl("1"), node1, node2, 500, 25, 3600, 1);
-		this.network.createLink(new IdImpl("2"), node2, node3, 5000, 50, 3600, 1);
-		LinkImpl link3 = this.network.createLink(new IdImpl("3"), node3, node4, 500, 25, 3600, 1);
-		this.network.createLink(new IdImpl("4"), node4, node5, 5000, 50, 3600, 1);
-		LinkImpl link5 = this.network.createLink(new IdImpl(5), node5, node6, 500, 25, 3600, 1);
+		NodeImpl node1 = this.network.createAndAddNode(new IdImpl("1"), new CoordImpl(    0.0, 0.0));
+		NodeImpl node2 = this.network.createAndAddNode(new IdImpl("2"), new CoordImpl(  500.0, 0.0));
+		NodeImpl node3 = this.network.createAndAddNode(new IdImpl("3"), new CoordImpl( 5500.0, 0.0));
+		NodeImpl node4 = this.network.createAndAddNode(new IdImpl("4"), new CoordImpl( 6000.0, 0.0));
+		NodeImpl node5 = this.network.createAndAddNode(new IdImpl("5"), new CoordImpl(11000.0, 0.0));
+		NodeImpl node6 = this.network.createAndAddNode(new IdImpl("6"), new CoordImpl(11500.0, 0.0));
+		LinkImpl link1 = this.network.createAndAddLink(new IdImpl("1"), node1, node2, 500, 25, 3600, 1);
+		this.network.createAndAddLink(new IdImpl("2"), node2, node3, 5000, 50, 3600, 1);
+		LinkImpl link3 = this.network.createAndAddLink(new IdImpl("3"), node3, node4, 500, 25, 3600, 1);
+		this.network.createAndAddLink(new IdImpl("4"), node4, node5, 5000, 50, 3600, 1);
+		LinkImpl link5 = this.network.createAndAddLink(new IdImpl(5), node5, node6, 500, 25, 3600, 1);
 
 		this.person = new PersonImpl(new IdImpl(1));
-		this.plan = this.person.createPlan(true);
+		this.plan = this.person.createAndAddPlan(true);
 		try {
-			this.plan.createActivity("h", link1);
-			LegImpl leg = this.plan.createLeg(TransportMode.car);
+			this.plan.createAndAddActivity("h", link1);
+			LegImpl leg = this.plan.createAndAddLeg(TransportMode.car);
 			NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link3);
 			leg.setRoute(route);
 			route.setDistance(25000.0);
 			route.setTravelTime(0.5*3600);
-			this.plan.createActivity("w", link3);
-			leg = this.plan.createLeg(TransportMode.pt);
+			this.plan.createAndAddActivity("w", link3);
+			leg = this.plan.createAndAddLeg(TransportMode.pt);
 			route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link3, link5);
 			leg.setRoute(route);
 			route.setDistance(20000.0);
 			route.setTravelTime(0.25*3600);
-			this.plan.createActivity("h", link5);
+			this.plan.createAndAddActivity("h", link5);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

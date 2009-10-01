@@ -43,13 +43,13 @@ public class LinkToLinkTravelTimeCalculatorTest extends MatsimTestCase {
     scenario.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 		NetworkLayer network = (NetworkLayer) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(1000, 0));
-		NodeImpl node3 = network.createNode(new IdImpl(3), new CoordImpl(2000, 0));
-		NodeImpl node4 = network.createNode(new IdImpl(4), new CoordImpl(1000, 1000));
-		LinkImpl link1 = network.createLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
-		LinkImpl link2 = network.createLink(new IdImpl(2), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
-		LinkImpl link3 = network.createLink(new IdImpl(3), node2, node4, 1000.0, 100.0, 3600.0, 1.0);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
+		NodeImpl node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(2000, 0));
+		NodeImpl node4 = network.createAndAddNode(new IdImpl(4), new CoordImpl(1000, 1000));
+		LinkImpl link1 = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
+		LinkImpl link2 = network.createAndAddLink(new IdImpl(2), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
+		LinkImpl link3 = network.createAndAddLink(new IdImpl(3), node2, node4, 1000.0, 100.0, 3600.0, 1.0);
 
 		int timeBinSize = 15*60;
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());

@@ -371,8 +371,8 @@ class OTFServerQUADCA extends OTFServerQuad {
 	public OTFServerQUADCA(double minX, double minY, double maxX, double maxY) {
 		super(minX, minY, maxX, maxY);
 		NetworkLayer net = new NetworkLayer();
-		BasicNode node1 = net.createNode(new IdImpl("0"), new CoordImpl(0, 500));
-		BasicNode node2 = net.createNode(new IdImpl("1"), new CoordImpl(CALink.LINKLEN, 500));
+		BasicNode node1 = net.createAndAddNode(new IdImpl("0"), new CoordImpl(0, 500));
+		BasicNode node2 = net.createAndAddNode(new IdImpl("1"), new CoordImpl(CALink.LINKLEN, 500));
 
 		LinkImpl lk = new LinkImpl(new IdImpl("0"), node1, node2, net, CALink.LINKLEN,0,0, CALink.LANECOUNT);
 		link = new CALink(lk, null, null);

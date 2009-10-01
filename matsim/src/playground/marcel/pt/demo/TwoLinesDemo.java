@@ -93,34 +93,34 @@ public class TwoLinesDemo {
 		 */
 		NetworkLayer network = this.scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		NodeImpl node1 = network.createNode(this.ids[1], this.scenario.createCoord(-2000, 0));
-		NodeImpl node2 = network.createNode(this.ids[2], this.scenario.createCoord(-2000, 1000));
-		NodeImpl node3 = network.createNode(this.ids[3], this.scenario.createCoord(-1000, 0));
-		NodeImpl node4 = network.createNode(this.ids[4], this.scenario.createCoord(-1000, 1000));
-		NodeImpl node5 = network.createNode(this.ids[5], this.scenario.createCoord(0, 0));
-		NodeImpl node6 = network.createNode(this.ids[6], this.scenario.createCoord(0, 1000));
-		NodeImpl node7 = network.createNode(this.ids[7], this.scenario.createCoord(500, 500));
-		NodeImpl node8 = network.createNode(this.ids[8], this.scenario.createCoord(1500, 500));
-		NodeImpl node9 = network.createNode(this.ids[9], this.scenario.createCoord(2500, 500));
-		NodeImpl node10 = network.createNode(this.ids[10], this.scenario.createCoord(3500, 500));
-		NodeImpl node11 = network.createNode(this.ids[11], this.scenario.createCoord(4000, 0));
-		NodeImpl node12 = network.createNode(this.ids[12], this.scenario.createCoord(4000, 1000));
-		NodeImpl node13 = network.createNode(this.ids[13], this.scenario.createCoord(5000, 0));
-		NodeImpl node14 = network.createNode(this.ids[14], this.scenario.createCoord(5000, 1000));
+		NodeImpl node1 = network.createAndAddNode(this.ids[1], this.scenario.createCoord(-2000, 0));
+		NodeImpl node2 = network.createAndAddNode(this.ids[2], this.scenario.createCoord(-2000, 1000));
+		NodeImpl node3 = network.createAndAddNode(this.ids[3], this.scenario.createCoord(-1000, 0));
+		NodeImpl node4 = network.createAndAddNode(this.ids[4], this.scenario.createCoord(-1000, 1000));
+		NodeImpl node5 = network.createAndAddNode(this.ids[5], this.scenario.createCoord(0, 0));
+		NodeImpl node6 = network.createAndAddNode(this.ids[6], this.scenario.createCoord(0, 1000));
+		NodeImpl node7 = network.createAndAddNode(this.ids[7], this.scenario.createCoord(500, 500));
+		NodeImpl node8 = network.createAndAddNode(this.ids[8], this.scenario.createCoord(1500, 500));
+		NodeImpl node9 = network.createAndAddNode(this.ids[9], this.scenario.createCoord(2500, 500));
+		NodeImpl node10 = network.createAndAddNode(this.ids[10], this.scenario.createCoord(3500, 500));
+		NodeImpl node11 = network.createAndAddNode(this.ids[11], this.scenario.createCoord(4000, 0));
+		NodeImpl node12 = network.createAndAddNode(this.ids[12], this.scenario.createCoord(4000, 1000));
+		NodeImpl node13 = network.createAndAddNode(this.ids[13], this.scenario.createCoord(5000, 0));
+		NodeImpl node14 = network.createAndAddNode(this.ids[14], this.scenario.createCoord(5000, 1000));
 
-		network.createLink(this.ids[1], node1, node3, 1000.0, 10.0, 3600.0, 1);
-		network.createLink(this.ids[2], node2, node4, 1000.0, 10.0, 3600.0, 1);
-		network.createLink(this.ids[3], node3, node5, 1000.0, 10.0, 3600.0, 1);
-		network.createLink(this.ids[4], node4, node6, 1000.0, 10.0, 3600.0, 1);
-		network.createLink(this.ids[5], node5, node7, 1000.0, 10.0, 3600.0, 1);
-		network.createLink(this.ids[6], node6, node7, 1000.0, 10.0, 3600.0, 1);
-		network.createLink(this.ids[7], node7, node8, 1000.0, 10.0, 3600.0, 1);
-		network.createLink(this.ids[8], node8, node9, 1000.0, 10.0, 3600.0, 1);
-		network.createLink(this.ids[9], node9, node10, 1000.0, 10.0, 3600.0, 1);
-		network.createLink(this.ids[10], node10, node12, 1000.0, 10.0, 3600.0, 1);
-		network.createLink(this.ids[11], node10, node11, 1000.0, 10.0, 3600.0, 1);
-		network.createLink(this.ids[12], node12, node14, 1000.0, 10.0, 3600.0, 1);
-		network.createLink(this.ids[13], node11, node13, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(this.ids[1], node1, node3, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(this.ids[2], node2, node4, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(this.ids[3], node3, node5, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(this.ids[4], node4, node6, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(this.ids[5], node5, node7, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(this.ids[6], node6, node7, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(this.ids[7], node7, node8, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(this.ids[8], node8, node9, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(this.ids[9], node9, node10, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(this.ids[10], node10, node12, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(this.ids[11], node10, node11, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(this.ids[12], node12, node14, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(this.ids[13], node11, node13, 1000.0, 10.0, 3600.0, 1);
 	}
 
 	private void createTransitSchedule() {

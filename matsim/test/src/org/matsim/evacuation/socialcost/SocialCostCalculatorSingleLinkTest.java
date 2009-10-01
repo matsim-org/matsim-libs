@@ -159,12 +159,12 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		Id n1 = this.sc.createId("1");
 
 		
-		NodeImpl node0 = ((NetworkLayer)this.network).createNode(n0, this.sc.createCoord(0,0));
-		NodeImpl node1 = ((NetworkLayer)this.network).createNode(n1, this.sc.createCoord(10,0));
+		NodeImpl node0 = ((NetworkLayer)this.network).createAndAddNode(n0, this.sc.createCoord(0,0));
+		NodeImpl node1 = ((NetworkLayer)this.network).createAndAddNode(n1, this.sc.createCoord(10,0));
 		
 		
 		
-		this.link0 = ((NetworkLayer)this.network).createLink(this.l0,node0,node1,100,10,1,1);
+		this.link0 = ((NetworkLayer)this.network).createAndAddLink(this.l0,node0,node1,100,10,1,1);
 		
 		
 		

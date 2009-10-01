@@ -49,31 +49,31 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		/* create a simple network where agents can drive from the lower left
 		 * to the upper right */
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl node0 = network.createNode(new IdImpl("0"), new CoordImpl(0, 0));
-		NodeImpl node1 = network.createNode(new IdImpl("1"), new CoordImpl(10, 10));
-		NodeImpl node2 = network.createNode(new IdImpl("2"), new CoordImpl(90, 10));
-		NodeImpl node3 = network.createNode(new IdImpl("3"), new CoordImpl(10, 90));
-		NodeImpl node4 = network.createNode(new IdImpl("4"), new CoordImpl(90, 90));
-		NodeImpl node5 = network.createNode(new IdImpl("5"), new CoordImpl(100, 100));
-		LinkImpl link0 = network.createLink(new IdImpl("0"), node0, node1, 20, 20, 100, 1);
-/*	Link link1=*/network.createLink(new IdImpl("1"), node1, node2, 100, 20, 100, 1);
-		LinkImpl link2 = network.createLink(new IdImpl("2"), node2, node4, 100, 20, 100, 1);
-/*	Link link3=*/network.createLink(new IdImpl("3"), node1, node3, 100, 20, 100, 1);
-		LinkImpl link4 = network.createLink(new IdImpl("4"), node3, node4, 100, 20, 100, 1);
-		LinkImpl link5 = network.createLink(new IdImpl("5"), node4, node5, 20, 20, 100, 1);
+		NodeImpl node0 = network.createAndAddNode(new IdImpl("0"), new CoordImpl(0, 0));
+		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(10, 10));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(90, 10));
+		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(10, 90));
+		NodeImpl node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(90, 90));
+		NodeImpl node5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(100, 100));
+		LinkImpl link0 = network.createAndAddLink(new IdImpl("0"), node0, node1, 20, 20, 100, 1);
+/*	Link link1=*/network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 20, 100, 1);
+		LinkImpl link2 = network.createAndAddLink(new IdImpl("2"), node2, node4, 100, 20, 100, 1);
+/*	Link link3=*/network.createAndAddLink(new IdImpl("3"), node1, node3, 100, 20, 100, 1);
+		LinkImpl link4 = network.createAndAddLink(new IdImpl("4"), node3, node4, 100, 20, 100, 1);
+		LinkImpl link5 = network.createAndAddLink(new IdImpl("5"), node4, node5, 20, 20, 100, 1);
 
 		// create a test person
 		PersonImpl person = new PersonImpl(new IdImpl("1"));
-		PlanImpl plan = person.createPlan(true);
+		PlanImpl plan = person.createAndAddPlan(true);
 
-		ActivityImpl act1 = plan.createActivity("h", link0);
+		ActivityImpl act1 = plan.createAndAddActivity("h", link0);
 		act1.setEndTime(8.0*3600);
 
-		LegImpl leg = plan.createLeg(TransportMode.car);
+		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		leg.setDepartureTime(8.0*3600);
 		leg.setTravelTime(2.0*60);
 
-		plan.createActivity("w", link5);
+		plan.createAndAddActivity("w", link5);
 
 		NetworkRouteWRefs route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link0, link5);
 		leg.setRoute(route);

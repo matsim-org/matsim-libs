@@ -81,9 +81,9 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 		events.addHandler(testee);
 
 		NetworkLayer testNetwork = new NetworkLayer();
-		NodeImpl node1 = testNetwork.createNode(new IdImpl("1"), new CoordImpl(0.0, 0.0));
-		NodeImpl node2 = testNetwork.createNode(new IdImpl("2"), new CoordImpl(100.0, 100.0));
-		LinkImpl link = testNetwork.createLink(new IdImpl("200"), node1, node2, 0, 0, 0, 0);
+		NodeImpl node1 = testNetwork.createAndAddNode(new IdImpl("1"), new CoordImpl(0.0, 0.0));
+		NodeImpl node2 = testNetwork.createAndAddNode(new IdImpl("2"), new CoordImpl(100.0, 100.0));
+		LinkImpl link = testNetwork.createAndAddLink(new IdImpl("200"), node1, node2, 0, 0, 0, 0);
 		LegImpl leg = new LegImpl(TransportMode.car);
 		
 		events.processEvent(new AgentDepartureEventImpl(Time.parseTime("06:00:00"), testPerson, link, leg));

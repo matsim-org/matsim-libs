@@ -50,11 +50,11 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 		this.factory.setNetwork(this);
 	}
 
-	public final NodeImpl createNode(final Id id, final Coord coord) {
-		return createNode(id, coord, null);
+	public final NodeImpl createAndAddNode(final Id id, final Coord coord) {
+		return createAndAddNode(id, coord, null);
 	}
 
-	public final NodeImpl createNode(final Id id, final Coord coord, final String nodeType) {
+	public final NodeImpl createAndAddNode(final Id id, final Coord coord, final String nodeType) {
 		if (this.nodes.containsKey(id)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
@@ -69,11 +69,11 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 		return n;
 	}
 
-	public final LinkImpl createLink(final Id id, final NodeImpl fromNode, final NodeImpl toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
-		return createLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
+	public final LinkImpl createAndAddLink(final Id id, final NodeImpl fromNode, final NodeImpl toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
+		return createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
 	}
 
-	public final LinkImpl createLink(final Id id, final NodeImpl fromNode, final NodeImpl toNode, final double length, final double freespeed, final double capacity, final double numLanes, final String origId, final String type) {
+	public final LinkImpl createAndAddLink(final Id id, final NodeImpl fromNode, final NodeImpl toNode, final double length, final double freespeed, final double capacity, final double numLanes, final String origId, final String type) {
 
 		if (this.nodes.get(fromNode.getId()) == null) {
 			throw new IllegalArgumentException(this+"[from="+fromNode+" does not exist]");

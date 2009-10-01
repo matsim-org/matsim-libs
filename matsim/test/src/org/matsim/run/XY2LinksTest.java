@@ -63,8 +63,8 @@ public class XY2LinksTest extends MatsimTestCase {
 		PopulationImpl population = new PopulationImpl();
 		PersonImpl person = new PersonImpl(new IdImpl("1"));
 		population.getPersons().put(person.getId(), person);
-		PlanImpl plan = person.createPlan(true);
-		ActivityImpl a1 = plan.createActivity("h", new CoordImpl(50, 25));
+		PlanImpl plan = person.createAndAddPlan(true);
+		ActivityImpl a1 = plan.createAndAddActivity("h", new CoordImpl(50, 25));
 		a1.setEndTime(3600);
 
 		// write person to file

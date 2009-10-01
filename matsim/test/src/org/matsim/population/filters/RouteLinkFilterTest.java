@@ -67,36 +67,36 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		NetworkRouteWRefs route;
 
 		person = new PersonImpl(new IdImpl("1"));
-		plan = person.createPlan(true);
-		ActivityImpl a = plan.createActivity("h", link1);
+		plan = person.createAndAddPlan(true);
+		ActivityImpl a = plan.createAndAddActivity("h", link1);
 		a.setEndTime(7.0 * 3600);
-		leg = plan.createLeg(TransportMode.car);
+		leg = plan.createAndAddLeg(TransportMode.car);
 		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link20);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 7 12"), link20);
 		leg.setRoute(route);
-		plan.createActivity("w", link20);
+		plan.createAndAddActivity("w", link20);
 		population.getPersons().put(person.getId(), person);
 
 		person = new PersonImpl(new IdImpl("2"));
-		plan = person.createPlan(true);
-		ActivityImpl a2 = plan.createActivity("h", link1);
+		plan = person.createAndAddPlan(true);
+		ActivityImpl a2 = plan.createAndAddActivity("h", link1);
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
-		leg = plan.createLeg(TransportMode.car);
+		leg = plan.createAndAddLeg(TransportMode.car);
 		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link20);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 7 12"), link20);
 		leg.setRoute(route);
-		plan.createActivity("w", link20);
+		plan.createAndAddActivity("w", link20);
 		population.getPersons().put(person.getId(), person);
 
 		person = new PersonImpl(new IdImpl("3"));
-		plan = person.createPlan(true);
-		ActivityImpl a3 = plan.createActivity("h", link1);
+		plan = person.createAndAddPlan(true);
+		ActivityImpl a3 = plan.createAndAddActivity("h", link1);
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
-		leg = plan.createLeg(TransportMode.car);
+		leg = plan.createAndAddLeg(TransportMode.car);
 		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, link1, link20);
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 6 12"), link20);
 		leg.setRoute(route);
-		plan.createActivity("w", link20);
+		plan.createAndAddActivity("w", link20);
 		population.getPersons().put(person.getId(), person);
 
 		return population;

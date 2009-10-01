@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -54,7 +55,7 @@ public class PersonImpl extends BasicPersonImpl<Plan> implements Person {
 	}
 
 
-	public PlanImpl createPlan(final boolean selected) {
+	public PlanImpl createAndAddPlan(final boolean selected) {
 		PlanImpl p = new PlanImpl(this);
 		this.addPlan(p);
 		if (selected) {

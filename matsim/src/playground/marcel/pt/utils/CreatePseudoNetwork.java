@@ -118,26 +118,26 @@ public class CreatePseudoNetwork {
 			fromNode = this.startNodes.get(toFacility);
 			if (fromNode == null) {
 				Coord coord = new CoordImpl(toFacility.getCoord().getX() + 50, toFacility.getCoord().getY() + 50);
-				fromNode = this.network.createNode(new IdImpl(this.prefix + this.nodeIdCounter++), coord);
+				fromNode = this.network.createAndAddNode(new IdImpl(this.prefix + this.nodeIdCounter++), coord);
 				this.startNodes.put(toFacility, fromNode);
 			}
 		} else {
 			fromNode = this.nodes.get(fromFacility);
 		}
 		if (fromNode == null) {
-			fromNode = this.network.createNode(new IdImpl(this.prefix + this.nodeIdCounter++), fromFacility.getCoord());
+			fromNode = this.network.createAndAddNode(new IdImpl(this.prefix + this.nodeIdCounter++), fromFacility.getCoord());
 			this.nodes.put(fromFacility, fromNode);
 		}
 		NodeImpl toNode = this.nodes.get(toFacility);
 		if (toNode == null) {
-			toNode = this.network.createNode(new IdImpl(this.prefix + this.nodeIdCounter++), toFacility.getCoord());
+			toNode = this.network.createAndAddNode(new IdImpl(this.prefix + this.nodeIdCounter++), toFacility.getCoord());
 			this.nodes.put(toFacility, toNode);
 		}
 
 		Tuple<NodeImpl, NodeImpl> connection = new Tuple<NodeImpl, NodeImpl>(fromNode, toNode);
 		LinkImpl link = this.links.get(connection);
 		if (link == null) {
-			link = this.network.createLink(new IdImpl(this.prefix + this.linkIdCounter++), fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()), 30.0 / 3.6, 500, 1);
+			link = this.network.createAndAddLink(new IdImpl(this.prefix + this.linkIdCounter++), fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()), 30.0 / 3.6, 500, 1);
 			link.setAllowedModes(transitModes);
 			this.links.put(connection, link);
 

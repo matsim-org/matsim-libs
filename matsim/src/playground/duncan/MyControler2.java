@@ -94,7 +94,7 @@ public class MyControler2 {
 				Id id = new IdImpl( popCnt ) ; popCnt++ ;
 				PersonImpl newPerson = new PersonImpl( id ) ;
 				population.addPerson( newPerson ) ;
-				PlanImpl plan = newPerson.createPlan(true);
+				PlanImpl plan = newPerson.createAndAddPlan(true);
 				plan.setSelected(true) ;
 				playground.kai.urbansim.Utils.makeHomePlan(plan, coord) ;
 			}

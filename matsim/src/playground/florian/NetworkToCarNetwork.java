@@ -52,7 +52,7 @@ public class NetworkToCarNetwork {
 			Id id = it.next();
 			NodeImpl node = nodes.get(id);
 			Coord coord = node.getCoord();
-			net3.createNode(id, coord);
+			net3.createAndAddNode(id, coord);
 		}
 		
 		//Bearbeiten der Links
@@ -82,7 +82,7 @@ public class NetworkToCarNetwork {
 			}
 			//Berechnung der capacity
 			double capacity = (capacityVehPerHourPerLane / 3600) * lanes;
-			net3.createLink(id2, startNode, endNode, length, freespeed, capacity, lanes);
+			net3.createAndAddLink(id2, startNode, endNode, length, freespeed, capacity, lanes);
 			i++;
 		}
 		

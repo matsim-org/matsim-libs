@@ -104,11 +104,11 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// setup: network
 		NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
-		NodeImpl node2 = network.createNode(scenario.createId("2"), scenario.createCoord(1000, 0));
-		NodeImpl node3 = network.createNode(scenario.createId("3"), scenario.createCoord(2000, 0));
-		Link link1 = network.createLink(scenario.createId("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
-		Link link2 = network.createLink(scenario.createId("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
+		NodeImpl node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(   0, 0));
+		NodeImpl node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(1000, 0));
+		NodeImpl node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(2000, 0));
+		Link link1 = network.createAndAddLink(scenario.createId("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
+		Link link2 = network.createAndAddLink(scenario.createId("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
 
 		// setup: vehicles
 		BasicVehicles vehicles = scenario.getVehicles();
@@ -224,9 +224,9 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// setup: network
 		NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
-		NodeImpl node2 = network.createNode(scenario.createId("2"), scenario.createCoord(1000, 0));
-		network.createLink(scenario.createId("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
+		NodeImpl node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(   0, 0));
+		NodeImpl node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(1000, 0));
+		network.createAndAddLink(scenario.createId("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
 
 		// setup: transit schedule
 		TransitSchedule schedule = scenario.getTransitSchedule();
@@ -281,17 +281,17 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// setup: network
 		NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
-		NodeImpl node2 = network.createNode(scenario.createId("2"), scenario.createCoord(1000, 0));
-		NodeImpl node3 = network.createNode(scenario.createId("3"), scenario.createCoord(2000, 0));
-		NodeImpl node4 = network.createNode(scenario.createId("4"), scenario.createCoord(3000, 0));
-		NodeImpl node5 = network.createNode(scenario.createId("5"), scenario.createCoord(4000, 0));
-		NodeImpl node6 = network.createNode(scenario.createId("6"), scenario.createCoord(5000, 0));
-		Link link1 = network.createLink(scenario.createId("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
-		Link link2 = network.createLink(scenario.createId("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
-		Link link3 = network.createLink(scenario.createId("3"), node3, node4, 1000.0, 10.0, 3600.0, 1);
-		Link link4 = network.createLink(scenario.createId("4"), node4, node5, 1000.0, 10.0, 3600.0, 1);
-		Link link5 = network.createLink(scenario.createId("5"), node5, node6, 1000.0, 10.0, 3600.0, 1);
+		NodeImpl node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(   0, 0));
+		NodeImpl node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(1000, 0));
+		NodeImpl node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(2000, 0));
+		NodeImpl node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord(3000, 0));
+		NodeImpl node5 = network.createAndAddNode(scenario.createId("5"), scenario.createCoord(4000, 0));
+		NodeImpl node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord(5000, 0));
+		Link link1 = network.createAndAddLink(scenario.createId("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
+		Link link2 = network.createAndAddLink(scenario.createId("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
+		Link link3 = network.createAndAddLink(scenario.createId("3"), node3, node4, 1000.0, 10.0, 3600.0, 1);
+		Link link4 = network.createAndAddLink(scenario.createId("4"), node4, node5, 1000.0, 10.0, 3600.0, 1);
+		Link link5 = network.createAndAddLink(scenario.createId("5"), node5, node6, 1000.0, 10.0, 3600.0, 1);
 
 		// setup: transit schedule
 		TransitSchedule schedule = scenario.getTransitSchedule();

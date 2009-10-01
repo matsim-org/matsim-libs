@@ -85,13 +85,13 @@ public class NetworkCalibrator {
 		net.setCapacityPeriod(1);
 		net.setEffectiveCellSize(CELLSIZE);
 		net.setEffectiveLaneWidth(0.71);
-		NodeImpl n0 = net.createNode(new IdImpl(0),new CoordImpl(0,0));
-		NodeImpl n1 = net.createNode(new IdImpl(1),new CoordImpl(50,0));
-		NodeImpl n2 = net.createNode(new IdImpl(2),new CoordImpl(150,0));
-		NodeImpl n3 = net.createNode(new IdImpl(3),new CoordImpl(200,0));
-		LinkImpl l0 = net.createLink(new IdImpl(0), n0, n1, 50, fs, 20000,PERSONS/(50/CELLSIZE));
-		this.l1 = net.createLink(new IdImpl(1), n1, n2, 100, fs, CAP, WIDTH/PERS_WIDTH);
-		LinkImpl l2 = net.createLink(new IdImpl(3), n2, n3, 50, fs, 20000, PERSONS/(50/CELLSIZE));
+		NodeImpl n0 = net.createAndAddNode(new IdImpl(0),new CoordImpl(0,0));
+		NodeImpl n1 = net.createAndAddNode(new IdImpl(1),new CoordImpl(50,0));
+		NodeImpl n2 = net.createAndAddNode(new IdImpl(2),new CoordImpl(150,0));
+		NodeImpl n3 = net.createAndAddNode(new IdImpl(3),new CoordImpl(200,0));
+		LinkImpl l0 = net.createAndAddLink(new IdImpl(0), n0, n1, 50, fs, 20000,PERSONS/(50/CELLSIZE));
+		this.l1 = net.createAndAddLink(new IdImpl(1), n1, n2, 100, fs, CAP, WIDTH/PERS_WIDTH);
+		LinkImpl l2 = net.createAndAddLink(new IdImpl(3), n2, n3, 50, fs, 20000, PERSONS/(50/CELLSIZE));
 		
 		PopulationImpl pop = sc.getPopulation();
 		PopulationBuilder pb = pop.getBuilder();
@@ -159,7 +159,7 @@ public class NetworkCalibrator {
 			this.net.setEffectiveCellSize(p.cs);
 			LinkImpl l = (LinkImpl) this.link;
 			this.net.removeLink(this.link);
-			this.link = this.net.createLink(l.getId(), l.getFromNode(), l.getToNode(), 100, p.fs, p.fc*WIDTH, WIDTH/PERS_WIDTH);
+			this.link = this.net.createAndAddLink(l.getId(), l.getFromNode(), l.getToNode(), 100, p.fs, p.fc*WIDTH, WIDTH/PERS_WIDTH);
 			
 		}
 		

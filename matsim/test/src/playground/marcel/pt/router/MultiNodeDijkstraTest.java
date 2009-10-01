@@ -424,21 +424,21 @@ public class MultiNodeDijkstraTest extends TestCase {
 
 		public Fixture() {
 			this.network = new NetworkLayer();
-			NodeImpl node1 = this.network.createNode(new IdImpl(1), new CoordImpl(1000,    0));
-			NodeImpl node2 = this.network.createNode(new IdImpl(2), new CoordImpl( 500,    0));
-			NodeImpl node3 = this.network.createNode(new IdImpl(3), new CoordImpl(   0,    0));
-			NodeImpl node4 = this.network.createNode(new IdImpl(4), new CoordImpl(1000, 2000));
-			NodeImpl node5 = this.network.createNode(new IdImpl(5), new CoordImpl( 500, 2000));
-			NodeImpl node6 = this.network.createNode(new IdImpl(6), new CoordImpl(   0, 2000));
-			NodeImpl node7 = this.network.createNode(new IdImpl(7), new CoordImpl( 500,  500));
-			NodeImpl node8 = this.network.createNode(new IdImpl(8), new CoordImpl( 500, 1500));
-			this.network.createLink(new IdImpl(1), node1, node7, 1000.0, 10.0, 2000.0, 1);
-			this.network.createLink(new IdImpl(2), node2, node7, 1000.0, 10.0, 2000.0, 1);
-			this.network.createLink(new IdImpl(3), node3, node7, 1000.0, 10.0, 2000.0, 1);
-			this.network.createLink(new IdImpl(4), node8, node4, 1000.0, 10.0, 2000.0, 1);
-			this.network.createLink(new IdImpl(5), node8, node5, 1000.0, 10.0, 2000.0, 1);
-			this.network.createLink(new IdImpl(6), node8, node6, 1000.0, 10.0, 2000.0, 1);
-			this.network.createLink(new IdImpl(7), node7, node8, 1000.0, 10.0, 2000.0, 1);
+			NodeImpl node1 = this.network.createAndAddNode(new IdImpl(1), new CoordImpl(1000,    0));
+			NodeImpl node2 = this.network.createAndAddNode(new IdImpl(2), new CoordImpl( 500,    0));
+			NodeImpl node3 = this.network.createAndAddNode(new IdImpl(3), new CoordImpl(   0,    0));
+			NodeImpl node4 = this.network.createAndAddNode(new IdImpl(4), new CoordImpl(1000, 2000));
+			NodeImpl node5 = this.network.createAndAddNode(new IdImpl(5), new CoordImpl( 500, 2000));
+			NodeImpl node6 = this.network.createAndAddNode(new IdImpl(6), new CoordImpl(   0, 2000));
+			NodeImpl node7 = this.network.createAndAddNode(new IdImpl(7), new CoordImpl( 500,  500));
+			NodeImpl node8 = this.network.createAndAddNode(new IdImpl(8), new CoordImpl( 500, 1500));
+			this.network.createAndAddLink(new IdImpl(1), node1, node7, 1000.0, 10.0, 2000.0, 1);
+			this.network.createAndAddLink(new IdImpl(2), node2, node7, 1000.0, 10.0, 2000.0, 1);
+			this.network.createAndAddLink(new IdImpl(3), node3, node7, 1000.0, 10.0, 2000.0, 1);
+			this.network.createAndAddLink(new IdImpl(4), node8, node4, 1000.0, 10.0, 2000.0, 1);
+			this.network.createAndAddLink(new IdImpl(5), node8, node5, 1000.0, 10.0, 2000.0, 1);
+			this.network.createAndAddLink(new IdImpl(6), node8, node6, 1000.0, 10.0, 2000.0, 1);
+			this.network.createAndAddLink(new IdImpl(7), node7, node8, 1000.0, 10.0, 2000.0, 1);
 		}
 	}
 

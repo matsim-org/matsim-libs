@@ -145,7 +145,7 @@ public class ModdedConverter {
 						endTime = convertTime(tabs[3]);
 						double dur = endTime - this.tmpEndTime;
 
-						LegImpl leg = pl.createLeg(TransportMode.car);
+						LegImpl leg = pl.createAndAddLeg(TransportMode.car);
 						leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 						Coord tmpCoord;
@@ -160,7 +160,7 @@ public class ModdedConverter {
 							tmpCoord = getRandomCoordInZone(tabs[6]);
 						}
 						this.tmpType = tabs[7];
-						ActivityImpl act = pl.createActivity(tabs[4], tmpCoord);
+						ActivityImpl act = pl.createAndAddActivity(tabs[4], tmpCoord);
 						act.setEndTime(convertTime(tabs[3]));
 						act.setDuration(dur);
 					} else {
@@ -172,7 +172,7 @@ public class ModdedConverter {
 							PersonImpl p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
 							PlanImpl tmpPl = p.getSelectedPlan();
 
-							LegImpl leg = tmpPl.createLeg(TransportMode.car);
+							LegImpl leg = tmpPl.createAndAddLeg(TransportMode.car);
 							leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 							// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 
@@ -188,7 +188,7 @@ public class ModdedConverter {
 								this.count2+=1;
 								System.out.println(personId);
 							}
-							ActivityImpl lastAct = tmpPl.createActivity(this.tmpTabs[7], tmpCoord2);
+							ActivityImpl lastAct = tmpPl.createAndAddActivity(this.tmpTabs[7], tmpCoord2);
 						}
 
 						PersonImpl p = new PersonImpl(new IdImpl(personId));
@@ -215,7 +215,7 @@ public class ModdedConverter {
 							this.count1 += 1;
 							System.out.println(personId);
 						}
-						ActivityImpl homeAct = pl.createActivity(tabs[4], tmpCoord3);
+						ActivityImpl homeAct = pl.createAndAddActivity(tabs[4], tmpCoord3);
 						homeAct.setEndTime(convertTime(tabs[3]));
 						p.addPlan(pl);
 						this.pop.addPerson(p);
@@ -241,7 +241,7 @@ public class ModdedConverter {
 			PersonImpl p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
 			PlanImpl tmpPl = p.getSelectedPlan();
 
-			LegImpl leg = tmpPl.createLeg(TransportMode.car);
+			LegImpl leg = tmpPl.createAndAddLeg(TransportMode.car);
 			leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 			Coord tmpCoord2;
@@ -256,7 +256,7 @@ public class ModdedConverter {
 				this.count2+=1;
 				System.out.println(this.tmpPersonId);
 			}
-			ActivityImpl lastAct = tmpPl.createActivity(this.tmpTabs[7], tmpCoord2);
+			ActivityImpl lastAct = tmpPl.createAndAddActivity(this.tmpTabs[7], tmpCoord2);
 			System.out.println("# of chains that do not start at home: " + this.count1);
 			System.out.println("# of chains that do not end at home: " + this.count2);
 		}

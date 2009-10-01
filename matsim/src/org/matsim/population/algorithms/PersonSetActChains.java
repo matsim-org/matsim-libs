@@ -223,16 +223,16 @@ public class PersonSetActChains extends AbstractPersonAlgorithm {
 		}
 
 		person.getPlans().clear();
-		PlanImpl p = person.createPlan(true);
+		PlanImpl p = person.createAndAddPlan(true);
 
 		String [] acttypes = chain.split("");
 		// note: by splitting, the string[0] is always = ""!
 		for (int j=1; j<acttypes.length; j++) {
 			try {
 				if (j != 1) {
-					p.createLeg(TransportMode.car);
+					p.createAndAddLeg(TransportMode.car);
 				}
-				p.createActivity(acttypes[j], new CoordImpl(-1, -1));//,"-1","-1",null,"00:00:00", "00:00:00", "00:00:00", null);
+				p.createAndAddActivity(acttypes[j], new CoordImpl(-1, -1));//,"-1","-1",null,"00:00:00", "00:00:00", "00:00:00", null);
 			}
 			catch (Exception e) {
 				throw new RuntimeException(e);

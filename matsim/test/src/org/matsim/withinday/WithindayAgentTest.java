@@ -142,9 +142,9 @@ public class WithindayAgentTest extends MatsimTestCase {
 		p.addPlan(this.plan);
 		this.leg = null;
 		try {
-			this.plan.createActivity("h", homeLink);
-			this.leg = this.plan.createLeg(TransportMode.car);
-			this.plan.createActivity("work", workLink);
+			this.plan.createAndAddActivity("h", homeLink);
+			this.leg = this.plan.createAndAddLeg(TransportMode.car);
+			this.plan.createAndAddActivity("work", workLink);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

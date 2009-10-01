@@ -70,17 +70,17 @@ public class TransitDriverTest extends TestCase {
 		ArrayList<Link> links = new ArrayList<Link>();
 
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl node1 = network.createNode(new IdImpl("1"), new CoordImpl(   0, 0));
-		NodeImpl node2 = network.createNode(new IdImpl("2"), new CoordImpl(1000, 0));
-		NodeImpl node3 = network.createNode(new IdImpl("3"), new CoordImpl(2000, 0));
-		NodeImpl node4 = network.createNode(new IdImpl("4"), new CoordImpl(3000, 0));
-		NodeImpl node5 = network.createNode(new IdImpl("5"), new CoordImpl(4000, 0));
-		NodeImpl node6 = network.createNode(new IdImpl("6"), new CoordImpl(5000, 0));
-		Link link1 = network.createLink(new IdImpl("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
-		Link link2 = network.createLink(new IdImpl("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
-		Link link3 = network.createLink(new IdImpl("3"), node3, node4, 1000.0, 10.0, 3600.0, 1);
-		Link link4 = network.createLink(new IdImpl("4"), node4, node5, 1000.0, 10.0, 3600.0, 1);
-		Link link5 = network.createLink(new IdImpl("5"), node5, node6, 1000.0, 10.0, 3600.0, 1);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
+		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));
+		NodeImpl node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(3000, 0));
+		NodeImpl node5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(4000, 0));
+		NodeImpl node6 = network.createAndAddNode(new IdImpl("6"), new CoordImpl(5000, 0));
+		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
+		Link link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
+		Link link3 = network.createAndAddLink(new IdImpl("3"), node3, node4, 1000.0, 10.0, 3600.0, 1);
+		Link link4 = network.createAndAddLink(new IdImpl("4"), node4, node5, 1000.0, 10.0, 3600.0, 1);
+		Link link5 = network.createAndAddLink(new IdImpl("5"), node5, node6, 1000.0, 10.0, 3600.0, 1);
 
 		Collections.addAll(links, link2, link3, link4);
 		NetworkRouteWRefs route = new NodeNetworkRouteImpl(link1, link5);

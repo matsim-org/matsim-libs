@@ -176,7 +176,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 			case 6:
 				x = 40000.0; y = 10000.0; break;
 			}
-			network.createNode(new IdImpl(nodeId), new CoordImpl(x, y));
+			network.createAndAddNode(new IdImpl(nodeId), new CoordImpl(x, y));
 			logger.info(network.getNode(new IdImpl(nodeId)).toString());
 		}
 
@@ -193,7 +193,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 				freespeed = 50.0 / 3.6;
 			}
 			
-			network.createLink(
+			network.createAndAddLink(
 					linkId, 
 					network.getNode(new IdImpl(nodePair[0])), 
 					network.getNode(new IdImpl(nodePair[1])), 

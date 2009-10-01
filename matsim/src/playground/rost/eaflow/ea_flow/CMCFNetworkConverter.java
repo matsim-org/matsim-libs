@@ -63,7 +63,7 @@ public class CMCFNetworkConverter {
 			 //build a new node in the NetworkLayer
 			 Coord coord = new CoordImpl(x,y);
 			 Id matsimid  = new IdImpl(id);
-			 result.createNode(matsimid, coord);
+			 result.createAndAddNode(matsimid, coord);
 		 }
 		 //read the edges
 		 Element edges = basegraph.getChild("edges");
@@ -78,7 +78,7 @@ public class CMCFNetworkConverter {
 			 //build a new edge in 
 			 Id matsimid  = new IdImpl(id);
 			 //TODO free speed is set to 1.3 find something better
-			 result.createLink(matsimid, result.getNode(from), result.getNode(to),
+			 result.createAndAddLink(matsimid, result.getNode(from), result.getNode(to),
 					 Double.parseDouble(length),
 					  1.3 ,
 					 Double.parseDouble(capacity),

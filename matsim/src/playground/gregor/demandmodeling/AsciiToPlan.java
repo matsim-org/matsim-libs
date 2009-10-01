@@ -118,7 +118,7 @@ public class AsciiToPlan {
 			//Erzeuge Homeactivity
 			Coord coord1 = new CoordImpl(homex,homey);
 			String type = "h";
-			ActivityImpl home1 = plan.createActivity(type, coord1);
+			ActivityImpl home1 = plan.createAndAddActivity(type, coord1);
 			home1.setEndTime(start);
 			
 			plan.addLeg(pb.createLeg(TransportMode.car));
@@ -135,7 +135,7 @@ public class AsciiToPlan {
 			}else	if (actType == 4) {
 				type = "soc";
 			}
-			ActivityImpl work = plan.createActivity(type, coord2);
+			ActivityImpl work = plan.createAndAddActivity(type, coord2);
 			work.setStartTime(start);
 			work.setEndTime(start + dur);
 			
@@ -143,7 +143,7 @@ public class AsciiToPlan {
 			
 			//Erzeuge 2. Homeactivity
 			type = "h";
-			ActivityImpl home2 = plan.createActivity(type, coord1);
+			ActivityImpl home2 = plan.createAndAddActivity(type, coord1);
 			home2.setStartTime(start + dur);
 			
 			try {

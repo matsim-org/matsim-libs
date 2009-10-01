@@ -127,14 +127,14 @@ public class ShortestDistanceFromSupersource {
 	protected void addSuperSink()
 	{
 		long i = 0;
-		network.createNode(sSID, new CoordImpl(0,0));
+		network.createAndAddNode(sSID, new CoordImpl(0,0));
 		Node sink = network.getNode(sSID);
 		
 		for(String s : evacArea.evacBorderNodeIds)
 		{
 			NodeImpl node = (NodeImpl)network.getNode(s);
 			Id linkId = new IdImpl("superlink" + ++i);
-			network.createLink(linkId, 
+			network.createAndAddLink(linkId, 
 								network.getNode(sSID),
 								node,
 								0,

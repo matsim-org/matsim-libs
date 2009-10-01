@@ -129,8 +129,8 @@ public class NetworkGenerator {
 		
 		NodeImpl from = this.network.getNode(getNode(ls.getStartPoint()));
 		NodeImpl to  = this.network.getNode(getNode(ls.getEndPoint()));
-		this.network.createLink(new IdImpl(this.linkId++), from, to, ls.getLength(), 1.66, 1.33, 1);
-		this.network.createLink(new IdImpl(this.linkId++), to, from, ls.getLength(), 1.66, 1.33, 1);
+		this.network.createAndAddLink(new IdImpl(this.linkId++), from, to, ls.getLength(), 1.66, 1.33, 1);
+		this.network.createAndAddLink(new IdImpl(this.linkId++), to, from, ls.getLength(), 1.66, 1.33, 1);
 	}
 	
 	
@@ -140,7 +140,7 @@ public class NetworkGenerator {
 			throw new RuntimeException("two different nodes on the same location is not allowd!");
 		} 
 		if (tmp.size() == 0) {
-			NodeImpl n = network.createNode(new IdImpl(this.nodeId++), new CoordImpl(p.getX(), p.getY()));
+			NodeImpl n = network.createAndAddNode(new IdImpl(this.nodeId++), new CoordImpl(p.getX(), p.getY()));
 			addNode(n);
 			return n.getId().toString();
 		} else {

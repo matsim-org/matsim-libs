@@ -58,10 +58,10 @@ public class NetworkTransform {
 			if (c == null){
 				c = node.getCoord();
 			}
-			nl.createNode(node.getId(), c);
+			nl.createAndAddNode(node.getId(), c);
 		}
 		for (LinkImpl link : net.getLinks().values()) {
-			nl.createLink(link.getId(), nl.getNode(link.getFromNode().getId()), nl.getNode(link.getToNode().getId()), link.getLength(), link.getFreespeed(Time.UNDEFINED_TIME), link.getCapacity(Time.UNDEFINED_TIME), link.getNumberOfLanes(Time.UNDEFINED_TIME));
+			nl.createAndAddLink(link.getId(), nl.getNode(link.getFromNode().getId()), nl.getNode(link.getToNode().getId()), link.getLength(), link.getFreespeed(Time.UNDEFINED_TIME), link.getCapacity(Time.UNDEFINED_TIME), link.getNumberOfLanes(Time.UNDEFINED_TIME));
 		}
 		nl.setEffectiveCellSize(net.getEffectiveCellSize());
 		nl.setEffectiveLaneWidth(net.getEffectiveLaneWidth());

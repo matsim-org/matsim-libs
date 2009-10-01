@@ -36,9 +36,9 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	public void testRandomChoice() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
-		plan.createActivity("home", new CoordImpl(0, 0));
-		LegImpl leg = plan.createLeg(TransportMode.car);
-		plan.createActivity("work", new CoordImpl(0, 0));
+		plan.createAndAddActivity("home", new CoordImpl(0, 0));
+		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+		plan.createAndAddActivity("work", new CoordImpl(0, 0));
 		boolean foundCarMode = false;
 		boolean foundPtMode = false;
 		boolean foundWalkMode = false;
@@ -72,7 +72,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	public void testHandlePlanWithoutLeg() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
-		plan.createActivity("home", new CoordImpl(0, 0));
+		plan.createAndAddActivity("home", new CoordImpl(0, 0));
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
@@ -83,13 +83,13 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	public void testMultipleLegs() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new TransportMode[] {TransportMode.car, TransportMode.pt}, MatsimRandom.getRandom());
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
-		plan.createActivity("home", new CoordImpl(0, 0));
-		plan.createLeg(TransportMode.car);
-		plan.createActivity("work", new CoordImpl(0, 0));
-		plan.createLeg(TransportMode.car);
-		plan.createActivity("shop", new CoordImpl(0, 0));
-		plan.createLeg(TransportMode.car);
-		plan.createActivity("home", new CoordImpl(0, 0));
+		plan.createAndAddActivity("home", new CoordImpl(0, 0));
+		plan.createAndAddLeg(TransportMode.car);
+		plan.createAndAddActivity("work", new CoordImpl(0, 0));
+		plan.createAndAddLeg(TransportMode.car);
+		plan.createAndAddActivity("shop", new CoordImpl(0, 0));
+		plan.createAndAddLeg(TransportMode.car);
+		plan.createAndAddActivity("home", new CoordImpl(0, 0));
 		algo.run(plan);
 		assertEquals("unexpected leg mode in leg 1.", TransportMode.pt, ((BasicLeg) plan.getPlanElements().get(1)).getMode());
 		assertEquals("unexpected leg mode in leg 2.", TransportMode.pt, ((BasicLeg) plan.getPlanElements().get(3)).getMode());

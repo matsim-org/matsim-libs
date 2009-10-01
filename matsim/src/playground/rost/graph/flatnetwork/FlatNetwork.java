@@ -301,7 +301,7 @@ public class FlatNetwork {
 		{
 			newId = new IdImpl(node.getId().toString());
 			newCoord = new CoordImpl(node.getCoord().getX(), node.getCoord().getY());
-			output.createNode(newId, newCoord);
+			output.createAndAddNode(newId, newCoord);
 		}
 		int counter = 0;
 		for(Node node : newNodes)
@@ -309,7 +309,7 @@ public class FlatNetwork {
 			++counter;
 			newId = new IdImpl(node.getId().toString());
 			newCoord = new CoordImpl(node.getCoord().getX(), node.getCoord().getY());
-			output.createNode(newId, newCoord);
+			output.createAndAddNode(newId, newCoord);
 		}
 		log.debug("created " + counter + " new nodes!");
 		
@@ -342,7 +342,7 @@ public class FlatNetwork {
 			length = fL.length;
 			capacity = fL.link.getCapacity(1.);
 			freespeed = fL.link.getFreespeed(1.);
-			output.createLink(newId, 
+			output.createAndAddLink(newId, 
 								output.getNode(fL.fromNode.getId().toString()),
 								output.getNode(fL.toNode.getId().toString()),
 								length, freespeed, capacity, 1);
@@ -362,7 +362,7 @@ public class FlatNetwork {
 					newId = new IdImpl(fL.reverseId.toString());
 				}
 				//log.debug("linkid: " + newId.toString());
-				output.createLink(newId, 
+				output.createAndAddLink(newId, 
 						output.getNode(fL.toNode.getId().toString()),
 						output.getNode(fL.fromNode.getId().toString()),
 						length, freespeed, capacity, 1);

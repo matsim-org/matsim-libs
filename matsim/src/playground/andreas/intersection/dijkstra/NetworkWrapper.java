@@ -28,14 +28,14 @@ public class NetworkWrapper {
 		int numberOfLinksGenerated = 0;
 
 		for (LinkImpl link : networkLayer.getLinks().values()) {
-			wrappedNetwork.createNode(link.getId(), link.getToNode().getCoord());
+			wrappedNetwork.createAndAddNode(link.getId(), link.getToNode().getCoord());
 			numberOfNodesGenerated++;
 		}
 
 		for (NodeImpl node : networkLayer.getNodes().values()) {
 			for (LinkImpl inLink : node.getInLinks().values()) {
 				for (LinkImpl outLink : node.getOutLinks().values()) {
-					LinkImpl link = wrappedNetwork.createLink(new IdImpl(numberOfLinksGenerated),
+					LinkImpl link = wrappedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated),
 							wrappedNetwork.getNode(inLink.getId()), wrappedNetwork.getNode(outLink.getId().toString()),
 							outLink.getLength(),
 							outLink.getFreespeed(Time.UNDEFINED_TIME),

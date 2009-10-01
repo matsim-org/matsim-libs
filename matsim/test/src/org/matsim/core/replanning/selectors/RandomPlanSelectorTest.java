@@ -47,12 +47,12 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 	 */
 	public void testRandom() {
 		PersonImpl person = new PersonImpl(new IdImpl(1));
-		PlanImpl plan1 = person.createPlan(false);
-		PlanImpl plan2 = person.createPlan(false);
+		PlanImpl plan1 = person.createAndAddPlan(false);
+		PlanImpl plan2 = person.createAndAddPlan(false);
 		plan2.setScore(10.0);
-		PlanImpl plan3 = person.createPlan(false);
+		PlanImpl plan3 = person.createAndAddPlan(false);
 		plan3.setScore(-50.0);
-		PlanImpl plan4 = person.createPlan(false);
+		PlanImpl plan4 = person.createAndAddPlan(false);
 		plan4.setScore(0.0);
 
 		RandomPlanSelector selector = new RandomPlanSelector();

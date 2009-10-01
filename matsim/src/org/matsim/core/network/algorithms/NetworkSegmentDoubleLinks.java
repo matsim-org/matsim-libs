@@ -117,9 +117,9 @@ public class NetworkSegmentDoubleLinks {
 		double freespeed = link.getFreespeed(Time.UNDEFINED_TIME);
 		double capacity = link.getCapacity(Time.UNDEFINED_TIME);
 		double permlanes = link.getNumberOfLanes(Time.UNDEFINED_TIME);
-		NodeImpl medianNode = this.network.createNode(getNewNodeId(), link.getCoord());
-		this.network.createLink(link.getId(), link.getFromNode(), medianNode, length, freespeed, capacity, permlanes);
-		this.network.createLink(getNewLinkId(), medianNode, link.getToNode(), length, freespeed, capacity, permlanes);
+		NodeImpl medianNode = this.network.createAndAddNode(getNewNodeId(), link.getCoord());
+		this.network.createAndAddLink(link.getId(), link.getFromNode(), medianNode, length, freespeed, capacity, permlanes);
+		this.network.createAndAddLink(getNewLinkId(), medianNode, link.getToNode(), length, freespeed, capacity, permlanes);
 	}
 
 	private Id getNewLinkId() {

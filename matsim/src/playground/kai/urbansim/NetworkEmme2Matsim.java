@@ -67,7 +67,7 @@ public class NetworkEmme2Matsim {
 						String idStr = parts[1] ;
 						String xxStr = parts[2] ;
 						String yyStr = parts[3] ;
-						NodeImpl node = network.createNode(new IdImpl(idStr), new CoordImpl(xxStr,yyStr)) ;
+						NodeImpl node = network.createAndAddNode(new IdImpl(idStr), new CoordImpl(xxStr,yyStr)) ;
 						if ( NW_NAME==PSRC ) {
 							node.setOrigId(parts[7]);		
 						}
@@ -112,7 +112,7 @@ public class NetworkEmme2Matsim {
 
 						Id id = new IdImpl( linkCnt ) ; linkCnt++ ;
 
-						network.createLink(id, fromNode, toNode, length, freespeed, capacity, permlanes );
+						network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, permlanes );
 					}
 				} else {
 					// something else; do nothing

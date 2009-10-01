@@ -112,19 +112,19 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		// generate network
 		this.network = new NetworkLayer();
 
-		NodeImpl node1 = network.createNode(new IdImpl(1), new CoordImpl(    0.0, 0.0));
-		NodeImpl node2 = network.createNode(new IdImpl(2), new CoordImpl(  500.0, 0.0));
-		NodeImpl node3 = network.createNode(new IdImpl(3), new CoordImpl( 5500.0, 0.0));
-		NodeImpl node4 = network.createNode(new IdImpl(4), new CoordImpl( 6000.0, 0.0));
-		NodeImpl node5 = network.createNode(new IdImpl(5), new CoordImpl(11000.0, 0.0));
-		network.createLink(new IdImpl(1020), node1, node2, 500, 25, 3600, 1);
-		network.createLink(new IdImpl(2010), node2, node1, 500, 25, 3600, 1);
-		network.createLink(new IdImpl(2030), node2, node3, 500, 25, 3600, 1);
-		network.createLink(new IdImpl(3020), node3, node2, 500, 25, 3600, 1);
-		network.createLink(new IdImpl(3040), node3, node4, 500, 25, 3600, 1);
-		network.createLink(new IdImpl(4030), node4, node3, 500, 25, 3600, 1);
-		network.createLink(new IdImpl(4050), node4, node5, 500, 25, 3600, 1);
-		network.createLink(new IdImpl(5040), node5, node4, 500, 25, 3600, 1);
+		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(    0.0, 0.0));
+		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(  500.0, 0.0));
+		NodeImpl node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl( 5500.0, 0.0));
+		NodeImpl node4 = network.createAndAddNode(new IdImpl(4), new CoordImpl( 6000.0, 0.0));
+		NodeImpl node5 = network.createAndAddNode(new IdImpl(5), new CoordImpl(11000.0, 0.0));
+		network.createAndAddLink(new IdImpl(1020), node1, node2, 500, 25, 3600, 1);
+		network.createAndAddLink(new IdImpl(2010), node2, node1, 500, 25, 3600, 1);
+		network.createAndAddLink(new IdImpl(2030), node2, node3, 500, 25, 3600, 1);
+		network.createAndAddLink(new IdImpl(3020), node3, node2, 500, 25, 3600, 1);
+		network.createAndAddLink(new IdImpl(3040), node3, node4, 500, 25, 3600, 1);
+		network.createAndAddLink(new IdImpl(4030), node4, node3, 500, 25, 3600, 1);
+		network.createAndAddLink(new IdImpl(4050), node4, node5, 500, 25, 3600, 1);
+		network.createAndAddLink(new IdImpl(5040), node5, node4, 500, 25, 3600, 1);
 
 		RouteFactory ptRouteFactory = new KtiPtRouteFactory(null);
 		this.network.getFactory().setRouteFactory(TransportMode.pt, ptRouteFactory);
@@ -137,61 +137,61 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		desires.putActivityDuration("shop", Time.parseTime("00:20:00"));
 
 		// generate plan
-		plan = person.createPlan(true);
+		plan = person.createAndAddPlan(true);
 
-		ActivityImpl act = plan.createActivity("home", facilityHome);
+		ActivityImpl act = plan.createAndAddActivity("home", facilityHome);
 		LinkImpl link = this.network.getLink("2030");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
-		LegImpl leg = this.plan.createLeg(TransportMode.car);
+		LegImpl leg = this.plan.createAndAddLeg(TransportMode.car);
 		RouteWRefs route = network.getFactory().createRoute(TransportMode.car, this.network.getLink("2030"), this.network.getLink("3040"));
 		leg.setRoute(route);
 
-		act = plan.createActivity("work_sector3", facilityWork);
+		act = plan.createAndAddActivity("work_sector3", facilityWork);
 		link = this.network.getLink("3040");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
-		leg = this.plan.createLeg(TransportMode.pt);
+		leg = this.plan.createAndAddLeg(TransportMode.pt);
 		route = network.getFactory().createRoute(TransportMode.pt, this.network.getLink("3040"), this.network.getLink("4050"));
 		route.setDistance(100.0);
 		((GenericRoute) route).setRouteDescription(this.network.getLink("3040"), "bla", this.network.getLink("4050"));
 		leg.setRoute(route);
 
-		act = plan.createActivity("leisure", facilityLeisure);
+		act = plan.createAndAddActivity("leisure", facilityLeisure);
 		link = this.network.getLink("4050");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
-		leg = this.plan.createLeg(TransportMode.pt);
+		leg = this.plan.createAndAddLeg(TransportMode.pt);
 		route = network.getFactory().createRoute(TransportMode.pt, this.network.getLink("4050"), this.network.getLink("3040"));
 		route.setDistance(100.0);
 		((GenericRoute) route).setRouteDescription(this.network.getLink("3040"), "bla", this.network.getLink("4050"));
 		leg.setRoute(route);
 
-		act = plan.createActivity("work_sector3", facilityWork);
+		act = plan.createAndAddActivity("work_sector3", facilityWork);
 		link = this.network.getLink("3040");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
-		leg = this.plan.createLeg(TransportMode.car);
+		leg = this.plan.createAndAddLeg(TransportMode.car);
 		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.network.getLink("3040"), this.network.getLink("2030"));
 		leg.setRoute(route);
 
-		act = plan.createActivity("home", facilityHome);
+		act = plan.createAndAddActivity("home", facilityHome);
 		link = this.network.getLink("2030");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
-		leg = this.plan.createLeg(TransportMode.bike);
+		leg = this.plan.createAndAddLeg(TransportMode.bike);
 		route = network.getFactory().createRoute(TransportMode.bike, this.network.getLink("2030"), this.network.getLink("1020"));
 		leg.setRoute(route);
 
-		act = plan.createActivity("shop", facilityShop);
+		act = plan.createAndAddActivity("shop", facilityShop);
 		link = this.network.getLink("1020");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
-		leg = this.plan.createLeg(TransportMode.bike);
+		leg = this.plan.createAndAddLeg(TransportMode.bike);
 		route = network.getFactory().createRoute(TransportMode.bike, this.network.getLink("1020"), this.network.getLink("2030"));
 		leg.setRoute(route);
 
-		act = plan.createActivity("home", facilityHome);
+		act = plan.createAndAddActivity("home", facilityHome);
 		link = this.network.getLink("2030");
 		act.setLink(link);
 		act.setCoord(link.getCoord());

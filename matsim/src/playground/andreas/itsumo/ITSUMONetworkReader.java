@@ -138,7 +138,7 @@ public class ITSUMONetworkReader {
 			} else if (lname.equals("network_name")) {
 
 			} else if (lname.equals("node")) {
-				ITSUMONetworkReader.this.network.createNode(new IdImpl(this.nodeId), new CoordImpl(this.xCoord, this.yCoord));
+				ITSUMONetworkReader.this.network.createAndAddNode(new IdImpl(this.nodeId), new CoordImpl(this.xCoord, this.yCoord));
 			} else if (lname.equals("node_id")) {
 				this.nodeId = content.trim();
 			} else if (lname.equals("x_coord")) {
@@ -150,7 +150,7 @@ public class ITSUMONetworkReader {
 			} else if (lname.equals("laneset")) {
 				double length = CoordUtils.calcDistance(ITSUMONetworkReader.this.network.getNode(this.lanesetFrom).getCoord(), ITSUMONetworkReader.this.network.getNode(this.lanesetTo).getCoord());
 				double capacity = 3600.0; // TODO calculate capacity from speed
-				ITSUMONetworkReader.this.network.createLink(new IdImpl(this.lanesetId), ITSUMONetworkReader.this.network.getNode(this.lanesetFrom), ITSUMONetworkReader.this.network.getNode(this.lanesetTo),
+				ITSUMONetworkReader.this.network.createAndAddLink(new IdImpl(this.lanesetId), ITSUMONetworkReader.this.network.getNode(this.lanesetFrom), ITSUMONetworkReader.this.network.getNode(this.lanesetTo),
 						length, this.laneSpeed / this.lanesCount, capacity, this.lanesCount);
 			} else if (lname.equals("laneset_id")) {
 				this.lanesetId = content.trim();

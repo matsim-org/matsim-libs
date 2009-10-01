@@ -300,7 +300,7 @@ public class PlansCreateFromDataPuls {
 		// plan
 		if (cPerson.getPlans().size() != 1) { throw new RuntimeException("cpid="+cPerson.getId()+": does not have one plan"); }
 		PlanImpl cPlan = cPerson.getPlans().get(0);
-		PlanImpl dPlan = dPerson.createPlan(true);
+		PlanImpl dPlan = dPerson.createAndAddPlan(true);
 		dPlan.copyPlan(cPlan);
 		dPlan.setPerson(dPerson);
 		for (PlanElement e : dPlan.getPlanElements()) {

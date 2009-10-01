@@ -77,7 +77,7 @@ public class CreatePlans {
 			k.addActivity(home, false);
 			k.addActivity(work, false);
 
-			PlanImpl plan = person.createPlan(true);
+			PlanImpl plan = person.createAndAddPlan(true);
 			ActivityFacilityImpl home_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("home").get(0).getFacility();
 			ActivityFacilityImpl work_facility = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("work").get(0).getFacility();
 			ArrayList<ActivityOption> acts = knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities();
@@ -85,23 +85,23 @@ public class CreatePlans {
 			double depTime=3600*8;
 			double duration=3600*8;
 
-			ActivityImpl a = plan.createActivity("home",home_facility.getCoord());
+			ActivityImpl a = plan.createAndAddActivity("home",home_facility.getCoord());
 			a.setLink(home_facility.getLink());
 			a.setEndTime(depTime);
-			LegImpl l = plan.createLeg(TransportMode.car);
+			LegImpl l = plan.createAndAddLeg(TransportMode.car);
 			l.setArrivalTime(depTime);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTime);
-			a = plan.createActivity("work",work_facility.getCoord());
+			a = plan.createAndAddActivity("work",work_facility.getCoord());
 			a.setLink(work_facility.getLink());
 			a.setStartTime(depTime);
 			a.setEndTime(depTime+duration);
 			a.setDuration(duration);
-			l = plan.createLeg(TransportMode.car);
+			l = plan.createAndAddLeg(TransportMode.car);
 			l.setArrivalTime(depTime+duration);
 			l.setTravelTime(0.0);
 			l.setDepartureTime(depTime+duration);
-			a = plan.createActivity("home",home_facility.getCoord());
+			a = plan.createAndAddActivity("home",home_facility.getCoord());
 			a.setLink(home_facility.getLink());
 			// assign home-work-home activities to each person
 

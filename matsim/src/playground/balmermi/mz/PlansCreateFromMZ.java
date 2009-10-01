@@ -208,7 +208,7 @@ public class PlansCreateFromMZ {
 				// creating/getting plan
 				PlanImpl plan = person.getSelectedPlan();
 				if (plan == null) {
-					person.createPlan(true);
+					person.createAndAddPlan(true);
 					plan = person.getSelectedPlan();
 					plan.setScore(weight); // used plans score as a storage for the person weight of the MZ2005
 				}
@@ -218,7 +218,7 @@ public class PlansCreateFromMZ {
 					ActivityImpl from_act = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 					from_act.setEndTime(departure);
 					from_act.setDuration(from_act.getEndTime()-from_act.getStartTime());
-					LegImpl leg = plan.createLeg(mode);
+					LegImpl leg = plan.createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
@@ -226,7 +226,7 @@ public class PlansCreateFromMZ {
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
-					ActivityImpl act = plan.createActivity(acttype,to);
+					ActivityImpl act = plan.createAndAddActivity(acttype,to);
 					act.setStartTime(arrival);
 
 					// coordinate consistency check
@@ -236,9 +236,9 @@ public class PlansCreateFromMZ {
 					}
 				}
 				else {
-					ActivityImpl homeAct = plan.createActivity(HOME,from);
+					ActivityImpl homeAct = plan.createAndAddActivity(HOME,from);
 					homeAct.setEndTime(departure);
-					LegImpl leg = plan.createLeg(mode);
+					LegImpl leg = plan.createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
@@ -246,7 +246,7 @@ public class PlansCreateFromMZ {
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
-					ActivityImpl act = plan.createActivity(acttype,to);
+					ActivityImpl act = plan.createAndAddActivity(acttype,to);
 					act.setStartTime(arrival);
 				}
 			}

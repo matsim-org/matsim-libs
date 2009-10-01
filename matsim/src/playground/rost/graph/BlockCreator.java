@@ -315,7 +315,7 @@ public class BlockCreator {
 			if(!linkTo)
 			{
 				Id id = new IdImpl("" + (++maxLinkId));
-				network.createLink(id, 
+				network.createAndAddLink(id, 
 						current, 
 						next, 
 						GraphAlgorithms.getDistanceMeter(current, next),
@@ -328,7 +328,7 @@ public class BlockCreator {
 			if(!linkFrom)
 			{
 				Id id = new IdImpl("" + (++maxLinkId));
-				network.createLink(id, 
+				network.createAndAddLink(id, 
 						next, 
 						current, 
 						GraphAlgorithms.getDistanceMeter(current, next),
@@ -352,20 +352,20 @@ public class BlockCreator {
 			if(noStartSet.contains(node))
 				continue;
 			//node = network.getNode("254308571");
-//			//konstruiere weg, der immer nach rechts führt.
+//			//konstruiere weg, der immer nach rechts fï¿½hrt.
 //			constructBlocks(node);
 //			node = network.getNode("103902985");
-//			//konstruiere weg, der immer nach rechts führt.
+//			//konstruiere weg, der immer nach rechts fï¿½hrt.
 //			constructBlocks(node);
 //			node = network.getNode("103906854");
-//			//konstruiere weg, der immer nach rechts führt.
+//			//konstruiere weg, der immer nach rechts fï¿½hrt.
 //			constructBlocks(node);
 //			node = network.getNode("27785560");
-//			//konstruiere weg, der immer nach rechts führt.
+//			//konstruiere weg, der immer nach rechts fï¿½hrt.
 			constructBlocks(node);
 			//break;
 		}
-		//füge alle Blocks in ein set zusammen
+		//fï¿½ge alle Blocks in ein set zusammen
 		for(Set<Block> set : hashBlocks.values())
 		{
 			for(Block b : set)
@@ -409,7 +409,7 @@ public class BlockCreator {
 		int linkCount = currentNode.getOutLinks().values().size();
 //		if(linkCount <= 2)
 //			return true;
-		//sofern es eine Kante gibt, die zurück führt
+		//sofern es eine Kante gibt, die zurï¿½ck fï¿½hrt
 		for(Link link : currentNode.getOutLinks().values())
 		{
 			if(usedLinks.contains(link) || link.getToNode().equals(previousNode))

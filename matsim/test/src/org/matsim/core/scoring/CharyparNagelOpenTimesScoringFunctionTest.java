@@ -73,9 +73,9 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		// here, we don't test the scoring function itself, but just the method to retrieve opening times
 		// we don't really need persons and plans, they're just used to initialize the ScoringFunction object
 		this.person = new PersonImpl(new IdImpl(1));
-		this.plan = person.createPlan(true);
+		this.plan = person.createAndAddPlan(true);
 
-		ActivityImpl act = plan.createActivity("no type", testFacility);
+		ActivityImpl act = plan.createAndAddActivity("no type", testFacility);
 		act.setStartTime(8.0 * 3600);
 		act.setEndTime(16.0 * 3600);
 		act.setFacility(testFacility);

@@ -106,24 +106,24 @@ public class PopulationAsciiFileReader implements TabularFileHandler {
 			p.setAge(Integer.parseInt(row[2]));
 			p.setSex(row[3]);
 			log.warn("Income is not supported by the current version of MATSim. Column 5 will be ignored");
-			PlanImpl plan = p.createPlan(true);
+			PlanImpl plan = p.createAndAddPlan(true);
 			Zone homeZone = (Zone)this.zoneLayer.getLocation(new IdImpl(row[1]));
 			Coord homeCoord = WorldUtils.getRandomCoordInZone(homeZone, this.zoneLayer);
 			Zone primaryZone = (Zone)this.zoneLayer.getLocation(new IdImpl(row[6]));
 			Coord primaryCoord = WorldUtils.getRandomCoordInZone(primaryZone, this.zoneLayer);
 			double homeEndTime = SIXOCLOCK + MatsimRandom.getRandom().nextDouble() * TWOHOURS;
 
-			ActivityImpl act1 = plan.createActivity(ACTTYPE_HOME, homeCoord);
+			ActivityImpl act1 = plan.createAndAddActivity(ACTTYPE_HOME, homeCoord);
 			act1.setEndTime(homeEndTime);
 
-			plan.createLeg(TransportMode.car);
+			plan.createAndAddLeg(TransportMode.car);
 
-			ActivityImpl act2 = plan.createActivity(row[5], primaryCoord);
+			ActivityImpl act2 = plan.createAndAddActivity(row[5], primaryCoord);
 			act2.setDuration(WORKDURATION);
 
-			plan.createLeg(TransportMode.car);
+			plan.createAndAddLeg(TransportMode.car);
 
-			/*Act act3 = */plan.createActivity(ACTTYPE_HOME, homeCoord);
+			/*Act act3 = */plan.createAndAddActivity(ACTTYPE_HOME, homeCoord);
 			this.plans.addPerson(p);
 		}
 	}

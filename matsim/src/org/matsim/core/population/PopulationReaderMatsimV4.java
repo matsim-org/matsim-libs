@@ -316,7 +316,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.routeDescription = null;
-		this.currplan = this.currperson.createPlan(selected);
+		this.currplan = this.currperson.createAndAddPlan(selected);
 
 		String scoreString = atts.getValue("score");
 		if (scoreString != null) {
@@ -360,14 +360,14 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			if (link == null) {
 				throw new IllegalArgumentException("No link found with id = " + atts.getValue("link"));
 			}
-			this.curract = this.currplan.createActivity(atts.getValue("type"), link);
+			this.curract = this.currplan.createAndAddActivity(atts.getValue("type"), link);
 			if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 				coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 			coord = new CoordImpl(atts.getValue("x"), atts.getValue("y"));
-			this.curract = this.currplan.createActivity(atts.getValue("type"), coord);
+			this.curract = this.currplan.createAndAddActivity(atts.getValue("type"), coord);
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
 		}
@@ -400,7 +400,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		if (mode.equals("undef")) {
 			mode = "undefined";
 		}
-		this.currleg = this.currplan.createLeg(TransportMode.valueOf(mode));
+		this.currleg = this.currplan.createAndAddLeg(TransportMode.valueOf(mode));
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
 		this.currleg.setArrivalTime(Time.parseTime(atts.getValue("arr_time")));

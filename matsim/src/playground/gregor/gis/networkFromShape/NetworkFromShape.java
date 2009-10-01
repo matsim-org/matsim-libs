@@ -48,7 +48,7 @@ public class NetworkFromShape {
 			Coordinate c = geo.getGeometryN(0).getCentroid().getCoordinate();
 			Coord coord = MGC.coordinate2Coord(c);
 			Integer id = (Integer) f.getAttribute(1);
-			NodeImpl n = net.createNode(new IdImpl(id), coord);
+			NodeImpl n = net.createAndAddNode(new IdImpl(id), coord);
 			if (n == null) {
 				System.out.println("id:" + id);
 			}
@@ -81,8 +81,8 @@ public class NetworkFromShape {
 				continue;
 			}
 			
-			net.createLink(new IdImpl(id), nFrom, nTo, length, freespeed, flowCap, Math.max(lanes,1));
-			net.createLink(new IdImpl(id+100000), nTo, nFrom, length, freespeed, flowCap, Math.max(lanes,1));
+			net.createAndAddLink(new IdImpl(id), nFrom, nTo, length, freespeed, flowCap, Math.max(lanes,1));
+			net.createAndAddLink(new IdImpl(id+100000), nTo, nFrom, length, freespeed, flowCap, Math.max(lanes,1));
 		}
 
 		new NetworkCleaner().run(net);
