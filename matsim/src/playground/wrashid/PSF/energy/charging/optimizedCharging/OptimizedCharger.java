@@ -60,6 +60,10 @@ public class OptimizedCharger {
 			// TODO: later for each individual car we should be able to read the
 			// max Battery capacities
 			
+			
+			//System.out.println("personId: " + personId);
+			
+			
 			EnergyConsumption agentEnergyConsumption=energyConsumption.get(personId);
 			double maxBatteryCapacity = defaultMaxBatteryCapacity;
 			ChargingTimes chargingTimes = new ChargingTimes();
@@ -69,15 +73,15 @@ public class OptimizedCharger {
 					chargingTimes);
 
 			
-			if (personId.toString().equalsIgnoreCase("193077")){
-				System.out.println();
+			if (personId.toString().equalsIgnoreCase("107909")){
+			//	System.out.println();
 			}
 			
 			chargingTimes = eb.getChargingTimes(agentEnergyConsumption);
 
 			// write out charging events to the console and also to a file (if specified)
 			chargingTimes.print();
-					
+			//System.out.println("===================");	
 
 		}
 		
