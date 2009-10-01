@@ -113,17 +113,16 @@ public class DefaultPlanBasedSignalSystemController extends AbstractSignalSystem
 						(currentSecondInPlan < dropping)) {
 					newState = SignalGroupState.GREEN;
 				}
-				else if ((dropping <= currentSecondInPlan) && (currentSecondInPlan < 
-						endIntergreenDrop)) {
+				else if (((dropping <= currentSecondInPlan) && (currentSecondInPlan < endIntergreenDrop)) ||
+						((endIntergreenDrop > cycleTime) && (currentSecondInPlan < (endIntergreenDrop - cycleTime)))){
 					newState = SignalGroupState.YELLOW;
 				}
 				else {
 					newState = SignalGroupState.RED;
 				}
-			} 
-			else {
-				if ((roughcast <= currentSecondInPlan) &&
-						(currentSecondInPlan <  endIntergreenRc)) {
+			} else {
+				if (((roughcast <= currentSecondInPlan) && (currentSecondInPlan <  endIntergreenRc)) ||
+						((endIntergreenRc > cycleTime) && (currentSecondInPlan < (endIntergreenRc - cycleTime)))){
 					newState = SignalGroupState.REDYELLOW;
 				}
 				else if ((endIntergreenDrop <= currentSecondInPlan) && 
