@@ -179,7 +179,6 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		this.scenario_input.getPopulation().getPersons().clear();
 		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"expected_output_person1.xml");
 		
-		// Use expected output plan as input plan for this test (since it includes everything we need for this test: routes, travel times, etc.)
 		// Import expected output plan into population
 		PlanomatXPlan newPlan = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPerson());
 		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
@@ -229,23 +228,12 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		/* Prepare actslegs */
 		newPlan.setActsLegs(this.testee.copyActsLegs(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements()));
 		double move = 9000;
-		((ActivityImpl)newPlan.getPlanElements().get(4)).setEndTime(((ActivityImpl)newPlan.getPlanElements().get(4)).getEndTime()+move);
-		((ActivityImpl)newPlan.getPlanElements().get(4)).setDuration(((ActivityImpl)newPlan.getPlanElements().get(4)).getDuration()+move);
 		((LegImpl)(newPlan.getPlanElements().get(5))).setDepartureTime(((LegImpl)(newPlan.getPlanElements().get(5))).getDepartureTime()+move);
 		((LegImpl)(newPlan.getPlanElements().get(5))).setArrivalTime(((LegImpl)(newPlan.getPlanElements().get(5))).getArrivalTime()+move);
-		((ActivityImpl)newPlan.getPlanElements().get(6)).setStartTime(((ActivityImpl)newPlan.getPlanElements().get(6)).getStartTime()+move);
-		((ActivityImpl)newPlan.getPlanElements().get(6)).setDuration(((ActivityImpl)newPlan.getPlanElements().get(6)).getDuration()-move);
 		
 		/* Copy planElements */
 		alIn = this.testee.copyActsLegs(newPlan.getPlanElements()); 
 		alCheck = this.testee.copyActsLegs(newPlan.getPlanElements()); 
-		
-		log.info("vor 3. testee.");
-		for (int i=1;i<alIn.size();i++){
-			if (i%2==1)	log.info("Departure time "+((LegImpl)(alIn.get(i))).getDepartureTime()+" travel time "+((LegImpl)(alIn.get(i))).getTravelTime()+" arrival time "+((LegImpl)(alIn.get(i))).getArrivalTime());
-			else log.info("Start time "+((ActivityImpl)(alIn.get(i))).getStartTime()+" duration "+((ActivityImpl)(alIn.get(i))).getDuration()+" end time "+((ActivityImpl)(alIn.get(i))).getEndTime());
-		}
-		System.out.println();
 		
 		// Run testee
 		this.testee.increaseTime(newPlan, alIn, 4, 6, planAnalyzeSubtours, subtourDis);
@@ -265,6 +253,94 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		// Run testee
 		this.testee.increaseTime(newPlan, alIn, 0, 6, planAnalyzeSubtours, subtourDis);
 		
+		// Assert
+		assertEquals(Math.floor(((LegImpl)(alCheck.get(5))).getDepartureTime()+this.testee.OFFSET), Math.floor(((LegImpl)(alIn.get(5))).getDepartureTime()));
+		assertEquals(Math.floor(((LegImpl)(alCheck.get(5))).getArrivalTime()+this.testee.OFFSET), Math.floor(((LegImpl)(alIn.get(5))).getArrivalTime()));
+	}
+	
+	
+	public void testDecreaseTime (){
+		
+		// Import expected output plan into population
+		this.scenario_input.getPopulation().getPersons().clear();
+		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"expected_output_person1.xml");
+		
+		// Import expected output plan into population
+		PlanomatXPlan newPlan = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPerson());
+		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
+		
+		/* Analysis of subtours */
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		planAnalyzeSubtours.run(newPlan);
+		
+		/* Make sure that all subtours with distance = 0 are set to "walk" */
+		int [] subtourDis = new int [planAnalyzeSubtours.getNumSubtours()];
+		for (int i=0;i<subtourDis.length;i++) {
+			subtourDis[i]=this.testee.checksubtourDistance2(newPlan.getPlanElements(), planAnalyzeSubtours, i);
+		}
+		for (int i=1;i<newPlan.getPlanElements().size();i=i+2){
+			if (subtourDis[planAnalyzeSubtours.getSubtourIndexation()[(i-1)/2]]==0) {
+				((LegImpl)(newPlan.getPlanElements().get(i))).setMode(TransportMode.walk);
+			}
+		}
+		
+		/* 1. Just the very normal case: decrease an act, increase another one */
+		/* Copy planElements */
+		List<? extends BasicPlanElement> alIn = this.testee.copyActsLegs(newPlan.getPlanElements()); 
+		List<? extends BasicPlanElement> alCheck = this.testee.copyActsLegs(newPlan.getPlanElements()); 
+		
+		// Run testee
+		this.testee.decreaseTime(newPlan, alIn, 0, 2, planAnalyzeSubtours, subtourDis);
+		
+		// Assert
+		assertEquals(Math.floor(((LegImpl)(alCheck.get(1))).getDepartureTime()-this.testee.OFFSET), Math.floor(((LegImpl)(alIn.get(1))).getDepartureTime()));
+		assertEquals(Math.floor(((LegImpl)(alCheck.get(1))).getArrivalTime()-this.testee.OFFSET), Math.floor(((LegImpl)(alIn.get(1))).getArrivalTime()));		
+		
+		
+		/* 2. Swap durations */
+		/* Copy planElements */
+		alIn = this.testee.copyActsLegs(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements()); 
+		alCheck = this.testee.copyActsLegs(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements()); 
+		
+		// Run testee
+		this.testee.decreaseTime(newPlan, alIn, 4, 6, planAnalyzeSubtours, subtourDis);
+		
+		// Assert considering rounding errors
+		assertTrue(Math.abs(86400-((LegImpl)(alCheck.get(5))).getArrivalTime()-(((LegImpl)(alIn.get(5))).getDepartureTime()-((LegImpl)(alIn.get(3))).getArrivalTime()))<2);
+		assertTrue(Math.abs(((LegImpl)(alIn.get(5))).getDepartureTime()-(((LegImpl)(alCheck.get(3))).getArrivalTime()+86400-((LegImpl)(alCheck.get(5))).getArrivalTime()))<2);
+		
+		
+		/* 3. outer == 0 && inner == size()-1 */
+		/* Prepare actslegs */
+		this.testee.cleanSchedule(this.testee.OFFSET+2, newPlan);
+		
+		/* Copy planElements */
+		alIn = this.testee.copyActsLegs(newPlan.getPlanElements()); 
+		alCheck = this.testee.copyActsLegs(newPlan.getPlanElements()); 
+		
+		// Run testee
+		this.testee.decreaseTime(newPlan, alIn, 0, 6, planAnalyzeSubtours, subtourDis);
+		
+		// Assert
+		assertEquals(Math.floor(((LegImpl)(alIn.get(1))).getDepartureTime()), 2.0);
+		assertEquals(Math.floor(86400-((LegImpl)(alIn.get(5))).getArrivalTime()), Math.floor(86400-((LegImpl)(alCheck.get(5))).getArrivalTime())+this.testee.OFFSET);
+		
+		
+		/* 4. outer == 0 && size()-1 short */
+		/* Copy planElements (take new solution.) */
+		newPlan.setActsLegs(this.testee.copyActsLegs(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements()));
+		double travelTime = ((LegImpl)(newPlan.getPlanElements().get(1))).getArrivalTime() - ((LegImpl)(newPlan.getPlanElements().get(1))).getDepartureTime();
+		((LegImpl)(newPlan.getPlanElements().get(1))).setDepartureTime(this.testee.minimumTime.get(((ActivityImpl)(newPlan.getPlanElements().get(0))).getType())+1);
+		((LegImpl)(newPlan.getPlanElements().get(1))).setArrivalTime(((LegImpl)(newPlan.getPlanElements().get(1))).getDepartureTime()+travelTime);
+		((LegImpl)(newPlan.getPlanElements().get(5))).setDepartureTime(86400-(((LegImpl)(newPlan.getPlanElements().get(5))).getArrivalTime()-((LegImpl)(newPlan.getPlanElements().get(5))).getDepartureTime())-1);
+		((LegImpl)(newPlan.getPlanElements().get(5))).setArrivalTime(86400-1);		
+		this.testee.cleanActs(newPlan.getPlanElements());
+		alIn = this.testee.copyActsLegs(newPlan.getPlanElements()); 
+		alCheck = this.testee.copyActsLegs(newPlan.getPlanElements()); 
+		
+		// Run testee
+		this.testee.decreaseTime(newPlan, alIn, 0, 2, planAnalyzeSubtours, subtourDis);
+		
 		/*
 		log.info("nach 4. testee alCheck.");
 		for (int i=1;i<alIn.size();i++){
@@ -273,8 +349,8 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		}*/
 		
 		// Assert
-		assertEquals(Math.floor(((LegImpl)(alCheck.get(5))).getDepartureTime()+this.testee.OFFSET), Math.floor(((LegImpl)(alIn.get(5))).getDepartureTime()));
-		assertEquals(Math.floor(((LegImpl)(alCheck.get(5))).getArrivalTime()+this.testee.OFFSET), Math.floor(((LegImpl)(alIn.get(5))).getArrivalTime()));
+		assertEquals(Math.floor(((LegImpl)(alCheck.get(3))).getDepartureTime()-((LegImpl)(alCheck.get(1))).getArrivalTime()), Math.floor(((LegImpl)(alIn.get(1))).getDepartureTime()));
+		assertEquals(((LegImpl)(alCheck.get(5))).getDepartureTime(),((LegImpl)(alIn.get(5))).getDepartureTime());
 		
 		
 	}
