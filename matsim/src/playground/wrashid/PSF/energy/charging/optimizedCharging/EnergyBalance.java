@@ -105,7 +105,7 @@ public class EnergyBalance {
 			int maxTimeSlotNumber = Math.round(parkingIndex * offSet + (float) parkingTimes.get(parkingIndex).getEndParkingTime()
 					/ 900);
 
-			addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex);
+			addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex, parkingTimes.get(parkingIndex).getStartParkingTime());
 		} else {
 			// if we need to handle the last (night parking)
 			int offSetOfEarlyNightHours = 100000000;
@@ -115,7 +115,7 @@ public class EnergyBalance {
 			int maxTimeSlotNumber = Math.round(offSetOfEarlyNightHours + (float) parkingTimes.get(parkingIndex).getEndParkingTime()
 					/ 900);
 
-			addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex);
+			addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex,0);
 
 			if (parkingTimes.get(parkingIndex).getStartParkingTime() < 86400) {
 				// only handle the first part of the last parking, if the day is
@@ -127,7 +127,7 @@ public class EnergyBalance {
 				// this is just one second before mid night to get the right end
 				// slot
 
-				addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex);
+				addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex,parkingTimes.get(parkingIndex).getStartParkingTime() );
 			}
 		}
 
@@ -135,10 +135,10 @@ public class EnergyBalance {
 	}
 
 	private void addChargingPriceToPriorityQueue(PriorityQueue<FacilityChargingPrice> chargingPrice, int minTimeSlotNumber,
-			int maxTimeSlotNumber, int parkingIndex) {
+			int maxTimeSlotNumber, int parkingIndex,double startTime) {
 		double tempPrice;
 		for (int j = 0; j < maxTimeSlotNumber - minTimeSlotNumber; j++) {
-			double time = Math.floor(parkingTimes.get(parkingIndex).getStartParkingTime() / 900) * 900 + j * 900;
+			double time = Math.floor(startTime / 900) * 900 + j * 900;
 			tempPrice = EnergyChargingPriceInfo.getEnergyPrice(time, parkingTimes.get(parkingIndex).getActivity().getLinkId());
 
 			FacilityChargingPrice tempFacilityChPrice = new FacilityChargingPrice(tempPrice, minTimeSlotNumber + j, parkingIndex,
@@ -165,7 +165,7 @@ public class EnergyBalance {
 	}
 
 	/*
-	 * - positive value: the energy, that mus be charged, so that the car does
+	 * - positive value: the energy, that must be charged, so that the car does
 	 * not run out of gasoline on its way - negative value: only little energy
 	 * is needed for driving, therefore the next parking station could be
 	 * reached without problems
@@ -258,6 +258,7 @@ public class EnergyBalance {
 			ChargeLog chargeLog = bestEnergyPrice.getChargeLog(minimumEnergyThatNeedsToBeCharged, maximumEnergyThatCanBeCharged);
 
 			chargingTimes.addChargeLog(chargeLog);
+			//chargeLog.print();
 
 			updateMaxChargableEnergy(parkingIndex, energyCharged);
 
