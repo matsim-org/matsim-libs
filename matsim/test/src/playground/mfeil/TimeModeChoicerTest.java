@@ -172,16 +172,14 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 	
 	public void testIncreaseTime (){
 		
+		// Import expected output plan into population
+		this.scenario_input.getPopulation().getPersons().clear();
+		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"expected_output_person1.xml");
+		
 		// Use expected output plan as input plan for this test (since it includes everything we need for this test: routes, travel times, etc.)
 		// Import expected output plan into population
 		PlanomatXPlan newPlan = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPerson());
 		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
-		
-		// Routing necessary because not loaded
-		this.router.run(newPlan);
-		for (int i=0;i<newPlan.getPlanElements().size();i+=2){
-			((ActivityImpl)(newPlan.getPlanElements().get(i))).setDuration(((ActivityImpl)(newPlan.getPlanElements().get(i))).getEndTime()-((ActivityImpl)(newPlan.getPlanElements().get(i))).getStartTime());
-		}
 		
 		/* Analysis of subtours */
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
@@ -198,32 +196,37 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 			}
 		}
 		
+		/* 1. Just the very normal case: increase an act, decrease another one */
+		/* Copy planElements to not bias newPlan */
 		List<? extends BasicPlanElement> alIn = this.testee.copyActsLegs(newPlan.getPlanElements()); 
 		List<? extends BasicPlanElement> alCheck = this.testee.copyActsLegs(newPlan.getPlanElements()); 
 		
-		// Just the very normal case: increase an act, decrease another one
 		// Run testee
 		this.testee.increaseTime(newPlan, alIn, 0, 2, planAnalyzeSubtours, subtourDis);
-		((LegImpl)(alCheck.get(1))).setArrivalTime(((LegImpl)(alCheck.get(1))).getDepartureTime()+this.estimator.getLegTravelTimeEstimation(newPlan.getPerson().getId(), ((LegImpl)(alCheck.get(1))).getDepartureTime(), ((ActivityImpl)(alCheck.get(0))), ((ActivityImpl)(alCheck.get(2))), ((LegImpl)(alCheck.get(1))), false));
 		
 		// Assert
-		assertEquals(((LegImpl)(alCheck.get(1))).getDepartureTime()+this.testee.OFFSET,((LegImpl)(alIn.get(1))).getDepartureTime());
-		assertEquals(((LegImpl)(alCheck.get(1))).getArrivalTime()+this.testee.OFFSET,((LegImpl)(alIn.get(1))).getArrivalTime());
-		/*
-		this.testee.cleanActs(alIn);
+		assertEquals(Math.floor(((LegImpl)(alCheck.get(1))).getDepartureTime()+this.testee.OFFSET), Math.floor(((LegImpl)(alIn.get(1))).getDepartureTime()));
+		assertEquals(Math.floor(((LegImpl)(alCheck.get(1))).getArrivalTime()+this.testee.OFFSET), Math.floor(((LegImpl)(alIn.get(1))).getArrivalTime()));		
 		
-		((Act)(alCheck.get(2))).setDuration(((Act)(alCheck.get(2))).getDuration()+this.testee.getOffset());
-		((Act)(alCheck.get(2))).setEndTime(((Act)(alCheck.get(2))).getEndTime()+this.testee.getOffset());
 		
-		((Leg)(alCheck.get(3))).setTravelTime(this.ltte.getLegTravelTimeEstimation(plan.getPerson().getId(), ((Act)(alCheck.get(2))).getEndTime(), (Act)(alCheck.get(2)), (Act)(alCheck.get(4)), (Leg)(alCheck.get(3))));
-		((Act)(alCheck.get(4))).setDuration(((Act)(alCheck.get(4))).getEndTime()-(((Act)(alCheck.get(2))).getEndTime()+((Leg)(alCheck.get(3))).getTravelTime()));
-	
-		for (int i=0;i<alIn.size();i+=2){
-			assertEquals(((Act)(alIn.get(i))).getDuration(), ((Act)(alCheck.get(i))).getDuration());
-		}*/
+		/* 2. Swap durations */
+		/* Copy planElements to not bias newPlan */
+		 alIn = this.testee.copyActsLegs(newPlan.getPlanElements()); 
+		 alCheck = this.testee.copyActsLegs(newPlan.getPlanElements()); 
+		
+		// Run testee
+		this.testee.increaseTime(newPlan, alIn, 2, 4, planAnalyzeSubtours, subtourDis);
+		
+		// Assert
+		assertEquals(Math.floor(((LegImpl)(alCheck.get(1))).getArrivalTime()+(((LegImpl)(alCheck.get(5))).getDepartureTime()-((LegImpl)(alCheck.get(3))).getArrivalTime())), Math.floor(((LegImpl)(alIn.get(3))).getDepartureTime()));
+		assertEquals(Math.floor(((LegImpl)(alCheck.get(5))).getDepartureTime()-(((LegImpl)(alCheck.get(3))).getDepartureTime()-((LegImpl)(alCheck.get(1))).getArrivalTime())), Math.floor(((LegImpl)(alIn.get(3))).getArrivalTime()));
+		
 		
 		
 	}
+	
+	
+	
 	/*
 	private void testDecreaseTime (){
 		
