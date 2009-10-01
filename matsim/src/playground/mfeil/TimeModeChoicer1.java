@@ -148,7 +148,8 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		this.legTravelTimeEstimatorFactory = null;
 	}
 	
-	public TimeModeChoicer1 (LegTravelTimeEstimatorFactory estimatorFactory, PlanScorer scorer, PlansCalcRoute router){
+	// Constructor for test case
+	public TimeModeChoicer1 (LegTravelTimeEstimatorFactory estimatorFactory, LegTravelTimeEstimator	estimator, PlanScorer scorer, PlansCalcRoute router){
 		
 		this.router 				= router;
 		this.scorer 				= scorer;
@@ -181,6 +182,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		// meisterk
 		this.legTravelTimeEstimatorFactory = estimatorFactory;
 		this.config					= Gbl.getConfig().planomat();
+		this.estimator = estimator;
 	}
 	
 		
@@ -226,10 +228,6 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				this.config.getSimLegInterpretation(),
 				this.config.getRoutingCapability(),
 				this.router);
-
-		/* Replace delivered plan by copy since delivered plan must not be changed until valid solution has been found */
-		//PlanomatXPlan plan = new PlanomatXPlan (basePlan.getPerson());
-		//plan.copyPlan(basePlan);
 		
 		/* Analysis of subtours */
 		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
@@ -246,7 +244,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			}
 		}
 		
-		/* Initial clean-up of plan for the case actslegs is not sound*/
+		/* Initial clean-up of plan in case actslegs is not sound*/
 		double move = this.cleanSchedule (((ActivityImpl)(plan.getPlanElements().get(0))).getEndTime(), plan);
 		int loops=1;
 		while (move!=0.0){
@@ -851,10 +849,11 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			
 		double travelTime;
 		for (int i=1;i<=plan.getPlanElements().size()-2;i=i+2){
+			System.out.println("Ursprüngliche Reisezeit: "+(((LegImpl)(plan.getPlanElements().get(i))).getArrivalTime()-((LegImpl)(plan.getPlanElements().get(i))).getDepartureTime()));
 			((LegImpl)(plan.getPlanElements().get(i))).setDepartureTime(now);
 //			statement was replaced by the one below
 //			travelTime = this.estimator.getInterpolation(plan.getPerson().getId(), now, (ActivityImpl)(plan.getPlanElements().get(i-1)), (ActivityImpl)(plan.getPlanElements().get(i+1)), (LegImpl)(plan.getPlanElements().get(i)));
-			//System.out.println("clean schedule leg "+plan.getActLegIndex(plan.getPlanElements().get(i)));
+			System.out.println("clean schedule leg "+plan.getActLegIndex(plan.getPlanElements().get(i)));
 			travelTime = this.estimator.getLegTravelTimeEstimation(
 					plan.getPerson().getId(), 
 					now, 
@@ -865,6 +864,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			if (((LegImpl)(plan.getPlanElements().get(i))).getMode()!=TransportMode.car){
 				((LegImpl)(plan.getPlanElements().get(i))).setRoute(this.routes.get((int)(i/2)));
 			}
+			System.out.println("Neue Reisezeit: "+travelTime);
 			((LegImpl)(plan.getPlanElements().get(i))).setArrivalTime(now+travelTime);
 			((LegImpl)(plan.getPlanElements().get(i))).setTravelTime(travelTime);
 			now+=travelTime;
@@ -1034,6 +1034,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 					(ActivityImpl)(actslegs.get(i+1)), 
 					(LegImpl)(actslegs.get(i)),
 					false);
+			//System.out.println("travel time "+travelTime);
 			if (((LegImpl)(actslegs.get(i))).getMode()!=TransportMode.car){
 				((LegImpl)(actslegs.get(i))).setRoute(this.routes.get((i-1)/2));
 				
