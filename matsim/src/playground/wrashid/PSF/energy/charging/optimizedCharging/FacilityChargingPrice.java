@@ -66,6 +66,14 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	}
 
 	public int compareTo(FacilityChargingPrice otherChargingPrice) {
+		// only one slot for the same time is available for charging...
+		if (getInitStartChargingTime()==otherChargingPrice.getInitStartChargingTime()){
+			log.error("two slots with the same starting time => some thing is wrong...");
+			System.exit(-1);
+		}
+		
+		
+		
 		if (price > otherChargingPrice.getPrice()) {
 			return 1;
 		} else if (price < otherChargingPrice.getPrice()) {
@@ -84,8 +92,17 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 		return timeSlotNumber;
 	}
 
-	public ChargeLog getChargeLog(double minimumEnergyThatNeedsToBeCharged, double maxChargableEnergy) {
+	
+	public double getInitStartChargingTime(){
 		double startChargingTime = slotStartTime < startParkingTime ? startParkingTime : slotStartTime;
+		startChargingTime = endTimeOfSlot < startParkingTime ? slotStartTime : startChargingTime;
+		
+		return startChargingTime;
+	}
+	
+	public ChargeLog getChargeLog(double minimumEnergyThatNeedsToBeCharged, double maxChargableEnergy) {
+		double startChargingTime = getInitStartChargingTime();
+		
 		double endChargingTime = getEndTimeOfCharge(minimumEnergyThatNeedsToBeCharged, maxChargableEnergy);
 
 		// this is possible, because parking can start in the evening and stop
@@ -100,7 +117,8 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 
 	// how much energy will be charged through this slot and facility
 	public double getEnergyCharge(double minimumEnergyThatNeedsToBeCharged, double maxChargableEnergy) {
-		double startChargingTime = slotStartTime < startParkingTime ? startParkingTime : slotStartTime;
+		double startChargingTime = getInitStartChargingTime();
+		
 		double electricityPower = ParkingInfo.getParkingElectricityPower(facilityId);
 		double chargingDuration = getEndTimeOfCharge(minimumEnergyThatNeedsToBeCharged, maxChargableEnergy) - startChargingTime;
 		double energyCharged = electricityPower * chargingDuration;
@@ -118,7 +136,7 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	 */
 	public double getEndTimeOfCharge(double minimumEnergyThatNeedsToBeCharged, double maxChargableEnergy) {
 
-		double startChargingTime = slotStartTime < startParkingTime ? startParkingTime : slotStartTime;
+		double startChargingTime =  getInitStartChargingTime();
 
 		// how much time would be needed to charge the car fully at the current
 		// parking
