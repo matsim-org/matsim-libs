@@ -8,6 +8,7 @@
 	<facility id="1" x="0.0" y="500.0">
 		<activity type="home"/>
 		<activity type="work"/>
+		<activity type="shop"/>
 	</facility>
 
 <!-- ====================================================================== -->
