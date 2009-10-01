@@ -29,9 +29,11 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.planomat.costestimators.*;
+import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -40,10 +42,13 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.api.core.v01.network.Node;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 
 
@@ -66,10 +71,16 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		this.initializer = new Initializer();
 		this.initializer.init(this); 
 		
-		ScenarioLoader loader = new ScenarioLoader(this.initializer.getControler().getConfig());
+		this.scenario_input = new ScenarioImpl();
+		new MatsimNetworkReader(this.scenario_input.getNetwork()).readFile(this.initializer.getControler().getConfig().network().getInputFile());
+		new MatsimFacilitiesReader(this.scenario_input.getActivityFacilities()).readFile(this.initializer.getControler().getConfig().facilities().getInputFile());
+		new MatsimPopulationReader(this.scenario_input).readFile(this.initializer.getControler().getConfig().plans().getInputFile());
+		
+		/*ScenarioLoader loader = new ScenarioLoader(this.initializer.getControler().getConfig());
 		loader.loadScenario();
 		this.scenario_input = loader.getScenario();
-	
+		*/
+		
 		// no events are used, hence an empty road network
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario_input.getNetwork(), 900);
        	
@@ -87,7 +98,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				this.router);
 		
-		this.testee = new TimeModeChoicer1 (legTravelTimeEstimatorFactory, new PlanScorer(new JohScoringTestFunctionFactory()), this.router);
+		this.testee = new TimeModeChoicer1 (legTravelTimeEstimatorFactory, this.estimator, new PlanScorer(new JohScoringTestFunctionFactory()), this.router);
 		
 		PlanImpl basePlan = ((PersonImpl)(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)))).getSelectedPlan();
 		this.plan = new PlanImpl (basePlan.getPerson());
@@ -108,7 +119,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		this.testee.run(this.plan);
 		
 		// Import expected output plan into population
-		new MatsimPopulationReader(scenario_input).readFile(this.getPackageInputDirectory()+"expected_output_person1.xml");
+		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"expected_output_person1.xml");
 				
 		// Compare the two plans; <1 because of double rounding errors
 		for (int i=0;i<this.plan.getPlanElements().size();i++){
@@ -158,19 +169,47 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		assertEquals(((LegImpl)(newPlanActsLegs.get(1))).getRoute(), route);
 	}
 	
-	/*
+	
 	public void testIncreaseTime (){
 		
-		PlanomatXPlan plan = new PlanomatXPlan (population.getPerson(this.TEST_PERSON_ID));
-		plan.copyPlan(population.getPerson(this.TEST_PERSON_ID).getPlans().get(0));
+		// Use expected output plan as input plan for this test (since it includes everything we need for this test: routes, travel times, etc.)
+		// Import expected output plan into population
+		PlanomatXPlan newPlan = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPerson());
+		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
 		
-		this.router.run(plan);	// conducts routing and sets travel times
-		this.testee.cleanActs(plan.getActsLegs());	// adjusts the act durations according to travel times
+		// Routing necessary because not loaded
+		this.router.run(newPlan);
+		for (int i=0;i<newPlan.getPlanElements().size();i+=2){
+			((ActivityImpl)(newPlan.getPlanElements().get(i))).setDuration(((ActivityImpl)(newPlan.getPlanElements().get(i))).getEndTime()-((ActivityImpl)(newPlan.getPlanElements().get(i))).getStartTime());
+		}
 		
-		ArrayList<Object> alIn = this.testee.copyActsLegs(plan.getActsLegs()); 
-		ArrayList<Object> alCheck = this.testee.copyActsLegs(plan.getActsLegs()); 
+		/* Analysis of subtours */
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		planAnalyzeSubtours.run(newPlan);
 		
-		this.testee.increaseTime(plan, alIn, 2, 4);
+		/* Make sure that all subtours with distance = 0 are set to "walk" */
+		int [] subtourDis = new int [planAnalyzeSubtours.getNumSubtours()];
+		for (int i=0;i<subtourDis.length;i++) {
+			subtourDis[i]=this.testee.checksubtourDistance2(newPlan.getPlanElements(), planAnalyzeSubtours, i);
+		}
+		for (int i=1;i<newPlan.getPlanElements().size();i=i+2){
+			if (subtourDis[planAnalyzeSubtours.getSubtourIndexation()[(i-1)/2]]==0) {
+				((LegImpl)(newPlan.getPlanElements().get(i))).setMode(TransportMode.walk);
+			}
+		}
+		
+		List<? extends BasicPlanElement> alIn = this.testee.copyActsLegs(newPlan.getPlanElements()); 
+		List<? extends BasicPlanElement> alCheck = this.testee.copyActsLegs(newPlan.getPlanElements()); 
+		
+		// Just the very normal case: increase an act, decrease another one
+		// Run testee
+		this.testee.increaseTime(newPlan, alIn, 0, 2, planAnalyzeSubtours, subtourDis);
+		((LegImpl)(alCheck.get(1))).setArrivalTime(((LegImpl)(alCheck.get(1))).getDepartureTime()+this.estimator.getLegTravelTimeEstimation(newPlan.getPerson().getId(), ((LegImpl)(alCheck.get(1))).getDepartureTime(), ((ActivityImpl)(alCheck.get(0))), ((ActivityImpl)(alCheck.get(2))), ((LegImpl)(alCheck.get(1))), false));
+		
+		// Assert
+		assertEquals(((LegImpl)(alCheck.get(1))).getDepartureTime()+this.testee.OFFSET,((LegImpl)(alIn.get(1))).getDepartureTime());
+		assertEquals(((LegImpl)(alCheck.get(1))).getArrivalTime()+this.testee.OFFSET,((LegImpl)(alIn.get(1))).getArrivalTime());
+		/*
 		this.testee.cleanActs(alIn);
 		
 		((Act)(alCheck.get(2))).setDuration(((Act)(alCheck.get(2))).getDuration()+this.testee.getOffset());
@@ -181,11 +220,11 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 	
 		for (int i=0;i<alIn.size();i+=2){
 			assertEquals(((Act)(alIn.get(i))).getDuration(), ((Act)(alCheck.get(i))).getDuration());
-		}
+		}*/
 		
 		
 	}
-	
+	/*
 	private void testDecreaseTime (){
 		
 		PlanomatXPlan plan = new PlanomatXPlan (population.getPerson(this.TEST_PERSON_ID));
