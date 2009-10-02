@@ -20,13 +20,14 @@
 
 package org.matsim.core.network.algorithms;
 
+import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 
 /**
  * Calculates the number of lanes for each link, based on the capacity.
  */
-public class NetworkCalcLanes {
+public class NetworkCalcLanes implements NetworkRunnable {
 
 	public void run(NetworkLayer network) {
 		double capDivider = network.getCapacityPeriod();

@@ -23,13 +23,14 @@ package org.matsim.core.network.algorithms;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
 /** See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
  * for a description of node types. It's the graph matching paper. */
-public class NetworkCalcTopoType {
+public class NetworkCalcTopoType implements NetworkRunnable {
 
 	public final static Integer EMPTY        = Integer.valueOf(0);
 	public final static Integer SOURCE       = Integer.valueOf(1);

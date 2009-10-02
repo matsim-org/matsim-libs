@@ -21,6 +21,7 @@
 package org.matsim.core.network.algorithms;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -34,7 +35,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  *
  * @author mrieser
  */
-public class NetworkFalsifier {
+public class NetworkFalsifier implements NetworkRunnable {
 
 	private final double distance;
 

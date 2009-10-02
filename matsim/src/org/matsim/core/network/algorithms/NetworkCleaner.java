@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
@@ -44,7 +45,7 @@ import org.matsim.core.network.NodeImpl;
  * @author mrieser
  * @author balmermi
  */
-public class NetworkCleaner {
+public class NetworkCleaner implements NetworkRunnable {
 	
 	private static final Logger log = Logger.getLogger(NetworkCleaner.class);
 

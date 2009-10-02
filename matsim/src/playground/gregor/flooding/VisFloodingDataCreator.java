@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.MatsimWriter;
+import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.evacuation.flooding.FloodingInfo;
 import org.matsim.evacuation.flooding.FloodingReader;
 
-public class VisFloodingDataCreator extends MatsimWriter {
+public class VisFloodingDataCreator extends AbstractMatsimWriter {
 	
 	private static final Logger log = Logger.getLogger(VisFloodingDataCreator.class);
 	

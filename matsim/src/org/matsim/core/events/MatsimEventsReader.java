@@ -26,9 +26,11 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.utils.io.MatsimXmlParser;
 
 /**
  * A reader for events-files of MATSim. This reader recognizes the format of the events-file and uses
@@ -36,7 +38,7 @@ import org.xml.sax.SAXException;
  *
  * @author mrieser
  */
-public class MatsimEventsReader {
+public class MatsimEventsReader implements MatsimSomeReader {
 
 	private final EventsImpl events;
 

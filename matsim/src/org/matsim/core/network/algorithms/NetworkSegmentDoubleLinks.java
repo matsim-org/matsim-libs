@@ -28,7 +28,9 @@ import java.util.Queue;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -42,7 +44,7 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author laemmel
  */
-public class NetworkSegmentDoubleLinks {
+public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 	private static final Logger log = Logger.getLogger(NetworkSegmentDoubleLinks.class);
 
 	private NetworkLayer network = null;

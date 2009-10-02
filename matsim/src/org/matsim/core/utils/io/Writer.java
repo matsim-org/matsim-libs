@@ -23,13 +23,14 @@ package org.matsim.core.utils.io;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.core.api.internal.MatsimNofileWriter;
 import org.matsim.core.gbl.Gbl;
 
 /**
  * Usage of this class discouraged. It will be deprecated soon. Please
  * use {@link MatsimXmlWriter} for writing XML files.
  */
-public abstract class Writer {
+public abstract class Writer extends AbstractMatsimWriter implements MatsimNofileWriter {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

@@ -21,17 +21,19 @@
 package org.matsim.core.network.algorithms;
 
 import org.apache.log4j.Logger;
+
+import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-public class NetworkAdaptLength {
+public class NetworkAdaptLength implements NetworkRunnable {
 	
 	private static final double overLengthFactor = 1.001; // link length is at least 1 permil longer than euclidean distance
 
 	private static final Logger log = Logger.getLogger(NetworkAdaptLength.class);
 	
-	public void run(final NetworkLayer network) {
+	public void run( NetworkLayer network) {
 		log.info("running " + this.getClass().getName() + " module...");
 		log.info("  adapting link length to at least 'overLengthFactor * euclidean distance' (works properly only for eucledian coord systems)");
 		log.info("  also ceil link length to meters");

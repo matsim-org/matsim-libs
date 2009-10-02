@@ -30,7 +30,7 @@ import java.io.Writer;
  *
  * @author mrieser
  */
-public abstract class MatsimWriter {
+public abstract class AbstractMatsimWriter {
 
 	/** The Unix newline character. */
 	protected static final String NL = "\n";

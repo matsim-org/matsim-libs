@@ -21,13 +21,14 @@
 package org.matsim.core.network.algorithms;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
-public class NetworkSummary {
+public class NetworkSummary implements NetworkRunnable {
 
 	private int network_capacity = 0;
 	private double minX = Double.POSITIVE_INFINITY;

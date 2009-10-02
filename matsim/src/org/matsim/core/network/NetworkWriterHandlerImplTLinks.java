@@ -23,11 +23,12 @@ package org.matsim.core.network;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.core.api.internal.MatsimFileWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
-public class NetworkWriterHandlerImplTLinks {
+public class NetworkWriterHandlerImplTLinks implements MatsimFileWriter {
 
 	private final NetworkLayer network;
 

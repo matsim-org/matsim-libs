@@ -22,13 +22,15 @@ package org.matsim.core.network;
 
 import java.io.IOException;
 
+import org.matsim.core.api.internal.MatsimSomeReader;
+
 
 /**
  * generic network reader interface
  * 
  * @author balmermi
  */
-public interface NetworkReader {
+public interface NetworkReader extends MatsimSomeReader {
 	
 	/**
 	 * read network from files.

@@ -22,13 +22,14 @@ package org.matsim.core.network.algorithms;
 
 import java.util.Iterator;
 
+import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
 
-public class NetworkMergeDoubleLinks {
+public class NetworkMergeDoubleLinks implements NetworkRunnable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

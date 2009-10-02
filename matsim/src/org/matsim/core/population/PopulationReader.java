@@ -20,8 +20,10 @@
 
 package org.matsim.core.population;
 
+import org.matsim.core.api.internal.MatsimSomeReader;
 
-public interface PopulationReader {
+
+public interface PopulationReader extends MatsimSomeReader {
 	
 	/**
 	 * read plans from the specified file.

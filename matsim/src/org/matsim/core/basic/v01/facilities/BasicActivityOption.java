@@ -21,12 +21,13 @@ package org.matsim.core.basic.v01.facilities;
 
 import java.util.SortedSet;
 
+import org.matsim.core.api.internal.MatsimFacilitiesObject;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 
 /**
  * @author dgrether
  */
-public interface BasicActivityOption {
+public interface BasicActivityOption extends MatsimFacilitiesObject {
 	
 	public Double getCapacity();
 	

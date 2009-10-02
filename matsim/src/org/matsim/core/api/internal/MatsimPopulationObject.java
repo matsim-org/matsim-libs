@@ -21,7 +21,7 @@
 package org.matsim.core.api.internal;
 
 /**
- * marker interface
+ * marker interface, only used for objects without id
  * 
  * @author nagel
  *

@@ -30,7 +30,9 @@ import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.feature.Feature;
+
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -47,7 +49,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
  * 
  * @author balmermi
  */
-public class NetworkTeleatlasAddManeuverRestrictions {
+public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

@@ -23,6 +23,7 @@ package org.matsim.core.network.algorithms;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -30,7 +31,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
-public class NetworkWriteAsTable {
+public class NetworkWriteAsTable implements NetworkRunnable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

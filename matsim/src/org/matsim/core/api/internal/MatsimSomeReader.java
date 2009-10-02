@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,26 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01.facilities;
-
-import org.matsim.core.api.internal.MatsimFacilitiesObject;
+package org.matsim.core.api.internal;
 
 /**
- * @author dgrether
+ * @author nagel
+ *
+ * @deprecated don't use; this is just a marker interface.  kai, oct'09
  */
-public interface BasicOpeningTime extends Comparable<BasicOpeningTime>, MatsimFacilitiesObject {
-	
-	public enum DayType {mon, tue, wed, thu, fri, sat, sun, wkday, wkend, wk}
-	
-	public DayType getDay();
-	
-	public void setDay(DayType day);
-	
-	public double getStartTime();
-	
-	public void setStartTime(double starttime);
-	
-	public double getEndTime();
-	
-	public void setEndTime(double endtime);
+public interface MatsimSomeReader {
+
 }

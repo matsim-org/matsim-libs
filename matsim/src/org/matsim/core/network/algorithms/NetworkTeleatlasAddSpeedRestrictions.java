@@ -25,8 +25,9 @@ import java.nio.channels.FileChannel;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
+
+import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderTeleatlas;
@@ -40,7 +41,7 @@ import org.matsim.core.utils.misc.Time;
  * 
  * @author balmermi
  */
-public class NetworkTeleatlasAddSpeedRestrictions {
+public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

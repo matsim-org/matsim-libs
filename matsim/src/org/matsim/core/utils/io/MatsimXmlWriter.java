@@ -31,7 +31,7 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author mrieser
  */
-public abstract class MatsimXmlWriter extends MatsimWriter {
+public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 
 	/** The default location where dtds are stored on the internet. */
 	public static final String DEFAULT_DTD_LOCATION = "http://www.matsim.org/files/dtd/";

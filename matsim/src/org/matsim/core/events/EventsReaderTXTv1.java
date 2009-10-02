@@ -26,11 +26,12 @@ import java.io.IOException;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
-public class EventsReaderTXTv1 {
+public class EventsReaderTXTv1 implements MatsimSomeReader {
 
 	private BufferedReader infile = null;
 	protected EventsImpl events;
