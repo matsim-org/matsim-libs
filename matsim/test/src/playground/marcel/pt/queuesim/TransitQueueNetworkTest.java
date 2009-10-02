@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
@@ -56,7 +56,7 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.BasicVehicleCapacity;
 import org.matsim.vehicles.BasicVehicleCapacityImpl;
@@ -998,7 +998,7 @@ public class TransitQueueNetworkTest extends TestCase {
 
 			// setup: population
 			Population population = scenario.getPopulation();
-			PopulationBuilder pb = population.getBuilder();
+			PopulationFactory pb = population.getFactory();
 			Person person = pb.createPerson(id2);
 			Plan plan = pb.createPlan();
 			person.addPlan(plan);
@@ -1016,7 +1016,7 @@ public class TransitQueueNetworkTest extends TestCase {
 
 			// setup: transit schedule
 			TransitSchedule schedule = scenario.getTransitSchedule();
-			TransitScheduleBuilder builder = schedule.getBuilder();
+			TransitScheduleFactory builder = schedule.getFactory();
 			TransitStopFacility stop1 = builder.createTransitStopFacility(id1, scenario.createCoord(0, 0), firstStopisBlocking);
 			schedule.addStopFacility(stop1);
 			stop1.setLink(links[firstStopLocation]);

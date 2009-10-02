@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
@@ -88,7 +88,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 		this.createFakeNetwork(sc, (Network)sc.getNetwork());
 		
 		Population pop = sc.getPopulation();
-		PopulationBuilder builder = pop.getBuilder();
+		PopulationFactory builder = pop.getFactory();
 		Person person;
 		Plan plan;
 		Activity activity;
@@ -174,19 +174,19 @@ public class DemandGenerationTest extends MatsimTestCase {
 	private void createFakeNetwork(Scenario scenario, Network network){
 		Coord coord = scenario.createCoord(0,0 ) ;
 
-		Node n1 = network.getBuilder().createNode(ids.get(0),coord);
+		Node n1 = network.getFactory().createNode(ids.get(0),coord);
 //		((NodeImpl)n1).setCoord(scenario.createCoord(0, 0));		
 //		((Map)network.getNodes()).put(n1.getId(), n1);
 		network.addNode( n1 ) ;
 
-		Node n2 = network.getBuilder().createNode(ids.get(1),coord);
+		Node n2 = network.getFactory().createNode(ids.get(1),coord);
 //		((NodeImpl)n2).setCoord(scenario.createCoord(0, 0));
 //		((Map)network.getNodes()).put(n2.getId(), n2);
 		network.addNode( n2 ) ;
 
 		for (Id id : ids){
 //			Link l = ((NetworkLayer)network).getFactory().createLink(id, n1.getId(), n2.getId());
-			Link l = network.getBuilder().createLink(id, n1.getId(), n2.getId() ) ;
+			Link l = network.getFactory().createLink(id, n1.getId(), n2.getId() ) ;
 			
 //			((Map)network.getLinks()).put(l.getId(), l);
 			network.addLink( l ) ;

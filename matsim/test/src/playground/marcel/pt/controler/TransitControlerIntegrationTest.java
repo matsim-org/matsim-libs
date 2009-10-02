@@ -27,14 +27,14 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.NetworkBuilder;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
@@ -47,7 +47,7 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
@@ -67,7 +67,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 
 		// build network
 		NetworkLayer network = scenario.getNetwork();
-		NetworkBuilder nBuilder = network.getBuilder();
+		NetworkFactory nBuilder = network.getFactory();
 		Node node1 = nBuilder.createNode(id1, scenario.createCoord(0, 0));
 		Node node2 = nBuilder.createNode(id2, scenario.createCoord(1000, 0));
 		Node node3 = nBuilder.createNode(id3, scenario.createCoord(2000, 0));
@@ -81,7 +81,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 
 		// build schedule
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		TransitScheduleBuilder sBuilder = schedule.getBuilder();
+		TransitScheduleFactory sBuilder = schedule.getFactory();
 
 		TransitStopFacility stopF1 = sBuilder.createTransitStopFacility(id1, scenario.createCoord(1000.0, 0), false);
 		TransitStopFacility stopF2 = sBuilder.createTransitStopFacility(id2, scenario.createCoord(2000.0, 0), false);
@@ -111,7 +111,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 
 		// build population
 		Population population = scenario.getPopulation();
-		PopulationBuilder pBuilder = population.getBuilder();
+		PopulationFactory pBuilder = population.getFactory();
 		Person person1 = pBuilder.createPerson(id1);
 		Plan plan = pBuilder.createPlan();
 		Activity homeAct = pBuilder.createActivityFromLinkId("h", id1);

@@ -31,11 +31,11 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.fakes.FakeLink;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 public class ExperimentalTransitRouteTest extends TestCase {
@@ -52,7 +52,7 @@ public class ExperimentalTransitRouteTest extends TestCase {
 	}
 
 	public void testInitializationStops() {
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(5, 11), false);
 		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl(2), new CoordImpl(18, 7), false);
 		Link link1 = new FakeLink(new IdImpl(3));

@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
@@ -73,7 +73,7 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.BasicVehicleCapacity;
 import org.matsim.vehicles.BasicVehicleCapacityImpl;
@@ -81,7 +81,7 @@ import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.matsim.vehicles.BasicVehicles;
-import org.matsim.vehicles.VehicleBuilder;
+import org.matsim.vehicles.VehiclesFactory;
 
 import playground.marcel.pt.router.PlansCalcTransitRoute;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
@@ -112,7 +112,7 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// setup: vehicles
 		BasicVehicles vehicles = scenario.getVehicles();
-		VehicleBuilder vb = vehicles.getBuilder();
+		VehiclesFactory vb = vehicles.getFactory();
 		BasicVehicleType vehicleType = vb.createVehicleType(new IdImpl("transitVehicleType"));
 		BasicVehicleCapacity capacity = vb.createVehicleCapacity();
 		capacity.setSeats(Integer.valueOf(101));
@@ -126,7 +126,7 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// setup: transit schedule
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		TransitScheduleBuilder builder = schedule.getBuilder();
+		TransitScheduleFactory builder = schedule.getFactory();
 
 		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0), false);
 		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("stop2"), scenario.createCoord(0, 0), false);
@@ -230,7 +230,7 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// setup: transit schedule
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		TransitScheduleBuilder builder = schedule.getBuilder();
+		TransitScheduleFactory builder = schedule.getFactory();
 		TransitLine line = builder.createTransitLine(scenario.createId("1"));
 
 		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("stop1"), scenario.createCoord(0, 0), false);
@@ -240,7 +240,7 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// setup: population
 		Population population = scenario.getPopulation();
-		PopulationBuilder pb = population.getBuilder();
+		PopulationFactory pb = population.getFactory();
 		Person person = pb.createPerson(scenario.createId("1"));
 		Plan plan = pb.createPlan();
 		person.addPlan(plan);
@@ -295,7 +295,7 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// setup: transit schedule
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		TransitScheduleBuilder builder = schedule.getBuilder();
+		TransitScheduleFactory builder = schedule.getFactory();
 		TransitLine line = builder.createTransitLine(scenario.createId("1"));
 		// important: do NOT add the line to the schedule, or agents will be created twice!
 
@@ -330,7 +330,7 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// setup: population
 		Population population = scenario.getPopulation();
-		PopulationBuilder pb = population.getBuilder();
+		PopulationFactory pb = population.getFactory();
 		Person person1 = pb.createPerson(scenario.createId("1"));
 		Plan plan1 = pb.createPlan();
 		person1.addPlan(plan1);
@@ -483,20 +483,20 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// build simple network with 2 links
 		NetworkImpl network = scenario.getNetwork();
-		NodeImpl node1 = (NodeImpl) network.getBuilder().createNode(scenario.createId("1"));
+		NodeImpl node1 = (NodeImpl) network.getFactory().createNode(scenario.createId("1"));
 		node1.setCoord(scenario.createCoord(0.0, 0.0));
-		NodeImpl node2 = (NodeImpl) network.getBuilder().createNode(scenario.createId("2"));
+		NodeImpl node2 = (NodeImpl) network.getFactory().createNode(scenario.createId("2"));
 		node2.setCoord(scenario.createCoord(1000.0, 0.0));
-		NodeImpl node3 = (NodeImpl) network.getBuilder().createNode(scenario.createId("3"));
+		NodeImpl node3 = (NodeImpl) network.getFactory().createNode(scenario.createId("3"));
 		node3.setCoord(scenario.createCoord(2000.0, 0.0));
 		network.getNodes().put(node1.getId(), node1);
 		network.getNodes().put(node2.getId(), node2);
 		network.getNodes().put(node3.getId(), node3);
-		LinkImpl link1 = (LinkImpl) network.getBuilder().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		LinkImpl link1 = (LinkImpl) network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
 		link1.setFreespeed(10.0);
 		link1.setCapacity(2000.0);
 		link1.setLength(1000.0);
-		LinkImpl link2 = (LinkImpl) network.getBuilder().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		LinkImpl link2 = (LinkImpl) network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
 		link2.setFreespeed(10.0);
 		link2.setCapacity(2000.0);
 		link2.setLength(1000.0);
@@ -510,7 +510,7 @@ public class TransitQueueSimulationTest extends TestCase {
 		config.scenario().setUseVehicles(true);
 		double depTime = 7.0*3600;
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		TransitScheduleBuilder sb = schedule.getBuilder();
+		TransitScheduleFactory sb = schedule.getFactory();
 		TransitStopFacility stopFacility1 = sb.createTransitStopFacility(scenario.createId("1"), scenario.createCoord(1000, 0), false);
 		TransitStopFacility stopFacility2 = sb.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(2000, 0), false);
 		schedule.addStopFacility(stopFacility1);
@@ -575,20 +575,20 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// build simple network with 2 links
 		NetworkImpl network = scenario.getNetwork();
-		NodeImpl node1 = (NodeImpl) network.getBuilder().createNode(scenario.createId("1"));
+		NodeImpl node1 = (NodeImpl) network.getFactory().createNode(scenario.createId("1"));
 		node1.setCoord(scenario.createCoord(0.0, 0.0));
-		NodeImpl node2 = (NodeImpl) network.getBuilder().createNode(scenario.createId("2"));
+		NodeImpl node2 = (NodeImpl) network.getFactory().createNode(scenario.createId("2"));
 		node2.setCoord(scenario.createCoord(1000.0, 0.0));
-		NodeImpl node3 = (NodeImpl) network.getBuilder().createNode(scenario.createId("3"));
+		NodeImpl node3 = (NodeImpl) network.getFactory().createNode(scenario.createId("3"));
 		node3.setCoord(scenario.createCoord(2000.0, 0.0));
 		network.getNodes().put(node1.getId(), node1);
 		network.getNodes().put(node2.getId(), node2);
 		network.getNodes().put(node3.getId(), node3);
-		LinkImpl link1 = (LinkImpl) network.getBuilder().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		LinkImpl link1 = (LinkImpl) network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
 		link1.setFreespeed(10.0);
 		link1.setCapacity(2000.0);
 		link1.setLength(1000.0);
-		LinkImpl link2 = (LinkImpl) network.getBuilder().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		LinkImpl link2 = (LinkImpl) network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
 		link2.setFreespeed(10.0);
 		link2.setCapacity(2000.0);
 		link2.setLength(1000.0);
@@ -602,7 +602,7 @@ public class TransitQueueSimulationTest extends TestCase {
 		config.scenario().setUseVehicles(true);
 		double depTime = 7.0*3600;
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		TransitScheduleBuilder sb = schedule.getBuilder();
+		TransitScheduleFactory sb = schedule.getFactory();
 		TransitStopFacility stopFacility1 = sb.createTransitStopFacility(scenario.createId("1"), scenario.createCoord(1000, 0), false);
 		TransitStopFacility stopFacility2 = sb.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(2000, 0), false);
 		schedule.addStopFacility(stopFacility1);
@@ -625,7 +625,7 @@ public class TransitQueueSimulationTest extends TestCase {
 		
 		// build population with 1 person
 		Population population = scenario.getPopulation();
-		PopulationBuilder pb = population.getBuilder();
+		PopulationFactory pb = population.getFactory();
 		Person person = pb.createPerson(scenario.createId("1"));
 		Plan plan = pb.createPlan();
 		Activity act1 = pb.createActivityFromLinkId("h", link1.getId());

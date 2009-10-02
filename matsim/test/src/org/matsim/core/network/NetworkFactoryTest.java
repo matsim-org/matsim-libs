@@ -35,7 +35,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class NetworkFactoryTest extends MatsimTestCase {
 
 	public void testSetRouteFactory() {
-		NetworkFactory factory = new NetworkFactory();
+		NetworkFactoryImpl factory = new NetworkFactoryImpl();
 
 		// test default
 		RouteWRefs carRoute = factory.createRoute(TransportMode.car, null, null);

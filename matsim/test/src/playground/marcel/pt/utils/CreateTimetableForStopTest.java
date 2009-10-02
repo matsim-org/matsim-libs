@@ -29,12 +29,12 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderTest;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.utils.CreateTimetableForStop;
@@ -51,7 +51,7 @@ public class CreateTimetableForStopTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 

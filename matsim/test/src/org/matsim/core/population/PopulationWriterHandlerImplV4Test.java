@@ -22,7 +22,7 @@ package org.matsim.core.population;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPopulationWriter;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -43,7 +43,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		Gbl.createWorld().setNetworkLayer(network);
 		
 		PopulationImpl pop = new PopulationImpl();
-		PopulationBuilder pb = pop.getBuilder();
+		PopulationFactory pb = pop.getFactory();
 		PersonImpl person = (PersonImpl) pb.createPerson(new IdImpl(1));
 		PlanImpl plan = (PlanImpl) pb.createPlan(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", link1.getId()));

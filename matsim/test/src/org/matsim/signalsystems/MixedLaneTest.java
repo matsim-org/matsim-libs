@@ -38,27 +38,27 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.Events;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.lanes.basic.BasicLane;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsBuilder;
+import org.matsim.lanes.basic.BasicLaneDefinitionsFactory;
 import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalSystemsBuilder;
+import org.matsim.signalsystems.basic.BasicSignalSystemsFactory;
 import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicSignalGroupSettings;
 import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsBuilder;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsFactory;
 import org.matsim.signalsystems.config.BasicSignalSystemPlan;
 
 
@@ -95,7 +95,7 @@ public class MixedLaneTest extends TestCase {
 		id4 = sc.createId("4");
 		
 		Network n = sc.getNetwork();
-		NetworkFactory nb = (NetworkFactory) n.getBuilder();
+		NetworkFactoryImpl nb = (NetworkFactoryImpl) n.getFactory();
 		
 		Coord coord = sc.createCoord(0.0, 0.0);
 		// create network
@@ -137,7 +137,7 @@ public class MixedLaneTest extends TestCase {
 		n.addLink(link3);
 		//create lanes
 		BasicLaneDefinitions lanes = this.sc.getLaneDefinitions();
-		BasicLaneDefinitionsBuilder lb = lanes.getBuilder();
+		BasicLaneDefinitionsFactory lb = lanes.getFactory();
 		BasicLane lane = lb.createLane(id1);
 		lane.setLength(50.0);
 		lane.addToLinkId(id2);
@@ -148,7 +148,7 @@ public class MixedLaneTest extends TestCase {
 		
 		//create signalsystems
 		BasicSignalSystems signals = this.sc.getSignalSystems();
-		BasicSignalSystemsBuilder signalb = signals.getBuilder();
+		BasicSignalSystemsFactory signalb = signals.getFactory();
 		BasicSignalSystemDefinition signalSystem = signalb.createSignalSystemDefinition(id1);
 		BasicSignalGroupDefinition signalGroup2Link2 = signalb.createSignalGroupDefinition(id1, id2);
 		signalGroup2Link2.setSignalSystemDefinitionId(id1);
@@ -164,7 +164,7 @@ public class MixedLaneTest extends TestCase {
 		
 		//create signal system config
 		BasicSignalSystemConfigurations signalConf = this.sc.getSignalSystemConfigurations();
-		BasicSignalSystemConfigurationsBuilder signalConfb = signalConf.getBuilder();
+		BasicSignalSystemConfigurationsFactory signalConfb = signalConf.getFactory();
 		BasicSignalSystemConfiguration systemConf = signalConfb.createSignalSystemConfiguration(id1);
 		BasicPlanBasedSignalSystemControlInfo signalPlanControl = signalConfb.createPlanBasedSignalSystemControlInfo();
 		BasicSignalSystemPlan signalPlan = signalConfb.createSignalSystemPlan(id1);
@@ -189,7 +189,7 @@ public class MixedLaneTest extends TestCase {
 		
 		//create population
 		Population pop = sc.getPopulation();
-		PopulationBuilder pb = pop.getBuilder();
+		PopulationFactory pb = pop.getFactory();
 		//first person
 		Person p = pb.createPerson(id1);
 		Plan plan = pb.createPlan();

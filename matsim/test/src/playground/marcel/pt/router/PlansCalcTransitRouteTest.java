@@ -30,7 +30,7 @@ import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PlanImpl;
@@ -52,7 +52,7 @@ public class PlansCalcTransitRouteTest extends TestCase {
 		Coord fromCoord = f.scenario.createCoord(3800, 5100);
 		Coord toCoord = f.scenario.createCoord(16100, 10050);
 		
-		PopulationBuilder pb = f.scenario.getPopulation().getBuilder();
+		PopulationFactory pb = f.scenario.getPopulation().getFactory();
 		Plan plan = pb.createPlan();
 		Activity act1 = pb.createActivityFromCoord("h", fromCoord);
 		act1.setEndTime(5.0*3600);

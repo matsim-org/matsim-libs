@@ -25,8 +25,8 @@ import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 import playground.marcel.pt.fakes.FakeAgent;
@@ -40,7 +40,7 @@ public class TransitStopAgentTrackerTest extends TestCase {
 
 	public void testAddAgent() {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		PassengerAgent agent1 = new FakeAgent(null, null);
 		PassengerAgent agent2 = new FakeAgent(null, null);
 		PassengerAgent agent3 = new FakeAgent(null, null);
@@ -64,7 +64,7 @@ public class TransitStopAgentTrackerTest extends TestCase {
 
 	public void testRemoveAgent() {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		PassengerAgent agent1 = new FakeAgent(null, null);
 		PassengerAgent agent2 = new FakeAgent(null, null);
 		PassengerAgent agent3 = new FakeAgent(null, null);
@@ -88,7 +88,7 @@ public class TransitStopAgentTrackerTest extends TestCase {
 
 	public void testGetAgentsAtStopImmutable() {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		PassengerAgent agent1 = new FakeAgent(null, null);
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3), false);
 

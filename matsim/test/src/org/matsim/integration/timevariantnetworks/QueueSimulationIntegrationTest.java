@@ -34,7 +34,7 @@ import org.matsim.core.events.EventsImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.TimeVariantLinkFactory;
@@ -167,7 +167,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 */
 	private NetworkLayer createNetwork() {
 		// create a network
-		NetworkFactory nf = new NetworkFactory();
+		NetworkFactoryImpl nf = new NetworkFactoryImpl();
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		final NetworkLayer network = new NetworkLayer(nf);
 		network.setCapacityPeriod(3600.0);

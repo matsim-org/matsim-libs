@@ -29,7 +29,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -42,7 +42,7 @@ public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{
 	public void testChangeEventsParserWriter(){
 		String input = getInputDirectory() + "testNetworkChangeEvents.xml";
 		String output  = getOutputDirectory() + "outputTestNetworkChangeEvents.xml";
-		NetworkFactory nf = new NetworkFactory();
+		NetworkFactoryImpl nf = new NetworkFactoryImpl();
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		final NetworkLayer network = new NetworkLayer(nf);
 		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));

@@ -26,7 +26,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -37,13 +37,13 @@ public class TransitScheduleTest extends MatsimTestCase {
 	private static final Logger log = Logger.getLogger(TransitScheduleTest.class);
 
 	public void testInitialization() {
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = new TransitScheduleImpl(builder);
-		assertEquals(builder, schedule.getBuilder());
+		assertEquals(builder, schedule.getFactory());
 	}
 
 	public void testAddTransitLine() {
-		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleBuilderImpl());
+		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
 		TransitLine line1 = new TransitLineImpl(new IdImpl(1));
 		TransitLine line2 = new TransitLineImpl(new IdImpl(2));
 		assertEquals(0, schedule.getTransitLines().size());
@@ -57,7 +57,7 @@ public class TransitScheduleTest extends MatsimTestCase {
 	}
 
 	public void testAddTransitLineException() {
-		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleBuilderImpl());
+		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
 		TransitLine line1a = new TransitLineImpl(new IdImpl(1));
 		TransitLine line1b = new TransitLineImpl(new IdImpl(1));
 		assertEquals(0, schedule.getTransitLines().size());
@@ -85,7 +85,7 @@ public class TransitScheduleTest extends MatsimTestCase {
 	}
 
 	public void testGetTransitLinesImmutable() {
-		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleBuilderImpl());
+		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
 		TransitLine line1 = new TransitLineImpl(new IdImpl(1));
 		try {
 			schedule.getTransitLines().put(line1.getId(), line1);
@@ -97,7 +97,7 @@ public class TransitScheduleTest extends MatsimTestCase {
 	}
 
 	public void testAddStopFacility() {
-		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleBuilderImpl());
+		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
 		TransitStopFacility stop1 = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(0, 0), false);
 		TransitStopFacility stop2 = new TransitStopFacilityImpl(new IdImpl(2), new CoordImpl(1, 1), false);
 		assertEquals(0, schedule.getFacilities().size());
@@ -111,7 +111,7 @@ public class TransitScheduleTest extends MatsimTestCase {
 	}
 
 	public void testAddStopFacilityException() {
-		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleBuilderImpl());
+		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
 		TransitStopFacility stop1a = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(2, 2), false);
 		TransitStopFacility stop1b = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(3, 3), false);
 		assertEquals(0, schedule.getFacilities().size());
@@ -139,7 +139,7 @@ public class TransitScheduleTest extends MatsimTestCase {
 	}
 
 	public void testGetFacilitiesImmutable() {
-		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleBuilderImpl());
+		TransitSchedule schedule = new TransitScheduleImpl(new TransitScheduleFactoryImpl());
 		TransitStopFacility stop1 = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(0, 0), false);
 		try {
 			schedule.getFacilities().put(stop1.getId(), stop1);

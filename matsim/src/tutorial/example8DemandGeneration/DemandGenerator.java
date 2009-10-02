@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -106,7 +106,7 @@ public class DemandGenerator {
 
 	private static void createActivities(Scenario scenario, Random rnd,  Feature recreation, Feature commercial) {
 		Population pop =  scenario.getPopulation();
-		PopulationBuilder pb = pop.getBuilder(); //the population builder creates all we need 
+		PopulationFactory pb = pop.getFactory(); //the population builder creates all we need 
 		
 		for (Person pers : pop.getPersons().values()) { //this loop iterates over all persons
 			Plan plan = pers.getPlans().get(0); //each person has exactly one plan, that has been created in createPersons(...)
@@ -144,7 +144,7 @@ public class DemandGenerator {
 
 	private static void createPersons(Scenario scenario, Feature ft, Random rnd, int number) {
 		Population pop = scenario.getPopulation();
-		PopulationBuilder pb = pop.getBuilder();
+		PopulationFactory pb = pop.getFactory();
 		for (; number > 0; number--) {
 			Person pers = pb.createPerson(scenario.createId(Integer.toString(ID++)));
 			pop.addPerson( pers ) ;

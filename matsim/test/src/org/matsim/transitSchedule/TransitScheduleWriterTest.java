@@ -28,7 +28,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitScheduleWriter;
 import org.xml.sax.SAXException;
 
@@ -47,7 +47,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 	public void testDefaultV1() throws IOException, SAXException, ParserConfigurationException {
 		String filename = getOutputDirectory() + "schedule.xml";
 
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
 		TransitLine line = builder.createTransitLine(new IdImpl(1));
 		schedule.addTransitLine(line);
@@ -55,7 +55,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 		TransitScheduleWriter writer = new TransitScheduleWriter(schedule);
 		writer.writeFile(filename);
 
-		TransitScheduleBuilder builder2 = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder2 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule2 = builder2.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule2, null).readFile(filename);
 		assertEquals(1, schedule2.getTransitLines().size());

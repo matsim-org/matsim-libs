@@ -38,7 +38,7 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -78,7 +78,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 	/*package*/ final ScenarioImpl scenario;
 	/*package*/ final Config config;
 	/*package*/ final NetworkLayer network;
-	/*package*/ final TransitScheduleBuilder builder;
+	/*package*/ final TransitScheduleFactory builder;
 	/*package*/ final TransitSchedule schedule;
 	/*package*/ TransitLine redLine = null;
 	/*package*/ TransitLine blueLine = null;
@@ -93,7 +93,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 		this.config.scenario().setUseTransit(true);
 		this.network = this.scenario.getNetwork();
 		this.schedule = this.scenario.getTransitSchedule();
-		this.builder = this.schedule.getBuilder();
+		this.builder = this.schedule.getFactory();
 	}
 
 	protected void init() {

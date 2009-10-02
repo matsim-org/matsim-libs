@@ -40,7 +40,7 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
@@ -361,19 +361,19 @@ public class TransitRouterTest extends TestCase {
 
 			// network
 			NetworkImpl network = this.scenario.getNetwork();
-			NodeImpl node1 = (NodeImpl) network.getBuilder().createNode(this.scenario.createId("1"));
+			NodeImpl node1 = (NodeImpl) network.getFactory().createNode(this.scenario.createId("1"));
 			node1.setCoord(this.coord1);
-			NodeImpl node2 = (NodeImpl) network.getBuilder().createNode(this.scenario.createId("2"));
+			NodeImpl node2 = (NodeImpl) network.getFactory().createNode(this.scenario.createId("2"));
 			node2.setCoord(this.coord2);
-			NodeImpl node3 = (NodeImpl) network.getBuilder().createNode(this.scenario.createId("3"));
+			NodeImpl node3 = (NodeImpl) network.getFactory().createNode(this.scenario.createId("3"));
 			node3.setCoord(this.coord3);
-			NodeImpl node4 = (NodeImpl) network.getBuilder().createNode(this.scenario.createId("4"));
+			NodeImpl node4 = (NodeImpl) network.getFactory().createNode(this.scenario.createId("4"));
 			node4.setCoord(this.coord4);
-			NodeImpl node5 = (NodeImpl) network.getBuilder().createNode(this.scenario.createId("5"));
+			NodeImpl node5 = (NodeImpl) network.getFactory().createNode(this.scenario.createId("5"));
 			node5.setCoord(this.coord5);
-			NodeImpl node6 = (NodeImpl) network.getBuilder().createNode(this.scenario.createId("6"));
+			NodeImpl node6 = (NodeImpl) network.getFactory().createNode(this.scenario.createId("6"));
 			node6.setCoord(this.coord6);
-			NodeImpl node7 = (NodeImpl) network.getBuilder().createNode(this.scenario.createId("7"));
+			NodeImpl node7 = (NodeImpl) network.getFactory().createNode(this.scenario.createId("7"));
 			node7.setCoord(this.coord7);
 			network.getNodes().put(node1.getId(), node1);
 			network.getNodes().put(node2.getId(), node2);
@@ -382,10 +382,10 @@ public class TransitRouterTest extends TestCase {
 			network.getNodes().put(node5.getId(), node5);
 			network.getNodes().put(node6.getId(), node6);
 			network.getNodes().put(node7.getId(), node7);
-			LinkImpl link1 = (LinkImpl) network.getBuilder().createLink(this.scenario.createId("1"), node1.getId(), node2.getId());
-			LinkImpl link2 = (LinkImpl) network.getBuilder().createLink(this.scenario.createId("2"), node3.getId(), node4.getId());
-			LinkImpl link3 = (LinkImpl) network.getBuilder().createLink(this.scenario.createId("3"), node4.getId(), node5.getId());
-			LinkImpl link4 = (LinkImpl) network.getBuilder().createLink(this.scenario.createId("4"), node6.getId(), node7.getId());
+			LinkImpl link1 = (LinkImpl) network.getFactory().createLink(this.scenario.createId("1"), node1.getId(), node2.getId());
+			LinkImpl link2 = (LinkImpl) network.getFactory().createLink(this.scenario.createId("2"), node3.getId(), node4.getId());
+			LinkImpl link3 = (LinkImpl) network.getFactory().createLink(this.scenario.createId("3"), node4.getId(), node5.getId());
+			LinkImpl link4 = (LinkImpl) network.getFactory().createLink(this.scenario.createId("4"), node6.getId(), node7.getId());
 			network.getLinks().put(link1.getId(), link1);
 			network.getLinks().put(link2.getId(), link2);
 			network.getLinks().put(link3.getId(), link3);
@@ -393,7 +393,7 @@ public class TransitRouterTest extends TestCase {
 
 			// schedule
 			this.schedule = this.scenario.getTransitSchedule();
-			TransitScheduleBuilder sb = this.schedule.getBuilder();
+			TransitScheduleFactory sb = this.schedule.getFactory();
 
 			this.stop1 = sb.createTransitStopFacility(this.scenario.createId("1"), this.coord1, false);
 			this.stop2 = sb.createTransitStopFacility(this.scenario.createId("2"), this.coord2, false);

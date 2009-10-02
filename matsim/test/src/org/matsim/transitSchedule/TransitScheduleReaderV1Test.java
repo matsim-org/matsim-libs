@@ -56,7 +56,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	private static final String EMPTY_STRING = "";
 
 	public void testStopFacility_Minimalistic() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		Attributes emptyAtts = AttributesBuilder.getEmpty();
@@ -83,7 +83,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testStopFacility_withLink() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		NetworkLayer network = new NetworkLayer();
 		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
 		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(5, 11));
@@ -113,7 +113,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testStopFacility_withBadLink() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		NetworkLayer network = new NetworkLayer();
 		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
 		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(5, 11));
@@ -138,7 +138,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testStopFacility_withName() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		Attributes emptyAtts = AttributesBuilder.getEmpty();
@@ -162,7 +162,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testStopFacility_isBlocking() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
@@ -187,7 +187,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testStopFacility_Multiple() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		Attributes emptyAtts = AttributesBuilder.getEmpty();
@@ -221,7 +221,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testTransitLine_Single() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
@@ -238,7 +238,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testTransitLine_Multiple() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
@@ -261,7 +261,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testTransitRoute_Single() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
@@ -299,7 +299,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testTransitRoute_Multiple() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
@@ -353,7 +353,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testTransitRoute_Description() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
@@ -390,7 +390,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testRouteProfile_SingleStop() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
@@ -443,7 +443,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testRouteProfile_MultipleStop() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
@@ -513,7 +513,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testRouteProfileStop_Offsets() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
@@ -608,7 +608,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testRouteProfileStop_AwaitDeparture() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
@@ -677,7 +677,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testRouteProfileRoute_NoLink() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
@@ -714,7 +714,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testRouteProfileRoute_OneLink() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
 		NetworkLayer network = new NetworkLayer();
 		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
@@ -773,7 +773,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testRouteProfileRoute_TwoLinks() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
 		NetworkLayer network = new NetworkLayer();
 		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
@@ -835,7 +835,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testRouteProfileRoute_MoreLinks() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
 		NetworkLayer network = new NetworkLayer();
 		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(10, 5));
@@ -905,7 +905,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testDepartures_Single() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
@@ -946,7 +946,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testDepartures_Multiple() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);
@@ -997,7 +997,7 @@ public class TransitScheduleReaderV1Test extends TestCase {
 	}
 
 	public void testDepartures_withVehicleRef() {
-		TransitSchedule schedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, null);
 		Stack<String> context = new Stack<String>();
 		reader.startTag(Constants.TRANSIT_SCHEDULE, AttributesBuilder.getEmpty(), context);

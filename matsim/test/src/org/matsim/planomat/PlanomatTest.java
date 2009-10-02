@@ -334,7 +334,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 		public void handleEvent(BasicPersonEvent event) {
 			if (!this.scenario.getPopulation().getPersons().containsKey(event.getPersonId()))
-			  this.scenario.getPopulation().addPerson(this.scenario.getPopulation().getBuilder().createPerson(event.getPersonId()));
+			  this.scenario.getPopulation().addPerson(this.scenario.getPopulation().getFactory().createPerson(event.getPersonId()));
 		}
 
 		public void reset(int iteration) {

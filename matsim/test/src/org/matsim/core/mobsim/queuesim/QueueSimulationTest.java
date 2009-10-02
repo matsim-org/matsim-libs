@@ -44,7 +44,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEventImpl;
@@ -929,20 +929,20 @@ public class QueueSimulationTest extends TestCase {
 		
 		// build simple network with 1 link
 		NetworkImpl network = scenario.getNetwork();
-		NodeImpl node1 = (NodeImpl) network.getBuilder().createNode(scenario.createId("1"));
+		NodeImpl node1 = (NodeImpl) network.getFactory().createNode(scenario.createId("1"));
 		node1.setCoord(scenario.createCoord(0.0, 0.0));
-		NodeImpl node2 = (NodeImpl) network.getBuilder().createNode(scenario.createId("2"));
+		NodeImpl node2 = (NodeImpl) network.getFactory().createNode(scenario.createId("2"));
 		node2.setCoord(scenario.createCoord(1000.0, 0.0));
 		network.getNodes().put(node1.getId(), node1);
 		network.getNodes().put(node2.getId(), node2);
-		LinkImpl link = (LinkImpl) network.getBuilder().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		LinkImpl link = (LinkImpl) network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
 		link.setFreespeed(10.0);
 		link.setCapacity(2000.0);
 		network.getLinks().put(link.getId(), link);
 
 		// build simple population with 1 person with 1 plan with 1 leg
 		PopulationImpl population = scenario.getPopulation();
-		PopulationBuilder pb = population.getBuilder();
+		PopulationFactory pb = population.getFactory();
 		Person person = pb.createPerson(scenario.createId("1"));
 		Plan plan = pb.createPlan();
 		Activity act1 = pb.createActivityFromLinkId("h", link.getId());

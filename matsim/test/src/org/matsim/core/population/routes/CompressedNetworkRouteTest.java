@@ -28,7 +28,7 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkBuilder;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkIdComparator;
@@ -164,7 +164,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		Id id6 = new IdImpl(6);
 
 		Network network = new NetworkLayer();
-		NetworkBuilder builder = network.getBuilder();
+		NetworkFactory builder = network.getFactory();
 
 		Node node1 = builder.createNode(id1, new CoordImpl(0, 1000));
 		Node node2 = builder.createNode(id2, new CoordImpl(0, 2000));

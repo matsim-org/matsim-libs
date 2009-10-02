@@ -42,7 +42,7 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.SAXException;
 
@@ -70,7 +70,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		LinkImpl l3 = network.createAndAddLink(new IdImpl("3"), n3, n4, 1000, 10, 3600, 1.0);
 		LinkImpl l4 = network.createAndAddLink(new IdImpl("4"), n4, n5, 1000, 10, 3600, 1.0);
 
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule1 = builder.createTransitSchedule();
 
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("stop1"), new CoordImpl(0, 0), false);
@@ -112,7 +112,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		// write and read it
 		String filename = getOutputDirectory() + "scheduleNoRoute.xml";
 		new TransitScheduleWriterV1(schedule1).write(filename);
-		TransitScheduleBuilder builder2 = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder2 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule2 = builder2.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule2, network).readFile(filename);
 
@@ -132,7 +132,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		// write and read version with network-route
 		filename = getOutputDirectory() + "scheduleWithRoute.xml";
 		new TransitScheduleWriterV1(schedule1).write(filename);
-		TransitScheduleBuilder builder3 = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder3 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule3 = builder3.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule3, network).readFile(filename);
 

@@ -21,10 +21,10 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.PTRouter.PTRouter;
@@ -47,7 +47,7 @@ public class PTRouterTest extends MatsimTestCase {
 		/**read transit schedule, plain net create logic elements */
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(NETWORK);
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(transitSchedule, network).readFile(TRANSITSCHEDULE);
 		LogicFactory logicFactory = new LogicFactory(transitSchedule, ptvalues); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter

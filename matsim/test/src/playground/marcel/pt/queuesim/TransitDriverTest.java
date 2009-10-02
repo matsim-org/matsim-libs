@@ -41,12 +41,12 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.fakes.FakeLink;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.BasicVehicle;
 import org.matsim.vehicles.BasicVehicleCapacity;
@@ -65,7 +65,7 @@ public class TransitDriverTest extends TestCase {
 	private static final Logger log = Logger.getLogger(TransitDriverTest.class);
 
 	public void testInitializationNetworkRoute() {
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
 		ArrayList<Link> links = new ArrayList<Link>();
 
@@ -113,7 +113,7 @@ public class TransitDriverTest extends TestCase {
 	}
 
 	public void testInitializationDeparture() {
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
 		NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), TransportMode.bus);
@@ -126,7 +126,7 @@ public class TransitDriverTest extends TestCase {
 	}
 
 	public void testInitializationStops() {
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
 		NetworkRouteWRefs route = new NodeNetworkRouteImpl(null, null);
 
@@ -167,7 +167,7 @@ public class TransitDriverTest extends TestCase {
 	}
 
 	public void testHandleStop_EnterPassengers() {
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
@@ -233,7 +233,7 @@ public class TransitDriverTest extends TestCase {
 	}
 
 	public void testHandleStop_ExitPassengers() {
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
@@ -288,7 +288,7 @@ public class TransitDriverTest extends TestCase {
 	}
 
 	public void testHandleStop_CorrectIdentification() {
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
@@ -317,7 +317,7 @@ public class TransitDriverTest extends TestCase {
 	}
 
 	public void testHandleStop_AwaitDepartureTime() {
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
@@ -366,7 +366,7 @@ public class TransitDriverTest extends TestCase {
 	}
 
 	public void testExceptionWhenNotEmptyAfterLastStop() {
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();

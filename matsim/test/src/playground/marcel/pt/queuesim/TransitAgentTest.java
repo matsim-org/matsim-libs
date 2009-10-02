@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -38,11 +38,11 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
@@ -62,8 +62,8 @@ public class TransitAgentTest extends TestCase {
 		network.createAndAddLink(new IdImpl("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
 		network.createAndAddLink(new IdImpl("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
 
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
-		PopulationBuilder pb = scenario.getPopulation().getBuilder();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
+		PopulationFactory pb = scenario.getPopulation().getFactory();
 		Person person = pb.createPerson(scenario.createId("1"));
 		Plan plan = pb.createPlan();
 		person.addPlan(plan);
@@ -102,8 +102,8 @@ public class TransitAgentTest extends TestCase {
 		network.createAndAddLink(new IdImpl("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
 		network.createAndAddLink(new IdImpl("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
 
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
-		PopulationBuilder pb = scenario.getPopulation().getBuilder();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
+		PopulationFactory pb = scenario.getPopulation().getFactory();
 		Person person = pb.createPerson(scenario.createId("1"));
 		Plan plan = pb.createPlan();
 		person.addPlan(plan);

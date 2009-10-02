@@ -36,10 +36,10 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
@@ -53,7 +53,7 @@ public class RouterTest extends MatsimTestCase {
 		// setup very simple scenario
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile("test/input/playground/marcel/pt/transitSchedule/network.xml");
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).readFile("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
 		PopulationImpl population = new PopulationImpl();

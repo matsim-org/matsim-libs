@@ -37,7 +37,7 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -45,25 +45,25 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
  */
 public class TransitScheduleBuilderTest extends MatsimTestCase {
 
-	protected TransitScheduleBuilder createTransitScheduleBuilder() {
-		return new TransitScheduleBuilderImpl();
+	protected TransitScheduleFactory createTransitScheduleBuilder() {
+		return new TransitScheduleFactoryImpl();
 	}
 
 	public void testCreateTransitSchedule() {
-		TransitScheduleBuilder builder = createTransitScheduleBuilder();
+		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		TransitSchedule schedule = builder.createTransitSchedule();
-		assertEquals(builder, schedule.getBuilder());
+		assertEquals(builder, schedule.getFactory());
 	}
 
 	public void testCreateTransitLine() {
-		TransitScheduleBuilder builder = createTransitScheduleBuilder();
+		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id id = new IdImpl(1);
 		TransitLine line = builder.createTransitLine(id);
 		assertEquals(id, line.getId());
 	}
 
 	public void testCreateTransitRoute() {
-		TransitScheduleBuilder builder = createTransitScheduleBuilder();
+		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id id = new IdImpl(2);
 		NetworkRouteWRefs route = new NodeNetworkRouteImpl(new FakeLink(new IdImpl(3), null, null), new FakeLink(new IdImpl(4), null, null));
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
@@ -79,7 +79,7 @@ public class TransitScheduleBuilderTest extends MatsimTestCase {
 	}
 
 	public void testCreateTransitRouteStop() {
-		TransitScheduleBuilder builder = createTransitScheduleBuilder();
+		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		TransitStopFacility stopFacility = new TransitStopFacilityImpl(new IdImpl(5), new CoordImpl(6, 6), false);
 		double arrivalOffset = 23;
 		double departureOffset = 42;
@@ -90,7 +90,7 @@ public class TransitScheduleBuilderTest extends MatsimTestCase {
 	}
 
 	public void testCreateTransitStopFacility() {
-		TransitScheduleBuilder builder = createTransitScheduleBuilder();
+		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id id1 = new IdImpl(6);
 		Coord coord1 = new CoordImpl(511, 1980);
 		Id id2 = new IdImpl(7);
@@ -108,7 +108,7 @@ public class TransitScheduleBuilderTest extends MatsimTestCase {
 	}
 
 	public void testCreateDeparture() {
-		TransitScheduleBuilder builder = createTransitScheduleBuilder();
+		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id id = new IdImpl(8);
 		double time = 9.0*3600;
 		Departure dep = builder.createDeparture(id, time);

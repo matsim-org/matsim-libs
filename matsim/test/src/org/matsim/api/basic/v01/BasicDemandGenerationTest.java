@@ -29,7 +29,7 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.population.BasicPopulationFactory;
 import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -86,7 +86,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		this.createFakeNetwork(sc, (NetworkLayer)sc.getNetwork());
 		
 		BasicPopulation pop = sc.getPopulation();
-		BasicPopulationBuilder builder = pop.getBuilder();
+		BasicPopulationFactory builder = pop.getFactory();
 		BasicPerson person;
 		BasicPlan plan;
 		BasicActivity activity;
