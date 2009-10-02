@@ -192,6 +192,9 @@ public class AccessEgressDemo {
 		events.addHandler(diagram);
 
 		final TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario, events);
+		// Transit vehicle drivers are created inside the TransitQueueSimulation, by the createAgents() method. That is, they exist
+		// as derivatives from the schedule, not as behavioral entities by themselves.  kai, oct'09
+		
 		sim.startOTFServer(SERVERNAME);
 		OTFDemo.ptConnect(SERVERNAME);
 		sim.run();
