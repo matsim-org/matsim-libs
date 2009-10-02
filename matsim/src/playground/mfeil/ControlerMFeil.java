@@ -21,6 +21,7 @@ package playground.mfeil;
 
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
@@ -46,6 +47,10 @@ public class ControlerMFeil extends Controler {
 	
 	public ControlerMFeil (String [] args){
 		super(args);
+	}
+	
+	public ControlerMFeil (final Config config) {
+		super(config);
 	}
 	
 	

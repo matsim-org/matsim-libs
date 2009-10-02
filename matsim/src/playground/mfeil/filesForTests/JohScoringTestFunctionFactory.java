@@ -18,10 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mfeil;
+package playground.mfeil.filesForTests;
 
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.*;
+
+import playground.mfeil.JohScoringFunction;
 
 /**
  * A factory to create {@link JohScoringFunction}s.

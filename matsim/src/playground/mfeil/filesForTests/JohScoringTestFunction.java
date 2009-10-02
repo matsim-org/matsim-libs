@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mfeil;
+package playground.mfeil.filesForTests;
 
 import java.util.TreeMap;
 
@@ -31,6 +31,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
+
+import playground.mfeil.JohActUtilityParameters;
 
 /**
  * New scoring function following Joh's dissertation:
