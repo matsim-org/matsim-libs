@@ -56,7 +56,7 @@ import playground.mfeil.config.PlanomatXConfigGroup;
  * New standard version as of 22.12.2008. Like PlanomatX17 but also covering plans with only 1 or 2 activities.
  */
 
-public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorithm { 
+public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm { 
 	
 	private final int						NEIGHBOURHOOD_SIZE, MAX_ITERATIONS, LC_SET_SIZE;
 	private final double					WEIGHT_CHANGE_ORDER, WEIGHT_CHANGE_NUMBER;
@@ -66,7 +66,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	private final LocationMutatorwChoiceSet locator;
 	private final PlansCalcRoute		 	router;
 	private final PlanScorer 				scorer;
-	private static final Logger 			log = Logger.getLogger(PlanomatX18.class);
+	private static final Logger 			log = Logger.getLogger(PlanomatX.class);
 	private final String					finalOpt;
 	private final ActivityTypeFinder 		finder;
 	
@@ -80,7 +80,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 	//////////////////////////////////////////////////////////////////////
 	
 	
-	public PlanomatX18 (Controler controler, PreProcessLandmarks preProcessRoutingData, LocationMutatorwChoiceSet locator, DepartureDelayAverageCalculator tDepDelayCalc, ActivityTypeFinder finder){
+	public PlanomatX (Controler controler, PreProcessLandmarks preProcessRoutingData, LocationMutatorwChoiceSet locator, DepartureDelayAverageCalculator tDepDelayCalc, ActivityTypeFinder finder){
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
 
@@ -193,13 +193,7 @@ public class PlanomatX18 implements org.matsim.population.algorithms.PlanAlgorit
 		// Start calculation
 		//////////////////////////////////////////////////////////////////////
 		
-		// NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
-		/*if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
-			for (int z=1;z<plan.getPlanElements().size();z+=2){
-				((Leg)(plan.getPlanElements().get(z))).setMode(TransportMode.car);
-			}
-		}
-		 */
+		
 		this.locator.run(plan);
 		if (PlanomatXConfigGroup.getTimer().equals("Planomat")){
 			for (int z=1;z<plan.getPlanElements().size();z+=2){

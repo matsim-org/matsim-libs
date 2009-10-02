@@ -90,12 +90,12 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.tDepDelayCalc 			= new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
 		this.nonassignedAgents 		= new LinkedList<String>();
-		this.noOfSchedulingAgents	= 100;
+		this.noOfSchedulingAgents	= 5;
 		
 		this.finder					= finder;
 		
 		this.iterations 			= 20;
-		this.noOfAssignmentAgents	= 500;
+		this.noOfAssignmentAgents	= 10;
 		this.primActsDistance 		= "yes";
 		this.homeLocationDistance 	= "yes";
 		this.sex 					= "no";
@@ -111,7 +111,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		this.coefficients 			= new DistanceCoefficients (startCoefficients, this.softCoef, this.allCoef);	
 		this.list1Pointer 			= new ArrayList<Integer>();
 		
-		this.schedulingModule 		= new PlanomatX12Initialiser(controler, finder);
+		this.schedulingModule 		= new PlanomatXInitialiser(controler, finder);
 		this.assignmentModule		= new AgentsAssignmentInitialiser (this.controler, this.tDepDelayCalc, this.locator, this.scorer, this.finder, this, this.coefficients, this.nonassignedAgents);
 		
 		

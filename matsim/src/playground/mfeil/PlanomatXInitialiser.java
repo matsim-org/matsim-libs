@@ -38,7 +38,7 @@ import playground.mfeil.MDSAM.ActivityTypeFinder;
  * Replacing the PlanomatOptimizeTimes class to initialise the PlanomatX module.
  */
 
-public class PlanomatX12Initialiser extends AbstractMultithreadedModule{
+public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 	
 	
 	private final NetworkLayer 						network;
@@ -49,7 +49,7 @@ public class PlanomatX12Initialiser extends AbstractMultithreadedModule{
 	private final ActivityTypeFinder 				finder;
 	
 	
-	public PlanomatX12Initialiser (final ControlerMFeil controler, ActivityTypeFinder finder) {
+	public PlanomatXInitialiser (final ControlerMFeil controler, ActivityTypeFinder finder) {
 		
 		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		this.preProcessRoutingData.run(controler.getNetwork());
@@ -63,7 +63,7 @@ public class PlanomatX12Initialiser extends AbstractMultithreadedModule{
 		this.finder = finder;
 	}
 	
-	public PlanomatX12Initialiser (final ControlerMFeil controler, 
+	public PlanomatXInitialiser (final ControlerMFeil controler, 
 			final PreProcessLandmarks preProcessRoutingData,
 			final LocationMutatorwChoiceSet locator, ActivityTypeFinder finder) {
 		
@@ -83,7 +83,7 @@ public class PlanomatX12Initialiser extends AbstractMultithreadedModule{
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		PlanAlgorithm planomatXAlgorithm;
-		planomatXAlgorithm = new PlanomatX18 (this.controler, this.preProcessRoutingData, this.locator, this.tDepDelayCalc, this.finder);
+		planomatXAlgorithm = new PlanomatX (this.controler, this.preProcessRoutingData, this.locator, this.tDepDelayCalc, this.finder);
 		return planomatXAlgorithm;
 	}
 	

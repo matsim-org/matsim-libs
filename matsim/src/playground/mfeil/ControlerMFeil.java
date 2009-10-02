@@ -71,7 +71,7 @@ public class ControlerMFeil extends Controler {
 				ActivityTypeFinder finder = new ActivityTypeFinder (this);
 				finder.run(this.getFacilities());
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule planomatXStrategyModule = new PlanomatX12Initialiser(this, finder);
+				PlanStrategyModule planomatXStrategyModule = new PlanomatXInitialiser(this, finder);
 				strategy.addStrategyModule(planomatXStrategyModule);
 			}
 			else if  (classname.equals("ReRoute") || classname.equals("threaded.ReRoute")) {
