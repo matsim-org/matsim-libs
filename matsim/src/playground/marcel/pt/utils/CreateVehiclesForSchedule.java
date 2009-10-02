@@ -30,7 +30,7 @@ import org.matsim.vehicles.BasicVehicleCapacity;
 import org.matsim.vehicles.BasicVehicleCapacityImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicles;
-import org.matsim.vehicles.VehicleBuilder;
+import org.matsim.vehicles.VehiclesFactory;
 
 /**
  * Creates a vehicle of type "defaultTransitVehicleType" for each departure.
@@ -48,7 +48,7 @@ public class CreateVehiclesForSchedule {
 	}
 
 	public void run() {
-		VehicleBuilder vb = this.vehicles.getBuilder();
+		VehiclesFactory vb = this.vehicles.getFactory();
 		BasicVehicleType vehicleType = vb.createVehicleType(new IdImpl("defaultTransitVehicleType"));
 		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(101));

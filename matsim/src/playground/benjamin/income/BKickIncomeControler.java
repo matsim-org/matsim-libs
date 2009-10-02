@@ -25,7 +25,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanCalcType;
@@ -61,7 +61,7 @@ public class BKickIncomeControler extends Controler {
 	protected void setUp(){	
 		this.hhdb = new PersonHouseholdMapping(this.scenarioData.getHouseholds());
 		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = TravelTimeCalculatorBuilder.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+			this.travelTimeCalculator = TravelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		}
 		this.travelCostCalculator = new BKickIncomeTravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
 		super.setUp();

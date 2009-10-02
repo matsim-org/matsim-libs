@@ -32,7 +32,7 @@ import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkBuilder;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -257,7 +257,7 @@ import org.matsim.world.Layer;
 		return 3600.0;
 	}
 
-	public NetworkBuilder getBuilder() {
+	public NetworkFactory getFactory() {
 		return null;
 	}
 

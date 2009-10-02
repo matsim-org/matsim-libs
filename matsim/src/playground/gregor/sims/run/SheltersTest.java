@@ -8,15 +8,15 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.PopulationBuilderImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.flooding.FloodingReader;
@@ -60,7 +60,7 @@ public class SheltersTest extends Controler{
 		
 		
 		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = TravelTimeCalculatorBuilder.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+			this.travelTimeCalculator = TravelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		}
 		
 		String netcdf = this.config.evacuation().getFloodingDataFile();
@@ -122,7 +122,7 @@ public class SheltersTest extends Controler{
 
 		PopulationImpl pop = this.scenarioData.getPopulation();
 		
-		PopulationBuilder pb = new PopulationBuilderImpl(this.scenarioData);
+		PopulationFactory pb = new PopulationFactoryImpl(this.scenarioData);
 		for (int i = 0; i < 100; i++) {
 			Person p = pb.createPerson(new IdImpl(i));
 			Plan plan = pb.createPlan();

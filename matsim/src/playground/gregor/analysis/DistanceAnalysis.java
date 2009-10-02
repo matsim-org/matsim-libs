@@ -45,7 +45,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.LegImpl;
@@ -363,7 +363,7 @@ public class DistanceAnalysis {
 		World world = Gbl.createWorld();
 
 		log.info("loading network from " + config.network().getInputFile());
-		NetworkFactory fc = new NetworkFactory();
+		NetworkFactoryImpl fc = new NetworkFactoryImpl();
 		fc.setLinkFactory(new TimeVariantLinkFactory());
 
 		NetworkLayer network = new NetworkLayer(fc);

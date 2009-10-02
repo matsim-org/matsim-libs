@@ -35,7 +35,7 @@ import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.population.BasicPopulationFactory;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.population.BasicPersonImpl;
@@ -154,7 +154,7 @@ public class IVT2006ToGraphML {
 //		act.setCoord(transform.transform(new CoordImpl(Double.parseDouble(x),
 //				Double.parseDouble(y))));
 		
-		BasicPopulationBuilder pb = population.getBuilder() ;
+		BasicPopulationFactory pb = population.getFactory() ;
 		BasicActivity act = pb.createActivityFromCoord(HOME_ACT_TYPE,new CoordImpl(Double.parseDouble(x),
 				Double.parseDouble(y))) ;
 		

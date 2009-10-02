@@ -32,7 +32,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.network.BasicLegImpl;
 import org.matsim.core.network.LinkImpl;
@@ -96,7 +96,7 @@ public class CMCFtoEvacConverter {
 	@SuppressWarnings("unchecked")
 	public static PopulationImpl readCMCFDemands(String filename, NetworkLayer network, boolean coordinates) throws JDOMException, IOException{
 		PopulationImpl result = new PopulationImpl();
-		PopulationBuilder pb = result.getBuilder() ;
+		PopulationFactory pb = result.getFactory() ;
 		SAXBuilder builder = new SAXBuilder();
 		Document cmcfdemands = builder.build(filename);
 		Element demandgraph = cmcfdemands.getRootElement();

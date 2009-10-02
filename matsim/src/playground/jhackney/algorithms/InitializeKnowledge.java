@@ -48,7 +48,7 @@ public class InitializeKnowledge {
 
 			Knowledge k = knowledges.getKnowledgesByPersonId().get(person.getId());
 			if(k ==null){
-				k = knowledges.getBuilder().createKnowledge(person.getId(), "created by " + this.getClass().getName());
+				k = knowledges.getFactory().createKnowledge(person.getId(), "created by " + this.getClass().getName());
 			}
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
 				PlanImpl plan = person.getPlans().get(ii);

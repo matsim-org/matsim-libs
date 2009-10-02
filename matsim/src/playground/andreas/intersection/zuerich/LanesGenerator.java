@@ -201,7 +201,7 @@ public class LanesGenerator {
 				//create the assignment
 				BasicLanesToLinkAssignment assignment = laneDefs.getLanesToLinkAssignments().get(linkId);
 				if (assignment == null){
-					assignment = laneDefs.getBuilder().createLanesToLinkAssignment(linkId);
+					assignment = laneDefs.getFactory().createLanesToLinkAssignment(linkId);
 					laneDefs.addLanesToLinkAssignment(assignment);
 				}
 				//and the lane

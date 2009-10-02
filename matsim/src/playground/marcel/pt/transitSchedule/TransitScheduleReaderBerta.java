@@ -43,13 +43,13 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -105,7 +105,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
 
 	private final TransitSchedule schedule;
-	private final TransitScheduleBuilder builder;
+	private final TransitScheduleFactory builder;
 	private TransitLine currentTransitLine = null;
 	private BLinie tmpLinie = null;
 	private BHaltepunkt tmpHaltepunkt = null;
@@ -123,7 +123,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
 	public TransitScheduleReaderBerta(final TransitSchedule schedule, final CoordinateTransformation coordTransformation) {
 		this.schedule = schedule;
-		this.builder = schedule.getBuilder();
+		this.builder = schedule.getFactory();
 		this.wgs84ToRBS = coordTransformation;
 	}
 
@@ -277,7 +277,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		TransitStopFacility facility = this.schedule.getFacilities().get(hp.id);
 		if (facility == null) {
 			Coord coord = this.wgs84ToRBS.transform(this.soldnerToWgs84.transform(new CoordImpl(hp.x/1000.0, hp.y/1000.0)));
-			facility = this.schedule.getBuilder().createTransitStopFacility(hp.id, coord, false);
+			facility = this.schedule.getFactory().createTransitStopFacility(hp.id, coord, false);
 			this.schedule.addStopFacility(facility);
 		}
 		return facility;
@@ -329,7 +329,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
 		// TODO [MR] remove after testing
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
 		TransitScheduleReaderBerta reader = new TransitScheduleReaderBerta(schedule, transformation);

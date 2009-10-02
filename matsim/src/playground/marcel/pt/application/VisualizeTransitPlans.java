@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
@@ -98,7 +98,7 @@ public class VisualizeTransitPlans {
 		pseudoNetCreator.createNetwork();
 
 		Population visPop = this.visScenario.getPopulation();
-		PopulationBuilder pb = visPop.getBuilder();
+		PopulationFactory pb = visPop.getFactory();
 		for (Person person : this.realScenario.getPopulation().getPersons().values()) {
 			Person visPerson = pb.createPerson(person.getId());
 			for (Plan plan : person.getPlans()) {

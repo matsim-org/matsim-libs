@@ -42,16 +42,16 @@ public class CreateAndWritePerson {
 		Id personId = sc.createId("personId");
 		Coord coord= sc.createCoord(1.0, 1.0);
 		
-		Node node1= sc.getNetwork().getBuilder().createNode(nodeId1,coord);
-		Node node2= sc.getNetwork().getBuilder().createNode(nodeId2,coord);
+		Node node1= sc.getNetwork().getFactory().createNode(nodeId1,coord);
+		Node node2= sc.getNetwork().getFactory().createNode(nodeId2,coord);
 		
 		sc.getNetwork().addNode(node1);
 		sc.getNetwork().addNode(node2);
 
-		Link link= sc.getNetwork().getBuilder().createLink(linkId,nodeId1,nodeId2);
+		Link link= sc.getNetwork().getFactory().createLink(linkId,nodeId1,nodeId2);
 		sc.getNetwork().addLink(link);
 		
-		Person person=sc.getPopulation().getBuilder().createPerson(personId);
+		Person person=sc.getPopulation().getFactory().createPerson(personId);
 		
 		sc.getPopulation().addPerson(person);
 		

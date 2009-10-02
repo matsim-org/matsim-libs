@@ -4,10 +4,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vehicles.BasicVehiclesImpl;
 public class MyMain {
@@ -65,7 +65,7 @@ public class MyMain {
 //
 		log.info("converting data");
 		BasicVehicles vehicles = new BasicVehiclesImpl();
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
 		new Visum2TransitSchedule(vNetwork, schedule, vehicles).convert();
 

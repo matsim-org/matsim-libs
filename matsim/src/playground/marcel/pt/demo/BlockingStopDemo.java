@@ -28,7 +28,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsImpl;
@@ -49,12 +49,12 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.BasicVehicleCapacity;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicles;
-import org.matsim.vehicles.VehicleBuilder;
+import org.matsim.vehicles.VehiclesFactory;
 
 import playground.marcel.OTFDemo;
 import playground.marcel.pt.analysis.TransitRouteAccessEgressAnalysis;
@@ -106,7 +106,7 @@ public class BlockingStopDemo {
 
 	private void createTransitSchedule() {
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
-		TransitScheduleBuilder builder = schedule.getBuilder();
+		TransitScheduleFactory builder = schedule.getFactory();
 
 		TransitStopFacility[] stops = new TransitStopFacility[nOfStops * 2];
 		ArrayList<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>(nOfStops);
@@ -173,7 +173,7 @@ public class BlockingStopDemo {
 
 	private void createVehicles() {
 		BasicVehicles vehicles = this.scenario.getVehicles();
-		VehicleBuilder vb = vehicles.getBuilder();
+		VehiclesFactory vb = vehicles.getFactory();
 		BasicVehicleType vehicleType = vb.createVehicleType(new IdImpl("transitVehicleType"));
 		BasicVehicleCapacity capacity = vb.createVehicleCapacity();
 		capacity.setSeats(Integer.valueOf(101));
@@ -188,7 +188,7 @@ public class BlockingStopDemo {
 	private void createPopulation() {
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
 		PopulationImpl population = this.scenario.getPopulation();
-		PopulationBuilder pb = population.getBuilder();
+		PopulationFactory pb = population.getFactory();
 //		TransitStopFacility[] stops = this.schedule.getFacilities().values().toArray(new TransitStopFacility[this.schedule.getFacilities().size()]);
 		TransitLine tLine1 = schedule.getTransitLines().get(this.ids[1]);
 		TransitRoute tRoute1 = tLine1.getRoutes().get(this.ids[1]);

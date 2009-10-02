@@ -45,7 +45,7 @@ public class MyControler2 {
 		BasicScenario sc = new BasicScenarioImpl() ;
 		
 		BasicPopulation population = sc.getPopulation() ;
-		BasicPopulationBuilder pb = population.getBuilder() ;
+		BasicPopulationFactory pb = population.getFactory() ;
 
 		// get all features from the shp file:
 		FeatureIterator it = null; try {

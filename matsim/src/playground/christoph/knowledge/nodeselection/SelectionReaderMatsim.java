@@ -166,7 +166,7 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 	 
 				if (currentKnowledge == null)
 				{
-					this.knowledges.getBuilder().createKnowledge(person.getId(), "activityroom");
+					this.knowledges.getFactory().createKnowledge(person.getId(), "activityroom");
 					currentKnowledge = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 				}
 			}

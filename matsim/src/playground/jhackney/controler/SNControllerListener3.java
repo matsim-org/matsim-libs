@@ -356,7 +356,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 
 			Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 			if(k ==null){
-				k = this.knowledges.getBuilder().createKnowledge(person.getId(), "created by " + this.getClass().getName());
+				k = this.knowledges.getFactory().createKnowledge(person.getId(), "created by " + this.getClass().getName());
 			}
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
 				PlanImpl plan = person.getPlans().get(ii);

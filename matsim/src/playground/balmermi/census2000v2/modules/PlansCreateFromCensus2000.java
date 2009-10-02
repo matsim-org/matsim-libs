@@ -407,7 +407,7 @@ public class PlansCreateFromCensus2000 {
 
 		// adding home knowledge
 		Knowledge k = this.knowledges.getKnowledgesByPersonId().get(p.getId());
-		if (k == null) { k = this.knowledges.getBuilder().createKnowledge(p.getId(), ""); }
+		if (k == null) { k = this.knowledges.getFactory().createKnowledge(p.getId(), ""); }
 		String desc = "";
 		if (wkat == 1) {
 			Household hh_w = (Household)p_atts.get(CAtts.HH_W);

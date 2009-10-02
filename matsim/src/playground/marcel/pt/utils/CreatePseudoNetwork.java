@@ -150,7 +150,7 @@ public class CreatePseudoNetwork {
 					this.facilityCopies.put(toFacility, copies);
 				}
 				IdImpl newId = new IdImpl(toFacility.getId().toString() + "." + Integer.toString(copies.size() + 1));
-				TransitStopFacility newFacility = this.schedule.getBuilder().createTransitStopFacility(newId, toFacility.getCoord(), toFacility.getIsBlockingLane());
+				TransitStopFacility newFacility = this.schedule.getFactory().createTransitStopFacility(newId, toFacility.getCoord(), toFacility.getIsBlockingLane());
 				newFacility.setLink(link);
 				copies.add(newFacility);
 				this.nodes.put(newFacility, toNode);

@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -43,18 +43,18 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.basic.BasicLane;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsBuilder;
+import org.matsim.lanes.basic.BasicLaneDefinitionsFactory;
 import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
 import org.matsim.signalsystems.MatsimSignalSystemConfigurationsWriter;
 import org.matsim.signalsystems.MatsimSignalSystemsWriter;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalSystemsBuilder;
+import org.matsim.signalsystems.basic.BasicSignalSystemsFactory;
 import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsBuilder;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsFactory;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.IdFactory;
@@ -191,7 +191,7 @@ public class DaganzoScenarioGenerator {
 		int homeEndTime = firstHomeEndTime;
 		LinkImpl l1 = network.getLink(scenario.createId("1"));
 		LinkImpl l7 = network.getLink(scenario.createId("7"));
-		PopulationBuilder builder = population.getBuilder();
+		PopulationFactory builder = population.getFactory();
 
 		for (int i = 1; i <= 1000; i++) {
 			PersonImpl p = (PersonImpl) builder.createPerson(scenario.createId(Integer
@@ -279,7 +279,7 @@ public class DaganzoScenarioGenerator {
 
 	private BasicLaneDefinitions createLanes(ScenarioImpl scenario) {
 		BasicLaneDefinitions lanes = scenario.getLaneDefinitions();
-		BasicLaneDefinitionsBuilder builder = lanes.getBuilder();
+		BasicLaneDefinitionsFactory builder = lanes.getFactory();
 		//lanes for link 4
 		BasicLanesToLinkAssignment lanesForLink4 = builder.createLanesToLinkAssignment(id4);
 		BasicLane link4lane1 = builder.createLane(id1);
@@ -298,7 +298,7 @@ public class DaganzoScenarioGenerator {
 	
 	private BasicSignalSystems createSignalSystems(ScenarioImpl scenario) {
 		BasicSignalSystems systems = scenario.getSignalSystems();
-		BasicSignalSystemsBuilder builder = systems.getBuilder();
+		BasicSignalSystemsFactory builder = systems.getFactory();
 		//create the signal system no 1
 		BasicSignalSystemDefinition definition = builder.createSignalSystemDefinition(id1);
 		systems.addSignalSystemDefinition(definition);
@@ -328,7 +328,7 @@ public class DaganzoScenarioGenerator {
 	private BasicSignalSystemConfigurations createSignalSystemsConfig(
 			ScenarioImpl scenario) {
 		BasicSignalSystemConfigurations configs = scenario.getSignalSystemConfigurations();
-		BasicSignalSystemConfigurationsBuilder builder = configs.getBuilder();
+		BasicSignalSystemConfigurationsFactory builder = configs.getFactory();
 		
 		BasicSignalSystemConfiguration systemConfig = builder.createSignalSystemConfiguration(id1);
 		BasicAdaptiveSignalSystemControlInfo controlInfo = builder.createAdaptiveSignalSystemControlInfo();

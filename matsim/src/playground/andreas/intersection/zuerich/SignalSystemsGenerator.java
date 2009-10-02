@@ -144,7 +144,7 @@ public class SignalSystemsGenerator {
 					Id linkId = new IdImpl(linkIdString);
 					//check if there is already a SignalGroupDefinition
 					if (!this.signalSystems.getSignalGroupDefinitions().containsKey(signalGroupId)){
-						BasicSignalGroupDefinition sg	= signalSystems.getBuilder().createSignalGroupDefinition(linkId, signalGroupId);
+						BasicSignalGroupDefinition sg	= signalSystems.getFactory().createSignalGroupDefinition(linkId, signalGroupId);
 						sg.setSignalSystemDefinitionId(signalSystemId);
 						
 						//add lanes and toLinks

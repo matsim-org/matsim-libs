@@ -75,7 +75,7 @@ public class CreatePlans1 {
 			plans.addPerson(person);
 
 
-			Knowledge k = knowledges.getBuilder().createKnowledge(person.getId(), "");
+			Knowledge k = knowledges.getFactory().createKnowledge(person.getId(), "");
 			k.addActivity(home,false);
 			k.addActivity(work,false);
 			k.addActivity(shop,false);

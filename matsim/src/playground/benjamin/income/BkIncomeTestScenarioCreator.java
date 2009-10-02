@@ -33,7 +33,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.population.BasicPopulationFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -76,7 +76,7 @@ public class BkIncomeTestScenarioCreator {
 		BasicScenario scenario = new BasicScenarioImpl();
 		
 		BasicPopulation<BasicPerson<BasicPlan>> pop = scenario.getPopulation();
-		BasicPopulationBuilder builder = pop.getBuilder();
+		BasicPopulationFactory builder = pop.getFactory();
 		
 		for (int i = 1; i <= 2000; i++) {
 			BasicPerson p = builder.createPerson(scenario.createId(Integer.toString(i)));	

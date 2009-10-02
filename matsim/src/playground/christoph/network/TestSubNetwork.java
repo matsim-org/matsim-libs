@@ -13,7 +13,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -56,7 +56,7 @@ public class TestSubNetwork {
 	private Dijkstra dijkstra;
 	private DijkstraWrapper dijkstraWrapper;
 	private KnowledgePlansCalcRoute dijkstraRouter;
-	private NetworkFactory networkFactory;
+	private NetworkFactoryImpl networkFactory;
 	private QueueNetwork queueNetwork;
 	
 	private final String configFileName = "mysimulations/kt-zurich/config.xml";
@@ -90,7 +90,7 @@ public class TestSubNetwork {
 	
 	private void loadNetwork()
 	{
-		networkFactory = new NetworkFactory(this.network);
+		networkFactory = new NetworkFactoryImpl(this.network);
 		networkFactory.setLinkFactory(new MyLinkFactoryImpl());
 
 		network = new NetworkLayer();

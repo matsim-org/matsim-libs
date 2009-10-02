@@ -108,18 +108,18 @@ public class PseudoNetworkDemo {
 		LinkImpl link1 = network.getLinks().values().iterator().next();//getLink(scenario.createId("1"));
 
 		PopulationImpl population = scenario.getPopulation();
-		Person person = population.getBuilder().createPerson(new IdImpl(1));
+		Person person = population.getFactory().createPerson(new IdImpl(1));
 		population.getPersons().put(person.getId(), (PersonImpl) person);
-		Plan plan = population.getBuilder().createPlan();
+		Plan plan = population.getFactory().createPlan();
 		person.addPlan(plan);
-		Activity act = population.getBuilder().createActivityFromLinkId("home", link1.getId());
+		Activity act = population.getFactory().createActivityFromLinkId("home", link1.getId());
 		act.setEndTime(4*3600.0);
 		plan.addActivity(act);
-		Leg leg = population.getBuilder().createLeg(TransportMode.walk);
+		Leg leg = population.getFactory().createLeg(TransportMode.walk);
 		leg.setTravelTime(15*3600.0);
 		leg.setRoute(network.getFactory().createRoute(TransportMode.walk, link1, link1));
 		plan.addLeg(leg);
-		plan.addActivity(population.getBuilder().createActivityFromLinkId("home", link1.getId()));
+		plan.addActivity(population.getFactory().createActivityFromLinkId("home", link1.getId()));
 
 		final EventsImpl events = new EventsImpl();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");

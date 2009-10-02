@@ -37,7 +37,7 @@ public class LSASystemsReader implements TabularFileHandler {
 			if (this.signals.getSignalSystemDefinitions().containsKey(signalSystemId)) {
 				log.error("Cannot create signal system definition id " + signalSystemId + " twice!");
 			}
-			BasicSignalSystemDefinition lsa = this.signals.getBuilder().createSignalSystemDefinition(signalSystemId);
+			BasicSignalSystemDefinition lsa = this.signals.getFactory().createSignalSystemDefinition(signalSystemId);
 			lsa.setDefaultCycleTime(Double.parseDouble(row[1]));
 			lsa.setDefaultInterGreenTime(3.0);
 			lsa.setDefaultSynchronizationOffset(0.0);

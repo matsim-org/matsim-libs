@@ -19,7 +19,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.population.BasicPopulationFactory;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
 
 
@@ -105,7 +105,7 @@ BasicActivityEndEventHandler
 	public void handlePlan(BasicPlan ppp) { // need handlePlan(BasicPlan) ??????
 		BasicPlan plan = ppp ;
 		
-		BasicPopulationBuilder pb = pop.getBuilder() ; 
+		BasicPopulationFactory pb = pop.getFactory() ; 
 		
 		try {
 			Id id = sc.createId("1") ; 

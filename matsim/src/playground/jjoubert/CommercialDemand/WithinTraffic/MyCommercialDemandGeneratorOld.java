@@ -33,7 +33,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -122,7 +122,7 @@ public class MyCommercialDemandGeneratorOld {
 			// Initiate the population builder
 			ScenarioImpl sc = new ScenarioImpl();
 			PopulationImpl population = sc.getPopulation();
-			PopulationBuilder pb = population.getBuilder();
+			PopulationFactory pb = population.getFactory();
 
 			//TODO Check if it is 'better' to create 'i' truck agents, and split them into dummy agents
 			// if the duration is greater than 24 hours - thus probably ending with more than 'i' agents;

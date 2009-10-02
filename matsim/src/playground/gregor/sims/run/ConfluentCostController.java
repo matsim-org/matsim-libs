@@ -5,7 +5,7 @@ import java.util.List;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.BuildingsShapeReader;
 import org.matsim.evacuation.base.EvacuationNetGenerator;
@@ -33,7 +33,7 @@ public class ConfluentCostController extends Controler {
 		this.events.addHandler(lpc);
 		addControlerListener(lpc);
 		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = TravelTimeCalculatorBuilder.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+			this.travelTimeCalculator = TravelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		}
 		
 		String netcdf = this.config.evacuation().getFloodingDataFile();

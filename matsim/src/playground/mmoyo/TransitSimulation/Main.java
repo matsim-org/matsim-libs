@@ -9,18 +9,18 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.PTRouter.*;
@@ -42,8 +42,8 @@ public class Main {
 	private static final String TRANSITSCHEDULEFILE = PATH + "transitSchedule.xml";
 	
 	public static void main(String[] args) {
-		NetworkLayer network= new NetworkLayer(new NetworkFactory());
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		NetworkLayer network= new NetworkLayer(new NetworkFactoryImpl());
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		PTActWriter ptActWriter;
 		PTValues ptValues = new PTValues();

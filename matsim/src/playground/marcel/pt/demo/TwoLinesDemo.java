@@ -26,7 +26,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.network.LinkImpl;
@@ -43,7 +43,7 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 import playground.marcel.OTFDemo;
@@ -125,7 +125,7 @@ public class TwoLinesDemo {
 
 	private void createTransitSchedule() {
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
-		TransitScheduleBuilder builder = schedule.getBuilder();
+		TransitScheduleFactory builder = schedule.getFactory();
 		TransitStopFacility stop1 = builder.createTransitStopFacility(this.ids[1], this.scenario.createCoord(-100, -50), false);
 		TransitStopFacility stop2 = builder.createTransitStopFacility(this.ids[2], this.scenario.createCoord(-100, 850), false);
 		TransitStopFacility stop3 = builder.createTransitStopFacility(this.ids[3], this.scenario.createCoord(1400, 450), false);
@@ -216,7 +216,7 @@ public class TwoLinesDemo {
 	private void createPopulation() {
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
 		PopulationImpl population = this.scenario.getPopulation();
-		PopulationBuilder pb = population.getBuilder();
+		PopulationFactory pb = population.getFactory();
 
 		TransitLine tLine1 = schedule.getTransitLines().get(this.ids[1]);
 		TransitRoute tRoute1 = tLine1.getRoutes().get(this.ids[1]);

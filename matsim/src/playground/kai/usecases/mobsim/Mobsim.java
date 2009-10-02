@@ -10,7 +10,7 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.Events;
-import org.matsim.core.api.experimental.events.EventsBuilder;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 
@@ -31,7 +31,7 @@ public class Mobsim {
 		// getting the plans info should be w/o problems
 				
 		// the following tests the events generation
-		EventsBuilder eb = this.ev.getBuilder();
+		EventsFactory eb = this.ev.getFactory();
 
 		Id agentId = sc.createId("agentId");
 		Id linkId = sc.createId("linkId");

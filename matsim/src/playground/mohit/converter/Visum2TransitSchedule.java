@@ -19,13 +19,13 @@ import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.BasicVehicle;
 import org.matsim.vehicles.BasicVehicleCapacity;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicles;
-import org.matsim.vehicles.VehicleBuilder;
+import org.matsim.vehicles.VehiclesFactory;
 
 import playground.mohit.converter.VisumNetwork.VehicleCombination;
 import playground.mohit.converter.VisumNetwork.VehicleUnit;
@@ -56,10 +56,10 @@ public class Visum2TransitSchedule {
 
 		long vehId = 0;
 
-		TransitScheduleBuilder builder = this.schedule.getBuilder();
+		TransitScheduleFactory builder = this.schedule.getFactory();
 
 		// 1st step: convert vehicle types
-		VehicleBuilder vb = this.vehicles.getBuilder();
+		VehiclesFactory vb = this.vehicles.getFactory();
 		for (VehicleCombination vehComb : this.visum.vehicleCombinations.values()) {
 			BasicVehicleType type = vb.createVehicleType(new IdImpl(vehComb.id));
 			type.setDescription(vehComb.name);

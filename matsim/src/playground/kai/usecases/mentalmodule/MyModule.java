@@ -15,7 +15,7 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
@@ -135,7 +135,7 @@ ActivityStartEventHandler
 	
 	public void handlePlan(BasicPlan plan) {
 		
-		PopulationBuilder pb = pop.getBuilder() ; 
+		PopulationFactory pb = pop.getFactory() ; 
 		
 		
 		

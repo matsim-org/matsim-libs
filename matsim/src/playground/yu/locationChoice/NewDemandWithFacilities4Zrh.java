@@ -78,7 +78,7 @@ public class NewDemandWithFacilities4Zrh {
 			currentPerson = (PersonImpl) person;
 			currentKnowledge = knowledges.getKnowledgesByPersonId().get(person.getId());
 			if (currentKnowledge == null)
-				knowledges.getBuilder().createKnowledge(person.getId(), "");
+				knowledges.getFactory().createKnowledge(person.getId(), "");
 			for (PlanImpl plan : person.getPlans())
 				run(plan);
 		}

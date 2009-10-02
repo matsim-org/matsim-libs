@@ -23,7 +23,7 @@ package playground.marcel.pt.utils;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkBuilder;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
@@ -41,7 +41,7 @@ public class MergeNetworks {
 
 	public static void merge(final Network networkA, final String prefixA, final Network networkB, final String prefixB, final NetworkImpl mergedNetwork) {
 		double capacityFactor = mergedNetwork.getCapacityPeriod() / networkA.getCapacityPeriod();
-		NetworkBuilder builder = mergedNetwork.getBuilder();
+		NetworkFactory builder = mergedNetwork.getFactory();
 		for (Node node : networkA.getNodes().values()) {
 			NodeImpl node2 = (NodeImpl) builder.createNode(new IdImpl(prefixA + node.getId().toString()));
 			node2.setCoord(node.getCoord());

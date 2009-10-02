@@ -30,7 +30,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.households.Household;
-import org.matsim.households.HouseholdBuilder;
+import org.matsim.households.HouseholdsFactory;
 import org.matsim.households.Households;
 import org.matsim.households.Income;
 import org.matsim.households.HouseholdsWriterV10;
@@ -51,7 +51,7 @@ public class BKickHouseholdsCreator {
     Id id1 = sc.createId("1");
     Id id2 = sc.createId("2");
     Households hhs = sc.getHouseholds();
-    HouseholdBuilder b = hhs.getBuilder();
+    HouseholdsFactory b = hhs.getFactory();
 
     Household hh = b.createHousehold(id1);
     hh.setIncome(b.createIncome(120000, Income.IncomePeriod.year));
@@ -83,7 +83,7 @@ public class BKickHouseholdsCreator {
     popReader.readFile(plansFile);
     
     Households hhs = sc.getHouseholds();
-    HouseholdBuilder b = hhs.getBuilder();
+    HouseholdsFactory b = hhs.getFactory();
 
     IncomeCalculatorKantonZurich incomeCalculator = new IncomeCalculatorKantonZurich();
     

@@ -11,10 +11,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.collections.map.LinkedMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -29,7 +29,7 @@ public class timeGraph  {
 	private Choice listOfLineRoutes= new Choice() ;
 	private int totalLineRoutes;
 	public final Map<String , TransitLineRoute> lineRoutes = new TreeMap<String, TransitLineRoute>();
-	TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+	TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 	TransitSchedule schedule = builder.createTransitSchedule();
 	NodeList LineRoutes;
 	public timeGraph(){
@@ -93,8 +93,8 @@ public class timeGraph  {
 					arr = el.getAttribute("arrivalOffset");
 					dep = el.getAttribute("departureOffset");
 					
-					TransitStopFacility stop = schedule.getBuilder().createTransitStopFacility(new IdImpl(stopId),null,false );
-					TransitRouteStop routeStop = schedule.getBuilder().createTransitRouteStop(stop,toDouble(arr),toDouble(dep));
+					TransitStopFacility stop = schedule.getFactory().createTransitStopFacility(new IdImpl(stopId),null,false );
+					TransitRouteStop routeStop = schedule.getFactory().createTransitRouteStop(stop,toDouble(arr),toDouble(dep));
 					stops.put(stopId+"/"+(j+1),routeStop);
 				}
 				TransitLineRoute route = new  TransitLineRoute(new IdImpl(elm.getAttribute("id")),stops);

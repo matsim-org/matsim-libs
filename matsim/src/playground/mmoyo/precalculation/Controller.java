@@ -10,15 +10,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
+import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.xml.sax.SAXException;
 
 /**invokes the precalculation of transit routes. Later on the best of them can be selected according to their properties*/ 
@@ -31,8 +31,8 @@ public class Controller {
 	
 	
 	public static void main(String[] args) {
-		NetworkLayer net= new NetworkLayer(new NetworkFactory());
-		TransitScheduleBuilder builder = new TransitScheduleBuilderImpl();
+		NetworkLayer net= new NetworkLayer(new NetworkFactoryImpl());
+		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		
 		/***************reads the transitSchedule file**********/

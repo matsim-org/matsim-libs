@@ -45,7 +45,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
-import org.matsim.households.HouseholdBuilder;
+import org.matsim.households.HouseholdsFactory;
 import org.matsim.households.Households;
 import org.matsim.households.Income;
 import org.matsim.households.HouseholdsWriterV10;
@@ -112,7 +112,7 @@ public class BKickHouseholdsCreatorZurich {
 		BasicPopulation<BasicPerson<BasicPlan>> pop = (BasicPopulation) scenario.getPopulation();
 		for (BasicPerson<BasicPlan> p : pop.getPersons().values()){
 			//create the households
-			HouseholdBuilder b = households.getBuilder();
+			HouseholdsFactory b = households.getFactory();
 			Household hh = b.createHousehold(p.getId());
 	    hh.getMemberIds().add(p.getId());
 	    households.getHouseholds().put(p.getId(), hh);

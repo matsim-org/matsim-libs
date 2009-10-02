@@ -16,7 +16,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.population.BasicPopulationFactory;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -136,7 +136,7 @@ public class Utils {
 		plan.createAndAddActivity(ACT_HOME, homeCoord) ;
 	}
 
-	public static void makeHomePlan( BasicPopulationBuilder pb, BasicPlan plan, Coord homeCoord ) {
+	public static void makeHomePlan( BasicPopulationFactory pb, BasicPlan plan, Coord homeCoord ) {
 		log.fatal("currently not implemented; exiting ...");
 		System.exit(-1) ;
 	}

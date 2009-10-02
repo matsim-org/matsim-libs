@@ -290,9 +290,9 @@ public class GraphBuilder {
 	}
 	
 	private BasicPerson<?> createPerson(Id id, Coord coord) {
-		BasicPerson<BasicPlan<?>> person = population.getBuilder().createPerson(id);
-		BasicPlan<?> plan = population.getBuilder().createPlan(person);
-		BasicActivity activity = population.getBuilder().createActivityFromCoord("home", coord);
+		BasicPerson<BasicPlan<?>> person = population.getFactory().createPerson(id);
+		BasicPlan<?> plan = population.getFactory().createPlan(person);
+		BasicActivity activity = population.getFactory().createActivityFromCoord("home", coord);
 		plan.addActivity(activity);
 		person.addPlan(plan);
 

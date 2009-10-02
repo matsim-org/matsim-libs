@@ -201,10 +201,10 @@ public class PlansCreateFromDataPuls {
 				ActivityOption a = af.getActivityOption("home");
 				if (a == null) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" does not contain 'home'."); }
 				
-				PersonImpl p = (PersonImpl)population.getBuilder().createPerson(id);
+				PersonImpl p = (PersonImpl)population.getFactory().createPerson(id);
 				Knowledge k = kn.getKnowledgesByPersonId().get(p.getId());
 				if (k != null) { throw new RuntimeException("pid="+p.getId()+": knowledge already exist."); }
-				k = kn.getBuilder().createKnowledge(p.getId(),null);
+				k = kn.getFactory().createKnowledge(p.getId(),null);
 				kn.getKnowledgesByPersonId().put(p.getId(),k);
 				k.addActivity(a,true);
 				population.addPerson(p);
