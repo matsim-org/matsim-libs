@@ -50,10 +50,10 @@ public class SpatialSubtourAnalyzer extends AbstractPersonAlgorithm {
 
 		log.info("adding algorithms...");
 		final SpatialSubtourAnalyzer analyzer = new SpatialSubtourAnalyzer();
-		PopulationImpl plans = sl.getScenario().getPopulation();
-		plans.setIsStreaming(true);
-		plans.addAlgorithm(analyzer);
-		plans.addAlgorithm(new PersonStupidDeleteKnowledgeForStreamingModule(sl.getScenario().getKnowledges()));
+		PopulationImpl population = sl.getScenario().getPopulation();
+		population.setIsStreaming(true);
+		population.addAlgorithm(analyzer);
+		population.addAlgorithm(new PersonStupidDeleteKnowledgeForStreamingModule(sl.getScenario().getKnowledges()));
 		Gbl.printMemoryUsage();
 		log.info("adding algorithms...done.");
 		
@@ -63,6 +63,7 @@ public class SpatialSubtourAnalyzer extends AbstractPersonAlgorithm {
 		log.info("Processing plans...");
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		plansReader.readFile(config.plans().getInputFile());
+		population.printPlansCount();
 		Gbl.printMemoryUsage();
 		log.info("Processing plans...done.");
 		Gbl.printElapsedTime();
