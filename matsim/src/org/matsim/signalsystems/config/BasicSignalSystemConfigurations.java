@@ -30,7 +30,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  */
 public interface BasicSignalSystemConfigurations extends MatsimToplevelContainer {
 
-	public BasicSignalSystemConfigurationsBuilder getBuilder();
+	public BasicSignalSystemConfigurationsFactory getFactory();
 
 	/**
 	 * 

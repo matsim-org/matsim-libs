@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicHouseholdBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,42 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.signalsystems.config;
+package org.matsim.households;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.households.Income.IncomePeriod;
+
 
 /**
  * @author dgrether
+ *
  */
-public class BasicSignalSystemConfigurationsBuilder {
+public interface HouseholdsFactory extends MatsimFactory {
 
-	public BasicSignalSystemConfigurationsBuilder(){}
+	public Household createHousehold(Id householdId);
 	
-	public BasicSignalSystemConfiguration createSignalSystemConfiguration(
-			Id refId) {
-		return new BasicSignalSystemConfigurationImpl(refId);
-	}
-
-	public BasicPlanBasedSignalSystemControlInfo createPlanBasedSignalSystemControlInfo() {
-		return new BasicPlanBasedSignalSystemControlInfoImpl();
-	}
-
-	public BasicSignalSystemPlan createSignalSystemPlan(Id id) {
-		return new BasicSignalSystemPlanImpl(id);
-	}
-
-	public BasicSignalGroupSettings createSignalGroupSettings(
-			Id refid) {
-		return new BasicSignalGroupSettingsImpl(refid);
-	}
-
-	public BasicAdaptiveSignalSystemControlInfo createAdaptiveSignalSystemControlInfo() {
-		return new BasicAdaptiveSignalSystemControlInfoImpl();
-	}
-
-	public BasicAdaptivePlanbasedSignalSystemControlInfoImpl createAdaptivePlanbasedSignalSystemControlInfo() {
-		return new BasicAdaptivePlanbasedSignalSystemControlInfoImpl();
-	}
+	public Income createIncome(double income, IncomePeriod period);
 
 }

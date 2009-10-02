@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BasicNetworkBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,41 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.api.basic.v01.network;
 
-package org.matsim.api.basic.v01.population;
-
-import java.io.Serializable;
-
-import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.internal.MatsimFactory;
+
 
 /**
+ * Builder for network elements
  * @author dgrether
- * @deprecated don't use this class yet because the method signatures are still under heavy discussion and might be changed in the near future
+ * @deprecated use version in org.matsim.api.core
  */
-public interface BasicPopulationBuilder extends Serializable{
-
-	public BasicPerson createPerson(Id id);
-
-	public BasicPlan createPlan(BasicPerson person);
-
-	public BasicActivity createActivityFromCoord(String actType, Coord coord);
-
-//	public BasicActivity createActivityFromFacilityId(String actType, Id facilityId);
-	// disabled until everything else is figured out
-
-	public BasicActivity createActivityFromLinkId(String actType, Id linkId);
-	
-	public BasicLeg createLeg(TransportMode legMode);
-
+@Deprecated // use version in org.matsim.api.core
+public interface BasicNetworkFactory extends MatsimFactory {
 	/**
-	 * Creates a new Route object
-	 * @param currentRouteLinkIds List of Ids including the start and the end Link Id of the route's links
-	 * @return a BasicRoute Object with the links set accordingly
-	 * @deprecated needs to be verified
+	 * creates a node
+	 * @param id
+	 * @return
+	 * @deprecated use version in org.matsim.core
 	 */
-//	public BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds); // TODO [MR] check this
-	// disabled until everything else is figured out
+	@Deprecated // use version in org.matsim.api.core
+	public BasicNode createNode(final Id id);
 
+	/** @deprecated use version in org.matsim.api.core */
+	@Deprecated // use version in org.matsim.api.core
+	public BasicLink createLink(final Id id, final Id fromNodeId, final Id toNodeId);
+	
 }

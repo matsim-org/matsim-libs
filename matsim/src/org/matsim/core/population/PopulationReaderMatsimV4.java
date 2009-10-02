@@ -256,7 +256,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startKnowledge(final Attributes atts) {
-		this.currknowledge = this.knowledges.getBuilder().createKnowledge(this.currperson.getId(), atts.getValue("desc"));
+		this.currknowledge = this.knowledges.getFactory().createKnowledge(this.currperson.getId(), atts.getValue("desc"));
 		this.knowledges.getKnowledgesByPersonId().put(this.currperson.getId(), this.currknowledge);
 	}
 

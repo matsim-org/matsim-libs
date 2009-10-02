@@ -36,7 +36,7 @@ public class BasicLaneDefinitionsImpl implements BasicLaneDefinitions {
 	
 	private Map<Id, BasicLanesToLinkAssignment> lanesToLinkAssignments =  new LinkedHashMap<Id, BasicLanesToLinkAssignment>();
 
-	private BasicLaneDefinitionsBuilder builder = new BasicLaneDefinitionsBuilderImpl();
+	private BasicLaneDefinitionsFactory builder = new BasicLaneDefinitionsFactoryImpl();
 	
 	/**
 	 * @see org.matsim.lanes.basic.BasicLaneDefinitions#getLanesToLinkAssignmentsList()
@@ -62,9 +62,9 @@ public class BasicLaneDefinitionsImpl implements BasicLaneDefinitions {
 	}
 	
 	/**
-	 * @see org.matsim.lanes.basic.BasicLaneDefinitions#getBuilder()
+	 * @see org.matsim.lanes.basic.BasicLaneDefinitions#getFactory()
 	 */
-	public BasicLaneDefinitionsBuilder getBuilder(){
+	public BasicLaneDefinitionsFactory getFactory(){
 		return this.builder;
 	}
 

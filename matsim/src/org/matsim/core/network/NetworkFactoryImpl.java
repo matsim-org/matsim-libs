@@ -27,7 +27,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.NetworkBuilder;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.NodeNetworkRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
@@ -36,7 +36,7 @@ import org.matsim.core.population.routes.RouteWRefs;
 /**
  * @author dgrether
  */
-public class NetworkFactory implements Serializable, NetworkBuilder {
+public class NetworkFactoryImpl implements Serializable, NetworkFactory {
 	// yyyyyy is it NetworkFactory or NetworkBuilder or do we really need both?  kai, jul09
 
 	private LinkFactory linkFactory = null;
@@ -46,12 +46,12 @@ public class NetworkFactory implements Serializable, NetworkBuilder {
 
 	private NetworkLayer network;
 
-	public NetworkFactory(NetworkLayer network) {
+	public NetworkFactoryImpl(NetworkLayer network) {
 		this();
 		this.network = network;
 	}
 	
-	public NetworkFactory() {
+	public NetworkFactoryImpl() {
 		this.linkFactory = new LinkFactoryImpl();
 		this.routeFactories.put(TransportMode.car, new NodeNetworkRouteFactory());
 		this.routeFactories.put(TransportMode.pt, new GenericRouteFactory());

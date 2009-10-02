@@ -33,6 +33,6 @@ public interface Households extends MatsimToplevelContainer {
 
 	public Map<Id, Household> getHouseholds();
 	
-	public HouseholdBuilder getBuilder();
+	public HouseholdsFactory getFactory();
 	
 }

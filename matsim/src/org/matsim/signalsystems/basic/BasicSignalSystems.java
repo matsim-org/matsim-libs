@@ -26,7 +26,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 public interface BasicSignalSystems extends MatsimToplevelContainer {
 	
-	public BasicSignalSystemsBuilder getBuilder();
+	public BasicSignalSystemsFactory getFactory();
 
 	public Map<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions();
 

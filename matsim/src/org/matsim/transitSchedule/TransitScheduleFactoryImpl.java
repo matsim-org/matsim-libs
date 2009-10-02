@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitSchedule.java
+ * TransitScheduleBuilderImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,60 +20,46 @@
 
 package org.matsim.transitSchedule;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
 
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 
-/**
- * Default implementation of {@link TransitSchedule}.
- * 
- * {@inheritDoc}
- * 
- * @author mrieser
- */
-public class TransitScheduleImpl implements TransitSchedule {
 
-	private final Map<Id, TransitLine> transitLines = new TreeMap<Id, TransitLine>();
-	private final Map<Id, TransitStopFacility> stopFacilities = new TreeMap<Id, TransitStopFacility>();
-	private final TransitScheduleFactory factory;
-	
-	protected TransitScheduleImpl(final TransitScheduleFactory builder) {
-		this.factory = builder;
+public class TransitScheduleFactoryImpl implements TransitScheduleFactory {
+
+	public TransitLine createTransitLine(final Id lineId) {
+		return new TransitLineImpl(lineId);
 	}
 
-	public void addTransitLine(final TransitLine line) {
-		final Id id = line.getId();
-		if (this.transitLines.containsKey(id)) {
-			throw new IllegalArgumentException("There is already a transit line with id " + id.toString());
-		}
-		this.transitLines.put(id, line);
-	}
-	
-	public void addStopFacility(final TransitStopFacility stop) {
-		final Id id = stop.getId();
-		if (this.stopFacilities.containsKey(id)) {
-			throw new IllegalArgumentException("There is already a stop facility with id " + id.toString());
-		}
-		this.stopFacilities.put(id, stop);
+	public TransitRoute createTransitRoute(final Id routeId, final NetworkRouteWRefs route, final List<TransitRouteStop> stops, final TransportMode mode) {
+		return new TransitRouteImpl(routeId, route, stops, mode);
 	}
 
-	public Map<Id, TransitLine> getTransitLines() {
-		return Collections.unmodifiableMap(this.transitLines);
+	public TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
+		return new TransitRouteStopImpl(stop, arrivalDelay, departureDelay);
 	}
-	
-	public Map<Id, TransitStopFacility> getFacilities() {
-		return Collections.unmodifiableMap(this.stopFacilities);
+
+	public TransitSchedule createTransitSchedule() {
+		return new TransitScheduleImpl(this);
 	}
-	
-	public TransitScheduleFactory getFactory() {
-		return this.factory;
+
+	public TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate, final boolean blocksLane) {
+		return new TransitStopFacilityImpl(facilityId, coordinate, blocksLane);
+	}
+
+	public Departure createDeparture(final Id departureId, final double time) {
+		return new DepartureImpl(departureId, time);
 	}
 
 }

@@ -25,7 +25,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -72,7 +72,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 */
 	protected PlansCalcRouteConfigGroup configGroup = new PlansCalcRouteConfigGroup();
 	
-	private final NetworkFactory routeFactory;
+	private final NetworkFactoryImpl routeFactory;
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -370,7 +370,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		return travTime;
 	}
 
-	public NetworkFactory getRouteFactory() {
+	public NetworkFactoryImpl getRouteFactory() {
 		return routeFactory;
 	}
 

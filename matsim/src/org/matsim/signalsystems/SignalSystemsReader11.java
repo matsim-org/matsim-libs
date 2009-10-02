@@ -37,7 +37,7 @@ import org.matsim.jaxb.signalsystems11.XMLSignalSystems;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalSystemsBuilder;
+import org.matsim.signalsystems.basic.BasicSignalSystemsFactory;
 
 import org.xml.sax.SAXException;
 
@@ -52,12 +52,12 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 
 	private BasicSignalSystems lightSignalSystems;
 
-	private BasicSignalSystemsBuilder builder;
+	private BasicSignalSystemsFactory builder;
 
 	public SignalSystemsReader11(BasicSignalSystems lightSignalSystems, String schemaLocation) {
 		super(schemaLocation);
 		this.lightSignalSystems = lightSignalSystems;
-		this.builder = this.lightSignalSystems.getBuilder();
+		this.builder = this.lightSignalSystems.getFactory();
 	}
 
 	@Override

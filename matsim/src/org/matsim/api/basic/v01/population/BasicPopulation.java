@@ -40,8 +40,8 @@ public interface BasicPopulation<T extends BasicPerson> extends MatsimToplevelCo
 	// yyyy resurrected.  move to BasicPopulation once certain that this is a good idea  
 
 	/** @deprecated use getBuilder() */
-	public BasicPopulationBuilder getPopulationBuilder();
+	public BasicPopulationFactory getPopulationBuilder();
 	
-	public BasicPopulationBuilder getBuilder() ;
+	public BasicPopulationFactory getFactory() ;
 
 }

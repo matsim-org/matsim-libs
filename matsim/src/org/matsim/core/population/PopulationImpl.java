@@ -30,7 +30,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -59,7 +59,7 @@ public class PopulationImpl implements Population {
 
 	private static final Logger log = Logger.getLogger(PopulationImpl.class);
 
-	private final PopulationBuilder pb ;
+	private final PopulationFactory pb ;
 	
 	private final ScenarioImpl sc ;
 
@@ -67,12 +67,12 @@ public class PopulationImpl implements Population {
 	
 	public PopulationImpl() { 
 		this.sc = null ;
-		this.pb = new PopulationBuilderImpl((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE), this, (ActivityFacilitiesImpl) Gbl.getWorld().getLayer(ActivityFacilitiesImpl.LAYER_TYPE));
+		this.pb = new PopulationFactoryImpl((NetworkLayer) Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE), this, (ActivityFacilitiesImpl) Gbl.getWorld().getLayer(ActivityFacilitiesImpl.LAYER_TYPE));
 	}
 	
 	public PopulationImpl(ScenarioImpl sc) {
 		this.sc = sc ;
-		this.pb = new PopulationBuilderImpl( sc ) ;
+		this.pb = new PopulationFactoryImpl( sc ) ;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -189,12 +189,12 @@ public class PopulationImpl implements Population {
 		log.info(" person # " + this.counter);
 	}
 
-	public PopulationBuilder getBuilder() {
+	public PopulationFactory getFactory() {
 		return this.pb;
 	}
 	
-	public PopulationBuilder getPopulationBuilder() {
-		return this.getBuilder();
+	public PopulationFactory getPopulationBuilder() {
+		return this.getFactory();
 	}
 	
 	private String name ;

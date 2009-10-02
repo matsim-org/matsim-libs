@@ -23,12 +23,13 @@ package org.matsim.api.basic.v01.population;
 import java.io.Serializable;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.MatsimPopulationObject;
 
 
 /**
 * @author dgrether
 */
-public interface BasicRoute extends Serializable {
+public interface BasicRoute extends Serializable, MatsimPopulationObject {
 
 	public double getDistance();
 

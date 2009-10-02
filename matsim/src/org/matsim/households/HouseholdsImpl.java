@@ -32,17 +32,17 @@ import org.matsim.api.basic.v01.Id;
  */
 public class HouseholdsImpl implements Households{
 
-	private HouseholdBuilder builder;
+	private HouseholdsFactory factory;
 
 	private Map<Id, Household> households;
 	
 	public HouseholdsImpl(){
 		this.households = new HashMap<Id, Household>();
-		this.builder = new HouseholdBuilderImpl();
+		this.factory = new HouseholdsFactoryImpl();
 	}
 	
-	public HouseholdBuilder getBuilder() {
-		return this.builder;
+	public HouseholdsFactory getFactory() {
+		return this.factory;
 	}
 
 	public Map<Id, Household> getHouseholds() {

@@ -25,6 +25,6 @@ public interface BasicLaneDefinitions extends MatsimToplevelContainer {
 	 */
 	public void addLanesToLinkAssignment(BasicLanesToLinkAssignment assignment);
 
-	public BasicLaneDefinitionsBuilder getBuilder();
+	public BasicLaneDefinitionsFactory getFactory();
 
 }

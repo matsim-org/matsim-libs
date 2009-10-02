@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.core.gbl.Gbl;
@@ -97,8 +98,8 @@ public class ActivityFacilitiesImpl extends LayerImpl implements ActivityFacilit
 		return f;
 	}
 	
-	public Object getBuilder() {
-		throw new UnsupportedOperationException( "The builder for facilities needs to be implemented.  kai, jul09" ) ; 
+	public MatsimFactory getFactory() {
+		throw new UnsupportedOperationException( "The factory for facilities needs to be implemented.  kai, jul09" ) ; 
 	}
 
 	//////////////////////////////////////////////////////////////////////

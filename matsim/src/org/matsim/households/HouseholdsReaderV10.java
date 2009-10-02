@@ -45,7 +45,7 @@ public class HouseholdsReaderV10 extends MatsimXmlParser {
 
 	private Income currentincome = null;
 
-	private HouseholdBuilder builder = null;
+	private HouseholdsFactory builder = null;
 
 	private Id currentHhId = null;
 
@@ -61,7 +61,7 @@ public class HouseholdsReaderV10 extends MatsimXmlParser {
 			throw new IllegalArgumentException("Container for households must not be null!");
 		}
 		this.households = households;
-		this.builder = households.getBuilder();
+		this.builder = households.getFactory();
 	}
 	
 	public void readFile(String filename) {

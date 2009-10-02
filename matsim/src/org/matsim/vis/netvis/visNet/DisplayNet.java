@@ -26,7 +26,7 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.api.basic.v01.network.BasicNetworkBuilder;
+import org.matsim.api.basic.v01.network.BasicNetworkFactory;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -134,7 +134,7 @@ public class DisplayNet implements BasicNetwork, DisplayableNetI {
 		return maxNorthing;
 	}
 
-	public BasicNetworkBuilder getBuilder() {
+	public BasicNetworkFactory getFactory() {
 		throw new UnsupportedOperationException("Not available in this class");
 	}
 

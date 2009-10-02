@@ -27,11 +27,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkBuilder;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -67,7 +67,7 @@ public class NetworkImpl implements Network {
 
 	private double effectiveLaneWidth = Double.NaN;
 
-	protected NetworkFactory factory;
+	protected NetworkFactoryImpl factory;
 
 	private Collection<NetworkChangeEvent> networkChangeEvents = null;
 
@@ -458,10 +458,10 @@ public class NetworkImpl implements Network {
 		return this.networkChangeEvents;
 	}
 
-	public NetworkFactory getFactory() {
+	public NetworkFactoryImpl getFactory() {
 		return this.factory;
 	}
-
+	
 	// ////////////////////////////////////////////////////////////////////
 	// print methods
 	// ////////////////////////////////////////////////////////////////////
@@ -531,12 +531,8 @@ public class NetworkImpl implements Network {
 		return (LinkImpl) this.layerDelegate.getLocations().get(linkId);
 	}
 
-	public void setFactory(final NetworkFactory networkFactory) {
+	public void setFactory(final NetworkFactoryImpl networkFactory) {
 		this.factory = networkFactory;
-	}
-
-	public NetworkBuilder getBuilder() {
-		return this.factory;
 	}
 
 

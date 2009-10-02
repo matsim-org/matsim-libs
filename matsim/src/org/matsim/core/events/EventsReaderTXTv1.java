@@ -25,7 +25,7 @@ import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicEvent;
-import org.matsim.core.api.experimental.events.EventsBuilder;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
@@ -34,12 +34,12 @@ public class EventsReaderTXTv1 {
 
 	private BufferedReader infile = null;
 	protected EventsImpl events;
-	private EventsBuilder builder;
+	private EventsFactory builder;
 
 	public EventsReaderTXTv1(final EventsImpl events) {
 		super();
 		this.events = events;
-		this.builder = events.getBuilder();
+		this.builder = events.getFactory();
 	}
 
 	public void readFile(final String filename) {

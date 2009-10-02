@@ -34,6 +34,6 @@ public interface Knowledges extends MatsimToplevelContainer {
 
 	public Map<Id, Knowledge> getKnowledgesByPersonId();
 
-	public KnowledgesBuilder getBuilder();
+	public KnowledgesFactory getFactory();
 
 }

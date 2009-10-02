@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicEventBuilder
+ * KnowledgesBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,42 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.api.experimental.events;
+package org.matsim.knowledges;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.MatsimFactory;
 
 
 /**
- * Builder for basic events.
+ * This is just a refactoring of the current code within matsim.
+ * It is NOT THE RECOMMENDED WAY TO WRITE CODE.
+ * See api for better examples.
  * @author dgrether
  *
- */
-public interface EventsBuilder {
+ */public interface KnowledgesFactory extends MatsimFactory {
 
-	LinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId);
-
-	LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId);
-
-	AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId);
-
-	AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId);
-
-	AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId);
-
-	AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId);
-
-	ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, String acttype);
-
-	ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, String acttype);
-
-	AgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney);
-
-	// the following are not (yet) in the api?
-	
-//	BasicPersonEntersVehicleEvent createPersonEntersVehicleEvent(double time, Id personId, Id vehicleId);
-//	BasicPersonLeavesVehicleEvent createPersonLeavesVehicleEvent(double time, Id personId, Id vehicleId);
-//
-//	BasicVehicleArrivesAtFacilityEvent createVehicleArrivesAtFacilityEvent(double time, Id vehicleId, Id facilityId);
-//	BasicVehicleDepartsAtFacilityEvent createVehicleDepartsAtFacilityEvent(double time, Id vehicleId, Id facilityId);
-	
+	public Knowledge createKnowledge(final Id personId, final String desc);
 }

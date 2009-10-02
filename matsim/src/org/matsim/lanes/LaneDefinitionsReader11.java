@@ -37,7 +37,7 @@ import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
 import org.matsim.lanes.basic.BasicLane;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsBuilder;
+import org.matsim.lanes.basic.BasicLaneDefinitionsFactory;
 import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
 
 import org.xml.sax.SAXException;
@@ -56,14 +56,14 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
 	
 	private BasicLaneDefinitions laneDefinitions;
 	
-	private BasicLaneDefinitionsBuilder builder;
+	private BasicLaneDefinitionsFactory builder;
 	/**
 	 * @param schemaLocation
 	 */
 	public LaneDefinitionsReader11(BasicLaneDefinitions laneDefs, String schemaLocation) {
 		super(schemaLocation);
 		this.laneDefinitions = laneDefs;
-		builder = this.laneDefinitions.getBuilder();
+		builder = this.laneDefinitions.getFactory();
 	}
 
 	/**

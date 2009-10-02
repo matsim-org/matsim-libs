@@ -45,7 +45,7 @@ import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicSignalGroupSettings;
 import org.matsim.signalsystems.config.BasicSignalSystemConfiguration;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsBuilder;
+import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsFactory;
 import org.matsim.signalsystems.config.BasicSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicSignalSystemPlan;
 import org.xml.sax.SAXException;
@@ -59,14 +59,14 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 
   private XMLSignalSystemConfig xmlLssConfig;
 	
-  private BasicSignalSystemConfigurationsBuilder builder;
+  private BasicSignalSystemConfigurationsFactory builder;
 
 	private BasicSignalSystemConfigurations lssConfigurations;
   
 	public SignalSystemConfigurationsReader11(BasicSignalSystemConfigurations lssConfigs, String schemaLocation) {
 		super(schemaLocation);
 		this.lssConfigurations = lssConfigs;
-		this.builder = this.lssConfigurations.getBuilder();
+		this.builder = this.lssConfigurations.getFactory();
 	}
 	
 	@Override

@@ -23,11 +23,13 @@ package org.matsim.api.basic.v01.population;
 import java.io.Serializable;
 import java.util.List;
 
+import org.matsim.core.api.internal.MatsimPopulationObject;
+
 
 /**
 * @author dgrether
 */
-public interface BasicPlan<P extends BasicPlanElement> extends Serializable{
+public interface BasicPlan<P extends BasicPlanElement> extends Serializable, MatsimPopulationObject {
 	// yyyyyy should be parameterized in terms of "Person".
 	// yyyy In contrast, (Basic)PlanElement is NOT needed.
 

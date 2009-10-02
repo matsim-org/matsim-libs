@@ -42,10 +42,10 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 	// ////////////////////////////////////////////////////////////////////
 
 	public NetworkLayer() {
-		this.factory = new NetworkFactory(this);
+		this.factory = new NetworkFactoryImpl(this);
 	}
 
-	public NetworkLayer(final NetworkFactory factory) {
+	public NetworkLayer(final NetworkFactoryImpl factory) {
 		this.factory = factory;
 		this.factory.setNetwork(this);
 	}

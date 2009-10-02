@@ -27,7 +27,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
-import org.matsim.core.api.experimental.events.EventsBuilder;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.events.BasicPersonEntersVehicleEvent;
@@ -42,7 +42,7 @@ import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEventImpl;
  * @author dgrether
  *
  */
-public class EventsBuilderImpl implements EventsBuilder {
+public class EventsFactoryImpl implements EventsFactory {
 
 	public ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, String acttype) {
 		return new ActivityEndEventImpl(time, agentId, linkId, acttype);

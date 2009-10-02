@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLaneDefinitionBuilder
+ * KnowledgesBuilderImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.basic;
+package org.matsim.knowledges;
 
 import org.matsim.api.basic.v01.Id;
 
 
 /**
- * Builder for the content of BasicLaneDefinitions
+ * This is just a refactoring of the current code within matsim.
+ * It is NOT THE RECOMMENDED WAY TO WRITE CODE.
+ * See api for better examples.
  * @author dgrether
+ *
  */
-public interface BasicLaneDefinitionsBuilder {
+public class KnowledgesFactoryImpl implements KnowledgesFactory {
+
+	private KnowledgesImpl knowledge;
+
+	public KnowledgesFactoryImpl(KnowledgesImpl k){
+		this.knowledge = k;
+	}
 
 	/**
-	 * 
-	 * @param linkIdReference id of the links the lanes of the created object belong to
-	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
+	 * This method is not always creating an object. If already one exists
+	 * for the given personId the existing object will be returned.
 	 */
-	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference);
-	/**
-	 * Creates an instance of BasicLane with the id given as parameter.
-	 * @param laneId
-	 * @return
-	 */
-	public BasicLane createLane(Id laneId);
+	public Knowledge createKnowledge(Id personId, String desc) {
+		if (!this.knowledge.getKnowledgesByPersonId().containsKey(personId)){
+			Knowledge k = new Knowledge();
+			k.setDescription(desc);
+			this.knowledge.getKnowledgesByPersonId().put(personId, k);
+			return k;
+		}
+		return this.knowledge.getKnowledgesByPersonId().get(personId);
+	}
+
 }

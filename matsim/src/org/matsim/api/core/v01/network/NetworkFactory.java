@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KnowledgesBuilder
+ * NetworkBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,18 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.knowledges;
+package org.matsim.api.core.v01.network;
 
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.network.BasicNetworkFactory;
 
 
 /**
- * This is just a refactoring of the current code within matsim.
- * It is NOT THE RECOMMENDED WAY TO WRITE CODE.
- * See api for better examples.
  * @author dgrether
  *
- */public interface KnowledgesBuilder {
+ */
+public interface NetworkFactory extends BasicNetworkFactory {
 
-	public Knowledge createKnowledge(final Id personId, final String desc);
+	public Node createNode(final Id id);
+	
+	public Node createNode(final Id id, final Coord coord ) ;
+	
+	public Link createLink(final Id id, final Id fromNodeId, final Id toNodeId);
+	
+	
 }

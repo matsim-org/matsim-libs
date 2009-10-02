@@ -34,7 +34,7 @@ public interface BasicNetwork<N extends BasicNode, L extends BasicLink> extends 
 		 * Returns the builder for network elements
 		 * @return
 		 */
-		public BasicNetworkBuilder getBuilder();
+		public BasicNetworkFactory getFactory();
 	
     /**
      * Returns a set of this network's nodes. This set might be empty, but it

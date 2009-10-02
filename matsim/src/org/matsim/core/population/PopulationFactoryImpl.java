@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationBuilder;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
@@ -41,7 +41,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 /**
  * @author dgrether
  */
-public class PopulationBuilderImpl implements PopulationBuilder {
+public class PopulationFactoryImpl implements PopulationFactory {
 
 //	private static final Logger log = Logger.getLogger(PopulationBuilderImpl.class);
 
@@ -49,12 +49,12 @@ public class PopulationBuilderImpl implements PopulationBuilder {
 	private final ActivityFacilitiesImpl facilities;
 
 	@Deprecated
-	public PopulationBuilderImpl(final NetworkLayer network, final PopulationImpl population, final ActivityFacilitiesImpl facilities) {
+	public PopulationFactoryImpl(final NetworkLayer network, final PopulationImpl population, final ActivityFacilitiesImpl facilities) {
 		this.network = network;
 		this.facilities = facilities;
 	}
 
-	public PopulationBuilderImpl(final Scenario scenario) {
+	public PopulationFactoryImpl(final Scenario scenario) {
 //		this.scenario = scenario;
 		this.network = scenario.getNetwork();
 //		this.population = scenario.getPopulation();

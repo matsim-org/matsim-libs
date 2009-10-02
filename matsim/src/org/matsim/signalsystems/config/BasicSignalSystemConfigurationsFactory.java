@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KnowledgesBuilderImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,38 +16,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.knowledges;
+
+package org.matsim.signalsystems.config;
 
 import org.matsim.api.basic.v01.Id;
-
+import org.matsim.core.api.internal.MatsimFactory;
 
 /**
- * This is just a refactoring of the current code within matsim.
- * It is NOT THE RECOMMENDED WAY TO WRITE CODE.
- * See api for better examples.
  * @author dgrether
- *
  */
-public class KnowledgesBuilderImpl implements KnowledgesBuilder {
+public class BasicSignalSystemConfigurationsFactory implements MatsimFactory {
 
-	private KnowledgesImpl knowledge;
-
-	public KnowledgesBuilderImpl(KnowledgesImpl k){
-		this.knowledge = k;
+	public BasicSignalSystemConfigurationsFactory(){}
+	
+	public BasicSignalSystemConfiguration createSignalSystemConfiguration(
+			Id refId) {
+		return new BasicSignalSystemConfigurationImpl(refId);
 	}
 
-	/**
-	 * This method is not always creating an object. If already one exists
-	 * for the given personId the existing object will be returned.
-	 */
-	public Knowledge createKnowledge(Id personId, String desc) {
-		if (!this.knowledge.getKnowledgesByPersonId().containsKey(personId)){
-			Knowledge k = new Knowledge();
-			k.setDescription(desc);
-			this.knowledge.getKnowledgesByPersonId().put(personId, k);
-			return k;
-		}
-		return this.knowledge.getKnowledgesByPersonId().get(personId);
+	public BasicPlanBasedSignalSystemControlInfo createPlanBasedSignalSystemControlInfo() {
+		return new BasicPlanBasedSignalSystemControlInfoImpl();
+	}
+
+	public BasicSignalSystemPlan createSignalSystemPlan(Id id) {
+		return new BasicSignalSystemPlanImpl(id);
+	}
+
+	public BasicSignalGroupSettings createSignalGroupSettings(
+			Id refid) {
+		return new BasicSignalGroupSettingsImpl(refid);
+	}
+
+	public BasicAdaptiveSignalSystemControlInfo createAdaptiveSignalSystemControlInfo() {
+		return new BasicAdaptiveSignalSystemControlInfoImpl();
+	}
+
+	public BasicAdaptivePlanbasedSignalSystemControlInfoImpl createAdaptivePlanbasedSignalSystemControlInfo() {
+		return new BasicAdaptivePlanbasedSignalSystemControlInfoImpl();
 	}
 
 }

@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
  */
 public class BasicVehicleReaderV1 extends MatsimXmlParser {
 
-	private VehicleBuilder builder;
+	private VehiclesFactory builder;
 	private BasicVehicleType currentVehType;
 	private BasicVehicleCapacity currentCapacity;
 	private BasicFreightCapacity currentFreightCap;
@@ -47,7 +47,7 @@ public class BasicVehicleReaderV1 extends MatsimXmlParser {
 	
 	public BasicVehicleReaderV1(BasicVehicles vehicles) {
 		this.vehicles = vehicles;
-		this.builder = this.vehicles.getBuilder();
+		this.builder = this.vehicles.getFactory();
 	}
 	
 	public void readFile(String filename) {

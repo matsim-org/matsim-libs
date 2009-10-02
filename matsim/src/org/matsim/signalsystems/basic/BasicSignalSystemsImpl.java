@@ -33,7 +33,7 @@ import org.matsim.api.basic.v01.Id;
  */
 public class BasicSignalSystemsImpl implements BasicSignalSystems {
 
-	private BasicSignalSystemsBuilder builder = new BasicSignalSystemsBuilder();
+	private BasicSignalSystemsFactory builder = new BasicSignalSystemsFactory();
 	
 	private Map<Id, BasicSignalSystemDefinition> signalSystemDefinitions = new LinkedHashMap<Id, BasicSignalSystemDefinition>();
 	private Map<Id, BasicSignalGroupDefinition> signalGroupDefinitions = new LinkedHashMap<Id, BasicSignalGroupDefinition>();;
@@ -75,7 +75,7 @@ public class BasicSignalSystemsImpl implements BasicSignalSystems {
 	}
 
 
-	public BasicSignalSystemsBuilder getBuilder() {
+	public BasicSignalSystemsFactory getFactory() {
 		return this.builder;
 	}
 

@@ -17,27 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.households;
-
-import java.util.ArrayList;
+package org.matsim.vehicles;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.households.Income.IncomePeriod;
+import org.matsim.vehicles.BasicEngineInformation.FuelType;
 
 /**
  * @author dgrether
  */
-public class HouseholdBuilderImpl implements HouseholdBuilder {
+public class BasicVehiclesFactoryImpl implements VehiclesFactory {
 
-	public HouseholdImpl createHousehold(Id householdId) {
-		HouseholdImpl hh = new HouseholdImpl(householdId);
-		hh.setMemberIds(new ArrayList<Id>());
-		hh.setVehicleIds(new ArrayList<Id>());
-		return hh;
+
+	public BasicVehiclesFactoryImpl() {
+	}
+
+	public BasicVehicle createVehicle(Id id, BasicVehicleType type) {
+		BasicVehicle veh = new BasicVehicleImpl(id, type);
+		return veh;
 	}
 	
-	public Income createIncome(double income, IncomePeriod period) {
-		return new IncomeImpl(income, period);
+	public BasicVehicleType createVehicleType(Id typeId) {
+			BasicVehicleType veh = new BasicVehicleTypeImpl(typeId);
+			return veh;
 	}
 
+
+	public BasicVehicleCapacity createVehicleCapacity() {
+		return new BasicVehicleCapacityImpl();
+	}
+
+
+	public BasicFreightCapacity createFreigthCapacity() {
+		return new BasicFreightCapacityImpl();
+	}
+
+
+	public BasicEngineInformation createEngineInformation(FuelType fuelType,
+			double gasConsumption) {
+			return new BasicEngineInformationImpl(fuelType, gasConsumption);
+	}
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitScheduleBuilderImpl.java
+ * TransitScheduleBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,48 +18,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.transitSchedule;
+package org.matsim.transitSchedule.api;
 
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.transitSchedule.api.Departure;
-import org.matsim.transitSchedule.api.TransitLine;
-import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.transitSchedule.api.TransitRouteStop;
-import org.matsim.transitSchedule.api.TransitSchedule;
-import org.matsim.transitSchedule.api.TransitScheduleBuilder;
-import org.matsim.transitSchedule.api.TransitStopFacility;
 
+/**
+ * @author mrieser
+ */
+public interface TransitScheduleFactory extends MatsimFactory {
 
+	public abstract TransitSchedule createTransitSchedule();
 
-public class TransitScheduleBuilderImpl implements TransitScheduleBuilder {
+	public abstract TransitLine createTransitLine(final Id lineId);
 
-	public TransitLine createTransitLine(final Id lineId) {
-		return new TransitLineImpl(lineId);
-	}
+	public abstract TransitRoute createTransitRoute(final Id routeId, final NetworkRouteWRefs route, final List<TransitRouteStop> stops, final TransportMode mode);
 
-	public TransitRoute createTransitRoute(final Id routeId, final NetworkRouteWRefs route, final List<TransitRouteStop> stops, final TransportMode mode) {
-		return new TransitRouteImpl(routeId, route, stops, mode);
-	}
+	public abstract TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay);
 
-	public TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
-		return new TransitRouteStopImpl(stop, arrivalDelay, departureDelay);
-	}
+	public abstract TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate, final boolean blocksLane);
 
-	public TransitSchedule createTransitSchedule() {
-		return new TransitScheduleImpl(this);
-	}
-
-	public TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate, final boolean blocksLane) {
-		return new TransitStopFacilityImpl(facilityId, coordinate, blocksLane);
-	}
-
-	public Departure createDeparture(final Id departureId, final double time) {
-		return new DepartureImpl(departureId, time);
-	}
+	public abstract Departure createDeparture(final Id departureId, final double time);
 
 }

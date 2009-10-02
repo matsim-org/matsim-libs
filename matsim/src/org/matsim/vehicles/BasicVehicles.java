@@ -35,6 +35,6 @@ public interface BasicVehicles extends MatsimToplevelContainer {
 	
 	public Map<Id, BasicVehicle> getVehicles();
 	
-	public VehicleBuilder getBuilder();
+	public VehiclesFactory getFactory();
 	
 }

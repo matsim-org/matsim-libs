@@ -22,6 +22,8 @@ package org.matsim.api.basic.v01.population;
 
 import java.io.Serializable;
 
-public interface BasicPlanElement extends Serializable{
+import org.matsim.core.api.internal.MatsimPopulationObject;
+
+public interface BasicPlanElement extends Serializable, MatsimPopulationObject{
 
 }

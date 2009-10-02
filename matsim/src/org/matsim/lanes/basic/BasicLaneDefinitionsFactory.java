@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitScheduleBuilder.java
+ * BasicLaneDefinitionBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.lanes.basic;
 
-package org.matsim.transitSchedule.api;
-
-import java.util.List;
-
-import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.api.internal.MatsimFactory;
+
 
 /**
- * @author mrieser
+ * Builder for the content of BasicLaneDefinitions
+ * @author dgrether
  */
-public interface TransitScheduleBuilder {
+public interface BasicLaneDefinitionsFactory extends MatsimFactory {
 
-	public abstract TransitSchedule createTransitSchedule();
-
-	public abstract TransitLine createTransitLine(final Id lineId);
-
-	public abstract TransitRoute createTransitRoute(final Id routeId, final NetworkRouteWRefs route, final List<TransitRouteStop> stops, final TransportMode mode);
-
-	public abstract TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay);
-
-	public abstract TransitStopFacility createTransitStopFacility(final Id facilityId, final Coord coordinate, final boolean blocksLane);
-
-	public abstract Departure createDeparture(final Id departureId, final double time);
-
+	/**
+	 * 
+	 * @param linkIdReference id of the links the lanes of the created object belong to
+	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
+	 */
+	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference);
+	/**
+	 * Creates an instance of BasicLane with the id given as parameter.
+	 * @param laneId
+	 * @return
+	 */
+	public BasicLane createLane(Id laneId);
 }

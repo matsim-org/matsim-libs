@@ -27,7 +27,7 @@ import org.matsim.api.basic.v01.population.BasicPopulation;
  */
 public interface Population extends BasicPopulation<Person> {
 	
-	public PopulationBuilder getBuilder();
+	public PopulationFactory getFactory();
 	
 	
 

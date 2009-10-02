@@ -21,11 +21,13 @@
 package org.matsim.core.api.internal;
 
 /**
+ * essentially a marker interface 
+ * 
  * @author nagel
  *
  */
 public interface MatsimToplevelContainer {
 	
-	Object getBuilder() ;
+	MatsimFactory getFactory() ;
 
 }

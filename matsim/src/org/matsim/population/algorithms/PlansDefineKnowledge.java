@@ -63,7 +63,7 @@ public class PlansDefineKnowledge {
 		Iterator<PersonImpl> p_it = plans.getPersons().values().iterator();
 		while (p_it.hasNext()) {
 			PersonImpl p = p_it.next();
-			Knowledge k = this.knowledges.getBuilder().createKnowledge(p.getId(), "created by " + this.getClass().getName());
+			Knowledge k = this.knowledges.getFactory().createKnowledge(p.getId(), "created by " + this.getClass().getName());
 			int index = MatsimRandom.getRandom().nextInt(home_acts.size());
 			k.addActivity(home_acts.get(index),true);
 			index = MatsimRandom.getRandom().nextInt(work_acts.size());

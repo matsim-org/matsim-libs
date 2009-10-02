@@ -20,6 +20,7 @@
 package org.matsim.signalsystems.basic;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.MatsimFactory;
 
 /**
  * Builder for Objects to be used within BasicSignalSystems container
@@ -28,13 +29,13 @@ import org.matsim.api.basic.v01.Id;
  * complex build behavior. 
  * @author dgrether
  */
-public class BasicSignalSystemsBuilder {
+public class BasicSignalSystemsFactory implements MatsimFactory {
 	/**
 	 * The constructor is only visible in the package because instances should 
 	 * be retrieved from the container, i.e. an instance of BasicSignalSystems
-	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#getBuilder()
+	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#getFactory()
 	 */
-	BasicSignalSystemsBuilder(){}
+	BasicSignalSystemsFactory(){}
 	
 	public BasicSignalSystemDefinition createSignalSystemDefinition(
 			Id signalSystemId) {

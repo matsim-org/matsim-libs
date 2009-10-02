@@ -35,11 +35,11 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 	static public final String EVENTS = "events";
 
 	private final EventsImpl events;
-	private EventsBuilderImpl builder;
+	private EventsFactoryImpl builder;
 
 	public EventsReaderXMLv1(final EventsImpl events) {
 		this.events = events;
-		this.builder = (EventsBuilderImpl) events.getBuilder();
+		this.builder = (EventsFactoryImpl) events.getFactory();
 		this.setValidating(false);// events-files have no DTD, thus they cannot validate
 	}
 

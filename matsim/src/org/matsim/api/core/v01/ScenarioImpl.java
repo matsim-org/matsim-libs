@@ -41,7 +41,7 @@ import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.basic.BasicSignalSystemsImpl;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurationsImpl;
-import org.matsim.transitSchedule.TransitScheduleBuilderImpl;
+import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vehicles.BasicVehiclesImpl;
@@ -146,7 +146,7 @@ public class ScenarioImpl implements Scenario {
 	}
 	
 	protected void createTransit() {
-		this.transitSchedule = new TransitScheduleBuilderImpl().createTransitSchedule();
+		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 	}
 	
 	@Deprecated

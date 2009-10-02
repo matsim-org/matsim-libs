@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicNetworkBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +16,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.api.basic.v01.network;
+
+package org.matsim.households;
+
+import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Id;
-
+import org.matsim.households.Income.IncomePeriod;
 
 /**
- * Builder for network elements
  * @author dgrether
- * @deprecated use version in org.matsim.api.core
  */
-@Deprecated // use version in org.matsim.api.core
-public interface BasicNetworkBuilder {
-	/**
-	 * creates a node
-	 * @param id
-	 * @return
-	 * @deprecated use version in org.matsim.core
-	 */
-	@Deprecated // use version in org.matsim.api.core
-	public BasicNode createNode(final Id id);
+public class HouseholdsFactoryImpl implements HouseholdsFactory {
 
-	/** @deprecated use version in org.matsim.api.core */
-	@Deprecated // use version in org.matsim.api.core
-	public BasicLink createLink(final Id id, final Id fromNodeId, final Id toNodeId);
+	public HouseholdImpl createHousehold(Id householdId) {
+		HouseholdImpl hh = new HouseholdImpl(householdId);
+		hh.setMemberIds(new ArrayList<Id>());
+		hh.setVehicleIds(new ArrayList<Id>());
+		return hh;
+	}
 	
+	public Income createIncome(double income, IncomePeriod period) {
+		return new IncomeImpl(income, period);
+	}
+
 }

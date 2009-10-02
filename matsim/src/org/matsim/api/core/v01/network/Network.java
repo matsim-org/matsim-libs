@@ -24,7 +24,7 @@ import org.matsim.api.basic.v01.network.BasicNetwork;
 
 public interface Network extends BasicNetwork<Node, Link> {
 
-	public NetworkBuilder getBuilder();
+	public NetworkFactory getFactory();
 	
 	public void addNode( Node nn ) ;
 	// "void" can still be changed into "boolean" or "Node", see "Collection" or "Map" interface.

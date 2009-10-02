@@ -1,9 +1,10 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.vehicles.BasicEngineInformation.FuelType;
 
-public interface VehicleBuilder {
+public interface VehiclesFactory extends MatsimFactory {
 
 	public BasicVehicleType createVehicleType(Id type);
 

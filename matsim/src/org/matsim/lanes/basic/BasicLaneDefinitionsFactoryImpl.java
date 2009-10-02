@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicHouseholdBuilder
+ * BasicLaneDefinitionsBuilderImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.households;
+package org.matsim.lanes.basic;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.households.Income.IncomePeriod;
 
 
 /**
+ * 
  * @author dgrether
- *
+ * @see org.matsim.lanes.basic.BasicLaneDefinitionsFactory
  */
-public interface HouseholdBuilder {
-
-	public Household createHousehold(Id householdId);
-	
-	public Income createIncome(double income, IncomePeriod period);
-
+public class BasicLaneDefinitionsFactoryImpl implements BasicLaneDefinitionsFactory {
+	/**
+	 * @see org.matsim.lanes.basic.BasicLaneDefinitionsFactory#createLanesToLinkAssignment(org.matsim.api.basic.v01.Id)
+	 */
+	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference) {
+		return new BasicLanesToLinkAssignmentImpl(linkIdReference);
+	}
+	/**
+	 * @see org.matsim.lanes.basic.BasicLaneDefinitionsFactory#createLane(org.matsim.api.basic.v01.Id)
+	 */
+	public BasicLane createLane(Id id) {
+		return new BasicLaneImpl(id);
+	}
 }

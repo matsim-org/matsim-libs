@@ -32,7 +32,7 @@ import org.matsim.api.basic.v01.Id;
 public class BasicSignalSystemConfigurationsImpl implements
 		BasicSignalSystemConfigurations {
 
-	private BasicSignalSystemConfigurationsBuilder builder = new BasicSignalSystemConfigurationsBuilder();
+	private BasicSignalSystemConfigurationsFactory factory = new BasicSignalSystemConfigurationsFactory();
 	
 	private Map<Id, BasicSignalSystemConfiguration> signalSystemConfigs = new HashMap<Id, BasicSignalSystemConfiguration>();
 
@@ -46,8 +46,8 @@ public class BasicSignalSystemConfigurationsImpl implements
 		return this.signalSystemConfigs;
 	}
 
-	public BasicSignalSystemConfigurationsBuilder getBuilder() {
-		return this.builder;
+	public BasicSignalSystemConfigurationsFactory getFactory() {
+		return this.factory;
 	}
 
 	public void addSignalSystemConfiguration(BasicSignalSystemConfiguration systemConfig) {

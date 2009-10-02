@@ -23,12 +23,12 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPopulationBuilder;
+import org.matsim.api.basic.v01.population.BasicPopulationFactory;
 
 /**
  * @author dgrether
  */
-public interface PopulationBuilder extends BasicPopulationBuilder {
+public interface PopulationFactory extends BasicPopulationFactory {
 
 	Person createPerson(Id id);
 	/**

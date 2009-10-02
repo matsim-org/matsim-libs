@@ -39,12 +39,12 @@ import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystemDefinitionType;
 import org.matsim.jaxb.lightsignalsystems10.XMLLightSignalSystems;
 import org.matsim.lanes.basic.BasicLane;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.lanes.basic.BasicLaneDefinitionsBuilder;
+import org.matsim.lanes.basic.BasicLaneDefinitionsFactory;
 import org.matsim.lanes.basic.BasicLanesToLinkAssignment;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
-import org.matsim.signalsystems.basic.BasicSignalSystemsBuilder;
+import org.matsim.signalsystems.basic.BasicSignalSystemsFactory;
 
 import org.xml.sax.SAXException;
 
@@ -60,9 +60,9 @@ public class LightSignalSystemsReader10 extends MatsimJaxbXmlParser {
 	private BasicSignalSystems lightSignalSystems;
 	private BasicLaneDefinitions laneDefinitions;
 
-	private BasicSignalSystemsBuilder builder;
+	private BasicSignalSystemsFactory builder;
 
-	private BasicLaneDefinitionsBuilder laneBuilder;
+	private BasicLaneDefinitionsFactory laneBuilder;
 
 
 	public LightSignalSystemsReader10(BasicLaneDefinitions laneDefs,
@@ -70,8 +70,8 @@ public class LightSignalSystemsReader10 extends MatsimJaxbXmlParser {
 		super(schemaLocation);
 		this.laneDefinitions = laneDefs;
 		this.lightSignalSystems = lightSignalSystems;
-		this.laneBuilder = this.laneDefinitions.getBuilder();
-		this.builder = this.lightSignalSystems.getBuilder();
+		this.laneBuilder = this.laneDefinitions.getFactory();
+		this.builder = this.lightSignalSystems.getFactory();
 	}
 
 	@Override

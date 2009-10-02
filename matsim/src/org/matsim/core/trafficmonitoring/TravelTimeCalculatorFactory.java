@@ -28,9 +28,9 @@ import org.matsim.core.network.NetworkLayer;
  * @author dgrether
  * @author mrieser
  */
-abstract public class TravelTimeCalculatorBuilder {
+abstract public class TravelTimeCalculatorFactory {
 
-	private static final Logger log = Logger.getLogger(TravelTimeCalculatorBuilder.class);
+	private static final Logger log = Logger.getLogger(TravelTimeCalculatorFactory.class);
 
 	public static TravelTimeCalculator createTravelTimeCalculator(final NetworkLayer network, final TravelTimeCalculatorConfigGroup group) {
 		TravelTimeCalculator calculator = new TravelTimeCalculator(network, group);

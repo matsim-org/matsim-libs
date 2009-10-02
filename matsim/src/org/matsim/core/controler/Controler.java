@@ -79,7 +79,7 @@ import org.matsim.core.mobsim.jdeqsim.parallel.PJDEQSimulation;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
-import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationImpl;
@@ -99,7 +99,7 @@ import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorBuilder;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -154,7 +154,7 @@ public class Controler {
 	protected NetworkLayer network = null;
 	protected PopulationImpl population = null;
 	private Counts counts = null;
-	private final NetworkFactory networkFactory = new NetworkFactory(this.network);
+	private final NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(this.network);
 
 	protected TravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCost travelCostCalculator = null;
@@ -434,7 +434,7 @@ public class Controler {
 	 */
 	protected void setUp() {
 		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = TravelTimeCalculatorBuilder.createTravelTimeCalculator(this.network, this.config
+			this.travelTimeCalculator = TravelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config
 					.travelTimeCalculator());
 		}
 		if (this.travelCostCalculator == null) {
@@ -1072,7 +1072,7 @@ public class Controler {
 		return this.counts;
 	}
 
-	protected NetworkFactory getNetworkFactory() {
+	protected NetworkFactoryImpl getNetworkFactory() {
 		return this.networkFactory;
 	}
 

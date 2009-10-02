@@ -33,16 +33,16 @@ public class BasicVehiclesImpl implements BasicVehicles {
 	
 	private Map<Id, BasicVehicleType> vehicleTypes;
 	private LinkedHashMap<Id, BasicVehicle> vehicles;
-	private BasicVehicleBuilderImpl builder;
+	private BasicVehiclesFactoryImpl builder;
 
 	public BasicVehiclesImpl(){
 		this.vehicleTypes = new LinkedHashMap<Id, BasicVehicleType>();
-		this.builder = new BasicVehicleBuilderImpl();
+		this.builder = new BasicVehiclesFactoryImpl();
 		this.vehicles = new LinkedHashMap<Id, BasicVehicle>();
 	}
 	
 	
-	public VehicleBuilder getBuilder() {
+	public VehiclesFactory getFactory() {
 		return this.builder;
 	}
 
