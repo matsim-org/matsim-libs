@@ -34,7 +34,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
@@ -80,7 +79,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	//////////////////////////////////////////////////////////////////////
 	
 	
-	public PlanomatX (Controler controler, PreProcessLandmarks preProcessRoutingData, LocationMutatorwChoiceSet locator, DepartureDelayAverageCalculator tDepDelayCalc, ActivityTypeFinder finder){
+	public PlanomatX (Controler controler, LocationMutatorwChoiceSet locator, DepartureDelayAverageCalculator tDepDelayCalc, ActivityTypeFinder finder){
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
 
@@ -133,7 +132,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 
 		MatsimRandom.getLocalInstance();
 		
-		long runStartTime = System.currentTimeMillis();
+//		long runStartTime = System.currentTimeMillis();
 		long timerRunTime = 0;
 		long lcRunTime = 0;
 		int numberTimerCalls = 0;

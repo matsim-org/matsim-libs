@@ -41,18 +41,15 @@ import playground.mfeil.MDSAM.ActivityTypeFinder;
 public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 	
 	
-	private final NetworkLayer 						network;
-	private final Controler							controler;
-	private final PreProcessLandmarks				preProcessRoutingData;
-	private final LocationMutatorwChoiceSet 		locator;
+	private final NetworkLayer 							network;
+	private final Controler								controler;
+	private final LocationMutatorwChoiceSet 			locator;
 	private /*final*/ DepartureDelayAverageCalculator 	tDepDelayCalc;
-	private final ActivityTypeFinder 				finder;
+	private final ActivityTypeFinder 					finder;
 	
 	
 	public PlanomatXInitialiser (final ControlerMFeil controler, ActivityTypeFinder finder) {
 		
-		this.preProcessRoutingData 	= new PreProcessLandmarks(new FreespeedTravelTimeCost());
-		this.preProcessRoutingData.run(controler.getNetwork());
 		this.network = controler.getNetwork();
 		this.controler = controler;
 		this.init(network);	
@@ -64,13 +61,11 @@ public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 	}
 	
 	public PlanomatXInitialiser (final ControlerMFeil controler, 
-			final PreProcessLandmarks preProcessRoutingData,
 			final LocationMutatorwChoiceSet locator, ActivityTypeFinder finder) {
 		
 		this.network = controler.getNetwork();
 		this.controler = controler;
 		this.init(network);
-		this.preProcessRoutingData = preProcessRoutingData;	
 		this.locator = locator;
 		this.finder = finder;
 	}
@@ -83,7 +78,7 @@ public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		PlanAlgorithm planomatXAlgorithm;
-		planomatXAlgorithm = new PlanomatX (this.controler, this.preProcessRoutingData, this.locator, this.tDepDelayCalc, this.finder);
+		planomatXAlgorithm = new PlanomatX (this.controler, this.locator, this.tDepDelayCalc, this.finder);
 		return planomatXAlgorithm;
 	}
 	
