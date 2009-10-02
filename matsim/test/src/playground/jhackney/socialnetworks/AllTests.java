@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for org.matsim.socialnetworks");
+		TestSuite suite = new TestSuite("Tests for playground.jhackney.socialnetworks");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(SocialNetworksTest1.class);
 		suite.addTestSuite(SocialNetworksTest2.class);
