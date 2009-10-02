@@ -51,6 +51,9 @@ import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 
+import playground.mfeil.filesForTests.Initializer;
+import playground.mfeil.filesForTests.JohScoringTestFunctionFactory;
+
 
 
 public class TimeModeChoicerTest extends MatsimTestCase{
@@ -104,7 +107,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 	
 	public void testRun (){
 		
-		log.info("Running main test comparing processed plan with expected output plan...");
+		log.info("Running TMC testRun...");
 		
 		PlanImpl newPlan = new PlanImpl (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
 		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
@@ -130,7 +133,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		this.testee.run(newPlan);
 		
 		// Import expected output plan into population
-		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"expected_output_person1.xml");
+		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"TMC_expected_output.xml");
 				
 		// Compare the two plans; <1 because of double rounding errors
 		for (int i=0;i<newPlan.getPlanElements().size();i++){
@@ -148,6 +151,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 
 	
 	public void testCopyActslegs (){
+		log.info("Running TMC testCopyActslegs...");
 		
 		PlanImpl newPlan = new PlanImpl (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
 		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
@@ -181,14 +185,16 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		assertEquals(((ActivityImpl)(newPlanActsLegs.get(0))).getEndTime(), 0.0);
 		assertEquals(((LegImpl)(newPlan.getPlanElements().get(1))).getRoute(), route);
 		assertEquals(((LegImpl)(newPlanActsLegs.get(1))).getRoute(), route);
+		log.info("... done.");
 	}
 	
 	
 	public void testIncreaseTime (){
+		log.info("Running TMC testIncreaseTime...");
 		
 		// Import expected output plan into population
 		this.scenario_input.getPopulation().getPersons().clear();
-		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"expected_output_person1.xml");
+		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"TMC_expected_output.xml");
 		
 		// Import expected output plan into population
 		PlanomatXPlan newPlan = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPerson());
@@ -267,14 +273,16 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		// Assert
 		assertEquals(Math.floor(((LegImpl)(alCheck.get(5))).getDepartureTime()+this.testee.OFFSET), Math.floor(((LegImpl)(alIn.get(5))).getDepartureTime()));
 		assertEquals(Math.floor(((LegImpl)(alCheck.get(5))).getArrivalTime()+this.testee.OFFSET), Math.floor(((LegImpl)(alIn.get(5))).getArrivalTime()));
+		log.info("... done.");
 	}
 	
 	
 	public void testDecreaseTime (){
+		log.info("Running TMC testDecreaseTime...");
 		
 		// Import expected output plan into population
 		this.scenario_input.getPopulation().getPersons().clear();
-		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"expected_output_person1.xml");
+		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"TMC_expected_output.xml");
 		
 		// Import expected output plan into population
 		PlanomatXPlan newPlan = new PlanomatXPlan (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPerson());
@@ -362,7 +370,6 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		// Assert
 		assertEquals(Math.floor(((LegImpl)(alCheck.get(3))).getDepartureTime()-((LegImpl)(alCheck.get(1))).getArrivalTime()), Math.floor(((LegImpl)(alIn.get(1))).getDepartureTime()));
 		assertEquals(((LegImpl)(alCheck.get(5))).getDepartureTime(),((LegImpl)(alIn.get(5))).getDepartureTime());
-		
-		
+		log.info("... done.");		
 	}
 }
