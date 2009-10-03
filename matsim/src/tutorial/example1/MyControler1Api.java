@@ -30,7 +30,7 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.scenario.ScenarioLoader;
 
 /**
- * This is an attempt to move this tutorial to teh API.  We are not there yet, however.
+ * This is an attempt to move this tutorial to the API.  We are not there yet, however.
  * 
  * @author nagel
  *
