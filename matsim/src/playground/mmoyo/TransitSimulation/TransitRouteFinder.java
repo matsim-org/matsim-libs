@@ -24,7 +24,7 @@ import playground.mmoyo.PTRouter.PTValues;
 public class TransitRouteFinder {
 	private PTRouter ptRouter;
 	private LogicIntoPlainTranslator logicToPlainTranslator;
-	private PTValues ptValues ;
+	private PTValues ptValues;
 	
 	public TransitRouteFinder(final TransitSchedule transitSchedule, PTValues ptValues){
 		this.ptValues = ptValues;
@@ -36,7 +36,6 @@ public class TransitRouteFinder {
 	/**returns a list of legs that represent a PT connection between two activities locations*/ 
 	public List<LegImpl> calculateRoute (final ActivityImpl fromAct, final ActivityImpl toAct, final PersonImpl person ){
 		List<LegImpl> legList = new ArrayList<LegImpl>();
-		
 		double distToWalk = ptValues.distToWalk(person.getAge());
 		Path path = ptRouter.findPTPath(fromAct.getCoord(), toAct.getCoord(), fromAct.getEndTime(), distToWalk);
 

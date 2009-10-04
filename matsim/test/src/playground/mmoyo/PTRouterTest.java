@@ -61,8 +61,8 @@ public class PTRouterTest extends MatsimTestCase {
 		LinkImpl transferLink = logicNet.getLink("T39");  								 // first departure: 09:00 ,  last departure is at 19:00
 		double waitTime1= ptRouter.ptTravelTime.getLinkTravelTime(transferLink, 67800);  //  67800= 16:50 .  The agent should wait 10 mins 
 		double waitTime2= ptRouter.ptTravelTime.getLinkTravelTime(transferLink, 72000);  //  72000= 20:00 .  The agent should wait 13 hours, until next day
-		assertEquals( 600, waitTime1 ) ;                                               
-		assertEquals( 46800, waitTime2 ) ;
+		assertEquals( 600, waitTime1 +120) ;                                               
+		assertEquals( 46800, waitTime2 +120) ;
 
 		
 		/**tests search path results*/		

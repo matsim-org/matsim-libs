@@ -224,8 +224,5 @@ public class KroutesCalculator {
 		NetworkRouteWRefs subRoute = transitRoute.getRoute().getSubRoute(nodeA, nodeB);
 		return new PTtrip(transitRoute, subRoute,travelTime);
 	}
-	
-	
-	
 }
 

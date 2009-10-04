@@ -19,4 +19,5 @@ public class PTTravelTime implements TravelTime {
 	public double getLinkTravelTime(final Link link, final double time) {
 		return this.ptTimeTable.getLinkTravelTime(link, time);
 	}
+
 }

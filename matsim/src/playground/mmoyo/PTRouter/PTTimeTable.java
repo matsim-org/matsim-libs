@@ -34,7 +34,7 @@ public class PTTimeTable{
 	 * 1 Detached transfer And Access: (distance*walk speed) + (veh departure - walk arrival)
 	 * 2 Transfer link: (second veh departure - first veh arrival)
 	 * 3 Standard link: (toNode arrival- fromNode arrival)
-	 * 4 Egress link : (distance * walk speed)  
+	 * 4 Egress link : (distance * walk speed)
 	 */
 	public double getLinkTravelTime(final Link link, final double time){
 		if (lastLink==link && lastTime==time) return lastTravelTime;
@@ -44,7 +44,7 @@ public class PTTimeTable{
 			waitingTime= getTransferTime(link.getToNode().getId(), time+walkTime);
 			travelTime= walkTime + waitingTime; 
 		}else if (type.equals("Transfer")){
-			travelTime= getTransferTime(link.getToNode().getId(),time)+ 120;   //2 minutes to allow the passenger walk between ptv's 
+			travelTime= getTransferTime(link.getToNode().getId(),time)+ 120; //2 minutes to allow the passenger walk between ptv's 
 		}else if (type.equals("Standard")){
 			travelTime = linkTravelTimeMap.get(link.getId())*60; // stored in minutes, returned in seconds
 			//travelTime= ((StandardLink)link).getTravelTime();

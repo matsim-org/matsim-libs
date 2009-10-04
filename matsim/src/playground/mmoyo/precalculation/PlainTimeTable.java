@@ -36,7 +36,7 @@ public class PlainTimeTable {
 		}
 	}
 
-	/**returns next departure at a stop facility aftr a given time*/
+	/**returns next departure at a stop facility after a given time*/
 	public double getNextDeparture(final TransitRoute transitRoute, final TransitStopFacility transitStopFacility, double time){
 		double[] departureArray = transitRouteDepartureMap.get(transitRoute.getId());
 		TransitRouteStop transitRouteStop =	transitRoute.getStop(transitStopFacility);

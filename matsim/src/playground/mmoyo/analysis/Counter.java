@@ -1,4 +1,4 @@
-package playground.mmoyo.PTRouter;
+package playground.mmoyo.analysis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +18,17 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.api.basic.v01.Id;
 import playground.mmoyo.TransitSimulation.LogicFactory;
 import playground.mmoyo.PTRouter.PTTimeTable;
+import playground.mmoyo.PTRouter.PTValues;
+import playground.mmoyo.PTRouter.PTRouter;;
 
 /**shows the average result values (travelTime, distance, number of transfers) of the whole population with different travelTime and distance coefficients*/
 public class Counter {
 	private PopulationImpl population;
 	private List<PopulationResult> populationResultList = new ArrayList<PopulationResult>();
 	private PTValues ptValues;
+	
+	private List<Path> pathListA = new ArrayList<Path>();
+	private List<Path> pathListB = new ArrayList<Path>();
 	
 	public Counter(final String plansFile, final LogicFactory logicFactory, PTValues ptValues){
 		NetworkLayer logicNet = logicFactory.getLogicNet();
@@ -34,21 +39,54 @@ public class Counter {
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(this.population, logicFactory.getLogicNet());
 		plansReader.readFile(plansFile);
 	
+		//18sep
 		///iterate with all values
-		for (double i=0; i<=100 ; i+=2 ){
+		/*
+		for (double i=0; i<=100 ; i++ ){
 			double x = i/100;  
 			PTRouter ptRouter = new PTRouter(logicNet, logicPTTimeTable, this.ptValues, x , (1-x), 60);
 			routePopulation(x , ptRouter);	
 		}
+		*/
 
+		//18sep	
+		double timeCoefficient = 1;
+		double distanceCoefficient = 0;
+		double transferPenalty = 0;
+		PTRouter ptRouter = new PTRouter(logicNet, logicPTTimeTable, this.ptValues, timeCoefficient, distanceCoefficient, transferPenalty);
+		pathListA =routePopulation(timeCoefficient , ptRouter);
+
+		transferPenalty = 60;
+		PTRouter ptRouter2 = new PTRouter(logicNet, logicPTTimeTable, this.ptValues, timeCoefficient, distanceCoefficient, transferPenalty);
+		pathListB =routePopulation(timeCoefficient , ptRouter2);
+		
+		
+		System.out.println(pathListA.equals(pathListB));
+		
+		int differences=0;
+		int  size= pathListA.size();
+		for (int i=0; i< size-1; i++){
+			if (pathListA.get(i) != pathListB.get(i))differences++; 
+		}
+		
+		System.out.println("size:" + size + " diferences:" + differences);
+		
+		///
+		
+		//18sep	
+		/*
 		System.out.println("Time Coefficient\tDistance Coefficient\tTimeAvg\tDistanceAvg\tTransfers\tDetTransfer\tWalkDistance");
 		for (PopulationResult r : populationResultList){
 			System.out.println(r.getTimeCoef() + "\t+" + r.getDistanceCoef() + "\t+" + r.getTimeAvg() + "\t+" + r.getDistanceAvg() + "\t+" + r.getTransferNum() + "\t+" + r.getDetTransferNum() + "\t+" + r.getWalkDistanceAvg());
 			//r.getTransferPenalty()
 		} 
+		*/
 	}
 	
-	public void routePopulation(double x, final PTRouter ptRouter){
+	//18 sep used to be void
+	public List<Path> routePopulation(double timeCoefficient, final PTRouter ptRouter){
+		List<Path> pathList = new ArrayList<Path>();
+		
 		int numPlans=0;
 		
 		PopulationResult populationResult= new PopulationResult(ptRouter.getTimeCoeficient(), ptRouter.getDistanceCoeficient(), ptRouter.getTransferPenalty());
@@ -56,12 +94,12 @@ public class Counter {
 		for (PersonImpl person: population.getPersons().values()) {
 			//if ( true ) {
 			//PersonImpl person = population.getPersons().get(new IdImpl("905449")); // 5228308   5636428  2949483 
- 			System.out.println(x + " " + (numPlans++) + " id:" + person.getId());
+ 			System.out.println(timeCoefficient + " " + (numPlans++) + " id:" + person.getId());
 			PlanImpl plan = person.getPlans().get(0);
 
 			boolean first =true;
 			ActivityImpl lastAct = null;
-			ActivityImpl thisAct= null;		 
+			ActivityImpl thisAct= null;
 			
 			//double startTime=0;
 			//double duration=0;
@@ -83,11 +121,16 @@ public class Counter {
 			    		}else{
 				    		//startTime = System.currentTimeMillis();
 				    		Path path = ptRouter.findPTPath(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
+				    		
 				    		//duration= System.currentTimeMillis()-startTime;
 				    		if(path!=null){
 					    		if (path.nodes.size()>1){
 					    			//found++;
 					    			populationResult.addPath(person.getId(), path);
+					    			
+					    			//18 sep
+					    			pathList.add(path);
+					    			
 					    			//System.out.println("travelTime:" + path.travelTime);		    			
 					    			//durations.add(duration);
 				    			}else{
@@ -106,8 +149,13 @@ public class Counter {
 		}//for person
 
 		System.out.println("average Time:" + populationResult.getTimeAvg() + "   average distance:" + populationResult.getDistanceAvg() + "    transfers:" + populationResult.getTransferNum() + "  WalkDistance:" + populationResult.getWalkDistanceAvg());
-	
+
+		//
 		populationResultList.add(populationResult);
+
+		//18sep
+		return pathList;
+	
 	}
 
 }
@@ -220,23 +268,23 @@ class PopulationResult {
 	}
 	
 	public double getDistanceAvg() {
-		return this.travelDistance / connectionNumber;
+		return this.travelDistance; // / connectionNumber;  //18sep
 	}
 	
 	public double getTimeAvg() {
-		return this.travelTime  / connectionNumber;
+		return this.travelTime; // / connectionNumber;    //18sep
 	}
 	
 	public double getTransferNum() {
-		return this.transfers / connectionNumber;
+		return this.transfers; // / connectionNumber;     //18sep
 	}
 	
 	public double getDetTransferNum() {
-		return this.detTransfers / connectionNumber;
+		return this.detTransfers; // / connectionNumber;   //18sep
 	}
 	
 	public double getWalkDistanceAvg() {
-		return this.walkDistance / connectionNumber;
+		return this.walkDistance; // / connectionNumber;   //18sep
 	}
 	
 }	

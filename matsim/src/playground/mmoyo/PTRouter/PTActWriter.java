@@ -51,8 +51,6 @@ public class PTActWriter {
 	private PTRouter ptRouter;
 	private LogicIntoPlainTranslator logicToPlainConverter;
 	
-//public Population detouredPopulation = new PopulationImpl();  //temporal to find plans with detoured trips
-	
 	public PTActWriter(final LogicFactory logicFactory, final PTValues ptValues, final String configFile, final String plansFile, final String outputFile){
 		this.outputFile= outputFile;
 		this.ptValues= ptValues;
@@ -139,9 +137,9 @@ public class PTActWriter {
 			
 			PlanImpl newPlan = new PlanImpl(person);
 			
-			for (PlanElement pe : plan.getPlanElements()) {   		//temporarily commented in order to find only the first leg
-			//for	(int elemIndex=0; elemIndex<3; elemIndex++){            //jun09  finds only
-				//PlanElement pe= plan.getPlanElements().get(elemIndex);  //jun09  the first trip
+			//for (PlanElement pe : plan.getPlanElements()) {   		//temporarily commented in order to find only the first leg
+			for	(int elemIndex=0; elemIndex<3; elemIndex++){            //jun09  finds only
+				PlanElement pe= plan.getPlanElements().get(elemIndex);  //jun09  the first trip
 				if (pe instanceof ActivityImpl) {  				
 					thisAct= (ActivityImpl) pe;					
 					if (!first) {								
@@ -210,7 +208,7 @@ public class PTActWriter {
 			total=total+d;
 			average100= average100 + d;
 			if(x==100){
-				//System.out.println(average100/100);
+				System.out.println(average100/100);
 				average100=0;
 				x=0;
 			}

@@ -52,10 +52,10 @@ public class RouterTest extends MatsimTestCase {
 		
 		// setup very simple scenario
 		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile("test/input/playground/marcel/pt/transitSchedule/network.xml");
+		new MatsimNetworkReader(network).readFile("test/input/playground/marcel/pt/router/network.xml");
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
-		new TransitScheduleReaderV1(schedule, network).readFile("test/input/playground/marcel/pt/transitSchedule/transitSchedule.xml");
+		new TransitScheduleReaderV1(schedule, network).readFile("test/input/playground/marcel/pt/router/transitSchedule.xml");
 		PopulationImpl population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile("test/input/playground/marcel/pt/plans.xml");
 		PersonImpl person = population.getPersons().get(new IdImpl(1));

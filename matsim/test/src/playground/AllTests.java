@@ -39,6 +39,7 @@ public class AllTests {
 		suite.addTest(playground.marcel.AllTests.suite());
 		suite.addTest(playground.meisterk.AllTests.suite());
 		suite.addTest(playground.wrashid.AllTests.suite());
+		suite.addTest(playground.mmoyo.AllTests.suite());
 		
 		/* xTODO balmermi: Urgent!!! There is an unknown problem about those two test suites. Need's to be solved!
 		 * For the time being, per night, only one of the two will run */

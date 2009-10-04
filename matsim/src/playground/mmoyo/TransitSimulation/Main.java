@@ -23,8 +23,11 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.xml.sax.SAXException;
 
-import playground.mmoyo.PTRouter.*;
+import playground.mmoyo.PTRouter.PTActWriter;
+import playground.mmoyo.PTRouter.PTRouter;
+import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.Validators.TransitRouteValidator;
+import playground.mmoyo.analysis.Counter;
 
 /**
  * This class contains the options to route with a TransitSchedule object 
@@ -33,7 +36,7 @@ public class Main {
 	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
 	//private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
 	private static final String CONFIG =  PATH  + "config.xml";
-	private static final String PLANFILE = PATH + "plans.xml";// "plans.xml"; //"_input_file.xml"; // 
+	private static final String PLANFILE = PATH + "plans.xml"; // "plans.xml"; //"_input_file.xml"; // 
 	private static final String OUTPUTPLANS = PATH + "output_plans.xml";
 	private static final String NETWORK = PATH + "network.xml";
 	private static final String PLAINNETWORK = PATH + "plainNetwork.xml";
@@ -64,7 +67,7 @@ public class Main {
 		LogicFactory logicFactory = new LogicFactory(transitSchedule, ptValues); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
 		NetworkLayer plainNetwork=logicFactory.getPlainNet();
 		
-		int option =10;
+		int option =3;
 		switch (option){
 			case 1:    //writes logicElement files
 				logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);
@@ -157,6 +160,7 @@ public class Main {
 			case 11:
 				TransitRouteValidator transitRouteValidator = new TransitRouteValidator(logicFactory, ptValues);
 				break;
+	
 		}
 	}
 }

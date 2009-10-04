@@ -15,21 +15,21 @@ public class StationValidator {
 	
 	public void validateIds(final NetworkLayer netDiv){
 		int x=0;
-		int diferent = 0;
+		int differents = 0;
 		for (NodeImpl node: net.getNodes().values()){
 			
 			String idStation = ((playground.mmoyo.PTRouter.PTNode)node).getStrIdStation();
 			int intId = Integer.valueOf(idStation);
 
 			if (intId< 106699 || intId > 106699){
-				diferent++;
+				differents++;
 				for (NodeImpl divNode: netDiv.getNodes().values()){
 					if (node.getCoord().equals(divNode.getCoord())){
 						System.out.println("Corregible " + x++);
 					}
 				}
 			}
-			System.out.println("diferent " + diferent);
+			System.out.println("different " + differents);
 			//Coord coord = node.getCoord();
 			//find the correct id database;
 			//correct it
