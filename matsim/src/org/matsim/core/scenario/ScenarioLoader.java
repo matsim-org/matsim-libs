@@ -25,11 +25,15 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.basic.v01.BasicScenarioLoader;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkChangeEventsParser;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
@@ -54,31 +58,42 @@ import org.xml.sax.SAXException;
  * 
  * @author dgrether
  */
-public class ScenarioLoader extends BasicScenarioLoader {
-	// yyyy quite possibly, move functionality from BasicScenarioLoader into this here and delete BasicScenarioLoader. kai, jul09
+public class ScenarioLoader {
 
 	private static final Logger log = Logger.getLogger(ScenarioLoader.class);
 
+	private Config config;
+
+	private ScenarioImpl scenario;
+
+	
 	public ScenarioLoader(Config config) {
-		super(config);
-		super.setScenario(new ScenarioImpl(this.config));
+		this.config = config;
+		this.setScenario(new ScenarioImpl(this.config));
 	}
 
 	public ScenarioLoader(ScenarioImpl scenario) {
-		super(scenario);
+		this.scenario = scenario;
+		this.config = this.scenario.getConfig();
 	}
 
 	public ScenarioLoader(String configFilename) {
-		super(configFilename);
+		this.config = new Config();
+		this.config.addCoreModules();
+		MatsimConfigReader reader = new MatsimConfigReader(this.config);
+		reader.readFile(configFilename);
+		this.scenario = new ScenarioImpl(this.config);
 		Gbl.setConfig(this.config);
 		MatsimRandom.reset(config.global().getRandomSeed());
-		super.setScenario(new ScenarioImpl(this.config));
+		this.setScenario(new ScenarioImpl(this.config));
 	}
 
+	protected void setScenario(ScenarioImpl sc){
+		this.scenario = sc;
+	}
 	
-	@Override
 	public ScenarioImpl getScenario() {
-		return (ScenarioImpl)super.getScenario();
+		return this.scenario;
 	}
 
 	/**
@@ -104,6 +119,51 @@ public class ScenarioLoader extends BasicScenarioLoader {
 		return getScenario();
 	}
 
+	/**
+	 * Loads the network into the scenario of this class
+	 */
+	public void loadNetwork() {
+		String networkFileName = null;
+		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
+			networkFileName = this.config.network().getInputFile();
+			log.info("loading network from " + networkFileName);
+			NetworkLayer network = (NetworkLayer) this.scenario.getNetwork();
+			if (this.config.network().isTimeVariantNetwork()) {
+				log.info("use TimeVariantLinks in NetworkFactory.");
+				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
+			}
+				if (network instanceof NetworkLayer) {
+					try {
+						new MatsimNetworkReader(network).parse(networkFileName);
+					} catch (SAXException e) {
+						throw new RuntimeException(e);
+					} catch (ParserConfigurationException e) {
+						throw new RuntimeException(e);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				} else {
+					throw new IllegalStateException(
+							"Implementation of Network interface not supported, a specific parser is needed for this implementation of Network interface!");
+				}
+			if ((config.network().getChangeEventsInputFile() != null) && config.network().isTimeVariantNetwork()) {
+				log.info("loading network change events from " + config.network().getChangeEventsInputFile());
+				NetworkChangeEventsParser parser = new NetworkChangeEventsParser((NetworkLayer) network);
+				try {
+					parser.parse(config.network().getChangeEventsInputFile());
+				} catch (SAXException e) {
+					e.printStackTrace();
+				} catch (ParserConfigurationException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				((NetworkLayer) network).setNetworkChangeEvents(parser.getEvents());
+			}
+		}
+	}
+
+	
 	private void loadHouseholds() {
 			if ((this.getScenario().getHouseholds() != null) && (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
 				String hhFileName = this.config.households().getInputFile();

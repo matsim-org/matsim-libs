@@ -17,9 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 package org.matsim.api.core.v01;
-import org.matsim.api.basic.v01.BasicScenario;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
 
 
 
@@ -33,11 +35,18 @@ import org.matsim.api.core.v01.population.Population;
  * @author dgrether
  *
  */
-public interface Scenario extends BasicScenario {
+public interface Scenario /*extends BasicScenario */{
 
 	public Network getNetwork();
 
 	public Population getPopulation() ;
+
+	public Config getConfig();
+
+	public Id createId(String string);
+
+	public Coord createCoord(double x, double y);
+
 	
 	// the following are available via the Impl only
 //	public ActivityFacilities getActivityFacilities() ;

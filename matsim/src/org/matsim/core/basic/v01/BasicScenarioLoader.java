@@ -29,7 +29,6 @@ import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
@@ -39,8 +38,10 @@ import org.xml.sax.SAXException;
  * Implementing a scenario loader for the basic level. This class
  * allows to read each part of the scenario to be read separately.
  * @author dgrether
+ * @deprecated use ScenarioLoader instead
  * 
  */
+@Deprecated
 public class BasicScenarioLoader {
 
 	private static final Logger log = Logger.getLogger(BasicScenarioLoader.class);

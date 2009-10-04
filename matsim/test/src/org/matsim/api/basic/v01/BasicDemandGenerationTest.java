@@ -32,10 +32,10 @@ import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationFactory;
 import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 import org.matsim.api.basic.v01.population.BasicRoute;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -57,7 +57,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 	private final double homeEndTime = 9*3600.0;
 	private final double workEndTime = 19*3600.0;
 	private List<Id> ids = new ArrayList<Id>();
-	private final BasicScenario sc = new BasicScenarioImpl();
+	private final Scenario sc = new ScenarioImpl();
 	
 	/**
 	 * @see junit.framework.TestCase#setUp()
@@ -174,7 +174,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		checkContent(population);
 	}
 	
-	private void createFakeNetwork(BasicScenario scenario, NetworkLayer network){
+	private void createFakeNetwork(Scenario scenario, NetworkLayer network){
 		NodeImpl n1 = network.getFactory().createNode(ids.get(0), scenario.createCoord(0.0, 0.0), null);
 		network.getNodes().put(n1.getId(), n1);
 		NodeImpl n2 = network.getFactory().createNode(ids.get(1), scenario.createCoord(0.0, 0.0), null);
