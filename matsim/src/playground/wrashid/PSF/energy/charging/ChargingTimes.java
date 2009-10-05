@@ -2,6 +2,7 @@ package playground.wrashid.PSF.energy.charging;
 
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -18,6 +19,20 @@ public class ChargingTimes {
 
 	private PriorityQueue<ChargeLog> chargingTimes = new PriorityQueue<ChargeLog>();
 
+	public double getTotalEnergyCharged(){
+		double totalEnergyCharged=0;
+		
+		Object[] iterChargingTimes =chargingTimes.toArray();
+		Arrays.sort(iterChargingTimes);
+
+		for (int i=0;i<iterChargingTimes.length;i++){
+			ChargeLog curItem = (ChargeLog) iterChargingTimes[i];
+			totalEnergyCharged+=curItem.getEnergyCharged();
+		}
+		
+		return totalEnergyCharged;
+	}
+	
 	public void addChargeLog(ChargeLog chargeLog) {
 		chargingTimes.add(chargeLog);
 	}
@@ -29,10 +44,11 @@ public class ChargingTimes {
 	 */
 	public LinkedList<ChargeLog> getChargingTimes() {
 		LinkedList<ChargeLog> list = new LinkedList<ChargeLog>();
-		Iterator<ChargeLog> iterator = chargingTimes.iterator();
+		Object[] iterChargingTimes =chargingTimes.toArray();
+		Arrays.sort(iterChargingTimes);
 
-		while (iterator.hasNext()) {
-			ChargeLog curItem = iterator.next();
+		for (int i=0;i<iterChargingTimes.length;i++){
+			ChargeLog curItem = (ChargeLog) iterChargingTimes[i];
 			list.add(curItem);
 		}
 
@@ -40,10 +56,11 @@ public class ChargingTimes {
 	}
 
 	public void print() {
-		Iterator<ChargeLog> iterator = chargingTimes.iterator();
-
-		while (iterator.hasNext()) {
-			ChargeLog curItem = iterator.next();
+		Object[] iterChargingTimes =chargingTimes.toArray();
+		Arrays.sort(iterChargingTimes);
+	
+		for (int i=0;i<iterChargingTimes.length;i++){
+			ChargeLog curItem = (ChargeLog) iterChargingTimes[i];
 			curItem.print();
 		}
 	}
@@ -68,10 +85,12 @@ public class ChargingTimes {
 		// take both energy consumption and charging into consideration for
 		// calculating the SOC
 
-		Iterator<ChargeLog> iterator = chargingTimes.iterator();
+		Object[] iterChargingTimes =chargingTimes.toArray();
+		Arrays.sort(iterChargingTimes);
 
-		while (iterator.hasNext()) {
-			ChargeLog curChargeLog = iterator.next();
+		
+		for (int i=0;i<iterChargingTimes.length;i++){
+			ChargeLog curChargeLog = (ChargeLog) iterChargingTimes[i];
 
 			// we must check if curConsumptionLog is not null, because if the
 			// agent only charges at home
