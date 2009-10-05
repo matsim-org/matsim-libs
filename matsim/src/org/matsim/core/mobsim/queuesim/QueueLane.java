@@ -171,6 +171,8 @@ public class QueueLane {
 	 */
 	private boolean fireLaneEvents = false;
 
+	private double capacityFraction = 1.0;
+
 	/*package*/ QueueLane(final QueueLink ql, BasicLane laneData) {
 		this.queueLink = ql;
 		this.originalLane = (laneData == null) ? true : false;
@@ -219,16 +221,12 @@ public class QueueLane {
 			/*
 			 * Without lanes a Link has a flow capacity that describes the flow on a certain number of
 			 * lanes. If lanes are given the following is assumed:
-			 *
-			 * Flow of a Lane is given by the flow of the link divided by the number of lanes represented by the link.
-			 *
+       *
 			 * A Lane may represent one or more lanes in reality. This is given by the attribute numberOfRepresentedLanes
-			 * of the Lane definition. The flow of a lane is scaled by this number.
-			 *
+			 * of the Lane definition. The flow capacity is weighted by this number 
+			 * in respect to the total number of represented lanes.
 			 */
-			double queueLinksNumberOfRepresentedLanes = this.queueLink.getLink().getNumberOfLanes(time);
-			this.simulatedFlowCapacity = this.simulatedFlowCapacity/queueLinksNumberOfRepresentedLanes
-				* this.laneData.getNumberOfRepresentedLanes();
+			this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.capacityFraction;
 		}
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
 		this.simulatedFlowCapacity = this.simulatedFlowCapacity * SimulationTimer.getSimTickTime() * Gbl.getConfig().simulation().getFlowCapFactor();
@@ -242,12 +240,13 @@ public class QueueLane {
 		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
 
 		double numberOfLanes = this.queueLink.getLink().getNumberOfLanes(time);
-		if (this.laneData != null) {
-			numberOfLanes = this.laneData.getNumberOfRepresentedLanes();
-		}
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.length * numberOfLanes)
 				/ this.queueLink.getQueueNetwork().getNetworkLayer().getEffectiveCellSize() * storageCapFactor;
+
+		if (this.laneData != null) {
+			this.storageCapacity *= this.capacityFraction;
+		}
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
@@ -1012,5 +1011,12 @@ public class QueueLane {
 	
 	protected SortedMap<Id, BasicSignalGroupDefinition> getSignalGroups() {
 		return signalGroups;
+	}
+
+	/**
+	 * proportion of numberofrepresented lanes by this lane / total number of lanes on this link
+	 */
+	void setCapacityFraction(double capacityFraction) {
+		this.capacityFraction = capacityFraction;
 	}
 }

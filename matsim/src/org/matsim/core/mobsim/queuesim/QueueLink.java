@@ -163,7 +163,15 @@ public class QueueLink {
 		this.queueLanes = new ArrayList<QueueLane>();
 		this.queueLanes.add(this.originalLane);
 	}
-
+  
+	
+	private double calculateNumberOfRepresentedLanesTotal(Map<Id, BasicLane> map) {
+		double ret = 0.0;
+		for (BasicLane l : map.values()) {
+			ret += l.getNumberOfRepresentedLanes();
+		}
+		return ret;
+	}
 
 	/**
 	 * Initialize the QueueLink with more than one QueueLane
@@ -172,7 +180,7 @@ public class QueueLink {
 	/*package*/ void createLanes(Map<Id, BasicLane> map) {
 		this.hasLanes = true;
 		boolean firstNodeLinkInitialized = false;
-		
+		double totalNumberOfRepresentedLanes = this.calculateNumberOfRepresentedLanesTotal(map);
 		for (BasicLane signalLane : map.values()) {
 			if (signalLane.getLength() > this.link.getLength()) {
 				throw new IllegalStateException("Link Id " + this.link.getId() + " is shorter than Lane Id " + signalLane.getId() + " on this link!");
@@ -181,6 +189,7 @@ public class QueueLink {
 			lane = new QueueLane(this, signalLane);
 			lane.setMetersFromLinkEnd(0.0);
 			lane.setLaneLength(signalLane.getLength());
+			lane.setCapacityFraction((double)signalLane.getNumberOfRepresentedLanes()/totalNumberOfRepresentedLanes);
 			lane.calculateCapacities();
 
 			this.originalLane.addToLane(lane);
@@ -408,7 +417,13 @@ public class QueueLink {
 	}
 
 	public double getSpaceCap() {
-		return this.originalLane.getStorageCapacity();
+		double total = this.originalLane.getStorageCapacity();
+		if (this.hasLanes) {
+			for (QueueLane ql : this.getToNodeQueueLanes()) {
+				total += ql.getStorageCapacity();
+			}
+		}
+		return total;
 	}
 
 	public Queue<QueueVehicle> getVehiclesInBuffer() {
