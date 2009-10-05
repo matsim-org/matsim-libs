@@ -29,6 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
 		suite.addTestSuite(QueueLinkTest.class);
+		suite.addTestSuite(QueueLaneTest.class);
 		suite.addTestSuite(QueueSimulationTest.class);
 		suite.addTestSuite(TravelTimeTest.class);
 		
