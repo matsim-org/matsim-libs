@@ -38,7 +38,6 @@ import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.basic.BasicSignalSystemsFactory;
-
 import org.xml.sax.SAXException;
 
 /**
@@ -80,12 +79,18 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 				.getSignalSystemDefinition()) {
 			lssdef = builder.createSignalSystemDefinition(new IdImpl(xmllssDef
 					.getId()));
-			lssdef.setDefaultCycleTime(xmllssDef.getDefaultCycleTime()
-					.getSeconds());
-			lssdef.setDefaultInterGreenTime(xmllssDef.getDefaultInterGreenTime()
-					.getSeconds());
-			lssdef.setDefaultSynchronizationOffset(xmllssDef
-					.getDefaultSynchronizationOffset().getSeconds());
+			if (xmllssDef.getDefaultCycleTime() != null) {
+				lssdef.setDefaultCycleTime(xmllssDef.getDefaultCycleTime()
+						.getSeconds());
+			}
+			if (xmllssDef.getDefaultInterGreenTime() !=  null) {
+				lssdef.setDefaultInterGreenTime(xmllssDef.getDefaultInterGreenTime()
+						.getSeconds());
+			}
+			if (xmllssDef.getDefaultSynchronizationOffset() != null) {
+				lssdef.setDefaultSynchronizationOffset(xmllssDef
+						.getDefaultSynchronizationOffset().getSeconds());
+			}
 			lightSignalSystems.addSignalSystemDefinition(lssdef);
 		}
 		// parsing lightSignalGroupDefinitions
