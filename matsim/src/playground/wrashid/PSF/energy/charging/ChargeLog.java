@@ -9,7 +9,7 @@ import playground.wrashid.PSF.energy.charging.optimizedCharging.EnergyBalance;
 public class ChargeLog implements Comparable<ChargeLog> {
 
 	private static final Logger log = Logger.getLogger(ChargeLog.class);
-	
+
 	private Id linkId;
 
 	private double startChargingTime;
@@ -40,13 +40,13 @@ public class ChargeLog implements Comparable<ChargeLog> {
 	}
 
 	/*
-	 * TODO - refactoring: Is it possible, that we just pass in the facilityId and the the facilityId and get the
-	 * linkId from there?
+	 * TODO - refactoring: Is it possible, that we just pass in the facilityId
+	 * and the the facilityId and get the linkId from there?
 	 */
 	public ChargeLog(Id linkId, Id facilityId, double startChargingTime, double endChargingTime) {
 		super();
 		this.linkId = linkId;
-		this.facilityId= facilityId;
+		this.facilityId = facilityId;
 		this.startChargingTime = startChargingTime;
 		this.endChargingTime = endChargingTime;
 	}
@@ -64,18 +64,24 @@ public class ChargeLog implements Comparable<ChargeLog> {
 	 * @param chargingPower
 	 */
 	public void updateSOC(double startSOC) {
-		this.startSOC=startSOC;
-		this.endSOC=this.startSOC+(endChargingTime-startChargingTime)*ParametersPSF.getFacilityChargingPowerMapper().getChargingPower(facilityId);
+		this.startSOC = startSOC;
+		this.endSOC = this.startSOC + getEnergyCharged();
+	}
+
+	public double getEnergyCharged() {
+		return (endChargingTime - startChargingTime) * ParametersPSF.getFacilityChargingPowerMapper().getChargingPower(facilityId);
 	}
 
 	public void print() {
-		System.out.println("linkId: " + linkId + ", startChargingTime: " + startChargingTime + ", endChargingTime: " + endChargingTime + ", startSOC: "
-				+ startSOC + ", endSOC: " + endSOC);
+		System.out.println("linkId: " + linkId + ", startChargingTime: " + startChargingTime + ", endChargingTime: "
+				+ endChargingTime + ", startSOC: " + startSOC + ", endSOC: " + endSOC);
 	}
 
 	/**
-	 * Two ChargeLogs are equal, if their chargeStartTime is equal... => That throws an error, because
-	 * this should not be possible for the same agent... => that would mean a wrong usage of this class...
+	 * Two ChargeLogs are equal, if their chargeStartTime is equal... => That
+	 * throws an error, because this should not be possible for the same
+	 * agent... => that would mean a wrong usage of this class...
+	 * 
 	 * @param otherChargeLog
 	 * @return
 	 */
