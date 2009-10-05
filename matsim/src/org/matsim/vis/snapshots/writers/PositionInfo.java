@@ -28,6 +28,8 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
 /**
+ * This provides a position for the visualizer. Since the QueueSimulation has no physics these coordinates
+ * are meant for the visualizer and not necessary meaningful in engineering terms.
  * A helper class to store information about agents (id, position, speed), mainly used to create
  * {@link SnapshotWriter snapshots}.
  *
