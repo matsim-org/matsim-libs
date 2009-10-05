@@ -216,6 +216,15 @@ public class EnergyBalance {
 		while (maxChargableEnergy.get(indexOfLastParking) > 0) {
 			FacilityChargingPrice bestEnergyPrice = chargingPrice.poll();
 
+			// only for debugging
+			// assert the following (a bit expensive operation)
+			//if (chargingTimes.getTotalEnergyCharged()>agentEnergyConsumption.getTotalEnergyConsumption()){
+			//	System.out.println(chargingTimes.getTotalEnergyCharged() + " - " + agentEnergyConsumption.getTotalEnergyConsumption());
+			//	System.out.println();
+			//}
+			
+			//System.out.println(chargingTimes.getTotalEnergyCharged() + " - " + agentEnergyConsumption.getTotalEnergyConsumption());
+			
 			if (bestEnergyPrice == null) {
 				// TODO: report, that the current vehicle could not reach the
 				// destination, because the electricity was finished
