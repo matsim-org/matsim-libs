@@ -216,11 +216,15 @@ public class BellmanFordVertexIntervalls {
 		
 		Node to = _sink;
 		VertexIntervalls tolabels = this._labels.get(to);
+		if (tolabels.getFirstUnscannedIntervall() == null) {
+			throw new BFException("sink can not be reached!");
+		}
 		int totime = tolabels.getFirstUnscannedIntervall().getLowBound();
 		int arrivalAtSuperSink = totime;
 		//check if TimeExpandedPath can be constructed
+		
 		if(Integer.MAX_VALUE==totime){
-			throw new BFException("sink can not be reached!");
+			throw new BFException("sink can not be reached (totime == MAX_VALUE)!");
 		}
 		if(totime>_timehorizon){
 			throw new BFException("sink can not be reached within timehorizon!");
@@ -430,9 +434,14 @@ public class BellmanFordVertexIntervalls {
 			VertexIntervall start = _labels.get(v).getFirstUnscannedIntervall();
 			if(start == null)
 			{
-				//TODO find an intervall
-				start = _labels.get(v).getFirstUnscannedIntervall();
+				// that was weird ...
+				// start = _labels.get(v).getFirstUnscannedIntervall();
+
 				System.out.println(v.toString() +"  "+_labels.get(v).toString());
+				
+				// WARNING: Not all vertices remain in the queue with this.
+				// useless vertices that need no scanning are dumped
+				continue;							
 			}
 			
 			// link is outgoing edge of v => forward edge
