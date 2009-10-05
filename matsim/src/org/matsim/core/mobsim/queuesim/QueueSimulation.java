@@ -374,7 +374,7 @@ public class QueueSimulation {
 		prepareNetworkChangeEventsQueue();
 	}
 
-	private void prepareLanes(){
+	protected void prepareLanes(){
 		if (this.laneDefintions != null){
 			for (BasicLanesToLinkAssignment laneToLink : this.laneDefintions.getLanesToLinkAssignmentsList()){
 				QueueLink link = this.network.getQueueLink(laneToLink.getLinkId());
