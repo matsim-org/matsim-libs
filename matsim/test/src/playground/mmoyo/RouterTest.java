@@ -68,8 +68,8 @@ public class RouterTest extends MatsimTestCase {
 		assertNotNull(toAct);
 		
 		// in the plans file, there are no coordinates for the activities... fix that.
-		fromAct.setCoord(new CoordImpl(400.0, 399.0));
-		toAct.setCoord(new CoordImpl(4700.0, 700.0));
+		fromAct.setCoord(new CoordImpl(5000.0, 5005.0));
+		toAct.setCoord(new CoordImpl(44000.0, 24005.0));
 		
 		// now run the essential thing:
 		TransitRouteFinder routeFinder = new TransitRouteFinder(schedule, new PTValues());
@@ -81,7 +81,7 @@ public class RouterTest extends MatsimTestCase {
 		
 		/* I would expect the following, although I could be wrong.
 		 * It must be checked once the code runs up to this line.     */
-		assertEquals(3, legs.size());
+		assertEquals(3, legs.size());  
 		assertEquals(TransportMode.walk, legs.get(0).getMode());
 		assertEquals(TransportMode.pt, legs.get(1).getMode());
 		assertEquals(TransportMode.walk, legs.get(2).getMode());
