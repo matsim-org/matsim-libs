@@ -309,6 +309,7 @@ public class BellmanFordVertexIntervalls {
 		EdgeIntervalls	flowover = _flowlabels.get(over);
 		boolean changed=false;
 		int t=0;
+		
 		if(start.getReachable() && !start.isScanned()){
 			if(_debug>0){
 				System.out.println("wir kommen los:"+ from.getId());
@@ -429,7 +430,9 @@ public class BellmanFordVertexIntervalls {
 			VertexIntervall start = _labels.get(v).getFirstUnscannedIntervall();
 			if(start == null)
 			{
+				//TODO find an intervall
 				start = _labels.get(v).getFirstUnscannedIntervall();
+				System.out.println(v.toString() +"  "+_labels.get(v).toString());
 			}
 			
 			// link is outgoing edge of v => forward edge
