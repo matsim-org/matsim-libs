@@ -37,13 +37,14 @@ import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 /** makes tests with the transit router on the 5x5 scenario*/
 public class PTRouterTest extends MatsimTestCase {
 
-	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/"; 
-	private static final String NETWORK= PATH + "network.xml";
-	private static final String TRANSITSCHEDULE= PATH + "TransitSchedule.xml";
-	private static final String PLANFILE = PATH +  "plans.xml";
+	private final String PATH= getInputDirectory();
+	private final String NETWORK = PATH  + "network.xml";
+	private final String TRANSITSCHEDULE= PATH + "transitSchedule.xml";
+	private final String PLANFILE = PATH +  "plans.xml";
 	private static PTValues ptvalues = new PTValues();
 	
 	public void testRouter() throws SAXException, ParserConfigurationException, IOException {
+	
 		/**read transit schedule, plain net create logic elements */
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(NETWORK);

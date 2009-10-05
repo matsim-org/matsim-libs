@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd"[]>
+<plans>
+
+ <person id="1" sex="f" age="20" license="no" car_avail="never" employed="no">
+    <travelcard type="unknown" />
+    <plan selected="yes" type="PT">
+      <act type="h13" x="1010.0" y="5010.0" start_time="00:00:00" dur="07:48:00" end_time="07:48:00" />
+		<leg num="0" mode="pt" dep_time="07:48:00" trav_time="00:36:00" arr_time="08:24:00">
+      	</leg>
+	<act type="l1" x="8950.0" y="8950.0" start_time="07:48:00" dur="08:00:00" end_time="15:48:00" />
+      	<leg num="1" mode="pt" dep_time="15:48:00" trav_time="00:36:00" arr_time="15:48:00">
+      	</leg>
+        <act type="h13" x="1000.0" y="4200.0" start_time="15:48:00" />
+    </plan>
+  </person>
+</plans>
