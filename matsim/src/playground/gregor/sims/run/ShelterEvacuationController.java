@@ -17,6 +17,7 @@ import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData;
 import org.matsim.evacuation.shelters.EvacuationShelterNetLoader;
 
 import playground.gregor.sims.shelters.linkpenaltyII.ShelterInputCounterLinkPenalty;
+import playground.gregor.sims.shelters.socialcost.ShelterInputCounterSocialCost;
 
 
 
@@ -45,8 +46,9 @@ public class ShelterEvacuationController extends Controler {
 //		this.config.controler().setLastIteration(0);
 		super.setUp();
 		
-		ShelterInputCounterLinkPenalty si = new ShelterInputCounterLinkPenalty(this.network,this.shelterLinkMapping,getEvents());
+		ShelterInputCounterSocialCost si = new ShelterInputCounterSocialCost(this.scenarioData,this.shelterLinkMapping);
 		this.events.addHandler(si);
+		this.addControlerListener(si);
 		
 //		//link penalty
 //		this.travelCostCalculator = new PenaltyLinkCostCalculator(this.travelTimeCalculator,sic);
@@ -64,7 +66,7 @@ public class ShelterEvacuationController extends Controler {
 //		RiskCostCalculator rc = new RiskCostFromFloodingData(this.network,fr,getEvents());
 //		this.events.addHandler(rc);
 		
-		this.travelCostCalculator = new ShelterLinkPenaltyRiskCostTravelCost(this.travelTimeCalculator,si,null,null);
+		this.travelCostCalculator = new ShelterSocialCostRiskCostTravelCost(this.travelTimeCalculator,si,null,null);
 		
 	}
 

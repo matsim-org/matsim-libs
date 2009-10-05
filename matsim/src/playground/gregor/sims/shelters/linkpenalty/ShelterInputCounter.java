@@ -71,7 +71,16 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 			int max = this.shelterLinkMapping.get(e.getKey()).getShelterSpace();
 			double overload = (double)count / max;
 			System.out.println("Link:" + e.getKey() + "  count:" + count + " should be at most:" + max + " overload:" + overload);
-			e.getValue().count = 0;
+			e.getValue().count = 0;//		if (c.count <= 1.5 * b.getShelterSpace()) {
+//			return MatsimRandom.getRandom().nextDouble() < 0.25;
+//			}
+	//
+//			if (c.count <= 2 * b.getShelterSpace()) {
+//				return MatsimRandom.getRandom().nextDouble() < 0.1;
+//			}
+//			if (c.count <= 3 * b.getShelterSpace()) {
+//				return MatsimRandom.getRandom().nextDouble() < 0.01;
+//			}
 			c++;
 			o+=overload;
 		}
