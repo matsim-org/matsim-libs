@@ -247,7 +247,7 @@ public class MultiSourceEAF {
 
 				timeAugment += timer3 - timer2;
 				if (true) {
-					if (i % 1 == 0) {
+					if (i % 100 == 0) {
 						System.out.println("Iteration " + i + ". flow: " + fluss.getTotalFlow() + " of " + totaldemands + ". Time: MBF " + timeMBF / 1000 + ", augment " + timeAugment / 1000 + ".");
 						//System.out.println("CleanUp got rid of " + gain + " intervalls so far.");
 						//System.out.println("last " + tempstr);
@@ -520,15 +520,18 @@ public class MultiSourceEAF {
 					result = routingAlgo.doCalculations();
 					timer2 = System.currentTimeMillis();
 					timeMBF += timer2 - timer1;
-					if (result==null){
+					if (result.isEmpty()){
 						break;
-					}
-					if(_debug){
-						tempstr = "found path " + result;
-						//System.out.println("found path: " +  result);
-					}
+					}				
+					tempstr = "";
 					for(TimeExpandedPath path : result){
 						fluss.augment(path);
+						if(_debug){
+							tempstr += path + "\n";							
+						}
+					}
+					if (_debug) {
+						System.out.println("found path: " +  tempstr);
 					}
 					timer3 = System.currentTimeMillis();
 					gain += fluss.cleanUp();
@@ -553,14 +556,7 @@ public class MultiSourceEAF {
 				System.out.println("Removed " + routingAlgo.gain + " intervals.");
 				System.out.println("removed on the fly:" + VertexIntervalls.rem);
 			}
-			else{ // dont use the other algo
-				/* FakeTravelTimeCost length = new FakeTravelTimeCost();
-				fluss = new Flow(network, length, demands, sink, timeHorizon);
-				TravelCost travelCost = length;
-				TravelTime travelTime = length;
-				MBFdynamic_withFlowClass routingAlgo = new MBFdynamic_withFlowClass(travelCost, travelTime, fluss);
-				fluss = routingAlgo.calcLeastCostFlow(0.0, fluss); */
-			}
+			
 			if(_debug){
 				System.out.println(fluss.arrivalsToString());
 				System.out.println(fluss.arrivalPatternToString());
