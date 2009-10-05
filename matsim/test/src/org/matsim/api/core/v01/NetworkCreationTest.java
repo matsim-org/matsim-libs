@@ -23,9 +23,9 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -47,7 +47,7 @@ public class NetworkCreationTest extends MatsimTestCase {
 		//test default capacity period
 		assertEquals(3600.0, network.getCapacityPeriod());
 		//have to cast to NetworkFactory because coord is needed otherwise null pointer exception
-		NetworkFactoryImpl nb = (NetworkFactoryImpl) network.getFactory();
+		NetworkFactory nb = network.getFactory();
 		Node n1 = nb.createNode(id1, coord);
 		assertNotNull(n1);
 		Node n2 = nb.createNode(id2, coord);
@@ -64,7 +64,7 @@ public class NetworkCreationTest extends MatsimTestCase {
 		LinkImpl ll1 = (LinkImpl) l1;
 		assertEquals(1.0/3600.0, ll1.getFlowCapacity(Time.UNDEFINED_TIME), MatsimTestCase.EPSILON);
 		//would expect this cause no add was invoked
-		//assertNull(l1.getLayer());
+//		assertNull(l1.getLayer());
 		//the next lines are not obvious because only the references have been given to the builder
 		assertEquals(n1, l1.getFromNode());
 		assertEquals(n2, l1.getToNode());
