@@ -161,6 +161,9 @@ public class DaganzoScenarioGenerator {
 			//enable lanes and signal system feature in config
 			config.scenario().setUseLanes(true);
 			config.scenario().setUseSignalSystems(true);
+			config.network().setLaneDefinitionsFile(LANESOUTPUTFILE);
+			config.signalSystems().setSignalSystemFile(SIGNALSYSTEMSOUTPUTFILE);
+			config.signalSystems().setSignalSystemConfigFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
 			//create the lanes and write them
 			BasicLaneDefinitions lanes = createLanes(scenario);
 			MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(lanes);
@@ -233,9 +236,6 @@ public class DaganzoScenarioGenerator {
 	// set scenario
 		config.network().setInputFile(NETWORKFILE);
 		config.plans().setInputFile(plansOut);
-		config.network().setLaneDefinitionsFile(LANESOUTPUTFILE);
-		config.signalSystems().setSignalSystemFile(SIGNALSYSTEMSOUTPUTFILE);
-		config.signalSystems().setSignalSystemConfigFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
 		
 		// configure scoring for plans
 		config.charyparNagelScoring().setLateArrival(0.0);

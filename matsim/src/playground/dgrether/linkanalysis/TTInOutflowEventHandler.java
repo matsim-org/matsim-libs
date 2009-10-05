@@ -61,8 +61,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	
 	
 	public void handleEvent(BasicLinkEnterEvent event) {
-		Id id = new IdImpl(event.getLinkId().toString());
-		if (linkIdIn.equals(id)) {
+		if (linkIdIn.equals(event.getLinkId())) {
 			Integer in = getInflowMap().get(event.getTime());
 			if (in == null) {
 				in = Integer.valueOf(1);
@@ -77,8 +76,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	}
 	
 	public void handleEvent(BasicLinkLeaveEvent event) {
-		Id id = new IdImpl(event.getLinkId().toString());
-		if (linkIdOut.equals(id)) {
+		if (linkIdOut.equals(event.getLinkId())) {
 			Integer out = getOutflowMap().get(event.getTime());
 			if (out == null) {
 				out = Integer.valueOf(1);

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VisFirstIteration
+ * VisLastIteration
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,34 +19,31 @@
  * *********************************************************************** */
 package playground.dgrether.daganzosignal;
 
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsImpl;
-import org.matsim.core.scenario.ScenarioLoader;
-
-import playground.dgrether.signalVis.DgOnTheFlyQueueSimQuad;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.run.OTFVis;
 
 
 /**
  * @author dgrether
  *
  */
-public class VisFirstIteration {
+public class VisLastIteration {
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] a) {
 		DaganzoScenarioGenerator scenarioGenerator = new DaganzoScenarioGenerator();
-		scenarioGenerator.createScenario();
-		ScenarioLoader loader = new ScenarioLoader(scenarioGenerator.configOut);
-		loader.loadScenario();
-		ScenarioImpl sc = loader.getScenario();
+		Config config = null;
+		config = new Config();
+		MatsimConfigReader reader = new MatsimConfigReader(config);
+		reader.readFile(scenarioGenerator.configOut);
 		
-		EventsImpl events = new EventsImpl();
-		DgOnTheFlyQueueSimQuad visSim = new DgOnTheFlyQueueSimQuad(sc, events);
-		visSim.setLaneDefinitions(sc.getLaneDefinitions());
-//		visSim.setSignalSystems(sc.getSignalSystems(), sc.getSignalSystemConfigurations());
-		visSim.run();
+		String[] args = {config.controler().getOutputDirectory() + 
+				"/ITERS/it." + config.controler().getLastIteration() + 
+				"/" + config.controler().getLastIteration() + ".otfvis.mvi"};
+		OTFVis.main(args);
 		
 	}
 
