@@ -21,7 +21,6 @@
 package playground.mfeil;
 
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.core.population.PersonImpl;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -34,6 +33,7 @@ import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -53,7 +53,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 
 import playground.mfeil.MDSAM.ActivityTypeFinder;
-import playground.mfeil.filesForTests.Initializer;
+import playground.mfeil.filesForTestCases.Initializer;
 
 
 
@@ -117,6 +117,10 @@ public class PlanomatXTest extends MatsimTestCase{
 		log.info("... done.");
 	}
 	
+	public void testCreateNeighbourhood (){
+		
+	}
+	//(PlanomatXPlan [] neighbourhood, int[][]infoOnNeighbourhood, List<String> actTypes, ArrayList<ActivityOption> primActs) {
 	
 	
 }
