@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mfeil.filesForTests;
+package playground.mfeil.FilesForTests;
 
 import java.util.TreeMap;
 

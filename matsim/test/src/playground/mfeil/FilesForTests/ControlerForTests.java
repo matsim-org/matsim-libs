@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.mfeil.filesForTests;
+package playground.mfeil.FilesForTests;
 
 
 import org.matsim.core.config.Config;

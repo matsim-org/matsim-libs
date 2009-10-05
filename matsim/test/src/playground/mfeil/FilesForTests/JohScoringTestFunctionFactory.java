@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mfeil.filesForTests;
+package playground.mfeil.FilesForTests;
 
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.*;

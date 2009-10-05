@@ -51,8 +51,8 @@ import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 
-import playground.mfeil.filesForTestCases.Initializer;
-import playground.mfeil.filesForTestCases.JohScoringTestFunctionFactory;
+import playground.mfeil.FilesForTests.Initializer;
+import playground.mfeil.FilesForTests.JohScoringTestFunctionFactory;
 
 
 

@@ -1,4 +1,4 @@
-package playground.mfeil.filesForTests;
+package playground.mfeil.FilesForTests;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
