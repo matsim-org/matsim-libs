@@ -29,7 +29,10 @@ import org.matsim.api.basic.v01.network.BasicNetworkFactory;
  *
  */
 public interface NetworkFactory extends BasicNetworkFactory {
-
+	/**
+	 * @deprecated use createNode(Id id, Coord coord)
+	 */
+	@Deprecated
 	public Node createNode(final Id id);
 	
 	public Node createNode(final Id id, final Coord coord ) ;
