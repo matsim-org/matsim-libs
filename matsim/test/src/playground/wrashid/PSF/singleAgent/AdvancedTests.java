@@ -413,4 +413,28 @@ public class AdvancedTests extends MatsimTestCase {
 		assertEquals(chargingTimesOfAgentOne.getChargingTimes().getLast().getEndSOC(), ParametersPSF.getDefaultMaxBatteryCapacity(), 0.1);
 	}  
   
+	/**
+	 * This covers a fixed bug, which occurs during charging in the night.
+	 */
+	public void test8OptimizedCharger() {
+		initTest("test/input/playground/wrashid/PSF/singleAgent/config2.xml");
+
+		simulationStartupListener.addParameterPSFMutator(new ParametersPSFMutator() {
+			public void mutateParameters() {
+				ParametersPSF.setTestingPeakPriceStartTime(20000);
+				ParametersPSF.setTestingPeakPriceEndTime(86000);
+
+				ParametersPSF.setTestingEnergyConsumptionPerLink(8000000);
+			}
+		});
+
+		controler.run();
+
+		ChargingTimes chargingTimesOfAgentOne = getChargingTimesOfAgent("1");
+		ChargeLog chargeLogOfAgentOne;
+		
+		// fully charged in the end
+		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(11);
+		assertEquals(ParametersPSF.getDefaultMaxBatteryCapacity(), chargeLogOfAgentOne.getEndSOC(), 1.0);
+	}
 } 

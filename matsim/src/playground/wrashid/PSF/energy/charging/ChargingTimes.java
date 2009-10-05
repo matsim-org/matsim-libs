@@ -55,6 +55,10 @@ public class ChargingTimes {
 		return list;
 	}
 
+	/**
+	 * Just prints out sorted after the time (starting with 0:00)
+	 * Note: This is not the order in which the charging happened.
+	 */
 	public void print() {
 		Object[] iterChargingTimes =chargingTimes.toArray();
 		Arrays.sort(iterChargingTimes);
@@ -88,8 +92,15 @@ public class ChargingTimes {
 		Object[] iterChargingTimes =chargingTimes.toArray();
 		Arrays.sort(iterChargingTimes);
 
+		// the charging times is ordered after the time and not in the order, the charging actually happned (starting after first activity)
+		int firstIndex=0;
 		
-		for (int i=0;i<iterChargingTimes.length;i++){
+		while (curConsumptionLog.getEnterTime()>((ChargeLog)iterChargingTimes[firstIndex]).getStartChargingTime()){
+			firstIndex++;
+		}
+		
+		// process first the charging / consumption from first activity to midnight
+		for (int i=firstIndex;i<iterChargingTimes.length;i++){
 			ChargeLog curChargeLog = (ChargeLog) iterChargingTimes[i];
 
 			// we must check if curConsumptionLog is not null, because if the
@@ -97,6 +108,21 @@ public class ChargingTimes {
 			// in the evening, then all energy consumption happens before
 			// that...
 			while (curConsumptionLog != null && curConsumptionLog.getEnterTime() < curChargeLog.getEndChargingTime()) {
+				startSOC -= curConsumptionLog.getEnergyConsumption();
+				curConsumptionLog = consumptionLog.poll();
+			}
+
+			curChargeLog.updateSOC(startSOC);
+			startSOC = curChargeLog.getEndSOC();
+		}
+		
+		// process all charging / consumption after mid night
+		for (int i=0;i<firstIndex;i++){
+			ChargeLog curChargeLog = (ChargeLog) iterChargingTimes[i];
+
+			// we must check if curConsumptionLog is not null, because if the
+			// agent only charges at home
+			while (curConsumptionLog != null) {
 				startSOC -= curConsumptionLog.getEnergyConsumption();
 				curConsumptionLog = consumptionLog.poll();
 			}
