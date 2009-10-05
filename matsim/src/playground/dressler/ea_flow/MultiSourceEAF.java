@@ -62,7 +62,7 @@ import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
 public class MultiSourceEAF {
 
 	/**
-	 * debug flag
+	 * debug flag and EdgeTypes
 	 */
 	private static boolean _debug = true;
 	private static boolean vertexAlgo = true;
