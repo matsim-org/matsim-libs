@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.utils.charts.XYLineChart;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.data.HubLinkMapping;
@@ -171,6 +172,30 @@ public class ChargingTimes {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	
+	
+	public static void writeEnergyUsageStatisticsGrafic(String fileName, double[][] energyUsageStatistics, int numberOfHubs){
+		XYLineChart chart = new XYLineChart("Energy Consumption", "Time of Day [s]", "Energy Consumption [J]");
+		
+		double[] time=new double[numberOfTimeBins];
+		
+		for (int i=0;i<numberOfTimeBins;i++){
+			time[i]=i*900;
+		}
+		
+		
+		for (int i=0;i<numberOfHubs;i++){
+			double[] hubConcumption=new double[numberOfTimeBins];
+			for (int j=0;j<numberOfTimeBins;j++){
+				hubConcumption[j] = energyUsageStatistics[j][i];
+			}
+			chart.addSeries("hub-"+i, time, hubConcumption); 
+		}
+		
+		//chart.addMatsimLogo(); 
+		chart.saveAsPng(fileName, 800, 600); 
 	}
 	
 	

@@ -85,13 +85,21 @@ public class OptimizedCharger {
 
 		}
 		
+		outputOptimizationData();
+
+	}
+	
+	private void outputOptimizationData(){
 		// write out charging events to file, if specified
 		if (ParametersPSF.getMainChargingTimesOutputFilePath()!=null){
 			ChargingTimes.writeChargingTimes(chargingTimes, ParametersPSF.getMainChargingTimesOutputFilePath());
-		}	
-
-	} 
-
+		}
+		
+		//TODO: output statistics to file (make parameter for that).
+		
+		//TODO: output grafics for (input) price at each hub and output for each hub
+	}
+	
 	public HashMap<Id, ChargingTimes> getChargingTimes() {
 		return chargingTimes;
 	}
