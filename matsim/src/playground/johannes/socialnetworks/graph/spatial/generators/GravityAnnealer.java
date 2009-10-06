@@ -115,7 +115,7 @@ public class GravityAnnealer {
 		terms[0] = new ErgmDensity();
 		terms[0].setTheta(thetaDensity);
 		
-		ErgmGravity gravity = new ErgmGravity(matrix, descretization);
+		ErgmGravity gravity = new ErgmGravity(matrix, descretization, true, true); //FIXME
 		gravity.setTheta(thetaGravity);
 		gravity.setDescretization(descretization);
 		terms[1] = gravity;

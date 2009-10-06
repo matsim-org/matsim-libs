@@ -25,6 +25,7 @@ package playground.johannes.socialnetworks.graph.generators;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -53,21 +54,41 @@ public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Ed
 
 	public G generate(int numVertices, double p, long randomSeed) {
 		G g = factory.createGraph();
-		LinkedList<V> pending = new LinkedList<V>();
+//		LinkedList<V> pending = new LinkedList<V>();
 		for (int i = 0; i < numVertices; i++)
-			pending.add(factory.addVertex(g));
+			factory.addVertex(g);
 
+		return generate(g, p, randomSeed);
+//		Random random = new Random(randomSeed);
+//		V v1;
+//		while ((v1 = pending.poll()) != null) {
+//			for (V v2 : pending) {
+//				if (random.nextDouble() <= p) {
+//					factory.addEdge(g, v1, v2);
+//				}
+//			}
+//		}
+//
+//		return g;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public G generate(G graph, double p, long randomSeed) {
+		LinkedList<V> pending = new LinkedList<V>();
+		pending.addAll((Collection<? extends V>) graph.getVertices());
+		
 		Random random = new Random(randomSeed);
 		V v1;
 		while ((v1 = pending.poll()) != null) {
 			for (V v2 : pending) {
 				if (random.nextDouble() <= p) {
-					factory.addEdge(g, v1, v2);
+					factory.addEdge(graph, v1, v2);
 				}
 			}
 		}
 
-		return g;
+		return graph;
+
 	}
 	
 	public static void main(String args[]) throws FileNotFoundException, IOException {

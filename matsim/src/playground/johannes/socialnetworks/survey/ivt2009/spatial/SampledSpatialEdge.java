@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SnowballPartititions.java
+ * SampledSpatialEdge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,35 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.survey.ivt2009.spatial;
 
-import java.util.HashSet;
-import java.util.Set;
+import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
+import playground.johannes.socialnetworks.survey.ivt2009.SampledEdge;
 
 /**
  * @author illenberger
  *
  */
-public class SnowballPartitions {
+public class SampledSpatialEdge extends SpatialEdge implements SampledEdge {
 
-//	public static <V extends SampledVertex> Set<V> createSampledPartition(SampledGraph g) {
-//		return (Set<V>) createSampledPartition(g.getVertices());
-//	}
-	
-	public static <V extends SampledVertex> Set<V> createSampledPartition(Set<V> vertices) {
-		Set<V> partition = new HashSet<V>();
-		for(V vertex : vertices) {
-			if(vertex.isSampled())
-				partition.add(vertex);
-		}
-		return partition;
+	public SampledSpatialEdge(SampledSpatialVertex v1, SampledSpatialVertex v2) {
+		super(v1, v2);
 	}
-	public static Set<SampledVertex> createSampledPartition(SampledGraph g, int itertation) {
-		Set<SampledVertex> vertices = new HashSet<SampledVertex>();
-		for(SampledVertex vertex : g.getVertices()) {
-			if(vertex.getIterationSampled() == itertation)
-				vertices.add(vertex);
-		}
-		return vertices;
-	}
+
 }

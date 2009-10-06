@@ -86,6 +86,9 @@ public class GravityGenerator {
 		generator.outputDir = config.getParam(MODULE_NAME, "output");
 		generator.descretization = Double.parseDouble(config.getParam(MODULE_NAME, "descretization"));
 		
+		generator.reweightBoundaries = Boolean.parseBoolean(config.getParam(MODULE_NAME, "boundaries"));
+		generator.reweightDensity = Boolean.parseBoolean(config.getParam(MODULE_NAME, "popdensity"));
+		
 		String gridFile = config.findParam(MODULE_NAME, "densityGrid");
 		SpatialGrid<Double> densityGrid = null;
 		if(gridFile != null)
@@ -116,6 +119,10 @@ public class GravityGenerator {
 	
 	private long randomSeed;
 	
+	private boolean reweightDensity = true;
+	
+	private boolean reweightBoundaries = true;
+	
 	public void generate(SpatialGraph graph, SpatialGrid<Double> densityGrid, RandomWalkType type) {
 		/*
 		 * convert graph to matrix
@@ -130,8 +137,10 @@ public class GravityGenerator {
 		density.setTheta(thetaDensity);
 		terms.add(density);
 		
-		ErgmGravity gravity = new ErgmGravity(matrix, descretization);
+		ErgmGravity gravity = new ErgmGravity(matrix, descretization, reweightBoundaries, reweightDensity);
 		gravity.setTheta(thetaGravity);
+//		gravity.setReweightBoundaries(reweightBoundaries);
+//		gravity.setReweightDensity(reweightDensity);
 		terms.add(gravity);
 		
 		if (type == RandomWalkType.flip) {

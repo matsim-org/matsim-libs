@@ -67,12 +67,15 @@ public class Population2SpatialGraph {
 		SAXParserFactory saxfactory = SAXParserFactory.newInstance();
 		saxfactory.setValidating(false);
 		saxfactory.setNamespaceAware(false);
+		
 		SAXParser parser;
 		try {
 			XMLHandler handler = new XMLHandler();
 			parser = saxfactory.newSAXParser();
+
 			XMLReader reader = parser.getXMLReader();
 			reader.setContentHandler(handler);
+			
 			
 			factory = new SpatialGraphFactory();
 			graph = factory.createGraph();

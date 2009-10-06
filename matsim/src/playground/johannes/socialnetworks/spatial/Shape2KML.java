@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SnowballPartititions.java
+ * Shape2KML.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,35 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.spatial;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.IOException;
 
 /**
  * @author illenberger
  *
  */
-public class SnowballPartitions {
+public class Shape2KML {
 
-//	public static <V extends SampledVertex> Set<V> createSampledPartition(SampledGraph g) {
-//		return (Set<V>) createSampledPartition(g.getVertices());
-//	}
-	
-	public static <V extends SampledVertex> Set<V> createSampledPartition(Set<V> vertices) {
-		Set<V> partition = new HashSet<V>();
-		for(V vertex : vertices) {
-			if(vertex.isSampled())
-				partition.add(vertex);
-		}
-		return partition;
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		GeometryLayer layer = GeometryLayer.creatFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+		ZoneLayerKMLWriter writer = new ZoneLayerKMLWriter();
+		writer.write(layer, "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.kml");
+
 	}
-	public static Set<SampledVertex> createSampledPartition(SampledGraph g, int itertation) {
-		Set<SampledVertex> vertices = new HashSet<SampledVertex>();
-		for(SampledVertex vertex : g.getVertices()) {
-			if(vertex.getIterationSampled() == itertation)
-				vertices.add(vertex);
-		}
-		return vertices;
-	}
+
 }

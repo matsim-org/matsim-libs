@@ -25,6 +25,7 @@ import gnu.trove.TIntIntIterator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -87,16 +88,23 @@ public class Centrality {
 		/*
 		 * put all vertex indices in a queue
 		 */
-		Queue<Integer> vertices = new ConcurrentLinkedQueue<Integer>();
-		for(int i = 0; i < y.getVertexCount(); i++)
-			vertices.add(i);
+//		Queue<Integer> vertices = new ConcurrentLinkedQueue<Integer>();
+//		for(int i = 0; i < y.getVertexCount(); i++)
+//			vertices.add(i);
 		/*
 		 * create threads
 		 */
 		List<CentralityThread> threads = new ArrayList<CentralityThread>();
-		for(int i = 0; i < numThreads; i++) {
-			threads.add(new CentralityThread(y, vertices));
+		int size = (int) Math.floor(n/(double)numThreads);
+		int i_start = 0;
+		int i_stop = size;
+		for(int i = 0; i < numThreads-1; i++) {
+//			threads.add(new CentralityThread(y, vertices));
+			threads.add(new CentralityThread(y, i_start, i_stop));
+			i_start = i_stop;
+			i_stop += size;
 		}
+		threads.add(new CentralityThread(y, i_start, n));
 		/*
 		 * start threads
 		 */
@@ -177,7 +185,10 @@ public class Centrality {
 		
 		private Dijkstra dijkstra;
 		
-		private Queue<Integer> vertices;
+//		private Queue<Integer> vertices;
+		private int i_start;
+		
+		private int i_stop;
 		
 		private TIntIntHashMap[] edgeBetweenness;
 		
@@ -191,9 +202,11 @@ public class Centrality {
 		
 		private final Logger logger = Logger.getLogger(CentralityThread.class);
 		
-		public CentralityThread(AdjacencyMatrix y, Queue<Integer> vertices) {
+		public CentralityThread(AdjacencyMatrix y, int i_start, int i_stop) {
 			dijkstra = new Dijkstra(y);
-			this.vertices = vertices;
+			this.i_start = i_start;
+			this.i_stop = i_stop;
+//			this.vertices = vertices;
 			n = y.getVertexCount();
 			counter = 0;
 		}
@@ -217,14 +230,17 @@ public class Centrality {
 			long dkTime = 0;
 			long cTime = 0;
 			
-			Integer i_obj;
-			while((i_obj = vertices.poll()) != null) {
-				int i = i_obj.intValue();
+//			Integer i_obj;
+//			while((i_obj = vertices.poll()) != null) {
+			for(int i = i_start; i < i_stop; i++) {
+				
+//				int i = i_obj.intValue();
 				/*
 				 * run the Dijkstra to all nodes
 				 */
 				long time = System.currentTimeMillis();
-				TIntArrayList reachable = dijkstra.run(i_obj, -1);
+				TIntArrayList reachable = dijkstra.run(i, -1);
+
 				dkTime += System.currentTimeMillis() - time;
 				/*
 				 * extract the paths

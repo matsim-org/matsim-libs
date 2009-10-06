@@ -100,12 +100,14 @@ public class PopulationClipping {
 		writer.write();
 		
 		for(double f = 0.001; f < 0.01; f += 0.001) {
-			writer = new PopulationWriter(pop, outputDir+ "plans." + f + ".xml", "v4", f);
+			String file = String.format("%1$splans.%2$.3f.xml", outputDir, f);
+			writer = new PopulationWriter(pop, file, "v4", f);
 			writer.write();
 		}
 		
 		for(double f = 0.01; f <= 0.1; f += 0.01) {
-			writer = new PopulationWriter(pop, outputDir + "plans." + f + ".xml", "v4", f);
+			String file = String.format("%1$splans.%2$.2f.xml", outputDir, f);
+			writer = new PopulationWriter(pop, file, "v4", f);
 			writer.write();
 		}
 	}

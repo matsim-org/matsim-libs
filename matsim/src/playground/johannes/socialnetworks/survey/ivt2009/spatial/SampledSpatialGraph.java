@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CentralitySpeedTest.java
+ * SampledSpatialGraph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.matrix;
+package playground.johannes.socialnetworks.survey.ivt2009.spatial;
 
-import junit.framework.TestCase;
+import java.util.Set;
 
-import org.apache.log4j.Logger;
-
+import playground.johannes.socialnetworks.graph.SparseEdge;
 import playground.johannes.socialnetworks.graph.SparseVertex;
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
+import playground.johannes.socialnetworks.survey.ivt2009.SampledGraph;
 
 /**
  * @author illenberger
  *
  */
-public class CentralitySpeedTest extends TestCase {
+public class SampledSpatialGraph extends SpatialGraph implements SampledGraph {
 
-	private static final Logger logger = Logger.getLogger(CentralitySpeedTest.class);
-	
-	public void test() {
-//		ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge>(new SparseGraphFactory());
-//		logger.info("Generating grah...");
-//		SparseGraph graph = generator.generate(1000, 0.1, 4711);
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		SpatialGraph graph = reader.readGraph("/Volumes/hertz:ils-raid/socialnets/mcmc/runs/run45/output/2000000000/graph.graphml"); 
-		logger.info("Converting matrix...");
-		AdjacencyMatrixDecorator<SparseVertex> y = new AdjacencyMatrixDecorator<SparseVertex>(graph);
-		
-		logger.info("Calculation centrality measures...");
-		long time = System.currentTimeMillis();
-		Centrality c = new Centrality();
-		c.run(y);
-		logger.info("Done. Took " + (System.currentTimeMillis() - time) + " ms");
-		
-		logger.info(String.format("Mean closeness is %1$s.", c.getMeanVertexCloseness()));
+	@SuppressWarnings("unchecked")
+	public Set<? extends SampledSpatialEdge> getEdges() {
+		return (Set<? extends SampledSpatialEdge>) super.getEdges();
 	}
+
+	@SuppressWarnings("unchecked")
+	public Set<? extends SampledSpatialVertex> getVertices() {
+		return (Set<? extends SampledSpatialVertex>) super.getVertices();
+	}
+
+	@Override
+	public SampledSpatialEdge getEdge(SparseVertex v1, SparseVertex v2) {
+		return (SampledSpatialEdge) super.getEdge(v1, v2);
+	}
+
+	@Override
+	protected boolean insertEdge(SparseEdge e, SparseVertex v1, SparseVertex v2) {
+		return super.insertEdge(e, v1, v2);
+	}
+
+	@Override
+	protected boolean insertVertex(SparseVertex v) {
+		return super.insertVertex(v);
+	}
+
 }

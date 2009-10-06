@@ -378,7 +378,7 @@ public class TravelTimeHistogram {
 		double ttShortestPath;
 	}
 
-	private static class TravelDistanceCost implements TravelTime, TravelCost {
+	public static class TravelDistanceCost implements TravelTime, TravelCost {
 
 		public double getLinkTravelTime(Link link, double time) {
 			return link.getLength() / link.getFreespeed(time);

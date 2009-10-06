@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CentralitySpeedTest.java
+ * CalcCentrality.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.matrix;
 
-import junit.framework.TestCase;
-
 import org.apache.log4j.Logger;
 
 import playground.johannes.socialnetworks.graph.SparseVertex;
@@ -32,14 +30,13 @@ import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
  * @author illenberger
  *
  */
-public class CentralitySpeedTest extends TestCase {
+public class CalcCentrality {
 
-	private static final Logger logger = Logger.getLogger(CentralitySpeedTest.class);
-	
-	public void test() {
-//		ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge>(new SparseGraphFactory());
-//		logger.info("Generating grah...");
-//		SparseGraph graph = generator.generate(1000, 0.1, 4711);
+	private static final Logger logger = Logger.getLogger(CalcCentrality.class);
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 		SpatialGraph graph = reader.readGraph("/Volumes/hertz:ils-raid/socialnets/mcmc/runs/run45/output/2000000000/graph.graphml"); 
 		logger.info("Converting matrix...");
@@ -52,5 +49,7 @@ public class CentralitySpeedTest extends TestCase {
 		logger.info("Done. Took " + (System.currentTimeMillis() - time) + " ms");
 		
 		logger.info(String.format("Mean closeness is %1$s.", c.getMeanVertexCloseness()));
+
 	}
+
 }

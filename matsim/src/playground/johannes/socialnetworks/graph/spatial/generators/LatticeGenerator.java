@@ -77,7 +77,7 @@ public class LatticeGenerator {
 		terms[0] = new ErgmDensity();
 		terms[0].setTheta(2);
 		
-		ErgmGravity gravity = new ErgmGravity(matrix, 1);
+		ErgmGravity gravity = new ErgmGravity(matrix, 1, true, true);
 		gravity.setTheta(1);
 //		gravity.setDescretization(descretization);
 		terms[1] = gravity;

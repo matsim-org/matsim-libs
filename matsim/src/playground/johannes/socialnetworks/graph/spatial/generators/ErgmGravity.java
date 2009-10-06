@@ -25,7 +25,6 @@ package playground.johannes.socialnetworks.graph.spatial.generators;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleDoubleIterator;
-import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntObjectHashMap;
 
 import org.apache.log4j.Logger;
@@ -35,6 +34,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
+import visad.SetException;
 
 /**
  * @author illenberger
@@ -46,21 +46,25 @@ public class ErgmGravity extends ErgmTerm {
 
 	private double descretization;
 	
-	private TIntObjectHashMap<TDoubleDoubleHashMap> z_id;
+	private TIntObjectHashMap<TDoubleDoubleHashMap> rho_id;
 	
-	private TIntDoubleHashMap z_i;
+	private TIntObjectHashMap<TDoubleDoubleHashMap> b_id;
 	
 	private double d_max;
 	
-	private double z;
+	private boolean reweightBoundaries;
 	
-	public ErgmGravity(SpatialAdjacencyMatrix m, double descretization) {
+	private boolean reweightDensity;
+	
+	public ErgmGravity(SpatialAdjacencyMatrix m, double descretization, boolean reweightBoundaries, boolean reweightDensity) {
 		this.descretization = descretization;
+		setReweightBoundaries(reweightBoundaries);
+		setReweightDensity(reweightDensity);
 
 		logger.info("Initializing ERGM gravity term...");
 		
-		z_i = new TIntDoubleHashMap();
-		z_id = new TIntObjectHashMap<TDoubleDoubleHashMap>();
+		rho_id = new TIntObjectHashMap<TDoubleDoubleHashMap>();
+		b_id = new TIntObjectHashMap<TDoubleDoubleHashMap>();
 		
 		int n = m.getVertexCount();
 		/*
@@ -79,11 +83,12 @@ public class ErgmGravity extends ErgmTerm {
 			ymax = Math.max(ymax, c_i.getY());
 		}
 		/*
-		 * calculate the normalization constant for the distance distribution 
+		 * calculate the population density 
 		 */
-		logger.info("Calculating normalization constant z_id...");
+		if(reweightBoundaries || reweightDensity) {
+		logger.info("Calculating population density...");
 		for(int i = 0; i < n; i++) {
-			TDoubleDoubleHashMap z_d = new TDoubleDoubleHashMap();
+			TDoubleDoubleHashMap n_d = new TDoubleDoubleHashMap();
 			Coord c_i = m.getVertex(i).getCoordinate();
 			/*
 			 * count the number of vertices for each possible distance
@@ -93,14 +98,15 @@ public class ErgmGravity extends ErgmTerm {
 					Coord c_j = m.getVertex(j).getCoordinate();
 					double d = CoordUtils.calcDistance(c_i, c_j);
 					double bin = descretize(d);
-					z_d.adjustOrPutValue(bin, 1, 1);
+					n_d.adjustOrPutValue(bin, 1, 1);
 				}
 			}
 			/*
-			 * divide the z_d by the circle segment that lays within the system boundaries
+			 * determine density
 			 */
-			TDoubleDoubleIterator it = z_d.iterator();
-			for(int k = 0; k < z_d.size(); k++) {
+			TDoubleDoubleHashMap b_d = new TDoubleDoubleHashMap();
+			TDoubleDoubleIterator it = n_d.iterator();
+			for(int k = 0; k < n_d.size(); k++) {
 				it.advance();
 				double r = it.key();
 				double count = it.value();
@@ -128,44 +134,27 @@ public class ErgmGravity extends ErgmTerm {
 				} else if(b == 0) {
 					b = 0.001; //TODO: Check this!
 				}
+				b_d.put(r, b);
 				/*
 				 * set the new value for z_d
 				 */
-				it.setValue(count);
+				double a = b*r - 0.5;
+				it.setValue(count/a);
 			}
 			
 			if(i % 1000 == 0)
 				logger.info((i/(float)n * 100) + " %...");
 			
-			z_id.put(i, z_d);
+			rho_id.put(i, n_d);
+			b_id.put(i, b_d);
+		}
 		}
 		/*
 		 * determine normalization constant z_i
 		 */
-		logger.info("Determining normalization constant z_i...");
 		double dx = (xmax - xmin)/2.0;
 		double dy = (ymax - ymin)/2.0;
 		d_max = descretize(Math.sqrt(dx*dx + dy*dy));
-		
-		double sum = 0;
-		for(int d = 0; d < d_max; d++) {
-			sum += 1/(double)(1 + d);
-		}
-		z = 1/sum;
-//		for(int i = 0; i < n; i++) {
-//			Coord c_i = m.getVertex(i).getCoordinate();
-//			double sum = 0;
-//			for(int j = 0; j < n; j++) {
-//				if(j != i) {
-//					Coord c_j = m.getVertex(j).getCoordinate();
-//					double d = descretize(CoordUtils.calcDistance(c_i, c_j));
-//					sum += calculateProba(d, i);//1/((1+d) * (z_id.get(i).get(d) ));
-//				}
-//			}
-//			
-//			z_i.put(i, 1/sum);
-////			z_i.put(i, 1);
-//		}
 	}
 	
 	private double calculateCircleSegment(double dx, double dy, double r) {
@@ -194,27 +183,26 @@ public class ErgmGravity extends ErgmTerm {
 		this.descretization = descretization;
 	}
 
+	public void setReweightBoundaries(boolean reweightBoundaries) {
+		this.reweightBoundaries = reweightBoundaries;
+	}
+
+	public void setReweightDensity(boolean reweightDensity) {
+		this.reweightDensity = reweightDensity;
+	}
+
 	private double descretize(double d) {
-//		if(d == 0)
-//			return 1;
-//		else
+		if(d == 0)
+			return 1;
+		else
 			return Math.ceil(d/descretization);
 	}
 	
 	private double calculateProba(double d, int i) {
-		double z_d = z_id.get(i).get(d);
-		
-		if(Double.isNaN(z_d))
-			throw new IllegalArgumentException("z_d must not be NaN!");
-		else if(Double.isInfinite(z_d))
-			throw new IllegalArgumentException("z_d must not be infinity!");
-		else if(z_d == 0)
-			throw new IllegalArgumentException("z_d must not be zero!");
-		
 		if(d > d_max)
 			return 0;
 		else
-			return 1 / ( (1 + d) * z_d );
+			return 1 / (1 + d*d);
 	}
 	
 	@Override
@@ -224,18 +212,22 @@ public class ErgmGravity extends ErgmTerm {
 		
 		double d = descretize(CoordUtils.calcDistance(c_i, c_j));
 		
-//		double z = z_i.get(i);
-//		
-//		if(Double.isNaN(z))
-//			throw new IllegalArgumentException("z must not be NaN!");
-//		else if(Double.isInfinite(z))
-//			throw new IllegalArgumentException("z must not be infinity!");
-//		else if(z == 0)
-//			throw new IllegalArgumentException("z must not be zero!");
-		
 		double p = calculateProba(d, i);
 		
-		return - Math.log(1 / ( 1 / (p * z) - 1 ) );
+		double rho = 1.0;
+		if(reweightDensity)
+			rho = rho_id.get(i).get(d);
+		
+		double b = 2 * Math.PI;
+		if(reweightBoundaries)
+			b = b_id.get(i).get(d);
+		
+		double r = - Math.log(p * 1/rho * 2 * Math.PI/b);
+
+		if(Double.isNaN(r))
+			throw new IllegalArgumentException();
+		else
+			return r;
 	}
 
 }

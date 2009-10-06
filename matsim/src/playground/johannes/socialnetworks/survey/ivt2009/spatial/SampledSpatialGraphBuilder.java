@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SnowballPartititions.java
+ * SampledSpatialGraphBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,35 +17,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.survey.ivt2009.spatial;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
+
+import playground.johannes.socialnetworks.graph.GraphFactory;
 
 /**
  * @author illenberger
  *
  */
-public class SnowballPartitions {
-
-//	public static <V extends SampledVertex> Set<V> createSampledPartition(SampledGraph g) {
-//		return (Set<V>) createSampledPartition(g.getVertices());
-//	}
+public class SampledSpatialGraphBuilder implements GraphFactory<SampledSpatialGraph, SampledSpatialVertex, SampledSpatialEdge> {
 	
-	public static <V extends SampledVertex> Set<V> createSampledPartition(Set<V> vertices) {
-		Set<V> partition = new HashSet<V>();
-		for(V vertex : vertices) {
-			if(vertex.isSampled())
-				partition.add(vertex);
-		}
-		return partition;
+	public SampledSpatialEdge addEdge(SampledSpatialGraph g, SampledSpatialVertex v1, SampledSpatialVertex v2) {
+		SampledSpatialEdge e = new SampledSpatialEdge(v1, v2);
+		if(g.insertEdge(e, v1, v2))
+			return e;
+		else
+			return null;
 	}
-	public static Set<SampledVertex> createSampledPartition(SampledGraph g, int itertation) {
-		Set<SampledVertex> vertices = new HashSet<SampledVertex>();
-		for(SampledVertex vertex : g.getVertices()) {
-			if(vertex.getIterationSampled() == itertation)
-				vertices.add(vertex);
-		}
-		return vertices;
+
+	public SampledSpatialVertex addVertex(SampledSpatialGraph g) {
+		SampledSpatialVertex v = new SampledSpatialVertex(new CoordImpl(0.0, 0.0));
+		if(g.insertVertex(v))
+			return v;
+		else
+			return null;
 	}
+
+	public SampledSpatialVertex addVertex(SampledSpatialGraph g, Coord c) {
+		SampledSpatialVertex v = new SampledSpatialVertex(c);
+		if(g.insertVertex(v))
+			return v;
+		else
+			return null;
+	}
+	
+	public SampledSpatialGraph createGraph() {
+		return new SampledSpatialGraph();
+	}
+
 }

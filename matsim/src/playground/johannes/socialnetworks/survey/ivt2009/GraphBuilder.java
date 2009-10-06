@@ -19,8 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
+import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TObjectDoubleHashMap;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -43,11 +47,18 @@ import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
+import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.io.KMLDegreeStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLEgoNetWriter;
+import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
+import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
 import playground.johannes.socialnetworks.statistics.Distribution;
+import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraphMLWriter;
 
 /**
  * @author illenberger
@@ -319,26 +330,60 @@ public class GraphBuilder {
 		System.out.println(SampledGraphStatistics.degreeDistribution(socialnet).mean());
 		System.out.println(SampledGraphStatistics.localClusteringDistribution(socialnet).mean());
 		
-		Distribution.writeHistogram(SampledGraphStatistics.degreeDistribution(socialnet).absoluteDistribution(), "/Users/fearonni/Desktop/degree.hist.txt");
-		Distribution.writeHistogram(SampledGraphStatistics.edgeLenghtDistribution(socialnet).absoluteDistribution(500), "/Users/fearonni/Desktop/edgelength.hist.txt");
-//		
-		Population2SpatialGraph pop2graph = new Population2SpatialGraph();
-		SpatialGraph g2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/plans/plans.10.xml");
-		Set<Coord> coords = new HashSet<Coord>();
-		for(SpatialVertex v : g2.getVertices()) {
-			coords.add(v.getCoordinate());
-		}
-		Distribution edgelength = SampledGraphStatistics.normalizedEdgeLengthDistribution(socialnet, g2, 1000);
-		Distribution.writeHistogram(edgelength.absoluteDistribution(500), "/Users/fearonni/Desktop/edgelength.norm.hist.txt");
-//		
-		KMLEgoNetWriter writer = new KMLEgoNetWriter();
-		writer.setCoordinateTransformation(new CH1903LV03toWGS84());
-		writer.setDrawEdges(true);
-		writer.setVertexStyle(new KMLSnowballVertexStyle(writer.getVertexIconLink()));
-		writer.setVertexDescriptor(new KMLSnowballDescriptor());
-		writer.write(socialnet, (Set) SnowballPartitions.createSampledPartition(socialnet, 0), 10, "/Users/fearonni/vsp-work/work/socialnets/data/ivt2009-pretest/egonets.kmz");
+//		SpatialGraphMLWriter writer2 = new SpatialGraphMLWriter();
+//		writer2.write(socialnet, "/Users/fearonni/vsp-work/work/socialnets/data/ivt2009/graph.graphml");
 		
-		SpatialPajekWriter pwriter = new SpatialPajekWriter();
-		pwriter.write(socialnet, "/Users/fearonni/Desktop/egonet.net");
+		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
+		writer.write(socialnet, "/Users/fearonni/vsp-work/work/socialnets/data/ivt2009/graph.graphml");
+//		Distribution.writeHistogram(SampledGraphStatistics.degreeDistribution(socialnet).absoluteDistribution(), "/Users/fearonni/Desktop/degree.hist.txt");
+//		Distribution.writeHistogram(SampledGraphStatistics.edgeLenghtDistribution(socialnet).absoluteDistributionLog2(1000), "/Users/fearonni/Desktop/edgelength.hist.txt");
+////		
+//		Population2SpatialGraph pop2graph = new Population2SpatialGraph();
+//		SpatialGraph g2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/plans/plans.10.xml");
+//		Set<Coord> coords = new HashSet<Coord>();
+//		for(SpatialVertex v : g2.getVertices()) {
+//			coords.add(v.getCoordinate());
+//		}
+//		Distribution edgelength = SampledGraphStatistics.normalizedEdgeLengthDistribution(socialnet, g2, 1000);
+//		Distribution.writeHistogram(edgelength.absoluteDistributionLog2(1000), "/Users/fearonni/Desktop/edgelength.norm.hist.txt");
+//		
+//		SpatialGrid<Double> grid = SpatialGrid.readFromFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/popdensity/popdensity.1000.xml");
+//		TDoubleDoubleHashMap distr = SpatialGraphStatistics.degreeDensityCorrelation((Collection<? extends SpatialVertex>) SnowballPartitions.createSampledPartition(socialnet), grid);
+//		Distribution.writeHistogram(distr, "/Users/fearonni/Desktop/k_rho.txt");
+//		
+//		Set<? extends SpatialVertex> set = (Set<? extends SpatialVertex>)SnowballPartitions.createSampledPartition(socialnet);
+//		TObjectDoubleHashMap<? extends SpatialVertex> meanEdgeLengthDistr = SpatialGraphStatistics.meanEdgeLength(set);
+//		Distribution.writeHistogram(SpatialGraphStatistics.densityCorrelation(meanEdgeLengthDistr, grid, 1000), "/Users/fearonni/Desktop/meanedgelength.txt");
+////		
+////		Distribution gt2000 = new Distribution();
+////		Distribution lt2000 = new Distribution();
+//		Set<? extends SampledVertex> sampled = SnowballPartitions.createSampledPartition(socialnet);
+//		Set<SpatialVertex> gt2000 = new HashSet<SpatialVertex>();
+//		Set<SpatialVertex> lt2000 = new HashSet<SpatialVertex>();
+//		for(SampledVertex v : sampled) {
+//			Double rho = grid.getValue(((SpatialVertex)v).getCoordinate());
+//			if(rho != null) {
+//			if(rho > 2000)
+//				gt2000.add((SpatialVertex) v);
+//			else
+//				lt2000.add((SpatialVertex) v);
+//			}
+//		}
+//		Distribution.writeHistogram(SpatialGraphStatistics.edgeLengthDistribution(gt2000).absoluteDistribution(1000), "/Users/fearonni/Desktop/edgelength.gt2000.txt");
+//		Distribution.writeHistogram(SpatialGraphStatistics.edgeLengthDistribution(lt2000).absoluteDistribution(1000), "/Users/fearonni/Desktop/edgelength.lt2000.txt");
+		
+////		KMLEgoNetWriter writer = new KMLEgoNetWriter();
+//		KMLWriter writer = new KMLWriter();
+//		writer.setCoordinateTransformation(new CH1903LV03toWGS84());
+//		writer.setDrawEdges(true);
+////		writer.setVertexStyle(new KMLSnowballVertexStyle(writer.getVertexIconLink()));
+//		writer.setVertexStyle(new KMLDegreeStyle(writer.getVertexIconLink()));
+////		writer.setVertexDescriptor(new KMLSnowballDescriptor());
+//		writer.setVertexDescriptor(new KMLVertexDescriptor(socialnet));
+////		writer.write(socialnet, (Set) SnowballPartitions.createSampledPartition(socialnet, 0), 10, "/Users/fearonni/vsp-work/work/socialnets/data/ivt2009/egonets.kmz");
+//		writer.write(socialnet, "/Users/fearonni/vsp-work/work/socialnets/data/ivt2009/egonets.kmz");
+//		
+//		SpatialPajekWriter pwriter = new SpatialPajekWriter();
+//		pwriter.write(socialnet, "/Users/fearonni/Desktop/egonet.net");
 	}
 }

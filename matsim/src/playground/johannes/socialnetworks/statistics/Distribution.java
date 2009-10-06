@@ -182,6 +182,32 @@ public class Distribution {
 		return freq;
 	}
 
+	public TDoubleDoubleHashMap absoluteDistributionLog10(double descretization) {
+		TDoubleDoubleHashMap freq = new TDoubleDoubleHashMap();
+		int size = values.size();
+		for(int i = 0; i < size; i++) {
+			double bin_idx = Math.ceil(Math.log10(values.get(i)/descretization));
+			bin_idx = Math.max(bin_idx, 0.0);
+			double binWidth = Math.pow(10, bin_idx) - Math.pow(10, bin_idx-1);
+			binWidth = Math.max(1.0, binWidth);
+			freq.adjustOrPutValue(Math.pow(10, bin_idx)*descretization, weights.get(i)/binWidth, weights.get(i)/binWidth);
+		}
+		return freq;
+	}
+	
+	public TDoubleDoubleHashMap absoluteDistributionLog2(double descretization) {
+		TDoubleDoubleHashMap freq = new TDoubleDoubleHashMap();
+		int size = values.size();
+		for(int i = 0; i < size; i++) {
+			double bin = Math.ceil(Math.log(values.get(i)/descretization)/Math.log(2.0));
+			bin = Math.max(bin, 0.0);
+			double binWidth = Math.pow(2, bin) - Math.pow(2, bin-1);
+			binWidth = Math.max(1.0, binWidth);
+			freq.adjustOrPutValue(Math.pow(2, bin)*descretization, weights.get(i)/binWidth, weights.get(i)/binWidth);
+		}
+		return freq;
+	}
+	
 	public TDoubleDoubleHashMap normalizedDistribution() {
 		return normalizedDistribution(absoluteDistribution());
 	}

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SnowballPartititions.java
+ * SampledSpatialVertex.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,35 +17,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.survey.ivt2009.spatial;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.matsim.api.basic.v01.Coord;
+
+import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.survey.ivt2009.SampledVertex;
+import playground.johannes.socialnetworks.survey.ivt2009.SnowballAttributes;
 
 /**
  * @author illenberger
  *
  */
-public class SnowballPartitions {
+public class SampledSpatialVertex extends SpatialVertex implements
+		SampledVertex {
 
-//	public static <V extends SampledVertex> Set<V> createSampledPartition(SampledGraph g) {
-//		return (Set<V>) createSampledPartition(g.getVertices());
-//	}
+	private SnowballAttributes attributes;
 	
-	public static <V extends SampledVertex> Set<V> createSampledPartition(Set<V> vertices) {
-		Set<V> partition = new HashSet<V>();
-		for(V vertex : vertices) {
-			if(vertex.isSampled())
-				partition.add(vertex);
-		}
-		return partition;
+	protected SampledSpatialVertex(Coord coord) {
+		super(coord);
+		attributes = new SnowballAttributes();
 	}
-	public static Set<SampledVertex> createSampledPartition(SampledGraph g, int itertation) {
-		Set<SampledVertex> vertices = new HashSet<SampledVertex>();
-		for(SampledVertex vertex : g.getVertices()) {
-			if(vertex.getIterationSampled() == itertation)
-				vertices.add(vertex);
-		}
-		return vertices;
+
+	public void detect(int iteration) {
+		attributes.detect(iteration);
 	}
+
+	public int getIterationDetected() {
+		return attributes.getIterationDeteted();
+	}
+
+	public int getIterationSampled() {
+		return attributes.getIterationSampled();
+	}
+
+	public boolean isDetected() {
+		return attributes.isDetected();
+	}
+
+	public boolean isSampled() {
+		return attributes.isSampled();
+	}
+
+	public void sample(int iteration) {
+		attributes.sample(iteration);
+	}
+
 }

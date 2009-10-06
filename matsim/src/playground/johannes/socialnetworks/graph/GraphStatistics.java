@@ -532,18 +532,18 @@ public class GraphStatistics {
 				int numPaths;
 				int eccentricity = 0;//Integer.MAX_VALUE;
 				List<CentralityVertex<Vertex>> passedVertices = new ArrayList<CentralityVertex<Vertex>>();
-				List<CentralityEdge<?,?>> passedEdges = new ArrayList<CentralityEdge<?,?>>();
+//				List<CentralityEdge<?,?>> passedEdges = new ArrayList<CentralityEdge<?,?>>();
 				int size2 = vertices.size();
 				for(int k = 0; k < size2; k++) {
 					int size;
 
 					UnweightedDijkstra<CentralityVertex<Vertex>>.DijkstraVertex target = vertices.get(k);
 					passedVertices.clear();
-					passedEdges.clear();
+//					passedEdges.clear();
 					numPaths = 0;
 					size = target.getPrecedingVertices().length;
 					for(int i = 0; i < size; i++) {
-						numPaths += getNumPaths(target.getPrecedingVertices()[i], passedVertices, passedEdges);					
+						numPaths += getNumPaths(target.getPrecedingVertices()[i], passedVertices);					
 					}
 					
 					double bc = 1 / (double)numPaths;
@@ -551,10 +551,10 @@ public class GraphStatistics {
 					for(int i = 0; i < size; i++) {
 						passedVertices.get(i).addBetweenness(bc);
 					}
-					size = passedEdges.size();
-					for(int i = 0; i < size; i++) {
-						passedEdges.get(i).addBetweenness(bc);
-					}
+//					size = passedEdges.size();
+//					for(int i = 0; i < size; i++) {
+//						passedEdges.get(i).addBetweenness(bc);
+//					}
 					//**************************************************************
 //					size = passedEdges.size();
 //					for(int i = 0; i < size; i++) {
@@ -586,7 +586,7 @@ public class GraphStatistics {
 			}
 		}
 
-		private int getNumPaths(UnweightedDijkstra<CentralityVertex<Vertex>>.DijkstraVertex v, List<CentralityVertex<Vertex>> vertices, List<CentralityEdge<?,?>> edges) {
+		private int getNumPaths(UnweightedDijkstra<CentralityVertex<Vertex>>.DijkstraVertex v, List<CentralityVertex<Vertex>> vertices) {
 			if (v.getPrecedingVertices().length == 0)
 				return 1;
 			else {
@@ -594,7 +594,7 @@ public class GraphStatistics {
 				int size = v.getPrecedingVertices().length;
 				for(int i = 0; i < size; i++) {
 					vertices.add(v.getDelegate());
-					edges.add((CentralityEdge<?, ?>) v.getPrecedingEdges()[i].getDelegate());
+//					edges.add((CentralityEdge<?, ?>) v.getPrecedingEdges()[i].getDelegate());
 					//****************************************************************
 //					List<? extends Edge> adjacentEdges = v.getDelegate().getDelegate().getEdges();
 //					Vertex toNode = v.getPrecedingVertices()[i].getDelegate().getDelegate();
@@ -604,7 +604,7 @@ public class GraphStatistics {
 //						}
 //					}
 					//****************************************************************
-					numPaths += getNumPaths(v.getPrecedingVertices()[i], vertices, edges);
+					numPaths += getNumPaths(v.getPrecedingVertices()[i], vertices);
 				}
 				return numPaths;
 			}

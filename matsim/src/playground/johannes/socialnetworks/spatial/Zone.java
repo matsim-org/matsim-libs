@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SnowballPartititions.java
+ * Zone.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,35 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.spatial;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.matsim.api.basic.v01.Id;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author illenberger
  *
  */
-public class SnowballPartitions {
+public class Zone {
 
-//	public static <V extends SampledVertex> Set<V> createSampledPartition(SampledGraph g) {
-//		return (Set<V>) createSampledPartition(g.getVertices());
-//	}
+	private Id id;
 	
-	public static <V extends SampledVertex> Set<V> createSampledPartition(Set<V> vertices) {
-		Set<V> partition = new HashSet<V>();
-		for(V vertex : vertices) {
-			if(vertex.isSampled())
-				partition.add(vertex);
-		}
-		return partition;
+	private Geometry border;
+	
+	public Zone(Geometry polygon, Id id) {
+		this.border = polygon;
+		this.id = id;
 	}
-	public static Set<SampledVertex> createSampledPartition(SampledGraph g, int itertation) {
-		Set<SampledVertex> vertices = new HashSet<SampledVertex>();
-		for(SampledVertex vertex : g.getVertices()) {
-			if(vertex.getIterationSampled() == itertation)
-				vertices.add(vertex);
-		}
-		return vertices;
+	
+	public Geometry getBorder() {
+		return border;
+	}
+	
+	public Id getId() {
+		return id;
 	}
 }

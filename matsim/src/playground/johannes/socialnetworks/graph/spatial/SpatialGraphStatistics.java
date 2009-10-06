@@ -20,6 +20,7 @@
 package playground.johannes.socialnetworks.graph.spatial;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TDoubleDoubleIterator;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TObjectByteHashMap;
 import gnu.trove.TObjectDoubleHashMap;
@@ -88,6 +89,31 @@ public class SpatialGraphStatistics {
 		return stats;
 	}
 	
+	private static double descretize(double d) {
+		if(d == 0)
+			return 1;
+		else
+			return Math.ceil(d/1000.0);
+	}
+	
+	private static double calculateCircleSegment(double dx, double dy, double r) {
+		if(dx >= r && dy >= r) {
+			return Math.PI/2.0;
+		} else if (Math.sqrt(dx * dx + dy *dy) <= r){
+			return 0.0;
+		} else {
+			double alpha1 = 0;
+			if(dx < r)
+				alpha1 = Math.acos(dx/r);
+			
+			double alpha2 = Math.PI/2.0;
+			if(dy < r)
+				alpha2 = Math.asin(dy/r);
+			
+			return Math.abs(alpha2 - alpha1);
+		}
+	}
+	
 	public static Distribution normalizedEdgeLengthDistribution(Set<? extends SpatialVertex> vertices, SpatialGraph vertices2, double descretization) {
 		HashMap<SpatialVertex, TDoubleDoubleHashMap> normConstants = new HashMap<SpatialVertex, TDoubleDoubleHashMap>();
 		
@@ -95,36 +121,91 @@ public class SpatialGraphStatistics {
 		for(SpatialVertex v_i : vertices) {
 			
 			Coord c_i = v_i.getCoordinate();
-			if(c_i.getX() >= bounds[0] && c_i.getY() >= bounds[1] && c_i.getY() <= bounds[2] && c_i.getY() <= bounds[3]) {
-			TDoubleDoubleHashMap norm_i = new TDoubleDoubleHashMap();
-			
-			
-//			for(SpatialVertex v_j : vertices) {
-			for(SpatialVertex v_j : vertices2.getVertices()) {
-//				if(v_i != v_j) {
+			if(c_i.getX() >= bounds[0] && c_i.getY() >= bounds[1] && c_i.getX() <= bounds[2] && c_i.getY() <= bounds[3]) {
+				/*
+				 * count vertices per distance bin
+				 */
+				TDoubleDoubleHashMap n_d = new TDoubleDoubleHashMap();
+				for(SpatialVertex v_j : vertices2.getVertices()) {
 					Coord c_j = v_j.getCoordinate();
 					double d = CoordUtils.calcDistance(c_i, c_j);
-					
-					double bin = Math.ceil(d/descretization);
-					norm_i.adjustOrPutValue(bin, 1, 1);
-//				}
-			}
-			normConstants.put(v_i, norm_i);
+					double bin = descretize(d);
+					n_d.adjustOrPutValue(bin, 1, 1);
+				}
+				/*
+				 * determine density
+				 */
+				TDoubleDoubleHashMap b_d = new TDoubleDoubleHashMap();
+				TDoubleDoubleIterator it = n_d.iterator();
+				for(int k = 0; k < n_d.size(); k++) {
+					it.advance();
+					double r = it.key();
+					double count = it.value();
+					/*
+					 * determine the distances to the system boundaries
+					 */
+					double dx1 = descretize(c_i.getX() - bounds[0]);//(c_i.getX() - xmin) / descretization;
+					double dx2 = descretize(bounds[2] - c_i.getX());//(xmax - c_i.getX()) / descretization;
+					double dy1 = descretize(c_i.getY() - bounds[1]);//(c_i.getY() - ymin) / descretization;
+					double dy2 = descretize(bounds[3] - c_i.getY());//(ymax - c_i.getY()) / descretization;
+					/*
+					 * calculate the circle segment for each quadrant
+					 */
+					double b = calculateCircleSegment(dx2, dy2, r);
+					b += calculateCircleSegment(dy1, dx2, r);
+					b += calculateCircleSegment(dx1, dy1, r);
+					b += calculateCircleSegment(dy2, dx1, r);
+					/*
+					 * do some checks
+					 */
+					if (Double.isNaN(b)) {
+						throw new IllegalArgumentException("b must not be NaN!");
+					} else if(Double.isInfinite(b)) {
+						throw new IllegalArgumentException("b must not be infinity!");
+					} else if(b == 0) {
+						b = 0.001; //TODO: Check this!
+					}
+					b_d.put(r, b);
+					/*
+					 * set the new value for z_d
+					 */
+					double a = b*r - 0.5;
+					it.setValue(count/a);
+				}
+			
+				
+//				
+//				TDoubleDoubleHashMap norm_i = new TDoubleDoubleHashMap();
+//			
+//			
+////			for(SpatialVertex v_j : vertices) {
+//			for(SpatialVertex v_j : vertices2.getVertices()) {
+////				if(v_i != v_j) {
+//					Coord c_j = v_j.getCoordinate();
+//					double d = CoordUtils.calcDistance(c_i, c_j);
+//					
+//					double bin = Math.ceil(d/descretization);
+//					norm_i.adjustOrPutValue(bin, 1, 1);
+////				}
+//			}
+			normConstants.put(v_i, n_d);
 			}
 		}
 		
 		Distribution stats = new Distribution();
 		for(SpatialVertex v1 : vertices) {
 			Coord c_i = v1.getCoordinate();
-			if(c_i.getX() >= bounds[0] && c_i.getY() >= bounds[1] && c_i.getY() <= bounds[2] && c_i.getY() <= bounds[3]) {
-			for(SparseEdge e : v1.getEdges()) {
-				double d = ((SpatialEdge)e).length();
-				if(d > 0) {
-				double n = normConstants.get(v1).get(Math.ceil(d/descretization));
-				n += 1;
-				stats.add(d, 1/n);
+			if(c_i.getX() >= bounds[0] && c_i.getY() >= bounds[1] && c_i.getX() <= bounds[2] && c_i.getY() <= bounds[3]) {
+				for (SparseEdge e : v1.getEdges()) {
+					double d = ((SpatialEdge) e).length();
+					if (d > 0) {
+//						double n = normConstants.get(v1).get(
+//								Math.ceil(d / descretization));
+						double n = normConstants.get(v1).get(descretize(d));
+//						n += 1;
+						stats.add(d, 1 / n);
+					}
 				}
-			}
 			}
 		}
 		
