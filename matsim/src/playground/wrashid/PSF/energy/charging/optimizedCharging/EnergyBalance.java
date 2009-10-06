@@ -228,7 +228,7 @@ public class EnergyBalance {
 			if (bestEnergyPrice == null) {
 				// TODO: report, that the current vehicle could not reach the
 				// destination, because the electricity was finished
-				// there should be some input here to the utility function
+				// there should be some input here to the utility function (gasoline or if el. vehicle, bad utility => switch mode)
 				log.info("if this is an electric vehicle, then it has run out of power");
 				break;
 			}

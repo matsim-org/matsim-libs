@@ -95,7 +95,8 @@ public class ChargingTimes {
 		// the charging times is ordered after the time and not in the order, the charging actually happned (starting after first activity)
 		int firstIndex=0;
 		
-		while (curConsumptionLog.getEnterTime()>((ChargeLog)iterChargingTimes[firstIndex]).getStartChargingTime()){
+		// the length of iterChargingTimes can be zero, if charging of vehicle was not possible and it needed to drive on gazoline (or if electric vehicle, then quite bad for it...)
+		while (iterChargingTimes.length>0 && curConsumptionLog.getEnterTime()>((ChargeLog)iterChargingTimes[firstIndex]).getStartChargingTime()){
 			firstIndex++;
 		}
 		
