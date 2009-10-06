@@ -23,6 +23,7 @@ package org.matsim.core.replanning;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -99,15 +100,29 @@ public class PlanStrategy {
 	 */
 	public void run(final PersonImpl person) {
 		this.counter++;
+		
+		// if there is at least one unscored plan, find that one:
 		PlanImpl plan = person.getRandomUnscoredPlan();
+		
+		// otherwise, find one according to selector (often defined in PlanStrategy ctor):
 		if (plan == null) {
 			plan = this.planSelector.selectPlan(person);
 		}
+		
+		// "select" that plan:
 		person.setSelectedPlan(plan);
+		
+		// if there is a "module" (i.e. "innovation"):
 		if (this.firstModule != null) {
+			
+			// set the working plan to a copy of the selected plan:
 			plan = person.copySelectedPlan();
+			// (this makes, as a side effect, the _new_ plan selected)
+			
+			// add that new plan to the agent's plans:
 			this.plans.add(plan);
-			// start working on this plan already
+
+			// start working on this new plan:
 			if (this.firstModule instanceof PlanStrategyModule) {
 				((PlanStrategyModule) this.firstModule).handlePlan(plan);
 			} else if (this.firstModule instanceof BasicPlanStrategyModule) {
