@@ -42,7 +42,15 @@ public class ParametersPSF {
 	private static String main_chargingTimesOutputFilePath = "main.chargingTimesOutputFilePath";
 	private static String mainChargingTimesOutputFilePath = null;
 	
+	// used both for output of text file and png (just extentions added to the given input file name)
+	private static String main_energyUsageStatistics = "main.energyUsageStatistics";
+	private static String mainEnergyUsageStatistics = null;
+	
 	// TESTING PARAMETERS
+
+	public static String getMainEnergyUsageStatistics() {
+		return mainEnergyUsageStatistics;
+	}
 
 	private static String testing_ModeOn = "testingModeOn";
 	private static boolean testingModeOn = false;
@@ -114,8 +122,15 @@ public class ParametersPSF {
 			mainChargingTimesOutputFilePath = tempStringValue;
 		} else {
 			errorReadingParameter(main_chargingTimesOutputFilePath);
-		}		
-
+		}
+		
+		tempStringValue = controler.getConfig().findParam(PSFModule, main_energyUsageStatistics);
+		if (tempStringValue != null) {
+			mainEnergyUsageStatistics = tempStringValue;
+		} else {
+			infoMissingReadingParameter(main_energyUsageStatistics);
+		}
+		
 		if (testingModeOn) {
 			tempStringValue = controler.getConfig().findParam(PSFModule, testing_energyConsumptionPerLink);
 			if (tempStringValue != null) {
@@ -165,6 +180,10 @@ public class ParametersPSF {
 
 	private static void errorReadingParameter(String parameterName) {
 		log.error("parameter '" + parameterName + "' could not be read");
+	}
+	
+	private static void infoMissingReadingParameter(String parameterName) {
+		log.info("parameter '" + parameterName + "' could not be read");
 	}
 
 	/**

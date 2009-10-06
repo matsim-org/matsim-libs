@@ -451,7 +451,5 @@ public class AdvancedTests extends MatsimTestCase {
 		assertEquals(3150000.0, energyUsageStatistics[10][0], 1.0);
 		assertEquals(1350000.0, energyUsageStatistics[11][0], 1.0);
 		
-		
-		ChargingTimes.writeEnergyUsageStatisticsGrafic("C:\\data\\workspace\\matsim\\output\\PSF\\singleAgent\\abc.png",energyUsageStatistics, ParametersPSF.getHubLinkMapping().getNumberOfHubs());
 	}
 } 

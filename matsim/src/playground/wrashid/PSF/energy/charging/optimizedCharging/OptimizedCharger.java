@@ -95,7 +95,17 @@ public class OptimizedCharger {
 			ChargingTimes.writeChargingTimes(chargingTimes, ParametersPSF.getMainChargingTimesOutputFilePath());
 		}
 		
-		//TODO: output statistics to file (make parameter for that).
+		
+		
+		if (ParametersPSF.getMainEnergyUsageStatistics()!=null){
+			double[][] energyUsageStatistics = ChargingTimes.getEnergyUsageStatistics(chargingTimes,ParametersPSF.getHubLinkMapping()); 
+			
+			// write out grafics
+			ChargingTimes.writeEnergyUsageStatisticsGrafic(ParametersPSF.getMainEnergyUsageStatistics() + ".png",energyUsageStatistics, ParametersPSF.getHubLinkMapping().getNumberOfHubs());
+		
+			// TODO: write out text file
+			
+		}
 		
 		//TODO: output grafics for (input) price at each hub and output for each hub
 	}
