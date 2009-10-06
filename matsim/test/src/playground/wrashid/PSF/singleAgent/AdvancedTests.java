@@ -30,6 +30,7 @@ public class AdvancedTests extends MatsimTestCase {
 	SimulationStartupListener simulationStartupListener;
 	LogEnergyConsumption logEnergyConsumption;
 	LogParkingTimes logParkingTimes;
+	HashMap<Id, ChargingTimes> chargingTimes;
 
 	private void initTest(String configFile) {
 		controler = new Controler(configFile);
@@ -342,7 +343,7 @@ public class AdvancedTests extends MatsimTestCase {
 	public ChargingTimes getChargingTimesOfAgent(String agentId) {
 		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes
 				.getParkingTimes());
-		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
+		chargingTimes = optimizedCharger.getChargingTimes();
 
 		ChargingTimes chargingTimesOfAgent = chargingTimes.get(new IdImpl(agentId));
 		return chargingTimesOfAgent;
@@ -415,6 +416,8 @@ public class AdvancedTests extends MatsimTestCase {
   
 	/**
 	 * This covers a fixed bug, which occurs during charging in the night.
+	 * 
+	 * This also tests the method ChargingTimes.getEnergyUsageStatistics 
 	 */
 	public void test8OptimizedCharger() {
 		initTest("test/input/playground/wrashid/PSF/singleAgent/config2.xml");
@@ -436,5 +439,17 @@ public class AdvancedTests extends MatsimTestCase {
 		// fully charged in the end
 		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(11);
 		assertEquals(ParametersPSF.getDefaultMaxBatteryCapacity(), chargeLogOfAgentOne.getEndSOC(), 1.0);
+		
+		// also test energy Usage Statistics
+		
+		double[][] energyUsageStatistics = ChargingTimes.getEnergyUsageStatistics(chargingTimes,ParametersPSF.getHubLinkMapping()); 
+		
+		// the vehicle charges between 
+		
+		//energy charged between 150 and 165 min:  3150000
+		//energy charged between 165 and 180 min:  1350000
+		assertEquals(3150000.0, energyUsageStatistics[10][0], 1.0);
+		assertEquals(1350000.0, energyUsageStatistics[11][0], 1.0);
+		
 	}
 } 

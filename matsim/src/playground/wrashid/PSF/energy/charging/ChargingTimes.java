@@ -11,6 +11,7 @@ import java.util.PriorityQueue;
 import org.matsim.api.basic.v01.Id;
 
 import playground.wrashid.PSF.ParametersPSF;
+import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF.energy.consumption.EnergyConsumption;
 import playground.wrashid.PSF.energy.consumption.LinkEnergyConsumptionLog;
 import playground.wrashid.PSF.parking.ParkLog;
@@ -18,6 +19,7 @@ import playground.wrashid.PSF.parking.ParkLog;
 public class ChargingTimes {
 
 	private PriorityQueue<ChargeLog> chargingTimes = new PriorityQueue<ChargeLog>();
+	private static final int numberOfTimeBins = 96;
 
 	public double getTotalEnergyCharged(){
 		double totalEnergyCharged=0;
@@ -170,5 +172,51 @@ public class ChargingTimes {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	public static void printEnergyUsageStatistics(HashMap<Id, ChargingTimes> chargingTimes, HubLinkMapping hubLinkMapping){
+		double[][] energyUsageStatistics= getEnergyUsageStatistics(chargingTimes,hubLinkMapping); 
+		
+		// write header
+		System.out.print("time");
+		for (int j=0;j<hubLinkMapping.getNumberOfHubs();j++){
+			System.out.print("\tHub");
+			System.out.print(j);
+		}
+		System.out.println();
+		
+		// write data
+		for (int i=0;i<numberOfTimeBins;i++){
+			System.out.print(i*900);
+			for (int j=0;j<hubLinkMapping.getNumberOfHubs();j++){
+				System.out.print("\t");
+				System.out.print(energyUsageStatistics[i][j]);
+			}
+			System.out.println();
+		}
+		
+	}
+	
+	/**
+	 * find out how much energy was used in which time slot at which hub 
+	 * format: the first index of the result array is the slotIndex (15 min bins), the second index is the hub id
+	 * 
+	 * TODO: write tests for it!
+	 */
+	public static double[][] getEnergyUsageStatistics(HashMap<Id, ChargingTimes> chargingTimes, HubLinkMapping hubLinkMapping){
+		double[][] energyUsageStatistics= new double[numberOfTimeBins][hubLinkMapping.getNumberOfHubs()];
+		
+		for (Id personId : chargingTimes.keySet()) {
+			ChargingTimes curChargingTime = chargingTimes.get(personId);
+
+			for (ChargeLog chargeLog : curChargingTime.getChargingTimes()) {
+				int slotIndex= Math.round((float)Math.floor(chargeLog.getStartChargingTime()/900));
+				
+				energyUsageStatistics[slotIndex][hubLinkMapping.getHubNumber(chargeLog.getLinkId().toString())]+=chargeLog.getEnergyCharged();
+			}
+		}
+		return energyUsageStatistics;
+	}
+	
 
 }

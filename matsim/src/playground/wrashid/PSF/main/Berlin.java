@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.controler.Controler;
 
+import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.ParametersPSFMutator;
 import playground.wrashid.PSF.energy.AddEnergyScoreListener;
 import playground.wrashid.PSF.energy.SimulationStartupListener;
@@ -35,6 +36,8 @@ public class Berlin implements ParametersPSFMutator {
 		
 		OptimizedCharger optimizedCharger= new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(),logParkingTimes.getParkingTimes());
 		HashMap<Id, ChargingTimes> chargingTimes=optimizedCharger.getChargingTimes();
+		
+		ChargingTimes.printEnergyUsageStatistics(chargingTimes, ParametersPSF.getHubLinkMapping());
 	} 
 
 	public void mutateParameters() {
