@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.income2;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 
 import playground.benjamin.income1.BKickIncomeControler;
@@ -30,11 +31,19 @@ import playground.benjamin.income1.BKickIncomeControler;
  */
 public class BKickIncomeControler2 extends BKickIncomeControler {
 
+	public BKickIncomeControler2(String arg) {
+		super(arg);
+	}
+	
 	public BKickIncomeControler2(String[] args) {
 		super(args);
 	}
 
 	
+	public BKickIncomeControler2(Config config) {
+		super(config);
+	}
+
 	public static void main(String[] args) {
 //	String config = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
 //	String[] args2 = {config};
