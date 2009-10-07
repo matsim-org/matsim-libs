@@ -62,7 +62,7 @@ public class RunCommercialActivityAnalyser {
 			
 		// Create an instance of the analyser.
 //		MyStringBuilder sb = new MyStringBuilder("/Users/johanwjoubert/MATSim/workspace/MATSimData/");		// Mac
-		MyStringBuilder sb = new MyStringBuilder("/home/jjoubert/data/DigiCore/");							// Satawal
+		MyStringBuilder sb = new MyStringBuilder("/home/jjoubert/data/");									// Satawal
 		CommercialActivityAnalyser caa = new CommercialActivityAnalyser(sb, sb.getWgs84(), sb.getUtm35S(), studyAreaName, ds);
 
 		// Sample for different threshold values.
