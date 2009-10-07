@@ -27,7 +27,7 @@ public class HubPriceInfo {
 
 		this.numberOfHubs = numberOfHubs;
 
-		hubPrice = GeneralLib.readMatrix(numberOfTimeBins,numberOfHubs,true,fileName);
+		hubPrice = GeneralLib.readMatrix(numberOfTimeBins,numberOfHubs,false,fileName);
 		// need to invert the matrix, because hubPrice expects the hub number as the first dimension and
 		// the time as the second dimension.
 		hubPrice = GeneralLib.invertMatrix(hubPrice);
