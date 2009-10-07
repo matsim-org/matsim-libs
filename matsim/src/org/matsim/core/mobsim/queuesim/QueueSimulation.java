@@ -376,6 +376,7 @@ public class QueueSimulation {
 
 	protected void prepareLanes(){
 		if (this.laneDefintions != null){
+			log.info("Lanes enabled...");
 			for (BasicLanesToLinkAssignment laneToLink : this.laneDefintions.getLanesToLinkAssignmentsList()){
 				QueueLink link = this.network.getQueueLink(laneToLink.getLinkId());
 				if (link == null) {
