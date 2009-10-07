@@ -96,18 +96,18 @@ public class OptimizedCharger {
 		}
 		
 		
-		
+		// write out energy usage statistics (data and graph)
 		if (ParametersPSF.getMainEnergyUsageStatistics()!=null){
 			double[][] energyUsageStatistics = ChargingTimes.getEnergyUsageStatistics(chargingTimes,ParametersPSF.getHubLinkMapping()); 
 			
-			// write out grafics
-			ChargingTimes.writeEnergyUsageStatisticsGrafic(ParametersPSF.getMainEnergyUsageStatistics() + ".png",energyUsageStatistics, ParametersPSF.getHubLinkMapping().getNumberOfHubs());
-		
 			ChargingTimes.writeEnergyUsageStatisticsData(ParametersPSF.getMainEnergyUsageStatistics() + ".txt", energyUsageStatistics, ParametersPSF.getHubLinkMapping().getNumberOfHubs());
+			
+			ChargingTimes.writeEnergyUsageStatisticsGrafic(ParametersPSF.getMainEnergyUsageStatistics() + ".png",energyUsageStatistics, ParametersPSF.getHubLinkMapping().getNumberOfHubs());
 		}
 		
-		//TODO: output grafics for (input) price at each hub and output for each hub
-	}
+		// output the price graphics
+		ParametersPSF.getHubPriceInfo().writePriceGraph(ParametersPSF.getMainHubPriceGraphFileName());
+	} 
 	
 	public HashMap<Id, ChargingTimes> getChargingTimes() {
 		return chargingTimes;

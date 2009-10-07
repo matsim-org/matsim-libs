@@ -96,7 +96,7 @@ public class GeneralLib {
 	public static void writeList(ArrayList<String> list, String fileName) {
 		try {
 			FileOutputStream fos = new FileOutputStream(fileName);
-			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos, "UTF8");
+			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos);
 
 			for (int i = 0; i < list.size(); i++) {
 				outputStreamWriter.write(list.get(i));

@@ -46,6 +46,9 @@ public class ParametersPSF {
 	private static String main_energyUsageStatistics = "main.energyUsageStatistics";
 	private static String mainEnergyUsageStatistics = null;
 	
+	// MAKE THESE PARAMETERS CONFIGURABLE, IF NEEDED
+	private static String mainHubPriceGraphFileName = null;
+	
 	// TESTING PARAMETERS
 
 	public static String getMainEnergyUsageStatistics() {
@@ -159,14 +162,22 @@ public class ParametersPSF {
 			} else {
 				errorReadingParameter(testing_lowTariffElectrictyPrice);
 			}
-
 		}
 
+		// add output path prefix to filename
+		mainHubPriceGraphFileName="hubPrices.png";
+		mainHubPriceGraphFileName= controler.getOutputFilename(mainHubPriceGraphFileName);
+		
+		
 		// TODO: adapt this later, when we have better models (e.g. consider car
 		// type also)
 		averageEnergyConsumptionBins = new AverageEnergyConsumptionGalus();
 
 		resetInternalParameters();
+	}
+
+	public static String getMainHubPriceGraphFileName() {
+		return mainHubPriceGraphFileName;
 	}
 
 	public static HubLinkMapping getHubLinkMapping() {

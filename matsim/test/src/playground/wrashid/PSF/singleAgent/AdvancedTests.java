@@ -450,6 +450,5 @@ public class AdvancedTests extends MatsimTestCase {
 		//energy charged between 165 and 180 min:  1350000
 		assertEquals(3150000.0, energyUsageStatistics[10][0], 1.0);
 		assertEquals(1350000.0, energyUsageStatistics[11][0], 1.0);
-		
 	}
 } 

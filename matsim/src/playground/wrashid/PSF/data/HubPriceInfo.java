@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+
+import org.matsim.core.utils.charts.XYLineChart;
+
 import playground.wrashid.lib.GeneralLib;
 
 /*
@@ -69,6 +72,28 @@ public class HubPriceInfo {
 				hubPrice[0][i] = offPeakRate;
 			}
 		}
+	}
+	
+	public void writePriceGraph(String fileName){
+		XYLineChart chart = new XYLineChart("Hub Energy Prices", "Time of Day [s]", "Price [CHF]");
+
+		double[] time = new double[numberOfTimeBins];
+
+		for (int i = 0; i < numberOfTimeBins; i++) {
+			time[i] = i * 900;
+		}
+
+		for (int i = 0; i < numberOfHubs; i++) {
+			double[] priceInfo = new double[numberOfTimeBins];
+			for (int j = 0; j < numberOfTimeBins; j++) {
+				// convert from Joule to kWh
+				priceInfo[j] = hubPrice[i][j];
+			}
+			chart.addSeries("hub-" + i, time, priceInfo);
+		}
+
+		// chart.addMatsimLogo();
+		chart.saveAsPng(fileName, 800, 600);
 	}
 
 	/*
