@@ -420,7 +420,7 @@ public class AdvancedTests extends MatsimTestCase {
 	 * This also tests the method ChargingTimes.getEnergyUsageStatistics 
 	 */
 	public void test8OptimizedCharger() {
-		initTest("test/input/playground/wrashid/PSF/singleAgent/config2.xml");
+		initTest("test/input/playground/wrashid/PSF/singleAgent/config8.xml"); 
 
 		simulationStartupListener.addParameterPSFMutator(new ParametersPSFMutator() {
 			public void mutateParameters() {
