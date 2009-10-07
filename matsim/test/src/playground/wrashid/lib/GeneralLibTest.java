@@ -27,4 +27,26 @@ public class GeneralLibTest extends MatsimTestCase {
 		assertEquals(23, facilities.getFacilities().size());
 		  
 	}
-}       
+	
+	public void testReadWriteMatrix(){
+		double[][] hubPriceInfoOriginal=GeneralLib.readMatrix(96, 4, false, "test/input/playground/wrashid/PSF/data/hubPriceInfo.txt");
+	
+		GeneralLib.writeMatrix(hubPriceInfoOriginal, "output/hubPriceInfo.txt", null);
+		
+		double[][] hubPriceInfoRead=GeneralLib.readMatrix(96, 4, false, "output/hubPriceInfo.txt");
+		
+		assertTrue(isEqual(hubPriceInfoOriginal, hubPriceInfoRead));
+	}
+	
+	private boolean isEqual(double[][] matrixA, double[][] matrixB){
+		for (int i=0;i<matrixA.length;i++){
+			for (int j=0;j<matrixA[0].length;j++){
+				if (matrixA[i][j]!=matrixB[i][j]){
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+}      

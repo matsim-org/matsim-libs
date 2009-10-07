@@ -37,7 +37,7 @@ public class ChargingTimes {
 
 		return totalEnergyCharged;
 	}
-
+ 
 	public void addChargeLog(ChargeLog chargeLog) {
 		chargingTimes.add(chargeLog);
 	}
@@ -198,6 +198,19 @@ public class ChargingTimes {
 		// chart.addMatsimLogo();
 		chart.saveAsPng(fileName, 800, 600);
 	}
+	
+	// 96 data points for each hub
+	public static void writeEnergyUsageStatisticsData(String fileName, double[][] energyUsageStatistics, int numberOfHubs) {
+		String headerLine="";
+		
+		for (int i=1;i<numberOfHubs;i++){
+			headerLine+="hub-"+i+"\t";
+		}
+		
+		headerLine+="hub-"+numberOfHubs+"\t";
+		
+		GeneralLib.writeMatrix(energyUsageStatistics, fileName, headerLine);
+	}
 
 	public static void printEnergyUsageStatistics(HashMap<Id, ChargingTimes> chargingTimes, HubLinkMapping hubLinkMapping) {
 		double[][] energyUsageStatistics = getEnergyUsageStatistics(chargingTimes, hubLinkMapping);
@@ -244,5 +257,5 @@ public class ChargingTimes {
 		}
 		return energyUsageStatistics;
 	}
-
-}
+ 
+} 

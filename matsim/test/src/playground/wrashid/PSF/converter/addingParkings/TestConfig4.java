@@ -17,7 +17,7 @@ public class TestConfig4  extends MatsimTestCase {
 		// start simulation run
 		String configFilePath="test/input/playground/wrashid/PSF/converter/addParkings/config4.xml";
 		new GeneralTestOptimizedCharger(configFilePath).optimizedChargerTest();
-	}
-	 
-} 
+	} 
+	  
+}
  
