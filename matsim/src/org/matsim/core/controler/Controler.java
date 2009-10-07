@@ -88,7 +88,8 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -100,6 +101,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -213,7 +215,11 @@ public class Controler {
 		}
 	};
 	private ScenarioLoader loader;
+	
+	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 
+	private TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
+	
 	/** initializes Log4J */
 	static {
 		final String logProperties = "log4j.xml";
@@ -434,11 +440,11 @@ public class Controler {
 	 */
 	protected void setUp() {
 		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = TravelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config
+			this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config
 					.travelTimeCalculator());
 		}
 		if (this.travelCostCalculator == null) {
-			this.travelCostCalculator = new TravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config
+			this.travelCostCalculator = this.travelCostCalculatorFactory.createTravelCostCalculator(this.travelTimeCalculator, this.config
 					.charyparNagelScoring());
 		}
 		this.events.addHandler(this.travelTimeCalculator);
@@ -1326,6 +1332,16 @@ public class Controler {
 
 	public PlansScoring getPlansScoring() {
 		return this.plansScoring;
+	}
+
+	
+	public TravelTimeCalculatorFactory getTravelTimeCalculatorFactory() {
+		return travelTimeCalculatorFactory;
+	}
+
+	
+	public void setTravelTimeCalculatorFactory(TravelTimeCalculatorFactory travelTimeCalculatorFactory) {
+		this.travelTimeCalculatorFactory = travelTimeCalculatorFactory;
 	}
 
 }

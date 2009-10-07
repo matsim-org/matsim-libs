@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeDataArrayFactory.java
+ * TravelCostCalculatorFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,24 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.router.costcalculators;
 
-package org.matsim.core.trafficmonitoring;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 
-public class TravelTimeDataArrayFactory implements TravelTimeDataFactory {
-
-	private final Network network;
-	private final int numSlots;
+/**
+ * @author dgrether
+ *
+ */
+public interface TravelCostCalculatorFactory {
 	
-	public TravelTimeDataArrayFactory(final Network network, final int numSlots) {
-		this.network = network;
-		this.numSlots = numSlots;
-	}
-	
-	public TravelTimeData createTravelTimeData(Id linkId) {
-		return new TravelTimeDataArray(this.network.getLinks().get(linkId), this.numSlots);
-	}
+	public TravelCost createTravelCostCalculator(TravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup);
 
 }

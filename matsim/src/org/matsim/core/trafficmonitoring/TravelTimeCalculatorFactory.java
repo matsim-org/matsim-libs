@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeCalculatorBuilder
+ * TravelTimeCalculatorFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,42 +19,10 @@
  * *********************************************************************** */
 package org.matsim.core.trafficmonitoring;
 
-import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 
-import org.matsim.core.network.NetworkLayer;
+public interface TravelTimeCalculatorFactory {
 
-
-/**
- * @author dgrether
- * @author mrieser
- */
-abstract public class TravelTimeCalculatorFactory {
-
-	private static final Logger log = Logger.getLogger(TravelTimeCalculatorFactory.class);
-
-	public static TravelTimeCalculator createTravelTimeCalculator(final NetworkLayer network, final TravelTimeCalculatorConfigGroup group) {
-		TravelTimeCalculator calculator = new TravelTimeCalculator(network, group);
-		
-		// set travelTimeData factory
-		if ("TravelTimeCalculatorArray".equals(group.getTravelTimeCalculatorType())) {
-			calculator.setTravelTimeDataFactory(new TravelTimeDataArrayFactory(network, calculator.numSlots));
-		} else if ("TravelTimeCalculatorHashMap".equals(group.getTravelTimeCalculatorType())) {
-			calculator.setTravelTimeDataFactory(new TravelTimeDataHashMapFactory(network));
-		} else {
-			throw new RuntimeException(group.getTravelTimeCalculatorType() + " is unknown!");
-		}
-		
-		// set travelTimeAggregator
-		if ("optimistic".equals(group.getTravelTimeAggregatorType())) {
-			calculator.setTravelTimeAggregator(new OptimisticTravelTimeAggregator(calculator.numSlots, calculator.timeslice));
-		} else if ("experimental_LastMile".equals(group.getTravelTimeAggregatorType())) {
-			calculator.setTravelTimeAggregator(new PessimisticTravelTimeAggregator(calculator.numSlots, calculator.timeslice));
-			log.warn("Using experimental TravelTimeAggregator! \nIf this was not intendet please remove the travelTimeAggregator entry in the controler section in your config.xml!");
-		} else {
-			throw new RuntimeException(group.getTravelTimeAggregatorType() + " is unknown!");
-		}
-		
-		return calculator;
-	}
+	public TravelTimeCalculator createTravelTimeCalculator(final Network network, final TravelTimeCalculatorConfigGroup group);
 	
 }

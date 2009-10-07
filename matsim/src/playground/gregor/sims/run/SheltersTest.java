@@ -16,12 +16,10 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.flooding.FloodingReader;
 
-import playground.gregor.sims.shelters.linkpenaltyII.ShelterInputCounterLinkPenalty;
 import playground.gregor.sims.shelters.socialcost.ShelterInputCounterSocialCost;
 
 public class SheltersTest extends Controler{
@@ -62,7 +60,7 @@ public class SheltersTest extends Controler{
 		
 		
 		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = TravelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+			this.travelTimeCalculator = this.getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		}
 		
 		String netcdf = this.config.evacuation().getFloodingDataFile();

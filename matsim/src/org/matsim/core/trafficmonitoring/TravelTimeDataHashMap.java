@@ -23,6 +23,7 @@ package org.matsim.core.trafficmonitoring;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.misc.IntegerCache;
 
@@ -38,9 +39,9 @@ import org.matsim.core.utils.misc.IntegerCache;
 public class TravelTimeDataHashMap implements TravelTimeData {
 	private final Map<Integer,TimeStruct> travelTimes;
 	
-	private final LinkImpl link;
+	private final Link link;
 
-	public TravelTimeDataHashMap(final LinkImpl link) {
+	public TravelTimeDataHashMap(final Link link) {
 		this.travelTimes =  new ConcurrentHashMap<Integer,TimeStruct>();
 		this.link = link;
 		resetTravelTimes();
@@ -64,7 +65,7 @@ public class TravelTimeDataHashMap implements TravelTimeData {
 
 		TimeStruct ts = this.travelTimes.get(IntegerCache.getInteger(timeSlice));
 		if (ts == null) {
-			return this.link.getFreespeedTravelTime(now);
+			return ((LinkImpl)this.link).getFreespeedTravelTime(now);
 		}
 		return ts.timeSum / ts.cnt;
 	}

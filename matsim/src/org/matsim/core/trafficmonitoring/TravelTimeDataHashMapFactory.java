@@ -21,13 +21,13 @@
 package org.matsim.core.trafficmonitoring;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.api.core.v01.network.Network;
 
 public class TravelTimeDataHashMapFactory implements TravelTimeDataFactory {
 
-	private final NetworkLayer network;
+	private final Network network;
 	
-	public TravelTimeDataHashMapFactory(final NetworkLayer network) {
+	public TravelTimeDataHashMapFactory(final Network network) {
 		this.network = network;
 	}
 	

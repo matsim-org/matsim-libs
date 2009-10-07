@@ -7,16 +7,12 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.BuildingsShapeReader;
 import org.matsim.evacuation.base.EvacuationPopulationFromShapeFileLoader;
 import org.matsim.evacuation.flooding.FloodingReader;
-import org.matsim.evacuation.riskaversion.RiskCostCalculator;
-import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData;
 import org.matsim.evacuation.shelters.EvacuationShelterNetLoader;
 
-import playground.gregor.sims.shelters.linkpenaltyII.ShelterInputCounterLinkPenalty;
 import playground.gregor.sims.shelters.socialcost.ShelterInputCounterSocialCost;
 
 
@@ -56,7 +52,7 @@ public class ShelterEvacuationController extends Controler {
 		
 		
 		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = TravelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+			this.travelTimeCalculator = this.getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		}
 		
 		String netcdf = this.config.evacuation().getFloodingDataFile();

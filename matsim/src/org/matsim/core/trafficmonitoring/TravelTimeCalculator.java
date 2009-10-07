@@ -33,7 +33,7 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
@@ -80,11 +80,11 @@ public class TravelTimeCalculator
 	
 	private TravelTimeDataFactory ttDataFactory = null; 
 	
-	public TravelTimeCalculator(final NetworkLayer network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
+	public TravelTimeCalculator(final Network network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this(network, ttconfigGroup.getTraveltimeBinSize(), 30*3600, ttconfigGroup); // default: 30 hours at most
 	}
 
-	public TravelTimeCalculator(final NetworkLayer network, final int timeslice, final int maxTime,
+	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
 			TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this.timeslice = timeslice;
 		this.numSlots = (maxTime / this.timeslice) + 1;
