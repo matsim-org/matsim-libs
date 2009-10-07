@@ -20,7 +20,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="./output/PSF/converter/addParkings3/" />
+		<param name="outputDirectory" value="./output/PSF/converter/addParkings4/" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 		<param name= "writeEventsInterval" value="4" />
