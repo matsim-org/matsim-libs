@@ -19,9 +19,9 @@ import com.vividsolutions.jts.geom.Point;
 public class CommercialVehicle {
 	private int vehID;	
 	private List<Chain> chains;
-	private int avgActivitesPerChain;
-	private int avgChainDuration;
-	private int avgChainDistance; 
+	private int averageActivitesPerChain;
+	private int averageChainDuration;
+	private int averageChainDistance; 
 	private double fractionMinorInStudyArea;
 	private double fractionMajorInStudyArea;
 	private double kilometerPerAreaActivityStat;
@@ -35,9 +35,9 @@ public class CommercialVehicle {
 
 		this.vehID = id;
 		this.chains = new ArrayList<Chain>();
-		this.avgActivitesPerChain = 0;
-		this.avgChainDuration = 0;
-		this.avgChainDistance = 0;
+		this.averageActivitesPerChain = 0;
+		this.averageChainDuration = 0;
+		this.averageChainDistance = 0;
 		this.fractionMinorInStudyArea = 0;
 		this.fractionMajorInStudyArea = 0;
 		this.kilometerPerAreaActivityStat = 0;
@@ -87,9 +87,9 @@ public class CommercialVehicle {
 			for (Chain chain : this.chains) {
 				totalActivities += (chain.getActivities().size() - 2);
 			}
-			this.avgActivitesPerChain = (int) ( totalActivities / (double) this.chains.size() );
+			this.averageActivitesPerChain = (int) ( totalActivities / (double) this.chains.size() );
 		} else{
-			this.avgActivitesPerChain = (0);
+			this.averageActivitesPerChain = (0);
 		}
 	}
 
@@ -99,9 +99,9 @@ public class CommercialVehicle {
 			for (Chain chain : this.chains){
 				duration += chain.getDuration();
 			}
-			this.avgChainDuration = (int) (duration / (double) this.chains.size());
+			this.averageChainDuration = (int) (duration / (double) this.chains.size());
 		} else{
-			this.avgChainDuration = (0);
+			this.averageChainDuration = (0);
 		}
 	}
 
@@ -111,9 +111,9 @@ public class CommercialVehicle {
 			for(Chain chain: this.chains ){
 				totalDistance += chain.getDistance();
 			}
-			this.avgChainDistance = ((totalDistance / this.chains.size() ));
+			this.averageChainDistance = ((totalDistance / this.chains.size() ));
 		} else{
-			this.avgChainDistance = (0);
+			this.averageChainDistance = (0);
 		}
 	}
 
@@ -211,15 +211,15 @@ public class CommercialVehicle {
 	}
 
 	public int getAvgActivitesPerChain() {
-		return avgActivitesPerChain;
+		return averageActivitesPerChain;
 	}
 
 	public int getAvgChainDuration() {
-		return avgChainDuration;
+		return averageChainDuration;
 	}
 
 	public int getAvgChainDistance() {
-		return avgChainDistance;
+		return averageChainDistance;
 	}
 
 	public double getFractionMinorInStudyArea() {
