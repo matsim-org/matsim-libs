@@ -10,6 +10,7 @@ import playground.wrashid.PSF.data.energyConsumption.AverageEnergyConsumptionBin
 import playground.wrashid.PSF.data.energyConsumption.AverageEnergyConsumptionGalus;
 import playground.wrashid.PSF.data.powerCharging.DefaultChargingPower;
 import playground.wrashid.PSF.data.powerCharging.FacilityChargingPowerMapper;
+import playground.wrashid.lib.GeneralLib;
 
 public class ParametersPSF {
 
@@ -46,10 +47,19 @@ public class ParametersPSF {
 	private static String main_energyUsageStatistics = "main.energyUsageStatistics";
 	private static String mainEnergyUsageStatistics = null;
 	
+	// the data about the base load (without electric vehicles at each hub), in joules
+	private static String main_baseLoadPath = "main.baseLoadPath";
+	private static double[][] mainBaseLoad = null;
+	
 	// MAKE THESE PARAMETERS CONFIGURABLE, IF NEEDED
 	private static String mainHubPriceGraphFileName = null;
+	private static String mainBaseLoadOutputGraphFileName=null;
 	
 	// TESTING PARAMETERS
+
+	public static String getMainBaseLoadOutputGraphFileName() {
+		return mainBaseLoadOutputGraphFileName;
+	}
 
 	public static String getMainEnergyUsageStatistics() {
 		return mainEnergyUsageStatistics;
@@ -112,6 +122,13 @@ public class ParametersPSF {
 		} else {
 			errorReadingParameter(main_hubLinkMappingPath);
 		}
+		
+		tempStringValue = controler.getConfig().findParam(PSFModule, main_baseLoadPath);
+		if (tempStringValue != null) {
+			mainBaseLoad = GeneralLib.readMatrix(96, numberOfHubs, false, tempStringValue);
+		} else {
+			errorReadingParameter(main_baseLoadPath);
+		}
 
 		tempStringValue = controler.getConfig().findParam(PSFModule, testing_ModeOn);
 		if (tempStringValue != null) {
@@ -167,6 +184,9 @@ public class ParametersPSF {
 		// add output path prefix to filename
 		mainHubPriceGraphFileName="hubPrices.png";
 		mainHubPriceGraphFileName= controler.getOutputFilename(mainHubPriceGraphFileName);
+		
+		mainBaseLoadOutputGraphFileName="baseLoad.png";
+		mainBaseLoadOutputGraphFileName= controler.getOutputFilename(mainBaseLoadOutputGraphFileName);
 		
 		
 		// TODO: adapt this later, when we have better models (e.g. consider car
@@ -296,6 +316,10 @@ public class ParametersPSF {
 
 	public static String getMainChargingTimesOutputFilePath() {
 		return mainChargingTimesOutputFilePath;
+	}
+	
+	public static double[][] getMainBaseLoad() {
+		return mainBaseLoad;
 	}
 	
 	// if any thing needs to be processed after mutation of the parameters,

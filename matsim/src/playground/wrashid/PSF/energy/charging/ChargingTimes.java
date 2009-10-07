@@ -177,10 +177,17 @@ public class ChargingTimes {
 		GeneralLib.writeList(list, outputFilePath);
 	}
 
-	public static void writeEnergyUsageStatisticsGrafic(String fileName, double[][] energyUsageStatistics, int numberOfHubs) {
-		XYLineChart chart = new XYLineChart("Energy Consumption", "Time of Day [s]", "Energy Consumption [kWh]");
+	public static void writeVehicleEnergyConsumptionStatisticsGraphic(String fileName, double[][] energyUsageStatistics) {
+		writeEnergyConsumptionGraphic(fileName,energyUsageStatistics,"Vehicle Energy Consumption");
+	}
+	
+	
+	
+	public static void writeEnergyConsumptionGraphic(String fileName, double[][] energyUsageStatistics, String title){
+		XYLineChart chart = new XYLineChart(title, "Time of Day [s]", "Energy Consumption [kWh]");
 
 		double[] time = new double[numberOfTimeBins];
+		int numberOfHubs=energyUsageStatistics[0].length;
 
 		for (int i = 0; i < numberOfTimeBins; i++) {
 			time[i] = i * 900;

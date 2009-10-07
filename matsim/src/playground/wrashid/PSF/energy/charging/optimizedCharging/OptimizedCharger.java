@@ -6,6 +6,8 @@ import java.util.Iterator;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
+import EDU.oswego.cs.dl.util.concurrent.FJTask.Par;
+
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF.energy.consumption.EnergyConsumption;
@@ -102,11 +104,16 @@ public class OptimizedCharger {
 			
 			ChargingTimes.writeEnergyUsageStatisticsData(ParametersPSF.getMainEnergyUsageStatistics() + ".txt", energyUsageStatistics, ParametersPSF.getHubLinkMapping().getNumberOfHubs());
 			
-			ChargingTimes.writeEnergyUsageStatisticsGrafic(ParametersPSF.getMainEnergyUsageStatistics() + ".png",energyUsageStatistics, ParametersPSF.getHubLinkMapping().getNumberOfHubs());
+			ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(ParametersPSF.getMainEnergyUsageStatistics() + ".png",energyUsageStatistics);
 		}
 		
 		// output the price graphics
 		ParametersPSF.getHubPriceInfo().writePriceGraph(ParametersPSF.getMainHubPriceGraphFileName());
+	
+		// output base load data
+		if (ParametersPSF.getMainBaseLoad()!=null){
+			ChargingTimes.writeEnergyConsumptionGraphic(ParametersPSF.getMainBaseLoadOutputGraphFileName(), ParametersPSF.getMainBaseLoad(), "Base Load");
+		}
 	} 
 	
 	public HashMap<Id, ChargingTimes> getChargingTimes() {
