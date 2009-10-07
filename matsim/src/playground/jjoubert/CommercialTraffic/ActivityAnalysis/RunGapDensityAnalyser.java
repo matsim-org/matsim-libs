@@ -23,18 +23,23 @@ package playground.jjoubert.CommercialTraffic.ActivityAnalysis;
 public class RunGapDensityAnalyser {
 
 	/**
-	 * @param args
+	 * This is just an implementation of the <code>GapDensityAnalyser</code> class.
 	 */
 	public static void main(String[] args) {
 
-		String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData";
+//		String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData";		// Mac
+		String root = "/home/jjoubert/data/";									// Satawal
 		String studyArea = "Gauteng";
-		String version = "20090922165959";
-		String threshold = "0300";
-		String sample = "01";
+		String version = "20091007093450";
+		String[] thresholdArray = {"0300"};
+		String[] sampleArray = {"01","02","03","04","05","06","07","08","09","10"};
 		
-		GapDensityAnalyser gda = new GapDensityAnalyser(studyArea, version, threshold, sample, root);
-		gda.analyseGapDensity();
+		for (String threshold : thresholdArray) {
+			for (String sample : sampleArray) {
+				GapDensityAnalyser gda = new GapDensityAnalyser(studyArea, version, threshold, sample, root);
+				gda.analyseGapDensity();				
+			}
+		}
 	}
 
 }
