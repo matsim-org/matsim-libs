@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickControler2
+ * BKickIncomeControlerMain
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,48 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin;
+package playground.benjamin.income1;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.ScoringFunctionFactory;
+import playground.dgrether.DgPaths;
 
 
-/**
- * Controler for first zurich scenario test run of estimated scoring function.
- * @author dgrether
- *
- */
-public class BKickControler2 extends BKickControler {
-
-	public BKickControler2(String configFileName) {
-		super(configFileName);
-	}
+public class BKickIncomeControlerMain {
 	
-	public BKickControler2(Config conf){
-		super(conf);
-	}
-
-	public BKickControler2(String[] args) {
-		super(args);
-	}
-
-	@Override
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new BKickScoringFunctionFactory(this.config.charyparNagelScoring());
-	}
-
-	
-	public static void main(final String[] args) {
-		if ((args == null) || (args.length == 0)) {
-			System.out.println("No argument given!");
-			System.out.println("Usage: Controler config-file [dtd-file]");
-			System.out.println();
-		} else {
-			final Controler controler = new BKickControler2(args);
-			controler.run();
-		}
-		System.exit(0);
+	public static void main(String[] args){
+//		String config = DgPaths.STUDIESDG + "einkommenSchweiz/config_households_all_zrh30km_10pct.xml";
+//		String config = DgPaths.RUNBASE + "run724/resumeConfig.xml";
+//		new BKickIncomeControler(config).run();
+		
+		String config = DgPaths.RUNBASE + "run734/resumeConfig.xml";
+		new BKickIncomeControler(config).run();
 	}
 
 }

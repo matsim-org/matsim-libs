@@ -26,8 +26,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.benjamin.income.ChartData;
-import playground.benjamin.income.ChartDataWriter;
+import playground.benjamin.income1.ChartData;
+import playground.benjamin.income1.ChartDataWriter;
 import playground.dgrether.utils.DgChartUtils;
 
 public class DgDeltaScoreIncomeChart {

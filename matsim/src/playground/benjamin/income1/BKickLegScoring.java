@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income;
+package playground.benjamin.income1;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;

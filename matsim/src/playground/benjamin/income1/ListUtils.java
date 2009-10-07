@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ChartData
+ * ListUtils
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,76 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income;
+package playground.benjamin.income1;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.matsim.core.utils.collections.Tuple;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * @author dgrether
  *
  */
-public class ChartData {
+public class ListUtils {
 
-	private String chartName;
-	private String xLabel;
-	
-	private String yLabel;
-
-	private Map<String, Tuple<double[], double[]>> series = new HashMap<String, Tuple<double[], double[]>>();
-	
-	public ChartData(String chartName, String xlabel, String ylabel) {
-		this.chartName = chartName;
-		this.xLabel = xlabel;
-		this.yLabel = ylabel;
+	static <T> List<T> makeList(T...ts ){
+		List<T> l = new ArrayList<T>();
+		for (T t : ts){
+			l.add(t);
+		}
+		return l;
 	}
-	
-	public void addSeries(String seriesName, double[] xvalues, double[] yvalues){
-		this.series.put(seriesName, new Tuple<double[], double[]>(xvalues, yvalues));
-	}
-	
-	public String getChartName() {
-		return chartName;
-	}
-
-	
-	public void setChartName(String chartName) {
-		this.chartName = chartName;
-	}
-
-	
-	public String getXLabel() {
-		return xLabel;
-	}
-
-	
-	public void setXLabel(String label) {
-		xLabel = label;
-	}
-
-	
-	public String getYLabel() {
-		return yLabel;
-	}
-
-	
-	public void setYLabel(String label) {
-		yLabel = label;
-	}
-
-	
-	public Map<String, Tuple<double[], double[]>> getSeries() {
-		return series;
-	}
-
-	
-	public void setSeries(Map<String, Tuple<double[], double[]>> series) {
-		this.series = series;
-	}
-
-
-
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IncomeCalculatorGesamtschweiz
+ * ChartData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,49 +17,76 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income;
+package playground.benjamin.income1;
 
-import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.matsim.core.utils.collections.Tuple;
 
 
 /**
  * @author dgrether
  *
  */
-public class IncomeCalculatorGesamtschweiz {
-	
-	private static final Logger log = Logger.getLogger(IncomeCalculatorGesamtschweiz.class);
-	
-	private Random random;
+public class ChartData {
 
-	public IncomeCalculatorGesamtschweiz() {
-		long seed = 984521478;
-		this.random = new Random(seed);
+	private String chartName;
+	private String xLabel;
+	
+	private String yLabel;
+
+	private Map<String, Tuple<double[], double[]>> series = new HashMap<String, Tuple<double[], double[]>>();
+	
+	public ChartData(String chartName, String xlabel, String ylabel) {
+		this.chartName = chartName;
+		this.xLabel = xlabel;
+		this.yLabel = ylabel;
 	}
 	
-	
-	public double calculateIncome(double median){
-		double medianLorenz = calculateLorenzValue(0.5);
-	  double totalIncome =  median / medianLorenz;
-		
-		double rnd = this.random.nextDouble();
-		double lorenzDerivative = calculateLorenzDerivativeValue(rnd);
-
-		double income = lorenzDerivative * median;
-
-		return income;
+	public void addSeries(String seriesName, double[] xvalues, double[] yvalues){
+		this.series.put(seriesName, new Tuple<double[], double[]>(xvalues, yvalues));
 	}
 	
-	
-	private double calculateLorenzValue(double x){
-		return 0.3178 * Math.pow(x, 3) + 0.2259 * Math.pow(x, 2) + 0.4467 * x;
+	public String getChartName() {
+		return chartName;
 	}
-	
 
-	private double calculateLorenzDerivativeValue(double x){
-		return 0.9534 * Math.pow(x, 2.0) + 0.4518 * x + 0.4467;
+	
+	public void setChartName(String chartName) {
+		this.chartName = chartName;
 	}
+
+	
+	public String getXLabel() {
+		return xLabel;
+	}
+
+	
+	public void setXLabel(String label) {
+		xLabel = label;
+	}
+
+	
+	public String getYLabel() {
+		return yLabel;
+	}
+
+	
+	public void setYLabel(String label) {
+		yLabel = label;
+	}
+
+	
+	public Map<String, Tuple<double[], double[]>> getSeries() {
+		return series;
+	}
+
+	
+	public void setSeries(Map<String, Tuple<double[], double[]>> series) {
+		this.series = series;
+	}
+
+
 
 }

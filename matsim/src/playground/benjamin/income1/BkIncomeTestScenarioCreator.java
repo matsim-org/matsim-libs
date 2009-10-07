@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income;
+package playground.benjamin.income1;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

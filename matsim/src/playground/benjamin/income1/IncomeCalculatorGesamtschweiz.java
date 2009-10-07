@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickIncomeControlerMain
+ * IncomeCalculatorGesamtschweiz
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income;
+package playground.benjamin.income1;
 
-import playground.dgrether.DgPaths;
+import java.util.Random;
+
+import org.apache.log4j.Logger;
 
 
-public class BKickIncomeControlerMain {
+/**
+ * @author dgrether
+ *
+ */
+public class IncomeCalculatorGesamtschweiz {
 	
-	public static void main(String[] args){
-//		String config = DgPaths.STUDIESDG + "einkommenSchweiz/config_households_all_zrh30km_10pct.xml";
-//		String config = DgPaths.RUNBASE + "run724/resumeConfig.xml";
-//		new BKickIncomeControler(config).run();
+	private static final Logger log = Logger.getLogger(IncomeCalculatorGesamtschweiz.class);
+	
+	private Random random;
+
+	public IncomeCalculatorGesamtschweiz() {
+		long seed = 984521478;
+		this.random = new Random(seed);
+	}
+	
+	
+	public double calculateIncome(double median){
+		double medianLorenz = calculateLorenzValue(0.5);
+	  double totalIncome =  median / medianLorenz;
 		
-		String config = DgPaths.RUNBASE + "run734/resumeConfig.xml";
-		new BKickIncomeControler(config).run();
+		double rnd = this.random.nextDouble();
+		double lorenzDerivative = calculateLorenzDerivativeValue(rnd);
+
+		double income = lorenzDerivative * median;
+
+		return income;
+	}
+	
+	
+	private double calculateLorenzValue(double x){
+		return 0.3178 * Math.pow(x, 3) + 0.2259 * Math.pow(x, 2) + 0.4467 * x;
+	}
+	
+
+	private double calculateLorenzDerivativeValue(double x){
+		return 0.9534 * Math.pow(x, 2.0) + 0.4518 * x + 0.4467;
 	}
 
 }

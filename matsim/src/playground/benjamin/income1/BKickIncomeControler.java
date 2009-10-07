@@ -17,18 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income;
+package playground.benjamin.income1;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.algorithms.PlanCalcType;
+
+import playground.benjamin.BKickControler;
 
 
 /**
@@ -36,7 +36,7 @@ import org.matsim.population.algorithms.PlanCalcType;
  * @author dgrether
  *
  */
-public class BKickIncomeControler extends Controler {
+public class BKickIncomeControler extends BKickControler {
 
 	private PersonHouseholdMapping hhdb;
 
@@ -71,14 +71,7 @@ public class BKickIncomeControler extends Controler {
 	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
 		return new IncomePlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), this.hhdb);
 	}
-	
 
-	@Override
-	protected PopulationImpl loadPopulation() {
-		PopulationImpl pop = super.loadPopulation();
-		new PlanCalcType().run(pop);
-		return pop;
-	}
 	
 	public static void main(String[] args) {
 //		String config = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments

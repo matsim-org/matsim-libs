@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income;
+package playground.benjamin.income2;
 
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.population.PlanImpl;
@@ -34,13 +34,13 @@ import org.matsim.households.PersonHouseholdMapping;
  * @author dgrether
  *
  */
-public class BKickIncomeScoringFunctionFactory implements ScoringFunctionFactory {
+public class BKickIncomeScoringFunctionFactory2 implements ScoringFunctionFactory {
 
 	private CharyparNagelScoringConfigGroup configGroup;
 	private CharyparNagelScoringParameters params;
 	private PersonHouseholdMapping hhdb;
 
-	public BKickIncomeScoringFunctionFactory(
+	public BKickIncomeScoringFunctionFactory2(
 			CharyparNagelScoringConfigGroup charyparNagelScoring, PersonHouseholdMapping hhmapping) {
 		this.configGroup = charyparNagelScoring;
 		this.params = new CharyparNagelScoringParameters(configGroup);
@@ -56,7 +56,7 @@ public class BKickIncomeScoringFunctionFactory implements ScoringFunctionFactory
 
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, params));
 
-		scoringFunctionAccumulator.addScoringFunction(new BKickLegScoring(plan, params, this.hhdb));
+		scoringFunctionAccumulator.addScoringFunction(new BKickLegScoring2(plan, params, this.hhdb));
 
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 

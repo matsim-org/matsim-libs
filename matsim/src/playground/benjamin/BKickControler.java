@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IncomeCalculator
+ * BKickControler
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,50 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income;
+package playground.benjamin;
 
-import java.util.Random;
-
-import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.population.algorithms.PlanCalcType;
 
 
 /**
  * @author dgrether
  *
  */
-public class IncomeCalculatorKantonZurich {
+public class BKickControler extends Controler {
 
-	private static final Logger log = Logger.getLogger(IncomeCalculatorKantonZurich.class);
-	
-	private Random random;
-
-	public IncomeCalculatorKantonZurich() {
-		long seed = 984521478;
-		this.random = new Random(seed);
+	public BKickControler(String configFileName) {
+		super(configFileName);
 	}
 	
-	
-	public double calculateIncome(double median){
-		double medianLorenz = calculateLorenzValue(0.5);
-	  double totalIncome =  median / medianLorenz;
-		
-		double rnd = this.random.nextDouble();
-		double lorenzDerivative = calculateLorenzDerivativeValue(rnd);
-
-		double income = lorenzDerivative * median;
-
-		return income;
-	}
-	
-	
-	private double calculateLorenzValue(double x){
-		return 0.9916 * Math.pow(x, 3) - 0.2398 * Math.pow(x, 2) + 0.2056 * x;
-	}
-	
-
-	private double calculateLorenzDerivativeValue(double x){
-		return 2.9748 * Math.pow(x, 2.0) - 0.4796 * x + 0.2056;
+	public BKickControler(Config conf){
+		super(conf);
 	}
 
-	
+	public BKickControler(String[] args) {
+		super(args);
+	}
+
+	@Override
+	protected PopulationImpl loadPopulation() {
+		PopulationImpl pop = super.loadPopulation();
+		new PlanCalcType().run(pop);
+		return pop;
+	}
 }

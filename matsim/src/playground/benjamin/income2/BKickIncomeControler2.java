@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ListUtils
+ * BKickIncomeControler2
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,23 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income;
+package playground.benjamin.income2;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.matsim.core.controler.Controler;
+
+import playground.benjamin.income1.BKickIncomeControler;
 
 
 /**
  * @author dgrether
  *
  */
-public class ListUtils {
+public class BKickIncomeControler2 extends BKickIncomeControler {
 
-	static <T> List<T> makeList(T...ts ){
-		List<T> l = new ArrayList<T>();
-		for (T t : ts){
-			l.add(t);
-		}
-		return l;
+	public BKickIncomeControler2(String[] args) {
+		super(args);
 	}
+
+	
+	public static void main(String[] args) {
+//	String config = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
+//	String[] args2 = {config};
+//	args = args2;
+	if ((args == null) || (args.length == 0)) {
+		System.out.println("No argument given!");
+		System.out.println("Usage: Controler config-file [dtd-file]");
+		System.out.println();
+	} else {
+		final Controler controler = new BKickIncomeControler(args);
+		controler.run();
+	}
+}
+	
 }

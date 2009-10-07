@@ -28,7 +28,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.benjamin.income.BKickIncomeControler;
+import playground.benjamin.income1.BKickIncomeControler;
 
 
 /**

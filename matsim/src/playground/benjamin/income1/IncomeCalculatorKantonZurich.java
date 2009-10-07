@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickControler2
+ * IncomeCalculator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,48 +17,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin;
+package playground.benjamin.income1;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.ScoringFunctionFactory;
+import java.util.Random;
+
+import org.apache.log4j.Logger;
 
 
 /**
- * Controler for first zurich scenario test run of estimated scoring function.
  * @author dgrether
  *
  */
-public class BKickControler2 extends BKickControler {
+public class IncomeCalculatorKantonZurich {
 
-	public BKickControler2(String configFileName) {
-		super(configFileName);
+	private static final Logger log = Logger.getLogger(IncomeCalculatorKantonZurich.class);
+	
+	private Random random;
+
+	public IncomeCalculatorKantonZurich() {
+		long seed = 984521478;
+		this.random = new Random(seed);
 	}
 	
-	public BKickControler2(Config conf){
-		super(conf);
-	}
+	
+	public double calculateIncome(double median){
+		double medianLorenz = calculateLorenzValue(0.5);
+	  double totalIncome =  median / medianLorenz;
+		
+		double rnd = this.random.nextDouble();
+		double lorenzDerivative = calculateLorenzDerivativeValue(rnd);
 
-	public BKickControler2(String[] args) {
-		super(args);
-	}
+		double income = lorenzDerivative * median;
 
-	@Override
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new BKickScoringFunctionFactory(this.config.charyparNagelScoring());
+		return income;
+	}
+	
+	
+	private double calculateLorenzValue(double x){
+		return 0.9916 * Math.pow(x, 3) - 0.2398 * Math.pow(x, 2) + 0.2056 * x;
+	}
+	
+
+	private double calculateLorenzDerivativeValue(double x){
+		return 2.9748 * Math.pow(x, 2.0) - 0.4796 * x + 0.2056;
 	}
 
 	
-	public static void main(final String[] args) {
-		if ((args == null) || (args.length == 0)) {
-			System.out.println("No argument given!");
-			System.out.println("Usage: Controler config-file [dtd-file]");
-			System.out.println();
-		} else {
-			final Controler controler = new BKickControler2(args);
-			controler.run();
-		}
-		System.exit(0);
-	}
-
 }
