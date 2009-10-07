@@ -177,7 +177,7 @@ public class ChargingTimes {
 	
 	
 	public static void writeEnergyUsageStatisticsGrafic(String fileName, double[][] energyUsageStatistics, int numberOfHubs){
-		XYLineChart chart = new XYLineChart("Energy Consumption", "Time of Day [s]", "Energy Consumption [J]");
+		XYLineChart chart = new XYLineChart("Energy Consumption", "Time of Day [s]", "Energy Consumption [kWh]");
 		
 		double[] time=new double[numberOfTimeBins];
 		
@@ -189,7 +189,8 @@ public class ChargingTimes {
 		for (int i=0;i<numberOfHubs;i++){
 			double[] hubConcumption=new double[numberOfTimeBins];
 			for (int j=0;j<numberOfTimeBins;j++){
-				hubConcumption[j] = energyUsageStatistics[j][i];
+				// convert from Joule to kWh
+				hubConcumption[j] = energyUsageStatistics[j][i]/1000/3600;
 			}
 			chart.addSeries("hub-"+i, time, hubConcumption); 
 		}
