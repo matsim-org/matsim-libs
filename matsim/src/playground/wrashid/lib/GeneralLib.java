@@ -1,5 +1,9 @@
 package playground.wrashid.lib;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.StringTokenizer;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
@@ -73,6 +77,101 @@ public class GeneralLib {
 		FacilitiesWriter facilitiesWriter=new FacilitiesWriter(facilities, facilitiesFile);
 		facilitiesWriter.write();
 	}
+	
+	
+	/**
+	 * Write out a two dimentional array to a file.
+	 * 
+	 * if the firstRow Parameter is not null, it will be inserted at the beginning of the file.
+	 * 
+	 * @param array
+	 * @param fileName
+	 * @param firstRow
+	 */
+	public static void writeArray(double[][] array, String fileName, String firstRow){
+		
+	}
+	
+	/**
+	 * reads in data from a file.
+	 * 
+	 * 
+	 * @param numberOfRows
+	 * @param numberOfColumns
+	 * @param ignoreFirstLine
+	 * @return
+	 */
+	public static double[][] readMatrix(int numberOfRows, int numberOfColumns, boolean ignoreFirstLine, String fileName){
+		
+		double[][] matrix= new double[numberOfRows][numberOfColumns];
+		
+		try {
+
+			FileReader fr = new FileReader(fileName);
+
+			BufferedReader br = new BufferedReader(fr);
+			String line;
+			StringTokenizer tokenizer;
+			String token;
+			line = br.readLine();
+			int rowId = 0;
+			while (line != null) {
+				tokenizer = new StringTokenizer(line);
+
+				for (int i = 0; i < numberOfColumns; i++) {
+					token = tokenizer.nextToken();
+					double parsedNumber = Double.parseDouble(token);
+					matrix[rowId][i] = parsedNumber;
+				}
+
+				if (tokenizer.hasMoreTokens()) {
+					// if there are more columns than expected, throw an
+					// exception
+					throw new RuntimeException("the number of columns is wrong");
+				}
+
+				line = br.readLine();
+				rowId++;
+			}
+			if (rowId != numberOfRows) {
+				throw new RuntimeException("the number of rows is wrong");
+			}
+
+		} catch (RuntimeException e) {
+			// just forward the runtime exception
+			throw e;
+		} catch (Exception e) {
+			throw new RuntimeException("Error reading the matrix from the file");
+		}
+		
+		return matrix;
+	}
+	
+	
+	public static double[][] invertMatrix(double[][] matrix){
+		int firstDimentionOfResultMatrix=matrix[0].length;
+		int secondDimentionOfResultMatrix=matrix.length;
+		
+		double[][] resultMatrix=new double[firstDimentionOfResultMatrix][secondDimentionOfResultMatrix];
+		
+		for (int i=0;i<matrix.length;i++){
+			for (int j=0;j<matrix[0].length;j++){
+				resultMatrix[j][i]=matrix[i][j];
+			}
+		}
+	
+		return resultMatrix;
+	}
+	
+	/**
+	 * TODO 
+	 * This method 
+	 * @param fileName
+	 * @return
+	 */
+	public static String getFirstLineOfFile(String fileName){
+		return null;
+	} 
 	 
 }   
  
