@@ -40,6 +40,7 @@ import playground.dressler.Intervall.src.Intervalls.Intervall;
 import playground.dressler.Intervall.src.Intervalls.VertexIntervall;
 import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
 import playground.dressler.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
+import ucar.ma2.Section.Iterator;
 
 
 /**
@@ -61,7 +62,13 @@ public class BellmanFordVertexIntervalls {
 				//TODO ROST MAKE MORE EFFICIENT! (use a map to retrieve the intervalls..)
 				Integer firstPossibleNextRelabel = retrieveFirstNextPossibleTimeToPropagate(_labels.get(first));
 				Integer secondPossibleNextRelabel = retrieveFirstNextPossibleTimeToPropagate(_labels.get(second));
-				return firstPossibleNextRelabel.compareTo(secondPossibleNextRelabel);
+				if (firstPossibleNextRelabel != secondPossibleNextRelabel) {
+				  return firstPossibleNextRelabel.compareTo(secondPossibleNextRelabel);
+				} else {
+					// Important! PriorityQueue assumes that compate = 0 implies the same object ...
+					return first.getId().compareTo(second.getId());
+				}
+				
 			}
 			else
 				throw new RuntimeException("nodes cannot be compared!");
@@ -185,11 +192,11 @@ public class BellmanFordVertexIntervalls {
 		LinkedList<Node> nodes = new LinkedList<Node>();
 		for(Node node: network.getNodes().values()){
 			VertexIntervalls label = new VertexIntervalls();
-			_labels.put(node, label);
-			nodes.add(node);
+			_labels.put(node, label);			
 			if(isActiveSource(node)){
 				_labels.get(node).getIntervallAt(0).setReachable(true);
 				_labels.get(node).getIntervallAt(0).setScanned(false);
+				nodes.add(node);				
 			}
 		}
 		return nodes;
@@ -216,10 +223,10 @@ public class BellmanFordVertexIntervalls {
 		
 		Node to = _sink;
 		VertexIntervalls tolabels = this._labels.get(to);
-		if (tolabels.getFirstUnscannedIntervall() == null) {
+		if (tolabels.getFirstPossible() == null) {
 			throw new BFException("sink can not be reached!");
 		}
-		int totime = tolabels.getFirstUnscannedIntervall().getLowBound();
+		int totime = tolabels.getFirstPossible().getLowBound();
 		int arrivalAtSuperSink = totime;
 		//check if TimeExpandedPath can be constructed
 		
@@ -385,8 +392,8 @@ public class BellmanFordVertexIntervalls {
 		//set the startLabels and add active sources to to the queue
 		LinkedList<Node> activesources = this.refreshLabels();
 		// queue to save nodes we have to scan
-		NodeComparator f = new NodeComparator();
-		queue = new PriorityQueue<Node>(activesources.size(), f);
+		NodeComparator nodecomp = new NodeComparator();
+		queue = new PriorityQueue<Node>(Math.max(activesources.size(),1), nodecomp);
 		
 		if(_warmstart>0 && _warmstartlist!=null){
 			queue.addAll(_warmstartlist);					
@@ -415,11 +422,14 @@ public class BellmanFordVertexIntervalls {
 		while (!queue.isEmpty()) {
 			//sort!
 			//Collections.sort(queue, new NodeComparator());
-			
-			// gets the first vertex in the queue
+							
+					
+			// gets the first vertex in the queue			
 			v = queue.remove();
+						
 			if(v.equals(this._sink))
-				break;
+				continue; // no need to scan the sink (but do not assume the sink is unscanned for future tests)
+			
 			//System.out.println(_labels.get(v).getFirstUnscannedIntervall() + "");
 			this._roundpolls++;
 			this._totalpolls++;
@@ -437,13 +447,13 @@ public class BellmanFordVertexIntervalls {
 				// that was weird ...
 				// start = _labels.get(v).getFirstUnscannedIntervall();
 
-				System.out.println(v.toString() +"  "+_labels.get(v).toString());
+				//System.out.println(v.toString() +"  "+_labels.get(v).toString());
 				
 				// WARNING: Not all vertices remain in the queue with this.
 				// useless vertices that need no scanning are dumped
 				continue;							
 			}
-			
+						
 			// link is outgoing edge of v => forward edge
 			for (Link link : v.getOutLinks().values()) {
 				w=link.getToNode();
@@ -457,21 +467,23 @@ public class BellmanFordVertexIntervalls {
 //				}
 				
 				boolean changed = relabel(start,v,w,link,true);
-				if (changed) {
+								
+				if (changed) {					
 					queue.remove(w);
 					gain += _labels.get(w).cleanup();
-					queue.add(w);
-				}
+					queue.add(w);					
+				}				
 			}
 			// link is incoming edge of v => backward edge
 			for (Link link : v.getInLinks().values()) {
 				w=link.getFromNode();
 				boolean changed = relabel(start,v,w,link,false);
-				if (changed) {
+				
+				if (changed) {					
 					queue.remove(w);
 					gain += _labels.get(w).cleanup();
-					queue.add(w);
-				}
+					queue.add(w);			
+				}				
 			}
 			start.setScanned(true);
 			if(_debug>3){
@@ -481,6 +493,9 @@ public class BellmanFordVertexIntervalls {
 			
 			queue.add(v);
 		}
+				
+		//System.out.println(this._labels.toString());
+		
 		this._calcend= System.currentTimeMillis();
 		this._totalcalctime+=(this._calcend-this._calcstart);
 		if (_debug>3) {
