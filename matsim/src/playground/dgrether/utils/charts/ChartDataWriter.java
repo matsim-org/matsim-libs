@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income1;
+package playground.dgrether.utils.charts;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;

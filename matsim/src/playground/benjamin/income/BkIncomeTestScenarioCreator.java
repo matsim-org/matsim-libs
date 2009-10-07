@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income1;
+package playground.benjamin.income;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -43,6 +43,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.utils.ListUtils;
 
 
 /**

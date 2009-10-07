@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income1;
+package playground.benjamin.income;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -34,6 +34,8 @@ import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.households.HouseholdIncomeComparator;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.utils.charts.ChartData;
+import playground.dgrether.utils.charts.ChartDataWriter;
 
 
 /**
