@@ -36,8 +36,8 @@ public class RunCommercialActivityAnalyser {
 	//====================================================
 	// Parameters that must be set
 	//----------------------------------------------------		
-	private static int numberOfSamples = 1;
-	private static int sampleSize = 1000;
+	private static int numberOfSamples = 10;
+	private static int sampleSize = 3000;
 	private static float clusterRadius = 10;
 	private static int clusterCount = 20;
 //	private static double[] majorThresholds = {179.6, 339.4, 628.8, 931.5, 2062.5};
@@ -61,7 +61,8 @@ public class RunCommercialActivityAnalyser {
 		DateString ds = new DateString();
 			
 		// Create an instance of the analyser.
-		MyStringBuilder sb = new MyStringBuilder("/Users/johanwjoubert/MATSim/workspace/MATSimData/");
+//		MyStringBuilder sb = new MyStringBuilder("/Users/johanwjoubert/MATSim/workspace/MATSimData/");		// Mac
+		MyStringBuilder sb = new MyStringBuilder("/home/jjoubert/data/DigiCore/");							// Satawal
 		CommercialActivityAnalyser caa = new CommercialActivityAnalyser(sb, sb.getWgs84(), sb.getUtm35S(), studyAreaName, ds);
 
 		// Sample for different threshold values.
