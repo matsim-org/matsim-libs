@@ -28,7 +28,7 @@ public class AllTests {
 	public static Test suite() {
 
 		TestSuite suite = new TestSuite("Integration Tests for org.matsim.signalsystems");
-		suite.addTestSuite(org.matsim.integration.signalsystems.SignalSystemsIntegrationTest.class);
+//		suite.addTestSuite(org.matsim.integration.signalsystems.SignalSystemsIntegrationTest.class);
 		return suite;
 	}
 
