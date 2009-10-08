@@ -54,7 +54,6 @@ public class BKickIncome2LegScoring extends LegScoringFunction {
 	@Override
 	public void finish() {
 		this.score += (betaIncomeCar * Math.log(this.incomePerDay));
-		log.error("score of leg scoring after finish: " + this.score);
 	}
 
 	@Override
@@ -65,7 +64,6 @@ public class BKickIncome2LegScoring extends LegScoringFunction {
 		double dist = 0.0; // distance in meters
 
 		if (TransportMode.car.equals(leg.getMode())) {
-			log.error("car leg of agent id " + this.plan.getPerson().getId() + "...");
 			RouteWRefs route = leg.getRoute();
 			dist = route.getDistance();
 			dist += route.getEndLink().getLength();
@@ -78,7 +76,6 @@ public class BKickIncome2LegScoring extends LegScoringFunction {
 					/ this.incomePerDay;
 		}
 		else if (TransportMode.pt.equals(leg.getMode())) {
-			  log.error("pt leg...");
 				dist = leg.getRoute().getDistance();
 				if (Double.isNaN(dist)){
 					throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
@@ -95,8 +92,6 @@ public class BKickIncome2LegScoring extends LegScoringFunction {
 		if (Double.isNaN(tmpScore)){
 			throw new IllegalStateException("Leg score is NaN for person: " + this.plan.getPerson().getId());
 		}
-		log.error("distance : " + dist);
-		log.error("score " + tmpScore);
 		return tmpScore;
 	}
 
