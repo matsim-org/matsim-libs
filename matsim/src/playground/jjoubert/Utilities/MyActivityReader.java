@@ -28,6 +28,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
@@ -50,7 +51,7 @@ public class MyActivityReader {
 		log.info("Reading activities from " + filename);
 		log.info("Reading all points: no study area provided.");
 		GeometryFactory gf = new GeometryFactory();
-		ArrayList<Point> points = new ArrayList<Point>();
+		List<Point> points = new ArrayList<Point>();
 		
 		double x;
 		double minX = Double.POSITIVE_INFINITY;
@@ -109,7 +110,7 @@ public class MyActivityReader {
 	public QuadTree<Point> readActivityPointsToQuadTree(String filename, MultiPolygon studyArea){
 		log.info("Reading activities from " + filename);
 		log.info("Reading only points in the given study area provided.");
-		ArrayList<Point> points = readActivityPointsToArrayList(filename, studyArea);
+		List<Point> points = readActivityPointsToList(filename, studyArea);
 		
 		// Calculate the extent of the QuadTree.
 		double minX = Double.MAX_VALUE;
@@ -183,12 +184,12 @@ public class MyActivityReader {
 	}
 	
 	
-	public ArrayList<Point> readActivityPointsToArrayList(String filename, MultiPolygon studyArea){
+	public List<Point> readActivityPointsToList(String filename, MultiPolygon studyArea){
 		log.info("Reading activities from " + filename);
 		log.info("Reading only points in the given study area provided.");
 		
 		GeometryFactory gf = new GeometryFactory();
-		ArrayList<Point> points = new ArrayList<Point>();
+		List<Point> points = new ArrayList<Point>();
 		
 		Geometry envelope = studyArea.getEnvelope();
 		

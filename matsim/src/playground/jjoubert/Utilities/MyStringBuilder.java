@@ -59,28 +59,5 @@ public class MyStringBuilder {
 	public String getUtm35S(){
 		return "PROJCS[\"WGS_1984_UTM_Zone_35S\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",27],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",10000000],UNIT[\"Meter\",1]]";
 	}
-	
-	/**
-	 * @return {@code ROOT + /DigiCore/Signals.txt}
-	 */
-	public String getSignalFilename(){
-		return root + "/DigiCore/Signals.txt";
-	}
-	
-	public String getGapInputMinor(String studyArea, String version, String threshold, String sample){
-		return root + "/" + studyArea + "/" + version + "/" + threshold + "/Sample" + sample + "/Activities/" + studyArea + "_" + threshold + "_MinorLocations.txt";
-	}
-	
-	public String getGapInputMajor(String studyArea, String version, String threshold, String sample){
-		return root + "/" + studyArea + "/" + version + "/" + threshold + "/Sample" + sample + "/Activities/" + studyArea + "_" + threshold + "_MajorLocations.txt";
-	}
-	
-	public String getGapOutputMinor(String studyArea, String version, String threshold, String sample){
-		return root + "/" + studyArea + "/" + version + "/" + threshold + "/Sample" + sample + "/Activities/" + studyArea + "_" + threshold + "_MinorGapStats.txt";
-	}
-	
-	public String getGapOutputMajor(String studyArea, String version, String threshold, String sample){
-		return root + "/" + studyArea + "/" + version + "/" + threshold + "/Sample" + sample + "/Activities/" + studyArea + "_" + threshold + "_MajorGapStats.txt";
-	}
-	
+			
 }
