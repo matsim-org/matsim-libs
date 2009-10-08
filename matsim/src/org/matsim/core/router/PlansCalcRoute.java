@@ -278,7 +278,6 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	}
 
 	private double handlePtLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
-		// currently: calc route in empty street network, use twice the traveltime
 		// TODO [MR] later: use special pt-router
 
 		int travTime = 0;
