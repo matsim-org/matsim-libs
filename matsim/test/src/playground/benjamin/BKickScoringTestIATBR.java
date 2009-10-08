@@ -31,7 +31,7 @@ import playground.benjamin.income2.BKickIncome2Controler;
 
 
 /**
- * Tests the scoring of the BKickControler2
+ * Tests the scoring of the BKickIncomeControler2
  * @author dgrether
  *
  */

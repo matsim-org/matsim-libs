@@ -20,8 +20,39 @@
 
 package playground.benjamin;
 
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestCase;
 
+
+
+
+
+
+
+
+
+/**
+ * Tests the routing of the BKickIncomeControler2
+ * @author dgrether
+ *
+ */
 public class BKickRouterTestIATBR extends MatsimTestCase {
 
+	/*package*/ final static Id id1 = new IdImpl("1");
+	/*package*/ final static Id id2 = new IdImpl("2");
+	/*package*/ final static Id id3 = new IdImpl("3");
+	
+		
+	
+	public void testSingleIterationIncomeScoring() {
+		Config config = this.loadConfig(this.getClassInputDirectory() + "configRouterTestIATBR.xml");
+		String netFileName = this.getClassInputDirectory() + "network.xml";
+		config.network().setInputFile(netFileName);
+		config.plans().setInputFile(this.getClassInputDirectory() + "plansRouterTest.xml");
+		//hh loading
+		config.scenario().setUseHouseholds(true);
+		config.households().setInputFile(this.getClassInputDirectory() + "households.xml");
+}
 }
