@@ -27,12 +27,12 @@ public class RunGapDensityAnalyser {
 	 */
 	public static void main(String[] args) {
 
-//		String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData";		// Mac
+//		String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/";		// Mac
 		String root = "/home/jjoubert/data/";									// Satawal
 		String studyArea = "Gauteng";
-		String version = "20091007093450";
+		String version = "20091008164221";
 		String[] thresholdArray = {"0300"};
-		String[] sampleArray = {"01","02","03","04","05","06","07","08","09","10"};
+		String[] sampleArray = {"01","02"};//,"03","04","05","06","07","08","09","10"};
 		
 		for (String threshold : thresholdArray) {
 			for (String sample : sampleArray) {

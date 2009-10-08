@@ -15,7 +15,6 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import playground.jjoubert.CommercialTraffic.SAZone;
 import playground.jjoubert.Utilities.MyGapReader;
-import playground.jjoubert.Utilities.MyStringBuilder;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

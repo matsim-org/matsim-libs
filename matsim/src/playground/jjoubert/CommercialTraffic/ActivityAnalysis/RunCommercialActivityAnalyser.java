@@ -23,23 +23,48 @@ package playground.jjoubert.CommercialTraffic.ActivityAnalysis;
 import org.apache.log4j.Logger;
 
 import playground.jjoubert.Utilities.DateString;
-import playground.jjoubert.Utilities.MyStringBuilder;
 
 public class RunCommercialActivityAnalyser {
 	private final static Logger log = Logger.getLogger(RunCommercialActivityAnalyser.class);
 
-	//====================================================
-	// Variables that must be set
-	//----------------------------------------------------
+	 /*=============================================================================
+	 * String value indicating where the root where job is executed. 				|
+	 * 		- Mac																	|
+	 * 		- IVT-Sim0																|
+	 * 		- Satawal																|
+	 *=============================================================================*/
+//	private static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
+//	private static String root = "/home/jjoubert/";										// IVT-Sim0
+	private static String root = "/home/jjoubert/data/";								// Satawal
+
+	 /*=============================================================================
+	 * String value that must be set. Allowed study areas are:						|
+	 * 																				|
+	 * 		- SouthAfrica															|
+	 * 		- Gauteng																|
+	 * 		- KZN																	|
+	 * 		- WesternCape															|
+	 * 		- TODO CityDeep															|
+	 *=============================================================================*/
 	private static String studyAreaName = "Gauteng";
-	
+
+	 /*=============================================================================
+	 * Cluster parameters that must be set. These include: 							|
+	 * 		- clusterRadius: the radius around an activity within which other 		|
+	 * 		  activities will be searched.											|
+	 * 		- clusterCount: the minimum number of activities required within the	|
+	 * 		  radius before a new cluster will be created.							|
+	 * 		- numberOfSamples: the number of samples to run.						|
+	 * 		- sampleSize: the number of vehicles sampled within each run.			| 
+	 *=============================================================================*/
+	private static float clusterRadius = 10;
+	private static int clusterCount = 20;
+	private static int numberOfSamples = 10;
+	private static int sampleSize = 3000;
+
 	//====================================================
 	// Parameters that must be set
 	//----------------------------------------------------		
-	private static int numberOfSamples = 10;
-	private static int sampleSize = 3000;
-	private static float clusterRadius = 10;
-	private static int clusterCount = 20;
 //	private static double[] majorThresholds = {179.6, 339.4, 628.8, 931.5, 2062.5};
 	private static double[] majorThresholds = {300};
 	private static double withinThreshold = 0.60;
@@ -60,15 +85,15 @@ public class RunCommercialActivityAnalyser {
 		}
 		DateString ds = new DateString();
 			
-		// Create an instance of the analyser.
-//		MyStringBuilder sb = new MyStringBuilder("/Users/johanwjoubert/MATSim/workspace/MATSimData/");		// Mac
-		MyStringBuilder sb = new MyStringBuilder("/home/jjoubert/data/");									// Satawal
-		CommercialActivityAnalyser caa = new CommercialActivityAnalyser(sb, sb.getWgs84(), sb.getUtm35S(), studyAreaName, ds);
-
 		// Sample for different threshold values.
 		for (Double threshold : majorThresholds) {
+			String theThreshold = String.format("%04d", (int)Math.round(threshold));
 			// Analyse as many samples as you want.
 			for(int sample = 1; sample <= numberOfSamples; sample++){
+				
+				String theSample = String.format("%02d", sample);
+				MyActivityAnalysisStringBuilder sb = new MyActivityAnalysisStringBuilder(root, ds.toString(), theThreshold, theSample, studyAreaName);
+				CommercialActivityAnalyser caa = new CommercialActivityAnalyser(sb, sb.getWgs84(), sb.getUtm35S(), studyAreaName, ds);
 				if(extractChains){
 					caa.extractChains(sample, sampleSize, threshold, withinThreshold, clusterRadius, clusterCount, true);
 				} 
@@ -83,5 +108,42 @@ public class RunCommercialActivityAnalyser {
 		log.info("=======================================================");
 	}
 	
+	
+	/**
+	 * Converts a given array of strings into a single string with the array elements 
+	 * separated by a semi-colon. 
+	 * @param thresholdArray
+	 * @return single <code>String</code>
+	 */
+	private static String thresholdsToString(String[] thresholdArray){
+		String result = null;
+		if(thresholdArray.length > 0){
+			result = thresholdArray[0];
+			for(int i = 1; i < thresholdArray.length; i++){
+				result += "; ";
+				result += thresholdArray[i];
+			}
+		}		
+		return result;
+	}
+	
+	/**
+	 * Converts a given array of strings into a single string with the array elements 
+	 * separated by a semi-colon. 
+	 * @param sampleArray
+	 * @return single <code>String</code>
+	 */
+	private static String samplesToString(String[] sampleArray){
+		String result = null;
+		if(sampleArray.length > 0){
+			result = sampleArray[0];
+			for(int i = 1; i < sampleArray.length; i++){
+				result += "; ";
+				result += sampleArray[i];
+			}
+		}		
+		return result;
+	}
+
 
 }

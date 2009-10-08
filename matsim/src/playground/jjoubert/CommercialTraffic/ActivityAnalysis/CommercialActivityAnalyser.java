@@ -36,7 +36,6 @@ import playground.jjoubert.CommercialTraffic.Chain;
 import playground.jjoubert.CommercialTraffic.CommercialVehicle;
 import playground.jjoubert.Utilities.DateString;
 import playground.jjoubert.Utilities.MyShapefileReader;
-import playground.jjoubert.Utilities.MyStringBuilder;
 import playground.jjoubert.Utilities.MyXmlConverter;
 import playground.jjoubert.Utilities.Clustering.ClusterPoint;
 import playground.jjoubert.Utilities.Clustering.DJCluster;
@@ -57,7 +56,7 @@ public class CommercialActivityAnalyser {
 	private MyFileFilter filter;
 	private MyFileSampler sampler;
 	private DateString ds;
-	private MyStringBuilder msb;
+	private MyActivityAnalysisStringBuilder sb;
 	private BufferedWriter vehicleOutput;
 	private BufferedWriter chainOutput;
 	private BufferedWriter minorOutput;
@@ -73,21 +72,21 @@ public class CommercialActivityAnalyser {
 	 * @param dateString a <code>DateString</code> so that the unique run can be 
 	 * 		identified in the output.
 	 */
-	public CommercialActivityAnalyser(MyStringBuilder sb,
+	public CommercialActivityAnalyser(MyActivityAnalysisStringBuilder sb,
 									  String fromCoordinateSystem, 
 									  String toCoordinateSystem,
 									  String studyArea,
 									  DateString dateString){
 		this.ds = dateString;
-		this.msb = sb;
-		this.signalFilename = msb.getSignalFilename();
+		this.sb = sb;
+		this.signalFilename = sb.getSignalFilename();
 		this.fromCoordinateSystem = fromCoordinateSystem;
 		this.toCoordinateSystem = toCoordinateSystem;
 		this.studyAreaName = studyArea;
-		MyShapefileReader msr = new MyShapefileReader(msb.getShapefilename(studyArea));
+		MyShapefileReader msr = new MyShapefileReader(sb.getShapefilename(studyArea));
 		this.studyArea = msr.readMultiPolygon();
 		filter = new MyFileFilter(".txt");
-		sampler = new MyFileSampler(msb.getSortedVehicleFoldername());
+		sampler = new MyFileSampler(sb.getSortedVehicleFoldername());
 	}
 
 	public void extractChains(int sample, int sampleSize, double majorThreshold, double withinThreshold, float clusterRadius, int clusterCount, boolean writeStatistics) {
@@ -103,7 +102,7 @@ public class CommercialActivityAnalyser {
 		CommercialActivityExtractor cae = new CommercialActivityExtractor(fromCoordinateSystem, toCoordinateSystem);
 		cae.readSignals(signalFilename);
 		
-		File xmlFolder = new File(msb.getRoot() + "/DigiCore/XML/" + ds.toString() + "/" + String.format("%04d", (int)Math.floor(majorThreshold)) + "/Sample" + String.format("%02d", sample) + "/");
+		File xmlFolder = new File(sb.getXmlFoldername());
 		if(xmlFolder.exists()){
 			log.warn("The folder " + xmlFolder.toString() + " already exists and will be cleared!");
 			boolean checkDelete = clearDirectory(xmlFolder);
@@ -168,20 +167,18 @@ public class CommercialActivityAnalyser {
 		 * this just simplifies the implementation to ensure it is closed should
 		 * something go wrong. 
 		 */
-		File outputFolder = new File(msb.getRoot() + "/" + studyAreaName + "/" + ds.toString() + "/" + String.format("%04d", (int) Math.floor(majorThreshold)) + "/Sample" + String.format("%02d", sample) + "/Activities/");
+		File outputFolder = new File(sb.getOutputFoldername());
 		boolean checkCreate = outputFolder.mkdirs();
 		if(!checkCreate){
 			throw new RuntimeException("Could not successfully create the output directory " + outputFolder.toString());
 		}
-		String vehicleFilename = outputFolder.getAbsolutePath() + "/" + studyAreaName + "_" + String.format("%04d", (int) Math.floor(majorThreshold)) + "_VehicleStats.txt";
-		String chainFilename = outputFolder.getAbsolutePath() + "/" + studyAreaName + "_" + String.format("%04d", (int) Math.floor(majorThreshold)) + "_ChainStats.txt";
-		String minorFilename = outputFolder.getAbsolutePath() + "/" + studyAreaName + "_" + String.format("%04d", (int) Math.floor(majorThreshold)) + "_MinorLocations.txt";
-		String majorFilename = outputFolder.getAbsolutePath() + "/" + studyAreaName + "_" + String.format("%04d", (int) Math.floor(majorThreshold)) + "_MajorLocations.txt";
+
+		List<String> output = sb.getActivityOutputList();
 		try {
-			this.vehicleOutput = new BufferedWriter(new FileWriter(new File(vehicleFilename)));
-			this.chainOutput = new BufferedWriter(new FileWriter(new File(chainFilename)));
-			this.minorOutput = new BufferedWriter(new FileWriter(new File(minorFilename)));
-			this.majorOutput = new BufferedWriter(new FileWriter(new File(majorFilename)));
+			this.vehicleOutput = new BufferedWriter(new FileWriter(new File(output.get(0))));
+			this.chainOutput = new BufferedWriter(new FileWriter(new File(output.get(1))));
+			this.minorOutput = new BufferedWriter(new FileWriter(new File(output.get(2))));
+			this.majorOutput = new BufferedWriter(new FileWriter(new File(output.get(3))));
 			
 			try{
 				// Write the header for each output file.
