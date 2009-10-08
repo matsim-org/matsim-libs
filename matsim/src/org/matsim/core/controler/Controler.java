@@ -1344,4 +1344,14 @@ public class Controler {
 		this.travelTimeCalculatorFactory = travelTimeCalculatorFactory;
 	}
 
+	
+	public TravelCostCalculatorFactory getTravelCostCalculatorFactory() {
+		return travelCostCalculatorFactory;
+	}
+
+	
+	public void setTravelCostCalculatorFactory(TravelCostCalculatorFactory travelCostCalculatorFactory) {
+		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
+	}
+
 }
