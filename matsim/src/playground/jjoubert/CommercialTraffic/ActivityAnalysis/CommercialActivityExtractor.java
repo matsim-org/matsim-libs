@@ -68,7 +68,7 @@ public class CommercialActivityExtractor {
 	}
 
 	/**
-	 * Creates an instance of the object. This constructor is usefule when the raw input
+	 * Creates an instance of the object. This constructor is useful when the raw input
 	 * data is in a different coordinate system than what you need the <code>Activity</code>s
 	 * to be in.
 	 * @param fromCoordinateSystem the coordinate system in which the data currently is, 
@@ -177,7 +177,7 @@ public class CommercialActivityExtractor {
 							e2.printStackTrace();
 						} catch(Exception e3){
 							// Points with coordinates outside the range (±90¼) are ignored.
-							e3.printStackTrace();						
+//							e3.printStackTrace();						
 						}
 					} else{
 						log.warn("Line number " + lineNumber + " of vehicle " + file.getName() + "does not have the right fields, and have been omitted!");
