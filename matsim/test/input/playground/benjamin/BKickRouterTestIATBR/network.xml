@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+
+<network name="equil test network">
+   <nodes>
+      <node id="1" x="-20000" y="0"/>
+      <node id="2" x="-17500" y="0"/>
+      <node id="3" x="-10000" y="0"/>
+      <node id="4" x="-5000" y="0"/>
+      <node id="5" x="0" y="0"/>
+      <node id="6" x="-5000" y="-8660"/>
+      <node id="7" x="-15000" y="-8660"/>
+      <node id="8" x="-7500" y="2500"/>
+      <node id="9" x="-7500" y="-2500"/>
+   </nodes>
+   <links capperiod="01:00:00">
+      <link id="1" from="1" to="2" length="2500.00" capacity="36000" freespeed="27.78" permlanes="1"  />
+      <link id="2" from="2" to="3" length="7500.00" capacity="36000" freespeed="27.78" permlanes="1"  />
+      <link id="3" from="3" to="4" length="75000.00" capacity="36000" freespeed="10.42" permlanes="1"  />
+      <link id="4" from="4" to="5" length="5000.00" capacity="36000" freespeed="27.78" permlanes="1"  />
+      <link id="5" from="5" to="6" length="10000.00" capacity="36000" freespeed="27.78" permlanes="1"  />
+      <link id="6" from="6" to="7" length="10000.00" capacity="36000" freespeed="27.78" permlanes="1"  />
+      <link id="7" from="7" to="1" length="10000.00" capacity="36000" freespeed="27.78" permlanes="1"  />
+      <link id="8" from="3" to="8" length="50000.00" capacity="36000" freespeed="27.78" permlanes="1"  />
+      <link id="9" from="8" to="4" length="50000.00" capacity="36000" freespeed="27.78" permlanes="1"  />
+      <link id="10" from="3" to="9" length="25000.00" capacity="36000" freespeed="2.78" permlanes="1"  />
+      <link id="11" from="9" to="4" length="25000.00" capacity="36000" freespeed="2.78" permlanes="1"  />
+   </links>
+</network>

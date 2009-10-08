@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<population xmlns="http://www.matsim.org/files/dtd"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/population_v5.0.xsd">
+	<person id="1">
+		<plan selected="true">
+			<act type="h" endTime="05:00:00">
+				<location>
+					<actLocation>
+						<linkId refId="1"/>
+					</actLocation>
+				</location>
+			</act>
+			<leg mode="car">
+			</leg>
+			<act type="w" startTime="07:00:00" duration="08:00:00" endTime="15:00:00">
+				<location>
+					<actLocation>
+						<linkId refId="4"/>
+					</actLocation>
+				</location>
+			</act>
+			<leg mode="car">
+			</leg>
+			<act type="h">
+				<location>
+					<actLocation>
+						<linkId refId="1"/>
+					</actLocation>
+				</location>
+			</act>
+		</plan>
+	</person>
+	<person id="2">
+		<plan selected="true">
+			<act type="h" endTime="05:00:00">
+				<location>
+					<actLocation>
+						<linkId refId="1"/>
+					</actLocation>
+				</location>
+			</act>
+			<leg mode="car">
+			</leg>
+			<act type="w" startTime="07:00:00" duration="08:00:00" endTime="15:00:00">
+				<location>
+					<actLocation>
+						<linkId refId="4"/>
+					</actLocation>
+				</location>
+			</act>
+			<leg mode="car">
+			</leg>
+			<act type="h">
+				<location>
+					<actLocation>
+						<linkId refId="1"/>
+					</actLocation>
+				</location>
+			</act>
+		</plan>
+	</person>
+</population>
