@@ -46,6 +46,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 //import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.constrained.ManageSubchains;
+import org.matsim.locationchoice.constrained.SubChain;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -90,15 +92,16 @@ public class PlansConstructor implements PlanStrategyModule{
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
 		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
-		this.outputFile = "/home/baug/mfeil/data/fullSet/it0/output_plans_mz02.xml.gz";	
-		this.outputFileBiogeme = "/home/baug/mfeil/data/fullSet/it0/output_plans02.dat";
-		this.outputFileMod = "/home/baug/mfeil/data/fullSet/it0/model02.mod";
-		this.outputFileSims = "/home/baug/mfeil/data/fullSet/it0/sims02.xls";
+		this.outputFile = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz01.xml.gz";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans01.dat";
+		this.outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model01.mod";
+		this.outputFileSims = "/home/baug/mfeil/data/choiceSet/it0/sims01.xls";
 	/*	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
 		this.outputFileMod = "./plans/model.mod";
 	*/	this.population = new PopulationImpl();
+		this.sims = null;
 		this.network = controler.getNetwork();
 		this.init(network);	
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
@@ -137,18 +140,41 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 
 	public void finishReplanning(){
+		this.rectifyActTypes();
+		this.keepPersons();
 	//	this.selectZurich10MZPlans();
 	//	this.reducePersonsMostFrequentStructures();
 	//	this.reducePersonsRandomly();
-		this.reducePersonsIntelligently();
+	//	this.reducePersonsIntelligently();
 		this.linkRouteOrigPlans();
-		this.enlargePlansSet();
+	//	this.enlargePlansSet();
+		this.enlargePlansSetWithRandomSelection();
 		this.writePlans(this.outputFile);
-		this.mdsam = new MDSAM(this.population);
-		this.sims = this.mdsam.runPopulation();
-		this.writeSims(this.outputFileSims);
-		this.writePlansForBiogeme(this.outputFileBiogeme);
+	//	this.mdsam = new MDSAM(this.population);
+	//	this.sims = this.mdsam.runPopulation();
+	//	this.writeSims(this.outputFileSims);
+	//	this.writePlansForBiogeme(this.outputFileBiogeme);
+		this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme);
 		this.writeModFile(this.outputFileMod);
+	}
+	
+	
+	protected void rectifyActTypes (){
+		log.info("Rectifying act types...");
+		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = iterator.next();
+			PlanImpl plan = person.getSelectedPlan();
+			for (int i=0;i<plan.getPlanElements().size();i+=2){
+				ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(i);
+				/*if (act.getType().equalsIgnoreCase("h")) act.setType("home");
+				else if (act.getType().equalsIgnoreCase("w")) act.setType("work");
+				else if (act.getType().equalsIgnoreCase("e")) act.setType("education");
+				else*/ if (act.getType().equalsIgnoreCase("l")) act.setType("shopping");
+				else if (act.getType().equalsIgnoreCase("s")) act.setType("leisure");
+				//else log.warn("Unknown act detected: "+act.getType());
+			}
+		}
+		log.info("done... ");
 	}
 	
 	
@@ -302,6 +328,17 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("done... Size of population is "+this.population.getPersons().size()+".");
 	}
 	
+	
+	protected void keepPersons (){
+		// Keep all persons of Zurich10, reduce choice set later on.
+		log.info("Analyzing activitiy chains...");
+		ASPActivityChainsModesAccumulated analyzer = new ASPActivityChainsModesAccumulated(this.population);
+		analyzer.run();
+		this.actChains = analyzer.getActivityChains();
+		log.info("done... Size of population is "+this.population.getPersons().size()+".");
+	}
+	
+	
 	private void linkRouteOrigPlans (){
 		log.info("Adding links and routes to original plans...");
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
@@ -403,6 +440,85 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("done.");
 	}
 	
+	protected void enlargePlansSetWithRandomSelection (){
+		
+		int sizeOfChoiceSet = 20;
+		
+		log.info("Adding alternative plans...");
+		int counter=0;
+		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
+		
+		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = iterator.next();
+			counter++;
+			if (counter%10==0) {
+				log.info("Handling person "+counter);
+				Gbl.printMemoryUsage();
+			}
+			ArrayList<Integer> taken = new ArrayList<Integer>();
+			
+			for (int i=0;i<sizeOfChoiceSet-1;i++){
+				
+				// Randomly select an act/mode chain different to the chosen one. 
+				int position = 0;
+				do {
+					position = (int)(MatsimRandom.getRandom().nextDouble()*this.actChains.size());
+				} while(!taken.contains(position) && !acCheck.checkEqualActChainsModesAccumulated(person.getSelectedPlan().getPlanElements(), this.actChains.get(position)));
+				taken.add(position);
+				
+				PlanImpl plan = new PlanImpl (person);		
+				for (int j=0;j<this.actChains.get(position).size();j++){
+					if (j%2==0) {
+						ActivityImpl act = new ActivityImpl((ActivityImpl)this.actChains.get(position).get(j));
+						//Timing
+						if (j!=this.actChains.get(position).size()-1) {
+							act.setEndTime(MatsimRandom.getRandom().nextDouble()*act.getDuration()*2+act.getStartTime());
+						}
+						//Location if "primary"
+						if (act.getType().equalsIgnoreCase("w") || act.getType().equalsIgnoreCase("e") || act.getType().equalsIgnoreCase("h")){
+							for (int k=0;k<person.getSelectedPlan().getPlanElements().size();k+=2){
+								if (act.getType().equalsIgnoreCase(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(k))).getType())){
+									act.setCoord(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(k))).getCoord());
+									break;
+								}
+								// If primary act cannot be found in selectedPlan
+								this.modifyLocationCoord(act);
+							}
+						}
+						plan.addActivity((BasicActivity)act);
+					}
+					else {
+						LegImpl leg = new LegImpl((LegImpl)this.actChains.get(position).get(j));
+						plan.addLeg((BasicLeg)leg);
+					}
+				}
+				
+				this.locator.handleSubChains(plan, this.getSubChains(plan));				
+				this.linker.run(plan);
+
+				for (int j=1;j<plan.getPlanElements().size();j++){
+					if (j%2==1){
+						this.router.handleLeg((LegImpl)plan.getPlanElements().get(j), (ActivityImpl)plan.getPlanElements().get(j-1), (ActivityImpl)plan.getPlanElements().get(j+1), ((ActivityImpl)plan.getPlanElements().get(j-1)).getEndTime());
+					}
+					else {
+						((ActivityImpl)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
+						if (j!=plan.getPlanElements().size()-1){
+							((ActivityImpl)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+1, ((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()));
+							((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
+						}
+					}
+				}
+				// if plan too long make it invalid (set score to -100000)
+				if (plan.getLastActivity().getStartTime()-86400>plan.getFirstActivity().getEndTime()){
+					plan.setScore(-100000.0);
+				}
+				person.getPlans().add(i, plan);
+				
+			}
+		}
+		log.info("done.");
+	}
+	
 	protected void modifyLocation (ActivityImpl act){
 		log.info("Start modify.");
 		ActivityFacilitiesImpl afImpl = (ActivityFacilitiesImpl) this.controler.getFacilities();
@@ -428,6 +544,24 @@ public class PlansConstructor implements PlanStrategyModule{
 		double X = 683518.0 - 30000 + java.lang.Math.floor(MatsimRandom.getRandom().nextDouble()*60000);
 		double Y = 246836.0 - Math.sqrt(Math.abs(30000*30000-(683518-X)*(683518-X))) + java.lang.Math.floor(MatsimRandom.getRandom().nextDouble()*Math.sqrt(Math.abs(30000*30000-(683518-X)*(683518-X)))*2);
 		act.setCoord(new CoordImpl(X, Y));
+	}
+	
+	protected List<SubChain> getSubChains (PlanImpl plan){
+		ManageSubchains manager = new ManageSubchains();
+		for (int i=0;i<plan.getPlanElements().size()-4;i+=2){
+			ActivityImpl act = (ActivityImpl)(plan.getPlanElements().get(i));
+			ActivityImpl actFollowing = (ActivityImpl)(plan.getPlanElements().get(i+2));
+			if ((act.getType().equalsIgnoreCase("w") || act.getType().equalsIgnoreCase("e") || act.getType().equalsIgnoreCase("h")) &&
+					!(actFollowing.getType().equalsIgnoreCase("w") || actFollowing.getType().equalsIgnoreCase("e") || actFollowing.getType().equalsIgnoreCase("h"))){
+				manager.primaryActivityFound(act, (LegImpl)(plan.getPlanElements()).get(i+1));
+				while (!(actFollowing.getType().equalsIgnoreCase("w") || actFollowing.getType().equalsIgnoreCase("e") || actFollowing.getType().equalsIgnoreCase("h"))){
+					i+=2;
+					manager.secondaryActivityFound(act, (LegImpl)(plan.getPlanElements()).get(i+1));
+				}
+				manager.primaryActivityFound(actFollowing, null);
+			}
+		}
+		return manager.getSubChains();
 	}
 	
 	
@@ -546,6 +680,96 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("done.");
 	}
 	
+	// Writes a Biogeme file that fits "protected void enlargePlansSetWithRandomSelection ()"
+	public void writePlansForBiogemeWithRandomSelection (String outputFile){
+		log.info("Writing plans for Biogeme...");
+		
+		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
+		
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputFile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		// First row
+		stream.print("Id\tChoice\t");
+		for (int i = 0;i<this.actChains.size();i++){
+			int j=0;
+			for (j =0;j<java.lang.Math.max(this.actChains.get(i).size()-1,1);j++){
+				stream.print("x"+(i+1)+""+(j+1)+"\t");
+			}
+			// stream.print("x"+(i+1)+""+(j+1)+"\t"); // Similarity
+		}
+		for (int i = 0;i<this.actChains.size();i++){
+			stream.print("av"+(i+1)+"\t");
+		}
+		stream.println();
+		
+		// Filling plans
+		
+		int counterPerson = -1;
+		boolean firstPersonFound = true;
+		Id firstPersonId = new IdImpl (1);
+		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = iterator.next();
+			if (firstPersonFound){
+				firstPersonId = person.getId();
+				firstPersonFound = false;
+			}
+			counterPerson++;
+			
+			// Person ID
+			stream.print(person.getId()+"\t");
+			
+			// Choice
+			int position = -1;
+			for (int i=0;i<this.actChains.size();i++){
+				if (acCheck.checkEqualActChainsModesAccumulated(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))) {
+					position = i+1;
+					break;
+				}
+			}
+			stream.print(position+"\t");
+			
+			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise 
+			for (int i=0;i<this.actChains.size();i++){
+				boolean found = false;
+				for (int j=0;j<person.getPlans().size();j++){
+					if (acCheck.checkEqualActChainsModesAccumulated(person.getPlans().get(j).getPlanElements(), this.actChains.get(i))) {
+						this.writeAccumulatedPlanIntoFile(stream, person.getPlans().get(j).getPlanElements(), this.actChains.get(i));
+						found = true;
+						break;
+					}
+				}
+				if (!found){
+					for (int j=0;j<this.actChains.size()-1;j++)stream.print("0\t");
+				}
+			}
+			
+			for (int i=0;i<this.actChains.size();i++){
+				boolean found = false;
+				for (int j=0;j<person.getPlans().size();j++){
+					if (acCheck.checkEqualActChainsModesAccumulated(person.getPlans().get(j).getPlanElements(), this.actChains.get(i))) {
+						if (person.getPlans().get(j).getScore()!=null && person.getPlans().get(j).getScore()==-100000.0) stream.print(0+"\t");
+						else stream.print(1+"\t");
+						found = true;
+						break;
+					}
+				}
+				if (!found){
+					stream.print("0\t");
+				}
+			}
+			stream.println();
+		}
+		stream.close();
+		log.info("done.");
+	}
+	
+	// for "repeat" attribute
 	public void writePlansForBiogemeWithSequence(String outputFile){
 		log.info("Writing plans for Biogeme...");
 		PrintStream stream;
@@ -660,12 +884,55 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("done.");
 	}
 	
+	private void writeAccumulatedPlanIntoFile (PrintStream stream, List<PlanElement> planToBeWritten, List<PlanElement> referencePlan){
+		// Plan has only one act
+		if (planToBeWritten.size()==1) stream.print("24\t");
+		else {
+			// First and last home act
+			stream.print((((ActivityImpl)(planToBeWritten.get(0))).getEndTime()+86400-((ActivityImpl)(planToBeWritten.get(planToBeWritten.size()-1))).getStartTime())/3600+"\t");
+				
+			LinkedList<Integer> takenPositions = new LinkedList<Integer>();
+			for (int i=1;i<referencePlan.size()-1;i++){
+				if (i%2==0){
+					boolean found = false;
+					for (int j=2;j<planToBeWritten.size()-2;j+=2){
+						if (((ActivityImpl)(referencePlan.get(i))).getType().equals(((ActivityImpl)(planToBeWritten.get(j))).getType()) &&
+								!takenPositions.contains(j)){
+							stream.print(((ActivityImpl)(planToBeWritten.get(j))).calculateDuration()/3600+"\t");
+							takenPositions.add(j);
+							found = true;
+							break;
+						}
+					}
+					if (!found) log.warn("Activity "+referencePlan.get(i)+" could not be found!");
+				}
+				else {
+					boolean found = false;
+					for (int j=1;j<planToBeWritten.size()-1;j+=2){
+						if (((LegImpl)(referencePlan.get(i))).getMode().equals(((LegImpl)(planToBeWritten.get(j))).getMode()) &&
+								!takenPositions.contains(j)){
+							stream.print(((LegImpl)(planToBeWritten.get(j))).getTravelTime()/3600+"\t");	
+							takenPositions.add(j);
+							found = true;
+							break;
+						}
+					}
+					if (!found) log.warn("Leg "+referencePlan.get(i)+" could not be found!");
+				}
+			}
+		}
+	}
+	
 	public void writeModFile(String outputFile){
 		new ModFileMaker (this.population, this.sims).write(outputFile);
 	}
 	
 	public void writeModFileWithSequence(String outputFile){
 		new ModFileMaker (this.population, this.sims).writeWithSequence(outputFile);
+	}
+	
+	public void writeModFileWithRandomSelection (String outputFile){
+		new ModFileMaker (this.population, this.sims).writeWithRandomSelection(outputFile);
 	}
 	
 	public void writeSims (String outputFile){
