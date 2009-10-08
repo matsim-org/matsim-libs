@@ -62,18 +62,36 @@ public class RunCommercialActivityAnalyser {
 	private static int numberOfSamples = 10;
 	private static int sampleSize = 3000;
 
-	//====================================================
-	// Parameters that must be set
-	//----------------------------------------------------		
+	 /*=============================================================================
+	 * Double array with all the minor/major thresholds that should be considered. 	|
+	 * This threshold indicates the duration (in minutes) that distinguishes 		|
+	 * between activity types. Activities with durations less than the threshold	|
+	 * are considered `minor'. Those with durations exceeding the threshold are 	|
+	 * considered `major' activities.												|
+	 *=============================================================================*/
 //	private static double[] majorThresholds = {179.6, 339.4, 628.8, 931.5, 2062.5};
 	private static double[] majorThresholds = {300};
+
+	 /*=============================================================================
+	 * The threshold value (expressed as a fraction) that distinguishes between		| 
+	 * vehicle types. Vehicles that spend more than the threshold of their 			|
+	 * activities in the study area are considered `within' vehicles. Those with 	|
+	 * fewer of their activities in the study area are considered to be `through'	|
+	 * traffic vehicles.
+	 *=============================================================================*/	
 	private static double withinThreshold = 0.60;
-	//====================================================
-	// Processes that must be run
-	//----------------------------------------------------			
+	
+	 /*=============================================================================
+	 * Boolean variables to indicate what type of run should be done. The 			|
+	 * following are current options:												|
+	 * 		- analyseForR: Only write the activity durations to file. No chains are	|
+	 * 		  extracted since the objective is to plot merely the activity 			|
+	 * 		  of all activities, both minor and major.								|
+	 * 		- extractChains: As the name implies, extract activities, and then 		|
+	 * 		  also extract the activity chains.
+	 *=============================================================================*/
 	private static boolean analyseForR = false;
 	private static boolean extractChains = true;
-	//====================================================
 	
 	/**
 	 * @param args
