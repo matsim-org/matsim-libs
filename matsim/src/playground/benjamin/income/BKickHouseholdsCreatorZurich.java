@@ -45,10 +45,10 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
-import org.matsim.households.HouseholdsFactory;
 import org.matsim.households.Households;
-import org.matsim.households.Income;
+import org.matsim.households.HouseholdsFactory;
 import org.matsim.households.HouseholdsWriterV10;
+import org.matsim.households.Income;
 
 import playground.dgrether.DgPaths;
 
@@ -75,17 +75,29 @@ public class BKickHouseholdsCreatorZurich {
 		
 		String gemeindenKantonZurichShapeFile = DgPaths.WORKBASE + "fgvsp01/externedaten/Schweiz/Gemeindegrenzen/gemeindegrenzen2008/g1g08_shp_080606/G1G08.shp";
 		
-		String plansZurichWoTransit = DgPaths.IVTCHBASE + "baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
+		String plansZurichWoTransit = DgPaths.IVTCHBASE + "baseCase/plans/plans_all_zrh30km_10pct.xml.gz";
+	
+		String plansZurichWTransit = DgPaths.IVTCHBASE + "baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
+		
 		
 		String einkommenZurichTextfile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/einkommenKantonZurichPlainDataEditedFinalUTF8.txt";
 
-		String householdsXmlFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
+		String householdsWTransitXmlFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
 		
-		String householdsTxtFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.txt";
+		String householdsWTransitTxtFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.txt";
+
+		String householdsWoTransitXmlFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_10pct.xml.gz";
+		
+		String householdsWoTransitTxtFile = DgPaths.SHAREDSVN + "studies/dgrether/einkommenSchweiz/households_all_zrh30km_10pct.txt";
+
 		
 		String plansZurich = plansZurichWoTransit;
 		
-
+    String householdsTxtFile = householdsWoTransitTxtFile;
+    
+    String householdsXmlFile = householdsWoTransitXmlFile;
+		
+		
 		Map<String, Double> gemeindeIncome = this.readMedianIncomeFile(einkommenZurichTextfile);
 		FeatureSource fts = ShapeFileReader.readDataFile(gemeindenKantonZurichShapeFile);
 

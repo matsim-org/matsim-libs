@@ -30,10 +30,10 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.households.Household;
-import org.matsim.households.HouseholdsFactory;
 import org.matsim.households.Households;
-import org.matsim.households.Income;
+import org.matsim.households.HouseholdsFactory;
 import org.matsim.households.HouseholdsWriterV10;
+import org.matsim.households.Income;
 
 import playground.dgrether.DgPaths;
 
@@ -82,6 +82,7 @@ public class BKickHouseholdsCreator {
     MatsimPopulationReader popReader = new MatsimPopulationReader(pop, network);
     popReader.readFile(plansFile);
     
+    sc.getConfig().scenario().setUseHouseholds(true);
     Households hhs = sc.getHouseholds();
     HouseholdsFactory b = hhs.getFactory();
 

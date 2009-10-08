@@ -41,14 +41,15 @@ public class IncomeCalculatorKantonZurich {
 	
 	
 	public double calculateIncome(double median){
-		double medianLorenz = calculateLorenzValue(0.5);
-	  double totalIncome =  median / medianLorenz;
-		
+//		double medianLorenz = calculateLorenzValue(0.5);
+//	  double totalIncome =  median / medianLorenz;
 		double rnd = this.random.nextDouble();
 		double lorenzDerivative = calculateLorenzDerivativeValue(rnd);
 
 		double income = lorenzDerivative * median;
 
+		double scale = calculateLorenzDerivativeValue(0.5);
+		income /= scale;
 		return income;
 	}
 	
