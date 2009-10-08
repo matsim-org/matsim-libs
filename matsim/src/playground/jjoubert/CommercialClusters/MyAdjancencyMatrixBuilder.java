@@ -41,6 +41,25 @@ import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
+/**
+ * This class builds adjacency matrices. An element <code>(i,j)</code> of the matrix 
+ * refers to the entry in the <code>i</code>-th row and the <code>j</code>-th column in
+ * the matrix. Each element <code>(i,j)</code> represents the directed link from the 
+ * cluster <code>i</code> to cluster <code>j</code>. The following matrices are 
+ * currently determined:   
+ * <ul>
+ *  <li><b><code>orderAdjacency</code>:</b> in the the order adjacency matrix we count 
+ *  	the number of links that exist from cluster <code>i</code> to cluster 
+ *  	<code>j</code>. A link in this this matrix context <i>exists</i> if and only if, 
+ *  	for two consecutive activities <code>a</code> and <code>b</code> in a chain, 
+ *  	activity <code>a</code> belongs to cluster <code>i</code> and activity <code>b
+ *  	</code> belongs to cluster <code>j</code>.
+ * 	<li><b><code>distanceAdjacency</code>:</b> the distance adjacency matrix indicates the 
+ * 		distance from cluster <code>i</code> to cluster <code>j</code>, but only if the 
+ * 		order adjacency of element <code>(i,j)</code> is greater than 0.
+ * </ul>
+ * @author jwjoubert
+ */
 public class MyAdjancencyMatrixBuilder {
 	private final static Logger log = Logger.getLogger(MyAdjancencyMatrixBuilder.class);
 	private final int matrixDimension;
@@ -116,8 +135,14 @@ public class MyAdjancencyMatrixBuilder {
 		
 		for(Chain chain : chains ){
 			List<Activity> al = chain.getActivities();
-			if(al.size() > 3){
-				for(int a = 1; a < al.size() - 2; a++){
+//			if(al.size() >= 3){
+//				for(int a = 1; a < al.size()-2; a++){ // Do not read the major activities at the ends of the chain. The `-2' is because I have an `a+1' within the loop.
+			if(al.size() >= 2){
+				for(int a = 0; a < al.size()-2; a++){ // Read all the activities. The `-2' is because I have an `a+1' within the loop.
+					/*
+					 * TODO Why NOT?! We will miss ALL the "full truck load" trips if a 
+					 * vehicle only performs one activity per chain.
+					 */
 					Point p1 = gf.createPoint(al.get(a).getLocation().getCoordinate());
 					Point p2 = gf.createPoint(al.get(a+1).getLocation().getCoordinate());
 					List<Cluster> link = testValidLink(p1,p2);
@@ -130,7 +155,10 @@ public class MyAdjancencyMatrixBuilder {
 						}
 					}
 				}
+			} else{
+				log.warn("Found a chain with only two activities: Vehicle " + chain.getActivities().get(0).getLocation().getVehID());
 			}
+				
 			chainCounter++;
 			// Report progress
 			if(chainCounter == chainMultiplier){
@@ -151,11 +179,13 @@ public class MyAdjancencyMatrixBuilder {
 		if(c1List.size() > 0){
 			c1 = ((List<ClusterPoint>) c1List).get(0).getCluster();
 			int pos = Integer.parseInt(c1.getClusterId());
+			// Increment the in-Order adjacency.
 			inOrderAdjacency.setQuick(pos, inOrderAdjacency.getQuick(pos)+1);
 		}
 		if(c2List.size() > 0){
 			c2 = ((List<ClusterPoint>) c2List).get(0).getCluster();
 			int pos = Integer.parseInt(c2.getClusterId());
+			// increment the out-Order adjacency.
 			outOrderAdjacency.setQuick(pos, outOrderAdjacency.getQuick(pos)+1);			
 		}
 		if(c1 != null && c2 != null){
@@ -236,8 +266,33 @@ public class MyAdjancencyMatrixBuilder {
 			e.printStackTrace();
 		}		
 	}
-	
-	public void writeAdjacencyAsPajekNetworkToFile(String outputFilename) {
+	/**
+	 * This method takes the cluster adjacency matrix and the cluster list, and writes a
+	 * <A HREF="http://pajek.imfm.si/doku.php?id=pajek">Pajek</A> network file. An example 
+	 * of the file format is given here. 
+	 * <ul>
+	 * 	<b>Format</b><ul><code>
+	 * 					Vertices*<br>
+	 * 					1 636656.0603363763 7112425.64839626<br>
+	 * 					2 646371.1428275895 7077439.060623741<br>
+	 * 					3 611341.8553271998 7084071.2019769605<br>
+	 * 					...<br>
+	 * 					1434 611139.0689426351 7084311.816469026<br>
+	 * 					Arcs*<br>
+	 * 					1 4 12<br>
+	 * 					1 10 2<br>
+	 * 					1 13 234<br>
+	 * 					1 22 8<br>
+	 * 					...
+	 * 				</code></ul>
+	 * </ul>
+	 * 
+	 * @param clusters the <code>List</code> of <code>Cluster</code>s so that the cluster
+	 * 		centroid coordinates can be written as attributes of the vertices.
+	 * @param outputFilename the complete path of the <code>*.net</code> file to which
+	 * 		the <i>Pajek</i> network is written. 
+	 */
+	public void writeAdjacencyAsPajekNetworkToFile(List<Cluster> clusters, String outputFilename) {
 		log.info("Writing order adjacency as Pajek network file.");
 		try {
 			BufferedWriter output = new BufferedWriter(new FileWriter(new File( outputFilename)));
@@ -245,17 +300,26 @@ public class MyAdjancencyMatrixBuilder {
 				output.write("*Vertices ");
 				output.write(String.valueOf(orderAdjacency.rows()));
 				output.newLine();
+				// Write the vertex coordinates
+				for(Cluster c : clusters){
+					output.write(String.valueOf(Integer.parseInt(c.getClusterId())+1));
+					output.write(" ");
+					output.write(String.valueOf(c.getCenterOfGravity().getX()));
+					output.write(" ");
+					output.write(String.valueOf(c.getCenterOfGravity().getY()));
+					output.newLine();
+				}
 				output.write("*Arcs");
 				output.newLine();
 				int rowMultiplier = 0;
 				for(int r = 0; r < orderAdjacency.rows(); r++){
 					for(int c = 0; c < orderAdjacency.columns(); c++){
 						if(orderAdjacency.getQuick(r, c) > 0){
-							output.write(String.valueOf(r));
+							output.write(String.valueOf(r+1));
 							output.write(" ");
-							output.write(String.valueOf(c));
+							output.write(String.valueOf(c+1));
 							output.write(" ");
-							output.write(String.valueOf(orderAdjacency.getQuick(r, c)));
+							output.write(String.valueOf((int) orderAdjacency.getQuick(r, c)));
 							output.newLine();
 						}
 					}

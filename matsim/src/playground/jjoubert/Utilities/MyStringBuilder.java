@@ -32,18 +32,18 @@ public class MyStringBuilder {
 	}
 	
 	public String getShapefilename(String studyArea){
-		return root + "/Shapefiles/" + studyArea + "/" + studyArea + "_UTM35S.shp";
+		return root + "Shapefiles/" + studyArea + "/" + studyArea + "_UTM35S.shp";
 	}
 	
 	public String getGapShapefilename(String studyArea){
-		return root + "/Shapefiles/" + studyArea + "/" + studyArea + "GAP_UTM35S.shp";
+		return root + "Shapefiles/" + studyArea + "/" + studyArea + "GAP_UTM35S.shp";
 	}
 	
 	/**
 	 * @return {@code ROOT + /DigiCore/SortedVehicles/}
 	 */
 	public String getSortedVehicleFoldername(){
-		return root + "/DigiCore/SortedVehicles/";
+		return root + "DigiCore/SortedVehicles/";
 	}
 	
 	/**
