@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickIncomeControler2
+ * Income1TravelCostCalculatorFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,45 +17,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income2;
+package playground.benjamin.income1;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-
-import playground.benjamin.income1.BKickIncomeControler;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 
 
 /**
  * @author dgrether
  *
  */
-public class BKickIncomeControler2 extends BKickIncomeControler {
+public class Income1TravelCostCalculatorFactory implements TravelCostCalculatorFactory {
 
-	public BKickIncomeControler2(String arg) {
-		super(arg);
-	}
-	
-	public BKickIncomeControler2(String[] args) {
-		super(args);
+	public TravelCost createTravelCostCalculator(TravelTime timeCalculator, CharyparNagelScoringConfigGroup cnScoringGroup) {
+		return new BKickIncomeTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup);
 	}
 
-	
-	public BKickIncomeControler2(Config config) {
-		super(config);
-	}
-
-	public static void main(String[] args) {
-//	String config = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
-//	String[] args2 = {config};
-//	args = args2;
-	if ((args == null) || (args.length == 0)) {
-		System.out.println("No argument given!");
-		System.out.println("Usage: Controler config-file [dtd-file]");
-		System.out.println();
-	} else {
-		final Controler controler = new BKickIncomeControler(args);
-		controler.run();
-	}
-}
-	
 }

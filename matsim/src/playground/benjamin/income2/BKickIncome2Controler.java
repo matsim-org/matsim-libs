@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickControler2
+ * BKickIncomeControler2
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,10 +17,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.income1;
+package playground.benjamin.income2;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -29,62 +28,61 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.benjamin.BKickControler;
 
-
 /**
- * Controler for first zurich scenario test run of estimated scoring function.
  * @author dgrether
  *
  */
-public class BKickIncomeControler extends BKickControler {
+public class BKickIncome2Controler extends BKickControler {
 
 	private PersonHouseholdMapping hhdb;
 
-	public BKickIncomeControler(String configFileName) {
-		super(configFileName);
+	public BKickIncome2Controler(String arg) {
+		super(arg);
 	}
 	
-	public BKickIncomeControler(Config conf){
-		super(conf);
-	}
 
-	public BKickIncomeControler(String[] args) {
+	public BKickIncome2Controler(String[] args) {
 		super(args);
 	}
 
-	@Override
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new BKickIncomeScoringFunctionFactory(this.config.charyparNagelScoring(), this.hhdb);
-	}
 	
+	public BKickIncome2Controler(Config config) {
+		super(config);
+	}
+
+	private void setHouseholdDb(PersonHouseholdMapping hhdb) {
+		this.hhdb = hhdb;
+	}
+
 	@Override
-	protected void setUp(){	
-		this.hhdb = new PersonHouseholdMapping(this.scenarioData.getHouseholds());
-		this.setTravelCostCalculatorFactory(new Income1TravelCostCalculatorFactory());
-//		if (this.travelTimeCalculator == null) {
-//			this.travelTimeCalculator = this.getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-//		}
-//		this.travelCostCalculator = new BKickIncomeTravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
+	protected void setUp() {
+		this.hhdb = new PersonHouseholdMapping(this.getScenarioData().getHouseholds());
+		ScoringFunctionFactory scoringFactory = new BKickIncome2ScoringFunctionFactory(this.getScenarioData().getConfig().charyparNagelScoring(), hhdb);
+		setTravelCostCalculatorFactory(new Income2TravelCostCalculatorFactory());
+		this.setScoringFunctionFactory(scoringFactory);
 		super.setUp();
 	}
+
 	
 	@Override
 	public PlanAlgorithm getRoutingAlgorithm(final TravelCost travelCosts, final TravelTime travelTimes) {
-		return new IncomePlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), this.hhdb);
+		return new Income2PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, 
+				this.getLeastCostPathCalculatorFactory(), this.hhdb);
 	}
+
+	public static void main(String[] args) {
+//	String config = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
+//	String[] args2 = {config};
+//	args = args2;
+	if ((args == null) || (args.length == 0)) {
+		System.out.println("No argument given!");
+		System.out.println("Usage: Controler config-file [dtd-file]");
+		System.out.println();
+	} else {
+		final BKickIncome2Controler controler = new BKickIncome2Controler(args);
+		controler.run();
+	}
+}
 
 	
-	public static void main(String[] args) {
-//		String config = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
-//		String[] args2 = {config};
-//		args = args2;
-		if ((args == null) || (args.length == 0)) {
-			System.out.println("No argument given!");
-			System.out.println("Usage: Controler config-file [dtd-file]");
-			System.out.println();
-		} else {
-			final Controler controler = new BKickIncomeControler(args);
-			controler.run();
-		}
-	}
-
 }

@@ -27,7 +27,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.benjamin.income2.BKickIncomeControler2;
+import playground.benjamin.income2.BKickIncome2Controler;
 
 
 /**
@@ -53,7 +53,7 @@ public class BKickScoringTestIATBR extends MatsimTestCase {
 		
 		
 		// controler with new scoring function
-		final BKickIncomeControler2 controler = new BKickIncomeControler2(config);
+		final BKickIncome2Controler controler = new BKickIncome2Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 
@@ -73,15 +73,22 @@ public class BKickScoringTestIATBR extends MatsimTestCase {
 		
 		//this score is calculated as follows:
 		//U_total_car = 4.58*LN(120000CHF/240)   -   4.58*(((0.12/1000m)*50000m)/(120000CHF/240)))   -   (0.97/3600s)*(60min*60)   +   1.86*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +   1.86*12*LN(15/(12*EXP((-10*3600s)/(12*3600s))))
-		//            = 28.46291                 -   0.005496                                        -   0.97                      +   14.88 *LN(3.490342957)                      +   22.32  *LN(2.876218905)
+		//            = 28.46291                 -   0.05496                                        -   0.97                      +   14.88 *LN(3.490342957)                      +   22.32  *LN(2.876218905)
 		//            =                                                                                                            +   18.599999998
+		//this calculation uses distance of street network * 1.5
 		//U_total_pt  = 4.58*LN(40000CHF/240)    -   4.58*(((0.28/1000m)*75000m)/(40000CHF/240)))                                  +   1.86*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +   1.86*12*LN(14/(12*EXP((-10*3600s)/(12*3600s))))
 		//            = 23.43126                 -   0.57708                                                                       +   14.88 *LN(3.490342957)                      +   22.32  *LN(2.684471873)
 		//            = 
+		//actually it is air distance * 1.5
+		//U_total_pt  = 4.58*LN(40000CHF/240)    -   4.58*(((0.28/1000m)*48750m)/(40000CHF/240)))                                  +   1.86*8*LN(1/(EXP((-10*3600s)/(8*3600s))))   +   1.86*12*LN(14/(12*EXP((-10*3600s)/(12*3600s))))
+		//            = 23.43126                 -   0.375102                                                                       +   14.88 *LN(3.490342957)                      +   22.32  *LN(2.684471873)
+		//            = 
 		System.out.println("Agent 001: " + this.planScorer.getAgentScore(id1));
 		System.out.println("Agent 002: " + this.planScorer.getAgentScore(id2));
-		assertEquals(69.66797062432467, this.planScorer.getAgentScore(id1), EPSILON);
-		assertEquals(63.49482317420086, this.planScorer.getAgentScore(id2), EPSILON);
+		// should be 69.618506624 using microsoft windows calculator but is in java 69.6185091561068 -> should be ok
+		assertEquals("Wrong score for car agent", 69.6185091561068, this.planScorer.getAgentScore(id1), EPSILON);
+		// using gnome gcalctool this should be 63.696801174 but it is in java 63.69790888638976 -> should be ok
+		assertEquals("Wrong score for pt agent", 63.69790888638976, this.planScorer.getAgentScore(id2), EPSILON);
 	}
 
 }
