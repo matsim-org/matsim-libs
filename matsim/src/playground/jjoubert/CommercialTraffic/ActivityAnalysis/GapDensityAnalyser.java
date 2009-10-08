@@ -58,16 +58,17 @@ public class GapDensityAnalyser {
 		this.root = root;
 		
 		// Read the study area files.
-		MyStringBuilder msb = new MyStringBuilder(this.root);
-		String gapShapefileName = msb.getGapShapefilename(this.studyAreaName);
+		MyActivityAnalysisStringBuilder sb = new MyActivityAnalysisStringBuilder(this.root, version, threshold, sample, studyAreaName);
+//		MyStringBuilder msb = new MyStringBuilder(this.root);
+		String gapShapefileName = sb.getGapShapefilename();
 		MyGapReader mgr = new MyGapReader(this.studyAreaName, gapShapefileName);
 		this.zoneList = mgr.getAllZones();
 		this.zoneTree = mgr.getGapQuadTree();
 		
-		inputFilenameMinor = msb.getGapInputMinor(studyAreaName, version, threshold, sample);
-		inputFilenameMajor = msb.getGapInputMajor(studyAreaName, version, threshold, sample);
-		outputFilenameMinor = msb.getGapOutputMinor(studyAreaName, version, threshold, sample);
-		outputFilenameMajor = msb.getGapOutputMajor(studyAreaName, version, threshold, sample);
+		inputFilenameMinor = sb.getGapInputMinor();
+		inputFilenameMajor = sb.getGapInputMajor();
+		outputFilenameMinor = sb.getGapOutputMinor();
+		outputFilenameMajor = sb.getGapOutputMajor();
 		
 	}
 
