@@ -3,7 +3,7 @@ package playground.ciarif.retailers.IO;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -23,9 +23,9 @@ public class LinksRetailerReader {
 	public final static String CONFIG_GROUP = "Retailers";
 	private String linkIdFile;// = null;
 	private Controler controler;
-	protected ArrayList<LinkRetailersImpl> allLinks = new ArrayList<LinkRetailersImpl>();
-	protected ArrayList<LinkRetailersImpl> freeLinks = new ArrayList<LinkRetailersImpl>();
-	private ArrayList<LinkRetailersImpl> currentLinks =  new ArrayList<LinkRetailersImpl>();
+	protected TreeMap<Id,LinkRetailersImpl> allLinks = new TreeMap<Id,LinkRetailersImpl>();
+	protected TreeMap<Id,LinkRetailersImpl> freeLinks = new TreeMap<Id,LinkRetailersImpl>();
+	private TreeMap<Id,LinkRetailersImpl> currentLinks =  new TreeMap<Id,LinkRetailersImpl>();
 	private Retailers retailers;
 	private final static Logger log = Logger.getLogger(LinksRetailerReader.class);
 	
@@ -40,31 +40,38 @@ public class LinksRetailerReader {
 	public void init() {
 		this.linkIdFile = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_LINKS);
 		this.detectRetailersActualLinks();
-		if (this.linkIdFile != null) {this.readFreeLinks();}
-		else {this.createFreeLinks();}	
-		this.allLinks.addAll(currentLinks);
+		if (this.linkIdFile != null) {
+			this.readFreeLinks();
+		}
+		else {
+			this.createFreeLinks();
+		}	
+		
+		this.allLinks.putAll(currentLinks);
 	}
 	
 	
 	public void updateFreeLinks() {
 		
-		ArrayList<LinkRetailersImpl> links =  new ArrayList<LinkRetailersImpl>();
-		ArrayList<LinkRetailersImpl> linksToRemove =  new ArrayList<LinkRetailersImpl>();
+		TreeMap<Id,LinkRetailersImpl> links =  new TreeMap<Id,LinkRetailersImpl>();
+		TreeMap<Id,LinkRetailersImpl> linksToRemove =  new TreeMap<Id,LinkRetailersImpl>();
 		this.detectRetailersActualLinks();
 		
-		for (LinkRetailersImpl link:allLinks) {
-			links.add(link);
+		for (LinkRetailersImpl link:allLinks.values()) {
+			links.put(link.getId(),link);
 		}
-		for (LinkRetailersImpl link:currentLinks) {
+		for (LinkRetailersImpl link:currentLinks.values()) {
 			Id id = link.getId();
-			for (LinkRetailersImpl link2:links){
+			for (LinkRetailersImpl link2:links.values()){
 				Id id2 = link2.getId();
 				if (id==id2){
-					linksToRemove.add(link2);
+					linksToRemove.put(link2.getId(), link2);
 				}
 			}
 		}
-		links.removeAll(linksToRemove);
+		for (LinkRetailersImpl l:linksToRemove.values()){
+			links.remove(l.getId());
+		}
 		this.freeLinks=links;
 	}
 	
@@ -96,8 +103,8 @@ public class LinksRetailerReader {
 					l.setMaxFacOnLink(Integer.parseInt(entries[1]));
 				}
 				
-				this.freeLinks.add(l);
-				this.allLinks.add(l);
+				this.freeLinks.put(l.getId(),l);
+				this.allLinks.put(l.getId(),l);
 			}
 		} 
 		catch (IOException e) {
@@ -106,17 +113,20 @@ public class LinksRetailerReader {
 	}
 	
 	private void detectRetailersActualLinks(){
-		ArrayList<LinkRetailersImpl> links =  new ArrayList<LinkRetailersImpl>();
+		TreeMap<Id,LinkRetailersImpl> links =  new TreeMap<Id,LinkRetailersImpl>();
 		for (Retailer r:retailers.getRetailers().values()) {
 			for (ActivityFacilityImpl af: r.getFacilities().values()){
 				LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)af.getLink(), controler.getNetwork());
-				links.add(link);
+				links.put(link.getId(),link);
 			}
 		}
 		this.currentLinks=links;
+		log.info("current Links size is " + currentLinks.size());
+		for (LinkRetailersImpl l:currentLinks.values()) {
+			log.info(("current Links contains link " + l.getId()));
+		}
 	}
 		
-
 	private void createFreeLinks() {
 		String freeLinksParameterString = Gbl.getConfig().findParam(CONFIG_GROUP,CONFIG_LINKS_PAR);
 		Double freeLinksParameterInt=Double.parseDouble(freeLinksParameterString);
@@ -125,17 +135,21 @@ public class LinksRetailerReader {
 		while (this.freeLinks.size()<(newLinksMax)) {
 			int rd = MatsimRandom.getRandom().nextInt(controler.getNetwork().getLinks().values().size());
 			LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLinks().values().toArray()[rd],controler.getNetwork());
-			if (currentLinks.contains(link.getId())) {}
+			if (currentLinks.containsKey(link.getId())) {}
 			else {	
-				this.freeLinks.add(link);
-				log.info("the link " + link.getId() + " has been added to the free links" ); 
-				this.allLinks.add(link);
+				if ((freeLinks.containsKey(link.getId())))	{log.info("The link " + link.getId() + " is already in the list");}
+				else {
+					this.freeLinks.put(link.getId(), link);
+					log.info("the link " + link.getId() + " has been added to the free links" );
+					log.info("free links are" + freeLinks );
+					this.allLinks.put(link.getId(),link);
+				}	
 			}		
 		}
 	}
 	
 	// get methods
-	public ArrayList<LinkRetailersImpl> getFreeLinks() {
+	public TreeMap<Id,LinkRetailersImpl> getFreeLinks() {
 		return this.freeLinks;
 	}
 }

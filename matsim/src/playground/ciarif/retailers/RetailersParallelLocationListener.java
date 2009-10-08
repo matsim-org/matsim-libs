@@ -203,7 +203,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 			for (Retailer r : this.retailers.getRetailers().values()) {
 				log.info("THE RETAILER " + r.getId() + " WILL TRY TO RELOCATE ITS FACILITIES");
 				//movedFacilities = r.runStrategy(this.retailersLinks);
-				r.runStrategy(retailersLinks);
+				//r.runStrategy(retailersLinks);
 				movedFacilities = r.getMovedFacilities();
 				
 				//TODO The check of moved facilities should happen here!!!!

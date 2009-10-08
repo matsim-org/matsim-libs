@@ -95,5 +95,12 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 		public ArrayList<LinkRetailersImpl> findAvailableLinks() {
 			// TODO Auto-generated method stub
 			return null;
+		}
+
+		public Map<Id, ActivityFacilityImpl> moveFacilities(
+				Map<Id, ActivityFacilityImpl> facilities,
+				TreeMap<Id, LinkRetailersImpl> links) {
+			// TODO Auto-generated method stub
+			return null;
 		}	
 }

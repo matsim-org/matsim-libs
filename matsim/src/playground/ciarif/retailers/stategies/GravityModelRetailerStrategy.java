@@ -29,7 +29,7 @@ import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO check the arguments that are passed from this class to 
 	//the GravityModel class, in particular if it is really necessary to pass the controler. 
 
-	//TODO have a look to variables here, it shouldn't happen that field here are the same as in the GravityModel class
+	//TODO have a look to variables here, it shouldn't happen that fields here are the same as in the GravityModel class
 	public static final String NAME = "gravityModelRetailerStrategy";
 	private final static Logger log = Logger.getLogger(GravityModelRetailerStrategy.class);
 	private Controler controler;
@@ -43,19 +43,24 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		this.controler = controler;
 	}
 	
-	private ArrayList<Integer> createInitialLocationsForGA (ArrayList<LinkRetailersImpl> links) {
+	private TreeMap<Integer,Id> createInitialLocationsForGA (TreeMap<Id,LinkRetailersImpl> availableLinks) {
 		
-		ArrayList<Integer> locations = new ArrayList<Integer> ();
-		
+		TreeMap<Integer,Id> locations = new TreeMap<Integer,Id> ();
+		int intCount=0;
 		for (ActivityFacilityImpl af:retailerFacilities.values()){
+			
 			Integer integer = new Integer(Integer.parseInt(af.getLink().getId().toString()));
-			locations.add(integer);
+			locations.put(intCount,af.getLink().getId());
+			intCount = intCount+1;
+			log.info("The facility with Id: " + integer + " has been added");
 		}
 		
-		for (LinkRetailersImpl l:links) {
-			if (locations.contains(Integer.parseInt(l.getId().toString()))) {}
+		for (LinkRetailersImpl l:availableLinks.values()) {
+			if (locations.containsValue(l.getId())) {}
 			else {
-				locations.add(Integer.parseInt(l.getId().toString()));
+				locations.put(intCount,l.getId());
+				intCount = intCount+1;
+				log.info("The facility with Id: " + Integer.parseInt(l.getId().toString()) + " has been added");
 			}
 		}
 		
@@ -121,7 +126,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 	}
 
 	
-	public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> retailerFacilities,ArrayList<LinkRetailersImpl> freeLinks) {
+	public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> retailerFacilities,TreeMap<Id,LinkRetailersImpl> freeLinks) {
 		
 		this.retailerFacilities = retailerFacilities;
 		GravityModel gm = new GravityModel(this.controler, retailerFacilities); 
@@ -176,12 +181,14 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		//double[] b = {-1, 1};
 		gm.setBetas(b);
 		RunRetailerGA rrGA = new RunRetailerGA();
-		ArrayList<Integer> solution = rrGA.runGA(this.createInitialLocationsForGA(this.mergeLinks(freeLinks)),gm);		
+		TreeMap<Integer, Id> first = this.createInitialLocationsForGA(this.mergeLinks(freeLinks));
+		gm.setFirst(first);
+		ArrayList<Integer> solution = rrGA.runGA(first.size(),gm);		
 		log.info("The optimized solution is: " + solution);
 		int count=0;
 		for (ActivityFacilityImpl af:this.retailerFacilities.values()) {
 			if (solution.get(count) != Integer.parseInt(af.getLink().getId().toString())) {
-				Utils.moveFacility(af,controler.getNetwork().getLink(solution.get(count).toString()),this.controler.getWorld());
+				Utils.moveFacility(af,controler.getNetwork().getLink(first.get(solution.get(count))),this.controler.getWorld());
 				log.info("The facility " + af.getId() + " has been moved");
 				this.movedFacilities.put(af.getId(), af);
 				log.info("Link Id after = "+ af.getLink().getId());
@@ -191,15 +198,15 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		return movedFacilities;
 	}
 
-	private ArrayList<LinkRetailersImpl> mergeLinks(ArrayList<LinkRetailersImpl> freeLinks) {
+	private TreeMap<Id,LinkRetailersImpl> mergeLinks(TreeMap<Id,LinkRetailersImpl> freeLinks) {
 		
-		ArrayList<LinkRetailersImpl> availableLinks = new ArrayList<LinkRetailersImpl>();
+		TreeMap<Id,LinkRetailersImpl> availableLinks = new TreeMap<Id,LinkRetailersImpl>();
 		for (ActivityFacilityImpl af: this.retailerFacilities.values()){
 			Id id = af.getLink().getId();
 			LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLink(id),controler.getNetwork());
-			availableLinks.add(link);
+			availableLinks.put(link.getId(),link);
 		}
-		availableLinks.addAll(freeLinks);
+		availableLinks.putAll(freeLinks);
 		return availableLinks;
 	}
 }

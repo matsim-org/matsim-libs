@@ -6,6 +6,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 //import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.TreeMap;
+
+import org.matsim.api.basic.v01.Id;
 
 import playground.ciarif.retailers.models.GravityModel;
 import playground.jjoubert.Utilities.DateString;
@@ -16,11 +19,14 @@ public class RunRetailerGA
  public final static String CONFIG_GROUP = "Retailers";
  public final static String CONFIG_MATRICES_FOLDER = "matricesFolder";
  
- public ArrayList<Integer> runGA(ArrayList<Integer> first, GravityModel gm)
+ public ArrayList<Integer> runGA(int size, GravityModel gm)
  
   {
-	 
-    int genomeLength = first.size();
+	ArrayList<Integer> initialSolution = new ArrayList<Integer>();
+	for (int i=0; i<size;  i=i+1){
+		initialSolution.add(i);
+	}
+    int genomeLength = initialSolution.size();
     int populationSize = 10;
     int numberOfGenerations = 10;
     double elites = 0.1;
@@ -30,7 +36,7 @@ public class RunRetailerGA
     ArrayList<ArrayList<Double>> solutionProgress = new ArrayList<ArrayList<Double>>(numberOfGenerations);
 
     MyFitnessFunction ff = new MyFitnessFunction(true, genomeLength, gm);
-    RetailerGA ga = new RetailerGA(populationSize, genomeLength, ff, first);
+    RetailerGA ga = new RetailerGA(populationSize, genomeLength, ff, initialSolution);
     solutionProgress.add(ga.getStats());
     long tNow = 0;
     long total = 0;

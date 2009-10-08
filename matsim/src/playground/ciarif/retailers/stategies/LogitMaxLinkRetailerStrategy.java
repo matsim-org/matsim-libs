@@ -93,5 +93,12 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public Map<Id, ActivityFacilityImpl> moveFacilities(
+			Map<Id, ActivityFacilityImpl> facilities,
+			TreeMap<Id, LinkRetailersImpl> links) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

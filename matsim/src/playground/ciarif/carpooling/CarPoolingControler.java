@@ -2,7 +2,9 @@ package playground.ciarif.carpooling;
 
 import org.matsim.core.controler.Controler;
 
-public class CarPoolingControler extends Controler {
+import playground.meisterk.kti.controler.KTIControler;
+
+public class CarPoolingControler extends KTIControler {
 	
 	public CarPoolingControler (String[] args){
 		super(args);

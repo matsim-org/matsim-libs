@@ -36,6 +36,7 @@ public class GravityModel
   private Map<Id, PersonRetailersImpl> retailersPersons = new TreeMap<Id, PersonRetailersImpl>();
   private RetailZones retailZones = new RetailZones();
   private Map<Id, ActivityFacilityImpl> retailersFacilities;
+  private TreeMap<Integer,Id> first;
   private Map<Id, PersonImpl> persons;
   private int counter=0;
   private int nextCounterMsg =1;
@@ -74,14 +75,15 @@ public void init() {
 
 public double computePotential(ArrayList<Integer> solution){
 	
-	//System.out.println("The current solution is " + solution);
+	System.out.println("The current solution is " + solution);
 	
 	double global_likelihood = 0;
     int a = 0;
     
     for (ActivityFacilityImpl c : this.retailersFacilities.values()) {
-    String linkId = (solution.get(a)).toString();
-    //System.out.println("The link " + linkId + " is now processed");
+    Id linkId = this.first.get(solution.get(a));
+    System.out.println("The link " + linkId + " is now processed");
+    System.out.println("The element " + a + " of the solution is now processed");
     Coord coord = this.controler.getNetwork().getLink(linkId).getCoord();
 	++a;
 	double loc_likelihood = 0.0D;
@@ -110,7 +112,7 @@ public double computePotential(ArrayList<Integer> solution){
 		          
 	        	  if (af.equals(s)){
 		            int index = count;
-		            Coord coord1 = this.controler.getNetwork().getLink(((Integer)solution.get(index)).toString()).getCoord();
+		            Coord coord1 = this.controler.getNetwork().getLink(this.first.get(solution.get(index))).getCoord();
 		            
 		            if (pr.getSelectedPlan().getFirstActivity().getFacility().calcDistance(coord1) == 0.0D) {
 		            	dist = 10.0D;
@@ -183,7 +185,7 @@ public double computePotential(ArrayList<Integer> solution){
 		/*minx= minx*0.75;
 		miny= miny*0.75;
 		maxx= maxx*0.75;
-		maxy= maxy*0.75;*/ // TODO attention! This way it dosn't work (it works just by coincidence in the test scenario), but a way to avoid
+		maxy= maxy*0.75;*/ // TODO attention! This way it doesn't work (it works just by coincidence in the test scenario), but a way to avoid
 		// too many retail zones with no, or just few, customers would be nice. Need to think again about it
 			double x_width = (maxx - minx)/n;
 			double y_width = (maxy - miny)/n;
@@ -287,7 +289,6 @@ public double computePotential(ArrayList<Integer> solution){
 	}
 
 	private void printEventsCount() {
-		// TODO Auto-generated method stub
 		log.info(" Person # " + this.counter +" have been processed" );
 		Gbl.printMemoryUsage();
 	}
@@ -300,6 +301,11 @@ public double computePotential(ArrayList<Integer> solution){
 	  }
 	  public boolean setBetas (double [] betas){
 		  this.betas=betas;
+		  return true;
+	  }
+	  
+	  public boolean setFirst (TreeMap<Integer, Id> first){
+		  this.first=first;
 		  return true;
 	  }
 }

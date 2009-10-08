@@ -78,7 +78,7 @@ public class Retailer {
 		return this.facilities;
 	}
 
-	public final void runStrategy(ArrayList<LinkRetailersImpl> links) {
+	public final void runStrategy(TreeMap<Id,LinkRetailersImpl> links) {
 		this.movedFacilities = strategy.moveFacilities(this.facilities, links);
 	}
 	
