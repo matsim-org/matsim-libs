@@ -49,7 +49,7 @@ public class OTFDefaultLinkHandler extends OTFDataReader {
 		OTFDataReader.setPreviousVersion(OTFDefaultLinkHandler.class.getCanonicalName() + "V1.1", ReaderV1_1.class);
 	}
 
-	public static final double LINK_SCALE  = 0.65;
+	public static final double LINK_SCALE  = 1.0; //0.65;
 	
 	protected OTFDataQuadReceiver quadReceiver = null;
 
