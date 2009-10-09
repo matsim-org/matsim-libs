@@ -17,7 +17,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.api.basic.v01.Id;
 import playground.mmoyo.TransitSimulation.LogicFactory;
-import playground.mmoyo.PTRouter.PTTimeTable;
 import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.PTRouter.PTRouter;;
 
@@ -25,15 +24,13 @@ import playground.mmoyo.PTRouter.PTRouter;;
 public class Counter {
 	private PopulationImpl population;
 	private List<PopulationResult> populationResultList = new ArrayList<PopulationResult>();
-	private PTValues ptValues;
+	private PTValues ptValues = new PTValues();
 	
 	private List<Path> pathListA = new ArrayList<Path>();
 	private List<Path> pathListB = new ArrayList<Path>();
 	
-	public Counter(final String plansFile, final LogicFactory logicFactory, PTValues ptValues){
+	public Counter(final String plansFile, final LogicFactory logicFactory){
 		NetworkLayer logicNet = logicFactory.getLogicNet();
-		PTTimeTable logicPTTimeTable= logicFactory.getLogicPTTimeTable();
-		this.ptValues = ptValues;
 		
 		this.population = new PopulationImpl();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(this.population, logicFactory.getLogicNet());
@@ -53,11 +50,11 @@ public class Counter {
 		double timeCoefficient = 1;
 		double distanceCoefficient = 0;
 		double transferPenalty = 0;
-		PTRouter ptRouter = new PTRouter(logicNet, logicPTTimeTable, this.ptValues, timeCoefficient, distanceCoefficient, transferPenalty);
+		PTRouter ptRouter = new PTRouter(logicNet, timeCoefficient, distanceCoefficient, transferPenalty);
 		pathListA =routePopulation(timeCoefficient , ptRouter);
 
 		transferPenalty = 60;
-		PTRouter ptRouter2 = new PTRouter(logicNet, logicPTTimeTable, this.ptValues, timeCoefficient, distanceCoefficient, transferPenalty);
+		PTRouter ptRouter2 = new PTRouter(logicNet, timeCoefficient, distanceCoefficient, transferPenalty);
 		pathListB =routePopulation(timeCoefficient , ptRouter2);
 		
 		
@@ -115,7 +112,7 @@ public class Counter {
 			    		Coord actCoord = thisAct.getCoord();
 						//trips++;
 			    		double distanceToDestination = CoordUtils.calcDistance(lastActCoord, actCoord);
-			    		double distToWalk= ptValues.distToWalk(person.getAge());
+			    		double distToWalk= ptValues.firstWalkRange();
 			    		if (distanceToDestination<= distToWalk){
 			    			//inWalkRange++;
 			    		}else{

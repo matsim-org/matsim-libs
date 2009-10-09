@@ -30,7 +30,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -43,7 +42,6 @@ import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
-import playground.mmoyo.PTRouter.PTValues;
 
 public class RouterTest extends MatsimTestCase {
 
@@ -72,8 +70,8 @@ public class RouterTest extends MatsimTestCase {
 		toAct.setCoord(new CoordImpl(44000.0, 24005.0));
 		
 		// now run the essential thing:
-		TransitRouteFinder routeFinder = new TransitRouteFinder(schedule, new PTValues());
-		List<LegImpl> legs = routeFinder.calculateRoute(fromAct, toAct, person);
+		TransitRouteFinder routeFinder = new TransitRouteFinder(schedule);
+		List<Leg> legs = routeFinder.calculateRoute(fromAct, toAct, person);
 		
 		for (Leg leg : legs) {
 			System.out.println("TransportMode: " + leg.getMode());

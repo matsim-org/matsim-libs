@@ -1,16 +1,12 @@
 package playground.mmoyo.Validators;
 
 import playground.mmoyo.PTRouter.MyDijkstra;
-import playground.mmoyo.PTRouter.PTTimeTable;
-import playground.mmoyo.PTRouter.PTValues;
-
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -27,12 +23,10 @@ public class TransitRouteValidator {
 
 	private NetworkLayer logicNetwork;		
 	private TransitSchedule logicTransitSchedule;
-	private PTValues ptValues;  
 	
-	public TransitRouteValidator(final LogicFactory logicFactory, final PTValues ptValues){
+	public TransitRouteValidator(final LogicFactory logicFactory){
 		this.logicNetwork=logicFactory.getLogicNet();		
 		this.logicTransitSchedule = logicFactory.getLogicTransitSchedule();
-		this.ptValues = ptValues; 
 		getIsolatedPTLines();
 	}
 	

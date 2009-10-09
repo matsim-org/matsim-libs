@@ -17,6 +17,9 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.api.core.v01.population.Leg;
+import playground.mmoyo.PTRouter.PTNode;
+import playground.mmoyo.PTRouter.PTLink;
 
 /**
  * Translates logic nodes and links into plain nodes and links. 
@@ -24,17 +27,21 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 public class LogicIntoPlainTranslator {
 	private NetworkLayer plainNet;
 	private Map<Id,Node> logicToPlainStopMap;
-	private Map<Id,LinkImpl> logicToPlainLinkMap;  
-	private Map<Id,LinkImpl> lastLinkMap;
+	//private Map<Id,LinkImpl> logicToPlainLinkMap;  
+	//private Map<Id,LinkImpl> lastLinkMap;
 	
 	/**the constructor creates the joiningLinkMap that stores the relation between logic and plain Nodes*/ 
 	public LogicIntoPlainTranslator(final NetworkLayer plainNetwork,  final Map<Id,Node> logicToPlanStopMap, Map<Id,LinkImpl> logicToPlanLinkMap, Map<Id,LinkImpl> lastLinkMap) {
 		this.plainNet= plainNetwork;
-		this.logicToPlainStopMap = logicToPlanStopMap;
-		this.logicToPlainLinkMap = logicToPlanLinkMap;
-		this.lastLinkMap = lastLinkMap;
+		//this.logicToPlainStopMap = logicToPlanStopMap;
+		//this.logicToPlainLinkMap = logicToPlanLinkMap;
+		//this.lastLinkMap = lastLinkMap;
 	}
 
+	public LogicIntoPlainTranslator(final NetworkLayer plainNetwork){
+		this.plainNet= plainNetwork;
+	}
+			
 	public Node convertToPlain(Id logicNodeId){
 		return logicToPlainStopMap.get(logicNodeId);
 	}
@@ -42,24 +49,24 @@ public class LogicIntoPlainTranslator {
 	public List<Node> convertNodesToPlain(List<Node> logicNodes){
 		List<Node> plainNodes  = new ArrayList<Node>();
 		for (Node logicNode: logicNodes){
-			Node plainNode= convertToPlain(logicNode.getId());
-			plainNodes.add(plainNode);
+			plainNodes.add(((PTNode)logicNode).getPlainNode());
 		}
 		return plainNodes;
 	}	
 	
+	/*
 	private Link convertToPlain(final Link logicLink){
 		Link logicAliasLink = logicLink;
 		if (((LinkImpl)logicLink).getType().equals("Transfer") || ((LinkImpl)logicLink).getType().equals("DetTransfer"))
 			logicAliasLink= lastLinkMap.get(logicLink.getFromNode().getId());
 		return logicToPlainLinkMap.get(logicAliasLink.getId());
 	}
+	*/
 	
 	public List<Link> convertToPlain(List<Link> logicLinks){
 		List<Link> plainLinks  = new ArrayList<Link>();
 		for (Link logicLink: logicLinks){
-			Link plainLink= convertToPlain(logicLink);
-			plainLinks.add(plainLink);
+			plainLinks.add(((PTLink)logicLink).getPlainLink());
 		}
 		return plainLinks;
 	}
@@ -83,15 +90,15 @@ public class LogicIntoPlainTranslator {
 		}
 	}
 	
-	public List<LegImpl> convertToPlainLeg (List<LegImpl> logicLegList){
-		List<LegImpl> plainLegList = new ArrayList<LegImpl>();
-		for(LegImpl logicLeg : logicLegList){
+	public List<Leg> convertToPlainLeg (List<Leg> logicLegList){
+		List<Leg> plainLegList = new ArrayList<Leg>();
+		for(Leg logicLeg : logicLegList){
 			NetworkRouteWRefs logicRoute= (NetworkRouteWRefs)logicLeg.getRoute();
 			List<Link> plainLinks = convertToPlain(logicRoute.getLinks());
 			//if(plainLinks.size()>0){
 				NetworkRouteWRefs plainRoute = new LinkNetworkRouteImpl(null, null);
 				plainRoute.setLinks(null, plainLinks, null);
-				LegImpl plainLeg = new LegImpl(logicLeg.getMode());
+				Leg plainLeg = new LegImpl(logicLeg.getMode());
 				plainLeg = logicLeg;
 				plainLeg.setRoute(plainRoute);
 				plainLegList.add(plainLeg);

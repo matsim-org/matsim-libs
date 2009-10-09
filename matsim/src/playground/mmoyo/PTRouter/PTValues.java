@@ -15,7 +15,7 @@ public class PTValues {
 	public double timeCoeficient=0;
 	public double distanceCoeficient=0;
 	
-	private final static double AV_WALKING_SPEED = 0.836;  //   0.836 m/s [Al-Azzawi2007]?      1.34 m/s [Antonini2004]?
+	private final static double AV_WALKING_SPEED = 0.836;  //   [Al-07]M. Al-Azzawi and R.Raeside. Modeling Pedestrian Walking Speeds on Sidewalks. Journal of Urban Planning and Development. ASCE. Sept. 2007.    or    1.34 m/s [Antonini2004]??
 	
 	public static double getAvgWalkSpeed(){
 		return AV_WALKING_SPEED;
@@ -25,7 +25,8 @@ public class PTValues {
 		return distance * AV_WALKING_SPEED;
 	}
 	
-	public int distToWalk(final int personAge){
+	public int firstWalkRange(){
+	//public int distToWalk(final int personAge){
 		//-> complete personalized values.
 		return 600;
 	}

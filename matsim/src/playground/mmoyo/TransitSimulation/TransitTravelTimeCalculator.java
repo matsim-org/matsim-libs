@@ -15,9 +15,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
-
-import playground.mmoyo.PTRouter.PTTimeTable;
-
 /**
  * Calculates and stores travel time according to the logicTransitSchedule object
  **/
@@ -83,12 +80,14 @@ public class TransitTravelTimeCalculator {
 		}
 	}
 
+	/*
 	public void fillTimeTable(PTTimeTable ptTimeTable2){
 		ptTimeTable2.setLinkTravelTimeMap(linkTravelTimeMap);
 		ptTimeTable2.setNodeDeparturesMap(nodeDeparturesMap);
 		//linkTravelTimeMap = null;
 		//nodeDeparturesMap = null;
 	}
+	*/
 	
 	
 }

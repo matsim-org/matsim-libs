@@ -13,24 +13,21 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.utils.geometry.CoordUtils;
 
 public class PTRouter{
 	private NetworkLayer logicNet;
 	private LeastCostPathCalculator myDijkstra;
 	private TravelCost ptTravelCost;
-	public TravelTime ptTravelTime;   //> make private 
+	public PTTravelTime ptTravelTime;   //> make private 
 	NodeImpl origin;
 	NodeImpl destination;
-	PTValues ptValues;
+	PTValues ptValues = new PTValues();
 	
-	public PTRouter(final NetworkLayer logicNet, final PTTimeTable ptTimetable, PTValues ptValues) {
+	public PTRouter(final NetworkLayer logicNet) {
 		this.logicNet = logicNet;
-		this.ptTravelCost = new PTTravelCost(ptTimetable);
-		this.ptTravelTime =new PTTravelTime(ptTimetable);
-		this.ptValues = ptValues;
+		this.ptTravelTime =new PTTravelTime();
+		this.ptTravelCost = new PTTravelCost(ptTravelTime);
 		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);	
 		origin= createWalkingNode(new IdImpl("W1"), null);   //this is faster than network.createNode but uses PTNode
 		destination= createWalkingNode(new IdImpl("W2"), null);
@@ -41,10 +38,11 @@ public class PTRouter{
 	double distanceCoeficient;
 	double transferPenalty;
 	
-	public PTRouter(final NetworkLayer logicNet, final PTTimeTable ptTimetable, final PTValues ptValues, final double timeCoeficient, final double distanceCoeficient, final double transferPenalty) {
+	public PTRouter(final NetworkLayer logicNet, final double timeCoeficient, final double distanceCoeficient, final double transferPenalty) {
 		this.logicNet = logicNet;
-		this.ptTravelCost = new PTTravelCost(ptTimetable, timeCoeficient, distanceCoeficient, transferPenalty);
-		this.ptTravelTime =new PTTravelTime(ptTimetable);
+		this.ptTravelTime =new PTTravelTime();
+		this.ptTravelCost = new PTTravelCost(ptTravelTime, timeCoeficient, distanceCoeficient, transferPenalty);
+		
 	
 		this.timeCoeficient = timeCoeficient;
 		this.distanceCoeficient = distanceCoeficient; 
@@ -108,13 +106,12 @@ public class PTRouter{
 	 * avoids the method net.createNode because it is not necessary to rebuild the quadtree
 	 */
 	public NodeImpl createWalkingNode(Id id, Coord coord) {
-		NodeImpl node = new PTNode(id, coord, "Walking");
+		NodeImpl node = new PTNode(id, coord);
 		logicNet.getNodes().put(id, node);
 		return node;
 	}
 	
 	public List <LinkImpl> createWalkingLinks(NodeImpl walkNode, Collection <NodeImpl> nearNodes, boolean to){
-		//->move to link factory
 		List<LinkImpl> newWalkLinks = new ArrayList<LinkImpl>();
 		Id idLink;
 		NodeImpl fromNode;
@@ -134,7 +131,8 @@ public class PTRouter{
 				type = "Egress";
 			}
 			
-			LinkImpl link= logicNet.createAndAddLink(idLink, fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()) , 1, 1, 1, "0", type);
+			PTLink link = new PTLink(idLink, fromNode, toNode, logicNet, type); 
+			//PTLink link= logicNet.createAndAddLink(idLink, fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()) , 1, 1, 1, "0", type);
 			newWalkLinks.add(link);
 		}
 		return newWalkLinks;
@@ -160,20 +158,17 @@ public class PTRouter{
 	public void printRoute(Path path){
 		if (path!=null){
 			System.out.print("\nLinks: ");
-			//for (Link l L route.getLinks()) {
-				//System.out.println("link: "l.getId() + " cost: " + link.);
-			//}
 		
-			Id idPTLine = new IdImpl("");
+			Id transitRouteId = new IdImpl("");
 			for (Node node : path.nodes){
 				PTNode ptNode= (PTNode)node;
-				if(ptNode.getIdPTLine()==idPTLine){
+				if(ptNode.getTransitRoute().getId()==transitRouteId){
 					System.out.print(ptNode.getId().toString() + " ");
 				}else{
-					System.out.println("\n" + ptNode.getIdPTLine().toString());
+					System.out.println("\n" + ptNode.getTransitRoute().getId().toString());
 					System.out.print(ptNode.getId().toString() + " ");
 				}
-				idPTLine= ptNode.getIdPTLine();	
+				transitRouteId= ptNode.getTransitRoute().getId();	
 			}
 			System.out.println("\nTravel cost of route=" + path.travelCost + "  time of route:" + path.travelTime);
 		}else{

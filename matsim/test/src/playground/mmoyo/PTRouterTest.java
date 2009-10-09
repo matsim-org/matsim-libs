@@ -13,7 +13,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -51,9 +51,9 @@ public class PTRouterTest extends MatsimTestCase {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(transitSchedule, network).readFile(TRANSITSCHEDULE);
-		LogicFactory logicFactory = new LogicFactory(transitSchedule, ptvalues); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
+		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
 		NetworkLayer logicNet= logicFactory.getLogicNet();
-		PTRouter ptRouter = new PTRouter (logicNet, logicFactory.getLogicPTTimeTable(), ptvalues);
+		PTRouter ptRouter = new PTRouter (logicNet);
 		
 		NetworkLayer plainNetwork= logicFactory.getPlainNet();
 		LogicIntoPlainTranslator logicIntoPlainTranslator = logicFactory.getLogicToPlainTranslator();
@@ -62,8 +62,8 @@ public class PTRouterTest extends MatsimTestCase {
 		LinkImpl transferLink = logicNet.getLink("T39");  								 // first departure: 09:00 ,  last departure is at 19:00
 		double waitTime1= ptRouter.ptTravelTime.getLinkTravelTime(transferLink, 67800);  //  67800= 16:50 .  The agent should wait 10 mins 
 		double waitTime2= ptRouter.ptTravelTime.getLinkTravelTime(transferLink, 72000);  //  72000= 20:00 .  The agent should wait 13 hours, until next day
-		assertEquals( waitTime1 -120, 600.0 ) ;                                               
-		assertEquals( waitTime2 -120, 46800.0 ) ;
+		assertEquals( waitTime1, 600.0 ) ;                                               
+		assertEquals( waitTime2, 46800.0 ) ;
 
 		
 		/**tests search path results*/		
@@ -81,7 +81,7 @@ public class PTRouterTest extends MatsimTestCase {
 		assertEquals( plainPathNodes.get(7).getId() , new IdImpl("24"));
 	
 		/**tests TransitRouteFinder class*/
-		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule,ptvalues);
+		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule);
 		PopulationImpl population = new PopulationImpl();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, plainNetwork);
 		plansReader.readFile(PLANFILE);
@@ -90,7 +90,7 @@ public class PTRouterTest extends MatsimTestCase {
 
 		ActivityImpl act1 = (ActivityImpl)plan.getPlanElements().get(0);
 		ActivityImpl act2 = (ActivityImpl)plan.getPlanElements().get(2);
-		List<LegImpl> legList = transitRouteFinder.calculateRoute (act1, act2, person);
+		List<Leg> legList = transitRouteFinder.calculateRoute (act1, act2, person);
 		
 		assertEquals( legList.get(0).getMode() , TransportMode.walk);
 		assertEquals( legList.get(1).getMode() , TransportMode.pt);

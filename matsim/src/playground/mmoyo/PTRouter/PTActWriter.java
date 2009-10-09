@@ -17,6 +17,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -40,11 +41,12 @@ import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 public class PTActWriter {
 	private PTValues ptValues;
 	private final PopulationImpl population;
-	private String outputFile;
+	private final String outputFile;
 	private NodeImpl originNode;
 	private NodeImpl destinationNode;
 	private LinkImpl accessLink;
 	private LinkImpl egressLink;
+	private final double firstWalkRange;
 	
 	private NetworkLayer logicNet;
 	private NetworkLayer plainNet;
@@ -56,8 +58,9 @@ public class PTActWriter {
 		this.ptValues= ptValues;
 		this.logicNet= logicFactory.getLogicNet();
 		this.plainNet= logicFactory.getPlainNet();
-		this.ptRouter = new PTRouter(logicNet, logicFactory.getLogicPTTimeTable(),ptValues);
+		this.ptRouter = new PTRouter(logicNet);
 		this.logicToPlainConverter = logicFactory.getLogicToPlainTranslator();
+		this.firstWalkRange = ptValues.firstWalkRange();
 		
 		Config config = new Config();
 		config = Gbl.createConfig(new String[]{ configFile, "http://www.matsim.org/files/dtd/plans_v4.dtd"});
@@ -85,8 +88,8 @@ public class PTActWriter {
 	/**
 	 * Shows in console the legs that are created between the plan activities 
 	 */
-	public void printPTLegs(final TransitSchedule transitSchedule, PTValues ptValues){
-		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule, ptValues);
+	public void printPTLegs(final TransitSchedule transitSchedule){
+		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule);
 		
 		for (PersonImpl person: this.population.getPersons().values()) {
 		//if (true){	
@@ -95,9 +98,9 @@ public class PTActWriter {
 			PlanImpl plan = person.getPlans().get(0);
 	 		ActivityImpl act1 = (ActivityImpl)plan.getPlanElements().get(0);
 			ActivityImpl act2 = (ActivityImpl)plan.getPlanElements().get(2);
-			List<LegImpl> legList = transitRouteFinder.calculateRoute (act1, act2, person);
+			List<Leg> legList = transitRouteFinder.calculateRoute (act1, act2, person);
 			
-			for (LegImpl leg : legList){
+			for (Leg leg : legList){
 				NetworkRouteWRefs networkRoute = (NetworkRouteWRefs)leg.getRoute(); 
 				System.out.println(" ");
 				System.out.println(leg.toString());
@@ -148,14 +151,13 @@ public class PTActWriter {
 	
 						trips++;
 			    		double distanceToDestination = CoordUtils.calcDistance(lastActCoord, actCoord);
-			    		double distToWalk= ptValues.distToWalk(person.getAge());
-			    		if (distanceToDestination<= distToWalk){
+			    		if (distanceToDestination<= firstWalkRange){  //<- try without this.
 			    		//if (true){
 			    			newPlan.addLeg(walkLeg(lastAct,thisAct));
 			    			inWalkRange++;
 			    		}else{
 				    		startTime = System.currentTimeMillis();
-				    		Path path = ptRouter.findPTPath(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
+				    		Path path = ptRouter.findPTPath(lastActCoord, actCoord, lastAct.getEndTime(), firstWalkRange);
 				    		duration= System.currentTimeMillis()-startTime;
 				    		if(path!=null){
 				    			if (path.nodes.size()>1){
@@ -402,7 +404,7 @@ public class PTActWriter {
 	 * Creates a temporary origin or destination node
 	 * avoids the method net.createNode because it is not necessary to rebuild the Quadtree*/
 	public NodeImpl createWalkingNode(final Id id, final Coord coord){
-		NodeImpl node = new PTNode(id, coord, "Walking");
+		NodeImpl node = new PTNode(id, coord);
 		logicNet.getNodes().put(id, node);
 		return node;
 	}

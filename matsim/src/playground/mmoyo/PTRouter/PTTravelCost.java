@@ -2,20 +2,19 @@ package playground.mmoyo.PTRouter;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.network.LinkImpl;
 
 /**
  * Calculates the cost of links for the routing algorithm
  */
-public class PTTravelCost implements TravelCost {
-	double walkSpeed = new PTValues().getAvgWalkSpeed();
-	private PTTimeTable ptTimeTable;
-	private String type;
+public class PTTravelCost implements TravelCost{
+	private PTTravelTime ptTravelTime;
 	double cost;
 	double travelTime;
 	double travelDistance;
 	double waitTime;
-
+	byte aliasType;
+	
+	
 	////coefficients with original values set to count only travelTime///
 	double timeCoeficient =.9;
 	double distanceCoeficient=.1;
@@ -23,12 +22,12 @@ public class PTTravelCost implements TravelCost {
 	double walkCoefficient= 0; 
 	double waitCoefficient=0;
 	
-	public PTTravelCost(final PTTimeTable ptTimeTable) {
-		this.ptTimeTable = ptTimeTable; 
+	public PTTravelCost(final PTTravelTime ptTravelTime) {
+		this.ptTravelTime = ptTravelTime;
 	}
 	
-	public PTTravelCost(final PTTimeTable ptTimeTable, double timeCoeficient, double distanceCoeficient, double transferPenalty) {
-		this.ptTimeTable = ptTimeTable; 
+	public PTTravelCost(final PTTravelTime ptTravelTime, double timeCoeficient, double distanceCoeficient, double transferPenalty) {
+		this.ptTravelTime = ptTravelTime;
 		this.timeCoeficient =timeCoeficient ; 
 		this.distanceCoeficient = distanceCoeficient; 
 		this.transferPenalty = transferPenalty;
@@ -57,9 +56,10 @@ public class PTTravelCost implements TravelCost {
 		//Time as single criterion
 		//cost= travelTime;
 
-		travelTime = ptTimeTable.getLinkTravelTime(link, time);
-		type = ((LinkImpl) link).getType();
-		if (type.equals("DetTransfer") || type.equals("Transfer")){
+		
+		travelTime = ptTravelTime.getLinkTravelTime(link, time);
+		aliasType = ((PTLink)link).getAliasType();
+		if (aliasType == 2 || aliasType == 3 ){  //transfer or dettransfer
 			cost += transferPenalty ;
 		}
 		

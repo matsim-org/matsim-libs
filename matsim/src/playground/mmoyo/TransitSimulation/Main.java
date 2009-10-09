@@ -35,14 +35,15 @@ import playground.mmoyo.analysis.Counter;
 public class Main {
 	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
 	//private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
-	private static final String CONFIG =  PATH  + "config.xml";
-	private static final String PLANFILE = PATH + "plans.xml"; // "plans.xml"; //"_input_file.xml"; // 
-	private static final String OUTPUTPLANS = PATH + "output_plans.xml";
-	private static final String NETWORK = PATH + "network.xml";
-	private static final String PLAINNETWORK = PATH + "plainNetwork.xml";
-	private static final String LOGICNETWORK = PATH + "logicNetwork.xml";
-	private static final String LOGICTRANSITSCHEDULE = PATH + "logicTransitSchedule.xml";
-	private static final String TRANSITSCHEDULEFILE = PATH + "transitSchedule.xml";
+	//private static final String PATH = "playground/marcel/pt/demo/equilnet/";
+	private static final String CONFIG =  				PATH + "config.xml";
+	private static final String PLANFILE = 				PATH + "plans.xml";  //"_input_file.xml"; // // "plans.xml"; //"_input_file.xml"; // 
+	private static final String OUTPUTPLANS = 			PATH + "output_plans.xml";
+	private static final String NETWORK = 				PATH + "network.xml"; //"examples/equil/network.xml";
+	private static final String PLAINNETWORK = 			PATH + "plainNetwork.xml";
+	private static final String LOGICNETWORK = 			PATH + "logicNetwork.xml";
+	private static final String LOGICTRANSITSCHEDULE = 	PATH + "logicTransitSchedule.xml";
+	private static final String TRANSITSCHEDULEFILE  = 	PATH + "transitSchedule.xml"; // "src/playground/marcel/pt/demo/equilnet/transitSchedule.xml";
 	
 	public static void main(String[] args) {
 		NetworkLayer network= new NetworkLayer(new NetworkFactoryImpl());
@@ -64,7 +65,7 @@ public class Main {
 		}
 		/*******************************************************/
 	
-		LogicFactory logicFactory = new LogicFactory(transitSchedule, ptValues); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
+		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
 		NetworkLayer plainNetwork=logicFactory.getPlainNet();
 		
 		int option =3;
@@ -75,7 +76,7 @@ public class Main {
 			
 			case 2:  //searches and shows a PT path between two coordinates or nodes */  
 				plainNetwork=logicFactory.getPlainNet();
-				PTRouter ptRouter = new PTRouter(logicFactory.getLogicNet(), logicFactory.getLogicPTTimeTable(), ptValues);
+				PTRouter ptRouter = new PTRouter(logicFactory.getLogicNet());
 				Coord coord1 = new CoordImpl(686897, 250590);
 				Coord coord2 = new CoordImpl(684854, 254079);
 				//NodeImpl nodeA = plainNetwork.getNode("299598");
@@ -90,6 +91,7 @@ public class Main {
 				
 			case 3: //Routes a population/
 				double startTime = System.currentTimeMillis();
+				logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);
 				ptActWriter = new PTActWriter(logicFactory, ptValues, CONFIG, PLANFILE, OUTPUTPLANS);
 				ptActWriter.findRouteForActivities();
 				System.out.println("total process duration: " + (System.currentTimeMillis()-startTime));
@@ -97,7 +99,7 @@ public class Main {
 
 			case 4:  //tests the TransitRouteFinder class with the population of PTActWriter class
 				ptActWriter = new PTActWriter(logicFactory, ptValues, CONFIG, PLANFILE, OUTPUTPLANS);
-				ptActWriter.printPTLegs(transitSchedule, ptValues);
+				ptActWriter.printPTLegs(transitSchedule);
 				break;
 
 			case 5:
@@ -146,21 +148,31 @@ public class Main {
 			case 9:
 				/**Counts transfer links*/
 				NetworkLayer logicNetwork=logicFactory.getLogicNet();
+				
 				int transfers=0;
+				int standard=0;
 				for (LinkImpl linkImpl : logicNetwork.getLinks().values()){
 					if (linkImpl.getType().equals("Transfer")) transfers++;
+					if (linkImpl.getType().equals("Standard")) standard++;
 				}
+				
 				System.out.println("Transferlinks: " +  transfers);
+				System.out.println("Standard: " +  standard);
+				System.out.println("num of logic nodes:" + logicNetwork.getNodes().size());
+				System.out.println("num of plain nodes:" + plainNetwork.getNodes().size());
+				
 				break;
 			
 			case 10:
 				/**shows statistics of population routing */
-				Counter counter= new Counter(PLANFILE, logicFactory, ptValues);
+				Counter counter= new Counter(PLANFILE, logicFactory);
 				break;
 			case 11:
-				TransitRouteValidator transitRouteValidator = new TransitRouteValidator(logicFactory, ptValues);
+				TransitRouteValidator transitRouteValidator = new TransitRouteValidator(logicFactory);
 				break;
-	
+			case 12:
+				
+				break;
 		}
 	}
 }

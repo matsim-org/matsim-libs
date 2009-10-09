@@ -2,10 +2,10 @@ package playground.mmoyo.PTRouter;
 
 import org.matsim.core.network.LinkImpl;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.api.core.v01.network.Network;
 
 /**
  * Implementation of Matsim Dijkstra algorithm adapted to the pt logic network
@@ -18,7 +18,7 @@ public class MyDijkstra extends Dijkstra{
 	final static String ACCESS = "Access";
 	final static String EGRESS = "Egress";
 	
-	public MyDijkstra(final NetworkLayer network, final TravelCost costFunction, final TravelTime timeFunction) {
+	public MyDijkstra(final Network network, final TravelCost costFunction, final TravelTime timeFunction) {
 		super(network, costFunction, timeFunction);
 	}
 
