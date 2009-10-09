@@ -44,7 +44,6 @@ import java.util.Iterator;
 import java.util.List;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-//import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.constrained.ManageSubchains;
 import org.matsim.locationchoice.constrained.SubChain;
@@ -66,7 +65,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 
 /**
  * @author Matthias Feil
- * Class that reads a file of plans and either varies them or assigns to an agent as alternatives the x most frequent other activity chains.
+ * Class that reads a file of plans and constructs an estimation choice set from that.
  */
 
 
@@ -82,11 +81,8 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected MDSAM mdsam;
 	protected XY2Links linker;
 	protected List<List<Double>> sims;
-	protected List<Double> simsActs;
-	protected List<Double> simsLocations;
-	protected List<Double> simsModes;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
-	protected final int noOfAlternatives;
+	protected int noOfAlternatives;
 	
 	                      
 	public PlansConstructor (Controler controler) {
@@ -140,23 +136,48 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 
 	public void finishReplanning(){
+		
+	//	Once-off task to filter Zurich people from overall census people
+		//	this.selectZurich10MZPlans();
+		
+	// Can be always switch on
 		this.rectifyActTypes();
+		
+	// Select type of population you want to work with
 		this.keepPersons();
-	//	this.selectZurich10MZPlans();
-	//	this.reducePersonsMostFrequentStructures();
-	//	this.reducePersonsRandomly();
-	//	this.reducePersonsIntelligently();
+		//	this.reducePersonsMostFrequentStructures();
+		//	this.reducePersonsRandomly();
+		//	this.reducePersonsIntelligently();
+		
+	// Needs to always run
 		this.linkRouteOrigPlans();
-	//	this.enlargePlansSet();
-		this.enlargePlansSetWithRandomSelection();
+		
+	// Type of enlarging plans set
+		//	this.enlargePlansSet();
+		this.enlargePlansSetWithRandomSelection("Random");
+		
+	// Needs to always run
 		this.writePlans(this.outputFile);
-	//	this.mdsam = new MDSAM(this.population);
-	//	this.sims = this.mdsam.runPopulation();
-	//	this.writeSims(this.outputFileSims);
-	//	this.writePlansForBiogeme(this.outputFileBiogeme);
+		
+	// Only if similarity attribute is desired
+		//	this.mdsam = new MDSAM(this.population);
+		//	this.sims = this.mdsam.runPopulation();
+		//	this.writeSims(this.outputFileSims);
+		
+	// Type of writing the Biogeme file
+		//	this.writePlansForBiogeme(this.outputFileBiogeme);
 		this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme);
-		this.writeModFile(this.outputFileMod);
+		
+	// Type of writing the mod file
+		//	this.writeModFile(this.outputFileMod);
+		//	this.writeModFileWithSequence(this.outputFileMod);
+		this.writeModFileWithRandomSelection(this.outputFileMod);
 	}
+	
+	
+	//////////////////////////////////////////////////////////////////////
+	// Methods running always 
+	//////////////////////////////////////////////////////////////////////
 	
 	
 	protected void rectifyActTypes (){
@@ -169,8 +190,8 @@ public class PlansConstructor implements PlanStrategyModule{
 				/*if (act.getType().equalsIgnoreCase("h")) act.setType("home");
 				else if (act.getType().equalsIgnoreCase("w")) act.setType("work");
 				else if (act.getType().equalsIgnoreCase("e")) act.setType("education");
-				else*/ if (act.getType().equalsIgnoreCase("l")) act.setType("shopping");
-				else if (act.getType().equalsIgnoreCase("s")) act.setType("leisure");
+				else*/ if (act.getType().equalsIgnoreCase("s")) act.setType("shop");
+				else if (act.getType().equalsIgnoreCase("l")) act.setType("leisure");
 				//else log.warn("Unknown act detected: "+act.getType());
 			}
 		}
@@ -178,28 +199,39 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 	
 	
-	// Method that filters only Zurich10% plans
-	protected void selectZurich10MZPlans (){
-		log.info("Creating Zurich10% population...");
-		// Quite strange coding but throws ConcurrentModificationException otherwise...
-		Object [] a = this.population.getPersons().values().toArray();
-		for (int i=a.length-1;i>=0;i--){
-			PersonImpl person = (PersonImpl) a[i];
-			boolean isIn = false;
-			for (int j=0;j<person.getSelectedPlan().getPlanElements().size();j+=2){
-				//30km circle around Zurich city centre (Bellevue)
-				if (CoordUtils.calcDistance(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(j))).getCoord(), new CoordImpl(683518.0,246836.0))<=30000){
-					isIn = true;
-					break;
+	private void linkRouteOrigPlans (){
+		log.info("Adding links and routes to original plans...");
+		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = iterator.next();
+			PlanImpl plan = person.getSelectedPlan();
+			this.linker.run(plan);
+			for (int j=1;j<plan.getPlanElements().size();j++){
+				if (j%2==1){
+					this.router.handleLeg((LegImpl)plan.getPlanElements().get(j), (ActivityImpl)plan.getPlanElements().get(j-1), (ActivityImpl)plan.getPlanElements().get(j+1), ((ActivityImpl)plan.getPlanElements().get(j-1)).getEndTime());
+				}
+				else {
+					((ActivityImpl)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
+					if (j!=plan.getPlanElements().size()-1){
+						((ActivityImpl)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+1, ((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()));
+						((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
+					}
 				}
 			}
-			if (!isIn){
-				this.population.getPersons().remove(person.getId());
-			}
 		}
-		log.info("done... Size of population is "+this.population.getPersons().size()+".");
+		log.info("done.");
 	}
 	
+	
+	protected void writePlans(String outputFile){
+		log.info("Writing plans...");
+		new PopulationWriter(this.population, outputFile).write();
+		log.info("done.");
+	}
+	
+	
+	//////////////////////////////////////////////////////////////////////
+	// Methods reducing/refactoring the population  
+	//////////////////////////////////////////////////////////////////////
 	
 	protected void reducePersonsMostFrequentStructures (){
 		// Drop those persons whose plans do not belong to x most frequent activity chains.
@@ -339,29 +371,12 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 	
 	
-	private void linkRouteOrigPlans (){
-		log.info("Adding links and routes to original plans...");
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
-			PlanImpl plan = person.getSelectedPlan();
-			this.linker.run(plan);
-			for (int j=1;j<plan.getPlanElements().size();j++){
-				if (j%2==1){
-					this.router.handleLeg((LegImpl)plan.getPlanElements().get(j), (ActivityImpl)plan.getPlanElements().get(j-1), (ActivityImpl)plan.getPlanElements().get(j+1), ((ActivityImpl)plan.getPlanElements().get(j-1)).getEndTime());
-				}
-				else {
-					((ActivityImpl)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
-					if (j!=plan.getPlanElements().size()-1){
-						((ActivityImpl)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+1, ((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()));
-						((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
-					}
-				}
-			}
-		}
-		log.info("done.");
-	}
 	
-	private void enlargePlansSet (){
+	//////////////////////////////////////////////////////////////////////
+	// Methods enlarging the choice set  
+	//////////////////////////////////////////////////////////////////////
+	
+	protected void enlargePlansSet (){
 		log.info("Adding alternative plans...");
 		int counter=0;
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
@@ -440,7 +455,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("done.");
 	}
 	
-	protected void enlargePlansSetWithRandomSelection (){
+	protected void enlargePlansSetWithRandomSelection (String locationChoice){
 		
 		log.info("Adding alternative plans...");
 		int counter=0;
@@ -491,7 +506,21 @@ public class PlansConstructor implements PlanStrategyModule{
 					}
 				}
 				
-				this.locator.handleSubChains(plan, this.getSubChains(plan));				
+				// Adopting PlanomatX for secondary location choice
+				if (locationChoice.equalsIgnoreCase("PlanomatX")){
+					this.locator.handleSubChains(plan, this.getSubChains(plan));	
+				}
+				
+				// Adopting random location choice
+				else {
+					List<SubChain> subChains = this.getSubChains(plan);
+					for (Iterator<SubChain> iteratorSubChain = subChains.iterator(); iteratorSubChain.hasNext();){
+						for (Iterator<ActivityImpl> iteratorActs = iteratorSubChain.next().getSlActs().iterator(); iteratorActs.hasNext();){
+							this.modifyLocationCoord(iteratorActs.next());
+						}
+					}
+				}
+				
 				this.linker.run(plan);
 
 				for (int j=1;j<plan.getPlanElements().size();j++){
@@ -516,6 +545,11 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		log.info("done.");
 	}
+	
+	
+	//////////////////////////////////////////////////////////////////////
+	// Location help methods 
+	//////////////////////////////////////////////////////////////////////
 	
 	protected void modifyLocation (ActivityImpl act){
 		log.info("Start modify.");
@@ -565,12 +599,9 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 	
 	
-	public void writePlans(String outputFile){
-		log.info("Writing plans...");
-		new PopulationWriter(this.population, outputFile).write();
-		log.info("done.");
-	}
-	
+	//////////////////////////////////////////////////////////////////////
+	// Writing output plans methods
+	//////////////////////////////////////////////////////////////////////
 	
 	public void writePlansForBiogeme(String outputFile){
 		log.info("Writing plans for Biogeme...");
@@ -922,6 +953,11 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 	}
 	
+	
+	//////////////////////////////////////////////////////////////////////
+	// Writing mod file methods 
+	//////////////////////////////////////////////////////////////////////
+	
 	public void writeModFile(String outputFile){
 		new ModFileMaker (this.population, this.actChains).write(outputFile);
 	}
@@ -933,6 +969,11 @@ public class PlansConstructor implements PlanStrategyModule{
 	public void writeModFileWithRandomSelection (String outputFile){
 		new ModFileMaker (this.population, this.actChains).writeWithRandomSelection(outputFile);
 	}
+	
+	
+	//////////////////////////////////////////////////////////////////////
+	// Writing sim file  
+	//////////////////////////////////////////////////////////////////////
 	
 	public void writeSims (String outputFile){
 		log.info("Writing sims file...");
@@ -972,4 +1013,31 @@ public class PlansConstructor implements PlanStrategyModule{
 		stream.close();
 		log.info("done.");
 	}		
+	
+	//////////////////////////////////////////////////////////////////////
+	// Once-off method
+	//////////////////////////////////////////////////////////////////////
+	
+	
+	// Method that filters only Zurich10% plans
+	protected void selectZurich10MZPlans (){
+		log.info("Creating Zurich10% population...");
+		// Quite strange coding but throws ConcurrentModificationException otherwise...
+		Object [] a = this.population.getPersons().values().toArray();
+		for (int i=a.length-1;i>=0;i--){
+			PersonImpl person = (PersonImpl) a[i];
+			boolean isIn = false;
+			for (int j=0;j<person.getSelectedPlan().getPlanElements().size();j+=2){
+				//30km circle around Zurich city centre (Bellevue)
+				if (CoordUtils.calcDistance(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(j))).getCoord(), new CoordImpl(683518.0,246836.0))<=30000){
+					isIn = true;
+					break;
+				}
+			}
+			if (!isIn){
+				this.population.getPersons().remove(person.getId());
+			}
+		}
+		log.info("done... Size of population is "+this.population.getPersons().size()+".");
+	}
 }

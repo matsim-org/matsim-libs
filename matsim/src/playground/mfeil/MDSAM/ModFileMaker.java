@@ -416,12 +416,12 @@ public class ModFileMaker {
 	public static void main(final String [] args) {
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-		final String populationFilename = "/home/baug/mfeil/data/fullSet/it0/output_plans_mz01.xml";
+		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz01.xml";
 	/*	final String populationFilename = "./plans/output_plans.xml.gz";
 		final String networkFilename = "./plans/network.xml";
 		final String facilitiesFilename = "./plans/facilities.xml.gz";
 	*/
-		final String outputFile = "/home/baug/mfeil/data/fullSet/it0/model01.mod";
+		final String outputFile = "/home/baug/mfeil/data/choiceSet/it0/model01.mod";
 	//	final String outputFile = "./plans/model.mod";
 
 		ScenarioImpl scenario = new ScenarioImpl();
@@ -433,7 +433,7 @@ public class ModFileMaker {
 		analyzer.run();
 
 		ModFileMaker sp = new ModFileMaker(scenario.getPopulation(), analyzer.getActivityChains());
-		sp.write(outputFile);
+		sp.writeWithRandomSelection(outputFile);
 		log.info("Model finished.");
 	}
 
