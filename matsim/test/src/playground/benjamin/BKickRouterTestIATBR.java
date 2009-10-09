@@ -30,7 +30,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.benjamin.income2.BKickIncome2Controler;
-import playground.dgrether.tests.LogOutputEventHandler;
 
 
 
@@ -70,7 +69,7 @@ public class BKickRouterTestIATBR extends MatsimTestCase {
 		controler.addControlerListener(new StartupListener() {
 			public void notifyStartup(final StartupEvent event) {
 				event.getControler().getEvents().addHandler(handler);
-				event.getControler().getEvents().addHandler(new LogOutputEventHandler());
+//				event.getControler().getEvents().addHandler(new LogOutputEventHandler());
 			}
 		});
 		
