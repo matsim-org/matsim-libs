@@ -52,7 +52,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 			Integer integer = new Integer(Integer.parseInt(af.getLink().getId().toString()));
 			locations.put(intCount,af.getLink().getId());
 			intCount = intCount+1;
-			log.info("The facility with Id: " + integer + " has been added");
+			//log.info("The facility with Id: " + integer + " has been added");
 		}
 		
 		for (LinkRetailersImpl l:availableLinks.values()) {
@@ -60,7 +60,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 			else {
 				locations.put(intCount,l.getId());
 				intCount = intCount+1;
-				log.info("The facility with Id: " + Integer.parseInt(l.getId().toString()) + " has been added");
+				//log.info("The facility with Id: " + Integer.parseInt(l.getId().toString()) + " has been added");
 			}
 		}
 		
@@ -187,12 +187,13 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		log.info("The optimized solution is: " + solution);
 		int count=0;
 		for (ActivityFacilityImpl af:this.retailerFacilities.values()) {
-			if (solution.get(count) != Integer.parseInt(af.getLink().getId().toString())) {
+			if (first.get(solution.get(count)) != (af.getLink().getId())) {
 				Utils.moveFacility(af,controler.getNetwork().getLink(first.get(solution.get(count))),this.controler.getWorld());
 				log.info("The facility " + af.getId() + " has been moved");
 				this.movedFacilities.put(af.getId(), af);
 				log.info("Link Id after = "+ af.getLink().getId());
 				count=count+1;
+				log.info("Count= " + count);
 			}
 		}
 		return movedFacilities;

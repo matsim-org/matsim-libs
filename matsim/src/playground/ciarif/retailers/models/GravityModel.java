@@ -75,15 +75,11 @@ public void init() {
 
 public double computePotential(ArrayList<Integer> solution){
 	
-	System.out.println("The current solution is " + solution);
-	
 	double global_likelihood = 0;
     int a = 0;
     
     for (ActivityFacilityImpl c : this.retailersFacilities.values()) {
     Id linkId = this.first.get(solution.get(a));
-    System.out.println("The link " + linkId + " is now processed");
-    System.out.println("The element " + a + " of the solution is now processed");
     Coord coord = this.controler.getNetwork().getLink(linkId).getCoord();
 	++a;
 	double loc_likelihood = 0.0D;

@@ -10,19 +10,28 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-
 import playground.ciarif.retailers.stategies.GravityModelRetailerStrategy;
 
 public class CarPoolingListener implements IterationEndsListener {
 	
+	public final static String CONFIG_GROUP = "carpooling";
+	public final static String CONFIG_TRIPS_FILE = "workHomeTripsSummary";
+	public final static String CONFIG_ANALYSIS_ITER = "TripsAnalysisIteration";				
 	private Controler controler;
 	private final static Logger log = Logger.getLogger(GravityModelRetailerStrategy.class);
 	private WorkTrips workTrips = new WorkTrips();
+	private String outputTripsFile = new String();
+	private Integer tripsAnalysisIter= null;
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
-		if (controler.getIteration()%2==0 & controler.getIteration()>0) {
-			this.controler = event.getControler();
+		this.controler = event.getControler();
+		this.outputTripsFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_TRIPS_FILE);
+		if (this.outputTripsFile == null) {throw new RuntimeException("In config file, param = "+CONFIG_TRIPS_FILE+" in module = "+CONFIG_GROUP+" not defined!");}
+		this.tripsAnalysisIter = Integer.parseInt(controler.getConfig().findParam(CONFIG_GROUP,CONFIG_ANALYSIS_ITER));
+		if (this.tripsAnalysisIter.equals(null)) {throw new RuntimeException("In config file, param = "+CONFIG_ANALYSIS_ITER+" in module = "+CONFIG_GROUP+" not defined!");}
+		
+		if (controler.getIteration()== this.tripsAnalysisIter) {
 			this.plansAnalyzer();
 		}
 		
@@ -31,7 +40,7 @@ public class CarPoolingListener implements IterationEndsListener {
 
 	private void plansAnalyzer() {
 		// TODO Auto-generated method stub
-		CarPoolingTripsWriter cptw = new CarPoolingTripsWriter("HomeWorkTrips");
+		CarPoolingTripsWriter cptw = new CarPoolingTripsWriter(this.outputTripsFile);
 		for (PersonImpl p:controler.getPopulation().getPersons().values()){
 			log.info("PERSON " + p.getId() );
 			PlanImpl plan = p.getSelectedPlan();

@@ -20,7 +20,7 @@ public class CarPoolingTripsWriter { //TODO generalize this for all trips type, 
 		super();
 		
 		//String outfile = "/scr/baug/ciarif/output/zurich_10pc/" + filename;
-		String outfile = "output/triangle/" + filename;
+		String outfile = filename;
 		
 		try {
 			fw = new FileWriter(outfile);

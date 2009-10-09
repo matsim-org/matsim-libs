@@ -121,9 +121,8 @@ public class LinksRetailerReader {
 			}
 		}
 		this.currentLinks=links;
-		log.info("current Links size is " + currentLinks.size());
 		for (LinkRetailersImpl l:currentLinks.values()) {
-			log.info(("current Links contains link " + l.getId()));
+			log.info(("Current Links list contains link: " + l.getId()));
 		}
 	}
 		
@@ -141,7 +140,7 @@ public class LinksRetailerReader {
 				else {
 					this.freeLinks.put(link.getId(), link);
 					log.info("the link " + link.getId() + " has been added to the free links" );
-					log.info("free links are" + freeLinks );
+					log.info("free links are" + freeLinks.keySet());
 					this.allLinks.put(link.getId(),link);
 				}	
 			}		
