@@ -52,7 +52,7 @@ public class BKickIncome2TravelTimeDistanceCostCalculator implements TravelCost 
 		this.traveltimeCostFactor = (- charyparNagelScoring.getTraveling() / 3600.0) + (charyparNagelScoring.getPerforming() / 3600.0);
 		this.marginalUtlOfDistance = - charyparNagelScoring.getMarginalUtlOfDistanceCar() * betaIncomeCar;
 		
-		log.info("Using BKickIncome2TravelTimeDistanceCostCalculator...");
+//		log.info("Using BKickIncome2TravelTimseDistanceCostCalculator...");
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class BKickIncome2TravelTimeDistanceCostCalculator implements TravelCost 
 			return travelTime * this.traveltimeCostFactor;
 		}
 		double cost = travelTime * this.traveltimeCostFactor + (this.marginalUtlOfDistance * link.getLength() / this.income);
-		log.error("Link id " + link.getId() + " cost "  + cost );
+//		log.error("Link id " + link.getId() + " cost "  + cost );
 		return cost;
 	}
 	
