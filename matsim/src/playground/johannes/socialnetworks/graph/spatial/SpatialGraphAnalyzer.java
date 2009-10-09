@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -39,6 +40,9 @@ import playground.johannes.socialnetworks.graph.GraphAnalyser;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.Partitions;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
+import playground.johannes.socialnetworks.spatial.Zone;
+import playground.johannes.socialnetworks.spatial.ZoneLayer;
+import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
@@ -85,21 +89,23 @@ public class SpatialGraphAnalyzer {
 		if(!output.endsWith("/"))
 			output = output + "/";
 		
-		SpatialGrid<Double> grid = null;
-		if(gridfile != null)
-			grid = SpatialGrid.readFromFile(gridfile);
+		ZoneLayer zones = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+		ZoneLayerDouble density = ZoneLayerDouble.createFromFile(new HashSet<Zone>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
+//		if(gridfile != null)
+//			grid = SpatialGrid.readFromFile(gridfile);
 		
-		analyze(g, output, extended, grid);
+		analyze(g, output, extended, density);
+//		throw new RuntimeException("To be fixed...");
 		
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void analyze(SpatialGraph graph, String output, boolean extended, SpatialGrid<Double> densityGrid) {
+	public static void analyze(SpatialGraph graph, String output, boolean extended, ZoneLayerDouble zones) {
 		GraphAnalyser.analyze(graph, output, extended);
 
 		double binsize = 1000.0;
-		if(densityGrid != null)
-			binsize = densityGrid.getResolution();
+//		if(densityGrid != null)
+//			binsize = densityGrid.getResolution();
 		
 		try {
 			/*
@@ -126,13 +132,13 @@ public class SpatialGraphAnalyzer {
 				/*
 				 * density correlations
 				 */
-				if(densityGrid != null) {
+				if(zones != null) {
 					Correlations.writeToFile(SpatialGraphStatistics.degreeDensityCorrelation(
-							graph.getVertices(), densityGrid), output + "k_rho.txt", "density", "k");
+							graph.getVertices(), zones, binsize), output + "k_rho.txt", "density", "k");
 					Correlations.writeToFile(SpatialGraphStatistics.clusteringDensityCorrelation(
-							graph.getVertices(), densityGrid), output + "c_rho.txt", "density", "c");
+							graph.getVertices(), zones, binsize), output + "c_rho.txt", "density", "c");
 					Correlations.writeToFile(SpatialGraphStatistics.densityCorrelation(
-							SpatialGraphStatistics.meanEdgeLength(graph), densityGrid, binsize), output + "edgelength_rho.txt", "rho", "mean_edgelength");
+							SpatialGraphStatistics.meanEdgeLength(graph), zones, binsize), output + "edgelength_rho.txt", "rho", "mean_edgelength");
 				}
 				/*
 				 * degree partitions
@@ -149,7 +155,7 @@ public class SpatialGraphAnalyzer {
 				/*
 				 * density partitions
 				 */			
-				TDoubleObjectHashMap<?> rhoPartitions = SpatialGraphStatistics.createDensityPartitions(graph.getVertices(), densityGrid, binsize);
+				TDoubleObjectHashMap<?> rhoPartitions = SpatialGraphStatistics.createDensityPartitions(graph.getVertices(), zones, binsize);
 				it = rhoPartitions.iterator();
 				patitionOutput = output + "/rhoPartitions"; 
 				new File(patitionOutput).mkdirs();

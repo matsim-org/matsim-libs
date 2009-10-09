@@ -202,7 +202,7 @@ public class ErgmGravity extends ErgmTerm {
 		if(d > d_max)
 			return 0;
 		else
-			return 1 / (1 + d*d);
+			return 1 / (d*d);
 	}
 	
 	@Override

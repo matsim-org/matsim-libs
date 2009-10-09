@@ -48,7 +48,7 @@ public class RandomGraphGenerator {
 		ErdosRenyiGenerator<SpatialGraph, SpatialVertex, SpatialEdge> generator = new ErdosRenyiGenerator<SpatialGraph, SpatialVertex, SpatialEdge>(new SpatialGraphFactory());
 		graph = generator.generate(graph, 0.0001, 4711);
 		
-		SpatialGraphAnalyzer.analyze(graph, "/Users/fearonni/vsp-work/work/socialnets/mcmc/", false, SpatialGrid.readFromFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/popdensity/popdensity.1000.xml"));
+//		SpatialGraphAnalyzer.analyze(graph, "/Users/fearonni/vsp-work/work/socialnets/mcmc/", false, SpatialGrid.readFromFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/popdensity/popdensity.1000.xml"));
 		SpatialGraphMLWriter writer = new SpatialGraphMLWriter();
 		writer.write(graph, "/Users/fearonni/vsp-work/work/socialnets/mcmc/graph.graphml");
 	}

@@ -97,7 +97,7 @@ public class LatticeGenerator {
 //		Handler handler = new Handler(outputDir, densityGrid);
 //		handler.setSampleSize(sampleSize);
 //		handler.setSampleInterval(sampleInterval);
-		DumpHandler handler = new DumpHandler("/Users/fearonni/vsp-work/work/socialnets/mcmc/output/", grid);
+		DumpHandler handler = new DumpHandler("/Users/fearonni/vsp-work/work/socialnets/mcmc/output/", null);
 		handler.setBurnin((long)4E9);
 		handler.setDumpInterval((long)1E8);
 		handler.setLogInterval((long)1E6);

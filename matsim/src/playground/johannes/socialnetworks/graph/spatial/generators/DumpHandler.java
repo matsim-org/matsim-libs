@@ -46,6 +46,7 @@ import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.PajekDistanceColorizer;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
+import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
@@ -74,11 +75,14 @@ public class DumpHandler implements SampleHandler {
 	
 	private BufferedWriter writer;
 	
-	private SpatialGrid<Double> densityGrid;
+//	private SpatialGrid<Double> densityGrid;
 	
-	public DumpHandler(String filename, SpatialGrid<Double> densityGrid) {
+	private ZoneLayerDouble zones;
+	
+	public DumpHandler(String filename, ZoneLayerDouble zones) {
 		outputDir = filename;
-		this.densityGrid = densityGrid;
+//		this.densityGrid = densityGrid;
+		this.zones = zones;
 		try {
 			writer = new BufferedWriter(new FileWriter(filename + "samplestats.txt"));
 			writer.write("it\tm\t<k>\t<c_local>\t<c_global>\t<d>");
@@ -175,7 +179,7 @@ public class DumpHandler implements SampleHandler {
 			/*
 			 * graph analysis
 			 */
-			SpatialGraphAnalyzer.analyze(net, currentOutputDir, false, densityGrid);
+			SpatialGraphAnalyzer.analyze(net, currentOutputDir, false, zones);
 			/*
 			 * graph output
 			 * 

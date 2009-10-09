@@ -23,9 +23,14 @@
  */
 package playground.johannes.socialnetworks.statistics;
 
-import java.util.Arrays;
-
+import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.Tuple;
@@ -84,5 +89,20 @@ public class PowerLawFit {
 			}
 		}
 		return 1 + (wsum/logsum);
+	}
+	
+	public static void main(String args[]) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader("/Users/fearonni/Desktop/data.txt"));
+		String line = reader.readLine();
+		TDoubleArrayList values = new TDoubleArrayList();
+		while((line = reader.readLine()) != null) {
+			double bin = Double.parseDouble(line.split(" ")[0]);
+			double count = Double.parseDouble(line.split(" ")[1]);
+			for(int i = 0; i < Math.floor(count*100000); i++)
+				values.add(bin);
+		}
+		
+		Tuple<Double, Double> fit = fit(values.toNativeArray());
+		System.out.println(String.format("gamma = %1$s, xmin = %2$s", fit.getSecond(), fit.getFirst()));
 	}
 }

@@ -21,6 +21,7 @@ package playground.johannes.socialnetworks.spatial;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -30,6 +31,7 @@ import java.util.Set;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
@@ -43,13 +45,16 @@ public class ZoneLayer {
 
 	private Map<Geometry, Zone> zones;
 	
+	private Map<Id, Zone> ids;
+	
 	private GeometryLayer geoLayer;
 	
 	public ZoneLayer(Set<Zone> zones) {
 		this.zones = new LinkedHashMap<Geometry, Zone>();
-		
+		ids = new HashMap<Id, Zone>();
 		for(Zone zone : zones) {
 			this.zones.put(zone.getBorder(), zone);
+			ids.put(zone.getId(), zone);
 		}
 		
 		geoLayer = new GeometryLayer(this.zones.keySet());
@@ -58,6 +63,10 @@ public class ZoneLayer {
 	public Zone getZone(Coord c) {
 		Geometry g = geoLayer.getZone(c);
 		return zones.get(g);
+	}
+	
+	public Zone getZone(Id id) {
+		return ids.get(id);
 	}
 	
 	public Collection<Zone> getZones() {

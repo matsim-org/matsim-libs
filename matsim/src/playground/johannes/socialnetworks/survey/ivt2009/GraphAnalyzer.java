@@ -22,22 +22,22 @@ package playground.johannes.socialnetworks.survey.ivt2009;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TDoubleObjectIterator;
-import gnu.trove.TObjectDoubleHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import playground.johannes.socialnetworks.graph.GraphStatistics;
-import playground.johannes.socialnetworks.graph.Vertex;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
+import playground.johannes.socialnetworks.spatial.Zone;
+import playground.johannes.socialnetworks.spatial.ZoneLayer;
+import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.Distribution;
 import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraph;
@@ -61,8 +61,11 @@ public class GraphAnalyzer {
 		SampledSpatialGraph graph = reader.readGraph(args[0]);
 		analyze(graph, args[1]);
 
+		ZoneLayer zones = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+		ZoneLayerDouble density = ZoneLayerDouble.createFromFile(new HashSet<Zone>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
+		
 		SpatialGrid<Double> grid = SpatialGrid.readFromFile(args[2]);
-		analyze(graph, grid, args[1]);
+		analyze(graph, density, args[1]);
 		
 		Population2SpatialGraph pop2graph = new Population2SpatialGraph();
 		SpatialGraph g2 = pop2graph.read(args[3]);
@@ -110,10 +113,10 @@ public class GraphAnalyzer {
 		writer.close();
 	}
 	
-	public static <V extends SampledSpatialGraph> void analyze(SampledSpatialGraph graph, SpatialGrid<Double> grid, String output) throws IOException {
+	public static <V extends SampledSpatialGraph> void analyze(SampledSpatialGraph graph, ZoneLayerDouble zones, String output) throws IOException {
 		Set partition = SnowballPartitions.createSampledPartition((Set)graph.getVertices());
 		
-		TDoubleObjectHashMap<Set<V>> partitions = SpatialGraphStatistics.createDensityPartitions(partition, grid, 2000);
+		TDoubleObjectHashMap<Set<V>> partitions = SpatialGraphStatistics.createDensityPartitions(partition, zones, 2000);
 		TDoubleObjectIterator<Set<V>> it = partitions.iterator();
 		
 		new File(output + "rhoPartitions").mkdirs();
@@ -129,9 +132,9 @@ public class GraphAnalyzer {
 //			values.put((SpatialVertex)v, ((Vertex)v).getNeighbours().size());
 //		}
 //		Correlations.writeToFile(SpatialGraphStatistics.densityCorrelation(values, grid, 1000), output + "k_rho.txt", "rho", "<k>");
-		Correlations.writeToFile(SpatialGraphStatistics.degreeDensityCorrelation(partition, grid), output + "k_rho.txt", "rho", "<k>");
+		Correlations.writeToFile(SpatialGraphStatistics.degreeDensityCorrelation(partition, zones, 1000), output + "k_rho.txt", "rho", "<k>");
 		
-		TDoubleDoubleHashMap correlations = SpatialGraphStatistics.densityCorrelation(SpatialGraphStatistics.meanEdgeLength(partition), grid, 1000);
+		TDoubleDoubleHashMap correlations = SpatialGraphStatistics.densityCorrelation(SpatialGraphStatistics.meanEdgeLength(partition), zones, 1000);
 		Correlations.writeToFile(correlations, output + "d_rho.txt", "rho", "d");
 	}
 	

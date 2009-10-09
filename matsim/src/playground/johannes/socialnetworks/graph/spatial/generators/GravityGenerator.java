@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -43,9 +44,11 @@ import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeFlip;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
+import playground.johannes.socialnetworks.spatial.Zone;
+import playground.johannes.socialnetworks.spatial.ZoneLayer;
+import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 
 /**
  * @author illenberger
@@ -89,15 +92,22 @@ public class GravityGenerator {
 		generator.reweightBoundaries = Boolean.parseBoolean(config.getParam(MODULE_NAME, "boundaries"));
 		generator.reweightDensity = Boolean.parseBoolean(config.getParam(MODULE_NAME, "popdensity"));
 		
-		String gridFile = config.findParam(MODULE_NAME, "densityGrid");
-		SpatialGrid<Double> densityGrid = null;
-		if(gridFile != null)
-			densityGrid = SpatialGrid.readFromFile(gridFile);
+//		String gridFile = config.findParam(MODULE_NAME, "densityGrid");
+//		SpatialGrid<Double> densityGrid = null;
+//		if(gridFile != null)
+//			densityGrid = SpatialGrid.readFromFile(gridFile);
+		String zonesFile = config.findParam(MODULE_NAME, "zonesFile");
+		String densityFile = config.findParam(MODULE_NAME, "densityFile");
+		ZoneLayerDouble zones = null;
+		if(zonesFile != null && densityFile != null) {
+			ZoneLayer layer = ZoneLayer.createFromShapeFile(zonesFile);
+			zones = ZoneLayerDouble.createFromFile(new HashSet<Zone>(layer.getZones()), densityFile);
+		}
 		
 		new File(generator.outputDir).mkdirs();
 		
 		String type = config.getParam(MODULE_NAME, "randomWalk");
-		generator.generate(graph, densityGrid, RandomWalkType.valueOf(type));
+		generator.generate(graph, zones, RandomWalkType.valueOf(type));
 
 	}
 
@@ -123,7 +133,7 @@ public class GravityGenerator {
 	
 	private boolean reweightBoundaries = true;
 	
-	public void generate(SpatialGraph graph, SpatialGrid<Double> densityGrid, RandomWalkType type) {
+	public void generate(SpatialGraph graph, ZoneLayerDouble zones, RandomWalkType type) {
 		/*
 		 * convert graph to matrix
 		 */
@@ -162,7 +172,7 @@ public class GravityGenerator {
 		
 		sampler.setInterval(1000000);
 		
-		DumpHandler handler = new DumpHandler(outputDir, densityGrid);
+		DumpHandler handler = new DumpHandler(outputDir, zones);
 		handler.setBurnin(burnin);
 		handler.setDumpInterval(sampleInterval);
 		handler.setLogInterval(logInterval);

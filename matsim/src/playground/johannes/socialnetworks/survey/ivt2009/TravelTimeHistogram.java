@@ -104,6 +104,7 @@ public class TravelTimeHistogram {
 		
 		Distribution fastest = new Distribution();
 		Distribution fastestNorm = new Distribution();
+		Distribution fastestNorm2 = new Distribution();
 		int counter=0;
 //		int starttime = Integer.parseInt(config.getParam("tthistogram", "starttime"));
 		TDoubleObjectIterator<?> it = partitions.iterator();
@@ -115,7 +116,7 @@ public class TravelTimeHistogram {
 
 			for(SpatialVertex v : partition) {
 				Zone z_i = zoneLayer.getZone(v.getCoordinate());
-				
+				if(z_i != null) {
 				TDoubleIntHashMap n_i = new TDoubleIntHashMap();
 				for(SpatialVertex v2 : v.getNeighbours()) {
 					Zone z_j = zoneLayer.getZone(v2.getCoordinate());
@@ -133,8 +134,9 @@ public class TravelTimeHistogram {
 					rhoDistr.add(tt);
 					fastest.add(tt);
 					fastestNorm.add(tt, 1/n_i.get(tt/300));
+					fastestNorm2.add(tt, (tt/300)/n_i.get(tt/300));
 				}
-				
+				}
 				counter++;
 				System.out.println(String.format("Processed %1$s of %2$s vertices.", counter, graph.getVertices().size()));
 			}
@@ -146,6 +148,9 @@ public class TravelTimeHistogram {
 				
 		Distribution.writeHistogram(fastest.absoluteDistribution(60), output + "traveltime.txt");
 		Distribution.writeHistogram(fastest.absoluteDistributionLog2(60), output + "traveltime.log2.txt");
+		Distribution.writeHistogram(fastestNorm.absoluteDistribution(60), output + "traveltime.norm.txt");
 		Distribution.writeHistogram(fastestNorm.absoluteDistributionLog2(60), output + "traveltime.norm.log2.txt");
+		Distribution.writeHistogram(fastestNorm2.absoluteDistribution(60), output + "traveltime.norm2.txt");
+		Distribution.writeHistogram(fastestNorm2.absoluteDistributionLog2(60), output + "traveltime.norm2.log2.txt");
 	}
 }

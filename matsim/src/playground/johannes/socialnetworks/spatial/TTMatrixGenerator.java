@@ -21,11 +21,12 @@ package playground.johannes.socialnetworks.spatial;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.EventsImpl;
@@ -37,8 +38,6 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Point;
@@ -54,20 +53,21 @@ public class TTMatrixGenerator {
 	 * @throws IOException 
 	 * @throws ParserConfigurationException 
 	 * @throws SAXException 
+	 * @throws InterruptedException 
 	 */
-	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
+	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
 		Logger logger = Logger.getLogger(TTMatrixGenerator.class);
 		
-		double minx = 5.8;
-		double miny = 45.7;
-		double maxx = 10.6;
-		double maxy = 47.9;
+//		double minx = 5.8;
+//		double miny = 45.7;
+//		double maxx = 10.6;
+//		double maxy = 47.9;
+//		
+//		CoordinateTransformation transform = new WGS84toCH1903LV03();
+//		Coord lowerleft = transform.transform(new CoordImpl(minx, miny));
+//		Coord upperright = transform.transform(new CoordImpl(maxx, maxy));
 		
-		CoordinateTransformation transform = new WGS84toCH1903LV03();
-		Coord lowerleft = transform.transform(new CoordImpl(minx, miny));
-		Coord upperright = transform.transform(new CoordImpl(maxx, maxy));
-		
-		int binSize = 60*60*24; // one day
+		int binSize = 900;
 		int maxTime = 60*60*24;
 		/*
 		 * read network
@@ -85,45 +85,76 @@ public class TTMatrixGenerator {
 		EventsReaderTXTv1 eReader = new EventsReaderTXTv1(events);
 		eReader.readFile(args[1]);
 		/*
-		 * init dijkstra
-		 */
-		Dijkstra router = new Dijkstra(network, new TravelCost() {
-			
-			public double getLinkTravelCost(Link link, double time) {
-				return ttCalculator.getLinkTravelTime(link, time);
-			}
-		}, ttCalculator);
-		/*
 		 * load zones
 		 */
-		ZoneLayer zoneLayer = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+		ZoneLayer zoneLayer = ZoneLayer.createFromShapeFile(args[2]);
+		Queue<Zone> zones = new ConcurrentLinkedQueue<Zone>(zoneLayer.getZones());
 		/*
 		 * fill travel time matrix
 		 */
 		TravelTimeMatrix matrix = new TravelTimeMatrix(new HashSet<Zone>(zoneLayer.getZones()));
 		logger.info("Calculating fastest paths...");
 		
-		
-		int n = 0;
-		int total = zoneLayer.getZones().size();
-		for(Zone z_i : matrix.getZones()) {
-			Point p_i = z_i.getBorder().getCentroid();
-			Node l_i = network.getNearestNode(new CoordImpl(p_i.getX(), p_i.getY()));
-			for(Zone z_j : matrix.getZones()) {
-//				if(z_i != z_j) {
-				Point p_j = z_j.getBorder().getCentroid();
-				Node l_j = network.getNearestNode(new CoordImpl(p_j.getX(), p_j.getY()));
-				
-				double tt = router.calcLeastCostPath(l_i, l_j, 6*60*60).travelTime;
-				matrix.setTravelTime(z_i, z_j, tt);
-				n++;
-				if(n % 1000 == 0)
-					logger.info(String.format("%1$s of %2$s done (%3$.2f).", n, total, n/(float)total));
-//				}
-			}
+		int threads = Runtime.getRuntime().availableProcessors();
+		RunThread[] runThreads = new RunThread[threads];
+		for(int i = 0; i < threads; i++) {
+			runThreads[i] = new RunThread(network, zones, matrix, ttCalculator);
+			runThreads[i].start();
+		}
+		for(int i = 0; i < threads; i++) {
+			runThreads[i].join();
 		}
 		
-		TravelTimeMatrix.toFile(matrix, "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/ttmatrix.txt");
+		TravelTimeMatrix.toFile(matrix, args[3]);
+	}
+	
+	private static class RunThread extends Thread {
+		
+		private static final Logger logger = Logger.getLogger(RunThread.class);
+		
+		private NetworkLayer network;
+		
+		private Queue<Zone> zones;
+		
+		private TravelTimeMatrix matrix;
+		
+		private Dijkstra router;
+		
+		private static int n = 0;
+		
+		private static int total;
+		
+		public RunThread(NetworkLayer network, Queue<Zone> zones, TravelTimeMatrix matrix, final TravelTimeCalculator ttCalculator) {
+			total = zones.size() * zones.size();
+			this.network = network;
+			this.zones = zones;
+			this.matrix = matrix;
+			
+			router = new Dijkstra(network, new TravelCost() {
+				public double getLinkTravelCost(Link link, double time) {
+					return ttCalculator.getLinkTravelTime(link, time);
+				}
+			}, ttCalculator);
+		}
+		
+		public void run() {
+			Zone z_i = null;
+			while((z_i = zones.poll()) != null) {
+//			for(Zone z_i : matrix.getZones()) {
+				Point p_i = z_i.getBorder().getCentroid();
+				Node l_i = network.getNearestNode(new CoordImpl(p_i.getX(), p_i.getY()));
+				for(Zone z_j : matrix.getZones()) {
+					Point p_j = z_j.getBorder().getCentroid();
+					Node l_j = network.getNearestNode(new CoordImpl(p_j.getX(), p_j.getY()));
+					
+					double tt = router.calcLeastCostPath(l_i, l_j, 6*60*60).travelTime;
+					matrix.setTravelTime(z_i, z_j, tt);
+					n++;
+					if(n % 1000 == 0)
+						logger.info(String.format("%1$s of %2$s done (%3$.2f).", n, total, n/(float)total));
+				}
+			}
+		}
 	}
 
 }

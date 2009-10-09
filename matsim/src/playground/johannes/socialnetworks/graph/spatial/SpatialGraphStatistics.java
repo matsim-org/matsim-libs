@@ -22,7 +22,6 @@ package playground.johannes.socialnetworks.graph.spatial;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleDoubleIterator;
 import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TObjectByteHashMap;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 
@@ -37,6 +36,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.Partitions;
 import playground.johannes.socialnetworks.graph.SparseEdge;
+import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
@@ -265,6 +265,24 @@ public class SpatialGraphStatistics {
 		return Correlations.correlationMean(values1, values2, binsize);
 	}
 
+	public static TDoubleDoubleHashMap densityCorrelation(TObjectDoubleHashMap<? extends SpatialVertex> vertexValues, ZoneLayerDouble zones, double binsize) {
+		double values1[] = new double[vertexValues.size()];
+		double values2[] = new double[vertexValues.size()];
+
+		TObjectDoubleIterator<? extends SpatialVertex> it = vertexValues
+				.iterator();
+		for (int i = 0; i < values1.length; i++) {
+			it.advance();
+			double rho = zones.getValue(it.key().getCoordinate());
+			if(!Double.isNaN(rho)) {
+				values1[i] = rho;
+				values2[i] = it.value();
+			}
+		}
+
+		return Correlations.correlationMean(values1, values2, binsize);
+	}
+	
 	public static TDoubleDoubleHashMap degreeDensityCorrelation(
 			Collection<? extends SpatialVertex> vertices,
 			SpatialGrid<Double> densityGrid) {
@@ -276,6 +294,17 @@ public class SpatialGraphStatistics {
 		return densityCorrelation(vertexValues, densityGrid, densityGrid
 				.getResolution());
 	}
+	
+	public static TDoubleDoubleHashMap degreeDensityCorrelation(
+			Collection<? extends SpatialVertex> vertices,
+			ZoneLayerDouble zones, double binsize) {
+		TObjectDoubleHashMap<SpatialVertex> vertexValues = new TObjectDoubleHashMap<SpatialVertex>();
+		for (SpatialVertex e : vertices) {
+			vertexValues.put(e, e.getEdges().size());
+		}
+
+		return densityCorrelation(vertexValues, zones, binsize);
+	}
 
 	public static TDoubleDoubleHashMap clusteringDensityCorrelation(
 			Collection<? extends SpatialVertex> vertices,
@@ -283,6 +312,13 @@ public class SpatialGraphStatistics {
 		return densityCorrelation(GraphStatistics
 				.localClusteringCoefficients(vertices), densityGrid,
 				densityGrid.getResolution());
+	}
+	
+	public static TDoubleDoubleHashMap clusteringDensityCorrelation(
+			Collection<? extends SpatialVertex> vertices,
+			ZoneLayerDouble zones, double binsize) {
+		return densityCorrelation(GraphStatistics
+				.localClusteringCoefficients(vertices), zones, binsize);
 	}
 
 	public static TObjectDoubleHashMap<? extends SpatialVertex> centerDistance(Set<? extends SpatialVertex> vertices) {
@@ -364,6 +400,22 @@ public class SpatialGraphStatistics {
 				double rho = densityGrid.getValue(v.getCoordinate());
 				vertexValues.put(v, rho);
 			}
+		}
+		return Partitions.createPartitions(vertexValues, binsize);
+	}
+	
+	public static <V extends SpatialVertex> TDoubleObjectHashMap<Set<V>> createDensityPartitions(
+			Set<V> vertices, ZoneLayerDouble zones, double binsize) {
+		TObjectDoubleHashMap<V> vertexValues = new TObjectDoubleHashMap<V>();
+		for (V v : vertices) {
+			double rho = zones.getValue(v.getCoordinate());
+			if(!Double.isNaN(rho)) {
+				vertexValues.put(v, rho);
+			}
+//			if (densityGrid.isInBounds(v.getCoordinate())) {
+//				double rho = densityGrid.getValue(v.getCoordinate());
+//				vertexValues.put(v, rho);
+//			}
 		}
 		return Partitions.createPartitions(vertexValues, binsize);
 	}
