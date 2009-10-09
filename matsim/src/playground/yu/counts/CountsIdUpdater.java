@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.utils.counts;
+package playground.yu.counts;
 
 import java.util.HashSet;
 import java.util.Set;

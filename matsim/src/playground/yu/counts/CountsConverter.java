@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.yu.utils.counts;
+package playground.yu.counts;
 
 import java.util.ArrayList;
 import java.util.List;

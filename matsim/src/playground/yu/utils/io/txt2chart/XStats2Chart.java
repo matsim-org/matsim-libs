@@ -39,13 +39,13 @@ public class XStats2Chart {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		// String fileBase = "../runs-svn/runFi34/";
-		String fileBase = "../matsimTests/breakdown/output/";
-		// String inputFile = fileBase + "traveldistancestats.txt";
-		String inputFile = fileBase + "scorestats.txt";
+		String fileBase = "../runs-svn/run764/";
+		// String fileBase = "../matsimTests/breakdown/output/";
+		 String inputFile = fileBase + "traveldistancestats.txt";
+//		String inputFile = fileBase + "scorestats.txt";
 		String chartFile = inputFile.replace("txt", "png");
 		// /////////////////////////////////////////////
-		int maxIter = 2001;
+		int maxIter = 1001;
 		// ////////////////////////////////////////////
 		String avgExec, avgWorst, avgAvg, avgBest;
 		double[] exec = new double[maxIter];
@@ -64,6 +64,8 @@ public class XStats2Chart {
 
 		line = reader.readLine();// first line
 		while (line != null) {
+			if (line.startsWith("I"))
+				line = reader.readLine();
 			series = line.split("\t");
 			int iter = Integer.parseInt(series[0]);
 			exec[iter] = Double.parseDouble(series[1]);

@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.utils.counts;
+package playground.yu.counts;
 
 import java.io.IOException;
 import java.util.HashMap;
