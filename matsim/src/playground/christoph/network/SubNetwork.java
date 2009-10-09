@@ -81,25 +81,13 @@ public class SubNetwork implements Network {
 		return nodes;
 	}
 
-	public void addSubNode(Node subNode)
+	public void addNode(Node node)
 	{
-		nodes.put(subNode.getId(), subNode);
+		nodes.put(node.getId(), node);
 	}
-	
-	public void addSubLink(Link link)
+
+	public void addLink(Link link)
 	{
 		links.put(link.getId(), link);
-	}
-
-	public void addNode(Node nn) {
-		// TODO Auto-generated method stub
-		//
-		throw new UnsupportedOperationException() ;
-	}
-
-	public void addLink(Link ll) {
-		// TODO Auto-generated method stub
-		//
-		throw new UnsupportedOperationException() ;
 	}
 }

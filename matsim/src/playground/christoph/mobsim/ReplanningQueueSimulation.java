@@ -44,17 +44,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	private final static Logger log = Logger.getLogger(ReplanningQueueSimulation.class);
 	
 	protected KnowledgeDBStorageHandler knowledgeDBStorageHandler;
-	
-//	/*
-//	 * Basically a 1:1 copy of the activityEndsList of the QueueSimulation.
-//	 * The difference is, that this implementation uses a Time Offset. That means
-//	 * that we are informed that an activity will end a few Time Steps before it
-//	 * really ends. This allows us for example to read the known nodes of a Person
-//	 * from a Database before they are needed what should speed up the Simulation.
-//	 */
-//	protected final PriorityBlockingQueue<DriverAgent> offsetActivityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
-//	protected final double timeOffset = 120.0;
-	
+		
 	public ReplanningQueueSimulation(final NetworkLayer network, final PopulationImpl population, final EventsImpl events)
 	{
 		super(network, population, events);
@@ -67,14 +57,6 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 //		this.simEngine = new ParallelQueueSimEngine2(this.getQueueNetwork(), MatsimRandom.getRandom());
 //		this.simEngine = new ParallelQueueSimEngine3(this.getQueueNetwork(), MatsimRandom.getRandom());
 //		this.simEngine = new ParallelQueueSimEngine4(this.getQueueNetwork(), MatsimRandom.getRandom());
-		
-		/*
-		 * This is part of Knowledge not of WithinDayReplanning...
-		 */
-//		this.knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(population);
-//		this.knowledgeDBStorageHandler.start();
-//		((EventsImpl)getEvents()).addHandler(knowledgeDBStorageHandler);
-//		this.addQueueSimulationListeners(this.knowledgeDBStorageHandler);
 	}
 	
 	/*
@@ -104,14 +86,6 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 			}
 		}
 	}
-	
-//	@Override
-//	protected boolean doSimStep(final double time) 
-//	{
-////		handleOffsetActivityEnds(time);
-//		
-//		return super.doSimStep(time);		
-//	}
 
 	/*
 	 * for the Knowledge Modules
@@ -123,41 +97,4 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 //		offsetActivityEndsList.add(agent);
 		super.scheduleActivityEnd(agent);
 	}
-	
-//	/*
-//	 * for the Knowledge Modules
-//	 */
-//	private void handleOffsetActivityEnds(final double time)
-//	{		
-//		while (this.offsetActivityEndsList.peek() != null)
-//		{
-//			DriverAgent agent = this.offsetActivityEndsList.peek();
-//			if (agent.getDepartureTime() <= time + timeOffset)
-//			{
-//				this.offsetActivityEndsList.poll();
-//				knowledgeDBStorageHandler.addPerson(agent.getPerson());
-//			} 
-//			else
-//			{
-//				return;
-//			}
-//		} 
-//	}
-	
-//	/*
-//	 * for the Knowledge Modules
-//	 */
-//	/*package*/ class DriverAgentDepartureTimeComparator implements Comparator<DriverAgent>, Serializable {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		public int compare(DriverAgent agent1, DriverAgent agent2) {
-//			int cmp = Double.compare(agent1.getDepartureTime(), agent2.getDepartureTime());
-//			if (cmp == 0) {
-//				// Both depart at the same time -> let the one with the larger id be first (=smaller)
-//				return agent2.getPerson().getId().compareTo(agent1.getPerson().getId());
-//			}
-//			return cmp;
-//		}
-//	}
 }

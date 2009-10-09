@@ -163,8 +163,7 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 
 	
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub	
 	}
 	
 	public void scheduleActivityEnd(final DriverAgent agent)

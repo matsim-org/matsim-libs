@@ -9,16 +9,18 @@ import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.world.Layer;
 
-public class SubLink implements BasicLink, Link{
+//public class SubLink implements BasicLink, Link{
+public class SubLink implements Link{
 
 	private Network network;
-	private BasicNode from;
-	private BasicNode to;
+	private Node from;
+	private Node to;
 	private Link parentLink;
 	
-	public SubLink(Network network, BasicNode from, BasicNode to, Link link)
+	public SubLink(Network network, Node from, Node to, Link link)
 	{
 		this.network = network;
 		this.from = from;
@@ -31,14 +33,14 @@ public class SubLink implements BasicLink, Link{
 		return parentLink;
 	}
 	
-	public SubNode getFromNode()
+	public Node getFromNode()
 	{ 
-		return (SubNode)this.from;
+		return this.from;
 	}
 	
-	public SubNode getToNode()
+	public Node getToNode()
 	{
-		return (SubNode)this.to;
+		return this.to;
 	}
 	
 	public double getCapacity(final double time)
@@ -83,7 +85,7 @@ public class SubLink implements BasicLink, Link{
 
 	public boolean setFromNode(BasicNode node)
 	{
-		this.from = node;
+		this.from = (Node)node;
 		return true;
 	}
 
@@ -99,7 +101,7 @@ public class SubLink implements BasicLink, Link{
 
 	public boolean setToNode(BasicNode node)
 	{
-		this.to = node;
+		this.to = (Node)node;
 		return true;
 	}
 

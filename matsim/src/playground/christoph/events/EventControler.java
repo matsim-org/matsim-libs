@@ -67,7 +67,6 @@ import playground.christoph.replanning.MyStrategyManagerConfigLoader;
 import playground.christoph.router.CompassRoute;
 import playground.christoph.router.DijkstraWrapper;
 import playground.christoph.router.KnowledgePlansCalcRoute;
-import playground.christoph.router.MyDijkstra;
 import playground.christoph.router.RandomCompassRoute;
 import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
@@ -127,7 +126,6 @@ public class EventControler extends Controler {
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ParallelActEndReplanner parallelActEndReplanner;
 	protected ParallelLeaveLinkReplanner parallelLeaveLinkReplanner;
-//	protected LinkVehiclesCounter linkVehiclesCounter;
 	protected LinkVehiclesCounter2 linkVehiclesCounter;
 	protected LinkReplanningMap linkReplanningMap;
 	protected LookupTableUpdater lookupTableUpdater;
@@ -171,7 +169,6 @@ public class EventControler extends Controler {
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCalculator());
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 		travelCostWrapper.checkNodeKnowledge(true);
-		travelCostWrapper.useLookupTable(false);
 		
 		this.setTravelCostCalculator(travelCostWrapper);
 //		this.setTravelCostCalculator(travelCost);
@@ -221,18 +218,12 @@ public class EventControler extends Controler {
 		// CostCalculators can be used
 		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
 		KnowledgeTravelTimeWrapper travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
-		travelTimeWrapper.setNetwork(this.getNetwork());
-		travelTimeWrapper.setLinkVehiclesCounter(linkVehiclesCounter);
 		
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
-		travelCostWrapper.setNetwork(this.getNetwork());
-		travelCostWrapper.setLinkVehiclesCounter(linkVehiclesCounter);
 		
 		travelTimeWrapper.checkNodeKnowledge(false);
 		travelCostWrapper.checkNodeKnowledge(false);
-		travelTimeWrapper.useLookupTable(false);
-		travelCostWrapper.useLookupTable(false);
 
 		// Don't use Knowledge for CostCalculations
 //		Dijkstra dijkstra = new MyDijkstra(network, travelCostWrapper, travelTimeWrapper);
@@ -316,7 +307,6 @@ public class EventControler extends Controler {
 	 */
 	protected void createHandlersAndListeners()
 	{
-//		linkVehiclesCounter = new LinkVehiclesCounter();
 		linkVehiclesCounter = new LinkVehiclesCounter2();
 		linkReplanningMap = new LinkReplanningMap();
 		lookupTableUpdater = new LookupTableUpdater();
@@ -344,8 +334,8 @@ public class EventControler extends Controler {
 		foqsl.addQueueSimulationInitializedListener(linkVehiclesCounter);
 		foqsl.addQueueSimulationAfterSimStepListener(linkVehiclesCounter);
 		
-		foqsl.addQueueSimulationInitializedListener(lookupTableUpdater);
-		foqsl.addQueueSimulationAfterSimStepListener(lookupTableUpdater);
+//		foqsl.addQueueSimulationInitializedListener(lookupTableUpdater);
+//		foqsl.addQueueSimulationAfterSimStepListener(lookupTableUpdater);
 
 		foqsl.addQueueSimulationBeforeSimStepListener(replanningManager);
 		
@@ -411,7 +401,7 @@ public class EventControler extends Controler {
 		log.info("do initial Replanning");
 		doInitialReplanning();	
 		
-		lookupTableUpdater.addReplannerArray(parallelInitialReplanner.getReplannerArray());
+//		lookupTableUpdater.addLookupTable(LookupTable lookupTable);
 		
 		ActEndReplanningModule actEndReplanning = new ActEndReplanningModule(parallelActEndReplanner, sim);
 		LeaveLinkReplanningModule leaveLinkReplanning = new LeaveLinkReplanningModule(parallelLeaveLinkReplanner, linkReplanningMap);

@@ -53,7 +53,6 @@ public class IterativeKnowledgeControler extends Controler{
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCalculator());
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 		travelCostWrapper.checkNodeKnowledge(true);
-		travelCostWrapper.useLookupTable(false);
 		
 		this.setTravelCostCalculator(travelCostWrapper);
 //.		this.setTravelCostCalculator(travelCost);
@@ -69,7 +68,6 @@ public class IterativeKnowledgeControler extends Controler{
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCalculator());
 		KnowledgeTravelCostWrapper travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
 		travelCostWrapper.checkNodeKnowledge(true);
-		travelCostWrapper.useLookupTable(false);
 
 //		Dijkstra dijkstra = new Dijkstra(network, travelCostWrapper, travelTime);
 //		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTime, network);	

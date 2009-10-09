@@ -1,0 +1,41 @@
+package playground.christoph.network.mapping;
+
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Node;
+
+/*
+ * 1:1 Mapping of a Node.
+ */
+public class SingleNodeMapping extends Mapping{
+
+	private Node input;
+	private Node output;
+	
+	public SingleNodeMapping(Id id, Node input, Node output)
+	{
+		this.setId(id);
+		this.input = input;
+		this.output = output;
+	}
+	
+	public Node getInput()
+	{
+		return input;
+	}
+	
+	public Node getOutput()
+	{
+		return output;
+	}
+	
+	@Override
+	public double getLength()
+	{
+		if (input instanceof MappingInfo)
+		{
+			return ((MappingInfo) input).getDownMapping().getLength();
+		}
+		// else: It is a single Node with Length 0
+		else return 0.0;
+	}
+}

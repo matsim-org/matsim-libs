@@ -34,7 +34,7 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.events.LinkReplanningMap;
-import playground.christoph.events.LinkVehiclesCounter;
+import playground.christoph.events.LinkVehiclesCounter2;
 import playground.christoph.events.algorithms.FixedOrderQueueSimulationListener;
 import playground.christoph.events.algorithms.ParallelActEndReplanner;
 import playground.christoph.events.algorithms.ParallelInitialReplanner;
@@ -57,7 +57,6 @@ import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
  * 
  * @author Christoph Dobler
  */
-
 
 //mysimulations/kt-zurich/configIterative.xml
 //test/scenarios/berlin/config.xml
@@ -82,7 +81,7 @@ public class WithinDayControler extends Controler {
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ParallelActEndReplanner parallelActEndReplanner;
 	protected ParallelLeaveLinkReplanner parallelLeaveLinkReplanner;
-	protected LinkVehiclesCounter linkVehiclesCounter;
+	protected LinkVehiclesCounter2 linkVehiclesCounter;
 	protected LinkReplanningMap linkReplanningMap;
 	protected ReplanningManager replanningManager;
 	protected ReplanningQueueSimulation sim;
@@ -104,8 +103,11 @@ public class WithinDayControler extends Controler {
 
 	private void setConstructorParameters()
 	{
-		// Use MyLinkImpl. They can carry some additional Information like their
-		// TravelTime or VehicleCount.
+		/*
+		 * Use MyLinkImpl. They can carry some additional Information like their
+		 * TravelTime or VehicleCount.
+		 * This is needed to be able to use a LinkVehiclesCounter.
+		 */
 		this.getNetworkFactory().setLinkFactory(new MyLinkFactoryImpl());
 
 		// Use a Scoring Function, that only scores the travel times!
@@ -162,7 +164,7 @@ public class WithinDayControler extends Controler {
 	 */
 	protected void createHandlersAndListeners()
 	{
-		linkVehiclesCounter = new LinkVehiclesCounter();
+		linkVehiclesCounter = new LinkVehiclesCounter2();
 		linkReplanningMap = new LinkReplanningMap();
 		replanningManager = new ReplanningManager();
 	}

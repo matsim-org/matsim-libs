@@ -130,16 +130,12 @@ public class TestSubNetwork {
 		
 		travelTime = new KnowledgeTravelTimeCalculator(queueNetwork);
 		travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
-		travelTimeWrapper.setNetwork(network);
 		
 		travelCost = new OnlyTimeDependentTravelCostCalculator(travelTimeWrapper);
 		travelCostWrapper = new KnowledgeTravelCostWrapper(travelCost);
-		travelCostWrapper.setNetwork(network);
 		
 		travelTimeWrapper.checkNodeKnowledge(false);
 		travelCostWrapper.checkNodeKnowledge(false);
-		travelTimeWrapper.useLookupTable(false);
-		travelCostWrapper.useLookupTable(false);
 		
 		// Don't use Knowledge for CostCalculations
 		dijkstra = new MyDijkstra(network, travelCostWrapper, travelTimeWrapper);

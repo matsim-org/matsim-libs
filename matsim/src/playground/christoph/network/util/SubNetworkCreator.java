@@ -70,7 +70,7 @@ public class SubNetworkCreator {
 				{
 					SubNode subNode = new SubNode(node);
 	
-					subNetwork.addSubNode(subNode);
+					subNetwork.addNode(subNode);
 					
 					nodesMapping.put(node.getId(), subNode);
 				}
@@ -94,7 +94,7 @@ public class SubNetworkCreator {
 							subNode.addInLinkNoCheck(subLink);
 							fromNode.addOutLinkNoCheck(subLink);
 	
-							subNetwork.addSubLink(subLink);
+							subNetwork.addLink(subLink);
 						}
 					}		
 				}
@@ -184,7 +184,7 @@ public class SubNetworkCreator {
 					if (knowsLink)
 					{
 						((SubNode)subNode).addInLinkNoCheck(in[i]);
-						subNetwork.addSubLink(in[i]);
+						subNetwork.addLink(in[i]);
 					}
 					i++;
 				}
@@ -195,14 +195,14 @@ public class SubNetworkCreator {
 					if (knowsLink)
 					{
 						((SubNode)subNode).addInLinkNoCheck(out[i]);
-						subNetwork.addSubLink(out[i]);
+						subNetwork.addLink(out[i]);
 					}
 					i++;
 				}
 			}
 			
 //			if (subNode != null) 
-			subNetwork.addSubNode(subNode);
+			subNetwork.addNode(subNode);
 			
 			knowsInLinks = null;
 			knowsOutLinks = null;

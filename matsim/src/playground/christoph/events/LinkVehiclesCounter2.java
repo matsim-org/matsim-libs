@@ -2,6 +2,7 @@ package playground.christoph.events;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,6 +32,10 @@ import playground.christoph.network.MyLinkImpl;
 
 /*
  * Counts the number of Vehicles on the QueueLinks of a given QueueNetwork.
+ * 
+ * After each SimStep the number of Vehicles is written to the MyLinks of 
+ * the Network. To do so it is necessary to use a MyLinkFactoryImpl in the
+ * Controller! 
  * 
  * Additional a List of Links with changed VehicleCount per TimeStep is
  * created.
@@ -122,8 +127,10 @@ public class LinkVehiclesCounter2 implements BasicLinkEnterEventHandler,
 	 */
 	private synchronized void updateLinkVehicleCounts()
 	{
-		for (Id id : changedLinkSet)
-		{            
+		Iterator<Id> iter = changedLinkSet.iterator();
+		while(iter.hasNext())
+		{   
+			Id id = iter.next();
             QueueLink queueLink = this.queueNetwork.getLinks().get(id);
             
     		int vehiclesCount = 0;
@@ -137,6 +144,8 @@ public class LinkVehiclesCounter2 implements BasicLinkEnterEventHandler,
             link.setVehiclesCount(vehiclesCount);
             
             countChangedInTimeStepMap.put(id, vehiclesCount);
+            
+            iter.remove();
 		}
 	}
 	
