@@ -25,6 +25,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -37,6 +38,9 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.api.basic.v01.population.PlanElement;
+
+import playground.mfeil.analysis.ASPActivityChainsModesAccumulated;
 
 
 /**
@@ -47,14 +51,14 @@ import org.matsim.core.controler.Controler;
 public class ModFileMaker {
 
 	protected final PopulationImpl population;
-	protected final List<List<Double>> sims;
+	protected final ArrayList<List<PlanElement>> actChains;
 	protected static final Logger log = Logger.getLogger(ModFileMaker.class);
 	
 
 
-	public ModFileMaker(final PopulationImpl population, final List<List<Double>> sims) {
+	public ModFileMaker(final PopulationImpl population, final ArrayList<List<PlanElement>> actChains) {
 		this.population = population;
-		this.sims = sims;
+		this.actChains = actChains;
 	}
 	
 	public void write (String outputFile){
@@ -297,8 +301,6 @@ public class ModFileMaker {
 	public void writeWithRandomSelection (String outputFile){
 		log.info("Writing mod file...");
 		
-		//Choose any person
-		PersonImpl person = this.population.getPersons().values().iterator().next();
 		PrintStream stream;
 		try {
 			stream = new PrintStream (new File(outputFile));
@@ -343,25 +345,25 @@ public class ModFileMaker {
 		//Utilities
 		stream.println("[Utilities]");
 		stream.println("//Id \tName  \tAvail  \tlinear-in-parameter expression (beta1*x1 + beta2*x2 + ... )");	
-		for (int i=0;i<person.getPlans().size();i++){
-			PlanImpl plan = person.getPlans().get(i);
+		for (int i=0;i<this.actChains.size();i++){
+			List<PlanElement> actslegs = this.actChains.get(i);
 			stream.print((i+1)+"\tAlt"+(i+1)+"\tav"+(i+1)+"\t");
 			
-			if (plan.getPlanElements().size()>1){
-				LegImpl leg = (LegImpl)plan.getPlanElements().get(1);
+			if (actslegs.size()>1){
+				LegImpl leg = (LegImpl)actslegs.get(1);
 				if (leg.getMode().equals(TransportMode.car)) stream.print("Ucar * x"+(i+1)+""+2);
 				else if (leg.getMode().equals(TransportMode.bike)) stream.print("Ubike * x"+(i+1)+""+2);
 				else if (leg.getMode().equals(TransportMode.pt)) stream.print("Upt * x"+(i+1)+""+2);
 				else if (leg.getMode().equals(TransportMode.walk)) stream.print("Uwalk * x"+(i+1)+""+2);
-				else log.warn("Leg has no valid mode! Person: "+person);
+				else log.warn("Leg has no valid mode! ActChains position: "+i);
 				
-				for (int j=3;j<plan.getPlanElements().size();j+=2){
-					LegImpl legs = (LegImpl)plan.getPlanElements().get(j);
+				for (int j=3;j<actslegs.size();j+=2){
+					LegImpl legs = (LegImpl)actslegs.get(j);
 					if (legs.getMode().equals(TransportMode.car)) stream.print(" + Ucar * x"+(i+1)+""+(j+1));
 					else if (legs.getMode().equals(TransportMode.bike)) stream.print(" + Ubike * x"+(i+1)+""+(j+1));
 					else if (legs.getMode().equals(TransportMode.pt)) stream.print(" + Upt * x"+(i+1)+""+(j+1));
 					else if (legs.getMode().equals(TransportMode.walk)) stream.print(" + Uwalk * x"+(i+1)+""+(j+1));
-					else log.warn("Leg has no valid mode! Person: "+person);
+					else log.warn("Leg has no valid mode! ActChains position: "+i);
 				}
 			}
 			else {
@@ -374,20 +376,20 @@ public class ModFileMaker {
 		//GeneralizedUtilities
 		stream.println("[GeneralizedUtilities]");
 		stream.println("//Id \tnonlinear-in-parameter expression");	
-		for (int i=0;i<person.getPlans().size();i++){
-			PlanImpl plan = person.getPlans().get(i);
+		for (int i=0;i<this.actChains.size();i++){
+			List<PlanElement> actslegs = this.actChains.get(i);
 			stream.print((i+1)+"\t");
 			
 			stream.print("HomeUmax * one / ( one + exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+""+1+" ) ) )");
 						
-			for (int j=2;j<plan.getPlanElements().size()-1;j+=2){
-				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(j);
+			for (int j=2;j<actslegs.size()-1;j+=2){
+				ActivityImpl act = (ActivityImpl)actslegs.get(j);
 				if (act.getType().toString().equals("h")) stream.print(" + HomeUmax * one / ( one + exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
 				else if (act.getType().toString().equals("w")) stream.print(" + WorkUmax * one / ( one + exp( one_point_two * ( WorkAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
 				else if (act.getType().toString().equals("e")) stream.print(" + EducationUmax * one / ( one + exp( one_point_two * ( EducationAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
-				else if (act.getType().toString().equals("s")) stream.print(" + ShoppingUmax * one / ( one + exp( one_point_two * ( ShoppingAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
-				else if (act.getType().toString().equals("l")) stream.print(" + LeisureUmax * one / ( one + exp( one_point_two * ( LeisureAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
-				else log.warn("Act has no valid type! Person: "+person);
+				else if (act.getType().toString().equals("shopping")) stream.print(" + ShoppingUmax * one / ( one + exp( one_point_two * ( ShoppingAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
+				else if (act.getType().toString().equals("leisure")) stream.print(" + LeisureUmax * one / ( one + exp( one_point_two * ( LeisureAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
+				else log.warn("Act has no valid type! ActChains position: "+i);
 			}
 			stream.println();
 		}
@@ -427,9 +429,10 @@ public class ModFileMaker {
 		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 		
-		List<List<Double>> sims = new MDSAM(scenario.getPopulation()).runPopulation();
+		ASPActivityChainsModesAccumulated analyzer = new ASPActivityChainsModesAccumulated(scenario.getPopulation());
+		analyzer.run();
 
-		ModFileMaker sp = new ModFileMaker(scenario.getPopulation(), sims);
+		ModFileMaker sp = new ModFileMaker(scenario.getPopulation(), analyzer.getActivityChains());
 		sp.write(outputFile);
 		log.info("Model finished.");
 	}

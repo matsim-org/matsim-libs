@@ -122,7 +122,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.outputFileMod = "./plans/model.mod";
 	*/	this.population = population;
 		this.sims = sims;
-		this.noOfAlternatives = 50;
+		this.noOfAlternatives = 20;
 	}
 	
 	private void init(final NetworkLayer network) {
@@ -442,8 +442,6 @@ public class PlansConstructor implements PlanStrategyModule{
 	
 	protected void enlargePlansSetWithRandomSelection (){
 		
-		int sizeOfChoiceSet = 20;
-		
 		log.info("Adding alternative plans...");
 		int counter=0;
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
@@ -457,7 +455,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			}
 			ArrayList<Integer> taken = new ArrayList<Integer>();
 			
-			for (int i=0;i<sizeOfChoiceSet-1;i++){
+			for (int i=0;i<this.noOfAlternatives-1;i++){
 				
 				// Randomly select an act/mode chain different to the chosen one. 
 				int position = 0;
@@ -556,6 +554,8 @@ public class PlansConstructor implements PlanStrategyModule{
 				manager.primaryActivityFound(act, (LegImpl)(plan.getPlanElements()).get(i+1));
 				while (!(actFollowing.getType().equalsIgnoreCase("w") || actFollowing.getType().equalsIgnoreCase("e") || actFollowing.getType().equalsIgnoreCase("h"))){
 					i+=2;
+					act = (ActivityImpl)(plan.getPlanElements().get(i));
+					actFollowing = (ActivityImpl)(plan.getPlanElements().get(i+2));
 					manager.secondaryActivityFound(act, (LegImpl)(plan.getPlanElements()).get(i+1));
 				}
 				manager.primaryActivityFound(actFollowing, null);
@@ -709,17 +709,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		stream.println();
 		
 		// Filling plans
-		
-		int counterPerson = -1;
-		boolean firstPersonFound = true;
-		Id firstPersonId = new IdImpl (1);
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
-			if (firstPersonFound){
-				firstPersonId = person.getId();
-				firstPersonFound = false;
-			}
-			counterPerson++;
 			
 			// Person ID
 			stream.print(person.getId()+"\t");
@@ -735,12 +726,14 @@ public class PlansConstructor implements PlanStrategyModule{
 			stream.print(position+"\t");
 			
 			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise 
+			int counterFound = 0;
 			for (int i=0;i<this.actChains.size();i++){
 				boolean found = false;
 				for (int j=0;j<person.getPlans().size();j++){
 					if (acCheck.checkEqualActChainsModesAccumulated(person.getPlans().get(j).getPlanElements(), this.actChains.get(i))) {
 						this.writeAccumulatedPlanIntoFile(stream, person.getPlans().get(j).getPlanElements(), this.actChains.get(i));
 						found = true;
+						counterFound++;
 						break;
 					}
 				}
@@ -748,6 +741,7 @@ public class PlansConstructor implements PlanStrategyModule{
 					for (int j=0;j<this.actChains.size()-1;j++)stream.print("0\t");
 				}
 			}
+			if (counterFound!=this.noOfAlternatives) log.warn("For person "+person+", size of choice set is not "+this.noOfAlternatives+" but only "+counterFound);
 			
 			for (int i=0;i<this.actChains.size();i++){
 				boolean found = false;
@@ -885,6 +879,11 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 	
 	private void writeAccumulatedPlanIntoFile (PrintStream stream, List<PlanElement> planToBeWritten, List<PlanElement> referencePlan){
+		
+		if (planToBeWritten.size()!=referencePlan.size()){
+			log.warn("Plans do not have same size; planToBeWritten: "+planToBeWritten+", referencePlan: "+referencePlan);
+		}
+		
 		// Plan has only one act
 		if (planToBeWritten.size()==1) stream.print("24\t");
 		else {
@@ -924,15 +923,15 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 	
 	public void writeModFile(String outputFile){
-		new ModFileMaker (this.population, this.sims).write(outputFile);
+		new ModFileMaker (this.population, this.actChains).write(outputFile);
 	}
 	
 	public void writeModFileWithSequence(String outputFile){
-		new ModFileMaker (this.population, this.sims).writeWithSequence(outputFile);
+		new ModFileMaker (this.population, this.actChains).writeWithSequence(outputFile);
 	}
 	
 	public void writeModFileWithRandomSelection (String outputFile){
-		new ModFileMaker (this.population, this.sims).writeWithRandomSelection(outputFile);
+		new ModFileMaker (this.population, this.actChains).writeWithRandomSelection(outputFile);
 	}
 	
 	public void writeSims (String outputFile){
