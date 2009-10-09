@@ -34,8 +34,7 @@ public class MatlabExecutor {
 			
 			// kill matlab 
 			//Runtime.getRuntime().exec("taskkill /im matlab.exe /f");
-			
-			
+			  
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
