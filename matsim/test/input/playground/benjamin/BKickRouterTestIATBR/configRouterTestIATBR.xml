@@ -16,9 +16,8 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="../bkick/output/routerTestIATBR" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="2" />
+		<param name="lastIteration" value="0" />
 	</module>
 
 	<module name="simulation">
@@ -26,7 +25,7 @@
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
 	
-		<param name = "snapshotperiod"	value = "00:01:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		<param name = "snapshotFormat"	value = "otfvis"/> <!-- netvis, googleearth, transims -->
 	</module>
 

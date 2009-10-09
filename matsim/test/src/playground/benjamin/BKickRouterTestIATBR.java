@@ -21,9 +21,16 @@
 package playground.benjamin;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.testcases.MatsimTestCase;
+
+import playground.benjamin.income2.BKickIncome2Controler;
+import playground.dgrether.tests.LogOutputEventHandler;
 
 
 
@@ -46,13 +53,56 @@ public class BKickRouterTestIATBR extends MatsimTestCase {
 	
 		
 	
-	public void testSingleIterationIncomeScoring() {
+	public void testGeneralizedCostRouting() {
 		Config config = this.loadConfig(this.getClassInputDirectory() + "configRouterTestIATBR.xml");
+		config.controler().setOutputDirectory(this.getOutputDirectory());
 		String netFileName = this.getClassInputDirectory() + "network.xml";
 		config.network().setInputFile(netFileName);
 		config.plans().setInputFile(this.getClassInputDirectory() + "plansRouterTest.xml");
 		//hh loading
 		config.scenario().setUseHouseholds(true);
 		config.households().setInputFile(this.getClassInputDirectory() + "households.xml");
-}
+
+		BKickIncome2Controler controler = new BKickIncome2Controler(config);
+	  controler.setCreateGraphs(false);
+		final EventHandler handler = new EventHandler();
+		
+		controler.addControlerListener(new StartupListener() {
+			public void notifyStartup(final StartupEvent event) {
+				event.getControler().getEvents().addHandler(handler);
+				event.getControler().getEvents().addHandler(new LogOutputEventHandler());
+			}
+		});
+		
+		controler.run();
+		assertTrue("Person 2 should be routed on link 3", handler.link3Ok);
+		assertTrue("Person 1 should be routed on link 8", handler.link8Ok);
+		assertTrue("Person 3 should be routed on link 10", handler.link10Ok);
+	}
+	
+	
+	private static class EventHandler implements BasicLinkEnterEventHandler{
+		
+		boolean link3Ok = false;
+		boolean link8Ok = false;
+		boolean link10Ok = false;
+		
+		//links 3, 8, 10 
+		public void handleEvent(BasicLinkEnterEvent e) {
+			if (e.getLinkId().equals(new IdImpl("3")) && e.getPersonId().equals(new IdImpl("2"))) {
+				link3Ok = true;
+			}
+			else if (e.getLinkId().equals(new IdImpl("8")) && e.getPersonId().equals(new IdImpl("1"))) {
+				link8Ok = true;
+			}
+			else if (e.getLinkId().equals(new IdImpl("10")) && e.getPersonId().equals(new IdImpl("3"))) {
+				link10Ok = true;
+			}
+		}
+
+		public void reset(int iteration) {}
+		
+	}
+	
+	
 }

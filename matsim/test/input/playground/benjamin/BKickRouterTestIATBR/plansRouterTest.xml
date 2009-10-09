@@ -11,15 +11,10 @@
 			<leg mode="car">
 
 			</leg>
-			<act type="w" link="4" start_time="07:00:00" dur="08:00:00" end_time="15:00:00" />
-			<leg mode="car">
-
-			</leg>
-			<act type="h" link="1" />
+			<act type="h" link="4" start_time="07:00:00" />
 		</plan>
 
 	</person>
-
 <!-- ====================================================================== -->
 
 	<person id="2">
@@ -28,29 +23,21 @@
 			<leg mode="car">
 
 			</leg>
-			<act type="w" link="4" start_time="07:00:00" dur="08:00:00" end_time="15:00:00" />
-			<leg mode="car">
-
-			</leg>
-			<act type="h" link="1" />
+			<act type="h" link="4" start_time="07:00:00" />
 		</plan>
 
 	</person>
 
 
 <!-- ====================================================================== -->
-
+<!---->
 	<person id="3">
 		<plan selected="yes">
 			<act type="h" link="1" end_time="05:00:00" />
 			<leg mode="car">
 
 			</leg>
-			<act type="w" link="4" start_time="07:00:00" dur="08:00:00" end_time="15:00:00" />
-			<leg mode="car">
-
-			</leg>
-			<act type="h" link="1" />
+			<act type="h" link="4" start_time="07:00:00" />
 		</plan>
 
 	</person>
