@@ -28,6 +28,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for playground.benjamin...");
 		suite.addTestSuite(BKickScoringTest.class);
 		suite.addTestSuite(BKickScoringTestIATBR.class);
+		suite.addTestSuite(BKickRouterTestIATBR.class);
 		return suite;
 	}
 
