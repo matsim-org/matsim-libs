@@ -39,7 +39,7 @@ public class BKickIncome2TravelTimeDistanceCostCalculator implements TravelCost 
 	private static double betaIncomeCar = 4.58;
 	
 	protected TravelTime timeCalculator;
-	private double travelCostFactor;
+	private double traveltimeCostFactor;
 	private double marginalUtlOfDistance;
 	
 	private double income;
@@ -49,10 +49,10 @@ public class BKickIncome2TravelTimeDistanceCostCalculator implements TravelCost 
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
 		 */
-		this.travelCostFactor = (- charyparNagelScoring.getTraveling() / 3600.0) + (charyparNagelScoring.getPerforming() / 3600.0);
-		this.marginalUtlOfDistance = charyparNagelScoring.getMarginalUtlOfDistanceCar() * 1.31;
+		this.traveltimeCostFactor = (- charyparNagelScoring.getTraveling() / 3600.0) + (charyparNagelScoring.getPerforming() / 3600.0);
+		this.marginalUtlOfDistance = - charyparNagelScoring.getMarginalUtlOfDistanceCar() * betaIncomeCar;
 		
-		log.info("Using BKickIncomeTravelTimeDistanceCostCalculator...");
+		log.info("Using BKickIncome2TravelTimeDistanceCostCalculator...");
 	}
 
 	/**
@@ -61,15 +61,17 @@ public class BKickIncome2TravelTimeDistanceCostCalculator implements TravelCost 
 	public double getLinkTravelCost(Link link, double time) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		if (this.marginalUtlOfDistance == 0.0) {
-			return travelTime * this.travelCostFactor;
+			return travelTime * this.traveltimeCostFactor;
 		}
-		return travelTime * this.travelCostFactor - (this.marginalUtlOfDistance * link.getLength() / this.income);
+		double cost = travelTime * this.traveltimeCostFactor + (this.marginalUtlOfDistance * link.getLength() / this.income);
+		log.error("Link id " + link.getId() + " cost "  + cost );
+		return cost;
 	}
 	
 	
 	public void setIncome(Income income) {
 		if (income.getIncomePeriod().equals(IncomePeriod.year)) {
-			this.income = income.getIncome() / (240 * 3.5);
+			this.income = income.getIncome() / 240;
 		}
 		else {
 			throw new UnsupportedOperationException("Can't calculate income per trip");
