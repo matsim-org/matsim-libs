@@ -4,8 +4,8 @@ import org.matsim.core.controler.Controler;
 
 import playground.meisterk.kti.controler.KTIControler;
 
-//public class CarPoolingControler extends KTIControler {
-public class CarPoolingControler extends Controler {
+public class CarPoolingControler extends KTIControler {
+//public class CarPoolingControler extends Controler {
 	
 	public CarPoolingControler (String[] args){
 		super(args);
