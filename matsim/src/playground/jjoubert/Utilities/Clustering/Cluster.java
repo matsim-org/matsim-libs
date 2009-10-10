@@ -21,6 +21,7 @@
 package playground.jjoubert.Utilities.Clustering;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -38,7 +39,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class Cluster implements Comparable<Cluster>{
 	private String clusterId;
-	private ArrayList<ClusterPoint> points;
+	private List<ClusterPoint> points;
 	private Point centerOfGravity;
 	private final static Logger log = Logger.getLogger(Cluster.class);
 			
@@ -80,7 +81,7 @@ public class Cluster implements Comparable<Cluster>{
 		this.clusterId = id;
 	}
 	
-	public ArrayList<ClusterPoint> getPoints() {
+	public List<ClusterPoint> getPoints() {
 		return points;
 	}
 

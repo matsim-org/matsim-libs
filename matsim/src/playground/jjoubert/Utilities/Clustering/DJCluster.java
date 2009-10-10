@@ -92,7 +92,6 @@ public class DJCluster {
 	public void clusterInput(){
 		log.info("Clustering input points. This may take a while.");
 		int clusterIndex = 0;
-		int pointCounter = 0;
 		int pointMultiplier = 1;
 		int uPointCounter = 0;
 		int cPointCounter = 0;
@@ -100,10 +99,10 @@ public class DJCluster {
 		/*
 		 * Determine the extent of the QuadTree. 
 		 */
-		double xMin = Double.MAX_VALUE;
-		double yMin = Double.MAX_VALUE;
-		double xMax = Double.MIN_VALUE;
-		double yMax = Double.MIN_VALUE;
+		double xMin = Double.POSITIVE_INFINITY;
+		double yMin = Double.POSITIVE_INFINITY;
+		double xMax = Double.NEGATIVE_INFINITY;
+		double yMax = Double.NEGATIVE_INFINITY;
 		for (Point p : this.inputPoints) {
 			xMin = Math.min(xMin, p.getX());
 			yMin = Math.min(yMin, p.getY());
@@ -116,7 +115,8 @@ public class DJCluster {
 		 * Initially all ClusterPoints will have a NULL reference to its cluster. An 
 		 * ArrayList of Points is also kept as iterator for unclustered points.
 		 */
-		clusteredPoints = new QuadTree<ClusterPoint>(xMin, yMin, xMax, yMax);
+		log.info("Place points in QuadTree.");
+		clusteredPoints = new QuadTree<ClusterPoint>(xMin-1, yMin-1, xMax+1, yMax+1);
 		List<ClusterPoint> ul = new ArrayList<ClusterPoint>();
 		for (int i = 0; i < this.inputPoints.size(); i++) {
 			double x = inputPoints.get(i).getX();
@@ -125,12 +125,13 @@ public class DJCluster {
 			clusteredPoints.put(x, y, cp);
 			ul.add(cp);
 		}
+		log.info("Points placed successfully.");
 		
-		int unclusteredIndex = 0;
-		while(unclusteredIndex < ul.size()){
+		int pointCounter = 0;
+		while(pointCounter < ul.size()){
 			// Get next point.
-			ClusterPoint p = ul.get(unclusteredIndex);
-			
+			ClusterPoint p = ul.get(pointCounter);
+
 			if(p.getCluster() == null){
 				// Compute the density-based neighbourhood, N(p), of the point p
 				Collection<ClusterPoint> neighbourhood = clusteredPoints.get(p.getPoint().getX(), p.getPoint().getY(), radius);
@@ -151,7 +152,7 @@ public class DJCluster {
 					 * Merge all the clusters. Use the cluster with the smallest clusterId
 					 * value as the remaining cluster.
 					 */
-					
+
 					List<Cluster> localClusters = new ArrayList<Cluster>();
 					Cluster smallestCluster = cN.get(0).getCluster();
 					for(int i = 1; i < cN.size(); i++){
@@ -165,30 +166,34 @@ public class DJCluster {
 					}
 					for (Cluster cluster : localClusters) {
 						if(!cluster.equals(smallestCluster)){
-							List<ClusterPoint> thisClusterList = (List<ClusterPoint>) cluster.getPoints().clone();
+							List<ClusterPoint> thisClusterList = cluster.getPoints();
 							for(int j = 0; j < thisClusterList.size(); j++){
 								// Change the Cluster reference of the ClusterPoint.
 								thisClusterList.get(j).setCluster(smallestCluster);
 								// Add the ClusterPoint to the new Cluster.
 								smallestCluster.getPoints().add(thisClusterList.get(j));
 								// Remove the ClusterPoint from old Cluster.
-								cluster.getPoints().remove(thisClusterList.get(j));
+								/* 
+								 * 20091009 - I've commented this out... this seems
+								 * both dangerous and unnecessary. 
+								 */
+//								cluster.getPoints().remove(thisClusterList.get(j));
 							}
 						}
 					}
-					
+
 					// Add unclustered points in the neighborhood.
 					for (ClusterPoint cp : uN) {
 						smallestCluster.getPoints().add(cp);
 						cp.setCluster(smallestCluster);
 						cPointCounter++;
 					}
-					
+
 				} else{
 					// Create new cluster and add all the points.
 					Cluster newCluster = new Cluster(String.valueOf(clusterIndex));
 					clusterIndex++;
-					
+
 					for (ClusterPoint cp : uN) {
 						cp.setCluster(newCluster);
 						newCluster.getPoints().add(cp);
@@ -202,14 +207,11 @@ public class DJCluster {
 				log.info("   Points clustered: " + pointCounter);
 				pointMultiplier = (int) Math.max(pointCounter, pointMultiplier)*2;
 			}
-			unclusteredIndex++;
 		}
 		log.info("   Points clustered: " + pointCounter + " (Done)");	
 		log.info("Sum should add up: " + cPointCounter + " (clustered) + " 
-									   + uPointCounter + " (unclustered) = "
+				+ uPointCounter + " (unclustered) = " + pointCounter);
 
-									   + pointCounter);
-				
 		/* 
 		 * Build the cluster list. Once built, I rename the clusterId field so as to
 		 * start at '0', and increment accordingly. This allows me to directly use
