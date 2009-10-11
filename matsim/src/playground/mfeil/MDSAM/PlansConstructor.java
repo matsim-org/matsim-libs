@@ -103,7 +103,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
 		this.linker = new XY2Links (this.controler.getNetwork());
-		this.noOfAlternatives = 50;
+		this.noOfAlternatives = 20;
 	}
 	
 	public PlansConstructor (PopulationImpl population, List<List<Double>> sims) {
@@ -154,7 +154,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		
 	// Type of enlarging plans set
 		//	this.enlargePlansSet();
-		this.enlargePlansSetWithRandomSelection("Random");
+		this.enlargePlansSetWithRandomSelection("PlanomatX");
 		
 	// Needs to always run
 		this.writePlans(this.outputFile);
@@ -476,8 +476,9 @@ public class PlansConstructor implements PlanStrategyModule{
 				int position = 0;
 				do {
 					position = (int)(MatsimRandom.getRandom().nextDouble()*this.actChains.size());
-				} while(!taken.contains(position) && !acCheck.checkEqualActChainsModesAccumulated(person.getSelectedPlan().getPlanElements(), this.actChains.get(position)));
+				} while(taken.contains(position) || acCheck.checkEqualActChainsModesAccumulated(person.getSelectedPlan().getPlanElements(), this.actChains.get(position)));
 				taken.add(position);
+				//log.info("Person "+person.getId()+", "+(i+2)+". plan has act chain position "+position);
 				
 				PlanImpl plan = new PlanImpl (person);		
 				for (int j=0;j<this.actChains.get(position).size();j++){
@@ -523,14 +524,14 @@ public class PlansConstructor implements PlanStrategyModule{
 				
 				this.linker.run(plan);
 
-				for (int j=1;j<plan.getPlanElements().size();j++){
+				for (int j=0;j<plan.getPlanElements().size();j++){
 					if (j%2==1){
 						this.router.handleLeg((LegImpl)plan.getPlanElements().get(j), (ActivityImpl)plan.getPlanElements().get(j-1), (ActivityImpl)plan.getPlanElements().get(j+1), ((ActivityImpl)plan.getPlanElements().get(j-1)).getEndTime());
 					}
 					else {
-						((ActivityImpl)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
+						if (j!=0)((ActivityImpl)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
 						if (j!=plan.getPlanElements().size()-1){
-							((ActivityImpl)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+1, ((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()));
+							((ActivityImpl)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+3600, ((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()));
 							((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
 						}
 					}
@@ -539,7 +540,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				if (plan.getLastActivity().getStartTime()-86400>plan.getFirstActivity().getEndTime()){
 					plan.setScore(-100000.0);
 				}
-				person.getPlans().add(i, plan);
+				person.getPlans().add(plan);
 				
 			}
 		}
@@ -726,25 +727,42 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		
 		// First row
+		int counterFirst=0;
 		stream.print("Id\tChoice\t");
+		counterFirst+=2;
 		for (int i = 0;i<this.actChains.size();i++){
 			int j=0;
 			for (j =0;j<java.lang.Math.max(this.actChains.get(i).size()-1,1);j++){
 				stream.print("x"+(i+1)+""+(j+1)+"\t");
+				counterFirst++;
 			}
 			// stream.print("x"+(i+1)+""+(j+1)+"\t"); // Similarity
 		}
 		for (int i = 0;i<this.actChains.size();i++){
 			stream.print("av"+(i+1)+"\t");
+			counterFirst++;
 		}
 		stream.println();
 		
 		// Filling plans
+		int counter=0;
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
+			counter++;
+			if (counter%10==0) {
+				log.info("Handling person "+counter);
+				Gbl.printMemoryUsage();
+			}
+			/*
+			if (person.getSelectedPlan().getScore()!=null && person.getSelectedPlan().getScore()==-100000.0){
+				log.warn("Person's "+person.getId()+" selected plan is not valid!");
+				continue;
+			}*/
+			int counterRow=0;
 			
 			// Person ID
 			stream.print(person.getId()+"\t");
+			counterRow++;
 			
 			// Choice
 			int position = -1;
@@ -755,6 +773,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				}
 			}
 			stream.print(position+"\t");
+			counterRow++;
 			
 			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise 
 			int counterFound = 0;
@@ -762,14 +781,17 @@ public class PlansConstructor implements PlanStrategyModule{
 				boolean found = false;
 				for (int j=0;j<person.getPlans().size();j++){
 					if (acCheck.checkEqualActChainsModesAccumulated(person.getPlans().get(j).getPlanElements(), this.actChains.get(i))) {
-						this.writeAccumulatedPlanIntoFile(stream, person.getPlans().get(j).getPlanElements(), this.actChains.get(i));
+						counterRow += this.writeAccumulatedPlanIntoFile(stream, person.getPlans().get(j).getPlanElements(), this.actChains.get(i));
 						found = true;
 						counterFound++;
 						break;
 					}
 				}
 				if (!found){
-					for (int j=0;j<this.actChains.size()-1;j++)stream.print("0\t");
+					for (int j=0;j<Math.max(this.actChains.get(i).size()-1, 1);j++){
+						stream.print(0+"\t");
+						counterRow++;
+					}
 				}
 			}
 			if (counterFound!=this.noOfAlternatives) log.warn("For person "+person+", size of choice set is not "+this.noOfAlternatives+" but only "+counterFound);
@@ -778,17 +800,25 @@ public class PlansConstructor implements PlanStrategyModule{
 				boolean found = false;
 				for (int j=0;j<person.getPlans().size();j++){
 					if (acCheck.checkEqualActChainsModesAccumulated(person.getPlans().get(j).getPlanElements(), this.actChains.get(i))) {
-						if (person.getPlans().get(j).getScore()!=null && person.getPlans().get(j).getScore()==-100000.0) stream.print(0+"\t");
-						else stream.print(1+"\t");
+						if (person.getPlans().get(j).getScore()!=null && person.getPlans().get(j).getScore()==-100000.0) {
+							stream.print(0+"\t");
+							counterRow++;
+						}
+						else {
+							stream.print(1+"\t");
+							counterRow++;
+						}
 						found = true;
 						break;
 					}
 				}
 				if (!found){
-					stream.print("0\t");
+					stream.print(0+"\t");
+					counterRow++;
 				}
 			}
 			stream.println();
+			if (counterFirst!=counterRow) log.warn("For person "+person.getId()+", the row length of "+counterRow+" does not fit the expected length of "+counterFirst+"!");
 		}
 		stream.close();
 		log.info("done.");
@@ -909,18 +939,23 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("done.");
 	}
 	
-	private void writeAccumulatedPlanIntoFile (PrintStream stream, List<PlanElement> planToBeWritten, List<PlanElement> referencePlan){
+	private int writeAccumulatedPlanIntoFile (PrintStream stream, List<PlanElement> planToBeWritten, List<PlanElement> referencePlan){
 		
 		if (planToBeWritten.size()!=referencePlan.size()){
 			log.warn("Plans do not have same size; planToBeWritten: "+planToBeWritten+", referencePlan: "+referencePlan);
 		}
 		
+		int counter=0;
+		
 		// Plan has only one act
-		if (planToBeWritten.size()==1) stream.print("24\t");
+		if (planToBeWritten.size()==1) {
+			stream.print(24+"\t");
+			counter++;
+		}
 		else {
 			// First and last home act
 			stream.print((((ActivityImpl)(planToBeWritten.get(0))).getEndTime()+86400-((ActivityImpl)(planToBeWritten.get(planToBeWritten.size()-1))).getStartTime())/3600+"\t");
-				
+			counter++;	
 			LinkedList<Integer> takenPositions = new LinkedList<Integer>();
 			for (int i=1;i<referencePlan.size()-1;i++){
 				if (i%2==0){
@@ -929,6 +964,7 @@ public class PlansConstructor implements PlanStrategyModule{
 						if (((ActivityImpl)(referencePlan.get(i))).getType().equals(((ActivityImpl)(planToBeWritten.get(j))).getType()) &&
 								!takenPositions.contains(j)){
 							stream.print(((ActivityImpl)(planToBeWritten.get(j))).calculateDuration()/3600+"\t");
+							counter++;
 							takenPositions.add(j);
 							found = true;
 							break;
@@ -941,7 +977,8 @@ public class PlansConstructor implements PlanStrategyModule{
 					for (int j=1;j<planToBeWritten.size()-1;j+=2){
 						if (((LegImpl)(referencePlan.get(i))).getMode().equals(((LegImpl)(planToBeWritten.get(j))).getMode()) &&
 								!takenPositions.contains(j)){
-							stream.print(((LegImpl)(planToBeWritten.get(j))).getTravelTime()/3600+"\t");	
+							stream.print(((LegImpl)(planToBeWritten.get(j))).getTravelTime()/3600+"\t");
+							counter++;
 							takenPositions.add(j);
 							found = true;
 							break;
@@ -951,6 +988,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				}
 			}
 		}
+		return counter;
 	}
 	
 	
