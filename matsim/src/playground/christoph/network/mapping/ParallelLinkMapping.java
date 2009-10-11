@@ -1,5 +1,6 @@
 package playground.christoph.network.mapping;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
@@ -30,7 +31,6 @@ public class ParallelLinkMapping extends Mapping{
 		return output;
 	}
 
-	@Override
 	public double getLength()
 	{
 		double length = 0.0;
@@ -44,5 +44,17 @@ public class ParallelLinkMapping extends Mapping{
 			else length = length + link.getLength();
 		}
 		return length / input.size();
+	}
+	
+	public List<MappingInfo> getMappedObjects()
+	{
+		List<MappingInfo> list = new ArrayList<MappingInfo>();
+
+		for (Link link : input)
+		{
+			MappingInfo mappingInfo = (MappingInfo) link;
+			list.addAll(mappingInfo.getDownMapping().getMappedObjects());
+		}
+		return list;
 	}
 }

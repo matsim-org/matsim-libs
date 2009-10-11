@@ -1,5 +1,8 @@
 package playground.christoph.network.mapping;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -40,7 +43,6 @@ public class ShortLinkMapping extends Mapping{
 		return output;
 	}
 
-	@Override
 	public double getLength()
 	{
 		if (input[0] instanceof MappingInfo)
@@ -48,5 +50,17 @@ public class ShortLinkMapping extends Mapping{
 			return ((MappingInfo) input[0]).getDownMapping().getLength();
 		}
 		else return input[0].getLength();
+	}
+	
+	public List<MappingInfo> getMappedObjects()
+	{
+		List<MappingInfo> list = new ArrayList<MappingInfo>();
+
+		for (Link link : input)
+		{
+			MappingInfo mappingInfo = (MappingInfo) link;
+			list.addAll(mappingInfo.getDownMapping().getMappedObjects());
+		}
+		return list;
 	}
 }

@@ -20,9 +20,7 @@ public class BatchRun {
 	protected static String[] knowledgeFactors = {"2.0"};
 	//protected static double[] probabilityFactors = {0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95};
 	protected static double[] probabilityFactors = {0.65};
-	
-	protected static double[] tbuffers = {15, 20, 25};
-	
+		
 /*	// no replanning, initial replanning, act end replanning, leave link replanning
 	protected static int[][] Versuchsplan = {{4, 2, 3, 1},
 											 {2, 3, 4, 1},
@@ -67,15 +65,15 @@ public class BatchRun {
 	
 	
 	// Default Config
-//	protected static String configFileName = "config.xml";
-//	protected static String configFilePath = "test/scenarios/berlin";	
-//	protected static String outbase = "output/scenarios/berlin";
-//	protected static String inbase = "test/scenarios/berlin";
-	
-	protected static String outbase = "mysimulations/kt-zurich/output";
-	protected static String inbase = "mysimulations/kt-zurich/input";
-	protected static String configFilePath = "mysimulations/kt-zurich";
 	protected static String configFileName = "config.xml";
+	protected static String configFilePath = "test/scenarios/berlin";	
+	protected static String outbase = "output/scenarios/berlin";
+	protected static String inbase = "test/scenarios/berlin";
+	
+//	protected static String outbase = "mysimulations/kt-zurich/output";
+//	protected static String inbase = "mysimulations/kt-zurich/input";
+//	protected static String configFilePath = "mysimulations/kt-zurich";
+//	protected static String configFileName = "config.xml";
 	
 //	protected static String configFilePath = "mysimulations/zurich-cut";
 //	protected static String configFileName = "config.xml";
@@ -93,6 +91,9 @@ public class BatchRun {
 	protected static String outputDirectory;
 	protected static String inputDirectory;
 	
+	/*
+	 * Select which kind of BatchRun you want to run.
+	 */
 	public static void main(final String[] args)
 	{			
 		BatchRun batchRun = new BatchRun();
@@ -138,8 +139,6 @@ public class BatchRun {
 				controler.run();
 				controler = null;
 				
-//				try { Thread.sleep(1000); }
-//				catch (Exception e) {}
 			}
 		}
 	}
@@ -186,9 +185,6 @@ public class BatchRun {
 				inputDirectory = inputDirectory.replace("/", separator);
 				
 				Gbl.reset();
-				
-				// only for Batch Runs...
-				//KnowledgeTravelTimeCalculator.tbuffer = tbuffers[j];
 			
 				Config config = readConfigFile();
 				
@@ -216,10 +212,7 @@ public class BatchRun {
 			inputDirectory = inputDirectory.replace("/", separator);
 			
 			Gbl.reset();
-						
-			// only for Batch Runs...
-			//KnowledgeTravelTimeCalculator.tbuffer = tbuffers[j];
-		
+					
 			Config config = readConfigFile();
 			
 			//updateConfigData(config, knowledgeFactors[i]);
@@ -242,7 +235,6 @@ public class BatchRun {
 			controler.run();
 			controler = null;
 			
-			//log.info("Replanning Counter: " + MyQueueSimEngine.replanningCounter);
 			log.info("Leave Link Replanning Counter: " + LeaveLinkReplanningModule.replanningCounter);
 			log.info("Act End Replanning Counter: " + ActEndReplanningModule.replanningCounter);
 		}
@@ -285,6 +277,9 @@ public class BatchRun {
 	}
 	*/
 	
+	/*
+	 * Set / Overwrite some Parameters in the Config Module.
+	 */
 	protected void updateConfigData(Config config, String knowledgeFactor)
 	{	
 		// if Module does not exist -> create it

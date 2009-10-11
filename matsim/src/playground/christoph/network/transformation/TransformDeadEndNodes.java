@@ -64,8 +64,8 @@ public class TransformDeadEndNodes extends TransformationImpl {
 			Node parentNode = node.getInLinks().values().iterator().next().getFromNode();
 
 			Id id = new IdImpl(Mapping.mappingId++);
-			List<Object> input = new ArrayList<Object>();
-			input.add(node);
+			List<MappingInfo> input = new ArrayList<MappingInfo>();
+			input.add((MappingInfo) node);
 			Mapping mapping = new DeadEndMapping(id, input, parentNode);
 			((MappingInfo)node).setUpMapping(mapping);
 			
@@ -77,14 +77,14 @@ public class TransformDeadEndNodes extends TransformationImpl {
 			{
 				this.network.getLinks().remove(link.getId());
 				link.getFromNode().getOutLinks().remove(link.getId());
-				input.add(link);
+				input.add((MappingInfo) link);
 				((MappingInfo)link).setUpMapping(mapping);
 			}
 			for (Link link : node.getOutLinks().values())
 			{
 				this.network.getLinks().remove(link.getId());
 				link.getToNode().getInLinks().remove(link.getId());
-				input.add(link);
+				input.add((MappingInfo) link);
 				((MappingInfo)link).setUpMapping(mapping);
 			}
 			

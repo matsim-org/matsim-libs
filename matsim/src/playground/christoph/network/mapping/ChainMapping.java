@@ -1,5 +1,6 @@
 package playground.christoph.network.mapping;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
@@ -31,7 +32,6 @@ public class ChainMapping extends Mapping{
 		return output;
 	}
 
-	@Override
 	public double getLength()
 	{
 		double length = 0.0;
@@ -40,5 +40,16 @@ public class ChainMapping extends Mapping{
 			length = length + mappingInfo.getDownMapping().getLength();
 		}
 		return length;
+	}
+	
+	public List<MappingInfo> getMappedObjects()
+	{
+		List<MappingInfo> list = new ArrayList<MappingInfo>();
+		
+		for (MappingInfo mappingInfo : input)
+		{
+			list.addAll(mappingInfo.getDownMapping().getMappedObjects());
+		}
+		return list;
 	}
 }

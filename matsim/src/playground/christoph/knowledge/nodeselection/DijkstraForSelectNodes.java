@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-// Zusï¿½tzlich Punkte innerhalb des aufgespannten Polygons finden?
+// Zusätzlich Punkte innerhalb des aufgespannten Polygons finden?
 // -> http://www.coding-board.de/board/showthread.php?t=23953 : 
 // Herausfinden, ob ein beliebiger Punkt innerhalb eines Polygons liegt
 
@@ -38,9 +38,10 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.Time;
+
+import playground.christoph.network.MyLinkImpl;
 
 /*
  * Using the LookupTable seems to improve the speed a tiny little bit.
@@ -51,18 +52,13 @@ import org.matsim.core.utils.misc.Time;
 public class DijkstraForSelectNodes {
 	
 	private static final Logger log = Logger.getLogger(DijkstraForSelectNodes.class);
-	
-	// Traffic network
-	Network network;
-	
+		
 	// mapping between nodes and dijkstraNodes
-	Map<Node, DijkstraNode> dijkstraNodeMap;
-	
-	// LookupTable for the TravelCosts of the various Links
-	Map<Link, Double> travelCostLookupTable;
-	
+	private Map<Node, DijkstraNode> dijkstraNodeMap;
+		
 	// CostCalculator for the Dijkstra Algorithm
-	TravelCost costCalculator = new FreespeedTravelTimeCost();
+//	TravelCost costCalculator = new FreespeedTravelTimeCost();
+	private TravelCost costCalculator;
 
 	// time for the cost calculator
 	double time = Time.UNDEFINED_TIME;
@@ -71,7 +67,7 @@ public class DijkstraForSelectNodes {
 	private static final int INITIAL_CAPACITY = 500;
 	
 	// all nodes of the network
-	Map<Id,? extends Node> networkNodesMap;
+	private Map<Id,? extends Node> networkNodesMap;
 	
 	// List of nodes, sorted by their distance to the startnode.
 	private final Comparator<DijkstraNode> shortestDistanceComparator = new Comparator<DijkstraNode>()
@@ -107,7 +103,6 @@ public class DijkstraForSelectNodes {
 	
 	public DijkstraForSelectNodes(Network network, Map<Id,? extends Node> networkNodesMap)
 	{
-		this.network = network;
 		this.networkNodesMap = networkNodesMap;
 		
 		dijkstraNodeMap = new HashMap<Node, DijkstraNode>();
@@ -117,19 +112,13 @@ public class DijkstraForSelectNodes {
 	
 	public DijkstraForSelectNodes(Network network)
 	{
-		this.network = network;
 		this.networkNodesMap = network.getNodes();
 		
 		dijkstraNodeMap = new HashMap<Node, DijkstraNode>();
 		DijkstraNode.setNodeMap(dijkstraNodeMap);
 		initDijkstraNodes();	
 	}
-	
-	public void setNetwork(Network network)
-	{
-		this.network = network;
-	}
-	
+		
 	public void setNetworkNodes(Map<Id, Node> networkNodesMap)
 	{
 		this.networkNodesMap = networkNodesMap;
@@ -379,33 +368,20 @@ public class DijkstraForSelectNodes {
 		// add node to the queue
 		unvisitedNodes.add(node);
 	}
-
-	public void createTravelCostLookupTable()
-	{	
-		travelCostLookupTable = null;
-		Map<Link, Double> lookupTable = new HashMap<Link, Double>();
-		
-		for (Link link : network.getLinks().values())
-		{
-			lookupTable.put(link, getLinkCost(link, time));
-		}
-		
-		travelCostLookupTable = lookupTable;
-	}
 		
 	/*
 	 * Get cost of the given link. This can be for example its length or the time to pass the link.
 	 */
 	protected double getLinkCost(Link link, double time)
 	{   
-		if (travelCostLookupTable != null) return travelCostLookupTable.get(link);
+		if (link instanceof MyLinkImpl) return ((MyLinkImpl) link).getTravelCost();
 		
 		return costCalculator.getLinkTravelCost(link, time);
 	}
 
 	public void setCostCalculator(TravelCost calculator)
 	{
-		costCalculator = calculator;
+		this.costCalculator = calculator;
 	}
 	
 	public TravelCost getCostCalculator()
@@ -553,7 +529,7 @@ class DijkstraNode
 		{
 			Node node = nodeIterator.next();
 
-			// zugehÃ¶rigen DijsktraNode aus der Map holen
+			// zugehörigen DijsktraNode aus der Map holen
 			DijkstraNode dijkstraNode = dijkstraNodeMap.get(node);
 			outgoingNodes.add(dijkstraNode);
 		}

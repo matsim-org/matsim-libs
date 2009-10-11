@@ -29,7 +29,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -45,58 +44,15 @@ public class CreateKnownNodesMap {
 	
 	private final static Logger log = Logger.getLogger(CreateKnownNodesMap.class);
 	
-/*	
-	public void collectAllSelectedNodes(PopulationImpl population, Network network)
-	{
-		for (PersonImpl person : population.getPersons().values()) 
-		{
-			collectAllSelectedNodes(person, network);
-		}
-	}
-	
-
-	private void collectAllSelectedNodes(PersonImpl person, Network network)
-	{					
-		ArrayList<SelectNodes> personNodeSelectors = (ArrayList<SelectNodes>)person.getCustomAttributes().get("NodeSelectors");
-		
-		// for all node selectors of the person
-		for (SelectNodes nodeSelector : personNodeSelectors)
-		{
-			collectSelectedNodes(person, network, nodeSelector);
-		}
-		// if Flag is set, remove Dead Ends from the Person's Activity Room
-		if(removeDeadEnds) DeadEndRemover.removeDeadEnds(person);
-	}
-*/	
 	/*
 	 * The handling of the nodeSelectors should probably be outsourced...
 	 * Implementing them direct in the nodeSelectors could be a good solution...
 	 */
 
-	public static void collectSelectedNodes(PersonImpl p, NetworkLayer network, SelectNodes nodeSelector)
+	public void collectSelectedNodes(PersonImpl p, NetworkLayer network, SelectNodes nodeSelector)
 	{		
 		PlanImpl plan = p.getSelectedPlan();
-/*		
-		ArrayList<Leg> legs = new ArrayList<Leg>();					
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				legs.add((Leg) pe);
-			}
-		}
 		
-		int count = 0;
-		for (Leg leg : legs)
-		{
-			NodeNetworkRoute route = (NodeNetworkRoute) leg.getRoute();
-			
-			count = count + route.getNodes().size();
-		}
-
-		if (count == 0)
-		{
-			log.error("No Nodes found in Persons Routes..." + p.getId());
-		}
-*/		
 		// get Nodes from the Person's Knowledge
 		Map<Id, Node> nodesMap = null;
 		

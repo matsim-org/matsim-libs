@@ -187,6 +187,61 @@ public class NetworkThinning {
 		if (info2 instanceof Node) log.info("Node " + subNw.getNodes().containsKey(((Node) info2).getId()));
 		else if (info2 instanceof Link) log.info("Link " + subNw.getLinks().containsKey(((Link) info2).getId()));
 
+		for (Node node : ntfd.getSubNetwork().getNodes().values())
+		{
+			MappingInfo mappingInfo = (MappingInfo) node;
+		
+			List<MappingInfo> mappings = mappingInfo.getDownMapping().getMappedObjects();
+			
+			for (MappingInfo mapping : mappings)
+			{
+				if (mapping instanceof Node)
+				{
+					if(! nw.getNodes().containsKey(((Node) mapping).getId()))
+					{
+						log.error("Node not found!");
+					}
+				}
+				else if (mapping instanceof Link)
+				{
+					if(! nw.getLinks().containsKey(((Link) mapping).getId()))
+					{
+						log.error("Link not found!");
+					}
+				}
+			}
+			
+			log.info("Size: " + mappings.size());		
+		}
+		
+		for (Link link : ntfd.getSubNetwork().getLinks().values())
+		{
+			MappingInfo mappingInfo = (MappingInfo) link;
+		
+			List<MappingInfo> mappings = mappingInfo.getDownMapping().getMappedObjects();
+			
+			for (MappingInfo mapping : mappings)
+			{
+				if (mapping instanceof Node)
+				{
+					if(! nw.getNodes().containsKey(((Node) mapping).getId()))
+					{
+						log.error("Node not found!");
+					}
+				}
+				else if (mapping instanceof Link)
+				{
+					if(! nw.getLinks().containsKey(((Link) mapping).getId()))
+					{
+						log.error("Link not found!");
+					}
+				}
+			}
+			
+			log.info("Size: " + mappings.size());		
+		}
+		
+		log.info("Done!");
 		
 //		log.info("Length: " + ntfd.getSubNetwork().getLinks().get(new IdImpl("mapped64713")).getLength());
 	}

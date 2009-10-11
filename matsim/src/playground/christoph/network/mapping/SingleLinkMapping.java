@@ -1,5 +1,8 @@
 package playground.christoph.network.mapping;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
@@ -28,7 +31,6 @@ public class SingleLinkMapping extends Mapping{
 		return output;
 	}
 
-	@Override
 	public double getLength()
 	{
 		if (input instanceof MappingInfo)
@@ -36,5 +38,20 @@ public class SingleLinkMapping extends Mapping{
 			return ((MappingInfo) input).getDownMapping().getLength();
 		}
 		else return input.getLength();
+	}
+	
+	public List<MappingInfo> getMappedObjects()
+	{
+		if (input instanceof MappingInfo)
+		{
+			return ((MappingInfo) input).getDownMapping().getMappedObjects();
+		}
+//		else return null;
+		else 
+		{
+			List<MappingInfo> list = new ArrayList<MappingInfo>();
+			list.add((MappingInfo) output);
+			return list;
+		}
 	}
 }

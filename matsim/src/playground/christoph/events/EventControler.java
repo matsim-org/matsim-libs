@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -648,7 +649,7 @@ public class EventControler extends Controler {
 	}
 
 	protected void setKnowledgeStorageHandler() {
-		for (PersonImpl person : this.getPopulation().getPersons().values()) {
+		for (Person person : this.getPopulation().getPersons().values()) {
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 			/*
 			 * CellNetworkMapping cellNetworkMapping = new CellNetworkMapping(network); cellNetworkMapping.createMapping();

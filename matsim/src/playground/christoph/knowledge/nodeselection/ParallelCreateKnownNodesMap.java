@@ -199,7 +199,7 @@ public class ParallelCreateKnownNodesMap {
 					// if there is a valid index returned -> get Nodes
 					if (index >= 0)
 					{	
-						//CreateKnownNodesMap.collectSelectedNodes(person, network, this.nodeSelectorArray[index][threadId]);
+//						CreateKnownNodesMap.collectSelectedNodes(person, network, this.nodeSelectorArray[index][threadId]);
 						new CreateKnownNodesMap().collectSelectedNodes(person, network, this.nodeSelectorArray[index][threadId]);
 					}
 					else

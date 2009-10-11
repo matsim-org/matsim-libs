@@ -22,7 +22,6 @@ package playground.christoph.network;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 

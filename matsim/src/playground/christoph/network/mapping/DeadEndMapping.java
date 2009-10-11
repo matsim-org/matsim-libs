@@ -1,5 +1,6 @@
 package playground.christoph.network.mapping;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
@@ -10,17 +11,17 @@ import org.matsim.api.core.v01.network.Node;
  */
 public class DeadEndMapping extends Mapping{
 
-	private List<Object> input;
+	private List<MappingInfo> input;
 	private Node output;
 	
-	public DeadEndMapping(Id id, List<Object> input, Node output)
+	public DeadEndMapping(Id id, List<MappingInfo> input, Node output)
 	{
 		this.setId(id);
 		this.input = input;
 		this.output = output;
 	}
 	
-	public List<Object> getInput()
+	public List<MappingInfo> getInput()
 	{
 		return input;
 	}
@@ -30,9 +31,19 @@ public class DeadEndMapping extends Mapping{
 		return output;
 	}
 
-	@Override
 	public double getLength()
 	{
 		return 0.0;
+	}
+	
+	public List<MappingInfo> getMappedObjects()
+	{
+		List<MappingInfo> list = new ArrayList<MappingInfo>();
+
+		for (MappingInfo mappingInfo : input)
+		{
+			list.addAll(mappingInfo.getDownMapping().getMappedObjects());
+		}
+		return list;
 	}
 }

@@ -97,9 +97,19 @@ public class LoopMapping extends Mapping{
 		return output;
 	}
 
-	@Override
 	public double getLength()
 	{
 		return length;
+	}
+
+	public List<MappingInfo> getMappedObjects()
+	{
+		List<MappingInfo> list = new ArrayList<MappingInfo>();
+
+		for (MappingInfo mappingInfo : input)
+		{
+			list.addAll(mappingInfo.getDownMapping().getMappedObjects());
+		}
+		return list;
 	}
 }

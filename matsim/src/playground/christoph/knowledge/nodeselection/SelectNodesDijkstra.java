@@ -29,9 +29,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.Time;
+
 
 /**
  * Selects Nodes by using a Dijkstra Algorithm. Nodes are included, if
@@ -45,7 +45,7 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 	private Node startNode;
 	private Node endNode;
 	private double costFactor = Double.MAX_VALUE;	
-	private TravelCost costCalculator = new FreespeedTravelTimeCost();	// CostCalculator
+	private TravelCost costCalculator;
 	private double time = Time.UNDEFINED_TIME;	// time for the CostCalculator
 	private Map<Id,? extends Node> networkNodesMap;
 	private DijkstraForSelectNodes dijkstra;
@@ -57,27 +57,21 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 		this.network = network;
 		
 		// get all nodes of the network
-		//this.networkNodesMap = new GetAllNodes().getAllNodes(network);
 		this.networkNodesMap = network.getNodes();
-		
-		//this.networkNodesMap = new HashMap<Id, Node>(); 
-		//this.networkNodesMap.putAll(network.getNodes());
-			
+					
 		this.dijkstra = new DijkstraForSelectNodes(this.network, networkNodesMap);
-		this.dijkstra.createTravelCostLookupTable();
 	}
 	
 	/* 
 	 * Uses already existing Map of the networks nodes.
 	 * For examples used when creating a clone. 
-	 * In general these maps are static, so it is no problem to share the map.
+	 * In general these maps are static, so it is no problem to share them.
 	 */
 	public SelectNodesDijkstra(Network network, Map<Id,? extends Node> networkNodesMap)
 	{
 		this.network = network;
 		this.networkNodesMap = networkNodesMap;		
 		this.dijkstra = new DijkstraForSelectNodes(this.network, networkNodesMap);
-		this.dijkstra.createTravelCostLookupTable();
 	}
 	
 	public SelectNodesDijkstra(Network network, Node startNode, Node endNode, double costFactor)
@@ -88,14 +82,9 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 		this.costFactor = costFactor;
 		
 		// get all nodes of the network
-		//this.networkNodesMap = new GetAllNodes().getAllNodes(network);
 		this.networkNodesMap = network.getNodes();
 		
-		//this.networkNodesMap = new HashMap<Id, Node>(); 
-		//this.networkNodesMap.putAll(network.getNodes());
-		
 		this.dijkstra = new DijkstraForSelectNodes(this.network, networkNodesMap);
-		this.dijkstra.createTravelCostLookupTable();
 	}
 	
 	public void setStartNode(Node startNode)
@@ -115,8 +104,8 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 	
 	public void setCostCalculator(TravelCost calculator)
 	{
-		costCalculator = calculator;
-		dijkstra.setCostCalculator(costCalculator);
+		this.costCalculator = calculator;
+		this.dijkstra.setCostCalculator(costCalculator);
 	}
 	
 	public TravelCost getCostCalculator()
@@ -127,7 +116,7 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 	public void setCalculationTime(double time)
 	{
 		this.time = time;
-		dijkstra.setCalculationTime(time);
+		this.dijkstra.setCalculationTime(time);
 	}
 	
 	public double getCalculationTime()
@@ -184,10 +173,8 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 				double cost = startMap.get(node) + endMap.get(node);
 
 				/* 
-				 * If the costs are smaller than the specified limit and 
-				 * the node isn't already in the nodeslist -> add it.
+				 * If the costs are smaller than the specified limit -> add Node.
 				 */
-				//if (cost < minCosts*costFactor && !nodesMap.containsKey(node.getId())) nodesMap.put(node.getId(), node);
 				if (cost <= minCosts * costFactor)
 				{
 					nodesMap.put(node.getId(), node);
@@ -217,8 +204,8 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 		//SelectNodesDijkstra clone = new SelectNodesDijkstra(this.network, nodesClone);
 		
 		SelectNodesDijkstra clone = new SelectNodesDijkstra(this.network, this.networkNodesMap);
-		clone.setCostFactor(this.costFactor);
 		clone.setCostCalculator(this.costCalculator);
+		clone.setCostFactor(this.costFactor);	
 		
 		return clone;
 	}

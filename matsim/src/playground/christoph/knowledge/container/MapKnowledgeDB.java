@@ -28,7 +28,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	
 	private static String separator = "@";
 	//private static String tableName = "MapKnowledge";
-	private static String tableName = "BatchTable1_25";
+	public static String tableName = "BatchTable1_25";
 	
 	private Lock lock = new ReentrantLock();
 	

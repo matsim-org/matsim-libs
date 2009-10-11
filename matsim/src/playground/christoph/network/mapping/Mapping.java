@@ -1,5 +1,7 @@
 package playground.christoph.network.mapping;
 
+import java.util.List;
+
 import org.matsim.api.basic.v01.Id;
 
 /*
@@ -28,4 +30,6 @@ public abstract class Mapping {
 	public abstract Object getOutput();
 	
 	public abstract double getLength();
+	
+	public abstract List<MappingInfo> getMappedObjects();
 }

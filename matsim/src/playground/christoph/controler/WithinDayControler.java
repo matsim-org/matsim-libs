@@ -55,17 +55,26 @@ import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
  * This Controler should give an Example what is needed to run
  * Simulations with WithinDayReplanning.
  * 
+ * The Path to a Config File is needed as Argument to run the
+ * Simulation.
+ * 
+ * By default "test/scenarios/berlin/config.xml" should work.
+ * 
  * @author Christoph Dobler
  */
 
 //mysimulations/kt-zurich/configIterative.xml
-//test/scenarios/berlin/config.xml
 
 public class WithinDayControler extends Controler {
 
 	protected ArrayList<PlanAlgorithm> replanners;
 	protected ArrayList<SelectNodes> nodeSelectors;
 
+	/*
+	 * Define the Probability that an Agent uses the
+	 * Replanning Strategy. It is possible to assign
+	 * multiple Strategies to the Agents.
+	 */
 	protected double pInitialReplanning = 0.0;
 	protected double pActEndReplanning = 1.0;
 	protected double pLeaveLinkReplanning = 0.0;
@@ -75,6 +84,9 @@ public class WithinDayControler extends Controler {
 	protected int actEndReplanningCounter = 0;
 	protected int leaveLinkReplanningCounter = 0;
 
+	/*
+	 * How many parallel Threads shall do the Replanning. 
+	 */
 	protected int numReplanningThreads = 2;
 	
 	protected KnowledgeTravelTimeCalculator knowledgeTravelTime;
@@ -88,14 +100,16 @@ public class WithinDayControler extends Controler {
 	
 	private static final Logger log = Logger.getLogger(WithinDayControler.class);
 
-	public WithinDayControler(String[] args) {
+	public WithinDayControler(String[] args)
+	{
 		super(args);
 
 		setConstructorParameters();
 	}
 
 	// only for Batch Runs
-	public WithinDayControler(Config config) {
+	public WithinDayControler(Config config)
+	{
 		super(config);
 
 		setConstructorParameters();
