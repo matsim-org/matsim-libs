@@ -60,7 +60,7 @@ public class PTActWriter {
 		this.plainNet= logicFactory.getPlainNet();
 		this.ptRouter = new PTRouter(logicNet);
 		this.logicToPlainConverter = logicFactory.getLogicToPlainTranslator();
-		this.firstWalkRange = ptValues.firstWalkRange();
+		this.firstWalkRange = ptValues.FIRST_WALKRANGE;
 		
 		Config config = new Config();
 		config = Gbl.createConfig(new String[]{ configFile, "http://www.matsim.org/files/dtd/plans_v4.dtd"});
@@ -312,7 +312,7 @@ public class PTActWriter {
 				newPlan.addActivity(newPTAct("transf off", link.getFromNode().getCoord(), link, arrTime, arrTime));
 				
 				/**like a Walking leg*/
-				walkTime= ptValues.walkTravelTime(link.getLength());
+				walkTime= linkDistance * ptValues.AV_WALKING_SPEED;
 				legRouteLinks.clear();
 				legRouteLinks.add(link);
 				depTime=arrTime;
@@ -332,7 +332,7 @@ public class PTActWriter {
 			}else if (link.getType().equals("Access")){
 					
 				/**like a Walking leg*/
-				walkTime= ptValues.walkTravelTime(link.getLength());
+				walkTime= linkDistance * ptValues.AV_WALKING_SPEED;
 				legRouteLinks.clear();
 				legRouteLinks.add(link);
 				depTime=accumulatedTime;
@@ -384,7 +384,7 @@ public class PTActWriter {
 
 	private LegImpl walkLeg(final ActivityImpl act1, final ActivityImpl act2){
 		double distance= CoordUtils.calcDistance(act1.getCoord(), act2.getCoord());
-		double walkTravelTime = ptValues.walkTravelTime(distance);
+		double walkTravelTime = distance * ptValues.AV_WALKING_SPEED;
 		double depTime = act1.getEndTime();
 		double arrTime = depTime + walkTravelTime;
 		return newPTLeg(TransportMode.walk, new ArrayList<Link>(), distance, depTime, walkTravelTime, arrTime);

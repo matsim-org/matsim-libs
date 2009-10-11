@@ -112,7 +112,7 @@ public class Counter {
 			    		Coord actCoord = thisAct.getCoord();
 						//trips++;
 			    		double distanceToDestination = CoordUtils.calcDistance(lastActCoord, actCoord);
-			    		double distToWalk= ptValues.firstWalkRange();
+			    		double distToWalk= ptValues.FIRST_WALKRANGE;
 			    		if (distanceToDestination<= distToWalk){
 			    			//inWalkRange++;
 			    		}else{

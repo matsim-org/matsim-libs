@@ -35,15 +35,19 @@ import playground.mmoyo.analysis.Counter;
 public class Main {
 	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
 	//private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
-	//private static final String PATH = "playground/marcel/pt/demo/equilnet/";
 	private static final String CONFIG =  				PATH + "config.xml";
-	private static final String PLANFILE = 				PATH + "plans.xml";  //"_input_file.xml"; // // "plans.xml"; //"_input_file.xml"; // 
+	private static final String PLANFILE = 				PATH + "plans.xml";  //"_input_file.xml"; // // "plans.xml"; 
 	private static final String OUTPUTPLANS = 			PATH + "output_plans.xml";
-	private static final String NETWORK = 				PATH + "network.xml"; //"examples/equil/network.xml";
+	private static final String NETWORK = 				PATH + "network.xml";
 	private static final String PLAINNETWORK = 			PATH + "plainNetwork.xml";
 	private static final String LOGICNETWORK = 			PATH + "logicNetwork.xml";
 	private static final String LOGICTRANSITSCHEDULE = 	PATH + "logicTransitSchedule.xml";
-	private static final String TRANSITSCHEDULEFILE  = 	PATH + "transitSchedule.xml"; // "src/playground/marcel/pt/demo/equilnet/transitSchedule.xml";
+	private static final String TRANSITSCHEDULEFILE  = 	PATH + "transitSchedule.xml";
+	
+	/*
+	private static final String NETWORK = "examples/equil/network.xml"; 
+	private static final String TRANSITSCHEDULEFILE  = 	"src/playground/marcel/pt/demo/equilnet/transitSchedule.xml";  //PATH + "transitSchedule.xml";	
+	*/
 	
 	public static void main(String[] args) {
 		NetworkLayer network= new NetworkLayer(new NetworkFactoryImpl());

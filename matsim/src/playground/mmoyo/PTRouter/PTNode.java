@@ -7,7 +7,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.transitSchedule.api.TransitRoute;
-import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 /**
  * Node with necessary data for the PT simulation
@@ -17,8 +17,8 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
  * @param idPTLine the PT line that exclusively travels through the node
  */
 public class PTNode extends NodeImpl {
-	//private TransitStopFacility transitStopFacility;
 	private TransitRoute transitRoute ;
+	private TransitLine transitLine;
 	private TransitRouteStop transitRouteStop;
 	private int minutesAfterDeparture;
 	private double[]arrDep;  
@@ -78,9 +78,10 @@ public class PTNode extends NodeImpl {
 	}
 		
 	/*
-	 * This is an attempt to speed up the calculaton of waiting time in a transfer
+	 * This is an attempt to speed up the calculation of waiting time in a transfer
 	 * It must be determined if it is faster to do it here or at timetable class
 	 */
+	/*
 	public double getTransferTime (final double time){//,
 		int length = arrDep.length;
 		int index =  Arrays.binarySearch(arrDep, time);
@@ -98,7 +99,15 @@ public class PTNode extends NodeImpl {
 		}
 		
 		return transTime;
-		
+	}
+	*/
+	
+	public TransitLine getTransitLine() {
+		return transitLine;
+	}
+
+	public void setTransitLine(TransitLine transitLine) {
+		this.transitLine = transitLine;
 	}
 		
 }

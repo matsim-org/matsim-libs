@@ -14,16 +14,16 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
 import playground.marcel.pt.router.TransitRouterConfig;
 import playground.mmoyo.PTRouter.MyDijkstra;
+import playground.mmoyo.PTRouter.PTLink;
+import playground.mmoyo.PTRouter.PTNode;
 import playground.mmoyo.PTRouter.PTTravelCost;
 import playground.mmoyo.PTRouter.PTTravelTime;
 import playground.mmoyo.PTRouter.PTValues;
@@ -36,8 +36,8 @@ public class TransitRouter {
 	private LogicIntoPlainTranslator logicToPlainTranslator;
 	private MyDijkstra myDijkstra;
 	private LogicFactory logicFactory;
-	private NodeImpl origin;
-	private NodeImpl destination;
+	private PTNode origin;
+	private PTNode destination;
 	private final double firstWalkRange; 
 	private PTTravelTime ptTravelTime = new PTTravelTime();
 	
@@ -49,7 +49,7 @@ public class TransitRouter {
 		this.schedule = schedule;
 
 		PTValues ptValues = new PTValues();
-		this.firstWalkRange = ptValues.firstWalkRange();
+		this.firstWalkRange = ptValues.FIRST_WALKRANGE;
 			
 		this.logicFactory = new LogicFactory(this.schedule);
 		this.logicNetwork = logicFactory.getLogicNet();
@@ -57,53 +57,10 @@ public class TransitRouter {
 		
 		PTTravelTime ptTravelTime = new PTTravelTime();
 		this.myDijkstra = new MyDijkstra(logicNetwork, new PTTravelCost(ptTravelTime), ptTravelTime);	
-		this.origin=  new NodeImpl(new IdImpl("W1"));		//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
-		this.destination=  new NodeImpl(new IdImpl("W2"));	//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
+		this.origin=  new PTNode(new IdImpl("W1"), null);		//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
+		this.destination=  new PTNode(new IdImpl("W2"), null);	//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
 		logicNetwork.addNode(origin);
 		logicNetwork.addNode(destination);
-	}
-	
-	private Collection <NodeImpl> find2Stations(final Coord coord){
-		Collection <NodeImpl> stations;
-		double extWalkRange = this.firstWalkRange;
-		do{
-			stations = logicNetwork.getNearestNodes(coord, extWalkRange);
-			extWalkRange +=  300;
-		} while (stations.size()<2);
-		return stations;
-	}
-	
-	public List <LinkImpl> createWalkingLinks(NodeImpl walkNode, Collection <NodeImpl> nearNodes, boolean to){
-		//->move to link factory
-		List<LinkImpl> newWalkLinks = new ArrayList<LinkImpl>();
-		Id idLink;
-		NodeImpl fromNode;
-		NodeImpl toNode;
-		int x=0;
-		String type;
-		for (NodeImpl node : nearNodes){
-			if (to){
-				fromNode= walkNode;
-				toNode= node;
-				idLink = new IdImpl("WLO" + x++);
-				type = "Access";
-			}else{
-				fromNode= node;
-				toNode=  walkNode;
-				idLink = new IdImpl("WLD" + x++);
-				type = "Egress";
-			}
-			
-			LinkImpl link= logicNetwork.createAndAddLink(idLink, fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()) , 1, 1, 1, "0", type);
-			newWalkLinks.add(link);
-		}
-		return newWalkLinks;
-	}
-	
-	public void removeWalkLinks(Collection<LinkImpl> WalkingLinkList){
-		for (LinkImpl link : WalkingLinkList){
-			logicNetwork.removeLink(link);
-		}
 	}
 	
 	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime) {
@@ -158,9 +115,68 @@ public class TransitRouter {
 			i++;
 		}
 		legList = logicToPlainTranslator.convertToPlainLeg(legList); //translates the listLeg into the plainNetwork
+		
+		System.out.println("\n\n\n\n\n=====================================================");
+		System.out.println("Printing leg list for coordinates: " + fromCoord + "  - " + toCoord);
+		for (Leg leg : legList){
+			System.out.println(leg.toString());
+		}
+		System.out.println("=====================================================\n\n\n\n\n");
+		
 		return legList;
 		
 	}	
+	
+	private Collection <NodeImpl> find2Stations(final Coord coord){
+		Collection <NodeImpl> stations;
+		double extWalkRange = this.firstWalkRange;
+		do{
+			stations = logicNetwork.getNearestNodes(coord, extWalkRange);
+			extWalkRange +=  300;
+		} while (stations.size()<2);
+		return stations;
+	}
+	
+	public List <LinkImpl> createWalkingLinks(NodeImpl walkNode, Collection <NodeImpl> nearNodes, boolean isAccess){
+		nearNodes.remove(walkNode);
+		List<LinkImpl> newWalkLinks = new ArrayList<LinkImpl>();
+		
+		if ((isAccess && nearNodes.contains(this.logicNetwork.getNode("W2"))) ||   //do not create a link (w1)-->(w2)
+		   (!isAccess && nearNodes.contains(this.logicNetwork.getNode("W1"))))
+			return newWalkLinks;
+		
+		Id idLink;
+		NodeImpl fromNode;
+		NodeImpl toNode;
+		int x=0;
+		String type;
+		for (NodeImpl node : nearNodes){
+			if (isAccess){
+				fromNode= walkNode;
+				toNode= node;
+				idLink = new IdImpl("WLO" + x++);
+				type = "Access";
+			}else{
+				fromNode= node;
+				toNode=  walkNode;
+				idLink = new IdImpl("WLD" + x++);
+				type = "Egress";
+			}
+			
+			//LinkImpl link= logicNetwork.createAndAddLink(idLink, fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()) , 1, 1, 1, "0", type);
+			PTLink link = new PTLink(idLink, fromNode, toNode, logicNetwork, type);
+			newWalkLinks.add(link);
+		}
+		return newWalkLinks;
+	}
+	
+	public void removeWalkLinks(Collection<LinkImpl> WalkingLinkList){
+		for (LinkImpl link : WalkingLinkList){
+			logicNetwork.removeLink(link);
+		}
+	}
+	
+
 		
 	private TransportMode selectMode(final String linkType){
 		TransportMode mode = null;
@@ -198,9 +214,11 @@ public class TransitRouter {
 		return leg;
 	}
 		
-	/* returns the plainnet to visualize but.... clases expect*/
+	/* returns the plainNet to visualize but.... class expected*/
+	/*
 	public Network getTransitRouterNetwork() {
 		return logicFactory.getPlainNet();
 	}
+	*/
 
 }

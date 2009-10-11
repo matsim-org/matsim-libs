@@ -26,25 +26,30 @@ import playground.mmoyo.PTRouter.PTLink;
  */
 public class LogicIntoPlainTranslator {
 	private NetworkLayer plainNet;
-	private Map<Id,Node> logicToPlainStopMap;
+	//private Map<Id,Node> logicToPlainStopMap;
 	//private Map<Id,LinkImpl> logicToPlainLinkMap;  
 	//private Map<Id,LinkImpl> lastLinkMap;
 	
+	
 	/**the constructor creates the joiningLinkMap that stores the relation between logic and plain Nodes*/ 
+	/*
 	public LogicIntoPlainTranslator(final NetworkLayer plainNetwork,  final Map<Id,Node> logicToPlanStopMap, Map<Id,LinkImpl> logicToPlanLinkMap, Map<Id,LinkImpl> lastLinkMap) {
 		this.plainNet= plainNetwork;
 		//this.logicToPlainStopMap = logicToPlanStopMap;
 		//this.logicToPlainLinkMap = logicToPlanLinkMap;
 		//this.lastLinkMap = lastLinkMap;
 	}
-
+	*/
+	
 	public LogicIntoPlainTranslator(final NetworkLayer plainNetwork){
 		this.plainNet= plainNetwork;
 	}
-			
+
+	/*
 	public Node convertToPlain(Id logicNodeId){
 		return logicToPlainStopMap.get(logicNodeId);
 	}
+	*/
 	
 	public List<Node> convertNodesToPlain(List<Node> logicNodes){
 		List<Node> plainNodes  = new ArrayList<Node>();

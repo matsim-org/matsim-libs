@@ -5,9 +5,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.api.core.v01.network.Node;
 
-/**
- * Calculates the travel time of each link depending on its type
- */
+/** Calculates the travel time of each link depending on its type */
 public class PTTravelTime implements TravelTime {
 	private Link lastLink;
 	private double lastTime;
@@ -16,41 +14,45 @@ public class PTTravelTime implements TravelTime {
 	private double waitingTime;
 	private double travelTime;
 	private PTValues ptValues = new PTValues(); 
-	private double walkSpeed = ptValues.getAvgWalkSpeed();
+	private double walkSpeed = ptValues.getAV_WALKING_SPEED();
 	private byte aliasLink;
 	
 	//Map <Id, List<Double>> dynTravTimeIndex = new TreeMap <Id, List<Double>>();
 	//Map <Id, List<Double>> dynTravTimeValue = new TreeMap <Id, List<Double>>();
 	
 	public PTTravelTime() {
-		
 	}
 	
-	/**
-	 * Calculation of travel time for each link type:
-	 * 0 Acces Link (distance*walk speed) + (veh departure - walk arrival)
-	 * 1 Standard link: (toNode arrival- fromNode arrival)
-	 * 2 Transfer link: (second veh departure - first veh arrival)
-	 * 3 Detached transfer And Access: (distance*walk speed) + (veh departure - walk arrival)
-	 * 4 Egress link : (distance * walk speed)
-	 */
+	/**Calculation of travel time for each link type:*/
 	public double getLinkTravelTime(final Link link, final double time) {
 		if (lastLink==link && lastTime==time) return lastTravelTime;
-
 		PTLink ptLink = (PTLink)link;
 		aliasLink = ptLink.getAliasType();
 		
-		if (aliasLink == 3 || aliasLink == 0){ // DetTransfer || "Access"
+		switch (aliasLink){
+		case 3:    // DetTransfer
 			walkTime=link.getLength()* walkSpeed;
 			waitingTime= getTransferTime(link.getToNode(), time+walkTime);
 			travelTime= walkTime + waitingTime; 
-		}else if (aliasLink == 2){  //  "Transfer"
+			break;
+		case 0:   //access
+			walkTime=link.getLength()* walkSpeed;
+			waitingTime= getTransferTime(link.getToNode(), time+walkTime);
+			travelTime= walkTime + waitingTime; 
+			break;
+		case 2:  //"Transfer"
 			travelTime= getTransferTime(link.getToNode(),time); //2 minutes to allow the passenger walk between ptv's!!!!! 
-		}else if (aliasLink ==1){   //  "Standard"
+			break;
+		case 1: //  "Standard"
 			travelTime = ptLink.getTravelTime() * 60; // stored in minutes, returned in seconds
-		}else if (aliasLink ==4){  //"Egress" 
+			break;
+		case 4: //"Egress" 
 			travelTime= link.getLength()* walkSpeed;
+			break;
+		default:
+			 throw new NullPointerException("The link does not have a defined type" + link.getId());
 		}
+
 		
 		lastLink= link;
 		lastTime = time;
@@ -84,6 +86,7 @@ public class PTTravelTime implements TravelTime {
 	*returns the first departure(of the next day)*/
 	public double nextDepartureB(Node node,  double time){//,
 		double[]arrDep= ((PTNode)node).getArrDep();
+		//System.out.println("node:" + node.getId());
 		int length = arrDep.length;
 		int index =  Arrays.binarySearch(arrDep, time);
 		if (index<0){

@@ -36,7 +36,7 @@ public class TransitRouteFinder {
 	/**returns a list of legs that represent a PT connection between two activities locations*/ 
 	public List<Leg> calculateRoute (final ActivityImpl fromAct, final ActivityImpl toAct, final PersonImpl person ){
 		List<Leg> legList = new ArrayList<Leg>();
-		double distToWalk = ptValues.firstWalkRange();
+		double distToWalk = ptValues.FIRST_WALKRANGE;
 		Path path = ptRouter.findPTPath(fromAct.getCoord(), toAct.getCoord(), fromAct.getEndTime(), distToWalk);
 
 		if (path!= null){

@@ -15,14 +15,15 @@ public class PTLink extends LinkImpl{
 	Link plainLink;
 	
 	public PTLink(Id id, BasicNode from, BasicNode to, NetworkLayer network, String type) {
-		super(id, from, to, network, 0, 1.0, 1.0 , 1);
-		this.length = CoordUtils.calcDistance(from.getCoord(), to.getCoord());
-		this.type= type;
-		if (type.equals("Access")) aliasType=0; 
-		if (type.equals("Standard")) aliasType=1;
-		if (type.equals("Transfer")) aliasType=2;
-		if (type.equals("DetTransfer")) aliasType=3;
-		if (type.equals("Egress")) aliasType=4;
+		super(id, from, to, network, 0, 10, 9999 , 1);
+		this.setLength(CoordUtils.calcDistance(from.getCoord(), to.getCoord()));
+		this.setType(type);
+
+		if 		(type.equals("Access")) 	{aliasType=0;} 
+		else if (type.equals("Standard")) 	{aliasType=1;}
+		else if (type.equals("Transfer")) 	{aliasType=2;}
+		else if (type.equals("DetTransfer")){aliasType=3;}
+		else if (type.equals("Egress")) 	{aliasType=4;}
 		network.addLink(this);///
 	}
 
