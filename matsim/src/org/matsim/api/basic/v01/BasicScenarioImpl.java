@@ -20,12 +20,13 @@
 
 package org.matsim.api.basic.v01;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 
 /** @deprecated use org.matsim.api.core.v01.ScenarioImpl */
 @Deprecated // use org.matsim.api.core.v01.ScenarioImpl
-public class BasicScenarioImpl extends ScenarioImpl implements BasicScenario {
+public class BasicScenarioImpl extends ScenarioImpl implements BasicScenario, Scenario {
 	
 	/** @deprecated use org.matsim.api.core.v01.ScenarioImpl */
 	@Deprecated // use org.matsim.api.core.v01.ScenarioImpl

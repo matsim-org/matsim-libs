@@ -20,11 +20,11 @@
 package org.matsim.api.core.v01;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -52,7 +52,7 @@ import org.matsim.world.World;
  * @author dgrether
  *
  */
-public class ScenarioImpl implements Scenario {
+public class ScenarioImpl implements BasicScenario, Scenario {
 
 	private static final Logger log = Logger.getLogger(ScenarioImpl.class);
 	
