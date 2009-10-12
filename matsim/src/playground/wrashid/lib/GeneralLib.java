@@ -1,8 +1,12 @@
 package playground.wrashid.lib;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
@@ -109,9 +113,10 @@ public class GeneralLib {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
-	 * if headerLine=null, then add no line at top of file. "\n" is added at end of first line by this method.
+	 * if headerLine=null, then add no line at top of file. "\n" is added at end
+	 * of first line by this method.
 	 * 
 	 * matrix[numberOfRows][numberOfColumns]
 	 * 
@@ -119,23 +124,23 @@ public class GeneralLib {
 	 * @param fileName
 	 * @param headerLine
 	 */
-	public static void writeMatrix(double[][] matrix, String fileName, String headerLine){
-		ArrayList<String> list=new ArrayList<String>();
-		
-		if (headerLine!=null){
+	public static void writeMatrix(double[][] matrix, String fileName, String headerLine) {
+		ArrayList<String> list = new ArrayList<String>();
+
+		if (headerLine != null) {
 			list.add(headerLine);
 		}
-		
-		for (int i=0;i<matrix.length;i++){
-			String line="";
-			for (int j=0;j<matrix[0].length-1;j++){
-				line+=matrix[i][j];
-				line+="\t";
+
+		for (int i = 0; i < matrix.length; i++) {
+			String line = "";
+			for (int j = 0; j < matrix[0].length - 1; j++) {
+				line += matrix[i][j];
+				line += "\t";
 			}
-			line+=matrix[i][matrix[0].length-1];
+			line += matrix[i][matrix[0].length - 1];
 			list.add(line);
 		}
-		
+
 		writeList(list, fileName);
 	}
 
@@ -223,12 +228,62 @@ public class GeneralLib {
 	public static String getFirstLineOfFile(String fileName) {
 		return null;
 	}
-	
-	
+
 	// TODO: write tests.
-	// The target 
-	public static void copyDirectory(String sourceDirectoryPath, String targetDirectoryPath){
-		
+	// create target directory, if it does not exist.
+	public static void copyDirectory(String sourceDirectoryPath, String targetDirectoryPath) {
+
+		File sourceDirectory = new File(sourceDirectoryPath);
+		File targetDirectory = new File(targetDirectoryPath);
+
+		try {
+			if (sourceDirectory.isDirectory()) {
+				// do recursion
+				if (!targetDirectory.exists()) {
+					targetDirectory.mkdir();
+				}
+
+				String[] children = sourceDirectory.list();
+				for (int i = 0; i < children.length; i++) {
+					copyDirectory(sourceDirectoryPath + "\\" + children[i], targetDirectory + "\\" + children[i]);
+				}
+			} else {
+
+				// copy the file
+				copyFile(sourceDirectory.getAbsolutePath(), targetDirectory.getAbsolutePath());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * TODO: write test.
+	 * @param sourceFilePath
+	 * @param targetFilePath
+	 */
+	public static void copyFile(String sourceFilePath, String targetFilePath) {
+		File sourceFile = new File(sourceFilePath);
+		File targetFile = new File(targetFilePath);
+
+		try {
+			// copy the file
+			InputStream in = new FileInputStream(sourceFile);
+			OutputStream out = new FileOutputStream(targetFile);
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void main(String[] args) {
+		copyDirectory("C:\\tmp\\abcd", "C:\\tmp\\aaab");
 	}
 
 }

@@ -19,11 +19,14 @@ import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF.energy.charging.optimizedCharging.OptimizedCharger;
 import playground.wrashid.PSF.energy.consumption.LogEnergyConsumption;
 import playground.wrashid.PSF.parking.LogParkingTimes;
+import playground.wrashid.lib.GeneralLib;
 
 public class PSSControler {
 
 	Controler controler;
-	String resultDirectory = "a:\\data\\results\\";
+	String resultDirectory = "A:\\data\\results\\";
+	String inputPSSPath = "A:\\data\\PSS\\input";
+	String outputPSSPath = "A:\\data\\PSS\\output";
 	String configFilePath;
 	ParametersPSFMutator parameterPSFMutator;
 	private int iterationNumber=0;
@@ -46,16 +49,34 @@ public class PSSControler {
 		for (int i=0;i<numberOfIterations;i++){
 			runMATSimIterations();
 			saveMATSimResults();
+			
 			preparePSSInput();
 			runPSS();
+			
+			savePSSResults();
+			prepareMATSimInput();
+			
 		}
 	}
 	
 	
 
-	private void preparePSSInput() {
-		// TODO Auto-generated method stub
+	private void prepareMATSimInput() {
 		
+		// not needed: configure in the config, that the input is read from the output folder of PSS.
+		
+	}
+
+
+	private void savePSSResults() {
+		// TODO Auto-generated method stub
+		GeneralLib.copyFile(outputPSSPath + "hubPriceInfo.txt", getIterationResultDirectory() + "\\" + "hubPriceInfo.txt");
+	}
+
+
+	private void preparePSSInput() {
+		// copy charging log to input directory of PSS
+		GeneralLib.copyFile(ParametersPSF.getMainChargingTimesOutputFilePath(), inputPSSPath + "chargingLog.txt");
 	}
 
 
@@ -63,7 +84,7 @@ public class PSSControler {
 		// copy all data from the matsim output directory to the results directory
 		String matsimOutputFolderName= 	controler.getOutputFilename("");
 		
-		
+		GeneralLib.copyDirectory(matsimOutputFolderName, getIterationResultDirectory());
 		
 		
 	}
@@ -93,16 +114,15 @@ public class PSSControler {
 	}
 
 	private void runPSS() {
-		String inputPath = "A:\\data\\PSS\\input";
-		String outputPath = "A:\\data\\PSS\\output";
+
 
 		// clean output directory
-		File tempFile = new File(outputPath + "hubPriceInfo.txt");
+		File tempFile = new File(outputPSSPath + "hubPriceInfo.txt");
 		if (tempFile.exists()) {
 			tempFile.delete();
 		}
 
-		tempFile = new File(outputPath + "fertig.txt");
+		tempFile = new File(outputPSSPath + "fertig.txt");
 		if (tempFile.exists()) {
 			tempFile.delete();
 		}
@@ -122,7 +142,7 @@ public class PSSControler {
 		
 		
 		// check, if MATLab finished
-		tempFile = new File(outputPath + "fertig.txt");
+		tempFile = new File(outputPSSPath + "fertig.txt");
 		while (!tempFile.exists()){
 			// TODO: do counting, if this not possible
 			Thread.sleep(5000);
@@ -134,6 +154,10 @@ public class PSSControler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private String getIterationResultDirectory(){
+		return resultDirectory + "\\iteration" + iterationNumber;
 	}
 
 }
