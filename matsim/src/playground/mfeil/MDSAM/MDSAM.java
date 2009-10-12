@@ -338,12 +338,12 @@ public class MDSAM {
 	public static void main(final String [] args) {
 				final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 				final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-				final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz02.xml";
+				final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz01.xml";
 		/*		final String populationFilename = "./plans/output_plans.xml";
 				final String networkFilename = "./plans/network.xml";
 				final String facilitiesFilename = "./plans/facilities.xml";
 		*/
-				final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans02.dat";
+				final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans01.dat";
 				final String outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims062.xls";
 				final String outputFileMod = "/home/baug/mfeil/data/largeSet/it0/model062.mod";
 		//		final String outputFile = "./plans/output_plans.dat";

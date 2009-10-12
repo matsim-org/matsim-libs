@@ -323,12 +323,14 @@ public class ModFileMaker {
 		stream.println("//Name \tValue  \tLowerBound \tUpperBound  \tstatus (0=variable, 1=fixed");
 		
 		stream.println("HomeUmax \t60  \t0 \t100  \t0");
+		stream.println("HomeInnerUmax \t60  \t0 \t100  \t0");
 		stream.println("WorkUmax \t55  \t0 \t100  \t0");
 		stream.println("EducationUmax \t40  \t0 \t100  \t0");
 		stream.println("ShoppingUmax \t35  \t0 \t100  \t0");
 		stream.println("LeisureUmax \t12  \t0 \t100  \t0");
 		
 		stream.println("HomeAlpha \t6  \t-5 \t20  \t0");
+		stream.println("HomeInnerAlpha \t6  \t-5 \t20  \t0");
 		stream.println("WorkAlpha \t4  \t-5 \t20  \t0");
 		stream.println("EducationAlpha \t3  \t-5 \t20  \t0");
 		stream.println("ShoppingAlpha \t2  \t-5 \t20  \t0");
@@ -384,6 +386,7 @@ public class ModFileMaker {
 			for (int j=2;j<actslegs.size()-1;j+=2){
 				ActivityImpl act = (ActivityImpl)actslegs.get(j);
 				if (act.getType().toString().equals("h")) stream.print(" + HomeUmax * one / ( one + exp( one_point_two * ( HomeAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
+				else if (act.getType().toString().equals("h_inner")) stream.print(" + HomeInnerUmax * one / ( one + exp( one_point_two * ( HomeInnerAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
 				else if (act.getType().toString().equals("w")) stream.print(" + WorkUmax * one / ( one + exp( one_point_two * ( WorkAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
 				else if (act.getType().toString().equals("e")) stream.print(" + EducationUmax * one / ( one + exp( one_point_two * ( EducationAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
 				else if (act.getType().toString().equals("shop")) stream.print(" + ShoppingUmax * one / ( one + exp( one_point_two * ( ShoppingAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");

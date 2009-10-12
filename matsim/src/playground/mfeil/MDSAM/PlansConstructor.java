@@ -88,10 +88,10 @@ public class PlansConstructor implements PlanStrategyModule{
 	public PlansConstructor (Controler controler) {
 		this.controler = controler;
 		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
-		this.outputFile = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz01.xml.gz";	
-		this.outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans01.dat";
-		this.outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model01.mod";
-		this.outputFileSims = "/home/baug/mfeil/data/choiceSet/it0/sims01.xls";
+		this.outputFile = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz06.xml.gz";	
+		this.outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans06.dat";
+		this.outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model06.mod";
+		this.outputFileSims = "/home/baug/mfeil/data/choiceSet/it0/sims06.xls";
 	/*	this.inputFile = "./plans/input_plans2.xml";	
 		this.outputFile = "./plans/output_plans.xml.gz";	
 		this.outputFileBiogeme = "./plans/output_plans.dat";
@@ -154,7 +154,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		
 	// Type of enlarging plans set
 		//	this.enlargePlansSet();
-		this.enlargePlansSetWithRandomSelection("PlanomatX");
+		this.enlargePlansSetWithRandomSelection("Random");
 		
 	// Needs to always run
 		this.writePlans(this.outputFile);
@@ -192,6 +192,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				else if (act.getType().equalsIgnoreCase("e")) act.setType("education");
 				else*/ if (act.getType().equalsIgnoreCase("s")) act.setType("shop");
 				else if (act.getType().equalsIgnoreCase("l")) act.setType("leisure");
+				else if (act.getType().equalsIgnoreCase("h") && i!=0 && i!=plan.getPlanElements().size()-1) act.setType("h_inner");
 				//else log.warn("Unknown act detected: "+act.getType());
 			}
 		}
@@ -474,72 +475,81 @@ public class PlansConstructor implements PlanStrategyModule{
 				
 				// Randomly select an act/mode chain different to the chosen one. 
 				int position = 0;
+				boolean isValidPlan = true;
+				PlanImpl plan = new PlanImpl (person);
 				do {
-					position = (int)(MatsimRandom.getRandom().nextDouble()*this.actChains.size());
-				} while(taken.contains(position) || acCheck.checkEqualActChainsModesAccumulated(person.getSelectedPlan().getPlanElements(), this.actChains.get(position)));
-				taken.add(position);
-				//log.info("Person "+person.getId()+", "+(i+2)+". plan has act chain position "+position);
-				
-				PlanImpl plan = new PlanImpl (person);		
-				for (int j=0;j<this.actChains.get(position).size();j++){
-					if (j%2==0) {
-						ActivityImpl act = new ActivityImpl((ActivityImpl)this.actChains.get(position).get(j));
-						//Timing
-						if (j!=this.actChains.get(position).size()-1) {
-							act.setEndTime(MatsimRandom.getRandom().nextDouble()*act.getDuration()*2+act.getStartTime());
-						}
-						//Location if "primary"
-						if (act.getType().equalsIgnoreCase("w") || act.getType().equalsIgnoreCase("e") || act.getType().equalsIgnoreCase("h")){
-							for (int k=0;k<person.getSelectedPlan().getPlanElements().size();k+=2){
-								if (act.getType().equalsIgnoreCase(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(k))).getType())){
-									act.setCoord(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(k))).getCoord());
-									break;
+					isValidPlan = true;
+					do {
+						position = (int)(MatsimRandom.getRandom().nextDouble()*this.actChains.size());
+					} while(taken.contains(position) || acCheck.checkEqualActChainsModesAccumulated(person.getSelectedPlan().getPlanElements(), this.actChains.get(position)));
+					taken.add(position);
+					
+					plan = new PlanImpl (person);		
+					for (int j=0;j<this.actChains.get(position).size();j++){
+						if (j%2==0) {
+							ActivityImpl act = new ActivityImpl((ActivityImpl)this.actChains.get(position).get(j));
+							//Timing
+							if (j!=this.actChains.get(position).size()-1) {
+								act.setEndTime(MatsimRandom.getRandom().nextDouble()*act.getDuration()*2+act.getStartTime());
+							}
+							//Location if "primary"
+							if (act.getType().equalsIgnoreCase("w") || act.getType().equalsIgnoreCase("e") || act.getType().equalsIgnoreCase("h") || act.getType().equalsIgnoreCase("h_inner")){
+								for (int k=0;k<person.getSelectedPlan().getPlanElements().size();k+=2){
+									if (act.getType().equalsIgnoreCase(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(k))).getType())){
+										act.setCoord(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(k))).getCoord());
+										break;
+									}
+									else if (act.getType().equalsIgnoreCase("h_inner") && ((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(k))).getType().equalsIgnoreCase("h")){
+										act.setCoord(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(k))).getCoord());
+										break;
+									}
+									// If primary act cannot be found in selectedPlan
+									this.modifyLocationCoord(act);
 								}
-								// If primary act cannot be found in selectedPlan
-								this.modifyLocationCoord(act);
+							}
+							plan.addActivity((BasicActivity)act);
+						}
+						else {
+							LegImpl leg = new LegImpl((LegImpl)this.actChains.get(position).get(j));
+							plan.addLeg((BasicLeg)leg);
+						}
+					}
+					
+					// Adopting PlanomatX for secondary location choice
+					if (locationChoice.equalsIgnoreCase("PlanomatX")){
+						this.locator.handleSubChains(plan, this.getSubChains(plan));	
+					}
+					
+					// Adopting random location choice
+					else {
+						List<SubChain> subChains = this.getSubChains(plan);
+						for (Iterator<SubChain> iteratorSubChain = subChains.iterator(); iteratorSubChain.hasNext();){
+							for (Iterator<ActivityImpl> iteratorActs = iteratorSubChain.next().getSlActs().iterator(); iteratorActs.hasNext();){
+								this.modifyLocationCoord(iteratorActs.next());
 							}
 						}
-						plan.addActivity((BasicActivity)act);
 					}
-					else {
-						LegImpl leg = new LegImpl((LegImpl)this.actChains.get(position).get(j));
-						plan.addLeg((BasicLeg)leg);
-					}
-				}
-				
-				// Adopting PlanomatX for secondary location choice
-				if (locationChoice.equalsIgnoreCase("PlanomatX")){
-					this.locator.handleSubChains(plan, this.getSubChains(plan));	
-				}
-				
-				// Adopting random location choice
-				else {
-					List<SubChain> subChains = this.getSubChains(plan);
-					for (Iterator<SubChain> iteratorSubChain = subChains.iterator(); iteratorSubChain.hasNext();){
-						for (Iterator<ActivityImpl> iteratorActs = iteratorSubChain.next().getSlActs().iterator(); iteratorActs.hasNext();){
-							this.modifyLocationCoord(iteratorActs.next());
+					
+					this.linker.run(plan);
+	
+					for (int j=0;j<plan.getPlanElements().size();j++){
+						if (j%2==1){
+							this.router.handleLeg((LegImpl)plan.getPlanElements().get(j), (ActivityImpl)plan.getPlanElements().get(j-1), (ActivityImpl)plan.getPlanElements().get(j+1), ((ActivityImpl)plan.getPlanElements().get(j-1)).getEndTime());
+						}
+						else {
+							if (j!=0)((ActivityImpl)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
+							if (j!=plan.getPlanElements().size()-1){
+								((ActivityImpl)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+1, ((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()));
+								((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
+							}
 						}
 					}
-				}
-				
-				this.linker.run(plan);
-
-				for (int j=0;j<plan.getPlanElements().size();j++){
-					if (j%2==1){
-						this.router.handleLeg((LegImpl)plan.getPlanElements().get(j), (ActivityImpl)plan.getPlanElements().get(j-1), (ActivityImpl)plan.getPlanElements().get(j+1), ((ActivityImpl)plan.getPlanElements().get(j-1)).getEndTime());
+					// if plan too long make it invalid (set score to -100000)
+					if (plan.getLastActivity().getStartTime()-86400>plan.getFirstActivity().getEndTime()){
+						plan.setScore(-100000.0);
+						isValidPlan = false;
 					}
-					else {
-						if (j!=0)((ActivityImpl)(plan.getPlanElements().get(j))).setStartTime(((LegImpl)(plan.getPlanElements().get(j-1))).getArrivalTime());
-						if (j!=plan.getPlanElements().size()-1){
-							((ActivityImpl)(plan.getPlanElements().get(j))).setEndTime(java.lang.Math.max(((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime()+3600, ((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()));
-							((ActivityImpl)(plan.getPlanElements().get(j))).setDuration(((ActivityImpl)(plan.getPlanElements().get(j))).getEndTime()-((ActivityImpl)(plan.getPlanElements().get(j))).getStartTime());
-						}
-					}
-				}
-				// if plan too long make it invalid (set score to -100000)
-				if (plan.getLastActivity().getStartTime()-86400>plan.getFirstActivity().getEndTime()){
-					plan.setScore(-100000.0);
-				}
+				} while (!isValidPlan);
 				person.getPlans().add(plan);
 				
 			}
@@ -584,10 +594,10 @@ public class PlansConstructor implements PlanStrategyModule{
 		for (int i=0;i<plan.getPlanElements().size()-4;i+=2){
 			ActivityImpl act = (ActivityImpl)(plan.getPlanElements().get(i));
 			ActivityImpl actFollowing = (ActivityImpl)(plan.getPlanElements().get(i+2));
-			if ((act.getType().equalsIgnoreCase("w") || act.getType().equalsIgnoreCase("e") || act.getType().equalsIgnoreCase("h")) &&
-					!(actFollowing.getType().equalsIgnoreCase("w") || actFollowing.getType().equalsIgnoreCase("e") || actFollowing.getType().equalsIgnoreCase("h"))){
+			if ((act.getType().equalsIgnoreCase("w") || act.getType().equalsIgnoreCase("e") || act.getType().equalsIgnoreCase("h") || act.getType().equalsIgnoreCase("h_inner")) &&
+					!(actFollowing.getType().equalsIgnoreCase("w") || actFollowing.getType().equalsIgnoreCase("e") || actFollowing.getType().equalsIgnoreCase("h") || actFollowing.getType().equalsIgnoreCase("h_inner"))){
 				manager.primaryActivityFound(act, (LegImpl)(plan.getPlanElements()).get(i+1));
-				while (!(actFollowing.getType().equalsIgnoreCase("w") || actFollowing.getType().equalsIgnoreCase("e") || actFollowing.getType().equalsIgnoreCase("h"))){
+				while (!(actFollowing.getType().equalsIgnoreCase("w") || actFollowing.getType().equalsIgnoreCase("e") || actFollowing.getType().equalsIgnoreCase("h") || actFollowing.getType().equalsIgnoreCase("h_inner"))){
 					i+=2;
 					act = (ActivityImpl)(plan.getPlanElements().get(i));
 					actFollowing = (ActivityImpl)(plan.getPlanElements().get(i+2));
@@ -746,6 +756,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		
 		// Filling plans
 		int counter=0;
+		int valid=0;
+		int invalid=0;
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
 			counter++;
@@ -803,10 +815,12 @@ public class PlansConstructor implements PlanStrategyModule{
 						if (person.getPlans().get(j).getScore()!=null && person.getPlans().get(j).getScore()==-100000.0) {
 							stream.print(0+"\t");
 							counterRow++;
+							invalid++;
 						}
 						else {
 							stream.print(1+"\t");
 							counterRow++;
+							valid++;
 						}
 						found = true;
 						break;
@@ -821,6 +835,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			if (counterFirst!=counterRow) log.warn("For person "+person.getId()+", the row length of "+counterRow+" does not fit the expected length of "+counterFirst+"!");
 		}
 		stream.close();
+		log.info("Number of valid plans is "+valid+"; number of invalid plans is "+invalid);
 		log.info("done.");
 	}
 	
