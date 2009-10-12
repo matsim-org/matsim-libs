@@ -15,7 +15,7 @@ public class PTTravelTime implements TravelTime {
 	private double travelTime;
 	private PTValues ptValues = new PTValues(); 
 	private double walkSpeed = ptValues.getAV_WALKING_SPEED();
-	private byte aliasLink;
+	private byte aliasType;
 	
 	//Map <Id, List<Double>> dynTravTimeIndex = new TreeMap <Id, List<Double>>();
 	//Map <Id, List<Double>> dynTravTimeValue = new TreeMap <Id, List<Double>>();
@@ -27,26 +27,26 @@ public class PTTravelTime implements TravelTime {
 	public double getLinkTravelTime(final Link link, final double time) {
 		if (lastLink==link && lastTime==time) return lastTravelTime;
 		PTLink ptLink = (PTLink)link;
-		aliasLink = ptLink.getAliasType();
+		aliasType = ptLink.getAliasType();
 		
-		switch (aliasLink){
-		case 3:    // DetTransfer
+		switch (aliasType){
+		case 4:    // DetTransfer
 			walkTime=link.getLength()* walkSpeed;
 			waitingTime= getTransferTime(link.getToNode(), time+walkTime);
 			travelTime= walkTime + waitingTime; 
 			break;
-		case 0:   //access
+		case 1:   //access
 			walkTime=link.getLength()* walkSpeed;
 			waitingTime= getTransferTime(link.getToNode(), time+walkTime);
 			travelTime= walkTime + waitingTime; 
 			break;
-		case 2:  //"Transfer"
+		case 3:  //"Transfer"
 			travelTime= getTransferTime(link.getToNode(),time); //2 minutes to allow the passenger walk between ptv's!!!!! 
 			break;
-		case 1: //  "Standard"
+		case 2: //  "Standard"
 			travelTime = ptLink.getTravelTime() * 60; // stored in minutes, returned in seconds
 			break;
-		case 4: //"Egress" 
+		case 5: //"Egress" 
 			travelTime= link.getLength()* walkSpeed;
 			break;
 		default:

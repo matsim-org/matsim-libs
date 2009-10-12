@@ -12,11 +12,11 @@ import org.matsim.api.core.v01.network.Network;
  */
 
 public class MyDijkstra extends Dijkstra{
-	final static String DETTRANSFER = "DetTransfer";
-	final static String TRANSFER = "Transfer";
-	final static String STANDARD = "Standard";
-	final static String ACCESS = "Access";
-	final static String EGRESS = "Egress";
+	final static String ACCESS = "Access";     			//1
+	final static String STANDARD = "Standard";			//2
+	final static String TRANSFER = "Transfer";			//3
+	final static String DETTRANSFER = "DetTransfer";	//4
+	final static String EGRESS = "Egress"; 				//5
 	
 	public MyDijkstra(final Network network, final TravelCost costFunction, final TravelTime timeFunction) {
 		super(network, costFunction, timeFunction);

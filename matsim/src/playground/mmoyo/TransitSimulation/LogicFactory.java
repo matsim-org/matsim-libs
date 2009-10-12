@@ -91,13 +91,15 @@ public class LogicFactory{
 					//logicNode
 					Coord coord = transitStopFacility.getCoord();
 					Id idStopFacility = transitStopFacility.getId();  
-					Id logicalId= createLogicalId(idStopFacility, transitLine.getId()); 
+					Id logicId= createLogicId(idStopFacility, transitLine.getId()); 
 					//PTNode logicNode= logicNet.createAndAddNode(logicalId, coord); 09 oct 
 					//new implementation 09oct
-					PTNode logicNode= new PTNode (logicalId, coord);
+					PTNode logicNode= new PTNode (logicId, coord);
+					logicNode.setTransitRoute(transitRoute);
 					logicNode.setTransitLine(transitLine);
-					logicNet.addNode(logicNode);
+					logicNode.setTransitRouteStop(transitRouteStop);
 					logicNode.setPlainNode(plainNode);
+					logicNet.addNode(logicNode);
 					
 					//logicToPlanStopMap.put(logicNode.getId(), plainNode); 9oct
 					
@@ -112,9 +114,10 @@ public class LogicFactory{
 					if (!first){
 						LinkImpl plainLink= createPlainLink(lastPlainNode, plainNode);
 						
-						Id id = new IdImpl(newLinkId++);
-						PTLink logicLink = new PTLink(id, lastLogicNode, logicNode, logicNet, "Standard"); 
+						PTLink logicLink = new PTLink(new IdImpl(newLinkId++), lastLogicNode, logicNode, logicNet, "Standard"); 
 						logicLink.setPlainLink(plainLink);
+						logicLink.setTransitLine(transitLine);
+						logicLink.setTransitRoute(transitRoute);
 						logicNode.setInStandardLink(logicLink);
 						
 						// 09oct logicToPlanLinkMap.put(id, plainLink);  //stores here the correspondent plainLink!! it will help to the translation!
@@ -125,7 +128,7 @@ public class LogicFactory{
 					}
 
 					/**creates logic stops and stopFacilities in logicTransitSchedule*/
-					TransitStopFacility logicTransitStopFacility = this.builder.createTransitStopFacility(logicalId, coord, false); 
+					TransitStopFacility logicTransitStopFacility = this.builder.createTransitStopFacility(logicId, coord, false); 
 					logicTransitSchedule.addStopFacility(logicTransitStopFacility);
 					TransitRouteStop logicTransitRouteStop = this.builder.createTransitRouteStop(logicTransitStopFacility, transitRouteStop.getArrivalOffset(), transitRouteStop.getDepartureOffset()); 
 					logicTransitStops.add(logicTransitRouteStop);
@@ -160,7 +163,7 @@ public class LogicFactory{
 	}
 	
 	//Created a new id for a new node. the nodeLinMap stores the transitLine of each node. */ 
-	private Id createLogicalId(final Id idStopFacility, final Id lineId){
+	private Id createLogicId(final Id idStopFacility, final Id lineId){
 		Id newId = new IdImpl(newStopId++);
 		//nodeLineMap.put(newId, lineId);
 		return newId;

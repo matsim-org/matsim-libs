@@ -1,12 +1,14 @@
 package playground.mmoyo.TransitSimulation;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -28,6 +30,8 @@ import playground.mmoyo.PTRouter.PTRouter;
 import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.Validators.TransitRouteValidator;
 import playground.mmoyo.analysis.Counter;
+import playground.mmoyo.iterations.TransitRouter;
+
 
 /**
  * This class contains the options to route with a TransitSchedule object 
@@ -38,18 +42,17 @@ public class Main {
 	private static final String CONFIG =  				PATH + "config.xml";
 	private static final String PLANFILE = 				PATH + "plans.xml";  //"_input_file.xml"; // // "plans.xml"; 
 	private static final String OUTPUTPLANS = 			PATH + "output_plans.xml";
-	private static final String NETWORK = 				PATH + "network.xml";
 	private static final String PLAINNETWORK = 			PATH + "plainNetwork.xml";
 	private static final String LOGICNETWORK = 			PATH + "logicNetwork.xml";
 	private static final String LOGICTRANSITSCHEDULE = 	PATH + "logicTransitSchedule.xml";
-	private static final String TRANSITSCHEDULEFILE  = 	PATH + "transitSchedule.xml";
-	
-	/*
-	private static final String NETWORK = "examples/equil/network.xml"; 
-	private static final String TRANSITSCHEDULEFILE  = 	"src/playground/marcel/pt/demo/equilnet/transitSchedule.xml";  //PATH + "transitSchedule.xml";	
-	*/
-	
+	private static String netWorkFile = 					PATH + "network.xml";
+	private static String transitScheduleFile  = 		PATH + "transitSchedule.xml";
+
 	public static void main(String[] args) {
+		/** equil Network  */
+		netWorkFile = "examples/equil/network.xml"; 
+		transitScheduleFile  = 	"src/playground/marcel/pt/demo/equilnet/transitSchedule.xml";
+		
 		NetworkLayer network= new NetworkLayer(new NetworkFactoryImpl());
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
@@ -57,9 +60,9 @@ public class Main {
 		PTValues ptValues = new PTValues();
 		
 		/***************reads the transitSchedule file**********/
-		new MatsimNetworkReader(network).readFile(NETWORK);
+		new MatsimNetworkReader(network).readFile(netWorkFile);
 		try {
-			new TransitScheduleReaderV1(transitSchedule, network).readFile(TRANSITSCHEDULEFILE);
+			new TransitScheduleReaderV1(transitSchedule, network).readFile(transitScheduleFile);
 		} catch (SAXException e){
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -72,7 +75,7 @@ public class Main {
 		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
 		NetworkLayer plainNetwork=logicFactory.getPlainNet();
 		
-		int option =3;
+		int option =12;
 		switch (option){
 			case 1:    //writes logicElement files
 				logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);
@@ -150,7 +153,7 @@ public class Main {
 				
 				break;
 			case 9:
-				/**Counts transfer links*/
+				/**Counts nodes, transfer links*/
 				NetworkLayer logicNetwork=logicFactory.getLogicNet();
 				
 				int transfers=0;
@@ -174,8 +177,20 @@ public class Main {
 			case 11:
 				TransitRouteValidator transitRouteValidator = new TransitRouteValidator(logicFactory);
 				break;
-			case 12:
 				
+				/**Try the transitRouter class on equilnet*/
+			case 12:
+				TransitRouter transitRouter = new TransitRouter(transitSchedule);
+				Coord fromCoord = new CoordImpl(10000.0, 0.0);
+				Coord toCoord = new CoordImpl(-25000.0, 0.0);
+				double departureTime= 24083.6; //24083.6;  // 31283.6   //45683.6
+				List<Leg> listLeg= transitRouter.calcRoute(fromCoord, toCoord, departureTime);
+				for (Leg leg :listLeg){
+					if (leg.getRoute()!=null){
+						System.out.println(leg.getRoute());
+					}
+					System.out.println(leg.toString());
+				}
 				break;
 		}
 	}

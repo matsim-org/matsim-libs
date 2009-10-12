@@ -59,7 +59,7 @@ public class PTTravelCost implements TravelCost{
 		
 		travelTime = ptTravelTime.getLinkTravelTime(link, time);
 		aliasType = ((PTLink)link).getAliasType();
-		if (aliasType == 2 || aliasType == 3 ){  //transfer or dettransfer
+		if (aliasType == 3 || aliasType == 4 ){  //transfer or dettransfer
 			cost += transferPenalty ;
 		}
 		

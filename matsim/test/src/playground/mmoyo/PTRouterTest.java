@@ -33,7 +33,6 @@ import playground.mmoyo.TransitSimulation.LogicFactory;
 import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 
-
 /** makes tests with the transit router on the 5x5 scenario*/
 public class PTRouterTest extends MatsimTestCase {
 	final static PTValues ptvalues = new PTValues();
