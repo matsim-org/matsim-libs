@@ -22,6 +22,7 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 
 public class PSSControler {
 
+	Controler controler;
 	String resultDirectory = "a:\\data\\results\\";
 	String configFilePath;
 	ParametersPSFMutator parameterPSFMutator;
@@ -59,13 +60,17 @@ public class PSSControler {
 
 
 	private void saveMATSimResults() {
-		// TODO Auto-generated method stub
+		// copy all data from the matsim output directory to the results directory
+		String matsimOutputFolderName= 	controler.getOutputFilename("");
+		
+		
+		
 		
 	}
 
 
 	private void runMATSimIterations() {
-		Controler controler = new Controler(configFilePath);
+		controler = new Controler(configFilePath);
 		controler.addControlerListener(new AddEnergyScoreListener());
 		controler.setOverwriteFiles(true);
 

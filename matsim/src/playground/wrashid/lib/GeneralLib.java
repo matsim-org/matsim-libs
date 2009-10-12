@@ -223,5 +223,12 @@ public class GeneralLib {
 	public static String getFirstLineOfFile(String fileName) {
 		return null;
 	}
+	
+	
+	// TODO: write tests.
+	// The target 
+	public static void copyDirectory(String sourceDirectoryPath, String targetDirectoryPath){
+		
+	}
 
 }
