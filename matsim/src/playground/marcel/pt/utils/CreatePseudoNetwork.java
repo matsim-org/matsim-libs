@@ -61,6 +61,7 @@ public class CreatePseudoNetwork {
 	private final String prefix;
 
 	private final Map<Tuple<NodeImpl, NodeImpl>, LinkImpl> links = new HashMap<Tuple<NodeImpl, NodeImpl>, LinkImpl>();
+	private final Map<Tuple<NodeImpl, NodeImpl>, TransitStopFacility> stopFacilities = new HashMap<Tuple<NodeImpl, NodeImpl>, TransitStopFacility>();
 	private final Map<TransitStopFacility, NodeImpl> nodes = new HashMap<TransitStopFacility, NodeImpl>();
 	private final Map<TransitStopFacility, NodeImpl> startNodes = new HashMap<TransitStopFacility, NodeImpl>();
 	private final Map<TransitStopFacility, List<TransitStopFacility>> facilityCopies = new HashMap<TransitStopFacility, List<TransitStopFacility>>();
@@ -68,8 +69,8 @@ public class CreatePseudoNetwork {
 	private long linkIdCounter = 0;
 	private long nodeIdCounter = 0;
 
-	private Set<TransportMode> transitModes = EnumSet.of(TransportMode.pt);
-	
+	private final Set<TransportMode> transitModes = EnumSet.of(TransportMode.pt);
+
 	public CreatePseudoNetwork(final TransitSchedule schedule, final NetworkLayer network, final String networkIdPrefix) {
 		this.schedule = schedule;
 		this.network = network;
@@ -138,11 +139,12 @@ public class CreatePseudoNetwork {
 		LinkImpl link = this.links.get(connection);
 		if (link == null) {
 			link = this.network.createAndAddLink(new IdImpl(this.prefix + this.linkIdCounter++), fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()), 30.0 / 3.6, 500, 1);
-			link.setAllowedModes(transitModes);
+			link.setAllowedModes(this.transitModes);
 			this.links.put(connection, link);
 
 			if (toFacility.getLink() == null) {
 				toFacility.setLink(link);
+				this.stopFacilities.put(connection, toFacility);
 			} else {
 				List<TransitStopFacility> copies = this.facilityCopies.get(toFacility);
 				if (copies == null) {
@@ -156,7 +158,10 @@ public class CreatePseudoNetwork {
 				this.nodes.put(newFacility, toNode);
 				this.schedule.addStopFacility(newFacility);
 				toStop.setStopFacility(newFacility);
+				this.stopFacilities.put(connection, newFacility);
 			}
+		} else {
+			toStop.setStopFacility(this.stopFacilities.get(connection));
 		}
 		return link;
 	}
