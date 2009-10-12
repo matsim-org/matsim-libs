@@ -1,6 +1,6 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * EdgeIntervall.java
+ * project: org.matsim.*												   *
+ * EdgeIntervall.java													   *	
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -24,28 +24,28 @@ package playground.dressler.Intervall.src.Intervalls;
 
 /**
  * @author Manuel Schneider
- * class representing an edge in a given timeIntervall in an timeexpanded network
- * carries information on the constant integer flow during that timeframe 
+ * class representing an edge in a given timeIntervall in an time expanded network
+ * carries information on the constant integer flow during that time frame 
  */
 public class EdgeIntervall extends Intervall 
 
 {
 
-//-----------------------------FIELDS--------------------------//
+//**********************************FIELDS*****************************************//
 	/**
 	 * field for flow information
-	 * flow is considered to be constant during the timespan of the Intervall
-	 * default flowvalue is 0
+	 * flow is considered to be constant during the time span of the Intervall
+	 * default flow value is 0
 	 */
 	private int _flow =0;
 
-//-----------------------------METHODS-------------------------//	
-//*************************************************************//
+//********************************METHODS******************************************//	
+
 	
-//----------------------------CONSTRUCTORS---------------------//
+//----------------------------CONSTRUCTORS-----------------------------------------//
 	
 	/**
-	 * Default constructor creating an (0,1) intervall with flowvalue 0
+	 * Default constructor creating an (0,1) EdgeIntervall with flow value 0
 	 */
 	public EdgeIntervall() {
 		super();
@@ -53,55 +53,55 @@ public class EdgeIntervall extends Intervall
 
 	/**
 	 * creating an EdgeIntervall (l,r)
-	 * with flowvalue 0
-	 * @param l lowbound
+	 * with flow value 0
+	 * @param l lowerbound
 	 * @param r highbound
 	 */
-	public EdgeIntervall(int l, int r) {
+	public EdgeIntervall(final int l,final int r) {
 		super(l, r);
 	}
 	
 	/**
-	 * Construct An EdgeIntervall out of an Intervall
-	 * flowvalue is set to 0
+	 * Construct an EdgeIntervall out of an Intervall
+	 * flow value is set to 0
 	 * @param i Intervall to be copied to an EdgeIntervall
 	 * 
 	 */
-	public EdgeIntervall(Intervall i){
+	public EdgeIntervall(final Intervall i){
 		super(i.getLowBound(),i.getHighBound());
 	}
 	
 	/**
 	 * Construct An EdgeIntervall out of an Intervall
-	 * flowvalue is set to f
+	 * flow value is set to f
 	 * @param i Intervall to be copied to an EdgeIntervall
-	 * @param flowvalue
+	 * @param f positive flow value
 	 * 
 	 */
-	public EdgeIntervall(Intervall i,int f){
+	public EdgeIntervall(final Intervall i,final int f){
 		this(i);
 		this.setFlow(f);
 	}
 
 	/**
 	 * creating an EdgeIntervall (l,r)
-	 * with flowvalue f
+	 * with flow value f
 	 * @param l lowbound 
 	 * @param r highbound
-	 * @param f flowvalue
+	 * @param f positive flow value
 	 */
-	public EdgeIntervall(int l, int r, int f) {
+	public EdgeIntervall(final int l,final int r,final int f) {
 		super(l, r);
 		this.setFlow(f);
 	}
 	
-//-------------------------GETTER AND SETTER-----------------------//
+//----------------------------------GETTER AND SETTER------------------------------//
 	
 	/**
-	 * Setter for flowvalue on an edge during tthe toimeframe of the Intervall
-	 * @param f flowvalue
+	 * Setter for flow value on an edge during the time frame of the Intervall
+	 * @param f positive flow value
 	 */
-	public void setFlow(int f){
+	public void setFlow(final int f){
 		if(f>=0){
 			this._flow=f;
 		}
@@ -111,7 +111,7 @@ public class EdgeIntervall extends Intervall
 	}
 	
 	/**
-	 * Getter for the flowvalue on an edge during tthe toimeframe of the Intervall
+	 * Getter for the flow value on an edge during the time frame of the Intervall
 	 * @return amount of flow on edge 
 	 */
 	public int getFlow(){
@@ -119,20 +119,11 @@ public class EdgeIntervall extends Intervall
 	}
 	
 	/**
-	 * changes the flow by f and throws an Exception if the new flow would succeed u or get negative
-	 * @param f amount of flow to augment
-	 * @param u  nonegetive capacty
-	 */
-	public void changeFlow(int f, int u){
-		this.setFlow(f+this._flow, u);
-	}
-	
-	/**
 	 * sets the flow to f and throws an Exception if the new flow would succeed u or is negative
 	 * @param f new flow value
-	 * @param u  nonegetive capacty
+	 * @param u  nonnegative capacity
 	 */
-	public void setFlow(int f, int u){
+	public void setFlow(final int f,final int u){
 		if(u<0){
 			throw new IllegalArgumentException("negative capacity");
 		}
@@ -141,91 +132,94 @@ public class EdgeIntervall extends Intervall
 		}else
 			throw new IllegalArgumentException("capacity violated");
 	}
-
 	
-//-----------------------------SPLITTING---------------------------//
+	/**
+	 * changes the flow by f and throws an Exception if the new flow would succeed u or get negative
+	 * @param f amount of flow to augment
+	 * @param u  nonnegative capacity
+	 */
+	public void changeFlow(final int f,final int u){
+		this.setFlow(f+this._flow, u);
+	}
+	
+//-------------------------------------SPLITTING-----------------------------------//
 	
 	/**
 	 * splits the referenced EdgeIntervall at t contained in (lowbound, higbound)
-	 * by changeing!! referenced Intervall to (lowbound,t) 
-	 * and creating a new EdgeInterval (t,highbound) with same Flowvalue as the referenced
+	 * by changing !! the referenced Intervall to (lowbound,t) 
+	 * and creating a new EdgeInterval (t,highbound) with same flow value as the referenced
 	 *@param t point to split at
 	 *@return new Interval 
 	 */
-	public EdgeIntervall splitAt(int t){
+	public EdgeIntervall splitAt(final int t){
 		Intervall j =super.splitAt(t);
 		EdgeIntervall k = new EdgeIntervall(j);
 		k._flow=this._flow;
 		return k;
 	}
-	/*
-	public static EdgeIntervall maxRight( Collection<EdgeIntervall> C){
-		if(C==null)throw new NullPointerException("Collection was null");
-		if(!C.isEmpty()){
-			int max = Integer.MIN_VALUE;
-			EdgeIntervall maxintervall = null;
-			for(EdgeIntervall i : C){
-				if (max<=i.getHighBound()){
-					max= i.getHighBound();
-					maxintervall=i;
-				}
-			}
-		 return maxintervall;	
-		}
-		throw new IllegalArgumentException("Empty Collection");
-	}
-	*/
-//-----------------------------comparators-------------------------//	
+	
+//-----------------------------------COMPARING-------------------------------------//	
 	
 	/**
 	 * compares the  lowbounds
 	 * Is not compatible to equals !!!!!
-	 * @param o
-	 * @return this.low-o.low
+	 * @param other Intervall to compare
+	 * @return this.lowbound-other.lowbound
 	 */
-	public int compareTo(EdgeIntervall o) {
-		return (this.getLowBound()-o.getLowBound());
+	public int compareTo(final EdgeIntervall other) {
+		return (this.getLowBound()-other.getLowBound());
 	
 	}
 	
 	/**
 	 * checks for equality of referenced and other
 	 * @param other Intervall
-	 * @return true iff Intervall and Flow are equal
+	 * @return true iff Intervall and flow value are equal
 	 */
-	public boolean equals(EdgeIntervall  other){
+	public boolean equals(final EdgeIntervall  other){
 		boolean ret = false;
 		ret= super.equals(other);
 		if(ret){
-			
 			ret= (this.getFlow()==other.getFlow());
 		}
 		return ret;
 	}
 	
 	/**
-	 * checks for equality of the intervalls, flow may differ
-	 * equivalten to Intervall.equlals(Intervall)
-	 * @param other
+	 * checks for equality of the underlying Intervalls, flow value may differ
+	 * equivalent to Intervall.equlals(Intervall)
+	 * @param other EdgeIntervall
 	 * @return
 	 */
-	public boolean sameIntervall(EdgeIntervall other){
+	public boolean sameIntervall(final EdgeIntervall other){
 		return super.equals(other);
 	}
+
+//----------------------- SHIFTING ------------------------------------------------//
 	
-	public EdgeIntervall shiftPositive(int tau){
-		int l,r;
+	/**
+	 * Method to shift a EdgeIntervall within the positive numbers and same flow value.
+	 * The EdgeIntervall might get cut off.
+	 * @param tau value to be shifted by
+	 * @return EdgeIntervall in the positive integers null if the shift does not intersect the positive integers
+	 */
+	public EdgeIntervall shiftPositive(final int tau){
 		Intervall tmp = super.shiftPositive(tau);
 		if(tmp == null)
 			return null;
 		return new EdgeIntervall(tmp, this.getFlow());
 	}
+
+//--------------------STRING METHODS-----------------------------------------------//
 	
+	/**
+	 * Gives a String representation of an EdgeIntervall.
+	 * Example: "[1,2) f: 2"
+	 * @return String representation
+	 */
 	public String toString()
 	{
-		return "[" + this.getLowBound() + "," + this.getHighBound() + "): f: " + this.getFlow(); 
+		return "[" + this.getLowBound() + "," + this.getHighBound() + ") f: " + this.getFlow(); 
 	}
-	
-//	-----------------------------MAIN METHOD-------------------------//	
-	
+
 }
