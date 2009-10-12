@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.FolderType;
 import net.opengis.kml._2.KmlType;
@@ -41,6 +43,7 @@ import net.opengis.kml._2.PolyStyleType;
 import net.opengis.kml._2.StyleType;
 import net.opengis.kml._2.TimeSpanType;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
@@ -49,6 +52,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
@@ -81,6 +85,7 @@ import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterPersonHasPlans;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.vis.kml.KMZWriter;
+import org.xml.sax.SAXException;
 
 public class MyRuns {
 
@@ -94,9 +99,9 @@ public class MyRuns {
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		sl.loadNetwork();
-		ScenarioImpl scenario = sl.getScenario();		
+		ScenarioImpl scenario = sl.getScenario();
 
-		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
+		final PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
 		plans.addAlgorithm(new PersonFilterSelectedPlan());
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
@@ -125,7 +130,7 @@ public class MyRuns {
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		sl.loadNetwork();
 		NetworkLayer network = sl.getScenario().getNetwork();
-		
+
 		System.out.println("  extracting aoi... at " + (new Date()));
 		for (LinkImpl link : network.getLinks().values()) {
 			final NodeImpl from = link.getFromNode();
@@ -241,7 +246,7 @@ public class MyRuns {
 		final Config config = sl.getScenario().getConfig();
 
 		System.out.println("  setting up plans objects...");
-		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
+		final PopulationImpl plans = sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
@@ -261,6 +266,21 @@ public class MyRuns {
 		System.out.println();
 	}
 
+	public static void createSample(final String[] args) {
+		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		sl.loadNetwork();
+		Config config = sl.getScenario().getConfig();
+
+		final PopulationImpl plans = sl.getScenario().getPopulation();
+		plans.setIsStreaming(true);
+		final PopulationWriter plansWriter = new PopulationWriter(plans, config.plans().getOutputFile(), "v4", config.plans().getOutputSample());
+		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
+
+		plans.addAlgorithm(plansWriter);
+		plansReader.readFile(config.plans().getInputFile());
+		plansWriter.write();
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	// calcNofLanes
 	//////////////////////////////////////////////////////////////////////
@@ -271,7 +291,7 @@ public class MyRuns {
 
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		sl.loadNetwork();
-		
+
 		NetworkLayer network = sl.getScenario().getNetwork();
 
 		System.out.println("  calculating number of lanes... ");
@@ -339,7 +359,7 @@ public class MyRuns {
 		ScenarioLoader sl = new ScenarioLoader(args[0]);
 		sl.loadNetwork();
 		ScenarioImpl scenario = sl.getScenario();
-		
+
 		NetworkLayer network = scenario.getNetwork();
 
 		System.out.println("  falsifying the network...");
@@ -351,12 +371,12 @@ public class MyRuns {
 		System.out.println("  done.");
 
 		System.out.println("  processing plans...");
-		final PopulationImpl population = (PopulationImpl) scenario.getPopulation();
+		final PopulationImpl population = scenario.getPopulation();
 		population.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(population);
 		final PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		population.addAlgorithm(new ActLocationFalsifier(200));
-		population.addAlgorithm(new XY2Links((NetworkLayer) network));
+		population.addAlgorithm(new XY2Links(network));
 		final FreespeedTravelTimeCost timeCostFunction = new FreespeedTravelTimeCost();
 		population.addAlgorithm(new PlansCalcRoute(network, timeCostFunction, timeCostFunction));
 		population.addAlgorithm(plansWriter);
@@ -368,7 +388,7 @@ public class MyRuns {
 		System.out.println("RUN: falsifyNetAndPlans finished.");
 		System.out.println();
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// buildKML2
 	//////////////////////////////////////////////////////////////////////
@@ -410,7 +430,7 @@ public class MyRuns {
 
 		if (useVolumes) {
 			System.out.println("  reading plans...");
-			final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
+			final PopulationImpl plans = sl.getScenario().getPopulation();
 			plans.setIsStreaming(true);
 			final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 			plans.addAlgorithm(
@@ -581,25 +601,51 @@ public class MyRuns {
 //		Coord alexanderplatz = new CoordImpl(25466670/1000.0, 21618520/1000.0);
 //		Coord wgs84 = transformation.transform(alexanderplatz);
 //		System.out.println(wgs84.getX() + " / " + wgs84.getY()); // expected: 13.41 / 52.52
-		
+
 //		Gbl.printSystemInfo();
 //		NetworkLayer network = new NetworkLayer();
-//		new MatsimNetworkReader(network).readFile("/Volumes/Data/ETH/cvs/ivt/studies/switzerland/networks/navteq/network.xml.gz");
-		
+//		new MatsimNetworkReader(network).readFile("/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml");
+//		System.out.println(network.getCapacityPeriod());
+
 //		Controler controler = new Controler(new String[] {"test/scenarios/berlin/config.xml"});
 //		controler.run();
-		
+
 //		ArrayList<Integer> list = new ArrayList<Integer>();
 //		list.add(new Integer(5));
 //		System.out.println(list.size());
 //		someMethod(list);
 //		System.out.println(list.size());
-		
-		Double d = null;
-		System.out.println("some value: " + d);
-		
+
+//		Integer i1 = new Integer(12);
+//		Integer i2 = new Integer(12);
+//		Integer i3 = Integer.valueOf(12);
+//		Integer i4 = Integer.valueOf(12);
+//		System.out.println(i1 == i2);
+//		System.out.println(i1 == i3);
+//		System.out.println(i3 == i4);
+
+		ScenarioImpl scenario = new ScenarioImpl();
+
+		Logger log = Logger.getLogger(MyRuns.class);
+		try {
+			log.info("reading network");
+			new MatsimNetworkReader(scenario.getNetwork()).parse("/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml");
+			log.info("reading plans");
+			new MatsimPopulationReader(scenario).parse("/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch10pct.dilZh30km.xml.gz");
+			scenario.getPopulation().printPlansCount();
+			log.info("writing plans");
+			new PopulationWriter(scenario.getPopulation()).writeFile("testplans.xml.gz");
+			log.info("done");
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
-	
+
 //	public static void someMethod(List<Integer> list) {
 //		System.out.println(list.size());
 //		list = new ArrayList<Integer>();
@@ -623,6 +669,7 @@ public class MyRuns {
 //		convertPlans(args);
 //		readPlans(args);
 //		removeLinkAndRoute(args);
+		createSample(args);
 
 		/* ***   DEMAND MODELING   *** */
 
@@ -694,7 +741,7 @@ public class MyRuns {
 //		readCounts(args);
 //		writeKml();
 //		runSimulation();
-		someTest(args);
+//		someTest(args);
 
 		Gbl.printSystemInfo();
 
