@@ -54,14 +54,14 @@ public class CarPoolingListener implements IterationEndsListener {
 					if (act.getType().equals("home") && plan.getNextLeg(act)!= null) {
 						LegImpl homeWorkLeg = plan.getNextLeg(act);
 						ActivityImpl workAct = plan.getNextActivity(homeWorkLeg);
-						if (homeWorkLeg.getMode().toString().equals("car") && workAct.getType().equals("work")) {
+						if (homeWorkLeg.getMode().toString().equals("car") && workAct.getType().contains("work")) {
 							tripNumber = tripNumber+1;
 							WorkTrip wt = new WorkTrip (tripNumber,(IdImpl)p.getId(), act.getCoord(),workAct.getCoord(),homeWorkLeg, true);
 							this.workTrips.addTrip(wt);
 						}
 					}
 					
-					if (act.getType().equals("work") && plan.getNextLeg(act)!=null) {
+					if (act.getType().contains("work") && plan.getNextLeg(act)!=null) {
 						LegImpl workHomeLeg = plan.getNextLeg(act);
 						ActivityImpl homeAct = plan.getNextActivity(workHomeLeg);
 						if (workHomeLeg.getMode().toString().equals("car") && homeAct.getType().equals("home")) {
