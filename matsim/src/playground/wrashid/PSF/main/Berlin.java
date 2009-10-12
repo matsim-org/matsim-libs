@@ -7,6 +7,7 @@ import org.matsim.core.controler.Controler;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.ParametersPSFMutator;
+import playground.wrashid.PSF.PSS.PSSControler;
 import playground.wrashid.PSF.energy.AddEnergyScoreListener;
 import playground.wrashid.PSF.energy.SimulationStartupListener;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
@@ -17,7 +18,13 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 public class Berlin implements ParametersPSFMutator {
 
 	public static void main(String[] args) {
-		Controler controler = new Controler("c:\\data\\matsim\\input\\runRW1002\\config.xml");
+		
+		PSSControler pssControler=new PSSControler("a:\\data\\matsim\\input\\runRW1002\\config.xml", null);
+		
+		pssControler.runMATSimPSSIterations(5);
+		
+		/*
+		Controler controler = new Controler("a:\\data\\matsim\\input\\runRW1002\\config.xml");
 		controler.addControlerListener(new AddEnergyScoreListener());
 		controler.setOverwriteFiles(true);
 
@@ -38,6 +45,7 @@ public class Berlin implements ParametersPSFMutator {
 		HashMap<Id, ChargingTimes> chargingTimes=optimizedCharger.getChargingTimes();
 		
 		ChargingTimes.printEnergyUsageStatistics(chargingTimes, ParametersPSF.getHubLinkMapping());
+		*/
 	} 
 
 	public void mutateParameters() {
