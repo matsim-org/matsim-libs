@@ -30,7 +30,7 @@ import playground.mmoyo.PTRouter.PTRouter;
 import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.Validators.TransitRouteValidator;
 import playground.mmoyo.analysis.Counter;
-import playground.mmoyo.iterations.TransitRouter;
+import playground.mmoyo.ptrouterFromMarcel.MMoyoTransitRouter;
 
 
 /**
@@ -180,7 +180,7 @@ public class Main {
 				
 				/**Try the transitRouter class on equilnet*/
 			case 12:
-				TransitRouter transitRouter = new TransitRouter(transitSchedule);
+				MMoyoTransitRouter transitRouter = new MMoyoTransitRouter(transitSchedule);
 				Coord fromCoord = new CoordImpl(10000.0, 0.0);
 				Coord toCoord = new CoordImpl(-25000.0, 0.0);
 				double departureTime= 24083.6; //24083.6;  // 31283.6   //45683.6
