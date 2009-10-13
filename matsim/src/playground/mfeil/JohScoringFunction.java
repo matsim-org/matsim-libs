@@ -74,38 +74,40 @@ public class JohScoringFunction implements ScoringFunction {
 	private static final Logger log = Logger.getLogger(JohScoringFunction.class);
 	
 	private static final TreeMap<String, JohActUtilityParameters> utilParams = new TreeMap<String, JohActUtilityParameters>();
-	private static double marginalUtilityOfWaiting = -6; //war -6
-	private static double marginalUtilityOfLateArrival = -18; //war -40
-	private static double marginalUtilityOfEarlyDeparture = -0; // war -6
-	private static double marginalUtilityOfTraveling = -6; // war f�r alle -12
-	private static double marginalUtilityOfTravelingPT = -6; // public transport
-	private static double marginalUtilityOfTravelingWalk = -6;
-	private static double marginalUtilityOfDistance = 0;
+	private static double marginalUtilityOfWaiting = -4.04; //war -6
+	private static double marginalUtilityOfLateArrival = -12.12; //war -18
+	private static double marginalUtilityOfEarlyDeparture = -0; // war -0
+	private static double marginalUtilityOfTraveling = -4.04; // war fuer alle -6
+	private static double marginalUtilityOfTravelingPT = -2.04; 
+	private static double marginalUtilityOfTravelingWalk = -1.17;
+	private static double marginalUtilityOfDistance = 0; // war 0
+	
+	//private static double repeat = 0.332;
 	
 	private static final double uMin_home = 0;
 	private static final double uMin_work = 0;
 	private static final double uMin_shopping = 0;
 	private static final double uMin_leisure = 0;
-	private static final double uMax_home = 60; //120//60//80//70
-	private static final double uMax_work= 55;  //100//55//70//60
-	private static final double uMax_shopping = 12; //40//20//12//12
-	private static final double uMax_leisure = 35;  //80//45//24//24
-	private static final double alpha_home = 6;//6//8
-	private static final double alpha_work = 4;//4//6
-	private static final double alpha_shopping = 1;//1//1
-	private static final double alpha_leisure = 2;//2//2
-	private static final double beta_home = 1.2;
+	private static final double uMax_home = 2.86; //60
+	private static final double uMax_work= 1.54;  //55
+	private static final double uMax_shopping = 1.31; //12
+	private static final double uMax_leisure = 2.29;  //35
+	private static final double alpha_home = 8.89;//6
+	private static final double alpha_work = 4.38;//4
+	private static final double alpha_shopping = -0.84;//1
+	private static final double alpha_leisure = 0.393;//2
+	private static final double beta_home = 1.2;//1.2
 	private static final double beta_work = 1.2;
 	private static final double beta_shopping = 1.2;
 	private static final double beta_leisure = 1.2;
-	private static final double gamma_home = 1;
+	private static final double gamma_home = 1;//1
 	private static final double gamma_work = 1;
 	private static final double gamma_shopping = 1;
 	private static final double gamma_leisure = 1;
 	
 	private static final double uMin_education = 0;
-	private static final double uMax_education = 40;
-	private static final double alpha_education = 3;
+	private static final double uMax_education = 1.18;//40
+	private static final double alpha_education = 1.68;//3
 	private static final double beta_education = 1.2;
 	private static final double gamma_education = 1;
 	
@@ -250,18 +252,10 @@ public class JohScoringFunction implements ScoringFunction {
 		}
 
 		// utility of performing an action
-		/*
-		double mt = 0;
-		if (act.getType().equalsIgnoreCase("home")) mt = 7200;
-		else if (act.getType().equalsIgnoreCase("work")) mt = 3600;
-		else if (act.getType().equalsIgnoreCase("shopping")) mt = 1800;
-		else if (act.getType().equalsIgnoreCase("leisure")) mt = 3600;
-		else System.out.println("Fehler in scoring function!");
-		*/
-		
-		if (duration > 0) {  // needs to be changed back to 0!!!
-			/* NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW */
-			double utilPerf = params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma()));
+		if (duration > 0) {
+			/*int gamma = 0;
+			if (this.index!=0 && this.index!=this.lastActIndex && ((ActivityImpl)(this.plan.getPlanElements().get(this.index))).getType().equals(((ActivityImpl)(this.plan.getPlanElements().get(this.index-2))).getType())) gamma = 1;
+			*/double utilPerf = /*(1 - repeat * gamma) * */(params.getUMin() + (params.getUMax()-params.getUMin())/(java.lang.Math.pow(1+params.getGamma()*java.lang.Math.exp(params.getBeta()*(params.getAlpha()-(duration/3600))),1/params.getGamma())));
 			double utilWait = marginalUtilityOfWaiting / 3600 * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 		} else if (duration<0){
@@ -441,6 +435,26 @@ public class JohScoringFunction implements ScoringFunction {
 		type = "h";
 		actParams = new JohActUtilityParameters("h", uMin_home, uMax_home, alpha_home, beta_home, gamma_home);
 		utilParams.put(type, actParams);
+		
+		type = "s";
+		actParams = new JohActUtilityParameters("s", uMin_shopping, uMax_shopping, alpha_shopping, beta_shopping, gamma_shopping);
+		actParams.setOpeningTime(10*3600);
+		actParams.setClosingTime(18*3600);
+		utilParams.put(type, actParams);
+
+		type = "l";
+		actParams = new JohActUtilityParameters("l", uMin_leisure, uMax_leisure, alpha_leisure, beta_leisure, gamma_leisure);
+		actParams.setOpeningTime(18*3600);
+		actParams.setClosingTime(22*3600);			
+		utilParams.put(type, actParams);
+		
+		type = "e";
+		actParams = new JohActUtilityParameters("e", uMin_education, uMax_education, alpha_education, beta_education, gamma_education);
+		actParams.setOpeningTime(7*3600);
+		actParams.setClosingTime(16*3600);
+		actParams.setLatestStartTime(9*3600);
+		actParams.setEarliestEndTime(12*3600);
+		utilParams.put(type, actParams);
 
 		
 	}
@@ -450,12 +464,12 @@ public class JohScoringFunction implements ScoringFunction {
 
 		if (this.index == 0) {
 			this.firstActTime = time;
-		} else if (this.index == this.lastActIndex) {
+		} /*else*/ if (this.index == this.lastActIndex) {
 			String lastActType = act.getType();
 			if (lastActType.equals(((ActivityImpl) this.plan.getPlanElements().get(0)).getType())) {
 				// the first Act and the last Act have the same type
-				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
-				
+				double sc = calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
+				this.score += sc;				
 			} else {
 				if (scoreActs) {
 					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
@@ -467,15 +481,17 @@ public class JohScoringFunction implements ScoringFunction {
 					
 				}
 			}
-		} else {
-			this.score += calcActScore(this.lastTime, time, act);
+		} else if (this.index != 0){
+			double sc = calcActScore(this.lastTime, time, act);
+			this.score += sc;
 		}
 		this.index++;
 	}
 
 	private void handleLeg(final double time) {
 		LegImpl leg = (LegImpl)this.plan.getPlanElements().get(this.index);
-		this.score += calcLegScore(this.lastTime, time, leg);
+		double lg = calcLegScore(this.lastTime, time, leg);
+		this.score += lg;
 		this.index++;
 	}
 
