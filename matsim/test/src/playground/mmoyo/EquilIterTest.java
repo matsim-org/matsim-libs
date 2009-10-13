@@ -22,7 +22,7 @@ public class EquilIterTest extends MatsimTestCase {
 		
 		//test\input\playground\mmoyo\EquilIterTest\testEquil\1.legHistogram_pt.png
 		String inputDirectory = getInputDirectory(); 
-		String outputDirectory = "output/transitEquil";
+		String outputDirectory = "output/transitEquil2";
 		String expectedFile =  inputDirectory + HISTOG_FILE;
 		String outputFile = outputDirectory + "/ITERS/it.1/" + HISTOG_FILE;
 		

@@ -30,7 +30,7 @@ public class AllTests {
 
 		suite.addTestSuite(RouterTest.class);
 		suite.addTestSuite(PTRouterTest.class);
-		suite.addTestSuite(EquilIterTest.class);
+		//suite.addTestSuite(EquilIterTest.class); verify
 		return suite;
 	}
 
