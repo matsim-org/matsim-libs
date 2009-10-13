@@ -89,7 +89,7 @@ public class MyCommercialClusterStringBuilder extends MyStringBuilder{
 	 * @return the absolute path of the folder.
 	 */
 	public String getVehicleFoldername() {
-		return this.getRoot() + "/DigiCore/XML/" + version + "/" + threshold + "/Sample" + sample + "/";
+		return this.getRoot() + "DigiCore/XML/" + version + "/" + threshold + "/Sample" + sample + "/";
 	}
 	
 	/**

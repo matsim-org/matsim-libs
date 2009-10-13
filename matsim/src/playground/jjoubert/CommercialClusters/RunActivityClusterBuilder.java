@@ -38,7 +38,7 @@ public class RunActivityClusterBuilder {
 	 * 		5 - Study area (no output; all vehicles SNA)	
 	 * 		6 - Study area (output and SNA)						|
 	 *=============================================================================*/
-	private static int scenario = 2	;
+	private static int scenario = 6	;
 	
 	 /*=============================================================================
 	 * String value that must be set. Allowed study areas are:						|
