@@ -30,8 +30,6 @@ import playground.mmoyo.PTRouter.PTRouter;
 import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.Validators.TransitRouteValidator;
 import playground.mmoyo.analysis.Counter;
-import playground.mmoyo.ptrouterFromMarcel.MMoyoTransitRouter;
-
 
 /**
  * This class contains the options to route with a TransitSchedule object 
@@ -88,7 +86,7 @@ public class Main {
 				Coord coord2 = new CoordImpl(684854, 254079);
 				//NodeImpl nodeA = plainNetwork.getNode("299598");
 				//NodeImpl nodeB = plainNetwork.getNode("8503309");
-				Path path = ptRouter.findPTPath (coord1, coord2, 37075, 400);
+				Path path = ptRouter.findPTPath (coord1, coord2, 37075);
 				System.out.println(path.links.size());
 				for (Link l : path.links){
 					System.out.println(l.getId()+ ": " + l.getFromNode().getId() + " " + ((LinkImpl)l).getType() + " " + l.getToNode().getId() );
@@ -180,11 +178,12 @@ public class Main {
 				
 				/**Try the transitRouter class on equilnet*/
 			case 12:
-				MMoyoTransitRouter transitRouter = new MMoyoTransitRouter(transitSchedule);
+				ptRouter = new PTRouter(logicFactory.getLogicNet());
+				//x=10000.0][y=0.0] to [x=-25000.0][y=0.0] departure Time:24083.6
 				Coord fromCoord = new CoordImpl(10000.0, 0.0);
 				Coord toCoord = new CoordImpl(-25000.0, 0.0);
 				double departureTime= 24083.6; //24083.6;  // 31283.6   //45683.6
-				List<Leg> listLeg= transitRouter.calcRoute(fromCoord, toCoord, departureTime);
+				List<Leg> listLeg= ptRouter.calcRoute(fromCoord, toCoord, departureTime);
 				for (Leg leg :listLeg){
 					if (leg.getRoute()!=null){
 						System.out.println(leg.getRoute());

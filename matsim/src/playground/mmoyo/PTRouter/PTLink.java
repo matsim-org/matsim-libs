@@ -13,7 +13,8 @@ public class PTLink extends LinkImpl{
 	private TransitRoute transitRoute;
 	private TransitLine transitLine;
 	private double travelTime;
-	private byte aliasType;   //1= access, 2= standard, 3= transfer 4= detTransfer 5= Egress
+	private double walkTime = Double.NaN;
+	private byte aliasType ;   //1= access, 2= standard, 3= transfer 4= detTransfer 5= Egress
 	private Link plainLink;
 	PTValues ptValues = new PTValues();
 	
@@ -28,6 +29,8 @@ public class PTLink extends LinkImpl{
 		else if (type.equals("DetTransfer")){aliasType=4;}
 		else if (type.equals("Egress")) 	{aliasType=5;}
 		else 				{aliasType=0;}
+		
+		if (aliasType!=2){ this.walkTime = this.length * ptValues.AV_WALKING_SPEED;  }
 		network.addLink(this);///
 	}
 
@@ -35,7 +38,7 @@ public class PTLink extends LinkImpl{
 		return transitRoute;
 	}
 
-	public void setTransitRoute(TransitRoute transitRoute) {
+	public void setTransitRoute(final TransitRoute transitRoute) {
 		this.transitRoute = transitRoute;
 	}
 
@@ -43,7 +46,7 @@ public class PTLink extends LinkImpl{
 		return travelTime;
 	}
 
-	public void setTravelTime(double travelTime) {
+	public void setTravelTime(final double travelTime) {
 		this.travelTime = travelTime;
 	}
 
@@ -51,7 +54,7 @@ public class PTLink extends LinkImpl{
 		return this.aliasType;
 	}
 
-	public void setAliasType(byte aliasType) {
+	public void setAliasType(final byte aliasType) {
 		this.aliasType = aliasType;
 	}
 
@@ -59,7 +62,7 @@ public class PTLink extends LinkImpl{
 		return plainLink;
 	}
 
-	public void setPlainLink(Link plainLink) {
+	public void setPlainLink(final Link plainLink) {
 		this.plainLink = plainLink;
 	}
 
@@ -67,12 +70,12 @@ public class PTLink extends LinkImpl{
 		return transitLine;
 	}
 
-	public void setTransitLine(TransitLine transitLine) {
+	public void setTransitLine(final TransitLine transitLine) {
 		this.transitLine = transitLine;
 	}
 
 	public double getWalkTime(){
-		return this.length * ptValues.getAV_WALKING_SPEED();
+		return this.walkTime;
 	}
 
 }

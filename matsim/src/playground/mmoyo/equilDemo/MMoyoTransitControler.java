@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.iterations;
+package playground.mmoyo.equilDemo;
 
 import java.io.IOException;
 import java.util.EnumSet;
@@ -47,11 +47,12 @@ import playground.marcel.pt.config.TransitConfigGroup;
 import playground.marcel.pt.queuesim.TransitQueueSimulation;
 import playground.marcel.pt.replanning.TransitStrategyManagerConfigLoader;
 import playground.marcel.pt.routes.ExperimentalTransitRouteFactory;
-import playground.mmoyo.ptrouterFromMarcel.MMoyoPlansCalcTransitRoute;
+
 
 /**
  * @author mrieser
  */
+/**copy of marcel.pt.controler.TransitControler to test the ptRouter in the simulation*/
 public class MMoyoTransitControler extends Controler {
 
 	private final TransitConfigGroup transitConfig;

@@ -68,7 +68,7 @@ public class PTRouterTest extends MatsimTestCase {
 		/**tests search path results*/		
 		Coord coord1 = new CoordImpl(1010, 5010);
 		Coord coord2 = new CoordImpl(8950, 8950);
-		Path path = ptRouter.findPTPath (coord1, coord2, 2808, 400);   //07:48 , 400 walk distance
+		Path path = ptRouter.findPTPath (coord1, coord2, 2808);   //07:48 , 400 walk distance
 		List<Node> plainPathNodes  = logicIntoPlainTranslator.convertNodesToPlain(path.nodes);
 		assertEquals( plainPathNodes.get(0).getId() , new IdImpl("10")); 
 		assertEquals( plainPathNodes.get(1).getId() , new IdImpl("15"));

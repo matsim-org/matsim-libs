@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.iterations;
+package playground.mmoyo.equilDemo;
 
 import java.util.EnumSet;
 
@@ -27,7 +27,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.scenario.ScenarioLoader;
+import playground.marcel.pt.controler.TransitControler;
 
+/**copy of marcel.pt.demo.equilNet.EquilnetDemo.java to test the ptRouter in the simulation*/
 public class MMoyoEquilnetDemo {
 
 	private final ScenarioImpl scenario = new ScenarioImpl();
@@ -78,7 +80,12 @@ public class MMoyoEquilnetDemo {
 
 	private void runControler() {
 		new ScenarioLoader(this.scenario).loadScenario();
-		MMoyoTransitControler c = new MMoyoTransitControler(this.scenario);
+		TransitControler c = new TransitControler(this.scenario);
+		
+		////////////////////////////////////////////////////
+		c.setOverwriteFiles(true);   //temporarily overwrite
+		////////////////////////////////////////////////////
+
 		c.run();
 	}
 

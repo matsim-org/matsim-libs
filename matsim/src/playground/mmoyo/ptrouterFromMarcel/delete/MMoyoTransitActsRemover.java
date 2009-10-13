@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.ptrouterFromMarcel;
+package playground.mmoyo.ptrouterFromMarcel.delete;
 
 import java.util.List;
 
@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import playground.marcel.pt.router.PlansCalcTransitRoute;
 
 /**
  * Removes all transit activities (like "pt -interaction") as well as the legs
@@ -46,7 +47,7 @@ public class MMoyoTransitActsRemover implements PlanAlgorithm {
 			PlanElement pe = planElements.get(i);
 			if (pe instanceof Activity) {
 				Activity act = (Activity) pe;
-				if (MMoyoPlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {
+				if (PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {
 					plan.removeActivity(i);
 					n -= 2;
 					i--; // i will be incremented again in next loop-iteration, so we'll check the next act

@@ -13,8 +13,6 @@ public class PTTravelTime implements TravelTime {
 	private double walkTime;
 	private double waitingTime;
 	private double travelTime;
-	private PTValues ptValues = new PTValues(); 
-	private double walkSpeed = ptValues.getAV_WALKING_SPEED();
 	private byte aliasType;
 	
 	//Map <Id, List<Double>> dynTravTimeIndex = new TreeMap <Id, List<Double>>();
@@ -31,12 +29,7 @@ public class PTTravelTime implements TravelTime {
 		
 		switch (aliasType){
 		case 4:    // DetTransfer
-			walkTime=link.getLength()* walkSpeed;
-			waitingTime= getTransferTime(link.getToNode(), time+walkTime);
-			travelTime= walkTime + waitingTime; 
-			break;
-		case 1:   //access
-			walkTime=link.getLength()* walkSpeed;
+			walkTime= ptLink.getWalkTime();
 			waitingTime= getTransferTime(link.getToNode(), time+walkTime);
 			travelTime= walkTime + waitingTime; 
 			break;
@@ -46,14 +39,18 @@ public class PTTravelTime implements TravelTime {
 		case 2: //  "Standard"
 			travelTime = ptLink.getTravelTime() * 60; // stored in minutes, returned in seconds
 			break;
+		case 1:   //access
+			walkTime=  ptLink.getWalkTime();
+			waitingTime= getTransferTime(link.getToNode(), time+walkTime);
+			travelTime= walkTime + waitingTime; 
+			break;
 		case 5: //"Egress" 
-			travelTime= link.getLength()* walkSpeed;
+			travelTime= ptLink.getWalkTime();
 			break;
 		default:
 			 throw new NullPointerException("The link does not have a defined type" + link.getId());
 		}
 
-		
 		lastLink= link;
 		lastTime = time;
 		lastTravelTime = travelTime;

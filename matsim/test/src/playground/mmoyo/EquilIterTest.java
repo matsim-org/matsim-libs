@@ -12,7 +12,7 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
-import playground.marcel.pt.demo.equilnet.EquilnetDemo;
+import playground.mmoyo.equilDemo.MMoyoEquilnetDemo;
 
 public class EquilIterTest extends MatsimTestCase {
 	
@@ -31,7 +31,7 @@ public class EquilIterTest extends MatsimTestCase {
 			IOUtils.deleteDirectory(directoryFile);
 		}
 		
-		EquilnetDemo demo = new EquilnetDemo();
+		MMoyoEquilnetDemo demo = new MMoyoEquilnetDemo();
 		demo.run();
 		
 		BufferedReader expected = new BufferedReader(new FileReader(new File(expectedFile)));

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.ptrouterFromMarcel;
+package playground.mmoyo.equilDemo;
 
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -49,17 +49,22 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 
 import playground.marcel.pt.config.TransitConfigGroup;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
+import playground.marcel.pt.router.TransitActsRemover;
+import playground.marcel.pt.router.TransitRouterConfig;
+import playground.mmoyo.PTRouter.PTRouter;
 
 /**
  * @author mrieser
  */
+
+/**copy of marcel.pt.router.PlansCalcTransitRoute.java to test the ptRouter in the simulation*/
 public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 
 	public final static String TRANSIT_ACTIVITY_TYPE = "pt interaction";
 
-	private final MMoyoTransitActsRemover transitLegsRemover = new MMoyoTransitActsRemover();
-	private final MMoyoTransitRouterConfig routerConfig = new MMoyoTransitRouterConfig();
-	private final MMoyoTransitRouter transitRouter;
+	private final TransitActsRemover transitLegsRemover = new TransitActsRemover();
+	private final TransitRouterConfig routerConfig = new TransitRouterConfig();
+	private final PTRouter transitRouter;
 	private final TransitConfigGroup transitConfig;
 	private final TransitSchedule schedule;
 
@@ -74,7 +79,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 
 		this.schedule = schedule;
 		this.transitConfig = transitConfig;
-		this.transitRouter = new MMoyoTransitRouter(schedule, this.routerConfig);
+		this.transitRouter = new PTRouter(schedule, this.routerConfig);
 		
 		LeastCostPathCalculator routeAlgo = super.getLeastCostPathCalculator();
 		if (routeAlgo instanceof Dijkstra) {

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.ptrouterFromMarcel;
+package playground.mmoyo.ptrouterFromMarcel.delete;
 
 public class MMoyoTransitRouterConfig {
 

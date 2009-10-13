@@ -117,7 +117,7 @@ public class Counter {
 			    			//inWalkRange++;
 			    		}else{
 				    		//startTime = System.currentTimeMillis();
-				    		Path path = ptRouter.findPTPath(lastActCoord, actCoord, lastAct.getEndTime(), distToWalk);
+				    		Path path = ptRouter.findPTPath(lastActCoord, actCoord, lastAct.getEndTime());
 				    		
 				    		//duration= System.currentTimeMillis()-startTime;
 				    		if(path!=null){

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.ptrouterFromMarcel;
+package playground.mmoyo.ptrouterFromMarcel.delete;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 
-import playground.mmoyo.ptrouterFromMarcel.MMoyoTransitRouterNetwork.TransitRouterNetworkLink;
+import playground.mmoyo.ptrouterFromMarcel.delete.MMoyoTransitRouterNetwork.TransitRouterNetworkLink;
 
 
 /**

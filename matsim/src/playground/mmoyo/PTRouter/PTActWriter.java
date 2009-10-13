@@ -157,7 +157,7 @@ public class PTActWriter {
 			    			inWalkRange++;
 			    		}else{
 				    		startTime = System.currentTimeMillis();
-				    		Path path = ptRouter.findPTPath(lastActCoord, actCoord, lastAct.getEndTime(), firstWalkRange);
+				    		Path path = ptRouter.findPTPath(lastActCoord, actCoord, lastAct.getEndTime());
 				    		duration= System.currentTimeMillis()-startTime;
 				    		if(path!=null){
 				    			if (path.nodes.size()>1){
