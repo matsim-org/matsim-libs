@@ -35,7 +35,8 @@ public class RunActivityClusterBuilder {
 	 * 		2 - Study area (with output)											|
 	 * 		3 - TODO City Deep sample (no output; single vehicle SNA)				|
 	 * 		4 - Study area (no output; single vehicle SNA)							|
-	 * 		5 - Study area (no output; all vehicles SNA)							|
+	 * 		5 - Study area (no output; all vehicles SNA)	
+	 * 		6 - Study area (output and SNA)						|
 	 *=============================================================================*/
 	private static int scenario = 2	;
 	
@@ -57,7 +58,7 @@ public class RunActivityClusterBuilder {
 	 * 		- null (this ensures that BOTH minor and major activities are 			|
 	 * 		  considered.															|
 	 *=============================================================================*/
-	private static String activityType = "minor";
+	private static String activityType = null;
 
 	 /*=============================================================================
 	 * String value indicating where the root where job is executed. 				|
@@ -65,14 +66,14 @@ public class RunActivityClusterBuilder {
 	 * 		- IVT-Sim0																|
 	 * 		- Satawal																|
 	 *=============================================================================*/
-	private static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
+//	private static String root = "/Users/johanwjoubert/MATSim/workspace/MATSimData/"; 	// Mac
 //	private static String root = "/home/jjoubert/";										// IVT-Sim0
-//	private static String root = "/home/jjoubert/data/";								// Satawal
+	private static String root = "/home/jjoubert/data/";								// Satawal
 	
 	 /*=============================================================================
 	 * String value indicating the version to run									|
 	 *=============================================================================*/
-	private static String version = "20091008164221";
+	private static String version = "20091010104236";
 	
 	 /*=============================================================================
 	 * String array with all the minor/major thresholds that should be considered. 	|
@@ -82,7 +83,8 @@ public class RunActivityClusterBuilder {
 	 /*=============================================================================
 	 * String array with all the sample numbers that should be considered. 			|
 	 *=============================================================================*/	
-	private static String[] sampleArray = {"01", "02"};
+//	private static String[] sampleArray = {"01", "02"};
+	private static String[] sampleArray = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10"};
 	
 	 /*=============================================================================
 	 * Cluster parameters that must be set. These include: 							|
@@ -91,8 +93,10 @@ public class RunActivityClusterBuilder {
 	 * 		- minimumPoints: the minimum number of activities required within the	|
 	 * 		  radius before a new cluster will be created.							| 
 	 *=============================================================================*/
-	private static int radius = 20;
-	private static int minimumPoints = 30;
+//	private static int radius = 20;
+	private static int[] radiusArray = {10,15,20,25,30};
+//	private static int minimumPoints = 30;
+	private static int[] minimumPointsArray = {10,20,30,40,50};
 	
 	 /*=============================================================================
 	 * Other utility parameters. Need not be set/changed							|
@@ -108,45 +112,50 @@ public class RunActivityClusterBuilder {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		log.info("==================================================================");
-		log.info(" Clustering activities for " + studyAreaName);
-		log.info("------------------------------------------------------------------");
-		log.info(" Parameter values:");
-		log.info("");
-		log.info("                   Version: " + version);
-		log.info("                Thresholds: " + thresholdsToString(thresholdArray));
-		log.info("                   Samples: " + samplesToString(sampleArray));
-		log.info(" Cluster search radius (m): " + radius);
-		log.info(" Minimum points in cluster: " + minimumPoints);
-		log.info("==================================================================");
-		log.info("");
 		
 		loadScenario();
 		
 		for (String threshold : thresholdArray) {
 			for (String sample : sampleArray) {
-				MyCommercialClusterStringBuilder sb = new MyCommercialClusterStringBuilder(root, version, threshold, 
-														sample, studyAreaName, radius, minimumPoints, activityType);
-				
-				ActivityClusterBuilder acb = new ActivityClusterBuilder(sb);
-				acb.clusterActivities(radius, minimumPoints, activityType);
-								
-				if(visualizeClusters){
-					List<String> outputList = sb.getClusterVisualisationFilenameList();
-					acb.getDjc().visualizeClusters(outputList.get(0), outputList.get(1), outputList.get(2), outputList.get(3));
-				}
-				
-				if(writeClusters){
-					acb.getDjc().writeClustersToFile(sb.getClusterOutputFilename());
-				}
-				
-				if(writeClusterListToXml){
-					MyXmlConverter mxc = new MyXmlConverter();
-					mxc.writeObjectToFile(acb.getDjc().getClusterList(), sb.getClusterXmlFilename());
-				}
-				
-				if(performSNA){
-					acb.executeSna(sb.getVehicleFoldername(), null);
+				for (int radius : radiusArray) {
+					for (int minimumPoints : minimumPointsArray) {
+						log.info("==================================================================");
+						log.info(" Clustering activities for " + studyAreaName);
+						log.info("------------------------------------------------------------------");
+						log.info(" Parameter values:");
+						log.info("");
+						log.info("                   Version: " + version);
+						log.info("                Thresholds: " + thresholdsToString(thresholdArray));
+						log.info("                   Samples: " + samplesToString(sampleArray));
+						log.info(" Cluster search radius (m): " + radius);
+						log.info(" Minimum points in cluster: " + minimumPoints);
+						log.info("==================================================================");
+						log.info("");
+						
+						MyCommercialClusterStringBuilder sb = new MyCommercialClusterStringBuilder(root, version, threshold, 
+								sample, studyAreaName, radius, minimumPoints, activityType);
+						
+						ActivityClusterBuilder acb = new ActivityClusterBuilder(sb);
+						acb.clusterActivities(radius, minimumPoints, activityType);
+						
+						if(visualizeClusters){
+							List<String> outputList = sb.getClusterVisualisationFilenameList();
+							acb.getDjc().visualizeClusters(outputList.get(0), outputList.get(1), outputList.get(2), outputList.get(3));
+						}
+						
+						if(writeClusters){
+							acb.getDjc().writeClustersToFile(sb.getClusterOutputFilename());
+						}
+						
+						if(writeClusterListToXml){
+							MyXmlConverter mxc = new MyXmlConverter();
+							mxc.writeObjectToFile(acb.getDjc().getClusterList(), sb.getClusterXmlFilename());
+						}
+						
+						if(performSNA){
+							acb.executeSna(sb.getVehicleFoldername(), null);
+						}						
+					}
 				}
 			}
 		}
@@ -183,6 +192,12 @@ public class RunActivityClusterBuilder {
 			break;
 
 		case 5: // Study area (no output; with ALL vehicles SNA)
+			performSNA = true;
+			break;
+			
+		case 6: // Study area (output and ALL vehicle SNA)
+			visualizeClusters = true;
+			writeClusters = true;
 			performSNA = true;
 			break;
 
