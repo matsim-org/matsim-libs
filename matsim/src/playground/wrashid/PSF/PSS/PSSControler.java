@@ -10,6 +10,7 @@ import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.ParametersPSFMutator;
@@ -37,6 +38,12 @@ public class PSSControler {
 	}
 	
 	
+	public static void main(String[] args) {
+		PSSControler pssControler=new PSSControler("a:\\data\\matsim\\input\\runRW1002\\config.xml", null);
+		
+		pssControler.runPSS();
+	}
+	
 	/**
 	 * number of iterations, in which both MATSim and PSS (Power System
 	 * Simulation) is run. The number of iterations within matsim is specified
@@ -45,8 +52,22 @@ public class PSSControler {
 	 * @param numberOfIterations
 	 */
 	public void runMATSimPSSIterations(int numberOfIterations) {
+		// if result folder not empty, stop the execution.
+		File resultsDirectory=new File(resultDirectory);
+		if (resultsDirectory.list().length>0){
+			System.out.println("The result directory is not empty."); 
+			System.exit(0);
+		}
 		
-		for (int i=0;i<numberOfIterations;i++){
+		if (!new File(outputPSSPath + "\\hubPriceInfo.txt").exists()){
+			System.out.println("The initial price file is not in " + outputPSSPath); 
+			System.exit(0);
+		}
+		
+		// copy the initial prices to the result directory.
+		GeneralLib.copyFile(outputPSSPath + "\\hubPriceInfo.txt", resultDirectory + "initialHubPriceInfo.txt");
+		
+		for (iterationNumber=0;iterationNumber<numberOfIterations;iterationNumber++){
 			runMATSimIterations();
 			saveMATSimResults();
 			
@@ -54,8 +75,7 @@ public class PSSControler {
 			runPSS();
 			
 			savePSSResults();
-			prepareMATSimInput();
-			
+			prepareMATSimInput();		
 		}
 	}
 	
@@ -70,13 +90,19 @@ public class PSSControler {
 
 	private void savePSSResults() {
 		// TODO Auto-generated method stub
-		GeneralLib.copyFile(outputPSSPath + "hubPriceInfo.txt", getIterationResultDirectory() + "\\" + "hubPriceInfo.txt");
+		GeneralLib.copyFile(outputPSSPath + "\\hubPriceInfo.txt", getIterationResultDirectory() + "\\" + "hubPriceInfo.txt");
 	}
 
 
 	private void preparePSSInput() {
+		// remove chargingLog file, if it exists already
+		File tempChargingLogFile=new File(inputPSSPath + "\\chargingLog.txt");
+		if (tempChargingLogFile.exists()){
+			tempChargingLogFile.delete();
+		}
+		
 		// copy charging log to input directory of PSS
-		GeneralLib.copyFile(ParametersPSF.getMainChargingTimesOutputFilePath(), inputPSSPath + "chargingLog.txt");
+		GeneralLib.copyFile(ParametersPSF.getMainChargingTimesOutputFilePath(), inputPSSPath + "\\chargingLog.txt");
 	}
 
 
@@ -91,6 +117,7 @@ public class PSSControler {
 
 
 	private void runMATSimIterations() {
+		Gbl.reset();
 		controler = new Controler(configFilePath);
 		controler.addControlerListener(new AddEnergyScoreListener());
 		controler.setOverwriteFiles(true);
@@ -117,12 +144,12 @@ public class PSSControler {
 
 
 		// clean output directory
-		File tempFile = new File(outputPSSPath + "hubPriceInfo.txt");
+		File tempFile = new File(outputPSSPath + "\\hubPriceInfo.txt");
 		if (tempFile.exists()) {
 			tempFile.delete();
 		}
 
-		tempFile = new File(outputPSSPath + "fertig.txt");
+		tempFile = new File(outputPSSPath + "\\fertig.txt");
 		if (tempFile.exists()) {
 			tempFile.delete();
 		}
@@ -133,20 +160,34 @@ public class PSSControler {
 			BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(proc.getOutputStream())), true);
 
-			String scriptPath = "a:\\";
-			String scriptName = "IVT_main";
-			out.println("a:");
-			out.println("cd " + scriptPath);
-			out.println("matlab -nodisplay -nojvm -r " + scriptName);
+			String matsimFolderPath="C:\\Program Files (x86)\\MATLAB\\R2008b\\bin\\";
+			//String scriptPath = "a:\\";
+			String scriptName;
+			if (iterationNumber==0){
+				scriptName="IVT_main_base";
+			} else {
+				scriptName="IVT_main";
+			}
+			
+			out.println("cd " + matsimFolderPath);
+			out.println("c:");
+			out.println("matlab -r " + scriptName);
 			out.flush();
+			System.out.println("Starting PSS...");
 		
 		
 		// check, if MATLab finished
-		tempFile = new File(outputPSSPath + "fertig.txt");
+		tempFile = new File(outputPSSPath + "\\fertig.txt");
 		while (!tempFile.exists()){
 			// TODO: do counting, if this not possible
-			Thread.sleep(5000);
+			
+			for (int i=0;i<1000000000;i++){
+				
+			}
+			System.out.print(".");
 		}
+		System.out.println("");
+		System.out.println("Killing matlab...");
 		
 		// stop/kill matlab 
 		Runtime.getRuntime().exec("taskkill /im matlab.exe /f");
