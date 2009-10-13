@@ -21,6 +21,9 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 import java.util.List;
+//import java.io.File;
+//import java.io.FileNotFoundException;
+//import java.io.PrintStream;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
@@ -132,7 +135,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 
 		MatsimRandom.getLocalInstance();
 		
-//		long runStartTime = System.currentTimeMillis();
+		long runStartTime = System.currentTimeMillis();
 		long timerRunTime = 0;
 		long lcRunTime = 0;
 		int numberTimerCalls = 0;
@@ -161,8 +164,8 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		/*
 		double [] xs;
 		double [] ys 									= new double [MAX_ITERATIONS+1];		
-		*/
-		/*
+		
+		System.out.println(Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls"));
 		String outputfile = Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls");
 		Counter.counter++;
 		PrintStream stream;
@@ -173,8 +176,8 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			return;
 		}
 		stream.println("Score\tnotNewInNeighbourhood\ttabuInNeighbourhood\tscoredInNeighbourhood\tActivity schedule");
-		*/
-		/*
+		
+		
 		String outputfileOverview = Controler.getOutputFilename("overview_log.xls");
 		FileOutputStream fileOverview;
 		PrintStream statistics;
@@ -325,8 +328,8 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				stream.print(tabuInNeighbourhood[x]+"\t");
 				stream.print(scoredInNeighbourhood[x]+"\t");
 				for (int i= 0;i<neighbourhood[x].getPlanElements().size();i=i+2){
-					Activity act = (Activity)neighbourhood[x].getPlanElements().get(i);
-					if (i!=neighbourhood[x].getPlanElements().size()-1) stream.print(act.getType()+"\t"+((Leg)(neighbourhood[x].getPlanElements()).get(i+1)).getMode()+"\t");
+					ActivityImpl act = (ActivityImpl)neighbourhood[x].getPlanElements().get(i);
+					if (i!=neighbourhood[x].getPlanElements().size()-1) stream.print(act.getType()+"\t"+((LegImpl)(neighbourhood[x].getPlanElements()).get(i+1)).getMode()+"\t");
 					else stream.print(act.getType()+"\t");
 				}
 				stream.print(infoOnNeighbourhood[x][1]+"\t");
@@ -381,8 +384,8 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	//		scoreStat.add(tabuList.get(tabuList.size()-1).getScore());
 	/*		stream.print(tabuList.get(tabuList.size()-1).getScore()+"\t\t\t\t");
 			for (int i= 0;i<tabuList.get(tabuList.size()-1).getPlanElements().size();i=i+2){
-				Activity act = (Activity)tabuList.get(tabuList.size()-1).getPlanElements().get(i);
-				if (i!=tabuList.get(tabuList.size()-1).getPlanElements().size()-1) stream.print(act.getType()+"\t"+((Leg)(tabuList.get(tabuList.size()-1).getPlanElements()).get(i+1)).getMode()+"\t");
+				ActivityImpl act = (ActivityImpl)tabuList.get(tabuList.size()-1).getPlanElements().get(i);
+				if (i!=tabuList.get(tabuList.size()-1).getPlanElements().size()-1) stream.print(act.getType()+"\t"+((LegImpl)(tabuList.get(tabuList.size()-1).getPlanElements()).get(i+1)).getMode()+"\t");
 				else stream.print(act.getType()+"\t");
 			}
 			stream.println(); */
