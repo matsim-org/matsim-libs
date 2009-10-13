@@ -35,10 +35,10 @@ public class RunActivityClusterBuilder {
 	 * 		2 - Study area (with output)											|
 	 * 		3 - TODO City Deep sample (no output; single vehicle SNA)				|
 	 * 		4 - Study area (no output; single vehicle SNA)							|
-	 * 		5 - Study area (no output; all vehicles SNA)	
-	 * 		6 - Study area (output and SNA)						|
+	 * 		5 - Study area (no output; all vehicles SNA)							|
+	 * 		6 - Study area (output and SNA)											|
 	 *=============================================================================*/
-	private static int scenario = 6	;
+	private static int scenario = 2	;
 	
 	 /*=============================================================================
 	 * String value that must be set. Allowed study areas are:						|
@@ -171,13 +171,11 @@ public class RunActivityClusterBuilder {
 		switch (scenario) {
 		case 1: // City Deep (with output)
 			visualizeClusters = true;
-			writeClusterListToXml = false;
 			break;
 			
 		case 2: // Given study area (with output)
 			visualizeClusters = true;
 			writeClusters = true;
-			writeClusterListToXml = false;			
 			break;
 			
 		case 3: // City Deep (no output; with SNA; single vehicle)
