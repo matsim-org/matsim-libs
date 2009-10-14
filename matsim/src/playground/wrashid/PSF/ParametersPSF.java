@@ -42,39 +42,54 @@ public class ParametersPSF {
 
 	private static String main_chargingTimesOutputFilePath = "main.chargingTimesOutputFilePath";
 	private static String mainChargingTimesOutputFilePath = null;
-	
-	// used both for output of text file and png (just extentions added to the given input file name)
+
+	// used both for output of text file and png (just extentions added to the
+	// given input file name)
 	private static String main_energyUsageStatistics = "main.energyUsageStatistics";
 	private static String mainEnergyUsageStatistics = null;
-	
-	// the data about the base load (without electric vehicles at each hub), in joules
+
+	// the data about the base load (without electric vehicles at each hub), in
+	// joules
 	private static String main_baseLoadPath = "main.baseLoadPath";
 	private static double[][] mainBaseLoad = null;
+
+	// earliest charging: charge at the earliest time you can during the day, if
+	// the same price is
+	// available at different times
+
+	// moderate Charging: if the same price charging price is available at
+	// different times, then
+	// alot a random charging time from them to the car randomly => smart
+	// charging: people tell
+	// the grid, how long they will stay at some place and the grid decides,
+	// when they should charge to
+	// avoid peaks
+
+	public static final String MODERATE_CHARGING = "moderateCharging";
+	public static final String EARLIEST_CHARGING = "earliestCharging";
+	// default charging mode: earliest charging
+	private static String main_chargingMode = "main.chargingMode";
+	private static String mainChargingMode = EARLIEST_CHARGING;
+
+	// its value is between 0 and 1.
+	// the value indicates how many percent the electricity price can be changed for each agent.
+	// reason: if for each agent there is the same minimum value on the price curve, then everybody will jump on
+	// it, creating a peak. but as we are simulating a smart grid, it takes measurements to avoid this.
+	// We provide each agent individual prices, which are adopted minimally from the price given by the PSS (e.g. 5%)
+	// at random (plus or minus). By doing so, the agents are considering the price, but not jumping on minimum value.
+	// Probably a good value is 1% to 5% (0.01 to 0.05)
 	
+	private static String main_chargingPriceBlurFactor = "main.chargingPriceBlurFactor";
+	private static double mainChargingPriceBlurFactor = -1.0;
+
+	public static double getMainChargingPriceBlurFactor() {
+		return mainChargingPriceBlurFactor;
+	}
+
 	// MAKE THESE PARAMETERS CONFIGURABLE, IF NEEDED
 	private static String mainHubPriceGraphFileName = null;
-	private static String mainBaseLoadOutputGraphFileName=null;
-	
-	// earliest charging: charge at the earliest time you can during the day, if the same price is
-	// available at different times
-	
-	// moderate Charging: if the same price charging price is available at different times, then
-	// alot a random charging time from them to the car.
-	
-	
-	public static final String MODERATE_CHARGING="moderateCharging";
-	public static final String EARLIEST_CHARGING="earliestCharging";
-	//public static final String EARLIEST_CHARGING="earliestCharging";
-	private static String main_chargingMode="main.chargingMode";
-	private static String mainChargingMode=EARLIEST_CHARGING;
-	
-	// default charging mode: earliest charging
-	
+	private static String mainBaseLoadOutputGraphFileName = null;
 
-	
-	
-
-	
 	// TESTING PARAMETERS
 
 	public static String getMainBaseLoadOutputGraphFileName() {
@@ -108,7 +123,6 @@ public class ParametersPSF {
 		return mainChargingMode;
 	}
 
-	
 	public static void readConfigParamters(Controler controler) {
 		String tempStringValue;
 
@@ -127,6 +141,13 @@ public class ParametersPSF {
 			errorReadingParameter(default_chargingPowerAtParking);
 		}
 
+		tempStringValue = controler.getConfig().findParam(PSFModule, main_chargingPriceBlurFactor);
+		if (tempStringValue != null) {
+			mainChargingPriceBlurFactor = Double.parseDouble(tempStringValue);
+		} else {
+			infoMissingReadingParameter(main_chargingPriceBlurFactor);
+		}
+		
 		tempStringValue = controler.getConfig().findParam(PSFModule, main_numberOfHubs);
 		if (tempStringValue != null) {
 			numberOfHubs = Integer.parseInt(tempStringValue);
@@ -147,7 +168,7 @@ public class ParametersPSF {
 		} else {
 			errorReadingParameter(main_hubLinkMappingPath);
 		}
-		
+
 		tempStringValue = controler.getConfig().findParam(PSFModule, main_baseLoadPath);
 		if (tempStringValue != null) {
 			mainBaseLoad = GeneralLib.readMatrix(96, numberOfHubs, false, tempStringValue);
@@ -161,28 +182,28 @@ public class ParametersPSF {
 		} else {
 			infoMissingReadingParameter(main_chargingMode);
 		}
-		
+
 		tempStringValue = controler.getConfig().findParam(PSFModule, testing_ModeOn);
 		if (tempStringValue != null) {
 			testingModeOn = Boolean.parseBoolean(tempStringValue);
 		} else {
 			errorReadingParameter(default_chargingPowerAtParking);
 		}
-		
+
 		tempStringValue = controler.getConfig().findParam(PSFModule, main_chargingTimesOutputFilePath);
 		if (tempStringValue != null) {
 			mainChargingTimesOutputFilePath = tempStringValue;
 		} else {
 			errorReadingParameter(main_chargingTimesOutputFilePath);
 		}
-		
+
 		tempStringValue = controler.getConfig().findParam(PSFModule, main_energyUsageStatistics);
 		if (tempStringValue != null) {
 			mainEnergyUsageStatistics = tempStringValue;
 		} else {
 			infoMissingReadingParameter(main_energyUsageStatistics);
 		}
-		
+
 		if (testingModeOn) {
 			tempStringValue = controler.getConfig().findParam(PSFModule, testing_energyConsumptionPerLink);
 			if (tempStringValue != null) {
@@ -214,13 +235,12 @@ public class ParametersPSF {
 		}
 
 		// add output path prefix to filename
-		mainHubPriceGraphFileName="hubPrices.png";
-		mainHubPriceGraphFileName= controler.getOutputFilename(mainHubPriceGraphFileName);
-		
-		mainBaseLoadOutputGraphFileName="baseLoad.png";
-		mainBaseLoadOutputGraphFileName= controler.getOutputFilename(mainBaseLoadOutputGraphFileName);
-		
-		
+		mainHubPriceGraphFileName = "hubPrices.png";
+		mainHubPriceGraphFileName = controler.getOutputFilename(mainHubPriceGraphFileName);
+
+		mainBaseLoadOutputGraphFileName = "baseLoad.png";
+		mainBaseLoadOutputGraphFileName = controler.getOutputFilename(mainBaseLoadOutputGraphFileName);
+
 		// TODO: adapt this later, when we have better models (e.g. consider car
 		// type also)
 		averageEnergyConsumptionBins = new AverageEnergyConsumptionGalus();
@@ -244,7 +264,7 @@ public class ParametersPSF {
 	private static void errorReadingParameter(String parameterName) {
 		log.error("parameter '" + parameterName + "' could not be read");
 	}
-	
+
 	private static void infoMissingReadingParameter(String parameterName) {
 		log.info("parameter '" + parameterName + "' could not be read");
 	}
@@ -349,11 +369,11 @@ public class ParametersPSF {
 	public static String getMainChargingTimesOutputFilePath() {
 		return mainChargingTimesOutputFilePath;
 	}
-	
+
 	public static double[][] getMainBaseLoad() {
 		return mainBaseLoad;
 	}
-	
+
 	// if any thing needs to be processed after mutation of the parameters,
 	// put it here
 	public static void postMutationProcessing() {
