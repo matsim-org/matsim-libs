@@ -24,7 +24,10 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.xml.sax.SAXException;
+
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.ScenarioLoaderI;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -43,7 +46,6 @@ import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.world.MatsimWorldReader;
-import org.xml.sax.SAXException;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -58,7 +60,7 @@ import org.xml.sax.SAXException;
  * 
  * @author dgrether
  */
-public class ScenarioLoader {
+public class ScenarioLoader implements ScenarioLoaderI {
 
 	private static final Logger log = Logger.getLogger(ScenarioLoader.class);
 
