@@ -18,10 +18,16 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 public class Berlin implements ParametersPSFMutator {
 
 	public static void main(String[] args) {
-		
+		// for running on "slanger4"
+		/*
 		PSSControler pssControler=new PSSControler("a:\\data\\matsim\\input\\runRW1002\\config.xml", null);
 		
-		pssControler.runMATSimPSSIterations(5);
+		pssControler.runMATSimPSSIterations(1);
+		*/
+		
+		// for starting one the local computer
+		PSSControler pssControler=new PSSControler("c:\\data\\matsim\\input\\runRW1002\\config.xml", null);
+		pssControler.runMATSimIterations();
 		
 		/*
 		Controler controler = new Controler("a:\\data\\matsim\\input\\runRW1002\\config.xml");

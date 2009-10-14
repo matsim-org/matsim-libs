@@ -116,7 +116,7 @@ public class PSSControler {
 	}
 
 
-	private void runMATSimIterations() {
+	public void runMATSimIterations() {
 		Gbl.reset();
 		controler = new Controler(configFilePath);
 		controler.addControlerListener(new AddEnergyScoreListener());

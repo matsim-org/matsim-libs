@@ -2,8 +2,10 @@ package playground.wrashid.PSF.energy.charging.optimizedCharging;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.jdeqsim.Message;
 
+import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.energy.charging.ChargeLog;
 import playground.wrashid.PSF.parking.ParkingInfo;
 
@@ -17,6 +19,11 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 	private double slotStartTime; // for finding out the bin / charge log
 	private Id facilityId;
 	private double endParkingTime;
+	private double randomNumber;
+
+	public double getRandomNumber() {
+		return randomNumber;
+	}
 
 	public double getEndParkingTime() {
 		return endParkingTime;
@@ -63,6 +70,8 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 			// log.error("startParkingTime cannot be bigger than endParkingTime!");
 			// System.exit(-1);
 		}
+		
+		this.randomNumber = MatsimRandom.getRandom().nextDouble();
 	}
 
 	public int compareTo(FacilityChargingPrice otherChargingPrice) {
@@ -72,15 +81,21 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 			System.exit(-1);
 		}
 		
-		
-		
 		if (price > otherChargingPrice.getPrice()) {
 			return 1;
 		} else if (price < otherChargingPrice.getPrice()) {
 			return -1;
 		} else {
-			// this does not work with cyclic time...
-			return timeSlotNumber - otherChargingPrice.getTimeSlotNumber();
+			// this does not work with cyclic time... => therefore time slots used
+			
+			// if moderate charging mode, then select one of the slots with equal price uniformly,
+			// else priorize after the time (charge as early as possible)
+			if (ParametersPSF.getChargingMode().equalsIgnoreCase(ParametersPSF.MODERATE_CHARGING)){
+				return (randomNumber - otherChargingPrice.getRandomNumber())>0?1:-1;
+			} else {
+				return timeSlotNumber - otherChargingPrice.getTimeSlotNumber();
+			}
+			
 		}
 	}
 

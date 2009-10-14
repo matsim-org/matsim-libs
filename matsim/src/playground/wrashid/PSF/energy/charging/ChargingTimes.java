@@ -107,6 +107,12 @@ public class ChargingTimes {
 		while (iterChargingTimes.length > 0
 				&& curConsumptionLog.getEnterTime() > ((ChargeLog) iterChargingTimes[firstIndex]).getStartChargingTime()) {
 			firstIndex++;
+			
+			if (firstIndex==iterChargingTimes.length){
+				// no charging before mid night.
+				// this will be handeled by the second loop.
+				break;
+			}
 		}
 
 		// process first the charging / consumption from first activity to

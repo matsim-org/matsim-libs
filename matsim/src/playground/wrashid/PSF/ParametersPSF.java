@@ -55,6 +55,26 @@ public class ParametersPSF {
 	private static String mainHubPriceGraphFileName = null;
 	private static String mainBaseLoadOutputGraphFileName=null;
 	
+	// earliest charging: charge at the earliest time you can during the day, if the same price is
+	// available at different times
+	
+	// moderate Charging: if the same price charging price is available at different times, then
+	// alot a random charging time from them to the car.
+	
+	
+	public static final String MODERATE_CHARGING="moderateCharging";
+	public static final String EARLIEST_CHARGING="earliestCharging";
+	//public static final String EARLIEST_CHARGING="earliestCharging";
+	private static String main_chargingMode="main.chargingMode";
+	private static String mainChargingMode=EARLIEST_CHARGING;
+	
+	// default charging mode: earliest charging
+	
+
+	
+	
+
+	
 	// TESTING PARAMETERS
 
 	public static String getMainBaseLoadOutputGraphFileName() {
@@ -84,6 +104,11 @@ public class ParametersPSF {
 	private static double testingPeakPriceStartTime = 25200;
 	private static double testingPeakPriceEndTime = 72000;
 
+	public static String getChargingMode() {
+		return mainChargingMode;
+	}
+
+	
 	public static void readConfigParamters(Controler controler) {
 		String tempStringValue;
 
@@ -130,6 +155,13 @@ public class ParametersPSF {
 			errorReadingParameter(main_baseLoadPath);
 		}
 
+		tempStringValue = controler.getConfig().findParam(PSFModule, main_chargingMode);
+		if (tempStringValue != null) {
+			mainChargingMode = tempStringValue;
+		} else {
+			infoMissingReadingParameter(main_chargingMode);
+		}
+		
 		tempStringValue = controler.getConfig().findParam(PSFModule, testing_ModeOn);
 		if (tempStringValue != null) {
 			testingModeOn = Boolean.parseBoolean(tempStringValue);
