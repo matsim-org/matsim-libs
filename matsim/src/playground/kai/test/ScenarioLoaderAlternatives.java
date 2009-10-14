@@ -1,9 +1,5 @@
 package playground.kai.test;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.ScenarioFactoryImpl;
-import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
-import org.matsim.core.api.experimental.ScenarioLoaderI;
 
 public class ScenarioLoaderAlternatives {
 
@@ -11,29 +7,29 @@ public class ScenarioLoaderAlternatives {
 
 		String configFileName = args[0] ;
 
-		{
-
-			ScenarioLoaderI scl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader( configFileName ) ;
-
-			Scenario sc = scl.loadScenario() ;
-
-		}
-
-		/////
-
-		{
-
-			Scenario scenario = (new ScenarioFactoryImpl()).createScenario() ;
-			
-//			Scenario scenario = new MyScenarioImpl() ;
-
-//			scenario.setPopulation( new MyPopulation() ) ;
-
-			ScenarioLoaderI scl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader( configFileName, scenario ) ;
-			
-			scl.loadScenario() ;
-			
-		}
+//		{
+//
+//			ScenarioLoaderI scl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader( configFileName ) ;
+//
+//			Scenario sc = scl.loadScenario() ;
+//
+//		}
+//
+//		/////
+//
+//		{
+//
+//			Scenario scenario = (new ScenarioFactoryImpl()).createScenario() ;
+//			
+////			Scenario scenario = new MyScenarioImpl() ;
+//
+////			scenario.setPopulation( new MyPopulation() ) ;
+//
+//			ScenarioLoaderI scl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader( configFileName, scenario ) ;
+//			
+//			scl.loadScenario() ;
+//			
+//		}
 
 
 	}
