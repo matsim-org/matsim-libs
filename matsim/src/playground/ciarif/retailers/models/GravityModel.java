@@ -36,7 +36,7 @@ public class GravityModel
   private Map<Id, PersonRetailersImpl> retailersPersons = new TreeMap<Id, PersonRetailersImpl>();
   private RetailZones retailZones = new RetailZones();
   private Map<Id, ActivityFacilityImpl> retailersFacilities;
-  private TreeMap<Integer,Id> first;
+  private TreeMap<Integer,String> first;
   private Map<Id, PersonImpl> persons;
   private int counter=0;
   private int nextCounterMsg =1;
@@ -79,7 +79,7 @@ public double computePotential(ArrayList<Integer> solution){
     int a = 0;
     
     for (ActivityFacilityImpl c : this.retailersFacilities.values()) {
-    Id linkId = this.first.get(solution.get(a));
+    String linkId = this.first.get(solution.get(a));
     Coord coord = this.controler.getNetwork().getLink(linkId).getCoord();
 	++a;
 	double loc_likelihood = 0.0D;
@@ -300,7 +300,7 @@ public double computePotential(ArrayList<Integer> solution){
 		  return true;
 	  }
 	  
-	  public boolean setFirst (TreeMap<Integer, Id> first){
+	  public boolean setFirst (TreeMap<Integer, String> first){
 		  this.first=first;
 		  return true;
 	  }

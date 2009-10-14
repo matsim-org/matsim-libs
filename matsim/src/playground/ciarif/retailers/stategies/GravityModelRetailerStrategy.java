@@ -43,13 +43,13 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		this.controler = controler;
 	}
 	
-	private TreeMap<Integer,Id> createInitialLocationsForGA (TreeMap<Id,LinkRetailersImpl> availableLinks) {
+	private TreeMap<Integer,String> createInitialLocationsForGA (TreeMap<Id,LinkRetailersImpl> availableLinks) {
 		
-		TreeMap<Integer,Id> locations = new TreeMap<Integer,Id> ();
+		TreeMap<Integer,String> locations = new TreeMap<Integer,String> ();
 		int intCount=0;
 		for (ActivityFacilityImpl af:retailerFacilities.values()){
 			
-			locations.put(intCount,af.getLink().getId());
+			locations.put(intCount,af.getLink().getId().toString());
 			intCount = intCount+1;
 			//log.info("The facility with Id: " + integer + " has been added");
 		}
@@ -57,7 +57,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		for (LinkRetailersImpl l:availableLinks.values()) {
 			if (locations.containsValue(l.getId())) {}
 			else {
-				locations.put(intCount,l.getId());
+				locations.put(intCount,l.getId().toString());
 				intCount = intCount+1;
 				//log.info("The facility with Id: " + Integer.parseInt(l.getId().toString()) + " has been added");
 			}
@@ -176,17 +176,17 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 			j=j+1;
 		}	
 
-		double [] b= this.computeParameters (prob_i_j, consumers, shops_keys);
-		//double[] b = {-1, 1};
+		//double [] b= this.computeParameters (prob_i_j, consumers, shops_keys);
+		double[] b = {-1, 1};
 		gm.setBetas(b);
 		RunRetailerGA rrGA = new RunRetailerGA();
-		TreeMap<Integer, Id> first = this.createInitialLocationsForGA(this.mergeLinks(freeLinks));
+		TreeMap<Integer, String> first = this.createInitialLocationsForGA(this.mergeLinks(freeLinks));
 		gm.setFirst(first);
 		ArrayList<Integer> solution = rrGA.runGA(first.size(),gm);		
 		log.info("The optimized solution is: " + solution);
 		int count=0;
 		for (ActivityFacilityImpl af:this.retailerFacilities.values()) {
-			if (first.get(solution.get(count)) != (af.getLink().getId())) {
+			if (first.get(solution.get(count)) != (af.getLink().getId().toString())) {
 				Utils.moveFacility(af,controler.getNetwork().getLink(first.get(solution.get(count))),this.controler.getWorld());
 				log.info("The facility " + af.getId() + " has been moved");
 				this.movedFacilities.put(af.getId(), af);
