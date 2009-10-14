@@ -20,14 +20,6 @@
 
 package tutorial.example1;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioFactory;
-import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsImpl;
-import org.matsim.core.events.algorithms.EventWriterTXT;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.scenario.ScenarioLoader;
 
 /**
  * This is an attempt to move this tutorial to the API.  We are not there yet, however.
@@ -56,24 +48,24 @@ public class MyControler1Api {
 //
 //		eventWriter.closeFile();
 
-		Scenario sc = ScenarioFactory.createScenario() ;
-
-		Config config = sc.getConfig() ;
-		config.network().setInputFile(netFilename) ;
-		config.plans().setInputFile(plansFilename) ;
-		
-		ScenarioLoader scl = new ScenarioLoader( (ScenarioImpl) sc ) ;
-		scl.loadScenario();
-		
-		EventsImpl events = new EventsImpl();
-
-		EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
-		events.addHandler(eventWriter);
-
-		QueueSimulation sim = new QueueSimulation( (ScenarioImpl) sc, events);
-		sim.run();
-
-		eventWriter.closeFile();
+//		Scenario sc = (new ScenarioFactory()).createScenario() ;
+//
+//		Config config = sc.getConfig() ;
+//		config.network().setInputFile(netFilename) ;
+//		config.plans().setInputFile(plansFilename) ;
+//		
+//		ScenarioLoaderI scl = (new ScenarioLoaderFactory()).createScenarioLoader( sc ) ;
+//		scl.loadScenario();
+//		
+//		EventsImpl events = new EventsImpl();
+//
+//		EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
+//		events.addHandler(eventWriter);
+//
+//		QueueSimulation sim = new QueueSimulation( (ScenarioImpl) sc, events);
+//		sim.run();
+//
+//		eventWriter.closeFile();
 
 	}
 
