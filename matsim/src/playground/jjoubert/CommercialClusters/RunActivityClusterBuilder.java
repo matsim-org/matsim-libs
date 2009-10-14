@@ -96,7 +96,7 @@ public class RunActivityClusterBuilder {
 //	private static int radius = 20;
 	private static int[] radiusArray = {10,15,20,25,30};
 //	private static int minimumPoints = 30;
-	private static int[] minimumPointsArray = {10,20,30,40,50};
+	private static int[] minimumPointsArray = {5,15,25};
 	
 	 /*=============================================================================
 	 * Other utility parameters. Need not be set/changed							|
