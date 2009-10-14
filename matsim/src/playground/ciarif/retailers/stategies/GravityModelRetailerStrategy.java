@@ -49,7 +49,6 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		int intCount=0;
 		for (ActivityFacilityImpl af:retailerFacilities.values()){
 			
-			//Integer integer = new Integer(Integer.parseInt(af.getLink().getId().toString()));
 			locations.put(intCount,af.getLink().getId());
 			intCount = intCount+1;
 			//log.info("The facility with Id: " + integer + " has been added");
