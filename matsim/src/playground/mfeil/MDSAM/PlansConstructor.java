@@ -72,7 +72,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 public class PlansConstructor implements PlanStrategyModule{
 		
 	protected Controler controler;
-	protected final String inputFile, outputFile, outputFileBiogeme, outputFileMod, outputFileSims;
+	protected String inputFile, outputFile, outputFileBiogeme, outputFileMod, outputFileSims;
 	protected PopulationImpl population;
 	protected ArrayList<List<PlanElement>> actChains;
 	protected NetworkLayer network;
@@ -107,17 +107,8 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 	
 	public PlansConstructor (PopulationImpl population, List<List<Double>> sims) {
-		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
-		this.outputFile = "/home/baug/mfeil/data/mz/output_plans.xml.gz";	
-		this.outputFileBiogeme = "/home/baug/mfeil/data/mz/output_plans.dat";
-		this.outputFileMod = "/home/baug/mfeil/data/mz/model.mod";
-		this.outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims03.xls";
-	/*	this.inputFile = "./plans/input_plans2.xml";	
-		this.outputFile = "./plans/output_plans.xml.gz";	
-		this.outputFileBiogeme = "./plans/output_plans.dat";
-		this.outputFileMod = "./plans/model.mod";
-	*/	this.population = population;
-		this.sims = sims;
+		this.population = population;
+		this.sims = sims;	
 		this.noOfAlternatives = 20;
 	}
 	
@@ -192,7 +183,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				else if (act.getType().equalsIgnoreCase("e")) act.setType("education");
 				else*/ if (act.getType().equalsIgnoreCase("s")) act.setType("shop");
 				else if (act.getType().equalsIgnoreCase("l")) act.setType("leisure");
-				else if (act.getType().equalsIgnoreCase("h") && i!=0 && i!=plan.getPlanElements().size()-1) act.setType("h_inner");
+	//			else if (act.getType().equalsIgnoreCase("h") && i!=0 && i!=plan.getPlanElements().size()-1) act.setType("h_inner");
 				//else log.warn("Unknown act detected: "+act.getType());
 			}
 		}
