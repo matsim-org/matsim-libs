@@ -205,10 +205,10 @@ public class ASPActivityChains {
 			for (int j=0; j<this.plans.get(i).size();j++){
 				PlanImpl plan = this.plans.get(i).get(j);
 				takenActTypes.clear();
-				log.info("Plan of person "+plan.getPerson().getId());
-				for (int z=0;z<plan.getPlanElements().size();z+=2){
-					log.info("Act "+z+" is "+((ActivityImpl)(plan.getPlanElements().get(z))).getType());
-				}				
+				//log.info("Plan of person "+plan.getPerson().getId());
+				//for (int z=0;z<plan.getPlanElements().size();z+=2){
+				//	log.info("Act "+z+" is "+((ActivityImpl)(plan.getPlanElements().get(z))).getType());
+				//}				
 				boolean occ = false;
 				boolean occSev = false;
 				double numPlanSame = 0;
@@ -264,12 +264,12 @@ public class ASPActivityChains {
 	public static void main(final String [] args) {
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-		final String populationFilename = "/home/baug/mfeil/data/largeSet/it1/run163/output_plans.xml";
+		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it1/run16/output_plans.xml";
 /*		final String populationFilename = "./plans/output_plans.xml.gz";
 		final String networkFilename = "./plans/network.xml";
 		final String facilitiesFilename = "./plans/facilities.xml.gz";
 */
-		final String outputDir = "/home/baug/mfeil/data/largeSet/it1/run163";
+		final String outputDir = "/home/baug/mfeil/data/choiceSet/it1/run16";
 //		final String outputDir = "./plans";
 
 		ScenarioImpl scenario = new ScenarioImpl();
