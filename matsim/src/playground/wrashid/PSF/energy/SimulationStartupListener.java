@@ -41,6 +41,10 @@ public class SimulationStartupListener implements StartupListener {
 		// process it
 		ParametersPSF.postMutationProcessing();
 		
+		// initialize events
+		if (ParametersPSF.getEvents()==null){
+			ParametersPSF.setEvents(event.getControler().getEvents());
+		}
 	}
 	
 	public void addParameterPSFMutator(ParametersPSFMutator parametersPSFMutator){

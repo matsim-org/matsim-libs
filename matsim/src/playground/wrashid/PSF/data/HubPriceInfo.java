@@ -43,7 +43,8 @@ public class HubPriceInfo {
 	 * @param hubNumber
 	 */
 	public double getPrice(double time, int hubNumber) {
-		return hubPrice[hubNumber][(int) Math.floor(time / (binInterval))];
+		// doing modulo 96, just in case the day had more than 24 hours
+		return hubPrice[hubNumber][(int) Math.floor(time / (binInterval)) % 96];
 	}
 
 	// if only one hub

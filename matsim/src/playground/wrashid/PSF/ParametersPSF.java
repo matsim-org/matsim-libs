@@ -2,6 +2,7 @@ package playground.wrashid.PSF;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.Gbl;
 
 import playground.wrashid.PSF.data.HubLinkMapping;
@@ -15,6 +16,15 @@ import playground.wrashid.lib.GeneralLib;
 public class ParametersPSF {
 
 	private static final Logger log = Logger.getLogger(ParametersPSF.class);
+	private static EventsImpl events=null;
+
+	public static EventsImpl getEvents() {
+		return events;
+	}
+
+	public static void setEvents(EventsImpl events) {
+		ParametersPSF.events = events;
+	}
 
 	private static String PSFModule = "PSF";
 
@@ -26,12 +36,24 @@ public class ParametersPSF {
 	private static double defaultChargingPowerAtParking;
 	private static FacilityChargingPowerMapper facilityChargingPowerMapper;
 
+	
+	private static String main_chargingPriceScalingFactor = "main.chargingPriceScalingFactor";
+	private static double mainChargingPriceScalingFactor=-1.0;
+	
+	public static double getMainChargingPriceScalingFactor() {
+		return mainChargingPriceScalingFactor;
+	}
+
 	// in [W]
 	private static String main_numberOfHubs = "main.numberOfHubs";
 	private static int numberOfHubs;
 	// number of hubs the network is divided into
 	private static String main_hubPricesPath = "main.hubPricesPath";
 	private static HubPriceInfo hubPriceInfo;
+	public static void setHubPriceInfo(HubPriceInfo hubPriceInfo) {
+		ParametersPSF.hubPriceInfo = hubPriceInfo;
+	}
+
 	// path of the file, where the electricity price of each hub during the day
 	// is specified
 	private static String main_hubLinkMappingPath = "main.hubLinkMappingPath";
@@ -153,6 +175,15 @@ public class ParametersPSF {
 		} else {
 			infoMissingReadingParameter(main_chargingPriceBlurFactor);
 		}
+		
+		tempStringValue = controler.getConfig().findParam(PSFModule, main_chargingPriceScalingFactor);
+		if (tempStringValue != null) {
+			mainChargingPriceScalingFactor = Double.parseDouble(tempStringValue);
+		} else {
+			infoMissingReadingParameter(main_chargingPriceScalingFactor);
+		}
+		
+		
 		
 		tempStringValue = controler.getConfig().findParam(PSFModule, main_numberOfHubs);
 		if (tempStringValue != null) {

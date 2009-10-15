@@ -34,9 +34,10 @@ public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEv
 
 			if (pTime != null) {
 				/*
-				 * this is not the first time we are departing, which means that the car was parked before 
-				 */ 
-				pTime.addParkLog(new ParkLog(event.getAct(),pTime.getLastParkingArrivalTime(),event.getTime()));
+				 * this is not the first time we are departing, which means that
+				 * the car was parked before
+				 */
+				pTime.addParkLog(new ParkLog(event.getAct(), pTime.getLastParkingArrivalTime(), event.getTime()));
 			} else {
 				/*
 				 * this means, that this is the first time the car departs (e.g.
@@ -44,10 +45,10 @@ public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEv
 				 * 
 				 * - set the time of leaving the parking for the first time
 				 */
-				
+
 				parkingTimes.put(personId, new ParkingTimes());
-				pTime=parkingTimes.get(personId);
-				
+				pTime = parkingTimes.get(personId);
+
 				pTime.setFirstParkingDepartTime(event.getTime());
 			}
 		}
@@ -62,12 +63,21 @@ public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEv
 		Id personId = event.getPersonId();
 		if (event.getActType().equalsIgnoreCase("parkingArrival")) {
 			ParkingTimes pTime = parkingTimes.get(personId);
-			if (pTime==null) {
+			if (pTime == null) {
 				parkingTimes.put(personId, new ParkingTimes());
-				pTime=parkingTimes.get(personId);
+				pTime = parkingTimes.get(personId);
 			}
-	
+
+			// if the day is long than 24 hours, then wrap the time
+			/*
+			 * if (event.getTime()>86400){ double time=event.getTime(); while
+			 * (time>86400){ time-=86400; } pTime.setCarLastTimeParked(time); }
+			 * else {
+			 * 
+			 * }
+			 */
 			pTime.setCarLastTimeParked(event.getTime());
+
 			pTime.setCarLastTimeParkedActivity(event.getAct());
 		}
 	}
@@ -79,9 +89,5 @@ public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEv
 	public HashMap<Id, ParkingTimes> getParkingTimes() {
 		return parkingTimes;
 	}
-
-	
-
-	
 
 }

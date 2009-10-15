@@ -70,6 +70,10 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 			// log.error("startParkingTime cannot be bigger than endParkingTime!");
 			// System.exit(-1);
 		}
+		// just for debugging
+		if (startParkingTime>86400){
+			System.out.println();
+		}
 		
 		this.randomNumber = MatsimRandom.getRandom().nextDouble();
 		
@@ -87,6 +91,8 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 			log.error("two slots with the same starting time => some thing is wrong...");
 			System.exit(-1);
 		}
+		// this error is very valid, but now we allow it to accommodate cars, which are traveling more than 24 hours.
+		// => this means, the same car can charge twice at the same time...
 		
 		if (price > otherChargingPrice.getPrice()) {
 			return 1;

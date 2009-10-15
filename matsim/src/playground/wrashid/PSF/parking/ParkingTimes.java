@@ -14,6 +14,11 @@ public class ParkingTimes {
 	private Activity activity;
 	
 	public void addParkLog(ParkLog parkLog){
+		// just for debuggin
+		if (parkLog.getStartParkingTime()>86400){
+			System.out.println();
+		}
+		
 		parkingTimes.add(parkLog);
 	}
 

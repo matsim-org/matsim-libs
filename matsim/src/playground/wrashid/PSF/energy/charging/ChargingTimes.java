@@ -264,7 +264,12 @@ public class ChargingTimes {
 			for (ChargeLog chargeLog : curChargingTime.getChargingTimes()) {
 				int slotIndex = Math.round((float) Math.floor(chargeLog.getStartChargingTime() / 900));
 
-				energyUsageStatistics[slotIndex][hubLinkMapping.getHubNumber(chargeLog.getLinkId().toString())] += chargeLog
+				if (slotIndex>numberOfTimeBins){
+					System.out.println();
+				}
+				
+				// doing module 96, just in case there are more than 24 hours in the day...
+				energyUsageStatistics[slotIndex % 96 ][hubLinkMapping.getHubNumber(chargeLog.getLinkId().toString())] += chargeLog
 						.getEnergyCharged();
 			}
 		}

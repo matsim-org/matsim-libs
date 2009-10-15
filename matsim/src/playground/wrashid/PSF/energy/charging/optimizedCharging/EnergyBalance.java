@@ -53,7 +53,8 @@ public class EnergyBalance {
 		int maxIndex = parkingTimes.size();
 
 		double sumEnergyConsumption;
-		LinkedList<LinkEnergyConsumptionLog> energyConsumptionLog = (LinkedList<LinkEnergyConsumptionLog>) energyConsumption.getLinkEnergyConsumption().clone();
+		LinkedList<LinkEnergyConsumptionLog> energyConsumptionLog = (LinkedList<LinkEnergyConsumptionLog>) energyConsumption
+				.getLinkEnergyConsumption().clone();
 		LinkEnergyConsumptionLog tempEnergyConsumptionLog = null;
 		/*
 		 * - we compare the starting parking time, because if we would use the
@@ -85,6 +86,19 @@ public class EnergyBalance {
 		for (int i = 1; i < maxIndex; i++) {
 			maxChargableEnergy.add(maxChargableEnergy.get(i - 1) + this.energyConsumption.get(i));
 		}
+
+		//checkMaxChargableEnergyInvariant();
+	}
+
+	private void checkMaxChargableEnergyInvariant() {
+		// assert: it is not possible that the driver requires less energy
+		// anywhere than before.
+		for (int i = 1; i < maxChargableEnergy.size(); i++) {
+			if (maxChargableEnergy.get(i) < maxChargableEnergy.get(i - 1)) {
+				log.error("this is not possible, because of causality");
+				System.exit(0);
+			}
+		}
 	}
 
 	/*
@@ -105,7 +119,8 @@ public class EnergyBalance {
 			int maxTimeSlotNumber = Math.round(parkingIndex * offSet + (float) parkingTimes.get(parkingIndex).getEndParkingTime()
 					/ 900);
 
-			addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex, parkingTimes.get(parkingIndex).getStartParkingTime());
+			addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex, parkingTimes.get(
+					parkingIndex).getStartParkingTime());
 		} else {
 			// if we need to handle the last (night parking)
 			int offSetOfEarlyNightHours = 100000000;
@@ -115,7 +130,7 @@ public class EnergyBalance {
 			int maxTimeSlotNumber = Math.round(offSetOfEarlyNightHours + (float) parkingTimes.get(parkingIndex).getEndParkingTime()
 					/ 900);
 
-			addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex,0);
+			addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex, 0);
 
 			if (parkingTimes.get(parkingIndex).getStartParkingTime() < 86400) {
 				// only handle the first part of the last parking, if the day is
@@ -127,7 +142,8 @@ public class EnergyBalance {
 				// this is just one second before mid night to get the right end
 				// slot
 
-				addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex,parkingTimes.get(parkingIndex).getStartParkingTime() );
+				addChargingPriceToPriorityQueue(chargingPrice, minTimeSlotNumber, maxTimeSlotNumber, parkingIndex, parkingTimes
+						.get(parkingIndex).getStartParkingTime());
 			}
 		}
 
@@ -135,7 +151,7 @@ public class EnergyBalance {
 	}
 
 	private void addChargingPriceToPriorityQueue(PriorityQueue<FacilityChargingPrice> chargingPrice, int minTimeSlotNumber,
-			int maxTimeSlotNumber, int parkingIndex,double startTime) {
+			int maxTimeSlotNumber, int parkingIndex, double startTime) {
 		double tempPrice;
 		for (int j = 0; j < maxTimeSlotNumber - minTimeSlotNumber; j++) {
 			double time = Math.floor(startTime / 900) * 900 + j * 900;
@@ -185,7 +201,8 @@ public class EnergyBalance {
 	/**
 	 * TODO: Test also, if the first parking is already so far, that we would
 	 * run out of electricity, if we can handle this case properly...
-	 * @param agentEnergyConsumption 
+	 * 
+	 * @param agentEnergyConsumption
 	 * 
 	 * @return
 	 */
@@ -195,7 +212,7 @@ public class EnergyBalance {
 	// TODO: for more general case
 	// TODO: need to take min Energy into consideration!!!
 	public ChargingTimes getChargingTimes(EnergyConsumption agentEnergyConsumption) {
-
+		
 		// this should only be called once (return immediatly if already
 		// populated)
 
@@ -218,21 +235,25 @@ public class EnergyBalance {
 
 			// only for debugging
 			// assert the following (a bit expensive operation)
-			//if (chargingTimes.getTotalEnergyCharged()>agentEnergyConsumption.getTotalEnergyConsumption()){
-			//	System.out.println(chargingTimes.getTotalEnergyCharged() + " - " + agentEnergyConsumption.getTotalEnergyConsumption());
-			//	System.out.println();
-			//}
-			
-			//System.out.println(chargingTimes.getTotalEnergyCharged() + " - " + agentEnergyConsumption.getTotalEnergyConsumption());
-			
+			// if
+			// (chargingTimes.getTotalEnergyCharged()>agentEnergyConsumption.getTotalEnergyConsumption()){
+			// System.out.println(chargingTimes.getTotalEnergyCharged() + " - "
+			// + agentEnergyConsumption.getTotalEnergyConsumption());
+			// System.out.println();
+			// }
+
+			// System.out.println(chargingTimes.getTotalEnergyCharged() + " - "
+			// + agentEnergyConsumption.getTotalEnergyConsumption());
+
 			if (bestEnergyPrice == null) {
 				// TODO: report, that the current vehicle could not reach the
 				// destination, because the electricity was finished
-				// there should be some input here to the utility function (gasoline or if el. vehicle, bad utility => switch mode)
+				// there should be some input here to the utility function
+				// (gasoline or if el. vehicle, bad utility => switch mode)
 				log.info("if this is an electric vehicle, then it has run out of power");
 				break;
 			}
-
+			
 			// get the parking index, where this car will charge
 			int parkingIndex = bestEnergyPrice.getEnergyBalanceParkingIndex();
 
@@ -267,9 +288,10 @@ public class EnergyBalance {
 			ChargeLog chargeLog = bestEnergyPrice.getChargeLog(minimumEnergyThatNeedsToBeCharged, maximumEnergyThatCanBeCharged);
 
 			chargingTimes.addChargeLog(chargeLog);
-			//chargeLog.print();
-
+			// chargeLog.print();
+			
 			updateMaxChargableEnergy(parkingIndex, energyCharged);
+			checkMaxChargableEnergyInvariant();
 
 			/*
 			 * We want to make sure, that unused parts of a slot can later be
@@ -281,31 +303,49 @@ public class EnergyBalance {
 			 * the queue, which are at the end of the parking and their first
 			 * part has been used and the rest cannot be used.
 			 */
-
+			
 			double endTimeOfCharge = bestEnergyPrice.getEndTimeOfCharge(minimumEnergyThatNeedsToBeCharged,
 					maximumEnergyThatCanBeCharged);
 
-			if (endTimeOfCharge < bestEnergyPrice.getEndTimeOfSlot() && bestEnergyPrice.getSlotStartTime()!=bestEnergyPrice.getEndParkingTime()) {
+			if (endTimeOfCharge < bestEnergyPrice.getEndTimeOfSlot()
+					&& bestEnergyPrice.getSlotStartTime() != bestEnergyPrice.getEndParkingTime()) {
 				bestEnergyPrice.setSlotStartTime(endTimeOfCharge);
 				chargingPrice.add(bestEnergyPrice);
 			}
 
 			// if possible, more parkings should be taken into consideration
 			updateChargingPrice(chargingPrice);
+			
 		}
 
 		// update the state of charge...
 		chargingTimes.updateSOCs(agentEnergyConsumption);
-		
+
 		return chargingTimes;
 	}
 
 	private void updateMaxChargableEnergy(int indexOfUsedParkingToCharge, double amountOfEnergy) {
+		// from all the charging possibilities coming in future can be deduced the charging value ('amount of energy')
 		for (int i = indexOfUsedParkingToCharge; i < maxChargableEnergy.size(); i++) {
 			double oldValue = maxChargableEnergy.get(i);
+			double newValue = oldValue - amountOfEnergy;
+
 			maxChargableEnergy.remove(i);
-			maxChargableEnergy.add(i, oldValue - amountOfEnergy);
+			maxChargableEnergy.add(i, newValue);
 		}
+		
+		
+		// trim the energy charging amount of all previous parking as of the current parking, where the charging is happening
+		double currentParkingMaxChargableEnergy=maxChargableEnergy.get(indexOfUsedParkingToCharge);
+		for (int i = 0; i < indexOfUsedParkingToCharge; i++) {
+			double oldValue = maxChargableEnergy.get(i);
+			if (oldValue>currentParkingMaxChargableEnergy){
+				double newValue = currentParkingMaxChargableEnergy;
+				maxChargableEnergy.remove(i);
+				maxChargableEnergy.add(i, newValue);
+			}
+		}
+		
 	}
 
 }
