@@ -25,6 +25,7 @@ package playground.mfeil.MDSAM;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.core.population.MatsimPopulationReader;
 import playground.mfeil.ActChainEqualityCheck;
+import playground.mfeil.MDSAM.AgentsAttributesAdder;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import playground.mfeil.analysis.*;
@@ -72,7 +73,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 public class PlansConstructor implements PlanStrategyModule{
 		
 	protected Controler controler;
-	protected String inputFile, outputFile, outputFileBiogeme, outputFileMod, outputFileSims;
+	protected String inputFile, outputFile, outputFileBiogeme, attributesInputFile, outputFileMod, outputFileSims;
 	protected PopulationImpl population;
 	protected ArrayList<List<PlanElement>> actChains;
 	protected NetworkLayer network;
@@ -83,6 +84,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected List<List<Double>> sims;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	protected int noOfAlternatives;
+	protected String similarity, income, gender, age, license, carAvail, employed, seasonTicket; 
 	
 	                      
 	public PlansConstructor (Controler controler) {
@@ -90,6 +92,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.inputFile = "/home/baug/mfeil/data/mz/plans_Zurich10.xml";	
 		this.outputFile = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz06.xml.gz";	
 		this.outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans06.dat";
+		this.attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
 		this.outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model06.mod";
 		this.outputFileSims = "/home/baug/mfeil/data/choiceSet/it0/sims06.xls";
 	/*	this.inputFile = "./plans/input_plans2.xml";	
@@ -104,6 +107,14 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
 		this.linker = new XY2Links (this.controler.getNetwork());
 		this.noOfAlternatives = 20;
+		this.similarity 	= "no";
+		this.income 		= "yes";
+		this.age 			= "no";
+		this.gender 		= "no";
+		this.employed 		= "no";
+		this.license 		= "no";
+		this.carAvail 		= "no";
+		this.seasonTicket 	= "no";
 	}
 	
 	public PlansConstructor (PopulationImpl population, List<List<Double>> sims) {
@@ -157,7 +168,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		
 	// Type of writing the Biogeme file
 		//	this.writePlansForBiogeme(this.outputFileBiogeme);
-		this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme);
+		this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
+				this.similarity, this.income, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket);
 		
 	// Type of writing the mod file
 		//	this.writeModFile(this.outputFileMod);
@@ -714,10 +726,34 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 	
 	// Writes a Biogeme file that fits "protected void enlargePlansSetWithRandomSelection ()"
-	public void writePlansForBiogemeWithRandomSelection (String outputFile){
+	public void writePlansForBiogemeWithRandomSelection (String outputFile, String attributesInputFile,
+			String similarity, 
+			String income,
+			String age,
+			String gender,
+			String employed,
+			String license,
+			String carAvail,
+			String seasonTicket){
+		
 		log.info("Writing plans for Biogeme...");
 		
+		// Writing the variables back to head of class due to MDSAM call possibility. 
+		// Like this, they are also available for modMaker class.
+		this.similarity=similarity; this.income=income; this.age=age; this.gender=gender; this.employed=employed; this.license=license;; this.carAvail=carAvail; this.seasonTicket=seasonTicket;
+		
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
+		AgentsAttributesAdder aaa = new AgentsAttributesAdder ();
+		
+		// Run external classes if required
+		if (income.equals("yes") || carAvail.equals("yes") || seasonTicket.equals("yes")){
+			aaa.run(attributesInputFile);
+		}
+		if (similarity.equals("yes")){
+			this.mdsam = new MDSAM(this.population);
+			this.sims = this.mdsam.runPopulation();
+			this.writeSims(this.outputFileSims);
+		}
 		
 		PrintStream stream;
 		try {
@@ -731,13 +767,22 @@ public class PlansConstructor implements PlanStrategyModule{
 		int counterFirst=0;
 		stream.print("Id\tChoice\t");
 		counterFirst+=2;
+		
+		if (income.equals("yes")) stream.print("Income\t"); counterFirst++;
+		if (age.equals("yes")) stream.print("Age\t"); counterFirst++;
+		if (gender.equals("yes")) stream.print("Gender\t"); counterFirst++;
+		if (employed.equals("yes")) stream.print("Employed\t"); counterFirst++;
+		if (license.equals("yes")) stream.print("License\t"); counterFirst++;
+		if (carAvail.equals("yes")) stream.print("CarAlways\tCarSometimes\tCarNever\t"); counterFirst+=3;
+		if (seasonTicket.equals("yes")) stream.print("SeasonTicket\t"); counterFirst++;
+		
 		for (int i = 0;i<this.actChains.size();i++){
 			int j=0;
 			for (j =0;j<java.lang.Math.max(this.actChains.get(i).size()-1,1);j++){
 				stream.print("x"+(i+1)+""+(j+1)+"\t");
 				counterFirst++;
 			}
-			// stream.print("x"+(i+1)+""+(j+1)+"\t"); // Similarity
+			if (similarity.equals("yes")) stream.print("x"+(i+1)+""+(j+1)+"\t"); counterFirst++;
 		}
 		for (int i = 0;i<this.actChains.size();i++){
 			stream.print("av"+(i+1)+"\t");
@@ -756,11 +801,39 @@ public class PlansConstructor implements PlanStrategyModule{
 				log.info("Handling person "+counter);
 				Gbl.printMemoryUsage();
 			}
-			/*
+			
+			// Check whether all info is available for this person. Drop the person, otherwise
+			if (income.equals("yes")){  
+				try {
+					aaa.getIncome().get(person.getId());
+				} catch (Exception e){
+					log.warn("No income available for person "+person.getId()+". Dropping the person.");
+					continue;
+				}
+			}
+			if (carAvail.equals("yes")){  
+				try {
+					aaa.getCarAvail().get(person.getId());
+				} catch (Exception e){
+					log.warn("No car availability info available for person "+person.getId()+". Dropping the person.");
+					continue;
+				}
+			}
+			if (seasonTicket.equals("yes")){  
+				try {
+					aaa.getSeasonTicket().get(person.getId());
+				} catch (Exception e){
+					log.warn("No season ticket info available for person "+person.getId()+". Dropping the person.");
+					continue;
+				}
+			}			
+			
+			// Check whether the selected plan of the person is valid. Drop the person, otherwise
 			if (person.getSelectedPlan().getScore()!=null && person.getSelectedPlan().getScore()==-100000.0){
-				log.warn("Person's "+person.getId()+" selected plan is not valid!");
+				log.warn("Person's "+person.getId()+" selected plan is not valid. Dropping the person.");
 				continue;
-			}*/
+			}
+			
 			int counterRow=0;
 			
 			// Person ID
@@ -778,6 +851,41 @@ public class PlansConstructor implements PlanStrategyModule{
 			stream.print(position+"\t");
 			counterRow++;
 			
+			if (income.equals("yes")) {
+				stream.print(aaa.getIncome().get(person.getId())+"\t");
+				counterRow++;
+			}
+			if (age.equals("yes")) {
+				stream.print(person.getAge()+"\t"); 
+				counterRow++;
+			}
+			if (gender.equals("yes")) {
+				if (person.getSex().equals("f")) stream.print(0+"\t"); 
+				else stream.print(1+"\t");
+				counterRow++;
+			}
+			if (employed.equals("yes")) {   // No info on this available!
+				stream.print(0+"\t"); 
+				counterRow++;
+			}
+			if (license.equals("yes")) {
+				if (person.getLicense().equals("no")) stream.print(0+"\t"); 
+				else stream.print(1+"\t"); 
+				counterRow++;
+			}
+			if (carAvail.equals("yes")) {
+				int car = aaa.getCarAvail().get(person.getId());
+				if (car==1) stream.print(1+"\t"+0+"\t"+0+"\t");
+				else if (car==2) stream.print(0+"\t"+1+"\t"+0+"\t");
+				else if (car==3) stream.print(0+"\t"+0+"\t"+1+"\t");
+				else log.warn("Unidentified car availability "+car+" for person "+person.getId());
+				counterRow+=3;
+			}
+			if (seasonTicket.equals("yes")) {
+				stream.print(aaa.getSeasonTicket().get(person.getId())+"\t"); 
+				counterRow++;
+			}
+			
 			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise 
 			int counterFound = 0;
 			for (int i=0;i<this.actChains.size();i++){
@@ -790,8 +898,15 @@ public class PlansConstructor implements PlanStrategyModule{
 						break;
 					}
 				}
+				// Similarity attribute
+				// TODO hier brauchts eine neue Lösung für die Similarity, weil jetzt die Reihenfolge der Plans nicht mehr eindeutig ist!
+				//if (similarity.equals("yes") && found) stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
 				if (!found){
 					for (int j=0;j<Math.max(this.actChains.get(i).size()-1, 1);j++){
+						stream.print(0+"\t");
+						counterRow++;
+					}
+					if (similarity.equals("yes")) {
 						stream.print(0+"\t");
 						counterRow++;
 					}

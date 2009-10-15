@@ -336,25 +336,36 @@ public class MDSAM {
 	}
 	
 	public static void main(final String [] args) {
+		
 				final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 				final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-				final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz01.xml";
+				final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz06.xml";
+				final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans062.dat";
+				final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
+				
 		/*		final String populationFilename = "./plans/output_plans.xml";
 				final String networkFilename = "./plans/network.xml";
 				final String facilitiesFilename = "./plans/facilities.xml";
-		*/
-				final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans01.dat";
 				final String outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims062.xls";
 				final String outputFileMod = "/home/baug/mfeil/data/largeSet/it0/model062.mod";
-		//		final String outputFile = "./plans/output_plans.dat";
+				final String outputFile = "./plans/output_plans.dat";
+				*/
+				
+				String similarity 	= "no";
+				String income 		= "yes";
+				String gender 		= "no";
+				String age 			= "no";
+				String employed 	= "no";
+				String license 		= "no";
+				String carAvail 	= "no";
+				String seasonTicket = "no";
 
 				ScenarioImpl scenario = new ScenarioImpl();
 				new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 				new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
 				new MatsimPopulationReader(scenario).readFile(populationFilename);
 				
-		//		MDSAM mdsam = new MDSAM(scenario.getPopulation());
-				
+		//		MDSAM mdsam = new MDSAM(scenario.getPopulation());				
 		//		List<List<Double>> sims = mdsam.runPopulation();
 				
 				List<List<Double>> sims = null;
@@ -363,7 +374,8 @@ public class MDSAM {
 		//		pc.writeSims(outputFileSims);
 		//		pc.writePlansForBiogemeWithSequence(outputFileBiogeme);
 				pc.keepPersons();
-				pc.writePlansForBiogemeWithRandomSelection(outputFileBiogeme);
+				pc.writePlansForBiogemeWithRandomSelection(outputFileBiogeme, attributesInputFile, 
+						similarity, income, age, gender, employed, license, carAvail, seasonTicket);
 		//		pc.writeModFileWithSequence(outputFileMod);
 				log.info("Process finished.");
 			}

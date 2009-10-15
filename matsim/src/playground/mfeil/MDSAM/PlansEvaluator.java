@@ -52,22 +52,18 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 
 public class PlansEvaluator extends PlansConstructor implements PlanStrategyModule{
 		
-	private final String outputFileBiogeme, outputFile, inputFile;
-	private final DepartureDelayAverageCalculator tDepDelayCalc;
-	private final PlansCalcRoute router;
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
-	private static final Logger log = Logger.getLogger(PlansEvaluator.class);
-	
+	private static final Logger log = Logger.getLogger(PlansEvaluator.class);	
 	                      
 	public PlansEvaluator (Controler controler) {
 		super (controler);
 		this.inputFile = "/home/baug/mfeil/data/fullSet/it0/output_plans_mz01.xml";	
 		this.outputFile = "/home/baug/mfeil/data/fullSet/it1/output_plans_mz11.xml.gz";	
 		this.outputFileBiogeme = "/home/baug/mfeil/data/fullSet/it1/output_plans11.dat";	
-		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
-		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
+		this.attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
+		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
-		this.legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), this.tDepDelayCalc);
+		this.legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);
 		
 	}
 	
@@ -90,7 +86,8 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 		
 	// 	Type of writing the Biogeme file		
 		//this.writePlansForBiogeme(this.outputFileBiogeme);
-		this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme);
+		this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
+				super.similarity, super.income, super.age, super.gender, super.employed, super.license, super.carAvail, super.seasonTicket);
 	}
 	
 	
