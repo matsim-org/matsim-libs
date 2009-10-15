@@ -43,13 +43,15 @@ public class Main {
 	private static final String PLAINNETWORK = 			PATH + "plainNetwork.xml";
 	private static final String LOGICNETWORK = 			PATH + "logicNetwork.xml";
 	private static final String LOGICTRANSITSCHEDULE = 	PATH + "logicTransitSchedule.xml";
-	private static String netWorkFile = 					PATH + "network.xml";
+	private static String netWorkFile = 				PATH + "network.xml";
 	private static String transitScheduleFile  = 		PATH + "transitSchedule.xml";
 
 	public static void main(String[] args) {
 		/** equil Network  */
+		/*
 		netWorkFile = "examples/equil/network.xml"; 
 		transitScheduleFile  = 	"src/playground/marcel/pt/demo/equilnet/transitSchedule.xml";
+		*/
 		
 		NetworkLayer network= new NetworkLayer(new NetworkFactoryImpl());
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
@@ -73,7 +75,7 @@ public class Main {
 		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
 		NetworkLayer plainNetwork=logicFactory.getPlainNet();
 		
-		int option =12;
+		int option =3;
 		switch (option){
 			case 1:    //writes logicElement files
 				logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);

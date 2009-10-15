@@ -54,6 +54,8 @@ public class PTTravelTime implements TravelTime {
 		lastLink= link;
 		lastTime = time;
 		lastTravelTime = travelTime;
+
+	
 		return travelTime;
 	}
 
@@ -83,7 +85,6 @@ public class PTTravelTime implements TravelTime {
 	*returns the first departure(of the next day)*/
 	public double nextDepartureB(Node node,  double time){//,
 		double[]arrDep= ((PTNode)node).getArrDep();
-		//System.out.println("node:" + node.getId());
 		int length = arrDep.length;
 		int index =  Arrays.binarySearch(arrDep, time);
 		if (index<0){

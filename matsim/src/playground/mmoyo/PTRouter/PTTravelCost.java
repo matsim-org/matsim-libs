@@ -14,7 +14,6 @@ public class PTTravelCost implements TravelCost{
 	double waitTime;
 	byte aliasType;
 	
-	
 	////coefficients with original values set to count only travelTime///
 	double timeCoeficient =.9;
 	double distanceCoeficient=.1;
@@ -35,7 +34,8 @@ public class PTTravelCost implements TravelCost{
 
 	public double getLinkTravelCost(Link link, double time){
 		cost=0;
-		
+
+		//System.out.println ("usando el pttravel cost de manuel");
 		/*
 		//set objective values
 		//travelTime = ptTimeTable.getLinkTravelTime(link, time);
@@ -48,21 +48,20 @@ public class PTTravelCost implements TravelCost{
 			cost = travelTime + transferPenalty;   
 			waitTime = travelTime - (link.getLength()* walkSpeed);
 		}else if (type.equals("Transfer")){
-			cost = travelTime + transferPenalty;   
+			cost = travelTime + transferPenalty;
 		}else if (type.equals("Access")){
 			waitTime = travelTime - (link.getLength()* walkSpeed);
 		}
 		*/
 		//Time as single criterion
 		//cost= travelTime;
-
 		
 		travelTime = ptTravelTime.getLinkTravelTime(link, time);
 		aliasType = ((PTLink)link).getAliasType();
 		if (aliasType == 3 || aliasType == 4 ){  //transfer or dettransfer
 			cost += transferPenalty ;
 		}
-		
+	
 		return cost;
 	}
 }

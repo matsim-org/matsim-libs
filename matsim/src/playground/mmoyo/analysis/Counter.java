@@ -20,7 +20,7 @@ import playground.mmoyo.TransitSimulation.LogicFactory;
 import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.PTRouter.PTRouter;;
 
-/**shows the average result values (travelTime, distance, number of transfers) of the whole population with different travelTime and distance coefficients*/
+/**shows the average result values (travelTime, distance, number of transfers) of the whole population with different travel time and distance coefficients*/
 public class Counter {
 	private PopulationImpl population;
 	private List<PopulationResult> populationResultList = new ArrayList<PopulationResult>();

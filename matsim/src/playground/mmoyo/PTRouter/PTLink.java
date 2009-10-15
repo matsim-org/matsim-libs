@@ -4,7 +4,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -20,7 +19,6 @@ public class PTLink extends LinkImpl{
 	
 	public PTLink(final Id id, final BasicNode from, final BasicNode to, final NetworkLayer network, final String type) {
 		super(id, from, to, network, 0, 10, 9999 , 1);
-		this.setLength(CoordUtils.calcDistance(from.getCoord(), to.getCoord()));
 		this.setType(type);
 
 		if 		(type.equals("Access")) 	{aliasType=1;} 
@@ -30,7 +28,8 @@ public class PTLink extends LinkImpl{
 		else if (type.equals("Egress")) 	{aliasType=5;}
 		else 				{aliasType=0;}
 		
-		if (aliasType!=2){ this.walkTime = this.length * ptValues.AV_WALKING_SPEED;  }
+		this.setLength(this.getEuklideanDistance());
+		if (aliasType!=2){ this.walkTime = this.getLength() * ptValues.AV_WALKING_SPEED;}
 		network.addLink(this);///
 	}
 

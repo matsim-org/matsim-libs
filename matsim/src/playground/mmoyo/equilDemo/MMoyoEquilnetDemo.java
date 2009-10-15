@@ -27,7 +27,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.scenario.ScenarioLoader;
-import playground.marcel.pt.controler.TransitControler;
+
+//import playground.marcel.pt.demo.equilnet.EquilnetDemo;
+import playground.mmoyo.equilDemo.MMoyoTransitControler;
 
 /**copy of marcel.pt.demo.equilNet.EquilnetDemo.java to test the ptRouter in the simulation*/
 public class MMoyoEquilnetDemo {
@@ -41,7 +43,7 @@ public class MMoyoEquilnetDemo {
 		
 		config.controler().setOutputDirectory("./output/transitEquil2");
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(50);
+		config.controler().setLastIteration(5);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 		config.controler().addParam("routingAlgorithmType", "AStarLandmarks");
 
@@ -80,7 +82,7 @@ public class MMoyoEquilnetDemo {
 
 	private void runControler() {
 		new ScenarioLoader(this.scenario).loadScenario();
-		TransitControler c = new TransitControler(this.scenario);
+		MMoyoTransitControler c = new MMoyoTransitControler(this.scenario);
 		
 		////////////////////////////////////////////////////
 		c.setOverwriteFiles(true);   //temporarily overwrite
@@ -95,7 +97,10 @@ public class MMoyoEquilnetDemo {
 	}
 
 	public static void main(final String[] args) {
+		double startTime = System.currentTimeMillis();
 		new MMoyoEquilnetDemo().run();
+		System.out.println("duracion:" );
+		System.out.println(System.currentTimeMillis()-startTime);
 	}
 
 }

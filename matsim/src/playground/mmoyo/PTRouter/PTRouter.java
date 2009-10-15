@@ -39,22 +39,24 @@ public class PTRouter{
 	PTValues ptValues = new PTValues();
 
 	public PTRouter(final NetworkLayer logicNet) {
-		InitObjects(logicNet);
+		init(logicNet);
 	}
 	
 	public PTRouter(final TransitSchedule schedule, final TransitRouterConfig config){
 		LogicFactory logicFactory = new LogicFactory(schedule);
 		 //this.logicToPlainTranslator = logicFactory.getLogicToPlainTranslator();
-		InitObjects(logicFactory.getLogicNet());
+		init(logicFactory.getLogicNet());
 	}
 	
-	private void InitObjects(final NetworkLayer logicNet){
+	private final void init(final NetworkLayer logicNet){
 		this.logicNet = logicNet;
 		this.ptTravelTime =new PTTravelTime();
 		this.ptTravelCost = new PTTravelCost(ptTravelTime);
 		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);	
-		this.originNode=  new PTNode(new IdImpl("W1"), null);		//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
-		this.destinationNode=  new PTNode(new IdImpl("W2"), null);	//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
+		
+		Coord iniCoord = logicNet.getNodes().values().iterator().next().getCoord();
+		this.originNode=  new PTNode(new IdImpl("W1"), iniCoord);		//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
+		this.destinationNode=  new PTNode(new IdImpl("W2"), iniCoord);	//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
 		this.logicNet.addNode(originNode);
 		this.logicNet.addNode(destinationNode);	
 	}
@@ -136,7 +138,7 @@ public class PTRouter{
 		double walkRange = ptValues.FIRST_WALKRANGE;
 		Coord coord = node.getCoord();
 		do{
-			nearStations = logicNet.getNearestNodes(coord, walkRange);
+			nearStations = logicNet.getNearestNodes(coord, walkRange);  //walkRange
 			walkRange += 300;
 		} while (nearStations.size()<ptValues.INI_STATIONS_NUM);
 		nearStations.remove(node);

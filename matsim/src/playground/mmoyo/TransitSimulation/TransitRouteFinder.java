@@ -17,7 +17,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.PTRouter.PTRouter;
-import playground.mmoyo.PTRouter.PTValues;
 
 /**
  * Receives two acts and returns a list of PT legs connecting their coordinates 
@@ -25,7 +24,6 @@ import playground.mmoyo.PTRouter.PTValues;
 public class TransitRouteFinder {
 	private PTRouter ptRouter;
 	private LogicIntoPlainTranslator logicToPlainTranslator;
-	private PTValues ptValues = new PTValues();
 	
 	public TransitRouteFinder(final TransitSchedule transitSchedule){
 		LogicFactory logicFactory = new LogicFactory(transitSchedule);
@@ -91,7 +89,7 @@ public class TransitRouteFinder {
 		double distance=0;
 		if (routeLinks.size()>0) routeNodeList.add(routeLinks.get(0).getFromNode());
 		for(Link link : routeLinks) {
-			distance= distance + link.getLength();
+			distance += link.getLength();
 			routeNodeList.add(link.getToNode());
 		} 
 		
