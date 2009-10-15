@@ -94,9 +94,9 @@ public class RunActivityClusterBuilder {
 	 * 		  radius before a new cluster will be created.							| 
 	 *=============================================================================*/
 //	private static int radius = 20;
-	private static int[] radiusArray = {10,15,20,25,30};
+	private static int[] radiusArray = {35,40};
 //	private static int minimumPoints = 30;
-	private static int[] minimumPointsArray = {5,15,25};
+	private static int[] minimumPointsArray = {5,10,15,20,25,30};
 	
 	 /*=============================================================================
 	 * Other utility parameters. Need not be set/changed							|
