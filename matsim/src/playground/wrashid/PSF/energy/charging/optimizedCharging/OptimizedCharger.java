@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 
 import EDU.oswego.cs.dl.util.concurrent.FJTask.Par;
@@ -93,8 +94,13 @@ public class OptimizedCharger {
 	
 	private void outputOptimizationData(){
 		// write out charging events to file, if specified
+		// TODO: 'remove parameter main.chargingTimesOutputFilePath from config'
 		if (ParametersPSF.getMainChargingTimesOutputFilePath()!=null){
-			ChargingTimes.writeChargingTimes(chargingTimes, ParametersPSF.getMainChargingTimesOutputFilePath());
+			// write it to the iteration folder
+			ChargingTimes.writeChargingTimes(chargingTimes, Controler.getIterationFilename("chargingLog.txt"));
+			
+			// also write it directly into the output folder, so that it can be used by the PSS
+			ChargingTimes.writeChargingTimes(chargingTimes, Controler.getOutputFilename("chargingLog.txt"));
 		}
 		
 		
@@ -102,9 +108,15 @@ public class OptimizedCharger {
 		if (ParametersPSF.getMainEnergyUsageStatistics()!=null){
 			double[][] energyUsageStatistics = ChargingTimes.getEnergyUsageStatistics(chargingTimes,ParametersPSF.getHubLinkMapping()); 
 			
-			ChargingTimes.writeEnergyUsageStatisticsData(ParametersPSF.getMainEnergyUsageStatistics() + ".txt", energyUsageStatistics, ParametersPSF.getHubLinkMapping().getNumberOfHubs());
+			//ChargingTimes.writeEnergyUsageStatisticsData(ParametersPSF.getMainEnergyUsageStatistics() + ".txt", energyUsageStatistics, ParametersPSF.getHubLinkMapping().getNumberOfHubs());
+			//ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(ParametersPSF.getMainEnergyUsageStatistics() + ".png",energyUsageStatistics);
+			// TODO: remove the parameter ParametersPSF.getMainEnergyUsageStatistics() from the config file.
 			
-			ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(ParametersPSF.getMainEnergyUsageStatistics() + ".png",energyUsageStatistics);
+			// write data into iterations folder
+			ChargingTimes.writeEnergyUsageStatisticsData(Controler.getIterationFilename("vehicleEnergyConsumption.txt"), energyUsageStatistics, ParametersPSF.getHubLinkMapping().getNumberOfHubs());
+			
+			ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(Controler.getIterationFilename("vehicleEnergyConsumption.txt.png"),energyUsageStatistics);
+			
 		}
 		
 		// output the price graphics

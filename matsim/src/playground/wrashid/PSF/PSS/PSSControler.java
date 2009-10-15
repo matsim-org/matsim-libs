@@ -15,6 +15,7 @@ import org.matsim.core.gbl.Gbl;
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.ParametersPSFMutator;
 import playground.wrashid.PSF.energy.AddEnergyScoreListener;
+import playground.wrashid.PSF.energy.AfterSimulationListener;
 import playground.wrashid.PSF.energy.SimulationStartupListener;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF.energy.charging.optimizedCharging.OptimizedCharger;
@@ -131,13 +132,13 @@ public class PSSControler {
 		simulationStartupListener.addEventHandler(logParkingTimes);
 		simulationStartupListener.addParameterPSFMutator(parameterPSFMutator);
 
+		
+		AfterSimulationListener afterSimulationListener=new AfterSimulationListener(logEnergyConsumption, logParkingTimes);
+		controler.addControlerListener(afterSimulationListener);
+		
 		controler.run();
 
-		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes
-				.getParkingTimes());
-		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
-
-		ChargingTimes.printEnergyUsageStatistics(chargingTimes, ParametersPSF.getHubLinkMapping());
+		
 	}
 
 	private void runPSS() {
