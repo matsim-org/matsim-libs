@@ -407,6 +407,9 @@ public class QueueLink {
 		return ret;
 	}
 
+	/**
+	 * @return the total space capacity available on that link (includes the space on lanes if available)
+	 */
 	public double getSpaceCap() {
 		double total = this.originalLane.getStorageCapacity();
 		if (this.hasLanes) {
