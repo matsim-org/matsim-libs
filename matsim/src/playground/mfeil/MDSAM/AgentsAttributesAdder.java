@@ -73,7 +73,7 @@ public class AgentsAttributesAdder {
 				
 				// Watch out that the order is equal to the order in the file!
 				token = tokenizer.nextToken();				
-				income.put(new IdImpl(tokenId), (int)(Double.parseDouble(token)));
+				income.put(new IdImpl(tokenId), (int)(Double.parseDouble(token)*1000));
 				
 				token = tokenizer.nextToken();				
 				carAvail.put(new IdImpl(tokenId), (int)(Double.parseDouble(token)));
