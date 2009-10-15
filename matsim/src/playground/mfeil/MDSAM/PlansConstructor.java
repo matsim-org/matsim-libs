@@ -768,13 +768,34 @@ public class PlansConstructor implements PlanStrategyModule{
 		stream.print("Id\tChoice\t");
 		counterFirst+=2;
 		
-		if (income.equals("yes")) stream.print("Income\t"); counterFirst++;
-		if (age.equals("yes")) stream.print("Age\t"); counterFirst++;
-		if (gender.equals("yes")) stream.print("Gender\t"); counterFirst++;
-		if (employed.equals("yes")) stream.print("Employed\t"); counterFirst++;
-		if (license.equals("yes")) stream.print("License\t"); counterFirst++;
-		if (carAvail.equals("yes")) stream.print("CarAlways\tCarSometimes\tCarNever\t"); counterFirst+=3;
-		if (seasonTicket.equals("yes")) stream.print("SeasonTicket\t"); counterFirst++;
+		if (income.equals("yes")) {
+			stream.print("Income\t"); 
+			counterFirst++;
+		}
+		if (age.equals("yes")) {
+			stream.print("Age\t"); 
+			counterFirst++;
+		}
+		if (gender.equals("yes")) {
+			stream.print("Gender\t"); 
+			counterFirst++;
+		}
+		if (employed.equals("yes")) {
+			stream.print("Employed\t"); 
+			counterFirst++;
+		}
+		if (license.equals("yes")) {
+			stream.print("License\t"); 
+			counterFirst++;
+		}
+		if (carAvail.equals("yes")) {
+			stream.print("CarAlways\tCarSometimes\tCarNever\t"); 
+			counterFirst+=3;
+		}
+		if (seasonTicket.equals("yes")) {
+			stream.print("SeasonTicket\t"); 
+			counterFirst++;
+		}
 		
 		for (int i = 0;i<this.actChains.size();i++){
 			int j=0;
@@ -782,7 +803,10 @@ public class PlansConstructor implements PlanStrategyModule{
 				stream.print("x"+(i+1)+""+(j+1)+"\t");
 				counterFirst++;
 			}
-			if (similarity.equals("yes")) stream.print("x"+(i+1)+""+(j+1)+"\t"); counterFirst++;
+			if (similarity.equals("yes")) {
+				stream.print("x"+(i+1)+""+(j+1)+"\t"); 
+				counterFirst++;
+			}
 		}
 		for (int i = 0;i<this.actChains.size();i++){
 			stream.print("av"+(i+1)+"\t");
@@ -797,35 +821,23 @@ public class PlansConstructor implements PlanStrategyModule{
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
 			counter++;
-			if (counter%10==0) {
+			if (counter%1000==0) {
 				log.info("Handling person "+counter);
 				Gbl.printMemoryUsage();
 			}
 			
 			// Check whether all info is available for this person. Drop the person, otherwise
-			if (income.equals("yes")){  
-				try {
-					aaa.getIncome().get(person.getId());
-				} catch (Exception e){
-					log.warn("No income available for person "+person.getId()+". Dropping the person.");
-					continue;
-				}
+			if (income.equals("yes") && !aaa.getIncome().containsKey(person.getId())){
+				log.warn("No income available for person "+person.getId()+". Dropping the person.");
+				continue;
 			}
-			if (carAvail.equals("yes")){  
-				try {
-					aaa.getCarAvail().get(person.getId());
-				} catch (Exception e){
-					log.warn("No car availability info available for person "+person.getId()+". Dropping the person.");
-					continue;
-				}
+			if (carAvail.equals("yes") && !aaa.getCarAvail().containsKey(person.getId())){
+				log.warn("No car availability info available for person "+person.getId()+". Dropping the person.");
+				continue;
 			}
-			if (seasonTicket.equals("yes")){  
-				try {
-					aaa.getSeasonTicket().get(person.getId());
-				} catch (Exception e){
-					log.warn("No season ticket info available for person "+person.getId()+". Dropping the person.");
-					continue;
-				}
+			if (seasonTicket.equals("yes") && !aaa.getSeasonTicket().containsKey(person.getId())){
+				log.warn("No season ticket info available for person "+person.getId()+". Dropping the person.");
+				continue;
 			}			
 			
 			// Check whether the selected plan of the person is valid. Drop the person, otherwise
