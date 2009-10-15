@@ -5,3 +5,17 @@ MESF (Mobility Energy Simulation Framework).
 
 next:
 - add general charging cases also...
+
+
+
+===========
+- TO START PSS:
+1.) make results folder empty (a:\data\results
+2.) copy initial prices to: a:\data\PSS\output\hubPriceInfo.txt (for input of MATSim) 
+and a:\data\PSS\input\initialNodePriceInfo.txt (for input to PSS).
+
+
+Notes:
+======
+- the price info file in an iteration folder are the input of MATSim and the
+vehicle energy consumptions are the output of MATSim.
