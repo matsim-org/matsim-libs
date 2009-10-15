@@ -78,9 +78,15 @@ public class ParametersPSF {
 	// We provide each agent individual prices, which are adopted minimally from the price given by the PSS (e.g. 5%)
 	// at random (plus or minus). By doing so, the agents are considering the price, but not jumping on minimum value.
 	// Probably a good value is 1% to 5% (0.01 to 0.05)
+	// => as we reach a relaxed state (because of this blue factor), we can stay there.
+	
+	// if we have a dual tariff in the beginning and we start it with earliestCharging mode, then we get a peak
+	// in the evening. But this disappears totally even if we set the blur factor to 1%.
 	
 	private static String main_chargingPriceBlurFactor = "main.chargingPriceBlurFactor";
 	private static double mainChargingPriceBlurFactor = -1.0;
+	
+
 
 	public static double getMainChargingPriceBlurFactor() {
 		return mainChargingPriceBlurFactor;

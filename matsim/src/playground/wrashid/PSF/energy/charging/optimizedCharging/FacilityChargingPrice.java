@@ -72,6 +72,13 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 		}
 		
 		this.randomNumber = MatsimRandom.getRandom().nextDouble();
+		
+		// blur the price, if a factor is set in the config (change price in plus or minus direction)
+		if (ParametersPSF.getMainChargingPriceBlurFactor()!=-1){
+			this.price = this.price * (1 + (MatsimRandom.getRandom().nextDouble()-1)*ParametersPSF.getMainChargingPriceBlurFactor());
+		}
+		
+		
 	}
 
 	public int compareTo(FacilityChargingPrice otherChargingPrice) {
