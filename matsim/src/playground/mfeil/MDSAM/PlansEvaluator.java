@@ -78,12 +78,21 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 	}
 
 	public void finishReplanning(){
+		
+	// 	Needs to always run		
 		this.evaluatePlans();
 		this.writePlans(this.outputFile);
-		//TODO: Similarity should be stored somewhere and re-used, rather than calculated again
-		this.sims = new MDSAM(this.population).runPopulation();
-		this.writePlansForBiogeme(this.outputFileBiogeme);
+		
+		
+	// 	Only if similarity attribute is desired
+		//this.sims = new MDSAM(this.population).runPopulation();
+		
+		
+	// 	Type of writing the Biogeme file		
+		//this.writePlansForBiogeme(this.outputFileBiogeme);
+		this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme);
 	}
+	
 	
 	private void evaluatePlans (){
 		log.info("Evaluating plans...");
