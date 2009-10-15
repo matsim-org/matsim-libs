@@ -63,7 +63,7 @@ public class QueueLaneTest extends MatsimTestCase {
 		return network;
   }
   
-	private BasicLaneDefinitions createOneLane(ScenarioImpl scenario) {
+	private BasicLaneDefinitions createOneLane(ScenarioImpl scenario, int numberOfRepresentedLanes) {
 		scenario.getConfig().scenario().setUseLanes(true);
 		BasicLaneDefinitions lanes = scenario.getLaneDefinitions();
 		BasicLaneDefinitionsFactory builder = lanes.getFactory();
@@ -72,6 +72,7 @@ public class QueueLaneTest extends MatsimTestCase {
 		BasicLane link1lane1 = builder.createLane(id1);
 		link1lane1.addToLinkId(id2);
 		link1lane1.setLength(105.0);
+		link1lane1.setNumberOfRepresentedLanes(numberOfRepresentedLanes);
 		lanesForLink1.addLane(link1lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink1);
 		return lanes;
@@ -116,10 +117,10 @@ public class QueueLaneTest extends MatsimTestCase {
 		assertEquals(268.0, ql.getSpaceCap());
 	}
 	
-	public void testCapacityWithOneLane() {
+	public void testCapacityWithOneLaneOneLane() {
 		ScenarioImpl scenario = new ScenarioImpl();
 		NetworkLayer network = this.initNetwork(scenario.getNetwork());
-		BasicLaneDefinitions lanes = this.createOneLane(scenario);
+		BasicLaneDefinitions lanes = this.createOneLane(scenario, 1);
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
@@ -128,7 +129,8 @@ public class QueueLaneTest extends MatsimTestCase {
 		queueSim.setLaneDefinitions(lanes);
 		queueSim.prepareLanes();
 		assertEquals(0.5, ql.getSimulatedFlowCapacity());
-//		assertEquals(268.0, ql.getSpaceCap());
+		//900 m link, 2 lanes = 240 storage + 105 m lane, 1 lane = 14 storage
+		assertEquals(254.0, ql.getSpaceCap());
 		//check original lane
 		QueueLane qlane = ql.getOriginalLane();
 		assertNotNull(qlane);
@@ -141,9 +143,43 @@ public class QueueLaneTest extends MatsimTestCase {
 		assertEquals(1, ql.getToNodeQueueLanes().size());
 		qlane = ql.getToNodeQueueLanes().get(0);
 		
-//		assertEquals(0.5, qlane.getSimulatedFlowCapacity());
-//		assertEquals(28.0, qlane.getStorageCapacity());
+		// link_no_of_lanes = 2 flow = 0.5 -> lane_flow = 0.5/2 * 1 = 0.25
+		assertEquals(0.25, qlane.getSimulatedFlowCapacity());
+		assertEquals(14.0, qlane.getStorageCapacity());
 	}
+
+	public void testCapacityWithOneLaneOneLaneTwoLanes() {
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = this.initNetwork(scenario.getNetwork());
+		BasicLaneDefinitions lanes = this.createOneLane(scenario, 2);
+		
+		QueueSimulation queueSim = new QueueSimulation(network, null, null);
+		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
+		QueueLink ql = queueNetwork.getQueueLink(id1);
+
+		queueSim.setLaneDefinitions(lanes);
+		queueSim.prepareLanes();
+		assertEquals(0.5, ql.getSimulatedFlowCapacity());
+		//900 m link, 2 lanes = 240 storage + 105 m lane, 2 lanes = 28 storage
+		assertEquals(268.0, ql.getSpaceCap());
+		//check original lane
+		QueueLane qlane = ql.getOriginalLane();
+		assertNotNull(qlane);
+		assertTrue(qlane.isOriginalLane());
+		assertEquals(0.5, qlane.getSimulatedFlowCapacity());
+		assertEquals(240.0, qlane.getStorageCapacity());
+		
+		// check lane
+		assertNotNull(ql.getToNodeQueueLanes());
+		assertEquals(1, ql.getToNodeQueueLanes().size());
+		qlane = ql.getToNodeQueueLanes().get(0);
+		
+		// link_no_of_lanes = 2 flow = 0.5 -> lane_flow = 0.5/2 * 2 = 0.5
+		assertEquals(0.5, qlane.getSimulatedFlowCapacity());
+		assertEquals(28.0, qlane.getStorageCapacity());
+	}
+
+	
 	
 	public void testCapacityWithLanes() {
 		ScenarioImpl scenario = new ScenarioImpl();
@@ -157,7 +193,8 @@ public class QueueLaneTest extends MatsimTestCase {
 		queueSim.setLaneDefinitions(lanes);
 		queueSim.prepareLanes();
 		assertEquals(0.5, ql.getSimulatedFlowCapacity());
-//		assertEquals(268.0, ql.getSpaceCap());
+		//240 link + 2 * 14 + 1 * 28 = 
+		assertEquals(296.0, ql.getSpaceCap());
 		double totalStorageCapacity = 0.0;
 		//check original lane
 		QueueLane qlane = ql.getOriginalLane();
@@ -172,18 +209,18 @@ public class QueueLaneTest extends MatsimTestCase {
 		double totalFlowCapacity = 0.0;
 		for (QueueLane qll : ql.getToNodeQueueLanes()) {
 			if (qll.getLaneId().equals(id2)) {
-//				assertEquals(0.25, qll.getSimulatedFlowCapacity());
-//				assertEquals(14.0, qll.getStorageCapacity());
+				assertEquals(0.5, qll.getSimulatedFlowCapacity());
+				assertEquals(28.0, qll.getStorageCapacity());
 			}
 			else {
-//				assertEquals(0.125, qll.getSimulatedFlowCapacity());
-//				assertEquals(7.0, qll.getStorageCapacity());
+				assertEquals(0.25, qll.getSimulatedFlowCapacity());
+				assertEquals(14.0, qll.getStorageCapacity());
 			}
 			totalStorageCapacity += qll.getStorageCapacity();
 			totalFlowCapacity += qll.getSimulatedFlowCapacity();
 		}
 		assertEquals(ql.getSpaceCap(), totalStorageCapacity);
-//		assertEquals(ql.getSimulatedFlowCapacity(), totalFlowCapacity);
+		assertEquals(1.0, totalFlowCapacity);
 	}
 	
 	
