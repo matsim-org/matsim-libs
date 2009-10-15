@@ -4,15 +4,8 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.TreeMap;
-
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.population.BasicActivityImpl;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -27,7 +20,7 @@ public class PersonSubTourExtractor extends AbstractPersonAlgorithm implements P
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final Persons persons;
+	//private final Persons persons;
 	private TreeMap<Integer, ArrayList<Integer>> subtours = new TreeMap<Integer,ArrayList<Integer>>();
 	private int subtour_idx;;
 	 
@@ -38,7 +31,7 @@ public class PersonSubTourExtractor extends AbstractPersonAlgorithm implements P
 
 	public PersonSubTourExtractor(final Persons persons) {
 		System.out.println("    init " + this.getClass().getName() + " module...");
-		this.persons = persons;
+		//this.persons = persons;
 		System.out.println("    done.");
 	}
 	

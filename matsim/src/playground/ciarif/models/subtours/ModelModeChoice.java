@@ -25,7 +25,6 @@ import java.util.TreeSet;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public abstract class ModelModeChoice {
 	

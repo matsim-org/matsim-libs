@@ -1,12 +1,7 @@
 package playground.ciarif.models.subtours;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class Subtour {
 		

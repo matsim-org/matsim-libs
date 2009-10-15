@@ -21,12 +21,12 @@ public class PersonSubtourHandler {
 	private static final String E = "e";
 	private static final String W = "w";
 	private static final String S = "s";
-	private static final String H = "h";
-	private static final String RIDE = "ride";
-	private static final String PT = "pt";
-	private static final String CAR = "car";
-	private static final String BIKE = "bike";
-	private static final String WALK = "walk";
+	//private static final String H = "h";
+	//private static final String RIDE = "ride";
+	//private static final String PT = "pt";
+	//private static final String CAR = "car";
+	//private static final String BIKE = "bike";
+	//private static final String WALK = "walk";
 		
 	//////////////////////////////////////////////////////////////////////
 	// constructors

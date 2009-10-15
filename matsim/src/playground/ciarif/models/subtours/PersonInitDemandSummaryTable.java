@@ -25,17 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeSet;
-import java.util.ArrayList;
-
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class PersonInitDemandSummaryTable {
 

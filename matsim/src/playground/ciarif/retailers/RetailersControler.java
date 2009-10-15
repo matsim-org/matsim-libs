@@ -38,12 +38,6 @@ public class RetailersControler extends KTIControler {
 	
     public static void main (final String[] args) { 
     	Controler controler = new RetailersControler(args);
-    	//controler.addControlerListener(new RetailersLocationListener());
-    	//controler.addControlerListener(new RetailersParallelLocationListener());
-    	//controler.addControlerListener(new RetailersSequentialLocationListener()); 
-
-		//controler.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
-    	//controler.addControlerListener(new FacilitiesLoadCalculator(controler.getFacilityPenalties()));
     	controler.run();
     }
 }
