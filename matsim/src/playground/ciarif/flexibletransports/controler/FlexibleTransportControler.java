@@ -39,7 +39,7 @@ public class FlexibleTransportControler extends Controler {
 		super(args);
 
 		this.ftConfigGroup = new FtConfigGroup();
-		super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ftConfigGroup);
+		super.config.addModule(FtConfigGroup.GROUP_NAME, this.ftConfigGroup);
 
 		this.getNetworkFactory().setRouteFactory(TransportMode.car, new KtiNodeNetworkRouteFactory());
 		this.getNetworkFactory().setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
@@ -109,10 +109,10 @@ public class FlexibleTransportControler extends Controler {
 	public static void main(String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
-			System.out.println("Usage: KtiControler config-file [dtd-file]");
+			System.out.println("Usage: FlexibleTransportControler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final Controler controler = new KTIControler(args);
+			final Controler controler = new FlexibleTransportControler(args);
 			controler.run();
 		}
 		System.exit(0);

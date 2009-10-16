@@ -65,7 +65,9 @@ public class FtConfigGroup extends Module {
 		 * TODO should be replaced by actual access/egress walk legs, 
 		 * which take time in the activity plan and thus generate additional opportunity costs 
 		 */
-		CONST_CAR("constCar", "0.0", "");
+		CONST_CAR("constCar", "0.0", ""), 
+		
+		TRAVELING_RIDE ("travelingRide", "0.0", "");
 		
 		private final String parameterName;
 		private final String defaultValue;
@@ -205,5 +207,13 @@ public class FtConfigGroup extends Module {
 
 	public void setConstCar(double newValue) {
 		FtConfigParameter.CONST_CAR.setActualValue(Double.toString(newValue));
+	}
+
+	public double getTravelingRide() {
+		return Double.parseDouble(FtConfigParameter.TRAVELING_RIDE.getActualValue());
+	}
+
+	public void setTravelingRide(double newValue) {
+		FtConfigParameter.TRAVELING_RIDE.setActualValue(Double.toString(newValue));
 	}
 }
