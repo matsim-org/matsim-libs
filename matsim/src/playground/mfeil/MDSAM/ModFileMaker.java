@@ -357,7 +357,8 @@ public class ModFileMaker {
 			stream.print((i+1)+"\tAlt"+(i+1)+"\tav"+(i+1)+"\t");
 			
 			if (actslegs.size()>1){
-				boolean onlyBike = true;				
+				boolean onlyBike = true;		
+				/*
 				LegImpl leg = (LegImpl)actslegs.get(1);
 				if (leg.getMode().equals(TransportMode.car)) {
 					stream.print("Ucar * x"+(i+1)+""+2);
@@ -375,27 +376,56 @@ public class ModFileMaker {
 				}
 				else if (bikeIn.equals("yes") && leg.getMode().equals(TransportMode.bike)) stream.print("Ubike * x"+(i+1)+""+2);
 				else log.warn("Leg has no valid mode! ActChains position: "+i);
-				
-				for (int j=3;j<actslegs.size();j+=2){
+				*/
+				boolean started = false;
+				for (int j=1;j<actslegs.size();j+=2){
 					LegImpl legs = (LegImpl)actslegs.get(j);
-					if (legs.getMode().equals(TransportMode.car)) {
-						stream.print(" + Ucar * x"+(i+1)+""+(j+1));
-						if (travelCost.equals("yes")) stream.print(" + Costcar * x"+(i+1)+""+(j+1)+"_1");
-						onlyBike = false;
+					if (!started){
+						if (legs.getMode().equals(TransportMode.car)) {
+							stream.print("Ucar * x"+(i+1)+""+(j+1));
+							if (travelCost.equals("yes")) stream.print(" + Costcar * x"+(i+1)+""+(j+1)+"_1");
+							onlyBike = false;
+							started = true;
+						}
+						else if (legs.getMode().equals(TransportMode.pt)) {
+							stream.print("Upt * x"+(i+1)+""+(j+1));
+							if (travelCost.equals("yes")) stream.print(" + Costpt * x"+(i+1)+""+(j+1)+"_1");
+							onlyBike = false;
+							started = true;
+						}
+						else if (legs.getMode().equals(TransportMode.walk)) {
+							stream.print("Uwalk * x"+(i+1)+""+(j+1));
+							onlyBike = false;
+							started = true;
+						}
+						else if (legs.getMode().equals(TransportMode.bike)) {
+							if (bikeIn.equals("yes")) {
+								stream.print("Ubike * x"+(i+1)+""+(j+1));
+								started = true;
+							}
+						}
+						else log.warn("Leg has no valid mode! ActChains position: "+i);
 					}
-					else if (legs.getMode().equals(TransportMode.pt)) {
-						stream.print(" + Upt * x"+(i+1)+""+(j+1));
-						if (travelCost.equals("yes")) stream.print(" + Costpt * x"+(i+1)+""+(j+1)+"_1");
-						onlyBike = false;
+					else {
+						if (legs.getMode().equals(TransportMode.car)) {
+							stream.print(" + Ucar * x"+(i+1)+""+(j+1));
+							if (travelCost.equals("yes")) stream.print(" + Costcar * x"+(i+1)+""+(j+1)+"_1");
+							onlyBike = false;
+						}
+						else if (legs.getMode().equals(TransportMode.pt)) {
+							stream.print(" + Upt * x"+(i+1)+""+(j+1));
+							if (travelCost.equals("yes")) stream.print(" + Costpt * x"+(i+1)+""+(j+1)+"_1");
+							onlyBike = false;
+						}
+						else if (legs.getMode().equals(TransportMode.walk)) {
+							stream.print(" + Uwalk * x"+(i+1)+""+(j+1));
+							onlyBike = false;
+						}
+						else if (legs.getMode().equals(TransportMode.bike)) {
+							if (bikeIn.equals("yes")) stream.print(" + Ubike * x"+(i+1)+""+(j+1));
+						}
+						else log.warn("Leg has no valid mode! ActChains position: "+i);
 					}
-					else if (legs.getMode().equals(TransportMode.walk)) {
-						stream.print(" + Uwalk * x"+(i+1)+""+(j+1));
-						onlyBike = false;
-					}
-					else if (legs.getMode().equals(TransportMode.bike)) {
-						if (bikeIn.equals("yes")) stream.print(" + Ubike * x"+(i+1)+""+(j+1));
-					}
-					else log.warn("Leg has no valid mode! ActChains position: "+i);
 				}
 				if (onlyBike && bikeIn.equals("no")) stream.print("$NONE");
 			}
