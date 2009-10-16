@@ -334,52 +334,5 @@ public class MDSAM {
 		del = java.lang.Math.min(del, ins);		
 		return java.lang.Math.min(del, sub);
 	}
-	
-	public static void main(final String [] args) {
-		
-				final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
-				final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-				final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz06.xml";
-				final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans064.dat";
-				final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
-				final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model064.mod";
-				
-		/*		final String populationFilename = "./plans/output_plans.xml";
-				final String networkFilename = "./plans/network.xml";
-				final String facilitiesFilename = "./plans/facilities.xml";
-				final String outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims062.xls";
-				final String outputFile = "./plans/output_plans.dat";
-				*/
-				
-				String similarity 	= "no";
-				String income 		= "no";
-				String gender 		= "no";
-				String age 			= "no";
-				String employed 	= "no";
-				String license 		= "no";
-				String carAvail 	= "no";
-				String seasonTicket = "no";
-				String travelCost	= "yes";
-				String bikeIn		= "no";
-
-				ScenarioImpl scenario = new ScenarioImpl();
-				new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
-				new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
-				new MatsimPopulationReader(scenario).readFile(populationFilename);
-				
-		//		MDSAM mdsam = new MDSAM(scenario.getPopulation());				
-		//		List<List<Double>> sims = mdsam.runPopulation();
-				
-				List<List<Double>> sims = null;
-
-				PlansConstructor pc = new PlansConstructor(scenario.getPopulation(), sims);
-		//		pc.writeSims(outputFileSims);
-		//		pc.writePlansForBiogemeWithSequence(outputFileBiogeme);
-				pc.keepPersons();
-				pc.writePlansForBiogemeWithRandomSelection(outputFileBiogeme, attributesInputFile, 
-						similarity, income, age, gender, employed, license, carAvail, seasonTicket, travelCost, bikeIn);
-				pc.writeModFileWithRandomSelection(outputFileMod);
-				log.info("Process finished.");
-			}
 }
 
