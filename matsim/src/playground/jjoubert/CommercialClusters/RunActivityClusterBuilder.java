@@ -38,7 +38,7 @@ public class RunActivityClusterBuilder {
 	 * 		5 - Study area (no output; all vehicles SNA)							|
 	 * 		6 - Study area (output and SNA)											|
 	 *=============================================================================*/
-	private static int scenario = 2	;
+	private static int scenario = 5	;
 	
 	 /*=============================================================================
 	 * String value that must be set. Allowed study areas are:						|
@@ -83,8 +83,8 @@ public class RunActivityClusterBuilder {
 	 /*=============================================================================
 	 * String array with all the sample numbers that should be considered. 			|
 	 *=============================================================================*/	
-//	private static String[] sampleArray = {"01", "02"};
-	private static String[] sampleArray = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10"};
+	private static String[] sampleArray = {"01"};
+//	private static String[] sampleArray = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10"};
 	
 	 /*=============================================================================
 	 * Cluster parameters that must be set. These include: 							|
@@ -94,9 +94,9 @@ public class RunActivityClusterBuilder {
 	 * 		  radius before a new cluster will be created.							| 
 	 *=============================================================================*/
 //	private static int radius = 20;
-	private static int[] radiusArray = {45};
+	private static int[] radiusArray = {30};
 //	private static int minimumPoints = 30;
-	private static int[] minimumPointsArray = {5,10,15,20,25,30};
+	private static int[] minimumPointsArray = {15};
 	
 	 /*=============================================================================
 	 * Other utility parameters. Need not be set/changed							|
