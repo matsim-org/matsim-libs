@@ -12,6 +12,8 @@ public class AllTests {
 
 		suite.addTestSuite(BasicTests.class);
 		suite.addTestSuite(AdvancedTests.class);
+		suite.addTestSuite(ScoringTests.class);
+		
 
 		return suite;
 	}
