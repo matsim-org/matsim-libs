@@ -105,7 +105,8 @@ public class OptimizedCharger {
 		
 		
 		// write out energy usage statistics (data and graph)
-		if (ParametersPSF.getMainEnergyUsageStatistics()!=null){
+		// the hub link mapping is not on during testing mode.
+		if (ParametersPSF.getMainEnergyUsageStatistics()!=null && !ParametersPSF.isTestingModeOn()){
 			double[][] energyUsageStatistics = ChargingTimes.getEnergyUsageStatistics(chargingTimes,ParametersPSF.getHubLinkMapping()); 
 			
 			//ChargingTimes.writeEnergyUsageStatisticsData(ParametersPSF.getMainEnergyUsageStatistics() + ".txt", energyUsageStatistics, ParametersPSF.getHubLinkMapping().getNumberOfHubs());
