@@ -105,6 +105,12 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			
 			tmpScore += travelTime * this.ftConfigGroup.getTravelingBike() / 3600d;
 			
+		} else if (TransportMode.ride.equals(leg.getMode())) {
+			
+			tmpScore += this.ftConfigGroup.getTravelingRide();
+			
+			tmpScore += travelTime * this.ftConfigGroup.getTravelingBike() / 3600d;
+			
 		} else {
 			
 			if (this.params.marginalUtilityOfDistanceCar != 0.0) {
