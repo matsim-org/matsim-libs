@@ -19,3 +19,6 @@ Notes:
 ======
 - the price info file in an iteration folder are the input of MATSim and the
 vehicle energy consumptions are the output of MATSim.
+- in matlab set the file->path to the right folder, where the IVT_main_base etc. are in. and remove paths, from
+other runs.
+- use matlab 2008(b)
