@@ -61,6 +61,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.api.basic.v01.TransportMode;
 
 
 
@@ -84,7 +85,8 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected List<List<Double>> sims;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	protected int noOfAlternatives;
-	protected String similarity, income, gender, age, license, carAvail, employed, seasonTicket; 
+	protected String similarity, income, gender, age, license, carAvail, employed, seasonTicket, travelCost, bikeIn; 
+	protected double travelCostCar, travelCostPt;
 	
 	                      
 	public PlansConstructor (Controler controler) {
@@ -106,7 +108,6 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
 		this.linker = new XY2Links (this.controler.getNetwork());
-		this.noOfAlternatives = 20;
 		this.similarity 	= "no";
 		this.income 		= "yes";
 		this.age 			= "no";
@@ -115,12 +116,19 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.license 		= "no";
 		this.carAvail 		= "no";
 		this.seasonTicket 	= "no";
+		this.travelCost		= "no";
+		this.bikeIn			= "no";
+		this.noOfAlternatives = 20;
+		this.travelCostCar	= 0.5;	// CHF/km
+		this.travelCostPt	= 0.28; // CHF/km
 	}
 	
 	public PlansConstructor (PopulationImpl population, List<List<Double>> sims) {
 		this.population = population;
 		this.sims = sims;	
 		this.noOfAlternatives = 20;
+		this.travelCostCar	= 0.5;	// CHF/km
+		this.travelCostPt	= 0.28;	// CHF/km
 	}
 	
 	private void init(final NetworkLayer network) {
@@ -169,7 +177,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	// Type of writing the Biogeme file
 		//	this.writePlansForBiogeme(this.outputFileBiogeme);
 		this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
-				this.similarity, this.income, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket);
+				this.similarity, this.income, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelCost, this.bikeIn);
 		
 	// Type of writing the mod file
 		//	this.writeModFile(this.outputFileMod);
@@ -734,13 +742,15 @@ public class PlansConstructor implements PlanStrategyModule{
 			String employed,
 			String license,
 			String carAvail,
-			String seasonTicket){
+			String seasonTicket,
+			String travelCost,
+			String bikeIn){
 		
 		log.info("Writing plans for Biogeme...");
 		
 		// Writing the variables back to head of class due to MDSAM call possibility. 
 		// Like this, they are also available for modMaker class.
-		this.similarity=similarity; this.income=income; this.age=age; this.gender=gender; this.employed=employed; this.license=license;; this.carAvail=carAvail; this.seasonTicket=seasonTicket;
+		this.similarity=similarity; this.income=income; this.age=age; this.gender=gender; this.employed=employed; this.license=license; this.carAvail=carAvail; this.seasonTicket=seasonTicket; this.travelCost=travelCost; this.bikeIn=bikeIn;
 		
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
 		AgentsAttributesAdder aaa = new AgentsAttributesAdder ();
@@ -800,8 +810,14 @@ public class PlansConstructor implements PlanStrategyModule{
 		for (int i = 0;i<this.actChains.size();i++){
 			int j=0;
 			for (j =0;j<java.lang.Math.max(this.actChains.get(i).size()-1,1);j++){
-				stream.print("x"+(i+1)+""+(j+1)+"\t");
-				counterFirst++;
+				if (j%2==0 || (j%2==1 && !((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.bike)) || bikeIn.equals("yes")){
+					stream.print("x"+(i+1)+""+(j+1)+"\t");
+					counterFirst++;
+					if (travelCost.equals("yes") && j%2==1 && (((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.car) || ((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.pt))){
+						stream.print("x"+(i+1)+""+(j+1)+"_1\t");
+						counterFirst++;
+					}
+				}
 			}
 			if (similarity.equals("yes")) {
 				stream.print("x"+(i+1)+""+(j+1)+"\t"); 
@@ -915,8 +931,14 @@ public class PlansConstructor implements PlanStrategyModule{
 				//if (similarity.equals("yes") && found) stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
 				if (!found){
 					for (int j=0;j<Math.max(this.actChains.get(i).size()-1, 1);j++){
-						stream.print(0+"\t");
-						counterRow++;
+						if (j%2==0 || (!((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.bike) || this.bikeIn.equals("yes"))){
+							stream.print(0+"\t");
+							counterRow++;
+							if (j%2==1 && this.travelCost.equals("yes") && (((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.car) || ((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.pt))){
+								stream.print(0+"\t");
+								counterRow++;
+							}
+						}
 					}
 					if (similarity.equals("yes")) {
 						stream.print(0+"\t");
@@ -1091,7 +1113,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			counter++;	
 			LinkedList<Integer> takenPositions = new LinkedList<Integer>();
 			for (int i=1;i<referencePlan.size()-1;i++){
-				if (i%2==0){
+				if (i%2==0){ // Activities
 					boolean found = false;
 					for (int j=2;j<planToBeWritten.size()-2;j+=2){
 						if (((ActivityImpl)(referencePlan.get(i))).getType().equals(((ActivityImpl)(planToBeWritten.get(j))).getType()) &&
@@ -1105,19 +1127,31 @@ public class PlansConstructor implements PlanStrategyModule{
 					}
 					if (!found) log.warn("Activity "+referencePlan.get(i)+" could not be found!");
 				}
-				else {
-					boolean found = false;
-					for (int j=1;j<planToBeWritten.size()-1;j+=2){
-						if (((LegImpl)(referencePlan.get(i))).getMode().equals(((LegImpl)(planToBeWritten.get(j))).getMode()) &&
-								!takenPositions.contains(j)){
-							stream.print(((LegImpl)(planToBeWritten.get(j))).getTravelTime()/3600+"\t");
-							counter++;
-							takenPositions.add(j);
-							found = true;
-							break;
+				else { // Legs
+					if ((!((LegImpl)(referencePlan.get(i))).getMode().equals(TransportMode.bike)) || this.bikeIn.equals("yes")){
+						boolean found = false;
+						for (int j=1;j<planToBeWritten.size()-1;j+=2){
+							if (((LegImpl)(referencePlan.get(i))).getMode().equals(((LegImpl)(planToBeWritten.get(j))).getMode()) &&
+									!takenPositions.contains(j)){
+								stream.print(((LegImpl)(planToBeWritten.get(j))).getTravelTime()/3600+"\t");
+								counter++;
+								takenPositions.add(j);
+								if (this.travelCost.equals("yes")){
+									if (((LegImpl)(planToBeWritten.get(j))).getMode().equals(TransportMode.car)){
+										stream.print((((LegImpl)(planToBeWritten.get(j))).getRoute().getDistance()*this.travelCostCar)+"\t");
+										counter++;
+									}
+									else if (((LegImpl)(planToBeWritten.get(j))).getMode().equals(TransportMode.pt)){
+										stream.print((((LegImpl)(planToBeWritten.get(j))).getRoute().getDistance()*this.travelCostPt)+"\t");
+										counter++;
+									}
+								}
+								found = true;
+								break;
+							}
 						}
+						if (!found) log.warn("Leg "+referencePlan.get(i)+" could not be found!");
 					}
-					if (!found) log.warn("Leg "+referencePlan.get(i)+" could not be found!");
 				}
 			}
 		}
@@ -1138,7 +1172,17 @@ public class PlansConstructor implements PlanStrategyModule{
 	}
 	
 	public void writeModFileWithRandomSelection (String outputFile){
-		new ModFileMaker (this.population, this.actChains).writeWithRandomSelection(outputFile);
+		new ModFileMaker (this.population, this.actChains).writeWithRandomSelection(outputFile,
+				this.similarity, 
+				this.income,
+				this.age,
+				this.gender,
+				this.employed,
+				this.license,
+				this.carAvail,
+				this.seasonTicket,
+				this.travelCost,
+				this.bikeIn);
 	}
 	
 	

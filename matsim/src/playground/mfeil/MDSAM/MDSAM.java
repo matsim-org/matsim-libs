@@ -340,25 +340,27 @@ public class MDSAM {
 				final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 				final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 				final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz06.xml";
-				final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans062.dat";
+				final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans064.dat";
 				final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
+				final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model064.mod";
 				
 		/*		final String populationFilename = "./plans/output_plans.xml";
 				final String networkFilename = "./plans/network.xml";
 				final String facilitiesFilename = "./plans/facilities.xml";
 				final String outputFileSims = "/home/baug/mfeil/data/largeSet/it0/sims062.xls";
-				final String outputFileMod = "/home/baug/mfeil/data/largeSet/it0/model062.mod";
 				final String outputFile = "./plans/output_plans.dat";
 				*/
 				
 				String similarity 	= "no";
-				String income 		= "yes";
+				String income 		= "no";
 				String gender 		= "no";
 				String age 			= "no";
 				String employed 	= "no";
 				String license 		= "no";
 				String carAvail 	= "no";
 				String seasonTicket = "no";
+				String travelCost	= "yes";
+				String bikeIn		= "no";
 
 				ScenarioImpl scenario = new ScenarioImpl();
 				new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
@@ -375,8 +377,8 @@ public class MDSAM {
 		//		pc.writePlansForBiogemeWithSequence(outputFileBiogeme);
 				pc.keepPersons();
 				pc.writePlansForBiogemeWithRandomSelection(outputFileBiogeme, attributesInputFile, 
-						similarity, income, age, gender, employed, license, carAvail, seasonTicket);
-		//		pc.writeModFileWithSequence(outputFileMod);
+						similarity, income, age, gender, employed, license, carAvail, seasonTicket, travelCost, bikeIn);
+				pc.writeModFileWithRandomSelection(outputFileMod);
 				log.info("Process finished.");
 			}
 }

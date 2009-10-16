@@ -28,18 +28,13 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.api.basic.v01.population.PlanElement;
 
-import playground.mfeil.analysis.ASPActivityChainsModesAccumulated;
 
 
 /**
@@ -297,7 +292,18 @@ public class ModFileMaker {
 	}
 	
 	
-	public void writeWithRandomSelection (String outputFile){
+	public void writeWithRandomSelection (String outputFile,
+			String similarity, 
+			String income,
+			String age,
+			String gender,
+			String employed,
+			String license,
+			String carAvail,
+			String seasonTicket,
+			String travelCost,
+			String bikeIn){
+		
 		log.info("Writing mod file...");
 		
 		PrintStream stream;
@@ -323,23 +329,23 @@ public class ModFileMaker {
 		stream.println("//Name \tValue  \tLowerBound \tUpperBound  \tstatus (0=variable, 1=fixed");
 		
 		stream.println("HomeUmax \t60  \t0 \t100  \t0");
-		stream.println("HomeInnerUmax \t60  \t0 \t100  \t0");
 		stream.println("WorkUmax \t55  \t0 \t100  \t0");
 		stream.println("EducationUmax \t40  \t0 \t100  \t0");
 		stream.println("ShoppingUmax \t35  \t0 \t100  \t0");
 		stream.println("LeisureUmax \t12  \t0 \t100  \t0");
 		
 		stream.println("HomeAlpha \t6  \t-5 \t20  \t0");
-		stream.println("HomeInnerAlpha \t6  \t-5 \t20  \t0");
 		stream.println("WorkAlpha \t4  \t-5 \t20  \t0");
 		stream.println("EducationAlpha \t3  \t-5 \t20  \t0");
 		stream.println("ShoppingAlpha \t2  \t-5 \t20  \t0");
 		stream.println("LeisureAlpha \t1  \t-5 \t20  \t0");
 		
 		stream.println("Ucar \t-6  \t-50 \t30  \t0");
+		if (travelCost.equals("yes")) stream.println("Costcar \t-6  \t-50 \t30  \t0");
 		stream.println("Upt \t-6  \t-50 \t30  \t0");
+		if (travelCost.equals("yes")) stream.println("Costpt \t-6  \t-50 \t30  \t0");
 		stream.println("Uwalk \t-6  \t-50 \t30  \t0");
-		stream.println("Ubike \t-6  \t-50 \t30  \t0");	
+		if (bikeIn.equals("yes")) stream.println("Ubike \t-6  \t-50 \t30  \t0");	
 		
 		stream.println();
 	
@@ -351,21 +357,47 @@ public class ModFileMaker {
 			stream.print((i+1)+"\tAlt"+(i+1)+"\tav"+(i+1)+"\t");
 			
 			if (actslegs.size()>1){
+				boolean onlyBike = true;				
 				LegImpl leg = (LegImpl)actslegs.get(1);
-				if (leg.getMode().equals(TransportMode.car)) stream.print("Ucar * x"+(i+1)+""+2);
-				else if (leg.getMode().equals(TransportMode.bike)) stream.print("Ubike * x"+(i+1)+""+2);
-				else if (leg.getMode().equals(TransportMode.pt)) stream.print("Upt * x"+(i+1)+""+2);
-				else if (leg.getMode().equals(TransportMode.walk)) stream.print("Uwalk * x"+(i+1)+""+2);
+				if (leg.getMode().equals(TransportMode.car)) {
+					stream.print("Ucar * x"+(i+1)+""+2);
+					if (travelCost.equals("yes")) stream.print(" + Costcar * x"+(i+1)+"2_1");
+					onlyBike = false;
+				}
+				else if (leg.getMode().equals(TransportMode.pt)) {
+					stream.print("Upt * x"+(i+1)+""+2);
+					if (travelCost.equals("yes")) stream.print(" + Costpt * x"+(i+1)+"2_1");
+					onlyBike = false;
+				}
+				else if (leg.getMode().equals(TransportMode.walk)) {
+					stream.print("Uwalk * x"+(i+1)+""+2);
+					onlyBike = false;
+				}
+				else if (bikeIn.equals("yes") && leg.getMode().equals(TransportMode.bike)) stream.print("Ubike * x"+(i+1)+""+2);
 				else log.warn("Leg has no valid mode! ActChains position: "+i);
 				
 				for (int j=3;j<actslegs.size();j+=2){
 					LegImpl legs = (LegImpl)actslegs.get(j);
-					if (legs.getMode().equals(TransportMode.car)) stream.print(" + Ucar * x"+(i+1)+""+(j+1));
-					else if (legs.getMode().equals(TransportMode.bike)) stream.print(" + Ubike * x"+(i+1)+""+(j+1));
-					else if (legs.getMode().equals(TransportMode.pt)) stream.print(" + Upt * x"+(i+1)+""+(j+1));
-					else if (legs.getMode().equals(TransportMode.walk)) stream.print(" + Uwalk * x"+(i+1)+""+(j+1));
+					if (legs.getMode().equals(TransportMode.car)) {
+						stream.print(" + Ucar * x"+(i+1)+""+(j+1));
+						if (travelCost.equals("yes")) stream.print(" + Costcar * x"+(i+1)+""+(j+1)+"_1");
+						onlyBike = false;
+					}
+					else if (legs.getMode().equals(TransportMode.pt)) {
+						stream.print(" + Upt * x"+(i+1)+""+(j+1));
+						if (travelCost.equals("yes")) stream.print(" + Costpt * x"+(i+1)+""+(j+1)+"_1");
+						onlyBike = false;
+					}
+					else if (legs.getMode().equals(TransportMode.walk)) {
+						stream.print(" + Uwalk * x"+(i+1)+""+(j+1));
+						onlyBike = false;
+					}
+					else if (legs.getMode().equals(TransportMode.bike)) {
+						if (bikeIn.equals("yes")) stream.print(" + Ubike * x"+(i+1)+""+(j+1));
+					}
 					else log.warn("Leg has no valid mode! ActChains position: "+i);
 				}
+				if (onlyBike && bikeIn.equals("no")) stream.print("$NONE");
 			}
 			else {
 				stream.print("$NONE");
@@ -412,32 +444,5 @@ public class ModFileMaker {
 		stream.close();
 		log.info("done.");
 	}
-	
-	
-
-	public static void main(final String [] args) {
-		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
-		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz01.xml";
-	/*	final String populationFilename = "./plans/output_plans.xml.gz";
-		final String networkFilename = "./plans/network.xml";
-		final String facilitiesFilename = "./plans/facilities.xml.gz";
-	*/
-		final String outputFile = "/home/baug/mfeil/data/choiceSet/it0/model01.mod";
-	//	final String outputFile = "./plans/model.mod";
-
-		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
-		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
-		new MatsimPopulationReader(scenario).readFile(populationFilename);
-		
-		ASPActivityChainsModesAccumulated analyzer = new ASPActivityChainsModesAccumulated(scenario.getPopulation());
-		analyzer.run();
-
-		ModFileMaker sp = new ModFileMaker(scenario.getPopulation(), analyzer.getActivityChains());
-		sp.writeWithRandomSelection(outputFile);
-		log.info("Model finished.");
-	}
-
 }
 
