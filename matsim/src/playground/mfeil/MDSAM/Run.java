@@ -62,6 +62,7 @@ public class Run {
 		String carAvail 	= "no";
 		String seasonTicket = "no";
 		String travelCost	= "yes";
+		String travelConstant = "no";
 		String bikeIn		= "no";
 
 		ScenarioImpl scenario = new ScenarioImpl();
@@ -78,7 +79,7 @@ public class Run {
 //		pc.writePlansForBiogemeWithSequence(outputFileBiogeme);
 		pc.keepPersons();
 		pc.writePlansForBiogemeWithRandomSelection(outputFileBiogeme, attributesInputFile, 
-				similarity, income, age, gender, employed, license, carAvail, seasonTicket, travelCost, bikeIn);
+				similarity, income, age, gender, employed, license, carAvail, seasonTicket, travelCost, travelConstant, bikeIn);
 		pc.writeModFileWithRandomSelection(outputFileMod);
 		log.info("Process finished.");
 	}

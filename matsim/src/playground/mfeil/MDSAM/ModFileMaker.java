@@ -302,6 +302,7 @@ public class ModFileMaker {
 			String carAvail,
 			String seasonTicket,
 			String travelCost,
+			String travelConstant,
 			String bikeIn){
 		
 		log.info("Writing mod file...");
@@ -328,23 +329,25 @@ public class ModFileMaker {
 		stream.println("[Beta]");
 		stream.println("//Name \tValue  \tLowerBound \tUpperBound  \tstatus (0=variable, 1=fixed");
 		
-		stream.println("HomeUmax \t60  \t0 \t100  \t0");
-		stream.println("WorkUmax \t55  \t0 \t100  \t0");
-		stream.println("EducationUmax \t40  \t0 \t100  \t0");
-		stream.println("ShoppingUmax \t35  \t0 \t100  \t0");
-		stream.println("LeisureUmax \t12  \t0 \t100  \t0");
+		stream.println("HomeUmax \t4  \t0 \t100  \t0");
+		stream.println("WorkUmax \t2  \t0 \t100  \t0");
+		stream.println("EducationUmax \t1  \t0 \t100  \t0");
+		stream.println("ShoppingUmax \t1  \t0 \t100  \t0");
+		stream.println("LeisureUmax \t1  \t0 \t100  \t0");
 		
-		stream.println("HomeAlpha \t6  \t-5 \t20  \t0");
+		stream.println("HomeAlpha \t8  \t-5 \t20  \t0");
 		stream.println("WorkAlpha \t4  \t-5 \t20  \t0");
-		stream.println("EducationAlpha \t3  \t-5 \t20  \t0");
-		stream.println("ShoppingAlpha \t2  \t-5 \t20  \t0");
+		stream.println("EducationAlpha \t2  \t-5 \t20  \t0");
+		stream.println("ShoppingAlpha \t0  \t-5 \t20  \t0");
 		stream.println("LeisureAlpha \t1  \t-5 \t20  \t0");
 		
-		stream.println("Ucar \t-6  \t-50 \t30  \t0");
-		if (travelCost.equals("yes")) stream.println("Costcar \t-6  \t-50 \t30  \t0");
-		stream.println("Upt \t-6  \t-50 \t30  \t0");
-		if (travelCost.equals("yes")) stream.println("Costpt \t-6  \t-50 \t30  \t0");
-		stream.println("Uwalk \t-6  \t-50 \t30  \t0");
+		stream.println("Ucar \t-4  \t-50 \t30  \t0");
+		if (travelCost.equals("yes")) stream.println("Costcar \t0  \t-50 \t30  \t0");
+		if (travelConstant.equals("yes")) stream.println("Constantcar \t0  \t-50 \t50  \t0");
+		stream.println("Upt \t-2  \t-50 \t30  \t0");
+		if (travelCost.equals("yes")) stream.println("Costpt \t0  \t-50 \t30  \t0");
+		if (travelConstant.equals("yes")) stream.println("Constantpt \t0  \t-50 \t50  \t0");
+		stream.println("Uwalk \t-1  \t-50 \t30  \t0");
 		if (bikeIn.equals("yes")) stream.println("Ubike \t-6  \t-50 \t30  \t0");	
 		
 		stream.println();
@@ -384,12 +387,14 @@ public class ModFileMaker {
 						if (legs.getMode().equals(TransportMode.car)) {
 							stream.print("Ucar * x"+(i+1)+""+(j+1));
 							if (travelCost.equals("yes")) stream.print(" + Costcar * x"+(i+1)+""+(j+1)+"_1");
+							if (travelConstant.equals("yes")) stream.print(" + Constantcar * one");
 							onlyBike = false;
 							started = true;
 						}
 						else if (legs.getMode().equals(TransportMode.pt)) {
 							stream.print("Upt * x"+(i+1)+""+(j+1));
 							if (travelCost.equals("yes")) stream.print(" + Costpt * x"+(i+1)+""+(j+1)+"_1");
+							if (travelConstant.equals("yes")) stream.print(" + Constantpt * one");
 							onlyBike = false;
 							started = true;
 						}
@@ -410,11 +415,13 @@ public class ModFileMaker {
 						if (legs.getMode().equals(TransportMode.car)) {
 							stream.print(" + Ucar * x"+(i+1)+""+(j+1));
 							if (travelCost.equals("yes")) stream.print(" + Costcar * x"+(i+1)+""+(j+1)+"_1");
+							if (travelConstant.equals("yes")) stream.print(" + Constantcar * one");
 							onlyBike = false;
 						}
 						else if (legs.getMode().equals(TransportMode.pt)) {
 							stream.print(" + Upt * x"+(i+1)+""+(j+1));
 							if (travelCost.equals("yes")) stream.print(" + Costpt * x"+(i+1)+""+(j+1)+"_1");
+							if (travelConstant.equals("yes")) stream.print(" + Constantpt * one");
 							onlyBike = false;
 						}
 						else if (legs.getMode().equals(TransportMode.walk)) {

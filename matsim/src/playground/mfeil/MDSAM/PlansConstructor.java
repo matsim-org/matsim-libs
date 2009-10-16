@@ -85,7 +85,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected List<List<Double>> sims;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	protected int noOfAlternatives;
-	protected String similarity, income, gender, age, license, carAvail, employed, seasonTicket, travelCost, bikeIn; 
+	protected String similarity, income, gender, age, license, carAvail, employed, seasonTicket, travelCost, travelConstant, bikeIn; 
 	protected double travelCostCar, travelCostPt;
 	
 	                      
@@ -117,6 +117,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.carAvail 		= "no";
 		this.seasonTicket 	= "no";
 		this.travelCost		= "no";
+		this.travelConstant = "no";
 		this.bikeIn			= "no";
 		this.noOfAlternatives = 20;
 		this.travelCostCar	= 0.5;	// CHF/km
@@ -177,7 +178,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	// Type of writing the Biogeme file
 		//	this.writePlansForBiogeme(this.outputFileBiogeme);
 		this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
-				this.similarity, this.income, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelCost, this.bikeIn);
+				this.similarity, this.income, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelCost, this.travelConstant, this.bikeIn);
 		
 	// Type of writing the mod file
 		//	this.writeModFile(this.outputFileMod);
@@ -744,13 +745,14 @@ public class PlansConstructor implements PlanStrategyModule{
 			String carAvail,
 			String seasonTicket,
 			String travelCost,
+			String travelConstant,
 			String bikeIn){
 		
 		log.info("Writing plans for Biogeme...");
 		
 		// Writing the variables back to head of class due to MDSAM call possibility. 
 		// Like this, they are also available for modMaker class.
-		this.similarity=similarity; this.income=income; this.age=age; this.gender=gender; this.employed=employed; this.license=license; this.carAvail=carAvail; this.seasonTicket=seasonTicket; this.travelCost=travelCost; this.bikeIn=bikeIn;
+		this.similarity=similarity; this.income=income; this.age=age; this.gender=gender; this.employed=employed; this.license=license; this.carAvail=carAvail; this.seasonTicket=seasonTicket; this.travelCost=travelCost; this.travelConstant=travelConstant; this.bikeIn=bikeIn;
 		
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
 		AgentsAttributesAdder aaa = new AgentsAttributesAdder ();
@@ -1138,11 +1140,11 @@ public class PlansConstructor implements PlanStrategyModule{
 								takenPositions.add(j);
 								if (this.travelCost.equals("yes")){
 									if (((LegImpl)(planToBeWritten.get(j))).getMode().equals(TransportMode.car)){
-										stream.print((((LegImpl)(planToBeWritten.get(j))).getRoute().getDistance()*this.travelCostCar)+"\t");
+										stream.print((((LegImpl)(planToBeWritten.get(j))).getRoute().getDistance()/1000*this.travelCostCar)+"\t");
 										counter++;
 									}
 									else if (((LegImpl)(planToBeWritten.get(j))).getMode().equals(TransportMode.pt)){
-										stream.print((((LegImpl)(planToBeWritten.get(j))).getRoute().getDistance()*this.travelCostPt)+"\t");
+										stream.print((((LegImpl)(planToBeWritten.get(j))).getRoute().getDistance()/1000*this.travelCostPt)+"\t");
 										counter++;
 									}
 								}
@@ -1182,6 +1184,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				this.carAvail,
 				this.seasonTicket,
 				this.travelCost,
+				this.travelConstant,
 				this.bikeIn);
 	}
 	
