@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.population.PlanImpl.Type;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -79,36 +81,15 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 		XYLineChart chart = new XYLineChart("", "Income groups", "Delta Utility");
 
 		List<DgAnalysisPopulation> popsPerModeSwitch = new ArrayList<DgAnalysisPopulation>();
-		DgAnalysisPopulation car2carPop = new DgAnalysisPopulation();
-		DgAnalysisPopulation pt2ptPop = new DgAnalysisPopulation();
-		DgAnalysisPopulation pt2carPop = new DgAnalysisPopulation();
-		DgAnalysisPopulation car2ptPop = new DgAnalysisPopulation();
+		DgModeSwitchPlanTypeAnalyzer modeSwitchAnalysis = new DgModeSwitchPlanTypeAnalyzer(this.ana);
+		DgAnalysisPopulation car2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.CAR, PlanImpl.Type.CAR));
+		DgAnalysisPopulation pt2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.PT, PlanImpl.Type.PT));
+		DgAnalysisPopulation pt2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.PT, PlanImpl.Type.CAR));
+		DgAnalysisPopulation car2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.CAR, PlanImpl.Type.PT));
 		popsPerModeSwitch.add(car2carPop);
 		popsPerModeSwitch.add(pt2ptPop);
 		popsPerModeSwitch.add(pt2carPop);
 		popsPerModeSwitch.add(car2ptPop);
-		
-		for (DgPersonData d : ana.getPersonData().values()) {
-			DgPlanData planDataRun1 = d.getPlanData().get(DgAnalysisPopulation.RUNID1);
-			DgPlanData planDataRun2 = d.getPlanData().get(DgAnalysisPopulation.RUNID2);
-			
-			if (planDataRun1.getPlan().getType().equals(Type.CAR) && planDataRun2.getPlan().getType().equals(Type.CAR)) {
-				car2carPop.getPersonData().put(d.getPersonId(), d);
-			}
-			else if (planDataRun1.getPlan().getType().equals(Type.PT) && planDataRun2.getPlan().getType().equals(Type.PT)) {
-				pt2ptPop.getPersonData().put(d.getPersonId(), d);
-			}
-			else if (planDataRun1.getPlan().getType().equals(Type.PT) && planDataRun2.getPlan().getType().equals(Type.CAR)) {
-				pt2carPop.getPersonData().put(d.getPersonId(), d);
-			}
-			else if (planDataRun1.getPlan().getType().equals(Type.CAR) && planDataRun2.getPlan().getType().equals(Type.PT)){
-				car2ptPop.getPersonData().put(d.getPersonId(), d);
-			}
-		}
-		
-		
-		
-		
 		
 		for (DgAnalysisPopulation population : popsPerModeSwitch) {
 			// calculate thresholds for income classes
@@ -131,9 +112,9 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 				groups[pos].getPersonData().put(d.getPersonId(), d);
 			}
 			
-			String[] groupDescriptions = new String[groups.length];
-			double[] xvalues = new double[groups.length];
-			double[] yvalues = new double[groups.length];
+//			String[] groupDescriptions = new String[groups.length];
+//			double[] xvalues = new double[groups.length];
+//			double[] yvalues = new double[groups.length];
 			
 			List<Tuple<Double, Double>> values = new ArrayList<Tuple<Double, Double>>();
 			
@@ -149,6 +130,12 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 				}
 
 			}
+			
+			XYSeriesCollection dataset = new XYSeriesCollection();
+			XYSeries series = this.createSeries("avg delta utility", values);
+			dataset.addSeries(series);
+			
+			
 			Tuple<double[], double[]> data = DgChartUtils.createArray(values);
 			
 			chart.addSeries("avg delta utility", data.getFirst(), data.getSecond());	
@@ -161,6 +148,14 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 		log.info("DgAvgDeltaScoreIncomeGroupChart written to : " +filename);
 	}
 
+	public XYSeries createSeries(final String title, List<Tuple<Double, Double>> values) {
+		XYSeries series = new XYSeries(title, false, true);
+		for (Tuple<Double, Double> t : values) {
+			series.add(t.getFirst(), t.getSecond());
+		}
+		return series;
+	}
+	
 	
 	private Double calcAverageScoreDifference(DgAnalysisPopulation group) {
 		Double deltaScoreSum = 0.0;

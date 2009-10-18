@@ -73,7 +73,7 @@ public class DaganzoScenarioGenerator {
 	public static final String DAGANZONETWORKFILE = DAGANZOBASEDIR
 			+ "daganzoNetwork.xml";
 
-	public static final String NETWORKFILE = DAGANZONETWORKFILE;
+	public static final String NETWORKFILE =  DAGANZOBASEDIR + "daganzoNetworkNoLanes.xml";//DAGANZONETWORKFILE;
 
 	private static final String PLANS1OUT = DAGANZOBASEDIR
 			+ "daganzoPlansNormalRoute.xml";
@@ -107,9 +107,11 @@ public class DaganzoScenarioGenerator {
 
 	private static final boolean isAlternativeRouteEnabled = false;
 	
-	private static final boolean isUseSignalSystems = true;
+	private static final boolean isUseLanes = false;
+	
+	private static final boolean isUseSignalSystems = false;
 
-	private static final int iterations = 10;
+	private static final int iterations = 0;
 
 	private static final int iterations2 = 0;
 
@@ -157,17 +159,19 @@ public class DaganzoScenarioGenerator {
 		createPlans(scenario);
 		PopulationWriter pwriter = new PopulationWriter(scenario.getPopulation(), plansOut);
 		pwriter.write();
-		if (isUseSignalSystems) {
-			//enable lanes and signal system feature in config
+		if (isUseLanes) {
 			config.scenario().setUseLanes(true);
-			config.scenario().setUseSignalSystems(true);
 			config.network().setLaneDefinitionsFile(LANESOUTPUTFILE);
-			config.signalSystems().setSignalSystemFile(SIGNALSYSTEMSOUTPUTFILE);
-			config.signalSystems().setSignalSystemConfigFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
 			//create the lanes and write them
 			BasicLaneDefinitions lanes = createLanes(scenario);
 			MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter(lanes);
 			laneWriter.writeFile(LANESOUTPUTFILE);
+		}
+		if (isUseSignalSystems) {
+			//enable lanes and signal system feature in config
+//			config.scenario().setUseSignalSystems(true);
+			config.signalSystems().setSignalSystemFile(SIGNALSYSTEMSOUTPUTFILE);
+			config.signalSystems().setSignalSystemConfigFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
 			//create the signal systems and write them
 			BasicSignalSystems signalSystems = createSignalSystems(scenario);
 			MatsimSignalSystemsWriter ssWriter = new MatsimSignalSystemsWriter(signalSystems);
@@ -219,7 +223,7 @@ public class DaganzoScenarioGenerator {
 				route.setLinks(l1, NetworkUtils.getLinks(network, "2 3 5 6"), l7);
 			}
 			else {
-				route.setLinks(l1, NetworkUtils.getLinks(network, "2 4 6"), l7);
+				route.setLinks(l1, NetworkUtils.getLinks(network, "2 4 41 6"), l7);
 			}
 			leg.setRoute(route);
 

@@ -33,7 +33,7 @@ public class DgOtfStarter {
 	public static void main(String[] args) {
 		String base = "/media/data/work/cvsRep/vsp-cvs/runs/run";
 		 
-		String network = "/media/data/work/vspSvn/studies/schweiz-ivtch/network/ivtch-osm.xml";
+		String network = DgPaths.IVTCHNET;
 		
 //		String runNumber = "486";
 //	String mvi = "1000.T.mvi";
@@ -85,7 +85,11 @@ public class DgOtfStarter {
 //		filename = DgPaths.RUNBASE + "run709/it.1000/1000.analysis/709.vis.mvi";
 //		filename = DgPaths.RUNBASE + "run710/it.1000/1000.analysis/710.vis.mvi";
 		
-		filename = DgPaths.RUNBASE + "run710/it.1000/1000.analysis/710.vis.mvi";
+//		filename = DgPaths.RUNBASE + "run710/it.1000/1000.analysis/710.vis.mvi";
+		
+		filename = network;
+		
+		filename = "/home/dgrether/svnworkspace/matsim/test/input/playground/benjamin/BKickRouterTestIATBR/network.xml";
 		
 		if (filename.endsWith(".veh.gz")) {
 			tVehStarter(filename, network);

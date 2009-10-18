@@ -42,4 +42,7 @@ public class DgChartUtils {
 		}
 		return new Tuple<double[], double[]>(xvalues, yvalues);
 	}
+	
+	
+	
 }

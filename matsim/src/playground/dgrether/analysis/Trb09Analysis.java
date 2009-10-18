@@ -20,16 +20,14 @@
 package playground.dgrether.analysis;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
-import playground.dgrether.analysis.population.DgAvgDeltaScoreIncomeGroupChart;
 import playground.dgrether.analysis.population.DgAvgDeltaScoreIncomeGroupModeSwitchChart;
 import playground.dgrether.analysis.population.DgDeltaScoreIncomeChart;
+import playground.dgrether.analysis.population.DgDeltaScoreIncomeModeChoiceChart;
 import playground.dgrether.analysis.population.DgHouseholdsAnalysisReader;
-import playground.dgrether.analysis.population.DgModeChoiceIncomeChart;
 import playground.dgrether.analysis.population.DgPopulationAnalysisReader;
 
 
@@ -42,10 +40,10 @@ public class Trb09Analysis {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-			String runNumber1 = "736";
-			String runNumber2 = "741";
-//			String runNumber1 = "732";
-//			String runNumber2 = "733";
+//			String runNumber1 = "743";
+//			String runNumber2 = "746";
+			String runNumber1 = "861";
+			String runNumber2 = "862";
 		
 			String runid1 = "run" + runNumber1;
 			String runid2 = "run" + runNumber2;
@@ -59,6 +57,7 @@ public class Trb09Analysis {
 			String housholdsfile = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/households.xml";
 
 			String deltaScoreChartFile = DgPaths.RUNBASE + runid2 + "/deltaScoreSingleColorIncomeChart"+runNumber1+"vs"+runNumber2+".png";
+			String deltaScoreColorChartFile = DgPaths.RUNBASE + runid2 + "/deltaScoreColorIncomeChart"+runNumber1+"vs"+runNumber2+".png";
 			String deltaScoreModeSwitchOnlyChartFile = DgPaths.RUNBASE + runid2 + "/deltaScoreIncomeChart"+runNumber1+"vs"+runNumber2+"ModeSwitcherOnly.png";
 			String modeChoiceIncomeChartFile1 = DgPaths.RUNBASE + runid1 + "/"+runNumber1+"modeChoiceIncomeChart.png";
 			String modeChoiceIncomeChartFile2 = DgPaths.RUNBASE + runid2 + "/"+runNumber2+"modeChoiceIncomeChart.png";
@@ -76,16 +75,20 @@ public class Trb09Analysis {
 			hhr.readHousholds(housholdsfile);
 			
 			DgDeltaScoreIncomeChart incomeChart;
-			incomeChart = new DgDeltaScoreIncomeChart(ana);
-			incomeChart.writeFile(deltaScoreChartFile);
+			//			incomeChart = new DgDeltaScoreIncomeChart(ana);
+//			incomeChart.writeFile(deltaScoreChartFile);
 			
 //			incomeChart.setWriteModeSwitcherOnly(true);
 //			incomeChart.writeFile(deltaScoreModeSwitchOnlyChartFile);
-//			
-			new DgModeChoiceIncomeChart(ana).writeFile(modeChoiceIncomeChartFile1, DgAnalysisPopulation.RUNID1);
-			new DgModeChoiceIncomeChart(ana).writeFile(modeChoiceIncomeChartFile2, DgAnalysisPopulation.RUNID2);
-
-			new DgAvgDeltaScoreIncomeGroupChart(ana).writeFile(avgDeltaScoreIncomeGroupChartFile);
+//		
+			DgDeltaScoreIncomeModeChoiceChart modeChoiceIncomeChart;
+			modeChoiceIncomeChart = new DgDeltaScoreIncomeModeChoiceChart(ana);
+			modeChoiceIncomeChart.writeFile(deltaScoreColorChartFile);
+			
+//			new DgModeChoiceIncomeChart(ana).writeFile(modeChoiceIncomeChartFile1, DgAnalysisPopulation.RUNID1);
+//			new DgModeChoiceIncomeChart(ana).writeFile(modeChoiceIncomeChartFile2, DgAnalysisPopulation.RUNID2);
+//
+//			new DgAvgDeltaScoreIncomeGroupChart(ana).writeFile(avgDeltaScoreIncomeGroupChartFile);
 			new DgAvgDeltaScoreIncomeGroupModeSwitchChart(ana).writeFile(avgDeltaScoreIncomeGroupChartModeSwitchFile);
 			
 			

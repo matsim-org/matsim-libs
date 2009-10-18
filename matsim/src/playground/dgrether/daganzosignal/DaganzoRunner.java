@@ -54,7 +54,7 @@ public class DaganzoRunner {
 		this.addListener(controler);
 		
 		controler.run();
-		this.startVisualizer(config);
+//		this.startVisualizer(config);
 	}
 	
 	private void addListener(Controler c) {

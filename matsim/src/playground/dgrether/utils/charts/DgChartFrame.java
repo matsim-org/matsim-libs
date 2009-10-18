@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VisFirstIteration
+ * DgChartFrame
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.daganzosignal;
+package playground.dgrether.utils.charts;
 
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import java.awt.Dimension;
 
-import playground.dgrether.signalVis.DgOnTheFlyQueueSimQuad;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.ui.ApplicationFrame;
+import org.jfree.ui.RefineryUtilities;
 
 
 /**
  * @author dgrether
  *
  */
-public class VisFirstIteration {
+public class DgChartFrame extends ApplicationFrame {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		DaganzoScenarioGenerator scenarioGenerator = new DaganzoScenarioGenerator();
-		scenarioGenerator.createScenario();
-		ScenarioLoader loader = new ScenarioLoader(scenarioGenerator.configOut);
-		loader.loadScenario();
-		ScenarioImpl sc = loader.getScenario();
-		
-		EventsImpl events = new EventsImpl();
-		DgOnTheFlyQueueSimQuad visSim = new DgOnTheFlyQueueSimQuad(sc, events);
-		visSim.setLaneDefinitions(sc.getLaneDefinitions());
-		visSim.setSignalSystems(sc.getSignalSystems(), sc.getSignalSystemConfigurations());
-		visSim.run();
-		
+	public DgChartFrame(String title, JFreeChart chart) {
+		super(title);
+		ChartPanel chartPanel = new ChartPanel(chart, false);
+		chartPanel.setPreferredSize(new Dimension(1024, 768));
+		setContentPane(chartPanel);
+		this.pack();
+		RefineryUtilities.centerFrameOnScreen(this);
+		this.setVisible(true);
 	}
 
 }
