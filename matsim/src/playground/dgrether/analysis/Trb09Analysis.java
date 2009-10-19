@@ -44,7 +44,7 @@ public class Trb09Analysis {
 //			String runNumber1 = "743";
 //			String runNumber2 = "746";
 			String runNumber1 = "860";
-			String runNumber2 = "864";
+			String runNumber2 = "861";
 		
 			String runid1 = "run" + runNumber1;
 			String runid2 = "run" + runNumber2;

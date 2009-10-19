@@ -117,9 +117,6 @@ public class DgDeltaScoreIncomeModeChoiceChart {
 		return writeModeSwitcherOnly;
 	}
 
-
-
-	
 	public void setWriteModeSwitcherOnly(boolean writeModeSwitcherOnly) {
 		this.writeModeSwitcherOnly = writeModeSwitcherOnly;
 	}

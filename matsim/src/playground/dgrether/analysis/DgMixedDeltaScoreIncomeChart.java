@@ -28,6 +28,8 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import playground.dgrether.utils.charts.DgColorScheme;
+
 
 /**
  * @author dgrether
@@ -48,22 +50,29 @@ public class DgMixedDeltaScoreIncomeChart {
 
 	public JFreeChart createChart() {
 		XYPlot plot = new XYPlot();
-		plot.setDomainAxis(new NumberAxis("x"));
-		plot.setRangeAxis(new NumberAxis("y"));
-
+		plot.setDomainAxis(new NumberAxis("income"));
+		plot.setRangeAxis(new NumberAxis("delta utils"));
+		
+		DgColorScheme colorScheme = new DgColorScheme();
+		
+		XYItemRenderer renderer1 = new XYLineAndShapeRenderer(false, true);
+		renderer1.setSeriesPaint(0, colorScheme.COLOR1B);
+		renderer1.setSeriesPaint(1, colorScheme.COLOR2B);
+		renderer1.setSeriesPaint(2, colorScheme.COLOR3B);
+		renderer1.setSeriesPaint(3, colorScheme.COLOR4B);
+		plot.setDataset(0, this.inomeModeChoiceDs);
+		plot.setRenderer(0, renderer1);
+		
 		int i = 0;
 		XYItemRenderer renderer2;
 		for (XYSeriesCollection col : this.avgDeltaScoreIncomeDs){
 			i++;
 			plot.setDataset(i, col);
 			renderer2 = new XYLineAndShapeRenderer(true, true);
+			renderer2.setSeriesPaint(0, colorScheme.getColor(i, "a"));
 			plot.setRenderer(i, renderer2);
 		}
 
-		
-		XYItemRenderer renderer1 = new XYLineAndShapeRenderer(false, true);
-		plot.setDataset(0, this.inomeModeChoiceDs);
-		plot.setRenderer(0, renderer1);
 		
 		
 		JFreeChart chart = new JFreeChart("Test",plot);

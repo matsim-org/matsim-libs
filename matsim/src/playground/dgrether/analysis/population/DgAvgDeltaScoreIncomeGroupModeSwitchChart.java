@@ -42,6 +42,8 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 	private DgAnalysisPopulation ana;
 	
 	private int numberOfClasses = 10;
+	
+	private int groupThreshold = 3;
 
 	private double minIncome = Double.POSITIVE_INFINITY;
 	private double maxIncome = Double.NEGATIVE_INFINITY;
@@ -71,8 +73,6 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 		XYSeries series = new XYSeries(title, false, true);
 		for (Tuple<Double, Double> t : values) {
 			series.add(t.getFirst(), t.getSecond());
-			log.error("x: " + t.getFirst());
-			log.error("y: " + t.getSecond());
 		}
 		return series;
 	}
@@ -86,7 +86,7 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 			deltaScoreSum += (planDataRun2.getScore() - planDataRun1.getScore());
 		}
 		Double avg = null;
-		if (group.getPersonData().size() > 4) {
+		if (group.getPersonData().size() > groupThreshold) {
 			avg = deltaScoreSum/group.getPersonData().size();
 		}
 		return avg;
@@ -111,7 +111,6 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 			DgAnalysisPopulation[] groups = new DgAnalysisPopulation[this.numberOfClasses];
 
 			double deltaY = this.maxIncome / (this.numberOfClasses -1);
-			log.error("delta y: " + deltaY);
 			for (int i = 0; i < incomeThresholds.length; i++) {
 				incomeThresholds[i] = new IncomeClass((i *deltaY), ((i+1) * deltaY));
 				groups[i] = new DgAnalysisPopulation();
