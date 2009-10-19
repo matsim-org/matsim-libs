@@ -39,6 +39,10 @@ public class DgAnalysisPopulation {
 	public static final Id RUNID1 = new IdImpl("run1");
 	public static final Id RUNID2 = new IdImpl("run2");
 	
+	private double minIncome = Double.POSITIVE_INFINITY;
+	private double maxIncome = Double.NEGATIVE_INFINITY;
+
+	
 	private Map<Id, DgPersonData> table;
 	/**
 	 * Creates a PlanComparison Object with the initial size
@@ -62,4 +66,27 @@ public class DgAnalysisPopulation {
 		return carplans;
 	}
 
+	public void calculateMinMaxIncome() {
+		double y;
+		for (DgPersonData d : this.getPersonData().values()) {
+			y = d.getIncome().getIncome();
+			if (y < this.minIncome) {
+				this.minIncome = y;
+			}
+			if (y > this.maxIncome) {
+				this.maxIncome = y;
+			}
+		}
+	}
+
+	
+	public double getMinIncome() {
+		return minIncome;
+	}
+	
+	public double getMaxIncome() {
+		return maxIncome;
+	}
+	
+	
 }

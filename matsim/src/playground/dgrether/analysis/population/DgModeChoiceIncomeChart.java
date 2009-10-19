@@ -34,27 +34,10 @@ public class DgModeChoiceIncomeChart {
 	
 	private int numberOfClasses = 10;
 
-	private double minIncome = Double.POSITIVE_INFINITY;
-	private double maxIncome = Double.NEGATIVE_INFINITY;
 	
 	public DgModeChoiceIncomeChart(DgAnalysisPopulation ana) {
 		this.ana = ana;
-		this.calculateMinMaxIncome();
-	}
-
-	private void calculateMinMaxIncome() {
-		double y;
-		for (DgPersonData d : ana.getPersonData().values()) {
-			y = d.getIncome().getIncome();
-			if (y< minIncome) {
-				this.minIncome = y;
-			}
-			
-			if (y > maxIncome) {
-				this.maxIncome = y;
-			}
-			
-		}
+		this.ana.calculateMinMaxIncome();
 	}
 
 	public void writeFile(String filename, Id runId) {
@@ -62,7 +45,7 @@ public class DgModeChoiceIncomeChart {
 		DgIncomeClass[] incomeThresholds = new DgIncomeClass[this.numberOfClasses];
 		DgAnalysisPopulation[] groups = new DgAnalysisPopulation[this.numberOfClasses];
 		
-		double deltaY = this.maxIncome / (this.numberOfClasses -1);
+		double deltaY = this.ana.getMaxIncome() / (this.numberOfClasses -1);
 		for (int i = 0; i < incomeThresholds.length; i++) {
 			incomeThresholds[i] = new DgIncomeClass(i *deltaY, i+1 * deltaY);
 			groups[i] = new DgAnalysisPopulation();
