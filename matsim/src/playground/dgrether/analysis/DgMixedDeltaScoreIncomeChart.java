@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.analysis;
 
+import java.awt.BasicStroke;
 import java.util.List;
 
 import org.jfree.chart.JFreeChart;
@@ -50,8 +51,8 @@ public class DgMixedDeltaScoreIncomeChart {
 
 	public JFreeChart createChart() {
 		XYPlot plot = new XYPlot();
-		plot.setDomainAxis(new NumberAxis("income"));
-		plot.setRangeAxis(new NumberAxis("delta utils"));
+		plot.setDomainAxis(new NumberAxis("Income [Chf / Year]"));
+		plot.setRangeAxis(new NumberAxis("Delta utils [Utils]"));
 		
 		DgColorScheme colorScheme = new DgColorScheme();
 		
@@ -69,6 +70,8 @@ public class DgMixedDeltaScoreIncomeChart {
 			i++;
 			plot.setDataset(i, col);
 			renderer2 = new XYLineAndShapeRenderer(true, true);
+			renderer2.setSeriesStroke(0, new BasicStroke(2.0f));
+			renderer2.setSeriesOutlineStroke(0, new BasicStroke(3.0f));
 			renderer2.setSeriesPaint(0, colorScheme.getColor(i, "a"));
 			plot.setRenderer(i, renderer2);
 		}

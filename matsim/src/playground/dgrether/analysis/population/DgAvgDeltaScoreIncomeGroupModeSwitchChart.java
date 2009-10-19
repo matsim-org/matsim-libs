@@ -41,7 +41,7 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 	
 	private DgAnalysisPopulation ana;
 	
-	private int numberOfClasses = 10;
+	private int numberOfClasses = 11;
 	
 	private int groupThreshold = 3;
 
@@ -107,20 +107,20 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 //		
 		for (DgAnalysisPopulation population : popsPerModeSwitch) {
 			// calculate thresholds for income classes
-			IncomeClass[] incomeThresholds = new IncomeClass[this.numberOfClasses];
+			DgIncomeClass[] incomeThresholds = new DgIncomeClass[this.numberOfClasses];
 			DgAnalysisPopulation[] groups = new DgAnalysisPopulation[this.numberOfClasses];
 
 			double deltaY = this.maxIncome / (this.numberOfClasses -1);
 			for (int i = 0; i < incomeThresholds.length; i++) {
-				incomeThresholds[i] = new IncomeClass((i *deltaY), ((i+1) * deltaY));
+				incomeThresholds[i] = new DgIncomeClass((i *deltaY), ((i+1) * deltaY));
 				groups[i] = new DgAnalysisPopulation();
 			}
 			
 			for (DgPersonData d : population.getPersonData().values()) {
 				double y = d.getIncome().getIncome();
 				int pos = (int) (y / deltaY);
-				IncomeClass c = incomeThresholds[pos];
-				if (!(c.min <= y) && (y <= c.max)) {
+				DgIncomeClass c = incomeThresholds[pos];
+				if (!(c.getMin() <= y) && (y <= c.getMax())) {
 					throw new IllegalStateException();
 				}
 				groups[pos].getPersonData().put(d.getPersonId(), d);
@@ -133,7 +133,8 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 //				yvalues[i] = calcAverageScoreDifference(groups[i]);
 				Double avgScore = calcAverageScoreDifference(groups[i]);
 				if (avgScore != null) {
-					values.add(new Tuple<Double, Double>(incomeThresholds[i].max, avgScore));
+				  double incomeLocation = incomeThresholds[i].getMin() + (deltaY / 2.0);
+					values.add(new Tuple<Double, Double>(incomeLocation, avgScore));
 				}
 			}
 			
@@ -169,20 +170,6 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 
 	public void setNumberOfClasses(int numberOfClasses) {
 		this.numberOfClasses = numberOfClasses;
-	}
-
-	
-	private static final class IncomeClass {		
-		double min;
-		double max;
-		String title;
-		
-		public IncomeClass(double min, double max){
-			this.min = min; 
-			this.max = max;
-			this.title = this.min + " - " + this.max;
-		}
-		
 	}
 
 }

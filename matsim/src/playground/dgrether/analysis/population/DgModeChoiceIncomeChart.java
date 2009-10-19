@@ -20,6 +20,7 @@
 package playground.dgrether.analysis.population;
 
 import org.apache.log4j.Logger;
+import org.jfree.chart.JFreeChart;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.utils.charts.BarChart;
 
@@ -56,35 +57,22 @@ public class DgModeChoiceIncomeChart {
 		}
 	}
 
-	private static final class IncomeClass {		
-		double min;
-		double max;
-		String title;
-		
-		public IncomeClass(double min, double max){
-			this.min = min; 
-			this.max = max;
-			this.title = this.min + " - " + this.max;
-		}
-		
-	}
-	
 	public void writeFile(String filename, Id runId) {
 		// calculate thresholds for income classes
-		IncomeClass[] incomeThresholds = new IncomeClass[this.numberOfClasses];
+		DgIncomeClass[] incomeThresholds = new DgIncomeClass[this.numberOfClasses];
 		DgAnalysisPopulation[] groups = new DgAnalysisPopulation[this.numberOfClasses];
 		
 		double deltaY = this.maxIncome / (this.numberOfClasses -1);
 		for (int i = 0; i < incomeThresholds.length; i++) {
-			incomeThresholds[i] = new IncomeClass(i *deltaY, i+1 * deltaY);
+			incomeThresholds[i] = new DgIncomeClass(i *deltaY, i+1 * deltaY);
 			groups[i] = new DgAnalysisPopulation();
 		}
 		
 		for (DgPersonData d : ana.getPersonData().values()) {
 			double y = d.getIncome().getIncome();
 			int pos = (int) (y / deltaY);
-			IncomeClass c = incomeThresholds[pos];
-			if (!(c.min <= y) && (y <= c.max)) {
+			DgIncomeClass c = incomeThresholds[pos];
+			if (!(c.getMin() <= y) && (y <= c.getMax())) {
 				throw new IllegalStateException();
 			}
 			groups[pos].getPersonData().put(d.getPersonId(), d);
@@ -99,7 +87,7 @@ public class DgModeChoiceIncomeChart {
 		double groupSize = 0.0;
 		double carPlans = 0.0;
 		for (int i = 0; i < groups.length; i++) {
-			groupDescriptions[i] = incomeThresholds[i].title;
+			groupDescriptions[i] = incomeThresholds[i].getTitle();
 			xvalues[i] = i;
 			groupSize = groups[i].getPersonData().size();
 			carPlans = groups[i].calculateNumberOfCarPlans(runId);
@@ -109,6 +97,7 @@ public class DgModeChoiceIncomeChart {
 		
 		
 		BarChart chart = new BarChart("", "Income", "% of car drivers", groupDescriptions);
+
 
 		chart.addSeries("car", carvalues);	
 		chart.addSeries("non-car", ptvalues);
@@ -125,6 +114,10 @@ public class DgModeChoiceIncomeChart {
 	
 	public void setNumberOfClasses(int numberOfClasses) {
 		this.numberOfClasses = numberOfClasses;
+	}
+
+	public JFreeChart createChart() {
+		return null;
 	}
 	
 

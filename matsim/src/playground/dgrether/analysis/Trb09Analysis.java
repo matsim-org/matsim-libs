@@ -28,8 +28,9 @@ import playground.dgrether.analysis.population.DgAvgDeltaScoreIncomeGroupModeSwi
 import playground.dgrether.analysis.population.DgDeltaScoreIncomeChart;
 import playground.dgrether.analysis.population.DgDeltaScoreIncomeModeChoiceChart;
 import playground.dgrether.analysis.population.DgHouseholdsAnalysisReader;
+import playground.dgrether.analysis.population.DgModeChoiceIncomeChart;
 import playground.dgrether.analysis.population.DgPopulationAnalysisReader;
-import playground.dgrether.utils.charts.DgChartWriter;
+import playground.dgrether.utils.charts.DgChartFrame;
 
 
 public class Trb09Analysis {
@@ -89,7 +90,10 @@ public class Trb09Analysis {
 //			DgChartWriter.writerChartToFile(deltaScoreColorChartFile, modeChoiceIncomeChart.createChart());
 			
 //			new DgModeChoiceIncomeChart(ana).writeFile(modeChoiceIncomeChartFile1, DgAnalysisPopulation.RUNID1);
-//			new DgModeChoiceIncomeChart(ana).writeFile(modeChoiceIncomeChartFile2, DgAnalysisPopulation.RUNID2);
+			DgModeChoiceIncomeChart modechoiceIncomeChartRun2 = new DgModeChoiceIncomeChart(ana);
+//			modechoiceIncomeChartRun2.writeFile(modeChoiceIncomeChartFile2, DgAnalysisPopulation.RUNID2);
+			
+			DgChartFrame frame = new DgChartFrame("test", modechoiceIncomeChartRun2.createChart());
 //
 //			new DgAvgDeltaScoreIncomeGroupChart(ana).writeFile(avgDeltaScoreIncomeGroupChartFile);
 			DgAvgDeltaScoreIncomeGroupModeSwitchChart avgDScoreIncomeChartData = new DgAvgDeltaScoreIncomeGroupModeSwitchChart(ana);
@@ -99,7 +103,7 @@ public class Trb09Analysis {
 			mixedDsIncomeChart.addIncomeModeChoiceDataSet(modeChoiceIncomeChart.createDeltaScoreIncomeModeChoiceDataset());
 			mixedDsIncomeChart.addAvgDeltaScoreIncomeDs(avgDScoreIncomeChartData.getDatasets());
 //			DgChartFrame frame = new DgChartFrame("test", mixedDsIncomeChart.createChart());
-			DgChartWriter.writerChartToFile(mixedDeltaScoreIncomeChartFile, mixedDsIncomeChart.createChart());
+//			DgChartWriter.writerChartToFile(mixedDeltaScoreIncomeChartFile, mixedDsIncomeChart.createChart());
 			
 			log.debug("ya esta ;-)");
 			
