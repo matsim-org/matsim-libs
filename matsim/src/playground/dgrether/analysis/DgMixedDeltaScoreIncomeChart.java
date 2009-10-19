@@ -22,6 +22,7 @@ package playground.dgrether.analysis;
 import java.awt.BasicStroke;
 import java.util.List;
 
+import org.jfree.chart.ChartColor;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
@@ -76,9 +77,8 @@ public class DgMixedDeltaScoreIncomeChart {
 			plot.setRenderer(i, renderer2);
 		}
 
-		
-		
 		JFreeChart chart = new JFreeChart("Test",plot);
+		chart.setBackgroundPaint(ChartColor.WHITE);
 		return chart;
 	}
 

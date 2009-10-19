@@ -45,7 +45,7 @@ public class Trb09Analysis {
 //			String runNumber1 = "743";
 //			String runNumber2 = "746";
 			String runNumber1 = "860";
-			String runNumber2 = "861";
+			String runNumber2 = "862";
 		
 			String runid1 = "run" + runNumber1;
 			String runid2 = "run" + runNumber2;
@@ -89,9 +89,11 @@ public class Trb09Analysis {
 			modeChoiceIncomeChart = new DgDeltaScoreIncomeModeChoiceChart(ana);
 //			DgChartWriter.writerChartToFile(deltaScoreColorChartFile, modeChoiceIncomeChart.createChart());
 			
-//			new DgModeChoiceIncomeChart(ana).writeFile(modeChoiceIncomeChartFile1, DgAnalysisPopulation.RUNID1);
-			DgModeChoiceIncomeChart modechoiceIncomeChartRun2 = new DgModeChoiceIncomeChart(ana);
-//			modechoiceIncomeChartRun2.writeFile(modeChoiceIncomeChartFile2, DgAnalysisPopulation.RUNID2);
+			DgModeChoiceIncomeChart modechoiceIncomeChartRun1 = new DgModeChoiceIncomeChart(ana, DgAnalysisPopulation.RUNID1);
+//			DgChartWriter.writerChartToFile(modeChoiceIncomeChartFile1, modechoiceIncomeChartRun1.createChart());
+//			DgChartWriter.writerChartToFile(modeChoiceIncomeChartFile1, );
+			DgModeChoiceIncomeChart modechoiceIncomeChartRun2 = new DgModeChoiceIncomeChart(ana, DgAnalysisPopulation.RUNID2);
+//			DgChartWriter.writerChartToFile(modeChoiceIncomeChartFile2, modechoiceIncomeChartRun2.createChart());
 			
 			DgChartFrame frame = new DgChartFrame("test", modechoiceIncomeChartRun2.createChart());
 //

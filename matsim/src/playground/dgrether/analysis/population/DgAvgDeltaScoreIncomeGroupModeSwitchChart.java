@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jfree.chart.ChartColor;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
@@ -141,6 +142,7 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 		}
 		
 		JFreeChart jchart = new JFreeChart("", plot);
+		jchart.setBackgroundPaint(ChartColor.WHITE);
 		return jchart;
 	}
 	

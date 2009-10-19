@@ -19,10 +19,21 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.population;
 
+import java.awt.Font;
+
 import org.apache.log4j.Logger;
+import org.jfree.chart.ChartColor;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.utils.charts.BarChart;
+
+import playground.dgrether.utils.charts.DgColorScheme;
 
 
 
@@ -33,21 +44,30 @@ public class DgModeChoiceIncomeChart {
 	private DgAnalysisPopulation ana;
 	
 	private int numberOfClasses = 10;
-
 	
-	public DgModeChoiceIncomeChart(DgAnalysisPopulation ana) {
-		this.ana = ana;
-		this.ana.calculateMinMaxIncome();
-	}
+	private DefaultCategoryDataset dataset;
+	
+	private String xLabel = "Income [CHF / Year]]";
+	private String yLabel = "% of drivers";
 
-	public void writeFile(String filename, Id runId) {
+	private Id runId; 
+	
+	public DgModeChoiceIncomeChart(DgAnalysisPopulation ana, Id runid) {
+		this.ana = ana;
+		this.runId = runid;
+		this.ana.calculateMinMaxIncome();
+		this.dataset = new DefaultCategoryDataset();
+		this.calculateData();
+	}
+	
+	private void calculateData() {
 		// calculate thresholds for income classes
 		DgIncomeClass[] incomeThresholds = new DgIncomeClass[this.numberOfClasses];
 		DgAnalysisPopulation[] groups = new DgAnalysisPopulation[this.numberOfClasses];
 		
 		double deltaY = this.ana.getMaxIncome() / (this.numberOfClasses -1);
 		for (int i = 0; i < incomeThresholds.length; i++) {
-			incomeThresholds[i] = new DgIncomeClass(i *deltaY, i+1 * deltaY);
+			incomeThresholds[i] = new DgIncomeClass((i *deltaY), ((i+1) * deltaY));
 			groups[i] = new DgAnalysisPopulation();
 		}
 		
@@ -70,39 +90,62 @@ public class DgModeChoiceIncomeChart {
 		double groupSize = 0.0;
 		double carPlans = 0.0;
 		for (int i = 0; i < groups.length; i++) {
-			groupDescriptions[i] = incomeThresholds[i].getTitle();
+//			groupDescriptions[i] = incomeThresholds[i].getTitle();
+			String title = Double.toString(incomeThresholds[i].getMax());
+			title = title.substring(0, (title.indexOf(".") + 3));
+			groupDescriptions[i] = title;
 			xvalues[i] = i;
 			groupSize = groups[i].getPersonData().size();
 			carPlans = groups[i].calculateNumberOfCarPlans(runId);
 			carvalues[i] = carPlans / groupSize * 100.0;
 			ptvalues[i] = (groupSize - carPlans) / groupSize * 100.0;
+		
+			this.dataset.addValue(carvalues[i], "car", groupDescriptions[i]);
+			this.dataset.addValue(ptvalues[i], "non-car", groupDescriptions[i]);
 		}
-		
-		
-		BarChart chart = new BarChart("", "Income", "% of car drivers", groupDescriptions);
-
-
-		chart.addSeries("car", carvalues);	
-		chart.addSeries("non-car", ptvalues);
-		
-		chart.saveAsPng(filename, 1000, 600);
-		log.info("ModeChoiceIncomeChart written to : " +filename);
 	}
 
+	public JFreeChart createChart() {
+		CategoryAxis categoryAxis = new CategoryAxis(xLabel);
+		categoryAxis.setCategoryMargin(0.05); // percentage of space between categories
+		categoryAxis.setLowerMargin(0.01); // percentage of space before first bar
+		categoryAxis.setUpperMargin(0.01); // percentage of space after last bar
+		categoryAxis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
+		Font labelFont = new Font("Helvetica", Font.BOLD, 14);
+		Font axisFont = new Font("Helvetica", Font.BOLD, 12);
+		categoryAxis.setLabelFont(labelFont);
+		categoryAxis.setTickLabelFont(axisFont);
+		ValueAxis valueAxis = new NumberAxis(yLabel);
+		valueAxis.setRange(0.0, 100.0);
+		valueAxis.setLabelFont(labelFont);
+		valueAxis.setTickLabelFont(axisFont);
+		
+		DgColorScheme colorScheme = new DgColorScheme();
+
+		CategoryPlot plot = new CategoryPlot();
+		plot.setDomainAxis(categoryAxis);
+		plot.setRangeAxis(valueAxis);
+		plot.setDataset(0, this.dataset);
+		BarRenderer carRenderer = new BarRenderer();
+		carRenderer.setSeriesPaint(0, colorScheme.COLOR1A);
+		carRenderer.setSeriesPaint(1, colorScheme.COLOR3A);
+	
+		carRenderer.setItemMargin(0.10);
+		plot.setRenderer(0, carRenderer);
+		
+		JFreeChart chart = new JFreeChart("", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
+		chart.setBackgroundPaint(ChartColor.WHITE);
+		chart.getLegend().setItemFont(labelFont);
+		return chart;
+	}
 	
 	public int getNumberOfClasses() {
 		return numberOfClasses;
 	}
-
 	
 	public void setNumberOfClasses(int numberOfClasses) {
 		this.numberOfClasses = numberOfClasses;
 	}
-
-	public JFreeChart createChart() {
-		return null;
-	}
-	
 
 
 }
