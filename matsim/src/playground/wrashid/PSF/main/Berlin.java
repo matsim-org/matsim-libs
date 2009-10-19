@@ -19,16 +19,16 @@ public class Berlin implements ParametersPSFMutator {
 
 	public static void main(String[] args) {
 		// for running on "slanger4"
-		
+		/*
 		PSSControler pssControler=new PSSControler("a:\\data\\matsim\\input\\runRW1002\\config.xml", null);
 		
 		pssControler.runMATSimPSSIterations(2);
+		*/
 		
-		/*
 		// for starting one the local computer
 		PSSControler pssControler=new PSSControler("c:\\data\\matsim\\input\\runRW1002\\config.xml", null);
 		pssControler.runMATSimIterations();
-		*/
+		
 		/*
 		Controler controler = new Controler("a:\\data\\matsim\\input\\runRW1002\\config.xml");
 		controler.addControlerListener(new AddEnergyScoreListener());

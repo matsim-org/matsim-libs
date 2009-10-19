@@ -24,6 +24,48 @@ public class ChargingTimes {
 	private PriorityQueue<ChargeLog> chargingTimes = new PriorityQueue<ChargeLog>();
 	private static final int numberOfTimeBins = 96;
 
+	/**
+	 * This fills out the SOC of the vehicle. But it does not take energy consumption into account.
+	 * The invoker must take this into account himself.
+	 * 
+	 * @return
+	 */
+	public double[][] getSOCWithoutEnergyConsumption() {
+		double[][] SOCWithoutEnergyConsumption = new double[numberOfTimeBins][ParametersPSF.getNumberOfHubs()];
+
+		// go through all the chargings logs. Find out for each charging log,
+		// the SOC of the car (and in the time inbetween).
+		for (ChargeLog curChargeLog : chargingTimes) {
+			int index = Math.round((float) Math.floor((curChargeLog.getStartChargingTime() / 900)));
+			double endSOC = curChargeLog.getEndSOC();
+
+			SOCWithoutEnergyConsumption[index][ParametersPSF.getHubLinkMapping().getHubNumber(curChargeLog.getLinkId().toString())] = endSOC;			
+		}
+
+		// fill all zeros with the previous SOC.
+		for (int i=0;i<numberOfTimeBins;i++){
+			for (int j=0;j<ParametersPSF.getNumberOfHubs();j++){
+				if (SOCWithoutEnergyConsumption[i][j]==0.0 && i!=0){
+					SOCWithoutEnergyConsumption[i][j]=SOCWithoutEnergyConsumption[i-1][j];
+				}
+			}
+		}
+		
+		// copy the last SOC on all SOCs at the beginning (for each hub)
+		for (int i=0;i<ParametersPSF.getNumberOfHubs();i++){
+			for (int j=0;j<numberOfTimeBins;j++){
+				if (SOCWithoutEnergyConsumption[j][i]==0.0){
+					SOCWithoutEnergyConsumption[j][i]=SOCWithoutEnergyConsumption[numberOfTimeBins-1][i];
+				} else {
+					break;
+				}
+			}
+		}
+		
+		
+		return SOCWithoutEnergyConsumption;
+	}
+
 	public double getTotalEnergyCharged() {
 		double totalEnergyCharged = 0;
 
@@ -37,7 +79,7 @@ public class ChargingTimes {
 
 		return totalEnergyCharged;
 	}
- 
+
 	public void addChargeLog(ChargeLog chargeLog) {
 		chargingTimes.add(chargeLog);
 	}
@@ -107,8 +149,8 @@ public class ChargingTimes {
 		while (iterChargingTimes.length > 0
 				&& curConsumptionLog.getEnterTime() > ((ChargeLog) iterChargingTimes[firstIndex]).getStartChargingTime()) {
 			firstIndex++;
-			
-			if (firstIndex==iterChargingTimes.length){
+
+			if (firstIndex == iterChargingTimes.length) {
 				// no charging before mid night.
 				// this will be handeled by the second loop.
 				break;
@@ -184,16 +226,14 @@ public class ChargingTimes {
 	}
 
 	public static void writeVehicleEnergyConsumptionStatisticsGraphic(String fileName, double[][] energyUsageStatistics) {
-		writeEnergyConsumptionGraphic(fileName,energyUsageStatistics,"Vehicle Energy Consumption");
+		writeEnergyConsumptionGraphic(fileName, energyUsageStatistics, "Vehicle Energy Consumption");
 	}
-	
-	
-	
-	public static void writeEnergyConsumptionGraphic(String fileName, double[][] energyUsageStatistics, String title){
+
+	public static void writeEnergyConsumptionGraphic(String fileName, double[][] energyUsageStatistics, String title) {
 		XYLineChart chart = new XYLineChart(title, "Time of Day [s]", "Energy Consumption [kWh]");
 
 		double[] time = new double[numberOfTimeBins];
-		int numberOfHubs=energyUsageStatistics[0].length;
+		int numberOfHubs = energyUsageStatistics[0].length;
 
 		for (int i = 0; i < numberOfTimeBins; i++) {
 			time[i] = i * 900;
@@ -211,17 +251,17 @@ public class ChargingTimes {
 		// chart.addMatsimLogo();
 		chart.saveAsPng(fileName, 800, 600);
 	}
-	
+
 	// 96 data points for each hub
 	public static void writeEnergyUsageStatisticsData(String fileName, double[][] energyUsageStatistics, int numberOfHubs) {
-		String headerLine="";
-		
-		for (int i=1;i<numberOfHubs;i++){
-			headerLine+="hub-"+i+"\t";
+		String headerLine = "";
+
+		for (int i = 1; i < numberOfHubs; i++) {
+			headerLine += "hub-" + i + "\t";
 		}
-		
-		headerLine+="hub-"+numberOfHubs+"\t";
-		
+
+		headerLine += "hub-" + numberOfHubs + "\t";
+
 		GeneralLib.writeMatrix(energyUsageStatistics, fileName, headerLine);
 	}
 
@@ -264,16 +304,17 @@ public class ChargingTimes {
 			for (ChargeLog chargeLog : curChargingTime.getChargingTimes()) {
 				int slotIndex = Math.round((float) Math.floor(chargeLog.getStartChargingTime() / 900));
 
-				if (slotIndex>numberOfTimeBins){
+				if (slotIndex > numberOfTimeBins) {
 					System.out.println();
 				}
-				
-				// doing module 96, just in case there are more than 24 hours in the day...
-				energyUsageStatistics[slotIndex % 96 ][hubLinkMapping.getHubNumber(chargeLog.getLinkId().toString())] += chargeLog
+
+				// doing module 96, just in case there are more than 24 hours in
+				// the day...
+				energyUsageStatistics[slotIndex % 96][hubLinkMapping.getHubNumber(chargeLog.getLinkId().toString())] += chargeLog
 						.getEnergyCharged();
 			}
 		}
 		return energyUsageStatistics;
 	}
- 
-} 
+
+}

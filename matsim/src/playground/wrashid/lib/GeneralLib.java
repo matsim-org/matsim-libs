@@ -285,5 +285,14 @@ public class GeneralLib {
 	public static void main(String[] args) {
 		copyDirectory("C:\\tmp\\abcd", "C:\\tmp\\aaab");
 	}
+	
+	public static double[][] initializeMatrix(double[][] matrix){
+		for (int i=0;i<matrix.length;i++){
+			for (int j=0;j<matrix[0].length;j++){
+				matrix[i][j]=0;
+			}
+		}
+		return matrix;
+	}
 
 }
