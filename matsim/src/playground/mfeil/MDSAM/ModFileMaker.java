@@ -348,6 +348,7 @@ public class ModFileMaker {
 		if (travelCost.equals("yes")) stream.println("Costpt \t0  \t-50 \t30  \t0");
 		if (travelConstant.equals("yes")) stream.println("Constantpt \t0  \t-50 \t50  \t0");
 		stream.println("Uwalk \t-1  \t-50 \t30  \t0");
+		if (travelConstant.equals("yes")) stream.println("ConstantWalk \t0  \t-50 \t50  \t0");
 		if (bikeIn.equals("yes")) stream.println("Ubike \t-6  \t-50 \t30  \t0");	
 		
 		stream.println();
@@ -400,6 +401,7 @@ public class ModFileMaker {
 						}
 						else if (legs.getMode().equals(TransportMode.walk)) {
 							stream.print("Uwalk * x"+(i+1)+""+(j+1));
+							if (travelConstant.equals("yes")) stream.print(" + ConstantWalk * one");
 							onlyBike = false;
 							started = true;
 						}
@@ -426,6 +428,7 @@ public class ModFileMaker {
 						}
 						else if (legs.getMode().equals(TransportMode.walk)) {
 							stream.print(" + Uwalk * x"+(i+1)+""+(j+1));
+							if (travelConstant.equals("yes")) stream.print(" + ConstantWalk * one");
 							onlyBike = false;
 						}
 						else if (legs.getMode().equals(TransportMode.bike)) {
