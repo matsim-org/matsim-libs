@@ -19,13 +19,10 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.population;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
@@ -35,8 +32,6 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.core.population.PlanImpl.Type;
 import org.matsim.core.utils.collections.Tuple;
-
-import playground.dgrether.utils.charts.DgChartFrame;
 
 
 
@@ -48,11 +43,14 @@ public class DgDeltaScoreIncomeModeChoiceChart {
 
 	private boolean writeModeSwitcherOnly = false;
 	
+	private XYSeriesCollection dataset;
+	
 	public DgDeltaScoreIncomeModeChoiceChart(DgAnalysisPopulation ana) {
 		this.ana = ana;
+		this.dataset = createDeltaScoreIncomeModeChoiceDataset();
 	}
 
-	public void writeFile(String filename) {
+	public XYSeriesCollection createDeltaScoreIncomeModeChoiceDataset() {
 		List<Tuple<Double, Double>> valuesCarCar = new ArrayList<Tuple<Double, Double>>();
 		List<Tuple<Double, Double>> valuesPtPt = new ArrayList<Tuple<Double, Double>>();
 		List<Tuple<Double, Double>> valuesPtCar = new ArrayList<Tuple<Double, Double>>();
@@ -85,39 +83,26 @@ public class DgDeltaScoreIncomeModeChoiceChart {
 			}
 		}
 		
-		//write the chart...
-		XYSeriesCollection dataset = new XYSeriesCollection();
+		//compose the dataset
+		XYSeriesCollection ds = new XYSeriesCollection();
 		if (!writeModeSwitcherOnly) {
-			dataset.addSeries(this.createSeries("Car2Car", valuesCarCar));
+			ds.addSeries(this.createSeries("Car2Car", valuesCarCar));
 		}
-
 		if (!writeModeSwitcherOnly) {
-			dataset.addSeries(this.createSeries("Pt2Pt", valuesPtPt));
+			ds.addSeries(this.createSeries("Pt2Pt", valuesPtPt));
 		}
-		
-		dataset.addSeries(this.createSeries("Pt2Car", valuesPtCar));
-
-		dataset.addSeries(this.createSeries("Car2Pt", valuesCarPt));
-		
-		
-		XYPlot plot = new XYPlot(dataset, new NumberAxis("Income"), new NumberAxis("Delta utils"), null);
-		
-		
+		ds.addSeries(this.createSeries("Pt2Car", valuesPtCar));
+		ds.addSeries(this.createSeries("Car2Pt", valuesCarPt));
+		return ds;
+	}
+	
+	public JFreeChart createChart() {
+		XYPlot plot = new XYPlot(this.dataset, new NumberAxis("Income"), new NumberAxis("Delta utils"), null);
 		XYItemRenderer renderer = new XYLineAndShapeRenderer(false, true);
 		plot.setRenderer(renderer);
 		
-		
 		JFreeChart jchart = new JFreeChart("", plot);
-		
-		new DgChartFrame("", jchart);
-		
-		try {
-			ChartUtilities.saveChartAsPNG(new File(filename), jchart, 800, 600, null, true, 9);
-			log.info("DeltaScoreIncomeChart written to : " +filename);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-//		chart.saveAsPng(filename, 800, 600);
+		return jchart;
 	}
 
 	private XYSeries createSeries(final String title, List<Tuple<Double, Double>> values) {

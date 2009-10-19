@@ -23,13 +23,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.collections.Tuple;
-
-import playground.dgrether.utils.DgChartUtils;
 
 
 
@@ -44,9 +46,12 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 	private double minIncome = Double.POSITIVE_INFINITY;
 	private double maxIncome = Double.NEGATIVE_INFINITY;
 	
+	private List<XYSeriesCollection> datasets;
+	
 	public DgAvgDeltaScoreIncomeGroupModeSwitchChart(DgAnalysisPopulation ana) {
 		this.ana = ana;
 		this.calculateMinMaxIncome();
+		this.datasets = this.createDatasets();
 	}
 
 	private void calculateMinMaxIncome() {
@@ -56,30 +61,39 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 			if (y< minIncome) {
 				this.minIncome = y;
 			}
-			
 			if (y > maxIncome) {
 				this.maxIncome = y;
 			}
-			
 		}
 	}
 
-	private static final class IncomeClass {		
-		double min;
-		double max;
-		String title;
-		
-		public IncomeClass(double min, double max){
-			this.min = min; 
-			this.max = max;
-			this.title = this.min + " - " + this.max;
+	private XYSeries createSeries(final String title, List<Tuple<Double, Double>> values) {
+		XYSeries series = new XYSeries(title, false, true);
+		for (Tuple<Double, Double> t : values) {
+			series.add(t.getFirst(), t.getSecond());
+			log.error("x: " + t.getFirst());
+			log.error("y: " + t.getSecond());
 		}
-		
+		return series;
 	}
 	
-	public void writeFile(String filename) {
-		XYLineChart chart = new XYLineChart("", "Income groups", "Delta Utility");
+	
+	private Double calcAverageScoreDifference(DgAnalysisPopulation group) {
+		Double deltaScoreSum = 0.0;
+		for (DgPersonData d : group.getPersonData().values()){
+			DgPlanData planDataRun1 = d.getPlanData().get(DgAnalysisPopulation.RUNID1);
+			DgPlanData planDataRun2 = d.getPlanData().get(DgAnalysisPopulation.RUNID2);
+			deltaScoreSum += (planDataRun2.getScore() - planDataRun1.getScore());
+		}
+		Double avg = null;
+		if (group.getPersonData().size() > 4) {
+			avg = deltaScoreSum/group.getPersonData().size();
+		}
+		return avg;
+	}
 
+	private List<XYSeriesCollection> createDatasets() {
+		List<XYSeriesCollection> dss = new ArrayList<XYSeriesCollection>();
 		List<DgAnalysisPopulation> popsPerModeSwitch = new ArrayList<DgAnalysisPopulation>();
 		DgModeSwitchPlanTypeAnalyzer modeSwitchAnalysis = new DgModeSwitchPlanTypeAnalyzer(this.ana);
 		DgAnalysisPopulation car2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.CAR, PlanImpl.Type.CAR));
@@ -90,15 +104,16 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 		popsPerModeSwitch.add(pt2ptPop);
 		popsPerModeSwitch.add(pt2carPop);
 		popsPerModeSwitch.add(car2ptPop);
-		
+//		
 		for (DgAnalysisPopulation population : popsPerModeSwitch) {
 			// calculate thresholds for income classes
 			IncomeClass[] incomeThresholds = new IncomeClass[this.numberOfClasses];
 			DgAnalysisPopulation[] groups = new DgAnalysisPopulation[this.numberOfClasses];
-			
+
 			double deltaY = this.maxIncome / (this.numberOfClasses -1);
+			log.error("delta y: " + deltaY);
 			for (int i = 0; i < incomeThresholds.length; i++) {
-				incomeThresholds[i] = new IncomeClass(i *deltaY, i+1 * deltaY);
+				incomeThresholds[i] = new IncomeClass((i *deltaY), ((i+1) * deltaY));
 				groups[i] = new DgAnalysisPopulation();
 			}
 			
@@ -112,14 +127,7 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 				groups[pos].getPersonData().put(d.getPersonId(), d);
 			}
 			
-//			String[] groupDescriptions = new String[groups.length];
-//			double[] xvalues = new double[groups.length];
-//			double[] yvalues = new double[groups.length];
-			
 			List<Tuple<Double, Double>> values = new ArrayList<Tuple<Double, Double>>();
-			
-			
-			
 			for (int i = 0; i < groups.length; i++) {
 //				groupDescriptions[i] = incomeThresholds[i].title;
 //				xvalues[i] = incomeThresholds[i].max;
@@ -128,58 +136,54 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 				if (avgScore != null) {
 					values.add(new Tuple<Double, Double>(incomeThresholds[i].max, avgScore));
 				}
-
 			}
 			
 			XYSeriesCollection dataset = new XYSeriesCollection();
 			XYSeries series = this.createSeries("avg delta utility", values);
 			dataset.addSeries(series);
-			
-			
-			Tuple<double[], double[]> data = DgChartUtils.createArray(values);
-			
-			chart.addSeries("avg delta utility", data.getFirst(), data.getSecond());	
+			dss.add(dataset);
 		}
-		
-		
-		
-		
-		chart.saveAsPng(filename, 1000, 600);
-		log.info("DgAvgDeltaScoreIncomeGroupChart written to : " +filename);
+		return dss;
 	}
 
-	public XYSeries createSeries(final String title, List<Tuple<Double, Double>> values) {
-		XYSeries series = new XYSeries(title, false, true);
-		for (Tuple<Double, Double> t : values) {
-			series.add(t.getFirst(), t.getSecond());
+	public JFreeChart createChart() {
+		XYPlot plot = new XYPlot();
+		plot.setDomainAxis(new NumberAxis("Income groups"));
+		plot.setRangeAxis(new NumberAxis("Delta Utility"));
+		for (int i = 0; i < this.datasets.size(); i++){
+			XYItemRenderer renderer = new XYLineAndShapeRenderer(true, true);
+			plot.setDataset(i, this.datasets.get(i));
+			plot.setRenderer(i, renderer);
 		}
-		return series;
+		
+		JFreeChart jchart = new JFreeChart("", plot);
+		return jchart;
 	}
 	
-	
-	private Double calcAverageScoreDifference(DgAnalysisPopulation group) {
-		Double deltaScoreSum = 0.0;
-		for (DgPersonData d : group.getPersonData().values()){
-			DgPlanData planDataRun1 = d.getPlanData().get(DgAnalysisPopulation.RUNID1);
-			DgPlanData planDataRun2 = d.getPlanData().get(DgAnalysisPopulation.RUNID2);
-			deltaScoreSum += planDataRun2.getScore() - planDataRun1.getScore();
-		}
-		Double avg = null;
-		if (group.getPersonData().size() > 1) {
-			avg = deltaScoreSum/group.getPersonData().size()  - 0.03;
-		}
-		return avg;
+	public List<XYSeriesCollection> getDatasets() {
+		return datasets;
 	}
-
+	
 	public int getNumberOfClasses() {
 		return numberOfClasses;
 	}
 
-	
 	public void setNumberOfClasses(int numberOfClasses) {
 		this.numberOfClasses = numberOfClasses;
 	}
-	
 
+	
+	private static final class IncomeClass {		
+		double min;
+		double max;
+		String title;
+		
+		public IncomeClass(double min, double max){
+			this.min = min; 
+			this.max = max;
+			this.title = this.min + " - " + this.max;
+		}
+		
+	}
 
 }

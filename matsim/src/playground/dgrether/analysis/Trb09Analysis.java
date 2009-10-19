@@ -29,6 +29,7 @@ import playground.dgrether.analysis.population.DgDeltaScoreIncomeChart;
 import playground.dgrether.analysis.population.DgDeltaScoreIncomeModeChoiceChart;
 import playground.dgrether.analysis.population.DgHouseholdsAnalysisReader;
 import playground.dgrether.analysis.population.DgPopulationAnalysisReader;
+import playground.dgrether.utils.charts.DgChartWriter;
 
 
 public class Trb09Analysis {
@@ -42,8 +43,8 @@ public class Trb09Analysis {
 	public static void main(String[] args) {
 //			String runNumber1 = "743";
 //			String runNumber2 = "746";
-			String runNumber1 = "861";
-			String runNumber2 = "862";
+			String runNumber1 = "860";
+			String runNumber2 = "864";
 		
 			String runid1 = "run" + runNumber1;
 			String runid2 = "run" + runNumber2;
@@ -65,6 +66,8 @@ public class Trb09Analysis {
 			String avgDeltaScoreIncomeGroupChartFile = DgPaths.RUNBASE + runid2 + "/avgDeltaScoreIncomeGroupChart"+runNumber1+"vs"+runNumber2+".png";
 			String avgDeltaScoreIncomeGroupChartModeSwitchFile = DgPaths.RUNBASE + runid2 + "/avgDeltaScoreIncomeGroupModeSwitchChart"+runNumber1+"vs"+runNumber2+".png";
 			
+			String mixedDeltaScoreIncomeChartFile = DgPaths.RUNBASE + runid2 + "/mixedDeltaScoreIncomeChart"+runNumber1+"vs"+runNumber2+".png";
+			
 			ScenarioImpl sc = new ScenarioImpl();
 
 			
@@ -83,20 +86,22 @@ public class Trb09Analysis {
 //		
 			DgDeltaScoreIncomeModeChoiceChart modeChoiceIncomeChart;
 			modeChoiceIncomeChart = new DgDeltaScoreIncomeModeChoiceChart(ana);
-			modeChoiceIncomeChart.writeFile(deltaScoreColorChartFile);
+//			DgChartWriter.writerChartToFile(deltaScoreColorChartFile, modeChoiceIncomeChart.createChart());
 			
 //			new DgModeChoiceIncomeChart(ana).writeFile(modeChoiceIncomeChartFile1, DgAnalysisPopulation.RUNID1);
 //			new DgModeChoiceIncomeChart(ana).writeFile(modeChoiceIncomeChartFile2, DgAnalysisPopulation.RUNID2);
 //
 //			new DgAvgDeltaScoreIncomeGroupChart(ana).writeFile(avgDeltaScoreIncomeGroupChartFile);
-			new DgAvgDeltaScoreIncomeGroupModeSwitchChart(ana).writeFile(avgDeltaScoreIncomeGroupChartModeSwitchFile);
+			DgAvgDeltaScoreIncomeGroupModeSwitchChart avgDScoreIncomeChartData = new DgAvgDeltaScoreIncomeGroupModeSwitchChart(ana);
+//			DgChartWriter.writerChartToFile(avgDeltaScoreIncomeGroupChartModeSwitchFile, avgDScoreIncomeChartData.createChart());
 			
-			
+			DgMixedDeltaScoreIncomeChart mixedDsIncomeChart = new DgMixedDeltaScoreIncomeChart();
+			mixedDsIncomeChart.addIncomeModeChoiceDataSet(modeChoiceIncomeChart.createDeltaScoreIncomeModeChoiceDataset());
+			mixedDsIncomeChart.addAvgDeltaScoreIncomeDs(avgDScoreIncomeChartData.getDatasets());
+//			DgChartFrame frame = new DgChartFrame("test", mixedDsIncomeChart.createChart());
+			DgChartWriter.writerChartToFile(mixedDeltaScoreIncomeChartFile, mixedDsIncomeChart.createChart());
 			
 			log.debug("ya esta ;-)");
-			
-			
-			
 			
 	}
 	
