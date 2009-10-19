@@ -211,7 +211,9 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 			// all other parking during the day
 
 			// we cannot charge longer than we are parked there
-			if (endParkingTime < endTimeOfCharge) {
+			// but this should not not be executed, when then end time of parking smaller than the start time of parking 
+			// (e.g. when a vehicle is parked for too long).
+			if (endParkingTime < endTimeOfCharge && !(endParkingTime < startParkingTime)) {
 				endTimeOfCharge = endParkingTime;
 			}
 
