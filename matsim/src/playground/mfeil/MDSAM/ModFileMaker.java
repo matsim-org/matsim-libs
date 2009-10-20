@@ -377,6 +377,7 @@ public class ModFileMaker {
 						if (legs.getMode().equals(TransportMode.car)) {
 							stream.print("Ucar * x"+(i+1)+""+(j+1));
 							if (travelCost.equals("yes")) stream.print(" + Costcar * x"+(i+1)+""+(j+1)+"_1");
+							if (incomeDivided.equals("yes")) stream.print(" + Costcar / ( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
 							if (travelConstant.equals("yes")) stream.print(" + Constantcar * one");
 							onlyBike = false;
 							started = true;
@@ -384,6 +385,7 @@ public class ModFileMaker {
 						else if (legs.getMode().equals(TransportMode.pt)) {
 							stream.print("Upt * x"+(i+1)+""+(j+1));
 							if (travelCost.equals("yes")) stream.print(" + Costpt * x"+(i+1)+""+(j+1)+"_1");
+							if (incomeDivided.equals("yes")) stream.print(" + Costpt / ( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
 							if (travelConstant.equals("yes")) stream.print(" + Constantpt * one");
 							onlyBike = false;
 							started = true;
@@ -406,12 +408,14 @@ public class ModFileMaker {
 						if (legs.getMode().equals(TransportMode.car)) {
 							stream.print(" + Ucar * x"+(i+1)+""+(j+1));
 							if (travelCost.equals("yes")) stream.print(" + Costcar * x"+(i+1)+""+(j+1)+"_1");
+							if (incomeDivided.equals("yes")) stream.print(" + Costcar / ( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
 							if (travelConstant.equals("yes")) stream.print(" + Constantcar * one");
 							onlyBike = false;
 						}
 						else if (legs.getMode().equals(TransportMode.pt)) {
 							stream.print(" + Upt * x"+(i+1)+""+(j+1));
 							if (travelCost.equals("yes")) stream.print(" + Costpt * x"+(i+1)+""+(j+1)+"_1");
+							if (incomeDivided.equals("yes")) stream.print(" + Costpt / ( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
 							if (travelConstant.equals("yes")) stream.print(" + Constantpt * one");
 							onlyBike = false;
 						}
@@ -453,6 +457,17 @@ public class ModFileMaker {
 				else if (act.getType().toString().equals("shop")) stream.print(" + ShoppingUmax * one / ( one + exp( one_point_two * ( ShoppingAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
 				else if (act.getType().toString().equals("leisure")) stream.print(" + LeisureUmax * one / ( one + exp( one_point_two * ( LeisureAlpha * one - x"+(i+1)+""+(j+1)+" ) ) )");
 				else log.warn("Act has no valid type! ActChains position: "+i);
+			}
+			if (incomeDividedLN.equals("yes")) {
+				for (int j=1;j<actslegs.size()-1;j+=2){
+					LegImpl legs = (LegImpl)actslegs.get(j);
+					if (legs.getMode().equals(TransportMode.car)) {
+						stream.print(" + Costcar / LN( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
+					}
+					if (legs.getMode().equals(TransportMode.pt)) {
+						stream.print(" + Costpt / LN( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
+					}					
+				}
 			}
 			stream.println();
 		}
