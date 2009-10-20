@@ -345,11 +345,11 @@ public class ModFileMaker {
 		stream.println("LeisureAlpha \t1  \t-5 \t20  \t0");
 		
 		stream.println("Ucar \t-4  \t-50 \t30  \t0");
-		if (travelCost.equals("yes")) stream.println("Costcar \t0  \t-50 \t30  \t0");
-		if (travelConstant.equals("yes")) stream.println("Constantcar \t0  \t-50 \t50  \t0");
+		if (travelCost.equals("yes")) stream.println("CostCar \t0  \t-50 \t30  \t0");
+		if (travelConstant.equals("yes")) stream.println("ConstantCar \t0  \t-50 \t50  \t0");
 		stream.println("Upt \t-2  \t-50 \t30  \t0");
-		if (travelCost.equals("yes")) stream.println("Costpt \t0  \t-50 \t30  \t0");
-		if (travelConstant.equals("yes")) stream.println("Constantpt \t0  \t-50 \t50  \t0");
+		if (travelCost.equals("yes")) stream.println("CostPt \t0  \t-50 \t30  \t0");
+		if (travelConstant.equals("yes")) stream.println("ConstantPt \t0  \t-50 \t50  \t0");
 		stream.println("Uwalk \t-1  \t-50 \t30  \t0");
 		if (travelConstant.equals("yes")) stream.println("ConstantWalk \t0  \t-50 \t50  \t0");
 		if (bikeIn.equals("yes")) stream.println("Ubike \t-6  \t-50 \t30  \t0");	
@@ -377,17 +377,17 @@ public class ModFileMaker {
 					if (!started){
 						if (legs.getMode().equals(TransportMode.car)) {
 							stream.print("Ucar * x"+(i+1)+""+(j+1));
-							if (travelCost.equals("yes")) stream.print(" + Costcar * x"+(i+1)+""+(j+1)+"_1");
-							if (incomeDivided.equals("yes")) stream.print(" + Costcar / ( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
-							if (travelConstant.equals("yes")) stream.print(" + Constantcar * one");
+							if (travelCost.equals("yes")) stream.print(" + CostCar * x"+(i+1)+""+(j+1)+"_1");
+							if (incomeDivided.equals("yes")) stream.print(" + CostCar / ( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
+							if (travelConstant.equals("yes")) stream.print(" + ConstantCar * one");
 							onlyBike = false;
 							started = true;
 						}
 						else if (legs.getMode().equals(TransportMode.pt)) {
 							stream.print("Upt * x"+(i+1)+""+(j+1));
-							if (travelCost.equals("yes")) stream.print(" + Costpt * x"+(i+1)+""+(j+1)+"_1");
-							if (incomeDivided.equals("yes")) stream.print(" + Costpt / ( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
-							if (travelConstant.equals("yes")) stream.print(" + Constantpt * one");
+							if (travelCost.equals("yes")) stream.print(" + CostPt * x"+(i+1)+""+(j+1)+"_1");
+							if (incomeDivided.equals("yes")) stream.print(" + CostPt / ( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
+							if (travelConstant.equals("yes")) stream.print(" + ConstantPt * one");
 							onlyBike = false;
 							started = true;
 						}
@@ -409,16 +409,16 @@ public class ModFileMaker {
 					else {
 						if (legs.getMode().equals(TransportMode.car)) {
 							stream.print(" + Ucar * x"+(i+1)+""+(j+1));
-							if (travelCost.equals("yes")) stream.print(" + Costcar * x"+(i+1)+""+(j+1)+"_1");
-							if (incomeDivided.equals("yes")) stream.print(" + Costcar / ( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
-							if (travelConstant.equals("yes")) stream.print(" + Constantcar * one");
+							if (travelCost.equals("yes")) stream.print(" + CostCar * x"+(i+1)+""+(j+1)+"_1");
+							if (incomeDivided.equals("yes")) stream.print(" + CostCar / ( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
+							if (travelConstant.equals("yes")) stream.print(" + ConstantCar * one");
 							onlyBike = false;
 						}
 						else if (legs.getMode().equals(TransportMode.pt)) {
 							stream.print(" + Upt * x"+(i+1)+""+(j+1));
-							if (travelCost.equals("yes")) stream.print(" + Costpt * x"+(i+1)+""+(j+1)+"_1");
-							if (incomeDivided.equals("yes")) stream.print(" + Costpt / ( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
-							if (travelConstant.equals("yes")) stream.print(" + Constantpt * one");
+							if (travelCost.equals("yes")) stream.print(" + CostPt * x"+(i+1)+""+(j+1)+"_1");
+							if (incomeDivided.equals("yes")) stream.print(" + CostPt / ( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
+							if (travelConstant.equals("yes")) stream.print(" + ConstantPt * one");
 							onlyBike = false;
 						}
 						else if (legs.getMode().equals(TransportMode.walk)) {
@@ -468,10 +468,10 @@ public class ModFileMaker {
 				for (int j=1;j<actslegs.size()-1;j+=2){
 					LegImpl legs = (LegImpl)actslegs.get(j);
 					if (legs.getMode().equals(TransportMode.car)) {
-						stream.print(" + Costcar / LN( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
+						stream.print(" + CostCar / LN( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
 					}
 					if (legs.getMode().equals(TransportMode.pt)) {
-						stream.print(" + Costpt / LN( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
+						stream.print(" + CostPt / LN( Income + one ) * x"+(i+1)+""+(j+1)+"_1");
 					}					
 				}
 			}
