@@ -353,6 +353,7 @@ public class ModFileMaker {
 		stream.println("Uwalk \t-1  \t-50 \t30  \t0");
 		if (travelConstant.equals("yes")) stream.println("ConstantWalk \t0  \t-50 \t50  \t0");
 		if (bikeIn.equals("yes")) stream.println("Ubike \t-6  \t-50 \t30  \t0");	
+		if (bikeIn.equals("yes") && travelConstant.equals("yes")) stream.println("ConstantBike \t0  \t-50 \t50  \t0");
 		
 		if (incomeConstant.equals("yes")) stream.println("IncomeConstant \t0  \t-50 \t50  \t0");
 		
@@ -399,6 +400,7 @@ public class ModFileMaker {
 						else if (legs.getMode().equals(TransportMode.bike)) {
 							if (bikeIn.equals("yes")) {
 								stream.print("Ubike * x"+(i+1)+""+(j+1));
+								if (travelConstant.equals("yes")) stream.print(" + ConstantBike * one");
 								started = true;
 							}
 						}
@@ -425,7 +427,11 @@ public class ModFileMaker {
 							onlyBike = false;
 						}
 						else if (legs.getMode().equals(TransportMode.bike)) {
-							if (bikeIn.equals("yes")) stream.print(" + Ubike * x"+(i+1)+""+(j+1));
+							if (bikeIn.equals("yes")) {
+								stream.print(" + Ubike * x"+(i+1)+""+(j+1));
+								if (travelConstant.equals("yes")) stream.print(" + ConstantBike * one");
+							}
+							
 						}
 						else log.warn("Leg has no valid mode! ActChains position: "+i);
 					}
