@@ -17,9 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether;
+package playground.dgrether.signalsystems;
 
 import org.matsim.core.controler.Controler;
+
+import playground.dgrether.DgPaths;
 
 
 /**

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.tests;
+package playground.dgrether.utils;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.events.BasicActivityEndEvent;

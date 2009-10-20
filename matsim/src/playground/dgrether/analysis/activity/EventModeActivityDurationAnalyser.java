@@ -43,7 +43,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.misc.Time;
 
-import playground.dgrether.IntegerCountMap;
+import playground.dgrether.utils.IntegerCountMap;
 
 
 /**

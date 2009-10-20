@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether;
+package playground.dgrether.utils;
 
 import java.util.Collection;
 import java.util.HashMap;

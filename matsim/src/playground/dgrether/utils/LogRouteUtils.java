@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * LogRouteUtils.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,42 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.functions;
+
+package playground.dgrether.utils;
+
+import java.util.ArrayList;
+
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 
 /**
  * @author dgrether
  *
  */
-public class Function {
+public class LogRouteUtils {
 
-
-	public double[] computeXValues(double from, double to) {
-		int size = 5;
-		double[] ret = new double[size];
-
-		for (int i = 0; i < ret.length; i++) {
-			ret[i] = i;
+	public static String getNodeRoute(final NetworkRouteWRefs r) {
+		StringBuffer buffer = new StringBuffer();
+		for (Node n : r.getNodes()) {
+			buffer.append(n.getId().toString());
+			buffer.append(" ");
 		}
-
-		return ret;
+		return buffer.toString();
 	}
-
-
-	public double[] computeYValues(double from, double to) {
-		int size = 5;
-		double[] ret = new double[size];
-
-		for (int i = 0; i < ret.length; i++) {
-			ret[i] = i;
+	
+	public static String getNodeRoute(final ArrayList<NodeImpl> l) {
+		StringBuffer buffer = new StringBuffer();
+		for (Node n : l) {
+			buffer.append(n.getId().toString());
+			buffer.append(" ");
 		}
-
-		return ret;
+		return buffer.toString();
 	}
-
-	public String getTitle() {
-		return "FunctionTitle";
-	}
-
-
 }

@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LogRouteUtils.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +16,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.dgrether.utils;
 
-package playground.dgrether;
+import org.matsim.core.controler.Controler;
 
-import java.util.ArrayList;
-
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
+import tutorial.example7ControlerListener.MyControlerListener;
 
 
 /**
  * @author dgrether
  *
  */
-public class LogRouteUtils {
+public class MyControler {
 
-	public static String getNodeRoute(final NetworkRouteWRefs r) {
-		StringBuffer buffer = new StringBuffer();
-		for (Node n : r.getNodes()) {
-			buffer.append(n.getId().toString());
-			buffer.append(" ");
-		}
-		return buffer.toString();
+	private static final String EQUILCONF = "../testData/examples/equil/config.xml";
+
+	private static final String EQUILNOROUTESCONF = "../testData/equilNoRoutes/config.xml";
+
+	private static final String EQUILONE = "../testData/equil1Agent/config.xml";
+
+	private static final String EQUILPT = "../testData/equilPt/config.xml";
+
+//	private static String usedConfig = EQUILNOROUTESCONF;
+
+	private static String usedConfig = EQUILPT;
+
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		//set a default config for convenience...
+		String [] config = {usedConfig};
+		//Create an instance of the controler and
+		Controler controler = new Controler(config);
+		//so we don't have to delete the output directory
+		controler.setOverwriteFiles(true);
+		//add an instance of this class as ControlerListener
+		controler.addControlerListener(new MyControlerListener());
+		//call run() to start the simulation
+		controler.run();
+		//open snapshot of the 10th iteration
+//		String[] visargs = {"../testData/output/equilNoRoutes/ITERS/it.10/Snapshot"};
+//		NetVis.main(visargs);
 	}
-	
-	public static String getNodeRoute(final ArrayList<NodeImpl> l) {
-		StringBuffer buffer = new StringBuffer();
-		for (Node n : l) {
-			buffer.append(n.getId().toString());
-			buffer.append(" ");
-		}
-		return buffer.toString();
-	}
+
+
 }
