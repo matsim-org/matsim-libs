@@ -7,6 +7,7 @@ import org.matsim.api.basic.v01.Id;
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.energy.charging.ChargeLog;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
+import playground.wrashid.PSF.lib.PSFGeneralLib;
 import playground.wrashid.PSF.parking.ParkLog;
 import playground.wrashid.PSF.parking.ParkingTimes;
 import playground.wrashid.lib.GeneralLib;
@@ -95,6 +96,24 @@ public class BatteryStatistics {
 		
 			
 		return gridConnectedPower;
+	}
+	
+	
+	
+	public static void writeGridConnectedPower(String fileName, double[][] gridConnectedPower) {
+		GeneralLib.writeGraphic(fileName, GeneralLib.scaleMatrix(gridConnectedPower, 1.0/1000) ,"Power Available From Connected Vehicles", "Time of Day [s]","Power [kW]");
+	}
+	
+	public static void writeGridConnectedPowerData(String fileName, double[][] gridConnectedPower) {
+		PSFGeneralLib.writeEnergyUsageStatisticsData(fileName, gridConnectedPower);
+	}
+	
+	public static void writeGridConnectedEnergy(String fileName, double[][] gridConnectedPower) {
+		GeneralLib.writeGraphic(fileName, GeneralLib.scaleMatrix(gridConnectedPower, 1.0/1000/3600) ,"Energy Available From Connected Vehicles", "Time of Day [s]","Energy [kWh]");
+	}
+	
+	public static void writeGridConnectedEnergyData(String fileName, double[][] gridConnectedPower) {
+		PSFGeneralLib.writeEnergyUsageStatisticsData(fileName, gridConnectedPower);
 	}
 	
 }

@@ -49,4 +49,12 @@ public class GeneralLibTest extends MatsimTestCase {
 		
 		return true;
 	}
-}
+	
+	public void testScaleMatrix(){
+		double[][] matrix=new double[1][1];
+		matrix[0][0]=1.0;
+		matrix=GeneralLib.scaleMatrix(matrix, 2);
+		
+		assertEquals(2.0, matrix[0][0]);
+	}
+} 

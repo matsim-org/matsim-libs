@@ -26,6 +26,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.utils.charts.XYLineChart;
 
 import playground.wrashid.PSF.energy.charging.ChargeLog;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
@@ -294,5 +295,59 @@ public class GeneralLib {
 		}
 		return matrix;
 	}
+	
+	/**
+	 * energyUsageStatistics[number of values][number of functions]
+	 * 
+	 * 
+	 * @param fileName
+	 * @param energyUsageStatistics
+	 * @param title
+	 * @param xLabel
+	 * @param yLabel
+	 */
+	public static void writeGraphic(String fileName, double[][] energyUsageStatistics, String title, String xLabel, String yLabel) {
+		XYLineChart chart = new XYLineChart(title, xLabel, yLabel);
+
+		int numberOfXValues=energyUsageStatistics.length;
+		int numberOfFunctions=energyUsageStatistics[0].length;
+		
+		double[] time = new double[numberOfXValues];
+
+		for (int i = 0; i < numberOfXValues; i++) {
+			time[i] = i * 900;
+		}
+
+		for (int i = 0; i < numberOfFunctions; i++) {
+			double[] hubConcumption = new double[numberOfXValues];
+			for (int j = 0; j < numberOfXValues; j++) {
+				hubConcumption[j] = energyUsageStatistics[j][i];
+			}
+			chart.addSeries("hub-" + i, time, hubConcumption);
+		}
+
+		// chart.addMatsimLogo();
+		chart.saveAsPng(fileName, 800, 600);
+	}
+	
+	public static double[][] scaleMatrix(double[][] matrix, double scalingFactor){
+		int numberOfRows=matrix.length;
+		int numberOfColumns=matrix[0].length;
+		
+		double[][] resultMatrix=new double[numberOfRows][numberOfColumns];
+		
+		for (int i=0;i<numberOfRows;i++){
+			for (int j=0;j<numberOfColumns;j++){
+				resultMatrix[i][j]=matrix[i][j]*scalingFactor;
+			}
+		}
+		
+		return resultMatrix;
+	}
+	
+	
+	
+	
+	
 
 }

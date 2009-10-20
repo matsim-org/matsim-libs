@@ -16,6 +16,7 @@ import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF.energy.consumption.EnergyConsumption;
 import playground.wrashid.PSF.energy.consumption.LinkEnergyConsumptionLog;
+import playground.wrashid.PSF.lib.PSFGeneralLib;
 import playground.wrashid.PSF.parking.ParkLog;
 import playground.wrashid.lib.GeneralLib;
 
@@ -229,40 +230,15 @@ public class ChargingTimes {
 		writeEnergyConsumptionGraphic(fileName, energyUsageStatistics, "Vehicle Energy Consumption");
 	}
 
+
+	
 	public static void writeEnergyConsumptionGraphic(String fileName, double[][] energyUsageStatistics, String title) {
-		XYLineChart chart = new XYLineChart(title, "Time of Day [s]", "Energy Consumption [kWh]");
-
-		double[] time = new double[numberOfTimeBins];
-		int numberOfHubs = energyUsageStatistics[0].length;
-
-		for (int i = 0; i < numberOfTimeBins; i++) {
-			time[i] = i * 900;
-		}
-
-		for (int i = 0; i < numberOfHubs; i++) {
-			double[] hubConcumption = new double[numberOfTimeBins];
-			for (int j = 0; j < numberOfTimeBins; j++) {
-				// convert from Joule to kWh
-				hubConcumption[j] = energyUsageStatistics[j][i] / 1000 / 3600;
-			}
-			chart.addSeries("hub-" + i, time, hubConcumption);
-		}
-
-		// chart.addMatsimLogo();
-		chart.saveAsPng(fileName, 800, 600);
+		GeneralLib.writeGraphic(fileName, GeneralLib.scaleMatrix(energyUsageStatistics, 1/3600000) ,title, "Time of Day [s]","Energy Consumption [kWh]");
 	}
 
-	// 96 data points for each hub
-	public static void writeEnergyUsageStatisticsData(String fileName, double[][] energyUsageStatistics, int numberOfHubs) {
-		String headerLine = "";
-
-		for (int i = 1; i < numberOfHubs; i++) {
-			headerLine += "hub-" + i + "\t";
-		}
-
-		headerLine += "hub-" + numberOfHubs + "\t";
-
-		GeneralLib.writeMatrix(energyUsageStatistics, fileName, headerLine);
+	// write out data (energy usage at each hub)
+	public static void writeEnergyUsageStatisticsData(String fileName, double[][] energyUsageStatistics) {
+		PSFGeneralLib.writeEnergyUsageStatisticsData(fileName, energyUsageStatistics);
 	}
 
 	public static void printEnergyUsageStatistics(HashMap<Id, ChargingTimes> chargingTimes, HubLinkMapping hubLinkMapping) {

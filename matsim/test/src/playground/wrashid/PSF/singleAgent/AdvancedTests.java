@@ -9,6 +9,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.ParametersPSFMutator;
+import playground.wrashid.PSF.V2G.BatteryStatistics;
 import playground.wrashid.PSF.energy.AddEnergyScoreListener;
 import playground.wrashid.PSF.energy.SimulationStartupListener;
 import playground.wrashid.PSF.energy.charging.ChargeLog;
@@ -16,6 +17,7 @@ import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF.energy.charging.optimizedCharging.OptimizedCharger;
 import playground.wrashid.PSF.energy.consumption.LogEnergyConsumption;
 import playground.wrashid.PSF.parking.LogParkingTimes;
+import playground.wrashid.PSF.parking.ParkingTimes;
 
 /**
  * Note: Cannot simply inherit from class TestCase, but must inherit from
@@ -377,6 +379,17 @@ public class AdvancedTests extends MatsimTestCase {
 		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 30492.901121572733, 1);
 
 		// chargingTimesOfAgentOne.print();
+		
+		// check the statistics about the battery for usage of the V2G concept.
+		double[][] gridConnectedEnergy = BatteryStatistics.getGridConnectedEnergy(chargingTimes,logParkingTimes.getParkingTimes());
+		double[][] getGridConnectedPower=BatteryStatistics.getGridConnectedPower(logParkingTimes.getParkingTimes(), ParametersPSF.getDefaultChargingPowerAtParking());
+		assertEquals(3500.0, getGridConnectedPower[(int) Math.round(Math.floor(22989/900))][0]);
+		assertEquals(0.0, getGridConnectedPower[(int) Math.round(Math.floor((22989-1000)/900))][0]);
+		
+		assertEquals(36000000.0, gridConnectedEnergy[0][0]);
+		
+		assertEquals(36000000.0, gridConnectedEnergy[(int) Math.round(Math.floor((22989-1000)/900))][0]);
+		assertEquals(1.117484607449543E7, gridConnectedEnergy[(int) Math.round(Math.floor(22989/900))][0],1);
 	}
 
 	/*
@@ -386,7 +399,7 @@ public class AdvancedTests extends MatsimTestCase {
 	 * because the car arrives at work very fast (within the first charging bin, available at work).
 	 * => This caused a negative energy value. => bug resolved now in FacilityChargingPrice.getEndTimeOfCharge(...)
 	 * 
-	 * As the peak is during the night, the agent should start charging immediatly upon arriving.
+	 * As the peak is during the night, the agent should start charging immediately upon arriving.
 	 */
 	public void test7OptimizedCharger() {
 		initTest("test/input/playground/wrashid/PSF/singleAgent/config6.xml");

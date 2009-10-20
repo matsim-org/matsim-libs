@@ -10,6 +10,7 @@ import org.matsim.core.gbl.Gbl;
 import EDU.oswego.cs.dl.util.concurrent.FJTask.Par;
 
 import playground.wrashid.PSF.ParametersPSF;
+import playground.wrashid.PSF.V2G.BatteryStatistics;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF.energy.consumption.EnergyConsumption;
 import playground.wrashid.PSF.parking.ParkingTimes;
@@ -114,10 +115,20 @@ public class OptimizedCharger {
 			// TODO: remove the parameter ParametersPSF.getMainEnergyUsageStatistics() from the config file.
 			
 			// write data into iterations folder
-			ChargingTimes.writeEnergyUsageStatisticsData(Controler.getIterationFilename("vehicleEnergyConsumption.txt"), energyUsageStatistics, ParametersPSF.getHubLinkMapping().getNumberOfHubs());
+			ChargingTimes.writeEnergyUsageStatisticsData(Controler.getIterationFilename("vehicleEnergyConsumption.txt"), energyUsageStatistics);
 			
-			ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(Controler.getIterationFilename("vehicleEnergyConsumption.txt.png"),energyUsageStatistics);
+			ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(Controler.getIterationFilename("vehicleEnergyConsumption.png"),energyUsageStatistics);
 			
+			
+			
+			// TODO: the v2g power could be changed later.
+			double[][] gridConnectedPower=BatteryStatistics.getGridConnectedPower(parkingTimes,ParametersPSF.getDefaultChargingPowerAtParking());
+			BatteryStatistics.writeGridConnectedPower(Controler.getIterationFilename("gridConnectedVehiclePower.png"), gridConnectedPower);
+			BatteryStatistics.writeGridConnectedPowerData(Controler.getIterationFilename("gridConnectedVehiclePower.txt"), gridConnectedPower);
+		
+			double[][] gridConnectedEnergy=BatteryStatistics.getGridConnectedEnergy(chargingTimes, parkingTimes);
+			BatteryStatistics.writeGridConnectedEnergy(Controler.getIterationFilename("gridConnectedVehicleEnergy.png"), gridConnectedEnergy);
+			BatteryStatistics.writeGridConnectedEnergyData(Controler.getIterationFilename("gridConnectedVehicleEnergy.txt"), gridConnectedEnergy);
 		}
 		
 		// output the price graphics
