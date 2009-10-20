@@ -85,7 +85,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected List<List<Double>> sims;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	protected int noOfAlternatives;
-	protected String similarity, income, gender, age, license, carAvail, employed, seasonTicket, travelCost, travelConstant, bikeIn; 
+	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, carAvail, employed, seasonTicket, travelCost, travelConstant, bikeIn; 
 	protected double travelCostCar, travelCostPt;
 	
 	                      
@@ -108,17 +108,20 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
 		this.linker = new XY2Links (this.controler.getNetwork());
-		this.similarity 	= "no";
-		this.income 		= "yes";
-		this.age 			= "no";
-		this.gender 		= "no";
-		this.employed 		= "no";
-		this.license 		= "no";
-		this.carAvail 		= "no";
-		this.seasonTicket 	= "no";
-		this.travelCost		= "no";
-		this.travelConstant = "no";
-		this.bikeIn			= "no";
+		this.similarity 		= "no";
+		this.incomeConstant 	= "yes";
+		this.incomeDivided 		= "no";
+		this.incomeDividedLN	= "no";
+		this.incomeBoxCox 		= "no";
+		this.age 				= "no";
+		this.gender 			= "no";
+		this.employed 			= "no";
+		this.license 			= "no";
+		this.carAvail 			= "no";
+		this.seasonTicket 		= "no";
+		this.travelCost			= "no";
+		this.travelConstant 	= "no";
+		this.bikeIn				= "no";
 		this.noOfAlternatives = 20;
 		this.travelCostCar	= 0.5;	// CHF/km
 		this.travelCostPt	= 0.28; // CHF/km
@@ -178,7 +181,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	// Type of writing the Biogeme file
 		//	this.writePlansForBiogeme(this.outputFileBiogeme);
 		this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
-				this.similarity, this.income, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelCost, this.travelConstant, this.bikeIn);
+				this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelCost, this.travelConstant, this.bikeIn);
 		
 	// Type of writing the mod file
 		//	this.writeModFile(this.outputFileMod);
@@ -737,7 +740,10 @@ public class PlansConstructor implements PlanStrategyModule{
 	// Writes a Biogeme file that fits "protected void enlargePlansSetWithRandomSelection ()"
 	public void writePlansForBiogemeWithRandomSelection (String outputFile, String attributesInputFile,
 			String similarity, 
-			String income,
+			String incomeConstant,
+			String incomeDivided,
+			String incomeDividedLN,
+			String incomeBoxCox,
 			String age,
 			String gender,
 			String employed,
@@ -752,13 +758,26 @@ public class PlansConstructor implements PlanStrategyModule{
 		
 		// Writing the variables back to head of class due to MDSAM call possibility. 
 		// Like this, they are also available for modMaker class.
-		this.similarity=similarity; this.income=income; this.age=age; this.gender=gender; this.employed=employed; this.license=license; this.carAvail=carAvail; this.seasonTicket=seasonTicket; this.travelCost=travelCost; this.travelConstant=travelConstant; this.bikeIn=bikeIn;
+		this.similarity=similarity; 
+		this.incomeConstant=incomeConstant; 
+		this.incomeDivided=incomeDivided; 
+		this.incomeDividedLN=incomeDividedLN; 
+		this.incomeBoxCox=incomeBoxCox;
+		this.age=age; 
+		this.gender=gender; 
+		this.employed=employed; 
+		this.license=license; 
+		this.carAvail=carAvail; 
+		this.seasonTicket=seasonTicket; 
+		this.travelCost=travelCost; 
+		this.travelConstant=travelConstant; 
+		this.bikeIn=bikeIn;
 		
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
 		AgentsAttributesAdder aaa = new AgentsAttributesAdder ();
 		
 		// Run external classes if required
-		if (income.equals("yes") || carAvail.equals("yes") || seasonTicket.equals("yes")){
+		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes") || carAvail.equals("yes") || seasonTicket.equals("yes")){
 			aaa.run(attributesInputFile);
 		}
 		if (similarity.equals("yes")){
@@ -780,7 +799,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		stream.print("Id\tChoice\t");
 		counterFirst+=2;
 		
-		if (income.equals("yes")) {
+		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) {
 			stream.print("Income\t"); 
 			counterFirst++;
 		}
@@ -845,7 +864,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			}
 			
 			// Check whether all info is available for this person. Drop the person, otherwise
-			if (income.equals("yes") && !aaa.getIncome().containsKey(person.getId())){
+			if ((incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) && !aaa.getIncome().containsKey(person.getId())){
 				log.warn("No income available for person "+person.getId()+". Dropping the person.");
 				continue;
 			}
@@ -881,8 +900,8 @@ public class PlansConstructor implements PlanStrategyModule{
 			stream.print(position+"\t");
 			counterRow++;
 			
-			if (income.equals("yes")) {
-				stream.print(aaa.getIncome().get(person.getId())+"\t");
+			if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) {
+				stream.print((aaa.getIncome().get(person.getId())/1000)+"\t");
 				counterRow++;
 			}
 			if (age.equals("yes")) {
@@ -1176,7 +1195,10 @@ public class PlansConstructor implements PlanStrategyModule{
 	public void writeModFileWithRandomSelection (String outputFile){
 		new ModFileMaker (this.population, this.actChains).writeWithRandomSelection(outputFile,
 				this.similarity, 
-				this.income,
+				this.incomeConstant,
+				this.incomeDivided,
+				this.incomeDividedLN,
+				this.incomeBoxCox,
 				this.age,
 				this.gender,
 				this.employed,

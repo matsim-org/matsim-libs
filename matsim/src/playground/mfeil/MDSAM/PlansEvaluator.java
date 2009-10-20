@@ -87,7 +87,7 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 	// 	Type of writing the Biogeme file		
 		//this.writePlansForBiogeme(this.outputFileBiogeme);
 		this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
-				super.similarity, super.income, super.age, super.gender, super.employed, super.license, super.carAvail, super.seasonTicket, super.travelCost, super.travelConstant, super.bikeIn);
+				super.similarity, super.incomeConstant, super.incomeDivided, super.incomeDividedLN, super.incomeBoxCox, super.age, super.gender, super.employed, super.license, super.carAvail, super.seasonTicket, super.travelCost, super.travelConstant, super.bikeIn);
 	}
 	
 	

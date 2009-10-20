@@ -294,7 +294,10 @@ public class ModFileMaker {
 	
 	public void writeWithRandomSelection (String outputFile,
 			String similarity, 
-			String income,
+			String incomeConstant,
+			String incomeDivided,
+			String incomeDividedLN,
+			String incomeBoxCox,
 			String age,
 			String gender,
 			String employed,
@@ -351,6 +354,8 @@ public class ModFileMaker {
 		if (travelConstant.equals("yes")) stream.println("ConstantWalk \t0  \t-50 \t50  \t0");
 		if (bikeIn.equals("yes")) stream.println("Ubike \t-6  \t-50 \t30  \t0");	
 		
+		if (incomeConstant.equals("yes")) stream.println("IncomeConstant \t0  \t-50 \t50  \t0");
+		
 		stream.println();
 	
 		//Utilities
@@ -359,29 +364,13 @@ public class ModFileMaker {
 		for (int i=0;i<this.actChains.size();i++){
 			List<PlanElement> actslegs = this.actChains.get(i);
 			stream.print((i+1)+"\tAlt"+(i+1)+"\tav"+(i+1)+"\t");
-			
+			boolean onlyBike = true;		
+			boolean started = false;
+			if (incomeConstant.equals("yes")) {
+				stream.print("IncomeConstant * Income");
+				started = true;
+			}
 			if (actslegs.size()>1){
-				boolean onlyBike = true;		
-				/*
-				LegImpl leg = (LegImpl)actslegs.get(1);
-				if (leg.getMode().equals(TransportMode.car)) {
-					stream.print("Ucar * x"+(i+1)+""+2);
-					if (travelCost.equals("yes")) stream.print(" + Costcar * x"+(i+1)+"2_1");
-					onlyBike = false;
-				}
-				else if (leg.getMode().equals(TransportMode.pt)) {
-					stream.print("Upt * x"+(i+1)+""+2);
-					if (travelCost.equals("yes")) stream.print(" + Costpt * x"+(i+1)+"2_1");
-					onlyBike = false;
-				}
-				else if (leg.getMode().equals(TransportMode.walk)) {
-					stream.print("Uwalk * x"+(i+1)+""+2);
-					onlyBike = false;
-				}
-				else if (bikeIn.equals("yes") && leg.getMode().equals(TransportMode.bike)) stream.print("Ubike * x"+(i+1)+""+2);
-				else log.warn("Leg has no valid mode! ActChains position: "+i);
-				*/
-				boolean started = false;
 				for (int j=1;j<actslegs.size();j+=2){
 					LegImpl legs = (LegImpl)actslegs.get(j);
 					if (!started){
@@ -437,9 +426,9 @@ public class ModFileMaker {
 						else log.warn("Leg has no valid mode! ActChains position: "+i);
 					}
 				}
-				if (onlyBike && bikeIn.equals("no")) stream.print("$NONE");
+				if (onlyBike && bikeIn.equals("no") && incomeConstant.equals("no")) stream.print("$NONE");
 			}
-			else {
+			else if (incomeConstant.equals("no")){
 				stream.print("$NONE");
 			}
 			stream.println();

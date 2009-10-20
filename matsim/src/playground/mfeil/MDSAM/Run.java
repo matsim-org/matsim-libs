@@ -42,9 +42,9 @@ public class Run {
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz06.xml";
-		final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans064.dat";
+		final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans068.dat";
 		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
-		final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model064.mod";
+		final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model068.mod";
 		
 /*		final String populationFilename = "./plans/output_plans.xml";
 		final String networkFilename = "./plans/network.xml";
@@ -53,17 +53,20 @@ public class Run {
 		final String outputFile = "./plans/output_plans.dat";
 		*/
 		
-		String similarity 	= "no";
-		String income 		= "no";
-		String gender 		= "no";
-		String age 			= "no";
-		String employed 	= "no";
-		String license 		= "no";
-		String carAvail 	= "no";
-		String seasonTicket = "no";
-		String travelCost	= "yes";
-		String travelConstant = "no";
-		String bikeIn		= "no";
+		String similarity 		= "no";
+		String incomeConstant 	= "yes";
+		String incomeDivided	= "no";
+		String incomeDividedLN	= "no";
+		String incomeBoxCox		= "no";
+		String gender 			= "no";
+		String age 				= "no";
+		String employed 		= "no";
+		String license 			= "no";
+		String carAvail 		= "no";
+		String seasonTicket 	= "no";
+		String travelCost		= "yes";
+		String travelConstant 	= "yes";
+		String bikeIn			= "yes";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
@@ -79,7 +82,7 @@ public class Run {
 //		pc.writePlansForBiogemeWithSequence(outputFileBiogeme);
 		pc.keepPersons();
 		pc.writePlansForBiogemeWithRandomSelection(outputFileBiogeme, attributesInputFile, 
-				similarity, income, age, gender, employed, license, carAvail, seasonTicket, travelCost, travelConstant, bikeIn);
+				similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, age, gender, employed, license, carAvail, seasonTicket, travelCost, travelConstant, bikeIn);
 		pc.writeModFileWithRandomSelection(outputFileMod);
 		log.info("Process finished.");
 	}
