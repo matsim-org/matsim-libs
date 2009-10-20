@@ -273,11 +273,11 @@ public class MyAdjancencyMatrixBuilder {
 	 * <ul>
 	 * 	<b>Format</b><ul><code>
 	 * 					Vertices*<br>
-	 * 					1 636656.0603363763 7112425.64839626<br>
-	 * 					2 646371.1428275895 7077439.060623741<br>
-	 * 					3 611341.8553271998 7084071.2019769605<br>
+	 * 					1 "1" 0.23553 0.12546<br>
+	 * 					2 "2" 0.12346 0.87543<br>
+	 * 					3 "3" 1.00000 0.26543<br>
 	 * 					...<br>
-	 * 					1434 611139.0689426351 7084311.816469026<br>
+	 * 					1434 "1434" 0.32432 0.54327<br>
 	 * 					Arcs*<br>
 	 * 					1 4 12<br>
 	 * 					1 10 2<br>
@@ -289,38 +289,70 @@ public class MyAdjancencyMatrixBuilder {
 	 * 
 	 * @param clusters the <code>List</code> of <code>Cluster</code>s so that the cluster
 	 * 		centroid coordinates can be written as attributes of the vertices.
-	 * @param outputFilename the complete path of the <code>*.net</code> file to which
+	 * @param pajekFilename the complete path of the <code>*.net</code> file to which
 	 * 		the <i>Pajek</i> network is written. 
+	 * @param rFilename the complete path of the <code>*.txt</code> file to which the
+	 * 		<i>R</i> network is written. 
 	 */
-	public void writeAdjacencyAsPajekNetworkToFile(List<Cluster> clusters, String outputFilename) {
-		log.info("Writing order adjacency as Pajek network file.");
+	public void writeAdjacencyAsNetworkToFile(List<Cluster> clusters, String pajekFilename, String rFilename) {
+		log.info("Writing order adjacency as Pajek and R network files.");
+		
+		/*
+		 * Pajek only handles the x- and y-coordinate in the [0,1] range. So, I need to
+		 * find the extent of the envelope, and express the coordinates accordingly.
+		 */
+		double minX = Double.POSITIVE_INFINITY;
+		double minY = Double.POSITIVE_INFINITY;
+		double maxX = Double.NEGATIVE_INFINITY;
+		double maxY = Double.NEGATIVE_INFINITY;
+		for (Cluster cluster : clusters) {
+			minX = Math.min(minX, cluster.getCenterOfGravity().getX());
+			minY = Math.min(minY, cluster.getCenterOfGravity().getY());
+			maxX = Math.max(maxX, cluster.getCenterOfGravity().getX());
+			maxY = Math.max(maxY, cluster.getCenterOfGravity().getY());
+		}
+		log.info("   Pajek coordinate envelope:");
+		log.info(String.format("      Min x: %1.5f", minX));
+		log.info(String.format("      Min y: %1.5f", minY));
+		log.info(String.format("      Max x: %1.5f", maxX));
+		log.info(String.format("      Max y: %1.5f", maxY));
+		
 		try {
-			BufferedWriter output = new BufferedWriter(new FileWriter(new File( outputFilename)));
+			BufferedWriter outputPajek = new BufferedWriter(new FileWriter(new File( pajekFilename)));
+			BufferedWriter outputR = new BufferedWriter(new FileWriter(new File( rFilename)));
 			try{
-				output.write("*Vertices ");
-				output.write(String.valueOf(orderAdjacency.rows()));
-				output.newLine();
-				// Write the vertex coordinates
+				outputPajek.write("*Vertices ");
+				outputPajek.write(String.valueOf(orderAdjacency.rows()));
+				outputPajek.newLine();
+				// Write the vertex name and coordinates
 				for(Cluster c : clusters){
-					output.write(String.valueOf(Integer.parseInt(c.getClusterId())+1));
-					output.write(" ");
-					output.write(String.valueOf(c.getCenterOfGravity().getX()));
-					output.write(" ");
-					output.write(String.valueOf(c.getCenterOfGravity().getY()));
-					output.newLine();
+					outputPajek.write(String.valueOf(Integer.parseInt(c.getClusterId())+1));
+					outputPajek.write(String.format(" \"%s\" ", String.valueOf(Integer.parseInt(c.getClusterId())+1)));
+					outputPajek.write(String.format("%1.5f  ", (c.getCenterOfGravity().getX() - minX)/maxX));
+					outputPajek.write(String.format("%1.5f", (c.getCenterOfGravity().getY() - minY)/maxY));
+					outputPajek.newLine();
 				}
-				output.write("*Arcs");
-				output.newLine();
+				outputPajek.write("*Arcs");
+				outputPajek.newLine();
 				int rowMultiplier = 0;
 				for(int r = 0; r < orderAdjacency.rows(); r++){
 					for(int c = 0; c < orderAdjacency.columns(); c++){
 						if(orderAdjacency.getQuick(r, c) > 0){
-							output.write(String.valueOf(r+1));
-							output.write(" ");
-							output.write(String.valueOf(c+1));
-							output.write(" ");
-							output.write(String.valueOf((int) orderAdjacency.getQuick(r, c)));
-							output.newLine();
+							// Write to Pajek file
+							outputPajek.write(String.valueOf(r+1));
+							outputPajek.write(" ");
+							outputPajek.write(String.valueOf(c+1));
+							outputPajek.write(" ");
+							outputPajek.write(String.valueOf((int) orderAdjacency.getQuick(r, c)));
+							outputPajek.newLine();
+							
+							// Write to R file
+							outputR.write(String.valueOf(r+1));
+							outputR.write(" ");
+							outputR.write(String.valueOf(c+1));
+							outputR.write(" ");
+							outputR.write(String.valueOf((int) orderAdjacency.getQuick(r, c)));
+							outputR.newLine();
 						}
 					}
 					if(rowMultiplier == r+1){
@@ -330,7 +362,7 @@ public class MyAdjancencyMatrixBuilder {
 				}
 				log.info("   Rows processed: " + orderAdjacency.rows() + " (Done)");
 			} finally{
-				output.close();
+				outputPajek.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -105,12 +105,13 @@ public class MyCommercialClusterStringBuilder extends MyStringBuilder{
 	 * 		</ul> 
 	 */
 	public List<String> getSnaOutputFilenameList() {
-		List<String> result = new ArrayList<String>(5);
+		List<String> result = new ArrayList<String>(6);
 		result.add(outputPrefix + "DistanceAdjacency.txt");
 		result.add(outputPrefix + "OrderAdjacency.txt");
 		result.add(outputPrefix + "InOrderAdjacency.txt");
 		result.add(outputPrefix + "OutOrderAdjacency.txt");
 		result.add(outputPrefix + "PajekNetwork.net");
+		result.add(outputPrefix + "RNetwork.txt");
 		return result;
 	}
 	
