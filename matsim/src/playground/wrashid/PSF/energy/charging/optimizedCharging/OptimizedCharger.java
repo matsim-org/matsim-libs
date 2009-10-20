@@ -84,7 +84,7 @@ public class OptimizedCharger {
 			chargingTimes = eb.getChargingTimes(agentEnergyConsumption);
 
 			// write out charging events to the console and also to a file (if specified)
-			chargingTimes.print();
+			//chargingTimes.print();
 			//System.out.println("===================");	
 
 		}
