@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * DgAnalysisReader
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,26 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether;
-
-import org.matsim.core.utils.misc.Time;
+package playground.dgrether.analysis.population;
 
 
 /**
  * @author dgrether
  *
  */
-public class TestMain {
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-//		System.out.println(Double.MAX_VALUE);
-//		System.out.println(Integer.MAX_VALUE);
-
-		System.out.println(Time.writeTime(4000.0));
-		
-	}
+public class DgAnalysisReader {
 
 }

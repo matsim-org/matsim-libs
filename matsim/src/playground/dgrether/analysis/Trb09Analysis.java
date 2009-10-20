@@ -23,12 +23,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.analysis.charts.DgAvgDeltaScoreIncomeModeChoiceChart;
+import playground.dgrether.analysis.charts.DgDeltaScoreIncomeChart;
+import playground.dgrether.analysis.charts.DgDeltaScoreIncomeModeChoiceChart;
+import playground.dgrether.analysis.charts.DgMixedDeltaScoreIncomeModeChoiceChart;
+import playground.dgrether.analysis.charts.DgModeChoiceIncomeChart;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
-import playground.dgrether.analysis.population.DgAvgDeltaScoreIncomeGroupModeSwitchChart;
-import playground.dgrether.analysis.population.DgDeltaScoreIncomeChart;
-import playground.dgrether.analysis.population.DgDeltaScoreIncomeModeChoiceChart;
 import playground.dgrether.analysis.population.DgHouseholdsAnalysisReader;
-import playground.dgrether.analysis.population.DgModeChoiceIncomeChart;
 import playground.dgrether.analysis.population.DgPopulationAnalysisReader;
 import playground.dgrether.utils.charts.DgChartFrame;
 
@@ -98,10 +99,10 @@ public class Trb09Analysis {
 			DgChartFrame frame = new DgChartFrame("test", modechoiceIncomeChartRun2.createChart());
 //
 //			new DgAvgDeltaScoreIncomeGroupChart(ana).writeFile(avgDeltaScoreIncomeGroupChartFile);
-			DgAvgDeltaScoreIncomeGroupModeSwitchChart avgDScoreIncomeChartData = new DgAvgDeltaScoreIncomeGroupModeSwitchChart(ana);
+			DgAvgDeltaScoreIncomeModeChoiceChart avgDScoreIncomeChartData = new DgAvgDeltaScoreIncomeModeChoiceChart(ana);
 //			DgChartWriter.writerChartToFile(avgDeltaScoreIncomeGroupChartModeSwitchFile, avgDScoreIncomeChartData.createChart());
 			
-			DgMixedDeltaScoreIncomeChart mixedDsIncomeChart = new DgMixedDeltaScoreIncomeChart();
+			DgMixedDeltaScoreIncomeModeChoiceChart mixedDsIncomeChart = new DgMixedDeltaScoreIncomeModeChoiceChart();
 			mixedDsIncomeChart.addIncomeModeChoiceDataSet(modeChoiceIncomeChart.createDeltaScoreIncomeModeChoiceDataset());
 			mixedDsIncomeChart.addAvgDeltaScoreIncomeDs(avgDScoreIncomeChartData.getDatasets());
 //			DgChartFrame frame = new DgChartFrame("test", mixedDsIncomeChart.createChart());

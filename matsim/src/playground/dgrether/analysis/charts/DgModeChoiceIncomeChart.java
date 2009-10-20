@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis.population;
+package playground.dgrether.analysis.charts;
 
 import java.awt.Font;
 
@@ -33,6 +33,9 @@ import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.matsim.api.basic.v01.Id;
 
+import playground.dgrether.analysis.population.DgAnalysisPopulation;
+import playground.dgrether.analysis.population.DgIncomeClass;
+import playground.dgrether.analysis.population.DgPersonData;
 import playground.dgrether.utils.charts.DgColorScheme;
 
 
@@ -47,8 +50,8 @@ public class DgModeChoiceIncomeChart {
 	
 	private DefaultCategoryDataset dataset;
 	
-	private String xLabel = "Income [CHF / Year]]";
-	private String yLabel = "% of drivers";
+	private String xLabel = "Income [CHF / Year] up to...";
+	private String yLabel = "% of travellers";
 
 	private Id runId; 
 	
@@ -92,7 +95,7 @@ public class DgModeChoiceIncomeChart {
 		for (int i = 0; i < groups.length; i++) {
 //			groupDescriptions[i] = incomeThresholds[i].getTitle();
 			String title = Double.toString(incomeThresholds[i].getMax());
-			title = title.substring(0, (title.indexOf(".") + 3));
+			title = title.substring(0, (title.indexOf(".") /*+ 3*/));
 			groupDescriptions[i] = title;
 			xvalues[i] = i;
 			groupSize = groups[i].getPersonData().size();

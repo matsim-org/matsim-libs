@@ -59,7 +59,7 @@ public class DgPopulationAnalysisReader {
 		sc.getConfig().network().setInputFile(networkPath);
 		sl.loadNetwork();
 		// load first plans file
-		population = loadPlansFile(firstPlanPath, sc.getNetwork());
+		population = loadPopulationFile(firstPlanPath, sc.getNetwork());
 		new PlanCalcType().run(population);
 		
 		analysisPopulation = new DgAnalysisPopulation();
@@ -82,7 +82,7 @@ public class DgPopulationAnalysisReader {
 		population = null;
 		System.gc();
 		// load second population
-		population = loadPlansFile(secondPlanPath, sc.getNetwork());
+		population = loadPopulationFile(secondPlanPath, sc.getNetwork());
 		new PlanCalcType().run(population);
 		for (Id id : population.getPersons().keySet()) {
 			plan = population.getPersons().get(id).getSelectedPlan();
@@ -102,7 +102,7 @@ public class DgPopulationAnalysisReader {
    *          the path to the filename
    * @return the Plans object containing the population
    */
-	protected PopulationImpl loadPlansFile(final String filename, NetworkLayer network) {
+	protected PopulationImpl loadPopulationFile(final String filename, NetworkLayer network) {
 		PopulationImpl plans = new PopulationImpl();
 
 		log.info("  reading plans xml file... ");

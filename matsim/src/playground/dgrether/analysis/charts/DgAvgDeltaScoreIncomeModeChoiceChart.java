@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis.population;
+package playground.dgrether.analysis.charts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +34,17 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.dgrether.analysis.population.DgAnalysisPopulation;
+import playground.dgrether.analysis.population.DgIncomeClass;
+import playground.dgrether.analysis.population.DgModeSwitchPlanTypeAnalyzer;
+import playground.dgrether.analysis.population.DgPersonData;
+import playground.dgrether.analysis.population.DgPlanData;
 
 
-public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
+
+public class DgAvgDeltaScoreIncomeModeChoiceChart {
 	
-	private static final Logger log = Logger.getLogger(DgAvgDeltaScoreIncomeGroupModeSwitchChart.class);
+	private static final Logger log = Logger.getLogger(DgAvgDeltaScoreIncomeModeChoiceChart.class);
 	
 	private DgAnalysisPopulation ana;
 	
@@ -48,7 +54,7 @@ public class DgAvgDeltaScoreIncomeGroupModeSwitchChart {
 	
 	private List<XYSeriesCollection> datasets;
 	
-	public DgAvgDeltaScoreIncomeGroupModeSwitchChart(DgAnalysisPopulation ana) {
+	public DgAvgDeltaScoreIncomeModeChoiceChart(DgAnalysisPopulation ana) {
 		this.ana = ana;
 		this.ana.calculateMinMaxIncome();
 		this.datasets = this.createDatasets();

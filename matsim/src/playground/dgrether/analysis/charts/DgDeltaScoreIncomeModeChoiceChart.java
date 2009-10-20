@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis.population;
+package playground.dgrether.analysis.charts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +32,10 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.core.population.PlanImpl.Type;
 import org.matsim.core.utils.collections.Tuple;
+
+import playground.dgrether.analysis.population.DgAnalysisPopulation;
+import playground.dgrether.analysis.population.DgPersonData;
+import playground.dgrether.analysis.population.DgPlanData;
 
 
 

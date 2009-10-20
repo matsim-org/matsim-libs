@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis;
+package playground.dgrether.analysis.charts;
 
 import java.awt.BasicStroke;
 import java.util.List;
@@ -37,7 +37,7 @@ import playground.dgrether.utils.charts.DgColorScheme;
  * @author dgrether
  *
  */
-public class DgMixedDeltaScoreIncomeChart {
+public class DgMixedDeltaScoreIncomeModeChoiceChart {
 
 	private List<XYSeriesCollection> avgDeltaScoreIncomeDs;
 	private XYSeriesCollection inomeModeChoiceDs;
