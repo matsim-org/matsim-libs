@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.jfree.chart.ChartColor;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
@@ -41,6 +41,8 @@ public class DgMixedDeltaScoreIncomeModeChoiceChart {
 
 	private List<XYSeriesCollection> avgDeltaScoreIncomeDs;
 	private XYSeriesCollection inomeModeChoiceDs;
+	
+	private DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();
 
 	public void addAvgDeltaScoreIncomeDs(List<XYSeriesCollection> datasets) {
 		this.avgDeltaScoreIncomeDs = datasets;
@@ -52,8 +54,10 @@ public class DgMixedDeltaScoreIncomeModeChoiceChart {
 
 	public JFreeChart createChart() {
 		XYPlot plot = new XYPlot();
-		plot.setDomainAxis(new NumberAxis("Income [Chf / Year]"));
-		plot.setRangeAxis(new NumberAxis("Delta utils [Utils]"));
+		ValueAxis xAxis = this.axisBuilder.createValueAxis("Income [Chf / Year]");
+		ValueAxis yAxis = this.axisBuilder.createValueAxis("Delta utils [Utils]");
+		plot.setDomainAxis(xAxis);
+		plot.setRangeAxis(yAxis);
 		
 		DgColorScheme colorScheme = new DgColorScheme();
 		

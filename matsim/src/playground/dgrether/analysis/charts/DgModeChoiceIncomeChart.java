@@ -19,14 +19,11 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.charts;
 
-import java.awt.Font;
-
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartColor;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
-import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
@@ -54,6 +51,8 @@ public class DgModeChoiceIncomeChart {
 	private String yLabel = "% of travellers";
 
 	private Id runId; 
+	
+	private DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();
 	
 	public DgModeChoiceIncomeChart(DgAnalysisPopulation ana, Id runid) {
 		this.ana = ana;
@@ -109,19 +108,10 @@ public class DgModeChoiceIncomeChart {
 	}
 
 	public JFreeChart createChart() {
-		CategoryAxis categoryAxis = new CategoryAxis(xLabel);
-		categoryAxis.setCategoryMargin(0.05); // percentage of space between categories
-		categoryAxis.setLowerMargin(0.01); // percentage of space before first bar
-		categoryAxis.setUpperMargin(0.01); // percentage of space after last bar
+		CategoryAxis categoryAxis = this.axisBuilder.createCategoryAxis(xLabel);
 		categoryAxis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
-		Font labelFont = new Font("Helvetica", Font.BOLD, 14);
-		Font axisFont = new Font("Helvetica", Font.BOLD, 12);
-		categoryAxis.setLabelFont(labelFont);
-		categoryAxis.setTickLabelFont(axisFont);
-		ValueAxis valueAxis = new NumberAxis(yLabel);
+		ValueAxis valueAxis = this.axisBuilder.createValueAxis(yLabel);
 		valueAxis.setRange(0.0, 100.0);
-		valueAxis.setLabelFont(labelFont);
-		valueAxis.setTickLabelFont(axisFont);
 		
 		DgColorScheme colorScheme = new DgColorScheme();
 
@@ -138,7 +128,7 @@ public class DgModeChoiceIncomeChart {
 		
 		JFreeChart chart = new JFreeChart("", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 		chart.setBackgroundPaint(ChartColor.WHITE);
-		chart.getLegend().setItemFont(labelFont);
+		chart.getLegend().setItemFont(this.axisBuilder.getAxisFont());
 		return chart;
 	}
 	
