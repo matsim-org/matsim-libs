@@ -24,9 +24,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
 /**
  * This Class provides a data object to compare to iterations. 
  * @author dgrether
@@ -42,6 +45,7 @@ public class DgAnalysisPopulation {
 	private double minIncome = Double.POSITIVE_INFINITY;
 	private double maxIncome = Double.NEGATIVE_INFINITY;
 
+	private Tuple<Coord, Coord> boundingBox = null;
 	
 	private Map<Id, DgPersonData> table;
 	/**
@@ -79,6 +83,40 @@ public class DgAnalysisPopulation {
 		}
 	}
 
+	private void calculateBoundingBox(){
+		Coord minNW = new CoordImpl(Double.MAX_VALUE, Double.MAX_VALUE);
+		Coord maxSE = new CoordImpl(Double.MIN_VALUE, Double.MIN_VALUE);
+		for (DgPersonData pers : this.getPersonData().values()){
+			Coord current = pers.getFirstActivity().getCoord();
+			if (current == null) {
+				throw new IllegalStateException("Person id " + pers.getPersonId() + " has no coord for home activity!");
+			}
+			if (current.getX() < minNW.getX()){
+				minNW.setX(current.getX());
+			}
+			if (current.getY() < minNW.getY()){
+				minNW.setY(current.getY());
+			}
+			if (current.getX() > maxSE.getX()){
+				maxSE.setX(current.getX());
+			}
+			if (current.getY() > maxSE.getY()){
+				maxSE.setY(current.getY());
+			}
+		}
+		this.boundingBox = new Tuple<Coord, Coord>(minNW, maxSE);
+	}
+	
+	/**
+	 * first entry of Tuple is min north west coord, second max south east
+	 */
+	public Tuple<Coord, Coord> getBoundingBox(){
+		if (this.boundingBox == null) {
+			this.calculateBoundingBox();
+		}
+		return this.boundingBox;
+	}
+	
 	
 	public double getMinIncome() {
 		return minIncome;
@@ -87,6 +125,8 @@ public class DgAnalysisPopulation {
 	public double getMaxIncome() {
 		return maxIncome;
 	}
+	
+	
 	
 	
 }

@@ -44,7 +44,7 @@ public class DgPopulationAnalysisReader {
 	
 	/**
    * Creates the object and computes the resulting comparison
-   *
+   *setActivity
    * @param firstPlanPath
    * @param secondPlanPath
    * @param outpath
@@ -70,7 +70,7 @@ public class DgPopulationAnalysisReader {
 			act = plan.getFirstActivity();
 			
 			DgPersonData personData = new DgPersonData();
-			personData.setActivity(act);
+			personData.setFirstActivity(act);
 			DgPlanData pd = new DgPlanData();
 			pd.setScore(plan.getScore());
 			pd.setPlan(plan);

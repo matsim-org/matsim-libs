@@ -29,11 +29,11 @@ public class DgPersonData {
 	 * 
 	 * @return the home location
 	 */
-	public ActivityImpl getActivity() {
+	public ActivityImpl getFirstActivity() {
 		return homeActivity;
 	}
 	
-	public void setActivity(ActivityImpl a) {
+	public void setFirstActivity(ActivityImpl a) {
 		this.homeActivity = a;
 	}
 

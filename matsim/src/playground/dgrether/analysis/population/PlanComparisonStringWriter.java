@@ -64,7 +64,7 @@ public class PlanComparisonStringWriter {
 			score1 = pd.getPlanData().get(DgAnalysisPopulation.RUNID1).getScore();
 			score2 = pd.getPlanData().get(DgAnalysisPopulation.RUNID2).getScore();
 			if ( !Double.isNaN(score1) && !Double.isNaN(score2) ) {
-				coordinates = pd.getActivity().getCoord();
+				coordinates = pd.getFirstActivity().getCoord();
 				_buffer.append(pd.getPersonId().toString());
 				_buffer.append("\t");
 				if ((coordinates != null) && !Double.isNaN(coordinates.getX()))
