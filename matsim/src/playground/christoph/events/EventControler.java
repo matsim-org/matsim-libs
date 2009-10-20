@@ -194,16 +194,16 @@ public class EventControler extends Controler {
 
 		// BasicReplanners (Random, Tabu, Compass, ...)
 		// each replanner can handle an arbitrary number of persons
-		KnowledgePlansCalcRoute randomRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomRoute()));
+		KnowledgePlansCalcRoute randomRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomRoute(this.network)));
 		replanners.add(randomRouter);
 
-		KnowledgePlansCalcRoute tabuRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomRoute()));
+		KnowledgePlansCalcRoute tabuRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new TabuRoute(this.network)));
 		replanners.add(tabuRouter);
 
-		KnowledgePlansCalcRoute compassRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomRoute()));
+		KnowledgePlansCalcRoute compassRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new CompassRoute(this.network)));
 		replanners.add(compassRouter);
 
-		KnowledgePlansCalcRoute randomCompassRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomRoute()));
+		KnowledgePlansCalcRoute randomCompassRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomCompassRoute(this.network)));
 		replanners.add(randomCompassRouter);
 
 		// Dijkstra for Replanning

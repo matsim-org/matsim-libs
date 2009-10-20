@@ -39,6 +39,7 @@ public class SimpleRouterFactory implements LeastCostPathCalculatorFactory{
 				Method method;
 				method = calculator.getClass().getMethod("clone", new Class[]{});
 				calculatorClone = calculator.getClass().cast(method.invoke(calculator, new Object[]{}));
+				return calculatorClone;
 			}
 			catch (Exception e)
 			{
@@ -51,8 +52,10 @@ public class SimpleRouterFactory implements LeastCostPathCalculatorFactory{
 		 */
 		if (calculatorClone == null)
 		{
-			try {
+			try
+			{
 				calculatorClone = this.calculator.getClass().newInstance();
+				return calculatorClone;
 			} 
 			catch (Exception e) 
 			{
@@ -66,8 +69,8 @@ public class SimpleRouterFactory implements LeastCostPathCalculatorFactory{
 		if (calculatorClone == null)
 		{
 			calculatorClone = calculator;
-			log.warn("Could not clone the Least Cost Path Calculator - use reference to the existing Calculator and hope the best...");
-		}		
+			log.warn("Could not clone the Least Cost Path Calculator - use reference to the existing Calculator and hope the best...");		
+		}
 		return calculator;
 	}
 

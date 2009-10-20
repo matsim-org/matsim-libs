@@ -120,4 +120,13 @@ public class SubLink implements Link{
 		return parentLink.getCoord();
 	}
 	
+	@Override
+	public boolean equals(final Object other) 
+	{
+		if (other instanceof Link)
+		{
+			return this.getId().equals(((Link)other).getId());
+		}
+		return false;
+	}
 }

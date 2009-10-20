@@ -31,7 +31,7 @@ public class LoopRemover {
 	 * Removes loops within a route. This is done by searching duplicated 
 	 * nodes / links and removing the route between them.
 	 */
-	public static void removeLoops(Path path)
+	public void removeLoops(Path path)
 	{
 		/*
 		 * Compare nodes and not links. 

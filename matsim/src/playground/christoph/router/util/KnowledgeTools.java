@@ -26,16 +26,22 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
+import playground.christoph.network.SubNetwork;
+import playground.christoph.network.util.SubNetworkCreator;
 
 public class KnowledgeTools {
 
 	private final static Logger log = Logger.getLogger(KnowledgeTools.class);
 
-	public KnowledgeTools() {
+	private int warnCounter = 0;
+	
+	public KnowledgeTools() 
+	{
 	}
 
 	/*
@@ -50,15 +56,18 @@ public class KnowledgeTools {
 		{
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 
-			if (customAttributes.containsKey("NodeKnowledge"))
+			NodeKnowledge nodeKnowledge;
+			if ((nodeKnowledge = getNodeKnowledge(customAttributes)) != null)
 			{
-				NodeKnowledge nodeKnowledge = (NodeKnowledge) customAttributes.get("NodeKnowledge");
-
-				knownNodesMap = nodeKnowledge.getKnownNodes();
-			} 
+				knownNodesMap = nodeKnowledge.getKnownNodes();	
+			}
 			else 
 			{
-				log.error("NodeKnowledge Object was not found in Person's Custom Attributes!");
+				if (warnCounter < 10)
+				{
+					log.warn("NodeKnowledge Object was not found in Person's Custom Attributes!");
+					warnCounter++;
+				}
 			}
 		} else
 		{
@@ -67,7 +76,7 @@ public class KnowledgeTools {
 
 		return knownNodesMap;
 	}
-
+	
 	/*
 	 * Returns a Map of Nodes, if the Person has Knowledge about known Nodes.
 	 */
@@ -80,13 +89,16 @@ public class KnowledgeTools {
 		{
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 
-			if (customAttributes.containsKey("NodeKnowledge")) 
+			if ((nodeKnowledge = getNodeKnowledge(customAttributes)) != null)
 			{
-				nodeKnowledge = (NodeKnowledge) customAttributes.get("NodeKnowledge");
-			} 
+			}
 			else 
 			{
-				log.error("NodeKnowledge Object was not found in Person's Custom Attributes!");
+				if (warnCounter < 10)
+				{
+					log.warn("NodeKnowledge Object was not found in Person's Custom Attributes!");
+					warnCounter++;
+				}
 			}
 		} else {
 			log.error("person = null!");
@@ -129,29 +141,12 @@ public class KnowledgeTools {
 	}
 
 	/*
-	 * Returns true, if the Start- and Endnode of the Link are included in the
-	 * Map. Returns true, if no known nodes are stored in the current Person.
-	 */
-	// public static boolean knowsLink(Link link, ArrayList<Node> knownNodes)
-	// public static boolean knowsLink(Link link, Map<Id, Node> knownNodesMap)
-	/*
-	 * public static boolean knowsLink(Link link, NodeKnowledge nodeKnowledge) {
-	 * // if no Map found or the Map is empty -> Person knows the entire
-	 * network, return true if ( nodeKnowledge == null ) return true; //if (
-	 * nodeKnowledge.size() == 0) return true;
-	 * 
-	 * //if ( nodeKnowledge.containsKey(link.getFromNode().getId()) &&
-	 * nodeKnowledge.containsKey(link.getToNode().getId()) ) return true; if (
-	 * nodeKnowledge.knowsNode(link.getFromNode()) &&
-	 * nodeKnowledge.knowsNode(link.getToNode()) ) return true; else return
-	 * false; }
-	 */
-	/*
 	 * To save memory, some routers may want to remove a Person's Knowledge
 	 * after doing their routing. An Example would be a Random Router that does
 	 * only an initial planning before starting the mobsim.
 	 */
-	public void removeKnowledge(Person person) {
+	public void removeKnowledge(Person person) 
+	{
 //		Map<Id, NodeImpl> knownNodesMap = null;
 
 		// Try getting knowledge from the current Person.
@@ -159,18 +154,89 @@ public class KnowledgeTools {
 		{
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 
-			if (customAttributes.containsKey("NodeKnowledge")) 
+			NodeKnowledge nodeKnowledge;
+			if ((nodeKnowledge = getNodeKnowledge(customAttributes)) != null)
 			{
-				NodeKnowledge nodeKnowledge = (NodeKnowledge) customAttributes.get("NodeKnowledge");
-
 				nodeKnowledge.clearKnowledge();
 				// knownNodesMap = nodeKnowledge.getKnownNodes();
 				// knownNodesMap.clear();
-			} 
+			}
 			else 
 			{
-				log.error("NodeKnowledge Object was not found in Person's Custom Attributes!");
+				if (warnCounter < 10)
+				{
+					log.warn("NodeKnowledge Object was not found in Person's Custom Attributes!");
+					warnCounter++;
+				}
 			}
+		} 
+		else 
+		{
+			log.error("person = null!");
+		}
+	}
+	
+	private NodeKnowledge getNodeKnowledge(Map<String, Object> customAttributes)
+	{
+		if (customAttributes.containsKey("NodeKnowledge"))
+		{
+			NodeKnowledge nodeKnowledge = (NodeKnowledge) customAttributes.get("NodeKnowledge");
+
+			return nodeKnowledge;
+		} 
+		else return null;
+	}
+	
+	public Network getSubNetwork(Person person, Network network)
+	{
+		if (person != null)
+		{
+			Map<String, Object> customAttributes = person.getCustomAttributes();
+			
+			SubNetwork subNetwork;
+			
+			// if there is already a SubNetwork in the Person's Attributes
+			subNetwork = (SubNetwork) customAttributes.get("SubNetwork");
+			if (subNetwork != null) return subNetwork;
+			
+			// ... else
+			NodeKnowledge nodeKnowledge;
+			if ((nodeKnowledge = getNodeKnowledge(customAttributes)) != null)
+			{
+				if (nodeKnowledge.getKnownNodes() != null)
+				{
+					SubNetworkCreator snc = new SubNetworkCreator(network);
+					subNetwork = snc.createSubNetwork(nodeKnowledge);
+					customAttributes.put("SubNetwork", subNetwork);
+					return subNetwork;
+				}				
+			}
+			else 
+			{
+				if (warnCounter < 10)
+				{
+					log.warn("NodeKnowledge Object was not found in Person's Custom Attributes!");
+					warnCounter++;
+				};
+			}
+		}
+		
+		return network;
+	}
+	
+	/*
+	 * To save memory, some routers may want to remove a Person's SubNetwork
+	 * after doing their routing. An Example would be a Random Router that does
+	 * only an initial planning before starting the mobsim.
+	 */
+	public void removeSubNetwork(Person person) 
+	{
+		// Try getting knowledge from the current Person.
+		if (person != null) 
+		{
+			Map<String, Object> customAttributes = person.getCustomAttributes();
+
+			customAttributes.remove("SubNetwork");
 		} 
 		else 
 		{

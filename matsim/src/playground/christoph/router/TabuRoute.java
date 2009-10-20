@@ -21,20 +21,18 @@
 package playground.christoph.router;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.gbl.MatsimRandom;
 
-import playground.christoph.router.util.KnowledgeTools;
-import playground.christoph.router.util.LoopRemover;
-import playground.christoph.router.util.PersonLeastCostPathCalculator;
-import playground.christoph.router.util.TabuSelector;
+import playground.christoph.network.SubLink;
+import playground.christoph.network.SubNetwork;
+import playground.christoph.network.SubNode;
+import playground.christoph.router.util.SimpleRouter;
 
-public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneable{
+public class TabuRoute extends SimpleRouter implements Cloneable{
 
 	protected static int errorCounter = 0;
 	
@@ -42,18 +40,10 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 
 	protected boolean removeLoops = false;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
-	protected KnowledgeTools knowledgeTools;
-	 
-	/**
-	 * Default constructor.
-	 *
-	 * @param random
-	 * 			  Random number generator. Needed to create reproducible results.           
-	 *            
-	 */
-	public TabuRoute() 
+	
+	public TabuRoute(Network network) 
 	{
-		this.knowledgeTools = new KnowledgeTools();
+		super(network);
 	}
 
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
@@ -61,7 +51,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 		return findRoute(fromNode, toNode);
 	}
 	
-	protected Path findRoute(Node fromNode, Node toNode)
+	private Path findRoute(Node fromNode, Node toNode)
 	{
 		Node currentNode = fromNode;
 		Link currentLink;
@@ -69,13 +59,24 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
-		Map<Id, Node> knownNodesMap = null;
-		
-		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = knowledgeTools.getKnownNodes(this.person);
 		
 		nodes.add(fromNode);
 	
+		Network nw = knowledgeTools.getSubNetwork(this.person, this.network);
+		
+		boolean useKnowledge = false;
+		if (nw instanceof SubNetwork)
+		{
+			SubNetwork subNetwork = (SubNetwork) nw;
+			
+			/*
+			 * Replace the CurrentNode with its child in the SubNetwork 
+			 */
+			currentNode = subNetwork.getNodes().get(currentNode.getId());
+						
+			useKnowledge = true;
+		}
+		
 		// first loop -> there is no previous node
 		Node previousNode = null;
 		
@@ -90,9 +91,6 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 			}
 			
 			Link[] linksArray = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
-
-			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
-			linksArray = knowledgeTools.getKnownLinks(linksArray, knownNodesMap);
 			
 			/*
 			 * If there are no Links available something may be wrong.
@@ -104,10 +102,10 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 			}
 			
 			// get Links, that do not return to the previous Node
-			Link[] newLinks = TabuSelector.getLinks(linksArray, previousNode);
+			Link[] newLinks = tabuSelector.getLinks(linksArray, previousNode);
 			
 			// choose link
-			int nextLink = MatsimRandom.getRandom().nextInt(newLinks.length);
+			int nextLink = random.nextInt(newLinks.length);
 			
 			// make the chosen link to the new current link
 			if(newLinks[nextLink] instanceof Link)
@@ -122,17 +120,22 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 				log.error("Return object was not from type Link! Class " + linksArray[nextLink] + " was returned!");
 				break;
 			}
-			nodes.add(currentNode);
-			links.add(currentLink);
+			
+			if (useKnowledge)
+			{
+				nodes.add(((SubNode)currentNode).getParentNode());
+				links.add(((SubLink)currentLink).getParentLink());
+			}
+			else
+			{
+				nodes.add(currentNode);
+				links.add(currentLink);
+			}
 		}	// while(!currentNode.equals(toNode))
 
 		Path path = new Path(nodes, links, 0, 0);
-/*
-		CarRoute route = new NodeCarRoute();
-		route.setNodes(nodes);
-		Path path = new Path(nodes, route.getLinks(), 0, 0); // TODO [MR] make collecting the links more efficient
-*/		
-		if (removeLoops) LoopRemover.removeLoops(path);
+	
+		if (removeLoops) loopRemover.removeLoops(path);
 				
 		return path;
 	}
@@ -150,7 +153,7 @@ public class TabuRoute extends PersonLeastCostPathCalculator implements Cloneabl
 	@Override
 	public TabuRoute clone()
 	{
-		TabuRoute clone = new TabuRoute();
+		TabuRoute clone = new TabuRoute(this.network);
 		clone.removeLoops = this.removeLoops;
 		clone.maxLinks = this.maxLinks;
 		

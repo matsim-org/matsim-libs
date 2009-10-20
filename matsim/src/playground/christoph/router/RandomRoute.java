@@ -21,19 +21,18 @@
 package playground.christoph.router;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.gbl.MatsimRandom;
 
-import playground.christoph.router.util.KnowledgeTools;
-import playground.christoph.router.util.LoopRemover;
-import playground.christoph.router.util.PersonLeastCostPathCalculator;
+import playground.christoph.network.SubLink;
+import playground.christoph.network.SubNetwork;
+import playground.christoph.network.SubNode;
+import playground.christoph.router.util.SimpleRouter;
 
-public class RandomRoute extends PersonLeastCostPathCalculator{
+public class RandomRoute extends SimpleRouter implements Cloneable{
 
 	private final static Logger log = Logger.getLogger(RandomRoute.class);
 	
@@ -41,18 +40,10 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 	
 	protected boolean removeLoops = false;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
-	protected KnowledgeTools knowledgeTools;
 	
-	/**
-	 * Default constructor.
-	 *
-	 * @param random
-	 * 			  Random number generator. Needed to create reproducible results.           
-	 *            
-	 */
-	public RandomRoute() 
+	public RandomRoute(Network network) 
 	{
-		this.knowledgeTools = new KnowledgeTools();
+		super(network);
 	}
 	
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
@@ -60,7 +51,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 		return findRoute(fromNode, toNode);
 	}
 	
-	protected Path findRoute(Node fromNode, Node toNode)
+	private Path findRoute(Node fromNode, Node toNode)
 	{
 		Node currentNode = fromNode;
 		Link currentLink;
@@ -68,13 +59,28 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
-		Map<Id, Node> knownNodesMap = null;
-		
-		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = knowledgeTools.getKnownNodes(this.person);
 		 
 		nodes.add(fromNode);
 		
+		Network nw = knowledgeTools.getSubNetwork(this.person, this.network);
+		
+		boolean useKnowledge = false;
+		if (nw instanceof SubNetwork)
+		{
+			SubNetwork subNetwork = (SubNetwork) nw;
+
+			/*
+			 * Replace the CurrentNode with its child in the SubNetwork 
+			 */
+			currentNode = subNetwork.getNodes().get(currentNode.getId());
+			
+			useKnowledge = true;
+		}
+		
+		/*
+		 * equals checks if the Ids are identically, what they are, even if the
+		 * CurrentNode comes from a SubNetwork.
+		 */
 		while(!currentNode.equals(toNode))
 		{
 			// stop searching if to many links in the generated Route...
@@ -86,9 +92,6 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 			}
 			
 			Link[] linksArray = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
-		
-			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
-			linksArray = knowledgeTools.getKnownLinks(linksArray, knownNodesMap);
 
 			if (linksArray.length == 0)
 			{
@@ -97,7 +100,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 			}
 			
 			// choose node
-			int nextLink = MatsimRandom.getRandom().nextInt(linksArray.length);
+			int nextLink = random.nextInt(linksArray.length);
 			
 			// make the chosen link to the new current link
 			if(linksArray[nextLink] instanceof Link)
@@ -111,17 +114,22 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 				log.error("Return object was not from type Link! Class " + linksArray[nextLink] + " was returned!");
 				break;
 			}
-			nodes.add(currentNode);
-			links.add(currentLink);
+			
+			if (useKnowledge)
+			{
+				nodes.add(((SubNode)currentNode).getParentNode());
+				links.add(((SubLink)currentLink).getParentLink());
+			}
+			else
+			{
+				nodes.add(currentNode);
+				links.add(currentLink);
+			}
 		}	// while(!currentNode.equals(toNode))
-		
+
 		Path path = new Path(nodes, links, 0, 0);
-/*		
-		CarRoute route = new NodeCarRoute();
-		route.setNodes(nodes);
-		Path path = new Path(nodes, route.getLinks(), 0, 0); // TODO [MR] make collecting the links more efficient
-*/	
-		if (removeLoops) LoopRemover.removeLoops(path);
+		
+		if (removeLoops) loopRemover.removeLoops(path);
 				
 		return path;
 	}
@@ -139,7 +147,7 @@ public class RandomRoute extends PersonLeastCostPathCalculator{
 	@Override
 	public RandomRoute clone()
 	{
-		RandomRoute clone = new RandomRoute();
+		RandomRoute clone = new RandomRoute(this.network);
 		clone.removeLoops = this.removeLoops;
 		clone.maxLinks = this.maxLinks;
 		

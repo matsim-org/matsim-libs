@@ -27,8 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
-
-
 /*
  * Returns those outgoing links from a Node, which don't return directly to a given previous node.
  * If all links return to the previous node, all links are returned. 
@@ -38,7 +36,7 @@ public class TabuSelector {
 
 	private final static Logger log = Logger.getLogger(TabuSelector.class);
 	
-	public static Link[] getLinks(Link[] links, Node previousNode)
+	public Link[] getLinks(Link[] links, Node previousNode)
 	{	
 		/*
 		 * If there is no previous Node (i.e. Person is at the first Node of a Leg)

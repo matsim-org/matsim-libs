@@ -7,6 +7,7 @@ import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.network.BasicNodeImpl;
+import org.matsim.core.network.NodeImpl;
 
 public class SubNode extends BasicNodeImpl implements Node{
 
@@ -74,5 +75,15 @@ public class SubNode extends BasicNodeImpl implements Node{
 		if (equalsParent) return parentNode.getInLinks();
 		
 		return (Map<Id, Link>)super.getOutLinks();
+	}
+	
+	@Override
+	public boolean equals(final Object other) 
+	{
+		if (other instanceof Node)
+		{
+			return this.id.equals(((Node)other).getId());
+		}
+		return false;
 	}
 }

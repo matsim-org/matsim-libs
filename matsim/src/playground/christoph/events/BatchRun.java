@@ -120,7 +120,7 @@ public class BatchRun {
 				Gbl.reset();
 				
 				// only for RandomCompassRoute Batch Runs...
-				RandomCompassRoute.compassProbability = probabilityFactors[j];
+//				RandomCompassRoute.compassProbability = probabilityFactors[j];
 			
 				Config config = readConfigFile();
 				

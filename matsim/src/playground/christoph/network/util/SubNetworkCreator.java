@@ -53,7 +53,7 @@ public class SubNetworkCreator {
 		return createSubNetwork(nodeKnowledge, subNetwork);
 	}
 	
-	public synchronized SubNetwork createSubNetwork(NodeKnowledge nodeKnowledge, SubNetwork subNetwork)
+	public SubNetwork createSubNetwork(NodeKnowledge nodeKnowledge, SubNetwork subNetwork)
 	{	
 		synchronized(subNetwork)
 		{

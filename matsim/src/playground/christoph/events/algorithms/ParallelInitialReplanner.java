@@ -158,13 +158,14 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 					
 				// get the replanner or a clone if it, if it's not the first running thread
 				replanner = this.replannerArray[index][threadId];
-					
+	
 				replanner.run(person.getSelectedPlan());
 
 				// If flag is set, remove Knowledge after doing the replanning.
 				if (removeKnowledge)
 				{
 					knowledgeTools.removeKnowledge(person);
+					knowledgeTools.removeSubNetwork(person);
 				}
 				
 				numRuns++;

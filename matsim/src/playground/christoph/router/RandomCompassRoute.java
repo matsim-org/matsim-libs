@@ -21,39 +21,33 @@
 package playground.christoph.router;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.christoph.router.util.KnowledgeTools;
-import playground.christoph.router.util.LoopRemover;
-import playground.christoph.router.util.PersonLeastCostPathCalculator;
-import playground.christoph.router.util.TabuSelector;
+import playground.christoph.network.SubLink;
+import playground.christoph.network.SubNetwork;
+import playground.christoph.network.SubNode;
+import playground.christoph.router.util.SimpleRouter;
 
-public class RandomCompassRoute extends PersonLeastCostPathCalculator implements Cloneable{
+public class RandomCompassRoute extends SimpleRouter implements Cloneable{
 
 	protected static int errorCounter = 0;
 	
 	protected boolean removeLoops = false;
 	protected boolean tabuSearch = true;
-	public static double compassProbability = 0.50;	// only for the batch runs...
-	//protected double compassProbability = 0.50;
+//	public static double compassProbability = 0.50;	// only for the batch runs...
+	protected double compassProbability = 0.50;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
-	protected KnowledgeTools knowledgeTools;
 	
 	private final static Logger log = Logger.getLogger(RandomCompassRoute.class);
 	
-	/**
-	 * Default constructor.
-	 *                    
-	 */
-	public RandomCompassRoute() 
+	public RandomCompassRoute(Network network) 
 	{	
-		this.knowledgeTools = new KnowledgeTools();
+		super(network);
 	}
 	
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
@@ -61,7 +55,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 		return findRoute(fromNode, toNode);
 	}
 	
-	protected Path findRoute(Node fromNode, Node toNode)
+	private Path findRoute(Node fromNode, Node toNode)
 	{
 		Node previousNode = null;
 		Node currentNode = fromNode;
@@ -70,13 +64,24 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 		
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
-		Map<Id, Node> knownNodesMap = null;
+		
+		Network nw = knowledgeTools.getSubNetwork(this.person, this.network);
+		
+		boolean useKnowledge = false;
+		if (nw instanceof SubNetwork)
+		{
+			SubNetwork subNetwork = (SubNetwork) nw;
+			
+			/*
+			 * Replace the CurrentNode with its child in the SubNetwork 
+			 */
+			currentNode = subNetwork.getNodes().get(currentNode.getId());
+						
+			useKnowledge = true;
+		}
 		
 		nodes.add(fromNode);
 		
-		// try getting Nodes from the Persons Knowledge
-		knownNodesMap = knowledgeTools.getKnownNodes(this.person);
-
 		while(!currentNode.equals(toNode))
 		{
 			// stop searching if to many links in the generated Route...
@@ -93,12 +98,9 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 			}
 			
 			Link[] linksArray = currentNode.getOutLinks().values().toArray(new Link[currentNode.getOutLinks().size()]);
-			
-			// Removes links, if their Start- and Endnodes are not contained in the known Nodes.
-			linksArray = knowledgeTools.getKnownLinks(linksArray, knownNodesMap);
-	
+				
 			// if a route should not return to the previous node from the step before
-			if (tabuSearch) linksArray = TabuSelector.getLinks(linksArray, previousNode);
+			if (tabuSearch) linksArray = tabuSelector.getLinks(linksArray, previousNode);
 		
 			if (linksArray.length == 0)
 			{
@@ -167,22 +169,26 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 				break;
 			}
 			
-			nodes.add(currentNode);
-			links.add(currentLink);
+			if (useKnowledge)
+			{
+				nodes.add(((SubNode)currentNode).getParentNode());
+				links.add(((SubLink)currentLink).getParentLink());
+			}
+			else
+			{
+				nodes.add(currentNode);
+				links.add(currentLink);
+			}
 		}	// while(!currentNode.equals(toNode))
 
 		Path path = new Path(nodes, links, 0, 0);
-/*		
-		CarRoute route = new NodeCarRoute();
-		route.setNodes(nodes);
-		Path path = new Path(nodes, route.getLinks(), 0, 0); // TODO [MR] make collecting the links more efficient
-*/
+
 		if (maxLinks == path.links.size())
 		{
 //			log.info("LinkCount " + path.links.size() + " distance " + routeLength);
 		}
 
-		if (removeLoops) LoopRemover.removeLoops(path);
+		if (removeLoops) loopRemover.removeLoops(path);
 				
 		return path;
 	}
@@ -235,7 +241,7 @@ public class RandomCompassRoute extends PersonLeastCostPathCalculator implements
 	@Override
 	public RandomCompassRoute clone()
 	{
-		RandomCompassRoute clone = new RandomCompassRoute();
+		RandomCompassRoute clone = new RandomCompassRoute(this.network);
 		clone.compassProbability = this.compassProbability;
 		clone.maxLinks = this.maxLinks;
 		clone.removeLoops = this.removeLoops;

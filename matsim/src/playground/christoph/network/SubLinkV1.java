@@ -71,4 +71,13 @@ public class SubLinkV1 extends BasicLinkImpl implements Link{
 		return parentLink.getNumberOfLanes(time);
 	}
 	
+	@Override
+	public boolean equals(final Object other) 
+	{
+		if (other instanceof Link)
+		{
+			return this.getId().equals(((Link)other).getId());
+		}
+		return false;
+	}
 }
