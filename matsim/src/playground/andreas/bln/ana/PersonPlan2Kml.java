@@ -35,7 +35,7 @@ public class PersonPlan2Kml extends NewPopulation{
 //		String networkFilename = "./examples/equil/network.xml";
 //		String plansFilename = "./examples/equil/plans2.xml";
 		String networkFilename = "E:/oev-test/output/network.multimodal.xml";
-		String plansFilename = "D:\\_serverruns_temp\\it.30\\it.30_17204263X3.txt";
+		String plansFilename = "E:\\oev-test\\server\\oevmatsim\\output\\ITERS\\it.100\\plan_17204263X3.txt";
 		String outputDirectory = "E:\\oev-test\\GE";
 
 		ScenarioImpl s = new ScenarioImpl();
@@ -71,16 +71,8 @@ public class PersonPlan2Kml extends NewPopulation{
 		// waiting for an implementation...
 		// new WGS84toCH1903LV03();
 
-		// weitere setter
-		
-//		test.writeKnownNodes(false);
-//		test.writeRouteNodes(false);
 //		test.writeActivityLinks(false);
-//		test.writeNetwork(false);
-
-//		String outputDirectory = this.config.controler().getOutputDirectory();
-		String outputDirectory = this.outputDir;
-		test.setOutputDirectory(outputDirectory);
+		test.setOutputDirectory(this.outputDir);
 
 		test.writeFile();
 	}

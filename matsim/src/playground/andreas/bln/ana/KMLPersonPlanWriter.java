@@ -22,9 +22,7 @@ package playground.andreas.bln.ana;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
-
-import javax.xml.bind.JAXBElement;
+import java.util.Iterator;
 
 import net.opengis.kml._2.AbstractFeatureType;
 import net.opengis.kml._2.DocumentType;
@@ -32,33 +30,22 @@ import net.opengis.kml._2.FolderType;
 import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.PlacemarkType;
-import net.opengis.kml._2.PointType;
 import net.opengis.kml._2.ScreenOverlayType;
 import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.network.BasicLegImpl;
-import org.matsim.core.basic.v01.population.BasicRouteImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -67,64 +54,63 @@ import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
 
-
 public class KMLPersonPlanWriter {
 
 	private static final Logger log = Logger.getLogger(KMLPersonPlanWriter.class);
-	
-	protected String netFileName;
-	protected String kmzFileName;
-	protected String outputDirectory;
-	protected PersonImpl person;
-	protected ArrayList<Link> activityLinks;
-	protected ArrayList<Node> routeNodes;
-	protected NetworkLayer network;
-	protected Map<Id, Node> nodes;
-	protected NetworkRouteWRefs route;
-	
-	protected boolean writeKnownNodes = true;
-	protected boolean writeActivityLinks = true;
-	protected boolean writeRouteNodes = true;
-	protected boolean writeNetwork = false;
-	
+
+	private String kmzFileName;
+	private String outputDirectory;
+
+	private PersonImpl person;
+
+	private ArrayList<Link> activityLinks;
+
+	private NetworkLayer network;
+
+	private boolean writeActivityLinks = true;
+	private boolean writeFullPlan = true;
+
 	private MatsimKmlStyleFactory styleFactory;
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	private StyleType networkLinkStyle;
 	private MyFeatureFactory networkFeatureFactory;
 	private StyleType networkNodeStyle;
+
 	private CoordinateTransformation coordinateTransform = new IdentityTransformation();
-	
+
 	PlanImpl personsPlan;
-	
-	public KMLPersonPlanWriter(NetworkLayer network, PersonImpl person){
-		setNetwork(network);
-		setPerson(person);
-		getKnownNodes(); // WOFUER???
-		
+
+
+
+	public KMLPersonPlanWriter(NetworkLayer network, PersonImpl person) {
+		this.network = network;
+		this.person = person;
+
 		this.personsPlan = this.person.getSelectedPlan();
 	}
-	
-	public KMLPersonPlanWriter(){
+
+	public KMLPersonPlanWriter() {
 		// Should never be used
 	}
-	
-	public void writeFile(){
-		
+
+	public void writeFile() {
+
 		String outputFile;
-		
-		if (this.kmzFileName == null || this.kmzFileName.equals("")){
+
+		if (this.kmzFileName == null || this.kmzFileName.equals("")) {
 			outputFile = this.outputDirectory + "/" + this.person.getId() + ".kmz";
-		}else{
+		} else {
 			outputFile = this.outputDirectory + "/" + this.kmzFileName;
 		}
-		
+
 		ObjectFactory LocalkmlObjectFactory = new ObjectFactory();
-			
+
 		// create main file and document
 
 		DocumentType mainDoc = LocalkmlObjectFactory.createDocumentType();
 		mainDoc.setId("mainDoc");
-		
+		mainDoc.setOpen(Boolean.TRUE);
+
 		KmlType mainKml = LocalkmlObjectFactory.createKmlType();
 		mainKml.setAbstractFeatureGroup(LocalkmlObjectFactory.createDocument(mainDoc));
 
@@ -132,105 +118,41 @@ public class KMLPersonPlanWriter {
 		FolderType mainFolder = LocalkmlObjectFactory.createFolderType();
 		mainFolder.setId("2dnetworklinksfolder");
 		mainFolder.setName("Matsim Data");
+		mainFolder.setOpen(Boolean.TRUE);
 		mainDoc.getAbstractFeatureGroup().add(LocalkmlObjectFactory.createFolder(mainFolder));
-		
+
 		// create the writer
 		KMZWriter writer = new KMZWriter(outputFile);
-		
+
 		this.styleFactory = new MatsimKmlStyleFactory(writer, mainDoc);
 		this.networkFeatureFactory = new MyFeatureFactory(this.coordinateTransform);
-		
-		try	{
-			
-			// add the MATSim Logo to the kml
+
+		try {
+
+			// add the MATSim logo to the kml
 			ScreenOverlayType logo = MatsimKMLLogo.writeMatsimKMLLogo(writer);
 			mainFolder.getAbstractFeatureGroup().add(LocalkmlObjectFactory.createScreenOverlay(logo));
 
-			// add the Entire Network to the kml
-			if (this.writeNetwork && this.network != null){
-				KmlNetworkWriter netWriter = new KmlNetworkWriter(this.network, this.coordinateTransform, writer, mainDoc);
-				FolderType networkFolder = netWriter.getNetworkFolder();
-				mainFolder.getAbstractFeatureGroup().add(LocalkmlObjectFactory.createFolder(networkFolder));
-			}
-			
-			// add the Person's Activity Room to the kml
-//			if (writeKnownNodes)
-//			{
-//				FolderType nodesFolder = getNodesFolder();
-//				if (nodesFolder != null)
-//				{
-//					mainFolder.getAbstractFeatureGroup().add(LocalkmlObjectFactory.createFolder(nodesFolder));
-//				}				
-//			}
-			
-			// add the Person's Route to the kml
-			if (this.writeRouteNodes){
-				FolderType routeFolder = getRouteNodesFolder();
-				if (routeFolder != null){
-					mainFolder.getAbstractFeatureGroup().add(LocalkmlObjectFactory.createFolder(routeFolder));
-				}							
-			}
-			
-			// add the Person's Activity Links to the kml
-			if (writeActivityLinks)
-			{
-				FolderType activityFolder = getActivityLinksFolder();
-				if (activityFolder != null)
-				{
+			// add the person's activity links to the kml
+			if(this.writeActivityLinks){
+				createActivityLinks();
+				FolderType activityFolder = getActivityLinksFolder(this.activityLinks, "Activity Links of Person " + this.person.getId());
+				if (activityFolder != null) {
+					activityFolder.setVisibility(Boolean.FALSE);
 					mainFolder.getAbstractFeatureGroup().add(LocalkmlObjectFactory.createFolder(activityFolder));
-				}							
-			}
-			
-			{//write Activities
-			
-				for (PlanElement planElement : this.personsPlan.getPlanElements()) {
-					
-					if(planElement instanceof BasicActivity){
-						
-						ActivityImpl act = (ActivityImpl) planElement;
-						
-						AbstractFeatureType abstractFeature = this.networkFeatureFactory.createActFeature(act, this.networkNodeStyle);
-						StringBuffer stringOut = new StringBuffer();
-						stringOut.append("Act: " + act.getType());
-						stringOut.append(", Link: " + act.getLinkId());
-						stringOut.append(", X: " + act.getCoord().getX() + ", Y: " + act.getCoord().getY());
-						stringOut.append(", StartTime: " + Time.writeTime(act.getStartTime()) + ", Duration: " + Time.writeTime(act.getDuration()) + ", EndTime: " + Time.writeTime(act.getEndTime()));
-																	
-						abstractFeature.setDescription(stringOut.toString());
-						mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
-					}
-					
-					if(planElement instanceof LegImpl){
-						
-						LegImpl leg = (LegImpl) planElement;
-						
-						AbstractFeatureType abstractFeature = this.networkFeatureFactory.createLegFeature(leg, this.networkNodeStyle);
-						StringBuffer stringOut = new StringBuffer();
-						stringOut.append("Mode: " + leg.getMode());
-						stringOut.append(", DepartureTime: " + Time.writeTime(leg.getDepartureTime()) + ", TravelTime: " + Time.writeTime(leg.getTravelTime()));
-						
-						if(leg.getRoute() != null){
-							
-							if(leg.getMode() == TransportMode.pt){
-								stringOut.append(", Route: " + ((GenericRouteImpl) leg.getRoute()).getRouteDescription());								
-							} else {
-								stringOut.append(", Route: " + leg.getRoute());
-							}
-						}
-						
-//						stringOut.append(", X: " + leg.getCoord().getX() + ", Y: " + leg.getCoord().getY());
-																	
-						abstractFeature.setDescription(stringOut.toString());
-						mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
-					}
-					
 				}
-			
 			}
 			
-		} 
-		catch (IOException e) 
-		{
+			// write the person's full plan
+			if(this.writeFullPlan){
+				FolderType activityFolder = getFullPlan();
+				if (activityFolder != null) {
+					activityFolder.setOpen(Boolean.TRUE);
+					mainFolder.getAbstractFeatureGroup().add(LocalkmlObjectFactory.createFolder(activityFolder));
+				}
+			}
+
+		} catch (IOException e) {
 			Gbl.errorMsg("Cannot create kmz or logo because of: " + e.getMessage());
 			e.printStackTrace();
 		}
@@ -238,247 +160,177 @@ public class KMLPersonPlanWriter {
 		writer.close();
 		log.info("... wrote agent " + this.person.getId());
 	}
-	
-	/*
-	 * adapted from KmlNetworkWriter.getNetworkFolder()
-	 */
-	private FolderType getNodesFolder() throws IOException {
-		
-		if (nodes == null) return null;
-		
-		FolderType folder = this.kmlObjectFactory.createFolderType();
-		
-		//folder.setName("MATSIM Network: " + this.network.getName());
-		folder.setName("Activity Room of Person " + this.person.getId());
-		this.networkLinkStyle = this.styleFactory.createDefaultNetworkLinkStyle();
-		this.networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
-		
-		FolderType nodeFolder = kmlObjectFactory.createFolderType();
-		nodeFolder.setName("Activity Room");
 
-//		linkFolder.addStyle(this.networkNodeStyle);
-		for (Node node : this.nodes.values())
-		{
-			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createNodeFeature(node, this.networkNodeStyle);
-			if (abstractFeature.getClass().equals(PlacemarkType.class)) 
-			{
-				nodeFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
-			} 
-			else 
-			{
-				log.warn("Not yet implemented: Adding node KML features of type " + abstractFeature.getClass());
-			}
-			
-		}	// for (Node node : nodes.values())
-		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(nodeFolder));
-		
-		return folder;		
-	}
-	
-	/*
-	 * adapted from KmlNetworkWriter.getNetworkFolder()
-	 */
-	private FolderType getRouteNodesFolder() throws IOException {
-		
-		if (routeNodes == null) return null;
-		
-		FolderType folder = this.kmlObjectFactory.createFolderType();
-		
-		//folder.setName("MATSIM Network: " + this.network.getName());
-		folder.setName("Route of Person " + this.person.getId());
-		this.networkLinkStyle = this.styleFactory.createDefaultNetworkLinkStyle();
-		this.networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
-		
-		FolderType nodeFolder = this.kmlObjectFactory.createFolderType();
-		nodeFolder.setName("Route");
+	private FolderType getFullPlan() throws IOException {
 
-//		linkFolder.addStyle(this.networkNodeStyle);
-		for (Node node : this.routeNodes){
-			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createNodeFeature(node, this.networkNodeStyle);
-			if (abstractFeature.getClass().equals(PlacemarkType.class))	{
-				nodeFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
-			} else {
-				log.warn("Not yet implemented: Adding node KML features of type " + abstractFeature.getClass());
-			}	
-		}	// for (Node  node : route.getRoute())
-		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(nodeFolder));
-		
-		return folder;		
-	}
-	
-	/*
-	 * adapted from KmlNetworkWriter.getNetworkFolder()
-	 */
-	private FolderType getActivityLinksFolder() throws IOException {
-		
-		if (routeNodes == null) return null;
-		
-		FolderType folder = this.kmlObjectFactory.createFolderType();
-		
-		//folder.setName("MATSIM Network: " + this.network.getName());
-		folder.setName("Activity Links of Person " + this.person.getId());
 		this.networkLinkStyle = this.styleFactory.createDefaultNetworkLinkStyle();
 		this.networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
 
-		FolderType linkFolder = kmlObjectFactory.createFolderType();
-		linkFolder.setName("Activity Links");
-//		linkFolder.addStyle(this.networkLinkStyle);
-		for (Link link : activityLinks) 
-		{
-			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createLinkFeature(link, this.networkLinkStyle);
-			if (abstractFeature.getClass().equals(PlacemarkType.class)) 
-			{
+		FolderType linkFolder = this.kmlObjectFactory.createFolderType();
+		linkFolder.setName("Full Plan of " + this.person.getId());
+
+		Coord fromCoords = null;
+
+		for (Iterator iterator = this.personsPlan.getPlanElements().iterator(); iterator.hasNext();) {
+			PlanElement planElement = (PlanElement) iterator.next();
+
+			if (planElement instanceof BasicActivity) {
+
+				ActivityImpl act = (ActivityImpl) planElement;
+				fromCoords = act.getCoord();
+
+				AbstractFeatureType abstractFeature = this.networkFeatureFactory.createActFeature(act, this.networkNodeStyle);
+				StringBuffer stringOut = new StringBuffer();
+				stringOut.append("Act: " + act.getType());
+				stringOut.append(", Link: " + act.getLinkId());
+				stringOut.append(", X: " + act.getCoord().getX() + ", Y: " + act.getCoord().getY());
+				stringOut.append(", StartTime: " + Time.writeTime(act.getStartTime()) + ", Duration: " + Time.writeTime(act.getDuration()) + ", EndTime: " + Time.writeTime(act.getEndTime()));
+
+				abstractFeature.setDescription(stringOut.toString());
 				linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
-			} 
-			else 
-			{
-				log.warn("Not yet implemented: Adding node KML features of type " + abstractFeature.getClass());
 			}
-		}
-		folder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(linkFolder));
-		
-		return folder;		
-	}
-	
-	private void createRouteNodes(){
-		this.routeNodes = new ArrayList<Node>();
-		
-		if (this.person != null){
-			
-			PlanImpl selectedPlan = this.person.getSelectedPlan();
-			if (selectedPlan != null){
-				for (PlanElement planElement : selectedPlan.getPlanElements()) {
-					if (planElement instanceof BasicLeg) {
-						BasicLeg leg = (BasicLeg) planElement;
-						
-						if (leg.getRoute() instanceof NodeNetworkRouteImpl){
-							NodeNetworkRouteImpl tempRoute = (NodeNetworkRouteImpl)leg.getRoute();
-							for(Node node : tempRoute.getNodes()){
-								this.routeNodes.add(node);
-							}
-						}
-						else {
-							if(leg.getRoute() != null){
-							log.error("Unknown Route Type found!" + leg.getRoute().getClass());} else{log.error("Route == null!");}
-						}
+
+			if (planElement instanceof LegImpl) {
+
+				LegImpl leg = (LegImpl) planElement;
+
+				if (leg.getMode() == TransportMode.car) {
+
+					ArrayList<Link> tempLinkList = getLinksOfCarLeg(leg);
+
+					FolderType routeLinksFolder = this.kmlObjectFactory.createFolderType();
+					routeLinksFolder.setName(leg.getMode().toString() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + leg.getRoute().getDistance());
+
+					for (Link link : tempLinkList) {
+						AbstractFeatureType abstractFeature = this.networkFeatureFactory.createCarLinkFeature(link,	this.networkLinkStyle);
+						routeLinksFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
 					}
-				}
-								
+					linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(routeLinksFolder));
+
+				} else if (leg.getMode() == TransportMode.pt) {
+
+					if (iterator.hasNext()) {
+
+						Coord toCoords = null;
+
+						for (Iterator tempIterator = this.personsPlan.getPlanElements().iterator(); tempIterator.hasNext();) {
+							PlanElement tempPlanElement = (PlanElement) tempIterator.next();
+							if (tempPlanElement == planElement) {
+								toCoords = ((ActivityImpl) tempIterator.next()).getCoord();
+							}
+
+						}
+
+						AbstractFeatureType abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.networkLinkStyle);
+						abstractFeature.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
+						linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
+					}
+
+				}				
 			}
-			
 		}
+		return linkFolder;
 	}
-	
-	private void createActivityLinks(){
-		
+
+	private FolderType getActivityLinksFolder(ArrayList<Link> links, String description) throws IOException {
+
+		this.networkLinkStyle = this.styleFactory.createDefaultNetworkLinkStyle();
+		this.networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
+
+		FolderType linkFolder = this.kmlObjectFactory.createFolderType();
+		linkFolder.setName(description);
+
+		for (Link link : links) {
+			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createLinkFeature(link, this.networkLinkStyle);
+			linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
+		}
+
+		return linkFolder;
+	}
+
+	private void createActivityLinks() {
+
 		this.activityLinks = new ArrayList<Link>();
-		
-		if (this.person != null){
+
+		if (this.person != null) {
 			PlanImpl selectedPlan = this.person.getSelectedPlan();
-			if (selectedPlan != null){
+			if (selectedPlan != null) {
 				for (PlanElement planElement : selectedPlan.getPlanElements()) {
 					if (planElement instanceof BasicActivity) {
 						BasicActivity act = (BasicActivity) planElement;
 						this.activityLinks.add(this.network.getLink(act.getLinkId()));
 					}
 				}
-								
 			}
-			
 		}
 	}
-	
-	private void getKnownNodes(){ // TODO bad naming: method is called get*, but doesn't return anything
-	
-		if(this.person != null){
-//			Knowledge knowledge = this.person.getKnowledge();
-//		
-//			if (knowledge != null)
-//			{
-				Map<String,Object> customAttributes = this.person.getCustomAttributes();
-				
-				if (customAttributes != null){
-					if (customAttributes.containsKey("Nodes")){
-						this.nodes = (Map<Id, Node>)customAttributes.get("Nodes");
-						
-					}	// if (customAttributes.containsKey("Nodes");
-					else nodes = null;
-					
-				}	// if (customAttributes != null)
-				else nodes = null;
-				
-//			}	// if (knowledge  != null)
-//			else nodes = null;
-			
-		}	// if (this.person != null)
-		else nodes = null;
-		
-	}	// getKnownNodes()
-	
-	
-	
+
+	private ArrayList<Link> getLinksOfCarLeg(LegImpl leg) {
+
+		ArrayList<Link> links = new ArrayList<Link>();
+			if (leg.getMode() == TransportMode.car) {
+
+				if (leg.getRoute() != null) {
+					NodeNetworkRouteImpl tempRoute = (NodeNetworkRouteImpl) leg.getRoute();
+					for (Link link : tempRoute.getLinks()) {
+						links.add(link);
+					}
+				}
+
+			} else { log.error("You gave me a non car leg. Can't handle this one."); }
+		return links;
+	}
+
 	/*
 	 * Getters & Setters
 	 */
-	
-	public void writeKnownNodes(boolean value){this.writeKnownNodes = value;}
-	public void writeRouteNodes(boolean value){this.writeRouteNodes = value;}
-	public void writeActivityLinks(boolean value){this.writeActivityLinks = value;}
-	public void writeNetwork(boolean value){this.writeNetwork = value;}
-	public void setNetwork(NetworkLayer network){this.network = network;}
-	
-	public void loadNetwork(String netFileName){
-		this.network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFileName);
+
+	public void setWriteActivityLinks(boolean value) {
+		this.writeActivityLinks = value;
 	}
-	
-	public void setCoordinateTransformation(CoordinateTransformation coordinateTransform){this.coordinateTransform = coordinateTransform;}
-	public CoordinateTransformation getCoordinateTransformation(){return this.coordinateTransform;}
-	
-	public void setOutputDirectory(String directory){this.outputDirectory = directory;}
-	public String getOutputDirectory(){return this.outputDirectory;}
-	
-	public void setPerson(PersonImpl person){
-		this.person = person;
-		
-		if (person != null){
-			createRouteNodes();
-			createActivityLinks();
-		}
-		else {
-			routeNodes = null;
-			activityLinks = null;
-		}
+
+	public void setCoordinateTransformation(CoordinateTransformation coordinateTransform) {
+		this.coordinateTransform = coordinateTransform;
 	}
-	
-	public PersonImpl getPerson(){return this.person;}
-	
-	public void setKmzFileName(String name){kmzFileName = name;}
-	public String getKmzFileName(){return this.kmzFileName;}
-	
-		
 
-	public static void main(String[] args) {
-		final String netFilename = "E:\\oev-test\\output\\network.multimodal.xml";
-		final String kmzFilename = "test.kmz";
-		final String outputDirectory = "E:\\oev-test\\GE"; 
-
-		Gbl.createConfig(null);
-		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
-		new MatsimNetworkReader(network).readFile(netFilename);
-	
-		KMLPersonPlanWriter test = new KMLPersonPlanWriter();
-				
-		test.setKmzFileName(kmzFilename);
-		test.setOutputDirectory(outputDirectory);
-		test.setNetwork(network);
-
-		test.writeFile();
-		
-		log.info("Done!");
+	public CoordinateTransformation getCoordinateTransformation() {
+		return this.coordinateTransform;
 	}
-	
 
+	public void setOutputDirectory(String directory) {
+		this.outputDirectory = directory;
+	}
 
+	public String getOutputDirectory() {
+		return this.outputDirectory;
+	}
+
+	public void setKmzFileName(String name) {
+		this.kmzFileName = name;
+	}
+
+	public String getKmzFileName() {
+		return this.kmzFileName;
+	}
+
+//	public static void main(String[] args) {
+//		final String netFilename = "E:\\oev-test\\output\\network.multimodal.xml";
+//		final String kmzFilename = "test.kmz";
+//		final String outputDirectory = "E:\\oev-test\\GE";
+//
+//		Gbl.createConfig(null);
+//		NetworkLayer network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
+//		new MatsimNetworkReader(network).readFile(netFilename);
+//
+//		KMLPersonPlanWriter test = new KMLPersonPlanWriter();
+//
+//		test.setKmzFileName(kmzFilename);
+//		test.setOutputDirectory(outputDirectory);
+////		test.setNetwork(network);
+//
+//		test.writeFile();
+//
+//		log.info("Done!");
+//	}
 
 }
