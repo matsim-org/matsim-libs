@@ -70,7 +70,7 @@ public class KMLPersonPlanWriter {
 	private boolean writeActivityLinks = true;
 	private boolean writeFullPlan = true;
 
-	private MatsimKmlStyleFactory styleFactory;
+	private MyKmlStyleFactory styleFactory;
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	private StyleType networkLinkStyle;
 	private MyFeatureFactory networkFeatureFactory;
@@ -124,7 +124,7 @@ public class KMLPersonPlanWriter {
 		// create the writer
 		KMZWriter writer = new KMZWriter(outputFile);
 
-		this.styleFactory = new MatsimKmlStyleFactory(writer, mainDoc);
+		this.styleFactory = new MyKmlStyleFactory(writer, mainDoc);
 		this.networkFeatureFactory = new MyFeatureFactory(this.coordinateTransform);
 
 		try {
@@ -197,7 +197,7 @@ public class KMLPersonPlanWriter {
 					if(tempLinkList.size() != 0){
 						routeLinksFolder.setDescription("see attached route");
 						for (Link link : tempLinkList) {
-							AbstractFeatureType abstractFeature = this.networkFeatureFactory.createCarLinkFeature(link,	this.networkLinkStyle);
+							AbstractFeatureType abstractFeature = this.networkFeatureFactory.createCarLinkFeature(link,	this.styleFactory.createCarNetworkLinkStyle());
 							routeLinksFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
 						}
 					} else {
@@ -219,8 +219,26 @@ public class KMLPersonPlanWriter {
 							}
 
 						}
+						
+						AbstractFeatureType abstractFeature;
+						
+						if(((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("===R")){
+							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createDBNetworkLinkStyle());
+						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("===S")){
+							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createSBAHNNetworkLinkStyle());
+						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("---M")){
+							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createMetroBusTramNetworkLinkStyle());
+						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("---B")){
+							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createBusNetworkLinkStyle());
+						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("---T")){
+							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createTramNetworkLinkStyle());
+						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("---U")){
+							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createSubWayNetworkLinkStyle());
+						} else {
+							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createDefaultNetworkLinkStyle());
+						}
 
-						AbstractFeatureType abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.networkLinkStyle);
+						
 						abstractFeature.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
 						linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
 					}
@@ -239,7 +257,7 @@ public class KMLPersonPlanWriter {
 
 							}
 
-							AbstractFeatureType abstractFeature = this.networkFeatureFactory.createWalkLinkFeature(fromCoords, toCoords, leg, this.networkLinkStyle);
+							AbstractFeatureType abstractFeature = this.networkFeatureFactory.createWalkLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createWalkNetworkLinkStyle());
 //							abstractFeature.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
 							linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
 						}
