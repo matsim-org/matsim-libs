@@ -328,8 +328,8 @@ public class MyAdjancencyMatrixBuilder {
 				for(Cluster c : clusters){
 					outputPajek.write(String.valueOf(Integer.parseInt(c.getClusterId())+1));
 					outputPajek.write(String.format(" \"%s\" ", String.valueOf(Integer.parseInt(c.getClusterId())+1)));
-					outputPajek.write(String.format("%1.5f  ", (c.getCenterOfGravity().getX() - minX)/maxX));
-					outputPajek.write(String.format("%1.5f", (c.getCenterOfGravity().getY() - minY)/maxY));
+					outputPajek.write(String.format("%1.5f  ", (c.getCenterOfGravity().getX() - minX)/(maxX - minX)));
+					outputPajek.write(String.format("%1.5f", (c.getCenterOfGravity().getY() - minY)/(maxY - minY)));
 					outputPajek.newLine();
 				}
 				outputPajek.write("*Arcs");
