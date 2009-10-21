@@ -200,7 +200,7 @@ public class PSSControler {
 	}
 	
 	private String getIterationResultDirectory(){
-		return resultDirectory + "\\iteration" + iterationNumber;
+		return resultDirectory + "iteration" + iterationNumber;
 	}
 
 }
