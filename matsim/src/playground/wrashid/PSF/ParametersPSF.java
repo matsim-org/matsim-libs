@@ -105,14 +105,35 @@ public class ParametersPSF {
 	// if we have a dual tariff in the beginning and we start it with earliestCharging mode, then we get a peak
 	// in the evening. But this disappears totally even if we set the blur factor to 1%.
 	
+	// a value of -2.0 of mainChargingPriceBlurFactor introduces a way for changing the price information in the following say:
+	// instead of using a blur factor. The higher a price, the lower the probability of a slot to get selected
+	// the lower the price, the higher the probability of getting selected.
+	
 	private static String main_chargingPriceBlurFactor = "main.chargingPriceBlurFactor";
 	private static double mainChargingPriceBlurFactor = -1.0;
 	
-
+	
 
 	public static double getMainChargingPriceBlurFactor() {
 		return mainChargingPriceBlurFactor;
 	}
+	
+	
+	/**
+	 * This means: if price is high, then leave it high with high probability (so that it does not
+	 * get selected in most cases). But with a low probability the price can become low and that slot
+	 * might get selected. 
+	 * 
+	 * @return
+	 */
+	public static boolean useGaussianPriceDistribution(){
+		if(mainChargingPriceBlurFactor==-2.0){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 
 	// MAKE THESE PARAMETERS CONFIGURABLE, IF NEEDED
 	private static String mainHubPriceGraphFileName = null;
