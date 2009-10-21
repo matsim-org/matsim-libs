@@ -74,7 +74,6 @@ public class MultiNodeDijkstra extends Dijkstra {
 
 		// find out which one is the cheapest end node
 		double minCost = Double.POSITIVE_INFINITY;
-		double arrivalTime = Double.NaN;
 		Node minCostNode = null;
 
 		// do the real work
@@ -92,7 +91,6 @@ public class MultiNodeDijkstra extends Dijkstra {
 					InitialNode initData = toNodes.get(outNode);
 					double cost = data.getCost() + initData.initialCost;
 					if (cost < minCost) {
-						arrivalTime = data.getTime() + initData.initialTime;
 						minCost = cost;
 						minCostNode = outNode;
 					}
@@ -123,9 +121,9 @@ public class MultiNodeDijkstra extends Dijkstra {
 			nodes.add(0, tmpLink.getFromNode());
 			tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
 		}
-		double startTime = getData(nodes.get(0)).getTime();
+		DijkstraNodeData startNodeData = getData(nodes.get(0));
 		DijkstraNodeData toNodeData = getData(toNode);
-		Path path = new Path(nodes, links, arrivalTime - startTime, toNodeData.getCost());
+		Path path = new Path(nodes, links, toNodeData.getTime() - startNodeData.getTime(), toNodeData.getCost() - startNodeData.getCost());
 
 		return path;
 	}
