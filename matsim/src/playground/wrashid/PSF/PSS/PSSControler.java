@@ -31,7 +31,12 @@ public class PSSControler {
 	String outputPSSPath = "A:\\data\\PSS\\output";
 	String configFilePath;
 	ParametersPSFMutator parameterPSFMutator;
-	private int iterationNumber=0;
+	private static int iterationNumber=0;
+
+	public static int getIterationNumber() {
+		return iterationNumber;
+	}
+
 
 	public PSSControler(String configFilePath,ParametersPSFMutator parameterPSFMutator) {
 		this.configFilePath=configFilePath;

@@ -6,6 +6,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.jdeqsim.Message;
 
 import playground.wrashid.PSF.ParametersPSF;
+import playground.wrashid.PSF.PSS.PSSControler;
 import playground.wrashid.PSF.energy.charging.ChargeLog;
 import playground.wrashid.PSF.parking.ParkingInfo;
 
@@ -82,13 +83,30 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 			this.price = this.price * (1 + (MatsimRandom.getRandom().nextDouble()-1)*ParametersPSF.getMainChargingPriceBlurFactor());
 		} else if (ParametersPSF.useLinearProbabilisticScalingOfPrice()){
 			// High Price remains high with high probability and gets low with low probability
-			this.price = this.price * this.randomNumber;
+			
+			// The price is scaled between 9 and 10 Rappen (but not necessary always - e.g. initial price
+			// can be lower than that. But for the run to relax, this must be considered.
+			
+			if (PSSControler.getIterationNumber()==0){
+				// assumption: the base load is taken as input price, which ranges between 0 and 43(right value)/48 rappen.
+				this.price = this.price * this.randomNumber;
+			} else {
+				// assumption: the price is always above 9 Rappen.
+				// the actual value would loose its meaning, if would would directly multiply with the
+				// randomNumber, because the main part would be the 9 Rappen part.
+				double basePrice=0.09;
+				this.price-=basePrice;
+				this.price = this.price * this.randomNumber;
+				this.price+=basePrice;
+			}
 		} else if (ParametersPSF.useSquareRootProbabilisticScalingOfPrice()){
+			// TODO: adapt,before running this case.
 			// High Price remains high with high probability and gets low with low probability
-			this.price = this.price * Math.sqrt(this.randomNumber);
+			//this.price = this.price * Math.sqrt(this.randomNumber);
 		}else if (ParametersPSF.useQuadraticProbabilisticScalingOfPrice()){
+			// TODO: adapt,before running this case.
 			// High Price remains high with high probability and gets low with low probability
-			this.price = this.price * (this.randomNumber*this.randomNumber);
+			//this.price = this.price * (this.randomNumber*this.randomNumber);
 		}
 		
 	}
