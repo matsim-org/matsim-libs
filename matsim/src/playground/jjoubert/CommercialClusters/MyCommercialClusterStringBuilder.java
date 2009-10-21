@@ -112,6 +112,7 @@ public class MyCommercialClusterStringBuilder extends MyStringBuilder{
 		result.add(outputPrefix + "OutOrderAdjacency.txt");
 		result.add(outputPrefix + "PajekNetwork.net");
 		result.add(outputPrefix + "RNetwork.txt");
+		result.add(outputPrefix + "RNodeCoordinate.txt");
 		return result;
 	}
 	

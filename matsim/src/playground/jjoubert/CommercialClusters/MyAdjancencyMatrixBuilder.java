@@ -291,10 +291,12 @@ public class MyAdjancencyMatrixBuilder {
 	 * 		centroid coordinates can be written as attributes of the vertices.
 	 * @param pajekFilename the complete path of the <code>*.net</code> file to which
 	 * 		the <i>Pajek</i> network is written. 
-	 * @param rFilename the complete path of the <code>*.txt</code> file to which the
+	 * @param rNetworkFilename the complete path of the <code>*.txt</code> file to which the
 	 * 		<i>R</i> network is written. 
+	 * @param rNodeFilename the complete path of the <code>*.txt</code> file to which the
+	 * 		<i>R</i> node coordinates are written. 
 	 */
-	public void writeAdjacencyAsNetworkToFile(List<Cluster> clusters, String pajekFilename, String rFilename) {
+	public void writeAdjacencyAsNetworkToFile(List<Cluster> clusters, String pajekFilename, String rNetworkFilename, String rNodeFilename) {
 		log.info("Writing order adjacency as Pajek and R network files.");
 		
 		/*
@@ -319,18 +321,28 @@ public class MyAdjancencyMatrixBuilder {
 		
 		try {
 			BufferedWriter outputPajek = new BufferedWriter(new FileWriter(new File( pajekFilename)));
-			BufferedWriter outputR = new BufferedWriter(new FileWriter(new File( rFilename)));
+			BufferedWriter outputRNetwork = new BufferedWriter(new FileWriter(new File( rNetworkFilename)));
+			BufferedWriter outputRNode = new BufferedWriter(new FileWriter(new File( rNodeFilename)));
 			try{
 				outputPajek.write("*Vertices ");
 				outputPajek.write(String.valueOf(orderAdjacency.rows()));
 				outputPajek.newLine();
 				// Write the vertex name and coordinates
 				for(Cluster c : clusters){
+					// Write to Pajek file
 					outputPajek.write(String.valueOf(Integer.parseInt(c.getClusterId())+1));
 					outputPajek.write(String.format(" \"%s\" ", String.valueOf(Integer.parseInt(c.getClusterId())+1)));
 					outputPajek.write(String.format("%1.5f  ", (c.getCenterOfGravity().getX() - minX)/(maxX - minX)));
 					outputPajek.write(String.format("%1.5f", (c.getCenterOfGravity().getY() - minY)/(maxY - minY)));
 					outputPajek.newLine();
+					
+					// Write to R file
+					outputRNode.write(String.valueOf(Integer.parseInt(c.getClusterId())+1));
+					outputRNode.write(",");
+					outputRNode.write(String.valueOf(c.getCenterOfGravity().getX()));
+					outputRNode.write(",");
+					outputRNode.write(String.valueOf(c.getCenterOfGravity().getY()));
+					outputRNode.newLine();					
 				}
 				outputPajek.write("*Arcs");
 				outputPajek.newLine();
@@ -347,12 +359,12 @@ public class MyAdjancencyMatrixBuilder {
 							outputPajek.newLine();
 							
 							// Write to R file
-							outputR.write(String.valueOf(r+1));
-							outputR.write(" ");
-							outputR.write(String.valueOf(c+1));
-							outputR.write(" ");
-							outputR.write(String.valueOf((int) orderAdjacency.getQuick(r, c)));
-							outputR.newLine();
+							outputRNetwork.write(String.valueOf(r+1));
+							outputRNetwork.write(",");
+							outputRNetwork.write(String.valueOf(c+1));
+							outputRNetwork.write(",");
+							outputRNetwork.write(String.valueOf((int) orderAdjacency.getQuick(r, c)));
+							outputRNetwork.newLine();
 						}
 					}
 					if(rowMultiplier == r+1){
@@ -363,6 +375,8 @@ public class MyAdjancencyMatrixBuilder {
 				log.info("   Rows processed: " + orderAdjacency.rows() + " (Done)");
 			} finally{
 				outputPajek.close();
+				outputRNetwork.close();
+				outputRNode.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

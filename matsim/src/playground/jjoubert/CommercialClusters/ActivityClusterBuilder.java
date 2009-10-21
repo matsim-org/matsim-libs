@@ -123,7 +123,7 @@ public class ActivityClusterBuilder {
 			}
 			List<String> outputList = sb.getSnaOutputFilenameList();
 			mamb.writeAdjacenciesToFile(outputList.get(0), outputList.get(1), outputList.get(2), outputList.get(3));
-			mamb.writeAdjacencyAsNetworkToFile(djc.getClusterList(), outputList.get(4), outputList.get(5));
+			mamb.writeAdjacencyAsNetworkToFile(djc.getClusterList(), outputList.get(4), outputList.get(5), outputList.get(6));
 		} else{
 			throw new RuntimeException("The cluster list size is not positive! Can not build adjacency matrix.");
 		}
