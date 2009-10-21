@@ -60,7 +60,6 @@ public class MultiNodeDijkstra extends Dijkstra {
 
 	public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes) {
 
-		Node toNode = null;
 		Set<Node> endNodes = new HashSet<Node>(toNodes.keySet());
 		Set<Node> foundNodes = new HashSet<Node>();
 
@@ -99,7 +98,7 @@ public class MultiNodeDijkstra extends Dijkstra {
 				if (data.getCost() > minCost) {
 					endNodes.clear(); // we can't get any better now
 				} else {
-					relaxNode(outNode, toNode, pendingNodes);
+					relaxNode(outNode, null, pendingNodes);
 				}
 			}
 		}
@@ -108,7 +107,7 @@ public class MultiNodeDijkstra extends Dijkstra {
 			log.warn("No route was found");
 			return null;
 		}
-		toNode = minCostNode;
+		Node toNode = minCostNode;
 
 		// now construct the path
 		List<Node> nodes = new LinkedList<Node>();
