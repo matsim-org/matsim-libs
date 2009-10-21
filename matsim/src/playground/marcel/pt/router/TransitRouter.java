@@ -117,6 +117,19 @@ public class TransitRouter {
 			return null;
 		}
 
+		double directWalkCost = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.beelineWalkSpeed * ( 0 - this.config.marginalUtilityOfTravelTimeWalk);
+		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
+		if (directWalkCost < pathCost) {
+			List<Leg> legs = new ArrayList<Leg>();
+			Leg leg = new LegImpl(TransportMode.walk);
+			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.beelineWalkSpeed;
+			Route walkRoute = new GenericRouteImpl(null, null);
+			leg.setRoute(walkRoute);
+			leg.setTravelTime(walkTime);
+			legs.add(leg);
+			return legs;
+		}
+
 		// now convert the path back into a series of legs with correct routes
 		double time = departureTime;
 		List<Leg> legs = new ArrayList<Leg>();

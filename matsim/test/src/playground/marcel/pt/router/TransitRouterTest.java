@@ -92,10 +92,43 @@ public class TransitRouterTest extends TestCase {
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
-	public void xtestSingleLine_DifferentWaitingTime() {
+	public void testDirectWalkCheaper() {
 		Fixture f = new Fixture();
 		f.init();
-		fail("not yet implemented.");
+		TransitRouterConfig config = new TransitRouterConfig();
+		TransitRouter router = new TransitRouter(f.schedule, config);
+		Coord fromCoord = f.scenario.createCoord(4000, 3000);
+		Coord toCoord = f.scenario.createCoord(8000, 3000);
+		List<Leg> legs = router.calcRoute(fromCoord, toCoord, 5.0*3600);
+		assertEquals(1, legs.size());
+		assertEquals(TransportMode.walk, legs.get(0).getMode());
+		double actualTravelTime = 0.0;
+		for (Leg leg : legs) {
+			actualTravelTime += leg.getTravelTime();
+		}
+		double expectedTravelTime = CoordUtils.calcDistance(fromCoord, toCoord) / config.beelineWalkSpeed;
+		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
+	}
+
+	public void testSingleLine_DifferentWaitingTime() {
+		Fixture f = new Fixture();
+		f.init();
+		TransitRouterConfig config = new TransitRouterConfig();
+		TransitRouter router = new TransitRouter(f.schedule, config);
+		Coord fromCoord = f.scenario.createCoord(4000, 5002);
+		Coord toCoord = f.scenario.createCoord(8000, 5002);
+
+		double inVehicleTime = 7.0*60; // travel time from A to B
+		for (int min = 0; min < 30; min += 3) {
+			List<Leg> legs = router.calcRoute(fromCoord, toCoord, 5.0*3600 + min*60);
+			assertEquals(3, legs.size()); // walk-pt-walk
+			double actualTravelTime = 0.0;
+			for (Leg leg : legs) {
+				actualTravelTime += leg.getTravelTime();
+			}
+			double waitingTime = ((46 - min) % 20) * 60; // departures at *:06 and *:26 and *:46
+			assertEquals("expected different waiting time at 05:"+min, waitingTime, actualTravelTime - inVehicleTime, MatsimTestCase.EPSILON);
+		}
 	}
 
 	public void testLineChange() {
@@ -201,6 +234,7 @@ public class TransitRouterTest extends TestCase {
 		Fixture f = new Fixture();
 		f.init();
 		TransitRouterConfig config = new TransitRouterConfig();
+		config.beelineWalkSpeed = 0.1; // something very slow, so the agent does not walk over night
 		TransitRouter router = new TransitRouter(f.schedule, config);
 		Coord toCoord = f.scenario.createCoord(16100, 5050);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(3800, 5100), toCoord, 25.0*3600);
@@ -246,7 +280,7 @@ public class TransitRouterTest extends TestCase {
 	 */
 	public void testDoubleWalk() {
 		WalkFixture f = new WalkFixture();
-
+		f.routerConfig.marginalUtilityOfTravelTimeTransit = -1.0 / 3600.0;
 		TransitRouter router = new TransitRouter(f.schedule, f.routerConfig);
 		List<Leg> legs = router.calcRoute(f.coord1, f.coord7, 990);
 		assertEquals(5, legs.size());
@@ -361,19 +395,19 @@ public class TransitRouterTest extends TestCase {
 
 			// network
 			NetworkImpl network = this.scenario.getNetwork();
-			NodeImpl node1 = (NodeImpl) network.getFactory().createNode(this.scenario.createId("1"));
+			NodeImpl node1 = network.getFactory().createNode(this.scenario.createId("1"));
 			node1.setCoord(this.coord1);
-			NodeImpl node2 = (NodeImpl) network.getFactory().createNode(this.scenario.createId("2"));
+			NodeImpl node2 = network.getFactory().createNode(this.scenario.createId("2"));
 			node2.setCoord(this.coord2);
-			NodeImpl node3 = (NodeImpl) network.getFactory().createNode(this.scenario.createId("3"));
+			NodeImpl node3 = network.getFactory().createNode(this.scenario.createId("3"));
 			node3.setCoord(this.coord3);
-			NodeImpl node4 = (NodeImpl) network.getFactory().createNode(this.scenario.createId("4"));
+			NodeImpl node4 = network.getFactory().createNode(this.scenario.createId("4"));
 			node4.setCoord(this.coord4);
-			NodeImpl node5 = (NodeImpl) network.getFactory().createNode(this.scenario.createId("5"));
+			NodeImpl node5 = network.getFactory().createNode(this.scenario.createId("5"));
 			node5.setCoord(this.coord5);
-			NodeImpl node6 = (NodeImpl) network.getFactory().createNode(this.scenario.createId("6"));
+			NodeImpl node6 = network.getFactory().createNode(this.scenario.createId("6"));
 			node6.setCoord(this.coord6);
-			NodeImpl node7 = (NodeImpl) network.getFactory().createNode(this.scenario.createId("7"));
+			NodeImpl node7 = network.getFactory().createNode(this.scenario.createId("7"));
 			node7.setCoord(this.coord7);
 			network.getNodes().put(node1.getId(), node1);
 			network.getNodes().put(node2.getId(), node2);
@@ -382,10 +416,10 @@ public class TransitRouterTest extends TestCase {
 			network.getNodes().put(node5.getId(), node5);
 			network.getNodes().put(node6.getId(), node6);
 			network.getNodes().put(node7.getId(), node7);
-			LinkImpl link1 = (LinkImpl) network.getFactory().createLink(this.scenario.createId("1"), node1.getId(), node2.getId());
-			LinkImpl link2 = (LinkImpl) network.getFactory().createLink(this.scenario.createId("2"), node3.getId(), node4.getId());
-			LinkImpl link3 = (LinkImpl) network.getFactory().createLink(this.scenario.createId("3"), node4.getId(), node5.getId());
-			LinkImpl link4 = (LinkImpl) network.getFactory().createLink(this.scenario.createId("4"), node6.getId(), node7.getId());
+			LinkImpl link1 = network.getFactory().createLink(this.scenario.createId("1"), node1.getId(), node2.getId());
+			LinkImpl link2 = network.getFactory().createLink(this.scenario.createId("2"), node3.getId(), node4.getId());
+			LinkImpl link3 = network.getFactory().createLink(this.scenario.createId("3"), node4.getId(), node5.getId());
+			LinkImpl link4 = network.getFactory().createLink(this.scenario.createId("4"), node6.getId(), node7.getId());
 			network.getLinks().put(link1.getId(), link1);
 			network.getLinks().put(link2.getId(), link2);
 			network.getLinks().put(link3.getId(), link3);
@@ -416,7 +450,7 @@ public class TransitRouterTest extends TestCase {
 					NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(link1, link1);
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
 					stops.add(sb.createTransitRouteStop(this.stop1, 0, 0));
-					stops.add(sb.createTransitRouteStop(this.stop2, 100, 100));
+					stops.add(sb.createTransitRouteStop(this.stop2, 50, 50));
 					TransitRoute tRoute = sb.createTransitRoute(this.scenario.createId("1a"), netRoute, stops, TransportMode.bus);
 					tRoute.addDeparture(sb.createDeparture(this.scenario.createId("1a1"), 1000));
 					tLine.addRoute(tRoute);
@@ -430,8 +464,8 @@ public class TransitRouterTest extends TestCase {
 					NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(link2, link3);
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(3);
 					stops.add(sb.createTransitRouteStop(this.stop3, 0, 0));
-					stops.add(sb.createTransitRouteStop(this.stop4, 100, 100));
-					stops.add(sb.createTransitRouteStop(this.stop5, 200, 200));
+					stops.add(sb.createTransitRouteStop(this.stop4, 50, 50));
+					stops.add(sb.createTransitRouteStop(this.stop5, 100, 100));
 					TransitRoute tRoute = sb.createTransitRoute(this.scenario.createId("2a"), netRoute, stops, TransportMode.bus);
 					tRoute.addDeparture(sb.createDeparture(this.scenario.createId("2a1"), 1000));
 					tLine.addRoute(tRoute);
@@ -445,9 +479,9 @@ public class TransitRouterTest extends TestCase {
 					NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(link4, link4);
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
 					stops.add(sb.createTransitRouteStop(this.stop6, 0, 0));
-					stops.add(sb.createTransitRouteStop(this.stop7, 100, 100));
+					stops.add(sb.createTransitRouteStop(this.stop7, 50, 50));
 					TransitRoute tRoute = sb.createTransitRoute(this.scenario.createId("3a"), netRoute, stops, TransportMode.train);
-					tRoute.addDeparture(sb.createDeparture(this.scenario.createId("3a1"), 1020));
+					tRoute.addDeparture(sb.createDeparture(this.scenario.createId("3a1"), 1070));
 					tLine.addRoute(tRoute);
 				}
 				this.schedule.addTransitLine(tLine);
