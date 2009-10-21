@@ -80,8 +80,15 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 		// blur the price, if a factor is set in the config (change price in plus or minus direction)
 		if (ParametersPSF.getMainChargingPriceBlurFactor()>0){
 			this.price = this.price * (1 + (MatsimRandom.getRandom().nextDouble()-1)*ParametersPSF.getMainChargingPriceBlurFactor());
-		} else if (ParametersPSF.useGaussianPriceDistribution()){
-			this.price = this.price * MatsimRandom.getRandom().nextGaussian();
+		} else if (ParametersPSF.useLinearProbabilisticScalingOfPrice()){
+			// High Price remains high with high probability and gets low with low probability
+			this.price = this.price * this.randomNumber;
+		} else if (ParametersPSF.useSquareRootProbabilisticScalingOfPrice()){
+			// High Price remains high with high probability and gets low with low probability
+			this.price = this.price * Math.sqrt(this.randomNumber);
+		}else if (ParametersPSF.useQuadraticProbabilisticScalingOfPrice()){
+			// High Price remains high with high probability and gets low with low probability
+			this.price = this.price * (this.randomNumber*this.randomNumber);
 		}
 		
 	}
