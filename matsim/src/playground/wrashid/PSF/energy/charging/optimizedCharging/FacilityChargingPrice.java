@@ -100,9 +100,19 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 				this.price+=basePrice;
 			}
 		} else if (ParametersPSF.useSquareRootProbabilisticScalingOfPrice()){
-			// TODO: adapt,before running this case.
 			// High Price remains high with high probability and gets low with low probability
-			//this.price = this.price * Math.sqrt(this.randomNumber);
+			if (PSSControler.getIterationNumber()==0){
+				// assumption: the base load is taken as input price, which ranges between 0 and 43(right value)/48 rappen.
+				this.price = this.price * Math.sqrt(this.randomNumber);
+			} else {
+				// assumption: the price is always above 9 Rappen.
+				// the actual value would loose its meaning, if would would directly multiply with the
+				// randomNumber, because the main part would be the 9 Rappen part.
+				double basePrice=0.09;
+				this.price-=basePrice;
+				this.price = this.price * Math.sqrt(this.randomNumber);
+				this.price+=basePrice;
+			}
 		}else if (ParametersPSF.useQuadraticProbabilisticScalingOfPrice()){
 			// TODO: adapt,before running this case.
 			// High Price remains high with high probability and gets low with low probability
