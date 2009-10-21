@@ -41,8 +41,8 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 	public AbstractFeatureType createActFeature(ActivityImpl act, StyleType style) {
 
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
-		p.setName(act.getType().toString());
-
+		p.setName(act.getType().toString() + " act");
+		p.setDescription(this.createActDescription(act));
 		Coord coord = this.coordTransform.transform(act.getCoord());
 		PointType point = this.kmlObjectFactory.createPointType();
 		point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
@@ -114,25 +114,47 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		return folder;
 	}
 	
+	public AbstractFeatureType createWalkLinkFeature(final Coord from, final Coord to, LegImpl leg, StyleType networkStyle) {
+		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
+		p.setName(leg.getMode() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + leg.getRoute().getDistance());
+		
+		if(((GenericRouteImpl) leg.getRoute()).getRouteDescription().equalsIgnoreCase("")){
+			p.setDescription("sorry no route, made a beeline to the destination");
+		} else {
+			p.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
+		}		
+
+		Coord fromCoord = this.coordTransform.transform(from);
+		Coord toCoord = this.coordTransform.transform(to);
+		LineStringType line = this.kmlObjectFactory.createLineStringType();
+		line.getCoordinates().add(Double.toString(fromCoord.getX()) + "," + Double.toString(fromCoord.getY()) + ",0.0");
+		line.getCoordinates().add(Double.toString(toCoord.getX()) + "," + Double.toString(toCoord.getY()) + ",0.0");
+		p.setAbstractGeometryGroup(this.kmlObjectFactory.createLineString(line));
+		p.setStyleUrl(networkStyle.getId());
+		
+		return p;
+	}
+	
 	// TODO [AN] visibility DG
 	private String createLinkDescription(Link l) {
 		StringBuilder buffer = new StringBuilder(100);
 //		buffer.append(NetworkFeatureFactory.STARTCDATA);
-		buffer.append(NetworkFeatureFactory.STARTH2);
+		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append("Link: " );
 		buffer.append(l.getId());
-		buffer.append(NetworkFeatureFactory.ENDH2);
-		buffer.append(NetworkFeatureFactory.STARTH3);
+		buffer.append(NetworkFeatureFactory.ENDP);
+		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append("From Node: ");
 		buffer.append(l.getFromNode().getId());
-		buffer.append(NetworkFeatureFactory.ENDH3);
-		buffer.append(NetworkFeatureFactory.STARTP);
-		buffer.append(NetworkFeatureFactory.ENDP);
-		buffer.append(NetworkFeatureFactory.STARTH3);
+//		buffer.append(NetworkFeatureFactory.ENDH3);
+//		buffer.append(NetworkFeatureFactory.STARTP);
+//		buffer.append(NetworkFeatureFactory.ENDP);
+//		buffer.append(NetworkFeatureFactory.STARTH3);
+		buffer.append("<br>");
 		buffer.append("To Node: ");
 		buffer.append(l.getToNode().getId());
-		buffer.append(NetworkFeatureFactory.ENDH3);
-		buffer.append(NetworkFeatureFactory.STARTP);
+//		buffer.append(NetworkFeatureFactory.ENDH3);
+//		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append(NetworkFeatureFactory.ENDP);
 
 		buffer.append(NetworkFeatureFactory.STARTH3);
@@ -155,6 +177,51 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		buffer.append(STARTLI);
 		buffer.append("Length: ");
 		buffer.append(l.getLength());
+		buffer.append(ENDLI);
+		buffer.append(ENDUL);
+		buffer.append(NetworkFeatureFactory.ENDP);
+
+//		buffer.append(NetworkFeatureFactory.ENDCDATA);
+
+		return buffer.toString();
+	}
+	
+	private String createActDescription(ActivityImpl act) {
+		StringBuilder buffer = new StringBuilder(100);
+//		buffer.append(NetworkFeatureFactory.STARTCDATA);
+//		buffer.append(NetworkFeatureFactory.STARTH2);
+		buffer.append("Link: " );
+		buffer.append(act.getLinkId());
+//		buffer.append(NetworkFeatureFactory.ENDH2);
+		buffer.append(NetworkFeatureFactory.STARTP);
+		buffer.append(NetworkFeatureFactory.ENDP);
+		buffer.append(NetworkFeatureFactory.STARTP);
+		buffer.append(NetworkFeatureFactory.ENDP);
+
+		buffer.append(NetworkFeatureFactory.STARTH3);
+		buffer.append("Attributes: ");
+		buffer.append(NetworkFeatureFactory.ENDH3);
+		buffer.append(NetworkFeatureFactory.STARTP);
+		buffer.append(STARTUL);
+		buffer.append(STARTLI);
+		buffer.append("StartTime: ");
+		buffer.append(Time.writeTime(act.getStartTime()));
+		buffer.append(ENDLI);
+		buffer.append(STARTLI);
+		buffer.append("Duration: ");
+		buffer.append(Time.writeTime(act.getDuration()));
+		buffer.append(ENDLI);
+		buffer.append(STARTLI);
+		buffer.append("EndTime: ");
+		buffer.append(Time.writeTime(act.getEndTime()));
+		buffer.append(ENDLI);
+		buffer.append(STARTLI);
+		buffer.append("X: ");
+		buffer.append(act.getCoord().getX());
+		buffer.append(ENDLI);
+		buffer.append(STARTLI);
+		buffer.append("Y: ");
+		buffer.append(act.getCoord().getY());
 		buffer.append(ENDLI);
 		buffer.append(ENDUL);
 		buffer.append(NetworkFeatureFactory.ENDP);

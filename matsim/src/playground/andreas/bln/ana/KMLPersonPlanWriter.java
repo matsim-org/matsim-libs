@@ -180,13 +180,6 @@ public class KMLPersonPlanWriter {
 				fromCoords = act.getCoord();
 
 				AbstractFeatureType abstractFeature = this.networkFeatureFactory.createActFeature(act, this.networkNodeStyle);
-				StringBuffer stringOut = new StringBuffer();
-				stringOut.append("Act: " + act.getType());
-				stringOut.append(", Link: " + act.getLinkId());
-				stringOut.append(", X: " + act.getCoord().getX() + ", Y: " + act.getCoord().getY());
-				stringOut.append(", StartTime: " + Time.writeTime(act.getStartTime()) + ", Duration: " + Time.writeTime(act.getDuration()) + ", EndTime: " + Time.writeTime(act.getEndTime()));
-
-				abstractFeature.setDescription(stringOut.toString());
 				linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
 			}
 
@@ -200,11 +193,17 @@ public class KMLPersonPlanWriter {
 
 					FolderType routeLinksFolder = this.kmlObjectFactory.createFolderType();
 					routeLinksFolder.setName(leg.getMode().toString() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + leg.getRoute().getDistance());
-
-					for (Link link : tempLinkList) {
-						AbstractFeatureType abstractFeature = this.networkFeatureFactory.createCarLinkFeature(link,	this.networkLinkStyle);
-						routeLinksFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
+					
+					if(tempLinkList.size() != 0){
+						routeLinksFolder.setDescription("see attached route");
+						for (Link link : tempLinkList) {
+							AbstractFeatureType abstractFeature = this.networkFeatureFactory.createCarLinkFeature(link,	this.networkLinkStyle);
+							routeLinksFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
+						}
+					} else {
+						routeLinksFolder.setDescription("sorry no route found");
 					}
+					
 					linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(routeLinksFolder));
 
 				} else if (leg.getMode() == TransportMode.pt) {
@@ -225,6 +224,25 @@ public class KMLPersonPlanWriter {
 						abstractFeature.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
 						linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
 					}
+				
+					} else if (leg.getMode() == TransportMode.walk) {
+
+						if (iterator.hasNext()) {
+
+							Coord toCoords = null;
+
+							for (Iterator tempIterator = this.personsPlan.getPlanElements().iterator(); tempIterator.hasNext();) {
+								PlanElement tempPlanElement = (PlanElement) tempIterator.next();
+								if (tempPlanElement == planElement) {
+									toCoords = ((ActivityImpl) tempIterator.next()).getCoord();
+								}
+
+							}
+
+							AbstractFeatureType abstractFeature = this.networkFeatureFactory.createWalkLinkFeature(fromCoords, toCoords, leg, this.networkLinkStyle);
+//							abstractFeature.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
+							linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
+						}
 
 				}				
 			}
