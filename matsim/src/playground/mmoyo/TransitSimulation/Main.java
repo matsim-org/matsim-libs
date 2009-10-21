@@ -38,7 +38,7 @@ public class Main {
 	private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/";
 	//private static final String PATH = "../shared-svn/studies/schweiz-ivtch/pt-experimental/5x5/";
 	private static final String CONFIG =  				PATH + "config.xml";
-	private static final String PLANFILE = 				PATH + "plans.xml";  //"_input_file.xml"; // // "plans.xml"; 
+	private static final String PLANFILE = 				PATH + "_input_file.xml";  //"_input_file.xml"; // // "plans.xml"; 
 	private static final String OUTPUTPLANS = 			PATH + "output_plans.xml";
 	private static final String PLAINNETWORK = 			PATH + "plainNetwork.xml";
 	private static final String LOGICNETWORK = 			PATH + "logicNetwork.xml";
@@ -75,7 +75,7 @@ public class Main {
 		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
 		NetworkLayer plainNetwork=logicFactory.getPlainNet();
 		
-		int option =3;
+		int option =10;
 		switch (option){
 			case 1:    //writes logicElement files
 				logicFactory.writeLogicElements(PLAINNETWORK, LOGICTRANSITSCHEDULE, LOGICNETWORK);

@@ -12,7 +12,7 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
-import playground.mmoyo.equilDemo.MMoyoEquilnetDemo;
+import playground.mmoyo.demo.equil.MMoyoEquilnetDemo;
 
 public class EquilIterTest extends MatsimTestCase {
 	

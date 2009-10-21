@@ -37,16 +37,16 @@ public class Counter {
 		plansReader.readFile(plansFile);
 	
 		//18sep
-		///iterate with all values
-		/*
+		///iterate with all coefficient values
 		for (double i=0; i<=100 ; i++ ){
 			double x = i/100;  
-			PTRouter ptRouter = new PTRouter(logicNet, logicPTTimeTable, this.ptValues, x , (1-x), 60);
+			PTRouter ptRouter = new PTRouter(logicNet,  x , (1-x), 60);
 			routePopulation(x , ptRouter);	
 		}
-		*/
+		
 
-		//18sep	
+		//a unique coefficient value
+		/*
 		double timeCoefficient = 1;
 		double distanceCoefficient = 0;
 		double transferPenalty = 0;
@@ -56,8 +56,6 @@ public class Counter {
 		transferPenalty = 60;
 		PTRouter ptRouter2 = new PTRouter(logicNet, timeCoefficient, distanceCoefficient, transferPenalty);
 		pathListB =routePopulation(timeCoefficient , ptRouter2);
-		
-		
 		System.out.println(pathListA.equals(pathListB));
 		
 		int differences=0;
@@ -65,19 +63,17 @@ public class Counter {
 		for (int i=0; i< size-1; i++){
 			if (pathListA.get(i) != pathListB.get(i))differences++; 
 		}
-		
 		System.out.println("size:" + size + " diferences:" + differences);
-		
 		///
-		
+		*/
 		//18sep	
-		/*
+		
 		System.out.println("Time Coefficient\tDistance Coefficient\tTimeAvg\tDistanceAvg\tTransfers\tDetTransfer\tWalkDistance");
 		for (PopulationResult r : populationResultList){
 			System.out.println(r.getTimeCoef() + "\t+" + r.getDistanceCoef() + "\t+" + r.getTimeAvg() + "\t+" + r.getDistanceAvg() + "\t+" + r.getTransferNum() + "\t+" + r.getDetTransferNum() + "\t+" + r.getWalkDistanceAvg());
 			//r.getTransferPenalty()
 		} 
-		*/
+		
 	}
 	
 	//18 sep used to be void
@@ -176,9 +172,9 @@ class ConnectionResult{
 			distance += link.getLength();
 
 			String type  = ((LinkImpl)link).getType();  
-			if (type.equals("Egress") || type.equals("Access") || type.equals("DetTransfer")){
+			if (type.equals("DetTransfer")){    //type.equals("Egress") || type.equals("Access") || <- we don't want to count the access and egress walk time until the radius search be defined.
 				walkDistance += distance;
- 
+
 				if (type.equals("DetTransfer")) detTransfers++;
 				
 			}else if (type.equals("Transfer")){
@@ -265,23 +261,22 @@ class PopulationResult {
 	}
 	
 	public double getDistanceAvg() {
-		return this.travelDistance; // / connectionNumber;  //18sep
+		return this.travelDistance / connectionNumber; 
 	}
 	
 	public double getTimeAvg() {
-		return this.travelTime; // / connectionNumber;    //18sep
+		return this.travelTime / connectionNumber; 
 	}
 	
 	public double getTransferNum() {
-		return this.transfers; // / connectionNumber;     //18sep
+		return this.transfers / connectionNumber;
 	}
 	
 	public double getDetTransferNum() {
-		return this.detTransfers; // / connectionNumber;   //18sep
+		return this.detTransfers / connectionNumber;
 	}
 	
 	public double getWalkDistanceAvg() {
-		return this.walkDistance; // / connectionNumber;   //18sep
+		return this.walkDistance / connectionNumber;
 	}
-	
 }	

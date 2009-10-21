@@ -34,33 +34,32 @@ public class PTTravelCost implements TravelCost{
 
 	public double getLinkTravelCost(Link link, double time){
 		cost=0;
-
-		//System.out.println ("usando el pttravel cost de manuel");
-		/*
-		//set objective values
-		//travelTime = ptTimeTable.getLinkTravelTime(link, time);
-		//travelDistance = link.getLength();
-		//weighing with coefficient values
-		cost = (travelTime * timeCoeficient) + (travelDistance * distanceCoeficient);
-		//adjusting according to link type
-		type = ((LinkImpl) link).getType();
-		if (type.equals("DetTransfer")){
-			cost = travelTime + transferPenalty;   
-			waitTime = travelTime - (link.getLength()* walkSpeed);
-		}else if (type.equals("Transfer")){
-			cost = travelTime + transferPenalty;
-		}else if (type.equals("Access")){
-			waitTime = travelTime - (link.getLength()* walkSpeed);
-		}
-		*/
-		//Time as single criterion
-		//cost= travelTime;
+		travelTime = ptTravelTime.getLinkTravelTime(link, time) ;
 		
-		travelTime = ptTravelTime.getLinkTravelTime(link, time);
+		/*1.-  for analysis with coefficients///////////////////////////
+		travelDistance = link.getLength();
+		String type = (( org.matsim.core.network.LinkImpl) link).getType();
+		if (type.equals("DetTransfer") || type.equals("Transfer")){
+			cost = (travelTime + transferPenalty);
+		}else if (type.equals("Standard")){
+			cost = (travelTime * timeCoeficient) + (travelDistance * distanceCoeficient) ;
+		}else if (type.equals("Access") || type.equals("Egress")){
+			cost = travelTime * walkCoefficient;
+		}
+		*////////////////////////////////////////////////////////////////
+
+		
+		//2.- Time as single criterion//////////////////////////////////
+		cost= travelTime;
+		//////////////////////////////////////////////////////////////*/
+		
+
+		//3.- add transfer penalty//////////////////////////
 		aliasType = ((PTLink)link).getAliasType();
 		if (aliasType == 3 || aliasType == 4 ){  //transfer or dettransfer
 			cost += transferPenalty ;
 		}
+		////////////////////////////////////////////////////////////////*/
 	
 		return cost;
 	}

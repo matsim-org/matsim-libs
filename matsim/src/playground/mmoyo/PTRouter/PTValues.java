@@ -11,15 +11,12 @@ public class PTValues {
 	public final static byte DETTRANSFER= 4;
 	public final static byte EGRESS 	= 5;
 	
-	public double timeCoeficient=0;
-	public double distanceCoeficient=0;
-	
 	public final double AV_WALKING_SPEED = 1/1.34;  //1.34 [Weidmann93], [Antonini2004].  0.836 by [Al-Azzawi 07]  
 	public final double DETTRANSFER_RANGE = 300;	//distance to search station to build det transfer links
 	public final double FIRST_WALKRANGE = 600;  	//initial distance for station search 
 	public final double WALKRANGE_EXT = 300;   		//progressive extension distance of the station search
+	
 	public final int INI_STATIONS_NUM = 2;			//number of stations to find in order to start the route search
-
 }
 
 /*
