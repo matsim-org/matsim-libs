@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.ConfigConfigGroup;
@@ -51,6 +52,7 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.WithindayConfigGroup;
 import org.matsim.core.config.groups.WorldConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+import org.matsim.vis.otfvis.gui.OTFVisConfig;
 
 /**
  * Stores all configuration settings specified in a configuration file
@@ -98,6 +100,8 @@ public class Config {
 	private List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
 
 	private HouseholdsConfigGroup households;
+	
+	private OTFVisConfig otfVis ;
 
 	/** static Logger-instance. */
 	private static final Logger log = Logger.getLogger(Config.class);
@@ -190,6 +194,9 @@ public class Config {
 		
 		this.vspExperimentalGroup = new VspExperimentalConfigGroup();
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, this.vspExperimentalGroup);
+		
+		this.otfVis = new OTFVisConfig() ;
+		this.modules.put( OTFVisConfig.GROUP_NAME, this.otfVis ) ;
 		
 	}
 
@@ -465,4 +472,7 @@ public class Config {
 		return this.vspExperimentalGroup;
 	}
 	
+	public OTFVisConfig otfVis() {
+		return this.otfVis ;
+	}
 }

@@ -22,11 +22,16 @@ package org.matsim.run;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
@@ -49,6 +54,7 @@ import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
  * @author mrieser
  */
 public class OTFVis {
+	private static final Logger log = Logger.getLogger(OTFVis.class);
 
 	private static void printUsage() {
 		System.out.println();
@@ -167,6 +173,14 @@ public class OTFVis {
 
 	public static final void playConfig(final String[] args) {
 		ScenarioLoader loader = new ScenarioLoader(args[0]);
+
+		log.info("Complete config dump:");
+		StringWriter writer = new StringWriter();
+		ConfigWriter configwriter = new ConfigWriter(loader.getScenario().getConfig(), new PrintWriter(writer));
+		configwriter.write();
+		log.info("\n\n" + writer.getBuffer().toString());
+		log.info("Complete config dump done.");
+		
 		loader.loadScenario();
 		ScenarioImpl scenario = loader.getScenario();
 		EventsImpl events = new EventsImpl();

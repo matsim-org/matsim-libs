@@ -29,6 +29,8 @@ import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
@@ -51,6 +53,8 @@ import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 public class OnTheFlyClientQuad extends Thread {
+	private static final Logger log = Logger.getLogger(OnTheFlyClientQuad.class);
+	
 	private final String url;
 	private OTFConnectionManager connect = new OTFConnectionManager();
 	private final boolean isMac;
@@ -91,9 +95,11 @@ public class OnTheFlyClientQuad extends Thread {
 	public void run() {
 		boolean fullscreen = false;
 
-		OTFVisConfig visconf = new OTFVisConfig();
-		if (Gbl.getConfig() == null) Gbl.createConfig(null);
-		Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, visconf);
+//		OTFVisConfig visconf = new OTFVisConfig();
+//		if (Gbl.getConfig() == null) Gbl.createConfig(null);
+//		Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, visconf);
+		
+		OTFVisConfig visconf = Gbl.getConfig().otfVis() ;
 		
 		JFrame frame = new JFrame("MATSIM OTFVis");
 		if (isMac) {

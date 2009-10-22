@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
@@ -227,6 +228,14 @@ public class OTFVisConfig extends Module {
 		map.put(MIDDLE_MOUSE_FUNC, getValue(MIDDLE_MOUSE_FUNC));
 		map.put(RIGHT_MOUSE_FUNC, getValue(RIGHT_MOUSE_FUNC));
 		return map;
+	}
+	
+	@Override
+	protected final Map<String, String> getComments() {
+		Map<String,String> map = super.getComments();
+		map.put(AGENT_SIZE, "The (initial) size of the agents.  Only a range of numbers is allowed, otherwise otfvis aborts"
+				+ " rather ungracefully, or displays no agents at all." ) ; 
+		return map ;
 	}
 
 	/* direct access */
