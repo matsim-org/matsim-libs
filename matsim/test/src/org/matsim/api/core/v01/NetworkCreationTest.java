@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -61,10 +60,7 @@ public class NetworkCreationTest extends MatsimTestCase {
 		assertEquals(1.0, l1.getCapacity(Time.UNDEFINED_TIME));
 		assertEquals(1.0, l1.getFreespeed(Time.UNDEFINED_TIME));
 		assertEquals(1.0, l1.getNumberOfLanes(Time.UNDEFINED_TIME));
-		LinkImpl ll1 = (LinkImpl) l1;
-		assertEquals(1.0/3600.0, ll1.getFlowCapacity(Time.UNDEFINED_TIME), MatsimTestCase.EPSILON);
-		//would expect this cause no add was invoked
-//		assertNull(l1.getLayer());
+		assertEquals(1.0/3600.0, l1.getCapacity(Time.UNDEFINED_TIME)/network.getCapacityPeriod(), MatsimTestCase.EPSILON);
 		//the next lines are not obvious because only the references have been given to the builder
 		assertEquals(n1, l1.getFromNode());
 		assertEquals(n2, l1.getToNode());
@@ -76,18 +72,14 @@ public class NetworkCreationTest extends MatsimTestCase {
 		l1.setCapacity(3600.0);
 		assertEquals(3600.0, l1.getCapacity(Time.UNDEFINED_TIME));
 		//tests on LinkImpl
-		assertEquals(10.0, ll1.getFreespeedTravelTime(Time.UNDEFINED_TIME));
-		assertEquals(1.0, ll1.getFlowCapacity(Time.UNDEFINED_TIME), EPSILON);
+		assertEquals(1.0, l1.getCapacity(Time.UNDEFINED_TIME)/network.getCapacityPeriod(), EPSILON);
 		
 		//add to network
 		network.addLink(l1);
-		assertNotNull(l1.getLayer());
-		assertEquals(network, l1.getLayer());
 		//test for no side effects by adding to network
 		assertEquals(1000.0, l1.getLength());
 		assertEquals(100.0, l1.getFreespeed(Time.UNDEFINED_TIME));
 		assertEquals(3600.0, l1.getCapacity(Time.UNDEFINED_TIME));
-		assertEquals(10.0, ll1.getFreespeedTravelTime(Time.UNDEFINED_TIME));
-		assertEquals(1.0, ll1.getFlowCapacity(Time.UNDEFINED_TIME), EPSILON);
+		assertEquals(1.0, l1.getCapacity(Time.UNDEFINED_TIME)/network.getCapacityPeriod(), EPSILON);
 	}
 }
