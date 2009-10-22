@@ -10,10 +10,7 @@ public class ScenarioLoaderFactoryImpl {
 	}
 
 	public ScenarioLoaderI createScenarioLoader(String configFileName, Scenario scenario) {
-		// TODO Auto-generated method stub
-		//return null;
-		throw new UnsupportedOperationException() ;
-		// needs to be implemented in ScenarioLoader.
+		return new ScenarioLoader(configFileName, scenario);
 	}
 
 }

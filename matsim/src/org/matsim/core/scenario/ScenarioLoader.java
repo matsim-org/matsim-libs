@@ -24,8 +24,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.SAXException;
-
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioLoaderI;
 import org.matsim.core.config.Config;
@@ -46,6 +45,7 @@ import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.world.MatsimWorldReader;
+import org.xml.sax.SAXException;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -66,7 +66,7 @@ public class ScenarioLoader implements ScenarioLoaderI {
 
 	private Config config;
 
-	private ScenarioImpl scenario;
+	private Scenario scenario;
 
 	
 	public ScenarioLoader(Config config) {
@@ -74,28 +74,34 @@ public class ScenarioLoader implements ScenarioLoaderI {
 		this.setScenario(new ScenarioImpl(this.config));
 	}
 
-	public ScenarioLoader(ScenarioImpl scenario) {
+	public ScenarioLoader(Scenario scenario) {
 		this.scenario = scenario;
 		this.config = this.scenario.getConfig();
 	}
 
 	public ScenarioLoader(String configFilename) {
-		this.config = new Config();
-		this.config.addCoreModules();
-		MatsimConfigReader reader = new MatsimConfigReader(this.config);
-		reader.readFile(configFilename);
-		this.scenario = new ScenarioImpl(this.config);
-		Gbl.setConfig(this.config);
-		MatsimRandom.reset(config.global().getRandomSeed());
-		this.setScenario(new ScenarioImpl(this.config));
+		this(configFilename, new ScenarioImpl());
 	}
 
-	protected void setScenario(ScenarioImpl sc){
+	/**
+	 * Loads the config from the file into the config set in the
+	 * scenario and initializes the ScenarioLoader.
+	 */
+	public ScenarioLoader(String configFilename, Scenario sc) {
+		this.config = sc.getConfig();
+		MatsimConfigReader reader = new MatsimConfigReader(this.config);
+		reader.readFile(configFilename);
+		Gbl.setConfig(this.config);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		this.setScenario(sc);
+	}
+
+	protected void setScenario(Scenario sc){
 		this.scenario = sc;
 	}
 	
 	public ScenarioImpl getScenario() {
-		return this.scenario;
+		return (ScenarioImpl)this.scenario;
 	}
 
 	/**
