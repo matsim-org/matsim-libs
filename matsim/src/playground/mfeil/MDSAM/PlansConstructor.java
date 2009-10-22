@@ -1724,24 +1724,24 @@ public class PlansConstructor implements PlanStrategyModule{
 				LegImpl leg = ((LegImpl)(planToBeWritten.get(i)));
 				if (leg.getMode().equals(TransportMode.car)) {
 					carCheck++;
-					car_time += leg.getTravelTime();
+					car_time += leg.getTravelTime()/3600;
 					car_cost += leg.getRoute().getDistance()/1000*this.travelCostCar;
 					car_distance += leg.getRoute().getDistance()/1000;
 				}
 				else if (leg.getMode().equals(TransportMode.pt)) {
 					ptCheck++;
-					pt_time += leg.getTravelTime();
+					pt_time += leg.getTravelTime()/3600;
 					pt_cost += leg.getRoute().getDistance()/1000*travelCostPt;
 					pt_distance += leg.getRoute().getDistance()/1000;
 				}
 				else if (leg.getMode().equals(TransportMode.bike)) {
 					bikeCheck++;
-					bike_time += leg.getTravelTime();
+					bike_time += leg.getTravelTime()/3600;
 					bike_distance += leg.getRoute().getDistance()/1000;
 				}
 				else if (leg.getMode().equals(TransportMode.walk)) {
 					walkCheck++;
-					walk_time += leg.getTravelTime();
+					walk_time += leg.getTravelTime()/3600;
 					walk_distance += leg.getRoute().getDistance()/1000;
 				}
 				else log.warn("Leg mode "+leg.getMode()+" in act chain "+i+" could not be identified!");

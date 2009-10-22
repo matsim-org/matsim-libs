@@ -828,7 +828,7 @@ public class ModFileMaker {
 						stream.print("beta_time *");
 						if (car==1) stream.print(" x"+(i+1)+"_car_time");
 						else if (pt==1) stream.print(" x"+(i+1)+"_pt_time");
-						else if (car==1) stream.print(" x"+(i+1)+"_walk_time");
+						else if (walk==1) stream.print(" x"+(i+1)+"_walk_time");
 					}
 					else if (car+pt+bike+walk>1) {
 						if (car==1) stream.print("beta_time * x"+(i+1)+"_car_time");
@@ -843,7 +843,7 @@ public class ModFileMaker {
 						if (car==1) stream.print(" x"+(i+1)+"_car_time");
 						else if (pt==1) stream.print(" x"+(i+1)+"_pt_time");
 						else if (bike==1) stream.print(" x"+(i+1)+"_bike_time");
-						else if (car==1) stream.print(" x"+(i+1)+"_walk_time");
+						else if (walk==1) stream.print(" x"+(i+1)+"_walk_time");
 					}
 					else if (car+pt+bike+walk>1) {
 						if (car==1) stream.print(" + beta_time * x"+(i+1)+"_car_time");
@@ -872,8 +872,8 @@ public class ModFileMaker {
 					stream.print(" + beta_distance *");
 					if (car==1) stream.print(" x"+(i+1)+"_car_distance");
 					else if (pt==1) stream.print(" x"+(i+1)+"_pt_distance");
-					else if (bike==1) stream.print(" x"+(i+1)+"_bike_distancee");
-					else if (car==1) stream.print(" x"+(i+1)+"_walk_distance");
+					else if (bike==1) stream.print(" x"+(i+1)+"_bike_distance");
+					else if (walk==1) stream.print(" x"+(i+1)+"_walk_distance");
 				}
 				else if (car+pt+bike+walk>1) {
 					if (car==1) stream.print(" + beta_distance * x"+(i+1)+"_car_distance");
@@ -983,7 +983,7 @@ public class ModFileMaker {
 						if (car==1) stream.print(" x"+(i+1)+"_car_time");
 						else if (pt==1) stream.print(" x"+(i+1)+"_pt_time");
 						else if (bike==1) stream.print(" x"+(i+1)+"_bike_time");
-						else if (car==1) stream.print(" x"+(i+1)+"_walk_time");
+						else if (walk==1) stream.print(" x"+(i+1)+"_walk_time");
 						stream.print(" * ( Income_IncomeAverage * one ) ^ lambda_time_income");
 					}
 					else if (car+pt+bike+walk>1) {
@@ -1011,8 +1011,8 @@ public class ModFileMaker {
 						stream.print(" + beta_distance *");
 						if (car==1) stream.print(" x"+(i+1)+"_car_distance");
 						else if (pt==1) stream.print(" x"+(i+1)+"_pt_distance");
-						else if (bike==1) stream.print(" x"+(i+1)+"_bike_distancee");
-						else if (car==1) stream.print(" x"+(i+1)+"_walk_distance");
+						else if (bike==1) stream.print(" x"+(i+1)+"_bike_distance");
+						else if (walk==1) stream.print(" x"+(i+1)+"_walk_distance");
 						stream.print(" * ( Income_IncomeAverage * one ) ^ lambda_distance_income");
 					}
 					else if (car+pt+bike+walk>1) {
