@@ -227,7 +227,7 @@ public class EventsImpl implements Events {
 		// nothing to do in this implementation
 	}
 
-	private void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {
+	public void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {
 		Method[] classmethods = handlerClass.getMethods();
 		for (Method method : classmethods) {
 			if (method.getName().equals("handleEvent")) {
