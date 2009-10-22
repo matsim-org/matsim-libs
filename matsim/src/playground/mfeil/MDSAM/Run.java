@@ -41,10 +41,10 @@ public class Run {
 		
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz06.xml";
-		final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans068.dat";
+		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
+		final String outputFileBiogeme = "/home/baug/mfeil/data/choiceSet/it0/output_plans057.dat";
 		final String attributesInputFile = "/home/baug/mfeil/data/mz/attributes_MZ2005.txt";
-		final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model068.mod";
+		final String outputFileMod = "/home/baug/mfeil/data/choiceSet/it0/model057.mod";
 		
 /*		final String populationFilename = "./plans/output_plans.xml";
 		final String networkFilename = "./plans/network.xml";
@@ -55,16 +55,17 @@ public class Run {
 		
 		String similarity 		= "no";
 		String incomeConstant 	= "yes";
-		String incomeDivided	= "no";
-		String incomeDividedLN	= "no";
-		String incomeBoxCox		= "no";
+		String incomeDivided	= "yes";
+		String incomeDividedLN	= "yes";
+		String incomeBoxCox		= "yes";
 		String gender 			= "no";
 		String age 				= "no";
 		String employed 		= "no";
 		String license 			= "no";
 		String carAvail 		= "no";
 		String seasonTicket 	= "no";
-		String travelCost		= "yes";
+		String travelDistance	= "yes"; 
+		String travelCost		= "yes"; 
 		String travelConstant 	= "yes";
 		String bikeIn			= "yes";
 
@@ -75,14 +76,14 @@ public class Run {
 		
 //		MDSAM mdsam = new MDSAM(scenario.getPopulation());				
 //		List<List<Double>> sims = mdsam.runPopulation();
+//		log.info("Size of sime is "+sims.size()+" times "+sims.get(0).size());
 		
 		List<List<Double>> sims = null;
 
 		PlansConstructor pc = new PlansConstructor(scenario.getPopulation(), sims);
-//		pc.writePlansForBiogemeWithSequence(outputFileBiogeme);
 		pc.keepPersons();
 		pc.writePlansForBiogemeWithRandomSelection(outputFileBiogeme, attributesInputFile, 
-				similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, age, gender, employed, license, carAvail, seasonTicket, travelCost, travelConstant, bikeIn);
+				similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, age, gender, employed, license, carAvail, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn);
 		pc.writeModFileWithRandomSelection(outputFileMod);
 		log.info("Process finished.");
 	}

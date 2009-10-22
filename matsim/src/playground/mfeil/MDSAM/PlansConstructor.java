@@ -85,7 +85,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected List<List<Double>> sims;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	protected int noOfAlternatives;
-	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, carAvail, employed, seasonTicket, travelCost, travelConstant, bikeIn; 
+	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, carAvail, employed, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn; 
 	protected double travelCostCar, travelCostPt;
 	
 	                      
@@ -119,6 +119,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.license 			= "no";
 		this.carAvail 			= "no";
 		this.seasonTicket 		= "no";
+		this.travelDistance		= "no";
 		this.travelCost			= "no";
 		this.travelConstant 	= "no";
 		this.bikeIn				= "no";
@@ -181,7 +182,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	// Type of writing the Biogeme file
 		//	this.writePlansForBiogeme(this.outputFileBiogeme);
 		this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
-				this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelCost, this.travelConstant, this.bikeIn);
+				this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);
 		
 	// Type of writing the mod file
 		//	this.writeModFile(this.outputFileMod);
@@ -750,6 +751,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			String license,
 			String carAvail,
 			String seasonTicket,
+			String travelDistance,
 			String travelCost,
 			String travelConstant,
 			String bikeIn){
@@ -769,6 +771,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.license=license; 
 		this.carAvail=carAvail; 
 		this.seasonTicket=seasonTicket; 
+		this.travelDistance=travelDistance;
 		this.travelCost=travelCost; 
 		this.travelConstant=travelConstant; 
 		this.bikeIn=bikeIn;
@@ -852,7 +855,11 @@ public class PlansConstructor implements PlanStrategyModule{
 					stream.print("x"+(i+1)+""+(j+1)+"\t");
 					counterFirst++;
 					if (travelCost.equals("yes") && j%2==1 && (((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.car) || ((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.pt))){
-						stream.print("x"+(i+1)+""+(j+1)+"_1\t");
+						stream.print("x"+(i+1)+""+(j+1)+"_1\t"); // travel cost
+						counterFirst++;
+					}
+					if ((incomeBoxCox.equals("yes") || travelDistance.equals("yes")) && j%2==1){
+						stream.print("x"+(i+1)+""+(j+1)+"_2\t"); // travel distance
 						counterFirst++;
 					}
 				}
@@ -977,6 +984,10 @@ public class PlansConstructor implements PlanStrategyModule{
 							stream.print(0+"\t");
 							counterRow++;
 							if (j%2==1 && this.travelCost.equals("yes") && (((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.car) || ((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.pt))){
+								stream.print(0+"\t");
+								counterRow++;
+							}
+							if (j%2==1 && (this.incomeBoxCox.equals("yes") || this.travelDistance.equals("yes"))){
 								stream.print(0+"\t");
 								counterRow++;
 							}
@@ -1188,6 +1199,10 @@ public class PlansConstructor implements PlanStrategyModule{
 										counter++;
 									}
 								}
+								if (this.incomeBoxCox.equals("yes") || this.travelDistance.equals("yes")){
+									stream.print((((LegImpl)(planToBeWritten.get(j))).getRoute().getDistance()/1000)+"\t");
+									counter++;
+								}
 								found = true;
 								break;
 							}
@@ -1226,6 +1241,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				this.license,
 				this.carAvail,
 				this.seasonTicket,
+				this.travelDistance,
 				this.travelCost,
 				this.travelConstant,
 				this.bikeIn);
