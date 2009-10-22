@@ -21,7 +21,14 @@
 package org.matsim.core.api.internal;
 
 /**
- * essentially a marker interface 
+ * <p> essentially a marker interface </p>
+ * 
+ * <p>
+ * The first level of elements below top level containers should NOT have a back pointer ...
+ * ... since, at that level, one should be able to get the relevant container from
+ * the context.
+ * (This becomes clear if you think about a nodeId/linkId given by person.)
+ * </p>
  * 
  * @author nagel
  *
