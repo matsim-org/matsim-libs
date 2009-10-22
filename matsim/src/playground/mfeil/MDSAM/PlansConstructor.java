@@ -86,7 +86,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	protected int noOfAlternatives;
 	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, carAvail, employed, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn; 
-	protected double travelCostCar, travelCostPt;
+	protected double travelCostCar, costPtNothing, costPtHalbtax, costPtGA;
 	
 	                      
 	public PlansConstructor (Controler controler) {
@@ -123,17 +123,21 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.travelCost			= "no";
 		this.travelConstant 	= "no";
 		this.bikeIn				= "no";
-		this.noOfAlternatives = 20;
-		this.travelCostCar	= 0.5;	// CHF/km
-		this.travelCostPt	= 0.28; // CHF/km
+		this.noOfAlternatives 	= 20;
+		this.travelCostCar		= 0.5;	// CHF/km
+		this.costPtNothing		= 0.28;	// CHF/km
+		this.costPtHalbtax		= 0.15;	// CHF/km
+		this.costPtGA			= 0.08;	// CHF/km
 	}
 	
 	public PlansConstructor (PopulationImpl population, List<List<Double>> sims) {
 		this.population = population;
 		this.sims = sims;	
-		this.noOfAlternatives = 20;
-		this.travelCostCar	= 0.5;	// CHF/km
-		this.travelCostPt	= 0.28;	// CHF/km
+		this.noOfAlternatives 	= 20;
+		this.travelCostCar		= 0.5;	// CHF/km
+		this.costPtNothing		= 0.28;	// CHF/km
+		this.costPtHalbtax		= 0.15;	// CHF/km
+		this.costPtGA			= 0.08;	// CHF/km
 	}
 	
 	private void init(final NetworkLayer network) {
@@ -182,7 +186,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	// Type of writing the Biogeme file
 		//	this.writePlansForBiogeme(this.outputFileBiogeme);
 		this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
-				this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);
+				this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);	
 		
 	// Type of writing the mod file
 		//	this.writeModFile(this.outputFileMod);
@@ -738,6 +742,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("done.");
 	}
 	
+	
 	// Writes a Biogeme file that fits "protected void enlargePlansSetWithRandomSelection ()"
 	public void writePlansForBiogemeWithRandomSelection (String outputFile, String attributesInputFile,
 			String similarity, 
@@ -779,9 +784,12 @@ public class PlansConstructor implements PlanStrategyModule{
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
 		AgentsAttributesAdder aaa = new AgentsAttributesAdder ();
 		int incomeAverage=0;
+		int noOfGA = 0;
+		int noOfHalbtax = 0;
+		int noOfNothing = 0;
 		
 		// Run external classes if required
-		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes") || carAvail.equals("yes") || seasonTicket.equals("yes")){
+		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes") || carAvail.equals("yes") || seasonTicket.equals("yes") || travelCost.equals("yes")){
 			aaa.run(attributesInputFile);
 		}
 		if (similarity.equals("yes")){
@@ -907,6 +915,21 @@ public class PlansConstructor implements PlanStrategyModule{
 				continue;
 			}
 			
+			// Calculate travelCostPt for the person
+			double travelCostPt = 0;
+			if (aaa.getSeasonTicket().get(person.getId())==11) { // No season ticket
+				travelCostPt = this.costPtNothing; 
+				noOfNothing++;
+			}
+			else if (aaa.getSeasonTicket().get(person.getId())==2 || aaa.getSeasonTicket().get(person.getId())==3) { // GA
+				travelCostPt = this.costPtGA; 
+				noOfGA++;
+			}
+			else { // all other cases
+				travelCostPt = this.costPtHalbtax;
+				noOfHalbtax++;
+			}
+			
 			int counterRow=0;
 			
 			// Person ID
@@ -969,7 +992,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				boolean found = false;
 				for (int j=0;j<person.getPlans().size();j++){
 					if (acCheck.checkEqualActChainsModesAccumulated(person.getPlans().get(j).getPlanElements(), this.actChains.get(i))) {
-						counterRow += this.writeAccumulatedPlanIntoFile(stream, person.getPlans().get(j).getPlanElements(), this.actChains.get(i));
+						counterRow += this.writeAccumulatedPlanIntoFile(stream, person.getPlans().get(j).getPlanElements(), this.actChains.get(i), travelCostPt);
 						found = true;
 						counterFound++;
 						break;
@@ -1029,8 +1052,12 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		stream.close();
 		log.info("Number of valid plans is "+valid+"; number of invalid plans is "+invalid);
+		log.info("Number of GA = "+noOfGA+", number of Halbtax = "+noOfHalbtax+", and number of nothing = "+noOfNothing);
 		log.info("done.");
 	}
+	
+	
+	
 	
 	// for "repeat" attribute
 	public void writePlansForBiogemeWithSequence(String outputFile){
@@ -1147,7 +1174,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("done.");
 	}
 	
-	private int writeAccumulatedPlanIntoFile (PrintStream stream, List<PlanElement> planToBeWritten, List<PlanElement> referencePlan){
+	private int writeAccumulatedPlanIntoFile (PrintStream stream, List<PlanElement> planToBeWritten, List<PlanElement> referencePlan, double travelCostPt){
 		
 		if (planToBeWritten.size()!=referencePlan.size()){
 			log.warn("Plans do not have same size; planToBeWritten: "+planToBeWritten+", referencePlan: "+referencePlan);
@@ -1195,7 +1222,7 @@ public class PlansConstructor implements PlanStrategyModule{
 										counter++;
 									}
 									else if (((LegImpl)(planToBeWritten.get(j))).getMode().equals(TransportMode.pt)){
-										stream.print((((LegImpl)(planToBeWritten.get(j))).getRoute().getDistance()/1000*this.travelCostPt)+"\t");
+										stream.print((((LegImpl)(planToBeWritten.get(j))).getRoute().getDistance()/1000*travelCostPt)+"\t");
 										counter++;
 									}
 								}

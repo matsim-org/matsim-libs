@@ -333,17 +333,26 @@ public class ModFileMaker {
 		stream.println("[Beta]");
 		stream.println("//Name \tValue  \tLowerBound \tUpperBound  \tstatus (0=variable, 1=fixed");
 		
-		stream.println("HomeUmax \t60  \t0 \t100  \t0");
-		stream.println("WorkUmax \t50  \t0 \t100  \t0");
-		stream.println("EducationUmax \t30  \t0 \t100  \t0");
-		stream.println("ShoppingUmax \t10  \t0 \t100  \t0");
-		stream.println("LeisureUmax \t20  \t0 \t100  \t0");
+		stream.println("HomeUmax \t4  \t0 \t100  \t0");
+		stream.println("WorkUmax \t3  \t0 \t100  \t0");
+		stream.println("EducationUmax \t3  \t0 \t100  \t0");
+		stream.println("ShoppingUmax \t1  \t0 \t100  \t0");
+		stream.println("LeisureUmax \t2  \t0 \t100  \t0");
 		
 		stream.println("HomeAlpha \t8  \t-5 \t20  \t0");
 		stream.println("WorkAlpha \t4  \t-5 \t20  \t0");
 		stream.println("EducationAlpha \t2  \t-5 \t20  \t0");
 		stream.println("ShoppingAlpha \t0  \t-5 \t20  \t0");
 		stream.println("LeisureAlpha \t1  \t-5 \t20  \t0");
+		
+		stream.println("beta_time \t0  \t-5 \t5  \t0");
+		if (travelCost.equals("yes")) stream.println("beta_cost \t0  \t-5 \t5  \t0");
+		if (travelDistance.equals("yes"))stream.println("beta_distance \t0  \t-5 \t5  \t0");
+		if (incomeBoxCox.equals("yes")) {
+			stream.println("lambda_time_income \t0  \t-5 \t5  \t0");
+			stream.println("lambda_cost_income \t0  \t-5 \t5  \t0");
+			stream.println("lambda_distance_income \t0  \t-5 \t5  \t0");
+		}
 		
 		// Car
 		stream.println("beta_time_car \t-4  \t-50 \t30  \t0");
@@ -382,7 +391,7 @@ public class ModFileMaker {
 		
 		// Bike
 		if (bikeIn.equals("yes")) {
-			stream.println("beta_time_bike \t-6  \t-50 \t30  \t0");	
+			stream.println("beta_time_bike \t-3  \t-50 \t30  \t0");	
 			if (travelDistance.equals("yes")) stream.println("beta_distance_bike \t0  \t-50 \t30  \t0");
 			if (travelConstant.equals("yes")) stream.println("constant_bike \t0  \t-50 \t50  \t0");
 			if (incomeBoxCox.equals("yes")) {
@@ -400,7 +409,7 @@ public class ModFileMaker {
 		stream.println("//Id \tName  \tAvail  \tlinear-in-parameter expression (beta1*x1 + beta2*x2 + ... )");	
 		for (int i=0;i<this.actChains.size();i++){
 			List<PlanElement> actslegs = this.actChains.get(i);
-			stream.print((i+1)+"\tAlt"+(i+1)+"\tav"+(i+1)+"\t");
+			stream.print((i+1)+"\tAlt"+(i+1)+"\tav"+(i+1)+"\t");			
 			boolean onlyBike = true;		
 			boolean started = false;
 			if (incomeConstant.equals("yes")) {
@@ -409,7 +418,7 @@ public class ModFileMaker {
 			}
 			if (actslegs.size()>1){
 				for (int j=1;j<actslegs.size();j+=2){
-					LegImpl legs = (LegImpl)actslegs.get(j);
+					LegImpl legs = (LegImpl)actslegs.get(j);					
 					if (!started){
 						if (legs.getMode().equals(TransportMode.car)) {
 							stream.print("beta_time_car * x"+(i+1)+""+(j+1));
@@ -471,7 +480,34 @@ public class ModFileMaker {
 						else log.warn("Leg has no valid mode! ActChains position: "+i);
 					}
 				}
-				if (onlyBike && bikeIn.equals("no") && incomeConstant.equals("no")) stream.print("$NONE");
+				if (onlyBike && bikeIn.equals("no") && incomeConstant.equals("no")){
+					stream.print("beta_time * ( x"+(i+1)+""+2+" ");
+					for (int j=3;j<actslegs.size()-1;j+=2) {
+						stream.print(" + x"+(i+1)+""+(j+1)+" ");
+					}
+					stream.print(" )");
+				}
+				else {
+					stream.print(" + beta_time * ( x"+(i+1)+""+2+" ");
+					for (int j=3;j<actslegs.size()-1;j+=2) {
+						stream.print(" + x"+(i+1)+""+(j+1)+" ");
+					}
+					stream.print(" )");
+				}
+				if (travelCost.equals("yes")){
+					stream.print(" + beta_cost * ( x"+(i+1)+""+2+"_1 ");
+					for (int j=3;j<actslegs.size()-1;j+=2) {
+						stream.print(" + x"+(i+1)+""+(j+1)+"_1 ");
+					}
+					stream.print(" )");
+				}
+				if (travelDistance.equals("yes")){
+					stream.print(" + beta_distance * ( x"+(i+1)+""+2+"_2 ");
+					for (int j=3;j<actslegs.size()-1;j+=2) {
+						stream.print(" + x"+(i+1)+""+(j+1)+"_2 ");
+					}
+					stream.print(" )");
+				}
 			}
 			else if (incomeConstant.equals("no")){
 				stream.print("$NONE");
@@ -522,6 +558,7 @@ public class ModFileMaker {
 				}
 			}
 			if (incomeBoxCox.equals("yes")) {
+				// mode specific coefficients
 				for (int j=1;j<actslegs.size()-1;j+=2){
 					LegImpl legs = (LegImpl)actslegs.get(j);
 					if (legs.getMode().equals(TransportMode.car)) {
@@ -542,6 +579,27 @@ public class ModFileMaker {
 						stream.print(" + beta_time_walk * x"+(i+1)+""+(j+1)+" * ( Income_IncomeAverage * one ) ^ lambda_time_walk_income");
 						stream.print(" + beta_distance_walk * x"+(i+1)+""+(j+1)+"_2 * ( Income_IncomeAverage * one ) ^ lambda_distance_walk_income");
 					}
+				}
+				
+				// cross-mode coefficients
+				if (actslegs.size()>1){
+					stream.print(" + beta_time * ( x"+(i+1)+""+2+" ");
+					for (int j=3;j<actslegs.size()-1;j+=2) {
+						stream.print(" + x"+(i+1)+""+(j+1)+" ");
+					}
+					stream.print(" ) * ( Income_IncomeAverage * one ) ^ lambda_time_income");
+					
+					stream.print(" + beta_cost * ( x"+(i+1)+""+2+"_1 ");
+					for (int j=3;j<actslegs.size()-1;j+=2) {
+						stream.print(" + x"+(i+1)+""+(j+1)+"_1 ");
+					}
+					stream.print(" ) * ( Income_IncomeAverage * one ) ^ lambda_cost_income");
+					
+					stream.print(" + beta_distance * ( x"+(i+1)+""+2+"_2 ");
+					for (int j=3;j<actslegs.size()-1;j+=2) {
+						stream.print(" + x"+(i+1)+""+(j+1)+"_2 ");
+					}
+					stream.print(" ) * ( Income_IncomeAverage * one ) ^ lambda_distance_income");
 				}
 			}
 			stream.println();
