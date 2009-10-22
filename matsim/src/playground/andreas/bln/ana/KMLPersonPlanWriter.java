@@ -226,14 +226,14 @@ public class KMLPersonPlanWriter {
 							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createDBNetworkLinkStyle());
 						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("===S")){
 							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createSBAHNNetworkLinkStyle());
-						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("---M")){
+						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("----M")){
 							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createMetroBusTramNetworkLinkStyle());
-						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("---B")){
-							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createBusNetworkLinkStyle());
-						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("---T")){
-							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createTramNetworkLinkStyle());
-						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("---U")){
+						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("BVU----")){
 							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createSubWayNetworkLinkStyle());
+						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("BVT----")){
+							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createTramNetworkLinkStyle());
+						} else if (((GenericRouteImpl) leg.getRoute()).getRouteDescription().contains("BVB----")){
+							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createBusNetworkLinkStyle());
 						} else {
 							abstractFeature = this.networkFeatureFactory.createPTLinkFeature(fromCoords, toCoords, leg, this.styleFactory.createDefaultNetworkLinkStyle());
 						}
@@ -243,7 +243,7 @@ public class KMLPersonPlanWriter {
 						linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
 					}
 				
-					} else if (leg.getMode() == TransportMode.walk) {
+					} else if (leg.getMode() == TransportMode.walk || leg.getMode() == TransportMode.bike || leg.getMode() == TransportMode.undefined) {
 
 						if (iterator.hasNext()) {
 
@@ -261,8 +261,9 @@ public class KMLPersonPlanWriter {
 //							abstractFeature.setDescription(((GenericRouteImpl) leg.getRoute()).getRouteDescription());
 							linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
 						}
-
-				}				
+					} else {
+						log.warn(leg.getMode() + " - leg type not handled");
+					}
 			}
 		}
 		return linkFolder;

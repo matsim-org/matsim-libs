@@ -1,5 +1,8 @@
 package playground.andreas.bln.ana;
 
+import java.util.TreeSet;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -17,13 +20,26 @@ import playground.andreas.bln.NewPopulation;
 
 public class PersonPlan2Kml extends NewPopulation{
 	
+	private static final Logger log = Logger.getLogger(PersonPlan2Kml.class);
+	
+	boolean warningPrinted = false;
 	String outputDir;
 	NetworkLayer network;
-
-	public PersonPlan2Kml(NetworkLayer network, PopulationImpl population, String outputDir) {
+	TreeSet<String> agentIds;
+	
+	/**
+	 * Converts the selected plan of an agent to a kml-file.
+	 * 
+	 * @param network The corresponding network file
+	 * @param population The population to be read
+	 * @param outputDir Directory for kml output
+	 * @param agentIds Ids of agents to be converted. Be careful: If <code>null</code> every agent will be converted.
+	 */
+	public PersonPlan2Kml(NetworkLayer network, PopulationImpl population, String outputDir, TreeSet<String> agentIds) {
 		super(population, "nofile.xml");
 		this.outputDir = outputDir;
 		this.network = network;
+		this.agentIds = agentIds;
 	}
 
 	/**
@@ -32,11 +48,28 @@ public class PersonPlan2Kml extends NewPopulation{
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
 
-//		String networkFilename = "./examples/equil/network.xml";
-//		String plansFilename = "./examples/equil/plans2.xml";
-		String networkFilename = "E:/oev-test/output/network.multimodal.xml";
-		String plansFilename = "E:\\oev-test\\server\\oevmatsim\\output\\ITERS\\it.100\\plan_17204263X3.txt";
-		String outputDirectory = "E:\\oev-test\\GE";
+		String networkFilename = null;
+		String plansFilename = null;
+		String outputDirectory = null;
+		TreeSet<String> agentIds = null;
+		
+		if(args.length < 3){
+			System.err.println("Need at least three arguments: networkfile, plansfile, outputdirectory");
+			System.exit(1);
+
+		} else {
+			networkFilename = args[0];
+			plansFilename = args[1];
+			outputDirectory = args[2];
+			
+			if(args.length > 3){
+				agentIds = new TreeSet<String>();
+				for (int i = 3; i < args.length; i++) {
+					agentIds.add(args[i]);					
+				}				
+			}
+		}
+
 
 		ScenarioImpl s = new ScenarioImpl();
 
@@ -44,11 +77,10 @@ public class PersonPlan2Kml extends NewPopulation{
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
 		PopulationImpl population = s.getPopulation();
-		PopulationReader plansReader = new MatsimPopulationReader(population,
-				network);
+		PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		plansReader.readFile(plansFilename);
 
-		PersonPlan2Kml myPP2Kml = new PersonPlan2Kml(network, population, outputDirectory);
+		PersonPlan2Kml myPP2Kml = new PersonPlan2Kml(network, population, outputDirectory, agentIds);
 		myPP2Kml.run(population);
 		myPP2Kml.writeEndPlans();
 
@@ -79,9 +111,17 @@ public class PersonPlan2Kml extends NewPopulation{
 
 	@Override
 	public void run(PersonImpl person) {
-//		if(person.getId().toString().equals("17204263X3")){//11100153
-		writePersonKML(person);	
-//		}
+		if(this.agentIds == null){
+			writePersonKML(person);
+			if(!this.warningPrinted){
+				log.info("Will write every agent to kml");
+				this.warningPrinted = true;
+			}
+
+		} else if(this.agentIds.contains(person.getId().toString())){
+			writePersonKML(person);
+			log.info(" " + person.getId() + " written to kml");
+		}
 	}
 	
 }
