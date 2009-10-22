@@ -51,6 +51,8 @@ public class MDSAM {
 	private static final Logger log = Logger.getLogger(MDSAM.class);
 	private final String outputFile;
 	private boolean printing;
+	private long unidimensional, multidimensional;
+	private int counter;
 
 
 	public MDSAM(final PopulationImpl population) {
@@ -60,10 +62,14 @@ public class MDSAM {
 		this.GWlocation = 1.0;
 	//	this.outputFile = "./plans/plans_similarity.xls";	
 		this.outputFile = "/home/baug/mfeil/data/mz/simlog.xls";	
-		this.printing = true;
+		this.printing = false;
+		this.unidimensional = 0;
+		this.multidimensional = 0;
+		this.counter = 0;
 	}
 	
 	public List<List<Double>> runPopulation () {
+		long overall = System.currentTimeMillis();
 		log.info("Calculating similarity of plans of population...");
 		
 		PrintStream stream;
@@ -148,17 +154,24 @@ public class MDSAM {
 			}
 		}
 		stream.close();
+		log.info("Overall runtime was "+(System.currentTimeMillis()-overall));
+		log.info("Unidimensional runtime was "+this.unidimensional);
+		log.info("Multidimensional runtime was "+this.multidimensional);
+		log.info(this.counter+" plans run.");
 		log.info("done...");
 		return this.sims;
 	}
 	
 	public double runPlans(PlanImpl origPlan, PlanImpl comparePlan, PrintStream stream){
 		
+		long runStartTime = System.currentTimeMillis();
+		this.counter++;
+		
 		// Calculate tables per attribute dimension
 		// Length is number of acts minus last home plus 0th position, or number of legs respectively
 		
-		//double [][][] table = new double [3][origPlan.getPlanElements().size()/2+1][comparePlan.getPlanElements().size()/2+1];
-		double [][][] table = new double [1][origPlan.getPlanElements().size()/2+1][comparePlan.getPlanElements().size()/2+1];
+		double [][][] table = new double [3][origPlan.getPlanElements().size()/2+1][comparePlan.getPlanElements().size()/2+1];
+		//double [][][] table = new double [1][origPlan.getPlanElements().size()/2+1][comparePlan.getPlanElements().size()/2+1];
 		
 		for (int k=0;k<table.length;k++){
 			double GW = 0;
@@ -206,6 +219,9 @@ public class MDSAM {
 			}
 			stream.println();
 		}
+		
+		this.unidimensional += System.currentTimeMillis()-runStartTime;
+		long trajectoryTime = System.currentTimeMillis();
 	
 		// Find one optimal trajectory close to the diagonal, for each attribute dimension
 		ArrayList<int[]> oset = new ArrayList<int[]>();	// contains the operation and position
@@ -300,6 +316,7 @@ public class MDSAM {
 			stream.println("Sum is "+sum);
 			stream.println();
 		}
+		this.multidimensional += System.currentTimeMillis()-trajectoryTime;
 		return sum;
 	}
 	
