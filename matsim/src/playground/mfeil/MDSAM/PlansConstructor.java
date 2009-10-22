@@ -1191,25 +1191,44 @@ public class PlansConstructor implements PlanStrategyModule{
 			}
 			if (car) {
 				stream.print("x"+(i+1)+"_car_time\t");
-				stream.print("x"+(i+1)+"_car_cost\t");
-				stream.print("x"+(i+1)+"_car_distance\t");
-				counterFirst+=3;
+				counterFirst++;
+				if (travelCost.equals("yes")) {
+					stream.print("x"+(i+1)+"_car_cost\t");
+					counterFirst++;
+				}
+				if (travelDistance.equals("yes")) {
+					stream.print("x"+(i+1)+"_car_distance\t");
+					counterFirst++;
+				}
 			}
 			if (pt) {
 				stream.print("x"+(i+1)+"_pt_time\t");
-				stream.print("x"+(i+1)+"_pt_cost\t");
-				stream.print("x"+(i+1)+"_pt_distance\t");
-				counterFirst+=3;
+				counterFirst++;
+				if (travelCost.equals("yes")) {
+					stream.print("x"+(i+1)+"_pt_cost\t");
+					counterFirst++;
+				}
+				if (travelDistance.equals("yes")) {
+					stream.print("x"+(i+1)+"_pt_distance\t");
+					counterFirst++;
+				}
+				
 			}
 			if (bike && this.bikeIn.equals("yes")) {
 				stream.print("x"+(i+1)+"_bike_time\t");
-				stream.print("x"+(i+1)+"_bike_distance\t");
-				counterFirst+=2;
+				counterFirst++;
+				if (travelDistance.equals("yes")) {
+					stream.print("x"+(i+1)+"_bike_distance\t");
+					counterFirst++;
+				}
 			}
 			if (walk) {
 				stream.print("x"+(i+1)+"_walk_time\t");
-				stream.print("x"+(i+1)+"_walk_distance\t");
-				counterFirst+=2;
+				counterFirst++;
+				if (travelDistance.equals("yes")) {
+					stream.print("x"+(i+1)+"_walk_distance\t");
+					counterFirst++;
+				}
 			}
 			if (similarity.equals("yes")) {
 				stream.print("x"+(i+1)+"_sim\t"); 
@@ -1243,7 +1262,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				log.warn("No car availability info available for person "+person.getId()+". Dropping the person.");
 				continue;
 			}
-			if (seasonTicket.equals("yes") && !aaa.getSeasonTicket().containsKey(person.getId())){
+			if ((seasonTicket.equals("yes") || travelCost.equals("yes")) && !aaa.getSeasonTicket().containsKey(person.getId())){
 				log.warn("No season ticket info available for person "+person.getId()+". Dropping the person.");
 				continue;
 			}			
@@ -1256,17 +1275,19 @@ public class PlansConstructor implements PlanStrategyModule{
 			
 			// Calculate travelCostPt for the person
 			double travelCostPt = 0;
-			if (aaa.getSeasonTicket().get(person.getId())==11) { // No season ticket
-				travelCostPt = this.costPtNothing; 
-				noOfNothing++;
-			}
-			else if (aaa.getSeasonTicket().get(person.getId())==2 || aaa.getSeasonTicket().get(person.getId())==3) { // GA
-				travelCostPt = this.costPtGA; 
-				noOfGA++;
-			}
-			else { // all other cases
-				travelCostPt = this.costPtHalbtax;
-				noOfHalbtax++;
+			if (travelCost.equals("yes")){
+				if (aaa.getSeasonTicket().get(person.getId())==11) { // No season ticket
+					travelCostPt = this.costPtNothing; 
+					noOfNothing++;
+				}
+				else if (aaa.getSeasonTicket().get(person.getId())==2 || aaa.getSeasonTicket().get(person.getId())==3) { // GA
+					travelCostPt = this.costPtGA; 
+					noOfGA++;
+				}
+				else { // all other cases
+					travelCostPt = this.costPtHalbtax;
+					noOfHalbtax++;
+				}
 			}
 			
 			int counterRow=0;
@@ -1349,14 +1370,14 @@ public class PlansConstructor implements PlanStrategyModule{
 						if (j%2==0){
 							stream.print(0+"\t");
 							counterRow++;
-							if (j%2==1 && this.travelCost.equals("yes") && (((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.car) || ((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.pt))){
+						/*	if (j%2==1 && this.travelCost.equals("yes") && (((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.car) || ((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.pt))){
 								stream.print(0+"\t");
 								counterRow++;
 							}
 							if (j%2==1 && (this.travelDistance.equals("yes"))){
 								stream.print(0+"\t");
 								counterRow++;
-							}
+							}*/
 						}
 						else { // Check whether mode is in
 							LegImpl leg = ((LegImpl)(this.actChains.get(i).get(j)));
@@ -1368,20 +1389,44 @@ public class PlansConstructor implements PlanStrategyModule{
 						}
 					}
 					if (car) {
-						stream.print("0\t0\t0\t");
-						counterRow+=3;
+						stream.print("0\t");
+						counterRow++;
+						if (travelCost.equals("yes")){
+							stream.print("0\t");
+							counterRow++;
+						}
+						if (travelDistance.equals("yes")){
+							stream.print("0\t");
+							counterRow++;
+						}
 					}
 					if (pt) {
-						stream.print("0\t0\t0\t");
-						counterRow+=3;
+						stream.print("0\t");
+						counterRow++;
+						if (travelCost.equals("yes")){
+							stream.print("0\t");
+							counterRow++;
+						}
+						if (travelDistance.equals("yes")){
+							stream.print("0\t");
+							counterRow++;
+						}
 					}
-					if (bike && this.bikeIn.equals("yes")) {
-						stream.print("0\t0\t");
-						counterRow+=2;
+					if (bike && bikeIn.equals("yes")) {
+						stream.print("0\t");
+						counterRow++;
+						if (travelDistance.equals("yes")){
+							stream.print("0\t");
+							counterRow++;
+						}
 					}
 					if (walk) {
-						stream.print("0\t0\t");
-						counterRow+=2;
+						stream.print("0\t");
+						counterRow++;
+						if (travelDistance.equals("yes")){
+							stream.print("0\t");
+							counterRow++;
+						}
 					}					
 					
 					if (similarity.equals("yes")) {
@@ -1708,25 +1753,44 @@ public class PlansConstructor implements PlanStrategyModule{
 			
 			if (car>0){
 				stream.print(car_time+"\t");
-				stream.print(car_cost+"\t");
-				stream.print(car_distance+"\t");
-				counter+=3;
+				counter++;
+				if (this.travelCost.equals("yes")){
+					stream.print(car_cost+"\t");
+					counter++;
+				}
+				if (this.travelDistance.equals("yes")){
+					stream.print(car_distance+"\t");
+					counter++;
+				}
 			}
 			if (pt>0){
 				stream.print(pt_time+"\t");
-				stream.print(pt_cost+"\t");
-				stream.print(pt_distance+"\t");
-				counter+=3;
+				counter++;
+				if (this.travelCost.equals("yes")){
+					stream.print(pt_cost+"\t");
+					counter++;
+				}
+				if (this.travelDistance.equals("yes")){
+					stream.print(pt_distance+"\t");
+					counter++;
+				}
+				
 			}
 			if (bike>0 && this.bikeIn.equals("yes")){
 				stream.print(bike_time+"\t");
-				stream.print(bike_distance+"\t");
-				counter+=3;
+				counter++;
+				if (this.travelDistance.equals("yes")){
+					stream.print(bike_distance+"\t");
+					counter++;
+				}
 			}
 			if (walk>0){
 				stream.print(walk_time+"\t");
-				stream.print(walk_distance+"\t");
-				counter+=3;
+				counter++;
+				if (this.travelDistance.equals("yes")){
+					stream.print(walk_distance+"\t");
+					counter++;
+				}
 			}
 		}
 		return counter;
