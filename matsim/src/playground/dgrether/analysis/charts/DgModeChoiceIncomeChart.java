@@ -48,7 +48,7 @@ public class DgModeChoiceIncomeChart {
 	private DefaultCategoryDataset dataset;
 	
 	private String xLabel = "Income [CHF / Year] up to...";
-	private String yLabel = "% of travellers";
+	private String yLabel = "% of Travellers";
 
 	private Id runId; 
 	

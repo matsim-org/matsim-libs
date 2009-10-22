@@ -20,7 +20,6 @@
 package playground.dgrether.analysis.charts;
 
 import java.awt.BasicStroke;
-import java.util.List;
 
 import org.jfree.chart.ChartColor;
 import org.jfree.chart.JFreeChart;
@@ -39,13 +38,13 @@ import playground.dgrether.utils.charts.DgColorScheme;
  */
 public class DgMixedDeltaScoreIncomeModeChoiceChart {
 
-	private List<XYSeriesCollection> avgDeltaScoreIncomeDs;
+	private XYSeriesCollection avgDeltaScoreIncomeDs;
 	private XYSeriesCollection inomeModeChoiceDs;
 	
 	private DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();
 
-	public void addAvgDeltaScoreIncomeDs(List<XYSeriesCollection> datasets) {
-		this.avgDeltaScoreIncomeDs = datasets;
+	public void addAvgDeltaScoreIncomeDs(XYSeriesCollection dataset) {
+		this.avgDeltaScoreIncomeDs = dataset;
 	}
 
 	public void addIncomeModeChoiceDataSet(XYSeriesCollection incomeModeChoice) {
@@ -55,7 +54,7 @@ public class DgMixedDeltaScoreIncomeModeChoiceChart {
 	public JFreeChart createChart() {
 		XYPlot plot = new XYPlot();
 		ValueAxis xAxis = this.axisBuilder.createValueAxis("Income [Chf / Year]");
-		ValueAxis yAxis = this.axisBuilder.createValueAxis("Delta utils [Utils]");
+		ValueAxis yAxis = this.axisBuilder.createValueAxis("Delta Utils [Utils]");
 		plot.setDomainAxis(xAxis);
 		plot.setRangeAxis(yAxis);
 		
@@ -69,20 +68,19 @@ public class DgMixedDeltaScoreIncomeModeChoiceChart {
 		plot.setDataset(0, this.inomeModeChoiceDs);
 		plot.setRenderer(0, renderer1);
 		
-		int i = 0;
 		XYItemRenderer renderer2;
-		for (XYSeriesCollection col : this.avgDeltaScoreIncomeDs){
-			i++;
-			plot.setDataset(i, col);
-			renderer2 = new XYLineAndShapeRenderer(true, true);
-			renderer2.setSeriesStroke(0, new BasicStroke(2.0f));
-			renderer2.setSeriesOutlineStroke(0, new BasicStroke(3.0f));
-			renderer2.setSeriesPaint(0, colorScheme.getColor(i, "a"));
-			plot.setRenderer(i, renderer2);
+		renderer2 = new XYLineAndShapeRenderer(true, true);
+		plot.setDataset(1, this.avgDeltaScoreIncomeDs);
+		for (int i = 0; i <= 3; i++){
+			renderer2.setSeriesStroke(i, new BasicStroke(2.0f));
+			renderer2.setSeriesOutlineStroke(i, new BasicStroke(3.0f));
+			renderer2.setSeriesPaint(i, colorScheme.getColor(i+1, "a"));
 		}
-
-		JFreeChart chart = new JFreeChart("Test",plot);
+		plot.setRenderer(1, renderer2);
+		JFreeChart chart = new JFreeChart("",plot);
 		chart.setBackgroundPaint(ChartColor.WHITE);
+		chart.getLegend().setItemFont(this.axisBuilder.getAxisFont());
+		chart.setTextAntiAlias(true);
 		return chart;
 	}
 
