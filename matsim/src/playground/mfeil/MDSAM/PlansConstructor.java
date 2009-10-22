@@ -185,7 +185,9 @@ public class PlansConstructor implements PlanStrategyModule{
 		
 	// Type of writing the Biogeme file
 		//	this.writePlansForBiogeme(this.outputFileBiogeme);
-		this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
+		//this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
+		//		this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);	
+		this.writePlansForBiogemeWithRandomSelectionAccumulated(this.outputFileBiogeme, this.attributesInputFile, 
 				this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);	
 		
 	// Type of writing the mod file
@@ -742,7 +744,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("done.");
 	}
 	
-	
+	/*
 	// Writes a Biogeme file that fits "protected void enlargePlansSetWithRandomSelection ()"
 	public void writePlansForBiogemeWithRandomSelection (String outputFile, String attributesInputFile,
 			String similarity, 
@@ -1054,6 +1056,372 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("Number of valid plans is "+valid+"; number of invalid plans is "+invalid);
 		log.info("Number of GA = "+noOfGA+", number of Halbtax = "+noOfHalbtax+", and number of nothing = "+noOfNothing);
 		log.info("done.");
+	}*/
+	
+	
+	// Writes a Biogeme file that fits "protected void enlargePlansSetWithRandomSelection ()"
+	public void writePlansForBiogemeWithRandomSelectionAccumulated (String outputFile, String attributesInputFile,
+			String similarity, 
+			String incomeConstant,
+			String incomeDivided,
+			String incomeDividedLN,
+			String incomeBoxCox,
+			String age,
+			String gender,
+			String employed,
+			String license,
+			String carAvail,
+			String seasonTicket,
+			String travelDistance,
+			String travelCost,
+			String travelConstant,
+			String bikeIn){
+		
+		log.info("Writing plans for Biogeme...");
+		
+		// Writing the variables back to head of class due to MDSAM call possibility. 
+		// Like this, they are also available for modMaker class.
+		this.similarity=similarity; 
+		this.incomeConstant=incomeConstant; 
+		this.incomeDivided=incomeDivided; 
+		this.incomeDividedLN=incomeDividedLN; 
+		this.incomeBoxCox=incomeBoxCox;
+		this.age=age; 
+		this.gender=gender; 
+		this.employed=employed; 
+		this.license=license; 
+		this.carAvail=carAvail; 
+		this.seasonTicket=seasonTicket; 
+		this.travelDistance=travelDistance;
+		this.travelCost=travelCost; 
+		this.travelConstant=travelConstant; 
+		this.bikeIn=bikeIn;
+		
+		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
+		AgentsAttributesAdder aaa = new AgentsAttributesAdder ();
+		int incomeAverage=0;
+		int noOfGA = 0;
+		int noOfHalbtax = 0;
+		int noOfNothing = 0;
+		
+		// Run external classes if required
+		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes") || carAvail.equals("yes") || seasonTicket.equals("yes") || travelCost.equals("yes")){
+			aaa.run(attributesInputFile);
+		}
+		if (similarity.equals("yes")){
+			this.mdsam = new MDSAM(this.population);
+			this.sims = this.mdsam.runPopulation();
+			this.writeSims(this.outputFileSims);
+		}
+		
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputFile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		// First row
+		int counterFirst=0;
+		stream.print("Id\tChoice\t");
+		counterFirst+=2;
+		
+		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) {
+			stream.print("Income\t"); 
+			counterFirst++;
+		}
+		if (incomeBoxCox.equals("yes")) {
+			stream.print("Income_IncomeAverage\t"); 
+			counterFirst++;
+			
+			// Calculate average income
+			int counterIncome=0;
+			for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
+				PersonImpl person = iterator.next();
+				if (!aaa.getIncome().containsKey(person.getId())){
+					continue;
+				}
+				counterIncome++;
+				incomeAverage+=aaa.getIncome().get(person.getId());
+			}
+			incomeAverage=incomeAverage/counterIncome;
+		}
+		if (age.equals("yes")) {
+			stream.print("Age\t"); 
+			counterFirst++;
+		}
+		if (gender.equals("yes")) {
+			stream.print("Gender\t"); 
+			counterFirst++;
+		}
+		if (employed.equals("yes")) {
+			stream.print("Employed\t"); 
+			counterFirst++;
+		}
+		if (license.equals("yes")) {
+			stream.print("License\t"); 
+			counterFirst++;
+		}
+		if (carAvail.equals("yes")) {
+			stream.print("CarAlways\tCarSometimes\tCarNever\t"); 
+			counterFirst+=3;
+		}
+		if (seasonTicket.equals("yes")) {
+			stream.print("SeasonTicket\t"); 
+			counterFirst++;
+		}
+		
+		for (int i = 0;i<this.actChains.size();i++){
+			boolean car = false;
+			boolean pt = false;
+			boolean bike = false;
+			boolean walk = false;
+			for (int j=0;j<java.lang.Math.max(this.actChains.get(i).size()-1,1);j+=2){
+				stream.print("x"+(i+1)+""+(j+1)+"\t");
+				counterFirst++;
+			}
+			for (int j=1;j<this.actChains.get(i).size()-1;j+=2){
+				LegImpl leg = ((LegImpl)(this.actChains.get(i).get(j)));
+				if (leg.getMode().equals(TransportMode.car)) car = true;
+				else if (leg.getMode().equals(TransportMode.pt)) pt = true;
+				else if (leg.getMode().equals(TransportMode.bike)) bike = true;
+				else if (leg.getMode().equals(TransportMode.walk)) walk = true;
+				else log.warn("Leg mode "+leg.getMode()+" in act chain "+i+" could not be identified!");
+			}
+			if (car) {
+				stream.print("x"+(i+1)+"_car_time\t");
+				stream.print("x"+(i+1)+"_car_cost\t");
+				stream.print("x"+(i+1)+"_car_distance\t");
+				counterFirst+=3;
+			}
+			if (pt) {
+				stream.print("x"+(i+1)+"_pt_time\t");
+				stream.print("x"+(i+1)+"_pt_cost\t");
+				stream.print("x"+(i+1)+"_pt_distance\t");
+				counterFirst+=3;
+			}
+			if (bike && this.bikeIn.equals("yes")) {
+				stream.print("x"+(i+1)+"_bike_time\t");
+				stream.print("x"+(i+1)+"_bike_distance\t");
+				counterFirst+=2;
+			}
+			if (walk) {
+				stream.print("x"+(i+1)+"_walk_time\t");
+				stream.print("x"+(i+1)+"_walk_distance\t");
+				counterFirst+=2;
+			}
+			if (similarity.equals("yes")) {
+				stream.print("x"+(i+1)+"_sim\t"); 
+				counterFirst++;
+			}
+		}
+		for (int i = 0;i<this.actChains.size();i++){
+			stream.print("av"+(i+1)+"\t");
+			counterFirst++;
+		}
+		stream.println();
+		
+		// Filling plans
+		int counter=0;
+		int valid=0;
+		int invalid=0;
+		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = iterator.next();
+			counter++;
+			if (counter%1000==0) {
+				log.info("Handling person "+counter);
+				Gbl.printMemoryUsage();
+			}
+			
+			// Check whether all info is available for this person. Drop the person, otherwise
+			if ((incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) && !aaa.getIncome().containsKey(person.getId())){
+				log.warn("No income available for person "+person.getId()+". Dropping the person.");
+				continue;
+			}
+			if (carAvail.equals("yes") && !aaa.getCarAvail().containsKey(person.getId())){
+				log.warn("No car availability info available for person "+person.getId()+". Dropping the person.");
+				continue;
+			}
+			if (seasonTicket.equals("yes") && !aaa.getSeasonTicket().containsKey(person.getId())){
+				log.warn("No season ticket info available for person "+person.getId()+". Dropping the person.");
+				continue;
+			}			
+			
+			// Check whether the selected plan of the person is valid. Drop the person, otherwise
+			if (person.getSelectedPlan().getScore()!=null && person.getSelectedPlan().getScore()==-100000.0){
+				log.warn("Person's "+person.getId()+" selected plan is not valid. Dropping the person.");
+				continue;
+			}
+			
+			// Calculate travelCostPt for the person
+			double travelCostPt = 0;
+			if (aaa.getSeasonTicket().get(person.getId())==11) { // No season ticket
+				travelCostPt = this.costPtNothing; 
+				noOfNothing++;
+			}
+			else if (aaa.getSeasonTicket().get(person.getId())==2 || aaa.getSeasonTicket().get(person.getId())==3) { // GA
+				travelCostPt = this.costPtGA; 
+				noOfGA++;
+			}
+			else { // all other cases
+				travelCostPt = this.costPtHalbtax;
+				noOfHalbtax++;
+			}
+			
+			int counterRow=0;
+			
+			// Person ID
+			stream.print(person.getId()+"\t");
+			counterRow++;
+			
+			// Choice
+			int position = -1;
+			for (int i=0;i<this.actChains.size();i++){
+				if (acCheck.checkEqualActChainsModesAccumulated(person.getSelectedPlan().getPlanElements(), this.actChains.get(i))) {
+					position = i+1;
+					break;
+				}
+			}
+			stream.print(position+"\t");
+			counterRow++;
+			
+			if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) {
+				stream.print((aaa.getIncome().get(person.getId())/30)+"\t");
+				counterRow++;
+			}
+			if (incomeBoxCox.equals("yes")) {
+				stream.print(((double)(aaa.getIncome().get(person.getId()))/(double)(incomeAverage))+"\t");
+				counterRow++;
+			}
+			if (age.equals("yes")) {
+				stream.print(person.getAge()+"\t"); 
+				counterRow++;
+			}
+			if (gender.equals("yes")) {
+				if (person.getSex().equals("f")) stream.print(0+"\t"); 
+				else stream.print(1+"\t");
+				counterRow++;
+			}
+			if (employed.equals("yes")) {   // No info on this available!
+				stream.print(0+"\t"); 
+				counterRow++;
+			}
+			if (license.equals("yes")) {
+				if (person.getLicense().equals("no")) stream.print(0+"\t"); 
+				else stream.print(1+"\t"); 
+				counterRow++;
+			}
+			if (carAvail.equals("yes")) {
+				int car = aaa.getCarAvail().get(person.getId());
+				if (car==1) stream.print(1+"\t"+0+"\t"+0+"\t");
+				else if (car==2) stream.print(0+"\t"+1+"\t"+0+"\t");
+				else if (car==3) stream.print(0+"\t"+0+"\t"+1+"\t");
+				else log.warn("Unidentified car availability "+car+" for person "+person.getId());
+				counterRow+=3;
+			}
+			if (seasonTicket.equals("yes")) {
+				stream.print(aaa.getSeasonTicket().get(person.getId())+"\t"); 
+				counterRow++;
+			}
+			
+			// Go through all act chains: if act chain == a plan of the person -> write it into file; write 0 otherwise 
+			int counterFound = 0;
+			for (int i=0;i<this.actChains.size();i++){
+				boolean found = false;
+				for (int j=0;j<person.getPlans().size();j++){
+					if (acCheck.checkEqualActChainsModesAccumulated(person.getPlans().get(j).getPlanElements(), this.actChains.get(i))) {
+						counterRow += this.writeAccumulatedPlanIntoFileAccumulated(stream, person.getPlans().get(j).getPlanElements(), this.actChains.get(i), travelCostPt);
+						found = true;
+						counterFound++;
+						break;
+					}
+				}
+				// Similarity attribute
+				// TODO hier brauchts eine neue Lösung für die Similarity, weil jetzt die Reihenfolge der Plans nicht mehr eindeutig ist!
+				//if (similarity.equals("yes") && found) stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
+				if (!found){
+					boolean car = false;
+					boolean pt = false;
+					boolean bike = false;
+					boolean walk = false;
+					for (int j=0;j<Math.max(this.actChains.get(i).size()-1, 1);j++){
+						if (j%2==0){
+							stream.print(0+"\t");
+							counterRow++;
+							if (j%2==1 && this.travelCost.equals("yes") && (((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.car) || ((LegImpl)(this.actChains.get(i).get(j))).getMode().equals(TransportMode.pt))){
+								stream.print(0+"\t");
+								counterRow++;
+							}
+							if (j%2==1 && (this.travelDistance.equals("yes"))){
+								stream.print(0+"\t");
+								counterRow++;
+							}
+						}
+						else { // Check whether mode is in
+							LegImpl leg = ((LegImpl)(this.actChains.get(i).get(j)));
+							if (leg.getMode().equals(TransportMode.car)) car = true;
+							else if (leg.getMode().equals(TransportMode.pt)) pt = true;
+							else if (leg.getMode().equals(TransportMode.bike)) bike = true;
+							else if (leg.getMode().equals(TransportMode.walk)) walk = true;
+							else log.warn("Leg mode "+leg.getMode()+" in act chain "+i+" could not be identified!");
+						}
+					}
+					if (car) {
+						stream.print("0\t0\t0\t");
+						counterRow+=3;
+					}
+					if (pt) {
+						stream.print("0\t0\t0\t");
+						counterRow+=3;
+					}
+					if (bike && this.bikeIn.equals("yes")) {
+						stream.print("0\t0\t");
+						counterRow+=2;
+					}
+					if (walk) {
+						stream.print("0\t0\t");
+						counterRow+=2;
+					}					
+					
+					if (similarity.equals("yes")) {
+						stream.print(0+"\t");
+						counterRow++;
+					}
+				}
+			}
+			if (counterFound!=this.noOfAlternatives) log.warn("For person "+person+", size of choice set is not "+this.noOfAlternatives+" but only "+counterFound);
+			
+			for (int i=0;i<this.actChains.size();i++){
+				boolean found = false;
+				for (int j=0;j<person.getPlans().size();j++){
+					if (acCheck.checkEqualActChainsModesAccumulated(person.getPlans().get(j).getPlanElements(), this.actChains.get(i))) {
+						if (person.getPlans().get(j).getScore()!=null && person.getPlans().get(j).getScore()==-100000.0) {
+							stream.print(0+"\t");
+							counterRow++;
+							invalid++;
+						}
+						else {
+							stream.print(1+"\t");
+							counterRow++;
+							valid++;
+						}
+						found = true;
+						break;
+					}
+				}
+				if (!found){
+					stream.print(0+"\t");
+					counterRow++;
+				}
+			}
+			stream.println();
+			if (counterFirst!=counterRow) log.warn("For person "+person.getId()+", the row length of "+counterRow+" does not fit the expected length of "+counterFirst+"!");
+		}
+		stream.close();
+		log.info("Number of valid plans is "+valid+"; number of invalid plans is "+invalid);
+		log.info("Number of GA = "+noOfGA+", number of Halbtax = "+noOfHalbtax+", and number of nothing = "+noOfNothing);
+		log.info("done.");
 	}
 	
 	
@@ -1173,7 +1541,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		stream.close();
 		log.info("done.");
 	}
-	
+	/*
 	private int writeAccumulatedPlanIntoFile (PrintStream stream, List<PlanElement> planToBeWritten, List<PlanElement> referencePlan, double travelCostPt){
 		
 		if (planToBeWritten.size()!=referencePlan.size()){
@@ -1241,22 +1609,145 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		return counter;
 	}
+	*/
+	
+	
+	private int writeAccumulatedPlanIntoFileAccumulated (PrintStream stream, List<PlanElement> planToBeWritten, List<PlanElement> referencePlan, double travelCostPt){
+		
+		if (planToBeWritten.size()!=referencePlan.size()){
+			log.warn("Plans do not have same size; planToBeWritten: "+planToBeWritten+", referencePlan: "+referencePlan);
+		}
+		
+		int counter=0;
+		
+		// Plan has only one act
+		if (planToBeWritten.size()==1) {
+			stream.print(24+"\t");
+			counter++;
+		}
+		else {
+			// First and last home act
+			stream.print((((ActivityImpl)(planToBeWritten.get(0))).getEndTime()+86400-((ActivityImpl)(planToBeWritten.get(planToBeWritten.size()-1))).getStartTime())/3600+"\t");
+			counter++;	
+			
+			LinkedList<Integer> takenPositions = new LinkedList<Integer>();
+			int car = 0;
+			int pt = 0;
+			int bike = 0;
+			int walk = 0;
+			double car_time = 0;
+			double car_cost = 0;
+			double car_distance = 0;
+			double pt_time = 0;
+			double pt_cost = 0;
+			double pt_distance = 0;
+			double bike_time = 0;
+			double bike_distance = 0;
+			double walk_time = 0;
+			double walk_distance = 0;
+			for (int i=1;i<referencePlan.size()-1;i++){ 
+				if (i%2==0){ // Activities
+					boolean found = false;
+					for (int j=2;j<planToBeWritten.size()-2;j+=2){
+						if (((ActivityImpl)(referencePlan.get(i))).getType().equals(((ActivityImpl)(planToBeWritten.get(j))).getType()) &&
+								!takenPositions.contains(j)){
+							stream.print(((ActivityImpl)(planToBeWritten.get(j))).calculateDuration()/3600+"\t");
+							counter++;
+							takenPositions.add(j);
+							found = true;
+							break;
+						}
+					}
+					if (!found) log.warn("Activity "+referencePlan.get(i)+" could not be found!");
+				}
+				else { // Check whether mode is in
+					LegImpl leg = ((LegImpl)(referencePlan.get(i)));
+					if (leg.getMode().equals(TransportMode.car)) car++;
+					else if (leg.getMode().equals(TransportMode.pt)) pt++;
+					else if (leg.getMode().equals(TransportMode.bike)) bike++;
+					else if (leg.getMode().equals(TransportMode.walk)) walk++;
+					else log.warn("Leg mode "+leg.getMode()+" in act chain "+i+" could not be identified!");
+				}
+			}
+			
+			// Now go through planToBeWritten, check whether everything correct and write legs into file
+			int carCheck = 0;
+			int ptCheck = 0;
+			int bikeCheck = 0;
+			int walkCheck = 0;
+			for (int i=1;i<planToBeWritten.size()-1;i+=2){ 
+				LegImpl leg = ((LegImpl)(planToBeWritten.get(i)));
+				if (leg.getMode().equals(TransportMode.car)) {
+					carCheck++;
+					car_time += leg.getTravelTime();
+					car_cost += leg.getRoute().getDistance()/1000*this.travelCostCar;
+					car_distance += leg.getRoute().getDistance()/1000;
+				}
+				else if (leg.getMode().equals(TransportMode.pt)) {
+					ptCheck++;
+					pt_time += leg.getTravelTime();
+					pt_cost += leg.getRoute().getDistance()/1000*travelCostPt;
+					pt_distance += leg.getRoute().getDistance()/1000;
+				}
+				else if (leg.getMode().equals(TransportMode.bike)) {
+					bikeCheck++;
+					bike_time += leg.getTravelTime();
+					bike_distance += leg.getRoute().getDistance()/1000;
+				}
+				else if (leg.getMode().equals(TransportMode.walk)) {
+					walkCheck++;
+					walk_time += leg.getTravelTime();
+					walk_distance += leg.getRoute().getDistance()/1000;
+				}
+				else log.warn("Leg mode "+leg.getMode()+" in act chain "+i+" could not be identified!");
+			}
+			if (car!=carCheck) log.warn("Number of "+car+" car legs in referencePlan is different from number of "+carCheck+" car legs in planToBeWritten!");
+			if (pt!=ptCheck) log.warn("Number of "+pt+" pt legs in referencePlan is different from number of "+ptCheck+" pt legs in planToBeWritten!");
+			if (bike!=bikeCheck) log.warn("Number of "+bike+" bike legs in referencePlan is different from number of "+bikeCheck+" bike legs in planToBeWritten!");
+			if (walk!=walkCheck) log.warn("Number of "+walk+" walk legs in referencePlan is different from number of "+walkCheck+" walk legs in planToBeWritten!");
+			
+			if (car>0){
+				stream.print(car_time+"\t");
+				stream.print(car_cost+"\t");
+				stream.print(car_distance+"\t");
+				counter+=3;
+			}
+			if (pt>0){
+				stream.print(pt_time+"\t");
+				stream.print(pt_cost+"\t");
+				stream.print(pt_distance+"\t");
+				counter+=3;
+			}
+			if (bike>0 && this.bikeIn.equals("yes")){
+				stream.print(bike_time+"\t");
+				stream.print(bike_distance+"\t");
+				counter+=3;
+			}
+			if (walk>0){
+				stream.print(walk_time+"\t");
+				stream.print(walk_distance+"\t");
+				counter+=3;
+			}
+		}
+		return counter;
+	}
 	
 	
 	//////////////////////////////////////////////////////////////////////
 	// Writing mod file methods 
 	//////////////////////////////////////////////////////////////////////
 	
-	public void writeModFile(String outputFile){
+	/*public void writeModFile(String outputFile){
 		new ModFileMaker (this.population, this.actChains).write(outputFile);
 	}
 	
 	public void writeModFileWithSequence(String outputFile){
 		new ModFileMaker (this.population, this.actChains).writeWithSequence(outputFile);
-	}
+	}*/
 	
 	public void writeModFileWithRandomSelection (String outputFile){
-		new ModFileMaker (this.population, this.actChains).writeWithRandomSelection(outputFile,
+		//new ModFileMaker (this.population, this.actChains).writeWithRandomSelection(outputFile,
+		new ModFileMaker (this.population, this.actChains).writeWithRandomSelectionAccumulated(outputFile,
 				this.similarity, 
 				this.incomeConstant,
 				this.incomeDivided,

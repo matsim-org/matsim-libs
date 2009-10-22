@@ -82,7 +82,9 @@ public class Run {
 
 		PlansConstructor pc = new PlansConstructor(scenario.getPopulation(), sims);
 		pc.keepPersons();
-		pc.writePlansForBiogemeWithRandomSelection(outputFileBiogeme, attributesInputFile, 
+		//pc.writePlansForBiogemeWithRandomSelection(outputFileBiogeme, attributesInputFile, 
+		//		similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, age, gender, employed, license, carAvail, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn);
+		pc.writePlansForBiogemeWithRandomSelectionAccumulated(outputFileBiogeme, attributesInputFile, 
 				similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, age, gender, employed, license, carAvail, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn);
 		pc.writeModFileWithRandomSelection(outputFileMod);
 		log.info("Process finished.");
