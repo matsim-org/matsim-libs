@@ -775,6 +775,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
 		AgentsAttributesAdder aaa = new AgentsAttributesAdder ();
+		int incomeAverage=0;
 		
 		// Run external classes if required
 		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes") || carAvail.equals("yes") || seasonTicket.equals("yes")){
@@ -802,6 +803,22 @@ public class PlansConstructor implements PlanStrategyModule{
 		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) {
 			stream.print("Income\t"); 
 			counterFirst++;
+		}
+		if (incomeBoxCox.equals("yes")) {
+			stream.print("Income_IncomeAverage\t"); 
+			counterFirst++;
+			
+			// Calculate average income
+			int counterIncome=0;
+			for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
+				PersonImpl person = iterator.next();
+				if (!aaa.getIncome().containsKey(person.getId())){
+					continue;
+				}
+				counterIncome++;
+				incomeAverage+=aaa.getIncome().get(person.getId());
+			}
+			incomeAverage=incomeAverage/counterIncome;
 		}
 		if (age.equals("yes")) {
 			stream.print("Age\t"); 
@@ -901,7 +918,11 @@ public class PlansConstructor implements PlanStrategyModule{
 			counterRow++;
 			
 			if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes")) {
-				stream.print((aaa.getIncome().get(person.getId())/1000)+"\t");
+				stream.print((aaa.getIncome().get(person.getId())/30)+"\t");
+				counterRow++;
+			}
+			if (incomeBoxCox.equals("yes")) {
+				stream.print(((double)(aaa.getIncome().get(person.getId()))/(double)(incomeAverage))+"\t");
 				counterRow++;
 			}
 			if (age.equals("yes")) {

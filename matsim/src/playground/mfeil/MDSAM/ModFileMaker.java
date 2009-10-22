@@ -332,11 +332,11 @@ public class ModFileMaker {
 		stream.println("[Beta]");
 		stream.println("//Name \tValue  \tLowerBound \tUpperBound  \tstatus (0=variable, 1=fixed");
 		
-		stream.println("HomeUmax \t4  \t0 \t100  \t0");
-		stream.println("WorkUmax \t2  \t0 \t100  \t0");
-		stream.println("EducationUmax \t1  \t0 \t100  \t0");
-		stream.println("ShoppingUmax \t1  \t0 \t100  \t0");
-		stream.println("LeisureUmax \t1  \t0 \t100  \t0");
+		stream.println("HomeUmax \t60  \t0 \t100  \t0");
+		stream.println("WorkUmax \t50  \t0 \t100  \t0");
+		stream.println("EducationUmax \t30  \t0 \t100  \t0");
+		stream.println("ShoppingUmax \t10  \t0 \t100  \t0");
+		stream.println("LeisureUmax \t20  \t0 \t100  \t0");
 		
 		stream.println("HomeAlpha \t8  \t-5 \t20  \t0");
 		stream.println("WorkAlpha \t4  \t-5 \t20  \t0");
@@ -349,11 +349,13 @@ public class ModFileMaker {
 		if (travelConstant.equals("yes")) stream.println("ConstantCar \t0  \t-50 \t50  \t0");
 		if (incomeDivided.equals("yes")) stream.println("IncomeDividedCar \t0  \t-50 \t50  \t0");
 		if (incomeDivided.equals("yes")) stream.println("IncomeDividedLNCar \t0  \t-50 \t50  \t0");
+		if (incomeBoxCox.equals("yes")) stream.println("IncomeBoxCoxCar \t0  \t-50 \t50  \t0");
 		stream.println("Upt \t-2  \t-50 \t30  \t0");
 		if (travelCost.equals("yes")) stream.println("CostPt \t0  \t-50 \t30  \t0");
 		if (travelConstant.equals("yes")) stream.println("ConstantPt \t0  \t-50 \t50  \t0");
 		if (incomeDivided.equals("yes")) stream.println("IncomeDividedPt \t0  \t-50 \t50  \t0");
 		if (incomeDivided.equals("yes")) stream.println("IncomeDividedLNPt \t0  \t-50 \t50  \t0");
+		if (incomeBoxCox.equals("yes")) stream.println("IncomeBoxCoxPt \t0  \t-50 \t50  \t0");
 		stream.println("Uwalk \t-1  \t-50 \t30  \t0");
 		if (travelConstant.equals("yes")) stream.println("ConstantWalk \t0  \t-50 \t50  \t0");
 		if (bikeIn.equals("yes")) stream.println("Ubike \t-6  \t-50 \t30  \t0");	
@@ -487,6 +489,17 @@ public class ModFileMaker {
 					}
 					if (legs.getMode().equals(TransportMode.pt)) {
 						stream.print(" + IncomeDividedPt * x"+(i+1)+""+(j+1)+"_1 / ( Income * one + one )");
+					}					
+				}
+			}
+			if (incomeBoxCox.equals("yes")) {
+				for (int j=1;j<actslegs.size()-1;j+=2){
+					LegImpl legs = (LegImpl)actslegs.get(j);
+					if (legs.getMode().equals(TransportMode.car)) {
+						stream.print(" + CostCar * x"+(i+1)+""+(j+1)+"_1 * ( Income_IncomeAverage * one ) ^ IncomeBoxCoxCar");
+					}
+					if (legs.getMode().equals(TransportMode.pt)) {
+						stream.print(" + CostPt * x"+(i+1)+""+(j+1)+"_1 * ( Income_IncomeAverage * one ) ^ IncomeBoxCoxPt");
 					}					
 				}
 			}
