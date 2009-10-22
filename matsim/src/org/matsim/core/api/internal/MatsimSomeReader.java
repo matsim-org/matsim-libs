@@ -21,9 +21,10 @@
 package org.matsim.core.api.internal;
 
 /**
+ * marker interface.  Don't use.  kai, oct'09
+ * 
  * @author nagel
  *
- * @deprecated don't use; this is just a marker interface.  kai, oct'09
  */
 public interface MatsimSomeReader {
 
