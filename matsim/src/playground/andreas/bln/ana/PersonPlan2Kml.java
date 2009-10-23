@@ -120,6 +120,10 @@ public class PersonPlan2Kml extends NewPopulation{
 
 		} else if(this.agentIds.contains(person.getId().toString())){
 			writePersonKML(person);
+			if(!this.warningPrinted){
+				log.info("Will write " + this.agentIds.size() + " agents to kml");
+				this.warningPrinted = true;
+			}
 			log.info(" " + person.getId() + " written to kml");
 		}
 	}
