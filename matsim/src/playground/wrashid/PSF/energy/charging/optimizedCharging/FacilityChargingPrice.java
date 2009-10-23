@@ -94,7 +94,8 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 				// assumption: the price is always above 9 Rappen.
 				// the actual value would loose its meaning, if would would directly multiply with the
 				// randomNumber, because the main part would be the 9 Rappen part.
-				double basePrice=0.09;
+				// TODO: adapt this, if prices changed from Rappen to CHF
+				double basePrice=9.0;
 				this.price-=basePrice;
 				this.price = this.price * this.randomNumber;
 				this.price+=basePrice;
@@ -108,7 +109,8 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 				// assumption: the price is always above 9 Rappen.
 				// the actual value would loose its meaning, if would would directly multiply with the
 				// randomNumber, because the main part would be the 9 Rappen part.
-				double basePrice=0.09;
+				// TODO: adapt this, if prices changed from Rappen to CHF
+				double basePrice=9.0; 
 				this.price-=basePrice;
 				this.price = this.price * Math.sqrt(this.randomNumber);
 				this.price+=basePrice;
