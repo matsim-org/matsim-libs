@@ -69,7 +69,7 @@ public class FtConfigGroup extends Module {
 		
 		TRAVELING_RIDE ("travelingRide", "0.0", ""), 
 		
-		CONST_RIDE ("travelingRide", "0.0", ""), 
+		CONST_RIDE ("constRide", "0.0", ""), 
 		
 		MARG_UTIL_DIST_RIDE("marginalUtilityOfDistanceRide", "0.0", ""),
 		
