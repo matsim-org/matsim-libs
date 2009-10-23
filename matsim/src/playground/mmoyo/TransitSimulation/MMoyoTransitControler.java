@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.demo.equil;
+package playground.mmoyo.TransitSimulation;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.router.util.TravelCost;
@@ -42,5 +42,13 @@ public class MMoyoTransitControler extends TransitControler {
 		return new MMoyoPlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
 				this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), new TransitConfigGroup());
 	}
-
+	
+	public static void main(final String[] args) {
+		if (args.length > 0) {
+			new MMoyoTransitControler(args).run();
+		} else {
+			new MMoyoTransitControler(new String[] {"src/playground/mmoyo/demo/Berlin/BerlinConfig.xml"}).run();
+		}
+	}
+	
 }

@@ -17,6 +17,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.PTRouter.PTRouter;
+import playground.mmoyo.PTRouter.LogicIntoPlainTranslator;
+import playground.mmoyo.PTRouter.LogicFactory;
 
 /**
  * Receives two acts and returns a list of PT legs connecting their coordinates 

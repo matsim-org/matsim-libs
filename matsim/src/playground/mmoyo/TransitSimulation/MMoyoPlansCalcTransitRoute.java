@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.demo.equil;
+package playground.mmoyo.TransitSimulation;
 
 import java.util.EnumSet;
 import java.util.Iterator;

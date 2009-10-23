@@ -1,4 +1,4 @@
-package playground.mmoyo.TransitSimulation;
+package playground.mmoyo.PTRouter;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -18,7 +18,7 @@ import org.matsim.core.network.NodeImpl;
 /**
  * Calculates and stores travel time according to the logicTransitSchedule object
  **/
-public class TransitTravelTimeCalculator {
+public class TransitTravelTimeCalculator{
 	private Map<Id,Double> linkTravelTimeMap = new TreeMap<Id,Double>();
 	public Map<Id,double[]> nodeDeparturesMap = new TreeMap<Id,double[]>();
 	

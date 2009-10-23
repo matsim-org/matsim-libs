@@ -30,7 +30,7 @@ public class PTLink extends LinkImpl{
 		
 		this.setLength(this.getEuklideanDistance());
 		if (aliasType!=2){ this.walkTime = this.getLength() * ptValues.AV_WALKING_SPEED;}
-		network.addLink(this);///
+		network.addLink(this);
 	}
 
 	public TransitRoute getTransitRoute() {

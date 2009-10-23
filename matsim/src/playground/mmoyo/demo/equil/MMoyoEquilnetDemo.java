@@ -27,8 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.scenario.ScenarioLoader;
-
-//import playground.marcel.pt.demo.equilnet.EquilnetDemo;
+import playground.mmoyo.TransitSimulation.MMoyoTransitControler;
 
 /**copy of marcel.pt.demo.equilNet.EquilnetDemo.java to test the ptRouter in the simulation*/
 public class MMoyoEquilnetDemo {
@@ -101,4 +100,5 @@ public class MMoyoEquilnetDemo {
 		System.out.println("duration:" + (System.currentTimeMillis()-startTime));
 	}
 
+	
 }

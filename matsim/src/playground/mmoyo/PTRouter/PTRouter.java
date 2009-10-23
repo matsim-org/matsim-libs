@@ -26,7 +26,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 
 import playground.marcel.pt.router.TransitRouterConfig;
 import playground.marcel.pt.routes.ExperimentalTransitRoute;
-import playground.mmoyo.TransitSimulation.LogicFactory;
+import playground.mmoyo.PTRouter.LogicFactory;
 
 
 public class PTRouter{

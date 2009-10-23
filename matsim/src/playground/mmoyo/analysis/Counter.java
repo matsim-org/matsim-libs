@@ -16,7 +16,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.api.basic.v01.Id;
-import playground.mmoyo.TransitSimulation.LogicFactory;
+import playground.mmoyo.PTRouter.LogicFactory;
 import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.PTRouter.PTRouter;;
 
@@ -36,7 +36,7 @@ public class Counter {
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(this.population, logicFactory.getLogicNet());
 		plansReader.readFile(plansFile);
 	
-		//18sep
+	
 		///iterate with all coefficient values
 		for (double i=0; i<=100 ; i++ ){
 			double x = i/100;  
@@ -44,7 +44,6 @@ public class Counter {
 			routePopulation(x , ptRouter);	
 		}
 		
-
 		//a unique coefficient value
 		/*
 		double timeCoefficient = 1;
@@ -66,7 +65,7 @@ public class Counter {
 		System.out.println("size:" + size + " diferences:" + differences);
 		///
 		*/
-		//18sep	
+	
 		
 		System.out.println("Time Coefficient\tDistance Coefficient\tTimeAvg\tDistanceAvg\tTransfers\tDetTransfer\tWalkDistance");
 		for (PopulationResult r : populationResultList){
@@ -76,7 +75,6 @@ public class Counter {
 		
 	}
 	
-	//18 sep used to be void
 	public List<Path> routePopulation(double timeCoefficient, final PTRouter ptRouter){
 		List<Path> pathList = new ArrayList<Path>();
 		
@@ -142,13 +140,8 @@ public class Counter {
 		}//for person
 
 		System.out.println("average Time:" + populationResult.getTimeAvg() + "   average distance:" + populationResult.getDistanceAvg() + "    transfers:" + populationResult.getTransferNum() + "  WalkDistance:" + populationResult.getWalkDistanceAvg());
-
-		//
 		populationResultList.add(populationResult);
-
-		//18sep
 		return pathList;
-	
 	}
 
 }
@@ -173,13 +166,10 @@ class ConnectionResult{
 
 			String type  = ((LinkImpl)link).getType();  
 			if (type.equals("DetTransfer")){    //type.equals("Egress") || type.equals("Access") || <- we don't want to count the access and egress walk time until the radius search be defined.
-				walkDistance += distance;
-
-				if (type.equals("DetTransfer")) detTransfers++;
-				
+				walkDistance += link.getLength();
+				detTransfers++;
 			}else if (type.equals("Transfer")){
 				transfers++;
-			}else if (type.equals("Standard")){
 			}
 		}	
 	}

@@ -29,8 +29,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
-import playground.mmoyo.TransitSimulation.LogicFactory;
-import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
+import playground.mmoyo.PTRouter.LogicFactory;
+import playground.mmoyo.PTRouter.LogicIntoPlainTranslator;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 

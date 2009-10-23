@@ -15,8 +15,8 @@ public class PTTravelCost implements TravelCost{
 	byte aliasType;
 	
 	////coefficients with original values set to count only travelTime///
-	double timeCoeficient =.9;
-	double distanceCoeficient=.1;
+	double timeCoefficient =.9;
+	double distanceCoefficient=.1;
 	double transferPenalty=60;
 	double walkCoefficient= 0; 
 	double waitCoefficient=0;
@@ -25,10 +25,10 @@ public class PTTravelCost implements TravelCost{
 		this.ptTravelTime = ptTravelTime;
 	}
 	
-	public PTTravelCost(final PTTravelTime ptTravelTime, double timeCoeficient, double distanceCoeficient, double transferPenalty) {
+	public PTTravelCost(final PTTravelTime ptTravelTime, double timeCoefficient, double distanceCoefficient, double transferPenalty) {
 		this.ptTravelTime = ptTravelTime;
-		this.timeCoeficient =timeCoeficient ; 
-		this.distanceCoeficient = distanceCoeficient; 
+		this.timeCoefficient =timeCoefficient ; 
+		this.distanceCoefficient = distanceCoefficient; 
 		this.transferPenalty = transferPenalty;
 	}
 
@@ -42,24 +42,20 @@ public class PTTravelCost implements TravelCost{
 		if (type.equals("DetTransfer") || type.equals("Transfer")){
 			cost = (travelTime + transferPenalty);
 		}else if (type.equals("Standard")){
-			cost = (travelTime * timeCoeficient) + (travelDistance * distanceCoeficient) ;
+			cost = (travelTime * timeCoefficient) + (travelDistance * distanceCoefficient) ;
 		}else if (type.equals("Access") || type.equals("Egress")){
 			cost = travelTime * walkCoefficient;
 		}
 		*////////////////////////////////////////////////////////////////
 
 		
-		//2.- Time as single criterion//////////////////////////////////
+		//2.- calculation only with transfer penalty//////////////////////////
 		cost= travelTime;
-		//////////////////////////////////////////////////////////////*/
-		
-
-		//3.- add transfer penalty//////////////////////////
 		aliasType = ((PTLink)link).getAliasType();
 		if (aliasType == 3 || aliasType == 4 ){  //transfer or dettransfer
 			cost += transferPenalty ;
 		}
-		////////////////////////////////////////////////////////////////*/
+		/*///////////////////////////////////////////////////////////////*/
 	
 		return cost;
 	}

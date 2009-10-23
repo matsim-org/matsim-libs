@@ -29,8 +29,8 @@ import org.xml.sax.SAXException;
 
 import playground.mmoyo.PTRouter.PTRouter;
 import playground.mmoyo.PTRouter.PTValues;
-import playground.mmoyo.TransitSimulation.LogicFactory;
-import playground.mmoyo.TransitSimulation.LogicIntoPlainTranslator;
+import playground.mmoyo.PTRouter.LogicFactory;
+import playground.mmoyo.PTRouter.LogicIntoPlainTranslator;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 
 /** makes tests with the transit router on the 5x5 scenario*/
@@ -58,6 +58,7 @@ public class PTRouterTest extends MatsimTestCase {
 		LogicIntoPlainTranslator logicIntoPlainTranslator = logicFactory.getLogicToPlainTranslator();
 
 		/**Tests transfer times*/
+//		System.out.println("links size of logicNet: " + logicNet.getLinks().size());
 		LinkImpl transferLink = logicNet.getLink("T39");  								 // first departure: 09:00 ,  last departure is at 19:00
 		double waitTime1= ptRouter.ptTravelTime.getLinkTravelTime(transferLink, 67800);  //  67800= 16:50 .  The agent should wait 10 mins 
 		double waitTime2= ptRouter.ptTravelTime.getLinkTravelTime(transferLink, 72000);  //  72000= 20:00 .  The agent should wait 13 hours, until next day
