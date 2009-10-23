@@ -95,7 +95,8 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 				// the actual value would loose its meaning, if would would directly multiply with the
 				// randomNumber, because the main part would be the 9 Rappen part.
 				// TODO: adapt this, if prices changed from Rappen to CHF
-				double basePrice=9.0;
+				// 8.99, because want to avoid that the value gets zero (minimum value)
+				double basePrice=8.99;
 				this.price-=basePrice;
 				this.price = this.price * this.randomNumber;
 				this.price+=basePrice;
@@ -110,7 +111,8 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 				// the actual value would loose its meaning, if would would directly multiply with the
 				// randomNumber, because the main part would be the 9 Rappen part.
 				// TODO: adapt this, if prices changed from Rappen to CHF
-				double basePrice=9.0; 
+				// 8.99, because want to avoid that the value gets zero (minimum value)
+				double basePrice=8.99; 
 				this.price-=basePrice;
 				this.price = this.price * Math.sqrt(this.randomNumber);
 				this.price+=basePrice;
