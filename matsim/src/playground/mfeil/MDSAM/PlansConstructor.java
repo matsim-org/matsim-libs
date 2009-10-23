@@ -85,7 +85,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected List<List<Double>> sims;
 	protected static final Logger log = Logger.getLogger(PlansConstructor.class);
 	protected int noOfAlternatives;
-	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, carAvail, employed, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn; 
+	protected String similarity, incomeConstant, incomeDivided, incomeDividedLN, incomeBoxCox, gender, age, license, carAvail, employed, seasonTicket, travelDistance, travelCost, travelConstant, bikeIn, beta, gamma; 
 	protected double travelCostCar, costPtNothing, costPtHalbtax, costPtGA;
 	
 	                      
@@ -108,6 +108,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
 		this.linker = new XY2Links (this.controler.getNetwork());
+		this.beta				= "no";
+		this.gamma				= "no";
 		this.similarity 		= "no";
 		this.incomeConstant 	= "yes";
 		this.incomeDivided 		= "no";
@@ -188,7 +190,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		//this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
 		//		this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);	
 		this.writePlansForBiogemeWithRandomSelectionAccumulated(this.outputFileBiogeme, this.attributesInputFile, 
-				this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);	
+				this.beta, this.gamma, this.similarity, this.incomeConstant, this.incomeDivided, this.incomeDividedLN, this.incomeBoxCox, this.age, this.gender, this.employed, this.license, this.carAvail, this.seasonTicket, this.travelDistance, this.travelCost, this.travelConstant, this.bikeIn);	
 		
 	// Type of writing the mod file
 		//	this.writeModFile(this.outputFileMod);
@@ -1061,6 +1063,8 @@ public class PlansConstructor implements PlanStrategyModule{
 	
 	// Writes a Biogeme file that fits "protected void enlargePlansSetWithRandomSelection ()"
 	public void writePlansForBiogemeWithRandomSelectionAccumulated (String outputFile, String attributesInputFile,
+			String beta,
+			String gamma,
 			String similarity, 
 			String incomeConstant,
 			String incomeDivided,
@@ -1081,6 +1085,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		
 		// Writing the variables back to head of class due to MDSAM call possibility. 
 		// Like this, they are also available for modMaker class.
+		this.beta=beta;
+		this.gamma=gamma;
 		this.similarity=similarity; 
 		this.incomeConstant=incomeConstant; 
 		this.incomeDivided=incomeDivided; 
@@ -1812,6 +1818,8 @@ public class PlansConstructor implements PlanStrategyModule{
 	public void writeModFileWithRandomSelection (String outputFile){
 		//new ModFileMaker (this.population, this.actChains).writeWithRandomSelection(outputFile,
 		new ModFileMaker (this.population, this.actChains).writeWithRandomSelectionAccumulated(outputFile,
+				this.beta,
+				this.gamma,
 				this.similarity, 
 				this.incomeConstant,
 				this.incomeDivided,
