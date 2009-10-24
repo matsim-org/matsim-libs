@@ -156,6 +156,11 @@ public class PSSControler {
 			tempFile.delete();
 		}
 
+		tempFile = new File(outputPSSPath + "\\hubPricePeaks.txt");
+		if (tempFile.exists()) {
+			tempFile.delete();
+		}
+		
 		tempFile = new File(outputPSSPath + "\\fertig.txt");
 		if (tempFile.exists()) {
 			tempFile.delete();
