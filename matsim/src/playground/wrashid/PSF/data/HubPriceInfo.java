@@ -35,6 +35,10 @@ public class HubPriceInfo {
 		// the time as the second dimension.
 		hubPrice = GeneralLib.invertMatrix(hubPrice);
 	}
+	
+	public double[][] getPriceMatrix(){
+		return GeneralLib.invertMatrix(hubPrice);
+	}
 
 	/**
 	 * time: time of day in seconds hub
