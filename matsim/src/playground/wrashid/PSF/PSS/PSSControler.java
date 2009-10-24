@@ -119,9 +119,14 @@ public class PSSControler {
 			for (int i=0;i<numberOfTimeBins;i++){
 				for (int j=0;j<ParametersPSF.getNumberOfHubs();j++){
 					// if the price was previously higher than 10 and still higher than 10, then increase the price level
-					// by 10%, because this means the price is still too low
+					// by 30%, because this means the price is still too low
+					
+					
+					// as the prices are determined by e.g. a squar root probabilistic algortihm, a
+					// value of 30% results in much less reduction of vehicle energy conumption during 
+					// the given slot than by 30%
 					if (newPriceSignalMatrix[i][j]>10.0 && oldPriceSignalMatrix[i][j]>10.0){
-						newPriceSignalMatrix[i][j]=1.1*oldPriceSignalMatrix[i][j];
+						newPriceSignalMatrix[i][j]=1.3*oldPriceSignalMatrix[i][j];
 						
 						// we are sure, that the maximum price level for this slot is the current value
 						
@@ -165,6 +170,7 @@ public class PSSControler {
 			// write out adapted price
 			GeneralLib.writeMatrix(newPriceSignalMatrix, outputPSSPath + "\\hubPriceInfo.txt", null);
 			
+			GeneralLib.copyFile(outputPSSPath + "\\hubPriceInfo.txt", getIterationResultDirectory() + "\\" + "hubPriceInfo-internal" + (iterationNumber+1) +".txt");
 			
 		}
 		
