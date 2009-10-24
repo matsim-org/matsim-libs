@@ -173,9 +173,17 @@ public class PSSControler {
 
 
 	private void savePSSResults() {
-		// TODO Auto-generated method stub
-		GeneralLib.copyFile(outputPSSPath + "\\hubPriceInfo.txt", getIterationResultDirectory() + "\\" + "hubPriceInfo" + (iterationNumber+1)  + ".txt");
-		GeneralLib.copyFile(outputPSSPath + "\\hubPricePeaks.txt", getIterationResultDirectory() + "\\" + "hubPricePeaks" + (iterationNumber+1) +  ".txt");
+		String hubPriceInfoFileName=getIterationResultDirectory() + "\\" + "hubPriceInfo" + (iterationNumber+1);
+		String hubPricePeaksFileName=getIterationResultDirectory() + "\\" + "hubPricePeaks" + (iterationNumber+1);
+		
+		GeneralLib.copyFile(outputPSSPath + "\\hubPriceInfo.txt", hubPriceInfoFileName + ".txt");
+		GeneralLib.copyFile(outputPSSPath + "\\hubPricePeaks.txt", hubPricePeaksFileName + ".txt");
+		
+		double[][] hubPriceInfo=GeneralLib.readMatrix(numberOfTimeBins, ParametersPSF.getNumberOfHubs(), false, hubPriceInfoFileName + ".txt");
+		double[][] hubPricePeaks=GeneralLib.readMatrix(numberOfTimeBins, ParametersPSF.getNumberOfHubs(), false, hubPricePeaksFileName + ".txt");
+		
+		GeneralLib.writeGraphic(hubPriceInfoFileName + ".png", hubPriceInfo, "Hub Energy Prices", "Time of Day [s]", "Price [CHF]");
+		GeneralLib.writeGraphic(hubPricePeaksFileName + ".png", hubPricePeaks, "Hub Energy Prices (only Peak)", "Time of Day [s]", "Price [CHF]");
 	}
 
 
