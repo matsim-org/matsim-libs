@@ -32,6 +32,8 @@ public class PSSControler {
 	String configFilePath;
 	ParametersPSFMutator parameterPSFMutator;
 	private static int iterationNumber=0;
+	private static final int numberOfTimeBins = 96;
+	private double[][] minimumPriceSignal;
 
 	public static int getIterationNumber() {
 		return iterationNumber;
@@ -47,7 +49,10 @@ public class PSSControler {
 	public static void main(String[] args) {
 		PSSControler pssControler=new PSSControler("a:\\data\\matsim\\input\\runRW1002\\config.xml", null);
 		
-		pssControler.runPSS();
+		//pssControler.runPSS();
+		
+		pssControler.runMATSimIterations();
+		pssControler.prepareMATSimInput();
 	}
 	
 	/**
@@ -90,6 +95,79 @@ public class PSSControler {
 	private void prepareMATSimInput() {
 		
 		// not needed: configure in the config, that the input is read from the output folder of PSS.
+		
+		
+		
+		if (minimumPriceSignal==null){
+			minimumPriceSignal=new double[numberOfTimeBins][ParametersPSF.getNumberOfHubs()];
+		}
+		
+		
+		
+		
+		
+		
+		// from iteration 1 onwards: if prices have been high in the previous iteration and they are
+		// still above 10 Rappen, then take the max(current iteration,previous iteration) and add 20% to the price.
+		// This is the price for the next iteration.
+		if (iterationNumber>=1){
+			double [][] newPriceSignalMatrix=GeneralLib.readMatrix(numberOfTimeBins, ParametersPSF.getNumberOfHubs(), false, outputPSSPath + "\\hubPriceInfo.txt");
+		
+			double [][] oldPriceSignalMatrix=ParametersPSF.getHubPriceInfo().getPriceMatrix();
+			
+			
+			for (int i=0;i<numberOfTimeBins;i++){
+				for (int j=0;j<ParametersPSF.getNumberOfHubs();j++){
+					// if the price was previously higher than 10 and still higher than 10, then increase the price level
+					// by 10%, because this means the price is still too low
+					if (newPriceSignalMatrix[i][j]>10.0 && oldPriceSignalMatrix[i][j]>10.0){
+						newPriceSignalMatrix[i][j]=1.1*oldPriceSignalMatrix[i][j];
+						
+						// we are sure, that the maximum price level for this slot is the current value
+						
+						minimumPriceSignal[i][j]=Math.max(newPriceSignalMatrix[i][j],minimumPriceSignal[i][j]);
+					}
+					
+					// if this is the first time, the price has been above 10.0, we need to find out the minimumPriceSignal value
+					// therefore we decrease the value of the price signal slowly
+					
+					// => as soon, as the current price has doped enough, there will be a rise in the price, leading to the 
+					// mimumPriceSignal beeing set.
+					if (newPriceSignalMatrix[i][j]<10.0 && oldPriceSignalMatrix[i][j]>10.0 && minimumPriceSignal[i][j]==0.0){
+						// decrease price by 5 %
+						newPriceSignalMatrix[i][j]=oldPriceSignalMatrix[i][j]*0.95;
+					}
+					
+					
+					// if the new price is smaller than the minimum Price signal, it should be set to the mimimumPriceSignal
+					// => needed for stabilization of the system (because when the right price is reached, PPSS will
+					// drop the price lower than 10 => we need to keep the price high. (correct it).
+					if (newPriceSignalMatrix[i][j]< minimumPriceSignal[i][j]){
+						newPriceSignalMatrix[i][j]= minimumPriceSignal[i][j];
+					}
+					
+									
+					
+					// if new price is now higher than 10 and previously it was lower than 10 => then leave it as it is
+					
+					// if new price is lower then and previously it was also lower than 10 => leave it as it is
+					
+					// => this means: decrease price slower than increasing the price.
+				}
+			}
+			
+			// remove old price
+			File tempFile = new File(outputPSSPath + "\\hubPriceInfo.txt");
+			if (tempFile.exists()) {
+				tempFile.delete();
+			}
+			
+			// write out adapted price
+			GeneralLib.writeMatrix(newPriceSignalMatrix, outputPSSPath + "\\hubPriceInfo.txt", null);
+			
+			
+		}
+		
 		
 	}
 
