@@ -122,9 +122,9 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 				this.price+=basePrice;
 			}
 		}else if (ParametersPSF.useQuadraticProbabilisticScalingOfPrice()){
-			// TODO: adapt,before running this case.
 			// High Price remains high with high probability and gets low with low probability
-			//this.price = this.price * (this.randomNumber*this.randomNumber);
+			// but the chance has increased, that heigh values can be chosen also
+			this.price = this.price * (this.randomNumber*this.randomNumber);
 		}
 		
 	}
