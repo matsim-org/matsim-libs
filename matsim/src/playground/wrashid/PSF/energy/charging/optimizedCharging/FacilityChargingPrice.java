@@ -87,7 +87,9 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 			// The price is scaled between 9 and 10 Rappen (but not necessary always - e.g. initial price
 			// can be lower than that. But for the run to relax, this must be considered.
 			
-			if (PSSControler.getIterationNumber()==0){
+			//if (PSSControler.getIterationNumber()==0){
+			// scale always in the 100 percent region, else there are problems.
+			if (true){
 				// assumption: the base load is taken as input price, which ranges between 0 and 43(right value)/48 rappen.
 				this.price = this.price * this.randomNumber;
 			} else {
@@ -96,14 +98,16 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 				// randomNumber, because the main part would be the 9 Rappen part.
 				// TODO: adapt this, if prices changed from Rappen to CHF
 				// 8.99, because want to avoid that the value gets zero (minimum value)
-				double basePrice=8.99;
+				double basePrice=7.99;
 				this.price-=basePrice;
 				this.price = this.price * this.randomNumber;
 				this.price+=basePrice;
 			}
 		} else if (ParametersPSF.useSquareRootProbabilisticScalingOfPrice()){
 			// High Price remains high with high probability and gets low with low probability
-			if (PSSControler.getIterationNumber()==0){
+			//if (PSSControler.getIterationNumber()==0){
+			// scale always in the 100 percent region, else there are problems.
+			if (true){
 				// assumption: the base load is taken as input price, which ranges between 0 and 43(right value)/48 rappen.
 				this.price = this.price * Math.sqrt(this.randomNumber);
 			} else {
@@ -112,7 +116,7 @@ public class FacilityChargingPrice implements Comparable<FacilityChargingPrice> 
 				// randomNumber, because the main part would be the 9 Rappen part.
 				// TODO: adapt this, if prices changed from Rappen to CHF
 				// 8.99, because want to avoid that the value gets zero (minimum value)
-				double basePrice=8.99; 
+				double basePrice=7.99; 
 				this.price-=basePrice;
 				this.price = this.price * Math.sqrt(this.randomNumber);
 				this.price+=basePrice;
