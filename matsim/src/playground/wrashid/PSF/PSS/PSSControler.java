@@ -96,8 +96,8 @@ public class PSSControler {
 
 	private void savePSSResults() {
 		// TODO Auto-generated method stub
-		GeneralLib.copyFile(outputPSSPath + "\\hubPriceInfo.txt", getIterationResultDirectory() + "\\" + "hubPriceInfo.txt");
-		GeneralLib.copyFile(outputPSSPath + "\\hubPricePeaks.txt", getIterationResultDirectory() + "\\" + "hubPricePeaks.txt");
+		GeneralLib.copyFile(outputPSSPath + "\\hubPriceInfo.txt", getIterationResultDirectory() + "\\" + "hubPriceInfo" + (iterationNumber+1)  + ".txt");
+		GeneralLib.copyFile(outputPSSPath + "\\hubPricePeaks.txt", getIterationResultDirectory() + "\\" + "hubPricePeaks" + (iterationNumber+1) +  ".txt");
 	}
 
 
