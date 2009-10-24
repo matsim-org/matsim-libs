@@ -73,7 +73,7 @@ public class AfterSimulationListener implements AfterMobsimListener {
 
 				
 				// add price to score.
-				ParametersPSF.getEvents().computeEvent(
+				ParametersPSF.getEvents().processEvent(
 						new AgentMoneyEventImpl(chargingStartTime, personId, negativeUtilitiesForCharging));
 
 				if (ParametersPSF.getMainChargingPriceScalingFactor() == -1.0) {
