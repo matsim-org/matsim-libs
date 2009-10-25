@@ -64,7 +64,7 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 
 	}
 
-	 public void createEvent(final EventsImpl events, final double time, final Id agentId,
+	 public BasicEvent createEvent(final EventsImpl events, final double time, final Id agentId,
 			final Id linkId, final int flag, final String desc, final String acttype) {
 		 BasicEvent data = null;
 
@@ -107,7 +107,7 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 			default:
 				throw new RuntimeException("Type of events with flag = " + flag + " is not known!");
 		}
-		events.processEvent(data);
+		return data;
 
 	}
 
@@ -115,12 +115,13 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 	protected void parseLine(final String line) {
 		String[] result = StringUtils.explode(line, '\t', 7);
 		if (result.length == 7) {
-			createEvent(this.events, Double.parseDouble(result[0]),	// time
+			BasicEvent data = createEvent(this.events, Double.parseDouble(result[0]),	// time
 					new IdImpl(result[1]),		// vehID
 					new IdImpl(result[3]),		// linkID
 					//Integer.parseInt(result[4]),		// nodeID
 					Integer.parseInt(result[5]),		// flag
 					result[6], "");		// description
+			events.processEvent(data);
 		}
 	}
 
