@@ -99,8 +99,7 @@ public class PSSControler {
 			minimumPriceSignal = new double[numberOfTimeBins][ParametersPSF.getNumberOfHubs()];
 		}
 
-		double minPriceBaseLoad = 8.00;
-		double maxPriceBaseLoad = 9.00;
+		
 
 		// from iteration 1 onwards: if prices have been high in the previous
 		// iteration and they are
@@ -115,65 +114,12 @@ public class PSSControler {
 
 			for (int i = 0; i < numberOfTimeBins; i++) {
 				for (int j = 0; j < ParametersPSF.getNumberOfHubs(); j++) {
-					// if the price was previously higher than 10 and still
-					// higher than 10, then increase the price level
-					// by 30%, because this means the price is still too low
-
-					// as the prices are determined by e.g. a squar root
-					// probabilistic algortihm, a
-					// value of 30% results in much less reduction of vehicle
-					// energy conumption during
-					// the given slot than by 30%
-					if (newPriceSignalMatrix[i][j] >= maxPriceBaseLoad && oldPriceSignalMatrix[i][j] >= maxPriceBaseLoad) {
-						newPriceSignalMatrix[i][j] = 1.30 * oldPriceSignalMatrix[i][j];
-
-						// we are sure, that the maximum price level for this
-						// slot is the current value
-
-						minimumPriceSignal[i][j] = Math.max(newPriceSignalMatrix[i][j], minimumPriceSignal[i][j]);
-					}
-
-					// if this is the first time, the price has been above 10.0,
-					// we need to find out the minimumPriceSignal value
-					// therefore we decrease the value of the price signal
-					// slowly
-
-					// => as soon, as the current price has doped enough, there
-					// will be a rise in the price, leading to the
-					// mimumPriceSignal beeing set.
-					// if (newPriceSignalMatrix[i][j]<maxPriceBaseLoad &&
-					// oldPriceSignalMatrix[i][j]>maxPriceBaseLoad &&
-					// minimumPriceSignal[i][j]==0.0){
-					// decrease price by 5 %
-					// newPriceSignalMatrix[i][j]=oldPriceSignalMatrix[i][j]*0.95;
-					// }
-
-					// if the new price is smaller than the minimum Price
-					// signal, it should be set to the mimimumPriceSignal
-					// => needed for stabilization of the system (because when
-					// the right price is reached, PPSS will
-					// drop the price lower than 10 => we need to keep the price
-					// high. (correct it).
-					if (newPriceSignalMatrix[i][j] < minimumPriceSignal[i][j]) {
-						newPriceSignalMatrix[i][j] = minimumPriceSignal[i][j];
-					}
-
-					// if new price is now higher than 9 and previously it was
-					// lower than 9, then adapted the minimum price signal to at
-					// least 9
-					// (it should never go below 9 because of the above check)
-					if (newPriceSignalMatrix[i][j] >= maxPriceBaseLoad && oldPriceSignalMatrix[i][j] <= maxPriceBaseLoad) {
-						minimumPriceSignal[i][j] = maxPriceBaseLoad;
-					}
-
-					// TODO: some test cases are needed for this
-					// e.g.
-
-					// if new price is lower then and previously it was also
-					// lower than 10 => leave it as it is
-
-					// => this means: decrease price slower than increasing the
-					// price.
+					
+					double[] priceSignalProcessing=FirstPriceSignalMaintainingAlgorithm.processPriceSignal(newPriceSignalMatrix[i][j], oldPriceSignalMatrix[i][j], minimumPriceSignal[i][j]);
+					
+					newPriceSignalMatrix[i][j]=priceSignalProcessing[0];
+					minimumPriceSignal[i][j]=priceSignalProcessing[1];
+					
 				}
 			}
 
@@ -193,22 +139,7 @@ public class PSSControler {
 
 	}
 
-	/**
-	 * Gives back in the a double array of size (2). The first array value is
-	 * the newSignalPrice (to be set as the new internal signal). The second
-	 * value is the new minimumPriceSingal.
-	 * 
-	 * 
-	 * @param newPriceSignal
-	 * @param oldInternalPriceSignal
-	 * @param minimumPriceSignal
-	 * @return
-	 */
-	public static double[] processPriceSignal(double newPriceSignal, double oldInternalPriceSignal, double minimumPriceSignal) {
-		double[] result = new double[2];
 
-		return result;
-	}
 
 	private void savePSSResults() {
 		String hubPriceInfoFileName = getIterationResultDirectory() + "\\" + "hubPriceInfo" + (iterationNumber + 1);
