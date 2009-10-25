@@ -104,7 +104,8 @@ public class PSSControler {
 		
 		
 		
-		
+		double minPriceBaseLoad=8.00;
+		double maxPriceBaseLoad=9.00;
 		
 		
 		// from iteration 1 onwards: if prices have been high in the previous iteration and they are
@@ -125,8 +126,8 @@ public class PSSControler {
 					// as the prices are determined by e.g. a squar root probabilistic algortihm, a
 					// value of 30% results in much less reduction of vehicle energy conumption during 
 					// the given slot than by 30%
-					if (newPriceSignalMatrix[i][j]>10.0 && oldPriceSignalMatrix[i][j]>10.0){
-						newPriceSignalMatrix[i][j]=1.3*oldPriceSignalMatrix[i][j];
+					if (newPriceSignalMatrix[i][j]>maxPriceBaseLoad && oldPriceSignalMatrix[i][j]>maxPriceBaseLoad){
+						newPriceSignalMatrix[i][j]=1.30*oldPriceSignalMatrix[i][j];
 						
 						// we are sure, that the maximum price level for this slot is the current value
 						
@@ -138,7 +139,7 @@ public class PSSControler {
 					
 					// => as soon, as the current price has doped enough, there will be a rise in the price, leading to the 
 					// mimumPriceSignal beeing set.
-					if (newPriceSignalMatrix[i][j]<10.0 && oldPriceSignalMatrix[i][j]>10.0 && minimumPriceSignal[i][j]==0.0){
+					if (newPriceSignalMatrix[i][j]<maxPriceBaseLoad && oldPriceSignalMatrix[i][j]>maxPriceBaseLoad && minimumPriceSignal[i][j]==0.0){
 						// decrease price by 5 %
 						newPriceSignalMatrix[i][j]=oldPriceSignalMatrix[i][j]*0.95;
 					}
