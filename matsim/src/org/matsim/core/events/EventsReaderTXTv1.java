@@ -64,7 +64,7 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 
 	}
 
-	 public final void createEvent(final EventsImpl events, final double time, final Id agentId,
+	 public void createEvent(final EventsImpl events, final double time, final Id agentId,
 			final Id linkId, final int flag, final String desc, final String acttype) {
 		 BasicEvent data = null;
 
