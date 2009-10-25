@@ -133,9 +133,17 @@ public class ASPActivityChains {
 							break;
 						}
 					}
-					else if (((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()<this.minimumTime.get(((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getType())-1) { //ignoring rounding errors
-						log.warn("Duration error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2)+" with duration "+(((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()));
-						break;
+					else {
+						if (((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()<this.minimumTime.get(((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getType())-1) { //ignoring rounding errors
+							log.warn("Duration error in plan of person "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2)+" with duration "+(((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getDuration()));
+							break;
+						}
+						if (((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k))).getType().equalsIgnoreCase("home") &&
+								(((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k-2))).getType().equalsIgnoreCase("home") ||
+								((ActivityImpl)(this.plans.get(i).get(j).getPlanElements().get(k+2))).getType().equalsIgnoreCase("home"))) { 
+							log.warn("Consecutive home acts found in plan of "+this.plans.get(i).get(j).getPerson().getId()+" at act position "+(k/2));
+							break;
+						}
 					}
 				}
 				for (int k=0;k<this.knowledges.getKnowledgesByPersonId().get(this.plans.get(i).get(j).getPerson().getId()).getActivities(true).size();k++){
@@ -245,10 +253,10 @@ public class ASPActivityChains {
 				if (Math.floor(plan.getPlanElements().size()/2)>0) {
 					numSame += Double.parseDouble(numPlanSame+"")/Math.floor(plan.getPlanElements().size()/2);
 					maxSame += Double.parseDouble(maxPlanSame+"")/Math.floor(plan.getPlanElements().size()/2);
-					log.info("numSame: "+Double.parseDouble(numPlanSame+"")/Math.floor(plan.getPlanElements().size()/2));
-					log.info("maxSame: "+Double.parseDouble(maxPlanSame+"")/Math.floor(plan.getPlanElements().size()/2));
-					log.info("occSame: "+occSame);
-					log.info("occSeveral "+occSeveral);
+					//log.info("numSame: "+Double.parseDouble(numPlanSame+"")/Math.floor(plan.getPlanElements().size()/2));
+					//log.info("maxSame: "+Double.parseDouble(maxPlanSame+"")/Math.floor(plan.getPlanElements().size()/2));
+					//log.info("occSame: "+occSame);
+					//log.info("occSeveral "+occSeveral);
 				}
 			}
 		}
@@ -262,15 +270,15 @@ public class ASPActivityChains {
 	
 
 	public static void main(final String [] args) {
-		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
+/*		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it1/run16/output_plans.xml";
-/*		final String populationFilename = "./plans/output_plans.xml.gz";
-		final String networkFilename = "./plans/network.xml";
-		final String facilitiesFilename = "./plans/facilities.xml.gz";
+		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it1/run151/output_plans.xml";
+		final String outputDir = "/home/baug/mfeil/data/choiceSet/it1/run151";		
 */
-		final String outputDir = "/home/baug/mfeil/data/choiceSet/it1/run16";
-//		final String outputDir = "./plans";
+		final String populationFilename = "./plans/output_plans.xml";
+		final String networkFilename = "./plans/network.xml";
+		final String facilitiesFilename = "./plans/facilities.xml";
+		final String outputDir = "./plans";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
