@@ -21,9 +21,9 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 import java.util.List;
-//import java.io.File;
-//import java.io.FileNotFoundException;
-//import java.io.PrintStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
@@ -160,12 +160,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		/* Activity types that may be included */
 		List<String> actTypes							= this.finder.getActTypes(plan.getPerson());
 		
-		
 		/*
-		double [] xs;
-		double [] ys 									= new double [MAX_ITERATIONS+1];		
-		
-		System.out.println(Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls"));
 		String outputfile = Controler.getOutputFilename(Counter.counter+"_"+plan.getPerson().getId()+"_detailed_log.xls");
 		Counter.counter++;
 		PrintStream stream;
@@ -176,8 +171,10 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			return;
 		}
 		stream.println("Score\tnotNewInNeighbourhood\ttabuInNeighbourhood\tscoredInNeighbourhood\tActivity schedule");
-		
-		
+		*/
+		/*
+		double [] xs;
+		double [] ys 									= new double [MAX_ITERATIONS+1];		
 		String outputfileOverview = Controler.getOutputFilename("overview_log.xls");
 		FileOutputStream fileOverview;
 		PrintStream statistics;
@@ -914,7 +911,8 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		boolean HomeActInserted = false;
 		if (actToBeAdded[position]>=actTypes.size()) actToBeAdded[position] = 0; //sets the pointer back to the first activity type
 		
-		if (position!=1 || actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home")){ // check whether act to be added is allowed while at position 1 everything is allowed to be inserted excpet for "home"
+		boolean enter = true;
+		while (enter && (position!=1 || actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home"))){ // check whether act to be added is allowed while at position 1 everything is allowed to be inserted excpet for "home"
 			if (actTypes.get(actToBeAdded[position]).equals(((ActivityImpl)(basePlan.getPlanElements().get(position*2-2))).getType().toString()) || // ensures that no duplicate activity chains are created
 					(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home") && !this.checkForHomeSequenceInserting(basePlan, position*2))){
 				if (actToBeAdded[position]+1>=actTypes.size()){
@@ -924,6 +922,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 					actToBeAdded[position]++;
 				}
 			}
+			else enter = false;
 		}
 		List<PlanElement> actslegs = basePlan.getPlanElements();
 		ActivityImpl actHelp;
