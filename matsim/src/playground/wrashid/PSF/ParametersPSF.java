@@ -28,6 +28,10 @@ public class ParametersPSF {
 
 	private static String PSFModule = "PSF";
 
+	public static String getPSFModule() {
+		return PSFModule;
+	}
+
 	// default parameters
 	private static String default_maxBatteryCapacity = "default.maxBatteryCapacity";
 	private static double defaultMaxBatteryCapacity;

@@ -175,8 +175,17 @@ public class PSSControler {
 	}
 
 	public void runMATSimIterations() {
+		
 		Gbl.reset();
+		
 		controler = new Controler(configFilePath);
+		
+		// use the right Controler
+		String tempStringValue = controler.getConfig().findParam(ParametersPSF.getPSFModule(), "main.inputEventsForSimulationPath");
+		if (tempStringValue != null) {
+			controler = new EventReadControler(configFilePath,tempStringValue);
+		}
+		
 		controler.addControlerListener(new AddEnergyScoreListener());
 		controler.setOverwriteFiles(true);
 
