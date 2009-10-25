@@ -9,6 +9,8 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 
@@ -178,12 +180,19 @@ public class PSSControler {
 		
 		Gbl.reset();
 		
-		controler = new Controler(configFilePath);
 		
-		// use the right Controler
-		String tempStringValue = controler.getConfig().findParam(ParametersPSF.getPSFModule(), "main.inputEventsForSimulationPath");
+		
+		// use the right Controler (read parameter 
+		Config config = new Config();
+		MatsimConfigReader reader = new MatsimConfigReader(config);
+		reader.readFile(configFilePath);
+		String tempStringValue = config.findParam(ParametersPSF.getPSFModule(), "main.inputEventsForSimulationPath");
 		if (tempStringValue != null) {
+			// ATTENTION, this does not work at the moment, because the read link from the 
+			// event file is null and this causes some probelems in my handlers...
 			controler = new EventReadControler(configFilePath,tempStringValue);
+		} else {
+			controler = new Controler(configFilePath);
 		}
 		
 		controler.addControlerListener(new AddEnergyScoreListener());

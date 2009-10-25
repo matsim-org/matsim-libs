@@ -10,7 +10,7 @@ import org.matsim.core.events.EventsReaderTXTv1;
 
 public class BufferedEventsReaderTXTv1 extends EventsReaderTXTv1 {
 
-	private ArrayList<BasicEvent> buffer;
+	private ArrayList<BasicEvent> buffer=new ArrayList<BasicEvent>();
 
 	public BufferedEventsReaderTXTv1(EventsImpl events) {
 		super(events);

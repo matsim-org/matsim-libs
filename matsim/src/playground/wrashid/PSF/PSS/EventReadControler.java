@@ -22,12 +22,13 @@ public class EventReadControler extends Controler {
 	
 	public void runMobSim(){
 		if (buffer == null){
+			// the processing happens during the reading process
 			BufferedEventsReaderTXTv1 reader = new BufferedEventsReaderTXTv1(events);
 			reader.readFile(pathToEventsFile);
 			buffer=reader.getBuffer();
 		} else {
 			// if events buffered, process events directly
-			for (int i=0;i<i;i++){
+			for (int i=0;i<buffer.size();i++){
 				events.processEvent(buffer.get(i));
 			}
 		}
