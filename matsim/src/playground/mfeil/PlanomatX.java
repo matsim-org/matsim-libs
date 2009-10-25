@@ -500,7 +500,9 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 					/*Activity swapping	*/		
 					ActivityImpl act0 = (ActivityImpl)(actslegs.get(planBasePos));
 					ActivityImpl act1 = (ActivityImpl)(actslegs.get(planRunningPos));
-					if (act0.getType()!=act1.getType()){
+					if (act0.getType()!=act1.getType() && 													// act types must not be identical
+							this.checkForHomeSequenceChangeOrder(basePlan, planBasePos, planRunningPos) &&	// do not group several home acts together
+							this.checkForHomeSequenceChangeOrder(basePlan, planRunningPos, planBasePos)){
 							
 						ActivityImpl actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get(planBasePos)));
 						
@@ -525,7 +527,6 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	public int[] changeNumber (PlanomatXPlan basePlan, int [] positions, int [] actsToBeAdded, 
 			List<String> actTypes, ArrayList<ActivityOption> primActs){
 				
-		//if(MatsimRandom.getRandom().nextDouble()>=weight){
 		if(MatsimRandom.getRandom().nextDouble()>=WEIGHT_INC_NUMBER){
 			
 			/* Removing an activity, "cycling"*/
@@ -533,48 +534,53 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				if (this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(2), primActs)		&&
 						!(this.checkForSamePrimary(basePlan, 1))) return (new int[]{1,0,0});
 				else {
+					/*this.removeAct(1, basePlan);
+					positions[3]++;*/
+					
+					// NEW (24th Oct 2009 MF): When removing act from plan with 3 acts, reduce to 24h of "home"
 					this.removeAct(1, basePlan);
+					this.removeAct(0, basePlan);
+					((ActivityImpl)(basePlan.getPlanElements().get(0))).setDuration(86400);
+					((ActivityImpl)(basePlan.getPlanElements().get(0))).setStartTime(0);
+					((ActivityImpl)(basePlan.getPlanElements().get(0))).setEndTime(86400);
 					positions[3]++;
-					//return (new int[]{0,-1,1});
 					return (new int[]{0,-1,-1});
 				}
 			}
+			// Randomly define position when removing an act for the first time
 			if(positions[1]==0){
 				positions[1] = (int)(MatsimRandom.getRandom().nextDouble()*((int)(basePlan.getPlanElements().size()/2)-1))+1;
 			}
 			
-			if (basePlan.getPlanElements().size()>5){
-			
-				OuterLoop:
-				while (positions[3]<(int)(basePlan.getPlanElements().size()/2)){
-					
-					if (positions[1]<=(int)(basePlan.getPlanElements().size()/2)-1){
-						if (this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(positions[1]*2), primActs)	&&
-								!(this.checkForSamePrimary(basePlan, positions[1]))) {
-							positions[1]++;
-							positions[3]++;
-							continue OuterLoop;
-						}
-						else this.removeAct(positions[1], basePlan);
+			OuterLoop:
+			while (positions[3]<(int)(basePlan.getPlanElements().size()/2)){
+				
+				// proceed through planElements
+				if (positions[1]<=(int)(basePlan.getPlanElements().size()/2)-1){
+					if ((this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(positions[1]*2), primActs) && !(this.checkForSamePrimary(basePlan, positions[1])))  ||
+							!this.checkForHomeSequenceRemoving(basePlan, positions[1])) {
+						positions[1]++;
+						positions[3]++;
+						continue OuterLoop;
 					}
-					else {
-						positions[1] = 1;
-						if (this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(positions[1]*2), primActs)	&&
-								!(this.checkForSamePrimary(basePlan, positions[1]))) {
-							positions[1]++;
-							positions[3]++;
-							continue OuterLoop;
-						}
-						else this.removeAct(positions[1], basePlan);
-					}
-					positions[1]++;
-					positions[3]++;
-					//return (new int[]{0,-1,positions[1]-1});
-					return (new int[]{0,-1,-1});
+					else this.removeAct(positions[1], basePlan);
 				}
-				return (new int[]{1,0,0});
+				// jump back to second act of plan
+				else {
+					positions[1] = 1;
+					if ((this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(positions[1]*2), primActs) && !(this.checkForSamePrimary(basePlan, positions[1]))) ||
+							!this.checkForHomeSequenceRemoving(basePlan, positions[1])) {
+						positions[1]++;
+						positions[3]++;
+						continue OuterLoop;
+					}
+					else this.removeAct(positions[1], basePlan);
+				}
+				positions[1]++;
+				positions[3]++;
+				return (new int[]{0,-1,-1});
 			}
-			else return (new int[]{1,0,0});
+			return (new int[]{1,0,0});
 		}
 		
 		else{	
@@ -595,7 +601,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				else if (positions[0]<=(int)(basePlan.getPlanElements().size()/2)){ // going through activity list
 					HomeActInserted = this.insertAct(positions[0], actsToBeAdded, basePlan, actTypes);				
 				}
-				else { // setting back to first activity
+				else { // jumping back to first activity
 					positions[0] = 1;
 					HomeActInserted = this.insertAct(positions[0], actsToBeAdded, basePlan, actTypes);
 					
@@ -620,39 +626,57 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			
 			((ActivityImpl)actslegs.get(0)).setDuration(12*3600);
 			((ActivityImpl)actslegs.get(0)).setEndTime(12*3600);
-			
+			/*
 			ActivityImpl actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get((0))));
 			actHelp.setDuration(12*3600);
 			actHelp.setEndTime(24*3600);
-			actHelp.setStartTime(12*3600);
+			actHelp.setStartTime(12*3600);			
+			LegImpl legHelp;
+			legHelp = new LegImpl (TransportMode.walk); // First and second acts must be "home" acts at same location so walk is appropriate
+			actslegs.add(legHelp);
+			actslegs.add(actHelp);	
+			position[0]=-1;*/
+			
+			// NEW (24th Oct 2009 MF) Plan should have either one or three acts
+			// First add a second home act, allow for 1h of travelling
+			ActivityImpl actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get((0))));
+			actHelp.setDuration(11*3600);
+			actHelp.setEndTime(24*3600);
+			actHelp.setStartTime(13*3600);
 			
 			LegImpl legHelp;
 			legHelp = new LegImpl (TransportMode.walk); // First and second acts must be "home" acts at same location so walk is appropriate
+			legHelp.setTravelTime(3600);			
 			
-			actslegs.add(legHelp);
-			actslegs.add(actHelp);	
+			// Then add a non-home act
+			if (position[0] == 1){ // first loop, define first actsToBeAdded position 
+				actsToBeAdded[1] = (int)(MatsimRandom.getRandom().nextDouble()* actTypes.size()); // define first actsToBeAdded position for second loop onwards
+			}
 			
-			position[0]=-1;
-			
-			return (new int[]{0,-1,-1}); // codify by "-1" to indicate that plan requires no LC
+			this.insertAct(1, actsToBeAdded, basePlan, actTypes); // no need to check for homeActInserted, cannot happen
+			position[0]++;
+			if (position[0]>actTypes.size()+1){
+				position[0]=-1;
+			}
+			return (new int[]{0,1,-1});
 		}
-		else {
-			if (position[0] == 1){
-				actsToBeAdded[1] = (int)(MatsimRandom.getRandom().nextDouble()* actTypes.size());
-				this.removeAct(0, basePlan);
+		
+		else { // Plan has 2 acts
+			if (position[0] == 1){ // first loop, reduce to 1 "home" act
+				actsToBeAdded[1] = (int)(MatsimRandom.getRandom().nextDouble()* actTypes.size()); // define first actsToBeAdded position for second loop onwards
+				this.removeAct(0, basePlan); 
 				((ActivityImpl)basePlan.getPlanElements().get(0)).setDuration(24*3600);
 				((ActivityImpl)basePlan.getPlanElements().get(0)).setStartTime(0);
 				((ActivityImpl)basePlan.getPlanElements().get(0)).setEndTime(24*3600);
 				position[0]++;
 				return (new int[]{0,-1,-1});
 			}
-			else {
-				boolean HomeActInserted = this.insertAct(1, actsToBeAdded, basePlan, actTypes);
+			else { // second loop onwards, increase to three acts
+				this.insertAct(1, actsToBeAdded, basePlan, actTypes); // no need to check for homeActInserted, cannot happen
 				position[0]++;
 				if (position[0]>actTypes.size()+1){
 					position[0]=-1;
 				}
-				if (HomeActInserted) return (new int[]{0,-1,-1});
 				return (new int[]{0,1,-1});
 			}
 		}
@@ -679,7 +703,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				type = actTypes.get(actsToBeChanged[position[0]]);
 				actsToBeChanged[position[0]]++;
 				if (actsToBeChanged[position[0]]>=actTypes.size()) actsToBeChanged[position[0]] = 0;
-			} while (type.equals(act.getType()));
+			} while (type.equals(act.getType()) || (type.equalsIgnoreCase("home") && !this.checkForHomeSequenceChangeType(basePlan, position[0]*2))); // continue if either type is same as current one or if two home acts would fall together 
 			
 			act.setType(type);
 			if (act.getType().equalsIgnoreCase("home")){
@@ -886,19 +910,13 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	
 	/* Inserts an activity of random type at the given position with the given type of act (but checks whether type is allowed)*/
 	private boolean insertAct (int position, int [] actToBeAdded, PlanomatXPlan basePlan, List<String> actTypes){
+		
 		boolean HomeActInserted = false;
-		/*
-		List<PlanElement> actslegs = basePlan.getPlanElements();
-		//Activity actHelp = new ActivityImpl ((Activity)(actslegs.get((position*2)-2))); //changed the actHelp position to the act "behind" the gap because of conflict with location choice (would otherwise see it as primary activity)
-		Activity actHelp = new ActivityImpl ((Activity)(actslegs.get((position*2))));
-		actHelp.setDuration(0);
-		actHelp.setEndTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
-		actHelp.setStartTime(((Leg)(actslegs.get(position*2-1))).getDepartureTime());
-		*/
 		if (actToBeAdded[position]>=actTypes.size()) actToBeAdded[position] = 0; //sets the pointer back to the first activity type
 		
-		if (position!=1){ // ensures that no duplicate activity chains are created
-			if (actTypes.get(actToBeAdded[position]).equals(((ActivityImpl)(basePlan.getPlanElements().get(position*2-2))).getType().toString())){
+		if (position!=1 || actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home")){ // check whether act to be added is allowed while at position 1 everything is allowed to be inserted excpet for "home"
+			if (actTypes.get(actToBeAdded[position]).equals(((ActivityImpl)(basePlan.getPlanElements().get(position*2-2))).getType().toString()) || // ensures that no duplicate activity chains are created
+					(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home") && !this.checkForHomeSequenceInserting(basePlan, position*2))){
 				if (actToBeAdded[position]+1>=actTypes.size()){
 					actToBeAdded[position] = 0;
 				}
@@ -909,8 +927,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		}
 		List<PlanElement> actslegs = basePlan.getPlanElements();
 		ActivityImpl actHelp;
-		if (!(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home"))){ // copy activity Before/behind the gap
-		//	actHelp = new ActivityImpl ((Activity)(actslegs.get(position*2)));
+		if (!(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home"))){ // copy activity before the gap
 			actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get(position*2-2)));
 			actHelp.setDuration(0);
 			actHelp.setEndTime(((LegImpl)(actslegs.get(position*2-1))).getDepartureTime());
@@ -938,7 +955,6 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	
 	/* Removes the activity at the given position*/
 	private void removeAct (int position, PlanImpl basePlan){
-		// why writing everything yourself, if it's already here? see basePlan.removeAct(position);
 		List<? extends BasicPlanElement> actslegs = basePlan.getPlanElements();
 		actslegs.remove(position*2);
 		actslegs.remove(position*2);
@@ -973,6 +989,36 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			}
 		}
 		return false;
+	}
+	
+	/* Checks whether 2 home acts would fall together*/
+	private boolean checkForHomeSequenceRemoving (PlanImpl plan, int position){
+		
+		if (((ActivityImpl)(plan.getPlanElements().get(position-2))).getType().equalsIgnoreCase("home") &&
+				((ActivityImpl)(plan.getPlanElements().get(position+2))).getType().equalsIgnoreCase("home")) return false; // Removal would bring 2 home acts together
+		else return true; // Removal is ok
+	}
+	/* Checks whether 2 home acts would fall together*/
+	private boolean checkForHomeSequenceInserting (PlanImpl plan, int position){
+		
+		if (((ActivityImpl)(plan.getPlanElements().get(position-2))).getType().equalsIgnoreCase("home") ||
+				((ActivityImpl)(plan.getPlanElements().get(position))).getType().equalsIgnoreCase("home")) return false; // Insertion would be next to an home act
+		else return true; // Insertion is ok
+	}
+	/* Checks whether 2 home acts would fall together*/
+	private boolean checkForHomeSequenceChangeOrder (PlanImpl plan, int positionAct, int positionInsertion){
+		
+		if (((ActivityImpl)(plan.getPlanElements().get(positionAct))).getType().equalsIgnoreCase("home") &&
+				(((ActivityImpl)(plan.getPlanElements().get(positionInsertion-2))).getType().equalsIgnoreCase("home") ||
+				((ActivityImpl)(plan.getPlanElements().get(positionInsertion+2))).getType().equalsIgnoreCase("home"))) return false; // Insertion would be next to an home act
+		else return true; // Insertion is ok
+	}
+	/* Checks whether 2 home acts would fall together*/
+	private boolean checkForHomeSequenceChangeType (PlanImpl plan, int position){
+		
+		if (((ActivityImpl)(plan.getPlanElements().get(position-2))).getType().equalsIgnoreCase("home") ||
+				((ActivityImpl)(plan.getPlanElements().get(position+2))).getType().equalsIgnoreCase("home")) return false; // Insertion would be next to an home act
+		else return true; // Insertion is ok
 	}
 	
 	
