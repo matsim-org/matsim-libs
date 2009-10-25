@@ -101,11 +101,7 @@ public class PSSControler {
 
 		
 
-		// from iteration 1 onwards: if prices have been high in the previous
-		// iteration and they are
-		// still above 10 Rappen, then take the max(current iteration,previous
-		// iteration) and add 20% to the price.
-		// This is the price for the next iteration.
+		// from iteration 1 onwards: maintain price levels.
 		if (iterationNumber >= 1) {
 			double[][] newPriceSignalMatrix = GeneralLib.readMatrix(numberOfTimeBins, ParametersPSF.getNumberOfHubs(), false,
 					outputPSSPath + "\\hubPriceInfo.txt");
@@ -114,7 +110,7 @@ public class PSSControler {
 
 			for (int i = 0; i < numberOfTimeBins; i++) {
 				for (int j = 0; j < ParametersPSF.getNumberOfHubs(); j++) {
-					
+					// get new values for price level and minimum price signal level 
 					double[] priceSignalProcessing=FirstPriceSignalMaintainingAlgorithm.processPriceSignal(newPriceSignalMatrix[i][j], oldPriceSignalMatrix[i][j], minimumPriceSignal[i][j]);
 					
 					newPriceSignalMatrix[i][j]=priceSignalProcessing[0];
