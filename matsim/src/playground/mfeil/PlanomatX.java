@@ -558,7 +558,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				// proceed through planElements
 				if (positions[1]<=(int)(basePlan.getPlanElements().size()/2)-1){
 					if ((this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(positions[1]*2), primActs) && !(this.checkForSamePrimary(basePlan, positions[1])))  ||
-							!this.checkForHomeSequenceRemoving(basePlan, positions[1])) {
+							!this.checkForHomeSequenceRemoving(basePlan, positions[1]*2)) {
 						positions[1]++;
 						positions[3]++;
 						continue OuterLoop;
@@ -569,7 +569,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				else {
 					positions[1] = 1;
 					if ((this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(positions[1]*2), primActs) && !(this.checkForSamePrimary(basePlan, positions[1]))) ||
-							!this.checkForHomeSequenceRemoving(basePlan, positions[1])) {
+							!this.checkForHomeSequenceRemoving(basePlan, positions[1]*2)) {
 						positions[1]++;
 						positions[3]++;
 						continue OuterLoop;
