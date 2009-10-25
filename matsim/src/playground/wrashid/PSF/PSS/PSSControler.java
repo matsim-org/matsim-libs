@@ -31,7 +31,7 @@ public class PSSControler {
 	String outputPSSPath = "A:\\data\\PSS\\output";
 	String configFilePath;
 	ParametersPSFMutator parameterPSFMutator;
-	private static int iterationNumber=0;
+	private static int iterationNumber = 0;
 	private static final int numberOfTimeBins = 96;
 	private double[][] minimumPriceSignal;
 
@@ -39,22 +39,22 @@ public class PSSControler {
 		return iterationNumber;
 	}
 
+	public PSSControler(String configFilePath, ParametersPSFMutator parameterPSFMutator) {
+		this.configFilePath = configFilePath;
+		this.parameterPSFMutator = parameterPSFMutator;
+	}
 
-	public PSSControler(String configFilePath,ParametersPSFMutator parameterPSFMutator) {
-		this.configFilePath=configFilePath;
-		this.parameterPSFMutator=parameterPSFMutator;
-	}
-	
-	
 	public static void main(String[] args) {
-		PSSControler pssControler=new PSSControler("a:\\data\\matsim\\input\\runRW1002\\config.xml", null);
-		
-		//pssControler.runPSS();
-		
-		pssControler.runMATSimIterations();
-		pssControler.prepareMATSimInput();
+		PSSControler pssControler = new PSSControler("a:\\data\\matsim\\input\\runRW1002\\config.xml", null);
+
+		// just run PPSS
+		pssControler.runPSS();
+
+		// run something to debug...
+		// pssControler.runMATSimIterations();
+		// pssControler.prepareMATSimInput();
 	}
-	
+
 	/**
 	 * number of iterations, in which both MATSim and PSS (Power System
 	 * Simulation) is run. The number of iterations within matsim is specified
@@ -64,157 +64,188 @@ public class PSSControler {
 	 */
 	public void runMATSimPSSIterations(int numberOfIterations) {
 		// if result folder not empty, stop the execution.
-		File resultsDirectory=new File(resultDirectory);
-		if (resultsDirectory.list().length>0){
-			System.out.println("The result directory is not empty."); 
+		File resultsDirectory = new File(resultDirectory);
+		if (resultsDirectory.list().length > 0) {
+			System.out.println("The result directory is not empty.");
 			System.exit(0);
 		}
-		
-		if (!new File(outputPSSPath + "\\hubPriceInfo.txt").exists()){
-			System.out.println("The initial price file is not in " + outputPSSPath); 
+
+		if (!new File(outputPSSPath + "\\hubPriceInfo.txt").exists()) {
+			System.out.println("The initial price file is not in " + outputPSSPath);
 			System.exit(0);
 		}
-		
+
 		// copy the initial prices to the result directory.
 		GeneralLib.copyFile(outputPSSPath + "\\hubPriceInfo.txt", resultDirectory + "initialHubPriceInfo.txt");
-		
-		for (iterationNumber=0;iterationNumber<numberOfIterations;iterationNumber++){
+
+		for (iterationNumber = 0; iterationNumber < numberOfIterations; iterationNumber++) {
 			runMATSimIterations();
 			saveMATSimResults();
-			
+
 			preparePSSInput();
 			runPSS();
-			
+
 			savePSSResults();
-			prepareMATSimInput();		
+			prepareMATSimInput();
 		}
 	}
-	
-	
 
 	private void prepareMATSimInput() {
-		
-		// not needed: configure in the config, that the input is read from the output folder of PSS.
-		
-		
-		
-		if (minimumPriceSignal==null){
-			minimumPriceSignal=new double[numberOfTimeBins][ParametersPSF.getNumberOfHubs()];
+
+		// not needed: configure in the config, that the input is read from the
+		// output folder of PSS.
+
+		if (minimumPriceSignal == null) {
+			minimumPriceSignal = new double[numberOfTimeBins][ParametersPSF.getNumberOfHubs()];
 		}
-		
-		
-		
-		double minPriceBaseLoad=8.00;
-		double maxPriceBaseLoad=9.00;
-		
-		
-		// from iteration 1 onwards: if prices have been high in the previous iteration and they are
-		// still above 10 Rappen, then take the max(current iteration,previous iteration) and add 20% to the price.
+
+		double minPriceBaseLoad = 8.00;
+		double maxPriceBaseLoad = 9.00;
+
+		// from iteration 1 onwards: if prices have been high in the previous
+		// iteration and they are
+		// still above 10 Rappen, then take the max(current iteration,previous
+		// iteration) and add 20% to the price.
 		// This is the price for the next iteration.
-		if (iterationNumber>=1){
-			double [][] newPriceSignalMatrix=GeneralLib.readMatrix(numberOfTimeBins, ParametersPSF.getNumberOfHubs(), false, outputPSSPath + "\\hubPriceInfo.txt");
-		
-			double [][] oldPriceSignalMatrix=ParametersPSF.getHubPriceInfo().getPriceMatrix();
-			
-			
-			for (int i=0;i<numberOfTimeBins;i++){
-				for (int j=0;j<ParametersPSF.getNumberOfHubs();j++){
-					// if the price was previously higher than 10 and still higher than 10, then increase the price level
+		if (iterationNumber >= 1) {
+			double[][] newPriceSignalMatrix = GeneralLib.readMatrix(numberOfTimeBins, ParametersPSF.getNumberOfHubs(), false,
+					outputPSSPath + "\\hubPriceInfo.txt");
+
+			double[][] oldPriceSignalMatrix = ParametersPSF.getHubPriceInfo().getPriceMatrix();
+
+			for (int i = 0; i < numberOfTimeBins; i++) {
+				for (int j = 0; j < ParametersPSF.getNumberOfHubs(); j++) {
+					// if the price was previously higher than 10 and still
+					// higher than 10, then increase the price level
 					// by 30%, because this means the price is still too low
-					
-					
-					// as the prices are determined by e.g. a squar root probabilistic algortihm, a
-					// value of 30% results in much less reduction of vehicle energy conumption during 
+
+					// as the prices are determined by e.g. a squar root
+					// probabilistic algortihm, a
+					// value of 30% results in much less reduction of vehicle
+					// energy conumption during
 					// the given slot than by 30%
-					if (newPriceSignalMatrix[i][j]>maxPriceBaseLoad && oldPriceSignalMatrix[i][j]>maxPriceBaseLoad){
-						newPriceSignalMatrix[i][j]=1.30*oldPriceSignalMatrix[i][j];
-						
-						// we are sure, that the maximum price level for this slot is the current value
-						
-						minimumPriceSignal[i][j]=Math.max(newPriceSignalMatrix[i][j],minimumPriceSignal[i][j]);
+					if (newPriceSignalMatrix[i][j] >= maxPriceBaseLoad && oldPriceSignalMatrix[i][j] >= maxPriceBaseLoad) {
+						newPriceSignalMatrix[i][j] = 1.30 * oldPriceSignalMatrix[i][j];
+
+						// we are sure, that the maximum price level for this
+						// slot is the current value
+
+						minimumPriceSignal[i][j] = Math.max(newPriceSignalMatrix[i][j], minimumPriceSignal[i][j]);
 					}
-					
-					// if this is the first time, the price has been above 10.0, we need to find out the minimumPriceSignal value
-					// therefore we decrease the value of the price signal slowly
-					
-					// => as soon, as the current price has doped enough, there will be a rise in the price, leading to the 
+
+					// if this is the first time, the price has been above 10.0,
+					// we need to find out the minimumPriceSignal value
+					// therefore we decrease the value of the price signal
+					// slowly
+
+					// => as soon, as the current price has doped enough, there
+					// will be a rise in the price, leading to the
 					// mimumPriceSignal beeing set.
-					if (newPriceSignalMatrix[i][j]<maxPriceBaseLoad && oldPriceSignalMatrix[i][j]>maxPriceBaseLoad && minimumPriceSignal[i][j]==0.0){
-						// decrease price by 5 %
-						newPriceSignalMatrix[i][j]=oldPriceSignalMatrix[i][j]*0.95;
+					// if (newPriceSignalMatrix[i][j]<maxPriceBaseLoad &&
+					// oldPriceSignalMatrix[i][j]>maxPriceBaseLoad &&
+					// minimumPriceSignal[i][j]==0.0){
+					// decrease price by 5 %
+					// newPriceSignalMatrix[i][j]=oldPriceSignalMatrix[i][j]*0.95;
+					// }
+
+					// if the new price is smaller than the minimum Price
+					// signal, it should be set to the mimimumPriceSignal
+					// => needed for stabilization of the system (because when
+					// the right price is reached, PPSS will
+					// drop the price lower than 10 => we need to keep the price
+					// high. (correct it).
+					if (newPriceSignalMatrix[i][j] < minimumPriceSignal[i][j]) {
+						newPriceSignalMatrix[i][j] = minimumPriceSignal[i][j];
 					}
-					
-					
-					// if the new price is smaller than the minimum Price signal, it should be set to the mimimumPriceSignal
-					// => needed for stabilization of the system (because when the right price is reached, PPSS will
-					// drop the price lower than 10 => we need to keep the price high. (correct it).
-					if (newPriceSignalMatrix[i][j]< minimumPriceSignal[i][j]){
-						newPriceSignalMatrix[i][j]= minimumPriceSignal[i][j];
+
+					// if new price is now higher than 9 and previously it was
+					// lower than 9, then adapted the minimum price signal to at
+					// least 9
+					// (it should never go below 9 because of the above check)
+					if (newPriceSignalMatrix[i][j] >= maxPriceBaseLoad && oldPriceSignalMatrix[i][j] <= maxPriceBaseLoad) {
+						minimumPriceSignal[i][j] = maxPriceBaseLoad;
 					}
-					
-									
-					
-					// if new price is now higher than 10 and previously it was lower than 10 => then leave it as it is
-					
-					// if new price is lower then and previously it was also lower than 10 => leave it as it is
-					
-					// => this means: decrease price slower than increasing the price.
+
+					// TODO: some test cases are needed for this
+					// e.g.
+
+					// if new price is lower then and previously it was also
+					// lower than 10 => leave it as it is
+
+					// => this means: decrease price slower than increasing the
+					// price.
 				}
 			}
-			
+
 			// remove old price
 			File tempFile = new File(outputPSSPath + "\\hubPriceInfo.txt");
 			if (tempFile.exists()) {
 				tempFile.delete();
 			}
-			
+
 			// write out adapted price
 			GeneralLib.writeMatrix(newPriceSignalMatrix, outputPSSPath + "\\hubPriceInfo.txt", null);
-			
-			GeneralLib.copyFile(outputPSSPath + "\\hubPriceInfo.txt", getIterationResultDirectory() + "\\" + "hubPriceInfo-internal" + (iterationNumber+1) +".txt");
-			
+
+			GeneralLib.copyFile(outputPSSPath + "\\hubPriceInfo.txt", getIterationResultDirectory() + "\\"
+					+ "hubPriceInfo-internal" + (iterationNumber + 1) + ".txt");
+
 		}
-		
-		
+
 	}
 
+	/**
+	 * Gives back in the a double array of size (2). The first array value is
+	 * the newSignalPrice (to be set as the new internal signal). The second
+	 * value is the new minimumPriceSingal.
+	 * 
+	 * 
+	 * @param newPriceSignal
+	 * @param oldInternalPriceSignal
+	 * @param minimumPriceSignal
+	 * @return
+	 */
+	public static double[] processPriceSignal(double newPriceSignal, double oldInternalPriceSignal, double minimumPriceSignal) {
+		double[] result = new double[2];
+
+		return result;
+	}
 
 	private void savePSSResults() {
-		String hubPriceInfoFileName=getIterationResultDirectory() + "\\" + "hubPriceInfo" + (iterationNumber+1);
-		String hubPricePeaksFileName=getIterationResultDirectory() + "\\" + "hubPricePeaks" + (iterationNumber+1);
-		
+		String hubPriceInfoFileName = getIterationResultDirectory() + "\\" + "hubPriceInfo" + (iterationNumber + 1);
+		String hubPricePeaksFileName = getIterationResultDirectory() + "\\" + "hubPricePeaks" + (iterationNumber + 1);
+
 		GeneralLib.copyFile(outputPSSPath + "\\hubPriceInfo.txt", hubPriceInfoFileName + ".txt");
 		GeneralLib.copyFile(outputPSSPath + "\\hubPricePeaks.txt", hubPricePeaksFileName + ".txt");
-		
-		double[][] hubPriceInfo=GeneralLib.readMatrix(numberOfTimeBins, ParametersPSF.getNumberOfHubs(), false, hubPriceInfoFileName + ".txt");
-		double[][] hubPricePeaks=GeneralLib.readMatrix(numberOfTimeBins, ParametersPSF.getNumberOfHubs(), false, hubPricePeaksFileName + ".txt");
-		
-		GeneralLib.writeGraphic(hubPriceInfoFileName + ".png", hubPriceInfo, "Hub Energy Prices", "Time of Day [s]", "Price [CHF]");
-		GeneralLib.writeGraphic(hubPricePeaksFileName + ".png", hubPricePeaks, "Hub Energy Prices (only Peak)", "Time of Day [s]", "Price [CHF]");
-	}
 
+		double[][] hubPriceInfo = GeneralLib.readMatrix(numberOfTimeBins, ParametersPSF.getNumberOfHubs(), false,
+				hubPriceInfoFileName + ".txt");
+		double[][] hubPricePeaks = GeneralLib.readMatrix(numberOfTimeBins, ParametersPSF.getNumberOfHubs(), false,
+				hubPricePeaksFileName + ".txt");
+
+		GeneralLib.writeGraphic(hubPriceInfoFileName + ".png", hubPriceInfo, "Hub Energy Prices", "Time of Day [s]", "Price [CHF]");
+		GeneralLib.writeGraphic(hubPricePeaksFileName + ".png", hubPricePeaks, "Hub Energy Prices (only Peak)", "Time of Day [s]",
+				"Price [CHF]");
+	}
 
 	private void preparePSSInput() {
 		// remove chargingLog file, if it exists already
-		File tempChargingLogFile=new File(inputPSSPath + "\\chargingLog.txt");
-		if (tempChargingLogFile.exists()){
+		File tempChargingLogFile = new File(inputPSSPath + "\\chargingLog.txt");
+		if (tempChargingLogFile.exists()) {
 			tempChargingLogFile.delete();
 		}
-		
+
 		// copy charging log to input directory of PSS
 		GeneralLib.copyFile(ParametersPSF.getMainChargingTimesOutputFilePath(), inputPSSPath + "\\chargingLog.txt");
 	}
 
-
 	private void saveMATSimResults() {
-		// copy all data from the matsim output directory to the results directory
-		String matsimOutputFolderName= 	controler.getOutputFilename("");
-		
-		GeneralLib.copyDirectory(matsimOutputFolderName, getIterationResultDirectory());
-		
-		
-	}
+		// copy all data from the matsim output directory to the results
+		// directory
+		String matsimOutputFolderName = controler.getOutputFilename("");
 
+		GeneralLib.copyDirectory(matsimOutputFolderName, getIterationResultDirectory());
+
+	}
 
 	public void runMATSimIterations() {
 		Gbl.reset();
@@ -231,17 +262,14 @@ public class PSSControler {
 		simulationStartupListener.addEventHandler(logParkingTimes);
 		simulationStartupListener.addParameterPSFMutator(parameterPSFMutator);
 
-		
-		AfterSimulationListener afterSimulationListener=new AfterSimulationListener(logEnergyConsumption, logParkingTimes);
+		AfterSimulationListener afterSimulationListener = new AfterSimulationListener(logEnergyConsumption, logParkingTimes);
 		controler.addControlerListener(afterSimulationListener);
-		
+
 		controler.run();
 
-		
 	}
 
 	private void runPSS() {
-
 
 		// clean output directory
 		File tempFile = new File(outputPSSPath + "\\hubPriceInfo.txt");
@@ -253,7 +281,7 @@ public class PSSControler {
 		if (tempFile.exists()) {
 			tempFile.delete();
 		}
-		
+
 		tempFile = new File(outputPSSPath + "\\fertig.txt");
 		if (tempFile.exists()) {
 			tempFile.delete();
@@ -265,44 +293,43 @@ public class PSSControler {
 			BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(proc.getOutputStream())), true);
 
-			String matsimFolderPath="C:\\Program Files (x86)\\MATLAB\\R2008b\\bin\\";
-			//String scriptPath = "a:\\";
+			String matsimFolderPath = "C:\\Program Files (x86)\\MATLAB\\R2008b\\bin\\";
+			// String scriptPath = "a:\\";
 			String scriptName;
-			if (iterationNumber==0){
-				scriptName="IVT_main_base";
+			if (iterationNumber == 0) {
+				scriptName = "IVT_main_base";
 			} else {
-				scriptName="IVT_main";
+				scriptName = "IVT_main";
 			}
-			
+
 			out.println("cd " + matsimFolderPath);
 			out.println("c:");
 			out.println("matlab -r " + scriptName);
 			out.flush();
 			System.out.println("Starting PSS...");
-		
-		
-		// check, if MATLab finished
-		tempFile = new File(outputPSSPath + "\\fertig.txt");
-		while (!tempFile.exists()){
-			// TODO: do counting, if this not possible
-			
-			for (int i=0;i<1000000000;i++){
-				
+
+			// check, if MATLab finished
+			tempFile = new File(outputPSSPath + "\\fertig.txt");
+			while (!tempFile.exists()) {
+				// TODO: do counting, if this not possible
+
+				for (int i = 0; i < 1000000000; i++) {
+
+				}
+				System.out.print(".");
 			}
-			System.out.print(".");
-		}
-		System.out.println("");
-		System.out.println("Killing matlab...");
-		
-		// stop/kill matlab 
-		Runtime.getRuntime().exec("taskkill /im matlab.exe /f");
-		
+			System.out.println("");
+			System.out.println("Killing matlab...");
+
+			// stop/kill matlab
+			Runtime.getRuntime().exec("taskkill /im matlab.exe /f");
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-	private String getIterationResultDirectory(){
+
+	private String getIterationResultDirectory() {
 		return resultDirectory + "iteration" + iterationNumber;
 	}
 
