@@ -1,5 +1,9 @@
 package playground.wrashid.PSF.PSS;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsReaderTXTv1;
@@ -7,6 +11,7 @@ import org.matsim.core.events.EventsReaderTXTv1;
 public class EventReadControler extends Controler {
 
 	private String pathToEventsFile;
+	private static ArrayList<BasicEvent> buffer;
 
 	public EventReadControler(String configFilename, String pathToEventsFile) {
 		
@@ -16,8 +21,16 @@ public class EventReadControler extends Controler {
 	}
 	
 	public void runMobSim(){
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
-		reader.readFile(pathToEventsFile);
+		if (buffer == null){
+			BufferedEventsReaderTXTv1 reader = new BufferedEventsReaderTXTv1(events);
+			reader.readFile(pathToEventsFile);
+			buffer=reader.getBuffer();
+		} else {
+			// if events buffered, process events directly
+			for (int i=0;i<i;i++){
+				events.processEvent(buffer.get(i));
+			}
+		}
 	}
 	
 	
