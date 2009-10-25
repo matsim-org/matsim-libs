@@ -38,7 +38,7 @@ public class FirstPriceSignalMaintainingAlgorithmTests extends TestCase {
 		newMinimumPriceSingal=newSignalValues[1];
 		
 		assertEquals(maxPriceBaseLoad+1, newPriceSignal);
-		assertEquals(maxPriceBaseLoad, newMinimumPriceSingal);
+		assertEquals(maxPriceBaseLoad+1, newMinimumPriceSingal);
 		
 		// the price signal should never drop below 'maxPriceBaseLoad', if it has been higher than this value
 		newSignalValues=FirstPriceSignalMaintainingAlgorithm.processPriceSignal(valueBelowMaxBaseLoad, maxPriceBaseLoad+1.0, maxPriceBaseLoad+1.0);
@@ -47,7 +47,6 @@ public class FirstPriceSignalMaintainingAlgorithmTests extends TestCase {
 		
 		assertEquals(maxPriceBaseLoad+1, newPriceSignal);
 		assertEquals(maxPriceBaseLoad+1, newMinimumPriceSingal);
-		
 	}
 	 
-}    
+}     

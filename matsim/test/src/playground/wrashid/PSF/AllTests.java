@@ -10,6 +10,7 @@ public class AllTests {
 
 		suite.addTest(playground.wrashid.PSF.converter.addingParkings.AllTests.suite());
 		suite.addTest(playground.wrashid.PSF.data.AllTests.suite());
+		suite.addTest(playground.wrashid.PSF.PSS.AllTests.suite());
 		suite.addTest(playground.wrashid.PSF.singleAgent.AllTests.suite());
 		
 		return suite;
