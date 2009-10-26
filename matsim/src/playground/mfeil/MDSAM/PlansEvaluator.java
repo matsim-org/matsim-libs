@@ -89,7 +89,7 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 		//this.writePlansForBiogemeWithRandomSelection(this.outputFileBiogeme, this.attributesInputFile, 
 		//		super.similarity, super.incomeConstant, super.incomeDivided, super.incomeDividedLN, super.incomeBoxCox, super.age, super.gender, super.employed, super.license, super.carAvail, super.seasonTicket, super.travelDistance, super.travelCost, super.travelConstant, super.bikeIn);
 		this.writePlansForBiogemeWithRandomSelectionAccumulated(this.outputFileBiogeme, this.attributesInputFile, 
-				super.beta, super.gamma, super.similarity, super.incomeConstant, super.incomeDivided, super.incomeDividedLN, super.incomeBoxCox, super.age, super.gender, super.employed, super.license, super.carAvail, super.seasonTicket, super.travelDistance, super.travelCost, super.travelConstant, super.bikeIn);
+				super.beta, super.gamma, super.similarity, super.incomeConstant, super.incomeDivided, super.incomeDividedLN, super.incomeBoxCox, super.age, super.gender, super.employed, super.license, super.carAvail, super.seasonTicket, super.travelDistance, super.travelCost, super.travelConstant, super.beta_travel, super.bikeIn);
 	}
 	
 	

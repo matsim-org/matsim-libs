@@ -641,6 +641,7 @@ public class ModFileMaker {
 			String travelDistance,
 			String travelCost,
 			String travelConstant,
+			String beta_travel,
 			String bikeIn){
 		
 		log.info("Writing mod file...");
@@ -698,20 +699,22 @@ public class ModFileMaker {
 		if (gamma.equals("yes")) stream.println("LeisureGamma \t1  \t0 \t5  \t0");
 		
 		// betas and gammas
-		stream.println("beta_time \t0  \t-5 \t5  \t0");
-		if (travelCost.equals("yes")) stream.println("beta_cost \t0  \t-5 \t5  \t0");
-		if (travelDistance.equals("yes"))stream.println("beta_distance \t0  \t-5 \t5  \t0");
-		if (incomeBoxCox.equals("yes")) {
-			stream.println("lambda_time_income \t0  \t-5 \t5  \t0");
-			stream.println("lambda_cost_income \t0  \t-5 \t5  \t0");
-			stream.println("lambda_distance_income \t0  \t-5 \t5  \t0");
+		if (beta_travel.equals("yes")){
+			stream.println("beta_time \t0  \t-5 \t5  \t0");
+			if (travelCost.equals("yes")) stream.println("beta_cost \t0  \t-5 \t5  \t0");
+			if (travelDistance.equals("yes"))stream.println("beta_distance \t0  \t-5 \t5  \t0");
+			if (incomeBoxCox.equals("yes")) {
+				stream.println("lambda_time_income \t0  \t-5 \t5  \t0");
+				stream.println("lambda_cost_income \t0  \t-5 \t5  \t0");
+				stream.println("lambda_distance_income \t0  \t-5 \t5  \t0");
+			}
 		}
 		
 		// Car
 		stream.println("beta_time_car \t-4  \t-50 \t30  \t0");
 		if (travelCost.equals("yes")) stream.println("beta_cost_car \t0  \t-50 \t30  \t0");
 		if (travelDistance.equals("yes")) stream.println("beta_distance_car \t0  \t-50 \t30  \t0");
-		if (travelConstant.equals("yes")) stream.println("constant_car \t0  \t-50 \t50  \t0");
+	//	if (travelConstant.equals("yes")) stream.println("constant_car \t0  \t-50 \t50  \t0");
 		if (incomeDivided.equals("yes")) stream.println("beta_cost_car_div_income \t0  \t-50 \t50  \t0");
 		if (incomeDivided.equals("yes")) stream.println("beta_cost_car_div_LNincome \t0  \t-50 \t50  \t0");
 		if (incomeBoxCox.equals("yes")) {
@@ -788,7 +791,7 @@ public class ModFileMaker {
 						stream.print("beta_time_car * x"+(i+1)+"_car_time");
 						if (travelCost.equals("yes")) stream.print(" + beta_cost_car * x"+(i+1)+"_car_cost");
 						if (travelDistance.equals("yes")) stream.print(" + beta_distance_car * x"+(i+1)+"_car_distance");
-						if (travelConstant.equals("yes")) stream.print(" + constant_car * one");
+		//				if (travelConstant.equals("yes")) stream.print(" + constant_car * one");
 						onlyBike = false;
 						started = true;
 					}
@@ -820,7 +823,7 @@ public class ModFileMaker {
 						stream.print(" + beta_time_car * x"+(i+1)+"_car_time");
 						if (travelCost.equals("yes")) stream.print(" + beta_cost_car * x"+(i+1)+"_car_cost");
 						if (travelDistance.equals("yes")) stream.print(" + beta_distance_car * x"+(i+1)+"_car_distance");
-						if (travelConstant.equals("yes")) stream.print(" + constant_car * one");
+	//					if (travelConstant.equals("yes")) stream.print(" + constant_car * one");
 						onlyBike = false;
 					}
 					else if (pt==1) {
@@ -844,66 +847,70 @@ public class ModFileMaker {
 					else log.warn("Leg has no valid mode! ActChains position: "+i);
 				}
 				// beta_time
-				if (onlyBike && bikeIn.equals("no") && incomeConstant.equals("no")) {
-					if (car+pt+bike+walk==1) {
-						stream.print("beta_time *");
-						if (car==1) stream.print(" x"+(i+1)+"_car_time");
-						else if (pt==1) stream.print(" x"+(i+1)+"_pt_time");
-						else if (walk==1) stream.print(" x"+(i+1)+"_walk_time");
+				if (beta_travel.equals("yes")){
+					if (onlyBike && bikeIn.equals("no") && incomeConstant.equals("no")) {
+						if (car+pt+bike+walk==1) {
+							stream.print("beta_time *");
+							if (car==1) stream.print(" x"+(i+1)+"_car_time");
+							else if (pt==1) stream.print(" x"+(i+1)+"_pt_time");
+							else if (walk==1) stream.print(" x"+(i+1)+"_walk_time");
+						}
+						else if (car+pt+bike+walk>1) {
+							if (car==1) stream.print("beta_time * x"+(i+1)+"_car_time");
+							if (car==0 && pt==1) stream.print("beta_time * x"+(i+1)+"_pt_time");
+							else if (car==1 && pt==1) stream.print(" + beta_time * x"+(i+1)+"_pt_time");
+							if (walk==1) stream.print(" + beta_time * x"+(i+1)+"_walk_time");
+						}	
 					}
-					else if (car+pt+bike+walk>1) {
-						if (car==1) stream.print("beta_time * x"+(i+1)+"_car_time");
-						if (car==0 && pt==1) stream.print("beta_time * x"+(i+1)+"_pt_time");
-						else if (car==1 && pt==1) stream.print(" + beta_time * x"+(i+1)+"_pt_time");
-						if (walk==1) stream.print(" + beta_time * x"+(i+1)+"_walk_time");
+					else {
+						if (car+pt+bike+walk==1) {
+							stream.print(" + beta_time *");
+							if (car==1) stream.print(" x"+(i+1)+"_car_time");
+							else if (pt==1) stream.print(" x"+(i+1)+"_pt_time");
+							else if (bike==1) stream.print(" x"+(i+1)+"_bike_time");
+							else if (walk==1) stream.print(" x"+(i+1)+"_walk_time");
+						}
+						else if (car+pt+bike+walk>1) {
+							if (car==1) stream.print(" + beta_time * x"+(i+1)+"_car_time");
+							if (car==0 && pt==1) stream.print(" + beta_time * x"+(i+1)+"_pt_time");
+							else if (car==1 && pt==1) stream.print(" + beta_time * x"+(i+1)+"_pt_time");
+							if (car==0 && pt==0 && bike==1) stream.print(" + beta_time * x"+(i+1)+"_bike_time");
+							else if ((car==1 || pt==1) && bike==1) stream.print(" + beta_time * x"+(i+1)+"_bike_time");
+							if (walk==1) stream.print(" + beta_time * x"+(i+1)+"_walk_time");
+						}	
 					}	
-				}
-				else {
-					if (car+pt+bike+walk==1) {
-						stream.print(" + beta_time *");
-						if (car==1) stream.print(" x"+(i+1)+"_car_time");
-						else if (pt==1) stream.print(" x"+(i+1)+"_pt_time");
-						else if (bike==1) stream.print(" x"+(i+1)+"_bike_time");
-						else if (walk==1) stream.print(" x"+(i+1)+"_walk_time");
+					
+					// beta cost					
+					if (travelCost.equals("yes")){
+						if (car+pt==1){
+							stream.print(" + beta_cost * ");
+							if (car==1) stream.print(" x"+(i+1)+"_car_cost");
+							else stream.print(" x"+(i+1)+"_pt_cost");
+						}
+						else if (car+pt>1){
+							stream.print(" + beta_cost * x"+(i+1)+"_car_cost + beta_cost * x"+(i+1)+"_pt_cost");;
+						}
 					}
-					else if (car+pt+bike+walk>1) {
-						if (car==1) stream.print(" + beta_time * x"+(i+1)+"_car_time");
-						if (car==0 && pt==1) stream.print(" + beta_time * x"+(i+1)+"_pt_time");
-						else if (car==1 && pt==1) stream.print(" + beta_time * x"+(i+1)+"_pt_time");
-						if (car==0 && pt==0 && bike==1) stream.print(" + beta_time * x"+(i+1)+"_bike_time");
-						else if ((car==1 || pt==1) && bike==1) stream.print(" + beta_time * x"+(i+1)+"_bike_time");
-						if (walk==1) stream.print(" + beta_time * x"+(i+1)+"_walk_time");
-					}	
-				}	
-				
-				// beta cost					
-				if (travelCost.equals("yes")){
-					if (car+pt==1){
-						stream.print(" + beta_cost * ");
-						if (car==1) stream.print(" x"+(i+1)+"_car_cost");
-						else stream.print(" x"+(i+1)+"_pt_cost");
-					}
-					else if (car+pt>1){
-						stream.print(" + beta_cost * x"+(i+1)+"_car_cost + beta_cost * x"+(i+1)+"_pt_cost");;
+					
+					// beta distance
+					if (travelDistance.equals("yes")){
+						if (car+pt+bike+walk==1) {
+							stream.print(" + beta_distance *");
+							if (car==1) stream.print(" x"+(i+1)+"_car_distance");
+							else if (pt==1) stream.print(" x"+(i+1)+"_pt_distance");
+							else if (bike==1) stream.print(" x"+(i+1)+"_bike_distance");
+							else if (walk==1) stream.print(" x"+(i+1)+"_walk_distance");
+						}
+						else if (car+pt+bike+walk>1) {
+							if (car==1) stream.print(" + beta_distance * x"+(i+1)+"_car_distance");
+							if (car==0 && pt==1) stream.print(" + beta_distance * x"+(i+1)+"_pt_distance");
+							else if (car==1 && pt==1) stream.print(" + beta_distance * x"+(i+1)+"_pt_distance");
+							if (car==0 && pt==0 && bike==1) stream.print(" + beta_distance * x"+(i+1)+"_bike_distance");
+							else if ((car==1 || pt==1) && bike==1) stream.print(" + beta_distance * x"+(i+1)+"_bike_distance");
+							if (walk==1) stream.print(" + beta_distance * x"+(i+1)+"_walk_distance");
+						}	
 					}
 				}
-				
-				// beta distance
-				if (car+pt+bike+walk==1) {
-					stream.print(" + beta_distance *");
-					if (car==1) stream.print(" x"+(i+1)+"_car_distance");
-					else if (pt==1) stream.print(" x"+(i+1)+"_pt_distance");
-					else if (bike==1) stream.print(" x"+(i+1)+"_bike_distance");
-					else if (walk==1) stream.print(" x"+(i+1)+"_walk_distance");
-				}
-				else if (car+pt+bike+walk>1) {
-					if (car==1) stream.print(" + beta_distance * x"+(i+1)+"_car_distance");
-					if (car==0 && pt==1) stream.print(" + beta_distance * x"+(i+1)+"_pt_distance");
-					else if (car==1 && pt==1) stream.print(" + beta_distance * x"+(i+1)+"_pt_distance");
-					if (car==0 && pt==0 && bike==1) stream.print(" + beta_distance * x"+(i+1)+"_bike_distance");
-					else if ((car==1 || pt==1) && bike==1) stream.print(" + beta_distance * x"+(i+1)+"_bike_distance");
-					if (walk==1) stream.print(" + beta_distance * x"+(i+1)+"_walk_distance");
-				}		
 			}
 			else if (incomeConstant.equals("no")){
 				stream.print("$NONE");
@@ -1031,7 +1038,7 @@ public class ModFileMaker {
 				}
 				
 				// cross-mode coefficients
-				if (actslegs.size()>1){
+				if (actslegs.size()>1 && beta_travel.equals("yes")){
 					if (car+pt+bike+walk==1) {
 						stream.print(" + beta_time *");
 						if (car==1) stream.print(" x"+(i+1)+"_car_time");
