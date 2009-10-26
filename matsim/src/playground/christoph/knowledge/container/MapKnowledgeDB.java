@@ -27,9 +27,9 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 	private DBConnectionTool dbConnectionTool = new DBConnectionTool();
 	
 	private static String separator = "@";
-	//private static String tableName = "MapKnowledge";
-	public static String tableName = "BatchTable1_25";
-	
+	public static String baseTableName = "MapKnowledge";
+	private String tableName = "BatchTable1_25";
+		
 	private Lock lock = new ReentrantLock();
 	
 	public MapKnowledgeDB()
@@ -38,7 +38,7 @@ public class MapKnowledgeDB extends MapKnowledge implements DBStorage{
 		localKnowledge = false;
 	}
 
-	public static void setTableName(String name)
+	public void setTableName(String name)
 	{
 		tableName = name;
 	}

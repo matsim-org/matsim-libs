@@ -22,7 +22,7 @@ public class DBConnectionTool {
 	private static MysqlConnectionPoolDataSource[] cpdsArray;
 	private static MyPooledConnection[] poledConArray;
 	private static int roundRobin = 0;
-	private static int conCount = 10;
+	private static int conCount = 50;
 	private static Object monitor;
 	
 	public static void main(String[] args)

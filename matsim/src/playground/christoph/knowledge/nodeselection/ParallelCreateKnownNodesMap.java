@@ -28,7 +28,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
@@ -47,7 +46,7 @@ public class ParallelCreateKnownNodesMap {
 
 	private final static Logger log = Logger.getLogger(ParallelCreateKnownNodesMap.class);
 	
-	protected static boolean removeDeadEnds = true;
+//	protected static boolean removeDeadEnds = true;
 	
 	/**
 	 * Creates a Map of known Nodes of each person of the given <code>population</code> using up to 
@@ -125,17 +124,16 @@ public class ParallelCreateKnownNodesMap {
 		}
 	}
 	
-	public static void setRemoveDeadEnds(boolean value)
-	{
-		removeDeadEnds = value;
-	}
-	
-	public static boolean getRemoveDeadEnds()
-	{
-		return removeDeadEnds;
-	}
-	
-	
+//	public static void setRemoveDeadEnds(boolean value)
+//	{
+//		removeDeadEnds = value;
+//	}
+//	
+//	public static boolean getRemoveDeadEnds()
+//	{
+//		return removeDeadEnds;
+//	}
+		
 	/**
 	 * The thread class that really handles the persons.
 	 */
@@ -168,7 +166,7 @@ public class ParallelCreateKnownNodesMap {
 			{	
 				/* 
 				 * If person has no Knowledge create at least the knowledge structure to
-				 * avoid error during the simulation.
+				 * avoid errors during the simulation.
 				 * No known nodes is handled as if the person would know the entire network.
 				 * This should be faster than using a Map that contains all Nodes of the network.
 				 */
@@ -199,7 +197,6 @@ public class ParallelCreateKnownNodesMap {
 					// if there is a valid index returned -> get Nodes
 					if (index >= 0)
 					{	
-//						CreateKnownNodesMap.collectSelectedNodes(person, network, this.nodeSelectorArray[index][threadId]);
 						new CreateKnownNodesMap().collectSelectedNodes(person, network, this.nodeSelectorArray[index][threadId]);
 					}
 					else
@@ -209,29 +206,40 @@ public class ParallelCreateKnownNodesMap {
 					
 				}	// for all NodeSelectors
 								
-				// if Flag is set, remove Dead Ends from the Person's Activity Room
-				//if(removeDeadEnds) DeadEndRemover.removeDeadEnds(person);
+//				 if Flag is set, remove Dead Ends from the Person's Activity Room
+//				if(removeDeadEnds) DeadEndRemover.removeDeadEnds(person);
+				
+				// get NodeKnowledge
+				NodeKnowledge nodeKnowledge = (NodeKnowledge)person.getCustomAttributes().get("NodeKnowledge");
+				
+				/* 
+				 * If the NodeKnowledge Object is from Type MapKnowledgeDB
+				 * this will cause it to write its Data to the Database.
+				 */
+				nodeKnowledge.setKnownNodes(nodeKnowledge.getKnownNodes());
+				
+				if (nodeKnowledge instanceof MapKnowledgeDB) ((MapKnowledgeDB) nodeKnowledge).clearLocalKnowledge();
 				
 				
-				if (person.getCustomAttributes().get("NodeKnowledgeStorageType") != null)
-				{
-					String NodeKnowledgeStorageType = (String)person.getCustomAttributes().get("NodeKnowledgeStorageType");
-					
-					if (MapKnowledgeDB.class.getName().equals(NodeKnowledgeStorageType))
-					{
-						NodeKnowledge nodeKnowledge = (NodeKnowledge)person.getCustomAttributes().get("NodeKnowledge");
-						Map<Id, Node> nodesMap = nodeKnowledge.getKnownNodes();
-												
-						MapKnowledgeDB mapKnowledgeDB = new MapKnowledgeDB();
-						mapKnowledgeDB.setPerson(person);
-						mapKnowledgeDB.setNetwork(network);
-						mapKnowledgeDB.setKnownNodes(nodesMap);
-						//mapKnowledgeDB.writeToDB(); // -> now done in MapKnowledgeDB
-						mapKnowledgeDB.clearLocalKnowledge();
-												
-						person.getCustomAttributes().put("NodeKnowledge", mapKnowledgeDB);
-					}
-				}
+//				if (person.getCustomAttributes().get("NodeKnowledgeStorageType") != null)
+//				{
+//					String NodeKnowledgeStorageType = (String)person.getCustomAttributes().get("NodeKnowledgeStorageType");
+//					
+//					if (MapKnowledgeDB.class.getName().equals(NodeKnowledgeStorageType))
+//					{
+//						NodeKnowledge nodeKnowledge = (NodeKnowledge)person.getCustomAttributes().get("NodeKnowledge");
+//						Map<Id, Node> nodesMap = nodeKnowledge.getKnownNodes();
+//						
+//						MapKnowledgeDB mapKnowledgeDB = new MapKnowledgeDB();
+//						mapKnowledgeDB.setPerson(person);
+//						mapKnowledgeDB.setNetwork(network);
+//						mapKnowledgeDB.setKnownNodes(nodesMap);
+//						//mapKnowledgeDB.writeToDB(); // -> now done in MapKnowledgeDB
+//						mapKnowledgeDB.clearLocalKnowledge();
+//												
+//						person.getCustomAttributes().put("NodeKnowledge", mapKnowledgeDB);
+//					}
+//				}
 				
 				numRuns++;
 				if (numRuns % 500 == 0) 

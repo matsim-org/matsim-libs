@@ -63,11 +63,7 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 	 * Select which size the known Areas should have in the Simulation.
 	 * The needed Parameter is the Name of the Table in the MYSQL Database.
 	 */
-	static
-	{
-		MapKnowledgeDB.setTableName("BatchTable1_5");
-		log.info("Selected Knowledge Database Table");
-	}
+	protected String tableName = "BatchTable1_5";
 	
 	public WithinDayKnowledgeControler(String[] args)
 	{
@@ -135,6 +131,7 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 			MapKnowledgeDB mapKnowledgeDB = new MapKnowledgeDB();
 			mapKnowledgeDB.setPerson(person);
 			mapKnowledgeDB.setNetwork(network);
+			mapKnowledgeDB.setTableName(tableName);
 
 			customAttributes.put("NodeKnowledge", mapKnowledgeDB);
 		}

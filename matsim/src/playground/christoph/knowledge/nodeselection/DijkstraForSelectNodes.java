@@ -48,7 +48,6 @@ import playground.christoph.network.MyLinkImpl;
  * This effect may vary depending on the Network and CostCalculator.
  * So maybe not using it could be faster...
  */
-
 public class DijkstraForSelectNodes {
 	
 	private static final Logger log = Logger.getLogger(DijkstraForSelectNodes.class);
@@ -57,7 +56,6 @@ public class DijkstraForSelectNodes {
 	private Map<Node, DijkstraNode> dijkstraNodeMap;
 		
 	// CostCalculator for the Dijkstra Algorithm
-//	TravelCost costCalculator = new FreespeedTravelTimeCost();
 	private TravelCost costCalculator;
 
 	// time for the cost calculator
@@ -91,7 +89,6 @@ public class DijkstraForSelectNodes {
 	   
 	// List of nodes, sorted by their distance to the startnode.
 	private final PriorityQueue<DijkstraNode> unvisitedNodes = new PriorityQueue<DijkstraNode>(INITIAL_CAPACITY, shortestDistanceComparator);
-	
 	
 	public DijkstraForSelectNodes(Map<Id,? extends Node> networkNodesMap)
 	{
@@ -128,8 +125,7 @@ public class DijkstraForSelectNodes {
 	{		
 		// clear map
 		dijkstraNodeMap.clear();
-		
-		// iterate over Array or Iteratable 
+		 
 		for (Node node : networkNodesMap.values())
 		{		
 			DijkstraNode dijkstraNode = new DijkstraNode(node);
@@ -151,8 +147,7 @@ public class DijkstraForSelectNodes {
 	    // add source
 	    setMinDistance(start, 0.0);
 	    unvisitedNodes.add(start);
-	}
-	   
+	}  
 	
 	// Search shortest Path for a Route. Break if distance has been found.
 	public void executeRoute(Node start, Node end)
@@ -264,6 +259,32 @@ public class DijkstraForSelectNodes {
 	}
 	
 	/*
+	 * Executes Forward and Backward Dijkstra and stores
+	 * the Backward and Forward Costs in the DijkstraNode Object.
+	 */
+	public void executeTotalNetwork(Node start, Node end)
+	{
+		// Reset values
+		for (DijkstraNode dijkstraNode : dijkstraNodeMap.values())
+		{
+			dijkstraNode.setMinDistForward(Double.MAX_VALUE);
+			dijkstraNode.setMinDistBackward(Double.MAX_VALUE);
+		}
+		
+		executeForwardNetwork(start);
+	    for (DijkstraNode dijkstraNode : dijkstraNodeMap.values())
+	    {
+	    	dijkstraNode.setMinDistForward(dijkstraNode.getMinDist());
+	    }
+		
+		executeBackwardNetwork(end);
+	    for (DijkstraNode dijkstraNode : dijkstraNodeMap.values())
+	    {
+	    	dijkstraNode.setMinDistBackward(dijkstraNode.getMinDist());
+	    }
+	}
+	
+	/*
 	 * Return Map with the distances to every node.
 	 * Is called from outside this class, so return nodes instead of
 	 * DijkstraNodes.
@@ -276,6 +297,24 @@ public class DijkstraForSelectNodes {
 		{
 			// add the node and its shortest path to the map
 			minDistances.put(node.getNode(), node.getMinDist());
+		}
+		
+		return minDistances;
+	}
+	
+	/*
+	 * Return Map with the distances to every node.
+	 * Is called from outside this class, so return nodes instead of
+	 * DijkstraNodes.
+	 */
+	public Map<Node, Double> getTotalMinDistances()
+	{
+		Map<Node, Double> minDistances = new HashMap<Node, Double>();
+		
+		for (DijkstraNode node : dijkstraNodeMap.values()) 
+		{
+			// add the node and its shortest path to the map
+			minDistances.put(node.getNode(), node.getMinDistBackward() + node.getMinDistForward());
 		}
 		
 		return minDistances;
@@ -438,6 +477,9 @@ class DijkstraNode
 	DijkstraNode prevNode = null;
 	boolean visited;
 	double minDist;
+	
+	double minDistForward;
+	double minDistBackward;
 
 	static void setNodeMap(Map<Node, DijkstraNode> map)
 	{
@@ -483,12 +525,32 @@ class DijkstraNode
 		this.minDist = minDist;
 	}
 	
+	public double getMinDistForward() 
+	{
+		return minDistForward;
+	}
+
+	public void setMinDistForward(double minDist) 
+	{
+		this.minDistForward = minDist;
+	}
+	
+	public double getMinDistBackward() 
+	{
+		return minDistBackward;
+	}
+
+	public void setMinDistBackward(double minDist) 
+	{
+		this.minDistBackward = minDist;
+	}
+	
 	protected void reset()
 	{
 		visited = false;
 		minDist = Double.MAX_VALUE;
 	}
-
+	
 	protected ArrayList<DijkstraNode> ingoingNodes()
 	{
 		ArrayList<DijkstraNode> ingoingNodes = new ArrayList<DijkstraNode>();

@@ -62,8 +62,8 @@ public class CreateKnowledgeForDatabase {
 	private ArrayList<SelectNodes> nodeSelectors;
 	
 	private double dijkstraCostFactor = 1.0;
-	private double[] dijkstraCostFactors = {1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0};
-//	private double[] dijkstraCostFactors = {1.025};
+//	private double[] dijkstraCostFactors = {1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0};
+	private double[] dijkstraCostFactors = {1.025};
 	private TravelCost costCalculator;
 	
 	private int parallelThreads = 4;
@@ -103,10 +103,9 @@ public class CreateKnowledgeForDatabase {
 	 * factor will be added to the String.
 	 */
 	private static final String baseTableName = "BatchTable";
-	
+		
 	public static void main(String[] args)
 	{	
-		MapKnowledgeDB.setTableName(baseTableName);
 		new CreateKnowledgeForDatabase();
 	}
 	
@@ -135,7 +134,7 @@ public class CreateKnowledgeForDatabase {
 		setNodeSelectors();
 		log.info("Assigned NodeSelectors");
 		
-		// create TravelCost LookupTable
+		// create TravelCost LookupTable using MyLinkImpls
 		createLookupTable();
 		
 		for (double factor : dijkstraCostFactors)
@@ -147,13 +146,11 @@ public class CreateKnowledgeForDatabase {
 					((SelectNodesDijkstra)selectNodes).setCostFactor(factor);
 				}
 			}
-
-			MapKnowledgeDB.setTableName(this.baseTableName + String.valueOf(factor).replace(".", "_"));
 			
 			// initialize and assign the Knowledge Storage Handlers
-			initDatabaseTable();
+			initDatabaseTable(factor);
 			log.info("Initialize Knowledge Storage Handler");
-			setKnowledgeStorageHandler();
+			setKnowledgeStorageHandler(factor);
 			log.info("Set Knowledge Storage Handler");
 			
 			// create known Nodes for each Person
@@ -221,24 +218,37 @@ public class CreateKnowledgeForDatabase {
 	 * Creates the Table in the Database if it does not already exist.
 	 * If it exists, clear its content.
 	 */
-	private void initDatabaseTable()
+	private void initDatabaseTable(double costFactor)
 	{
 		MapKnowledgeDB mapKnowledgeDB = new MapKnowledgeDB();
+		
+		// Set DB Name
+		String tableName = baseTableName + String.valueOf(costFactor).replace(".", "_");
+		
+		mapKnowledgeDB.setTableName(tableName);
 		mapKnowledgeDB.createTable();
 		mapKnowledgeDB.clearTable();
 	}
-	
+
 	/*
 	 * How to store the known Nodes of the Agents?
 	 * Currently we store them in a Database.
 	 */
-	private void setKnowledgeStorageHandler()
+	private void setKnowledgeStorageHandler(double factor)
 	{
 		for(Person person : population.getPersons().values())
 		{
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 			
 			customAttributes.put("NodeKnowledgeStorageType", MapKnowledgeDB.class.getName());
+			
+			// Create MapKnowledgeDB and set the name of the Table in the Database.
+			MapKnowledgeDB mapKnowledgeDB = new MapKnowledgeDB();
+			mapKnowledgeDB.setPerson(person);
+			mapKnowledgeDB.setNetwork(network);
+			mapKnowledgeDB.setTableName(baseTableName + String.valueOf(factor).replace(".", "_"));
+
+			customAttributes.put("NodeKnowledge", mapKnowledgeDB);
 		}
 	}
 	

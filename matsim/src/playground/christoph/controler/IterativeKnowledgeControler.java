@@ -27,6 +27,12 @@ public class IterativeKnowledgeControler extends Controler{
 
 	boolean knowledgeLoaded = false;
 	
+	/*
+	 * Select which size the known Areas should have in the Simulation.
+	 * The needed Parameter is the Name of the Table in the MYSQL Database.
+	 */
+	private static final String tableName = "BatchTable1_5";
+	
 	public IterativeKnowledgeControler(String[] args) 
 	{
 		super(args);
@@ -102,6 +108,7 @@ public class IterativeKnowledgeControler extends Controler{
 			MapKnowledgeDB mapKnowledgeDB = new MapKnowledgeDB();
 			mapKnowledgeDB.setPerson(person);
 			mapKnowledgeDB.setNetwork(network);
+			mapKnowledgeDB.setTableName(tableName);
 			
 			mapKnowledgeDB.readFromDB();
 
