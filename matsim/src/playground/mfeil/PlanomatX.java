@@ -643,7 +643,10 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			
 			LegImpl legHelp;
 			legHelp = new LegImpl (TransportMode.walk); // First and second acts must be "home" acts at same location so walk is appropriate
-			legHelp.setTravelTime(3600);			
+			legHelp.setTravelTime(3600);	
+			
+			actslegs.add(legHelp);
+			actslegs.add(actHelp);	
 			
 			// Then add a non-home act
 			if (position[0] == 1){ // first loop, define first actsToBeAdded position 
