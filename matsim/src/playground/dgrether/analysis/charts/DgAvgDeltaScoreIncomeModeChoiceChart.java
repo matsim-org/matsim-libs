@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.charts;
 
+import java.awt.BasicStroke;
+
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartColor;
 import org.jfree.chart.JFreeChart;
@@ -36,6 +38,7 @@ import playground.dgrether.analysis.population.DgIncomeClass;
 import playground.dgrether.analysis.population.DgModeSwitchPlanTypeAnalyzer;
 import playground.dgrether.analysis.population.DgPersonData;
 import playground.dgrether.analysis.population.DgPlanData;
+import playground.dgrether.utils.charts.DgColorScheme;
 
 
 
@@ -130,13 +133,24 @@ public class DgAvgDeltaScoreIncomeModeChoiceChart {
 		ValueAxis yAxis = this.axisBuilder.createValueAxis("Delta Utils [Utils]");
 		plot.setDomainAxis(xAxis);
 		plot.setRangeAxis(yAxis);
-		XYItemRenderer renderer = new XYLineAndShapeRenderer(true, true);
-		plot.setDataset(0, this.dataset);
-		plot.setRenderer(0, renderer);
 		
-		JFreeChart jchart = new JFreeChart("", plot);
-		jchart.setBackgroundPaint(ChartColor.WHITE);
-		return jchart;
+		DgColorScheme colorScheme = new DgColorScheme();
+		
+		XYItemRenderer renderer2;
+		renderer2 = new XYLineAndShapeRenderer(true, true);
+		plot.setDataset(0, this.dataset);
+		for (int i = 0; i <= 3; i++){
+			renderer2.setSeriesStroke(i, new BasicStroke(2.0f));
+			renderer2.setSeriesOutlineStroke(i, new BasicStroke(3.0f));
+			renderer2.setSeriesPaint(i, colorScheme.getColor(i+1, "a"));
+		}
+		plot.setRenderer(0, renderer2);
+		
+		JFreeChart chart = new JFreeChart("", plot);
+		chart.setBackgroundPaint(ChartColor.WHITE);
+		chart.getLegend().setItemFont(this.axisBuilder.getAxisFont());
+		chart.setTextAntiAlias(true);
+		return chart;
 	}
 	
 	public XYSeriesCollection getDataset() {
