@@ -68,7 +68,7 @@ import org.matsim.vis.snapshots.writers.SnapshotWriter;
  */
 public class OTFQuadFileHandler {
 
-	private static final int BUFFERSIZE = 100000000;
+	private static final int BUFFERSIZE = 300000000;
 
 	// the version number should be increased to imply a compatibility break
 	public static final int VERSION = 1;
@@ -87,7 +87,7 @@ public class OTFQuadFileHandler {
 		private boolean isOpen = false;
 
 		private final ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
-		private OTFConnectionManager connect;
+		private final OTFConnectionManager connect;
 
 		public Writer(final double intervall_s, final QueueNetwork network,
 				final String fileName) {
@@ -302,7 +302,7 @@ public class OTFQuadFileHandler {
 
 		private byte[] readTimeStep(final double time_s) throws IOException {
 			int time_string = (int) time_s;
-			ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
 			ZipEntry entry = zipFile.getEntry("step." + time_string + ".bin");
 			byte[] buffer = new byte[(int) this.timesteps.get(time_s)
 					.longValue()]; // DS TODO Might be bigger than int??
@@ -318,9 +318,9 @@ public class OTFQuadFileHandler {
 		private void openAndReadInfo() {
 			// open file
 			try {
-				sourceZipFile = new File(this.fileName);
+				this.sourceZipFile = new File(this.fileName);
 				// Open Zip file for reading
-				ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+				ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
 				ZipEntry infoEntry = zipFile.getEntry("info.bin");
 				this.inFile = new DataInputStream(zipFile.getInputStream(infoEntry));
 				version = this.inFile.readInt();
@@ -394,7 +394,7 @@ public class OTFQuadFileHandler {
 		private void readQuad() {
 			try {
 				// we do not cache anymore ...readZIPFile();
-				ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+				ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
 				ZipEntry quadEntry = zipFile.getEntry("quad.bin");
 				BufferedInputStream is = new BufferedInputStream(zipFile
 						.getInputStream(quadEntry));
@@ -414,7 +414,7 @@ public class OTFQuadFileHandler {
 
 		private void readConnect(OTFConnectionManager connect) {
 			try {
-				ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+				ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
 				ZipEntry connectEntry = zipFile.getEntry("connect.bin");
 				// maybe no connect given.. no Problem
 				if (connectEntry != null) {
@@ -490,7 +490,7 @@ public class OTFQuadFileHandler {
 				throws RemoteException {
 			byte[] buffer = null;
 			try {
-				ZipFile zipFile = new ZipFile(sourceZipFile, ZipFile.OPEN_READ);
+				ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
 				ZipEntry entry = zipFile.getEntry("const.bin");
 				buffer = new byte[(int) entry.getSize()];
 
