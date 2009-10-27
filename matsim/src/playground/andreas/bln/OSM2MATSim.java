@@ -9,11 +9,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkSegmentDoubleLinks;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.run.NetworkCleaner;
 import org.xml.sax.SAXException;
+
 
 public class OSM2MATSim {
 
@@ -82,7 +84,7 @@ public class OSM2MATSim {
 		osmReader.setHierarchyLayer(52.43, 12.97, 52.35, 13.16, 5); // Potsdam
 		osmReader.setHierarchyLayer(52.56, 13.13, 52.51, 13.21, 5); // Spandau
 
-//		osmReader.setHierarchyLayer(52.494, 13.413, 52.461, 13.440, 6); // Hermannstraﬂe
+		osmReader.setHierarchyLayer(52.494, 13.413, 52.461, 13.440, 6); // Hermannstraﬂe
 		
 		
 		
@@ -113,9 +115,12 @@ public class OSM2MATSim {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		System.out.println("...done");
+		
 		new NetworkWriter(network, outputFile + ".xml.gz").write();
 		new NetworkCleaner().run(new String[] {outputFile + ".xml.gz", outputFile + "_cl.xml.gz"});
-		
+		System.out.println("NetworkCleaner...done");
 
 		// Simplifier
 		network = new NetworkLayer();
@@ -128,8 +133,14 @@ public class OSM2MATSim {
 		nsimply.setNodesToMerge(nodeTypesToMerge);
 //		nsimply.setMergeLinkStats(true);
 		nsimply.run(network);
-
 		new NetworkWriter(network, outputFile + "_cl_simple.xml.gz").write();
+		System.out.println("NetworkSimplifier...done");
+		
+		NetworkSegmentDoubleLinks networkDoubleLinks = new NetworkSegmentDoubleLinks();
+		networkDoubleLinks.run(network);
+		new NetworkWriter(network, outputFile + "_cl_simple_dl.xml.gz").write();
+		System.out.println("NetworkDoubleLinks...done");
+		System.out.println("Converting...done");
 
 	}
 

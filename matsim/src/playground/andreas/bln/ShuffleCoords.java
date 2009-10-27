@@ -1,7 +1,9 @@
 package playground.andreas.bln;
 
 import org.matsim.api.basic.v01.BasicScenarioImpl;
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -25,10 +27,20 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class ShuffleCoords extends NewPopulation {
 
 	private double radius; // meter
+	private String homeActString = null;
 	
 	public ShuffleCoords(PopulationImpl plans, String filename, double radius) {
 		super(plans, filename);
 		this.radius = radius;
+	}
+
+	/**
+	 * If set, the coords of a home activity will only be changed once, thus all home acts have the same shuffled coords. 
+	 * 
+	 * @param givenHomeActString The String defining a home act
+	 */
+	public void setChangeHomeActsOnlyOnceTrue(String givenHomeActString) {
+		this.homeActString = givenHomeActString;		
 	}
 
 	@Override
@@ -43,6 +55,8 @@ public class ShuffleCoords extends NewPopulation {
 			
 			PlanImpl plan = person.getPlans().get(0);
 			
+			CoordImpl coordOfHomeAct = null;
+			
 			for (PlanElement planElement : plan.getPlanElements()) {
 				if(planElement instanceof ActivityImpl){
 					ActivityImpl act = (ActivityImpl) planElement;
@@ -52,7 +66,21 @@ public class ShuffleCoords extends NewPopulation {
 					
 					double scale = Math.sqrt((this.radius * this.radius)/(x * x + y * y)) * MatsimRandom.getRandom().nextDouble();
 					
-					act.setCoord(new CoordImpl(act.getCoord().getX() + x * scale, act.getCoord().getY() + y * scale));
+					CoordImpl shuffledCoords = new CoordImpl(act.getCoord().getX() + x * scale, act.getCoord().getY() + y * scale);
+					
+					if(this.homeActString != null){
+						if(act.getType().equalsIgnoreCase(this.homeActString)){
+							if (coordOfHomeAct == null){
+								coordOfHomeAct = shuffledCoords;
+							}
+							act.setCoord(coordOfHomeAct);
+						} else {
+							act.setCoord(shuffledCoords);
+						}
+					} else {
+						act.setCoord(shuffledCoords);
+					}			
+					
 				}
 			}
 			

@@ -25,8 +25,8 @@ public class PlanExpander {
 	public static void main(String[] args) {
 		
 		String networkFile = "./bb_cl.xml.gz";
-		String plansFile = "./plans3";
-		int numberOfAdditionalCopies = 4;
+		String plansFile = "./baseplan";
+		int numberOfAdditionalCopies = 9;
 		double radiusOfPerimeter = 1000.0;
 		
 		Gbl.startMeasurement();
@@ -53,6 +53,7 @@ public class PlanExpander {
 		popReader.readFile("tmp.xml.gz");
 
 		ShuffleCoords shuffleCoords = new ShuffleCoords(inPop, plansFile + "_" + (numberOfAdditionalCopies + 1) + "x.xml.gz", radiusOfPerimeter);
+		shuffleCoords.setChangeHomeActsOnlyOnceTrue("home");
 		shuffleCoords.run(inPop);
 		shuffleCoords.writeEndPlans();
 		
