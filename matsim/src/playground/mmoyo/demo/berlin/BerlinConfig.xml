@@ -8,18 +8,18 @@
 	</module>
 	
 	<module name="network">
-		<param name="inputNetworkFile" value="../shared-svn/studies/schweiz-ivtch/pt-experimental/berlin/network.multimodal.xml" />
+		<param name="inputNetworkFile" value="../shared-svn/studies/ptsimmanuel/input/network.multimodal.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="../shared-svn/studies/schweiz-ivtch/pt-experimental/berlin/pt_only.routedOevModell.xml.gz" />
+		<param name="inputPlansFile" value="../shared-svn/studies/ptsimmanuel/input/pt_only.routedOevModell.xml.gz" />
 	</module>
 
 	<module name="controler">
 		<param name="runId"	value="manuelPTsim" />
-		<param name="outputDirectory" value="../shared-svn/studies/schweiz-ivtch/pt-experimental/berlin/output" />
+		<param name="outputDirectory" value="../shared-svn/studies/ptsimmanuel/output" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="1" />
+		<param name="lastIteration" value="2" />
 	</module>
 
 	<module name="simulation">
@@ -61,8 +61,8 @@
 	</module>
 
 	<module name="transit">
-		<param name="transitScheduleFile" value="../shared-svn/studies/schweiz-ivtch/pt-experimental/berlin/transitSchedule.networkOevModellBln.xml" />
-		<param name="vehiclesFile" value="../shared-svn/studies/schweiz-ivtch/pt-experimental/berlin/vehicles.oevModellBln.xml" />
+		<param name="transitScheduleFile" value="../shared-svn/studies/ptsimmanuel/input/transitSchedule.networkOevModellBln.xml" />
+		<param name="vehiclesFile" value="../shared-svn/studies/ptsimmanuel/input/vehicles.oevModellBln.xml" />
 		<param name="transitModes" value="pt" />
 	</module>
 
