@@ -1,4 +1,4 @@
-package playground.andreas.bln;
+package playground.andreas.bln.pop.generate;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -22,6 +22,8 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.geometry.CoordImpl;
+
+
 
 /**
  * 

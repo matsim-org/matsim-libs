@@ -1,4 +1,4 @@
-package playground.andreas.bln;
+package playground.andreas.bln.pop.generate;
 
 import java.io.IOException;
 import java.util.TreeSet;

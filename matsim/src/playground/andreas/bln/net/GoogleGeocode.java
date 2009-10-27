@@ -1,4 +1,4 @@
-package playground.andreas.bln;
+package playground.andreas.bln.net;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,6 +15,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+
+import playground.andreas.bln.pop.generate.TabReader;
 
 public class GoogleGeocode {
 	

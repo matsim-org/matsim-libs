@@ -1,4 +1,4 @@
-package playground.andreas.bln;
+package playground.andreas.bln.pop.generate;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,6 +19,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
+
 
 /**
  * 

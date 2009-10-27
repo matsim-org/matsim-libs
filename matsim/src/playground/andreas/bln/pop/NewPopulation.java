@@ -1,4 +1,4 @@
-package playground.andreas.bln;
+package playground.andreas.bln.pop;
 
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;

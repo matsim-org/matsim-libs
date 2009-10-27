@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.bln;
+package playground.andreas.bln.net;
 
 import java.util.ArrayList;
 import java.util.List;

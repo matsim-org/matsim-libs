@@ -1,4 +1,4 @@
-package playground.andreas.bln;
+package playground.andreas.bln.pop.generate;
 
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.population.PlanElement;
@@ -13,6 +13,9 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+
+import playground.andreas.bln.pop.NewPopulation;
+
 
 /**
  * Filters persons with plans which do not have one node of a given network in common.

@@ -1,4 +1,4 @@
-package playground.andreas.bln;
+package playground.andreas.bln.pop;
 
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.TransportMode;
@@ -15,16 +15,16 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
 /**
- * Reset all "personal" attributes of a person
+ * Filter persons, not using a specific TransportMode.
  * 
  * @author aneumann
  * 
  */
-public class StripPersonPlan extends NewPopulation {
+public class FilterPersonPlan extends NewPopulation {
 	private int planswritten = 0;
 	private int personshandled = 0;
 
-	public StripPersonPlan(PopulationImpl plans, String filename) {
+	public FilterPersonPlan(PopulationImpl plans, String filename) {
 		super(plans, filename);
 	}
 
@@ -33,13 +33,29 @@ public class StripPersonPlan extends NewPopulation {
 		
 		this.personshandled++;
 		
-		person.setAge(Integer.MIN_VALUE);
-		person.setCarAvail(null);
-		person.setEmployed(null);
-		person.setLicence(null);
-		person.setSex(null);
+		if(person.getPlans().size() != 1){
+			System.err.println("Person got more than one plan");
+		} else {
+			
+			PlanImpl plan = person.getPlans().get(0);
+			boolean keepPlan = true;
+			
+			// only keep person if every leg is a car leg
+			for (PlanElement planElement : plan.getPlanElements()) {
+				if(planElement instanceof LegImpl){
+					if(((LegImpl)planElement).getMode() != TransportMode.car && ((LegImpl)planElement).getMode() != TransportMode.pt){
+						keepPlan = false;
+					}
+				}
+			}
+			
+			if(keepPlan){
+				this.popWriter.writePerson(person);
+				this.planswritten++;
+			}
+			
+		}
 
-		this.popWriter.writePerson(person);
 	}
 	
 	public static void main(final String[] args) {
@@ -49,8 +65,8 @@ public class StripPersonPlan extends NewPopulation {
 		Gbl.setConfig(sc.getConfig());
 
 		String networkFile = "./bb_cl.xml.gz";
-		String inPlansFile = "./plans3.xml.gz";
-		String outPlansFile = "./plans3_stripped.xml.gz";
+		String inPlansFile = "./baseplan.xml.gz";
+		String outPlansFile = "./baseplan_car_pt_only.xml.gz";
 
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(networkFile);
@@ -59,7 +75,7 @@ public class StripPersonPlan extends NewPopulation {
 		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
 		popReader.readFile(inPlansFile);
 
-		StripPersonPlan dp = new StripPersonPlan(inPop, outPlansFile);
+		FilterPersonPlan dp = new FilterPersonPlan(inPop, outPlansFile);
 		dp.run(inPop);
 		System.out.println(dp.personshandled + " persons handled; " + dp.planswritten + " plans written to file");
 		dp.writeEndPlans();

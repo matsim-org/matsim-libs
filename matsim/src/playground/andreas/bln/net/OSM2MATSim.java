@@ -1,4 +1,4 @@
-package playground.andreas.bln;
+package playground.andreas.bln.net;
 
 import java.io.IOException;
 import java.util.Set;

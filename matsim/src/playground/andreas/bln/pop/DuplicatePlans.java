@@ -1,4 +1,4 @@
-package playground.andreas.bln;
+package playground.andreas.bln.pop;
 
 import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.Id;
