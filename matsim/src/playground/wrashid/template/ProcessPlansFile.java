@@ -9,7 +9,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
-import playground.andreas.bln.pop.NewPopulation;
+import playground.wrashid.tryouts.plan.NewPopulation;
 
 /*
  * In KeepOnlyMIVPlans, you find an example where facilities are also involved...

@@ -37,7 +37,6 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.World;
 
-import playground.andreas.bln.pop.NewPopulation;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.tryouts.plan.KeepOnlyMIVPlans;
 
