@@ -46,6 +46,7 @@ import org.matsim.planomat.Planomat;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.mfeil.MDSAM.ActivityTypeFinder;
 import playground.mfeil.config.PlanomatXConfigGroup;
@@ -623,16 +624,6 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			
 			((ActivityImpl)actslegs.get(0)).setDuration(12*3600);
 			((ActivityImpl)actslegs.get(0)).setEndTime(12*3600);
-			/*
-			ActivityImpl actHelp = new ActivityImpl ((ActivityImpl)(actslegs.get((0))));
-			actHelp.setDuration(12*3600);
-			actHelp.setEndTime(24*3600);
-			actHelp.setStartTime(12*3600);			
-			LegImpl legHelp;
-			legHelp = new LegImpl (TransportMode.walk); // First and second acts must be "home" acts at same location so walk is appropriate
-			actslegs.add(legHelp);
-			actslegs.add(actHelp);	
-			position[0]=-1;*/
 			
 			// NEW (24th Oct 2009 MF) Plan should have either one or three acts
 			// First add a second home act, allow for 1h of travelling
@@ -643,7 +634,8 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			
 			LegImpl legHelp;
 			legHelp = new LegImpl (TransportMode.walk); // First and second acts must be "home" acts at same location so walk is appropriate
-			legHelp.setTravelTime(3600);	
+			//legHelp.setTravelTime(3600);
+			legHelp.setRoute(new LinkNetworkRouteImpl(actHelp.getLink(), actHelp.getLink()));
 			
 			actslegs.add(legHelp);
 			actslegs.add(actHelp);	
@@ -655,7 +647,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			
 			this.insertAct(1, actsToBeAdded, basePlan, actTypes); // no need to check for homeActInserted, cannot happen
 			position[0]++;
-			if (position[0]>actTypes.size()+1){
+			if (position[0]>=actTypes.size()){ // Add all available actTypes but "home"
 				position[0]=-1;
 			}
 			return (new int[]{0,1,-1});
@@ -674,7 +666,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			else { // second loop onwards, increase to three acts
 				this.insertAct(1, actsToBeAdded, basePlan, actTypes); // no need to check for homeActInserted, cannot happen
 				position[0]++;
-				if (position[0]>actTypes.size()+1){
+				if (position[0]>actTypes.size()){ // // Add all available actTypes but "home", including the one reduction from above
 					position[0]=-1;
 				}
 				return (new int[]{0,1,-1});
