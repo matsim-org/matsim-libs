@@ -88,6 +88,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			} else {
 
 				dist = leg.getRoute().getDistance();
+				travelTime=travelTime*2.0;
 				tmpScore += this.getPtScore(dist, travelTime);
 
 			}
@@ -110,6 +111,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			if (this.ftConfigGroup.getMarginalUtilityOfDistanceRide()!= 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
+			travelTime=travelTime*1.5;
 			tmpScore += this.getRideScore(dist, travelTime);
 			
 			
@@ -163,6 +165,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 		}
 		score += this.params.marginalUtilityOfDistancePt * distanceCost / 1000d * distance;
 		score += travelTime * this.params.marginalUtilityOfTravelingPT;
+		score += score += this.ftConfigGroup.getConstPt();
 
 		return score;
 		

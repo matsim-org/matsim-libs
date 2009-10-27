@@ -73,7 +73,9 @@ public class FtConfigGroup extends Module {
 		
 		MARG_UTIL_DIST_RIDE("marginalUtilityOfDistanceRide", "0.0", ""),
 		
-		DISTANCE_COST_RIDE("distanceCostRide", "0.0", "");
+		DISTANCE_COST_RIDE("distanceCostRide", "0.0", ""),
+		
+		CONST_PT ("constPt", "0.0", "");
 		
 		private final String parameterName;
 		private final String defaultValue;
@@ -243,5 +245,14 @@ public class FtConfigGroup extends Module {
 	}
 	public double getDistanceCostRide() {
 		return Double.parseDouble(FtConfigParameter.DISTANCE_COST_RIDE.getActualValue());
+	}
+
+	public void setConstPt(double newValue) {
+		FtConfigParameter.CONST_PT.setActualValue(Double.toString(newValue));
+	}
+
+	public double getConstPt() {
+		// TODO Auto-generated method stub
+		return Double.parseDouble(FtConfigParameter.CONST_PT.getActualValue());
 	}
 }
