@@ -15,7 +15,7 @@ import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 
-import playground.andreas.bln.NewPopulation;
+import playground.andreas.bln.pop.NewPopulation;
 
 
 public class PersonPlan2Kml extends NewPopulation{
