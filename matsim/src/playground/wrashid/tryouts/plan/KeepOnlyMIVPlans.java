@@ -16,7 +16,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.world.World;
 
-import playground.andreas.bln.NewPopulation;
+import playground.andreas.bln.pop.NewPopulation;
 
 /*
  * removes non miv plans from input file...
