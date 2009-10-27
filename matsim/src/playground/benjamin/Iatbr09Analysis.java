@@ -44,19 +44,22 @@ public class Iatbr09Analysis {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-			String runNumber1 = "855";
-			String runNumber2 = "873";
+			String runNumber1 = "749";
+			String runNumber2 = "867";
 //			String runNumber1 = "860";
-//			String runNumber2 = "862";
+//			String runNumber2 = "864";
 		
 			String runid1 = "run" + runNumber1;
 			String runid2 = "run" + runNumber2;
 			
 			String runiddot1 = runid1 + ".";
-//			String runiddot2 = runid2 + ".";
+			String runiddot2 = runid2 + ".";
 			
-			String netfile = BkPaths.RUNBASE + runid1 + "/" + runiddot1 + "output_network.xml.gz";
-			String plans1file = BkPaths.RUNBASE + runid1 + "/" + runiddot1 + "output_plans.xml.gz";
+//			String netfile = BkPaths.RUNBASE + runid1 + "/" + runiddot1 + "output_network.xml.gz";
+			String netfile = BkPaths.RUNBASE + runid1 + "/" + runNumber1 + ".output_network.xml.gz";
+//			String plans1file = BkPaths.RUNBASE + runid1 + "/" + runiddot1 + "output_plans.xml.gz";
+			String plans1file = BkPaths.RUNBASE + runid1 + "/" + runNumber1 + ".output_plans.xml.gz";
+//			String plans2file = BkPaths.RUNBASE + runid2 + "/" + runiddot2 + "output_plans.xml.gz";
 			String plans2file = BkPaths.RUNBASE + runid2 + "/" + runNumber2 + ".output_plans.xml.gz";
 			String housholdsfile = BkPaths.RUNBASE + "dgrether/einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
 //			String housholdsfile = BkPaths.RUNBASE+ "bkick/oneRouteTwoModeIncomeTest/households.xml";
@@ -81,19 +84,19 @@ public class Iatbr09Analysis {
 			DgHouseholdsAnalysisReader hhr = new DgHouseholdsAnalysisReader(ana);
 			hhr.readHousholds(housholdsfile);
 			
-			DgDeltaScoreIncomeChart incomeChart;
-			incomeChart = new DgDeltaScoreIncomeChart(ana);
-			incomeChart.writeFile(deltaScoreChartFile);
+//			DgDeltaScoreIncomeChart incomeChart;
+//			incomeChart = new DgDeltaScoreIncomeChart(ana);
+//			incomeChart.writeFile(deltaScoreChartFile);
 			
 //			incomeChart.setWriteModeSwitcherOnly(true);
 //			incomeChart.writeFile(deltaScoreModeSwitchOnlyChartFile);
 //		
 			DgDeltaScoreIncomeModeChoiceChart modeChoiceIncomeChart;
 			modeChoiceIncomeChart = new DgDeltaScoreIncomeModeChoiceChart(ana);
-			DgChartWriter.writerChartToFile(deltaScoreColorChartFile, modeChoiceIncomeChart.createChart());
+//			DgChartWriter.writerChartToFile(deltaScoreColorChartFile, modeChoiceIncomeChart.createChart());
 			
-			DgModeChoiceIncomeChart modechoiceIncomeChartRun1 = new DgModeChoiceIncomeChart(ana, DgAnalysisPopulation.RUNID1);
-			DgChartWriter.writerChartToFile(modeChoiceIncomeChartFile1, modechoiceIncomeChartRun1.createChart());
+//			DgModeChoiceIncomeChart modechoiceIncomeChartRun1 = new DgModeChoiceIncomeChart(ana, DgAnalysisPopulation.RUNID1);
+//			DgChartWriter.writerChartToFile(modeChoiceIncomeChartFile1, modechoiceIncomeChartRun1.createChart());
 			DgModeChoiceIncomeChart modechoiceIncomeChartRun2 = new DgModeChoiceIncomeChart(ana, DgAnalysisPopulation.RUNID2);
 			DgChartWriter.writerChartToFile(modeChoiceIncomeChartFile2, modechoiceIncomeChartRun2.createChart());
 			
