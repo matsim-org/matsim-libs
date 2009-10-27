@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
+import playground.gregor.MY_STATIC_STUFF;
+
 
 public class InundationDataFromBinaryFileReader {
 	String file = "test.dat";
@@ -12,8 +14,9 @@ public class InundationDataFromBinaryFileReader {
 	public InundationData readData(){
 		ObjectInputStream o;
 		try {
-			o = new ObjectInputStream(new FileInputStream("../../inputs/flooding/flooding_old.dat"));
+//			o = new ObjectInputStream(new FileInputStream("../../inputs/flooding/flooding_old.dat"));
 //			o = new ObjectInputStream(new FileInputStream(this.file));
+			o = new ObjectInputStream(new FileInputStream(MY_STATIC_STUFF.SWW_ROOT + "/flooding.dat"));
 			InundationData data = (InundationData) o.readObject();
 			o.close();
 			return data;

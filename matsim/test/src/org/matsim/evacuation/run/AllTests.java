@@ -29,6 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for org.matsim.evacuation.run");
 
 		suite.addTestSuite(MarginalRiskCostControllerTest.class);
+		suite.addTestSuite(ShelterEvacuationControllerTest.class);
 
 		return suite;
 	}

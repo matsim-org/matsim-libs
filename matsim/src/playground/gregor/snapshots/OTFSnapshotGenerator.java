@@ -48,12 +48,12 @@ public class OTFSnapshotGenerator {
 		this.scenario = sl.getScenario();
 		this.scenario.getConfig().network().setInputFile("../../outputs/output/output_network.xml.gz");
 		this.scenario.getConfig().simulation().setSnapshotFormat("otfvis");
-		this.scenario.getConfig().simulation().setSnapshotPeriod(20);
+		this.scenario.getConfig().simulation().setSnapshotPeriod(60);
 		this.scenario.getConfig().simulation().setEndTime(4*3600+30*60);
 		
 		this.scenario.getConfig().evacuation().setBuildingsFile("../../inputs/networks/evac_zone_buildings_v20090728.shp");
 		this.scenario.getConfig().evacuation().setSampleSize("0.1");
-		this.scenario.getConfig().controler().setLastIteration(75);
+//		this.scenario.getConfig().controler().setLastIteration(75);
 		int it = this.scenario.getConfig().controler().getLastIteration();
 		sl.loadNetwork();
 		this.eventsFile = MY_STATIC_STUFF.OUTPUTS + "/output/ITERS/it." + it + "/" + it + ".events.txt.gz";
@@ -78,6 +78,9 @@ public class OTFSnapshotGenerator {
 		EvacuationLinksTeleporter e = new EvacuationLinksTeleporter();
 		TimeDependentColorizer t = new TimeDependentColorizer();
 		ev.addHandler(t);
+//		EventsImpl evII = new EventsImpl();
+//		evII.addHandler(t);
+//		new EventsReaderTXTv1(evII).readFile("../../outputs/output_inf_floCap/ITERS/it.0/0.events.txt.gz");
 		
 		SheltersColorizer s = new SheltersColorizer(this.scenario.getConfig().evacuation().getBuildingsFile(),this.scenario.getConfig().simulation().getSnapshotPeriod(), this.scenario.getConfig().evacuation().getSampleSize());
 		ev.addHandler(s);
@@ -96,9 +99,10 @@ public class OTFSnapshotGenerator {
 		ev.removeHandler(t);
 		ev.removeHandler(c);
 //		ev.removeHandler(w);
-		c.createArrows();
+//		c.createArrows();
 //		w.createArrows();
 		ev.removeHandler(s);
+		
 		
 		PositionInfo.lsTree = new LineStringTree(getFeatures(),this.scenario.getNetwork());
 		

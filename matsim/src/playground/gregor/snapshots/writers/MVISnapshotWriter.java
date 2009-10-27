@@ -51,6 +51,7 @@ import playground.gregor.otf.drawer.OTFSheltersDrawer;
 import playground.gregor.otf.drawer.TimeDependentTrigger;
 import playground.gregor.otf.readerwriter.InundationDataFromBinaryFileReader;
 import playground.gregor.otf.readerwriter.InundationDataFromNetcdfReader;
+import playground.gregor.otf.readerwriter.InundationDataFromNetcdfReaderII;
 import playground.gregor.otf.readerwriter.InundationDataReader;
 import playground.gregor.otf.readerwriter.InundationDataWriter;
 import playground.gregor.otf.readerwriter.PolygonDataReader;
@@ -102,7 +103,7 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 		this.quad.addAdditionalElement(this.writer);
 		if (this.insertWave ){
 			this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromBinaryFileReader().readData()));
-//			this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromNetcdfReader(OTFServerQuad.offsetNorth,OTFServerQuad.offsetEast).createData()));
+//			this.quad.addAdditionalElement(new InundationDataWriter(new InundationDataFromNetcdfReaderII(OTFServerQuad.offsetNorth,OTFServerQuad.offsetEast).createData()));
 		}
 		
 

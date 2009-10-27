@@ -23,7 +23,8 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		
 		new MatsimNetworkReader(sc.getNetwork()).readFile(sc.getConfig().network().getInputFile());
 			
-		FloodingReader fr = new FloodingReader(sc.getConfig().evacuation().getFloodingDataFile(),true);
+		FloodingReader fr = new FloodingReader(sc.getConfig().evacuation().getFloodingDataFile());
+		fr.setReadTriangles(true);
 		
 		EventsImpl events = new EventsImpl();
 		RiskCostFromFloodingData rcf = new RiskCostFromFloodingData(sc.getNetwork(),fr,events,sc.getConfig().evacuation().getBufferSize());

@@ -46,7 +46,8 @@ public class FloodLineShape {
 
 	private void run() {
 		initFeatureType();
-		FloodingReader fr = new FloodingReader(this.netcdf,true);
+		FloodingReader fr = new FloodingReader(this.netcdf);
+		fr.setReadTriangles(true);
 		FloodingLine fl = new FloodingLine(fr);
 		Collection<Feature> fts = new ArrayList<Feature>();
 		Collection<Feature> fts2 = new ArrayList<Feature>();

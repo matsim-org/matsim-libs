@@ -172,7 +172,7 @@ public class CVSToShapeFile {
 	}
 
 	public static void main(String [] args) {
-		String cvs = MY_STATIC_STUFF.SVN_DATA + "/sheltersSurvey_2009/survey.csv";
+		String cvs = MY_STATIC_STUFF.PADANG_SVN_DATA + "/sheltersSurvey_2009/survey.csv";
 //		String config = "../../inputs/configs/shapeFileEvac.xml";
 		String config = "test/input/org/matsim/evacuation/riskaversion/RiskCostFromFloodingDataTest/testRiskCostFromFloodingData/config.xml";
 		ScenarioImpl sc = new ScenarioLoader(config).getScenario();

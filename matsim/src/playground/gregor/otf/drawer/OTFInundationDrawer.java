@@ -51,8 +51,8 @@ public class OTFInundationDrawer extends OTFTimeDependentDrawer {
 		calcCurrentZoom();
 
 
-		float [] top = getOGLPos(-20,-20);
-		float [] bot = getOGLPos(this.viewport[2]+20, this.viewport[3]+20);
+		float [] top = getOGLPos(-50,-50);
+		float [] bot = getOGLPos(this.viewport[2]+50, this.viewport[3]+50);
 		Collection<InundationGeometry> fic = new ArrayList<InundationGeometry>(); 
 		double mxX = top[0] > bot[0] ? top[0] : bot[0];
 		double miX = top[0] < bot[0] ? top[0] : bot[0];
@@ -67,7 +67,7 @@ public class OTFInundationDrawer extends OTFTimeDependentDrawer {
 //			zoom /= 2;
 //		}
 		this.data.floodingData.get(zoom).get(miX,miY,mxX,mxY,fic);
-		while (fic.size() > 30000) {
+		while (fic.size() > 80000) {
 			fic.clear();
 			zoom *= 4;
 			this.data.floodingData.get(zoom).get(miX,miY,mxX,mxY,fic);	

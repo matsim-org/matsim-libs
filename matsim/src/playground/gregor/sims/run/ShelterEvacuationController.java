@@ -57,7 +57,8 @@ public class ShelterEvacuationController extends Controler {
 		
 		String netcdf = this.config.evacuation().getFloodingDataFile();
 
-		FloodingReader fr  = new FloodingReader(netcdf,true);
+		FloodingReader fr  = new FloodingReader(netcdf);
+		fr.setReadTriangles(true);
 		
 //		RiskCostCalculator rc = new RiskCostFromFloodingData(this.network,fr,getEvents());
 //		this.events.addHandler(rc);

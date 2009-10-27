@@ -11,10 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.evacuation.flooding.FloodingInfo;
 import org.matsim.evacuation.flooding.FloodingReader;
 
+import playground.gregor.MY_STATIC_STUFF;
 import playground.gregor.collections.gnuclasspath.TreeMap;
 import playground.gregor.otf.readerwriter.InundationData.InundationGeometry;
 import playground.gregor.otf.readerwriter.InundationData.Polygon;
@@ -27,6 +30,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 public class InundationDataFromNetcdfReader {
 
+	
+	private static final Logger log = Logger.getLogger(InundationDataFromNetcdfReader.class);
 
 	private final String file = "../../inputs/flooding/flooding_old.sww";
 	//	private final String file = "../../inputs/networks/flooding.sww";
@@ -92,7 +97,8 @@ public class InundationDataFromNetcdfReader {
 
 
 		//		OutputStream a = new ByteArrayOutputStream();
-		ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream("test.dat"));
+		String fileName = MY_STATIC_STUFF.SWW_ROOT + "/flooding.dat";
+		ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(fileName));
 		o.writeObject(this.inundationData);
 		o.close();
 		//		FileWriter fw = new FileWriter("test.dat");
@@ -114,6 +120,7 @@ public class InundationDataFromNetcdfReader {
 		HashMap<Integer,ArrayList<InundationGeometry>> mapping = new HashMap<Integer,ArrayList<InundationGeometry>>();
 		QuadTree<InundationGeometry> triangles = getTriangles(mapping);
 		triangles = scaleTriangles(triangles,mapping);
+		System.out.println("TRIANGLES: " + triangles.size());
 //		triangles = scaleTriangles(triangles,mapping);
 		this.inundationData.floodingData.put(this.inundationData.powerLookUp[0], triangles);
 		for (int i = 1; i < this.inundationData.powerLookUp.length; i++) {
@@ -189,6 +196,8 @@ public class InundationDataFromNetcdfReader {
 		for (InundationGeometry p : triangles.values()) {
 			geos.add(p);
 		}
+		
+		triangles = null;
 		
 		GeometryFactory geofac = new GeometryFactory();
 		int minSize = 10;
@@ -273,6 +282,7 @@ public class InundationDataFromNetcdfReader {
 				y += this.inundationData.ycoords[coords[i]];
 			}
 			Polygon pol = new Polygon(this.inundationData);
+			
 			pol.coordsIdx = coords;
 			x /= coords.length;
 			y /= coords.length;
@@ -461,9 +471,9 @@ public class InundationDataFromNetcdfReader {
 		ArrayList<Float> xcoords = new ArrayList<Float>();
 		ArrayList<Float> ycoords = new ArrayList<Float>();
 		ArrayList<float []> walshs = new ArrayList<float[]>();
-		for (int i = 0; i < 1; i++) {
-//						String file = BASE + i + ".sww";
-			String file = this.file;
+		for (int i = 2; i < MY_STATIC_STUFF.SWW_COUNT; i++) {
+			String file = MY_STATIC_STUFF.SWW_ROOT + "/" + MY_STATIC_STUFF.SWW_PREFIX + i + MY_STATIC_STUFF.SWW_SUFFIX;
+			log.info("reading netcdf from file:" + file);
 			FloodingReader r = new FloodingReader(file);
 			List<int []> triangles = r.getTriangles();
 			Map<Integer,Integer> mapping = r.getIdxMapping();
