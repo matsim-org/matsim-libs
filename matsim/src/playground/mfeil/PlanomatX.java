@@ -586,7 +586,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			/* Adding an activity, "cycling"*/			
 			if (positions[2]<=actTypes.size()+(actTypes.size()-1)*((int)(basePlan.getPlanElements().size()/2)-1)){ //maximum number of possible insertions
 				
-				boolean HomeActInserted = false;
+				boolean [] HomeActInserted = {false,false};  // {"insertion failed", "home act inserted"}
 				
 				if (positions[0]==0){ //first insertion
 					positions[0] = 1;
@@ -607,7 +607,8 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				positions[0]++;
 				positions[2]++;
 				
-				if (!HomeActInserted) return (new int[]{0,positions[0]-1,-1}); // if no home act inserted indicate position of new act to location choice
+				if (HomeActInserted[0]) return (new int[]{1,0,0}); // insertion was unsuccessful 
+				if (!HomeActInserted[1]) return (new int[]{0,positions[0]-1,-1}); // if no home act inserted indicate position of new act to location choice
 				return (new int[]{0,-1,-1}); // if home act inserted treat like act removed -> no location choice
 			}
 			return (new int[]{1,0,0});
@@ -645,11 +646,12 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				actsToBeAdded[1] = (int)(MatsimRandom.getRandom().nextDouble()* actTypes.size()); // define first actsToBeAdded position for second loop onwards
 			}
 			
-			this.insertAct(1, actsToBeAdded, basePlan, actTypes); // no need to check for homeActInserted, cannot happen
+			boolean insertionFailed = this.insertAct(1, actsToBeAdded, basePlan, actTypes)[0]; // no need to check for homeActInserted, cannot happen
 			position[0]++;
 			if (position[0]>=actTypes.size()){ // Add all available actTypes but "home"
 				position[0]=-1;
 			}
+			if (insertionFailed) return (new int[]{1,0,0});
 			return (new int[]{0,1,-1});
 		}
 		
@@ -901,13 +903,18 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	
 	
 	/* Inserts an activity of random type at the given position with the given type of act (but checks whether type is allowed)*/
-	private boolean insertAct (int position, int [] actToBeAdded, PlanomatXPlan basePlan, List<String> actTypes){
+	private boolean[] insertAct (int position, int [] actToBeAdded, PlanomatXPlan basePlan, List<String> actTypes){
 		
-		boolean HomeActInserted = false;
+		boolean [] insertion = {false, false};
 		if (actToBeAdded[position]>=actTypes.size()) actToBeAdded[position] = 0; //sets the pointer back to the first activity type
 		
 		boolean enter = true;
+		int counter = 0;
 		while (enter && (position!=1 || actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home"))){ // check whether act to be added is allowed while at position 1 everything is allowed to be inserted excpet for "home"
+			if (counter>=actTypes.size()){
+				insertion[0]=true;
+				break;
+			}
 			if (actTypes.get(actToBeAdded[position]).equals(((ActivityImpl)(basePlan.getPlanElements().get(position*2-2))).getType().toString()) || // ensures that no duplicate activity chains are created
 					(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home") && !this.checkForHomeSequenceInserting(basePlan, position*2))){
 				if (actToBeAdded[position]+1>=actTypes.size()){
@@ -916,6 +923,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				else {
 					actToBeAdded[position]++;
 				}
+				counter++;
 			}
 			else enter = false;
 		}
@@ -932,7 +940,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			actHelp.setDuration(0);
 			actHelp.setEndTime(((LegImpl)(actslegs.get(position*2-1))).getDepartureTime());
 			actHelp.setStartTime(((LegImpl)(actslegs.get(position*2-1))).getDepartureTime());
-			HomeActInserted = true;
+			insertion[1] = true;
 		}
 		actHelp.setType(actTypes.get(actToBeAdded[position]));
 		actToBeAdded[position]++;
@@ -944,7 +952,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		actslegs.add(position*2, legHelp);
 		actslegs.add(position*2, actHelp);
 		
-		return HomeActInserted;
+		return insertion;
 	}
 	
 	/* Removes the activity at the given position*/
