@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.demo.equil;
+package playground.mmoyo.demo;
 
 import java.io.IOException;
 
@@ -62,7 +62,16 @@ public class ScenarioPlayer {
 	 * @throws SAXException
 	 */
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
-		ScenarioLoader sl = new ScenarioLoader("src/playground/mmoyo/demo/equil/EquilConfig.xml");
+		String configFile = null;
+		String scheduleFile = null;
+		if ((args != null) && (args.length == 2)) {
+			configFile= args[0];
+			scheduleFile =args[1];
+		}else {
+			//exception
+		}
+
+		ScenarioLoader sl = new ScenarioLoader(configFile);
 		ScenarioImpl scenario = sl.getScenario();
 
 		NetworkLayer network = scenario.getNetwork();
@@ -75,7 +84,7 @@ public class ScenarioPlayer {
 		scenario.getConfig().scenario().setUseVehicles(true);
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		new TransitScheduleReaderV1(schedule, network).parse("src/playground/marcel/pt/demo/equilnet/transitSchedule.xml");
+		new TransitScheduleReaderV1(schedule, network).parse(scheduleFile);
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 
 		final EventsImpl events = new EventsImpl();
