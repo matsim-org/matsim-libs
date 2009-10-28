@@ -693,12 +693,14 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			}
 			String type;
 					
+			int counter=0;
 			do {
 				type = actTypes.get(actsToBeChanged[position[0]]);
 				actsToBeChanged[position[0]]++;
 				if (actsToBeChanged[position[0]]>=actTypes.size()) actsToBeChanged[position[0]] = 0;
+				counter++;
+				if (counter>actTypes.size()) return (new int[]{1,0,0});
 			} while (type.equals(act.getType()) || (type.equalsIgnoreCase("home") && !this.checkForHomeSequenceChangeType(basePlan, position[0]*2))); // continue if either type is same as current one or if two home acts would fall together 
-			
 			act.setType(type);
 			if (act.getType().equalsIgnoreCase("home")){
 				act.setFacility(((ActivityImpl)(basePlan.getPlanElements().get(0))).getFacility());
@@ -913,7 +915,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		while (enter && (position!=1 || actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home"))){ // check whether act to be added is allowed while at position 1 everything is allowed to be inserted excpet for "home"
 			if (counter>=actTypes.size()){
 				insertion[0]=true;
-				break;
+				return insertion;
 			}
 			if (actTypes.get(actToBeAdded[position]).equals(((ActivityImpl)(basePlan.getPlanElements().get(position*2-2))).getType().toString()) || // ensures that no duplicate activity chains are created
 					(actTypes.get(actToBeAdded[position]).equalsIgnoreCase("home") && !this.checkForHomeSequenceInserting(basePlan, position*2))){
@@ -925,7 +927,9 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 				}
 				counter++;
 			}
-			else enter = false;
+			else {
+				enter = false;
+			}
 		}
 		List<PlanElement> actslegs = basePlan.getPlanElements();
 		ActivityImpl actHelp;
