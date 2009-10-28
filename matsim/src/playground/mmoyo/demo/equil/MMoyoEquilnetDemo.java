@@ -100,11 +100,11 @@ public class MMoyoEquilnetDemo {
 		new MMoyoEquilnetDemo().run();
 		System.out.println("duration:" + (System.currentTimeMillis()-startTime));
 	
-		/*
+		
 		String net = "examples/equil/network.xml";
 		String plans = "output/transitEquil2/output_plans.xml.gz";
 		OTFVis.main(new String[]{net, plans});
-		*/
+		
 	}
    
 	

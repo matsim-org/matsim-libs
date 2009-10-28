@@ -8,11 +8,11 @@
 	</module>
 	
 	<module name="network">
-		<param name="inputNetworkFile" value="../shared-svn/studies/pt-experimental/5X5/network.xml" />
+		<param name="inputNetworkFile" value="../shared-svn/studies/schweiz-ivtch/pt-experimental/5X5/network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="../shared-svn/studies/pt-experimental/5X5/plans.xml" />
+		<param name="inputPlansFile" value="../shared-svn/studies/schweiz-ivtch/pt-experimental/5X5/plans.xml" />
 	</module>
 
 	<module name="controler">
@@ -61,8 +61,8 @@
 	</module>
 
 	<module name="transit">
-		<param name="transitScheduleFile" value="../shared-svn/studies/pt-experimental/5X5/transitSchedule.xml" />
-		<param name="vehiclesFile" value="../shared-svn/studies/pt-experimental/5X5/vehicles.xml" />
+		<param name="transitScheduleFile" value="../shared-svn/studies/schweiz-ivtch/pt-experimental/5X5/transitSchedule.xml" />
+		<param name="vehiclesFile" value="../shared-svn/studies/schweiz-ivtch/pt-experimental/5X5/vehicles.xml" />
 		<param name="transitModes" value="pt" />
 	</module>
 

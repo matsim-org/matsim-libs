@@ -11,8 +11,8 @@ public class X5Player {
 
 	public static void main(String[] args) {
 		
-		String config ="src/playground/mmoyo/demo/berlin/BerlinConfig.xml"; 
-		String schedule =  "../shared-svn/studies/pt-experimental/5X5/transitSchedule.xml";
+		String config ="src/playground/mmoyo/demo/X5/X5Config.xml"; 
+		String schedule =  "../shared-svn/studies/schweiz-ivtch/pt-experimental/5X5/transitSchedule.xml";
 		
 		try {
 			ScenarioPlayer.main(new String[]{config, schedule});

@@ -28,6 +28,7 @@
 		
 		<param name = "snapshotperiod"	value = "00:00:00"/>
  		<param name = "snapshotFormat"	value = "otfvis"/> 
+ 		<param name = "snapshotStyle"	value = "queue"/>
  		
  		<param name = "flowCapacityFactor"	value = "0.10"/>
  		<param name = "storageCapacityFactor"	value = "0.30"/>
