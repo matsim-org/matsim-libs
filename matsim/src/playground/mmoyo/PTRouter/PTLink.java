@@ -11,13 +11,12 @@ import org.matsim.transitSchedule.api.TransitLine;
 public class PTLink extends LinkImpl{
 	private TransitRoute transitRoute;
 	private TransitLine transitLine;
+	private Link plainLink;
 	private double travelTime;
 	private double walkTime = Double.NaN;
 	private byte aliasType ;   //1= access, 2= standard, 3= transfer 4= detTransfer 5= Egress
-	private Link plainLink;
-	PTValues ptValues = new PTValues();
-	
-	public PTLink(final Id id, final BasicNode from, final BasicNode to, final NetworkLayer network, final String type) {
+
+	public PTLink(final Id id, final BasicNode from, final BasicNode to, final NetworkLayer network, final String type, double avWalkSpeed) {
 		super(id, from, to, network, 0, 10, 9999 , 1);
 		this.setType(type);
 
@@ -29,16 +28,8 @@ public class PTLink extends LinkImpl{
 		else 				{aliasType=0;}
 		
 		this.setLength(this.getEuklideanDistance());
-		if (aliasType!=2){ this.walkTime = this.getLength() * ptValues.AV_WALKING_SPEED;}
+		if (aliasType!=2){ this.walkTime = this.getLength() * avWalkSpeed;}
 		network.addLink(this);
-	}
-
-	public TransitRoute getTransitRoute() {
-		return transitRoute;
-	}
-
-	public void setTransitRoute(final TransitRoute transitRoute) {
-		this.transitRoute = transitRoute;
 	}
 
 	public double getTravelTime() {
@@ -57,24 +48,34 @@ public class PTLink extends LinkImpl{
 		this.aliasType = aliasType;
 	}
 
-	public Link getPlainLink() {
-		return plainLink;
+	public double getWalkTime(){
+		return this.walkTime;
 	}
 
-	public void setPlainLink(final Link plainLink) {
-		this.plainLink = plainLink;
+	public TransitRoute getTransitRoute() {
+		return transitRoute;
+	}
+
+	public void setTransitRoute(TransitRoute transitRoute) {
+		this.transitRoute = transitRoute;
 	}
 
 	public TransitLine getTransitLine() {
 		return transitLine;
 	}
 
-	public void setTransitLine(final TransitLine transitLine) {
+	public void setTransitLine(TransitLine transitLine) {
 		this.transitLine = transitLine;
 	}
 
-	public double getWalkTime(){
-		return this.walkTime;
+	public Link getPlainLink() {
+		return plainLink;
 	}
+
+	public void setPlainLink(Link plainLink) {
+		this.plainLink = plainLink;
+	}
+
+	
 
 }

@@ -34,6 +34,7 @@ public class PTRouter{
 	private LeastCostPathCalculator myDijkstra;
 	private TravelCost ptTravelCost;
 	public PTTravelTime ptTravelTime;   //> make private 
+	private TransitSchedule transitSchedule;
 	NodeImpl originNode;
 	NodeImpl destinationNode;
 	PTValues ptValues = new PTValues();
@@ -173,7 +174,7 @@ public class PTRouter{
 				type = "Egress";
 			}
 			
-			PTLink link = new PTLink(idLink, fromNode, toNode, logicNet, type); 
+			PTLink link = new PTLink(idLink, fromNode, toNode, logicNet, type, ptValues.AV_WALKING_SPEED); 
 			//PTLink link= logicNet.createAndAddLink(idLink, fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()) , 1, 1, 1, "0", type);
 			newWalkLinks.add(link);
 		}

@@ -28,6 +28,7 @@ import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.scenario.ScenarioLoader;
 import playground.mmoyo.TransitSimulation.MMoyoTransitControler;
+import org.matsim.run.OTFVis;
 
 /**copy of marcel.pt.demo.equilNet.EquilnetDemo.java to test the ptRouter in the simulation*/
 public class MMoyoEquilnetDemo {
@@ -41,7 +42,7 @@ public class MMoyoEquilnetDemo {
 		
 		config.controler().setOutputDirectory("./output/transitEquil2");
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(5);
+		config.controler().setLastIteration(1);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 		config.controler().addParam("routingAlgorithmType", "AStarLandmarks");
 
@@ -98,7 +99,13 @@ public class MMoyoEquilnetDemo {
 		double startTime = System.currentTimeMillis();
 		new MMoyoEquilnetDemo().run();
 		System.out.println("duration:" + (System.currentTimeMillis()-startTime));
+	
+		/*
+		String net = "examples/equil/network.xml";
+		String plans = "output/transitEquil2/output_plans.xml.gz";
+		OTFVis.main(new String[]{net, plans});
+		*/
 	}
-
+   
 	
 }

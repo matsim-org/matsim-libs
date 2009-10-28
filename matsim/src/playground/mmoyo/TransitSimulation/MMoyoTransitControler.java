@@ -26,6 +26,10 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.marcel.pt.config.TransitConfigGroup;
 import playground.marcel.pt.controler.TransitControler;
+import playground.marcel.pt.queuesim.TransitQueueSimulation;
+import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
+//import org.matsim.run.OTFVis;
+import playground.marcel.OTFDemo;
 
 public class MMoyoTransitControler extends TransitControler {
 
@@ -35,6 +39,23 @@ public class MMoyoTransitControler extends TransitControler {
 	 
 	public MMoyoTransitControler(final ScenarioImpl scenario) {
 		super(scenario);
+	}
+	
+	@Override
+	protected void runMobSim() {
+		//new TransitQueueSimulation(this.scenarioData, this.events).run();
+		 
+		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
+		sim.startOTFServer("livesim");
+		OTFDemo.ptConnect("livesim");
+		sim.run();
+		
+		/*
+		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
+		sim.startOTFServer("livesim");
+		new OnTheFlyClientQuad("rmi:127.0.0.1:4019:" + "livesim").start();
+		sim.run();
+		*/
 	}
 
 	@Override

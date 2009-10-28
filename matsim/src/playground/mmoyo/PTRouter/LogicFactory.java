@@ -46,7 +46,6 @@ public class LogicFactory{
 	private TransitSchedule logicTransitSchedule = builder.createTransitSchedule();
 	private LogicIntoPlainTranslator logicToPlainTranslator; 
 	private PTValues ptValues= new PTValues(); 
-	
 	private Map<Id,List<Node>> facilityNodeMap = new TreeMap<Id,List<Node>>(); /* <key =PlainStop, value = List of logicStops to be joined by transfer links>*/
 	//private Map<Id,Node> logicToPlanStopMap = new TreeMap<Id,Node>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
 	//private Map<Id,LinkImpl> logicToPlanLinkMap = new TreeMap<Id,LinkImpl>();    // stores the equivalent plainNode of a logicNode   <logic, plain>
@@ -56,10 +55,13 @@ public class LogicFactory{
 	long newLinkId=0;
 	long newPlainLinkId=0;
 	long newStopId=0;
-	
+	double avWalkSpeed =0;	
 
 	//Creates a logic network file and a logic TransitSchedule file with individualized id's for nodes and stops*/
 	public LogicFactory(final TransitSchedule transitSchedule){
+		avWalkSpeed = ptValues.AV_WALKING_SPEED;
+		
+		
 		for (TransitLine transitLine : transitSchedule.getTransitLines().values()){
 			TransitLine logicTransitLine = this.builder.createTransitLine(transitLine.getId()); 
 			
@@ -113,8 +115,9 @@ public class LogicFactory{
 					/**Creates links*/
 					if (!first){
 						LinkImpl plainLink= createPlainLink(lastPlainNode, plainNode);
+						Id logicLinkId = new IdImpl(newLinkId++);
+						PTLink logicLink = new PTLink(logicLinkId, lastLogicNode, logicNode, logicNet, "Standard", avWalkSpeed); 
 						
-						PTLink logicLink = new PTLink(new IdImpl(newLinkId++), lastLogicNode, logicNode, logicNet, "Standard"); 
 						logicLink.setPlainLink(plainLink);
 						logicLink.setTransitLine(transitLine);
 						logicLink.setTransitRoute(transitRoute);
@@ -217,7 +220,7 @@ public class LogicFactory{
 
 	/**Creates the links for the logical network, one for transitRoute*/
 	private PTLink createLogicLink(Id id, NodeImpl fromNode, NodeImpl toNode, String type){
-		PTLink ptLink = new PTLink(id, fromNode, toNode, logicNet, type); 
+		PTLink ptLink = new PTLink(id, fromNode, toNode, logicNet, type, avWalkSpeed ); 
 		//logicNet.addLink(ptLink);   //check	
 		return ptLink;
 	}
