@@ -1209,6 +1209,8 @@ public class PlansConstructor implements PlanStrategyModule{
 					stream.print("x"+(i+1)+"_car_distance\t");
 					counterFirst++;
 				}
+		//		stream.print("x"+(i+1)+"_car_legs\t");
+		//		counterFirst++;
 			}
 			if (pt) {
 				stream.print("x"+(i+1)+"_pt_time\t");
@@ -1221,7 +1223,8 @@ public class PlansConstructor implements PlanStrategyModule{
 					stream.print("x"+(i+1)+"_pt_distance\t");
 					counterFirst++;
 				}
-				
+				stream.print("x"+(i+1)+"_pt_legs\t");
+				counterFirst++;
 			}
 			if (bike && this.bikeIn.equals("yes")) {
 				stream.print("x"+(i+1)+"_bike_time\t");
@@ -1230,6 +1233,8 @@ public class PlansConstructor implements PlanStrategyModule{
 					stream.print("x"+(i+1)+"_bike_distance\t");
 					counterFirst++;
 				}
+				stream.print("x"+(i+1)+"_bike_legs\t");
+				counterFirst++;
 			}
 			if (walk) {
 				stream.print("x"+(i+1)+"_walk_time\t");
@@ -1238,6 +1243,8 @@ public class PlansConstructor implements PlanStrategyModule{
 					stream.print("x"+(i+1)+"_walk_distance\t");
 					counterFirst++;
 				}
+				stream.print("x"+(i+1)+"_walk_legs\t");
+				counterFirst++;
 			}
 			if (similarity.equals("yes")) {
 				stream.print("x"+(i+1)+"_sim\t"); 
@@ -1408,6 +1415,8 @@ public class PlansConstructor implements PlanStrategyModule{
 							stream.print("0\t");
 							counterRow++;
 						}
+				//		stream.print("0\t");
+				//		counterRow++;
 					}
 					if (pt) {
 						stream.print("0\t");
@@ -1420,6 +1429,8 @@ public class PlansConstructor implements PlanStrategyModule{
 							stream.print("0\t");
 							counterRow++;
 						}
+						stream.print("0\t");
+						counterRow++;
 					}
 					if (bike && bikeIn.equals("yes")) {
 						stream.print("0\t");
@@ -1428,6 +1439,8 @@ public class PlansConstructor implements PlanStrategyModule{
 							stream.print("0\t");
 							counterRow++;
 						}
+						stream.print("0\t");
+						counterRow++;
 					}
 					if (walk) {
 						stream.print("0\t");
@@ -1436,6 +1449,8 @@ public class PlansConstructor implements PlanStrategyModule{
 							stream.print("0\t");
 							counterRow++;
 						}
+						stream.print("0\t");
+						counterRow++;
 					}					
 					
 					if (similarity.equals("yes")) {
@@ -1771,6 +1786,8 @@ public class PlansConstructor implements PlanStrategyModule{
 					stream.print(car_distance+"\t");
 					counter++;
 				}
+			//	stream.print(car+"\t");
+			//	counter++;
 			}
 			if (pt>0){
 				stream.print(pt_time+"\t");
@@ -1783,6 +1800,8 @@ public class PlansConstructor implements PlanStrategyModule{
 					stream.print(pt_distance+"\t");
 					counter++;
 				}
+				stream.print(pt+"\t");
+				counter++;
 				
 			}
 			if (bike>0 && this.bikeIn.equals("yes")){
@@ -1792,6 +1811,8 @@ public class PlansConstructor implements PlanStrategyModule{
 					stream.print(bike_distance+"\t");
 					counter++;
 				}
+				stream.print(bike+"\t");
+				counter++;
 			}
 			if (walk>0){
 				stream.print(walk_time+"\t");
@@ -1800,6 +1821,8 @@ public class PlansConstructor implements PlanStrategyModule{
 					stream.print(walk_distance+"\t");
 					counter++;
 				}
+				stream.print(walk+"\t");
+				counter++;
 			}
 		}
 		return counter;
