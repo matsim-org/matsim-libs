@@ -45,6 +45,8 @@ public class MMoyoTransitControler extends TransitControler {
 	protected void runMobSim() {
 		//new TransitQueueSimulation(this.scenarioData, this.events).run();
 		 
+		/**  OTFDemo suggested by Andreas*/
+		
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
 		sim.startOTFServer("livesim");
 		OTFDemo.ptConnect("livesim");

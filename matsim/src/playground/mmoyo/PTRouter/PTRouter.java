@@ -220,9 +220,9 @@ public class PTRouter{
 			}
 		}
 
-		leg.setDepartureTime(depTime);
+		//leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		leg.setArrivalTime(arrivTime);
+		//leg.setArrivalTime(arrivTime);
 		
 		return leg;
 	}

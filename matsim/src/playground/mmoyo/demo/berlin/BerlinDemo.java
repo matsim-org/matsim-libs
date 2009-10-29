@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.demo.equil;
+package playground.mmoyo.demo.berlin;
 
 import java.util.EnumSet;
 
@@ -27,40 +27,33 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.scenario.ScenarioLoader;
-
 import playground.mmoyo.TransitSimulation.MMoyoTransitControler;
 
 /**copy of marcel.pt.demo.equilNet.EquilnetDemo.java to test the ptRouter in the simulation*/
-public class MMoyoEquilnetDemo {
+public class BerlinDemo {
 
 	private final ScenarioImpl scenario = new ScenarioImpl();
 
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
-		config.network().setInputFile("examples/equil/network.xml");
-		config.plans().setInputFile("examples/equil/plans2.xml");
-		
-		config.controler().setOutputDirectory("./output/transitEquil2");
+		config.network().setInputFile("../shared-svn/studies/ptsimmanuel/input/network.multimodal.xml");
+		config.plans().setInputFile("../shared-svn/studies/ptsimmanuel/input/pt_only.routedOevModell20.xml");  
+		config.controler().setOutputDirectory("./output/BerlinDemo");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 		config.controler().addParam("routingAlgorithmType", "AStarLandmarks");
-
 		config.charyparNagelScoring().addParam("activityType_0", "h");
 		config.charyparNagelScoring().addParam("activityPriority_0", "1");
 		config.charyparNagelScoring().addParam("activityTypicalDuration_0", "12:00:00");
 		config.charyparNagelScoring().addParam("activityMinimalDuration_0", "18:00:00");
-
 		config.charyparNagelScoring().addParam("activityType_1", "w");
 		config.charyparNagelScoring().addParam("activityPriority_1", "1");
 		config.charyparNagelScoring().addParam("activityTypicalDuration_1", "08:00:00");
 		config.charyparNagelScoring().addParam("activityMinimalDuration_1", "06:00:00");
 		config.charyparNagelScoring().addParam("activityOpeningTime_1", "07:00:00");
-
 		config.simulation().setEndTime(30.0*3600);
-
 		config.strategy().addParam("maxAgentPlanMemorySize", "5");
-
 		config.strategy().addParam("ModuleProbability_1", "0.1");
 		config.strategy().addParam("Module_1", "TimeAllocationMutator");
 		config.strategy().addParam("ModuleProbability_2", "0.1");
@@ -69,14 +62,11 @@ public class MMoyoEquilnetDemo {
 		config.strategy().addParam("Module_3", "ChangeLegMode");
 		config.strategy().addParam("ModuleProbability_4", "0.1");
 		config.strategy().addParam("Module_4", "SelectExpBeta");
-
-		
 		Module changeLegModeModule = config.createModule("changeLegMode");
 		changeLegModeModule.addParam("modes", "car,pt");
-
 		Module transitModule = config.createModule("transit");
-		transitModule.addParam("transitScheduleFile", "src/playground/marcel/pt/demo/equilnet/transitSchedule.xml");
-		transitModule.addParam("vehiclesFile", "src/playground/marcel/pt/demo/equilnet/vehicles.xml");
+		transitModule.addParam("transitScheduleFile", "../shared-svn/studies/ptsimmanuel/input/transitSchedule.networkOevModellBln.xml");
+		transitModule.addParam("vehiclesFile", "../shared-svn/studies/ptsimmanuel/input/vehicles.oevModellBln.xml");
 		transitModule.addParam("transitModes", "pt");
 	}
 
@@ -93,6 +83,6 @@ public class MMoyoEquilnetDemo {
 	}
 
 	public static void main(final String[] args) {
-		new MMoyoEquilnetDemo().run();
+		new BerlinDemo().run();
 	}
 }
