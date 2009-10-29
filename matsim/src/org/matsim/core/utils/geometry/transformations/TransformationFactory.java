@@ -38,6 +38,8 @@ public abstract class TransformationFactory {
 	public final static String WGS84_UTM35S = "WGS84_UTM35S"; // south-africa
 	public final static String DHDN_GK4 = "DHDN_GK4"; // berlin/germany, for GeoTools
 	public final static String WGS84_UTM29N = "WGS84_UTM29N"; // coimbra/portugal
+	public final static String CH1903_LV03_GT = "CH1903_LV03_GT"; //use geotools also for swiss coordinate system
+	
 
 	/**
 	 * Returns a coordinate transformation to transform coordinates from one
