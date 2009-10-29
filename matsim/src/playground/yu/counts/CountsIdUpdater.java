@@ -40,10 +40,10 @@ public class CountsIdUpdater {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		String oldNetFile = "../berlin/network/bb_5_v_notscaled.xml.gz";
-		String newNetFile = "../berlin/network/bb_5_v_notscaled_simple.xml.gz";
-		String oldCountsFile = "../berlin/counts/counts4bb_5_v_notscaled.xml";
-		String newCountsFile = "../berlin/counts/counts4bb_5_v_notscaled_simple.xml";
+		String oldNetFile = "../berlin/network/bb_5_v_notscaled_simple.xml.gz";
+		String newNetFile = "../berlin/network/bb_5_hermannstr.xml.gz";
+		String oldCountsFile = "../berlin/counts/counts4bb_5_v_notscaled_simple.xml";
+		String newCountsFile = "../berlin/counts/counts4bb_5_hermannstr.xml";
 
 		int cnt = 0;
 
@@ -61,7 +61,7 @@ public class CountsIdUpdater {
 		newCounts.setName("berlin counts");
 		newCounts.setLayer("0");
 		newCounts
-				.setDescription("extracted from vsp-cvs/studies/berlin-wip/external-data/counts/senstadt-hand/link_counts_PKW_hrs0-24.att, countIds also were changed according to the new OSM-network https://svn.vsp.tu-berlin.de/repos/shared-svn/studies/countries/de/berlin/network/bb_5_v_notscaled_simple.xml.gz");
+				.setDescription("extracted from vsp-cvs/studies/berlin-wip/external-data/counts/senstadt-hand/link_counts_PKW_hrs0-24.att, countIds also were changed according to the new OSM-network https://svn.vsp.tu-berlin.de/repos/shared-svn/studies/countries/de/berlin/network/bb_5_hermannstr.xml.gz");
 		for (Id oldCountId : oldCounts.getCounts().keySet()) {
 			LinkImpl oldLink = oldNet.getLink(oldCountId);
 			System.out.println("oldCountId :\t" + oldCountId);

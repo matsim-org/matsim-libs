@@ -20,14 +20,16 @@
 
 package playground.yu.newPlans;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioLoader;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -58,21 +60,29 @@ public class NewSmallPlan extends NewPopulation {
 	public static void main(final String[] args) {
 		// final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
-		final String plansFilename = "../schweiz-ivtch-SVN/baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
+		final String inputPopFilename = "../runs-svn/run669/it.500/500.plans.xml.gz";
+		final String outputPopFilename = "../matsimTests/Calibration/miniZurich/miniRun669it.500Plans.xml.gz";
+		// new ScenarioLoader(
+		// // "./test/yu/ivtch/config_for_10pctZuerich_car_pt_smallPlansl.xml"
+		// // "../data/ivtch/make10pctPlans.xml"
+		// "input/make10pctPlans.xml").loadScenario().getConfig();
 
-		new ScenarioLoader(
-		// "./test/yu/ivtch/config_for_10pctZuerich_car_pt_smallPlansl.xml"
-				// "../data/ivtch/make10pctPlans.xml"
-				"input/make10pctPlans.xml").loadScenario().getConfig();
+		Scenario s = new ScenarioImpl();
 
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = (NetworkLayer) s.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		PopulationImpl population = new PopulationImpl();
-		NewSmallPlan nsp = new NewSmallPlan(population);
 
+		PopulationImpl population = (PopulationImpl) s.getPopulation();
+		Config c = s.getConfig();
+		PlansConfigGroup pcg = c.plans();
+		pcg.setOutputFile(outputPopFilename);
+		pcg.setOutputSample(0.0001);
+
+		NewSmallPlan nsp = new NewSmallPlan(population);
 		PopulationReader plansReader = new MatsimPopulationReader(population,
 				network);
-		plansReader.readFile(plansFilename);
+		plansReader.readFile(inputPopFilename);
+
 		nsp.run(population);
 		nsp.writeEndPlans();
 	}

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.yu.utils.vis;
+package playground.yu.utils;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;

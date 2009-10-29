@@ -44,7 +44,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.opengis.referencing.FactoryException;
@@ -170,11 +169,11 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	public static void main(final String[] args) {
-		String netFilename = "../berlin/network/bb_5_v_notscaled.xml.gz";
+		String netFilename = "../berlin/network/bb_5_hermannstr.xml.gz";
 
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
 		mn2q.readNetwork(netFilename);
-		mn2q.setCrs(ch1903);
-		mn2q.writeShapeFile("../matsimTests/berlinQGIS/bb_5_v_notscaled.shp");
+		mn2q.setCrs(general);
+		mn2q.writeShapeFile("../matsimTests/berlinQGIS/bb_5_hermannstr.shp");
 	}
 }

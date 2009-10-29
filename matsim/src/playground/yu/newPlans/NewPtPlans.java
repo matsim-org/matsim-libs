@@ -122,8 +122,8 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 		Gbl.startMeasurement();
 
 		final String netFilename = "examples/equil/network.xml";
-		final String plansFilename = "../matsimTests/breakdown/plans100.xml";
-		final String outputFilename = "../matsimTests/breakdown/plans100withPt.xml";
+		final String plansFilename = "../matsimTests/Calibration/test/plans100.xml";
+		final String outputFilename = "../matsimTests/Calibration/test/plans100withPt.xml";
 
 		Gbl.createConfig(null);
 
