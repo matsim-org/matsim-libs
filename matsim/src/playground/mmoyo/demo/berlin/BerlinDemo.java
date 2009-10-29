@@ -37,7 +37,7 @@ public class BerlinDemo {
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
 		config.network().setInputFile("../shared-svn/studies/ptsimmanuel/input/network.multimodal.xml");
-		config.plans().setInputFile("../shared-svn/studies/ptsimmanuel/input/pt_only.routedOevModell20.xml");  
+		config.plans().setInputFile("../shared-svn/studies/schweiz-ivtch/pt-experimental/Berlin/pt_only.routedOevModell20.xml");  
 		config.controler().setOutputDirectory("./output/BerlinDemo");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
