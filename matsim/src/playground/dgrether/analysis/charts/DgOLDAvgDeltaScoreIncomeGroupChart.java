@@ -28,9 +28,9 @@ import playground.dgrether.analysis.population.DgPlanData;
 
 
 
-public class DgAvgDeltaScoreIncomeGroupChart {
+public class DgOLDAvgDeltaScoreIncomeGroupChart {
 	
-	private static final Logger log = Logger.getLogger(DgAvgDeltaScoreIncomeGroupChart.class);
+	private static final Logger log = Logger.getLogger(DgOLDAvgDeltaScoreIncomeGroupChart.class);
 	
 	private DgAnalysisPopulation ana;
 	
@@ -39,7 +39,7 @@ public class DgAvgDeltaScoreIncomeGroupChart {
 	private double minIncome = Double.POSITIVE_INFINITY;
 	private double maxIncome = Double.NEGATIVE_INFINITY;
 	
-	public DgAvgDeltaScoreIncomeGroupChart(DgAnalysisPopulation ana) {
+	public DgOLDAvgDeltaScoreIncomeGroupChart(DgAnalysisPopulation ana) {
 		this.ana = ana;
 		this.calculateMinMaxIncome();
 	}

@@ -32,6 +32,7 @@ public abstract class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		suite.addTestSuite(DgAnalysisTest.class);
+		suite.addTestSuite(DgGridTest.class);
 		return suite;
 	}
 }

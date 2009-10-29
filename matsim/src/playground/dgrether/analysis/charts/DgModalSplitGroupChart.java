@@ -37,9 +37,9 @@ import playground.dgrether.utils.charts.DgColorScheme;
 
 
 
-public class DgModeChoiceIncomeChart {
+public class DgModalSplitGroupChart {
 	
-	private static final Logger log = Logger.getLogger(DgModeChoiceIncomeChart.class);
+	private static final Logger log = Logger.getLogger(DgModalSplitGroupChart.class);
 	
 	private DgAnalysisPopulation ana;
 	
@@ -54,7 +54,7 @@ public class DgModeChoiceIncomeChart {
 	
 	private DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();
 	
-	public DgModeChoiceIncomeChart(DgAnalysisPopulation ana, Id runid) {
+	public DgModalSplitGroupChart(DgAnalysisPopulation ana, Id runid) {
 		this.ana = ana;
 		this.runId = runid;
 		this.ana.calculateMinMaxIncome();

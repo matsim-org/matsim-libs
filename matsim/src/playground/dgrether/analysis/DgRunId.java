@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * DgRunId
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,77 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis.runscompare;
+package playground.dgrether.analysis;
+
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
 
 /**
  * @author dgrether
  *
  */
-public class RunsComparison {
+public class DgRunId {
 
-	private static final String RUNPREFIX = "run";
+	private String runNumber;
+
+	public DgRunId(String n) {
+		this.runNumber = n;
+	}
 	
-	private String runBaseDirectory;
-	
-	private String run1Number;
-	
-	private String run2Number;
-	
-	private String iterationNumber;
-	
-  private String networkFile;
-  
-  private String countsFile;
-  
-  private String roadPricingFile;
-  
-  private String eventsFile1;
-  
-  private String eventsFile2;
-  
-  private String plansFile1;
-  
-  private String plansFile2;
-  
-  private String linkStatsFile1;
-  
-  private String linkStatsFile2;
-	
-  private String outputDirectory;
-  
-  
-  
-  public RunsComparison(ScenarioPathsSetter scenarioPaths) {
-  	this.retrieveScenarioPaths(scenarioPaths);
+  @Override
+	public String toString(){
+  	return this.runNumber;
   }
-	
-	/**
-	 * @param scenarioPaths
-	 */
-	private void retrieveScenarioPaths(ScenarioPathsSetter scenarioPaths) {
-		this.networkFile = scenarioPaths.getNetworkFile();
-		this.countsFile = scenarioPaths.getCountsFile();
-		this.roadPricingFile = scenarioPaths.getRoadPricingFile();
-	}
 
-	/**
-	 * 
-	 */
-	public void compareRuns() {
-		this.loadData();
-	}
-	
-	
-	
-	
-	
-	private void loadData() {
-		
-	}
-
-	public static void main(String[] args) {
-		new RunsComparison(new IvtChScenarioPathsSetter()).compareRuns();
-	}
+  public String toDotString(){
+  	return this.runNumber + ".";
+  }
+  
+  
+  public Id toId(){
+  	return new IdImpl(this.runNumber);
+  }
 
 }

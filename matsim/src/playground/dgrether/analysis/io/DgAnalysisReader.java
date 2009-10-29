@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * DgAnalysisReader
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,20 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis.runscompare;
+package playground.dgrether.analysis.io;
 
 
 /**
- * An implementing instance of this class has to provide all paths which
- * describe a scenario and don't have to be changed from run to run.
  * @author dgrether
  *
  */
-public interface ScenarioPathsSetter {
+public class DgAnalysisReader {
 
-	public String getNetworkFile();
-
-	public String getCountsFile();
-
-	public String getRoadPricingFile();
 }

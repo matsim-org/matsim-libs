@@ -24,9 +24,12 @@ import java.io.File;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestCase;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.dgrether.analysis.population.DgPopulationAnalysisReader;
+import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
 
 
 /**
@@ -36,7 +39,13 @@ import playground.dgrether.analysis.population.DgPopulationAnalysisReader;
 public class DgAnalysisTest extends MatsimTestCase {
 
 	
-	public void testReadPopulation(){
+	public void testCRSCreation(){
+			CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.CH1903_LV03_GT);
+			assertNotNull(targetCRS);
+	}
+	
+	
+	public void estReadPopulation(){
 		String netFilename = "test/scenarios/equil/network.xml";
 		String plansFilename = "test/scenarios/equil/plans100.xml";
 		String runId = "testRun23";
@@ -59,9 +68,7 @@ public class DgAnalysisTest extends MatsimTestCase {
 		assertTrue("no output population with default name written!", new File(outputPlansFilename).exists());
 		
 		
-		DgPopulationAnalysisReader reader = new DgPopulationAnalysisReader(sc);
+		DgAnalysisPopulationReader reader = new DgAnalysisPopulationReader(sc);
 //		reader.readPopulationFile();
-		
-		
 	}
 }

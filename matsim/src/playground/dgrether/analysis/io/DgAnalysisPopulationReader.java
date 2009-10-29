@@ -17,7 +17,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis.population;
+package playground.dgrether.analysis.io;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
@@ -31,25 +34,89 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.population.algorithms.PlanCalcType;
 
+import playground.dgrether.analysis.population.DgAnalysisPopulation;
+import playground.dgrether.analysis.population.DgPersonData;
+import playground.dgrether.analysis.population.DgPlanData;
 
-public class DgPopulationAnalysisReader {
+
+public class DgAnalysisPopulationReader {
 	
-	private static final Logger log = Logger.getLogger(DgPopulationAnalysisReader.class);
+	private static final Logger log = Logger.getLogger(DgAnalysisPopulationReader.class);
 
 	private ScenarioImpl sc;
+
+	private Map<String, NetworkLayer> loadedNetworks = new HashMap<String, NetworkLayer>();
 	
-	public DgPopulationAnalysisReader(ScenarioImpl sc) {
+	private boolean isExcludeTransit = false;
+	
+	public DgAnalysisPopulationReader(ScenarioImpl sc) {
 		this.sc = sc;
 	}
 	
+	public DgAnalysisPopulation readAnalysisPopulation(DgAnalysisPopulation analysisPopulation, final Id runId, final String networkPath, final String firstPlanPath) {
+		PopulationImpl population;
+		NetworkLayer net;
+		if (this.loadedNetworks.containsKey(networkPath)){
+			net = loadedNetworks.get(networkPath);
+			this.sc.setNetwork(net);
+		}
+		else {
+			ScenarioLoader sl = new ScenarioLoader(sc);
+			sc.getConfig().network().setInputFile(networkPath);
+			sl.loadNetwork();
+			net = sc.getNetwork();
+			this.loadedNetworks.put(networkPath, net);
+		}
+		// load first plans file
+		population = loadPopulationFile(firstPlanPath, sc.getNetwork());
+		new PlanCalcType().run(population);
+		PlanImpl plan;
+		ActivityImpl act;
+		for (Id id : population.getPersons().keySet()) {
+			if (isExcludeTransit){
+				if (isTransitPerson(id)){
+					continue;
+				}
+			}
+			plan = population.getPersons().get(id).getSelectedPlan();
+			act = plan.getFirstActivity();
+			
+			DgPersonData personData;
+			personData = analysisPopulation.getPersonData().get(id);
+			if (personData == null) {
+				personData = new DgPersonData();
+				analysisPopulation.getPersonData().put(id, personData);
+				personData.setFirstActivity(act);
+				personData.setPersonId(id);
+			}
+			DgPlanData pd = new DgPlanData();
+			pd.setScore(plan.getScore());
+			plan.setPerson(null);
+//			pd.setPlan(plan);
+			personData.getPlanData().put(runId, pd);
+		}
+		population = null;
+		System.gc();
+		return analysisPopulation;
+	}
+
+	
+	
+	private boolean isTransitPerson(Id id) {
+		int idi = Integer.parseInt(id.toString());
+		return (idi >= 1000000000);
+	}
+
 	/**
    * Creates the object and computes the resulting comparison
    *setActivity
+   * @deprecated 
    * @param firstPlanPath
    * @param secondPlanPath
    * @param outpath
    *          if null the output is written to the console
    */
+	@Deprecated
 	public DgAnalysisPopulation doPopulationAnalysis(final String networkPath, final String firstPlanPath,
 			final String secondPlanPath) {
 		PopulationImpl population;
@@ -111,5 +178,9 @@ public class DgPopulationAnalysisReader {
 		log.info("  done");
 
 		return plans;
+	}
+
+	public void setExcludeTransit(boolean b) {
+		this.isExcludeTransit  = b;
 	}
 }

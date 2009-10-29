@@ -39,9 +39,9 @@ import playground.dgrether.analysis.population.DgPlanData;
 
 
 
-public class DgDeltaScoreIncomeModeChoiceChart {
+public class DgDeltaUtilsModeGroupChart {
 	
-	private static final Logger log = Logger.getLogger(DgDeltaScoreIncomeModeChoiceChart.class);
+	private static final Logger log = Logger.getLogger(DgDeltaUtilsModeGroupChart.class);
 	
 	private DgAnalysisPopulation ana;
 
@@ -49,7 +49,7 @@ public class DgDeltaScoreIncomeModeChoiceChart {
 	
 	private XYSeriesCollection dataset;
 	
-	public DgDeltaScoreIncomeModeChoiceChart(DgAnalysisPopulation ana) {
+	public DgDeltaUtilsModeGroupChart(DgAnalysisPopulation ana) {
 		this.ana = ana;
 		this.dataset = createDeltaScoreIncomeModeChoiceDataset();
 	}

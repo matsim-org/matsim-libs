@@ -17,16 +17,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis.population;
+package playground.dgrether.analysis.io;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 
+import playground.dgrether.analysis.population.DgAnalysisPopulation;
+import playground.dgrether.analysis.population.DgPersonData;
+
 
 public class DgHouseholdsAnalysisReader {
 
+	private static final Logger log = Logger.getLogger(DgHouseholdsAnalysisReader.class);
 	
 	private DgAnalysisPopulation pop;
 
@@ -41,8 +47,14 @@ public class DgHouseholdsAnalysisReader {
 		HouseholdsReaderV10 reader = new HouseholdsReaderV10(hhs);
 		reader.readFile(filename);
 		for (Household hh : hhs.getHouseholds().values()) {
-			DgPersonData pd = this.pop.getPersonData().get(hh.getMemberIds().get(0));
-			pd.setIncome(hh.getIncome());
+			Id memberId = hh.getMemberIds().get(0);
+			DgPersonData pd = this.pop.getPersonData().get(memberId);
+			if (pd != null) {
+				pd.setIncome(hh.getIncome());
+			}
+			else {
+				log.warn("No DgPerson found for member id " + memberId + " in household: " + hh.getId());
+			}
 		}
 	}
 	

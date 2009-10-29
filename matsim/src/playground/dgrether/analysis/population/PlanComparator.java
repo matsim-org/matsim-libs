@@ -22,6 +22,10 @@ package playground.dgrether.analysis.population;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 
+import playground.dgrether.DgPaths;
+import playground.dgrether.analysis.DgRunId;
+import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
+
 
 /**
  * This Class is able to compare two plan files of different iterations. 
@@ -55,10 +59,22 @@ public class PlanComparator {
    *
    * @param args
    */
-	public static void main(final String[] args) {
+	public static void main(String[] args) {
+		String runNumber1 = "749";
+		String runNumber2 = "869";
+		DgRunId runid1 = new DgRunId(runNumber1);
+		DgRunId runid2 = new DgRunId(runNumber2);
+		String netfile = DgPaths.RUNBASE + "run" +  runid1.toString() + "/" + runid1.toDotString() + "output_network.xml.gz";
+		String plans1file = DgPaths.RUNBASE + "run" +runid1.toString() + "/" + runid1.toDotString() + "output_plans.xml.gz";
+		String plans2file = DgPaths.RUNBASE + "run" +runid2.toString() + "/" + runid2.toDotString() + "output_plans.xml.gz";
+		args = new String[4];
+		args[0] = netfile;
+		args[1] = plans1file;
+		args[2] = plans2file;
+		args[3] = DgPaths.RUNBASE + "run" +runid2.toString() + "/" + runid1.toString() + "vs" + runid2.toString()+ "plansCompare.txt";
 		DgAnalysisPopulation pop;
 		ScenarioImpl sc = new ScenarioImpl();
-		pop = new DgPopulationAnalysisReader(sc).doPopulationAnalysis(args[0], args[1], args[2]);
+		pop = new DgAnalysisPopulationReader(sc).doPopulationAnalysis(args[0], args[1], args[2]);
 		if (args.length == 3) {
 			System.out.println(new PlanComparisonStringWriter(pop).getResult());
 		}

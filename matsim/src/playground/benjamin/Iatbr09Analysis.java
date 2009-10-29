@@ -22,16 +22,10 @@ package playground.benjamin;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 
-import playground.benjamin.BkPaths;
-import playground.dgrether.analysis.charts.DgAvgDeltaScoreIncomeGroupChart;
-import playground.dgrether.analysis.charts.DgAvgDeltaScoreIncomeModeChoiceChart;
-import playground.dgrether.analysis.charts.DgDeltaScoreIncomeChart;
-import playground.dgrether.analysis.charts.DgDeltaScoreIncomeModeChoiceChart;
 import playground.dgrether.analysis.charts.DgMixedDeltaScoreIncomeModeChoiceChart;
-import playground.dgrether.analysis.charts.DgModeChoiceIncomeChart;
+import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
+import playground.dgrether.analysis.io.DgHouseholdsAnalysisReader;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
-import playground.dgrether.analysis.population.DgHouseholdsAnalysisReader;
-import playground.dgrether.analysis.population.DgPopulationAnalysisReader;
 import playground.dgrether.utils.charts.DgChartWriter;
 
 
@@ -78,7 +72,7 @@ public class Iatbr09Analysis {
 			ScenarioImpl sc = new ScenarioImpl();
 
 			
-			DgPopulationAnalysisReader pc = new DgPopulationAnalysisReader(sc);
+			DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader(sc);
 			DgAnalysisPopulation ana = pc.doPopulationAnalysis(netfile, plans1file, plans2file);
 			
 			DgHouseholdsAnalysisReader hhr = new DgHouseholdsAnalysisReader(ana);
@@ -91,25 +85,25 @@ public class Iatbr09Analysis {
 //			incomeChart.setWriteModeSwitcherOnly(true);
 //			incomeChart.writeFile(deltaScoreModeSwitchOnlyChartFile);
 //		
-			DgDeltaScoreIncomeModeChoiceChart modeChoiceIncomeChart;
-			modeChoiceIncomeChart = new DgDeltaScoreIncomeModeChoiceChart(ana);
+//			DgDeltaScoreIncomeModeChoiceChart modeChoiceIncomeChart;
+//			modeChoiceIncomeChart = new DgDeltaScoreIncomeModeChoiceChart(ana);
 //			DgChartWriter.writerChartToFile(deltaScoreColorChartFile, modeChoiceIncomeChart.createChart());
 			
 //			DgModeChoiceIncomeChart modechoiceIncomeChartRun1 = new DgModeChoiceIncomeChart(ana, DgAnalysisPopulation.RUNID1);
 //			DgChartWriter.writerChartToFile(modeChoiceIncomeChartFile1, modechoiceIncomeChartRun1.createChart());
-			DgModeChoiceIncomeChart modechoiceIncomeChartRun2 = new DgModeChoiceIncomeChart(ana, DgAnalysisPopulation.RUNID2);
-			DgChartWriter.writerChartToFile(modeChoiceIncomeChartFile2, modechoiceIncomeChartRun2.createChart());
+//			DgModeChoiceIncomeChart modechoiceIncomeChartRun2 = new DgModeChoiceIncomeChart(ana, DgAnalysisPopulation.RUNID2);
+//			DgChartWriter.writerChartToFile(modeChoiceIncomeChartFile2, modechoiceIncomeChartRun2.createChart());
 			
 //			DgChartFrame frame = new DgChartFrame("test", modechoiceIncomeChartRun2.createChart());
 //
-			new DgAvgDeltaScoreIncomeGroupChart(ana).writeFile(avgDeltaScoreIncomeGroupChartFile);
-			DgAvgDeltaScoreIncomeModeChoiceChart avgDScoreIncomeChartData = new DgAvgDeltaScoreIncomeModeChoiceChart(ana);
+//			new DgAvgDeltaScoreIncomeGroupChart(ana).writeFile(avgDeltaScoreIncomeGroupChartFile);
+//			DgAvgDeltaScoreIncomeModeChoiceChart avgDScoreIncomeChartData = new DgAvgDeltaScoreIncomeModeChoiceChart(ana);
 //			DgChartFrame frame = new DgChartFrame("test", avgDScoreIncomeChartData.createChart());
-			DgChartWriter.writerChartToFile(avgDeltaScoreIncomeGroupChartModeSwitchFile, avgDScoreIncomeChartData.createChart());
+//			DgChartWriter.writerChartToFile(avgDeltaScoreIncomeGroupChartModeSwitchFile, avgDScoreIncomeChartData.createChart());
 			
 			DgMixedDeltaScoreIncomeModeChoiceChart mixedDsIncomeChart = new DgMixedDeltaScoreIncomeModeChoiceChart();
-			mixedDsIncomeChart.addIncomeModeChoiceDataSet(modeChoiceIncomeChart.createDeltaScoreIncomeModeChoiceDataset());
-			mixedDsIncomeChart.addAvgDeltaScoreIncomeDs(avgDScoreIncomeChartData.getDataset());
+//			mixedDsIncomeChart.addIncomeModeChoiceDataSet(modeChoiceIncomeChart.createDeltaScoreIncomeModeChoiceDataset());
+//			mixsedDsIncomeChart.addAvgDeltaScoreIncomeDs(avgDScoreIncomeChartData.getDataset());
 //			DgChartFrame frame = new DgChartFrame("test", mixedDsIncomeChart.createChart());
 			DgChartWriter.writerChartToFile(mixedDeltaScoreIncomeChartFile, mixedDsIncomeChart.createChart());
 			

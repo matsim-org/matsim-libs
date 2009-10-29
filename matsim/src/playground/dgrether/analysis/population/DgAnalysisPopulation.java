@@ -20,7 +20,11 @@
 
 package playground.dgrether.analysis.population;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -28,8 +32,9 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
+
+import com.vividsolutions.jts.geom.Envelope;
 /**
  * This Class provides a data object to compare to iterations. 
  * @author dgrether
@@ -45,7 +50,7 @@ public class DgAnalysisPopulation {
 	private double minIncome = Double.POSITIVE_INFINITY;
 	private double maxIncome = Double.NEGATIVE_INFINITY;
 
-	private Tuple<Coord, Coord> boundingBox = null;
+	private Envelope boundingBox = null;
 	
 	private Map<Id, DgPersonData> table;
 	/**
@@ -58,6 +63,29 @@ public class DgAnalysisPopulation {
 	
 	public Map<Id, DgPersonData> getPersonData() {
 		return table;
+	}
+	
+	public List<DgAnalysisPopulation> getQuantiles(int numberOfQuantiles, Comparator<DgPersonData> comparator){
+		List<DgPersonData> list = new ArrayList<DgPersonData>(this.table.values());
+		Collections.sort(list, comparator);
+		int personsPerQuantile = list.size() / numberOfQuantiles;
+		List<DgAnalysisPopulation> result = new ArrayList<DgAnalysisPopulation>();
+		DgAnalysisPopulation quantilePop = null;
+		for (int i = 0; i < numberOfQuantiles; i++){
+			quantilePop = new DgAnalysisPopulation();
+			result.add(quantilePop);
+			for (int j = 0; j < personsPerQuantile; j++) {
+				DgPersonData p = list.remove(0);
+				quantilePop.getPersonData().put(p.getPersonId(), p);
+			}
+		}
+		if (!list.isEmpty()){
+			log.warn("base list after creating quantiles still has " + list.size() + " entries, adding to last quantile");
+			for (DgPersonData p : list){
+				quantilePop.getPersonData().put(p.getPersonId(), p);
+			}
+		}
+		return result;
 	}
 	
 	public int calculateNumberOfCarPlans(Id runId) {
@@ -104,19 +132,9 @@ public class DgAnalysisPopulation {
 				maxSE.setY(current.getY());
 			}
 		}
-		this.boundingBox = new Tuple<Coord, Coord>(minNW, maxSE);
+		this.boundingBox = new Envelope();
+		this.boundingBox.init(minNW.getX(), maxSE.getX(), minNW.getY(), maxSE.getY());
 	}
-	
-	/**
-	 * first entry of Tuple is min north west coord, second max south east
-	 */
-	public Tuple<Coord, Coord> getBoundingBox(){
-		if (this.boundingBox == null) {
-			this.calculateBoundingBox();
-		}
-		return this.boundingBox;
-	}
-	
 	
 	public double getMinIncome() {
 		return minIncome;
@@ -124,6 +142,13 @@ public class DgAnalysisPopulation {
 	
 	public double getMaxIncome() {
 		return maxIncome;
+	}
+
+	public Envelope getBoundingBox() {
+		if (this.boundingBox == null) {
+			this.calculateBoundingBox();
+		}
+		return this.boundingBox;
 	}
 	
 	

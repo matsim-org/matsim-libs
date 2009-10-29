@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * DgPersonDataIncomeComparator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,30 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis.runscompare;
+package playground.dgrether.analysis.population;
 
-import playground.dgrether.DgPaths;
+import java.util.Comparator;
 
 
 /**
+ * Compares DgPersons by income if set for the same period.
  * @author dgrether
  *
  */
-public class IvtChScenarioPathsSetter implements ScenarioPathsSetter {
+public class DgPersonDataIncomeComparator implements Comparator<DgPersonData> {
 
-	public IvtChScenarioPathsSetter(){}
-
-	public String getCountsFile() {
-		return DgPaths.IVTCHCOUNTS;
+	@Override
+	public int compare(DgPersonData p1, DgPersonData p2) {
+		if (p1.getIncome().getIncomePeriod() != p2.getIncome().getIncomePeriod()){
+			throw new IllegalArgumentException("Cannot compare different income periods by default. Please normalize manually!");
+		}
+		if (p1.getIncome().getIncome() < p2.getIncome().getIncome()){
+			return -1;
+		}
+		else if (p1.getIncome().getIncome() > p2.getIncome().getIncome()){
+			return 1;
+		}
+		return 0;
 	}
 
-	public String getNetworkFile() {
-		return DgPaths.IVTCHNET;
-	}
-
-	public String getRoadPricingFile() {
-		return DgPaths.IVTCHROADPRICING;
-	}
-	
-	
 }
