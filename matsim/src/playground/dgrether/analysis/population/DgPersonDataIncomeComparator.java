@@ -29,7 +29,6 @@ import java.util.Comparator;
  */
 public class DgPersonDataIncomeComparator implements Comparator<DgPersonData> {
 
-	@Override
 	public int compare(DgPersonData p1, DgPersonData p2) {
 		if (p1.getIncome().getIncomePeriod() != p2.getIncome().getIncomePeriod()){
 			throw new IllegalArgumentException("Cannot compare different income periods by default. Please normalize manually!");
