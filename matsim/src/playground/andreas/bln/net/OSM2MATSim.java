@@ -73,18 +73,20 @@ public class OSM2MATSim {
 		osmReader.setHighwayDefaults(8, "steps", 1,  3.0/3.6, 1.0,  300);
 		
 //		osmReader.setHierarchyLayer(55.5, 4.5, 47.5, 15.5, 1); // Deutschland
-		osmReader.setHierarchyLayer(54.3, 10.0, 50.8, 15.0, 2); // Brandenburg mit Autobahnstummeln
+//		osmReader.setHierarchyLayer(54.3, 10.0, 50.8, 15.0, 2); // Brandenburg mit Autobahnstummeln
 //		osmReader.setHierarchyLayer(53.6, 11.2, 51.2, 15.0, 4); // BerlinBrandenburg
 		
-		osmReader.setHierarchyLayer(53.6, 11.5, 52.8, 14.5, 4); // BerlinBrandenburg - Streifen 1
-		osmReader.setHierarchyLayer(53.0, 12.1, 52.0, 14.9, 4); // BerlinBrandenburg - Quadrat
-		osmReader.setHierarchyLayer(52.2, 13.0, 51.4, 14.9, 4); // BerlinBrandenburg - Streifen 2
+//		osmReader.setHierarchyLayer(53.6, 11.5, 52.8, 14.5, 4); // BerlinBrandenburg - Streifen 1
+//		osmReader.setHierarchyLayer(53.0, 12.1, 52.0, 14.9, 4); // BerlinBrandenburg - Quadrat
+//		osmReader.setHierarchyLayer(52.2, 13.0, 51.4, 14.9, 4); // BerlinBrandenburg - Streifen 2
 		
-		osmReader.setHierarchyLayer(52.62, 13.2, 52.37, 13.7, 5); // Stadtbereich Bln
-		osmReader.setHierarchyLayer(52.43, 12.97, 52.35, 13.16, 5); // Potsdam
-		osmReader.setHierarchyLayer(52.56, 13.13, 52.51, 13.21, 5); // Spandau
+//		osmReader.setHierarchyLayer(52.62, 13.2, 52.37, 13.7, 5); // Stadtbereich Bln
+//		osmReader.setHierarchyLayer(52.43, 12.97, 52.35, 13.16, 5); // Potsdam
+//		osmReader.setHierarchyLayer(52.56, 13.13, 52.51, 13.21, 5); // Spandau
 
-		osmReader.setHierarchyLayer(52.494, 13.413, 52.461, 13.440, 6); // Hermannstraﬂe
+//		osmReader.setHierarchyLayer(52.494, 13.413, 52.461, 13.440, 6); // Hermannstraﬂe
+		osmReader.setHierarchyLayer(52.51, 13.37, 52.38, 13.54, 5); // M44/344 weitere Umgebung
+		osmReader.setHierarchyLayer(52.495, 13.410, 52.407, 13.465, 6); // M44/344 komplett		
 		
 		
 		
