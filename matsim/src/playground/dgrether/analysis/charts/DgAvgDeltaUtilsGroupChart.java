@@ -186,7 +186,6 @@ public class DgAvgDeltaUtilsGroupChart {
 			this.labels.put(series, labels);
 		}
 
-		@Override
 		public String generateLabel(XYDataset dataset, int series, int item) {
 			return this.labels.get(series).get(item);
 		}
