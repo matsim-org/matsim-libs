@@ -17,7 +17,6 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.mmoyo.TransitSimulation;
 
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -32,32 +31,35 @@ import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
 import playground.marcel.OTFDemo;
 
 public class MMoyoTransitControler extends TransitControler {
-
+	boolean launchOTFDemo=false;
+	
 	public MMoyoTransitControler(final String[] args) {
 		super(args);
 	}
 	 
-	public MMoyoTransitControler(final ScenarioImpl scenario) {
+	public MMoyoTransitControler(final ScenarioImpl scenario, boolean launchOTFDemo){
 		super(scenario);
+		this.launchOTFDemo = launchOTFDemo;
 	}
 	
 	@Override
 	protected void runMobSim() {
 		//new TransitQueueSimulation(this.scenarioData, this.events).run();
 		 
-		/**  OTFDemo suggested by Andreas*/
-		
-		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
-		sim.startOTFServer("livesim");
-		OTFDemo.ptConnect("livesim");
-		sim.run();
-		
-		/*
-		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
-		sim.startOTFServer("livesim");
-		new OnTheFlyClientQuad("rmi:127.0.0.1:4019:" + "livesim").start();
-		sim.run();
-		*/
+		if (launchOTFDemo){
+			/**  OTFDemo suggested by Andreas*/
+			TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
+			sim.startOTFServer("livesim");
+			OTFDemo.ptConnect("livesim");
+			sim.run();
+
+			/*
+			TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
+			sim.startOTFServer("livesim");
+			new OnTheFlyClientQuad("rmi:127.0.0.1:4019:" + "livesim").start();
+			sim.run();
+			*/
+		}
 	}
 
 	@Override

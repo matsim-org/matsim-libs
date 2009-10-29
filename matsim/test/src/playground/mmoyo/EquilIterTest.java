@@ -12,27 +12,27 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
+import playground.mmoyo.demo.ScenarioDemo;
 import playground.mmoyo.demo.equil.MMoyoEquilnetDemo;
 
 public class EquilIterTest extends MatsimTestCase {
 	
-	private static final String HISTOG_FILE = "1.legHistogram_pt.png";
+	private static final String OUT_PLANS_FILE = "output_plans.xml.gz";
 	
 	public void testEquil() throws IOException, JAXBException, SAXException, ParserConfigurationException{
 		
-		//test\input\playground\mmoyo\EquilIterTest\testEquil\1.legHistogram_pt.png
+		//test\input\playground\mmoyo\EquilIterTest\testEquil\output_plans.xml.gz
 		String inputDirectory = getInputDirectory(); 
 		String outputDirectory = "output/transitEquil2";
-		String expectedFile =  inputDirectory + HISTOG_FILE;
-		String outputFile = outputDirectory + "/ITERS/it.1/" + HISTOG_FILE;
+		String expectedFile =  inputDirectory + OUT_PLANS_FILE;
+		String outputFile = outputDirectory + "/" + OUT_PLANS_FILE;
 		
 		File directoryFile = new File(outputDirectory);
 		if (directoryFile.exists()) {
 			IOUtils.deleteDirectory(directoryFile);
 		}
 		
-		MMoyoEquilnetDemo demo = new MMoyoEquilnetDemo();
-		demo.run();
+		MMoyoEquilnetDemo.main(new String[]{"NoOTFDemo"});
 		
 		BufferedReader expected = new BufferedReader(new FileReader(new File(expectedFile)));
 		BufferedReader output = new BufferedReader(new FileReader(new File(outputFile)));
@@ -41,10 +41,9 @@ public class EquilIterTest extends MatsimTestCase {
 		expected.close();
 		output.close();
 		assertEquals(CRCChecksum.getCRCFromFile(expectedFile), CRCChecksum.getCRCFromFile(outputFile));
-		
 
 		//compare event->
-		String eventFile = inputDirectory + "1.events.xml.gz"; 
+		String eventFile = inputDirectory + "ITERS/it.0/0.events.xml.gz"; 
 		BufferedReader events = new BufferedReader(new FileReader(new File(expectedFile)));
 		assertNotNull(events);
 		
