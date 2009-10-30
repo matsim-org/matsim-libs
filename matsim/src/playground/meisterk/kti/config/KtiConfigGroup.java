@@ -89,7 +89,15 @@ public class KtiConfigGroup extends Module {
 		 * TODO should be replaced by actual access/egress walk legs, 
 		 * which take time in the activity plan and thus generate additional opportunity costs 
 		 */
-		CONST_CAR("constCar", "0.0", "");
+		CONST_CAR("constCar", "0.0", ""),
+		/**
+		 * speed of legs with mode "pt" for intrazonal legs. 
+		 * The VISUM travel time matrix contains no travel time data for intrazonal trips, 
+		 * because there exists no intrazonal traffic in VISUM. When the travel time of
+		 * an intrazonal trip is estimated, the speed given here is used.
+		 * unit: [m/s] 
+		 */
+		INTRAZONAL_PT_SPEED("intrazonalPtSpeed", "1.0", "");
 		
 		private final String parameterName;
 		private final String defaultValue;
@@ -229,6 +237,10 @@ public class KtiConfigGroup extends Module {
 
 	public void setConstCar(double newValue) {
 		KtiConfigParameter.CONST_CAR.setActualValue(Double.toString(newValue));
+	}
+
+	public double getIntrazonalPtSpeed() {
+		return Double.parseDouble(KtiConfigParameter.INTRAZONAL_PT_SPEED.getActualValue());
 	}
 	
 }

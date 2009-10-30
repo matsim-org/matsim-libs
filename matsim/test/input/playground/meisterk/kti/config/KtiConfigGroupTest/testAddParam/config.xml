@@ -15,6 +15,7 @@
 		<param name="distanceCostPtNoTravelCard" value="-0.2" />
 		<param name="distanceCostPtUnknownTravelCard" value="0.3" />
 		<param name="travelingBike" value="-3.1" />
+		<param name="intrazonalPtSpeed" value="3.42" />
 	</module>
 
 	<!-- ====================================================================== -->
