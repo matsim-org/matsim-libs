@@ -34,14 +34,12 @@ public class KTIControler extends Controler {
 	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 	
-	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
-
-	private final KtiConfigGroup ktiConfigGroup;
+	private final KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
+	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(ktiConfigGroup);
 
 	public KTIControler(String[] args) {
 		super(args);
 
-		this.ktiConfigGroup = new KtiConfigGroup();
 		super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 
 		this.getNetworkFactory().setRouteFactory(TransportMode.car, new KtiNodeNetworkRouteFactory());
@@ -53,7 +51,7 @@ public class KTIControler extends Controler {
 	protected void setUp() {
 
 		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			this.plansCalcRouteKtiInfo.prepare(this.ktiConfigGroup, this.getNetwork());
+			this.plansCalcRouteKtiInfo.prepare(this.getNetwork());
 		}
 		
 		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(

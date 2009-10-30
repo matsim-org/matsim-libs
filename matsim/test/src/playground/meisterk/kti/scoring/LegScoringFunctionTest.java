@@ -151,8 +151,8 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		Link endLink = testPlan.getNextActivity(testLeg).getLink();
 
 		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
-			this.plansCalcRouteKtiInfo.prepare(ktiConfigGroup, this.network);
+			this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(this.ktiConfigGroup);
+			this.plansCalcRouteKtiInfo.prepare(this.network);
 		}
 		RouteFactory ptRouteFactory = new KtiPtRouteFactory(this.plansCalcRouteKtiInfo);
 		this.network.getFactory().setRouteFactory(TransportMode.pt, ptRouteFactory);

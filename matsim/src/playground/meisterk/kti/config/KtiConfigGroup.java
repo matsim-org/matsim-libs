@@ -242,5 +242,9 @@ public class KtiConfigGroup extends Module {
 	public double getIntrazonalPtSpeed() {
 		return Double.parseDouble(KtiConfigParameter.INTRAZONAL_PT_SPEED.getActualValue());
 	}
+
+	public void setIntrazonalPtSpeed(double newValue) {
+		KtiConfigParameter.INTRAZONAL_PT_SPEED.setActualValue(Double.toString(newValue));
+	}
 	
 }

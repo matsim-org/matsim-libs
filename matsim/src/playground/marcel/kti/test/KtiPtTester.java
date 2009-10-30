@@ -64,8 +64,8 @@ public class KtiPtTester {
 		ktiConfigGroup.setPtTraveltimeMatrixFilename("/Volumes/Data/ETH/cvs/ivt/studies/switzerland/externals/ptNationalModel/2005_OEV_Befoerderungszeit.mtx");
 		ktiConfigGroup.setWorldInputFilename(this.config.world().getInputFile());
 		
-		PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
-		plansCalcRouteKtiInfo.prepare(ktiConfigGroup, (NetworkLayer) this.data.getNetwork());
+		PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(ktiConfigGroup);
+		plansCalcRouteKtiInfo.prepare((NetworkLayer) this.data.getNetwork());
 
 		Gbl.printRoundTime();
 

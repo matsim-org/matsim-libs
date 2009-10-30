@@ -63,8 +63,8 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		network.createAndAddLink(new IdImpl(2), network.getNode("2"), network.getNode("3"), 1.0, 1.0, 1.0, 1.0);
 
 
-		plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
-		plansCalcRouteKtiInfo.prepare(ktiConfigGroup, network);
+		plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(ktiConfigGroup);
+		plansCalcRouteKtiInfo.prepare(network);
 
 		KtiPtRouteFactory ktiPtRouteFactory = new KtiPtRouteFactory(plansCalcRouteKtiInfo);
 		network.getFactory().setRouteFactory(TransportMode.pt, ktiPtRouteFactory);
@@ -123,7 +123,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		route.setRouteDescription(null, "kti=8503006=26101=300.0=26102=8503015", null);
 		
 //		assertEquals(expectedTimeInVehicle, route.getPtMatrixInVehicleTime());
-		assertNull(route.getPtMatrixInVehicleTime());
+		assertNull(route.getInVehicleTime());
 	}
 	
 }

@@ -11,16 +11,13 @@ import playground.ciarif.flexibletransports.config.FtConfigGroup;
 import playground.ciarif.flexibletransports.controler.listeners.FtPopulationPreparation;
 import playground.ciarif.flexibletransports.scoring.FtScoringFunctionFactory;
 import playground.meisterk.kti.config.KtiConfigGroup;
-import playground.meisterk.kti.controler.KTIControler;
 import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
-import playground.meisterk.kti.controler.listeners.KtiPopulationPreparation;
 import playground.meisterk.kti.controler.listeners.LegDistanceDistributionWriter;
 import playground.meisterk.kti.controler.listeners.ScoreElements;
 import playground.meisterk.kti.router.KtiNodeNetworkRouteFactory;
 import playground.meisterk.kti.router.KtiPtRouteFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
-import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
 
 public class FlexibleTransportControler extends Controler {
 	
@@ -30,11 +27,11 @@ public class FlexibleTransportControler extends Controler {
 	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 	
-	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
-
 	private final FtConfigGroup ftConfigGroup;
 	private KtiConfigGroup kTIConfigGroup; //TODO now is null and dosn't take any value when the FlexibleTransportControler is instantiated
 	
+	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(kTIConfigGroup);
+
 	public FlexibleTransportControler(String[] args) {
 		super(args);
 
@@ -51,7 +48,7 @@ public class FlexibleTransportControler extends Controler {
 	protected void setUp() {
 
 		if (this.ftConfigGroup.isUsePlansCalcRouteKti()) {
-			this.plansCalcRouteKtiInfo.prepare(this.kTIConfigGroup, this.getNetwork());
+			this.plansCalcRouteKtiInfo.prepare(this.getNetwork());
 		}
 		
 		FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(

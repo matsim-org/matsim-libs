@@ -113,7 +113,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 //				nanoMsg += Long.toString(nanos) + "\t";
 
 //				nanos = System.nanoTime();
-				travelTime = ((KtiPtRoute) leg.getRoute()).getPtMatrixInVehicleTime();
+				travelTime = ((KtiPtRoute) leg.getRoute()).getInVehicleTime();
 //				nanos = System.nanoTime() - nanos;
 //				nanoMsg += Long.toString(nanos) + "\t";
 

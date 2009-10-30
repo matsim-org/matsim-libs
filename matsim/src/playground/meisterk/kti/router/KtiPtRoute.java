@@ -42,7 +42,7 @@ public class KtiPtRoute extends GenericRouteImpl {
 	private Location fromMunicipality = null;
 	private Location toMunicipality = null;
 	private SwissHaltestelle toStop = null;
-	private Double ptMatrixInvehicleTime = null;
+	private Double inVehicleTime = null;
 	
 	public KtiPtRoute(Link startLink, Link endLink, PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
 		super(startLink, endLink);
@@ -62,7 +62,7 @@ public class KtiPtRoute extends GenericRouteImpl {
 		this.fromMunicipality = fromMunicipality;
 		this.toMunicipality = toMunicipality;
 		this.toStop = toStop;
-		this.ptMatrixInvehicleTime = this.calcInVehicleTime();
+		this.inVehicleTime = this.calcInVehicleTime();
 	}
 	
 	@Override
@@ -75,7 +75,7 @@ public class KtiPtRoute extends GenericRouteImpl {
 			IDENTIFIER + SEPARATOR + 
 			this.fromStop.getId() + SEPARATOR + 
 			this.fromMunicipality.getId() + SEPARATOR +
-			Double.toString(this.ptMatrixInvehicleTime) + SEPARATOR +
+			Double.toString(this.inVehicleTime) + SEPARATOR +
 			this.toMunicipality.getId() + SEPARATOR +
 			this.toStop.getId(); 
 		
@@ -112,11 +112,21 @@ public class KtiPtRoute extends GenericRouteImpl {
 	
 	protected double calcInVehicleTime() {
 
-		Entry traveltime = this.plansCalcRouteKtiInfo.getPtTravelTimes().getEntry(this.fromMunicipality, this.toMunicipality);
-		if (traveltime == null) {
+		Entry matrixEntry = this.plansCalcRouteKtiInfo.getPtTravelTimes().getEntry(this.fromMunicipality, this.toMunicipality);
+		if (matrixEntry == null) {
 			throw new RuntimeException("No entry found for " + this.fromMunicipality.getId() + " --> " + this.toMunicipality.getId());
 		}
-		return traveltime.getValue() * 60.0;
+		
+		double travelTime = matrixEntry.getValue() * 60.0;
+		/*
+		 * A value of NaN in the travel time matrix indicates that the matrix contains no valid value for this entry.
+		 * In this case, the travel time is calculated with the distance of the relation and an average speed.
+		 */
+		if (Double.isNaN(travelTime)) {
+			travelTime = this.calcInVehicleDistance() / this.plansCalcRouteKtiInfo.getKtiConfigGroup().getIntrazonalPtSpeed();
+		}
+		
+		return travelTime;
 		
 	}
 
@@ -145,8 +155,8 @@ public class KtiPtRoute extends GenericRouteImpl {
 		return toStop;
 	}
 
-	public Double getPtMatrixInVehicleTime() {
-		return this.ptMatrixInvehicleTime;
+	public Double getInVehicleTime() {
+		return this.inVehicleTime;
 	}
 	
 }

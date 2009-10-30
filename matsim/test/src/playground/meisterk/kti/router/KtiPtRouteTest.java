@@ -38,24 +38,26 @@ import playground.meisterk.kti.config.KtiConfigGroup;
 public class KtiPtRouteTest extends MatsimTestCase {
 
 	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = null;
+	private KtiConfigGroup ktiConfigGroup = null;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
 		
 		Config config = super.loadConfig(null);
-		KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
+		ktiConfigGroup = new KtiConfigGroup();
 		ktiConfigGroup.setUsePlansCalcRouteKti(true);
 		ktiConfigGroup.setPtHaltestellenFilename(this.getClassInputDirectory() + "haltestellen.txt");
 		ktiConfigGroup.setPtTraveltimeMatrixFilename(this.getClassInputDirectory() + "pt_Matrix.mtx");
 		ktiConfigGroup.setWorldInputFilename(this.getClassInputDirectory() + "world.xml");
+		ktiConfigGroup.setIntrazonalPtSpeed(10.0);
 		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
 		
 		NetworkLayer dummyNetwork = new NetworkLayer();
 		dummyNetwork.createAndAddNode(new IdImpl("1000"), new CoordImpl(900.0, 900.0));
-		dummyNetwork.createAndAddNode(new IdImpl("1001"), new CoordImpl(1300.0, 1300.0));
+		dummyNetwork.createAndAddNode(new IdImpl("1001"), new CoordImpl(3200.0, 3200.0));
 		
-		this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo();
-		this.plansCalcRouteKtiInfo.prepare(ktiConfigGroup, dummyNetwork);
+		this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(ktiConfigGroup);
+		this.plansCalcRouteKtiInfo.prepare(dummyNetwork);
 
 	}
 	
@@ -74,7 +76,7 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		assertEquals(link2, testee.getEndLink());
 		assertEquals(null, testee.getFromStop());
 		assertEquals(null, testee.getFromMunicipality());
-		assertEquals(null, testee.getPtMatrixInVehicleTime());
+		assertEquals(null, testee.getInVehicleTime());
 		assertEquals(null, testee.getToMunicipality());
 		assertEquals(null, testee.getToStop());
 		
@@ -102,7 +104,7 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		assertEquals(toStop, testee.getToStop());
 		assertEquals(fromMunicipality, testee.getFromMunicipality());
 		assertEquals(toMunicipality, testee.getToMunicipality());
-		assertEquals(330.0, testee.getPtMatrixInVehicleTime().doubleValue());
+		assertEquals(330.0, testee.getInVehicleTime().doubleValue());
 		
 		assertEquals("kti=123=30000=330.0=30001=456", testee.getRouteDescription());
 		
@@ -122,7 +124,7 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		assertNull(testee.getToStop());
 		assertNull(testee.getFromMunicipality());
 		assertNull(testee.getToMunicipality());
-		assertNull(testee.getPtMatrixInVehicleTime());
+		assertNull(testee.getInVehicleTime());
 		
 	}
 	
@@ -135,8 +137,28 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		assertNull(testee.getToStop());
 		assertNull(testee.getFromMunicipality());
 		assertNull(testee.getToMunicipality());
-		assertNull(testee.getPtMatrixInVehicleTime());
+		assertNull(testee.getInVehicleTime());
 		
+	}
+	
+	public void testCalcInVehicleTimeIntrazonal() {
+		
+		Link link1 = new FakeLink(new IdImpl(1));
+		Link link2 = new FakeLink(new IdImpl(2));
+
+		KtiPtRoute testee = new KtiPtRoute(
+				link1, 
+				link2, 
+				this.plansCalcRouteKtiInfo, 
+				this.plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(1001)), 
+				this.plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(30000)), 
+				this.plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(30000)), 
+				this.plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(1002)));
+		
+		double expectedInVehicleTime = testee.calcInVehicleDistance() / ktiConfigGroup.getIntrazonalPtSpeed();
+		double actualInVehicleTime = testee.getInVehicleTime();
+		
+		assertEquals(expectedInVehicleTime, actualInVehicleTime);
 	}
 	
 }

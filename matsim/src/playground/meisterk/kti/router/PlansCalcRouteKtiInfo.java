@@ -21,14 +21,16 @@ public class PlansCalcRouteKtiInfo {
 	private Matrix ptTravelTimes = null;
 	private SwissHaltestellen haltestellen = null;
 	private World localWorld=null;
+	private final KtiConfigGroup ktiConfigGroup;
 
 	private static final Logger log = Logger.getLogger(PlansCalcRouteKtiInfo.class);
 
-	public PlansCalcRouteKtiInfo() {
+	public PlansCalcRouteKtiInfo(final KtiConfigGroup ktiConfigGroup) {
 		super();
+		this.ktiConfigGroup = ktiConfigGroup;
 	}
 
-	public void prepare(final KtiConfigGroup ktiConfigGroup, final NetworkLayer network) {
+	public void prepare(final NetworkLayer network) {
 		
 		if (!ktiConfigGroup.isUsePlansCalcRouteKti()) {
 			log.error("The kti module is missing.");
@@ -77,4 +79,9 @@ public class PlansCalcRouteKtiInfo {
 	public World getLocalWorld() {
 		return localWorld;
 	}
+
+	public KtiConfigGroup getKtiConfigGroup() {
+		return ktiConfigGroup;
+	}
+	
 }
