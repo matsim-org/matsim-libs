@@ -45,6 +45,8 @@ public class DgModalSplitGroupChart {
 	
 	private int numberOfClasses = 10;
 	
+	private int groupThreshold = 0;
+	
 	private DefaultCategoryDataset dataset;
 	
 	private String xLabel = "Income [CHF / Year] up to...";
@@ -54,9 +56,10 @@ public class DgModalSplitGroupChart {
 	
 	private DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();
 	
-	public DgModalSplitGroupChart(DgAnalysisPopulation ana, Id runid) {
+	public DgModalSplitGroupChart(DgAnalysisPopulation ana, Id runid, int threshold) {
 		this.ana = ana;
 		this.runId = runid;
+		this.groupThreshold = threshold;
 		this.ana.calculateMinMaxIncome();
 		this.dataset = new DefaultCategoryDataset();
 		this.calculateData();
@@ -98,6 +101,9 @@ public class DgModalSplitGroupChart {
 			groupDescriptions[i] = title;
 			xvalues[i] = i;
 			groupSize = groups[i].getPersonData().size();
+			if (groupSize < this.groupThreshold) {
+				continue;
+			}
 			carPlans = groups[i].calculateNumberOfCarPlans(runId);
 			carvalues[i] = carPlans / groupSize * 100.0;
 			ptvalues[i] = (groupSize - carPlans) / groupSize * 100.0;

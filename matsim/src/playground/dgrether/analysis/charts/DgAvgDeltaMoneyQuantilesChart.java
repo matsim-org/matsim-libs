@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgAvgDeltaScoreIncomeGroupChart
+ * DgAvgDeltaUtilsQuantilesChart
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -40,8 +40,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
-import playground.dgrether.analysis.population.DgIncomeClass;
-import playground.dgrether.analysis.population.DgPersonData;
+import playground.dgrether.analysis.population.DgPersonDataIncomeComparator;
 import playground.dgrether.utils.charts.DgColorScheme;
 
 
@@ -49,15 +48,15 @@ import playground.dgrether.utils.charts.DgColorScheme;
  * @author dgrether
  *
  */
-public class DgAvgDeltaMoneyGroupChart {
+public class DgAvgDeltaMoneyQuantilesChart {
 	
-	private static final Logger log = Logger.getLogger(DgAvgDeltaMoneyGroupChart.class);
+	private static final Logger log = Logger.getLogger(DgAvgDeltaMoneyQuantilesChart.class);
 	
 	protected DgAnalysisPopulation ana;
 	
-	protected int numberOfClasses = 10;
+	protected int nQuantiles = 10;
 	
-	protected int groupThreshold = 0;
+	protected int groupThreshold = 3;
 	
 	protected XYSeriesCollection dataset;
 	
@@ -65,47 +64,24 @@ public class DgAvgDeltaMoneyGroupChart {
 
 	private LabelGenerator labelGenerator;
 	
-	public DgAvgDeltaMoneyGroupChart(DgAnalysisPopulation ana, int threshold) {
+	public DgAvgDeltaMoneyQuantilesChart(DgAnalysisPopulation ana) {
 		this.ana = ana;
 		this.labelGenerator = new LabelGenerator();
-		this.groupThreshold = threshold;
 		this.ana.calculateMinMaxIncome();
 		this.dataset = this.createDatasets();
 	}
 	
 	protected Tuple<XYSeries,List<String>> createXYSeries(String title, DgAnalysisPopulation pop) {
-		// calculate thresholds for income classes
-		DgIncomeClass[] incomeThresholds = new DgIncomeClass[this.numberOfClasses];
-		DgAnalysisPopulation[] groups = new DgAnalysisPopulation[this.numberOfClasses];
-
-		double deltaY = this.ana.getMaxIncome() / (this.numberOfClasses -1);
-		for (int i = 0; i < incomeThresholds.length; i++) {
-			incomeThresholds[i] = new DgIncomeClass((i *deltaY), ((i+1) * deltaY));
-			groups[i] = new DgAnalysisPopulation();
-		}
-		
-		for (DgPersonData d : pop.getPersonData().values()) {
-			double y = d.getIncome().getIncome();
-			int pos = (int) (y / deltaY);
-			DgIncomeClass c = incomeThresholds[pos];
-			if (!(c.getMin() <= y) && (y <= c.getMax())) {
-				throw new IllegalStateException();
-			}
-			groups[pos].getPersonData().put(d.getPersonId(), d);
-		}
-
+		List<DgAnalysisPopulation> quantiles = this.ana.getQuantiles(this.nQuantiles, new DgPersonDataIncomeComparator());
 		XYSeries series = new XYSeries(title, false, true);
 		List<String> labels = new ArrayList<String>();
-		for (int i = 0; i < groups.length; i++) {
-			int groupSize = groups[i].getPersonData().size();
-			if (groupSize < this.groupThreshold){
-				continue;
-			}
-			Double avgScore = IncomeChartUtils.calcAverageMoneyDifference(groups[i], 0);
+		for (DgAnalysisPopulation p : quantiles){
+			Double avgScore = IncomeChartUtils.calcAverageMoneyDifference(p, 0);
+			p.calculateMinMaxIncome();
 			if (avgScore != null) {
-			  double incomeLocation = incomeThresholds[i].getMin() + (deltaY / 2.0);
+			  double incomeLocation = p.getMinIncome() + ((p.getMaxIncome() - p.getMinIncome()) / 2.0) ;
 			  series.add(incomeLocation, avgScore);
-			  labels.add("Groupsize: " + groups[i].getPersonData().size());
+			  labels.add("Groupsize: " + p.getPersonData().size());
 			}
 		}
 		return new Tuple<XYSeries, List<String>>(series, labels);
@@ -115,7 +91,7 @@ public class DgAvgDeltaMoneyGroupChart {
 	
 	protected XYSeriesCollection createDatasets() {
 		XYSeriesCollection ds = new XYSeriesCollection();
-		Tuple<XYSeries, List<String>> seriesLabels = this.createXYSeries("Mean "+  '\u0394' + "Delta Money", this.ana);
+		Tuple<XYSeries, List<String>> seriesLabels = this.createXYSeries("Mean "+  '\u0394' + " Chf", this.ana);
 		ds.addSeries(seriesLabels.getFirst());
 		this.labelGenerator.setLabels(0, seriesLabels.getSecond());
 		return ds;
@@ -152,11 +128,11 @@ public class DgAvgDeltaMoneyGroupChart {
 	}
 	
 	public int getNumberOfClasses() {
-		return numberOfClasses;
+		return nQuantiles;
 	}
 
 	public void setNumberOfClasses(int numberOfClasses) {
-		this.numberOfClasses = numberOfClasses;
+		this.nQuantiles = numberOfClasses;
 	}
 	
 	/**
@@ -179,7 +155,4 @@ public class DgAvgDeltaMoneyGroupChart {
 			return this.labels.get(series).get(item);
 		}
 	}
-
-	
-	
 }

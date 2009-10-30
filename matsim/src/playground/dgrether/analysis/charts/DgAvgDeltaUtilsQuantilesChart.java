@@ -58,8 +58,6 @@ public class DgAvgDeltaUtilsQuantilesChart {
 	
 	protected int nQuantiles = 10;
 	
-	protected int groupThreshold = 3;
-	
 	protected XYSeriesCollection dataset;
 	
 	protected DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();
@@ -80,11 +78,9 @@ public class DgAvgDeltaUtilsQuantilesChart {
 		for (DgAnalysisPopulation p : quantiles){
 			Double avgScore = calcAverageScoreDifference(p);
 			p.calculateMinMaxIncome();
-			if (avgScore != null) {
-			  double incomeLocation = p.getMinIncome() + ((p.getMaxIncome() - p.getMinIncome()) / 2.0) ;
-			  series.add(incomeLocation, avgScore);
-			  labels.add("Groupsize: " + p.getPersonData().size());
-			}
+			double incomeLocation = p.getMinIncome() + ((p.getMaxIncome() - p.getMinIncome()) / 2.0) ;
+			series.add(incomeLocation, avgScore);
+			labels.add("Groupsize: " + p.getPersonData().size());
 		}
 		return new Tuple<XYSeries, List<String>>(series, labels);
 	}
@@ -97,9 +93,7 @@ public class DgAvgDeltaUtilsQuantilesChart {
 			deltaScoreSum += (planDataRun2.getScore() - planDataRun1.getScore());
 		}
 		Double avg = null;
-		if (group.getPersonData().size() > groupThreshold) {
-			avg = deltaScoreSum/group.getPersonData().size();
-		}
+		avg = deltaScoreSum/group.getPersonData().size();
 		return avg;
 	}
 	

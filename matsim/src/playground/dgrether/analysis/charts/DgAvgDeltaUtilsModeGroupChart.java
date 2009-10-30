@@ -43,8 +43,8 @@ public class DgAvgDeltaUtilsModeGroupChart extends DgAvgDeltaUtilsGroupChart {
 	
 	private static final Logger log = Logger.getLogger(DgAvgDeltaUtilsModeGroupChart.class);
 	
-	public DgAvgDeltaUtilsModeGroupChart(DgAnalysisPopulation ana) {
-		super(ana);
+	public DgAvgDeltaUtilsModeGroupChart(DgAnalysisPopulation ana, int threshold) {
+		super(ana, threshold);
 	}
 
 	@Override

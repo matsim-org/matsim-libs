@@ -74,15 +74,15 @@ public class DgDeltaUtilsModeGroupChart {
 				valuesPtPt.add(t);
 			}
 			else if (planDataRun1.getPlan().getType().equals(Type.PT) && planDataRun2.getPlan().getType().equals(Type.CAR)) {
-				if (d.getIncome().getIncome() > 100000.0 ) {
-					log.info("PT->Car person id: " + d.getPersonId().toString() + " income " + d.getIncome().getIncome());
-				}
+//				if (d.getIncome().getIncome() > 100000.0 ) {
+//					log.info("PT->Car person id: " + d.getPersonId().toString() + " income " + d.getIncome().getIncome());
+//				}
 				valuesPtCar.add(t);
 			}
 			else if (planDataRun1.getPlan().getType().equals(Type.CAR) && planDataRun2.getPlan().getType().equals(Type.PT)){
-				if (d.getIncome().getIncome() > 100000.0 ) {
-					log.info("Car->PT person id: " + d.getPersonId().toString() + " income " + d.getIncome().getIncome());
-				}
+//				if (d.getIncome().getIncome() > 100000.0 ) {
+//					log.info("Car->PT person id: " + d.getPersonId().toString() + " income " + d.getIncome().getIncome());
+//				}
 				valuesCarPt.add(t);
 			}
 		}

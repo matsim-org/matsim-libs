@@ -56,9 +56,9 @@ public class DgAvgDeltaUtilsGroupChart {
 	
 	protected DgAnalysisPopulation ana;
 	
-	protected int numberOfClasses = 11;
+	protected int numberOfClasses = 10;
 	
-	protected int groupThreshold = 3;
+	protected int groupThreshold;
 	
 	protected XYSeriesCollection dataset;
 	
@@ -66,8 +66,9 @@ public class DgAvgDeltaUtilsGroupChart {
 
 	private LabelGenerator labelGenerator;
 	
-	public DgAvgDeltaUtilsGroupChart(DgAnalysisPopulation ana) {
+	public DgAvgDeltaUtilsGroupChart(DgAnalysisPopulation ana, int threshold) {
 		this.ana = ana;
+		this.groupThreshold = threshold;
 		this.labelGenerator = new LabelGenerator();
 		this.ana.calculateMinMaxIncome();
 		this.dataset = this.createDatasets();
@@ -118,7 +119,7 @@ public class DgAvgDeltaUtilsGroupChart {
 			deltaScoreSum += (planDataRun2.getScore() - planDataRun1.getScore());
 		}
 		Double avg = null;
-		if (group.getPersonData().size() > groupThreshold) {
+		if (group.getPersonData().size() >= groupThreshold) {
 			avg = deltaScoreSum/group.getPersonData().size();
 		}
 		return avg;
