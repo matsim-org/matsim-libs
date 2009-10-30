@@ -1,5 +1,8 @@
 package org.matsim.evacuation.riskaversion;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
@@ -23,11 +26,25 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		
 		new MatsimNetworkReader(sc.getNetwork()).readFile(sc.getConfig().network().getInputFile());
 			
-		FloodingReader fr = new FloodingReader(sc.getConfig().evacuation().getFloodingDataFile());
-		fr.setReadTriangles(true);
+		double offsetEast = sc.getConfig().evacuation().getSWWOffsetEast();
+		double offsetNorth = sc.getConfig().evacuation().getSWWOffsetNorth();
+		List<FloodingReader> frs = new ArrayList<FloodingReader>();
+		for (int i = 0; i < sc.getConfig().evacuation().getSWWFileCount(); i++) {
+			String netcdf = sc.getConfig().evacuation().getSWWRoot() + "/" + sc.getConfig().evacuation().getSWWFilePrefix() + i + sc.getConfig().evacuation().getSWWFileSuffix();
+			FloodingReader fr = new FloodingReader(netcdf);
+			fr.setReadTriangles(true);
+			fr.setOffset(offsetEast, offsetNorth);
+//			fr.setMaxTimeStep(60);
+			frs .add(fr);
+		}
+
+
+		
+		
+		
 		
 		EventsImpl events = new EventsImpl();
-		RiskCostFromFloodingData rcf = new RiskCostFromFloodingData(sc.getNetwork(),fr,events,sc.getConfig().evacuation().getBufferSize());
+		RiskCostFromFloodingData rcf = new RiskCostFromFloodingData(sc.getNetwork(),frs,events,sc.getConfig().evacuation().getBufferSize());
 		
 		double delta = Math.pow(10, -6);
 		

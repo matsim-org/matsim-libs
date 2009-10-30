@@ -76,6 +76,18 @@ public class EvacuationConfigGroup  extends Module{
 	private static final String BUFFER_SIZE = "bufferSize";
 	
 	
+	private static final String SWW_ROOT = "swwRoot";
+	
+	private static final String SWW_FILE_PREFIX = "swwFilePrefix";
+	
+	private static final String SWW_FILE_SUFFIX = "swwFileSuffix";
+	
+	private static final String SWW_FILE_COUNT = "swwFileCount";
+	
+	private static final String SWW_OFFSET_EAST = "swwOffsetEast";
+	
+	private static final String SWW_OFFSET_NORTH = "swwOffsetNorth";
+	
 	/**
 	 * file name of the flooding data file
 	 */
@@ -105,6 +117,18 @@ public class EvacuationConfigGroup  extends Module{
 	 * the size of the spatial buffer
 	 */
 	private double bufferSize = 250.;
+
+	private String sWWRoot;
+
+	private String sWWFilePrefix;
+
+	private String sWWFileSuffix;
+
+	private int sWWFileCount;
+	
+	private double sWWOffsetEast = 0.;
+	
+	private double sWWOffsetNorth = 0.;
 	
 
 	public EvacuationConfigGroup(){
@@ -127,6 +151,18 @@ public class EvacuationConfigGroup  extends Module{
 			return Double.toString(getSampleSize());
 		}else if (BUFFER_SIZE.equals(key)) {
 			return Double.toString(getBufferSize());
+		}else if (SWW_ROOT.equals(key)) {
+			return getSWWRoot();
+		}else if (SWW_FILE_PREFIX.equals(key)) {
+			return getSWWFilePrefix();
+		}else if (SWW_FILE_SUFFIX.equals(key)) {
+			return getSWWFileSuffix();
+		}else if (SWW_FILE_COUNT.equals(key)) {
+			return Integer.toString(getSWWFileCount());
+		}else if (SWW_OFFSET_EAST.equals(key)) {
+			return Double.toString(getSWWOffsetEast());
+		}else if (SWW_OFFSET_NORTH.equals(key)) {
+			return Double.toString(getSWWOffsetNorth());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -141,6 +177,18 @@ public class EvacuationConfigGroup  extends Module{
 			setBuildingsFile(value.replace('\\', '/'));
 		}else if(SHORELINE_FILE.equals(key)){
 			setShorelineFile(value.replace('\\', '/'));
+		}else if(SWW_ROOT.equals(key)){
+			setSWWRoot(value.replace('\\', '/'));
+		}else if(SWW_FILE_PREFIX.equals(key)){
+			setSWWFilePrefix(value.replace('\\', '/'));
+		}else if(SWW_FILE_SUFFIX.equals(key)){
+			setSWWFileSuffix(value.replace('\\', '/'));
+		}else if(SWW_FILE_COUNT.equals(key)){
+			setSWWFileCount(value);
+		}else if(SWW_OFFSET_EAST.equals(key)){
+			setSWWOffsetEast(value);
+		}else if(SWW_OFFSET_NORTH.equals(key)){
+			setSWWOffsetNorth(value);
 		}else if(SCENARIO.equals(key)){
 			setEvacuationScenario(value);
 		}else if(SAMPLE_SIZE.equals(key)){
@@ -157,7 +205,14 @@ public class EvacuationConfigGroup  extends Module{
 	protected final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(FLOODING_DATA_FILE, getValue(FLOODING_DATA_FILE));
+		map.put(EVACUATION_AREA_FILE, getValue(EVACUATION_AREA_FILE));
 		map.put(BUILDINGS_FILE, getValue(BUILDINGS_FILE));
+		map.put(SWW_ROOT, getValue(SWW_ROOT));
+		map.put(SWW_FILE_PREFIX, getValue(SWW_FILE_PREFIX));
+		map.put(SWW_FILE_SUFFIX, getValue(SWW_FILE_SUFFIX));
+		map.put(SWW_FILE_COUNT, getValue(SWW_FILE_COUNT));
+		map.put(SWW_OFFSET_EAST, getValue(SWW_OFFSET_EAST));
+		map.put(SWW_OFFSET_NORTH, getValue(SWW_OFFSET_NORTH));
 		map.put(SCENARIO, getValue(SCENARIO));
 		map.put(SAMPLE_SIZE, getValue(SAMPLE_SIZE));
 		map.put(BUFFER_SIZE, getValue(BUFFER_SIZE));
@@ -186,6 +241,7 @@ public class EvacuationConfigGroup  extends Module{
 	 * 
 	 * @return the file name of the flooding data file
 	 */
+	@Deprecated
 	public String getFloodingDataFile() {
 		return this.floodingDataFile;
 	}
@@ -195,9 +251,50 @@ public class EvacuationConfigGroup  extends Module{
 	 * @param floodingDataFile
 	 * the flooding data filename to set
 	 */
+	@Deprecated
 	public void setFloodingDataFile(String floodingDataFile) {
 		this.floodingDataFile = floodingDataFile;
 	}
+	
+	public void setSWWRoot(String sWWRoot) {
+		this.sWWRoot = sWWRoot;
+	}
+	public void setSWWFilePrefix(String sWWFilePrefix) {
+		this.sWWFilePrefix = sWWFilePrefix;
+	}
+	public void setSWWFileSuffix(String sWWFileSuffix) {
+		this.sWWFileSuffix = sWWFileSuffix;
+	}
+	public void setSWWFileCount(String sWWFileCount) {
+		this.sWWFileCount = Integer.parseInt(sWWFileCount);
+	}
+
+	public void setSWWOffsetEast(String sWWOffsetEast) {
+		this.sWWOffsetEast = Double.parseDouble(sWWOffsetEast);
+	}
+
+	public void setSWWOffsetNorth(String sWWOffsetNorth) {
+		this.sWWOffsetNorth = Double.parseDouble(sWWOffsetNorth);
+	}
+	
+	public String getSWWRoot() {
+		return this.sWWRoot;
+	}
+	public String getSWWFilePrefix() {
+		return this.sWWFilePrefix;
+	}
+	public String getSWWFileSuffix() {
+		return this.sWWFileSuffix;
+	}
+	public int getSWWFileCount() {
+		return this.sWWFileCount;
+	}
+	public double getSWWOffsetEast() {
+		return this.sWWOffsetEast;
+	}
+	public double getSWWOffsetNorth() {
+		return this.sWWOffsetNorth;
+	}	
 
 	/**
 	 * 

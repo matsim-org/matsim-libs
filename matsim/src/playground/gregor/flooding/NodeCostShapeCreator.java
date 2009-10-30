@@ -36,7 +36,9 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 
+import org.matsim.api.basic.v01.Id;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData.LinkInfo;
@@ -57,14 +59,16 @@ public class NodeCostShapeCreator {
 	private FeatureType ft;
 	private final CoordinateReferenceSystem targetCRS;
 	private Collection<Feature> features;
-	private final Map<LinkImpl, LinkInfo> links;
+	private final Map<Id, LinkInfo> links;
 	private FeatureType ftPoint;
 	private Collection<Feature> pointFeatures;
+	private final NetworkLayer network;
 
-	public NodeCostShapeCreator(final Map<LinkImpl, LinkInfo> lis,
-			final CoordinateReferenceSystem crs) {
+	public NodeCostShapeCreator(final Map<Id, LinkInfo> lis,
+			final CoordinateReferenceSystem crs, NetworkLayer network) {
 		this.targetCRS = crs;
 		this.links = lis;
+		this.network = network;
 		initFeatures();
 		createFeatures();
 		writeFeatures();
@@ -86,8 +90,9 @@ public class NodeCostShapeCreator {
 		GeometryFactory geofac = new GeometryFactory();
 		this.features = new ArrayList<Feature>();
 		this.pointFeatures = new ArrayList<Feature>();
-		for (Entry<LinkImpl, LinkInfo> e : this.links.entrySet()) {
-			LinkImpl l = e.getKey();
+		for (Entry<Id, LinkInfo> e : this.links.entrySet()) {
+			Id id = e.getKey();
+			LinkImpl l = this.network.getLink(id);
 			Coordinate[] coords = {
 					MGC.coord2Coordinate(l.getFromNode().getCoord()),
 					MGC.coord2Coordinate(l.getToNode().getCoord()) };

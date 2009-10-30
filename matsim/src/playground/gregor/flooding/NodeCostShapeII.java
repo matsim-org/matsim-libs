@@ -3,6 +3,7 @@ package playground.gregor.flooding;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
@@ -20,7 +21,10 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.evacuation.flooding.FloodingReader;
 import org.matsim.evacuation.flooding.NodeRiskCostsFromNetcdf;
+import org.matsim.evacuation.riskaversion.RiskCostCalculator;
+import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import com.vividsolutions.jts.geom.Point;
 
@@ -41,7 +45,12 @@ public class NodeCostShapeII {
 	public void run() {
 		initFeatures();
 		this.targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM47S);
-		NodeRiskCostsFromNetcdf nc = new NodeRiskCostsFromNetcdf(this.netcdf);
+
+		FloodingReader fr = new FloodingReader(this.netcdf);
+		fr.setReadTriangles(true);
+		List<FloodingReader> frs = new ArrayList<FloodingReader>();
+		frs.add(fr);
+		NodeRiskCostsFromNetcdf nc = new NodeRiskCostsFromNetcdf(frs, 250.);
 		Collection<Feature> fts = new ArrayList<Feature>();
 		for (NodeImpl n : this.network.getNodes().values()) {
 			double cost = nc.getNodeRiskCost(n);

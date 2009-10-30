@@ -1,5 +1,6 @@
 package playground.gregor.sims.run;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.controler.Controler;
@@ -37,9 +38,12 @@ public class ConfluentCostController extends Controler {
 		
 		String netcdf = this.config.evacuation().getFloodingDataFile();
 
-		FloodingReader fr  = new FloodingReader(netcdf);
-		
-		RiskCostCalculator rc = new RiskCostFromFloodingData(this.network,fr,getEvents(),this.scenarioData.getConfig().evacuation().getBufferSize());
+		FloodingReader fr = new FloodingReader(netcdf);
+		fr.setReadTriangles(true);
+		List<FloodingReader> frs = new ArrayList<FloodingReader>();
+		frs.add(fr);
+
+		RiskCostCalculator rc = new RiskCostFromFloodingData(this.network, frs,getEvents(),this.scenarioData.getConfig().evacuation().getBufferSize());
 		
 		
 		this.travelCostCalculator = new RiskAverseCostCalculator(this.travelTimeCalculator,lpc,rc); 
