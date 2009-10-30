@@ -209,7 +209,18 @@ public class VisumMatrixReader {
 					warnMissingLocation(data[1]);
 					return;
 				}
-				this.matrix.createEntry(from, to, Double.parseDouble(data[2]));
+				
+				/*
+				 * There is no intrazonal traffic in VISUM.
+				 * However, when there comes a matrix entry from VISUM 
+				 * for a tuple of one and the same zone, store NaN instead of the value.
+				 * This indicates that the value has to be computed otherwise in MATSim.
+				 */
+				double value = Double.NaN;
+				if (!from.equals(to)) {
+					value = Double.parseDouble(data[2]);
+				}
+				this.matrix.createEntry(from, to, value);
 
 			} else if (this.state == STATE_HEADER) {
 
