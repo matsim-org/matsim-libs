@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -119,6 +120,11 @@ public class DgAnalysisPopulationReader {
 	@Deprecated
 	public DgAnalysisPopulation doPopulationAnalysis(final String networkPath, final String firstPlanPath,
 			final String secondPlanPath) {
+		return doPopulationAnalysis( networkPath, firstPlanPath, secondPlanPath, "selected" ) ;
+	}
+
+	public DgAnalysisPopulation doPopulationAnalysis(final String networkPath, final String firstPlanPath,
+			final String secondPlanPath, final String whichPlan ) {
 		PopulationImpl population;
 		DgAnalysisPopulation analysisPopulation;
 		
@@ -130,12 +136,18 @@ public class DgAnalysisPopulationReader {
 		new PlanCalcType().run(population);
 		
 		analysisPopulation = new DgAnalysisPopulation();
-		PlanImpl plan;
+		PlanImpl plan = null ;
 		ActivityImpl act;
 		for (Id id : population.getPersons().keySet()) {
-			plan = population.getPersons().get(id).getSelectedPlan();
+			if ( whichPlan.equals( "selected" ) ) {
+				plan = population.getPersons().get(id).getSelectedPlan();
+			} else if ( whichPlan.equals( "best" ) ) {
+				plan = population.getPersons().get(id).getBestPlan();
+			} else {
+				log.error( " whichPlan not recognized; aborting ... " ) ;
+				System.exit( -1 ) ;
+			}
 			act = plan.getFirstActivity();
-			
 			DgPersonData personData = new DgPersonData();
 			personData.setFirstActivity(act);
 			DgPlanData pd = new DgPlanData();
