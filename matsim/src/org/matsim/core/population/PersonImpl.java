@@ -80,6 +80,23 @@ public class PersonImpl extends BasicPersonImpl<Plan> implements Person {
 		int index = (int)(MatsimRandom.getRandom().nextDouble()*this.getPlans().size());
 		return this.getPlans().get(index);
 	}
+	
+	/** @deprecated this function is not tested.  kai, oct'09 */
+	public PlanImpl getBestPlan() {
+		if ( this.getPlans().size() == 0 ) {
+			return null ;
+		}
+		double currMaxScore = Double.NEGATIVE_INFINITY ;
+		PlanImpl currBestPlan = null ;
+		for ( Iterator<PlanImpl> iter = this.getPlans().iterator() ; iter.hasNext(); ) {
+			PlanImpl plan = iter.next() ;
+			if ( plan.getScore() > currMaxScore ) {
+				currMaxScore = plan.getScore() ;
+				currBestPlan = plan ;
+			}
+		}
+		return currBestPlan ;
+	}
 
 	public PlanImpl getRandomUnscoredPlan() {
 		int cntUnscored = 0;
