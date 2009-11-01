@@ -79,6 +79,7 @@ import org.matsim.core.mobsim.jdeqsim.parallel.PJDEQSimulation;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
+import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -419,6 +420,9 @@ public class Controler {
 			ActivityFacilitiesImpl facilities = this.getFacilities();
 			if (facilities != null) {
 				new FacilitiesWriter(facilities, this.getNameForOutputFilename("output_facilities.xml.gz")).write();
+			}
+			if (this.network.getFactory().isTimeVariant()) {
+				new NetworkChangeEventsWriter().write(this.getNameForOutputFilename("output_change_events.xml.gz"), this.network.getNetworkChangeEvents());
 			}
 
 			if (unexpected) {
@@ -1336,7 +1340,7 @@ public class Controler {
 
 	
 	public TravelTimeCalculatorFactory getTravelTimeCalculatorFactory() {
-		return travelTimeCalculatorFactory;
+		return this.travelTimeCalculatorFactory;
 	}
 
 	
@@ -1346,7 +1350,7 @@ public class Controler {
 
 	
 	public TravelCostCalculatorFactory getTravelCostCalculatorFactory() {
-		return travelCostCalculatorFactory;
+		return this.travelCostCalculatorFactory;
 	}
 
 	

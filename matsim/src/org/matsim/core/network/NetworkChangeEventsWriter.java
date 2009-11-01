@@ -24,6 +24,7 @@
 package org.matsim.core.network;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -64,50 +65,50 @@ public class NetworkChangeEventsWriter extends MatsimXmlWriter {
 	
 	public static final String XSD_LOCATION = "http://www.matsim.org/files/dtd/networkChangeEvents.xsd";
 
-	public void write(String file, List<NetworkChangeEvent> events) {
+	public void write(String file, Collection<NetworkChangeEvent> events) {
 		try {
 			openFile(file);
 			super.writeXmlHead();
 			
-			writer.write(OPEN_TAG_1);
-			writer.write(NetworkChangeEventsParser.NETWORK_CHANGE_EVENTS_TAG);
+			this.writer.write(OPEN_TAG_1);
+			this.writer.write(NetworkChangeEventsParser.NETWORK_CHANGE_EVENTS_TAG);
 			
-			writer.write(WHITESPACE);
-			writer.write("xmlns");
-			writer.write(EQUALS);
-			writer.write(QUOTE);
-			writer.write(DTD_LOCATION);
-			writer.write(QUOTE);
+			this.writer.write(WHITESPACE);
+			this.writer.write("xmlns");
+			this.writer.write(EQUALS);
+			this.writer.write(QUOTE);
+			this.writer.write(DTD_LOCATION);
+			this.writer.write(QUOTE);
 			
-			writer.write(WHITESPACE);
-			writer.write("xmlns:xsi");
-			writer.write(EQUALS);
-			writer.write(QUOTE);
-			writer.write(W3_URL);
-			writer.write(QUOTE);
+			this.writer.write(WHITESPACE);
+			this.writer.write("xmlns:xsi");
+			this.writer.write(EQUALS);
+			this.writer.write(QUOTE);
+			this.writer.write(W3_URL);
+			this.writer.write(QUOTE);
 			
-			writer.write(WHITESPACE);
-			writer.write("xsi:schemaLocation");
-			writer.write(EQUALS);
-			writer.write(QUOTE);
-			writer.write(DTD_LOCATION);
-			writer.write(WHITESPACE);
-			writer.write(XSD_LOCATION);
-			writer.write(QUOTE);
-			writer.write(CLOSE_TAG_1);
-			writer.write(NL);
-			writer.write(NL);
+			this.writer.write(WHITESPACE);
+			this.writer.write("xsi:schemaLocation");
+			this.writer.write(EQUALS);
+			this.writer.write(QUOTE);
+			this.writer.write(DTD_LOCATION);
+			this.writer.write(WHITESPACE);
+			this.writer.write(XSD_LOCATION);
+			this.writer.write(QUOTE);
+			this.writer.write(CLOSE_TAG_1);
+			this.writer.write(NL);
+			this.writer.write(NL);
 		
 			for (NetworkChangeEvent event : events) {
 				writeEvent(event);
-				writer.write(NL);
-				writer.write(NL);
+				this.writer.write(NL);
+				this.writer.write(NL);
 			}
 			
-			writer.write(OPEN_TAG_2);
-			writer.write(NetworkChangeEventsParser.NETWORK_CHANGE_EVENTS_TAG);
-			writer.write(CLOSE_TAG_1);
-			writer.write(NL);
+			this.writer.write(OPEN_TAG_2);
+			this.writer.write(NetworkChangeEventsParser.NETWORK_CHANGE_EVENTS_TAG);
+			this.writer.write(CLOSE_TAG_1);
+			this.writer.write(NL);
 			
 			close();
 		} catch (IOException e) {
@@ -116,31 +117,31 @@ public class NetworkChangeEventsWriter extends MatsimXmlWriter {
 	}
 	
 	private void writeEvent(NetworkChangeEvent event) throws IOException {
-		writer.write(TAB);
-		writer.write(OPEN_TAG_1);
-		writer.write(NetworkChangeEventsParser.NETWORK_CHANGE_EVENT_TAG);
-		writer.write(WHITESPACE);
-		writer.write(NetworkChangeEventsParser.START_TIME_TAG);
-		writer.write(EQUALS);
-		writer.write(QUOTE);
-		writer.write(Time.writeTime(event.getStartTime()));
-		writer.write(QUOTE);
-		writer.write(CLOSE_TAG_1);
-		writer.write(NL);
+		this.writer.write(TAB);
+		this.writer.write(OPEN_TAG_1);
+		this.writer.write(NetworkChangeEventsParser.NETWORK_CHANGE_EVENT_TAG);
+		this.writer.write(WHITESPACE);
+		this.writer.write(NetworkChangeEventsParser.START_TIME_TAG);
+		this.writer.write(EQUALS);
+		this.writer.write(QUOTE);
+		this.writer.write(Time.writeTime(event.getStartTime()));
+		this.writer.write(QUOTE);
+		this.writer.write(CLOSE_TAG_1);
+		this.writer.write(NL);
 		
 		for(LinkImpl link : event.getLinks()) {
-			writer.write(TAB);
-			writer.write(TAB);
-			writer.write(OPEN_TAG_1);
-			writer.write(NetworkChangeEventsParser.LINK_TAG);
-			writer.write(WHITESPACE);
-			writer.write(NetworkChangeEventsParser.REF_ID_TAG);
-			writer.write(EQUALS);
-			writer.write(QUOTE);
-			writer.write(link.getId().toString());
-			writer.write(QUOTE);
-			writer.write(CLOSE_TAG_2);
-			writer.write(NL);
+			this.writer.write(TAB);
+			this.writer.write(TAB);
+			this.writer.write(OPEN_TAG_1);
+			this.writer.write(NetworkChangeEventsParser.LINK_TAG);
+			this.writer.write(WHITESPACE);
+			this.writer.write(NetworkChangeEventsParser.REF_ID_TAG);
+			this.writer.write(EQUALS);
+			this.writer.write(QUOTE);
+			this.writer.write(link.getId().toString());
+			this.writer.write(QUOTE);
+			this.writer.write(CLOSE_TAG_2);
+			this.writer.write(NL);
 		}
 		
 		if(event.getFlowCapacityChange() != null) {
@@ -155,38 +156,38 @@ public class NetworkChangeEventsWriter extends MatsimXmlWriter {
 			writeChangeValue(NetworkChangeEventsParser.LANES_TAG, event.getLanesChange());
 		}
 
-		writer.write(TAB);
-		writer.write(OPEN_TAG_2);
-		writer.write(NetworkChangeEventsParser.NETWORK_CHANGE_EVENT_TAG);
-		writer.write(CLOSE_TAG_1);
+		this.writer.write(TAB);
+		this.writer.write(OPEN_TAG_2);
+		this.writer.write(NetworkChangeEventsParser.NETWORK_CHANGE_EVENT_TAG);
+		this.writer.write(CLOSE_TAG_1);
 	}
 	
 	private void writeChangeValue(String attName, ChangeValue value) throws IOException {
-		writer.write(TAB);
-		writer.write(TAB);
+		this.writer.write(TAB);
+		this.writer.write(TAB);
 		
-		writer.write(OPEN_TAG_1);
-		writer.write(attName);
+		this.writer.write(OPEN_TAG_1);
+		this.writer.write(attName);
 		
-		writer.write(WHITESPACE);
-		writer.write(NetworkChangeEventsParser.CHANGE_TYPE_TAG);
-		writer.write(EQUALS);
-		writer.write(QUOTE);
+		this.writer.write(WHITESPACE);
+		this.writer.write(NetworkChangeEventsParser.CHANGE_TYPE_TAG);
+		this.writer.write(EQUALS);
+		this.writer.write(QUOTE);
 		if(value.getType() == ChangeType.ABSOLUTE) {
-			writer.write(NetworkChangeEventsParser.ABSOLUTE_VALUE);
+			this.writer.write(NetworkChangeEventsParser.ABSOLUTE_VALUE);
 		} else if(value.getType() == ChangeType.FACTOR) {
-			writer.write(NetworkChangeEventsParser.FACTOR_VALUE);
+			this.writer.write(NetworkChangeEventsParser.FACTOR_VALUE);
 		}
-		writer.write(QUOTE);
+		this.writer.write(QUOTE);
 		
-		writer.write(WHITESPACE);
-		writer.write(NetworkChangeEventsParser.VALUE_TAG);
-		writer.write(EQUALS);
-		writer.write(QUOTE);
-		writer.write(String.valueOf(value.getValue()));
-		writer.write(QUOTE);
+		this.writer.write(WHITESPACE);
+		this.writer.write(NetworkChangeEventsParser.VALUE_TAG);
+		this.writer.write(EQUALS);
+		this.writer.write(QUOTE);
+		this.writer.write(String.valueOf(value.getValue()));
+		this.writer.write(QUOTE);
 		
-		writer.write(CLOSE_TAG_2);
-		writer.write(NL);
+		this.writer.write(CLOSE_TAG_2);
+		this.writer.write(NL);
 	}
 }
