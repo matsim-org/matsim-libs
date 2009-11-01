@@ -15,7 +15,6 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -40,7 +39,7 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		EventsImpl events = new EventsImpl();
 		
 		
-		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink((NetworkLayer) this.network,60, events);
+		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink(this.network,60, events);
 		scalc.notifyIterationStarts(new IterationStartsEvent(c,1));
 		
 		events.addHandler(scalc);
@@ -68,7 +67,7 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		
 		double costs = 0.;
 		for (; time >= 0; time--) {
-			costs += scalc.getSocialCost(this.link0, time);
+			costs += scalc.getLinkTravelCost(this.link0, time);
 		}
 		
 		assertEquals(0., costs);
@@ -87,7 +86,7 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		EventsImpl events = new EventsImpl();
 		
 		
-		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink((NetworkLayer) this.network,60, events);
+		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink(this.network,60, events);
 		scalc.notifyIterationStarts(new IterationStartsEvent(c,1));
 		
 		AgentPenaltyCalculator apc = new AgentPenaltyCalculator();
@@ -134,7 +133,7 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		// 6*(60-10) + 6*(120-10) +  ... + 6*(480-10) = 12480
 		double costs = 0.;
 		for (; time >= 0; time -= 10) {
-			costs += scalc.getSocialCost(this.link0, time);
+			costs += scalc.getLinkTravelCost(this.link0, time);
 		}
 		assertEquals(12480., costs);
 		
@@ -159,12 +158,12 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		Id n1 = this.sc.createId("1");
 
 		
-		NodeImpl node0 = ((NetworkLayer)this.network).createAndAddNode(n0, this.sc.createCoord(0,0));
-		NodeImpl node1 = ((NetworkLayer)this.network).createAndAddNode(n1, this.sc.createCoord(10,0));
+		NodeImpl node0 = (this.network).createAndAddNode(n0, this.sc.createCoord(0,0));
+		NodeImpl node1 = (this.network).createAndAddNode(n1, this.sc.createCoord(10,0));
 		
 		
 		
-		this.link0 = ((NetworkLayer)this.network).createAndAddLink(this.l0,node0,node1,100,10,1,1);
+		this.link0 = (this.network).createAndAddLink(this.l0,node0,node1,100,10,1,1);
 		
 		
 		

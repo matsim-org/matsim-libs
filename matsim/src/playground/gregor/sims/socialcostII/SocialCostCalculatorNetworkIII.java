@@ -41,11 +41,11 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.IntegerCache;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.evacuation.socialcost.SocialCostCalculator;
 
-public class SocialCostCalculatorNetworkIII implements SocialCostCalculator, IterationStartsListener,  AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
+public class SocialCostCalculatorNetworkIII implements TravelCost, IterationStartsListener,  AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
 
 	private final int travelTimeBinSize;
 	private final int numSlots;
@@ -78,7 +78,7 @@ public class SocialCostCalculatorNetworkIII implements SocialCostCalculator, Ite
 		this.network = network;
 	}
 	
-	public double getSocialCost(final Link link, final double time) {
+	public double getLinkTravelCost(final Link link, final double time) {
 		SocialCostRole sc = this.socCosts.get(link.getId().toString());
 		if (sc == null) {
 			return 0;

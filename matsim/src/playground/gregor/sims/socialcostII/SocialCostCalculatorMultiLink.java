@@ -27,13 +27,13 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.IntegerCache;
-import org.matsim.evacuation.socialcost.SocialCostCalculator;
 
 import playground.gregor.sims.run.MarginalCostControlerMultiLink;
 
-public class SocialCostCalculatorMultiLink implements SocialCostCalculator,BeforeMobsimListener, QueueSimulationBeforeCleanupListener, LinkEnterEventHandler, LinkLeaveEventHandler, AgentStuckEventHandler{
+public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimListener, QueueSimulationBeforeCleanupListener, LinkEnterEventHandler, LinkLeaveEventHandler, AgentStuckEventHandler{
 
 	private static final Logger  log = Logger.getLogger(SocialCostCalculatorMultiLink.class);
 	
@@ -63,7 +63,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 		this.discount = MarginalCostControlerMultiLink.QUICKnDIRTY;
 	}
 	
-	public double getSocialCost(Link link, double time) {
+	public double getLinkTravelCost(Link link, double time) {
 		LinkInfo li = this.linkInfos.get(link.getId());
 		if (li == null) {
 			return 0.;
@@ -176,7 +176,7 @@ public class SocialCostCalculatorMultiLink implements SocialCostCalculator,Befor
 				if (enterTime == null) {
 					return;
 				}
-				cost += getSocialCost(this.network.getLink(id), li.getAgentEnterTime(pers.getId()));
+				cost += getLinkTravelCost(this.network.getLink(id), li.getAgentEnterTime(pers.getId()));
 			}
 			AgentMoneyEventImpl e = new AgentMoneyEventImpl(this.maxK * this.binSize,pers.getId(),cost/-600);
 			QueueSimulation.getEvents().processEvent(e);

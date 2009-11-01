@@ -4,16 +4,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.IntegerCache;
-import org.matsim.evacuation.socialcost.SocialCostCalculator;
 
 public class MarginalTravelCostCalculatorIII implements TravelCost {
 	
 	
-	private final SocialCostCalculator sc;
+	private final TravelCost sc;
 	private final TravelTimeCalculator tc;
-	private int binSize;
+	private final int binSize;
 
-	public MarginalTravelCostCalculatorIII(final TravelTimeCalculator tc, final SocialCostCalculator sc, final int binSize) {
+	public MarginalTravelCostCalculatorIII(final TravelTimeCalculator tc, final TravelCost sc, final int binSize) {
 		this.tc = tc;
 		this.sc = sc;
 		this.binSize = binSize;

@@ -11,12 +11,10 @@ import org.matsim.evacuation.base.BuildingsShapeReader;
 import org.matsim.evacuation.base.EvacuationNetGenerator;
 import org.matsim.evacuation.base.EvacuationPopulationFromShapeFileLoader;
 import org.matsim.evacuation.flooding.FloodingReader;
-import org.matsim.evacuation.riskaversion.RiskCostCalculator;
 import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData;
+import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
 
-import playground.gregor.sims.confluent.LinkPenalty;
 import playground.gregor.sims.confluent.LinkPenaltyCalculatorII;
-import playground.gregor.sims.confluent.RiskAverseCostCalculator;
 
 public class ConfluentCostController extends Controler {
 	private List<Building> buildings;
@@ -29,7 +27,7 @@ public class ConfluentCostController extends Controler {
 	@Override
 	protected void setUp() {
 		
-		LinkPenalty lpc = new LinkPenaltyCalculatorII(this.network);
+		LinkPenaltyCalculatorII lpc = new LinkPenaltyCalculatorII(this.network);
 		this.events.addHandler(lpc);
 		addControlerListener(lpc);
 		if (this.travelTimeCalculator == null) {
@@ -43,10 +41,12 @@ public class ConfluentCostController extends Controler {
 		List<FloodingReader> frs = new ArrayList<FloodingReader>();
 		frs.add(fr);
 
-		RiskCostCalculator rc = new RiskCostFromFloodingData(this.network, frs,getEvents(),this.scenarioData.getConfig().evacuation().getBufferSize());
+		RiskCostFromFloodingData rc = new RiskCostFromFloodingData(this.network, frs,getEvents(),this.scenarioData.getConfig().evacuation().getBufferSize());
 		
-		
-		this.travelCostCalculator = new RiskAverseCostCalculator(this.travelTimeCalculator,lpc,rc); 
+		PluggableTravelCostCalculator tc = new PluggableTravelCostCalculator(this.travelTimeCalculator);
+		tc.addTravelCost(rc);
+		tc.addTravelCost(lpc);
+		this.travelCostCalculator = tc; 
 		
 		super.setUp();
 	}

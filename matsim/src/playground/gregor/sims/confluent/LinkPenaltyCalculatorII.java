@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -15,6 +16,8 @@ import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -22,9 +25,10 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.router.util.TravelCost;
 
 
-public class LinkPenaltyCalculatorII implements LinkPenalty, AfterMobsimListener {
+public class LinkPenaltyCalculatorII implements TravelCost, AfterMobsimListener, BasicLinkEnterEventHandler, AgentStuckEventHandler, AgentArrivalEventHandler {
 
 	private static final Logger log = Logger.getLogger(LinkPenaltyCalculatorII.class);
 
@@ -46,13 +50,13 @@ public class LinkPenaltyCalculatorII implements LinkPenalty, AfterMobsimListener
 
 	private int it = 0;
 
-	private NetworkLayer net;
+	private final NetworkLayer net;
 
 	public LinkPenaltyCalculatorII(NetworkLayer net) {
 		this.net = net;
 	}
 
-	public double getLinkCost(Link link) {
+	public double getLinkTravelCost(Link link, double time) {
 		LinkInfo li = this.linkInfos.get(link.getId());
 		if (li == null){
 			return 0;
@@ -255,7 +259,7 @@ public class LinkPenaltyCalculatorII implements LinkPenalty, AfterMobsimListener
 				throw new RuntimeException("ni was NaN!!!");
 			}
 
-			double prob = 1./(double)(1+this.it);
+			double prob = 1./(1+this.it);
 						if (this.it > 320) {
 							prob = 0.;
 						}
@@ -321,7 +325,7 @@ public class LinkPenaltyCalculatorII implements LinkPenalty, AfterMobsimListener
 //				if (li.avgCin == 0) {
 //					System.out.println(li.avgCin);
 //				}
-				li.penalty = li.avgTT / (double)li.avgCin;
+				li.penalty = li.avgTT / li.avgCin;
 				if (li.penalty != li.oldPen) {
 					penSwitch++;
 				}

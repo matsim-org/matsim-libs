@@ -15,7 +15,6 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.evacuation.socialcost.MarginalTravelCostCalculatorII;
-import org.matsim.evacuation.socialcost.SocialCostCalculator;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
 
 public class SocialCostTest extends Controler {
@@ -44,7 +43,7 @@ public class SocialCostTest extends Controler {
 //		TravelTimeAggregatorFactory factory = new TravelTimeAggregatorFactory();
 //		factory.setTravelTimeDataPrototype(TravelTimeDataHashMap.class);
 //		factory.setTravelTimeAggregatorPrototype(PessimisticTravelTimeAggregator.class);
-		SocialCostCalculator sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), getEvents());
+		SocialCostCalculatorSingleLink sc = new SocialCostCalculatorSingleLink(this.network,this.config.travelTimeCalculator().getTraveltimeBinSize(), getEvents());
 		
 		this.events.addHandler(sc);
 		this.travelCostCalculator = new MarginalTravelCostCalculatorII(this.travelTimeCalculator,sc);

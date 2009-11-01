@@ -24,16 +24,16 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.IntegerCache;
-import org.matsim.evacuation.socialcost.SocialCostCalculator;
 
-public class SocialCostCalculatorMultiLinkII implements SocialCostCalculator, QueueSimulationBeforeCleanupListener, BeforeMobsimListener, LinkEnterEventHandler, AgentStuckEventHandler{
+public class SocialCostCalculatorMultiLinkII implements TravelCost, QueueSimulationBeforeCleanupListener, BeforeMobsimListener, LinkEnterEventHandler, AgentStuckEventHandler{
 
 	
 	private final NetworkLayer network;
 	private final int binSize;
-	private TravelTimeCalculator travelTimeCalculator;
+	private final TravelTimeCalculator travelTimeCalculator;
 	private final PopulationImpl population;
 	
 	private Integer maxK;
@@ -51,7 +51,7 @@ public class SocialCostCalculatorMultiLinkII implements SocialCostCalculator, Qu
 		this.population = population;
 	}
 	
-	public double getSocialCost(Link link, double time) {
+	public double getLinkTravelCost(Link link, double time) {
 		LinkInfo li = this.linkInfos.get(link.getId());
 		if (li == null) {
 			return 0.;

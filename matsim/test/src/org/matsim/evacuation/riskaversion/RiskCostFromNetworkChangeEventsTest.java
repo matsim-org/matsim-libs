@@ -33,6 +33,7 @@ import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
 
@@ -96,11 +97,11 @@ public class RiskCostFromNetworkChangeEventsTest extends MatsimTestCase{
 		net.setNetworkChangeEvents(nc);
 		
 		RiskCostFromNetworkChangeEvents rcc = new RiskCostFromNetworkChangeEvents(net,false);
-		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l0));
-		assertEquals("Risk cost:" , 107400. * 10., rcc.getLinkRisk(l1));
-		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l2));
-		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l3));
-		assertEquals("Risk cost:" , 106800. * 2.5, rcc.getLinkRisk(l4));
+		assertEquals("Risk cost:" , 0. , rcc.getLinkTravelCost(l0,Time.UNDEFINED_TIME));
+		assertEquals("Risk cost:" , 107400. * 10., rcc.getLinkTravelCost(l1,Time.UNDEFINED_TIME));
+		assertEquals("Risk cost:" , 0. , rcc.getLinkTravelCost(l2,Time.UNDEFINED_TIME));
+		assertEquals("Risk cost:" , 0. , rcc.getLinkTravelCost(l3,Time.UNDEFINED_TIME));
+		assertEquals("Risk cost:" , 106800. * 2.5, rcc.getLinkTravelCost(l4,Time.UNDEFINED_TIME));
 		
 	}
 	
@@ -161,12 +162,12 @@ public class RiskCostFromNetworkChangeEventsTest extends MatsimTestCase{
 		
 		RiskCostFromNetworkChangeEvents rcc = new RiskCostFromNetworkChangeEvents(net,true);
 		
-		assertEquals("Risk cost:" , 106800. * 2.5, rcc.getLinkRisk(l0));
-		assertEquals("Risk cost:" , 107400. * 3.5, rcc.getLinkRisk(l1));
-		assertEquals("Risk cost:" , 107400. * 4.5, rcc.getLinkRisk(l2));
-		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l3));
-		assertEquals("Risk cost:" , 0. , rcc.getLinkRisk(l4));
-		assertEquals("Risk cost:" , 106800. * 5.5, rcc.getLinkRisk(l5));
+		assertEquals("Risk cost:" , 106800. * 2.5, rcc.getLinkTravelCost(l0,Time.UNDEFINED_TIME));
+		assertEquals("Risk cost:" , 107400. * 3.5, rcc.getLinkTravelCost(l1,Time.UNDEFINED_TIME));
+		assertEquals("Risk cost:" , 107400. * 4.5, rcc.getLinkTravelCost(l2,Time.UNDEFINED_TIME));
+		assertEquals("Risk cost:" , 0. , rcc.getLinkTravelCost(l3,Time.UNDEFINED_TIME));
+		assertEquals("Risk cost:" , 0. , rcc.getLinkTravelCost(l4,Time.UNDEFINED_TIME));
+		assertEquals("Risk cost:" , 106800. * 5.5, rcc.getLinkTravelCost(l5,Time.UNDEFINED_TIME));
 		
 	}
 	
