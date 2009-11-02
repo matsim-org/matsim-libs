@@ -1,6 +1,7 @@
 package playground.christoph.knowledge.container.dbtools;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -141,7 +142,7 @@ public class DBConnectionTool {
 			log.error("Connection Object is null!");
 		}
 	}
-	
+		
 	public ResultSet executeQuery(String query)
 	{
 		try
@@ -158,13 +159,47 @@ public class DBConnectionTool {
 		}
 		return null;
 	}
-	
+		
 	public int executeUpdate(String query)
 	{
 		try
 		{
 			Statement stmt = con.createStatement();
 			int result = stmt.executeUpdate(query);
+			
+			return result;
+		} 
+		catch (SQLException e) 
+		{
+			log.error("SQL Exception in executeQuery");
+			e.printStackTrace();
+		}
+		catch (NullPointerException npe)
+		{
+			log.error("Connection Object is null!");
+		}
+		return 0;
+	}
+	
+	public PreparedStatement getPreparedStatement(String sql)
+	{
+		try 
+		{
+			return con.prepareStatement(sql);
+		} 
+		catch (SQLException e)
+		{
+			log.error("SQL Exception in getPreparedStatement");
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public int executeUpdate(PreparedStatement stmt)
+	{
+		try
+		{
+			int result = stmt.executeUpdate();
 			
 			return result;
 		} 

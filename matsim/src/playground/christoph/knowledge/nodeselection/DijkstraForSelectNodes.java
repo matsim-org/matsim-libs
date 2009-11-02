@@ -18,12 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-// Zusätzlich Punkte innerhalb des aufgespannten Polygons finden?
+// Zusï¿½tzlich Punkte innerhalb des aufgespannten Polygons finden?
 // -> http://www.coding-board.de/board/showthread.php?t=23953 : 
 // Herausfinden, ob ein beliebiger Punkt innerhalb eines Polygons liegt
 
 package playground.christoph.knowledge.nodeselection;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -291,7 +292,11 @@ public class DijkstraForSelectNodes {
 	 */
 	public Map<Node, Double> getMinDistances()
 	{
-		Map<Node, Double> minDistances = new HashMap<Node, Double>();
+		/*
+		 * Don't change the Type of the Map! We need ordered Results!
+		 * Maybe change the return value to TreeMap<Node, Double>?
+		 */
+		Map<Node, Double> minDistances = new TreeMap<Node, Double>(new NodeComparator());
 		
 		for (DijkstraNode node : dijkstraNodeMap.values()) 
 		{
@@ -309,7 +314,11 @@ public class DijkstraForSelectNodes {
 	 */
 	public Map<Node, Double> getTotalMinDistances()
 	{
-		Map<Node, Double> minDistances = new HashMap<Node, Double>();
+		/*
+		 * Don't change the Type of the Map! We need ordered Results!
+		 * Maybe change the return value to TreeMap<Node, Double>?
+		 */
+		Map<Node, Double> minDistances = new TreeMap<Node, Double>(new NodeComparator());
 		
 		for (DijkstraNode node : dijkstraNodeMap.values()) 
 		{
@@ -467,6 +476,19 @@ public class DijkstraForSelectNodes {
 
 
 /*
+ * Compare two Nodes by their Ids. This allows to use Nodes as Keys
+ * in a TreeMap.
+ */
+class NodeComparator implements Comparator<Node>, Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	public int compare(final Node o1, final Node o2) {
+		return o1.getId().compareTo(o2.getId());
+	}
+}
+
+/*
  * Internal data structure with information about a node, the "distance" to it and its previous node.
  */
 class DijkstraNode
@@ -591,7 +613,7 @@ class DijkstraNode
 		{
 			Node node = nodeIterator.next();
 
-			// zugehörigen DijsktraNode aus der Map holen
+			// zugehï¿½rigen DijsktraNode aus der Map holen
 			DijkstraNode dijkstraNode = dijkstraNodeMap.get(node);
 			outgoingNodes.add(dijkstraNode);
 		}

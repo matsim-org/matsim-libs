@@ -87,11 +87,18 @@ public class CreateDijkstraKnowledge4MultiFactors {
 	 */
 	private static final String baseTableName = "KnowledgeFactor";
 	
-	private final String configFileName = "mysimulations/kt-zurich/config.xml";
+//	private final String configFileName = "mysimulations/kt-zurich/config.xml";
+//	private final String dtdFileName = null;
+//	private final String networkFile = "mysimulations/kt-zurich/input/network.xml";
+//	private final String populationFile = "mysimulations/kt-zurich/input/plans.xml";
+//	private final String facilitiesFile = null;
+		
+	private final String configFileName = "mysimulations/switzerland/config.xml";
 	private final String dtdFileName = null;
-	private final String networkFile = "mysimulations/kt-zurich/input/network.xml";
-	private final String populationFile = "mysimulations/kt-zurich/input/plans.xml";
-	private final String facilitiesFile = null;
+	private final String networkFile = "mysimulations/switzerland/input/network.xml";
+//	private final String populationFile = "mysimulations/switzerland/input/plans.xml.gz";
+	private final String populationFile = "mysimulations/switzerland/input/plans_split_1.xml.gz";
+	private final String facilitiesFile = "mysimulations/switzerland/input/facilities.xml.gz";
 	
 //	private final String configFileName = "mysimulations/kt-zurich-cut/config_10.xml";
 //	private final String dtdFileName = null;
@@ -111,7 +118,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 		loadPopulation();
 		loadConfig();
 			
-		log.info("Network size: " + network.getLinks().size());
+		log.info("Network size: " + network.getNodes().size());
 		log.info("Population size: " + population.getPersons().size());
 		
 		setKnowledgeStorageHandler();
@@ -238,7 +245,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 			DijkstraForSelectNodes dijkstra = new DijkstraForSelectNodes(this.network);
 			dijkstra.setCostCalculator(costCalculator);
 
-			CreateKnowledgeThread createKnowledgeThread = new CreateKnowledgeThread(i, dijkstra, costFactorsList);
+			CreateKnowledgeThread createKnowledgeThread = new CreateKnowledgeThread(i, dijkstra, costFactorsList, new ReadSpanningTreeFromDB(this.network));
 						
 			creationThreads[i] = createKnowledgeThread;
 			
@@ -283,11 +290,17 @@ public class CreateDijkstraKnowledge4MultiFactors {
 		private final List<Person> persons;
 		private KnowledgeTools knowledgeTools;
 		private DijkstraForSelectNodes dijkstra;
+		private ReadSpanningTreeFromDB dbReader;
 		
-		public CreateKnowledgeThread(final int i, final DijkstraForSelectNodes dijkstra, final List<Double> costFactors)
+		public CreateKnowledgeThread(final int i, final DijkstraForSelectNodes dijkstra, final List<Double> costFactors, ReadSpanningTreeFromDB dbReader)
 		{
 			this.threadId = i;
+			
+			// Sort the List - this is necessary for the Algorithm to work properly!
+			Collections.sort(costFactors);
 			this.costFactors = costFactors;
+			this.dbReader = dbReader;
+			
 			this.knowledgeTools = new KnowledgeTools();
 			this.dijkstra = dijkstra;
 			this.persons = new LinkedList<Person>();
@@ -374,15 +387,21 @@ public class CreateDijkstraKnowledge4MultiFactors {
 		{
 			// Without any CostFactors we do nothing.
 			if (costFactors.size() == 0) return null;
-		
+				
 			List<Map<Id, Node>> knowledges = new ArrayList<Map<Id, Node>>();
+		
+			Map<Node, Double> totalNodes;
 			
-			// Sort the List - this is necessary for the Algorithm to work properly!
-			Collections.sort(costFactors);
-			
-			// Calculate the Dijkstra only once.
-			dijkstra.executeTotalNetwork(startNode, endNode);
-			Map<Node, Double> totalNodes = dijkstra.getTotalMinDistances();
+			if (dbReader != null)
+			{
+				totalNodes = dbReader.getTotalSpanningTree(startNode, endNode);
+			}
+			else
+			{
+			// 	Calculate the Dijkstra only once.
+				dijkstra.executeTotalNetwork(startNode, endNode);
+				totalNodes = dijkstra.getTotalMinDistances();
+			}
 			
 			// get the minimal costs to get from the start- to the endnode
 			double minCostsStart = totalNodes.get(endNode);
