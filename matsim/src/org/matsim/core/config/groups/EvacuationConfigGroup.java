@@ -94,6 +94,8 @@ public class EvacuationConfigGroup  extends Module{
 	
 	private static final String SOCIAL_COST_OPTIMIZATION = "socialCostOptimization";
 	
+	private static final String GENERATE_EVAC_NET_FROM_SWW_FILE = "generateEvacNetFromSWWFile";
+	
 	/**
 	 * file name of the flooding data file
 	 */
@@ -142,6 +144,10 @@ public class EvacuationConfigGroup  extends Module{
 	
 	private boolean socialCostOptimization = false;
 
+	private boolean generateEvacNetFromSWWFile = false;
+	
+
+
 	public EvacuationConfigGroup(){
 		super(GROUP_NAME);
 	}
@@ -180,6 +186,8 @@ public class EvacuationConfigGroup  extends Module{
 			return Boolean.toString(isRiskMinimization());
 		}else if (SOCIAL_COST_OPTIMIZATION.equals(key)) {
 			return Boolean.toString(isSocialCostOptimization());
+		}else if (GENERATE_EVAC_NET_FROM_SWW_FILE.equals(key)) {
+			return Boolean.toString(isGenerateEvacNetFromSWWFile());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -218,6 +226,8 @@ public class EvacuationConfigGroup  extends Module{
 			setSampleSize(value);
 		}else if(BUFFER_SIZE.equals(key)){
 			setBufferSize(value);
+		}else if(GENERATE_EVAC_NET_FROM_SWW_FILE.equals(key)){
+			setGenerateEvacNetFromSWWFile(value);
 		}else {
 			throw new IllegalArgumentException(key);
 		}
@@ -242,6 +252,7 @@ public class EvacuationConfigGroup  extends Module{
 		map.put(SCENARIO, getValue(SCENARIO));
 		map.put(SAMPLE_SIZE, getValue(SAMPLE_SIZE));
 		map.put(BUFFER_SIZE, getValue(BUFFER_SIZE));
+		map.put(GENERATE_EVAC_NET_FROM_SWW_FILE, getValue(GENERATE_EVAC_NET_FROM_SWW_FILE));
 		return map;
 	}
 	
@@ -347,7 +358,13 @@ public class EvacuationConfigGroup  extends Module{
 		return this.socialCostOptimization;
 	}
 
+	public boolean isGenerateEvacNetFromSWWFile() {
+		return this.generateEvacNetFromSWWFile;
+	}
 
+	public void setGenerateEvacNetFromSWWFile(String generateEvacNetFromSWWFile) {
+		this.generateEvacNetFromSWWFile = Boolean.parseBoolean(generateEvacNetFromSWWFile);
+	}
 	
 	/**
 	 * 

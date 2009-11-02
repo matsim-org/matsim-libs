@@ -22,7 +22,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.evacuation.flooding.FloodingReader;
-import org.matsim.evacuation.flooding.NodeRiskCostsFromNetcdf;
+import org.matsim.evacuation.riskaversion.NodeRiskCostsFromNetcdf;
 import org.matsim.evacuation.riskaversion.RiskCostFromFloodingData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import com.vividsolutions.jts.geom.Point;
