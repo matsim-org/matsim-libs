@@ -75,7 +75,7 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 		calcCurrentZoom();
 				
 		recalcView(gl);
-		log.debug("on:" + this.offsetNorth + " oe:" + this.offsetEast);
+//		log.debug("on:" + this.offsetNorth + " oe:" + this.offsetEast);
 		
 		for (Tile t : this.currentView) {
 			drawTile(t,gl);
@@ -156,7 +156,7 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 		
 		if (zoom != this.zoom){
 			this.viewLocked = false;
-			System.out.println("ratio:" + ratio + " zoom:" + zoom);
+//			System.out.println("ratio:" + ratio + " zoom:" + zoom);
 		}
 		if (this.oTx != top[0] || this.oTy != top[1]){
 			this.viewLocked = false;
