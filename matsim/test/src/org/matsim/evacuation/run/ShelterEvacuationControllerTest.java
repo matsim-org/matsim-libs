@@ -11,7 +11,7 @@ public class ShelterEvacuationControllerTest extends MatsimTestCase{
 		String testEventsFile = getOutputDirectory() +"ITERS/it.10/10.events.txt.gz";
 		
 		
-		new ShelterEvacuationController(new String [] {config}).run();
+		new EvacuationQSimControllerII(new String [] {config}).run();
 		assertEquals("different events-files.", CRCChecksum.getCRCFromFile(refEventsFile),	CRCChecksum.getCRCFromFile(testEventsFile));
 		
 		

@@ -88,6 +88,12 @@ public class EvacuationConfigGroup  extends Module{
 	
 	private static final String SWW_OFFSET_NORTH = "swwOffsetNorth";
 	
+	private static final String LOAD_SHELTERS = "loadShelters";
+	
+	private static final String RISK_MINIMIZATION = "riskMinimization";
+	
+	private static final String SOCIAL_COST_OPTIMIZATION = "socialCostOptimization";
+	
 	/**
 	 * file name of the flooding data file
 	 */
@@ -130,6 +136,11 @@ public class EvacuationConfigGroup  extends Module{
 	
 	private double sWWOffsetNorth = 0.;
 	
+	private boolean loadShelters = false;
+
+	private boolean riskMinimization = false;
+	
+	private boolean socialCostOptimization = false;
 
 	public EvacuationConfigGroup(){
 		super(GROUP_NAME);
@@ -163,6 +174,12 @@ public class EvacuationConfigGroup  extends Module{
 			return Double.toString(getSWWOffsetEast());
 		}else if (SWW_OFFSET_NORTH.equals(key)) {
 			return Double.toString(getSWWOffsetNorth());
+		}else if (LOAD_SHELTERS.equals(key)) {
+			return Boolean.toString(isLoadShelters());
+		}else if (RISK_MINIMIZATION.equals(key)) {
+			return Boolean.toString(isRiskMinimization());
+		}else if (SOCIAL_COST_OPTIMIZATION.equals(key)) {
+			return Boolean.toString(isSocialCostOptimization());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -189,6 +206,12 @@ public class EvacuationConfigGroup  extends Module{
 			setSWWOffsetEast(value);
 		}else if(SWW_OFFSET_NORTH.equals(key)){
 			setSWWOffsetNorth(value);
+		}else if(LOAD_SHELTERS.equals(key)){
+			setLoadShelters(value);
+		}else if(RISK_MINIMIZATION.equals(key)){
+			setRiskMinimization(value);
+		}else if(SOCIAL_COST_OPTIMIZATION.equals(key)){
+			setSocialCostOptimization(value);
 		}else if(SCENARIO.equals(key)){
 			setEvacuationScenario(value);
 		}else if(SAMPLE_SIZE.equals(key)){
@@ -213,6 +236,9 @@ public class EvacuationConfigGroup  extends Module{
 		map.put(SWW_FILE_COUNT, getValue(SWW_FILE_COUNT));
 		map.put(SWW_OFFSET_EAST, getValue(SWW_OFFSET_EAST));
 		map.put(SWW_OFFSET_NORTH, getValue(SWW_OFFSET_NORTH));
+		map.put(LOAD_SHELTERS, getValue(LOAD_SHELTERS));
+		map.put(RISK_MINIMIZATION, getValue(RISK_MINIMIZATION));
+		map.put(SOCIAL_COST_OPTIMIZATION, getValue(SOCIAL_COST_OPTIMIZATION));
 		map.put(SCENARIO, getValue(SCENARIO));
 		map.put(SAMPLE_SIZE, getValue(SAMPLE_SIZE));
 		map.put(BUFFER_SIZE, getValue(BUFFER_SIZE));
@@ -296,6 +322,33 @@ public class EvacuationConfigGroup  extends Module{
 		return this.sWWOffsetNorth;
 	}	
 
+
+	public void setLoadShelters(String loadShelters) {
+		this.loadShelters = Boolean.parseBoolean(loadShelters);
+	}
+	
+	public void setRiskMinimization(String riskMinimization) {
+		this.riskMinimization = Boolean.parseBoolean(riskMinimization);
+	}
+	
+	public void setSocialCostOptimization(String socialCostOptimization) {
+		this.socialCostOptimization = Boolean.parseBoolean(socialCostOptimization);
+	}
+	
+	public boolean isLoadShelters() {
+		return this.loadShelters;
+	}
+
+	public boolean isRiskMinimization() {
+		return this.riskMinimization;
+	}
+
+	public boolean isSocialCostOptimization() {
+		return this.socialCostOptimization;
+	}
+
+
+	
 	/**
 	 * 
 	 * @return the shapes of the buildings
