@@ -22,18 +22,32 @@ package playground.kai.usecases.basicdemandgen;
  * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
  */
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.*;
-
-import com.vividsolutions.jts.geom.*;
-
-import org.matsim.api.basic.v01.*;
-import org.matsim.api.basic.v01.population.*;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureIterator;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.basic.v01.population.BasicPopulationFactory;
+import org.matsim.api.basic.v01.population.BasicPopulationWriter;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 
@@ -42,7 +56,7 @@ public class MyControler2 {
 
 	@SuppressWarnings("unchecked")
 	private static BasicPopulation createPlansFromShp(final FeatureSource n) {
-		BasicScenario sc = new BasicScenarioImpl() ;
+		Scenario sc = new ScenarioImpl() ;
 		
 		BasicPopulation population = sc.getPopulation() ;
 		BasicPopulationFactory pb = population.getFactory() ;

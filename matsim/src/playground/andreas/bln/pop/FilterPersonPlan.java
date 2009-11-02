@@ -1,8 +1,8 @@
 package playground.andreas.bln.pop;
 
-import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -10,7 +10,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -61,17 +60,16 @@ public class FilterPersonPlan extends NewPopulation {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 		
-		BasicScenarioImpl sc = new BasicScenarioImpl();
-		Gbl.setConfig(sc.getConfig());
+		ScenarioImpl sc = new ScenarioImpl();
 
 		String networkFile = "./bb_cl.xml.gz";
 		String inPlansFile = "./baseplan.xml.gz";
 		String outPlansFile = "./baseplan_car_pt_only.xml.gz";
 
-		NetworkLayer net = new NetworkLayer();
+		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(networkFile);
 
-		PopulationImpl inPop = new PopulationImpl();
+		PopulationImpl inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
 		popReader.readFile(inPlansFile);
 

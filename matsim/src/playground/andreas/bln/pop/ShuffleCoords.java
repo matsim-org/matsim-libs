@@ -1,9 +1,7 @@
 package playground.andreas.bln.pop;
 
-import org.matsim.api.basic.v01.BasicScenarioImpl;
-import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -12,7 +10,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -91,17 +88,16 @@ public class ShuffleCoords extends NewPopulation {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 		
-		BasicScenarioImpl sc = new BasicScenarioImpl();
-		Gbl.setConfig(sc.getConfig());
+		ScenarioImpl sc = new ScenarioImpl();
 
 		String networkFile = "./bb_cl.xml.gz";
 		String inPlansFile = "./plan_korridor_50x.xml.gz";
 		String outPlansFile = "./plan_korridor_50x_sc.xml.gz";
 
-		NetworkLayer net = new NetworkLayer();
+		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(networkFile);
 
-		PopulationImpl inPop = new PopulationImpl();
+		PopulationImpl inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
 		popReader.readFile(inPlansFile);
 

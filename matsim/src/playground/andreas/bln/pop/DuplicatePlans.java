@@ -1,14 +1,13 @@
 package playground.andreas.bln.pop;
 
-import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -45,17 +44,16 @@ public class DuplicatePlans extends NewPopulation {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 		
-		BasicScenarioImpl sc = new BasicScenarioImpl();
-		Gbl.setConfig(sc.getConfig());
+		ScenarioImpl sc = new ScenarioImpl();
 
 		String networkFile = "./bb_cl.xml.gz";
 		String inPlansFile = "./plan_korridor.xml.gz";
 		String outPlansFile = "./plan_korridor_50x.xml.gz";
 
-		NetworkLayer net = new NetworkLayer();
+		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(networkFile);
 
-		PopulationImpl inPop = new PopulationImpl();
+		PopulationImpl inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
 		popReader.readFile(inPlansFile);
 

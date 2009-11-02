@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -114,8 +114,7 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 		
-		BasicScenarioImpl sc = new BasicScenarioImpl();
-		Gbl.setConfig(sc.getConfig());
+		ScenarioImpl sc = new ScenarioImpl();
 
 		String wholeBigNetworkFile = "E:/eclwrk/berlin-bvg09/pt/baseplan_900s_bignetwork/network.multimodal.xml.gz";
 		String unroutedWholePlansFile = "E:/eclwrk/berlin-bvg09/pop/baseplan_900s.xml.gz";

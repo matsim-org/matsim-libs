@@ -24,17 +24,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.BasicScenario;
-import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicPopulationFactory;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -69,23 +69,23 @@ public class BkIncomeTestScenarioCreator {
 	}
 
 
-	public BasicPopulation<BasicPerson<BasicPlan>> createPlans() {
+	public Population createPlans() {
 		double firstHomeEndTime = 6.0 * 3600.0;
 		double homeEndTime = firstHomeEndTime;
 		log.info("starting plans creation...");
 		
-		BasicScenario scenario = new BasicScenarioImpl();
+		Scenario scenario = new ScenarioImpl();
 		
-		BasicPopulation<BasicPerson<BasicPlan>> pop = scenario.getPopulation();
-		BasicPopulationFactory builder = pop.getFactory();
+		Population pop = scenario.getPopulation();
+		PopulationFactory builder = pop.getFactory();
 		
 		for (int i = 1; i <= 2000; i++) {
-			BasicPerson p = builder.createPerson(scenario.createId(Integer.toString(i)));	
+			Person p = builder.createPerson(scenario.createId(Integer.toString(i)));	
 
 			//adding carPlan to person
-			BasicPlan plan = builder.createPlan(p);
+			Plan plan = builder.createPlan(p);
 			plan.setSelected(true);
-			p.getPlans().add(plan);
+			p.addPlan(plan);
 			
 			BasicActivity act1 = builder.createActivityFromLinkId("h", id1);			
 			act1.setEndTime(homeEndTime);
@@ -135,7 +135,7 @@ public class BkIncomeTestScenarioCreator {
 			
 			//adding ptPlan to person
 			plan = builder.createPlan(p);
-			p.getPlans().add(plan);
+			p.addPlan(plan);
 			//plan.setSelected(true);
 			
 			plan.addActivity(act1);
@@ -182,7 +182,7 @@ public class BkIncomeTestScenarioCreator {
 		
 		
 		BkIncomeTestScenarioCreator pc = new BkIncomeTestScenarioCreator(uselessNetwork);
-		BasicPopulation<BasicPerson<BasicPlan>> pop = pc.createPlans();
+		Population pop = pc.createPlans();
 		PopulationWriter writer = new PopulationWriter(pop, outfile);
 		writer.write();
 		log.info("plans written");

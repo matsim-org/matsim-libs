@@ -1,11 +1,10 @@
 package playground.wrashid.tryouts.plan;
 
-import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
@@ -25,9 +24,8 @@ import org.matsim.world.World;
 public class KeepOnlyMIVPlans extends NewPopulation {
 	public static void main(String[] args) {
 
-		BasicScenarioImpl sc = new BasicScenarioImpl();
-		Gbl.setConfig(sc.getConfig());
-		World world = Gbl.getWorld();
+		ScenarioImpl sc = new ScenarioImpl();
+		World world = sc.getWorld();
 
 		String inputPlansFile = "/data/matsim/wrashid/input/plans/teleatlas/census2000v2_dilZh30km_miv_only/plans.xml.gz";
 		String outputPlansFile = "/data/matsim/wrashid/input/plans/teleatlas/census2000v2_dilZh30km_miv_only/plans1.xml.gz";

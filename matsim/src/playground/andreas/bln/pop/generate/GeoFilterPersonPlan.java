@@ -1,7 +1,7 @@
 package playground.andreas.bln.pop.generate;
 
-import org.matsim.api.basic.v01.BasicScenarioImpl;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -85,8 +85,7 @@ public class GeoFilterPersonPlan extends NewPopulation {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 		
-		BasicScenarioImpl sc = new BasicScenarioImpl();
-		Gbl.setConfig(sc.getConfig());
+		ScenarioImpl sc = new ScenarioImpl();
 
 		String bigNetworkFile = "./bb_cl.xml.gz";
 		String targetNetworkFile = "./hundekopf_cl.xml.gz";

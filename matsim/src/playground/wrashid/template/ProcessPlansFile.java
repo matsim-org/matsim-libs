@@ -1,7 +1,6 @@
 package playground.wrashid.template;
 
-import org.matsim.api.basic.v01.BasicScenarioImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -18,16 +17,15 @@ import playground.wrashid.tryouts.plan.NewPopulation;
 public class ProcessPlansFile extends NewPopulation {
 	public static void main(String[] args) {
 
-		BasicScenarioImpl sc = new BasicScenarioImpl();
-		Gbl.setConfig(sc.getConfig());
+		ScenarioImpl sc = new ScenarioImpl();
 
 		String inputPlansFile = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 		String outputPlansFile = "./test.xml.gz";
 		String networkFile = "./test/scenarios/berlin/network.xml.gz";
 
-		PopulationImpl inPop = new PopulationImpl();
+		PopulationImpl inPop = sc.getPopulation();
 
-		NetworkLayer net = new NetworkLayer();
+		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(networkFile);
 
 		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
