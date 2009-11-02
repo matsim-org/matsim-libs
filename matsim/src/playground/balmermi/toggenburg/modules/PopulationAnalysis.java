@@ -1,0 +1,31 @@
+package playground.balmermi.toggenburg.modules;
+
+import org.apache.log4j.Logger;
+import org.matsim.core.population.PopulationImpl;
+
+public class PopulationAnalysis {
+	
+	//////////////////////////////////////////////////////////////////////
+	// member variables
+	//////////////////////////////////////////////////////////////////////
+
+	private final static Logger log = Logger.getLogger(PopulationAnalysis.class);
+
+	//////////////////////////////////////////////////////////////////////
+	// constructors
+	//////////////////////////////////////////////////////////////////////
+
+	public PopulationAnalysis() {
+		log.info("init " + this.getClass().getName() + " module...");
+		log.info("done.");
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+	// run methods
+	//////////////////////////////////////////////////////////////////////
+	
+	public void run(PopulationImpl population, final String outdir) {
+		log.info("running " + this.getClass().getName() + " module...");
+		log.info("done.");
+	}
+}
