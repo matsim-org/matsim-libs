@@ -39,7 +39,6 @@ public class TileLoader extends Thread implements Serializable {
 		while (this.running) {
 			if (System.currentTimeMillis() > this.oldTime  + 2000){
 				this.oldTime = System.currentTimeMillis();
-				System.out.println("dynamic cache:" + this.tilesQueue.size()  + " static cache:" + this.tiles.size() + " requests:" + this.requests.size());
 			}
 			if (this.requests.size() == 0) {
 				try {
@@ -104,6 +103,7 @@ public class TileLoader extends Thread implements Serializable {
 	private InputStream getBGImageStream(double topX, double topY, double xSize, double ySize, int pxSize, int pySize) throws IOException{
 		Socket socket = new Socket("localhost", 8080);
 		String query = "GET /?x="+topX+"&y="+topY+"&xSize="+xSize+"&ySize="+ySize+"&pxSize="+pxSize+"&pySize="+pySize;
+//		System.out.println("http://localhost:8080/?x="+topX+"&y="+topY+"&xSize="+xSize+"&ySize="+ySize+"&pxSize="+pxSize+"&pySize="+pySize);
 		OutputStream os = socket.getOutputStream();
 		os.write(query.getBytes());
 		os.write("\r\n".getBytes());

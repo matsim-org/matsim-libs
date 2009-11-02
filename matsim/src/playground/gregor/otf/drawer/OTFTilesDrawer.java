@@ -57,7 +57,7 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 	
 	
 	public OTFTilesDrawer() {
-
+		
 		this.loader = new TileLoader(this.tilesMap);
 		this.loader.start();
 		this.powerLookUp = new double [16];
@@ -75,7 +75,7 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 		calcCurrentZoom();
 				
 		recalcView(gl);
-
+		log.debug("on:" + this.offsetNorth + " oe:" + this.offsetEast);
 		
 		for (Tile t : this.currentView) {
 			drawTile(t,gl);
@@ -201,6 +201,8 @@ public class OTFTilesDrawer extends AbstractBackgroundDrawer implements Serializ
 		gl.glTexCoord2f(tx2, ty1); gl.glVertex3f(t.tX+t.sX,t.tY+t.sY, z);
 		gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(t.tX, t.tY+t.sY, z);
 		gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(t.tX, t.tY, z);
+//		log.debug("(" + (t.tX +t.sX) + "," + t.tY + ")  " + "(" + (t.tX +t.sX) + "," + (t.tY+t.sY) + ")  " + "(" + (t.tX) + "," + (t.tY+t.sY) + ")  " +  "(" + (t.tX) + "," + (t.tY) + ")  ");
+		
 		gl.glEnd();
 		t.getTex().disable();
 	

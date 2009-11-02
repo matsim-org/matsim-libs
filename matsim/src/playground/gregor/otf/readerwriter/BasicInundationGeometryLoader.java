@@ -84,6 +84,12 @@ public class BasicInundationGeometryLoader {
 		this.fts = new ArrayList<Feature>();
 		FloodingReader fl = new FloodingReader(this.netcdf);
 		fl.setReadTriangles(true);
+		fl.setReadFloodingSeries(true);
+		double offsetEast = 632968.461027224;
+		double offsetNorth = 9880201.726;
+		fl.setOffset(offsetEast, offsetNorth);
+		
+		
 		List<int[]> tris = fl.getTriangles();
 		this.fis = fl.getFloodingInfos();
 		this.mapping = fl.getIdxMapping();

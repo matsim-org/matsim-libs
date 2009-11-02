@@ -10,10 +10,12 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.gregor.MY_STATIC_STUFF;
@@ -52,7 +54,7 @@ public class OTFSnapshotGenerator {
 		this.scenario.getConfig().simulation().setEndTime(4*3600+30*60);
 		
 		this.scenario.getConfig().evacuation().setBuildingsFile("../../inputs/networks/evac_zone_buildings_v20090728.shp");
-		this.scenario.getConfig().evacuation().setSampleSize("0.1");
+//		this.scenario.getConfig().evacuation().setSampleSize("0.1");
 //		this.scenario.getConfig().controler().setLastIteration(75);
 		int it = this.scenario.getConfig().controler().getLastIteration();
 		sl.loadNetwork();
@@ -105,6 +107,10 @@ public class OTFSnapshotGenerator {
 		
 		
 		PositionInfo.lsTree = new LineStringTree(getFeatures(),this.scenario.getNetwork());
+		
+		
+		this.scenario.getNetwork().createAndAddNode(new IdImpl("minXY"), new CoordImpl(643000,9870000));//HACK to get the bounding box big enough; 
+		//otherwise we could get negative openGL coords since we calculating offsetEast, offsetNorth based on this bounding box
 		
 		MVISnapshotWriter writer = new MVISnapshotWriter(this.scenario);
 		writer.addSimpleBackgroundTextureDrawer(sbg);

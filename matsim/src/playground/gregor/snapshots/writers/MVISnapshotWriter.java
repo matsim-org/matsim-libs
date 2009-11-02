@@ -28,9 +28,11 @@ import java.util.Map;
 import org.geotools.data.FeatureSource;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
@@ -88,6 +90,8 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 
 	public MVISnapshotWriter(final QueueNetwork net, final String vehFileName, final String outFileName, final double intervall_s) {
 		super(intervall_s, net, outFileName);
+		net.getNetworkLayer().createAndAddNode(new IdImpl("minXY"), new CoordImpl(643000,9880000));//HACK to get the bounding box big enough; 
+		//otherwise we could get negative openGL coords since we calculating offsetEast, offsetNorth based on this bounding box
 //		this.vehFileName = vehFileName;
 		//this.outFileName = outFileName;
 	}
@@ -95,6 +99,7 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 
 	public MVISnapshotWriter(ScenarioImpl sc) {
 		super(sc.getConfig().simulation().getSnapshotPeriod(),new QueueNetwork(sc.getNetwork()),"../../outputs/output/movie.mvi");
+		
 	}
 
 
