@@ -112,15 +112,15 @@ public class GraphAnalyser {
 		/*
 		 * components
 		 */
-		SortedSet<Set<Vertex>> components = Partitions.disconnectedComponents(g); 
-		double numComponents = components.size();
-		logger.info(String.format("Number of disconnected components is %1$s.", numComponents));
-		if(output != null) {
-			Distribution stats = new Distribution();
-			for(Set<Vertex> component : components)
-				stats.add(component.size());
-			Distribution.writeHistogram(stats.absoluteDistribution(), output + "components.hist.txt");
-		}
+//		SortedSet<Set<Vertex>> components = Partitions.disconnectedComponents(g); 
+//		double numComponents = components.size();
+//		logger.info(String.format("Number of disconnected components is %1$s.", numComponents));
+//		if(output != null) {
+//			Distribution stats = new Distribution();
+//			for(Set<Vertex> component : components)
+//				stats.add(component.size());
+//			Distribution.writeHistogram(stats.absoluteDistribution(), output + "components.hist.txt");
+//		}
 				
 		GraphDistance gDistance = new GraphStatistics.GraphDistance();
 		if(extended) {
@@ -163,9 +163,9 @@ public class GraphAnalyser {
 			writer.write(String.valueOf(dcorrelation));
 			writer.newLine();
 			
-			writer.write("components=");
-			writer.write(String.valueOf(numComponents));
-			writer.newLine();
+//			writer.write("components=");
+//			writer.write(String.valueOf(numComponents));
+//			writer.newLine();
 
 			writer.write("betweenness=");
 			writer.write(String.valueOf(gDistance.getGraphBetweenness()));

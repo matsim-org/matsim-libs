@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KMLSnowballVertexStyle.java
+ * SpatialGraphProjection.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,51 +19,48 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
-import gnu.trove.TDoubleObjectHashMap;
-import net.opengis.kml._2.LinkType;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle;
+import org.matsim.api.basic.v01.Coord;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+
+import playground.johannes.socialnetworks.graph.Edge;
+import playground.johannes.socialnetworks.graph.GraphProjection;
+import playground.johannes.socialnetworks.graph.Vertex;
+import playground.johannes.socialnetworks.graph.VertexDecorator;
+import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
+import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.spatial.Zone;
 
 /**
  * @author illenberger
  *
  */
-public class KMLSnowballVertexStyle extends KMLVertexColorStyle<SampledGraph, SampledVertex> {
+public class SpatialGraphProjection <G extends SpatialGraph, V extends SpatialVertex, E extends SpatialEdge> extends GraphProjection<G, V, E> {
 
-	/**
-	 * @param vertexIconLink
-	 */
-	public KMLSnowballVertexStyle(LinkType vertexIconLink) {
-		super(vertexIconLink);
-		// TODO Auto-generated constructor stub
+	private Zone zone;
+	
+	public SpatialGraphProjection(G delegate, Zone zone) {
+		super(delegate);
+		
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle#getValues(playground.johannes.socialnetworks.graph.Graph)
-	 */
 	@Override
-	protected TDoubleObjectHashMap<String> getValues(SampledGraph graph) {
-		
-		TDoubleObjectHashMap<String> values = new TDoubleObjectHashMap<String>();
-		for(SampledVertex v : graph.getVertices()) {
-			values.put(v.getIterationSampled(), String.valueOf(v.getIterationSampled()));
+	public void decorate() {
+		GeometryFactory factory = new GeometryFactory();
+		for(Vertex v : getDelegate().getVertices()) {
+			Coord c = ((V)v).getCoordinate();
+			if(zone.getBorder().contains(factory.createPoint(new Coordinate(c.getX(), c.getY()))))
+				addVertex((V) v);
 		}
-		values.put(1.0, "1.0");
 		
-		return values;
-	}
-
-	@Override
-	public String getObjectSytleId(SampledVertex object) {
-		return String.valueOf(object.getIterationSampled());
-	}
-
-	/* (non-Javadoc)
-	 * @see playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle#getValue(playground.johannes.socialnetworks.graph.Vertex)
-	 */
-	@Override
-	protected double getValue(SampledVertex vertex) {
-		// TODO Auto-generated method stub
-		return 0;
+		for(Edge e : getDelegate().getEdges()) {
+			VertexDecorator<V> v1 = getVertex((V) e.getVertices().getFirst());
+			VertexDecorator<V> v2 = getVertex((V) e.getVertices().getSecond());
+			if(v1 != null && v2 != null)
+				addEdge(v1, v2, (E) e);
+		}
 	}
 
 }

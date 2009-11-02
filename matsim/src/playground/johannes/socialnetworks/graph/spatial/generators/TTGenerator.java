@@ -39,7 +39,6 @@ import org.xml.sax.SAXException;
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmDensity;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
-import playground.johannes.socialnetworks.graph.mcmc.ErgmTriangles;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeFlip;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
@@ -55,9 +54,9 @@ import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
  * @author illenberger
  *
  */
-public class GravityGenerator {
+public class TTGenerator {
 
-	private static final Logger logger = Logger.getLogger(GravityGenerator.class);
+	private static final Logger logger = Logger.getLogger(TTGenerator.class);
 	
 	private static final String MODULE_NAME = "gravityGenerator";
 	
@@ -77,21 +76,21 @@ public class GravityGenerator {
 			graph = reader.readGraph(graphFile);
 		}
 
-		GravityGenerator generator = new GravityGenerator();
+		TTGenerator generator = new TTGenerator();
 		generator.randomSeed = Long.parseLong(config.getParam("global", "randomSeed"));
 		
 		generator.thetaDensity = Double.parseDouble(config.getParam(MODULE_NAME, "theta_density"));
-		generator.thetaTriangle = Double.parseDouble(config.getParam(MODULE_NAME, "theta_triangle"));
-		generator.k_mean = Double.parseDouble(config.getParam(MODULE_NAME, "meanDegree"));
+//		generator.thetaTriangle = Double.parseDouble(config.getParam(MODULE_NAME, "theta_triangle"));
+	
 		generator.burnin = (long)Double.parseDouble(config.getParam(MODULE_NAME, "burnin"));
 
 		generator.logInterval = (long)Double.parseDouble(config.getParam(MODULE_NAME, "loginterval"));
 		generator.sampleInterval = (long)Double.parseDouble(config.getParam(MODULE_NAME, "sampleinterval"));
 		generator.outputDir = config.getParam(MODULE_NAME, "output");
-		generator.descretization = Double.parseDouble(config.getParam(MODULE_NAME, "descretization"));
+//		generator.descretization = Double.parseDouble(config.getParam(MODULE_NAME, "descretization"));
 		
-		generator.reweightBoundaries = Boolean.parseBoolean(config.getParam(MODULE_NAME, "boundaries"));
-		generator.reweightDensity = Boolean.parseBoolean(config.getParam(MODULE_NAME, "popdensity"));
+//		generator.reweightBoundaries = Boolean.parseBoolean(config.getParam(MODULE_NAME, "boundaries"));
+//		generator.reweightDensity = Boolean.parseBoolean(config.getParam(MODULE_NAME, "popdensity"));
 		
 //		String gridFile = config.findParam(MODULE_NAME, "densityGrid");
 //		SpatialGrid<Double> densityGrid = null;
@@ -130,19 +129,19 @@ public class GravityGenerator {
 	
 	private double thetaDensity;
 	
-	private double thetaTriangle;
+	private TravelTimeMatrix ttmatrix;
 	
-	private double k_mean;
+//	private double thetaTriangle;
 	
-	private double descretization = 1000.0;
+//	private final double thetaGravity = 1;
+	
+//	private double descretization = 1000.0;
 	
 	private long randomSeed;
 	
-	private boolean reweightDensity = true;
+//	private boolean reweightDensity = true;
 	
-	private boolean reweightBoundaries = true;
-	
-	private TravelTimeMatrix ttmatrix;
+//	private boolean reweightBoundaries = true;
 	
 	public void generate(SpatialGraph graph, ZoneLayerDouble zones, RandomWalkType type) {
 		/*
@@ -158,17 +157,8 @@ public class GravityGenerator {
 		density.setTheta(thetaDensity);
 		terms.add(density);
 		
-		ErgmGravity gravity = new ErgmGravity(matrix, descretization, reweightBoundaries, reweightDensity, k_mean); //FIXME
-//		gravity.setTheta(k_mean);
-//		gravity.setReweightBoundaries(reweightBoundaries);
-//		gravity.setReweightDensity(reweightDensity);
-		terms.add(gravity);
-		
-		if (type == RandomWalkType.flip) {
-			ErgmTriangles triangle = new ErgmTriangles();
-			triangle.setTheta(thetaTriangle);
-			terms.add(triangle);
-		}
+		ErgmTerm tt = new ErgmTravelTime(matrix, zones, ttmatrix);
+		terms.add(tt);
 		
 		Ergm ergm = new Ergm();
 		ergm.setErgmTerms(terms.toArray(new ErgmTerm[1]));

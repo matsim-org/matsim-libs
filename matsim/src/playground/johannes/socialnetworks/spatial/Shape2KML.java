@@ -19,7 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.spatial;
 
+import gnu.trove.TObjectDoubleHashMap;
+
 import java.io.IOException;
+import java.util.HashSet;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author illenberger
@@ -32,10 +37,36 @@ public class Shape2KML {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		GeometryLayer layer = GeometryLayer.creatFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+		ZoneLayer layer = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+		ZoneLayerDouble densityLayer = ZoneLayerDouble.createFromFile(new HashSet<Zone>(layer.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
 		ZoneLayerKMLWriter writer = new ZoneLayerKMLWriter();
-		writer.write(layer, "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.kml");
+		
+		TObjectDoubleHashMap<Geometry> geoValues = new TObjectDoubleHashMap<Geometry>();
+		
+		for(Zone z_j : densityLayer.getZones()) {
+			double tt = densityLayer.getValue(z_j);
+			geoValues.put(z_j.getBorder(), tt);
+		}
+		
+		writer.write(layer.getGeometryLayer(), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.kml", geoValues);
 
 	}
 
+	
+//	public static void main(String[] args) throws IOException {
+//		ZoneLayer zoneLayer = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+//		TravelTimeMatrix matrix = TravelTimeMatrix.createFromFile(new HashSet<Zone>(zoneLayer.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/ttmatrix.txt");
+//		
+//		Zone z_i = matrix.getZones().iterator().next();
+//		
+//		TObjectDoubleHashMap<Geometry> geoValues = new TObjectDoubleHashMap<Geometry>();
+//		
+//		for(Zone z_j : matrix.getZones()) {
+//			double tt = matrix.getTravelTime(z_i, z_j);
+//			geoValues.put(z_j.getBorder(), tt);
+//		}
+//		
+//		ZoneLayerKMLWriter writer = new ZoneLayerKMLWriter();
+//		writer.write(zoneLayer.getGeometryLayer(), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/traveltimes.kml", geoValues);
+//	}
 }

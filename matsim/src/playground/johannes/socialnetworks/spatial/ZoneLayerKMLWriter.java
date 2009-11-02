@@ -19,12 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.spatial;
 
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
-import org.matsim.vis.kml.KMZWriter;
+import java.awt.Color;
 
+import gnu.trove.TDoubleObjectHashMap;
+import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectDoubleIterator;
 import net.opengis.kml._2.BoundaryType;
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.FolderType;
@@ -32,7 +31,17 @@ import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.LinearRingType;
 import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.PolyStyleType;
 import net.opengis.kml._2.PolygonType;
+import net.opengis.kml._2.StyleType;
+
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.vis.kml.KMZWriter;
+
+import playground.johannes.socialnetworks.graph.social.util.ColorUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -47,10 +56,36 @@ public class ZoneLayerKMLWriter {
 	
 	private CoordinateTransformation transform = new CH1903LV03toWGS84();
 	
-	public void write(GeometryLayer zoneLayer, String filename) {
+	public void write(GeometryLayer zoneLayer, String filename, TObjectDoubleHashMap<Geometry> geoValues) {
+		
 		KMZWriter kmzWriter = new KMZWriter(filename);
 		DocumentType documentType = objectFactory.createDocumentType();
 		FolderType polyFolderType = objectFactory.createFolderType();
+		
+		double minVal = Double.MAX_VALUE;
+		double maxVal = Double.MIN_VALUE;
+		TObjectDoubleIterator<Geometry> it = geoValues.iterator();
+		for(int i = 0; i < geoValues.size(); i++) {
+			it.advance();
+			minVal = Math.min(minVal, it.value());
+			maxVal = Math.max(maxVal, it.value());
+		}
+		TDoubleObjectHashMap<StyleType> styles = new TDoubleObjectHashMap<StyleType>();
+		for(int i = 0; i < 100; i++) {
+			PolyStyleType polyStyleType = objectFactory.createPolyStyleType();
+			Color c = ColorUtils.getHeatmapColor(i/(double)100);
+			
+			polyStyleType.setColor(new byte[]{(byte)200, (byte)c.getBlue(), (byte)c.getGreen(), (byte)c.getRed()});
+			polyStyleType.setOutline(false);
+			
+			StyleType styleType = objectFactory.createStyleType();
+			styleType.setPolyStyle(polyStyleType);
+			styleType.setId(Integer.toString((int)(i)));
+			documentType.getAbstractStyleSelectorGroup().add(objectFactory.createStyle(styleType));
+			styles.put(i, styleType);
+		}
+		
+		
 		polyFolderType.setName("Zonelayer");
 		
 		for(Geometry geometry : zoneLayer.getZones()) {
@@ -69,6 +104,10 @@ public class ZoneLayerKMLWriter {
 			
 			PlacemarkType polyPlacemarkType = objectFactory.createPlacemarkType();
 			polyPlacemarkType.setAbstractGeometryGroup(objectFactory.createPolygon(polygonType));
+			
+			double val = geoValues.get(geometry) - minVal;
+			val = val/(maxVal - minVal) * 99;
+			polyPlacemarkType.setStyleUrl(styles.get((int)val).getId());
 			
 			polyFolderType.getAbstractFeatureGroup().add(objectFactory.createPlacemark(polyPlacemarkType));
 		}

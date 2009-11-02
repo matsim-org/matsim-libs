@@ -38,7 +38,6 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphAnalyzer;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLDegreeStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
@@ -46,8 +45,11 @@ import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.PajekDistanceColorizer;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
+import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 import playground.johannes.socialnetworks.statistics.Distribution;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author illenberger
@@ -71,18 +73,24 @@ public class DumpHandler implements SampleHandler {
 	
 	private Distribution distance = new Distribution();
 	
-	private String outputDir;
+	protected String outputDir;
 	
 	private BufferedWriter writer;
 	
 //	private SpatialGrid<Double> densityGrid;
 	
-	private ZoneLayerDouble zones;
+	protected ZoneLayerDouble zones;
 	
-	public DumpHandler(String filename, ZoneLayerDouble zones) {
+	private TravelTimeMatrix matrix;
+	
+//	private Geometry boundary;
+	
+	public DumpHandler(String filename, ZoneLayerDouble zones, TravelTimeMatrix matrix) {
 		outputDir = filename;
+		this.matrix = matrix;
 //		this.densityGrid = densityGrid;
 		this.zones = zones;
+//		this.boundary = boundary;
 		try {
 			writer = new BufferedWriter(new FileWriter(filename + "samplestats.txt"));
 			writer.write("it\tm\t<k>\t<c_local>\t<c_global>\t<d>");
@@ -122,10 +130,10 @@ public class DumpHandler implements SampleHandler {
 		}
 		
 		if(iteration >= burnin) {
-			dump(y, iteration);
+			dump(y, iteration, matrix);
 			return false;
 		} else if (iteration % dumpInterval == 0 && iteration > 0) {
-			dump(y, iteration);
+			dump(y, iteration, matrix);
 			return true;
 		} else {
 			return true;
@@ -153,7 +161,7 @@ public class DumpHandler implements SampleHandler {
 		
 	}
 	
-	private void dump(AdjacencyMatrix y, long iteration) {
+	protected SpatialGraph dump(AdjacencyMatrix y, long iteration, TravelTimeMatrix matrix) {
 		logger.info("Dumping sample...");
 		
 		edges.add(y.getEdgeCount());
@@ -179,7 +187,7 @@ public class DumpHandler implements SampleHandler {
 			/*
 			 * graph analysis
 			 */
-			SpatialGraphAnalyzer.analyze(net, currentOutputDir, false, zones);
+			SpatialGraphAnalyzer.analyze(net, currentOutputDir, false, zones, matrix, null);
 			/*
 			 * graph output
 			 * 
@@ -211,5 +219,7 @@ public class DumpHandler implements SampleHandler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		return net;
 	}
 }

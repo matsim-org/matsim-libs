@@ -40,11 +40,14 @@ import playground.johannes.socialnetworks.graph.GraphAnalyser;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.Partitions;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
+import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.Zone;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.Distribution;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author illenberger
@@ -89,18 +92,22 @@ public class SpatialGraphAnalyzer {
 		if(!output.endsWith("/"))
 			output = output + "/";
 		
+//		ZoneLayer boundary = ZoneLayer.createFromShapeFile("");
+//		Geometry geo = boundary.getZones().iterator().next().getBorder();
+		Geometry geo = null;
 		ZoneLayer zones = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
 		ZoneLayerDouble density = ZoneLayerDouble.createFromFile(new HashSet<Zone>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
+		TravelTimeMatrix matrix = TravelTimeMatrix.createFromFile(new HashSet<Zone>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/ttmatrix.txt");
 //		if(gridfile != null)
 //			grid = SpatialGrid.readFromFile(gridfile);
 		
-		analyze(g, output, extended, density);
+		analyze(g, output, extended, density, matrix, geo);
 //		throw new RuntimeException("To be fixed...");
 		
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void analyze(SpatialGraph graph, String output, boolean extended, ZoneLayerDouble zones) {
+	public static void analyze(SpatialGraph graph, String output, boolean extended, ZoneLayerDouble zones, TravelTimeMatrix matrix, Geometry boundary) {
 		GraphAnalyser.analyze(graph, output, extended);
 
 		double binsize = 1000.0;
@@ -119,16 +126,17 @@ public class SpatialGraphAnalyzer {
 				/*
 				 * edge length histogram
 				 */
-				Distribution.writeHistogram(edgeLengthDistr.absoluteDistribution(binsize), output + "edgelength.hist.txt");
-//				Distribution.writeHistogram(SpatialGraphStatistics.normalizedEdgeLengthDistribution(graph.getVertices(), binsize).absoluteDistribution(binsize), output + "edgelength.norm.hist.txt");
+				Distribution.writeHistogram(edgeLengthDistr.absoluteDistribution(binsize), output + "distance.txt");
+				Distribution.writeHistogram(edgeLengthDistr.normalizedDistribution(edgeLengthDistr.absoluteDistributionLog2(1000)), output + "distance.log2.norm.txt");
 				/*
 				 * degree correlation
 				 */
-				Correlations.writeToFile(SpatialGraphStatistics.edgeLengthDegreeCorrelation(graph), output + "edgelength_k.txt", "k", "edgelength");
+				Correlations.writeToFile(SpatialGraphStatistics.edgeLengthDegreeCorrelation(graph), output + "distance_k.txt", "k", "distance");
 				Correlations.writeToFile(GraphStatistics.clusteringDegreeCorrelation(graph), output + "c_k.txt", "k", "c");
 				Correlations.writeToFile(SpatialGraphStatistics.degreeCenterDistanceCorrelation(graph.getVertices(), binsize), output + "k_center.txt", "dx", "k");
 				Correlations.writeToFile(SpatialGraphStatistics.edgeLengthCenterDistanceCorrelation(graph.getVertices(), binsize), output + "d_center.txt", "dx", "c");
 				Correlations.writeToFile(SpatialGraphStatistics.clusteringCenterDistanceCorrelation(graph.getVertices(), binsize), output + "c_center.txt", "dx", "d");
+				Correlations.writeToFile(GraphStatistics.degreeCorrelation(SpatialGraphStatistics.meanEdgeLength(graph.getVertices())), output+"<d>_k.txt", "k", "<distance>");
 				/*
 				 * density correlations
 				 */
@@ -138,7 +146,33 @@ public class SpatialGraphAnalyzer {
 					Correlations.writeToFile(SpatialGraphStatistics.clusteringDensityCorrelation(
 							graph.getVertices(), zones, binsize), output + "c_rho.txt", "density", "c");
 					Correlations.writeToFile(SpatialGraphStatistics.densityCorrelation(
-							SpatialGraphStatistics.meanEdgeLength(graph), zones, binsize), output + "edgelength_rho.txt", "rho", "mean_edgelength");
+							SpatialGraphStatistics.meanEdgeLength(graph), zones, binsize), output + "distance_rho.txt", "rho", "<d>");
+				}
+				/*
+				 * reachablity
+				 */
+				if(zones != null && matrix != null) {
+//					Distribution.writeHistogram(SpatialGraphStatistics.travelTimeDistribution(graph.getVertices(), zones, matrix).absoluteDistribution(60), output+"traveltime.txt");
+//					
+//					ZoneLayerDouble reachability = Reachability.createReachablityTable(matrix, zones);
+//					Correlations.writeToFile(Reachability.degreeCorrelation(graph.getVertices(), reachability), output+"k_reach.txt", "reachability", "k");
+//					
+//					TObjectDoubleHashMap<? extends SpatialVertex> values = SpatialGraphStatistics.meanTravelTime(graph.getVertices(), zones, matrix);
+//					Correlations.writeToFile(GraphStatistics.degreeCorrelation(values), output+"<tt>_k.txt", "k", "<tt>");
+//					Correlations.writeToFile(SpatialGraphStatistics.densityCorrelation(values, zones, binsize), output+"<tt>_rho.txt", "rho", "<tt>");
+//					Correlations.writeToFile(Reachability.correlation(values, reachability), output+"<tt>_reach.txt", "reachability", "<tt>");
+//					
+//					Correlations.writeToFile(
+//									Reachability.degreeDistanceReachabilityCorrelation(Reachability
+//													.distanceReachability(graph.getVertices(),
+//															Reachability.createDistanceReachabilityTable(zones))),
+//									output + "k_dreach.txt",
+//									"distance_reachability", "k");
+					
+					Distribution distr = SpatialGraphStatistics.normalizedEdgeLengthDistribution(graph.getVertices(), graph, 1000, zones);
+					Distribution.writeHistogram(distr.absoluteDistribution(1000), output + "distance.norm.txt");
+					Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionLog2(1000)), output + "distance.norm.log2.norm.txt");
+//					Distribution.writeHistogram(Reachability.normalizedTravelTimeDistribution(graph.getVertices(), zones, matrix).absoluteDistribution(60), output+"traveltime.norm.txt");
 				}
 				/*
 				 * degree partitions

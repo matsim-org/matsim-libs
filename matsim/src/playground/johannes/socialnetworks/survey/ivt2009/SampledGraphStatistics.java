@@ -27,6 +27,7 @@ import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.spatial.ZoneLayer;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
@@ -47,11 +48,15 @@ public class SampledGraphStatistics {
 		return SpatialGraphStatistics.edgeLengthDistribution((Set)SnowballPartitions.createSampledPartition(g.getVertices()));
 	}
 	
+	public static <V extends SpatialVertex & SampledVertex> Distribution edgeLenghtDistribution(SampledGraph g, ZoneLayer zones) {
+		return SpatialGraphStatistics.edgeLengthDistribution((Set)SnowballPartitions.createSampledPartition(g.getVertices()), zones);
+	}
+	
 	public static <V extends SpatialVertex & SampledVertex> TDoubleDoubleHashMap edgeLengthDegreeCorrelation(Set<V> vertices) {
 		return SpatialGraphStatistics.edgeLengthDegreeCorrelation(SnowballPartitions.createSampledPartition(vertices));
 	}
 	
-	public static Distribution normalizedEdgeLengthDistribution(SampledSocialNet<?> g, SpatialGraph g2, double descretization) {
-		return SpatialGraphStatistics.normalizedEdgeLengthDistribution((Set) SnowballPartitions.createSampledPartition(g.getVertices()), g2, descretization);
-	}
+//	public static Distribution normalizedEdgeLengthDistribution(SampledSocialNet<?> g, SpatialGraph g2, double descretization) {
+//		return SpatialGraphStatistics.normalizedEdgeLengthDistribution((Set) SnowballPartitions.createSampledPartition(g.getVertices()), g2, descretization);
+//	}
 }

@@ -161,7 +161,7 @@ public class MCMCRandomGraphGenerator {
 		
 		sampler.setInterval(1000000);
 		
-		DumpHandler handler = new DumpHandler(outputDir, null);
+		DumpHandler handler = new DumpHandler(outputDir, null, null);
 		handler.setBurnin(burnin);
 		handler.setDumpInterval(sampleInterval);
 		handler.setLogInterval(logInterval);

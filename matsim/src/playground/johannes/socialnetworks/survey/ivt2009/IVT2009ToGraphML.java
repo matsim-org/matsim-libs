@@ -237,9 +237,9 @@ public class IVT2009ToGraphML {
 		double d_mean = edgeLengthDistr.mean();
 		logger.info("Mean edge length is " + d_mean);
 	
-		Distribution edgeLengthDistrNorm = SpatialGraphStatistics.normalizedEdgeLengthDistribution(egoSet, 1000);
-		double d_mean_norm = edgeLengthDistrNorm.mean();
-		logger.info("Normalized mean edge length is " + d_mean_norm);
+//		Distribution edgeLengthDistrNorm = SpatialGraphStatistics.normalizedEdgeLengthDistribution(egoSet, 1000);
+//		double d_mean_norm = edgeLengthDistrNorm.mean();
+//		logger.info("Normalized mean edge length is " + d_mean_norm);
 		
 		SpatialGrid<Double> densityGrid = null;
 		if(args[2] != null)
@@ -247,7 +247,7 @@ public class IVT2009ToGraphML {
 
 		if(output != null) {
 			Distribution.writeHistogram(edgeLengthDistr.absoluteDistribution(1000), output + "edgelength.hist.txt");
-			Distribution.writeHistogram(edgeLengthDistrNorm.absoluteDistribution(1000), output + "edgelength.norm.hist.txt");
+//			Distribution.writeHistogram(edgeLengthDistrNorm.absoluteDistribution(1000), output + "edgelength.norm.hist.txt");
 			Correlations.writeToFile(SpatialGraphStatistics.edgeLengthDegreeCorrelation(egoSet), output + "edgelength_k.txt", "k", "edge length");
 			
 			if(densityGrid != null) {

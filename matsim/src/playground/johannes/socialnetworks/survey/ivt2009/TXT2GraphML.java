@@ -19,24 +19,27 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
+import gnu.trove.TIntIntHashMap;
+import gnu.trove.TIntIntIterator;
 import gnu.trove.TIntObjectHashMap;
+import gnu.trove.TIntObjectIterator;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
+import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
+import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraphBuilder;
 import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraphMLWriter;
 import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialVertex;
-import playground.wrashid.tryouts.performance.SatawalLockTest1;
-import samples.preview_new_graphdraw.impl.GraphLayoutPanelMouseListener.NoEventPolicy;
 
 /**
  * @author illenberger
@@ -112,6 +115,14 @@ public class TXT2GraphML {
 		int nocoord = 0;
 		int alterIdCounter = 100000;
 		int egoNotFound = 0;
+		
+		TIntIntHashMap egoDegree = new TIntIntHashMap();
+		TIntObjectIterator<SampledSpatialVertex> it = vertexIds.iterator();
+		for(int i = 0; i< vertexIds.size(); i++) {
+			it.advance();
+			egoDegree.put(it.key(), 0);
+		}
+		
 		while((line = reader.readLine()) != null) {
 			tokens = line.split(TAB);
 			
@@ -150,6 +161,8 @@ public class TXT2GraphML {
 					if (alter != null) {
 						if(builder.addEdge(graph, ego, alter) == null)
 							doubleedges++;
+						else
+							egoDegree.adjustOrPutValue(egoId, 1, 1);
 					}
 //					} else {
 //						alterdropped++;
@@ -161,6 +174,16 @@ public class TXT2GraphML {
 //			}
 			}
 		}
+		
+		TIntIntIterator it2 = egoDegree.iterator();
+		for(int i = 0; i < egoDegree.size(); i++) {
+			it2.advance();
+			if(it2.value() == 0) {
+				logger.warn(String.format("Ego with id %1$s named no contacts. Marking as not sampled...", it2.key()));
+				vertexIds.get(it2.key()).sample(-1);
+			}
+		}
+		
 		logger.info(String.format("Built %1$s alters. %2$s alters named at least twice. %3$s doubled edges.", altercount, alterDoubled, doubleedges));
 		logger.info(String.format("Dropped %1$s alters because ego not found.", egoNotFound));
 		logger.info(String.format("Dropped %1$s alters becuase no coordinates are avaiable.", nocoord));
@@ -169,6 +192,15 @@ public class TXT2GraphML {
 		 */
 		SampledSpatialGraphMLWriter writer = new SampledSpatialGraphMLWriter();
 		writer.write(graph, args[2]);
+		
+		KMLWriter kmlwriter = new KMLWriter();
+		kmlwriter.setCoordinateTransformation(new CH1903LV03toWGS84());
+		kmlwriter.setDrawEdges(false);
+		kmlwriter.setVertexStyle(new KMLSnowballVertexStyle(kmlwriter.getVertexIconLink()));
+//		writer.setVertexStyle(new KMLDegreeStyle(writer.getVertexIconLink()));
+//		writer.setVertexDescriptor(new KMLSnowballDescriptor());
+		kmlwriter.setVertexDescriptor(new KMLVertexDescriptor(graph));
+		kmlwriter.write(graph, args[2] + ".kmz");
 	}
 	
 	private static int getIndex(String header, String[] tokens) {
@@ -191,10 +223,10 @@ public class TXT2GraphML {
 			return transform.transform(new CoordImpl(longitude, latitude));
 		} else {
 			logger.warn("No coordinates available!");
-			return null;
+			return new CoordImpl(0, 0);
 		}
 		} catch (ArrayIndexOutOfBoundsException e) {
-			return null;
+			return new CoordImpl(0, 0);
 		}
 	}
 }

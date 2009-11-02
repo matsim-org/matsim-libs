@@ -60,6 +60,10 @@ public class ZoneLayer {
 		geoLayer = new GeometryLayer(this.zones.keySet());
 	}
 	
+	public GeometryLayer getGeometryLayer() {
+		return geoLayer;
+	}
+	
 	public Zone getZone(Coord c) {
 		Geometry g = geoLayer.getZone(c);
 		return zones.get(g);

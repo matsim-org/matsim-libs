@@ -20,8 +20,12 @@
 package playground.johannes.socialnetworks.spatial;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -48,6 +52,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class TTMatrixGenerator {
 
+	private static final double startTime = 6*60*60;
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -98,7 +103,7 @@ public class TTMatrixGenerator {
 		int threads = Runtime.getRuntime().availableProcessors();
 		RunThread[] runThreads = new RunThread[threads];
 		for(int i = 0; i < threads; i++) {
-			runThreads[i] = new RunThread(network, zones, matrix, ttCalculator);
+			runThreads[i] = new RunThread(network, zones, zoneLayer, matrix, ttCalculator);
 			runThreads[i].start();
 		}
 		for(int i = 0; i < threads; i++) {
@@ -124,7 +129,9 @@ public class TTMatrixGenerator {
 		
 		private static int total;
 		
-		public RunThread(NetworkLayer network, Queue<Zone> zones, TravelTimeMatrix matrix, final TravelTimeCalculator ttCalculator) {
+		private Map<Zone, Set<Node>> nodeMapping;
+		
+		public RunThread(NetworkLayer network, Queue<Zone> zones, ZoneLayer zoneLayer, TravelTimeMatrix matrix, final TravelTimeCalculator ttCalculator) {
 			total = zones.size() * zones.size();
 			this.network = network;
 			this.zones = zones;
@@ -135,6 +142,21 @@ public class TTMatrixGenerator {
 					return ttCalculator.getLinkTravelTime(link, time);
 				}
 			}, ttCalculator);
+		
+			nodeMapping = new HashMap<Zone, Set<Node>>();
+			for(Node node : network.getNodes().values()) {
+				Zone zone = zoneLayer.getZone(node.getCoord());
+				if(zone != null) {
+					Set<Node> nodes = nodeMapping.get(zone);
+					if (nodes == null) {
+						nodes = new HashSet<Node>();
+						nodeMapping.put(zone, nodes);
+					}
+					nodes.add(node);
+				} else {
+					logger.warn(String.format("Node %1$s is not located in a zone.", node.getId().toString()));
+				}
+			}
 		}
 		
 		public void run() {
@@ -144,17 +166,55 @@ public class TTMatrixGenerator {
 				Point p_i = z_i.getBorder().getCentroid();
 				Node l_i = network.getNearestNode(new CoordImpl(p_i.getX(), p_i.getY()));
 				for(Zone z_j : matrix.getZones()) {
-					Point p_j = z_j.getBorder().getCentroid();
-					Node l_j = network.getNearestNode(new CoordImpl(p_j.getX(), p_j.getY()));
-					
-					double tt = router.calcLeastCostPath(l_i, l_j, 6*60*60).travelTime;
-					matrix.setTravelTime(z_i, z_j, tt);
+					if(z_i == z_j) {
+						double ttSum = 0;
+						int i = 0;
+						int count = 10;
+						Set<Node> nodes = nodeMapping.get(z_i);
+						if(nodes == null) {
+							matrix.setTravelTime(z_i, z_j, 0.0);
+						} else {
+						logger.info(String.format("Number of nodes in zone = %1$s", nodes.size()));
+						for(Iterator<Node> it = nodes.iterator(); it.hasNext();) {
+							Node o = it.next();
+							if(it.hasNext()) {
+								Node d = it.next();
+								ttSum += router.calcLeastCostPath(o, d, startTime).travelTime;
+								i++;
+								if(i > count)
+									break;
+							}
+						}
+						double tt = ttSum/(double)i;
+						if(Double.isInfinite(tt)) {
+							tt = 0.0;
+							logger.warn("Travel time was infinity, set to zero.");
+						} else if(Double.isNaN(tt)) {
+							tt = 0.0;
+							logger.warn("Travel time was NaN, set to zero.");
+						}
+						matrix.setTravelTime(z_i, z_j, tt);
+						}
+					} else {
+						double tt = calcInterCellTT(z_j, l_i);
+						matrix.setTravelTime(z_i, z_j, tt);
+					}
 					n++;
 					if(n % 1000 == 0)
 						logger.info(String.format("%1$s of %2$s done (%3$.2f).", n, total, n/(float)total));
 				}
 			}
 		}
+		
+		private double calcInterCellTT(Zone z_j, Node l_i) {
+			Point p_j = z_j.getBorder().getCentroid();
+			Node l_j = network.getNearestNode(new CoordImpl(p_j
+					.getX(), p_j.getY()));
+
+			return router.calcLeastCostPath(l_i, l_j,
+					startTime).travelTime;
+		}
 	}
 
+	
 }

@@ -19,9 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
-import gnu.trove.TDoubleIntHashMap;
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TDoubleObjectIterator;
+import gnu.trove.TIntDoubleHashMap;
+import gnu.trove.TIntIntHashMap;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,12 +31,11 @@ import java.util.Set;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.Zone;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
+import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 import playground.johannes.socialnetworks.statistics.Distribution;
 import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraphMLReader;
@@ -81,24 +79,26 @@ public class TravelTimeHistogram {
 		 * read graph
 		 */
 		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
-		SampledSpatialGraph graph = reader.readGraph(config.getParam("tthistogram", "graph"));
+		SampledSpatialGraph graph = reader.readGraph("/Users/fearonni/vsp-work/work/socialnets/data/ivt2009/graph/graph.graphml");
 		/*
 		 * read zones
 		 */
-		ZoneLayer zoneLayer = ZoneLayer.createFromShapeFile("");
-		TravelTimeMatrix matrix = TravelTimeMatrix.createFromFile(new HashSet<Zone>(zoneLayer.getZones()), "");
+		ZoneLayer zoneLayer = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
+		TravelTimeMatrix matrix = TravelTimeMatrix.createFromFile(new HashSet<Zone>(zoneLayer.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/ttmatrix.txt");
 //		Population2SpatialGraph pop2graph = new Population2SpatialGraph();
-//		SpatialGraph graph2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.04.xml");
+//		SpatialGraph graph2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.02.xml");
 //		double bounds[] = graph2.getBounds();
 		/*
 		 * read grid
 		 */
-		SpatialGrid<Double> grid = SpatialGrid.readFromFile(config.getParam("tthistogram", "densityfile"));
+//		SpatialGrid<Double> grid = SpatialGrid.readFromFile(config.getParam("tthistogram", "densityfile"));
+//		ZoneLayer zones = ZoneLayer.createFromShapeFile("");
+		ZoneLayerDouble densityZones = ZoneLayerDouble.createFromFile(new HashSet<Zone>(zoneLayer.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
 		/*
 		 * get sampled partition
 		 */
 		Set<? extends SampledSpatialVertex> sbPartition = SnowballPartitions.createSampledPartition(graph.getVertices());
-		TDoubleObjectHashMap<?> partitions = SpatialGraphStatistics.createDensityPartitions(sbPartition, grid, 2000);
+//		TDoubleObjectHashMap<?> partitions = SpatialGraphStatistics.createDensityPartitions(sbPartition, densityZones, 2000);
 		
 		new File(output + "rhoPartitions").mkdirs();
 		
@@ -107,45 +107,73 @@ public class TravelTimeHistogram {
 		Distribution fastestNorm2 = new Distribution();
 		int counter=0;
 //		int starttime = Integer.parseInt(config.getParam("tthistogram", "starttime"));
-		TDoubleObjectIterator<?> it = partitions.iterator();
-		for(int i = 0; i < partitions.size(); i++) {
-			it.advance();
-			Set<SampledSpatialVertex> partition = (Set<SampledSpatialVertex>) it.value();
-			
-			Distribution rhoDistr = new Distribution();
+//		TDoubleObjectIterator<?> it = partitions.iterator();
+//		for(int i = 0; i < partitions.size(); i++) {
+//			it.advance();
+//			Set<SampledSpatialVertex> partition = (Set<SampledSpatialVertex>) it.value();
+		Set<SampledSpatialVertex> partition = (Set<SampledSpatialVertex>) sbPartition;
 
-			for(SpatialVertex v : partition) {
-				Zone z_i = zoneLayer.getZone(v.getCoordinate());
-				if(z_i != null) {
-				TDoubleIntHashMap n_i = new TDoubleIntHashMap();
-				for(SpatialVertex v2 : v.getNeighbours()) {
-					Zone z_j = zoneLayer.getZone(v2.getCoordinate());
+//		Distribution rhoDistr = new Distribution();
+		
+		double binsize = 300;
+		for (SpatialVertex v : partition) {
+			Zone z_i = zoneLayer.getZone(v.getCoordinate());
+			if (z_i != null) {
+
+				TIntDoubleHashMap areas = new TIntDoubleHashMap();
+				TIntIntHashMap n_i = new TIntIntHashMap();
+				for (Zone z_j : densityZones.getZones()) {
 					double tt = matrix.getTravelTime(z_i, z_j);
-					double bin = tt/300;
-					n_i.adjustOrPutValue(bin, 1, 1);
-
+					double a = z_j.getBorder().getArea() / (1000 * 1000);
+					int bin = (int)Math.ceil(tt/binsize);
+					
+					areas.adjustOrPutValue(bin, a, a);
+					
+					double rho = densityZones.getValue(z_j);
+					int n = (int)(a * rho);
+					n_i.adjustOrPutValue(bin, n, n);
 				}
 
-							
-				for(SpatialVertex v2 : v.getNeighbours()) {
-					Zone z_j = zoneLayer.getZone(v2.getCoordinate());
-
-					double tt = matrix.getTravelTime(z_i, z_j);
-					rhoDistr.add(tt);
-					fastest.add(tt);
-					fastestNorm.add(tt, 1/n_i.get(tt/300));
-					fastestNorm2.add(tt, (tt/300)/n_i.get(tt/300));
-				}
-				}
-				counter++;
-				System.out.println(String.format("Processed %1$s of %2$s vertices.", counter, graph.getVertices().size()));
-			}
-			
-			Distribution.writeHistogram(rhoDistr.absoluteDistribution(60), output + "rhoPartitions/traveltime." + it.key() + ".txt");
-			Distribution.writeHistogram(rhoDistr.absoluteDistributionLog2(60), output + "rhoPartitions/traveltime.log2." + it.key() + ".txt");
-			
-		}
 				
+//				for (SpatialVertex v2 : graph2.getVertices()) {
+//					Zone z_j = zoneLayer.getZone(v2.getCoordinate());
+//					if (z_j != null) {
+//						double tt = matrix.getTravelTime(z_i, z_j);
+//						double bin = tt / 300;
+//						n_i.adjustOrPutValue(bin, 1, 1);
+//					}
+//				}
+
+				for (SpatialVertex v2 : v.getNeighbours()) {
+					Zone z_j = zoneLayer.getZone(v2.getCoordinate());
+					if (z_j == null)
+						System.err.println("Zone is null");
+					else {
+						double tt = matrix.getTravelTime(z_i, z_j);
+						int bin = (int)Math.ceil(tt/binsize);
+//						rhoDistr.add(tt);
+						fastest.add(tt);
+						fastestNorm.add(tt, 1 / (double)n_i.get(bin));
+						double a = areas.get(bin);
+						fastestNorm2.add(tt, a / (double)n_i.get(bin));
+					}
+				}
+			} else {
+				System.err.println("Zone is null!");
+			}
+			counter++;
+			System.out.println(String.format(
+					"Processed %1$s of %2$s vertices.", counter, graph
+							.getVertices().size()));
+		}
+
+		// Distribution.writeHistogram(rhoDistr.absoluteDistribution(60), output
+		// + "rhoPartitions/traveltime." + it.key() + ".txt");
+		// Distribution.writeHistogram(rhoDistr.absoluteDistributionLog2(60),
+		// output + "rhoPartitions/traveltime.log2." + it.key() + ".txt");
+
+		// }
+
 		Distribution.writeHistogram(fastest.absoluteDistribution(60), output + "traveltime.txt");
 		Distribution.writeHistogram(fastest.absoluteDistributionLog2(60), output + "traveltime.log2.txt");
 		Distribution.writeHistogram(fastestNorm.absoluteDistribution(60), output + "traveltime.norm.txt");

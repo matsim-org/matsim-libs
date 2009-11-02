@@ -115,7 +115,7 @@ public class GravityAnnealer {
 		terms[0] = new ErgmDensity();
 		terms[0].setTheta(thetaDensity);
 		
-		ErgmGravity gravity = new ErgmGravity(matrix, descretization, true, true); //FIXME
+		ErgmGravity gravity = new ErgmGravity(matrix, descretization, true, true, thetaGravity); //FIXME
 		gravity.setTheta(thetaGravity);
 		gravity.setDescretization(descretization);
 		terms[1] = gravity;
@@ -133,7 +133,7 @@ public class GravityAnnealer {
 		GibbsEdgeSwitch sampler = new GibbsEdgeSwitch();
 		sampler.setInterval(1000000);
 		
-		DumpHandler handler = new DumpHandler(outputDir, null);
+		DumpHandler handler = new DumpHandler(outputDir, null, null);
 		handler.setBurnin(burnin);
 		handler.setDumpInterval(sampleInterval);
 		handler.setLogInterval(logInterval);

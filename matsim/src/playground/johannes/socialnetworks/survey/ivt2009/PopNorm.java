@@ -74,9 +74,9 @@ public class PopNorm {
 //			}
 //		}
 
-		Distribution distr = SpatialGraphStatistics.normalizedEdgeLengthDistribution(egos, g2, 1000);
-		Distribution.writeHistogram(distr.absoluteDistribution(1000), "/Users/fearonni/vsp-work/work/socialnets/mcmc/distance.norm.txt");
-		Distribution.writeHistogram(distr.absoluteDistributionLog2(1000), "/Users/fearonni/vsp-work/work/socialnets/mcmc/distance.normlog2.txt");
+//		Distribution distr = SpatialGraphStatistics.normalizedEdgeLengthDistribution(egos, g2, 1000);
+//		Distribution.writeHistogram(distr.absoluteDistribution(1000), "/Users/fearonni/vsp-work/work/socialnets/mcmc/distance.norm.txt");
+//		Distribution.writeHistogram(distr.absoluteDistributionLog2(1000), "/Users/fearonni/vsp-work/work/socialnets/mcmc/distance.normlog2.txt");
 	} 
 
 }

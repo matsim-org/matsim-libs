@@ -82,6 +82,7 @@ public abstract class KMLVertexColorStyle<G extends Graph, V extends Vertex> imp
 			IconStyleType iconStyle = objectFactory.createIconStyleType();
 			iconStyle.setIcon(vertexIconLink);
 			iconStyle.setScale(0.5);
+//			iconStyle.setScale(1.0);
 			
 			Color c = colorForValue(val, min, max);
 			iconStyle.setColor(new byte[]{(byte)c.getAlpha(), (byte)c.getBlue(), (byte)c.getGreen(), (byte)c.getRed()});

@@ -77,7 +77,7 @@ public class LatticeGenerator {
 		terms[0] = new ErgmDensity();
 		terms[0].setTheta(2);
 		
-		ErgmGravity gravity = new ErgmGravity(matrix, 1, true, true);
+		ErgmGravity gravity = new ErgmGravity(matrix, 1, true, true, 5.0); //FIXME
 		gravity.setTheta(1);
 //		gravity.setDescretization(descretization);
 		terms[1] = gravity;
@@ -97,7 +97,7 @@ public class LatticeGenerator {
 //		Handler handler = new Handler(outputDir, densityGrid);
 //		handler.setSampleSize(sampleSize);
 //		handler.setSampleInterval(sampleInterval);
-		DumpHandler handler = new DumpHandler("/Users/fearonni/vsp-work/work/socialnets/mcmc/output/", null);
+		DumpHandler handler = new DumpHandler("/Users/fearonni/vsp-work/work/socialnets/mcmc/output/", null, null);
 		handler.setBurnin((long)4E9);
 		handler.setDumpInterval((long)1E8);
 		handler.setLogInterval((long)1E6);

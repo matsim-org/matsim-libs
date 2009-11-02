@@ -37,7 +37,7 @@ public class RandomDistribution {
 	public static void main(String[] args) throws IOException {
 		Random random = new Random(4711);
 		int count = 10000;
-		int scale = 100000;
+		int scale = 200000;
 		
 		BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/fearonni/vsp-work/work/socialnets/data/random/randompop.xml"));
 		writer.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
