@@ -25,9 +25,9 @@ import org.xml.sax.SAXException;
 
 import playground.yu.analysis.DailyEnRouteTime;
 import playground.yu.utils.CollectionSum;
+import playground.yu.utils.charts.PieChart;
+import playground.yu.utils.charts.StackedBarChart;
 import playground.yu.utils.io.SimpleWriter;
-import playground.yu.utils.io.charts.PieChart;
-import playground.yu.utils.io.charts.StackedBarChart;
 
 /**
  * daily en route time analysis only for Berlin or for Berlin & Brandenburg

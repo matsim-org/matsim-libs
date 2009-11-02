@@ -30,7 +30,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.xml.sax.SAXException;
 
-import playground.yu.utils.io.charts.StackedBarChart;
+import playground.yu.utils.charts.StackedBarChart;
 
 /**
  * @author yu

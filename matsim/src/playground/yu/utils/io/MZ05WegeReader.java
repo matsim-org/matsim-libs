@@ -12,7 +12,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 import playground.yu.utils.CollectionSum;
-import playground.yu.utils.io.charts.PieChart;
+import playground.yu.utils.charts.PieChart;
 
 /**
  * @author yu
