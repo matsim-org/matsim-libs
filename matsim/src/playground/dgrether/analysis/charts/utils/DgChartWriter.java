@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.utils.charts;
+package playground.dgrether.analysis.charts.utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,7 +27,9 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.xy.XYDataset;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -41,7 +43,12 @@ public class DgChartWriter {
 	private static final Logger log = Logger.getLogger(DgChartWriter.class);
 
 	
-	public static void writerChartToFile(String filename, JFreeChart jchart) {
+	public static void writeChart(String filename, JFreeChart jchart){
+		writeChartDataToFile(filename, jchart);
+		writeToPng(filename, jchart);
+	}
+	
+	public static void writeToPng(String filename, JFreeChart jchart) {
 		filename += ".png";
 		try {
 			ChartUtilities.saveChartAsPNG(new File(filename), jchart, 800, 600, null, true, 9);
@@ -56,24 +63,56 @@ public class DgChartWriter {
 		filename += ".txt";
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-			
-			XYPlot xy = chart.getXYPlot();
-			xy.getRangeAxis().getLabel();
-			xy.getDomainAxis().getLabel();
-			for (int i = 0; i < xy.getDatasetCount(); i++){
-				XYDataset xyds = xy.getDataset(i);
-				
-				for (int seriesIndex = 0; seriesIndex < xyds.getSeriesCount(); seriesIndex ++) {
-					int items = xyds.getItemCount(seriesIndex);
-					for (int itemsIndex = 0; itemsIndex < items; itemsIndex++){
-						Number xValue = xyds.getX(seriesIndex, itemsIndex);
-						Number yValue = xyds.getY(seriesIndex, itemsIndex);
-						writer.write(xValue.toString());
-						writer.write("\t");
-						writer.write(yValue.toString());
+			try{ /*read "try" as if (plot instanceof XYPlot)*/
+				XYPlot xy = chart.getXYPlot();
+				String yAxisLabel = xy.getRangeAxis().getLabel();
+				String xAxisLabel = xy.getDomainAxis().getLabel();
+				String header = xAxisLabel + "\t " + yAxisLabel;
+				writer.write(header);
+				writer.newLine();
+				for (int i = 0; i < xy.getDatasetCount(); i++){
+					XYDataset xyds = xy.getDataset(i);
+					for (int seriesIndex = 0; seriesIndex < xyds.getSeriesCount(); seriesIndex ++) {
 						writer.newLine();
+						writer.write("Series" + xyds.getSeriesKey(seriesIndex).toString());
+						writer.newLine();
+						int items = xyds.getItemCount(seriesIndex);
+						for (int itemsIndex = 0; itemsIndex < items; itemsIndex++){
+							Number xValue = xyds.getX(seriesIndex, itemsIndex);
+							Number yValue = xyds.getY(seriesIndex, itemsIndex);
+							writer.write(xValue.toString());
+							writer.write("\t");
+							writer.write(yValue.toString());
+							writer.newLine();
+						}
 					}
 				}
+			} catch(ClassCastException e){ //else instanceof CategoryPlot
+				log.info("caught class cast exception, trying to write CategoryPlot");
+				CategoryPlot cp = chart.getCategoryPlot();
+				String header = "CategoryRowKey \t CategoryColumnKey \t CategoryRowIndex \t CategoryColumnIndex \t Value";
+				writer.write(header);
+				writer.newLine();
+				for (int i = 0; i < cp.getDatasetCount(); i++) {
+					CategoryDataset cpds = cp.getDataset(i);
+					for (int rowIndex = 0; rowIndex < cpds.getRowCount(); rowIndex++){
+						for (int columnIndex = 0; columnIndex < cpds.getColumnCount(); columnIndex ++) {
+							Number value = cpds.getValue(rowIndex, columnIndex);
+							writer.write(cpds.getRowKey(rowIndex).toString());
+							writer.write("\t");
+							writer.write(cpds.getColumnKey(columnIndex).toString());
+							writer.write("\t");
+							writer.write(Integer.toString(rowIndex));
+							writer.write("\t");
+							writer.write(Integer.toString(columnIndex));
+							writer.write("\t");
+							writer.write(value.toString());
+							writer.newLine();
+						}
+					}
+				}
+				
+				
 			}
 		  writer.close();
 		} catch (FileNotFoundException e) {

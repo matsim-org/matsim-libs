@@ -43,7 +43,7 @@ public class Trb09Preprocessing {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-			String runNumber1 = "855";
+			String runNumber1 = "879";
 //			String runNumber1 = "732";
 //			String runNumber2 = "733";
 		
@@ -51,9 +51,9 @@ public class Trb09Preprocessing {
 			
 			String runiddot1 = runid1 + ".";
 			
-			String netfile = DgPaths.RUNBASE + runid1 + "/" + runiddot1 + "output_network.xml.gz";
-			String plans1file = DgPaths.RUNBASE + runid1 + "/" + runiddot1 + "output_plans.xml.gz";
-			String plans1fileOut = DgPaths.RUNBASE + runid1 + "/" + runiddot1 + "output_plans_wo_routes.xml.gz";
+			String netfile = DgPaths.RUNBASE + runid1 + "/" + runNumber1 + ".output_network.xml.gz";
+			String plans1file = DgPaths.RUNBASE + runid1 + "/" + runNumber1 + ".output_plans.xml.gz";
+			String plans1fileOut = DgPaths.RUNBASE + runid1 + "/" + runNumber1 + ".output_plans_wo_routes.xml.gz";
 
 			ScenarioImpl sc = new ScenarioImpl();
 			Config conf = sc.getConfig();

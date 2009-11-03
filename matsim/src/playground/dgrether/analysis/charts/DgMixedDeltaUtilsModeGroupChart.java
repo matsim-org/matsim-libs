@@ -29,14 +29,14 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import playground.dgrether.utils.charts.DgColorScheme;
+import playground.dgrether.analysis.charts.utils.DgColorScheme;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgMixedDeltaScoreIncomeModeChoiceChart {
+public class DgMixedDeltaUtilsModeGroupChart {
 
 	private XYSeriesCollection avgDeltaScoreIncomeDs;
 	private XYSeriesCollection inomeModeChoiceDs;

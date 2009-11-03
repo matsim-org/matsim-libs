@@ -20,6 +20,7 @@
 package playground.dgrether.analysis.charts;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -33,18 +34,20 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.core.population.PlanImpl.Type;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.dgrether.analysis.charts.interfaces.DgChart;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
 import playground.dgrether.analysis.population.DgPersonData;
+import playground.dgrether.analysis.population.DgPersonDataIncomeComparator;
 import playground.dgrether.analysis.population.DgPlanData;
 
 
 
-public class DgDeltaUtilsModeGroupChart {
+public class DgDeltaUtilsModeGroupChart implements DgChart {
 	
 	private static final Logger log = Logger.getLogger(DgDeltaUtilsModeGroupChart.class);
 	
 	private DgAnalysisPopulation ana;
-
+	
 	private boolean writeModeSwitcherOnly = false;
 	
 	private XYSeriesCollection dataset;
@@ -59,13 +62,20 @@ public class DgDeltaUtilsModeGroupChart {
 		List<Tuple<Double, Double>> valuesPtPt = new ArrayList<Tuple<Double, Double>>();
 		List<Tuple<Double, Double>> valuesPtCar = new ArrayList<Tuple<Double, Double>>();
 		List<Tuple<Double, Double>> valuesCarPt = new ArrayList<Tuple<Double, Double>>();
-				
+		List<DgPersonData> sortedPop = new ArrayList<DgPersonData>();
+		sortedPop.addAll(this.ana.getPersonData().values());
+		Collections.sort(sortedPop, new DgPersonDataIncomeComparator());		
 		//calculations
-		for (DgPersonData d : ana.getPersonData().values()) {
+//		double currentIncome = 0.0;
+		double i = 0.0;
+		double size = this.ana.getPersonData().size();
+		for (DgPersonData d : sortedPop) {
+			i++;
+//			currentIncome += d.getIncome().getIncome();
 			DgPlanData planDataRun1 = d.getPlanData().get(DgAnalysisPopulation.RUNID1);
 			DgPlanData planDataRun2 = d.getPlanData().get(DgAnalysisPopulation.RUNID2);
 			Double scoreDiff = planDataRun2.getScore() - planDataRun1.getScore();
-			Tuple<Double, Double> t = new Tuple<Double, Double>(d.getIncome().getIncome(), scoreDiff);
+			Tuple<Double, Double> t = new Tuple<Double, Double>(i/size, scoreDiff);
 			
 			if (planDataRun1.getPlan().getType().equals(Type.CAR) && planDataRun2.getPlan().getType().equals(Type.CAR)) {
 				valuesCarCar.add(t);
@@ -74,15 +84,9 @@ public class DgDeltaUtilsModeGroupChart {
 				valuesPtPt.add(t);
 			}
 			else if (planDataRun1.getPlan().getType().equals(Type.PT) && planDataRun2.getPlan().getType().equals(Type.CAR)) {
-//				if (d.getIncome().getIncome() > 100000.0 ) {
-//					log.info("PT->Car person id: " + d.getPersonId().toString() + " income " + d.getIncome().getIncome());
-//				}
 				valuesPtCar.add(t);
 			}
 			else if (planDataRun1.getPlan().getType().equals(Type.CAR) && planDataRun2.getPlan().getType().equals(Type.PT)){
-//				if (d.getIncome().getIncome() > 100000.0 ) {
-//					log.info("Car->PT person id: " + d.getPersonId().toString() + " income " + d.getIncome().getIncome());
-//				}
 				valuesCarPt.add(t);
 			}
 		}
@@ -100,6 +104,9 @@ public class DgDeltaUtilsModeGroupChart {
 		return ds;
 	}
 	
+	/**
+	 * @see playground.dgrether.analysis.charts.interfaces.DgChart#createChart()
+	 */
 	public JFreeChart createChart() {
 		XYPlot plot = new XYPlot(this.dataset, new NumberAxis("Income"), new NumberAxis("Delta utils"), null);
 		XYItemRenderer renderer = new XYLineAndShapeRenderer(false, true);

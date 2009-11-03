@@ -21,29 +21,22 @@ package playground.dgrether.analysis.charts;
 
 import java.awt.BasicStroke;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartColor;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.labels.AbstractXYItemLabelGenerator;
-import org.jfree.chart.labels.XYItemLabelGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.dgrether.analysis.charts.utils.DgColorScheme;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
-import playground.dgrether.analysis.population.DgPersonData;
 import playground.dgrether.analysis.population.DgPersonDataIncomeComparator;
-import playground.dgrether.analysis.population.DgPlanData;
-import playground.dgrether.utils.charts.DgColorScheme;
 
 
 /**
@@ -58,46 +51,39 @@ public class DgAvgDeltaUtilsQuantilesChart {
 	
 	protected int nQuantiles = 10;
 	
-	protected XYSeriesCollection dataset;
+	private XYSeriesCollection dataset;
 	
-	protected DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();
+	private DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();
 
-	private LabelGenerator labelGenerator;
+	private DgLabelGenerator labelGenerator;
 	
 	public DgAvgDeltaUtilsQuantilesChart(DgAnalysisPopulation ana) {
 		this.ana = ana;
-		this.labelGenerator = new LabelGenerator();
-		this.ana.calculateMinMaxIncome();
+		this.labelGenerator = new DgLabelGenerator();
 		this.dataset = this.createDatasets();
 	}
 	
-	protected Tuple<XYSeries,List<String>> createXYSeries(String title, DgAnalysisPopulation pop) {
-		List<DgAnalysisPopulation> quantiles = this.ana.getQuantiles(this.nQuantiles, new DgPersonDataIncomeComparator());
+	private Tuple<XYSeries,List<String>> createXYSeries(String title, DgAnalysisPopulation pop) {
+		List<DgAnalysisPopulation> quantiles = pop.getQuantiles(this.nQuantiles, new DgPersonDataIncomeComparator());
 		XYSeries series = new XYSeries(title, false, true);
 		List<String> labels = new ArrayList<String>();
+		double income= 0.0;
+		double i = -0.5;
 		for (DgAnalysisPopulation p : quantiles){
-			Double avgScore = calcAverageScoreDifference(p);
-			p.calculateMinMaxIncome();
-			double incomeLocation = p.getMinIncome() + ((p.getMaxIncome() - p.getMinIncome()) / 2.0) ;
+			i++;
+			Double avgScore = p.calcAverageScoreDifference(DgAnalysisPopulation.RUNID1, DgAnalysisPopulation.RUNID2);
+			p.calculateIncomeData();
+			income += p.getTotalIncome();
+			double incomeLocation = i/this.nQuantiles;
 			series.add(incomeLocation, avgScore);
 			labels.add("Groupsize: " + p.getPersonData().size());
 		}
 		return new Tuple<XYSeries, List<String>>(series, labels);
 	}
 	
-	protected Double calcAverageScoreDifference(DgAnalysisPopulation group) {
-		Double deltaScoreSum = 0.0;
-		for (DgPersonData d : group.getPersonData().values()){
-			DgPlanData planDataRun1 = d.getPlanData().get(DgAnalysisPopulation.RUNID1);
-			DgPlanData planDataRun2 = d.getPlanData().get(DgAnalysisPopulation.RUNID2);
-			deltaScoreSum += (planDataRun2.getScore() - planDataRun1.getScore());
-		}
-		Double avg = null;
-		avg = deltaScoreSum/group.getPersonData().size();
-		return avg;
-	}
+
 	
-	protected XYSeriesCollection createDatasets() {
+	private XYSeriesCollection createDatasets() {
 		XYSeriesCollection ds = new XYSeriesCollection();
 		Tuple<XYSeries, List<String>> seriesLabels = this.createXYSeries("Mean "+  '\u0394' + "Utility", this.ana);
 		ds.addSeries(seriesLabels.getFirst());
@@ -108,7 +94,9 @@ public class DgAvgDeltaUtilsQuantilesChart {
 	public JFreeChart createChart() {
 		XYPlot plot = new XYPlot();
 		ValueAxis xAxis = this.axisBuilder.createValueAxis("Income [Chf / Year]");
+		xAxis.setRange(0.0, 1.0);
 		ValueAxis yAxis = this.axisBuilder.createValueAxis("Delta Utils [Utils]");
+		yAxis.setRange(-0.3, 0.3);
 		plot.setDomainAxis(xAxis);
 		plot.setRangeAxis(yAxis);
 		
@@ -142,25 +130,5 @@ public class DgAvgDeltaUtilsQuantilesChart {
 	public void setNumberOfClasses(int numberOfClasses) {
 		this.nQuantiles = numberOfClasses;
 	}
-	
-	/**
-	  * A custom label generator.
-	  */
-	private static class LabelGenerator extends AbstractXYItemLabelGenerator
-	                               implements XYItemLabelGenerator {
 
-		private Map<Integer, List<String>> labels = new HashMap<Integer, List<String>>();
-
-		public LabelGenerator() {
-			
-		}
-
-		public void setLabels(int series, List<String> labels) {
-			this.labels.put(series, labels);
-		}
-
-		public String generateLabel(XYDataset dataset, int series, int item) {
-			return this.labels.get(series).get(item);
-		}
-	}
 }

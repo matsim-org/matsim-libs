@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgModeSwitchAnalyzer
+ * DgLabelGenerator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,51 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis.population;
+package playground.dgrether.analysis.charts;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PlanImpl.Type;
-import org.matsim.core.utils.collections.Tuple;
+import org.jfree.chart.labels.AbstractXYItemLabelGenerator;
+import org.jfree.chart.labels.XYItemLabelGenerator;
+import org.jfree.data.xy.XYDataset;
 
 
 /**
- * Create distinct groups from a given population by mode choice.
  * @author dgrether
+ *
  */
-public class DgModeSwitchPlanTypeAnalyzer {
-	
-	private DgAnalysisPopulation pop;
-	
-	private Map<Tuple<Type, Type>, DgAnalysisPopulation> classifiedPops;
+public class DgLabelGenerator extends AbstractXYItemLabelGenerator
+implements XYItemLabelGenerator {
+	private Map<Integer, List<String>> labels = new HashMap<Integer, List<String>>();
 
-	public DgModeSwitchPlanTypeAnalyzer(DgAnalysisPopulation ana){
-		this.pop = ana;
-		this.classifiedPops = new HashMap<Tuple<Type, Type>, DgAnalysisPopulation>();
-		this.classifyPopulationByPlanType();
+	public DgLabelGenerator() {
+		
 	}
-	
-	private void classifyPopulationByPlanType(){		
-		for (DgPersonData d : pop.getPersonData().values()) {
-			DgPlanData planDataRun1 = d.getPlanData().get(DgAnalysisPopulation.RUNID1);
-			DgPlanData planDataRun2 = d.getPlanData().get(DgAnalysisPopulation.RUNID2);
 
-			Tuple<Type, Type> modeSwitchTuple = new Tuple<Type, Type>(planDataRun1.getPlan().getType(), planDataRun2.getPlan().getType());
+	public void setLabels(int series, List<String> labels) {
+		this.labels.put(series, labels);
+	}
 
-			DgAnalysisPopulation p = this.classifiedPops.get(modeSwitchTuple);
-			if (p == null){
-				p = new DgAnalysisPopulation();
-				this.classifiedPops.put(modeSwitchTuple, p);
-			}
-			p.getPersonData().put(d.getPersonId(), d);
-		}
+	public String generateLabel(XYDataset dataset, int series, int item) {
+		return this.labels.get(series).get(item);
 	}
-	
-	public DgAnalysisPopulation getPersonsForModeSwitch(Tuple<PlanImpl.Type, PlanImpl.Type> modes) {
-		return this.classifiedPops.get(modes);
-	}
-	
-	
 }

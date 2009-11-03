@@ -39,10 +39,10 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.dgrether.analysis.charts.utils.DgColorScheme;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
 import playground.dgrether.analysis.population.DgIncomeClass;
 import playground.dgrether.analysis.population.DgPersonData;
-import playground.dgrether.utils.charts.DgColorScheme;
 
 
 /**

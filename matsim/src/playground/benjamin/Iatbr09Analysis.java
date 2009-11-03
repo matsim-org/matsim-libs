@@ -22,11 +22,11 @@ package playground.benjamin;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 
-import playground.dgrether.analysis.charts.DgMixedDeltaScoreIncomeModeChoiceChart;
+import playground.dgrether.analysis.charts.DgMixedDeltaUtilsModeGroupChart;
+import playground.dgrether.analysis.charts.utils.DgChartWriter;
 import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
 import playground.dgrether.analysis.io.DgHouseholdsAnalysisReader;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
-import playground.dgrether.utils.charts.DgChartWriter;
 
 
 public class Iatbr09Analysis {
@@ -101,11 +101,11 @@ public class Iatbr09Analysis {
 //			DgChartFrame frame = new DgChartFrame("test", avgDScoreIncomeChartData.createChart());
 //			DgChartWriter.writerChartToFile(avgDeltaScoreIncomeGroupChartModeSwitchFile, avgDScoreIncomeChartData.createChart());
 			
-			DgMixedDeltaScoreIncomeModeChoiceChart mixedDsIncomeChart = new DgMixedDeltaScoreIncomeModeChoiceChart();
+			DgMixedDeltaUtilsModeGroupChart mixedDsIncomeChart = new DgMixedDeltaUtilsModeGroupChart();
 //			mixedDsIncomeChart.addIncomeModeChoiceDataSet(modeChoiceIncomeChart.createDeltaScoreIncomeModeChoiceDataset());
 //			mixsedDsIncomeChart.addAvgDeltaScoreIncomeDs(avgDScoreIncomeChartData.getDataset());
 //			DgChartFrame frame = new DgChartFrame("test", mixedDsIncomeChart.createChart());
-			DgChartWriter.writerChartToFile(mixedDeltaScoreIncomeChartFile, mixedDsIncomeChart.createChart());
+			DgChartWriter.writeChart(mixedDeltaScoreIncomeChartFile, mixedDsIncomeChart.createChart());
 			
 			log.debug("ya esta ;-)");
 			

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgChartFrame
+ * DgChart
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,30 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.utils.charts;
+package playground.dgrether.analysis.charts.interfaces;
 
-import java.awt.Dimension;
-
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.ui.ApplicationFrame;
-import org.jfree.ui.RefineryUtilities;
 
+public interface DgChart {
 
-/**
- * @author dgrether
- *
- */
-public class DgChartFrame extends ApplicationFrame {
-
-	public DgChartFrame(String title, JFreeChart chart) {
-		super(title);
-		ChartPanel chartPanel = new ChartPanel(chart, false);
-		chartPanel.setPreferredSize(new Dimension(1024, 768));
-		setContentPane(chartPanel);
-		this.pack();
-		RefineryUtilities.centerFrameOnScreen(this);
-		this.setVisible(true);
-	}
+	public JFreeChart createChart();
 
 }

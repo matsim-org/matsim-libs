@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -174,6 +173,8 @@ public class DgAnalysisPopulationReader {
 		return analysisPopulation;
 	}
 
+
+	
 	/**
    * Load the plan file with the given path.
    *

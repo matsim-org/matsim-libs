@@ -29,16 +29,18 @@ import playground.dgrether.analysis.charts.DgAvgDeltaMoneyGroupChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaMoneyQuantilesChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaUtilsGroupChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaUtilsModeGroupChart;
+import playground.dgrether.analysis.charts.DgAvgDeltaUtilsModeQuantilesChart;
 import playground.dgrether.analysis.charts.DgAvgDeltaUtilsQuantilesChart;
 import playground.dgrether.analysis.charts.DgDeltaUtilsModeGroupChart;
-import playground.dgrether.analysis.charts.DgMixedDeltaScoreIncomeModeChoiceChart;
+import playground.dgrether.analysis.charts.DgMixedDeltaUtilsModeGroupChart;
 import playground.dgrether.analysis.charts.DgMixedModeSwitcherOnlyDeltaScoreIncomeModeChoiceChart;
 import playground.dgrether.analysis.charts.DgModalSplitGroupChart;
 import playground.dgrether.analysis.charts.DgModalSplitQuantilesChart;
+import playground.dgrether.analysis.charts.utils.DgChartFrame;
+import playground.dgrether.analysis.charts.utils.DgChartWriter;
 import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
 import playground.dgrether.analysis.io.DgHouseholdsAnalysisReader;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
-import playground.dgrether.utils.charts.DgChartWriter;
 
 
 public class Trb09Analysis {
@@ -53,13 +55,13 @@ public class Trb09Analysis {
 		String netfile, plans1file, plans2file, housholdsfile;
 		int threshold;
 		
-//		boolean isTestscenario = true;
-//		String runNumber1 = "860";
-//		String runNumber2 = "864";
+		boolean isTestscenario = true;
+		String runNumber1 = "860";
+		String runNumber2 = "863";
 		
-		boolean isTestscenario = false;		
-		String runNumber1 = "749";
-		String runNumber2 = "867";
+//		boolean isTestscenario = false;		
+//		String runNumber1 = "749";
+//		String runNumber2 = "867";
 		
 		String runid1 = "run" + runNumber1;
 		String runid2 = "run" + runNumber2;
@@ -83,6 +85,14 @@ public class Trb09Analysis {
 		}
 
 		
+//		runid1 += "best";
+//		runid2 += "best";
+//		
+//		File file = new File(DgPaths.RUNBASE + runid1);
+//		file.mkdir();
+//		File file2 = new File(DgPaths.RUNBASE + runid2);
+//		file2.mkdir();
+//		
 		String modalSplitGroupChartFileRun1 = DgPaths.RUNBASE + runid1 + "/"+runNumber1+"modalSplitGroupChart";
 		String modalSplitGroupChartFileRun2 = DgPaths.RUNBASE + runid2 + "/"+runNumber2+"modalSplitGroupChart";
 		
@@ -101,6 +111,7 @@ public class Trb09Analysis {
 		String modalSplitQuantilesChartFileRun2 = DgPaths.RUNBASE + runid2 + "/"+runNumber2+"modalSplitQuantilesChart";
 
 		String avgDeltaUtilsQuantilesChartFile = DgPaths.RUNBASE + runid2 + "/avgDeltaUtilsQuantilesChart" + runNumber1 + "vs" + runNumber2;
+		String avgDeltaUtilsModeQuantilesChartFile = DgPaths.RUNBASE + runid2 + "/avgDeltaUtilsModeQuantilesChart"+runNumber1+"vs"+runNumber2;
 
 		String avgDeltaMoneyQuantilesChartFile = DgPaths.RUNBASE + runid2 + "/avgDeltaMoneyQuantilesChart"+runNumber1+"vs"+runNumber2;
 
@@ -114,63 +125,69 @@ public class Trb09Analysis {
 
 		DgHouseholdsAnalysisReader hhr = new DgHouseholdsAnalysisReader(ana);
 		hhr.readHousholds(housholdsfile);
+		ana.calculateIncomeData();
 			
 		DgModalSplitGroupChart modalSplitGroupChartRun1 = new DgModalSplitGroupChart(ana, DgAnalysisPopulation.RUNID1, threshold);
-		DgChartWriter.writerChartToFile(modalSplitGroupChartFileRun1, modalSplitGroupChartRun1.createChart());
+		DgChartWriter.writeChart(modalSplitGroupChartFileRun1, modalSplitGroupChartRun1.createChart());
 		DgModalSplitGroupChart modalSplitGroupChartRun2 = new DgModalSplitGroupChart(ana, DgAnalysisPopulation.RUNID2, threshold);
-		DgChartWriter.writerChartToFile(modalSplitGroupChartFileRun2, modalSplitGroupChartRun2.createChart());
+		DgChartWriter.writeChart(modalSplitGroupChartFileRun2, modalSplitGroupChartRun2.createChart());
 
-		DgDeltaUtilsModeGroupChart deltaUtilsModeGroupChart;
-		deltaUtilsModeGroupChart = new DgDeltaUtilsModeGroupChart(ana);
-		DgChartWriter.writerChartToFile(deltaUtilsModeGroupChartFile, deltaUtilsModeGroupChart.createChart());
+		DgDeltaUtilsModeGroupChart deltaUtilsModeGroupChart = new DgDeltaUtilsModeGroupChart(ana);
+		DgChartFrame frame = new DgChartFrame("test", deltaUtilsModeGroupChart.createChart());
+		DgChartWriter.writeChart(deltaUtilsModeGroupChartFile, deltaUtilsModeGroupChart.createChart());
 
 		DgAvgDeltaUtilsGroupChart avgDeltaUtilsGroupChart = new DgAvgDeltaUtilsGroupChart(ana, threshold);
 		//			DgChartFrame frame = new DgChartFrame("test", avgDeltaUtilsGroupChart.createChart());
-		DgChartWriter.writerChartToFile(avgDeltaUtilsGroupChartFile, avgDeltaUtilsGroupChart.createChart());
+		DgChartWriter.writeChart(avgDeltaUtilsGroupChartFile, avgDeltaUtilsGroupChart.createChart());
 
 		DgAvgDeltaUtilsModeGroupChart avgDeltaUtilsModeGroupChart = new DgAvgDeltaUtilsModeGroupChart(ana, threshold);
 		//			DgChartFrame frame = new DgChartFrame("test", avgDScoreIncomeChartData.createChart());
-		DgChartWriter.writerChartToFile(avgDeltaUtilsModeGroupChartFile, avgDeltaUtilsModeGroupChart.createChart());
+		DgChartWriter.writeChart(avgDeltaUtilsModeGroupChartFile, avgDeltaUtilsModeGroupChart.createChart());
 
 		DgAvgDeltaMoneyGroupChart avgDeltaMoneyGroupChart = new DgAvgDeltaMoneyGroupChart(ana, threshold);
 		//		DgChartFrame frame = new DgChartFrame("test", avgDeltaUtilsGroupChart.createChart());
-		DgChartWriter.writerChartToFile(avgDeltaMoneyGroupChartFile, avgDeltaMoneyGroupChart.createChart());
+		DgChartWriter.writeChart(avgDeltaMoneyGroupChartFile, avgDeltaMoneyGroupChart.createChart());
 
-		writeMixedDeltaUtilsModeGroupChart(deltaUtilsModeGroupChart, avgDeltaUtilsModeGroupChart, 
-				mixedDeltaUtilsModeGroupChartFile, mixedMsoDeltaUtilsModeGroupChartFile);
+
 
 		//quantile charts
 		DgModalSplitQuantilesChart modalSplitQuantilesChartRun1 = new DgModalSplitQuantilesChart(ana, DgAnalysisPopulation.RUNID1);
 		//			DgChartFrame frame = new DgChartFrame("test", modalSplitQuantilesChartRun1.createChart());
-		DgChartWriter.writerChartToFile(modalSplitQuantilesChartFileRun1, modalSplitQuantilesChartRun1.createChart());
+		DgChartWriter.writeChart(modalSplitQuantilesChartFileRun1, modalSplitQuantilesChartRun1.createChart());
 		DgModalSplitQuantilesChart modalSplitQuantilesChartRun2 = new DgModalSplitQuantilesChart(ana, DgAnalysisPopulation.RUNID2);
-		DgChartWriter.writerChartToFile(modalSplitQuantilesChartFileRun2, modalSplitQuantilesChartRun2.createChart());
+		DgChartWriter.writeChart(modalSplitQuantilesChartFileRun2, modalSplitQuantilesChartRun2.createChart());
 
 
 		DgAvgDeltaUtilsQuantilesChart avgDeltaUtilsQuantilesChart = new DgAvgDeltaUtilsQuantilesChart(ana);
-		//			DgChartFrame frame = new DgChartFrame("test", avgDeltaUtilsQuantilesChart.createChart());
-		DgChartWriter.writerChartToFile(avgDeltaUtilsQuantilesChartFile, avgDeltaUtilsQuantilesChart.createChart());
+//					DgChartFrame frame = new DgChartFrame("test", avgDeltaUtilsQuantilesChart.createChart());
+		DgChartWriter.writeChart(avgDeltaUtilsQuantilesChartFile, avgDeltaUtilsQuantilesChart.createChart());
 
+		DgAvgDeltaUtilsModeQuantilesChart avgDeltaUtilesModeQuantilesChart = new DgAvgDeltaUtilsModeQuantilesChart(ana, threshold);
+//		DgChartFrame frame = new DgChartFrame("test", avgDeltaUtilesModeQuantilesChart.createChart());
+		DgChartWriter.writeChart(avgDeltaUtilsModeQuantilesChartFile, avgDeltaUtilesModeQuantilesChart.createChart());
+		
 		DgAvgDeltaMoneyQuantilesChart avgDeltaMoneyQuantilesChart = new DgAvgDeltaMoneyQuantilesChart(ana);
 		//		DgChartFrame frame = new DgChartFrame("test", avgDeltaUtilsQuantilesChart.createChart());
 		JFreeChart jfChart = avgDeltaMoneyQuantilesChart.createChart();
-		DgChartWriter.writeChartDataToFile(avgDeltaMoneyQuantilesChartFile, jfChart);
-		DgChartWriter.writerChartToFile(avgDeltaMoneyQuantilesChartFile, jfChart);
+		DgChartWriter.writeChart(avgDeltaMoneyQuantilesChartFile, jfChart);
 
+		writeMixedDeltaUtilsModeGroupChart(deltaUtilsModeGroupChart, avgDeltaUtilesModeQuantilesChart, 
+				mixedDeltaUtilsModeGroupChartFile, mixedMsoDeltaUtilsModeGroupChartFile);
+		
 		log.debug("ya esta ;-)");
 			
 	}
 	
   public static void writeMixedDeltaUtilsModeGroupChart(DgDeltaUtilsModeGroupChart deltaUtilsModeGroupChart, 
-  		DgAvgDeltaUtilsModeGroupChart avgDScoreModeIncomeChartData, 
+  		DgAvgDeltaUtilsModeQuantilesChart avgDScoreModeIncomeChartData, 
   		String mixedDeltaScoreIncomeChartFile, String mixedMsoDeltaScoreIncomeChartFile){
-		DgMixedDeltaScoreIncomeModeChoiceChart mixedDsIncomeChart = new DgMixedDeltaScoreIncomeModeChoiceChart();
+		DgMixedDeltaUtilsModeGroupChart mixedDsIncomeChart = new DgMixedDeltaUtilsModeGroupChart();
 		XYSeriesCollection modeChoiceDataset = deltaUtilsModeGroupChart.createDeltaScoreIncomeModeChoiceDataset();
 		mixedDsIncomeChart.addIncomeModeChoiceDataSet(modeChoiceDataset);
 		XYSeriesCollection avgScoreDataset = avgDScoreModeIncomeChartData.getDataset();
 		mixedDsIncomeChart.addAvgDeltaScoreIncomeDs(avgScoreDataset);
 //		DgChartFrame frame = new DgChartFrame("test", mixedDsIncomeChart.createChart());
-		DgChartWriter.writerChartToFile(mixedDeltaScoreIncomeChartFile, mixedDsIncomeChart.createChart());
+		DgChartWriter.writeChart(mixedDeltaScoreIncomeChartFile, mixedDsIncomeChart.createChart());
 		
 		XYSeriesCollection ds2 = new XYSeriesCollection();
 		ds2.addSeries(modeChoiceDataset.getSeries(2));
@@ -182,7 +199,7 @@ public class Trb09Analysis {
 		mixedSwichterOnlyDsIncomeChart.addIncomeModeChoiceDataSet(ds2);
 		mixedSwichterOnlyDsIncomeChart.addAvgDeltaScoreIncomeDs(ds3);
 //		DgChartFrame frame = new DgChartFrame("test", mixedSwichterOnlyDsIncomeChart.createChart());
-		DgChartWriter.writerChartToFile(mixedMsoDeltaScoreIncomeChartFile, mixedSwichterOnlyDsIncomeChart.createChart());
+		DgChartWriter.writeChart(mixedMsoDeltaScoreIncomeChartFile, mixedSwichterOnlyDsIncomeChart.createChart());
   }
 
 }

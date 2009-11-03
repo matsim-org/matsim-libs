@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgBarChart
+ * DgXYChart
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,25 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.utils.charts;
+package playground.dgrether.analysis.charts.interfaces;
 
-import org.jfree.chart.JFreeChart;
-import org.matsim.core.utils.charts.ChartUtil;
+import org.jfree.data.xy.XYSeriesCollection;
+
 
 
 /**
  * @author dgrether
  *
  */
-public class DgBarChart extends ChartUtil {
+public interface DgXYChart extends DgChart {
 
-	public DgBarChart(String title, String xAxisLabel, String yAxisLabel) {
-		super(title, xAxisLabel, yAxisLabel);
-	}
-
-	@Override
-	protected JFreeChart getChart() {
-		return null;
-	}
-
+	public XYSeriesCollection getDataset();
+	
 }

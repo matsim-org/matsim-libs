@@ -28,14 +28,12 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
+import org.matsim.households.HouseholdIncomeComparator;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.households.HouseholdIncomeComparator;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.utils.charts.ChartData;
-import playground.dgrether.utils.charts.ChartDataWriter;
 
 
 /**
@@ -120,11 +118,7 @@ public class IncomeStats {
 		}
 		
 		XYLineChart chart = new XYLineChart("Lorenz", "number of hh percent", "percentage of income");
-		ChartData data = new ChartData("Lorenz", "number of hh percent", "percentage of income");
 		chart.addSeries("incomes", xValues, yValues);
-		data.addSeries("incomes", xValues, yValues);
-		ChartDataWriter writer = new ChartDataWriter(data);
-		writer.writeFile(outdir + "lorenzValues.txt");
 		chart.saveAsPng(outdir + "lorenz.png", 800, 600);
 	}
 

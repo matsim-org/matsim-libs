@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ChartData
+ * DgChartFrame
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,76 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.utils.charts;
+package playground.dgrether.analysis.charts.utils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.awt.Dimension;
 
-import org.matsim.core.utils.collections.Tuple;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.ui.ApplicationFrame;
+import org.jfree.ui.RefineryUtilities;
 
 
 /**
  * @author dgrether
  *
  */
-public class ChartData {
+public class DgChartFrame extends ApplicationFrame {
 
-	private String chartName;
-	private String xLabel;
-	
-	private String yLabel;
-
-	private Map<String, Tuple<double[], double[]>> series = new HashMap<String, Tuple<double[], double[]>>();
-	
-	public ChartData(String chartName, String xlabel, String ylabel) {
-		this.chartName = chartName;
-		this.xLabel = xlabel;
-		this.yLabel = ylabel;
+	public DgChartFrame(String title, JFreeChart chart) {
+		super(title);
+		ChartPanel chartPanel = new ChartPanel(chart, false);
+		chartPanel.setPreferredSize(new Dimension(1024, 768));
+		setContentPane(chartPanel);
+		this.pack();
+		RefineryUtilities.centerFrameOnScreen(this);
+		this.setVisible(true);
 	}
-	
-	public void addSeries(String seriesName, double[] xvalues, double[] yvalues){
-		this.series.put(seriesName, new Tuple<double[], double[]>(xvalues, yvalues));
-	}
-	
-	public String getChartName() {
-		return chartName;
-	}
-
-	
-	public void setChartName(String chartName) {
-		this.chartName = chartName;
-	}
-
-	
-	public String getXLabel() {
-		return xLabel;
-	}
-
-	
-	public void setXLabel(String label) {
-		xLabel = label;
-	}
-
-	
-	public String getYLabel() {
-		return yLabel;
-	}
-
-	
-	public void setYLabel(String label) {
-		yLabel = label;
-	}
-
-	
-	public Map<String, Tuple<double[], double[]>> getSeries() {
-		return series;
-	}
-
-	
-	public void setSeries(Map<String, Tuple<double[], double[]>> series) {
-		this.series = series;
-	}
-
-
 
 }

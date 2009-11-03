@@ -47,8 +47,9 @@ public class DgAnalysisPopulation {
 	public static final Id RUNID1 = new IdImpl("run1");
 	public static final Id RUNID2 = new IdImpl("run2");
 	
-	private double minIncome = Double.POSITIVE_INFINITY;
-	private double maxIncome = Double.NEGATIVE_INFINITY;
+	private Double minIncome = null; 
+	private Double maxIncome = null; 
+	private Double totalIncome = null;
 
 	private Envelope boundingBox = null;
 	
@@ -97,8 +98,24 @@ public class DgAnalysisPopulation {
 		}
 		return carplans;
 	}
+	
+	public void calculateIncomeData() {
+		this.calculateMinMaxIncome();
+		this.calculateTotalIncome();
+	}
+
+
+	public void calculateTotalIncome() {
+		double i = 0;
+		for (DgPersonData d : this.getPersonData().values()){
+			i += d.getIncome().getIncome();
+		}
+		this.totalIncome = i;
+	}
 
 	public void calculateMinMaxIncome() {
+		this.minIncome = Double.POSITIVE_INFINITY;
+		this.maxIncome = Double.NEGATIVE_INFINITY;
 		double y;
 		for (DgPersonData d : this.getPersonData().values()) {
 			y = d.getIncome().getIncome();
@@ -111,6 +128,19 @@ public class DgAnalysisPopulation {
 		}
 	}
 
+	public Double calcAverageScoreDifference(Id runId1, Id runId2) {
+		Double deltaScoreSum = 0.0;
+		for (DgPersonData d : this.getPersonData().values()){
+			DgPlanData planDataRun1 = d.getPlanData().get(runId1);
+			DgPlanData planDataRun2 = d.getPlanData().get(runId2);
+			deltaScoreSum += (planDataRun2.getScore() - planDataRun1.getScore());
+		}
+		Double avg = null;
+		avg = deltaScoreSum/this.getPersonData().size();
+		return avg;
+	}
+	
+	
 	private void calculateBoundingBox(){
 		Coord minNW = new CoordImpl(Double.MAX_VALUE, Double.MAX_VALUE);
 		Coord maxSE = new CoordImpl(Double.MIN_VALUE, Double.MIN_VALUE);
@@ -136,12 +166,16 @@ public class DgAnalysisPopulation {
 		this.boundingBox.init(minNW.getX(), maxSE.getX(), minNW.getY(), maxSE.getY());
 	}
 	
-	public double getMinIncome() {
+	public Double getMinIncome() {
 		return minIncome;
 	}
 	
-	public double getMaxIncome() {
+	public Double getMaxIncome() {
 		return maxIncome;
+	}
+	
+	public Double getTotalIncome(){
+		return this.totalIncome;
 	}
 
 	public Envelope getBoundingBox() {
@@ -150,6 +184,7 @@ public class DgAnalysisPopulation {
 		}
 		return this.boundingBox;
 	}
+
 	
 	
 	

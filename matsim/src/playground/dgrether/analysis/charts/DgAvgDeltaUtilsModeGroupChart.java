@@ -32,9 +32,9 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.dgrether.analysis.charts.utils.DgColorScheme;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
 import playground.dgrether.analysis.population.DgModeSwitchPlanTypeAnalyzer;
-import playground.dgrether.utils.charts.DgColorScheme;
 /**
  * 
  * @author dgrether
