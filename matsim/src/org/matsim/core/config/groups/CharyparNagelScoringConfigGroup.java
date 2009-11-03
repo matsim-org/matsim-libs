@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.core.config.Module;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
@@ -290,7 +291,12 @@ public class CharyparNagelScoringConfigGroup extends Module {
 			}
 		}
 		if (!hasOpeningAndClosingTime && !hasOpeningTimeAndLatePenalty) {
-			log.error("NO OPENING OR CLOSING TIMES DEFINED!\n\n\nThere is no activity type that has an opening *and* closing time (or opening time and late penalty) defined.\nThis usually means that the activity chains can be shifted by an arbitrary\nnumber of hours without having an effect on the score of the plans, and thus\nresulting in wrong results / traffic patterns.\n\n\n");
+			log.info("NO OPENING OR CLOSING TIMES DEFINED!\n\n\n"
+					+"There is no activity type that has an opening *and* closing time (or opening time and late penalty) defined.\n"
+					+"This usually means that the activity chains can be shifted by an arbitrary\n"
+					+"number of hours without having an effect on the score of the plans, and thus\n"
+					+"resulting in wrong results / traffic patterns.\n"
+					+"If you are using MATSim without time adaptation, you can ignore this warning.\n\n\n");
 		}
 	}
 
