@@ -238,14 +238,22 @@ public class CreateDijkstraKnowledge4MultiFactors {
 		Thread[] threads = new Thread[this.numOfThreads];
 		CreateKnowledgeThread[] creationThreads = new CreateKnowledgeThread[numOfThreads];
 		
+		/*
+		 * Create Cost Arrays only once initially. They don't change so all Threads can
+		 * use them at the same time.
+		 */
+		log.info("Creating Cost Arrays ...");
+		SpanningTreeProvider stp = new SpanningTreeProvider(this.network);
+		stp.createCostArray();
+		log.info("Creating Cost Arrays ... done");
+		
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) 
-		{
-		
+		{		
 			DijkstraForSelectNodes dijkstra = new DijkstraForSelectNodes(this.network);
 			dijkstra.setCostCalculator(costCalculator);
-
-			CreateKnowledgeThread createKnowledgeThread = new CreateKnowledgeThread(i, dijkstra, costFactorsList, new ReadSpanningTreeFromDB(this.network));
+			
+			CreateKnowledgeThread createKnowledgeThread = new CreateKnowledgeThread(i, dijkstra, costFactorsList, stp.clone());
 						
 			creationThreads[i] = createKnowledgeThread;
 			
@@ -290,16 +298,16 @@ public class CreateDijkstraKnowledge4MultiFactors {
 		private final List<Person> persons;
 		private KnowledgeTools knowledgeTools;
 		private DijkstraForSelectNodes dijkstra;
-		private ReadSpanningTreeFromDB dbReader;
+		private SpanningTreeProvider stp;
 		
-		public CreateKnowledgeThread(final int i, final DijkstraForSelectNodes dijkstra, final List<Double> costFactors, ReadSpanningTreeFromDB dbReader)
+		public CreateKnowledgeThread(final int i, final DijkstraForSelectNodes dijkstra, final List<Double> costFactors, SpanningTreeProvider stp)
 		{
 			this.threadId = i;
 			
 			// Sort the List - this is necessary for the Algorithm to work properly!
 			Collections.sort(costFactors);
 			this.costFactors = costFactors;
-			this.dbReader = dbReader;
+			this.stp = stp;
 			
 			this.knowledgeTools = new KnowledgeTools();
 			this.dijkstra = dijkstra;
@@ -392,9 +400,10 @@ public class CreateDijkstraKnowledge4MultiFactors {
 		
 			Map<Node, Double> totalNodes;
 			
-			if (dbReader != null)
+			// If we get the Dijkstra Data from a SpanningTreeProvider
+			if (stp != null)
 			{
-				totalNodes = dbReader.getTotalSpanningTree(startNode, endNode);
+				totalNodes = stp.getTotalSpanningTree(startNode, endNode);
 			}
 			else
 			{

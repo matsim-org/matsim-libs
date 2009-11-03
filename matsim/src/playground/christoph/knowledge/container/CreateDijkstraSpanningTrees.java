@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.christoph.knowledge.container;
 
 import java.sql.PreparedStatement;
@@ -46,9 +47,9 @@ import playground.christoph.tools.Zipper;
  * - one containing the travel costs to all nodes traveling forwards
  * - one containing the travel costs to all nodes traveling backwards 
  */
-public class CreateDijkstraMap {
+public class CreateDijkstraSpanningTrees {
 
-	private final static Logger log = Logger.getLogger(CreateDijkstraMap.class);
+	private final static Logger log = Logger.getLogger(CreateDijkstraSpanningTrees.class);
 	
 	private NetworkLayer network;
 
@@ -66,9 +67,6 @@ public class CreateDijkstraMap {
 	 * change the results significantly.
 	 */
 	private boolean useFloatPrecision = true;
-	
-	// if we have all Data local in Memory - take it from there, else read it from the Database.
-	private boolean localData = false;
 	
 	/*
 	 * Dijkstra based Node Selector
@@ -97,7 +95,7 @@ public class CreateDijkstraMap {
 //		new CreateDijkstraMap(network);
 	}
 	
-	public CreateDijkstraMap(NetworkLayer network)
+	public CreateDijkstraSpanningTrees(NetworkLayer network)
 	{	
 		this.network = network;
 		
@@ -343,7 +341,7 @@ public class CreateDijkstraMap {
 			// If the Table doesn't exist -> create it.
 			if (!tableExists(tableName))
 			{
-				String createTable = "CREATE TABLE " + tableName + " (NodeId STRING, SpanningTree MEDIUMBLOB, PRIMARY KEY (NodeId))";
+				String createTable = "CREATE TABLE " + tableName + " (NodeId VARCHAR(255), SpanningTree MEDIUMBLOB, PRIMARY KEY (NodeId))";
 				
 				dbConnectionTool.connect();
 				dbConnectionTool.executeUpdate(createTable);
