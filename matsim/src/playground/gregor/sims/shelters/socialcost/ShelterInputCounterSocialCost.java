@@ -14,20 +14,14 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.evacuation.base.Building;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 
 public class ShelterInputCounterSocialCost implements BasicLinkLeaveEventHandler, BeforeMobsimListener, AfterMobsimListener{
