@@ -20,14 +20,19 @@
 
 package playground.balmermi.datapuls;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsImpl;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
+import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.scenario.ScenarioLoader;
 
 import playground.balmermi.datapuls.modules.FacilitiesWriteTables;
 import playground.balmermi.datapuls.modules.LinkTablesEventHandler;
+import playground.balmermi.datapuls.modules.LinkTablesFromPopulation;
 import playground.balmermi.datapuls.modules.PopulationWriteTable;
 
 
@@ -43,7 +48,7 @@ public class DatapulsConverter {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		
 		log.info("gathering time bin size...");
 		int timeBinSize = Integer.parseInt(args[1]);
@@ -70,5 +75,9 @@ public class DatapulsConverter {
 		
 		MatsimEventsReader eventsReader = new MatsimEventsReader(events);
 		eventsReader.readFile(scenario.getConfig().events().getInputFile());
+
+		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
+		AStarLandmarksFactory factory = new AStarLandmarksFactory(scenario.getNetwork(), timeCostCalculator);
+		new LinkTablesFromPopulation(timeBinSize, outdir, scenario.getNetwork(), factory.createPathCalculator(scenario.getNetwork(), timeCostCalculator, timeCostCalculator), scenario.getConfig().plansCalcRoute()).run(scenario.getPopulation());
 	}
 }
