@@ -41,6 +41,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * @author mrieser
@@ -51,6 +52,7 @@ public final class LinkTablesFromPopulation {
 	private final String outputDirectory;
 	private final Network network;
 	private final LeastCostPathCalculator router;
+	private final Counter counter = new Counter("person #");
 	
 	private final HashMap<TransportMode, HashMap<Integer, BufferedWriter>> writers = new HashMap<TransportMode, HashMap<Integer, BufferedWriter>>();
 	private final EnumSet<TransportMode> analyzedModes = EnumSet.of(TransportMode.walk, TransportMode.bike);
@@ -72,8 +74,10 @@ public final class LinkTablesFromPopulation {
 	
 	public void run(final Population population) throws IOException {
 		for (Person person : population.getPersons().values()) {
+			counter.incCounter();
 			run(person);
 		}
+		counter.printCounter();
 		closeAllFiles();
 	}
 
