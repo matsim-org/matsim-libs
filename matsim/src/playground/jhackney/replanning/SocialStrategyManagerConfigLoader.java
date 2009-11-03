@@ -24,7 +24,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.BasicScenario;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -181,7 +181,7 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 					try {
 						Class<? extends PlanStrategy> klas = (Class<? extends PlanStrategy>) Class.forName(classname);
 						Class[] args = new Class[1];
-						args[0] = BasicScenario.class;
+						args[0] = Scenario.class;
 						Constructor<? extends PlanStrategy> c = null;
 						try{
 							c = klas.getConstructor(args);

@@ -4,23 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
 import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicPopulationFactory;
 import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 
 
 @SuppressWarnings("unused")
@@ -30,12 +30,12 @@ BasicActivityEndEventHandler
 {
 	private static final Logger log = Logger.getLogger(MyModule.class);
 	
-	BasicScenario sc ; 
-	BasicNetwork<BasicNode,BasicLink> net ;
-	BasicPopulation<BasicPerson<BasicPlan>> pop ;
+	Scenario sc ; 
+	Network net ;
+	Population pop ;
 //	BasicFacilities facs ; // TODO: nicht konsequenterweise BasicFacilities<BasicFacility> ??  Maybe low prio.
 	
-	public MyModule(BasicScenario sc) {
+	public MyModule(Scenario sc) {
 		
 		net = sc.getNetwork() ;
 		pop = sc.getPopulation() ;
@@ -67,13 +67,13 @@ BasicActivityEndEventHandler
 		}
 		
 		// go through population and copy to my personal population:
-		for ( BasicPerson person : pop.getPersons().values() ) {
+		for ( Person person : pop.getPersons().values() ) {
 			
 			Id id = person.getId();
 			
-			List<BasicPlan> plans = person.getPlans() ;
+			List<? extends Plan> plans = person.getPlans() ;
 			
-			for ( BasicPlan plan : plans ) {
+			for ( Plan plan : plans ) {
 				for ( Object oo : plan.getPlanElements() ) {
 					if ( oo instanceof BasicActivity ) {
 						BasicActivity act = (BasicActivity) oo ;
@@ -105,15 +105,15 @@ BasicActivityEndEventHandler
 	public void handlePlan(BasicPlan ppp) { // need handlePlan(BasicPlan) ??????
 		BasicPlan plan = ppp ;
 		
-		BasicPopulationFactory pb = pop.getFactory() ; 
+		PopulationFactory pb = pop.getFactory() ; 
 		
 		try {
 			Id id = sc.createId("1") ; 
 
-			BasicPerson<BasicPlan> person = pb.createPerson(id) ;
+			Person person = pb.createPerson(id) ;
 			pop.addPerson(person);
 			
-			BasicPlan newPlan = pb.createPlan(person) ; 
+			Plan newPlan = pb.createPlan(person) ; 
 			person.addPlan(newPlan ) ;
 			
 			// FIXME: This creational method has the side effect of also adding the created Object.  In my view:

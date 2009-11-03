@@ -20,7 +20,6 @@
 package org.matsim.api.core.v01;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.BasicScenario;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -50,9 +49,8 @@ import org.matsim.world.World;
 
 /**
  * @author dgrether
- *
  */
-public class ScenarioImpl implements BasicScenario, Scenario {
+public class ScenarioImpl implements Scenario {
 
 	private static final Logger log = Logger.getLogger(ScenarioImpl.class);
 	
@@ -169,31 +167,18 @@ public class ScenarioImpl implements BasicScenario, Scenario {
 		return this.network;
 	}
 
-	/**
-	 * @see org.matsim.api.core.v01.Scenario#getPopulation()
-	 */
 	public PopulationImpl getPopulation() {
 		return this.population;
 	}
 
-	/**
-	 * @see org.matsim.api.basic.v01.BasicScenario#createCoord(double, double)
-	 */
 	public Coord createCoord(final double d, final double e) {
 		return new CoordImpl( d, e ) ;
 	}
 
-
-	/**
-	 * @see org.matsim.api.basic.v01.BasicScenario#createId(java.lang.String)
-	 */
 	public Id createId(final String string) {
 		return new IdImpl( string) ;
 	}
 
-	/**
-	 * @see org.matsim.api.basic.v01.BasicScenario#getConfig()
-	 */
 	public Config getConfig() {
 		return this.config;
 	}
