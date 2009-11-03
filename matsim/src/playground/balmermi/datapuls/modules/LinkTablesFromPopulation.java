@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.io.IOUtils;
@@ -57,7 +58,7 @@ public final class LinkTablesFromPopulation {
 	
 	public LinkTablesFromPopulation(final int timeBinSize,
 			final String outputDirectory, final Network network, 
-			final LeastCostPathCalculator router) {
+			final LeastCostPathCalculator router, final PlansCalcRouteConfigGroup config) {
 		this.timeBinSize = timeBinSize;
 		this.outputDirectory = outputDirectory;
 		this.network = network;
@@ -65,8 +66,8 @@ public final class LinkTablesFromPopulation {
 		for (TransportMode mode : analyzedModes) {
 			this.writers.put(mode, new HashMap<Integer, BufferedWriter>());
 		}
-		this.speeds.put(TransportMode.walk, 4.5 / 3.6);
-		this.speeds.put(TransportMode.bike, 12.5 / 3.6);
+		this.speeds.put(TransportMode.walk, config.getWalkSpeedFactor());
+		this.speeds.put(TransportMode.bike, config.getBikeSpeedFactor());
 	}
 	
 	public void run(final Population population) throws IOException {
@@ -129,7 +130,7 @@ public final class LinkTablesFromPopulation {
 		int timeBin = ((int) time) / timeBinSize;
 		BufferedWriter writer = this.writers.get(mode).get(Integer.valueOf(timeBin));
 		if (writer == null) {
-			String filename = "/linkAnalysis"+(timeBin*this.timeBinSize)+"-"+((timeBin+1)*this.timeBinSize)+mode.toString()+".txt.gz";
+			String filename = "/linkAnalysis_"+mode.toString()+"_"+(timeBin*this.timeBinSize)+"-"+((timeBin+1)*this.timeBinSize)+".txt.gz";
 			try {
 				writer = IOUtils.getBufferedWriter(this.outputDirectory + filename);
 				writer.write("lid\tpid\tfromActType\tfromActFid\ttoActType\ttoActFid\n");
