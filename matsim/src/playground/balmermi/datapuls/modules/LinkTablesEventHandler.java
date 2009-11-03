@@ -84,7 +84,7 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 				currentBin++;
 				log.info("new time bin: currentBin="+currentBin+"; time="+(event.getTime()/3600));
 				if (out != null) { out.close(); }
-				out = IOUtils.getBufferedWriter(outdir+"/linkAnalysis"+(currentBin*timeBinSize)+"-"+((currentBin+1)*timeBinSize)+".txt.gz");
+				out = IOUtils.getBufferedWriter(outdir+"/linkAnalysisCar"+(currentBin*timeBinSize)+"-"+((currentBin+1)*timeBinSize)+".txt.gz");
 				out.write("lid\tpid\tfromActType\tfromActFid\ttoActType\ttoActFid\n");
 			}
 			PersonImpl p = population.getPersons().get(event.getPersonId());

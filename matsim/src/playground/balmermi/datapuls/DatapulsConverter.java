@@ -50,26 +50,25 @@ public class DatapulsConverter {
 		log.info("=> timeBinSize: "+timeBinSize);
 		log.info("done.");
 		
+		log.info("gathering output directory... ");
+		String outdir = args[2];
+		log.info("=> "+outdir);
+		log.info("done.");
+		
 		log.info("loading scenario...");
 		ScenarioImpl scenario = new ScenarioLoader(args[0]).loadScenario();
 		log.info("done.");
 
-		log.info("extracting output directory... ");
-		String outdir = scenario.getConfig().facilities().getOutputFile();
-		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
-		log.info("=> "+outdir);
-		log.info("done.");
-		
 		new FacilitiesWriteTables().run(scenario.getActivityFacilities(),outdir);
 		new PopulationWriteTable(scenario.getActivityFacilities()).run(scenario.getPopulation(),outdir);
 
 		EventsImpl events = new EventsImpl();
 		
-		LinkTablesEventHandler handler = new LinkTablesEventHandler(timeBinSize,"../../output",scenario.getPopulation());
+		LinkTablesEventHandler handler = new LinkTablesEventHandler(timeBinSize,outdir,scenario.getPopulation());
 		
 		events.addHandler(handler);
 		
 		MatsimEventsReader eventsReader = new MatsimEventsReader(events);
-		eventsReader.readFile("../../input/150.events.txt.gz");
+		eventsReader.readFile(scenario.getConfig().events().getInputFile());
 	}
 }
