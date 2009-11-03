@@ -61,7 +61,7 @@ public class DatapulsConverter {
 		log.info("done.");
 		
 		new FacilitiesWriteTables().run(scenario.getActivityFacilities(),outdir);
-		new PopulationWriteTable().run(scenario.getPopulation(),outdir);
+		new PopulationWriteTable(scenario.getActivityFacilities()).run(scenario.getPopulation(),outdir);
 
 		EventsImpl events = new EventsImpl();
 		
