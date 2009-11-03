@@ -24,6 +24,8 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.xml.sax.SAXException;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioLoaderI;
@@ -45,7 +47,6 @@ import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.world.MatsimWorldReader;
-import org.xml.sax.SAXException;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -188,7 +189,7 @@ public class ScenarioLoader implements ScenarioLoaderI {
 				log.info("households loaded.");
 			}
 			else {
-				log.warn("no households file set in config or feature disabled, not able to load anything");
+				log.info("no households file set in config or feature disabled, not able to load anything");
 			}
 	}
 
