@@ -53,10 +53,13 @@ public class PlansCalcRouteConfigGroup extends Module {
 	
 	private double ptSpeedFactor = 2.0;
 	
+	// FIXME [KM] it's not a factor, but the actual speed, improve naming
 	private double walkSpeedFactor = 3.0 / 3.6; // 3.0 km/h --> m/s
 	
+	// FIXME [KM] it's not a factor, but the actual speed, improve naming
 	private double bikeSpeedFactor = 15.0 / 3.6; // 15.0 km/h --> m/s
 	
+	// FIXME [KM] it's not a factor, but the actual speed, improve naming
 	private double undefinedModeSpeedFactor = 50.0 / 3.6; // 50.0 km/h --> m/s
 
 	public PlansCalcRouteConfigGroup() {
