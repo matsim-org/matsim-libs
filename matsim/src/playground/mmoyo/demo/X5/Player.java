@@ -1,10 +1,16 @@
 package playground.mmoyo.demo.X5;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
 import playground.mmoyo.demo.ScenarioPlayer;
 
 public class Player {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
 		
 		//invoke controler first
 		/*
