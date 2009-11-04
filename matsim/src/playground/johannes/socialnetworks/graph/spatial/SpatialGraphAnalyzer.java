@@ -87,7 +87,7 @@ public class SpatialGraphAnalyzer {
 		
 		logger.info(String.format("Loading graph %1$s...", graphfile));
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		SpatialGraph g = reader.readGraph(graphfile);
+		SpatialSparseGraph g = reader.readGraph(graphfile);
 		
 		if(!output.endsWith("/"))
 			output = output + "/";
@@ -107,7 +107,7 @@ public class SpatialGraphAnalyzer {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void analyze(SpatialGraph graph, String output, boolean extended, ZoneLayerDouble zones, TravelTimeMatrix matrix, Geometry boundary) {
+	public static void analyze(SpatialSparseGraph graph, String output, boolean extended, ZoneLayerDouble zones, TravelTimeMatrix matrix, Geometry boundary) {
 		GraphAnalyser.analyze(graph, output, extended);
 
 		double binsize = 1000.0;
@@ -184,7 +184,7 @@ public class SpatialGraphAnalyzer {
 				for(int i = 0; i < kPartitions.size(); i++) {
 					it.advance();
 					String filename = String.format("%1$s/edgelength.%2$s.hist.txt", patitionOutput, (int)it.key());
-					Distribution.writeHistogram(SpatialGraphStatistics.edgeLengthDistribution((Set<SpatialVertex>)it.value()).absoluteDistribution(binsize), filename);
+					Distribution.writeHistogram(SpatialGraphStatistics.edgeLengthDistribution((Set<SpatialSparseVertex>)it.value()).absoluteDistribution(binsize), filename);
 				}
 				/*
 				 * density partitions
@@ -196,7 +196,7 @@ public class SpatialGraphAnalyzer {
 				for(int i = 0; i < rhoPartitions.size(); i++) {
 					it.advance();
 					String filename = String.format("%1$s/edgelength.%2$s.hist.txt", patitionOutput, (int)it.key());
-					Distribution.writeHistogram(SpatialGraphStatistics.edgeLengthDistribution((Set<SpatialVertex>)it.value()).absoluteDistribution(binsize), filename);
+					Distribution.writeHistogram(SpatialGraphStatistics.edgeLengthDistribution((Set<SpatialSparseVertex>)it.value()).absoluteDistribution(binsize), filename);
 				}
 			}
 			

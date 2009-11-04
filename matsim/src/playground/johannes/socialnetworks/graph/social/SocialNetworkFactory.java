@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SocialNetworkFactory.java
+ * SocialNetworkFactory2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,68 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
 package playground.johannes.socialnetworks.graph.social;
 
-import java.util.Iterator;
-
 import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.contrib.sna.graph.GraphFactory;
 
-import playground.johannes.socialnetworks.graph.GraphFactory;
+import visad.data.netcdf.UnsupportedOperationException;
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetworkFactory<P extends BasicPerson<?>> implements GraphFactory<SocialNetwork<P>, Ego<P>, SocialTie> {
+public class SocialNetworkFactory<P extends BasicPerson<?>> implements GraphFactory<SocialNetwork<P>, Ego<P>, SocialTie>{
 
-	private BasicPopulation<P> population;
-	
-	private Iterator<? extends P> popIterator;
-	
-	public SocialNetworkFactory(BasicPopulation<P> population) {
-		this.population = population;
+	public SocialTie createEdge() {
+		return new SocialTie(0);
 	}
 	
-	public SocialTie addEdge(SocialNetwork<P> g, Ego<P> v1, Ego<P> v2) {
-		SocialTie tie = new SocialTie(v1, v2);
-		if(g.insertEdge(tie, v1, v2))
-			return tie;
-		else
-			return null;
-		
-	}
-
-	public SocialTie addEdge(SocialNetwork<P> g, Ego<P> v1, Ego<P> v2, int created) {
-		SocialTie tie = new SocialTie(v1, v2, created);
-		if(g.insertEdge(tie, v1, v2))
-			return tie;
-		else
-			return null;
-	}
-	
-	public Ego<P> addVertex(SocialNetwork<P> g) {
-		if(popIterator.hasNext()) {
-			return addVertex(g, popIterator.next());
-		} else
-			return null;
-	}
-	
-	public Ego<P> addVertex(SocialNetwork<P> g, P person) {
-		Ego<P> ego = new Ego<P>(person);
-		if(g.insertVertex(ego))
-			return ego;
-		else
-			return null;
+	public SocialTie createEdge(int created) {
+		return new SocialTie(created);
 	}
 
 	public SocialNetwork<P> createGraph() {
-		popIterator = population.getPersons().values().iterator();
 		return new SocialNetwork<P>();
+	}
+
+	public Ego<P> createVertex() {
+		throw new UnsupportedOperationException();
+	}
+	
+	public Ego<P> createVertex(P person) {
+		return new Ego<P>(person);
 	}
 
 }

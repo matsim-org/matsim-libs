@@ -30,12 +30,12 @@ import gnu.trove.TObjectIntHashMap;
 
 import java.util.ArrayList;
 
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphBuilder;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.socialnetworks.graph.Edge;
-import playground.johannes.socialnetworks.graph.Graph;
-import playground.johannes.socialnetworks.graph.GraphFactory;
-import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger
@@ -81,12 +81,12 @@ public class AdjacencyMatrix {
 		}
 	}
 	
-	public <G extends Graph, V extends Vertex, E extends Edge> G getGraph(GraphFactory<G, V, E> factory) {
-		G g = factory.createGraph();
+	public <G extends Graph, V extends Vertex, E extends Edge> G getGraph(GraphBuilder<G, V, E> builder) {
+		G g = builder.createGraph();
 
 		TIntObjectHashMap<V> vertexIdx = new TIntObjectHashMap<V>();
 		for(int i = 0; i < rows.size(); i++) {
-			V v = factory.addVertex(g);
+			V v = builder.addVertex(g);
 			vertexIdx.put(i, v);
 		}
 		
@@ -96,7 +96,7 @@ public class AdjacencyMatrix {
 				for(int idx = 0; idx < row.size(); idx++) {
 					int j = row.get(idx);
 					if(j > i) {
-						if(factory.addEdge(g, vertexIdx.get(i), vertexIdx.get(j)) == null)
+						if(builder.addEdge(g, vertexIdx.get(i), vertexIdx.get(j)) == null)
 							throw new RuntimeException();
 					}
 				}

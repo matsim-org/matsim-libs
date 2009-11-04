@@ -28,13 +28,13 @@ import java.util.List;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicPerson;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class Ego<P extends BasicPerson<?>> extends SpatialVertex {
+public class Ego<P extends BasicPerson<?>> extends SpatialSparseVertex {
 
 	private P person;
 	

@@ -22,34 +22,19 @@ package playground.johannes.socialnetworks.graph.spatial;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.contrib.sna.graph.Vertex;
 
-import playground.johannes.socialnetworks.graph.SparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialVertex extends SparseVertex {
-
-	private Coord coord;
+public interface SpatialVertex extends Vertex {
 	
-	protected SpatialVertex(Coord coord) {
-		this.coord = coord;
-	}
+	public List<? extends SpatialEdge> getEdges();
 	
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<? extends SpatialVertex> getNeighbours() {
-		return (List<? extends SpatialVertex>) super.getNeighbours();
-	}
+	public List<? extends SpatialVertex> getNeighbours();
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<? extends SpatialEdge> getEdges() {
-		return (List<? extends SpatialEdge>) super.getEdges();
-	}
-
-	public Coord getCoordinate() {
-		return coord;
-	}
+	public Coord getCoordinate();
+	
 }

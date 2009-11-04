@@ -29,16 +29,16 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.contrib.sna.graph.SparseEdge;
+import org.matsim.contrib.sna.graph.SparseVertex;
 
-import playground.johannes.socialnetworks.graph.SparseEdge;
-import playground.johannes.socialnetworks.graph.SparseVertex;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetwork<P extends BasicPerson<?>> extends SpatialGraph {
+public class SocialNetwork<P extends BasicPerson<?>> extends SpatialSparseGraph {
 	
 	private Map<P, Ego<P>> personEgoMapping = new HashMap<P, Ego<P>>();
 	
@@ -46,35 +46,35 @@ public class SocialNetwork<P extends BasicPerson<?>> extends SpatialGraph {
 		super();
 	}
 	
-	@Deprecated
-	public SocialNetwork(BasicPopulation<P> pop) {
-		this();
-		for(P p : pop.getPersons().values())
-			addEgo(p);
-	}
-	
-	@Deprecated
-	public Ego<P> addEgo(P person) {
-		Ego<P> e = new Ego<P>(person);
-		if(insertVertex(e)) {
-			return e;
-		} else
-			return null;
-	}
-	
-	@Deprecated
-	public SocialTie addEdge(Ego<P> e1, Ego<P> e2) {
-		return this.addEdge(e1, e2, 0);
-	}
-	
-	@Deprecated
-	public SocialTie addEdge(Ego<P> e1, Ego<P> e2, int created) {
-		SocialTie e = new SocialTie(e1, e2, created);
-		if(insertEdge(e, e1, e2))
-			return e;
-		else
-			return null;
-	}
+//	@Deprecated
+//	public SocialNetwork(BasicPopulation<P> pop) {
+//		this();
+//		for(P p : pop.getPersons().values())
+//			addEgo(p);
+//	}
+//	
+//	@Deprecated
+//	public Ego<P> addEgo(P person) {
+//		Ego<P> e = new Ego<P>(person);
+//		if(insertVertex(e)) {
+//			return e;
+//		} else
+//			return null;
+//	}
+//	
+//	@Deprecated
+//	public SocialTie addEdge(Ego<P> e1, Ego<P> e2) {
+//		return this.addEdge(e1, e2, 0);
+//	}
+//	
+//	@Deprecated
+//	public SocialTie addEdge(Ego<P> e1, Ego<P> e2, int created) {
+//		SocialTie e = new SocialTie(e1, e2, created);
+//		if(insertEdge(e))
+//			return e;
+//		else
+//			return null;
+//	}
 	
 	@SuppressWarnings("unchecked")
 	public Set<? extends Ego<P>> getVertices() {
@@ -96,19 +96,19 @@ public class SocialNetwork<P extends BasicPerson<?>> extends SpatialGraph {
 		return (SocialTie) super.getEdge(v1, v2);
 	}
 
-	@Override
-	protected boolean insertEdge(SparseEdge e, SparseVertex v1, SparseVertex v2) {
-		return super.insertEdge(e, v1, v2);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	protected boolean insertVertex(SparseVertex v) {
-		if(super.insertVertex(v)) {
-			personEgoMapping.put(((Ego<P>)v).getPerson(), (Ego<P>)v);
-			return true;
-		} else
-			return false;
-	}
+//	@Override
+//	protected boolean insertEdge(SparseEdge e) {
+//		return super.insertEdge(e);
+//	}
+//
+//	@SuppressWarnings("unchecked")
+//	@Override
+//	protected boolean insertVertex(SparseVertex v) {
+//		if(super.insertVertex(v)) {
+//			personEgoMapping.put(((Ego<P>)v).getPerson(), (Ego<P>)v);
+//			return true;
+//		} else
+//			return false;
+//	}
 
 }

@@ -40,7 +40,7 @@ import playground.johannes.socialnetworks.graph.mcmc.ErgmTriangles;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeSwitch;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeFlip;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 
@@ -65,7 +65,7 @@ public class GravityAnnealer {
 		creader.parse(args[0]);
 		
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		SpatialGraph graph = reader.readGraph(config.findParam(MODULE_NAME, "graphfile"));
+		SpatialSparseGraph graph = reader.readGraph(config.findParam(MODULE_NAME, "graphfile"));
 		
 		GravityAnnealer generator = new GravityAnnealer();
 		generator.thetaDensity = Double.parseDouble(config.getParam(MODULE_NAME, "theta_density"));
@@ -105,7 +105,7 @@ public class GravityAnnealer {
 	
 	private double descretization = 1000.0;
 	
-	public void generate(SpatialGraph graph, SpatialGrid<Double> densityGrid) {
+	public void generate(SpatialSparseGraph graph, SpatialGrid<Double> densityGrid) {
 		SpatialAdjacencyMatrix matrix = new SpatialAdjacencyMatrix(graph);
 		/*
 		 * Setup ergm terms.

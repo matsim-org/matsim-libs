@@ -27,18 +27,19 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-import playground.johannes.socialnetworks.graph.Edge;
-import playground.johannes.socialnetworks.graph.Graph;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
-import playground.johannes.socialnetworks.graph.Vertex;
 import playground.johannes.socialnetworks.graph.io.PajekWriter;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
+import playground.johannes.socialnetworks.graph.social.SocialNetworkBuilder;
 import playground.johannes.socialnetworks.graph.social.io.SNGraphMLWriter;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
@@ -76,12 +77,13 @@ public class SNRun {
 		private InteractionHandler handler;
 		
 		public void notifyStartup(StartupEvent event) {
-			socialnet = new SocialNetwork<Person>(event.getControler().getPopulation());
+			//socialnet = new SocialNetwork<Person>(event.getControler().getPopulation()); //FIXME
+			SocialNetworkBuilder<Person> builder = new SocialNetworkBuilder<Person>();
 			/*
 			 * Setup interaction mechanism.
 			 */
 			InteractionSelector selector = new RandomSelector(1, event.getControler().getConfig().global().getRandomSeed());
-			BefriendInteractor interactor = new BefriendInteractor(socialnet, 1, event.getControler().getConfig().global().getRandomSeed());
+			BefriendInteractor interactor = new BefriendInteractor(socialnet, builder, 1, event.getControler().getConfig().global().getRandomSeed());
 			handler = new InteractionHandler(selector, interactor, event.getControler().getFacilities());
 			
 			event.getControler().addControlerListener(interactor);

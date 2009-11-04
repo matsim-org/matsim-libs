@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialPartitiona.java
+ * SpatialSparseGraphFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,32 +19,30 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.contrib.sna.graph.GraphFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-
-import playground.johannes.socialnetworks.spatial.Zone;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialPartitions {
+public class SpatialSparseGraphFactory implements GraphFactory<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> {
 
-	public static <V extends SpatialSparseVertex> Set<V> createSpatialPartition(Set<V> vertices, Zone zone) {
-		Set<V> partition = new HashSet<V>();
-		GeometryFactory factory = new GeometryFactory();
-		Geometry geometry = zone.getBorder();
-		for(V v : vertices) {
-			Coordinate coordinate = new Coordinate(v.getCoordinate().getX(), v.getCoordinate().getY());
-			if(geometry.contains(factory.createPoint(coordinate))) {
-				partition.add(v);
-			}
-		}
-		return partition;
+	public SpatialSparseEdge createEdge() {
+		return new SpatialSparseEdge();
+	}
+
+	public SpatialSparseGraph createGraph() {
+		return new SpatialSparseGraph();
+	}
+
+	public SpatialSparseVertex createVertex() {
+		return new SpatialSparseVertex(null);
 	}
 	
+	public SpatialSparseVertex createVertex(Coord coord) {
+		return new SpatialSparseVertex(coord);
+	}
+
 }

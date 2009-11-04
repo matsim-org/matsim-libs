@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialPartitiona.java
+ * SocialNetworkBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,34 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial;
+package playground.johannes.socialnetworks.graph.social;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-
-import playground.johannes.socialnetworks.spatial.Zone;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialPartitions {
+public class SocialNetworkBuilder<P extends BasicPerson<?>> extends AbstractSparseGraphBuilder<SocialNetwork<P>, Ego<P>, SocialTie>{
 
-	public static <V extends SpatialSparseVertex> Set<V> createSpatialPartition(Set<V> vertices, Zone zone) {
-		Set<V> partition = new HashSet<V>();
-		GeometryFactory factory = new GeometryFactory();
-		Geometry geometry = zone.getBorder();
-		for(V v : vertices) {
-			Coordinate coordinate = new Coordinate(v.getCoordinate().getX(), v.getCoordinate().getY());
-			if(geometry.contains(factory.createPoint(coordinate))) {
-				partition.add(v);
-			}
-		}
-		return partition;
+	public SocialNetworkBuilder() {
+		super(new SocialNetworkFactory<P>());
+	}
+
+	@Override
+	public Ego<P> addVertex(SocialNetwork<P> graph) {
+		throw new UnsupportedOperationException();
 	}
 	
+	public Ego<P> addVertex(SocialNetwork<P> graph, P person) {
+		Ego<P> ego = ((SocialNetworkFactory<P>)getFactory()).createVertex(person);
+		if(insertVertex(graph, ego))
+			return ego;
+		else
+			return null;
+	}
+	
+	public SocialTie addEdge(SocialNetwork<P> graph, Ego<P> vertex1, Ego<P> vertex2, int created) {
+		SocialTie edge = ((SocialNetworkFactory<P>)getFactory()).createEdge(created);
+		if(insertEdge(graph, vertex1, vertex2, edge))
+			return edge;
+		else
+			return null;
+	}
 }

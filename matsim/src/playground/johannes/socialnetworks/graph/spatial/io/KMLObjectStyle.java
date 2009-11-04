@@ -25,8 +25,9 @@ package playground.johannes.socialnetworks.graph.spatial.io;
 
 import java.util.List;
 
+import org.matsim.contrib.sna.graph.Graph;
+
 import net.opengis.kml._2.StyleType;
-import playground.johannes.socialnetworks.graph.Graph;
 
 /**
  * @author illenberger

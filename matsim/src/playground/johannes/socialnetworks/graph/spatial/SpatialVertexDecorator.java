@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialPartitiona.java
+ * SpatialVertexDecorator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,32 +19,33 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import org.matsim.api.basic.v01.Coord;
 
-import playground.johannes.socialnetworks.spatial.Zone;
+import playground.johannes.socialnetworks.graph.VertexDecorator;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialPartitions {
+public class SpatialVertexDecorator<V extends SpatialVertex> extends VertexDecorator<V> implements
+		SpatialVertex {
 
-	public static <V extends SpatialSparseVertex> Set<V> createSpatialPartition(Set<V> vertices, Zone zone) {
-		Set<V> partition = new HashSet<V>();
-		GeometryFactory factory = new GeometryFactory();
-		Geometry geometry = zone.getBorder();
-		for(V v : vertices) {
-			Coordinate coordinate = new Coordinate(v.getCoordinate().getX(), v.getCoordinate().getY());
-			if(geometry.contains(factory.createPoint(coordinate))) {
-				partition.add(v);
-			}
-		}
-		return partition;
+	protected SpatialVertexDecorator(V delegate) {
+		super(delegate);
 	}
-	
+
+	public List<? extends SpatialEdgeDecorator<?>> getEdges() {
+		return (List<? extends SpatialEdgeDecorator<?>>) super.getEdges();
+	}
+
+	public List<? extends SpatialVertexDecorator<V>> getNeighbours() {
+		return (List<? extends SpatialVertexDecorator<V>>) super.getNeighbours();
+	}
+
+	public Coord getCoordinate() {
+		return getDelegate().getCoordinate();
+	}
+
 }

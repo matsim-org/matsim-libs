@@ -23,48 +23,47 @@
  */
 package playground.johannes.socialnetworks.graph.spatial.io;
 
+import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.xml.sax.Attributes;
 
-import playground.johannes.socialnetworks.graph.SparseVertex;
-import playground.johannes.socialnetworks.graph.io.AbstractGraphMLReader;
-import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraphFactory;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraphBuilder;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialGraphMLReader extends AbstractGraphMLReader {
+public class SpatialGraphMLReader extends AbstractGraphMLReader<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> {
 
 	public static final String COORD_X_TAG = "x";
 	
 	public static final String COORD_Y_TAG = "y";
 	
-	private SpatialGraphFactory factory = new SpatialGraphFactory();
+	private SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder();
 	
 	@Override
-	public SpatialGraph readGraph(String file) {
-		return (SpatialGraph) super.readGraph(file);
+	public SpatialSparseGraph readGraph(String file) {
+		return (SpatialSparseGraph) super.readGraph(file);
 	}
 
 	@Override
-	protected SpatialEdge addEdge(SparseVertex v1, SparseVertex v2,
+	protected SpatialSparseEdge addEdge(SpatialSparseVertex v1, SpatialSparseVertex v2,
 			Attributes attrs) {
-		return factory.addEdge((SpatialGraph)graph, (SpatialVertex)v1, (SpatialVertex)v2);
+		return builder.addEdge(getGraph(), v1, v2);
 	}
 
 	@Override
-	protected SpatialVertex addVertex(Attributes attrs) {
+	protected SpatialSparseVertex addVertex(Attributes attrs) {
 		double x = Double.parseDouble(attrs.getValue(COORD_X_TAG));
 		double y = Double.parseDouble(attrs.getValue(COORD_Y_TAG));
-		return factory.addVertex((SpatialGraph)graph, new CoordImpl(x, y));
+		return builder.addVertex((SpatialSparseGraph)getGraph(), new CoordImpl(x, y));
 	}
 
 	@Override
-	protected SpatialGraph newGraph(Attributes attrs) {
-		return new SpatialGraph();
+	protected SpatialSparseGraph newGraph(Attributes attrs) {
+		return new SpatialSparseGraph();
 	}
 }

@@ -25,30 +25,30 @@ package playground.johannes.socialnetworks.graph.spatial.io;
 
 import gnu.trove.TObjectDoubleHashMap;
 import playground.johannes.socialnetworks.graph.io.PajekColorizer;
-import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class PajekDistanceColorizer extends PajekColorizer<SpatialVertex, SpatialEdge> {
+public class PajekDistanceColorizer extends PajekColorizer<SpatialSparseVertex, SpatialSparseEdge> {
 
 	private double d_min;
 	
 	private double d_max;
 	
-	private TObjectDoubleHashMap<SpatialVertex> d_mean;
+	private TObjectDoubleHashMap<SpatialSparseVertex> d_mean;
 	
 	private boolean logScale = false;
 	
 	@SuppressWarnings("unchecked")
-	public PajekDistanceColorizer(SpatialGraph graph, boolean logScale) {
+	public PajekDistanceColorizer(SpatialSparseGraph graph, boolean logScale) {
 		super();
 		setLogScale(logScale);
-		d_mean = (TObjectDoubleHashMap<SpatialVertex>) SpatialGraphStatistics.meanEdgeLength(graph);
+		d_mean = (TObjectDoubleHashMap<SpatialSparseVertex>) SpatialGraphStatistics.meanEdgeLength(graph);
 		
 		d_min = Double.MAX_VALUE;
 		d_max = Double.MIN_VALUE;
@@ -63,12 +63,12 @@ public class PajekDistanceColorizer extends PajekColorizer<SpatialVertex, Spatia
 	}
 	
 	@Override
-	public String getEdgeColor(SpatialEdge e) {
+	public String getEdgeColor(SpatialSparseEdge e) {
 		return getColor(-1);
 	}
 
 	@Override
-	public String getVertexFillColor(SpatialVertex v) {
+	public String getVertexFillColor(SpatialSparseVertex v) {
 		double color = -1;
 		if(logScale) {
 			double min = Math.log(d_min + 1);

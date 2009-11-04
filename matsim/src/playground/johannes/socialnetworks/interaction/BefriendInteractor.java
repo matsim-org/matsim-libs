@@ -31,6 +31,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
+import playground.johannes.socialnetworks.graph.social.SocialNetworkBuilder;
 import playground.johannes.socialnetworks.graph.social.SocialTie;
 
 /**
@@ -41,14 +42,17 @@ public class BefriendInteractor implements Interactor, IterationStartsListener {
 
 	private SocialNetwork<Person> socialnet;
 	
+	private SocialNetworkBuilder<Person> builder;
+	
 	private double tieProba;
 	
 	private Random random;
 	
 	private int currentIteration;
 	
-	public BefriendInteractor(SocialNetwork<Person> socialnet, double p, long randomSeed) {
+	public BefriendInteractor(SocialNetwork<Person> socialnet, SocialNetworkBuilder<Person> builder, double p, long randomSeed) {
 		this.socialnet = socialnet;
+		this.builder = builder;
 		this.tieProba = p;
 		random = new Random(randomSeed);
 	}
@@ -63,7 +67,7 @@ public class BefriendInteractor implements Interactor, IterationStartsListener {
 			 * Create tie...
 			 */
 			if(random.nextDouble() <= tieProba)
-				tie = socialnet.addEdge(e1, e2);
+				tie = builder.addEdge(socialnet, e1, e2);
 		} else {
 			/*
 			 * Reinforce tie...

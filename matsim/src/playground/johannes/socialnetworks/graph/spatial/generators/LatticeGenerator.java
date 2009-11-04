@@ -26,9 +26,9 @@ import playground.johannes.socialnetworks.graph.mcmc.ErgmDensity;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraphFactory;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraphBuilder;
 
 /**
  * @author illenberger
@@ -36,9 +36,9 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
  */
 public class LatticeGenerator {
 
-	public SpatialGraph generate(int width, int height, int gap) {
-		SpatialGraphFactory factory = new SpatialGraphFactory();
-		SpatialGraph graph = factory.createGraph();
+	public SpatialSparseGraph generate(int width, int height, int gap) {
+		SpatialSparseGraphBuilder factory = new SpatialSparseGraphBuilder();
+		SpatialSparseGraph graph = new SpatialSparseGraph();
 		
 //		double x_center = width/2.0;
 //		double y_center = height/2.0;
@@ -59,7 +59,7 @@ public class LatticeGenerator {
 	
 	public static void main(String args[]) {
 		int width = 100;
-		SpatialGraph graph = new LatticeGenerator().generate(width, width, 0);
+		SpatialSparseGraph graph = new LatticeGenerator().generate(width, width, 0);
 		
 		SpatialGrid<Double> grid = new SpatialGrid<Double>(0, 0, width, width, 1);
 		for(int i = 0; i < grid.getNumRows(); i++) {

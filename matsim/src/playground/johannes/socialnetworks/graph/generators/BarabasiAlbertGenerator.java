@@ -30,16 +30,17 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphBuilder;
+import org.matsim.contrib.sna.graph.SparseEdge;
+import org.matsim.contrib.sna.graph.SparseGraph;
+import org.matsim.contrib.sna.graph.SparseGraphBuilder;
+import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.Vertex;
 
-import playground.johannes.socialnetworks.graph.Edge;
-import playground.johannes.socialnetworks.graph.Graph;
-import playground.johannes.socialnetworks.graph.GraphFactory;
-import playground.johannes.socialnetworks.graph.SparseEdge;
-import playground.johannes.socialnetworks.graph.SparseGraph;
-import playground.johannes.socialnetworks.graph.SparseGraphFactory;
-import playground.johannes.socialnetworks.graph.SparseVertex;
-import playground.johannes.socialnetworks.graph.Vertex;
 import playground.johannes.socialnetworks.graph.io.GraphMLWriter;
+
 
 /**
  * @author illenberger
@@ -49,10 +50,10 @@ public class BarabasiAlbertGenerator<G extends Graph, V extends Vertex, E extend
 	
 	public static final Logger logger = Logger.getLogger(BarabasiAlbertGenerator.class);
 
-	private GraphFactory<G, V, E> factory;
+	private GraphBuilder<G, V, E> builder;
 	
-	public BarabasiAlbertGenerator(GraphFactory<G, V, E> factory) {
-		this.factory = factory;
+	public BarabasiAlbertGenerator(GraphBuilder<G, V, E> factory) {
+		this.builder = factory;
 	}
 	
 	public Graph generate(int m_0, int m, int t, long randomSeed) {
@@ -65,18 +66,18 @@ public class BarabasiAlbertGenerator<G extends Graph, V extends Vertex, E extend
 		/*
 		 * Initialize graph.
 		 */
-		G g = factory.createGraph();
+		G g = builder.createGraph();
 		List<V> vertices = new ArrayList<V>(m_0 + (m*t));
 		V previous = null;
 		for(int i = 0; i < m_0; i++) {
-			V v = factory.addVertex(g);
+			V v = builder.addVertex(g);
 			if(v == null)
 				throw new RuntimeException("Vertex must nor be null!");
 			
 			vertices.add(v);
 			
 			if(previous != null) {
-				E e = factory.addEdge(g, v, previous);
+				E e = builder.addEdge(g, v, previous);
 				if(e == null)
 					throw new RuntimeException("Edge must not be null!");
 			}
@@ -90,7 +91,7 @@ public class BarabasiAlbertGenerator<G extends Graph, V extends Vertex, E extend
 			/*
 			 * Insert a new vertex.
 			 */
-			V v = factory.addVertex(g);
+			V v = builder.addVertex(g);
 			/*
 			 * Connect the new vertex to m existing vertices.
 			 */
@@ -122,7 +123,7 @@ public class BarabasiAlbertGenerator<G extends Graph, V extends Vertex, E extend
 			 */
 			int count = targets.size();
 			for(int k = 0; k < count; k++)
-				factory.addEdge(g, v, targets.get(k));
+				builder.addEdge(g, v, targets.get(k));
 		}
 		
 		return g;
@@ -136,7 +137,7 @@ public class BarabasiAlbertGenerator<G extends Graph, V extends Vertex, E extend
 		if(args.length > 4)
 			seed = Long.parseLong(args[4]);
 		
-		BarabasiAlbertGenerator<SparseGraph, SparseVertex, SparseEdge> generator = new BarabasiAlbertGenerator<SparseGraph, SparseVertex, SparseEdge>(new SparseGraphFactory());
+		BarabasiAlbertGenerator<SparseGraph, SparseVertex, SparseEdge> generator = new BarabasiAlbertGenerator<SparseGraph, SparseVertex, SparseEdge>(new SparseGraphBuilder());
 		Graph g = generator.generate(m_0, m, t, seed);
 		GraphMLWriter writer = new GraphMLWriter();
 		writer.write(g, args[0]);

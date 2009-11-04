@@ -21,27 +21,27 @@ package playground.johannes.socialnetworks.graph.spatial.io;
 
 import gnu.trove.TObjectDoubleHashMap;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class KMLVertexDescriptor implements KMLObjectDescriptor<SpatialVertex> {
+public class KMLVertexDescriptor implements KMLObjectDescriptor<SpatialSparseVertex> {
 	
-	private TObjectDoubleHashMap<SpatialVertex> clustering;
+	private TObjectDoubleHashMap<SpatialSparseVertex> clustering;
 	
-	private TObjectDoubleHashMap<SpatialVertex> meanEdgeLength;
+	private TObjectDoubleHashMap<SpatialSparseVertex> meanEdgeLength;
 	
 	@SuppressWarnings("unchecked")
-	public KMLVertexDescriptor(SpatialGraph graph) {
-		clustering = (TObjectDoubleHashMap<SpatialVertex>) GraphStatistics.localClusteringCoefficients(graph);
-		meanEdgeLength = (TObjectDoubleHashMap<SpatialVertex>) SpatialGraphStatistics.meanEdgeLength(graph);
+	public KMLVertexDescriptor(SpatialSparseGraph graph) {
+		clustering = (TObjectDoubleHashMap<SpatialSparseVertex>) GraphStatistics.localClusteringCoefficients(graph);
+		meanEdgeLength = (TObjectDoubleHashMap<SpatialSparseVertex>) SpatialGraphStatistics.meanEdgeLength(graph);
 	}
 	
-	public String getDescription(SpatialVertex object) {
+	public String getDescription(SpatialSparseVertex object) {
 		StringBuilder builder= new StringBuilder();
 		
 		builder.append("k = ");
@@ -56,7 +56,7 @@ public class KMLVertexDescriptor implements KMLObjectDescriptor<SpatialVertex> {
 		return builder.toString();
 	}
 
-	public String getName(SpatialVertex object) {
+	public String getName(SpatialSparseVertex object) {
 		return null;
 	}
 

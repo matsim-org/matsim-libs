@@ -30,7 +30,7 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
-import playground.johannes.socialnetworks.graph.social.SocialNetworkFactory;
+import playground.johannes.socialnetworks.graph.social.SocialNetworkBuilder;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 
 /**
@@ -45,12 +45,12 @@ public class SNAdjacencyMatrix<P extends BasicPerson<?>> extends SpatialAdjacenc
 
 	
 	public SocialNetwork<P> getGraph() {
-		SocialNetworkFactory<P> factory = new SocialNetworkFactory<P>(null);
+		SocialNetworkBuilder<P> builder = new SocialNetworkBuilder<P>();
 		SocialNetwork<P> g = new SocialNetwork<P>();
 
 		TIntObjectHashMap<Ego<P>> vertexIdx = new TIntObjectHashMap<Ego<P>>();
 		for(int i = 0; i < getVertexCount(); i++) {
-			Ego<P> ego = factory.addVertex(g, getVertex(i).getPerson());
+			Ego<P> ego = builder.addVertex(g, getVertex(i).getPerson());
 			vertexIdx.put(i, ego);
 		}
 		
@@ -60,7 +60,7 @@ public class SNAdjacencyMatrix<P extends BasicPerson<?>> extends SpatialAdjacenc
 				for(int idx = 0; idx < row.size(); idx++) {
 					int j = row.get(idx);
 					if(j > i) {
-						if(factory.addEdge(g, vertexIdx.get(i), vertexIdx.get(j)) == null)
+						if(builder.addEdge(g, vertexIdx.get(i), vertexIdx.get(j)) == null)
 							throw new RuntimeException();
 					}
 				}

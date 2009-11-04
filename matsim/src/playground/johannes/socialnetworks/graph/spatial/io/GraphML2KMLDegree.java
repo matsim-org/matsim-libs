@@ -27,7 +27,7 @@ import java.io.IOException;
 
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 
 /**
  * @author illenberger
@@ -41,7 +41,7 @@ public class GraphML2KMLDegree {
 	 */
 	public static void main(String[] args) throws IOException {
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		SpatialGraph socialnet = reader.readGraph(args[0]);
+		SpatialSparseGraph socialnet = reader.readGraph(args[0]);
 		
 		KMLWriter writer = new KMLWriter();
 		

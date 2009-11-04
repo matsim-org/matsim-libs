@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialGraphFactory.java
+ * SpatialEdge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,42 +20,33 @@
 package playground.johannes.socialnetworks.graph.spatial;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.contrib.sna.graph.SparseEdge;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.johannes.socialnetworks.graph.GraphFactory;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialGraphFactory implements GraphFactory<SpatialGraph, SpatialVertex, SpatialEdge> {
+public class SpatialSparseEdge extends SparseEdge implements SpatialEdge {
 
-	public SpatialEdge addEdge(SpatialGraph g, SpatialVertex v1, SpatialVertex v2) {
-		SpatialEdge e = new SpatialEdge(v1, v2);
-		if(g.insertEdge(e, v1, v2))
-			return e;
-		else
-			return null;
-	}
-
-	public SpatialVertex addVertex(SpatialGraph g) {
-		SpatialVertex v = new SpatialVertex(new CoordImpl(0.0, 0.0));
-		if(g.insertVertex(v))
-			return v;
-		else
-			return null;
-	}
-
-	public SpatialVertex addVertex(SpatialGraph g, Coord c) {
-		SpatialVertex v = new SpatialVertex(c);
-		if(g.insertVertex(v))
-			return v;
-		else
-			return null;
+	public double length() {
+		Coord c1 = getVertices().getFirst().getCoordinate();
+		Coord c2 = getVertices().getSecond().getCoordinate();
+		return CoordUtils.calcDistance(c1, c2);
 	}
 	
-	public SpatialGraph createGraph() {
-		return new SpatialGraph();
+	@Override
+	public SpatialSparseVertex getOpposite(Vertex v) {
+		return (SpatialSparseVertex) super.getOpposite(v);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Tuple<? extends SpatialSparseVertex, ? extends SpatialSparseVertex> getVertices() {
+		return (Tuple<? extends SpatialSparseVertex, ? extends SpatialSparseVertex>) super.getVertices();
 	}
 
 }

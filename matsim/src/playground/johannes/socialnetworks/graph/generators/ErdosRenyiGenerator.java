@@ -29,15 +29,16 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 
-import playground.johannes.socialnetworks.graph.Edge;
-import playground.johannes.socialnetworks.graph.Graph;
-import playground.johannes.socialnetworks.graph.GraphFactory;
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphBuilder;
+import org.matsim.contrib.sna.graph.SparseEdge;
+import org.matsim.contrib.sna.graph.SparseGraph;
+import org.matsim.contrib.sna.graph.SparseGraphBuilder;
+import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.Vertex;
+
 import playground.johannes.socialnetworks.graph.Partitions;
-import playground.johannes.socialnetworks.graph.SparseEdge;
-import playground.johannes.socialnetworks.graph.SparseGraph;
-import playground.johannes.socialnetworks.graph.SparseGraphFactory;
-import playground.johannes.socialnetworks.graph.SparseVertex;
-import playground.johannes.socialnetworks.graph.Vertex;
 import playground.johannes.socialnetworks.graph.io.GraphMLWriter;
 
 /**
@@ -46,17 +47,17 @@ import playground.johannes.socialnetworks.graph.io.GraphMLWriter;
  */
 public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Edge> {
 
-	private GraphFactory<G, V, E> factory;
+	private GraphBuilder<G, V, E> builder;
 	
-	public ErdosRenyiGenerator(GraphFactory<G, V, E> factory) {
-		this.factory = factory;
+	public ErdosRenyiGenerator(GraphBuilder<G, V, E> factory) {
+		this.builder = factory;
 	}
 
 	public G generate(int numVertices, double p, long randomSeed) {
-		G g = factory.createGraph();
+		G g = builder.createGraph();
 //		LinkedList<V> pending = new LinkedList<V>();
 		for (int i = 0; i < numVertices; i++)
-			factory.addVertex(g);
+			builder.addVertex(g);
 
 		return generate(g, p, randomSeed);
 //		Random random = new Random(randomSeed);
@@ -82,7 +83,7 @@ public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Ed
 		while ((v1 = pending.poll()) != null) {
 			for (V v2 : pending) {
 				if (random.nextDouble() <= p) {
-					factory.addEdge(graph, v1, v2);
+					builder.addEdge(graph, v1, v2);
 				}
 			}
 		}
@@ -98,7 +99,7 @@ public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Ed
 		if(args.length > 3)
 			seed = Long.parseLong(args[3]);
 		
-		ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge>(new SparseGraphFactory());
+		ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge>(new SparseGraphBuilder());
 		Graph g = generator.generate(N, p, seed);
 		
 		for(String arg : args) {

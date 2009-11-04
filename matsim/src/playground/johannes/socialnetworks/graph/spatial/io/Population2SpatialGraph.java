@@ -34,8 +34,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraphFactory;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraphBuilder;
 
 /**
  * @author illenberger
@@ -55,13 +55,13 @@ public class Population2SpatialGraph {
 	
 	private static final String Y_KEY = "y";
 
-	private SpatialGraph graph;
+	private SpatialSparseGraph graph;
 	
-	private SpatialGraphFactory factory;
+	private SpatialSparseGraphBuilder builder;
 	
 	private int numVertex;
 	
-	public SpatialGraph read(String filename) {
+	public SpatialSparseGraph read(String filename) {
 		numVertex = 0;
 		
 		SAXParserFactory saxfactory = SAXParserFactory.newInstance();
@@ -77,8 +77,8 @@ public class Population2SpatialGraph {
 			reader.setContentHandler(handler);
 			
 			
-			factory = new SpatialGraphFactory();
-			graph = factory.createGraph();
+			builder = new SpatialSparseGraphBuilder();
+			graph = new SpatialSparseGraph();
 			
 			reader.parse(new InputSource(IOUtils.getBufferedReader(filename)));
 			printProgress();
@@ -94,7 +94,7 @@ public class Population2SpatialGraph {
 	}
 	
 	private void addVertex(double x, double y) {
-		if(factory.addVertex(graph, new CoordImpl(x, y)) == null) {
+		if(builder.addVertex(graph, new CoordImpl(x, y)) == null) {
 			logger.warn("Failed to add vertex!");
 		} else
 			numVertex++;

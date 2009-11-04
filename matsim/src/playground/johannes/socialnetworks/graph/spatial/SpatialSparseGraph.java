@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialPartitiona.java
+ * SpatialGraph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,32 +19,63 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial;
 
-import java.util.HashSet;
 import java.util.Set;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.contrib.sna.graph.SparseEdge;
+import org.matsim.contrib.sna.graph.SparseGraph;
+import org.matsim.contrib.sna.graph.SparseVertex;
 
-import playground.johannes.socialnetworks.spatial.Zone;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialPartitions {
+public class SpatialSparseGraph extends SparseGraph implements SpatialGraph {
 
-	public static <V extends SpatialSparseVertex> Set<V> createSpatialPartition(Set<V> vertices, Zone zone) {
-		Set<V> partition = new HashSet<V>();
-		GeometryFactory factory = new GeometryFactory();
-		Geometry geometry = zone.getBorder();
-		for(V v : vertices) {
-			Coordinate coordinate = new Coordinate(v.getCoordinate().getX(), v.getCoordinate().getY());
-			if(geometry.contains(factory.createPoint(coordinate))) {
-				partition.add(v);
-			}
-		}
-		return partition;
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<? extends SpatialSparseEdge> getEdges() {
+		return (Set<? extends SpatialSparseEdge>) super.getEdges();
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<? extends SpatialSparseVertex> getVertices() {
+		return (Set<? extends SpatialSparseVertex>) super.getVertices();
+	}
+
+//	@Override
+//	protected boolean insertEdge(SparseEdge e) {
+//		return super.insertEdge(e);
+//	}
+//
+//	@Override
+//	protected boolean insertVertex(SparseVertex v) {
+//		return super.insertVertex(v);
+//	}
+
+	public double[] getBounds() {
+		double[] bounds = new double[4];
+		
+		double xmin = Double.MAX_VALUE;
+		double ymin = Double.MAX_VALUE;
+		double xmax = - Double.MAX_VALUE;
+		double ymax = - Double.MAX_VALUE;
+		
+		for(SpatialSparseVertex v : getVertices()) {
+			Coord c = v.getCoordinate();
+			xmin = Math.min(xmin, c.getX());
+			ymin = Math.min(ymin, c.getY());
+			xmax = Math.max(xmax, c.getX());
+			ymax = Math.max(ymax, c.getY());
+		}
+		
+		bounds[0] = xmin;
+		bounds[1] = ymin;
+		bounds[2] = xmax;
+		bounds[3] = ymax;
+		
+		return bounds;
+	}
 }

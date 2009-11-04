@@ -23,11 +23,12 @@
  */
 package playground.johannes.socialnetworks.graph.spatial.io;
 
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
+
 import gnu.trove.TDoubleObjectHashMap;
 import net.opengis.kml._2.LinkType;
-import playground.johannes.socialnetworks.graph.Graph;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
-import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger

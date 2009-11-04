@@ -22,10 +22,10 @@ package playground.johannes.socialnetworks.graph.matrix;
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.SparseVertex;
 
-import playground.johannes.socialnetworks.graph.SparseVertex;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 
 /**
@@ -41,7 +41,7 @@ public class CentralitySpeedTest extends TestCase {
 //		logger.info("Generating grah...");
 //		SparseGraph graph = generator.generate(1000, 0.1, 4711);
 		SpatialGraphMLReader reader = new SpatialGraphMLReader();
-		SpatialGraph graph = reader.readGraph("/Volumes/hertz:ils-raid/socialnets/mcmc/runs/run45/output/2000000000/graph.graphml"); 
+		SpatialSparseGraph graph = reader.readGraph("/Volumes/hertz:ils-raid/socialnets/mcmc/runs/run45/output/2000000000/graph.graphml"); 
 		logger.info("Converting matrix...");
 		AdjacencyMatrixDecorator<SparseVertex> y = new AdjacencyMatrixDecorator<SparseVertex>(graph);
 		

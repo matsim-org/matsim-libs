@@ -23,7 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;

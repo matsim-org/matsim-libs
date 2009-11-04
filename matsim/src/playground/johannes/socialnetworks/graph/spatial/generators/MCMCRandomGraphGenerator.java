@@ -41,7 +41,7 @@ import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeFlip;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
@@ -61,7 +61,7 @@ public class MCMCRandomGraphGenerator {
 		MatsimConfigReader creader = new MatsimConfigReader(config);
 		creader.parse(args[0]);
 		
-		SpatialGraph graph = null;
+		SpatialSparseGraph graph = null;
 		String graphFile = config.findParam(MODULE_NAME, "graphfile");
 		
 		if(graphFile == null) {
@@ -122,7 +122,7 @@ public class MCMCRandomGraphGenerator {
 	
 	private boolean reweightBoundaries = true;
 	
-	public void generate(SpatialGraph graph, SpatialGrid<Double> densityGrid, RandomWalkType type) {
+	public void generate(SpatialSparseGraph graph, SpatialGrid<Double> densityGrid, RandomWalkType type) {
 		/*
 		 * convert graph to matrix
 		 */

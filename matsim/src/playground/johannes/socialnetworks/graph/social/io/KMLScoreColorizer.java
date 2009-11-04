@@ -116,25 +116,25 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<BasicPe
 		return styleIds.get(object);
 	}
 	
-	public static void main(String args[]) throws IOException {
-		Config config = Gbl.createConfig(new String[]{"/Users/fearonni/vsp-work/runs-svn/run669/config.xml"});
-		ScenarioLoader loader = new ScenarioLoader(config);
-		loader.loadScenario();
-		ScenarioImpl scenario = loader.getScenario();
-		PopulationImpl population = scenario.getPopulation();
-		
-		SocialNetwork<Person> socialnet = new SocialNetwork<Person>(population);
-		KMLWriter writer = new KMLWriter();
-		writer.setDrawEdges(false);
-		writer.setCoordinateTransformation(new CH1903LV03toWGS84());
-		KMLScoreColorizer colorizer = new KMLScoreColorizer(writer.getVertexIconLink());
-		colorizer.setMaxValue(250);
-		colorizer.setMinValue(100);
-		writer.setVertexStyle(colorizer);
-		writer.write(socialnet, "/Users/fearonni/vsp-work/runs-svn/run669/scores.kmz");
-		
-//		Distribution.writeHistogram(colorizer.distribution.absoluteDistribution(), "/Users/fearonni/vsp-work/runs-svn/run669/sorces.hist");
-	}
+//	public static void main(String args[]) throws IOException {
+//		Config config = Gbl.createConfig(new String[]{"/Users/fearonni/vsp-work/runs-svn/run669/config.xml"});
+//		ScenarioLoader loader = new ScenarioLoader(config);
+//		loader.loadScenario();
+//		ScenarioImpl scenario = loader.getScenario();
+//		PopulationImpl population = scenario.getPopulation();
+//		
+//		SocialNetwork<Person> socialnet = new SocialNetwork<Person>(population);
+//		KMLWriter writer = new KMLWriter();
+//		writer.setDrawEdges(false);
+//		writer.setCoordinateTransformation(new CH1903LV03toWGS84());
+//		KMLScoreColorizer colorizer = new KMLScoreColorizer(writer.getVertexIconLink());
+//		colorizer.setMaxValue(250);
+//		colorizer.setMinValue(100);
+//		writer.setVertexStyle(colorizer);
+//		writer.write(socialnet, "/Users/fearonni/vsp-work/runs-svn/run669/scores.kmz");
+//		
+////		Distribution.writeHistogram(colorizer.distribution.absoluteDistribution(), "/Users/fearonni/vsp-work/runs-svn/run669/sorces.hist");
+//	}
 
 	/* (non-Javadoc)
 	 * @see playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle#getValue(playground.johannes.socialnetworks.graph.Vertex)

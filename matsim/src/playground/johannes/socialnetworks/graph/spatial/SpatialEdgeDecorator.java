@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialPartitiona.java
+ * SpatialEdgeDecorator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,32 +19,32 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.core.utils.collections.Tuple;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-
-import playground.johannes.socialnetworks.spatial.Zone;
+import playground.johannes.socialnetworks.graph.EdgeDecorator;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialPartitions {
+public class SpatialEdgeDecorator<E extends SpatialEdge> extends EdgeDecorator<E> implements
+		SpatialEdge {
 
-	public static <V extends SpatialSparseVertex> Set<V> createSpatialPartition(Set<V> vertices, Zone zone) {
-		Set<V> partition = new HashSet<V>();
-		GeometryFactory factory = new GeometryFactory();
-		Geometry geometry = zone.getBorder();
-		for(V v : vertices) {
-			Coordinate coordinate = new Coordinate(v.getCoordinate().getX(), v.getCoordinate().getY());
-			if(geometry.contains(factory.createPoint(coordinate))) {
-				partition.add(v);
-			}
-		}
-		return partition;
+	protected SpatialEdgeDecorator(E delegate) {
+		super(delegate);
 	}
-	
+
+	public SpatialVertexDecorator<?> getOpposite(Vertex v) {
+		return (SpatialVertexDecorator<?>) super.getOpposite(v);
+	}
+
+	public Tuple<? extends SpatialVertexDecorator<?>, ? extends SpatialVertexDecorator<?>> getVertices() {
+		return (Tuple<? extends SpatialVertexDecorator<?>, ? extends SpatialVertexDecorator<?>>) super.getVertices();
+	}
+
+	public double length() {
+		return getDelegate().length();
+	}
+
 }

@@ -27,19 +27,19 @@ import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
  * @author illenberger
  *
  */
-public class SpatialAdjacencyMatrix extends AdjacencyMatrixDecorator<SpatialVertex> {
+public class SpatialAdjacencyMatrix extends AdjacencyMatrixDecorator<SpatialSparseVertex> {
 	
-	public SpatialAdjacencyMatrix(SpatialGraph g) {
+	public SpatialAdjacencyMatrix(SpatialSparseGraph g) {
 		super(g);
 	}
 
-	public SpatialGraph getGraph() {
-		SpatialGraphFactory factory = new SpatialGraphFactory();
-		SpatialGraph g = new SpatialGraph();
+	public SpatialSparseGraph getGraph() {
+		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder();
+		SpatialSparseGraph g = new SpatialSparseGraph();
 
-		TIntObjectHashMap<SpatialVertex> vertexIdx = new TIntObjectHashMap<SpatialVertex>();
+		TIntObjectHashMap<SpatialSparseVertex> vertexIdx = new TIntObjectHashMap<SpatialSparseVertex>();
 		for (int i = 0; i < getVertexCount(); i++) {
-			SpatialVertex ego = factory.addVertex(g, getVertex(i).getCoordinate());
+			SpatialSparseVertex ego = builder.addVertex(g, getVertex(i).getCoordinate());
 			vertexIdx.put(i, ego);
 		}
 
@@ -49,7 +49,7 @@ public class SpatialAdjacencyMatrix extends AdjacencyMatrixDecorator<SpatialVert
 				for (int idx = 0; idx < row.size(); idx++) {
 					int j = row.get(idx);
 					if (j > i) {
-						if (factory.addEdge(g, vertexIdx.get(i), vertexIdx
+						if (builder.addEdge(g, vertexIdx.get(i), vertexIdx
 								.get(j)) == null)
 							throw new RuntimeException();
 					}

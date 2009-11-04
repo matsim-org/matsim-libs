@@ -41,16 +41,16 @@ import net.opengis.kml._2.PointType;
 import net.opengis.kml._2.StyleType;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vis.kml.KMZWriter;
 
-import playground.johannes.socialnetworks.graph.Edge;
-import playground.johannes.socialnetworks.graph.Graph;
-import playground.johannes.socialnetworks.graph.Vertex;
-import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
 /**
  * @author illenberger
@@ -158,7 +158,7 @@ public class KMLWriter {
 		return vertexIconLink;
 	}
 	
-	public void write(SpatialGraph graph, String filename) throws IOException {
+	public void write(SpatialSparseGraph graph, String filename) throws IOException {
 		KMZWriter kmzWriter = new KMZWriter(filename);
 		kmzWriter.addNonKMLFile(MatsimResource.getAsInputStream("icon18.png"), "node.png");
 		
@@ -184,7 +184,7 @@ public class KMLWriter {
 			FolderType vertexFolder = objectFactory.createFolderType();
 			vertexFolder.setName("Vertices");
 			
-			for(SpatialVertex v : graph.getVertices()) {
+			for(SpatialSparseVertex v : graph.getVertices()) {
 				/*
 				 * create a point geometry
 				 */
@@ -229,13 +229,13 @@ public class KMLWriter {
 			FolderType edgeFolder = objectFactory.createFolderType();
 			edgeFolder.setName("Edges");
 			
-			for (SpatialEdge e : graph.getEdges()) {
+			for (SpatialSparseEdge e : graph.getEdges()) {
 				/*
 				 * create a line geometry
 				 */
 				LineStringType lineString = objectFactory.createLineStringType();
-				SpatialVertex v1 = e.getVertices().getFirst();
-				SpatialVertex v2 = e.getVertices().getSecond();
+				SpatialSparseVertex v1 = e.getVertices().getFirst();
+				SpatialSparseVertex v2 = e.getVertices().getSecond();
 				Coord c1 = v1.getCoordinate();
 				Coord c2 = v2.getCoordinate();
 				if (transformation != null) {

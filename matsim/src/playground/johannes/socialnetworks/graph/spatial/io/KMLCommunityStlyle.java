@@ -24,15 +24,16 @@ import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.Set;
 
+import org.matsim.contrib.sna.graph.Graph;
+
 import net.opengis.kml._2.LinkType;
-import playground.johannes.socialnetworks.graph.Graph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class KMLCommunityStlyle <G extends Graph, V extends SpatialVertex> extends KMLVertexColorStyle<G, V> {
+public class KMLCommunityStlyle <G extends Graph, V extends SpatialSparseVertex> extends KMLVertexColorStyle<G, V> {
 
 	private Set<Set<V>> clusters;
 	

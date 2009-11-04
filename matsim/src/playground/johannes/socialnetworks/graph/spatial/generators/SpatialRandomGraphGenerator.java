@@ -34,21 +34,20 @@ import java.util.Random;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.GraphBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.xml.sax.SAXException;
 
-import playground.johannes.socialnetworks.graph.GraphFactory;
 import playground.johannes.socialnetworks.graph.io.PajekClusteringColorizer;
 import playground.johannes.socialnetworks.graph.io.PajekDegreeColorizer;
-import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphAnalyzer;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraphFactory;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
-import playground.johannes.socialnetworks.graph.spatial.generators.GravityGenerator.RandomWalkType;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraphBuilder;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLDegreeStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
@@ -66,20 +65,20 @@ import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
  * @author illenberger
  *
  */
-public class SpatialRandomGraphGenerator<G extends SpatialGraph, V extends SpatialVertex, E extends SpatialEdge> {
+public class SpatialRandomGraphGenerator<G extends SpatialSparseGraph, V extends SpatialSparseVertex, E extends SpatialSparseEdge> {
 
 	private final static Logger logger = Logger.getLogger(SpatialRandomGraphGenerator.class);
 	
-	private GraphFactory<G, V, E> factory;
+	private GraphBuilder<G, V, E> builder;
 	
-	public SpatialRandomGraphGenerator(GraphFactory<G, V, E> factory) {
-		this.factory = factory;
+	public SpatialRandomGraphGenerator(GraphBuilder<G, V, E> factory) {
+		this.builder = factory;
 	}
 
 	public G generate(int numVertices, double gamma, double k_mean, long randomSeed) {
-		G g = factory.createGraph();
+		G g = builder.createGraph();
 		for (int i = 0; i < numVertices; i++)
-			factory.addVertex(g);
+			builder.addVertex(g);
 
 		return generate(g, gamma, k_mean, randomSeed);
 	}
@@ -103,7 +102,7 @@ public class SpatialRandomGraphGenerator<G extends SpatialGraph, V extends Spati
 					logger.warn(String.format("P = %1$s!", P));
 				
 				if (random.nextDouble() <= P) {
-					factory.addEdge(graph, v1, v2);
+					builder.addEdge(graph, v1, v2);
 				}
 			}
 			count++;
@@ -150,7 +149,7 @@ public class SpatialRandomGraphGenerator<G extends SpatialGraph, V extends Spati
 		MatsimConfigReader creader = new MatsimConfigReader(config);
 		creader.parse(args[0]);
 		
-		SpatialGraph graph = null;
+		SpatialSparseGraph graph = null;
 		String graphFile = config.findParam(MODULE_NAME, "graphfile");
 		
 		if(graphFile == null) {
@@ -184,8 +183,8 @@ public class SpatialRandomGraphGenerator<G extends SpatialGraph, V extends Spati
 	
 		new File(outputDir).mkdirs();
 		
-		SpatialGraphFactory factory = new SpatialGraphFactory();
-		SpatialRandomGraphGenerator<SpatialGraph, SpatialVertex, SpatialEdge> generator = new SpatialRandomGraphGenerator<SpatialGraph, SpatialVertex, SpatialEdge>(factory);
+		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder();
+		SpatialRandomGraphGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new SpatialRandomGraphGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(builder);
 		
 		graph = generator.generate(graph, -1.6, k_mean, randomSeed);
 
@@ -210,17 +209,17 @@ public class SpatialRandomGraphGenerator<G extends SpatialGraph, V extends Spati
 			/*
 			 * KML
 			 */
-//			KMLWriter kmlWriter = new KMLWriter();
-//			kmlWriter.setVertexStyle(new KMLDegreeStyle(kmlWriter.getVertexIconLink()));
-//			kmlWriter.setVertexDescriptor(new KMLVertexDescriptor(graph));
-//			kmlWriter.setDrawEdges(false);
-//			kmlWriter.setCoordinateTransformation(new CH1903LV03toWGS84());
-//			kmlWriter.write(graph, String.format("%1$sgraph.k.kml", currentOutputDir));
+			KMLWriter kmlWriter = new KMLWriter();
+			kmlWriter.setVertexStyle(new KMLDegreeStyle(kmlWriter.getVertexIconLink()));
+			kmlWriter.setVertexDescriptor(new KMLVertexDescriptor(graph));
+			kmlWriter.setDrawEdges(false);
+			kmlWriter.setCoordinateTransformation(new CH1903LV03toWGS84());
+			kmlWriter.write(graph, String.format("%1$sgraph.k.kml", currentOutputDir));
 			/*
 			 * Pajek
 			 */
-			PajekDegreeColorizer<SpatialVertex, SpatialEdge> colorizer1 = new PajekDegreeColorizer<SpatialVertex, SpatialEdge>(graph, true);
-			PajekClusteringColorizer<SpatialVertex, SpatialEdge> colorizer2 = new PajekClusteringColorizer<SpatialVertex, SpatialEdge>(graph);
+			PajekDegreeColorizer<SpatialSparseVertex, SpatialSparseEdge> colorizer1 = new PajekDegreeColorizer<SpatialSparseVertex, SpatialSparseEdge>(graph, true);
+			PajekClusteringColorizer<SpatialSparseVertex, SpatialSparseEdge> colorizer2 = new PajekClusteringColorizer<SpatialSparseVertex, SpatialSparseEdge>(graph);
 			PajekDistanceColorizer colorizer3 = new PajekDistanceColorizer(graph, false);
 			SpatialPajekWriter pwriter = new SpatialPajekWriter();
 			pwriter.write(graph, colorizer1, currentOutputDir + "graph.degree.net");

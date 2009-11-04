@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialPartitiona.java
+ * Distance.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,32 +19,32 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-
-import playground.johannes.socialnetworks.spatial.Zone;
+import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialPartitions {
+public class Distance<V extends SpatialVertex> {
 
-	public static <V extends SpatialSparseVertex> Set<V> createSpatialPartition(Set<V> vertices, Zone zone) {
-		Set<V> partition = new HashSet<V>();
-		GeometryFactory factory = new GeometryFactory();
-		Geometry geometry = zone.getBorder();
+	public Distribution distribution(Collection<V> vertices) {
+		Distribution distribution = new Distribution();
+		
+		Set<V> pending = new HashSet<V>(vertices);
 		for(V v : vertices) {
-			Coordinate coordinate = new Coordinate(v.getCoordinate().getX(), v.getCoordinate().getY());
-			if(geometry.contains(factory.createPoint(coordinate))) {
-				partition.add(v);
+			for(int i = 0; i < v.getEdges().size(); i++) {
+				SpatialVertex v_j = v.getNeighbours().get(i);
+				if(pending.contains(v_j))
+					distribution.add(v.getEdges().get(i).length());
 			}
+			
+			pending.remove(v);
 		}
-		return partition;
+		
+		return distribution;
 	}
-	
 }

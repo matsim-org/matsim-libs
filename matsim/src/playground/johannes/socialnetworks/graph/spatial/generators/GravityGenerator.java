@@ -43,7 +43,7 @@ import playground.johannes.socialnetworks.graph.mcmc.ErgmTriangles;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeFlip;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsSampler;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
@@ -66,7 +66,7 @@ public class GravityGenerator {
 		MatsimConfigReader creader = new MatsimConfigReader(config);
 		creader.parse(args[0]);
 		
-		SpatialGraph graph = null;
+		SpatialSparseGraph graph = null;
 		String graphFile = config.findParam(MODULE_NAME, "graphfile");
 		
 		if(graphFile == null) {
@@ -144,7 +144,7 @@ public class GravityGenerator {
 	
 	private TravelTimeMatrix ttmatrix;
 	
-	public void generate(SpatialGraph graph, ZoneLayerDouble zones, RandomWalkType type) {
+	public void generate(SpatialSparseGraph graph, ZoneLayerDouble zones, RandomWalkType type) {
 		/*
 		 * convert graph to matrix
 		 */

@@ -30,37 +30,37 @@ import java.util.List;
 import playground.johannes.socialnetworks.graph.io.PajekAttributes;
 import playground.johannes.socialnetworks.graph.io.PajekColorizer;
 import playground.johannes.socialnetworks.graph.io.PajekWriter;
-import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialPajekWriter extends PajekWriter<SpatialGraph, SpatialVertex, SpatialEdge>
-		implements PajekAttributes<SpatialVertex, SpatialEdge> {
+public class SpatialPajekWriter extends PajekWriter<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>
+		implements PajekAttributes<SpatialSparseVertex, SpatialSparseEdge> {
 
-	private PajekColorizer<SpatialVertex, SpatialEdge> colorizer;
+	private PajekColorizer<SpatialSparseVertex, SpatialSparseEdge> colorizer;
 
 	@SuppressWarnings("unchecked")
-	public void write(SpatialGraph graph, PajekColorizer<? extends SpatialVertex, ? extends SpatialEdge> colorizer, String file) throws IOException {
-		this.colorizer = (PajekColorizer<SpatialVertex, SpatialEdge>) colorizer;
+	public void write(SpatialSparseGraph graph, PajekColorizer<? extends SpatialSparseVertex, ? extends SpatialSparseEdge> colorizer, String file) throws IOException {
+		this.colorizer = (PajekColorizer<SpatialSparseVertex, SpatialSparseEdge>) colorizer;
 		super.write(graph, this, file);
 	}
 	
 	@Override
-	protected String getVertexX(SpatialVertex v) {
+	protected String getVertexX(SpatialSparseVertex v) {
 		return String.valueOf(v.getCoordinate().getX());
 	}
 
 	@Override
-	protected String getVertexY(SpatialVertex v) {
+	protected String getVertexY(SpatialSparseVertex v) {
 		return String.valueOf(v.getCoordinate().getY());
 	}
 
 	@Override
-	public void write(SpatialGraph g, String file) throws IOException {
+	public void write(SpatialSparseGraph g, String file) throws IOException {
 		colorizer = new DefaultColorizer();
 		super.write(g, this, file);
 	}
@@ -69,7 +69,7 @@ public class SpatialPajekWriter extends PajekWriter<SpatialGraph, SpatialVertex,
 		return new ArrayList<String>();
 	}
 
-	public String getEdgeValue(SpatialEdge e, String attribute) {
+	public String getEdgeValue(SpatialSparseEdge e, String attribute) {
 		return null;
 	}
 
@@ -79,23 +79,23 @@ public class SpatialPajekWriter extends PajekWriter<SpatialGraph, SpatialVertex,
 		return attrs;
 	}
 
-	public String getVertexValue(SpatialVertex v, String attribute) {
+	public String getVertexValue(SpatialSparseVertex v, String attribute) {
 		if (PajekAttributes.VERTEX_FILL_COLOR.equals(attribute))
 			return colorizer.getVertexFillColor(v);
 		else
 			return null;
 	}
 
-	private class DefaultColorizer extends PajekColorizer<SpatialVertex, SpatialEdge> {
+	private class DefaultColorizer extends PajekColorizer<SpatialSparseVertex, SpatialSparseEdge> {
 
 		private static final String COLOR_BLACK = "13";
 
-		public String getVertexFillColor(SpatialVertex v) {
+		public String getVertexFillColor(SpatialSparseVertex v) {
 			return COLOR_BLACK;
 		}
 
 		@Override
-		public String getEdgeColor(SpatialEdge e) {
+		public String getEdgeColor(SpatialSparseEdge e) {
 			return COLOR_BLACK;
 		}
 		

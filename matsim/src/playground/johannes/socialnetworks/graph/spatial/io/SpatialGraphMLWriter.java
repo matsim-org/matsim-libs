@@ -26,13 +26,13 @@ package playground.johannes.socialnetworks.graph.spatial.io;
 import java.io.IOException;
 import java.util.List;
 
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.socialnetworks.graph.Graph;
-import playground.johannes.socialnetworks.graph.Vertex;
 import playground.johannes.socialnetworks.graph.io.GraphMLWriter;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
 /**
  * @author illenberger
@@ -42,7 +42,7 @@ public class SpatialGraphMLWriter extends GraphMLWriter {
 
 	@Override
 	public void write(Graph graph, String filename) throws IOException {
-		if(graph instanceof SpatialGraph)
+		if(graph instanceof SpatialSparseGraph)
 			super.write(graph, filename);
 		else
 			throw new ClassCastException("Graph must be of type SpatialGraph.");
@@ -52,8 +52,8 @@ public class SpatialGraphMLWriter extends GraphMLWriter {
 	protected List<Tuple<String, String>> getVertexAttributes(Vertex v) {
 		List<Tuple<String, String>> attrs = super.getVertexAttributes(v);
 		
-		attrs.add(new Tuple<String, String>(SpatialGraphMLReader.COORD_X_TAG, String.valueOf(((SpatialVertex)v).getCoordinate().getX())));
-		attrs.add(new Tuple<String, String>(SpatialGraphMLReader.COORD_Y_TAG, String.valueOf(((SpatialVertex)v).getCoordinate().getY())));
+		attrs.add(new Tuple<String, String>(SpatialGraphMLReader.COORD_X_TAG, String.valueOf(((SpatialSparseVertex)v).getCoordinate().getX())));
+		attrs.add(new Tuple<String, String>(SpatialGraphMLReader.COORD_Y_TAG, String.valueOf(((SpatialSparseVertex)v).getCoordinate().getY())));
 		
 		return attrs;
 	}

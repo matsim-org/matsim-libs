@@ -36,9 +36,9 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.kml.KMZWriter;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
 /**
  * @author illenberger
@@ -61,7 +61,7 @@ public class KMLEgoNetWriter extends KMLWriter {
 //	
 //	private ObjectFactory objectFactory;
 	
-	public void write(SpatialGraph graph, Set<? extends SpatialVertex> egos, int radius, String filename) throws IOException {
+	public void write(SpatialSparseGraph graph, Set<? extends SpatialSparseVertex> egos, int radius, String filename) throws IOException {
 		KMZWriter kmzWriter = new KMZWriter(filename);
 		kmzWriter.addNonKMLFile(MatsimResource.getAsInputStream("icon18.png"), "node.png");
 		
@@ -88,11 +88,11 @@ public class KMLEgoNetWriter extends KMLWriter {
 			document.getAbstractStyleSelectorGroup().add(objectFactory.createStyle(styleType));
 		}
 		
-		for(SpatialVertex ego : egos) {
+		for(SpatialSparseVertex ego : egos) {
 			FolderType egoNetFolder = objectFactory.createFolderType();
 			egoNetFolder.setName(getVertexDescriptor().getName(ego));
 			
-			expand(ego, new HashSet<SpatialVertex>(), egoNetFolder, 0, radius);
+			expand(ego, new HashSet<SpatialSparseVertex>(), egoNetFolder, 0, radius);
 			
 			graphFolder.getAbstractFeatureGroup().add(objectFactory.createFolder(egoNetFolder));
 		}
@@ -106,7 +106,7 @@ public class KMLEgoNetWriter extends KMLWriter {
 		kmzWriter.close();
 	}
 	
-	private void expand(SpatialVertex v, Set<SpatialVertex> expandedVertices, FolderType egoNetFolder, int currentRadius, int maxRadius) {
+	private void expand(SpatialSparseVertex v, Set<SpatialSparseVertex> expandedVertices, FolderType egoNetFolder, int currentRadius, int maxRadius) {
 		/*
 		 * draw vertex
 		 */
@@ -135,8 +135,8 @@ public class KMLEgoNetWriter extends KMLWriter {
 		expandedVertices.add(v);
 		
 		if(currentRadius < maxRadius) {
-			for(SpatialEdge e : v.getEdges()) {
-				SpatialVertex v2 = e.getOpposite(v);
+			for(SpatialSparseEdge e : v.getEdges()) {
+				SpatialSparseVertex v2 = e.getOpposite(v);
 				if(!expandedVertices.contains(v2)) {
 					LineStringType lineString = objectFactory.createLineStringType();
 //					SpatialVertex v1 = e.getVertices().getFirst();

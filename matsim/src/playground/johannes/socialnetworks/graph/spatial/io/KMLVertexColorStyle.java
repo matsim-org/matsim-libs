@@ -36,9 +36,9 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.StyleType;
 
 import org.apache.commons.math.stat.StatUtils;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 
-import playground.johannes.socialnetworks.graph.Graph;
-import playground.johannes.socialnetworks.graph.Vertex;
 import playground.johannes.socialnetworks.graph.social.util.ColorUtils;
 
 /**

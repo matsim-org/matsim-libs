@@ -34,11 +34,11 @@ import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixStatistics;
 import playground.johannes.socialnetworks.graph.mcmc.SampleHandler;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphAnalyzer;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLDegreeStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
@@ -146,7 +146,7 @@ public class DumpHandler implements SampleHandler {
 		double c_local = AdjacencyMatrixStatistics.getLocalClusteringCoefficient(y);
 		double c_global = AdjacencyMatrixStatistics.getGlobalClusteringCoefficient(y);
 	
-		SpatialGraph net = ((SpatialAdjacencyMatrix)y).getGraph();
+		SpatialSparseGraph net = ((SpatialAdjacencyMatrix)y).getGraph();
 		double d_mean = SpatialGraphStatistics.edgeLengthDistribution(net).mean();
 		logger.info(String.format(Locale.US, "m=%1$s, <k>=%2$.4f, <c_local>=%3$.4f, <c_global>=%4$.4f, <d>=%5$.4f", m, k_mean, c_local, c_global, d_mean));
 	
@@ -161,14 +161,14 @@ public class DumpHandler implements SampleHandler {
 		
 	}
 	
-	protected SpatialGraph dump(AdjacencyMatrix y, long iteration, TravelTimeMatrix matrix) {
+	protected SpatialSparseGraph dump(AdjacencyMatrix y, long iteration, TravelTimeMatrix matrix) {
 		logger.info("Dumping sample...");
 		
 		edges.add(y.getEdgeCount());
 		degree.add(AdjacencyMatrixStatistics.getMeanDegree(y));
 		clustering.add(AdjacencyMatrixStatistics.getLocalClusteringCoefficient(y));
 		
-		SpatialGraph net = ((SpatialAdjacencyMatrix)y).getGraph();
+		SpatialSparseGraph net = ((SpatialAdjacencyMatrix)y).getGraph();
 		distance.add(SpatialGraphStatistics.edgeLengthDistribution(net).mean());
 		
 		logger.info(String.format("VarK(m)=%1$.4f, VarK(<k>)=%2$.4f, VarK(<c_local>)=%3$.4f, VarK(<d>)=%4$.4f",
@@ -207,8 +207,8 @@ public class DumpHandler implements SampleHandler {
 			/*
 			 * Pajek
 			 */
-			PajekDegreeColorizer<SpatialVertex, SpatialEdge> colorizer1 = new PajekDegreeColorizer<SpatialVertex, SpatialEdge>(net, true);
-			PajekClusteringColorizer<SpatialVertex, SpatialEdge> colorizer2 = new PajekClusteringColorizer<SpatialVertex, SpatialEdge>(net);
+			PajekDegreeColorizer<SpatialSparseVertex, SpatialSparseEdge> colorizer1 = new PajekDegreeColorizer<SpatialSparseVertex, SpatialSparseEdge>(net, true);
+			PajekClusteringColorizer<SpatialSparseVertex, SpatialSparseEdge> colorizer2 = new PajekClusteringColorizer<SpatialSparseVertex, SpatialSparseEdge>(net);
 			PajekDistanceColorizer colorizer3 = new PajekDistanceColorizer(net, false);
 			SpatialPajekWriter pwriter = new SpatialPajekWriter();
 			pwriter.write(net, colorizer1, currentOutputDir + "graph.degree.net");

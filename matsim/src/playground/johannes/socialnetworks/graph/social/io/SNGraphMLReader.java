@@ -36,6 +36,7 @@ import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -43,41 +44,39 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.xml.sax.Attributes;
 
-import playground.johannes.socialnetworks.graph.SparseVertex;
-import playground.johannes.socialnetworks.graph.io.AbstractGraphMLReader;
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
-import playground.johannes.socialnetworks.graph.social.SocialNetworkFactory;
+import playground.johannes.socialnetworks.graph.social.SocialNetworkBuilder;
 import playground.johannes.socialnetworks.graph.social.SocialTie;
 
 /**
  * @author illenberger
  *
  */
-public class SNGraphMLReader<P extends BasicPerson<?>> extends AbstractGraphMLReader {
+public class SNGraphMLReader<P extends BasicPerson<?>> extends AbstractGraphMLReader<SocialNetwork<P>, Ego<P>, SocialTie> {
 
 	private static final String WSPACE = " ";
 	
 	private BasicPopulation<P> population;
 	
-	private SocialNetworkFactory<P> factory;
+	private SocialNetworkBuilder<P> builder;
 	
 	public SNGraphMLReader(BasicPopulation<P> population) {
 		this.population = population;
 	}
 	
-	@SuppressWarnings("unchecked")
+//	@SuppressWarnings("unchecked")
 	@Override
 	public SocialNetwork<P> readGraph(String file) {
 		return (SocialNetwork<P>) super.readGraph(file);
 	}
 
-	@SuppressWarnings("unchecked")
+//	@SuppressWarnings("unchecked")
 	@Override
-	protected SocialTie addEdge(SparseVertex v1, SparseVertex v2,
+	protected SocialTie addEdge(Ego<P> v1, Ego<P> v2,
 			Attributes attrs) {
 		String created = attrs.getValue(SNGraphML.CREATED_TAG);
-		SocialTie e = factory.addEdge((SocialNetwork<P>)graph, (Ego<P>)v1, (Ego<P>)v2, Integer.parseInt(created));
+		SocialTie e = builder.addEdge(getGraph(), v1, v2, Integer.parseInt(created));
 		
 		String usage = attrs.getValue(SNGraphML.USAGE_TAG);
 		for(String token : usage.split(WSPACE)) {
@@ -87,7 +86,7 @@ public class SNGraphMLReader<P extends BasicPerson<?>> extends AbstractGraphMLRe
 		return e;
 	}
 
-	@SuppressWarnings("unchecked")
+//	@SuppressWarnings("unchecked")
 	@Override
 	protected Ego<P> addVertex(Attributes attrs) {
 		String id = attrs.getValue(SNGraphML.PERSON_ID_TAG);
@@ -95,12 +94,12 @@ public class SNGraphMLReader<P extends BasicPerson<?>> extends AbstractGraphMLRe
 		if(person == null)
 			throw new NullPointerException(String.format("Person with id %1$s not found!", id));
 		
-		return factory.addVertex((SocialNetwork<P>)graph, person);
+		return builder.addVertex((SocialNetwork<P>)getGraph(), person);
 	}
 
 	@Override
 	protected SocialNetwork<P> newGraph(Attributes attrs) {
-		factory = new SocialNetworkFactory<P>(population);
+		builder = new SocialNetworkBuilder<P>();
 		return new SocialNetwork<P>();
 	}
 

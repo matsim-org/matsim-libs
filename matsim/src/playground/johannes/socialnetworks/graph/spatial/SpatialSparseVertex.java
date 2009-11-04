@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialPartitiona.java
+ * SpatialVertex.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,32 +19,37 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import org.matsim.api.basic.v01.Coord;
+import org.matsim.contrib.sna.graph.SparseVertex;
 
-import playground.johannes.socialnetworks.spatial.Zone;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialPartitions {
+public class SpatialSparseVertex extends SparseVertex implements SpatialVertex {
 
-	public static <V extends SpatialSparseVertex> Set<V> createSpatialPartition(Set<V> vertices, Zone zone) {
-		Set<V> partition = new HashSet<V>();
-		GeometryFactory factory = new GeometryFactory();
-		Geometry geometry = zone.getBorder();
-		for(V v : vertices) {
-			Coordinate coordinate = new Coordinate(v.getCoordinate().getX(), v.getCoordinate().getY());
-			if(geometry.contains(factory.createPoint(coordinate))) {
-				partition.add(v);
-			}
-		}
-		return partition;
+	private Coord coord;
+	
+	protected SpatialSparseVertex(Coord coord) {
+		this.coord = coord;
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<? extends SpatialSparseVertex> getNeighbours() {
+		return (List<? extends SpatialSparseVertex>) super.getNeighbours();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<? extends SpatialSparseEdge> getEdges() {
+		return (List<? extends SpatialSparseEdge>) super.getEdges();
+	}
+
+	public Coord getCoordinate() {
+		return coord;
+	}
 }

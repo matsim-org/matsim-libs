@@ -27,13 +27,13 @@ import gnu.trove.TIntArrayList;
 
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
 
 /**
  * @author illenberger
  *
  */
-public class SocialTie extends SpatialEdge {
+public class SocialTie extends SpatialSparseEdge {
 
 	private int created;
 	
@@ -41,12 +41,7 @@ public class SocialTie extends SpatialEdge {
 	
 	private int lastUsed;
 	
-	protected SocialTie(Ego<?> v1, Ego<?> v2) {
-		this(v1, v2, 0);
-	}
-	
-	protected SocialTie(Ego<?> v1, Ego<?> v2, int created) {
-		super(v1, v2);
+	protected SocialTie(int created) {
 		this.created = created;
 		usage = new TIntArrayList();
 		usage.add(created);
