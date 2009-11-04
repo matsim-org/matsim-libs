@@ -36,10 +36,10 @@ import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
-import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraphBuilder;
-import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraphMLWriter;
-import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialVertex;
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraphBuilder;
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
+import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLWriter;
 
 /**
  * @author illenberger
@@ -55,7 +55,7 @@ public class TXT2GraphML {
 	
 	public static void main(String[] args) throws IOException {
 		SampledSpatialGraphBuilder builder = new SampledSpatialGraphBuilder();
-		SampledSpatialGraph graph = builder.createGraph();
+		SampledSpatialSparseGraph graph = builder.createGraph();
 		/*
 		 * read ego table
 		 */
@@ -71,7 +71,7 @@ public class TXT2GraphML {
 		if(idIdx < 0 || longIdx < 0 || latIdx < 0 || statusIdx < 0)
 			throw new IllegalArgumentException("Header not found!");
 		
-		TIntObjectHashMap<SampledSpatialVertex> vertexIds = new TIntObjectHashMap<SampledSpatialVertex>();
+		TIntObjectHashMap<SampledSpatialSparseVertex> vertexIds = new TIntObjectHashMap<SampledSpatialSparseVertex>();
 		
 		int egocount = 0;
 		while((line = reader.readLine()) != null) {
@@ -87,7 +87,7 @@ public class TXT2GraphML {
 
 					Coord c = getCoord(tokens, longIdx, latIdx);
 					if (c != null) {
-						SampledSpatialVertex v = builder.addVertex(graph, c);
+						SampledSpatialSparseVertex v = builder.addVertex(graph, c);
 						v.sample(0);
 						if(vertexIds.put(id, v) != null)
 							System.err.println("Overwriting ego with id " + id);
@@ -117,7 +117,7 @@ public class TXT2GraphML {
 		int egoNotFound = 0;
 		
 		TIntIntHashMap egoDegree = new TIntIntHashMap();
-		TIntObjectIterator<SampledSpatialVertex> it = vertexIds.iterator();
+		TIntObjectIterator<SampledSpatialSparseVertex> it = vertexIds.iterator();
 		for(int i = 0; i< vertexIds.size(); i++) {
 			it.advance();
 			egoDegree.put(it.key(), 0);
@@ -131,7 +131,7 @@ public class TXT2GraphML {
 			String[] tokens2 = egoIdStr.split(" ");
 //			try {
 			int egoId = Integer.parseInt(tokens2[tokens2.length - 1]);
-			SampledSpatialVertex ego = vertexIds.get(egoId);
+			SampledSpatialSparseVertex ego = vertexIds.get(egoId);
 			if(ego == null) {
 				logger.warn(String.format("Ego with id %1$s not found!", egoId));
 				egoNotFound++;
@@ -144,7 +144,7 @@ public class TXT2GraphML {
 					else
 						id = Integer.parseInt(idStr);
 
-					SampledSpatialVertex alter = vertexIds.get(id);
+					SampledSpatialSparseVertex alter = vertexIds.get(id);
 					if (alter == null) {
 						Coord c = getCoord(tokens, longIdx, latIdx);
 						if (c != null) {

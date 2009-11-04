@@ -42,18 +42,19 @@ import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
+import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
+import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
 import playground.johannes.socialnetworks.spatial.Zone;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 import playground.johannes.socialnetworks.statistics.Distribution;
-import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraphMLReader;
-import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialVertex;
 
 /**
  * @author illenberger
@@ -93,11 +94,11 @@ public class TravelTimeHistogram2 {
 		 * read graph
 		 */
 		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
-		SampledSpatialGraph graph = reader.readGraph(config.getParam("tthistogram", "graph"));
+		SampledSpatialSparseGraph graph = reader.readGraph(config.getParam("tthistogram", "graph"));
 		
 		
 		Population2SpatialGraph pop2graph = new Population2SpatialGraph();
-		SpatialGraph graph2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.04.xml");
+		SpatialSparseGraph graph2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.04.xml");
 		double bounds[] = graph2.getBounds();
 		/*
 		 * read grid
@@ -108,7 +109,7 @@ public class TravelTimeHistogram2 {
 		/*
 		 * get sampled partition
 		 */
-		Set<? extends SampledSpatialVertex> sbPartition = SnowballPartitions.createSampledPartition(graph.getVertices());
+		Set<? extends SampledSpatialSparseVertex> sbPartition = SnowballPartitions.createSampledPartition(graph.getVertices());
 		TDoubleObjectHashMap<?> partitions = SpatialGraphStatistics.createDensityPartitions(sbPartition, densityZones, 2000);
 		
 		new File(output + "rhoPartitions").mkdirs();
@@ -121,11 +122,11 @@ public class TravelTimeHistogram2 {
 		TDoubleObjectIterator<?> it = partitions.iterator();
 		for(int i = 0; i < partitions.size(); i++) {
 			it.advance();
-			Set<SampledSpatialVertex> partition = (Set<SampledSpatialVertex>) it.value();
+			Set<SampledSpatialSparseVertex> partition = (Set<SampledSpatialSparseVertex>) it.value();
 			
 			Distribution rhoDistr = new Distribution();
 
-			for(SpatialVertex v : partition) {
+			for(SpatialSparseVertex v : partition) {
 //				Zone z_i = zoneLayer.getZone(v.getCoordinate());
 //				if(z_i != null) {
 //					
@@ -149,7 +150,7 @@ public class TravelTimeHistogram2 {
 //				}
 
 				Node n_i = network.getNearestNode(v.getCoordinate());			
-				for(SpatialVertex v2 : v.getNeighbours()) {
+				for(SpatialSparseVertex v2 : v.getNeighbours()) {
 					Node n_j = network.getNearestNode(v2.getCoordinate());
 					double tt = router.calcLeastCostPath(n_i, n_j, 6*60*60).travelTime;
 					rhoDistr.add(tt);

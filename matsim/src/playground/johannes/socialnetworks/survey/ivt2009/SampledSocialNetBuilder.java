@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSocialNet.java
+ * SampledSocialNetFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,44 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
-package playground.johannes.socialnetworks.ivtsurveys;
-
-import java.util.HashSet;
-import java.util.Set;
+package playground.johannes.socialnetworks.survey.ivt2009;
 
 import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
 
-import playground.johannes.socialnetworks.graph.social.Ego;
-import playground.johannes.socialnetworks.graph.social.SocialNetwork;
 
 /**
  * @author illenberger
  *
  */
-public class SampledSocialNet<P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> extends SocialNetwork<P> {
+public class SampledSocialNetBuilder <P extends BasicPerson<?>> extends AbstractSparseGraphBuilder<SampledSocialNet<P>, SampledEgo<P>, SampledSocialTie> {
 
-	private Set<Ego<P>> sampledVertices = new HashSet<Ego<P>>();
-	
-	@Override
-	public Ego<P> addEgo(P person) {
-		Ego<P> ego = super.addEgo(person);
-		sampledVertices.add(ego);
-		return ego;
+	public SampledSocialNetBuilder() {
+		super(new SampledSocialNetFactory<P>());
 	}
 
-	public Ego<P> addUnsampledEgo(P person) {
-		return addEgo(person);
+	public SampledEgo<P> addVertex(SampledSocialNet<P> g) {
+		throw new UnsupportedOperationException("Don't know what to with that...");
 	}
 	
-	@Override
-	public Set<? extends Ego<P>> getVertices() {
-		return sampledVertices;
+	public SampledEgo<P> addVertex(SampledSocialNet<P> g, P person, int iteration) {
+		SampledEgo<P> ego = new SampledEgo<P>(person);
+		ego.detect(iteration);
+		if(insertVertex(g, ego))
+			return ego;
+		else
+			return null;
 	}
 
 }

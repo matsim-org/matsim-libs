@@ -23,22 +23,22 @@
  */
 package playground.johannes.socialnetworks.snowball;
 
+import org.matsim.contrib.sna.graph.SparseGraph;
+import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
 import org.matsim.core.gbl.Gbl;
 import org.xml.sax.Attributes;
 
-import playground.johannes.socialnetworks.graph.SparseEdge;
-import playground.johannes.socialnetworks.graph.SparseGraph;
-import playground.johannes.socialnetworks.graph.SparseVertex;
-import playground.johannes.socialnetworks.graph.io.AbstractGraphMLReader;
 
 /**
  * @author illenberger
  *
  */
-public class SampledGraphMLReader extends AbstractGraphMLReader {
+public class SampledGraphMLReader extends AbstractGraphMLReader<SampledGraph, SampledVertex, SampledEdge> {
 
+	private SampledGraphBuilder builder = new SampledGraphBuilder();
+	
 	@Override
-	protected SparseGraph newGraph(Attributes attrs) {
+	protected SampledGraph newGraph(Attributes attrs) {
 		return new SampledGraph();
 	}
 
@@ -48,13 +48,13 @@ public class SampledGraphMLReader extends AbstractGraphMLReader {
 	}
 
 	@Override
-	protected SparseEdge addEdge(SparseVertex v1, SparseVertex v2, Attributes attrs) {
-		return ((SampledGraph)graph).addEdge((SampledVertex)v1, (SampledVertex)v2);
+	protected SampledEdge addEdge(SampledVertex v1, SampledVertex v2, Attributes attrs) {
+		return builder.addEdge(((SampledGraph)getGraph()), (SampledVertex)v1, (SampledVertex)v2);
 	}
 
 	@Override
-	protected SparseVertex addVertex(Attributes attrs) {
-		return ((SampledGraph)graph).addVertex();
+	protected SampledVertex addVertex(Attributes attrs) {
+		return builder.addVertex(((SampledGraph)getGraph()));
 	}
 
 	public static void main(String args[]) {

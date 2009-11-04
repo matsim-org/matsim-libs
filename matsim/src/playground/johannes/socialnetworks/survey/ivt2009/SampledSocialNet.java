@@ -22,10 +22,10 @@ package playground.johannes.socialnetworks.survey.ivt2009;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.contrib.sna.graph.SparseVertex;
 
-import playground.johannes.socialnetworks.graph.SparseEdge;
-import playground.johannes.socialnetworks.graph.SparseVertex;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
+import playground.johannes.socialnetworks.snowball2.SampledGraph;
 
 /**
  * @author illenberger
@@ -52,15 +52,4 @@ public class SampledSocialNet<P extends BasicPerson<?>> extends SocialNetwork<P>
 	public SampledEgo<P> getEgo(P p) {
 		return (SampledEgo<P>) super.getEgo(p);
 	}
-
-	@Override
-	protected boolean insertEdge(SparseEdge e, SparseVertex v1, SparseVertex v2) {
-		return super.insertEdge(e, v1, v2);
-	}
-
-	@Override
-	protected boolean insertVertex(SparseVertex v) {
-		return super.insertVertex(v);
-	}
-
 }

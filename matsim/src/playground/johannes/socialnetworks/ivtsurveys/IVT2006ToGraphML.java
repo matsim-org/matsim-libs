@@ -48,6 +48,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
+import playground.johannes.socialnetworks.graph.social.SocialNetworkBuilder;
 import playground.johannes.socialnetworks.graph.social.io.SNGraphMLWriter;
 
 /**
@@ -77,6 +78,7 @@ public class IVT2006ToGraphML {
 		String graphfile = args[3];
 
 		SocialNetwork<BasicPerson<BasicPlan<PlanElement>>> socialnet = new SocialNetwork<BasicPerson<BasicPlan<PlanElement>>>();
+		SocialNetworkBuilder<BasicPerson<BasicPlan<PlanElement>>> builder = new SocialNetworkBuilder<BasicPerson<BasicPlan<PlanElement>>>();
 		BasicPopulation population = new PopulationImpl();
 		HashMap<String, Ego<BasicPerson<BasicPlan<PlanElement>>>> egos = new HashMap<String, Ego<BasicPerson<BasicPlan<PlanElement>>>>();
 		
@@ -99,8 +101,7 @@ public class IVT2006ToGraphML {
 			/*
 			 * Create an Ego
 			 */
-			Ego<BasicPerson<BasicPlan<PlanElement>>> ego = socialnet
-					.addEgo(person);
+			Ego<BasicPerson<BasicPlan<PlanElement>>> ego = builder.addVertex(socialnet, person);
 			egos.put(tokens[0], ego);
 			maxId = Math.max(Integer.parseInt(tokens[0]), maxId);
 		}
@@ -120,10 +121,9 @@ public class IVT2006ToGraphML {
 				BasicPerson<BasicPlan<PlanElement>> person = createPerson(String.valueOf(++maxId), tokens[1], tokens[2],population);
 				population.getPersons().put(person.getId(), person);
 
-				Ego<BasicPerson<BasicPlan<PlanElement>>> alter = socialnet
-						.addEgo(person);
+				Ego<BasicPerson<BasicPlan<PlanElement>>> alter = builder.addVertex(socialnet, person);
 
-				socialnet.addEdge(ego, alter);
+				builder.addEdge(socialnet, ego, alter);
 				anonymousVertices.add(alter);
 			}
 		}

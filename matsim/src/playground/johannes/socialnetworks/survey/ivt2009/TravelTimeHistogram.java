@@ -31,15 +31,16 @@ import java.util.Set;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
+import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
+import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.Zone;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
 import playground.johannes.socialnetworks.statistics.Distribution;
-import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraphMLReader;
-import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialVertex;
 
 /**
  * @author illenberger
@@ -79,7 +80,7 @@ public class TravelTimeHistogram {
 		 * read graph
 		 */
 		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
-		SampledSpatialGraph graph = reader.readGraph("/Users/fearonni/vsp-work/work/socialnets/data/ivt2009/graph/graph.graphml");
+		SampledSpatialSparseGraph graph = reader.readGraph("/Users/fearonni/vsp-work/work/socialnets/data/ivt2009/graph/graph.graphml");
 		/*
 		 * read zones
 		 */
@@ -97,7 +98,7 @@ public class TravelTimeHistogram {
 		/*
 		 * get sampled partition
 		 */
-		Set<? extends SampledSpatialVertex> sbPartition = SnowballPartitions.createSampledPartition(graph.getVertices());
+		Set<? extends SampledSpatialSparseVertex> sbPartition = SnowballPartitions.createSampledPartition(graph.getVertices());
 //		TDoubleObjectHashMap<?> partitions = SpatialGraphStatistics.createDensityPartitions(sbPartition, densityZones, 2000);
 		
 		new File(output + "rhoPartitions").mkdirs();
@@ -111,12 +112,12 @@ public class TravelTimeHistogram {
 //		for(int i = 0; i < partitions.size(); i++) {
 //			it.advance();
 //			Set<SampledSpatialVertex> partition = (Set<SampledSpatialVertex>) it.value();
-		Set<SampledSpatialVertex> partition = (Set<SampledSpatialVertex>) sbPartition;
+		Set<SampledSpatialSparseVertex> partition = (Set<SampledSpatialSparseVertex>) sbPartition;
 
 //		Distribution rhoDistr = new Distribution();
 		
 		double binsize = 300;
-		for (SpatialVertex v : partition) {
+		for (SpatialSparseVertex v : partition) {
 			Zone z_i = zoneLayer.getZone(v.getCoordinate());
 			if (z_i != null) {
 
@@ -144,7 +145,7 @@ public class TravelTimeHistogram {
 //					}
 //				}
 
-				for (SpatialVertex v2 : v.getNeighbours()) {
+				for (SpatialSparseVertex v2 : v.getNeighbours()) {
 					Zone z_j = zoneLayer.getZone(v2.getCoordinate());
 					if (z_j == null)
 						System.err.println("Zone is null");

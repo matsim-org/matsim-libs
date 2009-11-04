@@ -33,10 +33,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.omg.PortableServer.ThreadPolicyOperations;
-
 import playground.johannes.socialnetworks.graph.GraphProjection;
-import playground.johannes.socialnetworks.graph.SparseVertex;
+import playground.johannes.socialnetworks.graph.SparseGraphProjectionBuilder;
 import playground.johannes.socialnetworks.graph.VertexDecorator;
 
 /**
@@ -48,6 +46,8 @@ public class Sampler {
 	private int iteration;
 	
 	private Set<SampledVertex> egos;
+	
+	private final SparseGraphProjectionBuilder<SampledGraph, SampledVertex, SampledEdge> builder;
 	
 	private final GraphProjection<SampledGraph, SampledVertex, SampledEdge> projection;
 	
@@ -69,7 +69,8 @@ public class Sampler {
 		this.graph.reset();
 		this.iteration = -1;
 		this.egos = new HashSet<SampledVertex>();
-		this.projection = new GraphProjection<SampledGraph, SampledVertex, SampledEdge>(g);
+		builder = new SparseGraphProjectionBuilder<SampledGraph, SampledVertex, SampledEdge>();
+		this.projection = builder.createGraph(g);
 		this.numSampledVertices = new TIntArrayList();
 		this.responseRate = 1;
 		this.maxNumSamples = Integer.MAX_VALUE;
@@ -130,7 +131,8 @@ public class Sampler {
 		}
 		for(SampledVertex v : this.egos) {
 			v.detect(0);
-			v.setProjection(this.projection.addVertex(v));
+//			v.setProjection(this.projection.addVertex(v));
+			v.setProjection(builder.addVertex(projection, v));
 		}
 		return this.egos;
 	}
@@ -174,12 +176,15 @@ public class Sampler {
 			SampledVertex alter = e.getOpposite(ego);
 			if(alter.isSampled() || alter.isDetected()) {
 				if(e.getProjection() == null) {
-					e.setProjection(this.projection.addEdge(ego.getProjection(), alter.getProjection(), e));
+//					e.setProjection(this.projection.addEdge(ego.getProjection(), alter.getProjection(), e));
+					e.setProjection(builder.addEdge(projection, ego.getProjection(), alter.getProjection(), e));
 				}	
 			} else {
 				alter.detect(this.iteration);
-				alter.setProjection(this.projection.addVertex(alter));
-				e.setProjection(this.projection.addEdge(ego.getProjection(), alter.getProjection(), e));
+//				alter.setProjection(this.projection.addVertex(alter));
+				alter.setProjection(builder.addVertex(projection, alter));
+//				e.setProjection(this.projection.addEdge(ego.getProjection(), alter.getProjection(), e));
+				e.setProjection(builder.addEdge(projection, ego.getProjection(), alter.getProjection(), e));
 				alters.add(alter);
 			}
 		}

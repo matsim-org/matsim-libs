@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledEdge.java
+ * SampledVertex.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,14 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.snowball2;
 
-import playground.johannes.socialnetworks.graph.Edge;
+import java.util.List;
+
+import org.matsim.contrib.sna.graph.Vertex;
+
 
 /**
  * @author illenberger
  *
  */
-public interface SampledEdge extends Edge {
+public interface SampledVertex extends Vertex {
 
+	public List<? extends SampledEdge> getEdges();
+	
+	public List<? extends SampledVertex> getNeighbours();
+	
+	public void detect(int iteration);
+	
+	public int getIterationDetected();
+	
+	public boolean isDetected();
+	
+	public void sample(int iteration);
+	
+	public int getIterationSampled();
+	
+	public boolean isSampled();
+	
 }

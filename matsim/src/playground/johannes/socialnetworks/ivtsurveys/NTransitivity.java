@@ -32,11 +32,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 import org.matsim.core.gbl.Gbl;
 
-import playground.johannes.socialnetworks.graph.Graph;
-import playground.johannes.socialnetworks.graph.Vertex;
-import playground.johannes.socialnetworks.graph.io.SparseGraphMLReader;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**

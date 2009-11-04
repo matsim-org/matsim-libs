@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
-import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialTie;
+import playground.johannes.socialnetworks.snowball2.SampledEdge;
 
 /**
  * @author illenberger
@@ -28,12 +28,8 @@ import playground.johannes.socialnetworks.graph.social.SocialTie;
  */
 public class SampledSocialTie extends SocialTie implements SampledEdge {
 
-	public SampledSocialTie(Ego<?> v1, Ego<?> v2) {
-		super(v1, v2);
-	}
-
-	public SampledSocialTie(Ego<?> v1, Ego<?> v2, int created) {
-		super(v1, v2, created);
+	protected SampledSocialTie(int created) {
+		super(created);
 	}
 
 }

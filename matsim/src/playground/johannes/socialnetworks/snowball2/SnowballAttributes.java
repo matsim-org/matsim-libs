@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledEgo.java
+ * SnowballAttributes.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,70 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
-
-import java.util.List;
-
-import org.matsim.api.basic.v01.population.BasicPerson;
-
-import playground.johannes.socialnetworks.graph.social.Ego;
-import playground.johannes.socialnetworks.snowball2.SampledVertex;
-import playground.johannes.socialnetworks.snowball2.SnowballAttributes;
+package playground.johannes.socialnetworks.snowball2;
 
 /**
  * @author illenberger
  *
  */
-public class SampledEgo<P extends BasicPerson<?>> extends Ego<P> implements SampledVertex {
+public class SnowballAttributes {
 
-	private SnowballAttributes attributes;
+	private int detected = -1;
 	
-	private SampledEgo<P> recruitedBy;
+	private int sampled = -1;
 	
-	protected SampledEgo(P person) {
-		super(person);
-		attributes = new SnowballAttributes();
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<? extends SampledSocialTie> getEdges() {
-		return (List<? extends SampledSocialTie>) super.getEdges();
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<? extends SampledEgo<P>> getNeighbours() {
-		return (List<? extends SampledEgo<P>>) super.getNeighbours();
-	}
-
 	public void detect(int iteration) {
-		attributes.detect(iteration);
-	}
-
-	public int getIterationDetected() {
-		return attributes.getIterationDeteted();
-	}
-
-	public int getIterationSampled() {
-		return attributes.getIterationSampled();
-	}
-
-	public boolean isDetected() {
-		return attributes.isDetected();
-	}
-
-	public boolean isSampled() {
-		return attributes.isSampled();
-	}
-
-	public void sample(int iteration) {
-		attributes.sample(iteration);
-	}
-
-	public void setRecruitedBy(SampledEgo<P> ego) {
-		recruitedBy = ego;
+		detected = iteration;
 	}
 	
-	public SampledEgo<P> getRecruitedBy() {
-		return recruitedBy;
+	public int getIterationDeteted() {
+		return detected;
+	}
+	
+	public boolean isDetected() {
+		return (detected > -1);
+	}
+	
+	public void sample(int iteration) {
+		sampled = iteration;
+	}
+	
+	public int getIterationSampled() {
+		return sampled;
+	}
+	
+	public boolean isSampled() {
+		return sampled > -1;
 	}
 }

@@ -56,6 +56,7 @@ import playground.johannes.socialnetworks.graph.GraphAnalyser;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
+import playground.johannes.socialnetworks.graph.social.SocialNetworkBuilder;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectStyle;
@@ -118,6 +119,7 @@ public class IVT2009ToGraphML {
 		 */
 		BasicPopulation population = new PopulationImpl();
 		SocialNetwork<BasicPerson<?>> socialnet = new SocialNetwork<BasicPerson<?>>();
+		SocialNetworkBuilder<BasicPerson<?>> builder = new SocialNetworkBuilder<BasicPerson<?>>();
 		
 		Set<Ego<BasicPerson<?>>> alters = new HashSet<Ego<BasicPerson<?>>>();
 		Set egoSet = new HashSet<Ego<BasicPerson<BasicPlan<PlanElement>>>>();
@@ -167,7 +169,7 @@ public class IVT2009ToGraphML {
 					 */
 					BasicPerson<?> egoPerson = createPerson(id, coord, age, population);
 					population.getPersons().put(egoPerson.getId(), egoPerson);
-					Ego<BasicPerson<?>> ego = socialnet.addEgo(egoPerson);
+					Ego<BasicPerson<?>> ego = builder.addVertex(socialnet, egoPerson);
 					numEgos++;
 					egoSet.add(ego);
 					/*
@@ -177,8 +179,8 @@ public class IVT2009ToGraphML {
 						BasicPerson<BasicPlan<PlanElement>> alterPerson = createAlter(ALTER_1_KEY, i, egoData, id, population);
 						if(alterPerson != null) {
 							population.getPersons().put(alterPerson.getId(), alterPerson);
-							Ego<BasicPerson<?>> alter = socialnet.addEgo(alterPerson);
-							socialnet.addEdge(ego, alter);
+							Ego<BasicPerson<?>> alter = builder.addVertex(socialnet, alterPerson);
+							builder.addEdge(socialnet, ego, alter);
 							numAlters++;
 							alters.add(alter);
 						}// else
@@ -189,8 +191,8 @@ public class IVT2009ToGraphML {
 						BasicPerson<BasicPlan<PlanElement>> alterPerson = createAlter(ALTER_2_KEY, i, egoData, id, population);
 						if(alterPerson != null) {
 							population.getPersons().put(alterPerson.getId(), alterPerson);
-							Ego<BasicPerson<?>> alter = socialnet.addEgo(alterPerson);
-							socialnet.addEdge(ego, alter);
+							Ego<BasicPerson<?>> alter = builder.addVertex(socialnet, alterPerson);
+							builder.addEdge(socialnet, ego, alter);
 							numAlters++;
 							alters.add(alter);
 						}// else

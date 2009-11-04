@@ -19,16 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TObjectDoubleHashMap;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -43,22 +37,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLDegreeStyle;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLEgoNetWriter;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
-import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLWriter;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
-import playground.johannes.socialnetworks.statistics.Distribution;
-import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraphMLWriter;
+import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLWriter;
 
 /**
  * @author illenberger
@@ -74,7 +55,7 @@ public class GraphBuilder {
 	
 	private BasicPopulation population;
 	
-	private SampledSocialNetFactory<BasicPerson<?>> factory;
+	private SampledSocialNetBuilder<BasicPerson<?>> builder;
 	
 	private SampledSocialNet<BasicPerson<?>> socialnet;
 	
@@ -90,8 +71,8 @@ public class GraphBuilder {
 			
 			population = new PopulationImpl();
 			keyGenerator = new KeyGenerator();
-			factory = new SampledSocialNetFactory<BasicPerson<?>>();
-			socialnet = factory.createGraph();
+			builder = new SampledSocialNetBuilder<BasicPerson<?>>();
+			socialnet = builder.createGraph();
 			idVertexMapping = new HashMap<Id, SampledEgo<BasicPerson<?>>>();
 			userIdVertexMapping = new HashMap<String, SampledEgo<BasicPerson<?>>>();
 			
@@ -146,7 +127,7 @@ public class GraphBuilder {
 						 * add other person attributes...
 						 */
 						population.addPerson(person);
-						SampledEgo<BasicPerson<?>> ego = factory.addVertex(socialnet, person, iteration);
+						SampledEgo<BasicPerson<?>> ego = builder.addVertex(socialnet, person, iteration);
 						ego.sample(iteration);
 						idVertexMapping.put(person.getId(), ego);
 						userIdVertexMapping.put(userId, ego);
@@ -258,7 +239,7 @@ public class GraphBuilder {
 					 */
 					BasicPerson<?> person = createPerson(alterId, homeLoc);
 					population.addPerson(person);
-					alter = factory.addVertex(socialnet, person, ego.getIterationSampled());
+					alter = builder.addVertex(socialnet, person, ego.getIterationSampled());
 					idVertexMapping.put(person.getId(), alter);
 					userIdVertexMapping.put(userId, alter);
 					alter.detect(ego.getIterationSampled());
@@ -270,7 +251,7 @@ public class GraphBuilder {
 		}
 		
 		if(alter != null) {
-			factory.addEdge(socialnet, ego, alter);
+			builder.addEdge(socialnet, ego, alter);
 			alter.detect(Math.min(ego.getIterationSampled(), alter.getIterationDetected()));
 			return true;
 		} else

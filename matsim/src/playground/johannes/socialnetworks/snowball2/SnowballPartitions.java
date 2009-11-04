@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ClusteringStats.java
+ * SnowballPartititions.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,49 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.snowball2;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.snowball;
-
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Vertex;
-
-import playground.johannes.socialnetworks.graph.GraphProjection;
-import playground.johannes.socialnetworks.graph.GraphStatistics;
-import playground.johannes.socialnetworks.graph.VertexDecorator;
-
 /**
  * @author illenberger
- * 
+ *
  */
-public class GlobalClusteringStats extends GraphPropertyEstimator {
-
-	private double globalResponseRate;
+public class SnowballPartitions {
 	
-	public GlobalClusteringStats(String outputDir, double responseRate) {
-		super(outputDir);
-		this.globalResponseRate = responseRate;
-		openStatsWriters("global-clustering");
+	public static <V extends SampledVertex> Set<V> createSampledPartition(Collection<V> vertices) {
+		Set<V> partition = new HashSet<V>();
+		for(V vertex : vertices) {
+			if(vertex.isSampled())
+				partition.add(vertex);
+		}
+		return partition;
 	}
-
-	@Override
-	public DescriptiveStatistics calculate(
-			GraphProjection<SampledGraph, SampledVertex, SampledEdge> graph,
-			int iteration) {
-		DescriptiveStatistics observed = new DescriptiveStatistics();
-		DescriptiveStatistics estimated = new DescriptiveStatistics();
-		
-		observed.addValue(GraphStatistics.globalClusteringCoefficient(graph));
-		
-		dumpObservedStatistics(getStatisticsMap(observed), iteration);
-		dumpEstimatedStatistics(getStatisticsMap(estimated), iteration);
-
-		return observed;
+	public static Set<SampledVertex> createSampledPartition(SampledGraph g, int itertation) {
+		Set<SampledVertex> vertices = new HashSet<SampledVertex>();
+		for(SampledVertex vertex : g.getVertices()) {
+			if(vertex.getIterationSampled() == itertation)
+				vertices.add(vertex);
+		}
+		return vertices;
 	}
-
 }

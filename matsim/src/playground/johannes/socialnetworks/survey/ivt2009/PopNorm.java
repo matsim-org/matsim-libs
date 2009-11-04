@@ -26,13 +26,13 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
+import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
 import playground.johannes.socialnetworks.statistics.Distribution;
-import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.spatial.SampledSpatialGraphMLReader;
 
 /**
  * @author illenberger
@@ -47,10 +47,10 @@ public class PopNorm {
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
-		SampledSpatialGraph graph = reader.readGraph("/Users/fearonni/vsp-work/work/socialnets/mcmc/graph.graphml");
+		SampledSpatialSparseGraph graph = reader.readGraph("/Users/fearonni/vsp-work/work/socialnets/mcmc/graph.graphml");
 		
 		Population2SpatialGraph pop2graph = new Population2SpatialGraph();
-		SpatialGraph g2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/plans/plans.1.xml");
+		SpatialSparseGraph g2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/plans/plans.1.xml");
 //		SpatialGraph g2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/plans/plans.10.xml");
 		
 		Set egos = graph.getVertices();//SnowballPartitions.createSampledPartition(graph.getVertices());

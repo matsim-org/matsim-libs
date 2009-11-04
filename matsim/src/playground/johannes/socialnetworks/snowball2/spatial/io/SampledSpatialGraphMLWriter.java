@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledEgo.java
+ * SampledSpatialGraphMLWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,70 +17,51 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.snowball2.spatial.io;
 
+import java.io.IOException;
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.socialnetworks.graph.social.Ego;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
+import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLWriter;
+import playground.johannes.socialnetworks.snowball2.SampledGraph;
 import playground.johannes.socialnetworks.snowball2.SampledVertex;
-import playground.johannes.socialnetworks.snowball2.SnowballAttributes;
 
 /**
  * @author illenberger
  *
  */
-public class SampledEgo<P extends BasicPerson<?>> extends Ego<P> implements SampledVertex {
+public class SampledSpatialGraphMLWriter extends SpatialGraphMLWriter {
 
-	private SnowballAttributes attributes;
+	public static final String DETECTED_TAG = "detected";
 	
-	private SampledEgo<P> recruitedBy;
+	public static final String SAMPLED_TAG = "sampled";
 	
-	protected SampledEgo(P person) {
-		super(person);
-		attributes = new SnowballAttributes();
+	@Override
+	public void write(Graph graph, String filename) throws IOException {
+		if(graph instanceof SpatialSparseGraph && graph instanceof SampledGraph)
+			super.write(graph, filename);
+		else
+			throw new IllegalArgumentException("Graph has to be a SpatialGraph and SampledGraph!");
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<? extends SampledSocialTie> getEdges() {
-		return (List<? extends SampledSocialTie>) super.getEdges();
+	@Override
+	protected List<Tuple<String, String>> getVertexAttributes(Vertex v) {
+		List<Tuple<String, String>> attributes = super.getVertexAttributes(v);
+		
+		int detected = ((SampledVertex)v).getIterationDetected();
+		int sampled = ((SampledVertex)v).getIterationSampled();
+		
+		if(detected > -1)
+			attributes.add(new Tuple<String, String>(DETECTED_TAG, String.valueOf(detected)));
+		if(sampled > -1)
+			attributes.add(new Tuple<String, String>(SAMPLED_TAG, String.valueOf(sampled)));
+		
+		return attributes;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<? extends SampledEgo<P>> getNeighbours() {
-		return (List<? extends SampledEgo<P>>) super.getNeighbours();
-	}
-
-	public void detect(int iteration) {
-		attributes.detect(iteration);
-	}
-
-	public int getIterationDetected() {
-		return attributes.getIterationDeteted();
-	}
-
-	public int getIterationSampled() {
-		return attributes.getIterationSampled();
-	}
-
-	public boolean isDetected() {
-		return attributes.isDetected();
-	}
-
-	public boolean isSampled() {
-		return attributes.isSampled();
-	}
-
-	public void sample(int iteration) {
-		attributes.sample(iteration);
-	}
-
-	public void setRecruitedBy(SampledEgo<P> ego) {
-		recruitedBy = ego;
-	}
-	
-	public SampledEgo<P> getRecruitedBy() {
-		return recruitedBy;
-	}
 }

@@ -23,11 +23,11 @@
  */
 package playground.johannes.socialnetworks.snowball;
 
+import org.matsim.contrib.sna.graph.SparseEdge;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.socialnetworks.graph.EdgeDecorator;
-import playground.johannes.socialnetworks.graph.SparseEdge;
-import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger
@@ -37,8 +37,8 @@ public class SampledEdge extends SparseEdge {
 
 	private EdgeDecorator<SampledEdge> projection;
 	
-	protected SampledEdge(SampledVertex v1, SampledVertex v2) {
-		super(v1, v2);
+	protected SampledEdge() {
+		
 	}
 
 	@Override

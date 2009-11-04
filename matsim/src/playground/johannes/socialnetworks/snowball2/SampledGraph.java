@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SnowballAttributes.java
+ * SampledGraph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,39 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.snowball2;
+
+import java.util.Set;
+
+import org.matsim.contrib.sna.graph.Graph;
+
 
 /**
  * @author illenberger
  *
  */
-public class SnowballAttributes {
+public interface SampledGraph extends Graph {
 
-	private int detected = -1;
-	
-	private int sampled = -1;
-	
-	public void detect(int iteration) {
-		detected = iteration;
-	}
-	
-	public int getIterationDeteted() {
-		return detected;
-	}
-	
-	public boolean isDetected() {
-		return (detected > -1);
-	}
-	
-	public void sample(int iteration) {
-		sampled = iteration;
-	}
-	
-	public int getIterationSampled() {
-		return sampled;
-	}
-	
-	public boolean isSampled() {
-		return sampled > -1;
-	}
+	public Set<? extends SampledVertex> getVertices();
+
+	public Set<? extends SampledEdge> getEdges();
+
 }

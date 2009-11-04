@@ -25,7 +25,8 @@ package playground.johannes.socialnetworks.snowball;
 
 import java.util.Set;
 
-import playground.johannes.socialnetworks.graph.SparseGraph;
+import org.matsim.contrib.sna.graph.SparseGraph;
+
 
 /**
  * @author illenberger
@@ -33,21 +34,21 @@ import playground.johannes.socialnetworks.graph.SparseGraph;
  */
 public class SampledGraph extends SparseGraph {
 
-	public SampledEdge addEdge(SampledVertex v1, SampledVertex v2) {
-		SampledEdge e = new SampledEdge(v1, v2);
-		if(insertEdge(e, v1, v2))
-			return e;
-		else
-			return null;
-	}
-
-	public SampledVertex addVertex() {
-		SampledVertex v = new SampledVertex();
-		if(insertVertex(v))
-			return v;
-		else
-			return null;
-	}
+//	public SampledEdge addEdge(SampledVertex v1, SampledVertex v2) {
+//		SampledEdge e = new SampledEdge(v1, v2);
+//		if(insertEdge(e))
+//			return e;
+//		else
+//			return null;
+//	}
+//
+//	public SampledVertex addVertex() {
+//		SampledVertex v = new SampledVertex();
+//		if(insertVertex(v))
+//			return v;
+//		else
+//			return null;
+//	}
 
 	@SuppressWarnings("unchecked")
 	@Override

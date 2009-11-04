@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledVertex.java
+ * SampledDegree.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,26 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.snowball2;
 
-import playground.johannes.socialnetworks.graph.Vertex;
+import gnu.trove.TObjectDoubleHashMap;
+
+import java.util.Collection;
+
+import playground.johannes.socialnetworks.graph.Degree;
+import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger
  *
  */
-public interface SampledVertex extends Vertex {
+public class SampledDegree<V extends SampledVertex> extends Degree<V> {
 
-	public void detect(int iteration);
-	
-	public int getIterationDetected();
-	
-	public boolean isDetected();
-	
-	public void sample(int iteration);
-	
-	public int getIterationSampled();
-	
-	public boolean isSampled();
-	
+	@Override
+	public Distribution distribution(Collection<V> vertices) {
+		return super.distribution(SnowballPartitions.createSampledPartition(vertices));
+	}
+
+	@Override
+	public TObjectDoubleHashMap<V> values(Collection<V> vertices) {
+		return super.values(SnowballPartitions.createSampledPartition(vertices));
+	}
+
 }

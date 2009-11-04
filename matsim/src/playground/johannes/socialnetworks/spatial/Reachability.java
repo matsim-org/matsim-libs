@@ -29,13 +29,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.johannes.socialnetworks.graph.Vertex;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
@@ -92,21 +92,21 @@ public class Reachability {
 		return reachablityLayer;
 	}
 	
-	public static TDoubleDoubleHashMap degreeCorrelation(Set<? extends SpatialVertex> vertices, ZoneLayerDouble reachablity) {
-		TObjectDoubleHashMap<SpatialVertex> values = new TObjectDoubleHashMap<SpatialVertex>();
+	public static TDoubleDoubleHashMap degreeCorrelation(Set<? extends SpatialSparseVertex> vertices, ZoneLayerDouble reachablity) {
+		TObjectDoubleHashMap<SpatialSparseVertex> values = new TObjectDoubleHashMap<SpatialSparseVertex>();
 		
-		for(SpatialVertex v : vertices) {
+		for(SpatialSparseVertex v : vertices) {
 			values.put(v, v.getNeighbours().size());
 		}
 		
 		return correlation(values, reachablity);
 	}
 	
-	public static TDoubleDoubleHashMap correlation(TObjectDoubleHashMap<? extends SpatialVertex> values, ZoneLayerDouble reachablity) {
+	public static TDoubleDoubleHashMap correlation(TObjectDoubleHashMap<? extends SpatialSparseVertex> values, ZoneLayerDouble reachablity) {
 		double[] values1 = new double[values.size()];
 		double[] values2 = new double[values.size()];
 		
-		TObjectDoubleIterator<? extends SpatialVertex> it = values.iterator();
+		TObjectDoubleIterator<? extends SpatialSparseVertex> it = values.iterator();
 		for(int i = 0; i< values.size(); i++) {
 			it.advance();
 			double val = reachablity.getValue(it.key().getCoordinate());
@@ -118,7 +118,7 @@ public class Reachability {
 		return Correlations.correlationMean(values1, values2, 1);
 	}
 	
-	public static <V extends SpatialVertex> TObjectDoubleHashMap<V> distanceReachability(Set<V> vertices, ZoneLayerDouble reachability) {
+	public static <V extends SpatialSparseVertex> TObjectDoubleHashMap<V> distanceReachability(Set<V> vertices, ZoneLayerDouble reachability) {
 		TObjectDoubleHashMap<V> values = new TObjectDoubleHashMap<V>();
 		
 //		FIXME!
@@ -140,11 +140,11 @@ public class Reachability {
 		return values;
 	}
 	
-	public static TDoubleDoubleHashMap degreeDistanceReachabilityCorrelation(TObjectDoubleHashMap<? extends SpatialVertex> values) {
+	public static TDoubleDoubleHashMap degreeDistanceReachabilityCorrelation(TObjectDoubleHashMap<? extends SpatialSparseVertex> values) {
 		double[] values1 = new double[values.size()];
 		double[] values2 = new double[values.size()];
 		
-		TObjectDoubleIterator<? extends SpatialVertex> it = values.iterator();
+		TObjectDoubleIterator<? extends SpatialSparseVertex> it = values.iterator();
 		for(int i = 0; i < values.size(); i++) {
 			it.advance();
 			values1[i] = it.value();
@@ -154,10 +154,10 @@ public class Reachability {
 		return Correlations.correlationMean(values1, values2,5000);
 	}
 	
-	public static Distribution normalizedTravelTimeDistribution(Set<? extends SpatialVertex> vertices, ZoneLayerDouble densityLayer, TravelTimeMatrix matrix) {
+	public static Distribution normalizedTravelTimeDistribution(Set<? extends SpatialSparseVertex> vertices, ZoneLayerDouble densityLayer, TravelTimeMatrix matrix) {
 		double binsize = 300;
 		Distribution distr = new Distribution();
-		for (SpatialVertex v : vertices) {
+		for (SpatialSparseVertex v : vertices) {
 			Zone z_i = densityLayer.getZone(v.getCoordinate());
 			if (z_i != null) {
 
@@ -175,7 +175,7 @@ public class Reachability {
 					n_i.adjustOrPutValue(bin, n, n);
 				}
 
-				for (SpatialVertex v2 : v.getNeighbours()) {
+				for (SpatialSparseVertex v2 : v.getNeighbours()) {
 					Zone z_j = densityLayer.getZone(v2.getCoordinate());
 					if (z_j != null) {
 						double tt = matrix.getTravelTime(z_i, z_j);

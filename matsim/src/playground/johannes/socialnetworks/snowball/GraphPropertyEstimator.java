@@ -39,10 +39,10 @@ import java.util.Locale;
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.socialnetworks.graph.GraphProjection;
-import playground.johannes.socialnetworks.graph.Vertex;
 import playground.johannes.socialnetworks.graph.VertexDecorator;
 import playground.johannes.socialnetworks.statistics.Distribution;
 

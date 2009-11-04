@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledGraph.java
+ * SampledGraphFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009;
+package playground.johannes.socialnetworks.snowball;
 
-import java.util.Set;
-
-import playground.johannes.socialnetworks.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphFactory;
 
 /**
  * @author illenberger
  *
  */
-public interface SampledGraph extends Graph {
+public class SampledGraphFactory implements GraphFactory<SampledGraph, SampledVertex, SampledEdge>{
 
-	public Set<? extends SampledVertex> getVertices();
+	public SampledEdge createEdge() {
+		return new SampledEdge();
+	}
 
-	public Set<? extends SampledEdge> getEdges();
+	public SampledGraph createGraph() {
+		return new SampledGraph();
+	}
+
+	public SampledVertex createVertex() {
+		return new SampledVertex();
+	}
 
 }
