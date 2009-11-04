@@ -52,8 +52,8 @@ public class ScenarioPlayer {
 	public static void play(final ScenarioImpl scenario, final EventsImpl events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
-//		sim.startOTFServer(SERVERNAME);
-//		OTFDemo.ptConnect(SERVERNAME);
+		sim.startOTFServer(SERVERNAME);
+		OTFDemo.ptConnect(SERVERNAME);
 		sim.run();
 	}
 
