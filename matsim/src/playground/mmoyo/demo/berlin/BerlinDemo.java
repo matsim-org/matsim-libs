@@ -6,7 +6,7 @@ public class BerlinDemo {
 
 	public static void main(final String[] args) {
 		String networkFile = "../shared-svn/studies/ptsimmanuel/input/network.multimodal.xml";
-		String plansFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt_mmoyo/pt_only.routedOevModell20.xml";
+		String plansFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/pt_only.routedOevModell20.xml";
 		String outputDirectory = "./output/BerlinDemo";
 		String transitScheduleFile = "../shared-svn/studies/ptsimmanuel/input/transitSchedule.networkOevModellBln.xml";
 		String vehiclesFile = "../shared-svn/studies/ptsimmanuel/input/vehicles.oevModellBln.xml";

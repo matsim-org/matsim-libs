@@ -26,8 +26,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoader;
@@ -40,6 +40,11 @@ import playground.marcel.pt.queuesim.TransitQueueSimulation;
 import playground.marcel.pt.routes.ExperimentalTransitRouteFactory;
 import playground.marcel.pt.utils.CreateVehiclesForSchedule;
 
+/**
+ * @author mrieser
+ */
+
+//Copy of Scenario player at playgound.marcel.pt.demo
 public class ScenarioPlayer {
 
 	private static final String SERVERNAME = "ScenarioPlayer";
@@ -52,98 +57,42 @@ public class ScenarioPlayer {
 		sim.run();
 	}
 
-	public static void main(final String[] args){
-		String networkFile = null;
-		String scheduleFile = null;
-		String outputPlansFile = null; 
-		String outputDirectory = null;
+	/**
+	 * @param args
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 */
+	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
+		String configFile = args[0]; 
+		String scheduleFile = args[1];
 		
-		if ((args != null) && (args.length == 4)) {
-			networkFile = args[0];
-			scheduleFile = args[1];
-			outputPlansFile = args[2];
-			outputDirectory = args[3];
-		}else {
-			//exception
-		}
+		ScenarioLoader sl = new ScenarioLoader(configFile);
+		ScenarioImpl scenario = sl.getScenario();
 
-		//ScenarioLoader sl = new ScenarioLoader(configFile);
-		//ScenarioImpl scenario = sl.getScenario();
-		ScenarioImpl scenario = new ScenarioImpl();
-		ScenarioLoader sl = new ScenarioLoader(scenario);
-		
 		NetworkLayer network = scenario.getNetwork();
 		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
-		
-		//////////////////////////////////////////
-		Config config = scenario.getConfig();
-
-		config.scenario().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
-		
-		config.global().setRandomSeed(4711);
-		config.global().setCoordinateSystem("Atlantis");
-		config.network().setInputFile(networkFile);
-		config.plans().setInputFile(outputPlansFile);
-		config.controler().setOutputDirectory(outputDirectory);
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
-		config.simulation().setStartTime(0.0);
-		config.simulation().setEndTime(43200);  //12:00
-		config.simulation().setSnapshotPeriod(0.0);
-		config.simulation().setSnapshotFormat("otfvis");
-		config.simulation().setSnapshotStyle("queue");
-		
-		config.setParam("planCalcScore", "learningRate" ,"1.0");
-		config.setParam("planCalcScore", "BrainExpBeta" ,"2.0");
-		config.setParam("planCalcScore", "lateArrival" ,"-18");
-		config.setParam("planCalcScore", "earlyDeparture" ,"-0");
-		config.setParam("planCalcScore", "performing" ,"+6");
-		config.setParam("planCalcScore", "traveling" ,"-6");
-		config.setParam("planCalcScore", "waiting" ,"-0");
-		config.setParam("planCalcScore", "activityType_0"            ,"h");
-		config.setParam("planCalcScore", "activityPriority_0"        ,"1");
-		config.setParam("planCalcScore", "activityTypicalDuration_0" ,"12:00:00");
-		config.setParam("planCalcScore", "activityMinimalDuration_0" ,"08:00:00" );
-		config.setParam("planCalcScore", "activityPriority_1"        ,"1");
-		config.setParam("planCalcScore", "activityTypicalDuration_1" ,"08:00:00");
-		config.setParam("planCalcScore", "activityMinimalDuration_1" ,"06:00:00");
-		config.setParam("planCalcScore", "activityOpeningTime_1"     ,"07:00:00");
-		config.setParam("planCalcScore", "activityLatestStartTime_1" ,"09:00:00");
-		config.setParam("planCalcScore", "activityEarliestEndTime_1" ,"");
-		config.setParam("planCalcScore", "activityClosingTime_1"     ,"18:00:00");
-		
-		config.strategy().setMaxAgentPlanMemorySize(5);
-		config.setParam("strategy", "ModuleProbability_1" ,"0.9");
-		config.setParam("strategy", "Module_1" ,"BestScore");
-		config.setParam("strategy", "ModuleProbability_2" ,"0.1");
-		config.setParam("strategy", "Module_2" ,"ReRoute");
-	
-		//////////////////////////////////////////
 		sl.loadScenario();
-		
-		
-		TransitSchedule schedule = scenario.getTransitSchedule();
-	
-		try {
-			new TransitScheduleReaderV1(schedule, network).parse(scheduleFile);
-		} catch (SAXException e){
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e){
-			e.printStackTrace();
-		}
 
+		scenario.getConfig().simulation().setSnapshotPeriod(0.0);
+		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().scenario().setUseVehicles(true);
+
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		new TransitScheduleReaderV1(schedule, network).parse(scheduleFile);
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
+
 		final EventsImpl events = new EventsImpl();
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
+		EventWriterTXT writertxt = new EventWriterTXT("./output/testEvents.txt");
 		events.addHandler(writer);
+		events.addHandler(writertxt);
 
 		play(scenario, events);
 
 		writer.closeFile();
+		writertxt.closeFile();
 	}
 
 }

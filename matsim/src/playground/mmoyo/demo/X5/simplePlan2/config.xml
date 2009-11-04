@@ -8,11 +8,11 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="../shared-svn/studies/schweiz-ivtch/pt-experimental/5X5/network.xml"/>
+		<param name="inputNetworkFile" value="src/playground/mmoyo/demo/X5/network.xml"/>
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="src/playground/mmoyo/demo/X5/player2/output_plans.xml" />
+		<param name="inputPlansFile" value="src/playground/mmoyo/demo/X5/simplePlan2/output_plans.xml" />
 	</module>
 
 	<module name="controler">
