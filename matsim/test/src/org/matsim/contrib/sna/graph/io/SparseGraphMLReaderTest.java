@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Population2SpatialGraphTest.java
+ * SparseGraphMLReaderTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.graph;
+package org.matsim.contrib.sna.graph.io;
 
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.contrib.sna.graph.SparseGraph;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
+import junit.framework.TestCase;
 
 /**
  * @author illenberger
  *
  */
-public class Population2SpatialGraphTest extends MatsimTestCase {
+public class SparseGraphMLReaderTest extends TestCase {
 
-	private static final String PLANS_FILE = "plans.01.xml.gz";
+	private static final String GRPAH_FILE = "test/input/org/matsim/contrib/sna/graph/io/test.graphml.gz";
 	
-	private static final int numVertex = 2827;
-	
-	public void testRead() {
-		Population2SpatialGraph reader = new Population2SpatialGraph();
-		SpatialSparseGraph graph = reader.read(getPackageInputDirectory() + PLANS_FILE);
+	public void test() {
+		SparseGraphMLReader reader = new SparseGraphMLReader();
+		SparseGraph graph = reader.readGraph(GRPAH_FILE);
 		
-		assertEquals(numVertex, graph.getVertices().size());
+		assertEquals("The graph does not contain 1000 vertices.", 1000, graph.getVertices().size());
+		assertEquals("the graph does not contain 49334 edges.", 49334, graph.getEdges().size());
 	}
 }

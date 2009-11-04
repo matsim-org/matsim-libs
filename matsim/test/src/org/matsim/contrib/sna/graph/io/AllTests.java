@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Population2SpatialGraphTest.java
+ * AllTests.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.graph;
+package org.matsim.contrib.sna.graph.io;
 
-import org.matsim.testcases.MatsimTestCase;
-
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * @author illenberger
  *
  */
-public class Population2SpatialGraphTest extends MatsimTestCase {
+public class AllTests {
 
-	private static final String PLANS_FILE = "plans.01.xml.gz";
-	
-	private static final int numVertex = 2827;
-	
-	public void testRead() {
-		Population2SpatialGraph reader = new Population2SpatialGraph();
-		SpatialSparseGraph graph = reader.read(getPackageInputDirectory() + PLANS_FILE);
-		
-		assertEquals(numVertex, graph.getVertices().size());
+	public static Test suite() {
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
+		suite.addTestSuite(SparseGraphMLReaderTest.class);
+		return suite;
 	}
 }

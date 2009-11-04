@@ -24,14 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.contrib.sna.graph.GraphBuilder;
+import org.matsim.contrib.sna.graph.SparseEdge;
+import org.matsim.contrib.sna.graph.SparseGraph;
+import org.matsim.contrib.sna.graph.SparseGraphBuilder;
+import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.Vertex;
+
 import junit.framework.TestCase;
 import playground.johannes.socialnetworks.graph.GirvanNewmanAlgorithm;
-import playground.johannes.socialnetworks.graph.GraphFactory;
-import playground.johannes.socialnetworks.graph.SparseEdge;
-import playground.johannes.socialnetworks.graph.SparseGraph;
-import playground.johannes.socialnetworks.graph.SparseGraphFactory;
-import playground.johannes.socialnetworks.graph.SparseVertex;
-import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger
@@ -40,7 +41,7 @@ import playground.johannes.socialnetworks.graph.Vertex;
 public class GirvanNewmanTest extends TestCase {
 
 	public void test() throws IOException {
-		GraphFactory<SparseGraph, SparseVertex, SparseEdge> factory = new SparseGraphFactory();
+		GraphBuilder<SparseGraph, SparseVertex, SparseEdge> factory = new SparseGraphBuilder();
 		SparseGraph g = factory.createGraph();
 		
 		SparseVertex[] vertices = new SparseVertex[12];
