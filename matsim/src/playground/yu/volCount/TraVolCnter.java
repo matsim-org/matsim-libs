@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
@@ -134,7 +134,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 				network);
 		plansReader.readFile(plansFilename);
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 
 		TraVolCnter traVolCounter = new TraVolCnter();
 		events.addHandler(traVolCounter);

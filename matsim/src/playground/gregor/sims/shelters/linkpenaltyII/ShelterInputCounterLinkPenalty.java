@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
@@ -24,12 +24,12 @@ public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, Li
 	private final HashMap<Id,LinkInfo> linkInfos = new HashMap<Id, LinkInfo>();
 	private final HashMap<Id, Building> shelterLinkMapping;
 
-	private final EventsImpl events;
+	private final EventsManagerImpl events;
 	
 	private int it;
 
 
-	public ShelterInputCounterLinkPenalty(NetworkLayer network, HashMap<Id,Building> shelterLinkMapping, EventsImpl events) {
+	public ShelterInputCounterLinkPenalty(NetworkLayer network, HashMap<Id,Building> shelterLinkMapping, EventsManagerImpl events) {
 
 		this.events = events;
 		this.shelterLinkMapping = shelterLinkMapping;

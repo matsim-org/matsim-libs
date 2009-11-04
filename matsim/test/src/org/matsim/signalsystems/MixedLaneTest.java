@@ -39,10 +39,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.api.experimental.events.Events;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -227,12 +227,12 @@ public class MixedLaneTest extends TestCase {
 	
 	public void testMixedLanes() {
 		
-		Events events = new EventsImpl();
+		EventsManager events = new EventsManagerImpl();
 		
 //		((EventsImpl)events).addHandler(new LogOutputEventHandler());
 
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler();
-		((EventsImpl)events).addHandler(handler);
+		((EventsManagerImpl)events).addHandler(handler);
 		
 		QueueSimulation qsim = new QueueSimulation(this.sc, events);
 		qsim.setLaneDefinitions(this.sc.getLaneDefinitions());
@@ -244,11 +244,11 @@ public class MixedLaneTest extends TestCase {
 	
 	public void testMixedLanesAndSignals() {
 		
-		Events events = new EventsImpl();
+		EventsManager events = new EventsManagerImpl();
 //		((EventsImpl)events).addHandler(new LogOutputEventHandler());
 
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler();
-		((EventsImpl)events).addHandler(handler);
+		((EventsManagerImpl)events).addHandler(handler);
 		
 		QueueSimulation qsim = new QueueSimulation(this.sc, events);
 		qsim.setLaneDefinitions(this.sc.getLaneDefinitions());

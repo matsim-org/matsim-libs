@@ -5,7 +5,7 @@ package playground.yu.analysis;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -25,7 +25,7 @@ public class QvDiagram {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		VolumesAnalyzer va = new VolumesAnalyzer(300, 24 * 3600 - 1, network);
 		events.addHandler(va);
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network, 300, 682845.0,

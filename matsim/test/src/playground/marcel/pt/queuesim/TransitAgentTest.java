@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -82,7 +82,7 @@ public class TransitAgentTest extends TestCase {
 		plan.addLeg(leg);
 		plan.addActivity(workAct);
 
-		QueueSimulation sim = new QueueSimulation(scenario, new EventsImpl());
+		QueueSimulation sim = new QueueSimulation(scenario, new EventsManagerImpl());
 		TransitAgent agent = new TransitAgent((PersonImpl) person, sim);
 		agent.initialize();
 		agent.activityEnds(10);
@@ -119,7 +119,7 @@ public class TransitAgentTest extends TestCase {
 		plan.addLeg(leg);
 		plan.addActivity(workAct);
 
-		QueueSimulation sim = new QueueSimulation(scenario, new EventsImpl());
+		QueueSimulation sim = new QueueSimulation(scenario, new EventsManagerImpl());
 		TransitAgent agent = new TransitAgent((PersonImpl) person, sim);
 		agent.initialize();
 		agent.activityEnds(10);

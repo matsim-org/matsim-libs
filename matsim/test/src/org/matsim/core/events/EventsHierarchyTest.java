@@ -35,7 +35,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class EventsHierarchyTest extends MatsimTestCase {
 	
 	public void testEventsHierarchy() {
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		TestEventHandler handler = new TestEventHandler();
 		events.addHandler(handler);
 		assertEquals("wrong number of handled events.", 0, handler.counter);

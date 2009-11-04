@@ -32,7 +32,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
@@ -354,7 +354,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 			e.printStackTrace();
 		}
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 
 		LegTravelTimeModalSplit lttms = new LegTravelTimeModalSplit(population
 		// ,tollReader.getScheme()

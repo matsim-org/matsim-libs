@@ -3,7 +3,7 @@ package playground.wrashid.tryouts.performance;
 import java.util.LinkedList;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
@@ -36,7 +36,7 @@ public class EventProcessing {
 		double timer=System.currentTimeMillis();
 		EventProcessing ep=new EventProcessing();
 		
-		EventsImpl events = new ParallelEvents(numberOfThreads);
+		EventsManagerImpl events = new ParallelEvents(numberOfThreads);
 		//Events events = new Events();
 		
 		// start iteration

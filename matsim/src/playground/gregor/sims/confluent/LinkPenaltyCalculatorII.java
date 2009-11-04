@@ -15,7 +15,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
@@ -117,7 +117,7 @@ public class LinkPenaltyCalculatorII implements TravelCost, AfterMobsimListener,
 		log.info("Confluent nodes:" + conf + "   nonconfluent nodes:" + nonconf + "   penalty sum:" + cumPen);
 	}
 
-	private void scorePlans(EventsImpl events) {
+	private void scorePlans(EventsManagerImpl events) {
 		int charged = 0;
 		for (AgentArrivalEventImpl e : this.arrivedPersons) {
 			PersonImpl pers = e.getPerson();

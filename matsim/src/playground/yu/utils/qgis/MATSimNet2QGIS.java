@@ -37,7 +37,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -143,7 +143,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 
 	public void readEvents(final String eventsFilename,
 			final EventHandler[] handlers) {
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		for (EventHandler handler : handlers)
 			events.addHandler(handler);
 		new MatsimEventsReader(events).readFile(eventsFilename);

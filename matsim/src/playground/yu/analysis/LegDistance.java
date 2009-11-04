@@ -31,7 +31,7 @@ import java.util.HashMap;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
@@ -241,7 +241,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		// new MatsimPopulationReader(population).readFile(plansFilename);
 		// world.setPopulation(population);
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 
 		LegDistance legDist = new LegDistance(300, network);
 		events.addHandler(legDist);

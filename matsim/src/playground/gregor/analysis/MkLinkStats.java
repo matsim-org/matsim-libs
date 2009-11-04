@@ -3,7 +3,7 @@ package playground.gregor.analysis;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -25,7 +25,7 @@ public class MkLinkStats {
 		NetworkLayer netzzz = new NetworkLayer();
 		new MatsimNetworkReader(netzzz).readFile(net);
 		
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		VolumesAnalyzer h = new VolumesAnalyzer(60,5*3600,netzzz);
 		CalcLinkStats ls = new CalcLinkStats(netzzz);
 		events.addHandler(h);

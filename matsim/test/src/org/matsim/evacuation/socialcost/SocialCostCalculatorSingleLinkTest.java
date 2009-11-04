@@ -10,7 +10,7 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.LinkImpl;
@@ -36,7 +36,7 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		
 		Controler c = new Controler(this.sc);
 		
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		
 		
 		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink(this.network,60, events);
@@ -83,7 +83,7 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		
 		Controler c = new Controler(this.sc);
 		
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		
 		
 		SocialCostCalculatorSingleLink scalc = new SocialCostCalculatorSingleLink(this.network,60, events);

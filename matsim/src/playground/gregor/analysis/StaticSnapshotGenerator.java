@@ -37,7 +37,7 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
@@ -113,7 +113,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 
 	public void run(){
 		this.agentsOnLink.clear();
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(this);
 		new EventsReaderTXTv1(events).readFile(this.eventsFile);
 	}

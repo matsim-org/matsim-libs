@@ -38,7 +38,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -182,7 +182,7 @@ public class RegionAnalysis implements AgentDepartureEventHandler{
 
 		Coordinate superSink = MGC.coord2Coordinate(this.network.getNode("en1").getCoord());
 		
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		DestinationDependentColorizer ddc = new DestinationDependentColorizer();
 		events.addHandler(ddc);
 		events.addHandler(this);

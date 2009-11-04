@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
@@ -1038,7 +1038,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			Departure dep = builder.createDeparture(id1, 100);
 
 			// setup: simulation
-			TransitQueueSimulation qsim = new TransitQueueSimulation(scenario, new EventsImpl());
+			TransitQueueSimulation qsim = new TransitQueueSimulation(scenario, new EventsManagerImpl());
 			QueueNetwork qnet = qsim.getQueueNetwork();
 			this.qlink1 = qnet.getQueueLink(id1);
 			this.qlink2 = qnet.getQueueLink(id2);

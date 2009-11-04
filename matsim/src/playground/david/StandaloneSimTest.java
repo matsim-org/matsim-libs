@@ -35,7 +35,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -147,7 +147,7 @@ public class StandaloneSimTest {
 //			}
 //			System.exit(0);
 		}
-		EventsImpl events = new EventsImpl() ;
+		EventsManagerImpl events = new EventsManagerImpl() ;
 //		events.addHandler(new EventWriterXML("MatSimJEventsXML.txt"));
 //		events.addHandler(new EventWriterTXT("MatSimJEvents2.txt"));
 

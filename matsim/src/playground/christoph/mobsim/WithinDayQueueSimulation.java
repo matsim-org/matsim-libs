@@ -23,7 +23,7 @@ package playground.christoph.mobsim;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
@@ -46,7 +46,7 @@ public class WithinDayQueueSimulation extends QueueSimulation{
 	protected KnowledgeDBStorageHandler knowledgeDBStorageHandler;
 	
 
-	public WithinDayQueueSimulation(final NetworkLayer network, final PopulationImpl population, final EventsImpl events)
+	public WithinDayQueueSimulation(final NetworkLayer network, final PopulationImpl population, final EventsManagerImpl events)
 	{
 		super(network, population, events);
 		

@@ -34,10 +34,10 @@ import org.matsim.core.utils.misc.StringUtils;
 public class EventsReaderTXTv1 implements MatsimSomeReader {
 
 	private BufferedReader infile = null;
-	protected EventsImpl events;
+	protected EventsManagerImpl events;
 	private EventsFactory builder;
 
-	public EventsReaderTXTv1(final EventsImpl events) {
+	public EventsReaderTXTv1(final EventsManagerImpl events) {
 		super();
 		this.events = events;
 		this.builder = events.getFactory();
@@ -64,7 +64,7 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 
 	}
 
-	 public BasicEvent createEvent(final EventsImpl events, final double time, final Id agentId,
+	 public BasicEvent createEvent(final EventsManagerImpl events, final double time, final Id agentId,
 			final Id linkId, final int flag, final String desc, final String acttype) {
 		 BasicEvent data = null;
 

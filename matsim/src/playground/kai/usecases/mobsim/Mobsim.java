@@ -9,7 +9,7 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
-import org.matsim.core.api.experimental.events.Events;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -18,9 +18,9 @@ public class Mobsim {
 	private static final Logger log = Logger.getLogger(Mobsim.class);
 	
 	private Scenario sc ;
-	private Events ev ;
+	private EventsManager ev ;
 	
-	public Mobsim( Scenario sc, Events ev ) {
+	public Mobsim( Scenario sc, EventsManager ev ) {
 		this.sc = sc ;
 		this.ev = ev ;
 	}

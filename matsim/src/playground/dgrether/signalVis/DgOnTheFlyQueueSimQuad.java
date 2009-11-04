@@ -20,7 +20,7 @@
 package playground.dgrether.signalVis;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
 
 /**
@@ -42,7 +42,7 @@ public class DgOnTheFlyQueueSimQuad extends OnTheFlyQueueSimQuad {
 	 * @param events
 	 * @param laneDefsvoid
 	 */
-	public DgOnTheFlyQueueSimQuad(ScenarioImpl scenario, EventsImpl events) {
+	public DgOnTheFlyQueueSimQuad(ScenarioImpl scenario, EventsManagerImpl events) {
 		super(scenario, events);
 		this.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
 //		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");

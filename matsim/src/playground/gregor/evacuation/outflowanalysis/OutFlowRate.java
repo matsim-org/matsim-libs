@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.utils.io.IOUtils;
@@ -51,7 +51,7 @@ public class OutFlowRate implements AgentArrivalEventHandler {
 
 	private void run() {
 		this.outflow = new ArrayList<Integer>();
-		EventsImpl e = new EventsImpl();
+		EventsManagerImpl e = new EventsManagerImpl();
 		e.addHandler(this);
 		new EventsReaderTXTv1(e).readFile(this.events);
 		finish();

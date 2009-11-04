@@ -52,8 +52,8 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
-import org.matsim.core.api.experimental.events.Events;
 import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
@@ -82,9 +82,9 @@ import org.matsim.core.events.handler.LinkLeaveEventHandler;
  * @author dstrippgen
  * @author mrieser
  */
-public class EventsImpl implements Events {
+public class EventsManagerImpl implements EventsManager {
 
-	private static final Logger log = Logger.getLogger(EventsImpl.class);
+	private static final Logger log = Logger.getLogger(EventsManagerImpl.class);
 
 	static private class HandlerData {
 
@@ -121,11 +121,11 @@ public class EventsImpl implements Events {
 
 	private EventsFactory builder;
 	
-	public EventsImpl() {
+	public EventsManagerImpl() {
 		this.builder = new EventsFactoryImpl();
 	}
 	
-	private EventsImpl(EventsFactory builder) {
+	private EventsManagerImpl(EventsFactory builder) {
 		this.builder = builder;
 	}
 	

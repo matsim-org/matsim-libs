@@ -30,8 +30,8 @@ import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.core.api.experimental.events.Events;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsManagerImpl;
 
 /**
  * @author dgrether
@@ -50,9 +50,9 @@ public class LinkTravelTimeCounter implements BasicLinkEnterEventHandler, BasicL
 		this.travelTimes = new HashMap<Id, Double>(numberOfLinks);
 	}
 
-	public static void init(final Events events, final int numberOfLinks) {
+	public static void init(final EventsManager events, final int numberOfLinks) {
 		instance = new LinkTravelTimeCounter(numberOfLinks);
-		((EventsImpl)events).addHandler(instance);
+		((EventsManagerImpl)events).addHandler(instance);
 	}
 
 	public void handleEvent(final BasicLinkEnterEvent event) {

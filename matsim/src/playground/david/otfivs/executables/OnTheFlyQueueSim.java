@@ -24,7 +24,7 @@ import java.rmi.RemoteException;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -69,7 +69,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		super.prepareSim();
 
 		this.hist = new LegHistogram(300);
-		((EventsImpl)getEvents()).addHandler(this.hist);
+		((EventsManagerImpl)getEvents()).addHandler(this.hist);
 
 		// FOR TESTING ONLY!
 		new Thread(){@Override
@@ -90,7 +90,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		this.myOTFServer.updateStatus(time);
 	}
 
-	public OnTheFlyQueueSim(final NetworkLayer net, final PopulationImpl plans, final EventsImpl events) {
+	public OnTheFlyQueueSim(final NetworkLayer net, final PopulationImpl plans, final EventsManagerImpl events) {
 		super(net, plans, events);
 	}
 
@@ -129,7 +129,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 		PopulationReader plansReader = new MatsimPopulationReader(population, net);
 		plansReader.readFile(popFileName);
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 
 		config.simulation().setStartTime(Time.parseTime("00:00:00"));
 		config.simulation().setRemoveStuckVehicles(true);

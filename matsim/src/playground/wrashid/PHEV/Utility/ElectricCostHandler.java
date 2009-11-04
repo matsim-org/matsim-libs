@@ -17,7 +17,7 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.LinkImpl;
 
 //TODO: write tests for this class
@@ -33,7 +33,7 @@ public class ElectricCostHandler implements BasicLinkLeaveEventHandler,
 	private final double penaltyForRunningOutOfElectricEnergy = -100000000;
 	private MobSimController controler = null;
 	private EnergyConsumptionSamples energyConsumptionSamples = null;
-	private EventsImpl events = null;
+	private EventsManagerImpl events = null;
 
 	// application specific
 	private double averageTimeSpentAtWork = 0;
@@ -75,7 +75,7 @@ public class ElectricCostHandler implements BasicLinkLeaveEventHandler,
 
 	// observedVehicleId: if not null, the SOC of this vehicle is recorded
 	public ElectricCostHandler(MobSimController controler,
-			EnergyConsumptionSamples energyConsumptionSamples, EventsImpl events,
+			EnergyConsumptionSamples energyConsumptionSamples, EventsManagerImpl events,
 			String observedVehicleId) {
 		this.controler = controler;
 		this.energyConsumptionSamples = energyConsumptionSamples;
@@ -88,7 +88,7 @@ public class ElectricCostHandler implements BasicLinkLeaveEventHandler,
 	}
 
 	public ElectricCostHandler(DESController controler2,
-			EnergyConsumptionSamples energyConsumptionSamples2, EventsImpl events2,
+			EnergyConsumptionSamples energyConsumptionSamples2, EventsManagerImpl events2,
 			String observedVehicleId) {
 		this.controler2 = controler2;
 		this.energyConsumptionSamples = energyConsumptionSamples2;

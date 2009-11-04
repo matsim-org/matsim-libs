@@ -20,7 +20,7 @@
 package playground.dgrether.signalVis;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
@@ -53,7 +53,7 @@ public class ZurichVisNetworkOnly {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFile);
 //		PopulationImpl population = scenario.getPopulation();
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		
 		scenario.getConfig().scenario().setUseLanes(true);
 		BasicLaneDefinitions laneDefs = scenario.getLaneDefinitions();

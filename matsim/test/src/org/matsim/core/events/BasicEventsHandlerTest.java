@@ -33,7 +33,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class BasicEventsHandlerTest extends MatsimTestCase {
 
 	public void testBasicLinkEnterEventHandler() {
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		MyBasicLinkEnterEventHandler handler = new MyBasicLinkEnterEventHandler();
 		events.addHandler(handler);
 		events.printEventHandlers();

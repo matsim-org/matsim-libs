@@ -26,7 +26,7 @@ import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
@@ -66,7 +66,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 		
 		BasicLaneDefinitions lanedefs = data.getLaneDefinitions();
 		
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
 
@@ -120,7 +120,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 		ScenarioLoader loader = new ScenarioLoader(data);
 		loader.loadScenario();
 		
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
 		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);

@@ -25,7 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -87,7 +87,7 @@ public class EventsWait2LinkTest {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 
 		EventsWait2Link ew2l = new EventsWait2Link(outputFilename);
 		events.addHandler(ew2l);

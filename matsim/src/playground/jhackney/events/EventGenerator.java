@@ -20,12 +20,12 @@
 
 package playground.jhackney.events;
 
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.population.PopulationImpl;
 
 public class EventGenerator {
-    EventsImpl events=null;
-    EventsImpl generateEvents(PopulationImpl plans){
+    EventsManagerImpl events=null;
+    EventsManagerImpl generateEvents(PopulationImpl plans){
 
 
 	return events;

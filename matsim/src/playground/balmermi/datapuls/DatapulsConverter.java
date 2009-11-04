@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -67,7 +67,7 @@ public class DatapulsConverter {
 		new FacilitiesWriteTables().run(scenario.getActivityFacilities(),outdir);
 		new PopulationWriteTable(scenario.getActivityFacilities()).run(scenario.getPopulation(),outdir);
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		
 		LinkTablesEventHandler handler = new LinkTablesEventHandler(timeBinSize,outdir,scenario.getPopulation());
 		

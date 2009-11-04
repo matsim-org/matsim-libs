@@ -37,17 +37,17 @@ import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.BasicEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 
 public class EventsReaderDEQv1 {
 
-	private final EventsImpl events;
+	private final EventsManagerImpl events;
 
 	/*package*/ final static Logger log = Logger.getLogger(EventsReaderDEQv1.class);
 
-	public EventsReaderDEQv1(final EventsImpl events) {
+	public EventsReaderDEQv1(final EventsManagerImpl events) {
 		this.events = events;
 	}
 

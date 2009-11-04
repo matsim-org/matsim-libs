@@ -23,7 +23,7 @@ package playground.christoph.mobsim;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
@@ -45,7 +45,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	
 	protected KnowledgeDBStorageHandler knowledgeDBStorageHandler;
 		
-	public ReplanningQueueSimulation(final NetworkLayer network, final PopulationImpl population, final EventsImpl events)
+	public ReplanningQueueSimulation(final NetworkLayer network, final PopulationImpl population, final EventsManagerImpl events)
 	{
 		super(network, population, events);
 		
@@ -74,7 +74,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 		{
 			this.knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(this.plans);
 			this.knowledgeDBStorageHandler.start();
-			((EventsImpl)getEvents()).addHandler(knowledgeDBStorageHandler);
+			((EventsManagerImpl)getEvents()).addHandler(knowledgeDBStorageHandler);
 			this.addQueueSimulationListeners(this.knowledgeDBStorageHandler);
 		}
 		else
@@ -82,7 +82,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 			if (this.knowledgeDBStorageHandler != null)
 			{
 				this.knowledgeDBStorageHandler.stopHandler();
-				((EventsImpl)getEvents()).removeHandler(knowledgeDBStorageHandler);
+				((EventsManagerImpl)getEvents()).removeHandler(knowledgeDBStorageHandler);
 			}
 		}
 	}

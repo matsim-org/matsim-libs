@@ -38,7 +38,7 @@ import org.geotools.feature.SchemaException;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
@@ -172,8 +172,8 @@ public class EventFilesEvacuationTimeCompare {
 
 
 	private void readEvents() {
-		EventsImpl events1 = new EventsImpl();
-		EventsImpl events2 = new EventsImpl();
+		EventsManagerImpl events1 = new EventsManagerImpl();
+		EventsManagerImpl events2 = new EventsManagerImpl();
 		this.t1 = new TravelTimesFromEvents();
 		this.t2 = new TravelTimesFromEvents();
 		events1.addHandler(this.t1);

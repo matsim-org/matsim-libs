@@ -2,7 +2,7 @@ package playground.wrashid.PSF;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 
 import playground.wrashid.PSF.data.HubLinkMapping;
@@ -16,13 +16,13 @@ import playground.wrashid.lib.GeneralLib;
 public class ParametersPSF {
 
 	private static final Logger log = Logger.getLogger(ParametersPSF.class);
-	private static EventsImpl events=null;
+	private static EventsManagerImpl events=null;
 
-	public static EventsImpl getEvents() {
+	public static EventsManagerImpl getEvents() {
 		return events;
 	}
 
-	public static void setEvents(EventsImpl events) {
+	public static void setEvents(EventsManagerImpl events) {
 		ParametersPSF.events = events;
 	}
 

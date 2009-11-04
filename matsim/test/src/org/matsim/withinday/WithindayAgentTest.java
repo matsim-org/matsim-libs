@@ -29,7 +29,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
@@ -73,7 +73,7 @@ public class WithindayAgentTest extends MatsimTestCase {
 		MatsimNetworkReader parser = new MatsimNetworkReader(this.network);
 		parser.readFile(networkFile);
 		this.createRoutes();
-		this.simulation = new QueueSimulation(this.network, null, new EventsImpl());
+		this.simulation = new QueueSimulation(this.network, null, new EventsManagerImpl());
 	}
 
 	@Override

@@ -23,7 +23,7 @@ package playground.yu.visum.test;
 import java.io.IOException;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -58,7 +58,7 @@ public class EventFilterTestLaerm {
 		System.out.println("  done.");
 		// events
 		System.out.println("  creating events object... ");
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		System.out.println("  done.");
 
 		System.out.println("  adding events algorithms...");

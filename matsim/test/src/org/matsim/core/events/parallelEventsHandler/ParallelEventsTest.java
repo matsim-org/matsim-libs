@@ -3,7 +3,7 @@ package org.matsim.core.events.parallelEventsHandler;
 import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -32,7 +32,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 
 	/** test, if adding and removing a handler works */
 	public void testAddAndRemoveHandler() {
-		EventsImpl events = new ParallelEvents(2);
+		EventsManagerImpl events = new ParallelEvents(2);
 
 		// start iteration
 		events.initProcessing();
@@ -52,7 +52,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 		assertEquals(0, handler.getNumberOfProcessedMessages());
 	}
 
-	private void processEvents(final EventsImpl events, final int eventCount,
+	private void processEvents(final EventsManagerImpl events, final int eventCount,
 			final int numberOfHandlers, final int numberOfIterations) {
 
 		Handler1[] handlers = new Handler1[numberOfHandlers];

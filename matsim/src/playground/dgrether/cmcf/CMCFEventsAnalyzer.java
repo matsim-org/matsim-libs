@@ -19,7 +19,7 @@
 package playground.dgrether.cmcf;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 
 import playground.dgrether.DgPaths;
@@ -60,7 +60,7 @@ public class CMCFEventsAnalyzer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		MatsimEventsReader eventsReader = new MatsimEventsReader(events);
 		
 		TTInOutflowEventHandler handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));

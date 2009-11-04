@@ -32,12 +32,14 @@ import java.util.PriorityQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.Events;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -95,7 +97,7 @@ public class QueueSimulation {
 	protected QueueNetwork network;
 	protected NetworkLayer networkLayer;
 
-	private static Events events = null;
+	private static EventsManager events = null;
 	protected  SimStateWriterI netStateWriter = null;
 
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
@@ -140,17 +142,17 @@ public class QueueSimulation {
 	 * @param plans
 	 * @param events
 	 */
-	public QueueSimulation(final NetworkLayer network, final PopulationImpl plans, final Events events) {
+	public QueueSimulation(final Network network, final Population plans, final EventsManager events) {
 		// In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
 		this.listenerManager = new QueueSimListenerManager(this);
 		Simulation.reset();
 		this.config = Gbl.getConfig();
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
 		setEvents(events);
-		this.plans = plans;
+		this.plans = (PopulationImpl) plans;
 
-		this.network = new QueueNetwork(network);
-		this.networkLayer = network;
+		this.networkLayer = (NetworkLayer) network;
+		this.network = new QueueNetwork(this.networkLayer);
 		this.agentFactory = new AgentFactory(this);
 
 		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
@@ -161,7 +163,7 @@ public class QueueSimulation {
 	 * @param scenario
 	 * @param events
 	 */
-	public QueueSimulation(final ScenarioImpl scenario, final Events events) {
+	public QueueSimulation(final Scenario scenario, final EventsManager events) {
 		this(scenario.getNetwork(), scenario.getPopulation(), events);
 		this.scenario = scenario;
 	}
@@ -481,11 +483,11 @@ public class QueueSimulation {
 		}
 	}
 
-	public static final Events getEvents() {
+	public static final EventsManager getEvents() {
 		return events;
 	}
 
-	private static final void setEvents(final Events events) {
+	private static final void setEvents(final EventsManager events) {
 		QueueSimulation.events = events;
 	}
 

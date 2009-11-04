@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,60 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.events;
 
-import java.util.ArrayList;
-import java.util.List;
+package org.matsim.core.api.experimental.events;
 
-import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.PersonEventImpl;
-
-import playground.dgrether.events.filters.EventFilter;
-
-
 
 /**
- * @author dgrether
+ * @author nagel
  *
  */
-public class FilteredEvents extends EventsManagerImpl {
-
-	private List<EventFilter> filters = new ArrayList<EventFilter>();
-
-
-	public void addFilter(EventFilter filter) {
-		this.filters.add(filter);
-	}
-
-	/**
-	 * Delegates to List.remove() and returns the appropriate value
-	 * @param filter
-	 * @return the value of List.remove() see interface
-	 */
-	public boolean removeFilter(EventFilter filter) {
-		return this.filters.remove(filter);
-	}
-
-	/**
-	 * If all filters set in this class are returning true on the
-	 * event given as parameter the Events.processEvent() method is called.
-	 * Otherwise nothing is done at all.
-	 */
-	@Override
-	public void processEvent(final BasicEvent event) {
-		if (event instanceof PersonEventImpl) {
-			boolean doProcess = true;
-			for (EventFilter f : this.filters) {
-				if (!f.judge((PersonEventImpl)event)) {
-					doProcess = false;
-					break;
-				}
-			}
-			if (doProcess) {
-				super.processEvent(event);
-			}
-		}
+public class EventsManagerFactoryImpl {
+	
+	public EventsManager createEventsManager() {
+		return new EventsManagerImpl() ;
 	}
 
 }

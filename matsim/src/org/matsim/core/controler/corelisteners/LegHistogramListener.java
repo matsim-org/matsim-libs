@@ -27,7 +27,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 
 /**
  * Integrates the {@link org.matsim.analysis.LegHistogram} into the
@@ -38,13 +38,13 @@ import org.matsim.core.events.EventsImpl;
  */
 public class LegHistogramListener implements IterationEndsListener, IterationStartsListener {
 
-	private final EventsImpl events;
+	private final EventsManagerImpl events;
 	private final LegHistogram histogram;
 	private final boolean outputGraph;
 
 	static private final Logger log = Logger.getLogger(LegHistogramListener.class);
 
-	public LegHistogramListener(final EventsImpl events, final boolean outputGraph) {
+	public LegHistogramListener(final EventsManagerImpl events, final boolean outputGraph) {
 		this.events = events;
 		this.histogram = new LegHistogram(300);
 		this.outputGraph = outputGraph;

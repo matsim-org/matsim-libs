@@ -21,7 +21,7 @@
 package playground.david;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.Gbl;
@@ -67,7 +67,7 @@ public class IteratePopSimTest {
 		System.out.println("persons: " + count);
 		Gbl.printElapsedTime();
 		System.exit(0);
-		EventsImpl events = new EventsImpl() ;
+		EventsManagerImpl events = new EventsManagerImpl() ;
 		events.addHandler(new EventWriterXML("MatSimJEventsXML.txt"));
 		events.addHandler(new EventWriterTXT("MatSimJEvents2.txt"));
 

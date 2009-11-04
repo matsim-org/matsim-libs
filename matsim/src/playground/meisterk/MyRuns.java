@@ -35,7 +35,7 @@ import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -326,7 +326,7 @@ public class MyRuns {
 		return population;
 	}
 
-	public static void readEvents(final EventsImpl events, final NetworkLayer network) {
+	public static void readEvents(final EventsManagerImpl events, final NetworkLayer network) {
 
 		// load test events
 		long startTime, endTime;

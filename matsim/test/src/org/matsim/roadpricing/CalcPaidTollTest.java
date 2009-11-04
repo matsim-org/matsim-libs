@@ -30,7 +30,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
@@ -210,7 +210,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 	}
 
 	private void runTollSimulation(final NetworkLayer network, final PopulationImpl population, final RoadPricingScheme toll, final CharyparNagelScoringConfigGroup config) {
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		CalcPaidToll paidToll = new CalcPaidToll(network, toll);
 		events.addHandler(paidToll);
 		EventsToScore scoring = new EventsToScore(population, new CharyparNagelScoringFunctionFactory(config));

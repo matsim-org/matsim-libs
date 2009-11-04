@@ -5,7 +5,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.events.handler.EventHandler;
 
 
-public interface Events extends MatsimToplevelContainer {
+public interface EventsManager extends MatsimToplevelContainer {
 
 	public EventsFactory getFactory();
 

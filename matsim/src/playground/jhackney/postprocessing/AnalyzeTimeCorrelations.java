@@ -21,7 +21,7 @@ package playground.jhackney.postprocessing;
  * *********************************************************************** */
 
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -73,7 +73,7 @@ public class AnalyzeTimeCorrelations {
 		System.out.println("... done");
 		
 		// read in events
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 //		TrackEventsOverlap teo = new TrackEventsOverlap();
 		EventsMapStartEndTimes epp=new EventsMapStartEndTimes(plans);
 		//Fill timeWindowMap

@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.handler.EventHandler;
@@ -100,7 +100,7 @@ public class TimebinHistogram implements LinkEnterEventHandler {
 	public static void main(String [] args) {
 		String eventsFile = MY_STATIC_STUFF.OUTPUTS + "run337/800.events.txt.gz";
 		System.out.println("loading:" + eventsFile);
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		TimebinHistogram hist = new TimebinHistogram();
 		events.addHandler(hist);
 		new EventsReaderTXTv1(events).readFile(eventsFile);

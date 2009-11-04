@@ -9,7 +9,7 @@ import org.xml.sax.SAXException;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -50,7 +50,7 @@ public class NetworkGenerator {
 		//at this point we already have a matsim network...
 		new NetworkCleaner().run(net); //but may be there are isolated not connected links. The network cleaner removes those links
 		
-		new NetworkWriter(net,"./inputs/network.xml").write();//here we write the network to a xml file
+		new NetworkWriter(net).write("./inputs/network.xml");//here we write the network to a xml file
 
 		
 		//the remaining lines of code are necessary to create a ESRI shape file of the matsim network

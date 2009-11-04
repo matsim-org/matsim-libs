@@ -22,7 +22,7 @@ package org.matsim.core.mobsim.queuesim;
 import java.util.SortedMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.events.Events;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.signalsystems.basic.BasicSignalSystemDefinition;
 import org.matsim.signalsystems.control.SignalSystemController;
 
@@ -32,6 +32,6 @@ public interface SignalEngine {
 
 	public SortedMap<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions();
 
-	public Events getEvents();
+	public EventsManager getEvents();
 	
 }

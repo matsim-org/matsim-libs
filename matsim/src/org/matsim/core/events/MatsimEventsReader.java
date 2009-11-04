@@ -40,14 +40,14 @@ import org.matsim.core.utils.io.MatsimXmlParser;
  */
 public class MatsimEventsReader implements MatsimSomeReader {
 
-	private final EventsImpl events;
+	private final EventsManagerImpl events;
 
 	/**
 	 * Creates a new reader for MATSim events files.
 	 *
 	 * @param events The Events-object that handles the events.
 	 */
-	public MatsimEventsReader(final EventsImpl events) {
+	public MatsimEventsReader(final EventsManagerImpl events) {
 		this.events = events;
 	}
 
@@ -69,11 +69,11 @@ public class MatsimEventsReader implements MatsimSomeReader {
 
 	private static class XmlEventsReader extends MatsimXmlParser {
 
-		final EventsImpl events;
+		final EventsManagerImpl events;
 		private final static String EVENTS_V1 = "events_v1.dtd";
 		private MatsimXmlParser delegate = null;
 
-		public XmlEventsReader(final EventsImpl events) {
+		public XmlEventsReader(final EventsManagerImpl events) {
 			this.events = events;
 			this.setValidating(false); // events-files have no DTD, thus they cannot validate
 			setDoctype("events_v1.dtd"); // manually set a doctype, otherwise delegate would not be initialized

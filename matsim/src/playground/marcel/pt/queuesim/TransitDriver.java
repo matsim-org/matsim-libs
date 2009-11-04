@@ -29,7 +29,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.events.Events;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEventImpl;
@@ -120,7 +120,7 @@ public class TransitDriver implements TransitDriverAgent {
 			throw new RuntimeException("Expected different stop.");
 		}
 
-		Events events = TransitQueueSimulation.getEvents();
+		EventsManager events = TransitQueueSimulation.getEvents();
 		if (this.lastHandledStop != stop) {
 			events.processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
 		}

@@ -22,7 +22,7 @@ package org.matsim.core.scoring;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -46,7 +46,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		population.getPersons().put(person.getId(), person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
 		EventsToScore e2s = new EventsToScore(population, sfFactory, 1.0);
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(e2s);
 
 		events.processEvent(new AgentMoneyEventImpl(3600.0, person, 3.4));

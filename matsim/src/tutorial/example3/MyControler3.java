@@ -21,8 +21,7 @@
 package tutorial.example3;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsImpl;
-import org.matsim.core.events.algorithms.EventWriterTXT;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -41,16 +40,16 @@ public class MyControler3 {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 
-		EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
-		events.addHandler(eventWriter);
+//		EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
+//		events.addHandler(eventWriter);
 
 		QueueSimulation sim = new QueueSimulation(scenario, events);
 		sim.openNetStateWriter("./output/simout", netFilename, 10);
 		sim.run();
 
-		eventWriter.closeFile();
+//		eventWriter.closeFile();
 
 		String[] visargs = {"./output/simout"};
 		NetVis.main(visargs);

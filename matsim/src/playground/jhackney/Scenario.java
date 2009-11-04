@@ -22,7 +22,7 @@ package playground.jhackney;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -228,11 +228,11 @@ public abstract class Scenario {
 		return plans;
 	}
 
-	public static final EventsImpl readEvents(final int i, final EventsMapStartEndTimes epp) {
+	public static final EventsManagerImpl readEvents(final int i, final EventsMapStartEndTimes epp) {
 		System.out.println("  reading plans xml file... ");
 		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+config.events().getInputFile();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(epp);
 		System.out.println(filename);
 		new MatsimEventsReader(events).readFile(filename);
@@ -241,11 +241,11 @@ public abstract class Scenario {
 		return events;
 	}
 
-	public static final EventsImpl readEvents(final int i, final EventsMapStartEndTimes epp, final EventsToScore scoring) {
+	public static final EventsManagerImpl readEvents(final int i, final EventsMapStartEndTimes epp, final EventsToScore scoring) {
 		System.out.println("  reading plans xml file... ");
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
 		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(epp);
 		events.addHandler(scoring);
 		System.out.println(filename);

@@ -24,7 +24,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
@@ -46,10 +46,10 @@ import org.matsim.core.events.handler.EventHandler;
  * @author rashid_waraich
  * 
  */
-public class ParallelEvents extends EventsImpl {
+public class ParallelEvents extends EventsManagerImpl {
 
 	private int numberOfThreads;
-	private EventsImpl[] events = null;
+	private EventsManagerImpl[] events = null;
 	private ProcessEventThread[] eventsProcessThread = null;
 	private int numberOfAddedEventsHandler = 0;
 	private CyclicBarrier barrier = null;
@@ -145,12 +145,12 @@ public class ParallelEvents extends EventsImpl {
 
 	private void init(int numberOfThreads) {
 		this.numberOfThreads = numberOfThreads;
-		this.events = new EventsImpl[numberOfThreads];
+		this.events = new EventsManagerImpl[numberOfThreads];
 		this.eventsProcessThread = new ProcessEventThread[numberOfThreads];
 		// the additional 1 is for the simulation barrier
 		barrier = new CyclicBarrier(numberOfThreads + 1);
 		for (int i = 0; i < numberOfThreads; i++) {
-			events[i] = new EventsImpl();
+			events[i] = new EventsManagerImpl();
 		}
 	}
 

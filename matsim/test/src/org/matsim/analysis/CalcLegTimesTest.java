@@ -25,7 +25,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -84,7 +84,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		
 		CalcLegTimes testee = new CalcLegTimes(this.population);
 		
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(testee);
 		
 		// add events to handle here
@@ -96,7 +96,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		
 		CalcLegTimes testee = new CalcLegTimes(this.population);
 		
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(testee);
 
 		PersonImpl defaultPerson = this.population.getPersons().get(DEFAULT_PERSON_ID);

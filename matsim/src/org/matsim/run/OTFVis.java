@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -183,7 +183,7 @@ public class OTFVis {
 		
 		loader.loadScenario();
 		ScenarioImpl scenario = loader.getScenario();
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 
 		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(scenario, events);
 		client.run();
@@ -194,7 +194,7 @@ public class OTFVis {
 		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(args[0]);
 		PopulationImpl population = scenario.getPopulation();
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		
 		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(scenario, events);
 		client.run();

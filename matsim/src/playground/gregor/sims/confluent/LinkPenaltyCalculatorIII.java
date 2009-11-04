@@ -13,7 +13,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -67,7 +67,7 @@ public class LinkPenaltyCalculatorIII implements LinkPenalty, AfterMobsimListene
 	}
 
 
-	private void scorePlans(EventsImpl events) {
+	private void scorePlans(EventsManagerImpl events) {
 		for (AgentArrivalEventImpl e : this.arrivedPersons) {
 			PersonImpl pers = e.getPerson();
 			PlanImpl plan = pers.getSelectedPlan();

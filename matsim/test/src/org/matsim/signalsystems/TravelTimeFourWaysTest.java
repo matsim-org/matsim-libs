@@ -22,7 +22,7 @@ package org.matsim.signalsystems;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.scenario.ScenarioLoader;
@@ -56,7 +56,7 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		loader.loadScenario();
 		
 		String eventsOut = this.getOutputDirectory() + EVENTSFILE;
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 		QueueSimulation sim = new QueueSimulation(data.getNetwork(), data.getPopulation(), events);
@@ -86,7 +86,7 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		loader.loadScenario();
 
 		String eventsOut = this.getOutputDirectory() + EVENTSFILE;
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 		

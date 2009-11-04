@@ -20,7 +20,7 @@
 package playground.dgrether.signalVis;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoader;
 
 import playground.dgrether.DgPaths;
@@ -40,7 +40,7 @@ public class DenverStarter {
 		
 		ScenarioLoader scl = new ScenarioLoader(configFile);
 		ScenarioImpl sc = scl.loadScenario();
-		EventsImpl e = new EventsImpl();
+		EventsManagerImpl e = new EventsManagerImpl();
 		DgOnTheFlyQueueSimQuad sim = new DgOnTheFlyQueueSimQuad(sc, e);
 		sim.setLaneDefinitions(sc.getLaneDefinitions());
 		sim.setSignalSystems(sc.getSignalSystems(), sc.getSignalSystemConfigurations());

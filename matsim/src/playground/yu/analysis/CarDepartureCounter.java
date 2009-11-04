@@ -30,7 +30,7 @@ import java.io.IOException;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
@@ -79,7 +79,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		System.out.println("->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(ppl, network).readFile(plansFilename);
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		CarDepartureCounter cdc = new CarDepartureCounter(ppl);
 		events.addHandler(cdc);
 		System.out.println("-> reading eventsfile: " + eventsFilename);

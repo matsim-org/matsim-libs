@@ -55,7 +55,7 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 	class C extends A implements BasicEventHandler, BasicLinkLeaveEventHandler {}
 
 	public final void testHandlerHierarchy() {
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		Id dummy = new IdImpl("");
 		EventHandler cc = new B();
 		events.processEvent(new LinkLeaveEventImpl(0., dummy, dummy));
@@ -66,7 +66,7 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 	}
 
 	public final void testHierarchicalReset() {
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		Id dummy = new IdImpl("");
 		//first test if handleEvent is not called twice for A and for C
 		C cc = new C();

@@ -24,16 +24,19 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.xml.sax.SAXException;
+
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.EventsManagerFactoryImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoader;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
-import org.xml.sax.SAXException;
 
 import playground.marcel.OTFDemo;
 import playground.marcel.pt.queuesim.TransitQueueSimulation;
@@ -49,9 +52,9 @@ public class ScenarioPlayer {
 
 	private static final String SERVERNAME = "ScenarioPlayer";
 
-	public static void play(final ScenarioImpl scenario, final EventsImpl events) {
+	public static void play(final ScenarioImpl scenario, final EventsManager events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
-		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, events);
+		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, (EventsManagerImpl) events);
 		sim.startOTFServer(SERVERNAME);
 		OTFDemo.ptConnect(SERVERNAME);
 		sim.run();
@@ -83,7 +86,7 @@ public class ScenarioPlayer {
 		new TransitScheduleReaderV1(schedule, network).parse(scheduleFile);
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 
-		final EventsImpl events = new EventsImpl();
+		final EventsManager events = (new EventsManagerFactoryImpl()).createEventsManager() ;
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		EventWriterTXT writertxt = new EventWriterTXT("./output/testEvents.txt");
 		events.addHandler(writer);

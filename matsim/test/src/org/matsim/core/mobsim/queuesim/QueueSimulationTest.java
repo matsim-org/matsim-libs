@@ -52,7 +52,7 @@ import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -105,7 +105,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.getPersons().put(person.getId(), person);
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -143,7 +143,7 @@ public class QueueSimulationTest extends TestCase {
 		}
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -180,7 +180,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.getPersons().put(person.getId(), person);
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -223,7 +223,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.getPersons().put(person.getId(), person);
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -272,7 +272,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.getPersons().put(person.getId(), person);
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -299,7 +299,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.getPersons().put(person.getId(), person);
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -330,7 +330,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.getPersons().put(person.getId(), person);
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -388,7 +388,7 @@ public class QueueSimulationTest extends TestCase {
 		}
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		events.addHandler(vAnalyzer);
 
@@ -445,7 +445,7 @@ public class QueueSimulationTest extends TestCase {
 		}
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		events.addHandler(vAnalyzer);
 
@@ -514,7 +514,7 @@ public class QueueSimulationTest extends TestCase {
 		}
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		events.addHandler(vAnalyzer);
 
@@ -557,7 +557,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.getPersons().put(person.getId(), person);
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -606,7 +606,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.getPersons().put(person.getId(), person);
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -653,7 +653,7 @@ public class QueueSimulationTest extends TestCase {
 		plan.createAndAddActivity("w", f.link3);
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 
 		/* prepare sim */
 		QueueSimulation sim = new QueueSimulation(f.network, f.plans, events);
@@ -711,7 +711,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.getPersons().put(person.getId(), person);
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -764,7 +764,7 @@ public class QueueSimulationTest extends TestCase {
 		f.plans.getPersons().put(person.getId(), person);
 
 		/* build events */
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -802,7 +802,7 @@ public class QueueSimulationTest extends TestCase {
 	 */
 	public void testConsistentRoutes_WrongRoute() {
 		new LogCounter();
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "5", events); // route should continue on link 4
@@ -818,7 +818,7 @@ public class QueueSimulationTest extends TestCase {
 	 */
 	public void testConsistentRoutes_WrongStartLink() {
 		new LogCounter();
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("2", "3 4", "5", events); // first act is on link 1, not 2
@@ -834,7 +834,7 @@ public class QueueSimulationTest extends TestCase {
 	 */
 	public void testConsistentRoutes_WrongEndLink() {
 		new LogCounter();
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "4", events); // second act is on link 5, not 4
@@ -850,7 +850,7 @@ public class QueueSimulationTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_ImpossibleRoute() {
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("1", "2 4", "5", events); // link 3 is missing
@@ -865,7 +865,7 @@ public class QueueSimulationTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_MissingRoute() {
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("1", "", "5", events); // no links at all
@@ -885,7 +885,7 @@ public class QueueSimulationTest extends TestCase {
 	 *
 	 * @author mrieser
 	 **/
-	private LogCounter runConsistentRoutesTestSim(final String startLinkId, final String linkIds, final String endLinkId, final EventsImpl events) {
+	private LogCounter runConsistentRoutesTestSim(final String startLinkId, final String linkIds, final String endLinkId, final EventsManagerImpl events) {
 		Fixture f = new Fixture();
 
 		/* enhance network */
@@ -958,7 +958,7 @@ public class QueueSimulationTest extends TestCase {
 		person.addPlan(plan);
 		population.addPerson(person);
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		FirstLastEventCollector collector = new FirstLastEventCollector();
 		events.addHandler(collector);
 		

@@ -16,7 +16,7 @@ import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
@@ -166,7 +166,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 		if (populationModifier != null) {
 			population = populationModifier.modifyPopulation(population);
 		}
-		EventsImpl events = new ParallelEvents(1);
+		EventsManagerImpl events = new ParallelEvents(1);
 		events.addHandler(this);
 		events.initProcessing();
 		new JDEQSimulation(network, population, events).run();

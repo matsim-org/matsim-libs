@@ -20,7 +20,7 @@
 
 package playground.david;
 
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -43,7 +43,7 @@ public class ExternalMobsimTest {
 
 		System.out.println("[External MOBSIM called"  + "]");
 
-		EventsImpl events_ = new EventsImpl();
+		EventsManagerImpl events_ = new EventsManagerImpl();
 		PopulationImpl population_ = new PopulationImpl();
 
 		//load pop from popfile

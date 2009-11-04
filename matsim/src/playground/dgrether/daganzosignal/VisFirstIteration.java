@@ -20,7 +20,7 @@
 package playground.dgrether.daganzosignal;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoader;
 
 import playground.dgrether.signalVis.DgOnTheFlyQueueSimQuad;
@@ -42,7 +42,7 @@ public class VisFirstIteration {
 		loader.loadScenario();
 		ScenarioImpl sc = loader.getScenario();
 		
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		DgOnTheFlyQueueSimQuad visSim = new DgOnTheFlyQueueSimQuad(sc, events);
 		visSim.setLaneDefinitions(sc.getLaneDefinitions());
 		visSim.setSignalSystems(sc.getSignalSystems(), sc.getSignalSystemConfigurations());

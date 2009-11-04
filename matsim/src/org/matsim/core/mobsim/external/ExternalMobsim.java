@@ -32,7 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -50,7 +50,7 @@ public class ExternalMobsim {
 
 	private static final String CONFIG_MODULE = "simulation";
 
-	protected EventsImpl events;
+	protected EventsManagerImpl events;
 	protected PopulationImpl population;
 
 	protected String plansFileName = null;
@@ -61,7 +61,7 @@ public class ExternalMobsim {
 
 	private static final Logger log = Logger.getLogger(ExternalMobsim.class);
 
-	public ExternalMobsim(final PopulationImpl population, final EventsImpl events) {
+	public ExternalMobsim(final PopulationImpl population, final EventsManagerImpl events) {
 		this.population = population;
 		this.events = events;
 		init();

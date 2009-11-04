@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -204,7 +204,7 @@ public class DataPrepare {
 		new NetworkWriter(visNet, "visNet.xml").write();
 
 		log.info("start visualizer");
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(visScenario, events);
 		client.run();
 	}

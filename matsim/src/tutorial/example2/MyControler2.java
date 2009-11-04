@@ -21,7 +21,7 @@
 package tutorial.example2;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -39,7 +39,7 @@ public class MyControler2 {
 
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 
 		EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
 		events.addHandler(eventWriter);

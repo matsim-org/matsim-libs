@@ -33,7 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.BasicEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.LinkImpl;
@@ -128,7 +128,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 					PlanomatConfigGroup.RoutingCapability.fixedRoute,
 					plansCalcRoute);
 			
-			EventsImpl events = new EventsImpl();
+			EventsManagerImpl events = new EventsManagerImpl();
 			events.addHandler(tDepDelayCalc);
 			events.addHandler(linkTravelTimeEstimator);
 			events.printEventHandlers();
@@ -269,7 +269,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				plansCalcRoute);
 		Id linkId = this.originAct.getLinkId();
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(tDepDelayCalc);
 		events.printEventHandlers();
 
@@ -330,7 +330,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(linkTravelTimeEstimator);
 		events.printEventHandlers();
 
@@ -416,7 +416,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		Id linkId = ((NetworkRouteWRefs) this.testLeg.getRoute()).getLinks().get(0).getId();
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(linkTravelTimeEstimator);
 		events.printEventHandlers();
 

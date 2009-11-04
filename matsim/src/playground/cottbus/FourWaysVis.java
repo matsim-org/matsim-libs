@@ -20,7 +20,7 @@
 package playground.cottbus;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoader;
 
 import playground.dgrether.signalVis.DgOnTheFlyQueueSimQuad;
@@ -67,7 +67,7 @@ public class FourWaysVis {
 		ScenarioLoader loader = new ScenarioLoader(scenario);
 		loader.loadScenario();
 		
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		
 		
 		DgOnTheFlyQueueSimQuad client = new DgOnTheFlyQueueSimQuad(scenario, events);

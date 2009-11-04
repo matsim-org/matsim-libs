@@ -53,7 +53,7 @@ public abstract class XmlEventsTester extends TestCase {
 		writer.closeFile();
 		assertTrue(new File(eventsFile).exists());
 
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		new MatsimEventsReader(events).readFile(eventsFile);

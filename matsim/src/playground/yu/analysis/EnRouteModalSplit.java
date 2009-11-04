@@ -31,7 +31,7 @@ import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.EventsImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
@@ -444,7 +444,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		// } catch (IOException e) {
 		// e.printStackTrace();
 		// }
-		EventsImpl events = new EventsImpl();
+		EventsManagerImpl events = new EventsManagerImpl();
 		EnRouteModalSplit orms = new EnRouteModalSplit("Berlin", population,
 				null
 		// tollReader.getScheme()
