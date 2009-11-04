@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlainGraphFactory.java
+ * SparseGraphBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.contrib.sna.graph;
 
 /**
+ * An extension to AbstractSparseGraphBuilder to build SparseGraphs.
+ * 
+ * @author illenberger
  * 
  */
-package playground.johannes.socialnetworks.graph;
+public class SparseGraphBuilder extends
+		AbstractSparseGraphBuilder<SparseGraph, SparseVertex, SparseEdge> {
 
-
-/**
- * @author illenberger
- *
- */
-public class SparseGraphFactory implements GraphFactory<SparseGraph, SparseVertex, SparseEdge> {
-
-	public SparseEdge addEdge(SparseGraph g, SparseVertex v1, SparseVertex v2) {
-		SparseEdge e = new SparseEdge(v1, v2);
-		if (g.insertEdge(e, v1, v2))
-			return e;
-		else
-			return null;
-	}
-
-	public SparseVertex addVertex(SparseGraph g) {
-		SparseVertex v = new SparseVertex();
-		if (g.insertVertex(v))
-			return v;
-		else
-			return null;
-	}
-
-	public SparseGraph createGraph() {
-		return new SparseGraph();
+	/**
+	 * Creates a new SparseGraphBuilder.
+	 */
+	public SparseGraphBuilder() {
+		super(new SparseGraphFactory());
 	}
 
 }

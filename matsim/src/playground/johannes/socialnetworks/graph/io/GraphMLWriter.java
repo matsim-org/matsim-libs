@@ -29,12 +29,15 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.io.GraphML;
+import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-import playground.johannes.socialnetworks.graph.Edge;
-import playground.johannes.socialnetworks.graph.Graph;
-import playground.johannes.socialnetworks.graph.Vertex;
+
 
 /**
  * Basic class for writing graph objects into GraphML files

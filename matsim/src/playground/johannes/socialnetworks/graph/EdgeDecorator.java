@@ -23,6 +23,9 @@
  */
 package playground.johannes.socialnetworks.graph;
 
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.SparseEdge;
+
 /**
  * Decorator class for any type of {@link Edge}.
  * 
@@ -40,10 +43,16 @@ public class EdgeDecorator<E extends Edge> extends SparseEdge {
 	 *            one of the two vertices this edge is connected to.
 	 * @param v2
 	 *            one of the two vertices this edge is connected to.
+	 *            
+	 *  @deprecated
 	 */
 	protected EdgeDecorator(VertexDecorator<?> v1, VertexDecorator<?> v2,
 			E delegate) {
 		super(v1, v2);
+		this.delegate = delegate;
+	}
+	
+	protected EdgeDecorator(E delegate) {
 		this.delegate = delegate;
 	}
 

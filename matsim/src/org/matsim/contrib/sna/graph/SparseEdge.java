@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Edge.java
+ * SparseEdge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,34 +21,65 @@
 /**
  * 
  */
-package playground.johannes.socialnetworks.graph;
+package org.matsim.contrib.sna.graph;
 
 import org.matsim.core.utils.collections.Tuple;
 
 /**
- * Basic representation of an undirected and unweighted edge.
+ * Representation of an undirected and unweighted edge.
  * 
  * @author illenberger
  * 
  */
-public interface Edge {
+public class SparseEdge implements Edge {
+
+	private Tuple<? extends SparseVertex, ? extends SparseVertex> vertices;
 
 	/**
-	 * Returns a tuple of vertices connected to this edge. The order of the
-	 * vertices is arbitrary.
+	 * Creates a new edge with <tt>v1</tt> and <tt>v2</tt> as its end points.
 	 * 
-	 * @return a tuple of vertices connected to this edge.
+	 * @param v1
+	 *            one of the two vertices the edge is to be connected to.
+	 * @param v2
+	 *            one of the two vertices the edge is to be connected to.
+	 *            @deprecated
 	 */
-	public Tuple<? extends Vertex, ? extends Vertex> getVertices();
+	public SparseEdge(SparseVertex v1, SparseVertex v2) {
+		vertices = new Tuple<SparseVertex, SparseVertex>(v1, v2);
+	}
 
 	/**
-	 * Returns the vertex that is opposing to vertex <tt>v</tt>.
-	 * 
-	 * @param v
-	 *            a vertex connected to this edge.
-	 * @return the vertex that is opposing to vertex <tt>v</tt>, or
-	 *         <tt>null</tt> if <tt>v</tt> is not connected to this edge.
+	 * Creates an orphaned edge.
 	 */
-	public Vertex getOpposite(Vertex v);
+	protected SparseEdge() {
+	}
+	
+	/**
+	 * @see {@link Edge#getOpposite(Vertex)}
+	 */
+	public SparseVertex getOpposite(Vertex v) {
+		if (vertices.getFirst().equals(v))
+			return vertices.getSecond();
+		else if (vertices.getSecond().equals(v))
+			return vertices.getFirst();
+		else
+			return null;
+	}
+
+	/**
+	 * Sets the end points of this edge to <tt>vertices</tt>.
+	 * 
+	 * @param vertices the end points of this edge.
+	 */
+	void setVertices(Tuple<? extends SparseVertex, ? extends SparseVertex> vertices) {
+		this.vertices = vertices;
+	}
+	
+	/**
+	 * @see {@link Edge#getVertices()}
+	 */
+	public Tuple<? extends SparseVertex, ? extends SparseVertex> getVertices() {
+		return vertices;
+	}
 
 }

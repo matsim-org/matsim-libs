@@ -34,12 +34,16 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.SparseEdge;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.johannes.socialnetworks.graph.io.PajekCommunityColorizer;
-import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLCommunityStlyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
@@ -58,8 +62,9 @@ public class GirvanNewmanAlgorithm {
 	
 	public <V extends Vertex> List<Set<Set<V>>> dendogram(Graph graph, int maxIterations, Handler handler) {
 		List<Set<Set<V>>> dendogram = new ArrayList<Set<Set<V>>>();
-		GraphProjection<Graph, V, Edge> projection = new GraphProjection<Graph, V, Edge>(graph);
-		projection.decorate();
+		SparseGraphProjectionBuilder<Graph, V, Edge> builder = new SparseGraphProjectionBuilder<Graph, V, Edge>();
+		GraphProjection<Graph, V, Edge> projection = builder.decorateGraph(graph);
+//		projection.decorate();
 		
 		int iteration = 0;
 		int lastSize = Integer.MAX_VALUE;
@@ -80,7 +85,7 @@ public class GirvanNewmanAlgorithm {
 				}
 			}
 			
-			projection.removeEdge((SparseEdge) maxBCEdge);
+			builder.removeEdge(projection, (EdgeDecorator<Edge>) maxBCEdge);
 			SortedSet<Set<V>> partition = Partitions.disconnectedComponents(projection);
 		
 			logger.info(String.format("Done - disconnected components... %1$s", partition.size()));
@@ -149,10 +154,10 @@ public class GirvanNewmanAlgorithm {
 			writer.setCoordinateTransformation(new CH1903LV03toWGS84());
 			writer.setDrawEdges(false);
 			writer.setDrawNames(false);
-			writer.setVertexDescriptor(new KMLVertexDescriptor((SpatialGraph) projection.getDelegate()));
+			writer.setVertexDescriptor(new KMLVertexDescriptor((SpatialSparseGraph) projection.getDelegate()));
 			writer.setVertexStyle(new KMLCommunityStlyle(writer.getVertexIconLink(), components));
 			try {
-				writer.write((SpatialGraph) projection.getDelegate(), String.format("%1$s/%2$s.communityGraph.kmz", outputDir, level));
+				writer.write((SpatialSparseGraph) projection.getDelegate(), String.format("%1$s/%2$s.communityGraph.kmz", outputDir, level));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -162,7 +167,7 @@ public class GirvanNewmanAlgorithm {
 				writeDendogram(dendogram, String.format("%1$s/%2$s.dendogram.txt", outputDir, level));
 				
 				SpatialPajekWriter pwriter = new SpatialPajekWriter();
-				pwriter.write((SpatialGraph) projection.getDelegate(), new PajekCommunityColorizer(components), String.format("%1$s/%2$s.graph.net", outputDir, level));
+				pwriter.write((SpatialSparseGraph) projection.getDelegate(), new PajekCommunityColorizer(components), String.format("%1$s/%2$s.graph.net", outputDir, level));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

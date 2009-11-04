@@ -23,6 +23,11 @@
  */
 package playground.johannes.socialnetworks.graph;
 
+import java.util.List;
+
+import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.Vertex;
+
 /**
  * Decorator class for any type of {@link Vertex}.
  * 
@@ -51,5 +56,15 @@ public class VertexDecorator<V extends Vertex> extends SparseVertex {
 	 */
 	public V getDelegate() {
 		return delegate;
+	}
+
+	@Override
+	public List<? extends EdgeDecorator<?>> getEdges() {
+		return (List<? extends EdgeDecorator<?>>) super.getEdges();
+	}
+
+	@Override
+	public List<? extends VertexDecorator<V>> getNeighbours() {
+		return (List<? extends VertexDecorator<V>>) super.getNeighbours();
 	}
 }

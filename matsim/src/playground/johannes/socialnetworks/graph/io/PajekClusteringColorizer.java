@@ -26,11 +26,11 @@ package playground.johannes.socialnetworks.graph.io;
 import gnu.trove.TObjectDoubleHashMap;
 
 import org.apache.commons.math.stat.StatUtils;
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 
-import playground.johannes.socialnetworks.graph.Edge;
-import playground.johannes.socialnetworks.graph.Graph;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
-import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger

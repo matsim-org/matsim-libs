@@ -27,6 +27,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.SparseGraph;
+import org.matsim.contrib.sna.graph.SparseVertex;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.core.utils.collections.Tuple;
+
 /**
  * This class allows to extract subgraphs from existing graphs by projecting
  * specific vertices and edges onto a new graph. A GraphProjection works similar
@@ -58,25 +65,26 @@ public class GraphProjection<G extends Graph, V extends Vertex, E extends Edge> 
 		return delegate;
 	}
 	
-	/**
-	 * Makes a complete projection for the entire original graph by decorating all vertices and edges.
-	 */
-	@SuppressWarnings("unchecked")
-	public void decorate() {
-		
-		for(Vertex v : delegate.getVertices()) {
-			addVertex((V) v);
-		}
-		
-		for(Edge e : delegate.getEdges()) {
-			VertexDecorator<V> v1 = vMapping.get(e.getVertices().getFirst());
-			VertexDecorator<V> v2 = vMapping.get(e.getVertices().getSecond());
-			addEdge(v1, v2, (E) e);
-		}
-	}
+//	/**
+//	 * Makes a complete projection for the entire original graph by decorating all vertices and edges.
+//	 * @deprecated
+//	 */
+//	@SuppressWarnings("unchecked")
+//	public void decorate() {
+//		
+//		for(Vertex v : delegate.getVertices()) {
+//			addVertex((V) v);
+//		}
+//		
+//		for(Edge e : delegate.getEdges()) {
+//			VertexDecorator<V> v1 = vMapping.get(e.getVertices().getFirst());
+//			VertexDecorator<V> v2 = vMapping.get(e.getVertices().getSecond());
+//			addEdge(v1, v2, (E) e);
+//		}
+//	}
 	
 	/**
-	 * Returns the decorater representing the projection of vertex <tt>v</tt>.
+	 * Returns the decorator representing the projection of vertex <tt>v</tt>.
 	 * @param v the original vertex.
 	 * @return the decorater of vertex <tt>v</tt>, or <tt>null</tt> if there is no projection <tt>v</tt>.
 	 */
@@ -84,6 +92,9 @@ public class GraphProjection<G extends Graph, V extends Vertex, E extends Edge> 
 		return vMapping.get(v);
 	}
 
+	void setMapping(V delegate, VertexDecorator<V> decorator) {
+		vMapping.put(delegate, decorator);
+	}
 	/**
 	 * Creates a new projection of edge <tt>delegate</tt> and inserts it between
 	 * <tt>v1</tt> and <tt>v2</tt> obeying the constraints of
@@ -104,44 +115,50 @@ public class GraphProjection<G extends Graph, V extends Vertex, E extends Edge> 
 	 * internally find or create if necessary the corresponding vertex decorator
 	 * objects.
 	 */
-	public EdgeDecorator<E> addEdge(VertexDecorator<V> v1,
-			VertexDecorator<V> v2, E delegate) {
-		EdgeDecorator<E> e = new EdgeDecorator<E>(v1, v2, delegate);
-		if (insertEdge(e, v1, v2))
-			return e;
-		else
-			return null;
-	}
+//	public EdgeDecorator<E> addEdge(VertexDecorator<V> v1,
+//			VertexDecorator<V> v2, E delegate) {
+//		EdgeDecorator<E> edge = new EdgeDecorator<E>(delegate);
+//		return addEdge(v1, v2, edge);
+//	}
 	
-	/**
-	 * Creates a new projection of vertex <tt>delegate</tt> and inserts it into
-	 * the graph.
-	 * 
-	 * @param delegate
-	 *            the original vertex.
-	 * @return the new vertex decorator representing the projection of vertex
-	 *         <tt>delegate</tt>, or <tt>null</tt> if there exists already a
-	 *         projection of vertex <tt>delegate</tt>.
-	 */
-	public VertexDecorator<V> addVertex(V delegate) {
-//		if (getVertex(delegate) == null) {
-			VertexDecorator<V> v = new VertexDecorator<V>(delegate);
-			return addVertex(v);
-//		} else {
+//	protected EdgeDecorator<E> addEdge(VertexDecorator<V> v1, VertexDecorator<V> v2, EdgeDecorator<E> edge) {
+//		if (!v1.getNeighbours().contains(v2)) {
+//			edge.setVertices(new Tuple<SparseVertex, SparseVertex>(v1, v2));
+//			v1.addEdge(edge);
+//			v2.addEdge(edge);
+//			if(insertEdge(edge))
+//				return edge;
+//			else
+//				return null;
+//		} else
 //			return null;
-//		}
-	}
+//	}
 	
-	protected VertexDecorator<V> addVertex(VertexDecorator<V> v) {
-		if (getVertex(v.getDelegate()) == null) {
-			if (insertVertex(v)) {
-				vMapping.put(v.getDelegate(), v);
-				return v;
-			} else
-				return null;
-		} else
-			return null;
-	}
+//	/**
+//	 * Creates a new projection of vertex <tt>delegate</tt> and inserts it into
+//	 * the graph.
+//	 * 
+//	 * @param delegate
+//	 *            the original vertex.
+//	 * @return the new vertex decorator representing the projection of vertex
+//	 *         <tt>delegate</tt>, or <tt>null</tt> if there exists already a
+//	 *         projection of vertex <tt>delegate</tt>.
+//	 */
+//	public VertexDecorator<V> addVertex(V delegate) {
+//			VertexDecorator<V> v = new VertexDecorator<V>(delegate);
+//			return addVertex(v);
+//	}
+//	
+//	protected VertexDecorator<V> addVertex(VertexDecorator<V> v) {
+//		if (getVertex(v.getDelegate()) == null) {
+//			if (insertVertex(v)) {
+//				vMapping.put(v.getDelegate(), v);
+//				return v;
+//			} else
+//				return null;
+//		} else
+//			return null;
+//	}
 
 	/**
 	 * @see {@link Graph#getEdges()}.

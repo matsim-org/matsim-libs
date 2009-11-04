@@ -21,14 +21,14 @@
 /**
  * 
  */
-package playground.johannes.socialnetworks.graph;
+package org.matsim.contrib.sna.graph;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+
 /**
- * Representation of an undirected and unweighted mathematical graph
- * that does not allow multiple edges between two vertices.
+ * Representation of an undirected and unweighted mathematical sparse graph.
  * 
  * @author illenberger
  * 
@@ -48,13 +48,10 @@ public class SparseGraph implements Graph {
 	}
 
 	/**
-	 * @see {@link Graph#getEdges()}
-	 */
-	public Set<? extends SparseEdge> getEdges() {
-		return edges;
-	}
-
-	/**
+	 * Returns the set of vertices. It is discouraged to do modification to the
+	 * returned set. To modify a graph use {@link SparseGraphBuilder}, otherwise
+	 * graph consistency can not be guaranteed.
+	 * 
 	 * @see {@link Graph#getVertices()}
 	 */
 	public Set<? extends SparseVertex> getVertices() {
@@ -62,77 +59,69 @@ public class SparseGraph implements Graph {
 	}
 
 	/**
+	 * Returns the set of edges. It is discouraged to do modification to the
+	 * returned set. To modify a graph use {@link SparseGraphBuilder}, otherwise
+	 * graph consistency can not be guaranteed.
+	 * 
+	 * @see {@link Graph#getEdges()}
+	 */
+	public Set<? extends SparseEdge> getEdges() {
+		return edges;
+	}
+
+	/**
 	 * Inserts a vertex into this graph if it is not already part of the graph.
+	 * Do not use this call directly. Use
+	 * {@link SparseGraphBuilder#addVertex(SparseGraph)}.
 	 * 
 	 * @param v
 	 *            the vertex to be inserted.
 	 * @return <tt>true</tt> if the vertex is inserted into this graph,
 	 *         <tt>false</tt> otherwise.
 	 */
-	protected boolean insertVertex(SparseVertex v) {
+	boolean insertVertex(SparseVertex v) {
 		return vertices.add(v);
 	}
 
 	/**
-	 * Inserts a edge into this graph and assured correct connectivity. Multiple
-	 * edges between one pair of vertices are not allowed.
+	 * Inserts an edge into this graph if it is not already part of the graph.
+	 * Do not use this call directly. Use
+	 * {@link SparseGraphBuilder#addEdge(SparseGraph, SparseVertex, SparseVertex)}.
 	 * 
 	 * @param e
 	 *            the edge to be inserted.
-	 * @param v1
-	 *            one of the two vertices the edge is to be connected to.
-	 * @param v2
-	 *            one of the two vertices the edge is to be connected to.
 	 * @return <tt>true</tt> if the edge is inserted into this graph,
-	 *         <tt>false</tt> if <tt>e</tt> is already part of this graph or
-	 *         <tt>v1</tt> and <tt>v2</tt> are already connected by an edge.
+	 *         <tt>false</tt> otherwise.
 	 */
-	protected boolean insertEdge(SparseEdge e, SparseVertex v1, SparseVertex v2) {
-		if (!v1.getNeighbours().contains(v2)) {
-			v1.addEdge(e);
-			v2.addEdge(e);
-			return edges.add(e);
-		} else
-			return false;
+	boolean insertEdge(SparseEdge e) {
+		return edges.add(e);
 	}
 
 	/**
-	 * Removes an isolated vertex from the graph.
+	 * Removes a vertex from the graph. Do not use this call directly. Use
+	 * {@link SparseGraphBuilder#removeVertex(SparseGraph, SparseVertex)}.
 	 * 
 	 * @param v
-	 *            the vertex to remove.
-	 * @return <tt>true</tt> if <tt>v</tt> has been successfully removed,
+	 *            the vertex to be removed from the graph.
+	 * 
+	 * @return <tt>true</tt> if the vertex has been removed from the graph,
 	 *         <tt>false</tt> if <tt>v</tt> is not part of this graph.
-	 * @throws {@link RuntimeException} if <tt>v</tt> is still connected to
-	 *         other vertices.
 	 */
-	public boolean removeVertex(SparseVertex v) {
-		if(v.getEdges().isEmpty()) {
-			return vertices.remove(v);
-		} else {
-			throw new RuntimeException("Can only remove isolated vertices!");
-		}
+	boolean removeVertex(SparseVertex v) {
+		return vertices.remove(v);
 	}
-	
+
 	/**
-	 * Removes an edge from the graph.
+	 * Removes an edge from the graph. Do not use this call directly. Use
+	 * {@link SparseGraphBuilder#removeEdge(SparseGraph, SparseEdge)}.
 	 * 
 	 * @param e
 	 *            the edge to be removed.
-	 * @return <tt>true</tt> if <tt>e</tt> has been successfully removed,
+	 * @return <tt>true</tt> if the edge has been removed from the graph,
 	 *         <tt>false</tt> if <tt>e</tt> is not part of this graph.
 	 */
-	public boolean removeEdge(SparseEdge e) {
-		SparseVertex v1 = e.getVertices().getFirst();
-		SparseVertex v2 = e.getVertices().getSecond();
-		boolean removedv1 = v1.removeEdge(e);
-		boolean removedv2 = v2.removeEdge(e);
-		if(removedv1 && removedv2)
-			return edges.remove(e);
-		else if(!removedv1 && !removedv2)
-			return false;
-		else
-			throw new RuntimeException("Grpah connectivity appears to be inconsistent!");
+	boolean removeEdge(SparseEdge e) {		
+		return edges.remove(e);
 	}
 	
 	/**
@@ -144,22 +133,24 @@ public class SparseGraph implements Graph {
 	}
 
 	/**
-	 * Returns the edge connecting vertex <tt>v1</tt> and <tt>v2</tt>.
+	 * Returns the edge connecting vertex <tt>v_i</tt> and <tt>v_j</tt>. If
+	 * there are multiple edges connecting <tt>v_i</tt> and <tt>v_j</tt> it is
+	 * not defined which edge is returned.
 	 * 
-	 * @param v1
+	 * @param v_i
 	 *            a vertex.
-	 * @param v2
+	 * @param v_j
 	 *            a vertex.
-	 * @return the edge connecting vertex <tt>v1</tt> and <tt>v2</tt>, or
-	 *         <tt>null</tt> if <tt>v1</tt> and <tt>v2</tt> are not connected
+	 * @return the edge connecting vertex <tt>v_i</tt> and <tt>v_j</tt>, or
+	 *         <tt>null</tt> if <tt>v_i</tt> and <tt>v_j</tt> are not connected
 	 *         with each other.
 	 */
-	public SparseEdge getEdge(SparseVertex v1, SparseVertex v2) {
+	public SparseEdge getEdge(SparseVertex v_i, SparseVertex v_j) {
 		SparseEdge e = null;
-		int cnt = v1.getEdges().size();
+		int cnt = v_i.getEdges().size();
 		for(int i = 0; i < cnt; i++) {
-			e = v1.getEdges().get(i);
-			if(e.getOpposite(v1) == v2) {
+			e = v_i.getEdges().get(i);
+			if(e.getOpposite(v_i) == v_j) {
 				return e;
 			}
 		}
@@ -167,6 +158,11 @@ public class SparseGraph implements Graph {
 		return null;
 	}
 
+	/**
+	 * Returns a short description for this graph.
+	 * 
+	 * @return a short description for this grpah.
+	 */
 	public String toString() {
 		StringBuilder builder = new StringBuilder(60);
 		builder.append("SparseGraph: ");

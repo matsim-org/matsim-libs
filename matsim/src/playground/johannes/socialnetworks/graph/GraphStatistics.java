@@ -39,6 +39,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 
 import playground.johannes.socialnetworks.graph.matrix.Centrality;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
@@ -307,7 +310,9 @@ public class GraphStatistics {
 	 */
 	public static GraphDistance centrality(Graph g) {
 		logger.info("Initializing graph for centrality calculation...");
-		CentralityGraph<Vertex, Edge> cGraph = new CentralityGraph<Vertex, Edge>(g);
+		CentralityGraphBuilder<Vertex, Edge> builder = new CentralityGraphBuilder<Vertex, Edge>();
+		CentralityGraph<Vertex, Edge> cGraph = builder.decorateGraph(g);
+//		CentralityGraph<Vertex, Edge> cGraph = new CentralityGraph<Vertex, Edge>(g);
 		Queue<CentralityVertex<Vertex>> vertexQueue = new ConcurrentLinkedQueue<CentralityVertex<Vertex>>();
 		vertexQueue.addAll(cGraph.getVertices());
 		
@@ -412,14 +417,14 @@ public class GraphStatistics {
 
 		public CentralityGraph(Graph delegate) {
 			super(delegate);
-			decorate();
+//			decorate();
 		}
 
-		@Override
-		public VertexDecorator<V> addVertex(V delegate) {
-			VertexDecorator<V> v = new CentralityVertex<V>(delegate);
-			return addVertex(v);
-		}
+//		@Override
+//		public VertexDecorator<V> addVertex(V delegate) {
+//			VertexDecorator<V> v = new CentralityVertex<V>(delegate);
+//			return addVertex(v);
+//		}
 
 		@SuppressWarnings("unchecked")
 		@Override
@@ -427,15 +432,12 @@ public class GraphStatistics {
 			return (Set<? extends CentralityVertex<V>>) super.getVertices();
 		}
 
-		@Override
-		public EdgeDecorator<E> addEdge(VertexDecorator<V> v1,
-				VertexDecorator<V> v2, E delegate) {
-			EdgeDecorator<E> e = new CentralityEdge<V, E>((CentralityVertex<V>)v1, (CentralityVertex<V>)v2, delegate);
-			if (insertEdge(e, v1, v2))
-				return e;
-			else
-				return null;
-		}
+//		@Override
+//		public EdgeDecorator<E> addEdge(VertexDecorator<V> v1,
+//				VertexDecorator<V> v2, E delegate) {
+//			EdgeDecorator<E> e = new CentralityEdge<V, E>((CentralityVertex<V>)v1, (CentralityVertex<V>)v2, delegate);
+//			return addEdge(v1, v2, e);
+//		}
 
 		@Override
 		public Set<? extends CentralityEdge<V, E>> getEdges() {
@@ -480,8 +482,16 @@ public class GraphStatistics {
 		
 		private double betweenness;
 		
+		/**
+		 * @deprecated
+		 * 
+		 */
 		protected CentralityEdge(CentralityVertex<V> v1, CentralityVertex<V> v2, E delegate) {
 			super(v1, v2,delegate);
+		}
+		
+		protected CentralityEdge(E delegate) {
+			super(delegate);
 		}
 		
 		public double getBetweenness() {
@@ -720,6 +730,28 @@ public class GraphStatistics {
 		}
 	}
 	
+	private static class CentralityGraphFactory<V extends Vertex, E extends Edge> implements GraphProjectionFactory<Graph, V, E, CentralityGraph<V, E>, CentralityVertex<V>, CentralityEdge<V, E>> {
+
+		public CentralityEdge<V, E> createEdge(E delegate) {
+			return new CentralityEdge<V, E>(delegate);
+		}
+
+		public CentralityGraph<V, E> createGraph(Graph delegate) {
+			return new CentralityGraph<V, E>(delegate);
+		}
+
+		public CentralityVertex<V> createVertex(V delegate) {
+			return new CentralityVertex<V>(delegate);
+		}
+		
+	}
+	
+	private static class CentralityGraphBuilder<V extends Vertex, E extends Edge> extends GraphProjectionBuilder<Graph, V, E, CentralityGraph<V, E>, CentralityVertex<V>, CentralityEdge<V, E>> {
+		
+		public CentralityGraphBuilder() {
+			super(new CentralityGraphFactory<V, E>());
+		}
+	}
 //	public static void main(String args[]) {
 //		ErdosRenyiGenerator generator = new ErdosRenyiGenerator(200, 0.3);
 //		edu.uci.ics.jung.graph.ArchetypeGraph g = generator.generateGraph();

@@ -28,12 +28,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphBuilder;
+import org.matsim.contrib.sna.graph.SparseGraphBuilder;
+import org.matsim.contrib.sna.graph.Vertex;
 
-import playground.johannes.socialnetworks.graph.Edge;
-import playground.johannes.socialnetworks.graph.Graph;
-import playground.johannes.socialnetworks.graph.GraphFactory;
-import playground.johannes.socialnetworks.graph.SparseGraphFactory;
-import playground.johannes.socialnetworks.graph.Vertex;
 
 /**
  * @author illenberger
@@ -55,10 +55,10 @@ public class GMLReader {
 	
 	private static final String TARGET_KEY = "target";
 	
-	public <G extends Graph, V extends Vertex, E extends Edge> Graph read(String file, GraphFactory<G, V, E> factory) throws IOException {
+	public <G extends Graph, V extends Vertex, E extends Edge> Graph read(String file, GraphBuilder<G, V, E> builder) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		logger.info("Parsing GML file...");
-		return build(factory, parse(reader));
+		return build(builder, parse(reader));
 	}
 	
 	private List<Attribute> parse(BufferedReader reader) throws IOException {
@@ -178,14 +178,14 @@ public class GMLReader {
 		return builder.toString();
 	}
 	
-	private <G extends Graph, V extends Vertex, E extends Edge> Graph build(GraphFactory<G, V, E> factory, List<Attribute> data) {
+	private <G extends Graph, V extends Vertex, E extends Edge> Graph build(GraphBuilder<G, V, E> builder, List<Attribute> data) {
 		logger.info("Building graph...");
 		G graph = null;
 		int doubleEdges = 0;
 		
 		for(Attribute rootElements : data) {
 			if(rootElements.getKey().equalsIgnoreCase(GRAPH_KEY)) {
-				graph = factory.createGraph();
+				graph = builder.createGraph();
 				TIntObjectHashMap<V> nodes = new TIntObjectHashMap<V>();
 				List<Attribute> elements = rootElements.getAttributes();
 				/*
@@ -199,7 +199,7 @@ public class GMLReader {
 						 */
 						for(Attribute attribute : attributes) {
 							if(attribute.getKey().equalsIgnoreCase(ID_KEY)) {
-								V vertex = factory.addVertex(graph);
+								V vertex = builder.addVertex(graph);
 								nodes.put(Integer.parseInt(attribute.getValue()), vertex);
 								
 								if(graph.getVertices().size() % 1000 == 0)
@@ -230,7 +230,7 @@ public class GMLReader {
 						V v1 = nodes.get(Integer.parseInt(source));
 						V v2 = nodes.get(Integer.parseInt(target));
 						if(v1 != null && v2 != null) {
-							if(factory.addEdge(graph, v1, v2) != null) {
+							if(builder.addEdge(graph, v1, v2) != null) {
 								if(graph.getEdges().size() % 1000 == 0)
 									logger.info(String.format("Building graph... %1$s edges.", graph.getEdges().size()));
 							} else {
@@ -293,7 +293,7 @@ public class GMLReader {
 	
 	public static void main(String args[]) throws IOException {
 		GMLReader reader = new GMLReader();
-		Graph graph = reader.read("/Users/fearonni/Downloads/karate/karate.gml", new SparseGraphFactory());
+		Graph graph = reader.read("/Users/fearonni/Downloads/karate/karate.gml", new SparseGraphBuilder());
 		System.out.println(graph.getVertices().size() + " vertices");
 	}
 }

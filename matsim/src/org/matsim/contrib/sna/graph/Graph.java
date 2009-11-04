@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PajekCommunityColorizer.java
+ * Graph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,43 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.io;
 
-import gnu.trove.TObjectDoubleHashMap;
+/**
+ * 
+ */
+package org.matsim.contrib.sna.graph;
 
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Vertex;
-
 
 /**
+ * Basic representation of a mathematical graph.
+ * 
  * @author illenberger
- *
+ * 
  */
-public class PajekCommunityColorizer <V extends Vertex, E extends Edge> extends PajekColorizer<V, E> {
+public interface Graph {
 
-	private TObjectDoubleHashMap<V> values = new TObjectDoubleHashMap<V>();
-	
-	public PajekCommunityColorizer(Set<Set<V>> clusters) {
-		double value = 1;
-		for(Set<V> cluster : clusters) {
-			for(V vertex : cluster) {
-				values.put(vertex, value);
-			}
-			value -= 0.05;
-			value = Math.max(value, 0);
-		}
-	}
-	
-	@Override
-	public String getEdgeColor(E e) {
-		return getColor(-1);
-	}
+	/**
+	 * Returns the set of vertices.
+	 * 
+	 * @return the set of vertices.
+	 */
+	public Set<? extends Vertex> getVertices();
 
-	@Override
-	public String getVertexFillColor(V v) {
-		return getColor(values.get(v));
-	}
+	/**
+	 * Returns the set of edges.
+	 * 
+	 * @return the set of edges.
+	 */
+	public Set<? extends Edge> getEdges();
 
 }

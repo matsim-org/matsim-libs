@@ -29,6 +29,10 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
+
 /**
  * Representation of an unweighted Dijkstra best path algorithm. This algorithm
  * assigns each edge a weight of 1.
@@ -49,7 +53,8 @@ public class UnweightedDijkstra<V extends Vertex> {
 	 *            The graph on which best path searches should be performed.
 	 */
 	public UnweightedDijkstra(Graph graph) {
-		this.projection = new DijkstraGraph(graph);
+		DijkstraGraphBuilder builder = new DijkstraGraphBuilder();
+		this.projection = builder.decorateGraph(graph);
 	}
 
 	/**
@@ -178,23 +183,23 @@ public class UnweightedDijkstra<V extends Vertex> {
 	 */
 	public class DijkstraGraph extends GraphProjection<Graph, V, Edge> {
 	
-		/**
-		 * Creates a new DijkstraGraph out of <tt>delegate</tt>.
-		 * @param delegate the graph to be decorated.
-		 */
+//		/**
+//		 * Creates a new DijkstraGraph out of <tt>delegate</tt>.
+//		 * @param delegate the graph to be decorated.
+//		 */
 		public DijkstraGraph(Graph delegate) {
 			super(delegate);
-			decorate();
+//			decorate();
 		}
 
-		/**
-		 * @see {@link GraphProjection#addVertex(Vertex)}
-		 */
-		@Override
-		public VertexDecorator<V> addVertex(V delegate) {
-			VertexDecorator<V> v = new DijkstraVertex(delegate);
-			return addVertex(v);
-		}
+//		/**
+//		 * @see {@link GraphProjection#addVertex(Vertex)}
+//		 */
+//		@Override
+//		public VertexDecorator<V> addVertex(V delegate) {
+//			VertexDecorator<V> v = new DijkstraVertex(delegate);
+//			return addVertex(v);
+//		}
 
 		/**
 		 * @see {@link GraphProjection#getVertex(Vertex)}
@@ -337,6 +342,29 @@ public class UnweightedDijkstra<V extends Vertex> {
 			} else {
 				return result;
 			}
+		}
+	}
+	
+	private class DijkstraGraphFactory implements GraphProjectionFactory<Graph, V, Edge, DijkstraGraph, DijkstraVertex, EdgeDecorator<Edge>> {
+
+		public EdgeDecorator<Edge> createEdge(Edge delegate) {
+			return new EdgeDecorator<Edge>(delegate);
+		}
+
+		public DijkstraGraph createGraph(Graph delegate) {
+			return new DijkstraGraph(delegate);
+		}
+
+		public DijkstraVertex createVertex(V delegate) {
+			return new DijkstraVertex(delegate);
+		}
+		
+	}
+	
+	private class DijkstraGraphBuilder extends GraphProjectionBuilder<Graph, V, Edge, DijkstraGraph, DijkstraVertex, EdgeDecorator<Edge>> {
+		
+		public DijkstraGraphBuilder() {
+			super(new DijkstraGraphFactory());
 		}
 	}
 }

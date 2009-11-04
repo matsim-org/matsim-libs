@@ -21,10 +21,11 @@ package playground.johannes.socialnetworks.graph.io;
 
 import java.io.IOException;
 
-import playground.johannes.socialnetworks.graph.Edge;
-import playground.johannes.socialnetworks.graph.Graph;
-import playground.johannes.socialnetworks.graph.SparseGraphFactory;
-import playground.johannes.socialnetworks.graph.Vertex;
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.SparseGraphBuilder;
+import org.matsim.contrib.sna.graph.Vertex;
+
 
 /**
  * @author illenberger
@@ -37,7 +38,7 @@ public class GML2Pajek {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		Graph g = new GMLReader().read(args[0], new SparseGraphFactory());
+		Graph g = new GMLReader().read(args[0], new SparseGraphBuilder());
 		PajekWriter<Graph, Vertex, Edge> writer = new PajekWriter<Graph, Vertex, Edge>();
 		writer.write(g, args[1]);
 	}

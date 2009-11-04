@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Vertex.java
+ * Degree.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,38 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.johannes.socialnetworks.graph;
 
-import java.util.List;
-import java.util.RandomAccess;
+import gnu.trove.TObjectDoubleHashMap;
+
+import java.util.Collection;
+
+import org.matsim.contrib.sna.graph.Vertex;
+
+import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
- * Basic representation of a vertex.
- * 
  * @author illenberger
- * 
+ *
  */
-public interface Vertex {
+public class Degree<V extends Vertex> {
 
-	/**
-	 * Returns the list of edges connected to this vertex. Although, the
-	 * returned collection is a list, it must not contain duplicate entries. The
-	 * list implementation should implement the {@linkplain RandomAccess}
-	 * interface to allow fast iterating over the collection.
-	 * 
-	 * @return the list of edges connected to this vertex.
-	 */
-	public List<? extends Edge> getEdges();
-
-	/**
-	 * Returns the list of adjacent vertices. Although, the returned collection
-	 * is a list, it must not contain duplicate entries. The list implementation
-	 * should implement the {@linkplain RandomAccess} interface to allow fast
-	 * iterating over the collection.
-	 * 
-	 * @return the list of adjacent vertices.
-	 */
-	public List<? extends Vertex> getNeighbours();
-
+	public Distribution distribution(Collection<V> vertices) {
+		Distribution distribution = new Distribution();
+		for(V v : vertices)
+			distribution.add(v.getEdges().size());
+		
+		return distribution;
+	}
+	
+	public TObjectDoubleHashMap<V> values(Collection<V> vertices) {
+		TObjectDoubleHashMap<V> values = new TObjectDoubleHashMap<V>();
+		for(V v : vertices)
+			values.put(v, v.getEdges().size());
+		
+		return values;
+	}
 }

@@ -31,8 +31,9 @@ import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
-import playground.johannes.socialnetworks.graph.Edge;
-import playground.johannes.socialnetworks.graph.Vertex;
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Vertex;
+
 
 /**
  * @author illenberger

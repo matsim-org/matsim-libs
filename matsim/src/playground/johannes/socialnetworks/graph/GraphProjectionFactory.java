@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Graph.java
+ * GraphProjectionFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
 package playground.johannes.socialnetworks.graph;
 
-import java.util.Set;
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 
 /**
- * Basic representation of a mathematical graph.
- * 
  * @author illenberger
- * 
+ *
  */
-/*
- * joh 28/11/09: Think about, if we also allow adjacency matrices for dense graphs... 
- */
-public interface Graph {
+public interface GraphProjectionFactory<G2 extends Graph, V2 extends Vertex, E2 extends Edge,
+										G extends GraphProjection<G2, V2, E2>, V extends VertexDecorator<V2>, E extends EdgeDecorator<E2>> {
 
-	/**
-	 * Returns the set of vertices. The set should be read-only.
-	 * 
-	 * @return the set of vertices.
-	 */
-	public Set<? extends Vertex> getVertices();
-
-	/**
-	 * Returns the set of edges. The set should be read-only.
-	 * 
-	 * @return the set of edges.
-	 */
-	public Set<? extends Edge> getEdges();
-
+	public G createGraph(G2 delegate);
+	
+	public V createVertex(V2 delegate);
+	
+	public E createEdge(E2 delegate);
+	
 }

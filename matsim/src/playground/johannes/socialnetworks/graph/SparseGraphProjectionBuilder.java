@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphFactory.java
+ * SparseGraphProjectionBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,23 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- * 
- */
 package playground.johannes.socialnetworks.graph;
 
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public interface GraphFactory<G extends Graph, V extends Vertex, E extends Edge> {
+public class SparseGraphProjectionBuilder<G extends Graph, V extends Vertex, E extends Edge> extends GraphProjectionBuilder<G, V, E, GraphProjection<G,V,E>, VertexDecorator<V>, EdgeDecorator<E>> {
+	
+	public SparseGraphProjectionBuilder() {
+		super(new SparseGraphProjectionFactory<G, V, E>());
+	}
 
-	public G createGraph();
-	
-	public V addVertex(G g);
-	
-	public E addEdge(G g, V v1, V v2);
-	
 }

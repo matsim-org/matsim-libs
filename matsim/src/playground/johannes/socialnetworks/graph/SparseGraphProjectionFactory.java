@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphCentrao.java
+ * GraphProjectionFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,67 +23,22 @@ import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 
-import gnu.trove.TIntIntIterator;
-import gnu.trove.TObjectIntHashMap;
-import playground.johannes.socialnetworks.graph.matrix.Centrality;
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
-
 /**
  * @author illenberger
  *
  */
-public class GraphCentrality {
+public class SparseGraphProjectionFactory<G extends Graph, V extends Vertex, E extends Edge> implements GraphProjectionFactory<G, V, E, GraphProjection<G,V,E>, VertexDecorator<V>, EdgeDecorator<E>>{
 
-	private Graph g;
-	
-	private TObjectIntHashMap<Edge> edgeBetweenness;
-	
-	public GraphCentrality(Graph g) {
-		this.g = g;
+	public EdgeDecorator<E> createEdge(E delegate) {
+		return new EdgeDecorator<E>(delegate);
 	}
-	
-	public TObjectIntHashMap<Edge> getEdgeBetweenness() {
-		return edgeBetweenness;
+
+	public GraphProjection<G, V, E> createGraph(G delegate) {
+		return new GraphProjection<G, V, E>(delegate);
 	}
-	
-	public void calculate() {
-		AdjacencyMatrixDecorator<? extends Vertex> y = new AdjacencyMatrixDecorator<Vertex>(g);
-		
-		Centrality c = new Centrality();
-		c.run(y);
-	
-		int sum = 0;
-		for(int i = 0; i < c.getVertexBetweenness().length; i++) {
-			sum += c.getVertexBetweenness()[i];
-		}
-//		for(int i = 0; i < c.getVertexBetweenness().length; i++) {
-//			System.out.println((i+1) + " " + c.getVertexBetweenness()[i]/(float)sum);
-//		}
-		
-		edgeBetweenness = new TObjectIntHashMap<Edge>();
-		
-		for(int i = 0; i < y.getVertexCount(); i++) {
-			Vertex v1 = y.getVertex(i);
-			
-			if(c.getEdgeBetweenness()[i] != null) {
-				TIntIntIterator it = c.getEdgeBetweenness()[i].iterator();
-				for(int k = 0; k < c.getEdgeBetweenness()[i].size(); k++) {
-					it.advance();
-					Vertex v2 = y.getVertex(it.key());
-					Edge e = getEdge(v1, v2);
-					edgeBetweenness.put(e, it.value());
-				}
-			}
-		}
+
+	public VertexDecorator<V> createVertex(V delegate) {
+		return new VertexDecorator<V>(delegate);
 	}
-	
-	private Edge getEdge(Vertex v1, Vertex v2) {
-		for(Edge e : v1.getEdges()) {
-			if(e.getOpposite(v1).equals(v2)) {
-				return e;
-			}
-		}
-		
-		return null;
-	}
+
 }

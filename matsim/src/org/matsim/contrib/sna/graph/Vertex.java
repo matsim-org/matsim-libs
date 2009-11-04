@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphML.java
+ * Vertex.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,41 +18,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.io;
+package org.matsim.contrib.sna.graph;
+
+import java.util.List;
+import java.util.RandomAccess;
+
 
 /**
- * Constants used by {@link AbstractGraphMLReader} and {@link GraphMLWriter}.
+ * Basic representation of a vertex.
  * 
  * @author illenberger
  * 
  */
-interface GraphML {
+public interface Vertex {
 
-	static final String GRAPHML_TAG = "graphml";
+	/**
+	 * Returns the list of edges connected to this vertex. Although, the
+	 * returned collection is a list, it must not contain duplicate entries. The
+	 * list implementation should implement the {@link RandomAccess}
+	 * interface to allow fast iterating over the collection.
+	 * 
+	 * @return the list of edges connected to this vertex.
+	 */
+	public List<? extends Edge> getEdges();
 
-	static final String XMLNS_TAG = "xmlns";
-
-	static final String XMLNS_URL = "http://graphml.graphdrawing.org/xmlns";
-
-	static final String GRAPH_TAG = "graph";
-
-	static final String EDGEDEFAULT_TAG = "edgedefault";
-
-	static final String UNDIRECTED = "undirected";
-
-	static final String DIRECTED = "directed";
-
-	static final String ID_TAG = "id";
-
-	static final String SOURCE_TAG = "source";
-
-	static final String TARGET_TAG = "target";
-
-	static final String NODE_TAG = "node";
-
-	static final String EDGE_TAG = "edge";
+	/**
+	 * Returns the list of adjacent vertices. Although, the returned collection
+	 * is a list, it must not contain duplicate entries. The list implementation
+	 * should implement the {@link RandomAccess} interface to allow fast
+	 * iterating over the collection.
+	 * 
+	 * @return the list of adjacent vertices.
+	 */
+	public List<? extends Vertex> getNeighbours();
 
 }

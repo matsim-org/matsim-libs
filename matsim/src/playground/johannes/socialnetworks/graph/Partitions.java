@@ -33,6 +33,9 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.core.utils.collections.Tuple;
 
 import gnu.trove.TDoubleObjectHashMap;
@@ -162,13 +165,15 @@ public class Partitions {
 		});
 	
 		SortedSet<Set<Vertex>> components = disconnectedComponents(g);
+		SparseGraphProjectionBuilder<Graph, Vertex, Edge> builder = new SparseGraphProjectionBuilder<Graph, Vertex, Edge>();
 		for(Set<Vertex> component : components) {
 			GraphProjection<Graph, Vertex, Edge> proj = new GraphProjection<Graph, Vertex, Edge>(g);
 			/*
 			 * Add all vertices...
 			 */
 			for(Vertex v : component)
-				proj.addVertex(v);
+//				proj.addVertex(v);
+				builder.addVertex(proj, v);
 			
 			/*
 			 * Loop through all vertices and add edges...
@@ -178,7 +183,8 @@ public class Partitions {
 				for(int i = 0; i < n; i++) {
 					Edge e = v.getEdges().get(i);
 					Tuple<? extends Vertex, ? extends Vertex> p = e.getVertices();
-					proj.addEdge(proj.getVertex(p.getFirst()), proj.getVertex(p.getSecond()), e);
+//					proj.addEdge(proj.getVertex(p.getFirst()), proj.getVertex(p.getSecond()), e);
+					builder.addEdge(proj, proj.getVertex(p.getFirst()), proj.getVertex(p.getSecond()), e);
 				}
 			}
 			

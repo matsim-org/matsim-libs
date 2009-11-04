@@ -21,11 +21,12 @@
 /**
  * 
  */
-package playground.johannes.socialnetworks.graph;
+package org.matsim.contrib.sna.graph;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.RandomAccess;
+
 
 /**
  * Representation of a vertex without any further attributes.
@@ -51,6 +52,8 @@ public class SparseVertex implements Vertex {
 	 * Returns the list of edges connected to this vertex. The list implements
 	 * the {@link RandomAccess} interface.
 	 * 
+	 * @see {@link Vertex#getEdges()}
+	 * 
 	 * @return the list of edges connected to this vertex.
 	 */
 	public List<? extends SparseEdge> getEdges() {
@@ -61,9 +64,10 @@ public class SparseVertex implements Vertex {
 	 * Returns the list of adjacent vertices. The list implements the
 	 * {@link RandomAccess} interface.
 	 * 
+	 * @see {@link Vertex#getNeighbours()}.
+	 * 
 	 * @return the list of adjacent vertices.
 	 */
-
 	public List<? extends SparseVertex> getNeighbours() {
 		return neighbours;
 	}
@@ -84,7 +88,7 @@ public class SparseVertex implements Vertex {
 	 * Disconnects this vertex from an edge.
 	 * 
 	 * @param e
-	 *            the edge from this vertex is to be disconnected.
+	 *            the edge this vertex is to be disconnected from.
 	 * @return <tt>true</tt> if this vertex has been disconnected from
 	 *         <tt>e</tt>, <tt>false</tt> if this vertex is not connected
 	 *         to edge <tt>e</tt>.
@@ -105,7 +109,7 @@ public class SparseVertex implements Vertex {
 	}
 	
 	/**
-	 * Calls {@link ArrayList#trimToSize()} on all internal list.
+	 * Calls {@link ArrayList#trimToSize()} on all internal lists.
 	 */
 	void optimize() {
 		edges.trimToSize();

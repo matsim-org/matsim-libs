@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SparseEdge.java
+ * SparseGraphFactory2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,53 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.contrib.sna.graph;
+
 
 /**
- * 
- */
-package playground.johannes.socialnetworks.graph;
-
-import org.matsim.core.utils.collections.Tuple;
-
-/**
- * Representation of an undirected an unweighted edge.
+ * Implementation of GraphFactory to creates instances of SparseGraph,
+ * SparseVertex and SparseEdge.
  * 
  * @author illenberger
  * 
  */
-public class SparseEdge implements Edge {
-
-	private Tuple<SparseVertex, SparseVertex> vertices;
+public class SparseGraphFactory implements
+		GraphFactory<SparseGraph, SparseVertex, SparseEdge> {
 
 	/**
-	 * Creates a new edge with <tt>v1</tt> and <tt>v2</tt> as its end points.
+	 * Creates and returns an empty SparseGraph.
 	 * 
-	 * @param v1
-	 *            one of the two vertices the edge is to be connected to.
-	 * @param v2
-	 *            one of the two vertices the edge is to be connected to.
+	 * @return an empty SparseGraph.
 	 */
-	public SparseEdge(SparseVertex v1, SparseVertex v2) {
-		vertices = new Tuple<SparseVertex, SparseVertex>(v1, v2);
+	public SparseGraph createGraph() {
+		return new SparseGraph();
 	}
 
 	/**
-	 * @see {@link Edge#getOpposite(Vertex)}
+	 * Creates and returns an isolated SparseVertex.
+	 * 
+	 * @returns an isolated SparseVertex
 	 */
-	public SparseVertex getOpposite(Vertex v) {
-		if (vertices.getFirst().equals(v))
-			return vertices.getSecond();
-		else if (vertices.getSecond().equals(v))
-			return vertices.getFirst();
-		else
-			return null;
+	public SparseVertex createVertex() {
+		return new SparseVertex();
 	}
 
 	/**
-	 * @see {@link Edge#getVertices()}
+	 * Creates and returns an orphaned SparseEdge.
+	 * 
+	 * @return an orphaned SparseEdge.
 	 */
-	public Tuple<? extends SparseVertex, ? extends SparseVertex> getVertices() {
-		return vertices;
+	public SparseEdge createEdge() {
+		return new SparseEdge();
 	}
 
 }

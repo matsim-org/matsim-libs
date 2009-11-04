@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PajekCommunityColorizer.java
+ * Edge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,43 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.io;
 
-import gnu.trove.TObjectDoubleHashMap;
+/**
+ * 
+ */
+package org.matsim.contrib.sna.graph;
 
-import java.util.Set;
-
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.core.utils.collections.Tuple;
 
 
 /**
+ * Basic representation of an undirected and unweighted edge.
+ * 
  * @author illenberger
- *
+ * 
  */
-public class PajekCommunityColorizer <V extends Vertex, E extends Edge> extends PajekColorizer<V, E> {
+public interface Edge {
 
-	private TObjectDoubleHashMap<V> values = new TObjectDoubleHashMap<V>();
-	
-	public PajekCommunityColorizer(Set<Set<V>> clusters) {
-		double value = 1;
-		for(Set<V> cluster : clusters) {
-			for(V vertex : cluster) {
-				values.put(vertex, value);
-			}
-			value -= 0.05;
-			value = Math.max(value, 0);
-		}
-	}
-	
-	@Override
-	public String getEdgeColor(E e) {
-		return getColor(-1);
-	}
+	/**
+	 * Returns a tuple of vertices connected to this edge. The order of the
+	 * vertices is arbitrary.
+	 * 
+	 * @return a tuple of vertices connected to this edge.
+	 */
+	public Tuple<? extends Vertex, ? extends Vertex> getVertices();
 
-	@Override
-	public String getVertexFillColor(V v) {
-		return getColor(values.get(v));
-	}
+	/**
+	 * Returns the vertex that is opposing to vertex <tt>v</tt>.
+	 * 
+	 * @param v
+	 *            a vertex connected to this edge.
+	 * @return the vertex that is opposing to vertex <tt>v</tt>, or
+	 *         <tt>null</tt> if <tt>v</tt> is not connected to this edge.
+	 */
+	public Vertex getOpposite(Vertex v);
 
 }

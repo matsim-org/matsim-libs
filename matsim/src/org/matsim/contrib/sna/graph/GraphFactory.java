@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PajekCommunityColorizer.java
+ * GraphFactory2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,43 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.io;
-
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Set;
-
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Vertex;
+package org.matsim.contrib.sna.graph;
 
 
 /**
+ * A graph factory is responsible for instantiating new graphs, vertices and
+ * edges. It does not handle the connectivity of vertices and edges.
+ * 
  * @author illenberger
- *
+ * 
  */
-public class PajekCommunityColorizer <V extends Vertex, E extends Edge> extends PajekColorizer<V, E> {
+public interface GraphFactory<G extends Graph, V extends Vertex, E extends Edge> {
 
-	private TObjectDoubleHashMap<V> values = new TObjectDoubleHashMap<V>();
+	/**
+	 * Creates and returns an empty graph.
+	 * 
+	 * @return an empty graph.
+	 */
+	public G createGraph();
 	
-	public PajekCommunityColorizer(Set<Set<V>> clusters) {
-		double value = 1;
-		for(Set<V> cluster : clusters) {
-			for(V vertex : cluster) {
-				values.put(vertex, value);
-			}
-			value -= 0.05;
-			value = Math.max(value, 0);
-		}
-	}
+	/**
+	 * Creates and returns an isolated vertex.
+	 * 
+	 * @return an isolated vertex.
+	 */
+	public V createVertex();
 	
-	@Override
-	public String getEdgeColor(E e) {
-		return getColor(-1);
-	}
-
-	@Override
-	public String getVertexFillColor(V v) {
-		return getColor(values.get(v));
-	}
-
+	/**
+	 * Creates and returns an orphaned edge.
+	 * 
+	 * @return an orphaned edge.
+	 */
+	public E createEdge();
 }
