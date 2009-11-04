@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSpatialVertex.java
+ * SampledSpatialVertex2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,50 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.spatial;
+package playground.johannes.socialnetworks.snowball2.spatial;
 
-import org.matsim.api.basic.v01.Coord;
+import java.util.List;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.SampledVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.SnowballAttributes;
+import playground.johannes.socialnetworks.snowball2.SampledVertex;
 
 /**
  * @author illenberger
  *
  */
-public class SampledSpatialVertex extends SpatialVertex implements
-		SampledVertex {
+public interface SampledSpatialVertex extends SampledVertex, SpatialVertex {
 
-	private SnowballAttributes attributes;
+	public List<? extends SampledSpatialVertex> getNeighbours();
 	
-	protected SampledSpatialVertex(Coord coord) {
-		super(coord);
-		attributes = new SnowballAttributes();
-	}
-
-	public void detect(int iteration) {
-		attributes.detect(iteration);
-	}
-
-	public int getIterationDetected() {
-		return attributes.getIterationDeteted();
-	}
-
-	public int getIterationSampled() {
-		return attributes.getIterationSampled();
-	}
-
-	public boolean isDetected() {
-		return attributes.isDetected();
-	}
-
-	public boolean isSampled() {
-		return attributes.isSampled();
-	}
-
-	public void sample(int iteration) {
-		attributes.sample(iteration);
-	}
-
+	public List<? extends SampledSpatialEdge> getEdges();
+	
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSpatialGraph.java
+ * SampledSpatialVertex.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,19 +19,61 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.spatial;
 
-import java.util.Set;
+import java.util.List;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.snowball2.SampledGraph;
+import org.matsim.api.basic.v01.Coord;
+
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
+import playground.johannes.socialnetworks.snowball2.SnowballAttributes;
 
 /**
  * @author illenberger
  *
  */
-public interface SampledSpatialGraph extends SampledGraph, SpatialGraph {
+public class SampledSpatialSparseVertex extends SpatialSparseVertex implements
+		SampledSpatialVertex {
 
-	public Set<? extends SampledSpatialVertex> getVertices();
-
-	public Set<? extends SampledSpatialEdge> getEdges();
+	private SnowballAttributes attributes;
 	
+	protected SampledSpatialSparseVertex(Coord coord) {
+		super(coord);
+		attributes = new SnowballAttributes();
+	}
+
+	public void detect(int iteration) {
+		attributes.detect(iteration);
+	}
+
+	public int getIterationDetected() {
+		return attributes.getIterationDeteted();
+	}
+
+	public int getIterationSampled() {
+		return attributes.getIterationSampled();
+	}
+
+	public boolean isDetected() {
+		return attributes.isDetected();
+	}
+
+	public boolean isSampled() {
+		return attributes.isSampled();
+	}
+
+	public void sample(int iteration) {
+		attributes.sample(iteration);
+	}
+
+	@Override
+	public List<? extends SampledSpatialSparseEdge> getEdges() {
+		// TODO Auto-generated method stub
+		return (List<? extends SampledSpatialSparseEdge>) super.getEdges();
+	}
+
+	@Override
+	public List<? extends SampledSpatialSparseVertex> getNeighbours() {
+		// TODO Auto-generated method stub
+		return (List<? extends SampledSpatialSparseVertex>) super.getNeighbours();
+	}
+
 }

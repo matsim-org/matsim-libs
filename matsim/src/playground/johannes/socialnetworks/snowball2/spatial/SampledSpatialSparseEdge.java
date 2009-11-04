@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSpatialGraph.java
+ * SampledSpatialEdge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,19 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.spatial;
 
-import java.util.Set;
-
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.snowball2.SampledGraph;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
 
 /**
  * @author illenberger
  *
  */
-public interface SampledSpatialGraph extends SampledGraph, SpatialGraph {
+public class SampledSpatialSparseEdge extends SpatialSparseEdge implements SampledSpatialEdge {
 
-	public Set<? extends SampledSpatialVertex> getVertices();
-
-	public Set<? extends SampledSpatialEdge> getEdges();
-	
 }

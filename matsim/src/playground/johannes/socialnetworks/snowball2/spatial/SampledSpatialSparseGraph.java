@@ -21,17 +21,29 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 
 import java.util.Set;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.snowball2.SampledGraph;
+import org.matsim.contrib.sna.graph.SparseVertex;
+
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 
 /**
  * @author illenberger
  *
  */
-public interface SampledSpatialGraph extends SampledGraph, SpatialGraph {
+public class SampledSpatialSparseGraph extends SpatialSparseGraph implements SampledSpatialGraph {
 
-	public Set<? extends SampledSpatialVertex> getVertices();
+	@SuppressWarnings("unchecked")
+	public Set<? extends SampledSpatialSparseEdge> getEdges() {
+		return (Set<? extends SampledSpatialSparseEdge>) super.getEdges();
+	}
 
-	public Set<? extends SampledSpatialEdge> getEdges();
-	
+	@SuppressWarnings("unchecked")
+	public Set<? extends SampledSpatialSparseVertex> getVertices() {
+		return (Set<? extends SampledSpatialSparseVertex>) super.getVertices();
+	}
+
+	@Override
+	public SampledSpatialSparseEdge getEdge(SparseVertex v1, SparseVertex v2) {
+		return (SampledSpatialSparseEdge) super.getEdge(v1, v2);
+	}
+
 }

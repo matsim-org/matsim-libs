@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SampledSpatialEdge.java
+ * SampledSpatialEdge2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,19 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.survey.ivt2009.spatial;
+package playground.johannes.socialnetworks.snowball2.spatial;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
-import playground.johannes.socialnetworks.survey.ivt2009.SampledEdge;
+import playground.johannes.socialnetworks.snowball2.SampledEdge;
 
 /**
  * @author illenberger
  *
  */
-public class SampledSpatialEdge extends SpatialEdge implements SampledEdge {
-
-	public SampledSpatialEdge(SampledSpatialVertex v1, SampledSpatialVertex v2) {
-		super(v1, v2);
-	}
+public interface SampledSpatialEdge extends SampledEdge, SpatialEdge {
 
 }
