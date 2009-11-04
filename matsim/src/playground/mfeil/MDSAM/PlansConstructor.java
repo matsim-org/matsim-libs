@@ -1157,11 +1157,14 @@ public class PlansConstructor implements PlanStrategyModule{
 			incomeAverage=incomeAverage/counterIncome;
 		}
 		if (age.equals("yes")) {
-			stream.print("Age\t"); 
-			counterFirst++;
+			stream.print("Age_0_15\t"); 
+			stream.print("Age_16_30\t"); 
+			stream.print("Age_31_60\t"); 
+			stream.print("Age_61\t"); 
+			counterFirst+=4;
 		}
 		if (gender.equals("yes")) {
-			stream.print("Gender\t"); 
+			stream.print("Female\t"); 
 			counterFirst++;
 		}
 		if (employed.equals("yes")) {
@@ -1332,12 +1335,16 @@ public class PlansConstructor implements PlanStrategyModule{
 				counterRow++;
 			}
 			if (age.equals("yes")) {
-				stream.print(person.getAge()+"\t"); 
-				counterRow++;
+				if (person.getAge()<=15) stream.print(1+"\t"+0+"\t"+0+"\t"+0+"\t"); 
+				else if (person.getAge()<=30) stream.print(0+"\t"+1+"\t"+0+"\t"+0+"\t"); 
+				else if (person.getAge()<=60) stream.print(0+"\t"+0+"\t"+1+"\t"+0+"\t"); 
+				else stream.print(0+"\t"+0+"\t"+0+"\t"+1+"\t"); 
+				counterRow+=4;
 			}
 			if (gender.equals("yes")) {
-				if (person.getSex().equals("f")) stream.print(0+"\t"); 
-				else stream.print(1+"\t");
+				if (person.getSex().equals("f")) stream.print(1+"\t"); 
+				else if (person.getSex().equals("m")) stream.print(0+"\t");
+				else log.warn("Person "+person.getId()+" has no valid gender.");
 				counterRow++;
 			}
 			if (employed.equals("yes")) {   // No info on this available!
