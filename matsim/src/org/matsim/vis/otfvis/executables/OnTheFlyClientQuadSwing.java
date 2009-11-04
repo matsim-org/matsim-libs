@@ -75,9 +75,11 @@ public class OnTheFlyClientQuadSwing{
 
 		//main2(args);
 
-		OTFVisConfig visconf = new OTFVisConfig();
+////	OTFVisConfig visconf = new OTFVisConfig();
 		if (Gbl.getConfig() == null) Gbl.createConfig(null);
-		Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, visconf);
+//		Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, visconf);
+
+		OTFVisConfig visconf = Gbl.getConfig().otfVis() ;
 
 
 //		hostControl = new OTFHostControlBar("file:../MatsimJ/output/OTFQuadfile10p.mvi.gz");
