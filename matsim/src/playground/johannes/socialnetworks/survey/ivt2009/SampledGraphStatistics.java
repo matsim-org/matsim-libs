@@ -24,13 +24,13 @@ import gnu.trove.TDoubleDoubleHashMap;
 import java.util.Set;
 
 import playground.johannes.socialnetworks.graph.GraphStatistics;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.snowball2.SampledGraph;
 import playground.johannes.socialnetworks.snowball2.SampledVertex;
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraph;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
@@ -48,15 +48,15 @@ public class SampledGraphStatistics {
 		return GraphStatistics.localClusteringDistribution(SnowballPartitions.createSampledPartition(g.getVertices()));
 	}
 	
-	public static <V extends SpatialVertex & SampledVertex> Distribution edgeLenghtDistribution(SampledGraph g) {
-		return SpatialGraphStatistics.edgeLengthDistribution(SnowballPartitions.createSampledPartition((Set<V>)g.getVertices()));
+	public static <V extends SpatialVertex & SampledVertex> Distribution edgeLenghtDistribution(SampledSpatialGraph g) {
+		return SpatialGraphStatistics.edgeLengthDistribution(SnowballPartitions.createSampledPartition(g.getVertices()));
 	}
 	
-	public static <V extends SpatialSparseVertex & SampledVertex> Distribution edgeLenghtDistribution(SampledGraph g, ZoneLayer zones) {
-		return SpatialGraphStatistics.edgeLengthDistribution((Set)SnowballPartitions.createSampledPartition(g.getVertices()), zones);
+	public static <V extends SpatialVertex & SampledVertex> Distribution edgeLenghtDistribution(SampledSpatialGraph g, ZoneLayer zones) {
+		return SpatialGraphStatistics.edgeLengthDistribution(SnowballPartitions.createSampledPartition(g.getVertices()), zones);
 	}
 	
-	public static <V extends SpatialSparseVertex & SampledVertex> TDoubleDoubleHashMap edgeLengthDegreeCorrelation(Set<V> vertices) {
+	public static <V extends SpatialVertex & SampledVertex> TDoubleDoubleHashMap edgeLengthDegreeCorrelation(Set<V> vertices) {
 		return SpatialGraphStatistics.edgeLengthDegreeCorrelation(SnowballPartitions.createSampledPartition(vertices));
 	}
 	

@@ -47,4 +47,18 @@ public class Distance<V extends SpatialVertex> {
 		
 		return distribution;
 	}
+	
+	public Distribution vertexAccumulatedDistribution(Collection<? extends V> vertices) {
+		Distribution distribution = new Distribution();
+		
+		for(V v_i : vertices) {
+			double sum = 0;
+			for(SpatialEdge e : v_i.getEdges()) {
+				sum += e.length();
+			}
+			distribution.add(sum);
+		}
+		
+		return distribution;
+	}
 }
