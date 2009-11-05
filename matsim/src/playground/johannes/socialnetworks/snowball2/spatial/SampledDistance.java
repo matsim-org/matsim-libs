@@ -36,4 +36,9 @@ public class SampledDistance<V extends SampledSpatialVertex> extends Distance<V>
 		return super.distribution(SnowballPartitions.createSampledPartition(vertices));
 	}
 
+	@Override
+	public Distribution vertexAccumulatedDistribution(Collection<? extends V> vertices) {
+		return super.vertexAccumulatedDistribution(SnowballPartitions.createSampledPartition(vertices));
+	}
+
 }
