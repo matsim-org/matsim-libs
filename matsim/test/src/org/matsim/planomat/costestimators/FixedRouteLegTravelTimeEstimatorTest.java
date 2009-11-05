@@ -46,7 +46,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
@@ -79,7 +79,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		this.config = super.loadConfig(CONFIGFILE);
 		this.config.plans().setInputFile("test/scenarios/equil/plans1.xml");
 
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadScenario();
 		this.scenario = loader.getScenario();
 		

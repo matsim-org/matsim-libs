@@ -32,7 +32,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class PopulationCut {
@@ -40,7 +40,7 @@ public class PopulationCut {
 	//////////////////////////////////////////////////////////////////////
 	
 	private static void reduceScenario(String[] args) {
-		ScenarioImpl scenario = new ScenarioLoader(args[0]).loadScenario();
+		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 		Coord min = new CoordImpl(args[1],args[2]);
 		Coord max = new CoordImpl(args[3],args[4]);
 

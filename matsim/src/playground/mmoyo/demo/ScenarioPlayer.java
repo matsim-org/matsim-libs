@@ -34,7 +34,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
@@ -70,7 +70,7 @@ public class ScenarioPlayer {
 		String configFile = args[0]; 
 		String scheduleFile = args[1];
 		
-		ScenarioLoader sl = new ScenarioLoader(configFile);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(configFile);
 		ScenarioImpl scenario = sl.getScenario();
 
 		NetworkLayer network = scenario.getNetwork();

@@ -31,7 +31,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
@@ -53,11 +53,11 @@ public class SubPopScorer {
 
 	private List<String> linkIds;
 
-	private ScenarioLoader scenario;
+	private ScenarioLoaderImpl scenario;
 
 
 	public SubPopScorer(final String config, final List<String> linkIds) {
-		this.scenario = new ScenarioLoader(config);
+		this.scenario = new ScenarioLoaderImpl(config);
 		this.scenario.loadScenario();
 		this.linkIds = linkIds;
 		Set<Id> idSet = filterPlans(this.scenario.getScenario().getPopulation());

@@ -45,7 +45,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -75,7 +75,7 @@ public class PlanomatTest extends MatsimTestCase {
 		if (this.getName().equals("testRunDefaultManyModes")) {
 			config.plans().setInputFile(this.getInputDirectory() + "input_plans.xml.gz");
 		}
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadScenario();
 		this.scenario = loader.getScenario();
 		//store the only existing person

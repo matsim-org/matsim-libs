@@ -1,6 +1,6 @@
 package org.matsim.core.api.experimental;
 
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**<p>
  * Factory for the ScenarioLoader (what a surprise).
@@ -10,8 +10,8 @@ import org.matsim.core.scenario.ScenarioLoader;
  */
 public class ScenarioLoaderFactoryImpl {
 
-	public ScenarioLoaderI createScenarioLoader(String configFileName) {
-		return new ScenarioLoader( configFileName ) ;
+	public ScenarioLoader createScenarioLoader(String configFileName) {
+		return new ScenarioLoaderImpl( configFileName ) ;
 	}
 
 //	public ScenarioLoaderI createScenarioLoader(String configFileName, Scenario scenario) {

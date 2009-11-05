@@ -31,7 +31,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlanCalcType;
 
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
@@ -61,7 +61,7 @@ public class DgAnalysisPopulationReader {
 			this.sc.setNetwork(net);
 		}
 		else {
-			ScenarioLoader sl = new ScenarioLoader(sc);
+			ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc);
 			sc.getConfig().network().setInputFile(networkPath);
 			sl.loadNetwork();
 			net = sc.getNetwork();
@@ -127,7 +127,7 @@ public class DgAnalysisPopulationReader {
 		PopulationImpl population;
 		DgAnalysisPopulation analysisPopulation;
 		
-		ScenarioLoader sl = new ScenarioLoader(sc);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc);
 		sc.getConfig().network().setInputFile(networkPath);
 		sl.loadNetwork();
 		// load first plans file

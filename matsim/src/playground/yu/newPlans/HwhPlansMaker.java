@@ -34,7 +34,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlanSimplifyForDebug;
 
 /**
@@ -84,7 +84,7 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 	public static void main(final String[] args) {
 		final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String plansFilename = "./test/yu/ivtch/input/allPlansZuerich.xml.gz";
-		Config config = new ScenarioLoader(
+		Config config = new ScenarioLoaderImpl(
 				"./test/yu/ivtch/config_for_make_hwhPlans.xml").loadScenario()
 				.getConfig();
 

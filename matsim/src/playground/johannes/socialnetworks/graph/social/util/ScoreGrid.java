@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
@@ -45,7 +45,7 @@ public class ScoreGrid {
 	 */
 	public static void main(String[] args) {
 		Config config = Gbl.createConfig(new String[]{"/Users/fearonni/vsp-work/runs-svn/run669/config.xml"});
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadScenario();
 		ScenarioImpl scenario = loader.getScenario();
 		PopulationImpl population = scenario.getPopulation();

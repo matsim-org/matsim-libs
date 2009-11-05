@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -56,7 +56,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 		conf.plans().setInputFile(popFileName);
 
 		ScenarioImpl data = new ScenarioImpl(conf);
-		ScenarioLoader loader = new ScenarioLoader(data);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
 		loader.loadScenario();
 		
 		EventsManagerImpl events = new EventsManagerImpl();
@@ -81,7 +81,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 		conf.plans().setInputFile(popFileName);
 		
 		ScenarioImpl data = new ScenarioImpl(conf);
-		ScenarioLoader loader = new ScenarioLoader(data);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
 		loader.loadScenario();
 		
 		EventsManagerImpl events = new EventsManagerImpl();

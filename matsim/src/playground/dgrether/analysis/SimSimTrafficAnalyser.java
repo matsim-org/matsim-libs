@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.ComparisonErrorStatsCalculator;
 import org.matsim.counts.CountSimComparison;
@@ -63,7 +63,7 @@ public class SimSimTrafficAnalyser {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().addCoreModules();
 		scenario.getConfig().network().setInputFile(networkFile);
-		ScenarioLoader loader = new ScenarioLoader(scenario);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadNetwork();
 		
 		network = (NetworkLayer) scenario.getNetwork();

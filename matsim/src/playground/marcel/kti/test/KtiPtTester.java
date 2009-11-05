@@ -30,7 +30,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
@@ -44,7 +44,7 @@ public class KtiPtTester {
 
 	public KtiPtTester(final String[] args) {
 		
-		ScenarioLoader loader = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(args[0]);
 		loader.loadNetwork();
 		this.data = loader.getScenario();
 		this.config = this.data.getConfig();

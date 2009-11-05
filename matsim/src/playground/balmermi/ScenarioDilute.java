@@ -36,7 +36,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
@@ -76,7 +76,7 @@ public class ScenarioDilute {
 	public static void main(String[] args) {
 		if (args.length != 1) { printUsage(); return; }
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 
 		System.out.println("loading facilities...");
 		sl.loadActivityFacilities();

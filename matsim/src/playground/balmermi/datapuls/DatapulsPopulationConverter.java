@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.balmermi.datapuls.modules.FacilitiesWriteTables;
 import playground.balmermi.datapuls.modules.LinkTablesFromPopulation;
@@ -43,7 +43,7 @@ public class DatapulsPopulationConverter {
 		log.info("done.");
 		
 		log.info("loading scenario...");
-		ScenarioImpl scenario = new ScenarioLoader(args[0]).loadScenario();
+		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 		log.info("done.");
 
 		log.info("extracting output directory... ");

@@ -8,7 +8,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 public class RemoveRoutes {
 	
@@ -16,7 +16,7 @@ public class RemoveRoutes {
 	public static void main(String [] args) {
 		
 		String cf = "../../inputs/configs/eafEvac.xml";
-		ScenarioImpl sc = new ScenarioLoader(cf).getScenario();
+		ScenarioImpl sc = new ScenarioLoaderImpl(cf).getScenario();
 		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(sc.getConfig().network().getInputFile());
 		

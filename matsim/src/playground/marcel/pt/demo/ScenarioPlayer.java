@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
@@ -63,7 +63,7 @@ public class ScenarioPlayer {
 	 * @throws SAXException
 	 */
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
-		ScenarioLoader sl = new ScenarioLoader("test/input/playground/marcel/pt/config.xml");
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl("test/input/playground/marcel/pt/config.xml");
 		ScenarioImpl scenario = sl.getScenario();
 
 		NetworkLayer network = scenario.getNetwork();

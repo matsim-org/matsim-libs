@@ -21,7 +21,7 @@ package playground.dgrether.signalVis;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.dgrether.DgPaths;
 
@@ -38,7 +38,7 @@ public class DenverStarter {
 	public static void main(String[] args) {
 		String configFile = DgPaths.STUDIESDG + "denver/dgConfig.xml";
 		
-		ScenarioLoader scl = new ScenarioLoader(configFile);
+		ScenarioLoaderImpl scl = new ScenarioLoaderImpl(configFile);
 		ScenarioImpl sc = scl.loadScenario();
 		EventsManagerImpl e = new EventsManagerImpl();
 		DgOnTheFlyQueueSimQuad sim = new DgOnTheFlyQueueSimQuad(sc, e);

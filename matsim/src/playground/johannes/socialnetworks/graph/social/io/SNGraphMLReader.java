@@ -41,7 +41,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.xml.sax.Attributes;
 
 import playground.johannes.socialnetworks.graph.social.Ego;
@@ -106,7 +106,7 @@ public class SNGraphMLReader<P extends BasicPerson<?>> extends AbstractGraphMLRe
 	@SuppressWarnings("deprecation")
 	public static SocialNetwork<Person> loadFromConfig(String configFile, String socialnetFile) {
 		Config config = Gbl.createConfig(new String[]{configFile});
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadPopulation();
 		ScenarioImpl scenario = loader.getScenario();
 		PopulationImpl population = scenario.getPopulation();

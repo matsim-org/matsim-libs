@@ -28,7 +28,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class TestHandlerDetailedEventChecker extends MatsimTestCase implements BasicPersonEventHandler {
@@ -158,7 +158,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 			config.plans().setInputFile(planFilePath);
 		}
 		this.printEvent = printEvent;
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadScenario();
 		ScenarioImpl data = loader.getScenario();
 		NetworkLayer network = (NetworkLayer) data.getNetwork();

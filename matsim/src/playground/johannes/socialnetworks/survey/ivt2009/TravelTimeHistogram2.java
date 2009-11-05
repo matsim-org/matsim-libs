@@ -38,7 +38,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
@@ -64,7 +64,7 @@ public class TravelTimeHistogram2 {
 
 	public static void main(String args[]) throws FileNotFoundException, IOException {
 		Config config = Gbl.createConfig(new String[]{args[0]});
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadScenario();
 		ScenarioImpl data = loader.getScenario();
 		NetworkLayer network = (NetworkLayer) data.getNetwork();

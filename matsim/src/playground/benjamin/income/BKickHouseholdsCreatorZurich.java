@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -106,7 +106,7 @@ public class BKickHouseholdsCreatorZurich {
 		scenario.getConfig().network().setInputFile(DgPaths.IVTCHNET);
 		scenario.getConfig().plans().setInputFile(plansZurich);
 		scenario.getConfig().scenario().setUseHouseholds(true);
-		ScenarioLoader loader = new ScenarioLoader(scenario);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
 		
 		Households households = ((ScenarioImpl) scenario).getHouseholds();

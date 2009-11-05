@@ -29,7 +29,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.dgrether.DgPaths;
 
@@ -59,7 +59,7 @@ public class Trb09Preprocessing {
 			Config conf = sc.getConfig();
 			conf.network().setInputFile(netfile);
 			conf.plans().setInputFile(plans1file);
-			ScenarioLoader loader = new ScenarioLoader(sc);
+			ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
 			loader.loadScenario();
 			PopulationImpl pop = sc.getPopulation();
 			for (PersonImpl p : pop.getPersons().values()){

@@ -5,7 +5,7 @@ package playground.yu.scoring;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**
  * @author yu
@@ -25,7 +25,7 @@ public class WalkScoringTest {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			Config config = new ScenarioLoader(args[0]).loadScenario()
+			Config config = new ScenarioLoaderImpl(args[0]).loadScenario()
 					.getConfig();
 			final Controler controler = new Controler(args);
 			controler

@@ -28,7 +28,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo;
@@ -61,7 +61,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 		conf.scenario().setUseLanes(true);
 		conf.scenario().setUseSignalSystems(true);
 		ScenarioImpl data = new ScenarioImpl(conf);
-		ScenarioLoader loader = new ScenarioLoader(data);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
 		loader.loadScenario();
 		
 		BasicLaneDefinitions lanedefs = data.getLaneDefinitions();
@@ -117,7 +117,7 @@ public class TravelTimeOneWayTest extends MatsimTestCase {
 		conf.scenario().setUseLanes(true);
 		conf.scenario().setUseSignalSystems(true);
 		ScenarioImpl data = new ScenarioImpl(conf);
-		ScenarioLoader loader = new ScenarioLoader(data);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
 		loader.loadScenario();
 		
 		EventsManagerImpl events = new EventsManagerImpl();

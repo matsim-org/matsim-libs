@@ -68,7 +68,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -97,7 +97,7 @@ public class MyRuns {
 
 		System.out.println("RUN: filterSelectedPlans");
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 		ScenarioImpl scenario = sl.getScenario();
 
@@ -127,7 +127,7 @@ public class MyRuns {
 		final CoordImpl center = new CoordImpl(x, y);
 		final Map<Id, LinkImpl> areaOfInterest = new HashMap<Id, LinkImpl>();
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 		NetworkLayer network = sl.getScenario().getNetwork();
 
@@ -154,7 +154,7 @@ public class MyRuns {
 
 		System.out.println("RUN: filterCars");
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		ScenarioImpl scenario = sl.loadScenario();
 
 		System.out.println("  processing plans...");
@@ -177,7 +177,7 @@ public class MyRuns {
 
 		System.out.println("RUN: filterPt");
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		ScenarioImpl scenario = sl.loadScenario();
 		final PopulationImpl plans = scenario.getPopulation();
 
@@ -201,7 +201,7 @@ public class MyRuns {
 
 		System.out.println("RUN: filterWork");
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		ScenarioImpl scenario = sl.loadScenario();
 
 		new PersonRemoveCertainActs().run(scenario.getPopulation());
@@ -219,7 +219,7 @@ public class MyRuns {
 	public static void filterWorkEdu(final String[] args) {
 		System.out.println("RUN: filterWorkEdu");
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		ScenarioImpl scenario = sl.loadScenario();
 
 		new PlanFilterActTypes(new String[] {"work1", "work2", "work3", "edu", "uni"}).run(scenario.getPopulation());
@@ -241,7 +241,7 @@ public class MyRuns {
 
 		System.out.println("RUN: removeLinkAndRoute");
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 		final Config config = sl.getScenario().getConfig();
 
@@ -267,7 +267,7 @@ public class MyRuns {
 	}
 
 	public static void createSample(final String[] args) {
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 		Config config = sl.getScenario().getConfig();
 
@@ -289,7 +289,7 @@ public class MyRuns {
 
 		System.out.println("RUN: calcNofLanes");
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 
 		NetworkLayer network = sl.getScenario().getNetwork();
@@ -316,7 +316,7 @@ public class MyRuns {
 		final CoordImpl center = new CoordImpl(x, y);
 		final Map<Id, LinkImpl> areaOfInterest = new HashMap<Id, LinkImpl>();
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 
 		NetworkLayer network = sl.getScenario().getNetwork();
@@ -356,7 +356,7 @@ public class MyRuns {
 	public static void falsifyNetAndPlans(final String[] args) {
 		System.out.println("RUN: falsifyNetAndPlans");
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 		ScenarioImpl scenario = sl.getScenario();
 
@@ -423,7 +423,7 @@ public class MyRuns {
 
 		final TreeMap<Integer, TreeMap<Id, Integer>> linkValues = new TreeMap<Integer, TreeMap<Id, Integer>>();
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 		Config config = sl.getScenario().getConfig();
 		NetworkLayer network = sl.getScenario().getNetwork();

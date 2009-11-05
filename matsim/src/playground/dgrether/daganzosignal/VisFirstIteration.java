@@ -21,7 +21,7 @@ package playground.dgrether.daganzosignal;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.dgrether.signalVis.DgOnTheFlyQueueSimQuad;
 
@@ -38,7 +38,7 @@ public class VisFirstIteration {
 	public static void main(String[] args) {
 		DaganzoScenarioGenerator scenarioGenerator = new DaganzoScenarioGenerator();
 		scenarioGenerator.createScenario();
-		ScenarioLoader loader = new ScenarioLoader(scenarioGenerator.configOut);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenarioGenerator.configOut);
 		loader.loadScenario();
 		ScenarioImpl sc = loader.getScenario();
 		

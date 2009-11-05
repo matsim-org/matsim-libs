@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.xml.sax.SAXException;
 
 import playground.johannes.plans.plain.PlainPopulationBuilder;
@@ -55,7 +55,7 @@ public class TestMemory extends TestCase {
 	public void testNew() throws SAXException, ParserConfigurationException, IOException {
 		
 		Config config = Gbl.createConfig(new String[]{"/Users/fearonni/vsp-work/runs-svn/run669/config.xml"});
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadNetwork();
 		IdMapping.network = loader.getScenario().getNetwork();
 		
@@ -90,7 +90,7 @@ public class TestMemory extends TestCase {
 	public void testOld() {
 		baseMem = getMemory();
 		Config config = Gbl.createConfig(new String[]{"/Users/fearonni/vsp-work/runs-svn/run669/config.xml"});
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadScenario();
 //		ScenarioImpl data = loader.getScenario();
 		ScenarioImpl scenario = loader.getScenario();

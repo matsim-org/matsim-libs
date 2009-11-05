@@ -31,7 +31,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.MatsimMatricesReader;
@@ -68,7 +68,7 @@ public class InitDemandCreation {
 
 		System.out.println("MATSim-IIDM: create initial demand based on census2000 data.");
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		Config config = sl.getScenario().getConfig();
 		World world = ((ScenarioImpl) sl.getScenario()).getWorld();
 		
@@ -211,7 +211,7 @@ public class InitDemandCreation {
 
 		Gbl.startMeasurement();
 
-		Config config = new ScenarioLoader(args[0]).getScenario().getConfig();
+		Config config = new ScenarioLoaderImpl(args[0]).getScenario().getConfig();
 
 		createInitDemand(args);
 

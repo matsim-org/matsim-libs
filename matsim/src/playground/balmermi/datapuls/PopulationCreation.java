@@ -26,7 +26,7 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 
@@ -60,7 +60,7 @@ public class PopulationCreation {
 	public static void main(String[] args) {
 		if (args.length != 4) { printUsage(); return; }
 		
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 
 		System.out.println("loading census facilities...");
 		sl.loadActivityFacilities();

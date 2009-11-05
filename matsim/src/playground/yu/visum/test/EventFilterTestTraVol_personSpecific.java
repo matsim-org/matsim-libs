@@ -31,7 +31,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.yu.visum.filter.EventFilterAlgorithm;
 import playground.yu.visum.filter.EventFilterPersonSpecific;
@@ -57,7 +57,7 @@ public class EventFilterTestTraVol_personSpecific {
 	public static void main(final String[] args) throws Exception {
 
 		Gbl.startMeasurement();
-		Config config = new ScenarioLoader(args[0]).loadScenario().getConfig();
+		Config config = new ScenarioLoaderImpl(args[0]).loadScenario().getConfig();
 		testRunAveTraSpeCal(config);
 		Gbl.printElapsedTime();
 	}

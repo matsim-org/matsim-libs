@@ -38,7 +38,7 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
@@ -172,7 +172,7 @@ public class OTFVis {
 	}
 
 	public static final void playConfig(final String[] args) {
-		ScenarioLoader loader = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(args[0]);
 
 		log.info("Complete config dump:");
 		StringWriter writer = new StringWriter();

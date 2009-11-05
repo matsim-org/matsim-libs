@@ -97,7 +97,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorInvertedNetProxyFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -215,7 +215,7 @@ public class Controler {
 			shutdown(true);
 		}
 	};
-	private ScenarioLoader loader;
+	private ScenarioLoaderImpl loader;
 	
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 
@@ -589,7 +589,7 @@ public class Controler {
 	private void loadData() {
 		if (!this.scenarioLoaded) {
 			this.scenarioData.getNetwork().setFactory(this.getNetworkFactory());
-			this.loader = new ScenarioLoader(this.scenarioData);
+			this.loader = new ScenarioLoaderImpl(this.scenarioData);
 			this.loader.loadScenario();
 			this.network = loadNetwork();
 			this.population = loadPopulation();

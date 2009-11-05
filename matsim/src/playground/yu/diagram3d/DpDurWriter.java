@@ -35,7 +35,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -167,7 +167,7 @@ public class DpDurWriter implements AgentDepartureEventHandler,
 	}
 
 	public static void main(String[] args) {
-		Config config = new ScenarioLoader(args[0]).loadScenario().getConfig();
+		Config config = new ScenarioLoaderImpl(args[0]).loadScenario().getConfig();
 		DpDurWriter ddw = new DpDurWriter("DpDurMatrix.txt");
 
 		EventsManagerImpl events = new EventsManagerImpl();

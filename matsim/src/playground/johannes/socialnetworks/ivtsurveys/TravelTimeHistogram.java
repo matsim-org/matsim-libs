@@ -48,7 +48,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -82,7 +82,7 @@ public class TravelTimeHistogram {
 //		NetworkLayer network = new NetworkLayer();
 //		new MatsimNetworkReader(network).readFile(networkfile);
 		Config config = Gbl.createConfig(new String[]{configfile});
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadScenario();
 		ScenarioImpl data = loader.getScenario();
 		PopulationImpl population = data.getPopulation();

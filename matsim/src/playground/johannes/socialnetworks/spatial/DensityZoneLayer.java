@@ -30,7 +30,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**
  * @author illenberger
@@ -44,7 +44,7 @@ public class DensityZoneLayer {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		ScenarioLoader loader = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(args[0]);
 		loader.loadScenario();
 		Scenario data = loader.getScenario();
 //		Config config = data.getConfig();

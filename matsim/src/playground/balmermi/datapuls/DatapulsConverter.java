@@ -28,7 +28,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.balmermi.datapuls.modules.FacilitiesWriteTables;
 import playground.balmermi.datapuls.modules.LinkTablesEventHandler;
@@ -61,7 +61,7 @@ public class DatapulsConverter {
 		log.info("done.");
 		
 		log.info("loading scenario...");
-		ScenarioImpl scenario = new ScenarioLoader(args[0]).loadScenario();
+		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 		log.info("done.");
 
 		new FacilitiesWriteTables().run(scenario.getActivityFacilities(),outdir);

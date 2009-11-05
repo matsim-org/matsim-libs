@@ -34,7 +34,7 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -55,7 +55,7 @@ public class PlanFilter {
 		double[] smallRadiuses = {5000, 7000, 9000};
 		double[] bigRadiuses = {10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000, 25000, 30000, 40000, 50000};
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		ScenarioImpl sc = sl.loadScenario();
 		final NetworkLayer network = sc.getNetwork();
 		final PopulationImpl population = sc.getPopulation();
@@ -113,7 +113,7 @@ public class PlanFilter {
 		double smallRadius = 7000;
 		double bigRadius = 14000;
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		ScenarioImpl sc = sl.loadScenario();
 		final Config config = sc.getConfig();
 		final NetworkLayer network = sc.getNetwork();

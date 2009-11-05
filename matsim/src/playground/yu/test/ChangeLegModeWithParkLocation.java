@@ -36,7 +36,7 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -92,7 +92,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		ctl.setWriteEventsInterval(100);
 		ctl
 				.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithWalk(
-						new ScenarioLoader(args[0]).loadScenario().getConfig()
+						new ScenarioLoaderImpl(args[0]).loadScenario().getConfig()
 								.charyparNagelScoring()));
 		ctl.run();
 	}

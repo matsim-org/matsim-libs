@@ -30,7 +30,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
@@ -68,7 +68,7 @@ public class PersonCounter extends AbstractPersonAlgorithm {
 	public static void main(final String[] args) {
 		final String netFilename = "./test/yu/test/input/network.xml";
 		final String plansFilename = "./test/yu/test/input/10pctZrhCarPtPlans.xml.gz";
-		new ScenarioLoader("./test/yu/test/configTest.xml").loadScenario()
+		new ScenarioLoaderImpl("./test/yu/test/configTest.xml").loadScenario()
 				.getConfig();
 
 		NetworkLayer network = new NetworkLayer();

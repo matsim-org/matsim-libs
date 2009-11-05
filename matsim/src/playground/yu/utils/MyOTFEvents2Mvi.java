@@ -7,7 +7,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 
 import playground.yu.utils.io.SimpleReader;
@@ -56,7 +56,7 @@ public class MyOTFEvents2Mvi {
 
 		Gbl.startMeasurement();
 		// Gbl.createConfig(null);
-		new ScenarioLoader((String) null).loadScenario().getConfig();
+		new ScenarioLoaderImpl((String) null).loadScenario().getConfig();
 
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(args[0]);

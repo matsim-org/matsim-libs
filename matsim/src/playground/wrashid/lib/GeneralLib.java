@@ -25,7 +25,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 
 import playground.wrashid.PSF.energy.charging.ChargeLog;
@@ -60,7 +60,7 @@ public class GeneralLib {
 		sc.getConfig().setParam("network", "inputNetworkFile", networkFile);
 		sc.getConfig().setParam("facilities", "inputFacilitiesFile", facilititiesPath);
 
-		ScenarioLoader sl = new ScenarioLoader((ScenarioImpl) sc);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl((ScenarioImpl) sc);
 
 		sl.loadScenario();
 

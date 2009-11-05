@@ -33,7 +33,7 @@ import org.matsim.core.replanning.modules.ReRouteDijkstra;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -47,7 +47,7 @@ public class MyControler5 {
 		final String netFilename = "./examples/equil/network.xml";
 		final String plansFilename = "./examples/equil/plans100.xml";
 
-		ScenarioLoader loader = new ScenarioLoader("./examples/tutorial/myConfig.xml");
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl("./examples/tutorial/myConfig.xml");
 		ScenarioImpl scenario = loader.getScenario();
 		Config config = scenario.getConfig();
 

@@ -12,7 +12,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.yu.visum.filter.PersonFilterAlgorithm;
 import playground.yu.visum.filter.PersonRouteFilter;
@@ -158,7 +158,7 @@ public class NewPlansTest {
 	 */
 	public static void main(final String[] args) throws Exception {
 		Gbl.startMeasurement();
-		Config config = new ScenarioLoader(args[0]).loadScenario().getConfig();
+		Config config = new ScenarioLoaderImpl(args[0]).loadScenario().getConfig();
 		testRun(config);
 		Gbl.printElapsedTime();
 	}

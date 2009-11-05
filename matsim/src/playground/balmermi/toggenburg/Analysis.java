@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.balmermi.datapuls.modules.FacilitiesWriteTables;
 import playground.balmermi.datapuls.modules.PopulationWriteTable;
@@ -47,7 +47,7 @@ public class Analysis {
 	public static void main(String[] args) {
 		
 		log.info("loading scenario...");
-		ScenarioImpl scenario = new ScenarioLoader(args[0]).loadScenario();
+		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 		log.info("done.");
 		
 		log.info("extracting output directory... ");

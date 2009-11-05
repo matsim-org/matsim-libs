@@ -22,7 +22,7 @@ package tutorial.example3;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
-import org.matsim.core.api.experimental.ScenarioLoaderI;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.EventsManagerFactoryImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -33,7 +33,7 @@ public class MyControler3API {
 //		final String netFilename = "./examples/equil/network.xml";
 //		final String plansFilename = "./examples/equil/plans100.xml";
 		
-		ScenarioLoaderI loader = (new ScenarioLoaderFactoryImpl()).createScenarioLoader("examples/tutorial/myConfig.xml");
+		ScenarioLoader loader = (new ScenarioLoaderFactoryImpl()).createScenarioLoader("examples/tutorial/myConfig.xml");
 		loader.loadScenario() ;
 		
 		Scenario scenario = loader.getScenario();

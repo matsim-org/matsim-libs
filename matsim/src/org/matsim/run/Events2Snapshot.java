@@ -28,7 +28,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.vis.netvis.VisConfig;
@@ -109,7 +109,7 @@ public class Events2Snapshot {
 	 */
 	public void run(final String[] args) {
 		parseArguments(args);
-		ScenarioLoader sl = new ScenarioLoader(this.configfile);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
 		this.config = sl.getScenario().getConfig();
 
 		if (this.config.simulation().getSnapshotPeriod() <= 0.0) {

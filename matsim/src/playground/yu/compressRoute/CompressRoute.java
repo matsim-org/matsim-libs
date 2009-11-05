@@ -41,7 +41,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
@@ -171,7 +171,7 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 	}
 
 	public static void main(final String[] args) throws IOException {
-		Config config = new ScenarioLoader(args[0]).loadScenario().getConfig();
+		Config config = new ScenarioLoaderImpl(args[0]).loadScenario().getConfig();
 
 		System.out.println("  reading the network...");
 		NetworkLayer network = new NetworkLayer();

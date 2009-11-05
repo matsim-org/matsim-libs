@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 
@@ -44,7 +44,7 @@ public class PopulationDensity {
 	private static final String MODULE_NAME = "densityGrid";
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		ScenarioLoader loader = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(args[0]);
 		loader.loadScenario();
 		Scenario data = loader.getScenario();
 		Config config = data.getConfig();

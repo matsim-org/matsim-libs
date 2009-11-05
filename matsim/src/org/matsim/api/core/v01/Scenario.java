@@ -31,7 +31,7 @@ import org.matsim.core.config.Config;
  * has to provide consistent implementations
  * for the different return types, e.g. Network, 
  * Facilities or Population.
- * @see org.matsim.core.scenario.ScenarioLoader
+ * @see org.matsim.core.scenario.ScenarioLoaderImpl
  * @author dgrether
  *
  */

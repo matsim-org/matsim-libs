@@ -14,7 +14,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
@@ -45,7 +45,7 @@ public class OTFSnapshotGenerator {
 	
 	public OTFSnapshotGenerator() {
 		
-		ScenarioLoader sl = new ScenarioLoader("../../outputs/output/output_config.xml.gz");
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl("../../outputs/output/output_config.xml.gz");
 		
 		this.scenario = sl.getScenario();
 		this.scenario.getConfig().network().setInputFile("../../outputs/output/output_network.xml.gz");
@@ -65,7 +65,7 @@ public class OTFSnapshotGenerator {
 
 	public OTFSnapshotGenerator(String[] args) {
 		this.eventsFile = MY_STATIC_STUFF.OUTPUTS + "/output/ITERS/it." + args[1] + "/" + args[1] + ".events.txt.gz"; 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 		this.scenario = sl.getScenario();
 	}

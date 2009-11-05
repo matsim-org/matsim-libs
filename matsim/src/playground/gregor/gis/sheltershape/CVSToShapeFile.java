@@ -20,7 +20,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -175,7 +175,7 @@ public class CVSToShapeFile {
 		String cvs = MY_STATIC_STUFF.PADANG_SVN_DATA + "/sheltersSurvey_2009/survey.csv";
 //		String config = "../../inputs/configs/shapeFileEvac.xml";
 		String config = "test/input/org/matsim/evacuation/riskaversion/RiskCostFromFloodingDataTest/testRiskCostFromFloodingData/config.xml";
-		ScenarioImpl sc = new ScenarioLoader(config).getScenario();
+		ScenarioImpl sc = new ScenarioLoaderImpl(config).getScenario();
 		String shapeFile = sc.getConfig().evacuation().getBuildingsFile();
 		String output = "buildings.shp";
 		new CVSToShapeFile(cvs,shapeFile,output).run();

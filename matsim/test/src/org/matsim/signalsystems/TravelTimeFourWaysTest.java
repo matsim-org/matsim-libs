@@ -25,7 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -52,7 +52,7 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		conf.scenario().setUseLanes(true);
 		conf.scenario().setUseSignalSystems(true);
 		ScenarioImpl data = new ScenarioImpl(conf);
-		ScenarioLoader loader = new ScenarioLoader(data);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
 		loader.loadScenario();
 		
 		String eventsOut = this.getOutputDirectory() + EVENTSFILE;
@@ -82,7 +82,7 @@ public class TravelTimeFourWaysTest extends MatsimTestCase {
 		conf.scenario().setUseLanes(true);
 		conf.scenario().setUseSignalSystems(true);
 		ScenarioImpl data = new ScenarioImpl(conf);
-		ScenarioLoader loader = new ScenarioLoader(data);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
 		loader.loadScenario();
 
 		String eventsOut = this.getOutputDirectory() + EVENTSFILE;

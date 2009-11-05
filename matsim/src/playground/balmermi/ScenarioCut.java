@@ -47,7 +47,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ScenarioCut {
@@ -270,7 +270,7 @@ public class ScenarioCut {
 	//////////////////////////////////////////////////////////////////////
 	
 	private static void reduceScenario(String[] args) {
-		ScenarioImpl scenario = new ScenarioLoader(args[0]).loadScenario();
+		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 		calcExtent(scenario);
 		if (args.length == 4) {
 			Coord center = new CoordImpl(args[1],args[2]);

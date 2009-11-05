@@ -38,7 +38,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.lanes.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.basic.BasicLane;
@@ -151,7 +151,7 @@ public class DaganzoScenarioGenerator {
 		Config config = scenario.getConfig();
 		//set the network input file to the config and load it
 		config.network().setInputFile(NETWORKFILE);
-		ScenarioLoader loader = new ScenarioLoader(scenario);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadNetwork();
 		//create some ids as members of the class for convenience reasons
 		createIds(scenario);

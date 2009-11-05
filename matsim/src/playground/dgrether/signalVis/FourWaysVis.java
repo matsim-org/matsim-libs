@@ -21,7 +21,7 @@ package playground.dgrether.signalVis;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
 
 
@@ -59,7 +59,7 @@ public class FourWaysVis {
 		scenario.getConfig().signalSystems().setSignalSystemConfigFile(signalConfigFile);
 		scenario.getConfig().scenario().setUseSignalSystems(true);
 		
-		ScenarioLoader loader = new ScenarioLoader(scenario);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
 		
 		EventsManagerImpl events = new EventsManagerImpl();

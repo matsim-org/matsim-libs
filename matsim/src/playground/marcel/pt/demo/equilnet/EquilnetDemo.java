@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.marcel.pt.controler.TransitControler;
 
@@ -79,7 +79,7 @@ public class EquilnetDemo {
 	}
 
 	private void runControler() {
-		new ScenarioLoader(this.scenario).loadScenario();
+		new ScenarioLoaderImpl(this.scenario).loadScenario();
 		TransitControler c = new TransitControler(this.scenario);
 		c.run();
 	}

@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import playground.mmoyo.TransitSimulation.MMoyoTransitControler;
 
 /**copy of marcel.pt.demo.equilNet.EquilnetDemo.java to test the ptRouter in the simulation*/
@@ -77,7 +77,7 @@ public class ScenarioDemo {
 	}
 
 	private void runControler() {
-		new ScenarioLoader(this.scenario).loadScenario();
+		new ScenarioLoaderImpl(this.scenario).loadScenario();
 		MMoyoTransitControler c = new MMoyoTransitControler(this.scenario, launchOTFDemo);
 		c.setOverwriteFiles(true);
 		c.run();

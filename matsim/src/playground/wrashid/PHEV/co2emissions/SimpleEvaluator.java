@@ -3,7 +3,7 @@ package playground.wrashid.PHEV.co2emissions;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 public class SimpleEvaluator {
 
@@ -12,7 +12,7 @@ public class SimpleEvaluator {
 		args=new String[1];
 		args[0]="C:\\data\\SandboxCVS\\ivt\\studies\\triangle\\config\\config.xml";
 		
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 		NetworkLayer network = sl.getScenario().getNetwork();
 		

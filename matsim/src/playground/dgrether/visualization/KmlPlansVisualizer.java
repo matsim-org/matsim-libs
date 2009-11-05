@@ -39,7 +39,7 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
@@ -79,7 +79,7 @@ public class KmlPlansVisualizer {
 		MatsimConfigReader reader = new MatsimConfigReader(conf);
 		reader.readFile(config);
 		scenario = new ScenarioImpl(conf);
-		new ScenarioLoader(conf).loadScenario();
+		new ScenarioLoaderImpl(conf).loadScenario();
 		this.linkTuples = linkTuples;
 	}
 

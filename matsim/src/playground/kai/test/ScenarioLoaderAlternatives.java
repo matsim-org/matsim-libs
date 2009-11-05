@@ -2,7 +2,7 @@ package playground.kai.test;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.ScenarioLoaderFactoryImpl;
-import org.matsim.core.api.experimental.ScenarioLoaderI;
+import org.matsim.core.api.experimental.ScenarioLoader;
 
 
 public class ScenarioLoaderAlternatives {
@@ -14,7 +14,7 @@ public class ScenarioLoaderAlternatives {
 		{
 
 			// create scenario loader from configfile:
-			ScenarioLoaderI scl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader( configFileName ) ;
+			ScenarioLoader scl = (new ScenarioLoaderFactoryImpl()).createScenarioLoader( configFileName ) ;
 
 			// load scenario:
 			Scenario sc = scl.loadScenario() ;

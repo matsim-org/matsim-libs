@@ -33,7 +33,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**
  * @author illenberger
@@ -44,7 +44,7 @@ public class PopulationClipping {
 	private static final String MODULE_NAME = "populationClipping";
 	
 	public static void main(String[] args) {
-		ScenarioLoader loader = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(args[0]);
 		loader.loadScenario();
 		Scenario data = loader.getScenario();
 		Config config = data.getConfig();

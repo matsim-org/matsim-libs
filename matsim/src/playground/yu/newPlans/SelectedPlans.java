@@ -28,7 +28,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -60,7 +60,7 @@ public class SelectedPlans extends NewPopulation {
 	public static void main(final String[] args) {
 		final String netFilename = "../data/schweiz/input/ch.xml";
 		final String plansFilename = "../data/schweiz/input/459.100.plans.xml.gz";
-		new ScenarioLoader("../data/schweiz/selectedPlans.xml").loadScenario()
+		new ScenarioLoaderImpl("../data/schweiz/selectedPlans.xml").loadScenario()
 				.getConfig();
 
 		NetworkLayer network = new NetworkLayer();

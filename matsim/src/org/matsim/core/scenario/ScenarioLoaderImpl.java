@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.api.experimental.ScenarioLoaderI;
+import org.matsim.core.api.experimental.ScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -61,26 +61,26 @@ import org.matsim.world.MatsimWorldReader;
  * 
  * @author dgrether
  */
-public class ScenarioLoader implements ScenarioLoaderI {
+public class ScenarioLoaderImpl implements ScenarioLoader {
 
-	private static final Logger log = Logger.getLogger(ScenarioLoader.class);
+	private static final Logger log = Logger.getLogger(ScenarioLoaderImpl.class);
 
 	private Config config;
 
 	private Scenario scenario;
 
 	
-	public ScenarioLoader(Config config) {
+	public ScenarioLoaderImpl(Config config) {
 		this.config = config;
 		this.setScenario(new ScenarioImpl(this.config));
 	}
 
-	public ScenarioLoader(Scenario scenario) {
+	public ScenarioLoaderImpl(Scenario scenario) {
 		this.scenario = scenario;
 		this.config = this.scenario.getConfig();
 	}
 
-	public ScenarioLoader(String configFilename) {
+	public ScenarioLoaderImpl(String configFilename) {
 		this(configFilename, new ScenarioImpl());
 	}
 
@@ -88,7 +88,7 @@ public class ScenarioLoader implements ScenarioLoaderI {
 	 * Loads the config from the file into the config set in the
 	 * scenario and initializes the ScenarioLoader.
 	 */
-	public ScenarioLoader(String configFilename, Scenario sc) {
+	public ScenarioLoaderImpl(String configFilename, Scenario sc) {
 		this.config = sc.getConfig();
 		MatsimConfigReader reader = new MatsimConfigReader(this.config);
 		reader.readFile(configFilename);

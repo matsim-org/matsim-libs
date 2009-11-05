@@ -35,7 +35,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**
  * @author yu
@@ -92,7 +92,7 @@ public class AvoidOldNodes extends NewPopulation {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		Config config = new ScenarioLoader(args[0]).loadScenario().getConfig();
+		Config config = new ScenarioLoaderImpl(args[0]).loadScenario().getConfig();
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network()

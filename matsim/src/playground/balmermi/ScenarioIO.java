@@ -38,7 +38,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.balmermi.influenza.modules.PersonNoEducLessLeisure;
 import playground.balmermi.modules.PersonFacility2Link;
@@ -76,7 +76,7 @@ public class ScenarioIO {
 	public static void main(String[] args) {
 		if (args.length != 1) { printUsage(); return; }
 
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 
 		System.out.println("loading facilities...");
 		sl.loadActivityFacilities();

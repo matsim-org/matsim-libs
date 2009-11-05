@@ -28,7 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**
  * @author illenberger
@@ -41,7 +41,7 @@ public class ShrinkPopulation {
 	 */
 	public static void main(String[] args) {
 		Config config = Gbl.createConfig(new String[]{args[0]});
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadScenario();
 		ScenarioImpl data = loader.getScenario();
 //		loader.loadPopulation();

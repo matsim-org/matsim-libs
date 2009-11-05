@@ -1,12 +1,12 @@
 package playground.wrashid.PHEV.Triangle;
 
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 public class PrintLinkCoordinates {
 
 	public static void main(String[] args) throws Exception {
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 		
 		System.out.println("linkId\tx\ty");

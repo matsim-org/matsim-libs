@@ -39,7 +39,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -1076,7 +1076,7 @@ public class TollSchemeGenerator {
 	private NetworkLayer createTollScheme(final Config config) {
 		System.out.println("createTollScheme(config)->config : "
 				+ config.toString());
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		network = (NetworkLayer) loader.loadScenario().getNetwork();
 
 		// network = new NetworkLayer();

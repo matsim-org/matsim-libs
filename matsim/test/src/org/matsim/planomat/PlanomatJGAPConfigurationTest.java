@@ -35,7 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -51,7 +51,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		super.setUp();
 		Config config = super.loadConfig(this.getClassInputDirectory() + "config.xml");
 		config.plans().setInputFile(getPackageInputDirectory() + "testPlans.xml");
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadScenario();
 		this.scenario = loader.getScenario();
 	}

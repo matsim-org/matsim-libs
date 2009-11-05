@@ -27,7 +27,7 @@ import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanAverageScore;
@@ -40,7 +40,7 @@ public class MyControler4 {
 		final String netFilename = "./examples/equil/network.xml";
 		final String plansFilename = "./examples/equil/plans100.xml";
 
-		ScenarioLoader loader = new ScenarioLoader("./examples/tutorial/myConfig.xml");
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl("./examples/tutorial/myConfig.xml");
 		ScenarioImpl scenario = loader.getScenario();
 		Config config = scenario.getConfig();
 

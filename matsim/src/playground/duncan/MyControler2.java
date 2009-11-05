@@ -42,7 +42,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
@@ -125,7 +125,7 @@ public class MyControler2 {
 		} else {
 			Gbl.createConfig(args) ;
 		}
-		ScenarioLoader loader = new ScenarioLoader(Gbl.getConfig());
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(Gbl.getConfig());
 		loader.loadNetwork();
 		ScenarioImpl scenarioData = loader.getScenario();
 

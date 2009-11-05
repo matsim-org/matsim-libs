@@ -27,7 +27,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.yu.analysis.PtCheck2;
 
@@ -37,7 +37,7 @@ public class PtCheckTest {
 		final String netFilename = "./test/yu/test/input/network.xml";
 		final String plansFilename = "./test/yu/test/input/10pctZrhCarPt100.plans.xml.gz";
 		final String ptcheckFilename = "./test/yu/test/output/ptCheck100.10pctZrhCarPt.txt";
-		new ScenarioLoader("./test/yu/test/configPtcheckTest.xml")
+		new ScenarioLoaderImpl("./test/yu/test/configPtcheckTest.xml")
 				.loadScenario().getConfig();
 
 		NetworkLayer network = new NetworkLayer();

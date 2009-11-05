@@ -51,7 +51,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.PersonAlgorithm;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType;
@@ -286,7 +286,7 @@ public class MyRuns {
 	}
 	
 	public static void setPlansToSameDepTime(Config config) {
-		ScenarioLoader loader = new ScenarioLoader(config);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadScenario();
 		
 		ScenarioImpl scenario = loader.getScenario();

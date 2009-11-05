@@ -31,7 +31,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ArgumentParser;
 
 /**
@@ -110,7 +110,7 @@ public class InitRoutes {
 
 	public void run(final String[] args) {
 		parseArguments(args);
-		ScenarioLoader sl = new ScenarioLoader(this.configfile);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
 		sl.loadNetwork();
 		NetworkLayer network = sl.getScenario().getNetwork();
 		this.config = sl.getScenario().getConfig();

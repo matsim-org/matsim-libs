@@ -3,7 +3,7 @@ package org.matsim.signalsystems;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 
@@ -16,7 +16,7 @@ public class CalculateAngleTest extends MatsimTestCase {
 	public void testCalculateAngle() {
 		Config conf = loadConfig(this.getClassInputDirectory() + "config.xml");
 		ScenarioImpl data = new ScenarioImpl(conf);
-		ScenarioLoader loader = new ScenarioLoader(data);
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(data);
 		loader.loadNetwork();
 
 		assertEquals("Has to be 'null', since there is no other way back but Link 11.",

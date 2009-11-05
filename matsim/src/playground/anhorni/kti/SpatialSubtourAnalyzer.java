@@ -20,7 +20,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioLoader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -36,7 +36,7 @@ public class SpatialSubtourAnalyzer extends AbstractPersonAlgorithm {
 	
 	public static void main(final String[] args) {
 		
-		ScenarioLoader sl = new ScenarioLoader(args[0]);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 
 		log.info("loading facilities...");
 		sl.loadActivityFacilities();
