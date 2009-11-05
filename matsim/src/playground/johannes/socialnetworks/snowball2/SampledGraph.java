@@ -21,7 +21,9 @@ package playground.johannes.socialnetworks.snowball2;
 
 import java.util.Set;
 
+import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 
 
 /**
@@ -30,8 +32,8 @@ import org.matsim.contrib.sna.graph.Graph;
  */
 public interface SampledGraph extends Graph {
 
-	public Set<? extends SampledVertex> getVertices();
+	public Set<? extends Vertex> getVertices();
 
-	public Set<? extends SampledEdge> getEdges();
+	public Set<? extends Edge> getEdges();
 
 }

@@ -32,7 +32,7 @@ public interface SampledVertex extends Vertex {
 
 	public List<? extends SampledEdge> getEdges();
 	
-	public List<? extends SampledVertex> getNeighbours();
+	public List<? extends Vertex> getNeighbours();
 	
 	public void detect(int iteration);
 	

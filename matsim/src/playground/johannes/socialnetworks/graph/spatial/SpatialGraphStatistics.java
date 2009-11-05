@@ -34,6 +34,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.SparseEdge;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -68,7 +69,7 @@ public class SpatialGraphStatistics {
 	public static Distribution edgeLengthDistribution(Set<? extends SpatialVertex> vertices) {
 		Distribution stats = new Distribution();
 		for(SpatialVertex v1 : vertices) {
-			for(SpatialEdge e : v1.getEdges())
+			for(Edge e : v1.getEdges())
 				stats.add(((SpatialSparseEdge)e).length());
 		}
 		
@@ -83,7 +84,7 @@ public class SpatialGraphStatistics {
 		int count = 0;
 		for(SpatialVertex v1 : vertices) {
 			Zone z_i = zones.getZone(v1.getCoordinate());
-			for(SpatialEdge e : v1.getEdges()) {
+			for(Edge e : v1.getEdges()) {
 				SpatialSparseVertex v2 = (SpatialSparseVertex) e.getOpposite(v1);
 				Zone z_j = zones.getZone(v2.getCoordinate());
 				if(z_i != null && z_j != null)
@@ -382,7 +383,7 @@ public class SpatialGraphStatistics {
 		TObjectDoubleHashMap<SpatialVertex> d_distr = new TObjectDoubleHashMap<SpatialVertex>();
 		for(SpatialVertex v : vertices) {
 			double sum = 0;
-			for(SpatialEdge e : v.getEdges())
+			for(Edge e : v.getEdges())
 				sum += ((SpatialSparseEdge)e).length();
 			d_distr.put(v, sum/(double)v.getNeighbours().size());
 		}

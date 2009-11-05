@@ -30,7 +30,7 @@ import playground.johannes.socialnetworks.snowball2.SampledVertex;
  */
 public interface SampledSpatialVertex extends SampledVertex, SpatialVertex {
 
-	public List<? extends SampledSpatialVertex> getNeighbours();
+	public List getNeighbours();
 	
 	public List<? extends SampledSpatialEdge> getEdges();
 	

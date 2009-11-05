@@ -21,6 +21,8 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 
 import java.util.Set;
 
+import org.matsim.contrib.sna.graph.Edge;
+
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.SampledGraph;
 

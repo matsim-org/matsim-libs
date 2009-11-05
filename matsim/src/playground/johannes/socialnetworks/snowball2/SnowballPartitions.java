@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.contrib.sna.graph.Vertex;
+
 /**
  * @author illenberger
  *
@@ -39,9 +41,9 @@ public class SnowballPartitions {
 	}
 	public static Set<SampledVertex> createSampledPartition(SampledGraph g, int itertation) {
 		Set<SampledVertex> vertices = new HashSet<SampledVertex>();
-		for(SampledVertex vertex : g.getVertices()) {
-			if(vertex.getIterationSampled() == itertation)
-				vertices.add(vertex);
+		for(Vertex vertex : g.getVertices()) {
+			if(((SampledVertex) vertex).getIterationSampled() == itertation)
+				vertices.add((SampledVertex) vertex);
 		}
 		return vertices;
 	}

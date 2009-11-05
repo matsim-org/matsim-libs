@@ -21,7 +21,9 @@ package playground.johannes.socialnetworks.graph.spatial;
 
 import java.util.Set;
 
+import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.Vertex;
 
 
 /**
@@ -30,7 +32,7 @@ import org.matsim.contrib.sna.graph.Graph;
  */
 public interface SpatialGraph extends Graph {
 
-	public Set<? extends SpatialVertex> getVertices();
+	public Set<? extends Vertex> getVertices();
 	
-	public Set<? extends SpatialEdge> getEdges();
+	public Set<? extends Edge> getEdges();
 }

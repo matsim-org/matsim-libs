@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.contrib.sna.graph.Edge;
+
 import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
@@ -39,7 +41,7 @@ public class Distance<V extends SpatialVertex> {
 			for(int i = 0; i < v.getEdges().size(); i++) {
 				SpatialVertex v_j = v.getNeighbours().get(i);
 				if(pending.contains(v_j))
-					distribution.add(v.getEdges().get(i).length());
+					distribution.add(((SpatialEdge) v.getEdges().get(i)).length());
 			}
 			
 			pending.remove(v);
@@ -53,8 +55,8 @@ public class Distance<V extends SpatialVertex> {
 		
 		for(V v_i : vertices) {
 			double sum = 0;
-			for(SpatialEdge e : v_i.getEdges()) {
-				sum += e.length();
+			for(Edge e : v_i.getEdges()) {
+				sum += ((SpatialEdge) e).length();
 			}
 			distribution.add(sum);
 		}
