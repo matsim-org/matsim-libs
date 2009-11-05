@@ -24,8 +24,6 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.SAXException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.ScenarioLoader;
@@ -47,6 +45,7 @@ import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.world.MatsimWorldReader;
+import org.xml.sax.SAXException;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -81,21 +80,14 @@ public class ScenarioLoaderImpl implements ScenarioLoader {
 	}
 
 	public ScenarioLoaderImpl(String configFilename) {
-		this(configFilename, new ScenarioImpl());
-	}
-
-	/**
-	 * Loads the config from the file into the config set in the
-	 * scenario and initializes the ScenarioLoader.
-	 */
-	public ScenarioLoaderImpl(String configFilename, Scenario sc) {
-		this.config = sc.getConfig();
+		this.scenario = new ScenarioImpl();
+		this.config = this.scenario.getConfig();
 		MatsimConfigReader reader = new MatsimConfigReader(this.config);
 		reader.readFile(configFilename);
 		Gbl.setConfig(this.config);
 		MatsimRandom.reset(config.global().getRandomSeed());
-		this.setScenario(sc);
 	}
+
 
 	protected void setScenario(Scenario sc){
 		this.scenario = sc;
