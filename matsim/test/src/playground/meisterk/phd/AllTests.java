@@ -18,25 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk;
+package playground.meisterk.phd;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import playground.meisterk.org.matsim.analysis.CalcLegTimesKTITest;
 
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.meisterk");
+		TestSuite suite = new TestSuite("Tests for playground.meisterk.phd");
 		//$JUnit-BEGIN$
-		suite.addTest(playground.meisterk.org.matsim.config.groups.AllTests.suite());
-		suite.addTest(playground.meisterk.org.matsim.population.algorithms.AllTests.suite());
-		suite.addTest(playground.meisterk.kti.AllTests.suite());
-		suite.addTest(playground.meisterk.phd.AllTests.suite());
-		suite.addTestSuite(CalcLegTimesKTITest.class);
+		suite.addTestSuite(GenerateEquilPopulationsTest.class);
 		//$JUnit-END$
 		return suite;
 	}
-
 
 }

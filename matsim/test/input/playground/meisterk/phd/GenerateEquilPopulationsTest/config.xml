@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="test/scenarios/equil/network.xml" />
+	</module>
+
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="test/scenarios/equil/facilities.xml" />
+	</module>
+
+</config>

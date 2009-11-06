@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * GenerateEquilPopulations.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,25 +18,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk;
+package playground.meisterk.phd;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import playground.meisterk.org.matsim.analysis.CalcLegTimesKTITest;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.basic.v01.IdImpl;
 
-public class AllTests {
+public class GenerateEquilPopulations {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.meisterk");
-		//$JUnit-BEGIN$
-		suite.addTest(playground.meisterk.org.matsim.config.groups.AllTests.suite());
-		suite.addTest(playground.meisterk.org.matsim.population.algorithms.AllTests.suite());
-		suite.addTest(playground.meisterk.kti.AllTests.suite());
-		suite.addTest(playground.meisterk.phd.AllTests.suite());
-		suite.addTestSuite(CalcLegTimesKTITest.class);
-		//$JUnit-END$
-		return suite;
+	public static final int NUM_AGENTS = 4000;
+	
+	public GenerateEquilPopulations() {
+		// TODO Auto-generated constructor stub
 	}
 
+	protected void generateRandomCarOnly(ScenarioImpl scenario) {
+		
+		Population pop = scenario.getPopulation();
+		PopulationFactory popFactory = pop.getFactory();
 
+		ActivityFacilities facilities = scenario.getActivityFacilities();
+		
+		Person person = null;
+		Plan plan = null;
+		Activity act = null;
+		for (int ii=0; ii < NUM_AGENTS; ii++) {
+			
+			person = popFactory.createPerson(new IdImpl(ii));
+			pop.addPerson(person);
+			
+			plan = popFactory.createPlan();
+			person.addPlan(plan);
+			plan.setSelected(true);
+			
+			act = popFactory.createActivityFromCoord("h", facilities.getFacilities().get(new IdImpl(1)).getCoord());
+			plan.addActivity(act);
+		}
+		
+	}
+	
 }
