@@ -57,7 +57,7 @@ public class FloodLineShape {
 //			fr.setReadTriangles(true);
 			FloodingLine fl = new FloodingLine(fr);
 			int singletons = 0;
-			for (int i = 0; i <= 120; i += 1) {
+			for (int i = 0; i <= 50; i += 1) {
 				List<ArrayList<Coordinate>> allCoords = fl.getFloodLine(i);
 				for (ArrayList<Coordinate> coords : allCoords) {
 	

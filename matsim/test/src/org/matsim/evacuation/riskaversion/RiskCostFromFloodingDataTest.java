@@ -50,33 +50,72 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		double delta = Math.pow(10, -6);
 		
 		//// travel costs
+	
+		
+		//baseCost = 3 *3600
+		
+
+		
 		//test 2 links within flooding area
-		//Link 11288 cost = 33703318.3116002
+		// nodeCost = baseCost-nodeFloodTime 
+		
+		//Link 11288 cost = 28044.9329790229
+		// fromNodeTime = 35.54864794603423333333
+		// fromNodeCost = baseCost - 60 * fromNodeTime = 8667.081123237946
+		// toNodeTime = 33.04903456966766666666
+		// tNodeCost = baseCost - 60 * fromNodeTime = 8817.05792581994
+		// linkLength = 318.075861755381
+		// linkCost = 8667.081123237946 * linkLength / 100 = 28044.9329790229
 		LinkImpl l0 = sc.getNetwork().getLink(new IdImpl("11288"));
 		double l0Cost = rcf.getLinkTravelCost(l0,Time.UNDEFINED_TIME);
-		assertEquals(33703318.3116002,l0Cost,delta);
+		assertEquals(28044.9329790229,l0Cost,delta);
 		
 		//Link 111288 cost = 0. (opposite direction)
+		// fromNodeTime = 33.04903456966766666666
+		// toNodeTime = 35.54864794603423333333
+		// fromNodeTime < toNodeTime --> linkCost = 0
 		LinkImpl l0Inverse = sc.getNetwork().getLink(new IdImpl("111288"));
 		double l0InverseCost = rcf.getLinkTravelCost(l0Inverse,Time.UNDEFINED_TIME);
 		assertEquals(0,l0InverseCost,delta);
 		
+		
+		//bufferSize = 250
+		
 		//test 2 links within buffer
-		//Link 9204 cost = 124442.470964684
+		// nodeCost = baseCost/2 * (1 - (nodeFloodDist/bufferSize))
+		
+		//Link 9204 cost = 124.44247096468449
+		// fromNodeDist = 223.12500852607877
+		// fromNodeCost =  3 * 3600 / 2 * (1 -(223.12500852607877/250)) = 580.4998158366984
+		// toNodeDist = 212.98510568617348
+		// toNodeCost = 3 * 3600 / 2 * (1 -(212.98510568617348 /250)) = 799.5217171786527
+		// fromNodeCost < toNodeCost
+		// linkLength = 15.5646142300945
+		// linkCost = toNodeCost * linkLength / 100 = 124.44247096468449
 		LinkImpl l1 = sc.getNetwork().getLink(new IdImpl("9204"));
 		double l1Cost = rcf.getLinkTravelCost(l1,Time.UNDEFINED_TIME);
-		assertEquals(124442.470964684,l1Cost,delta);
+		assertEquals(124.44247096468449,l1Cost,delta);
 		
 		//Link 109204 cost = 0. (opposite direction)
+		// toNodeDist = 223.125
+		// toNodeCost =  3 * 3600 / 2 * (1 -(223.125 /250)) --> 580.4998158366984
+		// fromNodeDist = 212.985
+		// ffromNodeCost = 3 * 3600 / 2 * (1 -(223.125 /250)) --> ca. 799.5
+		// toNodeCost < fromNodeCost --> linkCost = 0
 		LinkImpl l1Inverse = sc.getNetwork().getLink(new IdImpl("109204"));
 		double l1InverseCost = rcf.getLinkTravelCost(l1Inverse,Time.UNDEFINED_TIME);
 		assertEquals(0,l1InverseCost,delta);
 		
 		//test 2 links at the edge of the buffer
-		//Link 6798 cost = 497605.266434762
+		//Link 6798 cost = 497.60526643476226
+		// toNodeDist = 223.125
+		// toNodeCost =  3 * 3600 / 2 * (1 -(223.125 /250)) --> 580.4998158366984
+		// fromNode = null
+		// linkLength = 85.7201419982439
+		// linkCost = toNodeCost * linkLength / 100 = 497.60526643476226
 		LinkImpl l2 = sc.getNetwork().getLink(new IdImpl("6798"));
 		double l2Cost = rcf.getLinkTravelCost(l2,Time.UNDEFINED_TIME);
-		assertEquals(497605.266434762,l2Cost,delta);
+		assertEquals(497.60526643476226,l2Cost,delta);
 		
 		//Link 106798 cost = 0. (opposite direction)
 		LinkImpl l2Inverse = sc.getNetwork().getLink(new IdImpl("106798"));
@@ -91,15 +130,15 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		double refCost = 0.;
 		
 		events.processEvent(new LinkEnterEventImpl(0.,id,l0.getId()));
-		refCost += 33703318.3116002 / -600.;
+		refCost += 28044.9329790229 / -600.;
 		events.processEvent(new LinkEnterEventImpl(0.,id,l0Inverse.getId()));
 		refCost += 0.;
 		events.processEvent(new LinkEnterEventImpl(0.,id,l1.getId()));
-		refCost += 124442.470964684 / -600.;
+		refCost += 124.44247096468449 / -600.;
 		events.processEvent(new LinkEnterEventImpl(0.,id,l1Inverse.getId()));
 		refCost += 0.;
 		events.processEvent(new LinkEnterEventImpl(0.,id,l2.getId()));
-		refCost += 497605.266434762 / -600.;
+		refCost += 497.60526643476226 / -600.;
 		events.processEvent(new LinkEnterEventImpl(0.,id,l2Inverse.getId()));
 		refCost += 0.;
 		
