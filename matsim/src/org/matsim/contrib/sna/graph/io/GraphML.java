@@ -18,16 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.contrib.sna.graph.io;
 
-import playground.johannes.socialnetworks.graph.io.GraphMLWriter;
-
-
 /**
- * Constants used by {@link AbstractGraphMLReader} and {@link GraphMLWriter}.
+ * Constants used by {@link AbstractGraphMLReader} and {@link playground.johannes.socialnetworks.grpah.io.GraphMLWriter}.
  * 
  * @author illenberger
  * 
