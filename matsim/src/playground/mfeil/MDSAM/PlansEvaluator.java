@@ -34,7 +34,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategyModule;
-import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.FixedRouteLegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
