@@ -20,16 +20,19 @@
 
 package playground.balmermi.toggenburg;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
-import playground.balmermi.datapuls.modules.FacilitiesWriteTables;
-import playground.balmermi.datapuls.modules.PopulationWriteTable;
-import playground.balmermi.toggenburg.modules.FacilitiesCount;
+import playground.balmermi.toggenburg.modules.PopulationAnalysis;
 
 
 public class Analysis {
@@ -40,6 +43,33 @@ public class Analysis {
 
 	private final static Logger log = Logger.getLogger(Analysis.class);
 
+	
+	//////////////////////////////////////////////////////////////////////
+	// parse File 
+	//////////////////////////////////////////////////////////////////////
+
+	private static final Set<IdImpl> setLinkSet(String infile) {
+		Set<IdImpl> linkSet = new HashSet<IdImpl>();
+		try {
+			FileReader fr = new FileReader(infile);
+			BufferedReader br = new BufferedReader(fr);
+
+			// Skip header
+			String curr_line = br.readLine();
+			while ((curr_line = br.readLine()) != null) {
+				String[] entries = curr_line.split("\t", -1);
+				// LinkId
+				// 0
+				IdImpl linkId = new IdImpl(entries[0]);
+				linkSet.add(linkId);
+			}
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+		
+		return linkSet;
+	}
+	
 	//////////////////////////////////////////////////////////////////////
 	// main
 	//////////////////////////////////////////////////////////////////////
@@ -56,12 +86,6 @@ public class Analysis {
 		log.info("=> "+outdir);
 		log.info("done.");
 		
-		FacilitiesCount fc = new FacilitiesCount(); 
-		
-		// Analyze facilities
-		fc.run(scenario.getActivityFacilities());
-		
-		// Analyze sinlge facility (it's a stupid example)
-		fc.run(scenario.getActivityFacilities().getFacilities().values().iterator().next());
+		new PopulationAnalysis().run(scenario.getPopulation(),setLinkSet(args[1]));
 	}
 }
