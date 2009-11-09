@@ -43,7 +43,7 @@ public class PersonEntersVehicleEventImpl extends PersonEventImpl implements Bas
 		this.vehicleId = vehicle.getId();
 	}
 
-	public PersonEntersVehicleEventImpl(final double time, final Id personId, final Id vehicleId) {
+	/* package */ PersonEntersVehicleEventImpl(final double time, final Id personId, final Id vehicleId) {
 		super(time, personId);
 		this.vehicleId = vehicleId;
 	}
