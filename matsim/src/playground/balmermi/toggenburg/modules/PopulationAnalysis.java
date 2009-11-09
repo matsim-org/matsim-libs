@@ -43,7 +43,7 @@ public class PopulationAnalysis {
 		int count = 0;
 		for (int i=0; i<stats.length; i++) { stats[i] = 0; }
 		for (PersonImpl p : population.getPersons().values()) {
-			boolean analyse = false;
+			boolean analyse = true;
 			List<PlanElement> e = p.getSelectedPlan().getPlanElements();
 			for (int i=0; i<e.size(); i++) {
 				if (i%2==0) {
@@ -54,7 +54,7 @@ public class PopulationAnalysis {
 					}
 				}
 				else {
-					LegImpl l = (LegImpl)e.get(i-1);
+					LegImpl l = (LegImpl)e.get(i);
 					if (l.getRoute() instanceof NetworkRouteWRefs) {
 						NetworkRouteWRefs ll = (NetworkRouteWRefs)l.getRoute();
 						for (Id lid : ll.getLinkIds()) {
