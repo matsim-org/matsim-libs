@@ -12,7 +12,7 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="src/playground/mmoyo/demo/X5/simplePlan2/output_plans.xml" />
+		<param name="inputPlansFile" value="src/playground/mmoyo/demo/X5/transfer/output_plans.xml" />
 	</module>
 
 	<module name="controler">

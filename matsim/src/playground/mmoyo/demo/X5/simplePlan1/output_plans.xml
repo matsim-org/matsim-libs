@@ -22,7 +22,7 @@
 			<act type="transitInteraction" end_time="00:00:00" link="22" />
 			<leg mode="car" >
 				<route>
-					15
+					15 16
 				</route>
 			</leg>
 			<act type="w" link="12"  />

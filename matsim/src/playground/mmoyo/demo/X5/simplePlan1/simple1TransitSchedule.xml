@@ -25,11 +25,10 @@
 		<transitRoute id="Blue Route 0_20">
 			<transportMode>pt</transportMode>
 			<routeProfile>
-				<stop refId="stop1" arrivalOffset="00:00:20" departureOffset="00:00:25"/>
-				<stop refId="stop2" arrivalOffset="00:00:40" departureOffset="00:00:45"/>
-				<stop refId="stop3" arrivalOffset="00:01:00" departureOffset="00:01:05"/>
-				<stop refId="stop4" arrivalOffset="00:01:20" departureOffset="00:01:25"/>
-				<stop refId="stop5" arrivalOffset="00:01:40" departureOffset="00:01:40"/>
+				<stop refId="stop1" arrivalOffset="00:00:00" departureOffset="00:00:00"/>
+				<stop refId="stop2" arrivalOffset="00:00:20" departureOffset="00:00:25"/>
+				<stop refId="stop3" arrivalOffset="00:00:40" departureOffset="00:00:45"/>
+				<stop refId="stop4" arrivalOffset="00:01:00" departureOffset="00:01:00"/>
 			</routeProfile>
 			<route>
 				<link refId="20"/>
@@ -37,13 +36,10 @@
 				<link refId="22"/>
 				<link refId="23"/>
 			</route>
-			
 			<departures>
 				<departure id="Blue0800" departureTime="08:00:00" vehicleRefId="tr_1" />
 				<departure id="Blue0805" departureTime="08:05:00" vehicleRefId="tr_2" />
 			</departures>
 		</transitRoute>
 	</transitLine>
-	
-	
 </transitSchedule>
