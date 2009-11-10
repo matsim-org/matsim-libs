@@ -306,8 +306,8 @@ public class PlanomatConfigGroup extends Module {
 		return PlanomatConfigGroup.TripStructureAnalysisLayerOption.valueOf(PlanomatConfigGroup.PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.getActualValue());
 	}
 
-	public void setTripStructureAnalysisLayer(String str) {
-		PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.setActualValue(PlanomatConfigGroup.TripStructureAnalysisLayerOption.valueOf(str).toString());
+	public void setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption newValue) {
+		PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.setActualValue(newValue.toString());
 	}
 
 }

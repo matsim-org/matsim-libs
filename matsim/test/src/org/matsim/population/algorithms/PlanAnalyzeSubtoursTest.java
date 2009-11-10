@@ -35,7 +35,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.Layer;
@@ -59,7 +58,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		
-		config.planomat().setTripStructureAnalysisLayer("link");
+		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
 		this.runDemo(network, config);
 	}
 	
@@ -68,7 +67,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 
-		config.planomat().setTripStructureAnalysisLayer("facility");
+		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility);
 		this.runDemo(facilities, config);
 	}
 	

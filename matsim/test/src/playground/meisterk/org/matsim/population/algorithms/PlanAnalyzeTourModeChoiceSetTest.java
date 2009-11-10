@@ -93,7 +93,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		log.info("Reading network xml file...done.");
 
 		// config
-		this.config.planomat().setTripStructureAnalysisLayer("link");
+		this.config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
 
 		// run
 		this.runDemo((Layer) network);
@@ -404,7 +404,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		log.info("Reading network xml file...done.");
 
 		// config
-		this.config.planomat().setTripStructureAnalysisLayer("link");
+		this.config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
 
 		String facString = "1 2 3 4 3 2 1";
 		PlanImpl testPlan = this.generateTestPlan(facString, network);

@@ -51,6 +51,36 @@ public class GenerateEquilPopulationsTest extends MatsimTestCase {
 
 	public void testGenerateRandomCarOnly() {
 		
+		// perform random initial demand generation wrt modes and times with planomat
+		Config config = scenario.getConfig();
+		// - set the population size to 1, so there is no sample of the initial random solutions the best individual would be chosen of
+		config.planomat().setPopSize(1);
+		// - set the number of generations to 0 (so only the random initialization, and no optimization takes place)
+		config.planomat().setJgapMaxGenerations(0);
+		// - set possible modes such that only "car" mode is generated
+		config.planomat().setPossibleModes("car");
+
+		this.runATest();
+		
+	}
+	
+	public void testGenerateRandomCarPt() {
+		
+		// perform random initial demand generation wrt modes and times with planomat
+		Config config = scenario.getConfig();
+		// - set the population size to 1, so there is no sample of the initial random solutions the best individual would be chosen of
+		config.planomat().setPopSize(1);
+		// - set the number of generations to 0 (so only the random initialization, and no optimization takes place)
+		config.planomat().setJgapMaxGenerations(0);
+		// - set possible modes such that "car" and "pt" mode legs are generated
+		config.planomat().setPossibleModes("car,pt");
+
+		this.runATest();
+		
+	}
+	
+	private void runATest() {
+
 		GenerateEquilPopulations testee = new GenerateEquilPopulations();
 		
 		testee.generateRandomCarOnly(scenario);

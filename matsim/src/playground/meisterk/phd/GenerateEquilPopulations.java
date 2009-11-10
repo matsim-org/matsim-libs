@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -81,14 +82,9 @@ public class GenerateEquilPopulations {
 			plan.addActivity(act);
 		}
 		
-		// perform random initial demand generation wrt modes and times with planomat
 		Config config = scenario.getConfig();
-		// - set the population size to 1, so there is no sample of the initial random solutions the best individual would be chosen of
-		config.planomat().setPopSize(1);
-		// - set the number of generations to 0 (so only the random initialization, and no optimization takes place)
-		config.planomat().setJgapMaxGenerations(0);
-		// - set possible modes such that only "car" mode is generated
-		config.planomat().setPossibleModes("car");
+		// no activity facilities are used here
+		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
 		
 		EventsManagerImpl emptyEvents = new EventsManagerImpl();
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
