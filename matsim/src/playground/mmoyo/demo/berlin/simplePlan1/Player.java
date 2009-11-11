@@ -11,7 +11,7 @@ public class Player {
 		//invoke controler first
 		
 		String configFile = "src/playground/mmoyo/demo/berlin/simplePlan1/config.xml";
-		String scheduleFile =  "../shared-svn/studies/countries/de/berlin-bvg09/pt/baseplan_900s_smallnetwork/transitSchedule.networkOevModellBln.xml.gz";
+		String scheduleFile =  "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/simpleTransitSchedule.xml";
 		ScenarioPlayer.main(new String[]{configFile, scheduleFile});
 	}
 }

@@ -5,7 +5,7 @@
 
 <!-- ====================================================================== -->
 
-	<person id="1">
+	<person id="passenger">
 		<plan selected="yes">
 			<act type="h" link="5480" x="4593596.929982451" y="5822001.0" start_time="00:00:00" dur="10:02:16" end_time="10:02:16" />
 			<leg mode="walk" trav_time="00:02:25">
