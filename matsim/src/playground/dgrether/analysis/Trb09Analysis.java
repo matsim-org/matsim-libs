@@ -34,9 +34,9 @@ import playground.dgrether.analysis.charts.DgAvgDeltaUtilsQuantilesChart;
 import playground.dgrether.analysis.charts.DgDeltaUtilsModeGroupChart;
 import playground.dgrether.analysis.charts.DgMixedDeltaUtilsModeGroupChart;
 import playground.dgrether.analysis.charts.DgMixedModeSwitcherOnlyDeltaScoreIncomeModeChoiceChart;
+import playground.dgrether.analysis.charts.DgModalSplitDiffQuantilesChart;
 import playground.dgrether.analysis.charts.DgModalSplitGroupChart;
 import playground.dgrether.analysis.charts.DgModalSplitQuantilesChart;
-import playground.dgrether.analysis.charts.utils.DgChartFrame;
 import playground.dgrether.analysis.charts.utils.DgChartWriter;
 import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
 import playground.dgrether.analysis.io.DgHouseholdsAnalysisReader;
@@ -55,13 +55,13 @@ public class Trb09Analysis {
 		String netfile, plans1file, plans2file, housholdsfile;
 		int threshold;
 		
-		boolean isTestscenario = true;
-		String runNumber1 = "860";
-		String runNumber2 = "863";
+//		boolean isTestscenario = true;
+//		String runNumber1 = "860";
+//		String runNumber2 = "861";
 		
-//		boolean isTestscenario = false;		
-//		String runNumber1 = "749";
-//		String runNumber2 = "867";
+		boolean isTestscenario = false;		
+		String runNumber1 = "749";
+		String runNumber2 = "869";
 		
 		String runid1 = "run" + runNumber1;
 		String runid2 = "run" + runNumber2;
@@ -109,6 +109,7 @@ public class Trb09Analysis {
 		//quantile charts
 		String modalSplitQuantilesChartFileRun1 = DgPaths.RUNBASE + runid1 + "/"+runNumber1+"modalSplitQuantilesChart";
 		String modalSplitQuantilesChartFileRun2 = DgPaths.RUNBASE + runid2 + "/"+runNumber2+"modalSplitQuantilesChart";
+		String modalSplitDiffQuantilesChartFileRun2 = DgPaths.RUNBASE + runid2 + "/modalSplitQuantilesChart" + runNumber1 + "vs" +runNumber2;
 
 		String avgDeltaUtilsQuantilesChartFile = DgPaths.RUNBASE + runid2 + "/avgDeltaUtilsQuantilesChart" + runNumber1 + "vs" + runNumber2;
 		String avgDeltaUtilsModeQuantilesChartFile = DgPaths.RUNBASE + runid2 + "/avgDeltaUtilsModeQuantilesChart"+runNumber1+"vs"+runNumber2;
@@ -132,8 +133,9 @@ public class Trb09Analysis {
 		DgModalSplitGroupChart modalSplitGroupChartRun2 = new DgModalSplitGroupChart(ana, DgAnalysisPopulation.RUNID2, threshold);
 		DgChartWriter.writeChart(modalSplitGroupChartFileRun2, modalSplitGroupChartRun2.createChart());
 
+		
 		DgDeltaUtilsModeGroupChart deltaUtilsModeGroupChart = new DgDeltaUtilsModeGroupChart(ana);
-		DgChartFrame frame = new DgChartFrame("test", deltaUtilsModeGroupChart.createChart());
+//		DgChartFrame frame = new DgChartFrame("test", deltaUtilsModeGroupChart.createChart());
 		DgChartWriter.writeChart(deltaUtilsModeGroupChartFile, deltaUtilsModeGroupChart.createChart());
 
 		DgAvgDeltaUtilsGroupChart avgDeltaUtilsGroupChart = new DgAvgDeltaUtilsGroupChart(ana, threshold);
@@ -157,7 +159,11 @@ public class Trb09Analysis {
 		DgModalSplitQuantilesChart modalSplitQuantilesChartRun2 = new DgModalSplitQuantilesChart(ana, DgAnalysisPopulation.RUNID2);
 		DgChartWriter.writeChart(modalSplitQuantilesChartFileRun2, modalSplitQuantilesChartRun2.createChart());
 
+		DgModalSplitDiffQuantilesChart modalSplitDiffQuantilesChartRun2 = new DgModalSplitDiffQuantilesChart(ana, DgAnalysisPopulation.RUNID1,  DgAnalysisPopulation.RUNID2);
+//		DgChartFrame frame = new DgChartFrame("test", modalSplitDiffQuantilesChartRun2.createChart());
+		DgChartWriter.writeChart(modalSplitDiffQuantilesChartFileRun2, modalSplitDiffQuantilesChartRun2.createChart());
 
+		
 		DgAvgDeltaUtilsQuantilesChart avgDeltaUtilsQuantilesChart = new DgAvgDeltaUtilsQuantilesChart(ana);
 //					DgChartFrame frame = new DgChartFrame("test", avgDeltaUtilsQuantilesChart.createChart());
 		DgChartWriter.writeChart(avgDeltaUtilsQuantilesChartFile, avgDeltaUtilsQuantilesChart.createChart());

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis.charts;
+package playground.dgrether.analysis.charts.utils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,11 +32,11 @@ import org.jfree.data.xy.XYDataset;
  * @author dgrether
  *
  */
-public class DgLabelGenerator extends AbstractXYItemLabelGenerator
+public class DgXYLabelGenerator extends AbstractXYItemLabelGenerator
 implements XYItemLabelGenerator {
 	private Map<Integer, List<String>> labels = new HashMap<Integer, List<String>>();
 
-	public DgLabelGenerator() {
+	public DgXYLabelGenerator() {
 		
 	}
 

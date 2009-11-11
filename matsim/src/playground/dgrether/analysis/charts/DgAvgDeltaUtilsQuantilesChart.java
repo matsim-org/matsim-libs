@@ -35,6 +35,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.dgrether.analysis.charts.utils.DgColorScheme;
+import playground.dgrether.analysis.charts.utils.DgXYLabelGenerator;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
 import playground.dgrether.analysis.population.DgPersonDataIncomeComparator;
 
@@ -55,11 +56,11 @@ public class DgAvgDeltaUtilsQuantilesChart {
 	
 	private DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();
 
-	private DgLabelGenerator labelGenerator;
+	private DgXYLabelGenerator labelGenerator;
 	
 	public DgAvgDeltaUtilsQuantilesChart(DgAnalysisPopulation ana) {
 		this.ana = ana;
-		this.labelGenerator = new DgLabelGenerator();
+		this.labelGenerator = new DgXYLabelGenerator();
 		this.dataset = this.createDatasets();
 	}
 	
@@ -74,7 +75,7 @@ public class DgAvgDeltaUtilsQuantilesChart {
 			Double avgScore = p.calcAverageScoreDifference(DgAnalysisPopulation.RUNID1, DgAnalysisPopulation.RUNID2);
 			p.calculateIncomeData();
 			income += p.getTotalIncome();
-			double incomeLocation = i/this.nQuantiles;
+			double incomeLocation = 100.0 * i/this.nQuantiles;
 			series.add(incomeLocation, avgScore);
 			labels.add("Groupsize: " + p.getPersonData().size());
 		}
@@ -93,10 +94,12 @@ public class DgAvgDeltaUtilsQuantilesChart {
 	
 	public JFreeChart createChart() {
 		XYPlot plot = new XYPlot();
-		ValueAxis xAxis = this.axisBuilder.createValueAxis("Income [Chf / Year]");
-		xAxis.setRange(0.0, 1.0);
+		ValueAxis xAxis = this.axisBuilder.createValueAxis("% of Population Sorted by Income");
+		xAxis.setRange(0.0, 102.0);
 		ValueAxis yAxis = this.axisBuilder.createValueAxis("Delta Utils [Utils]");
-		yAxis.setRange(-0.3, 0.3);
+		yAxis.setRange(-0.05, 0.3);
+//		xAxis.setVisible(false);
+//		xAxis.setFixedAutoRange(1.0);
 		plot.setDomainAxis(xAxis);
 		plot.setRangeAxis(yAxis);
 		
@@ -105,7 +108,7 @@ public class DgAvgDeltaUtilsQuantilesChart {
 		XYItemRenderer renderer2;
 		renderer2 = new XYLineAndShapeRenderer(true, true);
 		renderer2.setSeriesItemLabelsVisible(0, true);
-		renderer2.setSeriesItemLabelGenerator(0, this.labelGenerator);
+//		renderer2.setSeriesItemLabelGenerator(0, this.labelGenerator);
 		plot.setDataset(0, this.dataset);
 		renderer2.setSeriesStroke(0, new BasicStroke(2.0f));
 		renderer2.setSeriesOutlineStroke(0, new BasicStroke(3.0f));
@@ -116,6 +119,7 @@ public class DgAvgDeltaUtilsQuantilesChart {
 		chart.setBackgroundPaint(ChartColor.WHITE);
 		chart.getLegend().setItemFont(this.axisBuilder.getAxisFont());
 		chart.setTextAntiAlias(true);
+		chart.removeLegend();
 		return chart;
 	}
 	

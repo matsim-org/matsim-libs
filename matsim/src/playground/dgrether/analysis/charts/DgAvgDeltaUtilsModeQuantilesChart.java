@@ -36,6 +36,7 @@ import org.matsim.core.utils.collections.Tuple;
 
 import playground.dgrether.analysis.charts.interfaces.DgXYChart;
 import playground.dgrether.analysis.charts.utils.DgColorScheme;
+import playground.dgrether.analysis.charts.utils.DgXYLabelGenerator;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
 import playground.dgrether.analysis.population.DgModeSwitchPlanTypeAnalyzer;
 import playground.dgrether.analysis.population.DgPersonDataIncomeComparator;
@@ -54,13 +55,13 @@ public class DgAvgDeltaUtilsModeQuantilesChart implements DgXYChart {
 	
 	protected DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();
 
-	private DgLabelGenerator labelGenerator;
+	private DgXYLabelGenerator labelGenerator;
 	private int threshold;
 
 	public DgAvgDeltaUtilsModeQuantilesChart(DgAnalysisPopulation ana, int threshold) {
 		this.ana = ana;
 		this.threshold = threshold;
-		this.labelGenerator = new DgLabelGenerator();
+		this.labelGenerator = new DgXYLabelGenerator();
 		this.dataset = this.createDatasets();
 	}
 	
@@ -76,6 +77,7 @@ public class DgAvgDeltaUtilsModeQuantilesChart implements DgXYChart {
 		for (DgAnalysisPopulation p : quantiles){
 			quantile++;
 			xLoc = quantile /this.nQuantiles;
+			xLoc*=100.0;
 			DgModeSwitchPlanTypeAnalyzer modeSwitchAnalysis = new DgModeSwitchPlanTypeAnalyzer(p);
 			DgAnalysisPopulation car2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.CAR, PlanImpl.Type.CAR));
 			DgAnalysisPopulation pt2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(PlanImpl.Type.PT, PlanImpl.Type.PT));
@@ -108,8 +110,10 @@ public class DgAvgDeltaUtilsModeQuantilesChart implements DgXYChart {
 
 	public JFreeChart createChart() {
 		XYPlot plot = new XYPlot();
-		ValueAxis xAxis = this.axisBuilder.createValueAxis("Income [Chf / Year]");
+		ValueAxis xAxis = this.axisBuilder.createValueAxis("% of Population Sorted by Income");
+		xAxis.setRange(0.0, 102.0);
 		ValueAxis yAxis = this.axisBuilder.createValueAxis("Delta Utils [Utils]");
+		yAxis.setRange(-0.05, 0.3);
 		plot.setDomainAxis(xAxis);
 		plot.setRangeAxis(yAxis);
 		

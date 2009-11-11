@@ -51,7 +51,7 @@ public class DgChartWriter {
 	public static void writeToPng(String filename, JFreeChart jchart) {
 		filename += ".png";
 		try {
-			ChartUtilities.saveChartAsPNG(new File(filename), jchart, 800, 600, null, true, 9);
+			ChartUtilities.saveChartAsPNG(new File(filename), jchart, 1200, 800, null, true, 9);
 			log.info("DeltaScoreIncomeChart written to : " +filename);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -66,7 +66,11 @@ public class DgChartWriter {
 			try{ /*read "try" as if (plot instanceof XYPlot)*/
 				XYPlot xy = chart.getXYPlot();
 				String yAxisLabel = xy.getRangeAxis().getLabel();
-				String xAxisLabel = xy.getDomainAxis().getLabel();
+				
+				String xAxisLabel = "";
+				if (xy.getDomainAxis() != null){
+					xAxisLabel = xy.getDomainAxis().getLabel();
+				}
 				String header = xAxisLabel + "\t " + yAxisLabel;
 				writer.write(header);
 				writer.newLine();

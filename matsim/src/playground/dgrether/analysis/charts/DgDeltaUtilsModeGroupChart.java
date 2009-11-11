@@ -75,7 +75,7 @@ public class DgDeltaUtilsModeGroupChart implements DgChart {
 			DgPlanData planDataRun1 = d.getPlanData().get(DgAnalysisPopulation.RUNID1);
 			DgPlanData planDataRun2 = d.getPlanData().get(DgAnalysisPopulation.RUNID2);
 			Double scoreDiff = planDataRun2.getScore() - planDataRun1.getScore();
-			Tuple<Double, Double> t = new Tuple<Double, Double>(i/size, scoreDiff);
+			Tuple<Double, Double> t = new Tuple<Double, Double>(100.0*i/size, scoreDiff);
 			
 			if (planDataRun1.getPlan().getType().equals(Type.CAR) && planDataRun2.getPlan().getType().equals(Type.CAR)) {
 				valuesCarCar.add(t);

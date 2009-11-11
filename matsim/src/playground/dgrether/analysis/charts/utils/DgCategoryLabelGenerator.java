@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgDefaultAxisFactory
+ * DgLabelGenerator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,51 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis.charts;
+package playground.dgrether.analysis.charts.utils;
 
-import java.awt.Font;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.labels.CategoryItemLabelGenerator;
+import org.jfree.data.category.CategoryDataset;
+import org.matsim.core.utils.collections.Tuple;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgDefaultAxisBuilder implements DgAxisBuilder {
-	
-	
-	private Font labelFont = new Font("Helvetica", Font.BOLD, 18);
-	private Font axisFont = new Font("Helvetica", Font.BOLD, 14);
-	
-	
-	public CategoryAxis createCategoryAxis(String xLabel) {
-		CategoryAxis categoryAxis = new CategoryAxis(xLabel);
-		categoryAxis.setCategoryMargin(0.05); // percentage of space between categories
-		categoryAxis.setLowerMargin(0.01); // percentage of space before first bar
-		categoryAxis.setUpperMargin(0.01); // percentage of space after last bar
-		categoryAxis.setLabelFont(labelFont);
-		categoryAxis.setTickLabelFont(axisFont);
-		return categoryAxis;
-	}
-	
-	public ValueAxis createValueAxis(String yLabel) {
-		ValueAxis valueAxis = new NumberAxis(yLabel);
-		valueAxis.setLabelFont(labelFont);
-		valueAxis.setTickLabelFont(axisFont);
-		return valueAxis;
+public class DgCategoryLabelGenerator 
+implements CategoryItemLabelGenerator {
+	private Map<Tuple<Integer, Integer>, String> labels = 
+		new HashMap<Tuple<Integer, Integer>, String>();
+
+	public DgCategoryLabelGenerator() {
 	}
 
-	
-	public Font getLabelFont() {
-		return labelFont;
+	public String generateColumnLabel(CategoryDataset dataset, int column) {
+		return null;
 	}
 
-	
-	public Font getAxisFont() {
-		return axisFont;
+	public String generateLabel(CategoryDataset dataset, int row, int column) {
+		return this.labels.get(new Tuple<Integer, Integer>(row, column));
+	}
+
+	public String generateRowLabel(CategoryDataset dataset, int row) {
+		return null;
+	}
+
+	public void addLabel(int row, int column, String value) {
+		this.labels.put(new Tuple<Integer, Integer>(row, column), value);
 	}
 
 }

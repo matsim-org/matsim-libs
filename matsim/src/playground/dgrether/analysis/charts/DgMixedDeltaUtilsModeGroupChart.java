@@ -53,10 +53,13 @@ public class DgMixedDeltaUtilsModeGroupChart {
 
 	public JFreeChart createChart() {
 		XYPlot plot = new XYPlot();
-		ValueAxis xAxis = this.axisBuilder.createValueAxis("Income [Chf / Year]");
+		ValueAxis xAxis = this.axisBuilder.createValueAxis("% of Population Sorted by Income");
 		ValueAxis yAxis = this.axisBuilder.createValueAxis("Delta Utils [Utils]");
 		plot.setDomainAxis(xAxis);
 		plot.setRangeAxis(yAxis);
+		//RANGE
+		xAxis.setRange(0.0, 102.0);
+		yAxis.setRange(-0.31, 0.61);
 		
 		DgColorScheme colorScheme = new DgColorScheme();
 		
