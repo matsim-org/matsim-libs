@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -75,7 +76,17 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 			boolean keepPlan = false;
 
 			for (PlanElement planElement : plan.getPlanElements()) {
-				if(planElement instanceof LegImpl){
+				
+				if(planElement instanceof ActivityImpl){
+					
+					double actX = ((ActivityImpl) planElement).getCoord().getX();
+					double actY = ((ActivityImpl) planElement).getCoord().getY();
+					if(actX >= this.xyMin.getX() && actX <= this.xyMax.getX() && actY >= this.xyMin.getY() && actY <= this.xyMax.getY()){
+						keepPlan = true;
+						break;
+					}				
+					
+				} else if(planElement instanceof LegImpl){
 					if(((LegImpl) planElement).getRoute() instanceof NetworkRouteWRefs){
 						for (Node node : ((NetworkRouteWRefs)((LegImpl) planElement).getRoute()).getNodes()) {
 							
@@ -88,15 +99,15 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 							
 						}
 					}
-					if(((LegImpl) planElement).getRoute() instanceof GenericRouteImpl){
-						String routeDescription = ((GenericRouteImpl) ((LegImpl) planElement).getRoute()).getRouteDescription();
-						for (String ptLineID : this.ptLinesToKeep) {
-							if(routeDescription.contains(ptLineID)){
-								keepPlan = true;
-								break;
-							}
-						}						
-					}
+//					if(((LegImpl) planElement).getRoute() instanceof GenericRouteImpl){
+//						String routeDescription = ((GenericRouteImpl) ((LegImpl) planElement).getRoute()).getRouteDescription();
+//						for (String ptLineID : this.ptLinesToKeep) {
+//							if(routeDescription.contains(ptLineID)){
+//								keepPlan = true;
+//								break;
+//							}
+//						}						
+//					}
 					
 				}
 				if(keepPlan){
@@ -116,11 +127,20 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 		
 		ScenarioImpl sc = new ScenarioImpl();
 
-		String wholeBigNetworkFile = "E:/eclwrk/berlin-bvg09/pt/baseplan_900s_bignetwork/network.multimodal.xml.gz";
-		String unroutedWholePlansFile = "E:/eclwrk/berlin-bvg09/pop/baseplan_900s.xml.gz";
-		String wholeRoutedPlansFile = "E:/eclwrk/berlin-bvg09/pt/baseplan_900s_bignetwork/baseplan_900s.routedOevModell.xml.gz";
+		String wholeBigNetworkFile = "D:/Berlin/BVG/berlin-bvg09/pt/baseplan_900s_bignetwork/network.multimodal.xml.gz";
+		String unroutedWholePlansFile = "D:/Berlin/BVG/berlin-bvg09/pop/baseplan_900s.xml.gz";
+		String wholeRoutedPlansFile = "D:/Berlin/BVG/berlin-bvg09/pt/baseplan_900s_bignetwork/baseplan_900s.routedOevModell.xml.gz";
 		String outPlansFile = "./subset_pop.xml.gz";
-		String ptLinesToKeep = "E:/eclwrk/berlin-bvg09/net/pt/linien_im_untersuchungsgebiet.txt";
+		String ptLinesToKeep = "D:/Berlin/BVG/berlin-bvg09/net/pt/linien_im_untersuchungsgebiet.txt";
+		
+		Coord xyMin = new CoordImpl(4590999.0, 5805999.0);
+		Coord xyMax = new CoordImpl(4606021.0, 5822001.0);
+		
+//		String wholeBigNetworkFile = "./network.multimodal.xml.gz";
+//		String unroutedWholePlansFile = "./baseplan_10x_900s.xml.gz";
+//		String wholeRoutedPlansFile = "./baseplan_10x_900s.routedOevModell.xml.gz";
+//		String outPlansFile = "./subset_pop.xml.gz";
+//		String ptLinesToKeep = "./linien_im_untersuchungsgebiet.txt";
 		
 		System.out.println("Reading network " + wholeBigNetworkFile);
 		NetworkLayer wholeBigNet = new NetworkLayer();
@@ -136,8 +156,7 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 		PopulationReader origPopReader = new MatsimPopulationReader(unroutedWholePop, wholeBigNet);
 		origPopReader.readFile(unroutedWholePlansFile);
 
-		// xrange(4593118.0264578285,4604955.490347487); yrange(5806304.996440412,5820514.226139759)
-		PopGeoFilter dp = new PopGeoFilter(wholeRoutedPop, outPlansFile, unroutedWholePop, new CoordImpl(4593118.0264578285, 5806304.996440412), new CoordImpl(4604955.490347487, 5820514.226139759));
+		PopGeoFilter dp = new PopGeoFilter(wholeRoutedPop, outPlansFile, unroutedWholePop, xyMin, xyMax);
 		System.out.println("Reading pt lines to keep from " + ptLinesToKeep);
 		dp.readFile(ptLinesToKeep);
 		System.out.println("Filtering...");
