@@ -27,10 +27,10 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 
 /**
  * Represents a node in the QueueSimulation.
@@ -46,7 +46,7 @@ public class QueueNode {
 
 	private boolean active = false;
 
-	private final NodeImpl node;
+	private final Node node;
 
 	public QueueNetwork queueNetwork;
 	/**
@@ -54,7 +54,7 @@ public class QueueNode {
 	 */
 	private boolean signalized = false;
 
-	public QueueNode(final NodeImpl n, final QueueNetwork queueNetwork) {
+	public QueueNode(final Node n, final QueueNetwork queueNetwork) {
 		this.node = n;
 		this.queueNetwork = queueNetwork;
 
@@ -71,7 +71,7 @@ public class QueueNode {
 	 */
 	/*package*/ void init() {
 		int i = 0;
-		for (LinkImpl l : this.node.getInLinks().values()) {
+		for (Link l : this.node.getInLinks().values()) {
 			this.inLinksArrayCache[i] = this.queueNetwork.getLinks().get(l.getId());
 			i++;
 		}
@@ -81,7 +81,7 @@ public class QueueNode {
 		Arrays.sort(this.inLinksArrayCache, QueueNode.qlinkIdComparator);
 	}
 
-	public NodeImpl getNode() {
+	public Node getNode() {
 		return this.node;
 	}
 

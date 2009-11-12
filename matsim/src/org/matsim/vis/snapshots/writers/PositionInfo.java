@@ -23,6 +23,7 @@ package org.matsim.vis.snapshots.writers;
 import java.awt.geom.Point2D;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vis.vecmathutils.VectorUtils;
@@ -71,7 +72,7 @@ public class PositionInfo {
 	final private double speed;
 
 	final private VehicleState vehicleState;
-	final private LinkImpl link;
+	final private Link link;
 
 
 
@@ -87,7 +88,7 @@ public class PositionInfo {
 	 * @param vehicleState The state of the vehicle (Parking,Driving)
 	 * @param visualizerData additional data (null allowed) that may be used by some visualizers
 	 */
-	public PositionInfo(final Id agentId, final LinkImpl link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState, final String visualizerData) {
+	public PositionInfo(final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState, final String visualizerData) {
 		this.agentId = agentId;
 		this.link = link;
 		this.speed = speed;
@@ -110,7 +111,7 @@ public class PositionInfo {
 	 * @param vehicleState The state of the vehicle (Parking,Driving)
 	 * @param visualizerData additional data (null allowed) that may be used by some visualizers
 	 */
-	public PositionInfo(double linkScale, final Id agentId, final LinkImpl link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState, final String visualizerData) {
+	public PositionInfo(double linkScale, final Id agentId, final Link link, final double distanceOnLink, final int lane, final double speed, final VehicleState vehicleState, final String visualizerData) {
 		this.agentId = agentId;
 		this.link = link;
 		this.speed = speed;
@@ -164,7 +165,7 @@ public class PositionInfo {
 			}
 		}
 		if (theta < 0.0) theta += TWO_PI;
-		double correction = link.getEuklideanDistance() / link.getLength();
+		double correction = ((LinkImpl)link).getEuklideanDistance() / link.getLength();
 		if (linkScale != 1.0) {
 			Tuple<Point2D.Double, Point2D.Double> scaledLinkTuple = VectorUtils.scaleVector(linkStart, linkEnd, linkScale);
 			linkStart = scaledLinkTuple.getFirst();
@@ -206,7 +207,7 @@ public class PositionInfo {
 		return this.vehicleState;
 	}
 
-	public LinkImpl getLink() {
+	public Link getLink() {
 		return this.link;
 	}
 

@@ -50,7 +50,7 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 				LinkInfo li = this.linkInfos.get(event.getLink());
 				if (li == null) {
 					li = new LinkInfo();
-					this.linkInfos.put(event.getLink(), li);
+					this.linkInfos.put((LinkImpl) event.getLink(), li);
 					li.penalties.put(0.0, new LinkPenalty());
 				}
 				

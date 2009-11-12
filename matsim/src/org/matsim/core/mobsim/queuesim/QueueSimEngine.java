@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 
+import org.matsim.core.network.NodeImpl;
+
 /**
  * Coordinates the movement of vehicles on the links and the nodes. 
  *
@@ -70,7 +72,7 @@ public class QueueSimEngine {
 		//results they are sorted to avoid indeterministic simulations
 		Arrays.sort(this.simNodesArray, new Comparator<QueueNode>() {
 			public int compare(final QueueNode o1, final QueueNode o2) {
-				return o1.getNode().compareTo(o2.getNode());
+				return ((NodeImpl)o1.getNode()).compareTo((NodeImpl) o2.getNode());
 			}
 		});
 		for (QueueLink link : this.allLinks) {

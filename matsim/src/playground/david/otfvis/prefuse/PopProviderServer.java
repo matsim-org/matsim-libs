@@ -85,7 +85,7 @@ public class PopProviderServer implements PopulationProvider {
 		@Override
 		public OTFQuery query(QueueNetwork net, PopulationImpl population, EventsManager events,
 				OTFServerQuad quad) {
-			this.net = net.getNetworkLayer();
+			this.net = (NetworkLayer) net.getNetworkLayer();
 			return this;
 		}
 	}

@@ -31,7 +31,7 @@ public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 	
 	
 	public void handleEvent(LinkEnterEventImpl event) {
-		LinkImpl l = event.getLink();
+		LinkImpl l = (LinkImpl) event.getLink();
 		if (l == null) {
 			l = this.network.getLink(event.getLinkId());
 		}

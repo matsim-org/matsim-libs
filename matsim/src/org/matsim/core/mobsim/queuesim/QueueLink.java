@@ -36,7 +36,6 @@ import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.basic.BasicLane;
 import org.matsim.signalsystems.CalculateAngle;
@@ -112,7 +111,7 @@ public class QueueLink {
 	/**
 	 * The Link instance containing the data
 	 */
-	private final LinkImpl link;
+	private final Link link;
 	/**
 	 * Reference to the QueueNetwork instance this link belongs to.
 	 */
@@ -149,13 +148,13 @@ public class QueueLink {
 	
 	/**
 	 * Initializes a QueueLink with one QueueLane.
-	 * @param l
+	 * @param link2
 	 * @param queueNetwork
 	 * @param toNode
 	 * @see QueueLink#createLanes(List)
 	 */
-	public QueueLink(final LinkImpl l, final QueueNetwork queueNetwork, final QueueNode toNode) {
-		this.link = l;
+	public QueueLink(final Link link2, final QueueNetwork queueNetwork, final QueueNode toNode) {
+		this.link = link2;
 		this.queueNetwork = queueNetwork;
 		this.toQueueNode = toNode;
 
@@ -257,7 +256,7 @@ public class QueueLink {
 	}
 
 	private void addUTurn() {
-		for (LinkImpl outLink : this.getLink().getToNode().getOutLinks().values()) {
+		for (Link outLink : this.getLink().getToNode().getOutLinks().values()) {
 			if ((outLink.getToNode().equals(this.getLink().getFromNode()))) {
 				for (QueueLane l : this.toNodeQueueLanes) {
 					if ((l.getVisualizerLane() == 1) && (l.getMeterFromLinkEnd() == 0)){
@@ -437,7 +436,7 @@ public class QueueLink {
 		return count;
 	}
 
-	public LinkImpl getLink() {
+	public Link getLink() {
 		return this.link;
 	}
 	
@@ -516,7 +515,7 @@ public class QueueLink {
 			int cnt = parkedVehicles.size();
 			if (cnt > 0) {
 				String snapshotStyle = Gbl.getConfig().simulation().getSnapshotStyle();
-				int nLanes = getLink().getLanesAsInt(Time.UNDEFINED_TIME);
+				int nLanes = Math.round((float)Math.max(getLink().getNumberOfLanes(Time.UNDEFINED_TIME),1.0d));
 				int lane = nLanes + 4;
 	
 				double cellSize = 7.5;

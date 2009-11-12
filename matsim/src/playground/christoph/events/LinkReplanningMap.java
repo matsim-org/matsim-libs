@@ -24,6 +24,7 @@ import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 /*
@@ -71,7 +72,7 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 	{
 		double now = event.getTime();
 		QueueLink queueLink = queueNetwork.getQueueLink(event.getLinkId());
-		double departureTime = (now + queueLink.getLink().getFreespeedTravelTime(now));
+		double departureTime = (now + ((LinkImpl)queueLink.getLink()).getFreespeedTravelTime(now));
 
 		synchronized(replanningMap)
 		{

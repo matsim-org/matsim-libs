@@ -43,9 +43,11 @@ import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.DisplayNetStateWriter;
@@ -57,7 +59,7 @@ import org.matsim.vis.snapshots.writers.SnapshotWriter;
 public class SnapshotGenerator implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler, BasicLinkEnterEventHandler,
 		BasicLinkLeaveEventHandler, BasicAgentWait2LinkEventHandler, BasicAgentStuckEventHandler {
 
-	private final NetworkLayer network;
+	private final Network network;
 	private int lastSnapshotIndex = -1;
 	private final double snapshotPeriod;
 	protected final HashMap<Id, EventLink> eventLinks;
@@ -67,7 +69,7 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 	private final double storageCapFactor;
 	private final String snapshotStyle;
 
-	public SnapshotGenerator(final NetworkLayer network, final double snapshotPeriod, final SimulationConfigGroup config) {
+	public SnapshotGenerator(final Network network, final double snapshotPeriod, final SimulationConfigGroup config) {
 		this.network = network;
 		this.eventLinks = new HashMap<Id, EventLink>((int)(network.getLinks().size()*1.1), 0.95f);
 		this.eventAgents = new HashMap<Id, EventAgent>(1000, 0.95f);
@@ -118,8 +120,8 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 
 	public void reset(final int iteration) {
 		this.eventLinks.clear();
-		for (LinkImpl link : this.network.getLinks().values()) {
-			this.eventLinks.put(link.getId(), new EventLink(link, this.capCorrectionFactor, this.network.getEffectiveCellSize(), this.storageCapFactor));
+		for (Link link : this.network.getLinks().values()) {
+			this.eventLinks.put(link.getId(), new EventLink(link, this.capCorrectionFactor, ((NetworkImpl)this.network).getEffectiveCellSize(), this.storageCapFactor));
 		}
 		this.eventAgents.clear();
 		this.lastSnapshotIndex = -1;
@@ -200,8 +202,8 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 		private final double ratioLengthToEuklideanDist; // ratio of link.length / euklideanDist
 		private final double effectiveCellSize;
 
-		protected EventLink(final LinkImpl link2, final double capCorrectionFactor, final double effectiveCellSize, final double storageCapFactor) {
-			this.link = link2;
+		protected EventLink(final Link link2, final double capCorrectionFactor, final double effectiveCellSize, final double storageCapFactor) {
+			this.link = (LinkImpl) link2;
 			this.drivingQueue = new ArrayList<EventAgent>();
 			this.parkingQueue = new ArrayList<EventAgent>();
 			this.waitingQueue = new ArrayList<EventAgent>();

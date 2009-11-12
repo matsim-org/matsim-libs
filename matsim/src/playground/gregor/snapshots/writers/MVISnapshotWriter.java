@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.geotools.data.FeatureSource;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -52,8 +52,6 @@ import playground.gregor.otf.drawer.OTFBackgroundTexturesDrawer;
 import playground.gregor.otf.drawer.OTFSheltersDrawer;
 import playground.gregor.otf.drawer.TimeDependentTrigger;
 import playground.gregor.otf.readerwriter.InundationDataFromBinaryFileReader;
-import playground.gregor.otf.readerwriter.InundationDataFromNetcdfReader;
-import playground.gregor.otf.readerwriter.InundationDataFromNetcdfReaderII;
 import playground.gregor.otf.readerwriter.InundationDataReader;
 import playground.gregor.otf.readerwriter.InundationDataWriter;
 import playground.gregor.otf.readerwriter.PolygonDataReader;
@@ -90,7 +88,7 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 
 	public MVISnapshotWriter(final QueueNetwork net, final String vehFileName, final String outFileName, final double intervall_s) {
 		super(intervall_s, net, outFileName);
-		net.getNetworkLayer().createAndAddNode(new IdImpl("minXY"), new CoordImpl(643000,9880000));//HACK to get the bounding box big enough; 
+		((NetworkLayer) net.getNetworkLayer()).createAndAddNode(new IdImpl("minXY"), new CoordImpl(643000,9880000));//HACK to get the bounding box big enough; 
 		//otherwise we could get negative openGL coords since we calculating offsetEast, offsetNorth based on this bounding box
 //		this.vehFileName = vehFileName;
 		//this.outFileName = outFileName;

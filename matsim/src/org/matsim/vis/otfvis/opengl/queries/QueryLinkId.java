@@ -25,11 +25,11 @@ import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Executor;
@@ -97,7 +97,7 @@ public class QueryLinkId implements OTFQuery {
 		public void execute(double x, double y, OTFDataWriter writer)  {
 			Object src = writer.getSrc();
 			if(src instanceof QueueLink) {
-				LinkImpl link = ((QueueLink)src).getLink();
+				Link link = ((QueueLink)src).getLink();
 				double alpha = 0.6;
 				double fromX = link.getFromNode().getCoord().getX();
 				double fromY = link.getFromNode().getCoord().getY();

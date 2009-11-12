@@ -21,7 +21,7 @@
 package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.BasicVehicle;
 
 public class QueueVehicleImpl implements QueueVehicle {
@@ -33,7 +33,7 @@ public class QueueVehicleImpl implements QueueVehicle {
 
 	private final Id id;
 	
-	private LinkImpl currentLink = null;
+	private Link currentLink = null;
 	
 	private final double sizeInEquivalents;
 	
@@ -65,11 +65,11 @@ public class QueueVehicleImpl implements QueueVehicle {
 		this.earliestLinkExitTime = time;
 	}
 
-	public LinkImpl getCurrentLink() {
+	public Link getCurrentLink() {
 		return this.currentLink;
 	}
 	
-	public void setCurrentLink(final LinkImpl link) {
+	public void setCurrentLink(final Link link) {
 		this.currentLink = link;
 	}
 

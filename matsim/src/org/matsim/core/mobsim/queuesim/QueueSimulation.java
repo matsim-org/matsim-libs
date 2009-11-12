@@ -32,7 +32,6 @@ import java.util.PriorityQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
@@ -52,7 +51,7 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -95,7 +94,7 @@ public class QueueSimulation {
 	private final Config config;
 	protected final PopulationImpl plans;
 	protected QueueNetwork network;
-	protected NetworkLayer networkLayer;
+	protected Network networkLayer;
 
 	private static EventsManager events = null;
 	protected  SimStateWriterI netStateWriter = null;
@@ -151,7 +150,7 @@ public class QueueSimulation {
 		setEvents(events);
 		this.plans = (PopulationImpl) plans;
 
-		this.networkLayer = (NetworkLayer) network;
+		this.networkLayer = network;
 		this.network = new QueueNetwork(this.networkLayer);
 		this.agentFactory = new AgentFactory(this);
 
@@ -322,7 +321,7 @@ public class QueueSimulation {
 	}
 
 	private void prepareNetworkChangeEventsQueue() {
-		Collection<NetworkChangeEvent> changeEvents = (this.networkLayer).getNetworkChangeEvents();
+		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)(this.networkLayer)).getNetworkChangeEvents();
 		if ((changeEvents != null) && (changeEvents.size() > 0)) {
 			this.networkChangeEventsQueue = new PriorityQueue<NetworkChangeEvent>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
 			this.networkChangeEventsQueue.addAll(changeEvents);

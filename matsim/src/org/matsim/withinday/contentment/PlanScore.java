@@ -23,10 +23,8 @@ package org.matsim.withinday.contentment;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -129,7 +127,7 @@ public class PlanScore implements AgentContentment {
 		 * Determine how the remaining distance and traveltime to the
 		 * destination.
 		 */
-		LinkImpl currentLink = this.agent.getVehicle().getCurrentLink();
+		Link  currentLink = this.agent.getVehicle().getCurrentLink();
 		int duration = 0;
 		double distance = 0;
 		double totalDistance = 0;

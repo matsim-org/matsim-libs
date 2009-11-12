@@ -19,16 +19,17 @@
 
 package org.matsim.core.mobsim.queuesim;
 
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+
 
 /**
  * @author dgrether
  */
 public interface QueueNetworkFactory<QN extends QueueNode, QL extends QueueLink> {
 
-	public QN newQueueNode(NodeImpl node, QueueNetwork queueNetwork);
+	public QN newQueueNode(Node node, QueueNetwork queueNetwork);
 
-	public QL newQueueLink(LinkImpl link, QueueNetwork queueNetwork, QN queueNode);
+	public QL newQueueLink(Link link, QueueNetwork queueNetwork, QN queueNode);
 
 }

@@ -28,6 +28,7 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 
 import playground.christoph.network.MyLinkImpl;
@@ -407,7 +408,7 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
             Integer vehiclesCount = entry.getValue();
          
             // Assumption...
-            MyLinkImpl link = (MyLinkImpl)this.queueNetwork.getNetworkLayer().getLink(id);
+            MyLinkImpl link = (MyLinkImpl)((NetworkLayer) this.queueNetwork.getNetworkLayer()).getLink(id);
             
             link.setVehiclesCount(vehiclesCount);
         }

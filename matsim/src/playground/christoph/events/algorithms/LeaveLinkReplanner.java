@@ -23,11 +23,11 @@ package playground.christoph.events.algorithms;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -139,7 +139,7 @@ public class LeaveLinkReplanner {
 		// This would be the "correct" Type - but it is slower and is not necessary
 		//String type = this.plan.getPreviousActivity(leg).getType();
 		
-		ActivityImpl newFromAct = new ActivityImpl(type, this.vehicle.getCurrentLink().getToNode().getCoord(), this.vehicle.getCurrentLink());
+		ActivityImpl newFromAct = new ActivityImpl(type, this.vehicle.getCurrentLink().getToNode().getCoord(), (LinkImpl) this.vehicle.getCurrentLink());
 
 		newFromAct.setStartTime(time);
 		newFromAct.setEndTime(time);

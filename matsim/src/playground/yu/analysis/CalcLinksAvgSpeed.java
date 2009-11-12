@@ -217,7 +217,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 			Double enterTime = sc.removeTmpEnterTime(leave.getPersonId()
 					.toString());
 			if (enterTime != null) {
-				LinkImpl l = leave.getLink();
+				LinkImpl l = (LinkImpl) leave.getLink();
 				if (l == null)
 					l = network.getLink(linkId);
 				if (l != null) {

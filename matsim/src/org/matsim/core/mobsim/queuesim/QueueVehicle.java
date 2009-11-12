@@ -21,7 +21,7 @@
 package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.basic.v01.Identifiable;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.BasicVehicle;
 
 public interface QueueVehicle extends Identifiable {
@@ -30,9 +30,9 @@ public interface QueueVehicle extends Identifiable {
 
 	public void setDriver(final DriverAgent driver);
 	
-	public LinkImpl getCurrentLink();
+	public Link getCurrentLink();
 	
-	public void setCurrentLink(final LinkImpl link);
+	public void setCurrentLink(final Link link);
 	
 	public double getSizeInEquivalents();
 	

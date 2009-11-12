@@ -27,10 +27,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
@@ -47,23 +47,23 @@ public class QueueNetwork {
 
 	private final Map<Id, QueueNode> nodes;
 
-	private final NetworkLayer networkLayer;
+	private final Network networkLayer;
 
 	private final QueueNetworkFactory<QueueNode, QueueLink> queueNetworkFactory;
 
-	public QueueNetwork(final NetworkLayer networkLayer) {
-		this(networkLayer, new DefaultQueueNetworkFactory());
+	public QueueNetwork(final Network networkLayer2) {
+		this(networkLayer2, new DefaultQueueNetworkFactory());
 	}
 
-	public QueueNetwork(final NetworkLayer networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory) {
+	public QueueNetwork(final Network networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory) {
 		this.networkLayer = networkLayer;
 		this.queueNetworkFactory = factory;
 		this.links = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		this.nodes = new LinkedHashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
-		for (NodeImpl n : networkLayer.getNodes().values()) {
+		for (Node n : networkLayer.getNodes().values()) {
 			this.nodes.put(n.getId(), this.queueNetworkFactory.newQueueNode(n, this));
 		}
-		for (LinkImpl l : networkLayer.getLinks().values()) {
+		for (Link l : networkLayer.getLinks().values()) {
 			this.links.put(l.getId(), this.queueNetworkFactory.newQueueLink(l, this, this.nodes.get(l.getToNode().getId())));
 		}
 		for (QueueNode n : this.nodes.values()) {
@@ -71,7 +71,7 @@ public class QueueNetwork {
 		}
 	}
 
-	public NetworkLayer getNetworkLayer() {
+	public Network getNetworkLayer() {
 		return this.networkLayer;
 	}
 
