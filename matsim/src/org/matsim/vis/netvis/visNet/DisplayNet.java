@@ -28,9 +28,12 @@ import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.api.basic.v01.network.BasicNetworkFactory;
 import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.DisplayableLinkI;
 import org.matsim.vis.netvis.DisplayableNetI;
 
@@ -75,7 +78,7 @@ public class DisplayNet implements BasicNetwork, DisplayableNetI {
 			link2.setToNode(to);
 
 			link2.setLength_m(((LinkImpl) link).getLength());
-			link2.setNumberOfLanes(((LinkImpl) link).getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
+			link2.setNumberOfLanes(NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, (Link) link));
 
 			links.put(link2.getId(), link2);
 		}

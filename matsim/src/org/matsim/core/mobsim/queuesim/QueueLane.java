@@ -45,7 +45,7 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.basic.BasicLane;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
@@ -177,8 +177,8 @@ public class QueueLane {
 		this.queueLink = ql;
 		this.originalLane = (laneData == null) ? true : false;
 		this.laneData = laneData;
-		this.freespeedTravelTime =((LinkImpl)ql.getLink()).getFreespeedTravelTime(Time.UNDEFINED_TIME);
 		this.length = ql.getLink().getLength();
+		this.freespeedTravelTime = this.length / ql.getLink().getFreespeed(Time.UNDEFINED_TIME);
 		this.meterFromLinkEnd = 0.0;
 
 		if (this.originalLane){
@@ -348,7 +348,7 @@ public class QueueLane {
 			}
 
 			QueueSimulation.getEvents().processEvent(
-					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson(), ((LinkImpl)this.queueLink.getLink()), veh.getDriver().getCurrentLeg()));
+					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson(), this.queueLink.getLink(), veh.getDriver().getCurrentLeg()));
 			
 			boolean addToBuffer = true;
 			if (veh.getDriver() instanceof TransitDriverAgent) {
@@ -801,7 +801,7 @@ public class QueueLane {
 		private void getVehiclePositionsEquil(final Collection<PositionInfo> positions) {
 			double time = SimulationTimer.getTime();
 			int cnt = QueueLane.this.buffer.size() + QueueLane.this.vehQueue.size();
-			int nLanes = ((LinkImpl)QueueLane.this.queueLink.getLink()).getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
+			int nLanes = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QueueLane.this.queueLink.getLink());
 			if (cnt > 0) {
 				double cellSize = QueueLane.this.queueLink.getLink().getLength() / cnt;
 				double distFromFromNode = QueueLane.this.queueLink.getLink().getLength() - cellSize / 2.0;
@@ -861,24 +861,25 @@ public class QueueLane {
 		private void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
 			double now = SimulationTimer.getTime();
 			double queueEnd = QueueLane.this.queueLink.getLink().getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
+			Link link = QueueLane.this.queueLink.getLink();
 			if ((QueueLane.this.signalGroups != null) ){ 
 				queueEnd -= 35.0;
 			}
 			double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
-			double cellSize = ((NetworkLayer)QueueLane.this.queueLink.getLink().getLayer()).getEffectiveCellSize();
+			double cellSize = ((NetworkImpl)QueueLane.this.queueLink.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize();
 			double vehLen = Math.min( // the length of a vehicle in visualization
-					QueueLane.this.queueLink.getLink().getLength() / (QueueLane.this.storageCapacity + QueueLane.this.bufferStorageCapacity), // all vehicles must have place on the link
+					link.getLength() / (QueueLane.this.storageCapacity + QueueLane.this.bufferStorageCapacity), // all vehicles must have place on the link
 					cellSize / storageCapFactor); // a vehicle should not be larger than it's actual size
 
 			// put all cars in the buffer one after the other
 			for (QueueVehicle veh : QueueLane.this.buffer) {
 
-				int lane = 1 + (veh.getId().hashCode() % ((LinkImpl)QueueLane.this.queueLink.getLink()).getLanesAsInt(Time.UNDEFINED_TIME));
+				int lane = 1 + (veh.getId().hashCode() % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QueueLane.this.queueLink.getLink()));
 
 				int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLane.this.inverseSimulatedFlowCapacity + 2.0);
-				double speed = (now > cmp) ? 0.0 : QueueLane.this.queueLink.getLink().getFreespeed(Time.UNDEFINED_TIME);
+				double speed = (now > cmp) ? 0.0 : link.getFreespeed(Time.UNDEFINED_TIME);
 
-				PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(), queueEnd,
+				PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), link, queueEnd,
 						lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
 				queueEnd -= vehLen;
@@ -892,10 +893,11 @@ public class QueueLane {
 			 * - if the position is not within the queue, just place the car 	with free speed at that place
 			 */
 			double lastDistance = Integer.MAX_VALUE;
+			double ttfs = link.getLength() / link.getFreespeed(now);
 			for (QueueVehicle veh : QueueLane.this.vehQueue) {
 				double travelTime = now - veh.getLinkEnterTime();
-				double distanceOnLink = (((LinkImpl)QueueLane.this.queueLink.getLink()).getFreespeedTravelTime(now) == 0.0 ? 0.0
-						: ((travelTime / ((LinkImpl)QueueLane.this.queueLink.getLink()).getFreespeedTravelTime(now)) * QueueLane.this.queueLink.getLink().getLength()));
+				double distanceOnLink = (ttfs == 0.0 ? 0.0
+						: ((travelTime / ttfs) * link.getLength()));
 				if (distanceOnLink > queueEnd) { // vehicle is already in queue
 					distanceOnLink = queueEnd;
 					queueEnd -= vehLen;
@@ -915,15 +917,15 @@ public class QueueLane {
 						distanceOnLink = 0.0;
 				}
 				int cmp = (int) (veh.getEarliestLinkExitTime() + QueueLane.this.inverseSimulatedFlowCapacity + 2.0);
-				double speed = (now > cmp) ? 0.0 : QueueLane.this.queueLink.getLink().getFreespeed(now);
+				double speed = (now > cmp) ? 0.0 : link.getFreespeed(now);
 				int tmpLane ;
 				try {
 					tmpLane = Integer.parseInt(veh.getId().toString()) ;
 				} catch ( NumberFormatException ee ) {
 					tmpLane = veh.getId().hashCode() ;
 				}
-				int lane = 1 + (tmpLane % ((LinkImpl)QueueLane.this.queueLink.getLink()).getLanesAsInt(Time.UNDEFINED_TIME));
-				PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(), distanceOnLink,
+				int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
+				PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), link, distanceOnLink,
 						lane, speed, PositionInfo.VehicleState.Driving, null);
 				positions.add(position);
 				lastDistance = distanceOnLink;
@@ -934,7 +936,7 @@ public class QueueLane {
 			 * position doesn't matter, so they are just placed to the coordinates of
 			 * the from node
 			 */
-			int lane = ((LinkImpl)QueueLane.this.queueLink.getLink()).getLanesAsInt(Time.UNDEFINED_TIME) + 1; // place them next to the link
+			int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
 			for (QueueVehicle veh : QueueLane.this.waitingList) {
 				PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(),
 						/*positionOnLink*/cellSize, lane, 0.0, PositionInfo.VehicleState.Parking, null);

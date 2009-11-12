@@ -30,7 +30,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
@@ -99,7 +98,7 @@ public class QueueNetwork {
 		return this.links.get(id);
 	}
 
-	public QueueNode getQueueNode(final IdImpl id) {
+	public QueueNode getQueueNode(final Id id) {
 		return this.nodes.get(id);
 	}
 	

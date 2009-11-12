@@ -49,6 +49,7 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.DisplayNetStateWriter;
 import org.matsim.vis.netvis.DrawableAgentI;
@@ -275,7 +276,7 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 			// put all cars in the buffer one after the other
 			for (EventAgent agent : this.buffer) {
 
-				int lane = 1 + (agent.intId % this.link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME));
+				int lane = 1 + (agent.intId % NetworkUtils.getNumberOfLanesAsInt(time, this.link));
 
 				int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
 				double speed = (time > cmp) ? 0.0 : this.link.getFreespeed(time);
@@ -356,7 +357,7 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 		 */
 		protected void getVehiclePositionsEquil(final Collection<PositionInfo> positions, final double time) {
 			int cnt = this.buffer.size() + this.drivingQueue.size();
-			int nLanes = this.link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
+			int nLanes = NetworkUtils.getNumberOfLanesAsInt(time, this.link);
 			if (cnt > 0) {
 				double cellSize = this.link.getLength() / cnt;
 				double distFromFromNode = this.link.getLength() - cellSize / 2.0;

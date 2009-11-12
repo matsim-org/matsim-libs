@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.jdeqsim;
 import java.util.LinkedList;
 
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -87,7 +88,7 @@ public class Road extends SimUnit {
 		 * same time
 		 */
 		maxNumberOfCarsOnRoad = Math.round(link.getLength()
-				* link.getLanesAsInt(Time.UNDEFINED_TIME)
+				* NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link)
 				* SimulationParameters.getStorageCapacityFactor() / SimulationParameters.getCarSize());
 
 		/**
@@ -99,7 +100,7 @@ public class Road extends SimUnit {
 		}
 
 		double maxInverseInFlowCapacity = 3600 / (SimulationParameters.getMinimumInFlowCapacity()
-				* SimulationParameters.getFlowCapacityFactor() * link.getLanesAsInt(Time.UNDEFINED_TIME));
+				* SimulationParameters.getFlowCapacityFactor() * NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 
 		inverseOutFlowCapacity = 1 / (link.getFlowCapacity(Time.UNDEFINED_TIME) * SimulationParameters.getFlowCapacityFactor());
 
@@ -231,7 +232,7 @@ public class Road extends SimUnit {
 			double arrivalTimeOfGap = Double.MIN_VALUE;
 			// if the road has been full recently then find out, when the next
 			// gap arrives
-			if (gap != null && gap.size() > 0) {
+			if ((gap != null) && (gap.size() > 0)) {
 				arrivalTimeOfGap = gap.remove();
 			}
 

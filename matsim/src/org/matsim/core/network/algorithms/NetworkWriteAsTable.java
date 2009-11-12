@@ -29,6 +29,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 
 public class NetworkWriteAsTable implements NetworkRunnable {
@@ -115,12 +116,12 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 				NodeImpl t = l.getToNode();
 				this.out_l.write(l.getId() + "\t" + f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");
 				this.out_l.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\t" + l.getLength() + "\t");
-				this.out_l.write(l.getFreespeed(Time.UNDEFINED_TIME) + "\t" + (l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/capperiod) + "\t" + l.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + "\t1\n");
+				this.out_l.write(l.getFreespeed(Time.UNDEFINED_TIME) + "\t" + (l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/capperiod) + "\t" + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, l) + "\t1\n");
 				this.out_l.flush();
 
 				this.out_et.write(l.getId() + "\t" + l.getFromNode().getId() + "\t" + l.getToNode().getId() + "\t");
 				this.out_et.write(Math.round(l.getLength()) + "\t" + Math.round(l.getFreespeed(Time.UNDEFINED_TIME)*3.6) + "\t");
-				this.out_et.write(Math.round(l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/capperiod) + "\t" + l.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + "\t");
+				this.out_et.write(Math.round(l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/capperiod) + "\t" + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, l) + "\t");
 				this.out_et.write(l.getOrigId() + "\t" + l.getType() + "\t");
 				this.out_et.write(f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");
 				this.out_et.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\n");

@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
@@ -52,7 +52,7 @@ public class OTFLinkLanesAgentsNoParkingHandler extends OTFLinkAgentsHandler {
 			String id = this.src.getLink().getId().toString();
 			ByteBufferUtils.putString(out, id);
 			super.writeConstData(out);
-			out.putInt(((LinkImpl)this.src.getLink()).getLanesAsInt(0));
+			out.putInt(NetworkUtils.getNumberOfLanesAsInt(0, this.src.getLink()));
 		}
 
 		@Override

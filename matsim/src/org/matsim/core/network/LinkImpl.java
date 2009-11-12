@@ -174,7 +174,10 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 	public final double getEuklideanDistance() {
 		return this.euklideanDist;
 	}
-
+	/**
+	 * @deprecated use NetworkUtils.getNumberOfLanesAsInt() instead
+	 */
+	@Deprecated
 	public int getLanesAsInt(final double time) {
 		return Math.round((float)Math.max(this.nofLanes,1.0d));
 	}

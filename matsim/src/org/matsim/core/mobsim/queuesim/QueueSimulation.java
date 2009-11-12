@@ -49,7 +49,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
@@ -398,12 +397,12 @@ public class QueueSimulation {
 		double now = SimulationTimer.getTime();
 		for (Tuple<Double, DriverAgent> entry : this.teleportationList) {
 			DriverAgent agent = entry.getSecond();
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson(), (LinkImpl)agent.getDestinationLink(), agent.getCurrentLeg()));
+			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson(), agent.getDestinationLink(), agent.getCurrentLeg()));
 		}
 		this.teleportationList.clear();
 
 		for (DriverAgent agent : this.activityEndsList) {
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson(), (LinkImpl)agent.getDestinationLink(), agent.getCurrentLeg()));
+			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson(), agent.getDestinationLink(), agent.getCurrentLeg()));
 		}
 		this.activityEndsList.clear();
 
@@ -514,7 +513,7 @@ public class QueueSimulation {
 	private void handleNetworkChangeEvents(final double time) {
 		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)){
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
-			for (LinkImpl link : event.getLinks()) {
+			for (Link link : event.getLinks()) {
 				this.network.getQueueLink(link.getId()).recalcTimeVariantAttributes(time);
 			}
 		}
@@ -556,7 +555,7 @@ public class QueueSimulation {
 
 		LegImpl leg = agent.getCurrentLeg();
 
-		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson(), (LinkImpl) link, leg));
+		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson(), link, leg));
 
 		if (leg.getMode().equals(TransportMode.car)) {
 			NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();

@@ -1,4 +1,4 @@
 /**
- * TODO Classes using LinkImpl are QueueSimEngine and QueueLane mostly due to getLanesAsInt() and getFreespeedTravelTime() calls
+ * TODO QueueLane still needs some non interface types
  */
 package org.matsim.core.mobsim.queuesim;

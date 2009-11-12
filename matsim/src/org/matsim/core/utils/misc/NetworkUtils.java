@@ -120,4 +120,11 @@ public class NetworkUtils {
 		return linksList;
 	}
 	
+	/**
+	 * @return the maximum of 1 and the mathematically rounded number of lanes attribute's value at time "time" of the link given as parameter
+	 */
+	public static int getNumberOfLanesAsInt(final double time, final Link link) {
+		return Math.round((float)Math.max(link.getNumberOfLanes(time), 1.0d));
+	}
+	
 }

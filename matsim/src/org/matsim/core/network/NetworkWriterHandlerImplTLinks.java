@@ -23,9 +23,11 @@ package org.matsim.core.network;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimFileWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 
 public class NetworkWriterHandlerImplTLinks implements MatsimFileWriter {
@@ -83,14 +85,14 @@ public class NetworkWriterHandlerImplTLinks implements MatsimFileWriter {
 
 	}
 
-	private void writeLink(final LinkImpl link, final BufferedWriter out) throws IOException {
+	private void writeLink(final Link link, final BufferedWriter out) throws IOException {
 		
 		out.write(link.getId() + "\t");			// ID
 		out.write("[UNKNOWN]\t");					// NAME
 		out.write(link.getFromNode().getId() + "\t");		// NODEA
 		out.write(link.getToNode().getId() + "\t");		// NODEB
 		out.write("0\t");						// PERMLANESA
-		out.write(link.getLanesAsInt(org.matsim.core.utils.misc.Time.UNDEFINED_TIME) + "\t");	// PERMLANESB
+		out.write(NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + "\t");	// PERMLANESB
 		out.write("0\t");						// LEFTPCKTSA
 		out.write("0\t");						// LEFTPCKTSB
 		out.write("0\t");						// RGHTPCKTSA
