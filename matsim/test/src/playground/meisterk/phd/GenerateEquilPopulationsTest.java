@@ -33,6 +33,16 @@ public class GenerateEquilPopulationsTest extends MatsimTestCase {
 
 	private ScenarioImpl scenario = null;
 	
+	private enum InitialDemand {
+		/**
+		 * perform random initial demand generation wrt modes and times with planomat
+		 */
+		RANDOM, 
+		/**
+		 * generate initial demand as in Bryan Raneys Ph.D. Thesis, equil test
+		 */
+		ALL6AM};
+		
 	private static final Logger logger = Logger.getLogger(GenerateEquilPopulationsTest.class);
 	
 	protected void setUp() throws Exception {
@@ -60,7 +70,7 @@ public class GenerateEquilPopulationsTest extends MatsimTestCase {
 		// - set possible modes such that only "car" mode is generated
 		config.planomat().setPossibleModes("car");
 
-		this.runATest();
+		this.runATest(InitialDemand.RANDOM);
 		
 	}
 	
@@ -75,15 +85,28 @@ public class GenerateEquilPopulationsTest extends MatsimTestCase {
 		// - set possible modes such that "car" and "pt" mode legs are generated
 		config.planomat().setPossibleModes("car,pt");
 
-		this.runATest();
+		this.runATest(InitialDemand.RANDOM);
 		
 	}
 	
-	private void runATest() {
+	public void testGenerateAll6AM() {
+		
+		this.runATest(InitialDemand.ALL6AM);
+		
+	}
+	
+	private void runATest(InitialDemand initialDemand) {
 
 		GenerateEquilPopulations testee = new GenerateEquilPopulations();
-		
-		testee.generateRandomCarOnly(scenario);
+
+		switch(initialDemand) {
+		case RANDOM:
+			testee.generateRandomInitialDemand(scenario);
+			break;
+		case ALL6AM:
+			testee.generateAll6AMInitialDemand(scenario);
+			break;
+		}
 		
 		// write population out
 		logger.info("Writing plans file...");

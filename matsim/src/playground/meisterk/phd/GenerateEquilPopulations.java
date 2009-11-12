@@ -37,12 +37,19 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.modules.PlanomatModule;
+import org.matsim.core.replanning.modules.ReRouteDijkstra;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.core.utils.misc.Time;
 
 public class GenerateEquilPopulations {
 
@@ -52,7 +59,7 @@ public class GenerateEquilPopulations {
 		// TODO Auto-generated constructor stub
 	}
 
-	protected void generateRandomCarOnly(ScenarioImpl scenario) {
+	protected void generateRandomInitialDemand(ScenarioImpl scenario) {
 		
 		Population pop = scenario.getPopulation();
 		PopulationFactory popFactory = pop.getFactory();
@@ -94,7 +101,7 @@ public class GenerateEquilPopulations {
 		Controler dummyControler = new Controler(scenario);
 		dummyControler.setLeastCostPathCalculatorFactory(new DijkstraFactory());
 		
-		PlanomatModule testee = new PlanomatModule(
+		PlanomatModule planomat = new PlanomatModule(
 				dummyControler, 
 				emptyEvents, 
 				(NetworkLayer) scenario.getNetwork(), 
@@ -102,14 +109,76 @@ public class GenerateEquilPopulations {
 				travelCostEstimator, 
 				tTravelEstimator);
 		
-		testee.prepareReplanning();
+		planomat.prepareReplanning();
 		for (PersonImpl person : scenario.getPopulation().getPersons().values()) {
 
 			PlanImpl plan = person.getPlans().get(0);
-			testee.handlePlan(plan);
+			planomat.handlePlan(plan);
 			
 		}
-		testee.finishReplanning();
+		planomat.finishReplanning();
+
+	}
+	
+	protected void generateAll6AMInitialDemand(ScenarioImpl scenario) {
+
+		Population pop = scenario.getPopulation();
+		PopulationFactory popFactory = pop.getFactory();
+
+		NetworkLayer network = scenario.getNetwork();
+		
+		Activity act = null;
+		Leg leg = null;
+		for (int ii=0; ii < NUM_AGENTS; ii++) {
+			
+			Person person = popFactory.createPerson(new IdImpl(ii));
+			pop.addPerson(person);
+			
+			Plan plan = popFactory.createPlan();
+			person.addPlan(plan);
+			plan.setSelected(true);
+			
+			act = popFactory.createActivityFromLinkId("h", network.getLink(new IdImpl(1)).getId());
+			act.setEndTime(Time.parseTime("06:00:00"));
+			plan.addActivity(act);
+			leg = popFactory.createLeg(TransportMode.car);
+			leg.setDepartureTime(Time.parseTime("06:00:00"));
+			plan.addLeg(leg);
+			act = popFactory.createActivityFromLinkId("w", network.getLink(new IdImpl(20)).getId());
+			act.setEndTime(Time.parseTime("14:00:00"));
+			plan.addActivity(act);
+			leg = popFactory.createLeg(TransportMode.car);
+			leg.setDepartureTime(Time.parseTime("14:00:00"));
+			plan.addLeg(leg);
+			act = popFactory.createActivityFromLinkId("h", network.getLink(new IdImpl(1)).getId());
+			plan.addActivity(act);
+			
+		}
+		
+		// initial routes = free speed routes
+		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
+		TravelTime travelTimeCalculator = travelTimeCalculatorFactory.createTravelTimeCalculator(
+				network, 
+				scenario.getConfig().travelTimeCalculator());
+		TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
+		TravelCost travelCostCalculator = travelCostCalculatorFactory.createTravelCostCalculator(
+				travelTimeCalculator, 
+				scenario.getConfig().charyparNagelScoring());
+		
+		ReRouteDijkstra router = new ReRouteDijkstra(
+				scenario.getConfig().plansCalcRoute(), 
+				network, 
+				travelCostCalculator, 
+				travelTimeCalculator);
+		
+		router.prepareReplanning();
+		for (PersonImpl person : scenario.getPopulation().getPersons().values()) {
+
+			PlanImpl plan = person.getPlans().get(0);
+			router.handlePlan(plan);
+			
+		}
+		router.finishReplanning();
 
 	}
 	
