@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.facilities.algorithms;
+package playground.balmermi.modules;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -26,17 +26,30 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 
 public class FacilitiesRandomizeHectareCoordinates {
-
-	public void run(ActivityFacilitiesImpl facilities) {
-		System.out.println("    running " + this.getClass().getName() + " algorithm...");
-
-		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-			Coord coord = f.getCoord();
-			coord.setX((Double.valueOf(coord.getX()).intValue() / 100) * 100 + MatsimRandom.getRandom().nextInt(99));
-			coord.setY((Double.valueOf(coord.getY()).intValue() / 100) * 100 + MatsimRandom.getRandom().nextInt(99));
-		}
-
-		System.out.println("    done.");
+	
+	public FacilitiesRandomizeHectareCoordinates() {
+		System.out.println("init " + this.getClass().getName() + " module...");
+		System.out.println("done.");
 	}
 
+	public void run(ActivityFacilitiesImpl facilities) {
+		System.out.println("running " + this.getClass().getName() + " module...");
+
+		int cnt = 0;
+		
+		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
+			Coord coord = f.getCoord();
+			int x = (int)coord.getX();
+			int y = (int)coord.getY();
+			if ((x % 100 == 0) && (y % 100 == 0)) {
+				coord.setX(x+MatsimRandom.getRandom().nextInt(100));
+				coord.setY(y+MatsimRandom.getRandom().nextInt(100));
+				cnt++;
+			}
+		}
+		System.out.println("=> # facilities:            "+facilities.getFacilities().size());
+		System.out.println("=> # coordinates changed:   "+cnt);
+		System.out.println("=> # coordinates unchanged: "+(facilities.getFacilities().size()-cnt));
+		System.out.println("done.");
+	}
 }
