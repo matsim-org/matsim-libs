@@ -22,11 +22,11 @@ package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -70,7 +70,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 			// empty public constructor for private inner class
 		}
 
-		public ScoringFunction getNewScoringFunction(final PlanImpl plan) {
+		public ScoringFunction getNewScoringFunction(final Plan plan) {
 			this.counter++;
 			return this.sf;
 		}

@@ -27,6 +27,7 @@ import java.util.EnumSet;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
@@ -431,7 +432,7 @@ public class ControlerTest extends MatsimTestCase {
 	/** A helper class for testSetScoringFunctionFactory() */
 	/*package*/ static class DummyScoringFunctionFactory implements ScoringFunctionFactory {
 
-		public ScoringFunction getNewScoringFunction(final PlanImpl plan) {
+		public ScoringFunction getNewScoringFunction(final Plan plan) {
 			return new ScoringFunctionAccumulator();
 		}
 	}
