@@ -40,9 +40,9 @@ import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationFactory;
-import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -160,7 +160,7 @@ public class MyControler2 {
 		//dg yes but the used constructor from PopulationWriter doesn't need the config parameter
 		// so we don't need any Gbl or config 
 		// write the population for debugging purposes
-		BasicPopulationWriter popWriter = new BasicPopulationWriter(plans) ;
+		PopulationWriter popWriter = new PopulationWriter(plans) ;
 		popWriter.write("pop.xml.gz") ;
 
 		log.info("### DONE with demand generation  ### at " + new File("pop.xml.gz").getAbsolutePath()) ;

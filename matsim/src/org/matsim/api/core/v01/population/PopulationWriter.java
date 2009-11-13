@@ -21,19 +21,35 @@
 package org.matsim.api.core.v01.population;
 
 import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicPopulationWriter;
+import org.matsim.core.api.internal.MatsimWriter;
 
 /**
  * @author nagel
  *
  */
-public class PopulationWriter extends BasicPopulationWriter {
+public class PopulationWriter implements MatsimWriter {
 
-	/**
-	 * @param population
-	 */
+	private final BasicPopulation population;
+
 	public PopulationWriter(BasicPopulation population) {
-		super(population);
+		this.population = population;
 	}
+	
+	/**
+	 * Writes the population in the most current format (currently plans_v4.dtd). 
+	 */
+	public void write(final String filename) {
+		writeV4(filename);
+	}
+		
+	/**
+	 * Writes the population in the format of plans_v4.dtd
+	 * 
+	 * @param filename
+	 */
+	public void writeV4(final String filename) {
+		new org.matsim.core.population.PopulationWriter(population, filename, "v4", 1.0).write();
+	}
+
 
 }

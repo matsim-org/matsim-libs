@@ -30,10 +30,10 @@ import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.basic.v01.population.BasicPopulationFactory;
-import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -156,7 +156,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		}
 		
 		//write created population
-		BasicPopulationWriter writer = new BasicPopulationWriter(pop);
+		PopulationWriter writer = new PopulationWriter(pop);
 		writer.write(this.getOutputDirectory() + populationFile);
 		File outfile = new File(this.getOutputDirectory() + populationFile);
 		assertTrue(outfile.exists());

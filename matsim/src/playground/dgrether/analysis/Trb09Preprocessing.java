@@ -20,10 +20,10 @@
 package playground.dgrether.analysis;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicPopulationWriter;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -73,7 +73,7 @@ public class Trb09Preprocessing {
 				}
 			}
 			
-			BasicPopulationWriter writer = new BasicPopulationWriter(pop);
+			PopulationWriter writer = new PopulationWriter(pop);
 			writer.write(plans1fileOut);
 			log.debug("ya esta ;-)");
 			
