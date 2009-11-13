@@ -28,6 +28,7 @@ import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
@@ -38,13 +39,11 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandler;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.replanning.PlanStrategyModule;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -108,8 +107,8 @@ public class ExternalModule implements PlanStrategyModule {
 		return new PopulationWriter(pop, filename, version);
 	}
 
-	public void handlePlan(final PlanImpl plan) {
-		PersonImpl person = plan.getPerson();
+	public void handlePlan(final Plan plan) {
+		Person person = plan.getPerson();
 		this.persons.put(person.getId(), person);
 
 		try {

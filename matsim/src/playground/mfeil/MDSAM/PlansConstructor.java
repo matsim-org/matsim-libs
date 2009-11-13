@@ -22,46 +22,48 @@ package playground.mfeil.MDSAM;
 
 
 
-import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.population.MatsimPopulationReader;
-import playground.mfeil.ActChainEqualityCheck;
-import playground.mfeil.MDSAM.AgentsAttributesAdder;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import playground.mfeil.analysis.*;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.constrained.ManageSubchains;
 import org.matsim.locationchoice.constrained.SubChain;
 import org.matsim.population.algorithms.XY2Links;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.PlanStrategyModule;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.api.basic.v01.TransportMode;
+
+import playground.mfeil.ActChainEqualityCheck;
+import playground.mfeil.analysis.ASPActivityChainsModes;
+import playground.mfeil.analysis.ASPActivityChainsModesAccumulated;
 
 
 
@@ -153,7 +155,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("Reading population done.");
 	}
 
-	public void handlePlan(final PlanImpl plan) {			
+	public void handlePlan(final Plan plan) {			
 		// Do nothing here. We work only on the external plans.
 	}
 
@@ -1004,7 +1006,7 @@ public class PlansConstructor implements PlanStrategyModule{
 					}
 				}
 				// Similarity attribute
-				// TODO hier brauchts eine neue Lösung für die Similarity, weil jetzt die Reihenfolge der Plans nicht mehr eindeutig ist!
+				// TODO hier brauchts eine neue Lï¿½sung fï¿½r die Similarity, weil jetzt die Reihenfolge der Plans nicht mehr eindeutig ist!
 				//if (similarity.equals("yes") && found) stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
 				if (!found){
 					for (int j=0;j<Math.max(this.actChains.get(i).size()-1, 1);j++){
@@ -1382,7 +1384,7 @@ public class PlansConstructor implements PlanStrategyModule{
 					}
 				}
 				// Similarity attribute
-				// TODO hier brauchts eine neue Lösung für die Similarity, weil jetzt die Reihenfolge der Plans nicht mehr eindeutig ist!
+				// TODO hier brauchts eine neue Lï¿½sung fï¿½r die Similarity, weil jetzt die Reihenfolge der Plans nicht mehr eindeutig ist!
 				//if (similarity.equals("yes") && found) stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
 				if (!found){
 					boolean car = false;

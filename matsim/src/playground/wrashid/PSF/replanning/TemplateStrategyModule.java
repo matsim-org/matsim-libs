@@ -21,8 +21,8 @@
 package playground.wrashid.PSF.replanning;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.PlanStrategyModule;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 
 public class TemplateStrategyModule implements PlanStrategyModule {
 
@@ -39,7 +39,7 @@ public class TemplateStrategyModule implements PlanStrategyModule {
 		this.counter = 0;
 	}
 
-	public void handlePlan(final PlanImpl plan) {
+	public void handlePlan(final Plan plan) {
 		this.counter++;
 		this.planAlgo.run(plan);
 	}

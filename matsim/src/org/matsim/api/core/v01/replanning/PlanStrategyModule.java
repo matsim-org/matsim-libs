@@ -18,9 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.api.basic.v01.replanning;
+package org.matsim.api.core.v01.replanning;
 
-import org.matsim.api.basic.v01.population.BasicPlan;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PlanImpl;
 
 
 /**
@@ -28,7 +29,7 @@ import org.matsim.api.basic.v01.population.BasicPlan;
  * 
  * @author mrieser
  */
-public interface BasicPlanStrategyModule {
+public interface PlanStrategyModule {
 
 	/**
 	 * Initializes this module before handling plans. Modules using an external
@@ -48,7 +49,7 @@ public interface BasicPlanStrategyModule {
 	 * @param plan
 	 * @see #finishReplanning()
 	 */
-	public void handlePlan(BasicPlan plan);
+	public void handlePlan(Plan plan);
 	
 	/**
 	 * Indicates that no additional plans will be handed to this module and waits
@@ -56,7 +57,7 @@ public interface BasicPlanStrategyModule {
 	 * routines can call those here, or multi-threaded modules can wait here until
 	 * all threads are finished with their work.
 	 * 
-	 * @see #handlePlan(Plan)
+	 * @see #handlePlan(PlanImpl)
 	 */
 	public void finishReplanning();
 }

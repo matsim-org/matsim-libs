@@ -13,19 +13,18 @@ import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 
 
 @SuppressWarnings("unused")
 public class MyModule implements
-BasicPlanStrategyModule,
+PlanStrategyModule,
 BasicActivityEndEventHandler
 {
 	private static final Logger log = Logger.getLogger(MyModule.class);
@@ -102,8 +101,7 @@ BasicActivityEndEventHandler
 		}
 	}
 	
-	public void handlePlan(BasicPlan ppp) { // need handlePlan(BasicPlan) ??????
-		BasicPlan plan = ppp ;
+	public void handlePlan(Plan plan) {
 		
 		PopulationFactory pb = pop.getFactory() ; 
 		

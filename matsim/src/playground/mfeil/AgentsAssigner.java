@@ -179,7 +179,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			// Gender
 			if (this.sex=="yes"){
 				try{
-					if (!((PersonImpl) plan.getPerson()).getSex().equals(agents.getAgentPerson(j).getSex())) continue optimizedAgentsLoop;
+					if (!((PersonImpl) plan.getPerson()).getSex().equals(((PersonImpl) agents.getAgentPerson(j)).getSex())) continue optimizedAgentsLoop;
 				}
 				catch (Exception e) {
 					Statistics.noSexAssignment = true;
@@ -189,7 +189,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			// License
 			if (this.license=="yes"){
 				try{
-					if (!((PersonImpl) plan.getPerson()).getLicense().equals(agents.getAgentPerson(j).getLicense())) continue optimizedAgentsLoop;
+					if (!((PersonImpl) plan.getPerson()).getLicense().equals(((PersonImpl) agents.getAgentPerson(j)).getLicense())) continue optimizedAgentsLoop;
 				}
 				catch (Exception e){
 					Statistics.noLicenseAssignment = true;
@@ -199,7 +199,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			// Car availability
 			if (this.car_avail=="yes"){
 				try{
-					if (!((PersonImpl) plan.getPerson()).getCarAvail().equals(agents.getAgentPerson(j).getCarAvail())) continue optimizedAgentsLoop;
+					if (!((PersonImpl) plan.getPerson()).getCarAvail().equals(((PersonImpl) agents.getAgentPerson(j)).getCarAvail())) continue optimizedAgentsLoop;
 				}
 				catch (Exception e){
 					Statistics.noCarAvailAssignment = true;
@@ -209,7 +209,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			// Employment status
 			if (this.employed=="yes"){
 				try{
-					if (!((PersonImpl) plan.getPerson()).isEmployed().equals(agents.getAgentPerson(j).isEmployed())) continue optimizedAgentsLoop;
+					if (!((PersonImpl) plan.getPerson()).isEmployed().equals(((PersonImpl) agents.getAgentPerson(j)).isEmployed())) continue optimizedAgentsLoop;
 				}
 				catch (Exception e){
 					Statistics.noEmploymentAssignment = true;
@@ -243,7 +243,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			
 			// TODO @mfeil: exception handling missing
 			if (this.age=="yes"){
-				distanceAgent+= this.coefficients.getSingleCoef("age")* (((PersonImpl) plan.getPerson()).getAge()-agents.getAgentPerson(j).getAge());
+				distanceAgent+= this.coefficients.getSingleCoef("age")* (((PersonImpl) plan.getPerson()).getAge()-((PersonImpl) agents.getAgentPerson(j)).getAge());
 			}
 			
 			if (distanceAgent<distance){

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
@@ -13,9 +12,10 @@ import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.replanning.BasicPlanStrategyModule;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
@@ -38,7 +38,7 @@ import org.matsim.core.population.PopulationImpl;
 
 @SuppressWarnings("unused")
 public class MyModule implements
-BasicPlanStrategyModule,
+PlanStrategyModule,
 ActivityEndEventHandler,
 AgentDepartureEventHandler,
 AgentWait2LinkEventHandler,
@@ -133,7 +133,7 @@ ActivityStartEventHandler
 		}
 	}
 	
-	public void handlePlan(BasicPlan plan) {
+	public void handlePlan(Plan plan) {
 		
 		PopulationFactory pb = pop.getFactory() ; 
 		

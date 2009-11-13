@@ -20,8 +20,8 @@
 
 package org.matsim.core.replanning;
 
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -53,7 +53,7 @@ public class PlanStrategyTest extends MatsimTestCase {
 		public void finishReplanning() {
 		}
 
-		public void handlePlan(final PlanImpl plan) {
+		public void handlePlan(final Plan plan) {
 		}
 
 		public void prepareReplanning() {
