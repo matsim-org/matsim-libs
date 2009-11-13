@@ -1,5 +1,6 @@
 package playground.andreas.bln.pop;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -12,6 +13,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
  *
  */
 public abstract class NewPopulation extends AbstractPersonAlgorithm {
+	private static final Logger log = Logger.getLogger(NewPopulation.class);
 	protected PopulationWriter popWriter;
 	protected NetworkLayer net;
 
@@ -35,6 +37,7 @@ public abstract class NewPopulation extends AbstractPersonAlgorithm {
 	}
 
 	public void writeEndPlans() {
+		log.info("Dumping plans to file");
 		this.popWriter.writeEndPlans();
 	}
 }

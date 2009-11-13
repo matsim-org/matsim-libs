@@ -1,5 +1,6 @@
 package playground.andreas.bln.pop;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -21,6 +22,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
  * 
  */
 public class SetPersonCoordsToBoundingBox extends NewPopulation {
+	private static final Logger log = Logger.getLogger(SetPersonCoordsToBoundingBox.class);
 	private int planswritten = 0;
 	private int personshandled = 0;
 	private Coord minXY;
@@ -82,6 +84,10 @@ public class SetPersonCoordsToBoundingBox extends NewPopulation {
 			
 		}
 
+	}
+	
+	protected void printStatistics() {
+		log.info("Finished: " + this.personshandled + " persons handled; " + this.planswritten);
 	}
 	
 	public static void main(final String[] args) {

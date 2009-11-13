@@ -18,14 +18,11 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-
-import playground.andreas.bln.pop.generate.TabReader;
 
 
 /**
@@ -44,7 +41,7 @@ import playground.andreas.bln.pop.generate.TabReader;
  */
 public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 	
-	private static final Logger log = Logger.getLogger(TabReader.class);
+	private static final Logger log = Logger.getLogger(PopGeoFilter.class);
 	
 	private TabularFileParserConfig tabFileParserConfig;
 
@@ -99,17 +96,8 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 							
 						}
 					}
-//					if(((LegImpl) planElement).getRoute() instanceof GenericRouteImpl){
-//						String routeDescription = ((GenericRouteImpl) ((LegImpl) planElement).getRoute()).getRouteDescription();
-//						for (String ptLineID : this.ptLinesToKeep) {
-//							if(routeDescription.contains(ptLineID)){
-//								keepPlan = true;
-//								break;
-//							}
-//						}						
-//					}
-					
 				}
+				
 				if(keepPlan){
 					break;
 				}
@@ -168,9 +156,15 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 		Gbl.printElapsedTime();
 	}
 	
+	protected void printStatistics() {
+		log.info("Finished: " + this.personshandled + " persons handled; " + this.planswritten);
+	}
+	
 	
 	// TabReader below
-	private void readFile(String filename) {
+	protected void readFile(String filename) {
+		
+		log.info("Reading pt lines to keep from " + filename);
 		
 		this.ptLinesToKeep = new ArrayList<String>();
 		this.tabFileParserConfig = new TabularFileParserConfig();
