@@ -20,8 +20,9 @@
 
 package playground.mfeil;
 
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.*;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 /**
  * A factory to create {@link JohScoringFunction}s.
@@ -30,7 +31,7 @@ import org.matsim.core.scoring.*;
  */
 public class JohScoringFunctionFactory implements ScoringFunctionFactory {
 	
-	public ScoringFunction getNewScoringFunction(final PlanImpl plan) {
+	public ScoringFunction getNewScoringFunction(final Plan plan) {
 		return new JohScoringFunction(plan);
 	}
 

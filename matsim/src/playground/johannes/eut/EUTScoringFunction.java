@@ -23,8 +23,8 @@
  */
 package playground.johannes.eut;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 
@@ -36,7 +36,7 @@ public class EUTScoringFunction extends LegScoringFunction {
 
 	private ArrowPrattRiskAversionI utilFunc;
 	
-	public EUTScoringFunction(PlanImpl plan, final CharyparNagelScoringParameters params, ArrowPrattRiskAversionI utilFunc) {
+	public EUTScoringFunction(Plan plan, final CharyparNagelScoringParameters params, ArrowPrattRiskAversionI utilFunc) {
 		super(plan, params);
 		this.utilFunc = utilFunc;
 	}

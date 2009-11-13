@@ -22,9 +22,9 @@ package playground.christoph.scoring;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 public class OnlyTimeDependentScoringFunction implements ScoringFunction {
@@ -39,12 +39,12 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	public static final double beta_late = -18;
 	
 	private LegImpl currentLeg;
-	private PlanImpl plan;
+	private Plan plan;
 	private double score;
 	private double startTime;
 	
 
-	public OnlyTimeDependentScoringFunction(PlanImpl plan)
+	public OnlyTimeDependentScoringFunction(Plan plan)
 	{
 		this.plan = plan;
 	}

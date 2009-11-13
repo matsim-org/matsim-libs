@@ -20,8 +20,7 @@
 
 package playground.jhackney.scoring;
 
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 /**
@@ -31,10 +30,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  */
 public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.demandmodeling.scoring.ScoringFunctionFactory#getNewScoringFunction(org.matsim.demandmodeling.plans.Plan)
-	 */
-	public playground.jhackney.scoring.CharyparNagelReportingScoringFunction getNewScoringFunction(final PlanImpl plan) {
+	public playground.jhackney.scoring.CharyparNagelReportingScoringFunction getNewScoringFunction(final Plan plan) {
 		return new playground.jhackney.scoring.CharyparNagelReportingScoringFunction(plan);
 	}
 

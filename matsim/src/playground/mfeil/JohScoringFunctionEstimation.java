@@ -27,10 +27,10 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
 
@@ -48,8 +48,8 @@ import org.matsim.core.utils.misc.Time;
 
 public class JohScoringFunctionEstimation implements ScoringFunction {
 
-	protected final PersonImpl person;
-	protected final PlanImpl plan;
+	protected final Person person;
+	protected final Plan plan;
 	protected final Id id;
 
 	protected double score;
@@ -120,7 +120,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	
 	
 	
-	public JohScoringFunctionEstimation(final PlanImpl plan) {
+	public JohScoringFunctionEstimation(final Plan plan) {
 		init();
 		this.reset();
 

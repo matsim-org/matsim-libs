@@ -25,13 +25,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.ScoringFunction;
@@ -93,8 +93,8 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 	 * of reading everything from the config directly.
 	 */
 
-	protected final PersonImpl person;
-	protected final PlanImpl plan;
+	protected final Person person;
+	protected final Plan plan;
 
 	protected double score;
 	private double lastTime;
@@ -119,7 +119,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 
 	private static final Logger log = Logger.getLogger(CharyparNagelReportingScoringFunction.class);
 
-	public CharyparNagelReportingScoringFunction(final PlanImpl plan) {
+	public CharyparNagelReportingScoringFunction(final Plan plan) {
 		init();
 		this.reset();
 

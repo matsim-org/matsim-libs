@@ -7,12 +7,12 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
-import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.KtiPtRoute;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
 
@@ -61,7 +61,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 //				String nanoMsg = "Scoring kti pt:\t";
 				
 //				long nanos = System.nanoTime();
-				dist = ((KtiPtRoute) leg.getRoute()).calcAccessEgressDistance(this.plan.getPreviousActivity(leg), this.plan.getNextActivity(leg));
+				dist = ((KtiPtRoute) leg.getRoute()).calcAccessEgressDistance(((PlanImpl) this.plan).getPreviousActivity(leg), ((PlanImpl) this.plan).getNextActivity(leg));
 //				nanos = System.nanoTime() - nanos;
 //				nanoMsg += Long.toString(nanos) + "\t";
 				
@@ -154,7 +154,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 		double score = 0.0;
 
 		double distanceCost = 0.0;
-		TreeSet<String> travelCards = this.plan.getPerson().getTravelcards();
+		TreeSet<String> travelCards = ((PersonImpl) this.plan.getPerson()).getTravelcards();
 		if (travelCards == null) {
 			distanceCost = this.ftConfigGroup.getDistanceCostPtNoTravelCard();
 		} else if (travelCards.contains("unknown")) {

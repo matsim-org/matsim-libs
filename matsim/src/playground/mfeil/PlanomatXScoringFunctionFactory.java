@@ -20,13 +20,13 @@
 
 package playground.mfeil;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.*;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
-import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
-import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 
 /**
  * A factory to create {@link JohScoringFunction}s. Based on new modular approach.
@@ -49,7 +49,7 @@ public class PlanomatXScoringFunctionFactory implements ScoringFunctionFactory {
 	 * @param plan
 	 * @return
 	 */
-	public ScoringFunction getNewScoringFunction(PlanImpl plan) {
+	public ScoringFunction getNewScoringFunction(Plan plan) {
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 

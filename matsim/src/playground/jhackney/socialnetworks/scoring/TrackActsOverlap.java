@@ -24,8 +24,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -264,13 +265,13 @@ public class TrackActsOverlap {
 	 * @param plan
 	 * @return
 	 */
-	public LinkedHashMap<ActivityImpl,ArrayList<Double>> calculateTimeWindowActStats(PlanImpl plan) {
+	public LinkedHashMap<ActivityImpl,ArrayList<Double>> calculateTimeWindowActStats(Plan plan) {
 
 		LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats = new LinkedHashMap<ActivityImpl,ArrayList<Double>>();
 		// stats(0)=friendFoeRatio
 		// stats(1)=nFriends
 		// stats(2)=totalTimeWithFriends
-		PersonImpl p1=plan.getPerson();
+		Person p1=plan.getPerson();
 		for (PlanElement pe1 : plan.getPlanElements()) {
 			if (pe1 instanceof ActivityImpl) {
 				ActivityImpl act1 = (ActivityImpl) pe1;

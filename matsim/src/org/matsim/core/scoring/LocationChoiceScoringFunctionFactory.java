@@ -23,8 +23,8 @@ package org.matsim.core.scoring;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
@@ -48,7 +48,7 @@ public class LocationChoiceScoringFunctionFactory implements ScoringFunctionFact
 		this.facilityPenalties = facilityPenalties;
 	}
 	
-	public ScoringFunction getNewScoringFunction(final PlanImpl plan) {
+	public ScoringFunction getNewScoringFunction(final Plan plan) {
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new LocationChoiceScoringFunction(plan, params, facilityPenalties));

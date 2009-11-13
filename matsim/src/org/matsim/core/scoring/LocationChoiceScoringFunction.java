@@ -26,8 +26,8 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
 
@@ -39,7 +39,7 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 	private List<ScoringPenalty> penalty = null;
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 
-	public LocationChoiceScoringFunction(final PlanImpl plan, final CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties) {
+	public LocationChoiceScoringFunction(final Plan plan, final CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		super(plan, params);
 		this.penalty = new Vector<ScoringPenalty>();
 		this.facilityPenalties = facilityPenalties;

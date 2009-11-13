@@ -1,6 +1,6 @@
 package playground.jhackney.socialnetworks.scoring;
 
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -18,7 +18,7 @@ public class PlanSocScoringFactory implements ScoringFunctionFactory {
 
 	}
 
-	public ScoringFunction getNewScoringFunction(final PlanImpl plan) {
+	public ScoringFunction getNewScoringFunction(final Plan plan) {
 		return new PlanSocScoringFunction(plan, this.factory.getNewScoringFunction(plan), factype, scorer);
 	}
 

@@ -38,6 +38,7 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
@@ -241,7 +242,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	protected double getPerformanceScore(String actType, double duration) {
 
-		double typicalDuration = this.person.getDesires().getActivityDuration(actType);
+		double typicalDuration = ((PersonImpl) this.person).getDesires().getActivityDuration(actType);
 
 		// initialize zero utility durations here for better code readability, because we only need them here
 		double zeroUtilityDuration;

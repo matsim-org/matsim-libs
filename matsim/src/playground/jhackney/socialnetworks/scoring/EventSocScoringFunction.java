@@ -27,10 +27,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
 
@@ -44,7 +44,7 @@ public class EventSocScoringFunction implements ScoringFunction{
 
 	static final private Logger log = Logger.getLogger(EventSocScoringFunction.class);
 	private final ScoringFunction scoringFunction;
-	private final PlanImpl plan;
+	private final Plan plan;
 //	private final TrackEventsOverlap teo;
 	private final LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats;
 	private final String factype;
@@ -60,7 +60,7 @@ public class EventSocScoringFunction implements ScoringFunction{
 	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
 	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
 
-	public EventSocScoringFunction(final PlanImpl plan, final ScoringFunction scoringFunction, String factype, final LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats) {
+	public EventSocScoringFunction(final Plan plan, final ScoringFunction scoringFunction, String factype, final LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats) {
 //		this.paidToll = paidToll;
 		this.scoringFunction = scoringFunction;
 		this.plan = plan;

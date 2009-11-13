@@ -26,10 +26,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.utils.misc.Time;
@@ -48,8 +48,8 @@ import org.matsim.core.utils.misc.Time;
 
 public class ModularJohScoringFunction implements ActivityScoring, BasicScoring {
 
-	protected final PersonImpl person;
-	protected final PlanImpl plan;
+	protected final Person person;
+	protected final Plan plan;
 	protected final Id id;
 
 	protected double score;
@@ -113,7 +113,7 @@ public class ModularJohScoringFunction implements ActivityScoring, BasicScoring 
 	
 	
 	
-	public ModularJohScoringFunction(final PlanImpl plan) {
+	public ModularJohScoringFunction(final Plan plan) {
 		init();
 		this.reset();
 

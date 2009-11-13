@@ -20,8 +20,8 @@
 
 package org.matsim.core.scoring;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
@@ -39,7 +39,7 @@ public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunc
 		this.params = new CharyparNagelScoringParameters(config);
 	}
 
-	public ScoringFunction getNewScoringFunction(PlanImpl plan) {
+	public ScoringFunction getNewScoringFunction(Plan plan) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelOpenTimesScoringFunction(plan, params));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(plan, params));

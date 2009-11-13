@@ -18,8 +18,8 @@
  * *********************************************************************** */
 package playground.benjamin.income2;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -47,10 +47,7 @@ public class BKickIncome2ScoringFunctionFactory implements ScoringFunctionFactor
 		this.hhdb = hhmapping;
 	}
 
-	/**
-	 * @see org.matsim.core.scoring.ScoringFunctionFactory#getNewScoringFunction(org.matsim.core.population.PlanImpl)
-	 */
-	public ScoringFunction getNewScoringFunction(PlanImpl plan) {
+	public ScoringFunction getNewScoringFunction(Plan plan) {
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
