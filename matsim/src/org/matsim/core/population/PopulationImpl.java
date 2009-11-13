@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.routes.PersonAlgorithm;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
 /**
  * Root class of the population description (previously also called "plans file")

@@ -34,13 +34,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.routes.PersonAlgorithm;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.Writer;
 import org.matsim.knowledges.ActivitySpace;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Desires;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class PopulationWriter extends Writer implements PersonAlgorithm {
 

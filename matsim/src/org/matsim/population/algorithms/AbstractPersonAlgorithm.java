@@ -23,7 +23,6 @@ package org.matsim.population.algorithms;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.routes.PersonAlgorithm;
 import org.matsim.core.utils.misc.Counter;
 
 public abstract class AbstractPersonAlgorithm implements PersonAlgorithm {

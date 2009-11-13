@@ -33,8 +33,8 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.population.routes.PersonAlgorithm;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class CutTrips implements PersonAlgorithm {
 
