@@ -21,23 +21,22 @@ package org.matsim.api.core.v01.network;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicNetworkFactory;
+import org.matsim.core.api.internal.MatsimFactory;
 
 
 /**
  * @author dgrether
- *
  */
-public interface NetworkFactory extends BasicNetworkFactory {
+public interface NetworkFactory extends MatsimFactory {
 	/**
 	 * @deprecated use createNode(Id id, Coord coord)
 	 */
 	@Deprecated
 	public Node createNode(final Id id);
-	
+
 	public Node createNode(final Id id, final Coord coord ) ;
-	
+
 	public Link createLink(final Id id, final Id fromNodeId, final Id toNodeId);
-	
-	
+
+
 }

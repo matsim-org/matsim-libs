@@ -26,9 +26,9 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.api.basic.v01.network.BasicNetworkFactory;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -52,17 +52,17 @@ public class DisplayNet implements BasicNetwork, DisplayableNetI {
 
 	private final Map<Id, DisplayNode> nodes = new TreeMap<Id, DisplayNode>();
 	private final Map<Id, DisplayLink> links = new TreeMap<Id, DisplayLink>();
-	private double capacityPeriod;
+	private final double capacityPeriod;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public DisplayNet(NetworkLayer layer) {
+	public DisplayNet(final NetworkLayer layer) {
 		this.capacityPeriod = layer.getCapacityPeriod();
 		// first create nodes
 		for (BasicNode node : layer.getNodes().values()) {
 			DisplayNode node2 = new DisplayNode(node.getId(), this);
 			node2.setCoord(((NodeImpl) node).getCoord());
-			nodes.put(node2.getId(), node2);
+			this.nodes.put(node2.getId(), node2);
 		}
 
 		// second, create links
@@ -80,13 +80,13 @@ public class DisplayNet implements BasicNetwork, DisplayableNetI {
 			link2.setLength_m(((LinkImpl) link).getLength());
 			link2.setNumberOfLanes(NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, (Link) link));
 
-			links.put(link2.getId(), link2);
+			this.links.put(link2.getId(), link2);
 		}
 
 		// third, build/complete the network
 		this.build();
 	}
-	
+
 	public double getCapacityPeriod() {
 		return this.capacityPeriod;
 	}
@@ -94,11 +94,11 @@ public class DisplayNet implements BasicNetwork, DisplayableNetI {
 	// -------------------- IMPLEMENTATION OF BasicNetworkI --------------------
 
 	public Map<Id, ? extends DisplayNode> getNodes() {
-		return nodes;
+		return this.nodes;
 	}
 
 	public Map<Id, ? extends DisplayableLinkI> getLinks() {
-		return links;
+		return this.links;
 	}
 
 	// -------------------- OVERRIDING OF TrafficNet --------------------
@@ -108,36 +108,36 @@ public class DisplayNet implements BasicNetwork, DisplayableNetI {
 			link.build();
 		}
 
-		minEasting = Double.POSITIVE_INFINITY;
-		maxEasting = Double.NEGATIVE_INFINITY;
-		minNorthing = Double.POSITIVE_INFINITY;
-		maxNorthing = Double.NEGATIVE_INFINITY;
+		this.minEasting = Double.POSITIVE_INFINITY;
+		this.maxEasting = Double.NEGATIVE_INFINITY;
+		this.minNorthing = Double.POSITIVE_INFINITY;
+		this.maxNorthing = Double.NEGATIVE_INFINITY;
 
 		for (DisplayNode node : getNodes().values()) {
-			minEasting = Math.min(minEasting, node.getEasting());
-			maxEasting = Math.max(maxEasting, node.getEasting());
-			minNorthing = Math.min(minNorthing, node.getNorthing());
-			maxNorthing = Math.max(maxNorthing, node.getNorthing());
+			this.minEasting = Math.min(this.minEasting, node.getEasting());
+			this.maxEasting = Math.max(this.maxEasting, node.getEasting());
+			this.minNorthing = Math.min(this.minNorthing, node.getNorthing());
+			this.maxNorthing = Math.max(this.maxNorthing, node.getNorthing());
 		}
 	}
 
 	public double minEasting() {
-		return minEasting;
+		return this.minEasting;
 	}
 
 	public double maxEasting() {
-		return maxEasting;
+		return this.maxEasting;
 	}
 
 	public double minNorthing() {
-		return minNorthing;
+		return this.minNorthing;
 	}
 
 	public double maxNorthing() {
-		return maxNorthing;
+		return this.maxNorthing;
 	}
 
-	public BasicNetworkFactory getFactory() {
+	public NetworkFactory getFactory() {
 		throw new UnsupportedOperationException("Not available in this class");
 	}
 
