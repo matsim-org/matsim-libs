@@ -22,6 +22,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
@@ -96,14 +98,14 @@ public class BKickScoringFunction implements ScoringFunction {
 		this.score = INITIAL_SCORE;
 	}
 
-	public void startActivity(final double time, final ActivityImpl act) {
+	public void startActivity(final double time, final Activity act) {
 		// the activity is currently handled by startLeg()
 	}
 
 	public void endActivity(final double time) {
 	}
 
-	public void startLeg(final double time, final LegImpl leg) {
+	public void startLeg(final double time, final Leg leg) {
 		if (this.index % 2 == 0) {
 			// it seems we were not informed about activities
 			handleAct(time);

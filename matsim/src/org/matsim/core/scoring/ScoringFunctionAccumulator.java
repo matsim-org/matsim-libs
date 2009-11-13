@@ -22,8 +22,8 @@ package org.matsim.core.scoring;
 
 import java.util.ArrayList;
 
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
 import org.matsim.core.scoring.interfaces.AgentStuckScoring;
 import org.matsim.core.scoring.interfaces.BasicScoring;
@@ -55,7 +55,7 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		}
 	}
 
-	public void startActivity(double time, ActivityImpl act) {
+	public void startActivity(double time, Activity act) {
 		for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
 			activityScoringFunction.startActivity(time, act);
 		}
@@ -67,7 +67,7 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		}
 	}
 
-	public void startLeg(double time, LegImpl leg) {
+	public void startLeg(double time, Leg leg) {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.startLeg(time, leg);
 		}

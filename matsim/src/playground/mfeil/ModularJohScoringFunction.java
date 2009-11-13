@@ -25,14 +25,14 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.interfaces.LegScoring;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
 import org.matsim.core.scoring.interfaces.BasicScoring;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * New scoring function following Joh's dissertation:
@@ -138,7 +138,7 @@ public class ModularJohScoringFunction implements ActivityScoring, BasicScoring 
 	public void endActivity(final double time) {
 	}
 	*/
-	public void startActivity(final double time, final ActivityImpl act) {
+	public void startActivity(final double time, final Activity act) {
 		this.lastTime = time;
 	}
 
@@ -182,8 +182,8 @@ public class ModularJohScoringFunction implements ActivityScoring, BasicScoring 
 		if (initialized) return;
 		utilParams.clear();
 		readUtilityValues();
-		scoreActs = (marginalUtilityOfWaiting != 0 ||
-				marginalUtilityOfLateArrival != 0 || marginalUtilityOfEarlyDeparture != 0);
+		scoreActs = ((marginalUtilityOfWaiting != 0) ||
+				(marginalUtilityOfLateArrival != 0) || (marginalUtilityOfEarlyDeparture != 0));
 		initialized = true;
 	}
 
@@ -233,13 +233,13 @@ public class ModularJohScoringFunction implements ActivityScoring, BasicScoring 
 		double activityStart = arrivalTime;
 		double activityEnd = departureTime;
 		
-		if (openingTime >=  0 && arrivalTime < openingTime) {
+		if ((openingTime >=  0) && (arrivalTime < openingTime)) {
 			activityStart = openingTime;
 		}
-		if (closingTime >= 0 && closingTime < departureTime) {
+		if ((closingTime >= 0) && (closingTime < departureTime)) {
 			activityEnd = closingTime;
 		}
-		if (openingTime >= 0 && closingTime >= 0
+		if ((openingTime >= 0) && (closingTime >= 0)
 				&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
 			// agent could not perform action
 			activityStart = departureTime;
@@ -255,7 +255,7 @@ public class ModularJohScoringFunction implements ActivityScoring, BasicScoring 
 
 		// disutility if too late
 		double latestStartTime = params.getLatestStartTime();
-		if (latestStartTime >= 0 && activityStart > latestStartTime) {
+		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 			tmpScore += marginalUtilityOfLateArrival / 3600 * (activityStart - latestStartTime);
 		}
 
@@ -275,7 +275,7 @@ public class ModularJohScoringFunction implements ActivityScoring, BasicScoring 
 
 		// disutility if stopping too early
 		double earliestEndTime = params.getEarliestEndTime();
-		if (earliestEndTime >= 0 && activityEnd < earliestEndTime) {
+		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
 			tmpScore += marginalUtilityOfEarlyDeparture / 3600 * (earliestEndTime - activityEnd);
 		}
 

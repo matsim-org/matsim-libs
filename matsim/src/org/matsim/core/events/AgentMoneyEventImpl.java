@@ -23,8 +23,8 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.population.PersonImpl;
 
 /**
  * This event specifies that an agent has gained (or paid) some money.
@@ -51,7 +51,7 @@ public final class AgentMoneyEventImpl extends PersonEventImpl implements AgentM
 	 * @param agent
 	 * @param amount
 	 */
-	public AgentMoneyEventImpl(final double time, final PersonImpl agent, final double amount) {
+	public AgentMoneyEventImpl(final double time, final Person agent, final double amount) {
 		super(time, agent);
 		this.amount = amount;
 	}

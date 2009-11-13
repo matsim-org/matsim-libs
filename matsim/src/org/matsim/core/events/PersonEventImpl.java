@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
 
 /**
@@ -33,10 +34,10 @@ public abstract class PersonEventImpl extends BasicEventImpl implements BasicPer
 
 	public static final String ATTRIBUTE_PERSON = "person";
 
-	private PersonImpl person;
+	private Person person;
 	private final Id personId;
 
-	public PersonEventImpl(final double time, final PersonImpl person) {
+	public PersonEventImpl(final double time, final Person person) {
 		super(time);
 		this.person = person;
 		this.personId = person.getId();
@@ -55,8 +56,9 @@ public abstract class PersonEventImpl extends BasicEventImpl implements BasicPer
 	}
 
 	/** @deprecated use {@link #getPersonId()} instead */
+	@Deprecated
 	public PersonImpl getPerson() {
-		return this.person;
+		return (PersonImpl)this.person;
 	}
 
 	public Id getPersonId() {

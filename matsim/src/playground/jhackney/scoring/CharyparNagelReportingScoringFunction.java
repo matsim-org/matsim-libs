@@ -23,6 +23,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
@@ -133,14 +135,14 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		this.score = INITIAL_SCORE;
 	}
 
-	public void startActivity(final double time, final ActivityImpl act) {
+	public void startActivity(final double time, final Activity act) {
 		// the activity is currently handled by startLeg()
 	}
 
 	public void endActivity(final double time) {
 	}
 
-	public void startLeg(final double time, final LegImpl leg) {
+	public void startLeg(final double time, final Leg leg) {
 		if (this.index % 2 == 0) {
 			// it seems we were not informed about activities
 			handleAct(time);
@@ -172,34 +174,34 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		return this.score;
 	}
 	public double getDudur(ActivityImpl a){
-		if(dudur.size()>0&&dudur.keySet().contains(a)){
+		if((dudur.size()>0)&&dudur.keySet().contains(a)){
 			return dudur.get(a);
 			}else{
 				return -999;
 			}
 	}
 	public double getDuw(ActivityImpl a){
-		if(duw.size()>0&&duw.keySet().contains(a)){
+		if((duw.size()>0)&&duw.keySet().contains(a)){
 			return duw.get(a);
 			}else{
 				return 0;
 			}
 	}
 	public double getDus(ActivityImpl a){
-		if(dus.size()>0&&dus.keySet().contains(a)){
+		if((dus.size()>0)&&dus.keySet().contains(a)){
 			return dus.get(a);
 			}else{
 				return 0;
 			}
 	}
 	public double getDula(ActivityImpl a){
-		if(dula.size()>0&&dula.keySet().contains(a)){
+		if((dula.size()>0)&&dula.keySet().contains(a)){
 		return dula.get(a);
 		}else
 			return 0;
 	}
 	public double getDued(ActivityImpl a){
-		if(dued.size()>0&&dued.keySet().contains(a)){
+		if((dued.size()>0)&&dued.keySet().contains(a)){
 		return dued.get(a);
 		}else{
 			return 0;
@@ -207,21 +209,21 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		
 	}
 	public double getDuld(ActivityImpl a){
-		if(duld.size()>0&&duld.keySet().contains(a)){
+		if((duld.size()>0)&&duld.keySet().contains(a)){
 			return duld.get(a);
 			}else{
 				return 0;
 			}
 	}
 	public double getDulegt(LegImpl l){
-		if(dulegt.size()>0&&dulegt.keySet().contains(l)){
+		if((dulegt.size()>0)&&dulegt.keySet().contains(l)){
 			return dulegt.get(l);
 			}else{
 				return 0;
 			}
 	}
 	public double getDulegd(LegImpl l){
-		if(dulegd.size()>0&&dulegd.keySet().contains(l)){
+		if((dulegd.size()>0)&&dulegd.keySet().contains(l)){
 			return dulegd.get(l);
 			}else{
 				return 0;
@@ -229,34 +231,34 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 	}
 	
 	public double getUdur(ActivityImpl a){
-		if(udur.size()>0&&udur.keySet().contains(a)){
+		if((udur.size()>0)&&udur.keySet().contains(a)){
 			return udur.get(a);
 			}else{
 				return -999;
 			}
 	}
 	public double getUw(ActivityImpl a){
-		if(uw.size()>0&&uw.keySet().contains(a)){
+		if((uw.size()>0)&&uw.keySet().contains(a)){
 			return uw.get(a);
 			}else{
 				return 0;
 			}
 	}
 	public double getUs(ActivityImpl a){
-		if(us.size()>0&&us.keySet().contains(a)){
+		if((us.size()>0)&&us.keySet().contains(a)){
 			return us.get(a);
 			}else{
 				return 0;
 			}
 	}
 	public double getUla(ActivityImpl a){
-		if(ula.size()>0&&ula.keySet().contains(a)){
+		if((ula.size()>0)&&ula.keySet().contains(a)){
 		return ula.get(a);
 		}else
 			return 0;
 	}
 	public double getUed(ActivityImpl a){
-		if(ued.size()>0&&ued.keySet().contains(a)){
+		if((ued.size()>0)&&ued.keySet().contains(a)){
 		return ued.get(a);
 		}else{
 			return 0;
@@ -264,21 +266,21 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		
 	}
 	public double getUld(ActivityImpl a){
-		if(uld.size()>0&&uld.keySet().contains(a)){
+		if((uld.size()>0)&&uld.keySet().contains(a)){
 			return uld.get(a);
 			}else{
 				return 0;
 			}
 	}
 	public double getUlegt(LegImpl l){
-		if(ulegt.size()>0&&ulegt.keySet().contains(l)){
+		if((ulegt.size()>0)&&ulegt.keySet().contains(l)){
 			return ulegt.get(l);
 			}else{
 				return 0;
 			}
 	}
 	public double getUlegd(LegImpl l){
-		if(ulegd.size()>0&&ulegd.keySet().contains(l)){
+		if((ulegd.size()>0)&&ulegd.keySet().contains(l)){
 			return ulegd.get(l);
 			}else{
 				return 0;
@@ -336,8 +338,8 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
 
 		readUtilityValues();
-		scoreActs = (marginalUtilityOfPerforming != 0 || marginalUtilityOfWaiting != 0 ||
-				marginalUtilityOfLateArrival != 0 || marginalUtilityOfEarlyDeparture != 0);
+		scoreActs = ((marginalUtilityOfPerforming != 0) || (marginalUtilityOfWaiting != 0) ||
+				(marginalUtilityOfLateArrival != 0) || (marginalUtilityOfEarlyDeparture != 0));
 		initialized = true;
 	}
 
@@ -388,13 +390,13 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 
 		//
 				
-		if (openingTime >=  0 && arrivalTime < openingTime) {
+		if ((openingTime >=  0) && (arrivalTime < openingTime)) {
 			activityStart = openingTime;
 		}
-		if (closingTime >= 0 && closingTime < departureTime) {
+		if ((closingTime >= 0) && (closingTime < departureTime)) {
 			activityEnd = closingTime;
 		}
-		if (openingTime >= 0 && closingTime >= 0
+		if ((openingTime >= 0) && (closingTime >= 0)
 				&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
 			// agent could not perform action
 			activityStart = departureTime;
@@ -413,7 +415,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		// disutility if too late
 
 		double latestStartTime = params.getLatestStartTime();
-		if (latestStartTime >= 0 && activityStart > latestStartTime) {
+		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 			tmpScore += marginalUtilityOfLateArrival * (activityStart - latestStartTime);
 			ula.put(act,marginalUtilityOfLateArrival * (activityStart - latestStartTime));
 		}else ula.put(act,0.);
@@ -439,7 +441,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 				
 		// disutility if stopping too early
 		double earliestEndTime = params.getEarliestEndTime();
-		if (earliestEndTime >= 0 && activityEnd < earliestEndTime) {
+		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
 			tmpScore += marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd);
 			ued.put(act,marginalUtilityOfEarlyDeparture * (earliestEndTime - activityEnd));
 		}else ued.put(act,0.);
@@ -454,7 +456,7 @@ public class CharyparNagelReportingScoringFunction implements ScoringFunction {
 		
 		// disutility if duration was too short
 		double minimalDuration = params.getMinimalDuration();
-		if (minimalDuration >= 0 && duration < minimalDuration) {
+		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
 			tmpScore += marginalUtilityOfEarlyDeparture * (minimalDuration - duration);
 			us.put(act,marginalUtilityOfEarlyDeparture * (minimalDuration - duration));
 		}else {

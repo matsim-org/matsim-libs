@@ -20,7 +20,8 @@
 
 package org.matsim.core.scoring.interfaces;
 
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.api.core.v01.population.Activity;
+
 
 /**
  * The scoring methods related to activities.
@@ -29,7 +30,7 @@ import org.matsim.core.population.ActivityImpl;
  */
 public interface ActivityScoring {
 
-	public void startActivity(final double time, final ActivityImpl act);
+	public void startActivity(final double time, final Activity act);
 
 	public void endActivity(final double time);
 

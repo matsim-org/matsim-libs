@@ -22,14 +22,14 @@ package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.population.PersonImpl;
 
 public class LinkEnterEventImpl extends LinkEventImpl implements LinkEnterEvent {
 
 	public static final String EVENT_TYPE = "entered link";
 
-	public LinkEnterEventImpl(final double time, final PersonImpl agent, final Link link) {
+	public LinkEnterEventImpl(final double time, final Person agent, final Link link) {
 		super(time, agent, link);
 	}
 

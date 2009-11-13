@@ -21,6 +21,7 @@
 package org.matsim.core.scoring.charyparNagel;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.RouteWRefs;
@@ -62,7 +63,7 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 		this.score = INITIAL_SCORE;
 	}
 
-	public void startLeg(final double time, final LegImpl leg) {
+	public void startLeg(final double time, final Leg leg) {
 		this.lastTime = time;
 	}
 

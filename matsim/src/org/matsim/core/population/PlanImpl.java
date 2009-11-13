@@ -21,10 +21,10 @@
 package org.matsim.core.population;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.population.BasicPlanImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -258,7 +258,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 		return null;
 	}
 
-	public ActivityImpl getPreviousActivity(final LegImpl leg) {
+	public ActivityImpl getPreviousActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {
 			return (ActivityImpl) getPlanElements().get(index-1);
@@ -274,7 +274,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 		return null;
 	}
 
-	public ActivityImpl getNextActivity(final LegImpl leg) {
+	public ActivityImpl getNextActivity(final Leg leg) {
 		int index = this.getActLegIndex(leg);
 		if (index != -1) {
 			return (ActivityImpl) getPlanElements().get(index+1);

@@ -21,6 +21,7 @@
 package org.matsim.core.scoring.charyparNagel;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -76,7 +77,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		this.score = INITIAL_SCORE;
 	}
 
-	public void startActivity(final double time, final ActivityImpl act) {
+	public void startActivity(final double time, final Activity act) {
 		this.lastTime = time;
 	}
 

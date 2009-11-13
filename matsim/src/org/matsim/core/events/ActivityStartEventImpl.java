@@ -22,15 +22,15 @@ package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 
 public class ActivityStartEventImpl extends ActivityEventImpl implements ActivityStartEvent {
 
 	public static final String EVENT_TYPE = "actstart";
 
-	public ActivityStartEventImpl(final double time, final PersonImpl agent, final Link currentLink, final ActivityImpl act) {
+	public ActivityStartEventImpl(final double time, final Person agent, final Link currentLink, final Activity act) {
 		super(time, agent, currentLink, act);
 	}
 

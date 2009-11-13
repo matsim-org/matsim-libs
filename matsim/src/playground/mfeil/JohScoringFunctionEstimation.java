@@ -25,6 +25,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -137,14 +139,14 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 	}
 	
 	// the activity is currently handled by startLeg()
-	public void startActivity(final double time, final ActivityImpl act) {
+	public void startActivity(final double time, final Activity act) {
 	}
 
 	public void endActivity(final double time) {
 	}
 	
 	
-	public void startLeg(final double time, final LegImpl leg) {
+	public void startLeg(final double time, final Leg leg) {
 		
 		if (this.index % 2 == 0) {
 			handleAct(time);
@@ -179,8 +181,8 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		if (initialized) return;
 		utilParams.clear();
 		readUtilityValues();
-		scoreActs = (marginalUtilityOfWaiting != 0 ||
-				marginalUtilityOfLateArrival != 0 || marginalUtilityOfEarlyDeparture != 0);
+		scoreActs = ((marginalUtilityOfWaiting != 0) ||
+				(marginalUtilityOfLateArrival != 0) || (marginalUtilityOfEarlyDeparture != 0));
 		initialized = true;
 	}
 
@@ -188,8 +190,8 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		
 		JohActUtilityParameters params = null;
 		if (!act.getType().equalsIgnoreCase("home")) params = utilParams.get(act.getType());
-		else if (this.index==0 || this.index==this.lastActIndex) params = utilParams.get("home");
-		else if (this.index!=0 && this.index!=this.lastActIndex) params = utilParams.get("h_inner");
+		else if ((this.index==0) || (this.index==this.lastActIndex)) params = utilParams.get("home");
+		else if ((this.index!=0) && (this.index!=this.lastActIndex)) params = utilParams.get("h_inner");
 		
 		if (params == null) {
 			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters.");
@@ -233,13 +235,13 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 		double activityStart = arrivalTime;
 		double activityEnd = departureTime;
 		
-		if (openingTime >=  0 && arrivalTime < openingTime) {
+		if ((openingTime >=  0) && (arrivalTime < openingTime)) {
 			activityStart = openingTime;
 		}
-		if (closingTime >= 0 && closingTime < departureTime) {
+		if ((closingTime >= 0) && (closingTime < departureTime)) {
 			activityEnd = closingTime;
 		}
-		if (openingTime >= 0 && closingTime >= 0
+		if ((openingTime >= 0) && (closingTime >= 0)
 				&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
 			// agent could not perform action
 			activityStart = departureTime;
@@ -255,7 +257,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 
 		// disutility if too late
 		double latestStartTime = params.getLatestStartTime();
-		if (latestStartTime >= 0 && activityStart > latestStartTime) {
+		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 			tmpScore += marginalUtilityOfLateArrival / 3600 * (activityStart - latestStartTime);
 		}
 
@@ -273,7 +275,7 @@ public class JohScoringFunctionEstimation implements ScoringFunction {
 
 		// disutility if stopping too early
 		double earliestEndTime = params.getEarliestEndTime();
-		if (earliestEndTime >= 0 && activityEnd < earliestEndTime) {
+		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
 			tmpScore += marginalUtilityOfEarlyDeparture / 3600 * (earliestEndTime - activityEnd);
 		}
 

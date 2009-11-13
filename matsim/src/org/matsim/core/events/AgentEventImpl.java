@@ -24,19 +24,19 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentEvent;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 
 public abstract class AgentEventImpl extends PersonEventImpl implements AgentEvent {
 
 	public static final String ATTRIBUTE_LINK = "link";	
 
-	private LegImpl leg;
+	private Leg leg;
 
 	private final Id linkId;
 
-	AgentEventImpl(final double time, final PersonImpl agent, final Link link, final LegImpl leg) {
+	AgentEventImpl(final double time, final Person agent, final Link link, final Leg leg) {
 		super(time, agent);
 		this.linkId = link.getId();
 		this.leg = leg;
@@ -54,7 +54,7 @@ public abstract class AgentEventImpl extends PersonEventImpl implements AgentEve
 		return attr;
 	}
 
-	public LegImpl getLeg() {
+	public Leg getLeg() {
 		return this.leg;
 	}
 	

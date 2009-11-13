@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 
@@ -63,7 +63,7 @@ public class PlanSocScoringFunction implements ScoringFunction{
 		this.plan = plan;
 		this.spatialScorer=spatialScorer;
 		this.factype=factype;
-		if(this.betaNFriends!= 0 && this.betaLogNFriends!=0){
+		if((this.betaNFriends!= 0) && (this.betaLogNFriends!=0)){
 			log.warn("Utility function values linear AND log number of Friends in spatial meeting");
 		}
 
@@ -127,11 +127,11 @@ public class PlanSocScoringFunction implements ScoringFunction{
 		this.scoringFunction.finish();
 	}
 
-	public void startActivity(final double time, final ActivityImpl act) {
+	public void startActivity(final double time, final Activity act) {
 		this.scoringFunction.startActivity(time, act);
 	}
 
-	public void startLeg(final double time, final LegImpl leg) {
+	public void startLeg(final double time, final Leg leg) {
 		this.scoringFunction.startLeg(time, leg);
 	}
 

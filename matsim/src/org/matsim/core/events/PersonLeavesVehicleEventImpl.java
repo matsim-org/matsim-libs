@@ -23,8 +23,8 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.events.BasicPersonLeavesVehicleEvent;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.vehicles.BasicVehicle;
 
 /**
@@ -38,7 +38,7 @@ public class PersonLeavesVehicleEventImpl extends PersonEventImpl implements Bas
 
 	private final Id vehicleId;
 
-	public PersonLeavesVehicleEventImpl(final double time, final PersonImpl person, final BasicVehicle vehicle) {
+	public PersonLeavesVehicleEventImpl(final double time, final Person person, final BasicVehicle vehicle) {
 		super(time, person);
 		this.vehicleId = vehicle.getId();
 	}
