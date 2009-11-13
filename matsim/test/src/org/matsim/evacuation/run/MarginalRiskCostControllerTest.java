@@ -12,7 +12,9 @@ public class MarginalRiskCostControllerTest extends MatsimTestCase {
 		String testEventsFile = getOutputDirectory() +"ITERS/it.10/10.events.txt.gz";
 		
 		
-		new EvacuationQSimControllerII(new String [] {config}).run();
+		EvacuationQSimControllerII controler = new EvacuationQSimControllerII(new String [] {config});
+		controler.setCreateGraphs(false);
+		controler.run();
 		assertEquals("different events-files.", CRCChecksum.getCRCFromFile(refEventsFile),	CRCChecksum.getCRCFromFile(testEventsFile));
 		
 		
