@@ -25,11 +25,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -85,9 +86,9 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 	// ////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final PersonImpl person) {
-		for (Iterator<PlanImpl> iter = person.getPlans().iterator(); iter.hasNext();) {
-			PlanImpl plan = iter.next();
+	public void run(final Person person) {
+		for (Iterator<? extends Plan> iter = person.getPlans().iterator(); iter.hasNext();) {
+			Plan plan = iter.next();
 			run(plan);
 			if (plan.getPlanElements().size() != 5) {
 				iter.remove();
@@ -95,11 +96,11 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		}
 	}
 
-	private void run(final PlanImpl plan) {
-		removeUnwantedActs(plan);
-		shortenPlan(plan);
-		setTimes(plan);
-		restoreRoutes(plan);
+	private void run(final Plan plan) {
+		removeUnwantedActs((PlanImpl) plan);
+		shortenPlan((PlanImpl) plan);
+		setTimes((PlanImpl) plan);
+		restoreRoutes((PlanImpl) plan);
 	}
 
 	/**

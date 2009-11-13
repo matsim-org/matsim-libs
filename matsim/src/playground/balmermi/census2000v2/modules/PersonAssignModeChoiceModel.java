@@ -28,13 +28,14 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -124,7 +125,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		else { return false; }
 	}
 	
-	private final int getPrevMode(int s_act_idx, PlanImpl p) {
+	private final int getPrevMode(int s_act_idx, Plan p) {
 		// prev_mode; // 0= car; 1= Pt; 2= Car passenger; 3= Bike; 4= Walk; -1: subtour is starting from home;
 		ActivityImpl act = (ActivityImpl)p.getPlanElements().get(s_act_idx);
 		if (act.getType().startsWith(H)) { return -1; }
@@ -139,7 +140,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final int getUrbanDegree(ArrayList<Integer> act_indices, PlanImpl p) {
+	private final int getUrbanDegree(ArrayList<Integer> act_indices, Plan p) {
 		ActivityImpl act = (ActivityImpl)p.getPlanElements().get(act_indices.get(0));
 		Zone zone = (Zone)act.getFacility().getUpMapping().values().iterator().next();
 		return this.municipalities.getMunicipality(zone.getId()).getRegType();
@@ -147,7 +148,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final double calcTourDistance(ArrayList<Integer> act_indices, PlanImpl p) {
+	private final double calcTourDistance(ArrayList<Integer> act_indices, Plan p) {
 		double dist = 0.0;
 		for (int j=1; j<act_indices.size(); j++) {
 			ActivityImpl from_act = (ActivityImpl)p.getPlanElements().get(act_indices.get(j-1));
@@ -159,9 +160,9 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final ModelModeChoice createModel(int mainpurpose, PlanImpl p) {
+	private final ModelModeChoice createModel(int mainpurpose, Plan p) {
 		ModelModeChoice m = null;
-		if (p.getPerson().getAge() >= 18) {
+		if (((PersonImpl) p.getPerson()).getAge() >= 18) {
 			if (mainpurpose == 0) { m = new ModelModeChoiceWork18Plus(); }
 			else if (mainpurpose == 1) { m = new ModelModeChoiceEducation18Plus(); }
 			else if (mainpurpose == 2) { m = new ModelModeChoiceShop18Plus(); }
@@ -177,7 +178,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final int getMainPurpose(ArrayList<Integer> act_indices, PlanImpl p) {
+	private final int getMainPurpose(ArrayList<Integer> act_indices, Plan p) {
 		//   GET the mainpurpose of the subtour
 		int mainpurpose = 3; // 0 := work; 1 := edu; 2 := shop 3:=leisure
 		for (int j=1; j<act_indices.size()-1; j++) {
@@ -207,10 +208,10 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
-
+	public void run(Person pp) {
+		PersonImpl person = (PersonImpl) pp;
 		// GET the subtours
-		PlanImpl p = person.getSelectedPlan();
+		Plan p = person.getSelectedPlan();
 		past.run(p);
 		int[] subtour_leg_indices = past.getSubtourIndexation();
 		
@@ -344,7 +345,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 		}
 	}
 	
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 	}
 	
 	//////////////////////////////////////////////////////////////////////

@@ -21,9 +21,10 @@
 package playground.balmermi.census2000v2.modules;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -59,7 +60,8 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm implemen
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person p) {
+		PersonImpl person = (PersonImpl) p;
 		boolean has_work = false;
 		if (!this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_W2).isEmpty() ||
 		    !this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_W3).isEmpty()) {
@@ -87,6 +89,6 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm implemen
 		person.setSelectedPlan(mz_p.getSelectedPlan());
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 	}
 }

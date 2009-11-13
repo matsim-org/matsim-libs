@@ -23,11 +23,11 @@ package playground.balmermi.census2000.modules;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -57,7 +57,7 @@ public class PersonVaryTimes extends AbstractPersonAlgorithm implements PlanAlgo
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		List<? extends BasicPlanElement> acts_legs = person.getSelectedPlan().getPlanElements();
 
 		double bias = MatsimRandom.getRandom().nextInt(3600)-1800.0; // [-1800,1800[
@@ -94,6 +94,6 @@ public class PersonVaryTimes extends AbstractPersonAlgorithm implements PlanAlgo
 		} 
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 	}
 }

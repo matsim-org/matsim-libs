@@ -5,7 +5,8 @@ package playground.yu.utils.qgis;
 
 import java.io.Closeable;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -40,11 +41,11 @@ public abstract class TextLayer4QGIS extends AbstractPersonAlgorithm implements
 	}
 
 	@Override
-	public void run(PersonImpl person) {
-		PlanImpl plan = person.getSelectedPlan();
+	public void run(Person person) {
+		Plan plan = person.getSelectedPlan();
 		if (toll == null)
 			run(plan);
-		else if (TollTools.isInRange(plan.getFirstActivity().getLink(), toll)) {
+		else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity().getLink(), toll)) {
 			run(plan);
 		}
 

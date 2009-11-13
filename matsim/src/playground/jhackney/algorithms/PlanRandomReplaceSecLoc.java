@@ -42,6 +42,8 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -84,12 +86,11 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 		this.knowledges = knowledges;
 	}
 
-	public void run(PlanImpl plan) {
-		// TODO Auto-generated method stub
+	public void run(Plan plan) {
 		replaceRandomFacility(plan);
 	}
 
-	private void replaceRandomFacility(PlanImpl plan) {
+	private void replaceRandomFacility(Plan plan) {
 
 		// Draw a random number to figure out which of the facility types will be changed for this plan
 		// If the plan contains this facility type, replace it with a facility from knowledge,
@@ -100,10 +101,10 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 		//
 
 		String factype=null;// facility type to switch out
-		PersonImpl person = plan.getPerson();
+		Person person = plan.getPerson();
 
 		//COPY THE SELECTED PLAN		    
-		PlanImpl newPlan = person.copySelectedPlan();
+		Plan newPlan = ((PersonImpl) person).copySelectedPlan();
 		
 		// Note that it is not changed, yet
 		boolean changed = false;
@@ -137,7 +138,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 
 		// Choose a random act from this list. Return the plan unchanged if there are none.
 		if(actsOfFacType.size()<1){
-			person.setSelectedPlan(plan);
+			((PersonImpl) person).setSelectedPlan(plan);
 			person.getPlans().remove(newPlan);
 			return;
 		}else{
@@ -159,7 +160,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 
 			if(newAct.getLinkId()!=f.getLink().getId()){
 				// If the first activity was chosen, make sure the last activity is also changed
-				if((newAct.getType() == plan.getFirstActivity().getType()) && (newAct.getLink() == plan.getFirstActivity().getLink())){
+				if((newAct.getType() == ((PlanImpl) plan).getFirstActivity().getType()) && (newAct.getLink() == ((PlanImpl) plan).getFirstActivity().getLink())){
 					ActivityImpl lastAct = (ActivityImpl) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
 //					Act lastAct = (Act) plan.getActsLegs().get(plan.getActsLegs().size()-1);
 					lastAct.setLink(f.getLink());
@@ -168,7 +169,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
 				if((newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLink() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink())){
-					ActivityImpl firstAct = (ActivityImpl) newPlan.getFirstActivity();
+					ActivityImpl firstAct = (ActivityImpl) ((PlanImpl) newPlan).getFirstActivity();
 					firstAct.setLink(f.getLink());
 					firstAct.setCoord(f.getCoord());
 					firstAct.setFacility(f);
@@ -196,14 +197,14 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 
 //				Not needed with new change to Act --> Facility JH 7.2008
 //				k.getMentalMap().learnActsActivities(newAct,f.getActivity(factype));
-				person.setSelectedPlan(newPlan);
+				((PersonImpl) person).setSelectedPlan(newPlan);
 //				person.setSelectedPlan(plan);
 				// Remove previous plan
 //				person.getPlans().remove(plan);
 			}else{
 //				System.out.println("   ### newPlan same as old plan");
 				person.getPlans().remove(newPlan);
-				person.setSelectedPlan(plan);
+				((PersonImpl) person).setSelectedPlan(plan);
 			}
 		}
 	}

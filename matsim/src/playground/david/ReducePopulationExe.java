@@ -29,6 +29,9 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -74,7 +77,7 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 		super();
 	}
 
-	public void addLinks(final PlanImpl p) {
+	public void addLinks(final Plan p) {
 		List<?> actl = p.getPlanElements();
 		for (int i= 0; i< actl.size() ; i++) {
 				if (i % 2 == 0) {
@@ -95,8 +98,8 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 		}
 
 	}
-	PlanImpl copyPlanToPT(final PlanImpl in) {
-		PlanImpl erg = new PlanImpl(in.getPerson());
+	PlanImpl copyPlanToPT(final Plan in) {
+		PlanImpl erg = new PlanImpl((Person) in.getPerson());
 		List ergPEs = erg.getPlanElements();
 		List<?> actl = in.getPlanElements();
 		for (int i= 0; i< actl.size() ; i++) {
@@ -123,10 +126,10 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 		return erg;
 	}
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		// check for selected plans routes, if any of the relevant nodes shows up
-		PlanImpl plan = person.getSelectedPlan();
-		LegImpl leg = plan.getNextLeg(plan.getFirstActivity());
+		Plan plan = person.getSelectedPlan();
+		Leg leg = ((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity());
 		if(leg.getMode().equals(TransportMode.car) && leg.getRoute() == null) {
 			// car leg without route make all legs mode = PT
 			plan.setSelected(false);
@@ -134,9 +137,9 @@ class FilterPersons2 extends AbstractPersonAlgorithm{
 			ptCount++;
 			person.addPlan(plan);
 			plan.setSelected(true);
-			person.setSelectedPlan(plan);
+			((PersonImpl) person).setSelectedPlan(plan);
 		}
-		person.removeUnselectedPlans();
+		((PersonImpl) person).removeUnselectedPlans();
 		if(count > 1000000) return; //just write 1 mio plans and the ignore the rest for now
 		
 		try {

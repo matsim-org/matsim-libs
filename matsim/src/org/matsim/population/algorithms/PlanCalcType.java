@@ -21,20 +21,21 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 public class PlanCalcType extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	@Override
-	public void run(PersonImpl person) {
-		for (PlanImpl plan : person.getPlans()) {
+	public void run(Person person) {
+		for (Plan plan : person.getPlans()) {
 			run(plan);
 		}
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 		boolean hasCar = false;
 		boolean hasPt = false;
 		boolean hasRide = false;
@@ -50,11 +51,11 @@ public class PlanCalcType extends AbstractPersonAlgorithm implements PlanAlgorit
 			else if (leg.getMode().equals(TransportMode.walk)) hasWalk = true;
 		}
 
-		if (hasCar) plan.setType(PlanImpl.Type.CAR);
-		else if (hasPt) plan.setType(PlanImpl.Type.PT);
-		else if (hasRide) plan.setType(PlanImpl.Type.RIDE);
-		else if (hasBike) plan.setType(PlanImpl.Type.BIKE);
-		else if (hasWalk) plan.setType(PlanImpl.Type.WALK);
-		else plan.setType(null);
+		if (hasCar) ((PlanImpl) plan).setType(PlanImpl.Type.CAR);
+		else if (hasPt) ((PlanImpl) plan).setType(PlanImpl.Type.PT);
+		else if (hasRide) ((PlanImpl) plan).setType(PlanImpl.Type.RIDE);
+		else if (hasBike) ((PlanImpl) plan).setType(PlanImpl.Type.BIKE);
+		else if (hasWalk) ((PlanImpl) plan).setType(PlanImpl.Type.WALK);
+		else ((PlanImpl) plan).setType(null);
 	}
 }

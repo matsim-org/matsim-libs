@@ -39,12 +39,12 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -52,7 +52,6 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
-import org.matsim.vis.kml.MatsimKmlStyleFactory;
 
 public class KMLPersonPlanWriter {
 
@@ -61,7 +60,7 @@ public class KMLPersonPlanWriter {
 	private String kmzFileName;
 	private String outputDirectory;
 
-	private PersonImpl person;
+	private Person person;
 
 	private ArrayList<Link> activityLinks;
 
@@ -78,11 +77,11 @@ public class KMLPersonPlanWriter {
 
 	private CoordinateTransformation coordinateTransform = new IdentityTransformation();
 
-	PlanImpl personsPlan;
+	private Plan personsPlan;
 
 
 
-	public KMLPersonPlanWriter(NetworkLayer network, PersonImpl person) {
+	public KMLPersonPlanWriter(NetworkLayer network, Person person) {
 		this.network = network;
 		this.person = person;
 
@@ -290,7 +289,7 @@ public class KMLPersonPlanWriter {
 		this.activityLinks = new ArrayList<Link>();
 
 		if (this.person != null) {
-			PlanImpl selectedPlan = this.person.getSelectedPlan();
+			Plan selectedPlan = this.person.getSelectedPlan();
 			if (selectedPlan != null) {
 				for (PlanElement planElement : selectedPlan.getPlanElements()) {
 					if (planElement instanceof BasicActivity) {

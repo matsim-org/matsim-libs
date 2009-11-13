@@ -27,11 +27,11 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.PersonAlgorithm;
 import org.matsim.core.utils.misc.Time;
@@ -46,12 +46,12 @@ public class CutTrips implements PersonAlgorithm {
 		this.aoi = aoi;
 	}
 
-	public void run(final PersonImpl person) {
-		final List<PlanImpl> plans = person.getPlans();
+	public void run(final Person person) {
+		final List<? extends Plan> plans = person.getPlans();
 		if (plans.size() != 1) {
 			throw new RuntimeException("only 1 plan per person supported!");
 		}
-		final PlanImpl plan = plans.get(0);
+		final Plan plan = plans.get(0);
 
 		/* First, we will go through all links of all legs and remember when is the
 		 * first time we enter the AOI, and when we leave it again. After we leave

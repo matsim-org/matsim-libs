@@ -28,8 +28,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -56,12 +57,12 @@ public class PtRate2QGIS implements X2QGIS {
 		}
 
 		@Override
-		public void run(PersonImpl person) {
+		public void run(Person person) {
 			run(person.getSelectedPlan());
 		}
 
-		public void run(PlanImpl plan) {
-			ActivityImpl fa = plan.getFirstActivity();
+		public void run(Plan plan) {
+			ActivityImpl fa = ((PlanImpl) plan).getFirstActivity();
 			Id linkId = fa.getLinkId();
 			if (fa.getType().startsWith("h")) {
 				Integer a = agents.get(linkId);
@@ -82,7 +83,7 @@ public class PtRate2QGIS implements X2QGIS {
 		public Map<Id, Double> getPtRate() {
 			Map<Id, Double> ptRates = new TreeMap<Id, Double>();
 			for (Id linkId : ptUsers.keySet()) {
-				double a = ((double) agents.get(linkId).intValue());
+				double a = agents.get(linkId).intValue();
 				double ptRate = ((double) ptUsers.get(linkId).intValue()) / a;
 				ptRates.put(linkId, Double.valueOf(ptRate));
 			}

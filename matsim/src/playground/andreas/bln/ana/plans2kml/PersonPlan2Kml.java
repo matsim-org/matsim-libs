@@ -4,15 +4,13 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 
 import playground.andreas.bln.pop.NewPopulation;
@@ -87,7 +85,7 @@ public class PersonPlan2Kml extends NewPopulation{
 		Gbl.printElapsedTime();
 	}
 
-	protected void writePersonKML(PersonImpl person) {
+	protected void writePersonKML(Person person) {
 		KMLPersonPlanWriter test = new KMLPersonPlanWriter(this.network, person);
 
 		// set CoordinateTransformation
@@ -110,7 +108,7 @@ public class PersonPlan2Kml extends NewPopulation{
 	}
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		if(this.agentIds == null){
 			writePersonKML(person);
 			if(!this.warningPrinted){

@@ -10,13 +10,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
@@ -64,7 +64,7 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 	}
 
 	@Override
-	public void run(final PlanImpl plan) {
+	public void run(final Plan plan) {
 		double dayTime = 0.0;
 		double carDayTime = 0.0;
 		double ptDayTime = 0.0;
@@ -77,7 +77,7 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 				LegImpl bl = (LegImpl) pe;
 
 				ActType at = null;
-				String tmpActType = plan.getNextActivity(bl).getType();
+				String tmpActType = ((PlanImpl) plan).getNextActivity(bl).getType();
 				for (ActType a : ActType.values())
 					if (tmpActType.equals(a.getActTypeName())) {
 						at = a;

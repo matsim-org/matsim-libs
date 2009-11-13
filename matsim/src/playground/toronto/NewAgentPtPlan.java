@@ -24,9 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
@@ -57,13 +58,13 @@ public class NewAgentPtPlan extends NewPopulation {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		if (Integer.parseInt(person.getId().toString()) < 1000000000) {
 			List<PlanImpl> copyPlans = new ArrayList<PlanImpl>();
 			// copyPlans: the copy of the plans.
-			for (PlanImpl pl : person.getPlans()) {
+			for (Plan pl : person.getPlans()) {
 				// set plan type for car, pt, walk
-				pl.setType(PlanImpl.Type.CAR);
+				((PlanImpl) pl).setType(PlanImpl.Type.CAR);
 				PlanImpl ptPlan = new org.matsim.core.population.PlanImpl(person);
 				ptPlan.setType(PlanImpl.Type.PT);
 //				Plan walkPlan = new org.matsim.population.PlanImpl(person);

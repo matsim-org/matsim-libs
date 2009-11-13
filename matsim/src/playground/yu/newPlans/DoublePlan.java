@@ -21,12 +21,12 @@
 package playground.yu.newPlans;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -39,7 +39,7 @@ import org.matsim.core.population.PopulationReader;
  */
 public class DoublePlan extends NewPopulation {
 	// private String newPersonId;
-	private PersonImpl tmpPerson = null;
+	private Person tmpPerson = null;
 
 	/**
 	 * Construcktor
@@ -53,11 +53,9 @@ public class DoublePlan extends NewPopulation {
 
 	/**
 	 * writes an old Person and also new Persons in new plansfile.
-	 * 
-	 * @see org.matsim.population.algorithms.AbstractPersonAlgorithm#run(org.matsim.core.population.PersonImpl)
 	 */
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		pw.writePerson(person);
 		tmpPerson = person;
 		// String oldId = person.getId().toString();

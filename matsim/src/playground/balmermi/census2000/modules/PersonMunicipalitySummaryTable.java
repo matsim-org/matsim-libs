@@ -27,8 +27,9 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -106,7 +107,8 @@ public class PersonMunicipalitySummaryTable extends AbstractPersonAlgorithm impl
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person pp) {
+		PersonImpl person = (PersonImpl) pp;
 		playground.balmermi.census2000.data.MyPerson p = persons.getPerson(Integer.valueOf(person.getId().toString()));
 		Household hh = p.getHousehold();
 		Municipality muni = hh.getMunicipality();
@@ -133,6 +135,6 @@ public class PersonMunicipalitySummaryTable extends AbstractPersonAlgorithm impl
 		if (YES.equals(person.getLicense())) { v[8]++; }
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 	}
 }

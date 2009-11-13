@@ -25,9 +25,9 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.knowledges.ActivitySpace;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
@@ -83,7 +83,7 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 	
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 
 		// Check if knowledge exists
 		

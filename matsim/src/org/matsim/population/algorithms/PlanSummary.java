@@ -25,9 +25,10 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -110,14 +111,14 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		for (int i=0; i<person.getPlans().size(); i++) {
-			PlanImpl plan = person.getPlans().get(i);
+			Plan plan = person.getPlans().get(i);
 			run(plan);
 		}
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 		for (int j=0; j<actsLegs.size(); j=j+2) {
 			this.actCnt++;
@@ -139,9 +140,9 @@ public class PlanSummary extends AbstractPersonAlgorithm implements PlanAlgorith
 			}
 		}
 
-		Integer count = this.planTypes.get(plan.getType());
+		Integer count = this.planTypes.get(((PlanImpl) plan).getType());
 		if (count == null) count = 0;
-		this.planTypes.put(plan.getType(), count + 1);
+		this.planTypes.put(((PlanImpl) plan).getType(), count + 1);
 
 		this.planCnt++;
 	}

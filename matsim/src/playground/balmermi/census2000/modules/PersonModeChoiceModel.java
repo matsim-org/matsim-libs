@@ -22,12 +22,13 @@ package playground.balmermi.census2000.modules;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -70,7 +71,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		playground.balmermi.census2000.data.MyPerson p = this.persons.getPerson(Integer.valueOf(person.getId().toString()));
 
 		// calc plan distance and main purpose
@@ -113,10 +114,10 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		// setting parameters
 		model.setAge(p.getAge());
 		model.setHHDimension(p.getHousehold().getPersonCount());
-		model.setLicenseOwnership(person.hasLicense());
+		model.setLicenseOwnership(((PersonImpl) person).hasLicense());
 		model.setUrbanDegree(p.getHousehold().getMunicipality().getRegType());
 		model.setCar(p.getCarAvail());
-		model.setTickets(person.getTravelcards());
+		model.setTickets(((PersonImpl) person).getTravelcards());
 		model.setDistanceTour(plan_dist/1000.0); // model needs meters!
 		model.setLicenseOwnership(p.hasLicense());
 		model.setMainPurpose(mainpurpose);
@@ -141,6 +142,6 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		}
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 	}
 }

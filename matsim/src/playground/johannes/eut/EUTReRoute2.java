@@ -23,8 +23,8 @@
  */
 package playground.johannes.eut;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -82,7 +82,7 @@ public class EUTReRoute2 extends AbstractMultithreadedModule {
 			this.algo = algo;
 		}
 		
-		public void run(PlanImpl plan) {
+		public void run(Plan plan) {
 			analyzer.setNextPerson(plan.getPerson());
 			algo.run(plan);
 		}

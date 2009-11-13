@@ -25,23 +25,21 @@ package playground.mfeil.MDSAM;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mfeil.TimeOptimizer;
 import playground.mfeil.config.TimeModeChoicerConfigGroup;
@@ -89,7 +87,7 @@ public class PlansVariator implements PlanAlgorithm {
 	}
 	
 	
-	public void run (PlanImpl plan){
+	public void run (Plan plan){
 		
 		/* Ensure that noOfMaxActs is greater or equal than the noOfActs of current plan */
 		this.noOfMaxActs = java.lang.Math.max(this.noOfMaxActs, plan.getPlanElements().size()/2);
@@ -127,7 +125,7 @@ public class PlansVariator implements PlanAlgorithm {
 		//popwriter.write();
 	}
 	
-	private void varyPlans (PlanImpl[] output, PlanImpl plan){
+	private void varyPlans (PlanImpl[] output, Plan plan){
 		int counter = 0;
 		
 		/* Change number */
@@ -311,7 +309,7 @@ public class PlansVariator implements PlanAlgorithm {
 	
 	
 	/* Method that returns true if two plans feature the same activity chain and the same locations, or false otherwise.*/
-	private boolean checkEqualityOfLocations (PlanImpl plan1, PlanImpl plan2){
+	private boolean checkEqualityOfLocations (Plan plan1, Plan plan2){
 			
 		ArrayList<String> acts1 = new ArrayList<String> ();
 		ArrayList<String> acts2 = new ArrayList<String> ();

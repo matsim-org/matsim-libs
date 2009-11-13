@@ -23,6 +23,8 @@ package playground.balmermi.census2000v2.modules;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -65,7 +67,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 
 		ActivityOption home = null;
@@ -92,10 +94,10 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 			if (!educ_acts.isEmpty()) { educ = educ_acts.get(0); }
 		}
 		
-		PlanImpl p = person.createAndAddPlan(true);
+		Plan p = ((PersonImpl) person).createAndAddPlan(true);
 		try {
 			if ((work==null)&&(educ==null)) {
-				ActivityImpl act = p.createAndAddActivity(home.getType(),home.getFacility().getCoord());
+				ActivityImpl act = ((PlanImpl) p).createAndAddActivity(home.getType(),home.getFacility().getCoord());
 				act.setStartTime(0);
 				act.setEndTime(24*3600);
 				act.setDuration(24*3600);
@@ -107,12 +109,12 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				double end_time = 6*3600 + (MatsimRandom.getRandom().nextInt(2*3600));
 				double sum_dur = end_time;
 				int leg_cnt = 0;
-				ActivityImpl act = p.createAndAddActivity(home.getType(),home.getFacility().getCoord());
+				ActivityImpl act = ((PlanImpl) p).createAndAddActivity(home.getType(),home.getFacility().getCoord());
 				act.setStartTime(start_time);
 				act.setEndTime(end_time);
 				act.setDuration(end_time);
 				act.setFacility(home.getFacility());
-				LegImpl leg = p.createAndAddLeg(TransportMode.car);
+				LegImpl leg = ((PlanImpl) p).createAndAddLeg(TransportMode.car);
 				leg.setDepartureTime(end_time);
 				leg.setTravelTime(0.0);
 				leg.setArrivalTime(end_time);
@@ -123,12 +125,12 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					start_time = end_time;
 					end_time = end_time + 7*3600 + (MatsimRandom.getRandom().nextInt(1*3600));
 					sum_dur = sum_dur + (end_time-start_time);
-					act = p.createAndAddActivity(work.getType(),work.getFacility().getCoord());
+					act = ((PlanImpl) p).createAndAddActivity(work.getType(),work.getFacility().getCoord());
 					act.setStartTime(start_time);
 					act.setEndTime(end_time);
 					act.setDuration(end_time-start_time);
 					act.setFacility(work.getFacility());
-					LegImpl leg2 = p.createAndAddLeg(TransportMode.car);
+					LegImpl leg2 = ((PlanImpl) p).createAndAddLeg(TransportMode.car);
 					leg2.setDepartureTime(end_time);
 					leg2.setTravelTime(0.0);
 					leg2.setArrivalTime(end_time);
@@ -140,12 +142,12 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 					start_time = end_time;
 					end_time = end_time + 4*3600 + (MatsimRandom.getRandom().nextInt(2*3600));
 					sum_dur = sum_dur + (end_time-start_time);
-					act = p.createAndAddActivity(educ.getType(),educ.getFacility().getCoord());
+					act = ((PlanImpl) p).createAndAddActivity(educ.getType(),educ.getFacility().getCoord());
 					act.setStartTime(start_time);
 					act.setEndTime(end_time);
 					act.setDuration(end_time-start_time);
 					act.setFacility(educ.getFacility());
-					LegImpl leg2 = p.createAndAddLeg(TransportMode.car);
+					LegImpl leg2 = ((PlanImpl) p).createAndAddLeg(TransportMode.car);
 					leg2.setDepartureTime(end_time);
 					leg2.setTravelTime(0.0);
 					leg2.setArrivalTime(end_time);
@@ -154,7 +156,7 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 				start_time = end_time;
 				end_time = 24*3600;
 				sum_dur = sum_dur + (end_time-start_time);
-				act = p.createAndAddActivity(home.getType(),home.getFacility().getCoord());
+				act = ((PlanImpl) p).createAndAddActivity(home.getType(),home.getFacility().getCoord());
 				act.setStartTime(start_time);
 				act.setEndTime(end_time);
 				act.setDuration(end_time-start_time);

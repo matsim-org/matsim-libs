@@ -20,8 +20,8 @@
 
 package org.matsim.planomat.costestimators;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 
@@ -37,7 +37,7 @@ public class LegTravelTimeEstimatorFactory {
 	}
 
 	public LegTravelTimeEstimator getLegTravelTimeEstimator(
-			PlanImpl plan,
+			Plan plan,
 			PlanomatConfigGroup.SimLegInterpretation simLegInterpretation,
 			PlanomatConfigGroup.RoutingCapability routingCapability,
 			PlansCalcRoute routingAlgorithm) {

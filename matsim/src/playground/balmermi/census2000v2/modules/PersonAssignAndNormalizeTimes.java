@@ -24,12 +24,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.Desires;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -58,7 +59,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private final void moveTravTimeToNextAct(PlanImpl p) {
+	private final void moveTravTimeToNextAct(Plan p) {
 		double prev_ttime = Time.UNDEFINED_TIME;
 		double tod = ((ActivityImpl)p.getPlanElements().get(0)).getEndTime();
 		for (int i=1; i<p.getPlanElements().size(); i++) {
@@ -89,7 +90,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final void normalizeTimes(PlanImpl p) {
+	private final void normalizeTimes(Plan p) {
 		if (p.getPlanElements().size() == 1) {
 			ActivityImpl a = (ActivityImpl)p.getPlanElements().get(0);
 			a.setStartTime(0.0); a.setDuration(Time.MIDNIGHT); a.setEndTime(Time.MIDNIGHT);
@@ -128,8 +129,8 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final void assignDesires(PlanImpl p) {
-		Desires d = p.getPerson().createDesires(null);
+	private final void assignDesires(Plan p) {
+		Desires d = ((PersonImpl) p.getPerson()).createDesires(null);
 		double othr_dur = 0.0;
 		for (int i=2; i<p.getPlanElements().size()-2; i=i+2) {
 			ActivityImpl a = (ActivityImpl)p.getPlanElements().get(i);
@@ -144,7 +145,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final void varyTimes(PlanImpl p) {
+	private final void varyTimes(Plan p) {
 		List<? extends BasicPlanElement> acts_legs = p.getPlanElements();
 
 		// draw a new random number until the new end time >= 0.0
@@ -183,11 +184,11 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		this.run(person.getSelectedPlan());
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 		this.moveTravTimeToNextAct(plan);
 		this.normalizeTimes(plan);
 		this.assignDesires(plan);

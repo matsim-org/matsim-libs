@@ -25,6 +25,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -109,7 +111,8 @@ public class PersonsSummaryTable extends AbstractPersonAlgorithm implements Plan
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person pp) {
+		PersonImpl person = (PersonImpl) pp;
 
 		// calc i index
 		int age = person.getAge();
@@ -140,6 +143,6 @@ public class PersonsSummaryTable extends AbstractPersonAlgorithm implements Plan
 		this.chain_ageempl[i][j]++;
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 	}
 }

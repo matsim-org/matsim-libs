@@ -23,6 +23,7 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
@@ -42,8 +43,8 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 	}
 
 	@Override
-	public void run(final PersonImpl person) {
-		PlanImpl p = person.createAndAddPlan(true);
+	public void run(final Person person) {
+		PlanImpl p = ((PersonImpl) person).createAndAddPlan(true);
 		ActivityFacilityImpl home_facility = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("home").get(0).getFacility();
 		ArrayList<ActivityOption> acts = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities();
 

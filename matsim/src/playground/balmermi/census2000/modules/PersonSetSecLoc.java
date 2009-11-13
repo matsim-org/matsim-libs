@@ -25,13 +25,13 @@ import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -250,10 +250,10 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		Coord home_coord = null;
 		Coord prim_coord = null;
-		PlanImpl plan = person.getSelectedPlan();
+		Plan plan = person.getSelectedPlan();
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
@@ -313,7 +313,7 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 	}
 }
 

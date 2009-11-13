@@ -23,12 +23,12 @@
  */
 package playground.yu.analysis;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -50,9 +50,9 @@ public class License extends AbstractPersonAlgorithm {
 	}
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		if (person != null)
-			if (person.getLicense().equals("yes"))
+			if (((PersonImpl) person).getLicense().equals("yes"))
 				this.hasLicenseCount++;
 	}
 

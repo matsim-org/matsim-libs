@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -121,14 +120,14 @@ public class PersonImpl extends BasicPersonImpl<Plan> implements Person {
 		return null;
 	}
 
-	public void exchangeSelectedPlan(final PlanImpl newPlan, final boolean appendPlan) {
+	public void exchangeSelectedPlan(final Plan newPlan, final boolean appendPlan) {
 		newPlan.setPerson(this);
 		PlanImpl oldSelectedPlan = getSelectedPlan();
 		if (appendPlan || (oldSelectedPlan == null)) {
-			this.getPlans().add(newPlan);
+			this.getPlans().add((PlanImpl) newPlan);
 		} else {
 			int i = this.getPlans().indexOf(oldSelectedPlan);
-			this.getPlans().set(i, newPlan);
+			this.getPlans().set(i, (PlanImpl) newPlan);
 		}
 		setSelectedPlan(newPlan);
 	}
@@ -160,7 +159,7 @@ public class PersonImpl extends BasicPersonImpl<Plan> implements Person {
 	  return b.toString();
 	}
 
-	public boolean removePlan(final PlanImpl plan) {
+	public boolean removePlan(final Plan plan) {
 		boolean result = this.getPlans().remove(plan);
 		if ((this.getSelectedPlan() == plan) && result) {
 			this.setSelectedPlan(this.getRandomPlan());

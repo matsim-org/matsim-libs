@@ -27,12 +27,12 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -63,12 +63,12 @@ public class ScoreTest extends AbstractPersonAlgorithm {
 	}
 
 	@Override
-	public void run(final PersonImpl person) {
-		PlanImpl worstPlan = null;
-		PlanImpl bestPlan = null;
+	public void run(final Person person) {
+		Plan worstPlan = null;
+		Plan bestPlan = null;
 		double sumScores = 0.0;
 		double cntScores = 0;
-		for (PlanImpl plan : person.getPlans()) {
+		for (Plan plan : person.getPlans()) {
 			if (plan.getScore() == null) {
 				continue;
 			}

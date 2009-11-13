@@ -9,14 +9,14 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -63,7 +63,7 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 	protected double wlkHomeDist, ptHomeDist, carHomeDist, bikeHomeDist,
 			othersHomeDist;
 	protected int count;
-	protected PersonImpl person;
+	protected Person person;
 	protected RoadPricingScheme toll = null;
 
 	public DailyDistance(final RoadPricingScheme toll) {
@@ -130,19 +130,20 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 	}
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		this.person = person;
-		PlanImpl plan = person.getSelectedPlan();
+		Plan plan = person.getSelectedPlan();
 		if (toll == null) {
 			count++;
 			run(plan);
-		} else if (TollTools.isInRange(plan.getFirstActivity().getLink(), toll)) {
+		} else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity().getLink(), toll)) {
 			count++;
 			run(plan);
 		}
 	}
 
-	public void run(final PlanImpl plan) {
+	public void run(final Plan p) {
+		PlanImpl plan = (PlanImpl) p;
 		double dayDist = 0.0;
 		double carDayDist = 0.0;
 		double ptDayDist = 0.0;

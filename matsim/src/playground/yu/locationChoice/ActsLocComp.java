@@ -32,14 +32,14 @@ import java.util.Map.Entry;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -61,11 +61,11 @@ public class ActsLocComp {
 		}
 
 		@Override
-		public void run(final PersonImpl person) {
+		public void run(final Person person) {
 			run(person.getSelectedPlan());
 		}
 
-		public void run(final PlanImpl plan) {
+		public void run(final Plan plan) {
 			List<ActivityImpl> acts = new ArrayList<ActivityImpl>();
 			for (PlanElement pe : plan.getPlanElements())
 				if (pe instanceof ActivityImpl)

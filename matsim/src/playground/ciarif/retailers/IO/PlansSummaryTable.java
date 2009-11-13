@@ -4,10 +4,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class PlansSummaryTable implements PlanAlgorithm {
@@ -44,9 +43,9 @@ public class PlansSummaryTable implements PlanAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	
-	public void run(PersonImpl person, int iter) {
+	public void run(Person person, int iter) {
 		try {
-			PlanImpl plan = person.getSelectedPlan();
+			Plan plan = person.getSelectedPlan();
 			//out.write(person.getId() + "\t");
 			//out.write(plan.getScore() + "\t");
 			for (int i=1; i<plan.getPlanElements().size()-2; i=i+2) {
@@ -85,7 +84,7 @@ public class PlansSummaryTable implements PlanAlgorithm {
 			System.exit(-1);
 		}
 	}
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 		
 		
 	}

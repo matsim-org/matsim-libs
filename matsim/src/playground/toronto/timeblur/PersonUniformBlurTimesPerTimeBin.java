@@ -25,9 +25,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -58,21 +59,21 @@ public class PersonUniformBlurTimesPerTimeBin extends AbstractPersonAlgorithm im
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
-		for (PlanImpl p : person.getPlans()) {
+	public void run(Person person) {
+		for (Plan p : person.getPlans()) {
 			this.run(p);
 		}
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 		Map<Integer,ArrayList<ActivityImpl>> actBins = new TreeMap<Integer, ArrayList<ActivityImpl>>();
-		ActivityImpl currAct = plan.getFirstActivity();
-		while (!currAct.equals(plan.getLastActivity())) {
+		ActivityImpl currAct = ((PlanImpl) plan).getFirstActivity();
+		while (!currAct.equals(((PlanImpl) plan).getLastActivity())) {
 			int endTime = (int)currAct.getEndTime();
 			int binIndex = endTime/binSize;
 			if (!actBins.containsKey(binIndex)) { actBins.put(binIndex,new ArrayList<ActivityImpl>()); }
 			actBins.get(binIndex).add(currAct);
-			currAct = plan.getNextActivity(plan.getNextLeg(currAct));
+			currAct = ((PlanImpl) plan).getNextActivity(((PlanImpl) plan).getNextLeg(currAct));
 		}
 		for (Integer binIndex : actBins.keySet()) {
 			ArrayList<ActivityImpl> acts = actBins.get(binIndex);

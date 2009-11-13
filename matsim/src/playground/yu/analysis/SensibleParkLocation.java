@@ -27,14 +27,14 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -56,7 +56,7 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 		writer = new SimpleWriter(outputFilename);
 	}
 
-	private static boolean checkParkSensible(PlanImpl plan) {
+	private static boolean checkParkSensible(Plan plan) {
 		int carLegCnt = 0;
 		ParkLocation origPark = null, lastNextPark = null;
 
@@ -66,9 +66,9 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 
 			LegImpl leg = (LegImpl) pes.get(i);
 			if (leg.getMode().equals(TransportMode.car)) {
-				ParkLocation prePark = new ParkLocation(plan
+				ParkLocation prePark = new ParkLocation(((PlanImpl) plan)
 						.getPreviousActivity(leg));
-				ParkLocation nextPark = new ParkLocation(plan
+				ParkLocation nextPark = new ParkLocation(((PlanImpl) plan)
 						.getNextActivity(leg));
 
 				if (carLegCnt == 0)
@@ -90,13 +90,13 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 	}
 
 	@Override
-	public void run(PersonImpl person) {
-		for (PlanImpl plan : person.getPlans())
+	public void run(Person person) {
+		for (Plan plan : person.getPlans())
 			run(plan);
 		n++;
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 		List<PlanElement> pes = plan.getPlanElements();
 
 		for (int i = 0; i < pes.size(); i += 2)
@@ -111,7 +111,7 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 		}
 	}
 
-	private static String getPlanElementsPattern(PlanImpl plan) {
+	private static String getPlanElementsPattern(Plan plan) {
 		StringBuilder sb = new StringBuilder("personId :\t");
 		sb.append(plan.getPerson().getId());
 		sb.append('\n');

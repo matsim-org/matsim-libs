@@ -32,6 +32,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -202,7 +203,7 @@ public class MentalMap {
 	 * @param max
 	 * @param myPlans
 	 */
-	public void manageMemory(int max, List<PlanImpl> myPlans){
+	public void manageMemory(int max, List<? extends Plan> myPlans){
 
 		if(myPlans.get(0).getPlanElements().size()*myPlans.size()/2 >max){
 			this.log.info("No activities removed from memory");
@@ -214,7 +215,7 @@ public class MentalMap {
 			// so that they won't be deleted
 
 			ArrayList<Id> currentActivities = new ArrayList<Id>();
-			for (PlanImpl myPlan : myPlans) {
+			for (Plan myPlan : myPlans) {
 				for (PlanElement pe : myPlan.getPlanElements()) {
 					if (pe instanceof ActivityImpl) {
 						ActivityImpl act = (ActivityImpl) pe;

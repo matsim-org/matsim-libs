@@ -35,6 +35,7 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -46,7 +47,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -393,11 +393,11 @@ public class BetaTravelTest extends MatsimTestCase {
 			this.mutationRange = mutationRange;
 		}
 
-		public void run(final PlanImpl plan) {
+		public void run(final Plan plan) {
 			mutatePlan(plan);
 		}
 
-		private void mutatePlan(final PlanImpl plan) {
+		private void mutatePlan(final Plan plan) {
 			int max = plan.getPlanElements().size();
 			int now = 0;
 

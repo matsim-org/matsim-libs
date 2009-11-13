@@ -6,13 +6,13 @@ package playground.yu.analysis.forBln;
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -57,7 +57,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 	}
 
 	@Override
-	public void run(final PlanImpl plan) {
+	public void run(final Plan plan) {
 		double dayDist = 0.0;
 		double carDayDist = 0.0;
 		double ptDayDist = 0.0;
@@ -70,7 +70,7 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 				LegImpl bl = (LegImpl) pe;
 
 				ActType at = null;
-				String tmpActType = plan.getNextActivity(bl).getType();
+				String tmpActType = ((PlanImpl) plan).getNextActivity(bl).getType();
 				for (ActType a : ActType.values())
 					if (tmpActType.equals(a.getActTypeName())) {
 						at = a;
@@ -176,8 +176,8 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case walk:
-					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
-							.getLink().getCoord(), plan.getNextActivity(bl)
+					dist = CoordUtils.calcDistance(((PlanImpl) plan).getPreviousActivity(bl)
+							.getLink().getCoord(), ((PlanImpl) plan).getNextActivity(bl)
 							.getLink().getCoord()) * 1.5 / 1000.0;
 					wlkDist += dist;
 					wlkDayDist += dist;
@@ -225,8 +225,8 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 					wlkLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				case bike:
-					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
-							.getLink().getCoord(), plan.getNextActivity(bl)
+					dist = CoordUtils.calcDistance(((PlanImpl) plan).getPreviousActivity(bl)
+							.getLink().getCoord(), ((PlanImpl) plan).getNextActivity(bl)
 							.getLink().getCoord()) / 1000.0;
 					bikeDist += dist;
 					bikeDayDist += dist;
@@ -274,8 +274,8 @@ public class DailyDistance4Bln extends DailyDistance implements Analysis4Bln {
 					bikeLegDistanceCounts[Math.min(100, (int) dist)]++;
 					break;
 				default:
-					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
-							.getLink().getCoord(), plan.getNextActivity(bl)
+					dist = CoordUtils.calcDistance(((PlanImpl) plan).getPreviousActivity(bl)
+							.getLink().getCoord(), ((PlanImpl) plan).getNextActivity(bl)
 							.getLink().getCoord()) / 1000.0;
 					othersDist += dist;
 					othersDayDist += dist;

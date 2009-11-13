@@ -1,6 +1,6 @@
 package playground.yu.visum.filter.finalFilters;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.yu.visum.filter.PersonFilterA;
 
@@ -16,7 +16,7 @@ public class FinalPersonFilter extends PersonFilterA {
 	 *            a person transfered from another PersonFilter
 	 */
 	@Override
-	public boolean judge(PersonImpl person) {
+	public boolean judge(Person person) {
 		return false;
 	}
 }

@@ -1,6 +1,6 @@
 package playground.yu.visum.filter.finalFilters;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
@@ -35,7 +35,7 @@ public class NewPlansWriter extends FinalPersonFilter {
 	 *            a Person-object transfered from another PersonFilter
 	 */
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		if (person != null)
 			this.plansWriter.writePerson(person);
 	}

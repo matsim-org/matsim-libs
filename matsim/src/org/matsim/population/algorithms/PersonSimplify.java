@@ -22,9 +22,9 @@ package org.matsim.population.algorithms;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 public class PersonSimplify extends AbstractPersonAlgorithm {
@@ -48,7 +48,7 @@ public class PersonSimplify extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		List plans = person.getPlans();
 		for (int i=0; i<plans.size(); i++) {
 			PlanImpl plan = (PlanImpl)plans.get(i);

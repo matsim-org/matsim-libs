@@ -25,9 +25,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 
 public class PlanFilterActTypes extends AbstractPersonAlgorithm {
 
@@ -57,9 +57,9 @@ public class PlanFilterActTypes extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
-		for (Iterator<PlanImpl> iter = person.getPlans().iterator(); iter.hasNext(); ) {
-			PlanImpl plan = iter.next();
+	public void run(Person person) {
+		for (Iterator<? extends Plan> iter = person.getPlans().iterator(); iter.hasNext(); ) {
+			Plan plan = iter.next();
 			boolean match = false;
 			List actsLegs = plan.getPlanElements();
 			for (int i = 0, max = actsLegs.size(); i < max; i += 2) {

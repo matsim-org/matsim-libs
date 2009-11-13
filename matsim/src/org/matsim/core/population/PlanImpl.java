@@ -24,7 +24,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.population.BasicPlanImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -50,7 +52,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 
 	private final static String ACT_ERROR = "The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.";
 
-	public PlanImpl(final PersonImpl person) {
+	public PlanImpl(final Person person) {
 		super(person);
 	}
 
@@ -206,10 +208,12 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 	/** loads a copy of an existing plan, but keeps the person reference
 	 * @param in a plan who's data will be loaded into this plan
 	 **/
-	public void copyPlan(final PlanImpl in) {
+	public void copyPlan(final Plan in) {
 		// TODO should be re-implemented making use of Cloneable
 		setScore(in.getScore());
-		this.setType(in.getType());
+		if (in instanceof PlanImpl) {
+			this.setType(((PlanImpl) in).getType());
+		}
 //		setPerson(in.getPerson()); // do not copy person, but keep the person we're assigned to
 		for (PlanElement pe : in.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
@@ -250,7 +254,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 		getPlanElements().add(pos, leg);
 	}
 
-	public LegImpl getPreviousLeg(final ActivityImpl act) {
+	public LegImpl getPreviousLeg(final Activity act) {
 		int index = this.getActLegIndex(act);
 		if (index != -1) {
 			return (LegImpl) getPlanElements().get(index-1);
@@ -266,7 +270,7 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 		return null;
 	}
 
-	public LegImpl getNextLeg(final ActivityImpl act) {
+	public LegImpl getNextLeg(final Activity act) {
 		int index = this.getActLegIndex(act);
 		if ((index < getPlanElements().size() - 1) && (index != -1)) {
 			return (LegImpl) getPlanElements().get(index+1);

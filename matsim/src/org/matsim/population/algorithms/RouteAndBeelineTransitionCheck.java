@@ -28,6 +28,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -61,8 +62,8 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 		this.count = new int[4];
 	}
 
-	public void run(final PlanImpl plan) {
-		PlanImpl beeline = getBeeline(plan);
+	public void run(final Plan plan) {
+		Plan beeline = getBeeline(plan);
 
 		Iterator<PlanElement> itPlan = plan.getPlanElements().iterator();
 		Iterator<PlanElement> itBeeline = beeline.getPlanElements().iterator();
@@ -95,7 +96,7 @@ public class RouteAndBeelineTransitionCheck implements PlanAlgorithm {
 		return 0;
 	}
 
-	private PlanImpl getBeeline(final PlanImpl plan) {
+	private PlanImpl getBeeline(final Plan plan) {
 		PlanImpl beeline = new PlanImpl(plan.getPerson());
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {

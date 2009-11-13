@@ -59,18 +59,17 @@ import java.util.HashMap;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledge;
@@ -128,7 +127,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 	}
 	
 	@Override
-	public void run(PersonImpl guy){
+	public void run(Person guy){
 
 		// Modify the plans of the agents accordingly to the Primloc model 
 		// that was run in setup()
@@ -307,8 +306,8 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			}
 	}
 	
-	private boolean agentHasPrimaryActivityInPlan( PersonImpl guy ){
-		for( PlanImpl plan : guy.getPlans() ) {
+	private boolean agentHasPrimaryActivityInPlan(Person guy) {
+		for (Plan plan : guy.getPlans()) {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					if (((ActivityImpl) pe).getType().equals(primaryActivityName)) {

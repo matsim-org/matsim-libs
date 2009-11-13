@@ -21,9 +21,9 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 
 /**
  * Replaces the leg modes in a single plan or in all plans of a person.
@@ -49,13 +49,13 @@ public class PlanReplaceLegModes extends AbstractPersonAlgorithm implements Plan
 	}
 
 	@Override
-	public void run(final PersonImpl person) {
-		for (PlanImpl plan : person.getPlans()) {
+	public void run(final Person person) {
+		for (Plan plan : person.getPlans()) {
 			run(plan);
 		}
 	}
 
-	public void run(final PlanImpl plan) {
+	public void run(final Plan plan) {
 		for (int i = 1, max = plan.getPlanElements().size(); i < max; i += 2) {
 			LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
 			TransportMode mode = leg.getMode();

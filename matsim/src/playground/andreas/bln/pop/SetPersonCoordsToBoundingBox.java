@@ -4,13 +4,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -35,7 +35,7 @@ public class SetPersonCoordsToBoundingBox extends NewPopulation {
 	}
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		
 		this.personshandled++;
 		
@@ -43,7 +43,7 @@ public class SetPersonCoordsToBoundingBox extends NewPopulation {
 			System.err.println("Person got more than one plan");
 		} else {
 			
-			PlanImpl plan = person.getPlans().get(0);
+			Plan plan = person.getPlans().get(0);
 			
 			for (PlanElement planElement : plan.getPlanElements()) {
 				if(planElement instanceof ActivityImpl){

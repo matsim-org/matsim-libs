@@ -22,16 +22,16 @@ package org.matsim.planomat.costestimators;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 
 public abstract class AbstractLegTravelTimeEstimator implements
 		LegTravelTimeEstimator {
 
-	protected PlanImpl plan;
+	protected Plan plan;
 	
-	public AbstractLegTravelTimeEstimator(PlanImpl plan) {
+	public AbstractLegTravelTimeEstimator(Plan plan) {
 		super();
 		this.plan = plan;
 	}

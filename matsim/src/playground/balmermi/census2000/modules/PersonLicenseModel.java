@@ -20,8 +20,9 @@
 
 package playground.balmermi.census2000.modules;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -55,7 +56,7 @@ public class PersonLicenseModel extends AbstractPersonAlgorithm implements PlanA
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		playground.balmermi.census2000.data.MyPerson p = this.persons.getPerson(Integer.valueOf(person.getId().toString()));
 		model.setAge(p.getAge());
 		model.setHHDimension(p.getHousehold().getPersonCount());
@@ -65,12 +66,12 @@ public class PersonLicenseModel extends AbstractPersonAlgorithm implements PlanA
 		model.setSex(p.isMale());
 		model.setUrbanDegree(p.getHousehold().getMunicipality().getRegType());
 		boolean hasLicense = model.calcLicenseOwnership();
-		if (hasLicense) { person.setLicence(YES); } else { person.setLicence(NO); }
+		if (hasLicense) { ((PersonImpl) person).setLicence(YES); } else { ((PersonImpl) person).setLicence(NO); }
 		if ((p.getAge() < 18) && (hasLicense)) {
-			person.setLicence(NO);
+			((PersonImpl) person).setLicence(NO);
 		}
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 	}
 }

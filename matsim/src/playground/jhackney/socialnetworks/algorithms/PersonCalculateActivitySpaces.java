@@ -23,9 +23,9 @@ package playground.jhackney.socialnetworks.algorithms;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -61,7 +61,7 @@ public class PersonCalculateActivitySpaces {
 	 * @return the average straight-line distance from agent's home to all of its activities
 	 * (the radius of a disk-shaped activity space).
 	 */
-	public double getPersonASD2(PlanImpl plan) {
+	public double getPersonASD2(Plan plan) {
 
 		double aSd = 0.;
 		int numAct = 0;

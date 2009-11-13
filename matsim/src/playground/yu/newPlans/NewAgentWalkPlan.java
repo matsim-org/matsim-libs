@@ -25,15 +25,15 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -65,11 +65,11 @@ public class NewAgentWalkPlan extends NewPopulation {
 
 	@SuppressWarnings( { "deprecation", "unchecked" })
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		if (Integer.parseInt(person.getId().toString()) < 1000000000) {
 			List<PlanImpl> copyPlans = new ArrayList<PlanImpl>();
 			// copyPlans: the copy of the plans.
-			for (PlanImpl pl : person.getPlans()) {
+			for (Plan pl : person.getPlans()) {
 				if (hasLongLegs(pl))
 					break;
 				// set plan type for car, pt, walk
@@ -110,12 +110,12 @@ public class NewAgentWalkPlan extends NewPopulation {
 		this.pw.writePerson(person);
 	}
 
-	private boolean hasLongLegs(PlanImpl plan) {
+	private boolean hasLongLegs(Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
 				LegImpl leg = (LegImpl) pe;
-				if (CoordUtils.calcDistance(plan.getPreviousActivity(leg)
-						.getLink().getCoord(), plan.getNextActivity(leg)
+				if (CoordUtils.calcDistance(((PlanImpl) plan).getPreviousActivity(leg)
+						.getLink().getCoord(), ((PlanImpl) plan).getNextActivity(leg)
 						.getLink().getCoord()) / 1000.0 > 3.0)
 					return true;
 			}

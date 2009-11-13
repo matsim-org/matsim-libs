@@ -23,15 +23,15 @@ package playground.yu.newPlans;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
@@ -53,8 +53,8 @@ public class ModeChoicePlan extends NewPopulation {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void run(final PersonImpl person) {
-		PlanImpl sp = person.getSelectedPlan();
+	public void run(final Person person) {
+		Plan sp = person.getSelectedPlan();
 		person.getPlans().clear();
 		person.addPlan(sp);
 

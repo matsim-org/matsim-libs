@@ -1,15 +1,14 @@
 package playground.jhackney.algorithms;
 
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.PersonAlgorithm;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
-public class PlansPlotScoreDistance extends AbstractPersonAlgorithm implements PersonAlgorithm{
+public class PlansPlotScoreDistance extends AbstractPersonAlgorithm {
 	double[] dist=null;
 	double[] score=null;
 	int i=0;
@@ -21,14 +20,13 @@ public class PlansPlotScoreDistance extends AbstractPersonAlgorithm implements P
 	}
 
 	@Override
-	public void run(PersonImpl person) {
-		// TODO Auto-generated method stub
-		PlanImpl p = person.getSelectedPlan();
+	public void run(Person person) {
+		Plan p = person.getSelectedPlan();
 		dist[i]=0;
 		score[i]= p.getScore().doubleValue();
 		for (PlanElement pe : p.getPlanElements()) {
-			if (pe instanceof LegImpl) {
-				LegImpl l = (LegImpl) pe;
+			if (pe instanceof Leg) {
+				Leg l = (Leg) pe;
 				dist[i]+=l.getRoute().getDistance();
 			}
 		}

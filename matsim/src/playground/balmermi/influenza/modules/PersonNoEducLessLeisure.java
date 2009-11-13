@@ -23,11 +23,11 @@ package playground.balmermi.influenza.modules;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PersonNoEducLessLeisure extends AbstractPersonAlgorithm {
@@ -61,7 +61,7 @@ public class PersonNoEducLessLeisure extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		if (person.getPlans().size() != 1) { throw new RuntimeException("pid="+person.getId()+" must have one plan only!"); }
 		Plan plan = person.getPlans().get(0);
 		for (int i=1; i<plan.getPlanElements().size(); i=i+2) {

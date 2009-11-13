@@ -23,10 +23,11 @@ package playground.balmermi.census2000v2.modules;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -66,7 +67,7 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void assignHHSizeModelParamsFromHH(PersonImpl p, Household hh) {
+	private final void assignHHSizeModelParamsFromHH(Person p, Household hh) {
 		// nump
 		int nump = hh.getPersons().size();
 		if (nump > MAXNUMP) { nump = MAXNUMP; }
@@ -82,7 +83,7 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 		}
 	}
 	
-	private final void assignHHSizeModelParamsFromCatts(PersonImpl p, Household hh) {
+	private final void assignHHSizeModelParamsFromCatts(Person p, Household hh) {
 		// nump
 		int nump = (Integer)p.getCustomAttributes().get(CAtts.P_APERW);
 		if (nump < 1) { nump = (Integer)p.getCustomAttributes().get(CAtts.P_WKATA); }
@@ -106,15 +107,15 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		Map<String,Object> atts = person.getCustomAttributes();
 		Household hh = (Household)atts.get(CAtts.HH_W);
 
 		// age
-		model.setAge(person.getAge());
+		model.setAge(((PersonImpl) person).getAge());
 
 		// sex
-		if (person.getSex().equals(MALE)) { model.setSex(true); } else { model.setSex(false); }
+		if (((PersonImpl) person).getSex().equals(MALE)) { model.setSex(true); } else { model.setSex(false); }
 
 		// nat
 		if (((Integer)atts.get(CAtts.P_HMAT)) == 1) { model.setNationality(true); } else { model.setNationality(false); }
@@ -130,13 +131,13 @@ public class PersonAssignLicenseModel extends AbstractPersonAlgorithm implements
 		
 		// calc and assign license ownership
 		boolean hasLicense = false;
-		if (person.getAge() >= 18) {
+		if (((PersonImpl) person).getAge() >= 18) {
 			hasLicense = model.calcLicenseOwnership();
 			if (!hasLicense && (MatsimRandom.getRandom().nextDouble() < 0.4)) { hasLicense = true; }
 		}
-		if (hasLicense) { person.setLicence(YES); } else { person.setLicence(NO); }
+		if (hasLicense) { ((PersonImpl) person).setLicence(YES); } else { ((PersonImpl) person).setLicence(NO); }
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 	}
 }

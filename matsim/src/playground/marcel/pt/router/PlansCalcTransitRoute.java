@@ -30,12 +30,12 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.router.Dijkstra;
@@ -63,7 +63,7 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 	private final TransitConfigGroup transitConfig;
 	private final TransitSchedule schedule;
 
-	private PlanImpl currentPlan = null;
+	private Plan currentPlan = null;
 	private final List<Tuple<Leg, List<Leg>>> legReplacements = new LinkedList<Tuple<Leg, List<Leg>>>();
 
 	public PlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final NetworkLayer network,
@@ -87,7 +87,7 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 	}
 
 	@Override
-	public void handlePlan(final PlanImpl plan) {
+	public void handlePlan(final Plan plan) {
 		this.transitLegsRemover.run(plan);
 		this.currentPlan = plan;
 		this.legReplacements.clear();

@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -95,7 +96,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 			/*
 			 * Total average
 			 */
-			Collection<PersonImpl> population = event.getControler().getPopulation().getPersons().values();
+			Collection<Person> population = (Collection) event.getControler().getPopulation().getPersons().values();
 			double avrTripDur = avrTripDuration(population, samplesAll);
 			double avrScore = avrSelectedScore(population);
 			dump(avrTripDur, avrScore);
@@ -108,7 +109,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 			/*
 			 * Unguided agents
 			 */
-			Collection<PersonImpl> unguided = CollectionUtils.subtract(population, analyzer.getGuidedPersons());
+			Collection<Person> unguided = CollectionUtils.subtract(population, analyzer.getGuidedPersons());
 			avrTripDur = avrTripDuration(unguided, samplesUnguided);
 			avrScore = avrSelectedScore(unguided);
 			dump(avrTripDur, avrScore);
@@ -153,12 +154,12 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		
 	}
 
-	private double avrTripDuration(Collection<PersonImpl> persons, List<Double> samples) {
+	private double avrTripDuration(Collection<Person> persons, List<Double> samples) {
 		if(persons == null || persons.isEmpty())
 			return 0;
 		
 		double sum = 0;
-		for(PersonImpl p : persons) {
+		for(Person p : persons) {
 			Double d = tripDurations.get(p);
 			if(d != null) {// unfortunately this can happen -> within-day bug!
 				sum += d;
@@ -169,12 +170,12 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		return sum/(double)persons.size();
 	}
 	
-	private double avrSelectedScore(Collection<PersonImpl> persons) {
+	private double avrSelectedScore(Collection<Person> persons) {
 		if(persons == null || persons.isEmpty())
 			return 0;
 		
 		double sum = 0;
-		for(PersonImpl p : persons) {
+		for(Person p : persons) {
 			sum += p.getSelectedPlan().getScore().doubleValue();
 		}
 		

@@ -20,8 +20,9 @@
 
 package org.matsim.population.algorithms;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 
@@ -37,9 +38,9 @@ public class PersonRemoveCertainActs extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		for (int i = 0; i < person.getPlans().size(); i++) {
-			PlanImpl plan = person.getPlans().get(i);
+			Plan plan = person.getPlans().get(i);
 
 			int size = plan.getPlanElements().size();
 			if (size >= 5) {
@@ -52,13 +53,13 @@ public class PersonRemoveCertainActs extends AbstractPersonAlgorithm {
 					String act_type = act.getType();
 
 					if (!(act_type.equals("work1") || act_type.equals("work2") || act_type.equals("work3"))) {
-						plan.removeActivity(jj);
+						((PlanImpl) plan).removeActivity(jj);
 					}
 				}
 			}
 
 			if (plan.getPlanElements().size() == 3) {
-				plan.removeActivity(2); // new method! See Plan.java.
+				((PlanImpl) plan).removeActivity(2); // new method! See Plan.java.
 			}
 		}
 	}

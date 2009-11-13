@@ -23,6 +23,8 @@ package playground.balmermi.census2000.modules;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -196,11 +198,11 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void setChain(PersonImpl p, int bitcode) {
+	private final void setChain(Person p, int bitcode) {
 		ArrayList<ArrayList<Integer>> chains = this.actchains.getChains(bitcode);
 		int index = MatsimRandom.getRandom().nextInt(chains.size());
 		ArrayList<Integer> chain = chains.get(index);
-		PlanImpl plan =  p.createAndAddPlan(true);
+		PlanImpl plan =  ((PersonImpl) p).createAndAddPlan(true);
 		int time_sum = 0;
 		for (int i=0; i<chain.size(); i=i+2) {
 			int val = chain.get(i);
@@ -252,9 +254,9 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
-		int age = person.getAge();
-		boolean employed = person.isEmployed();
+	public void run(Person person) {
+		int age = ((PersonImpl) person).getAge();
+		boolean employed = ((PersonImpl) person).isEmployed();
 		int row = -1;
 		if (age < 6) { row = 0; }
 		else if (age < 8) { row = 2; }
@@ -272,6 +274,6 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 		}
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 	}
 }

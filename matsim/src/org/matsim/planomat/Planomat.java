@@ -31,10 +31,12 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunction;
@@ -96,14 +98,14 @@ public class Planomat implements PlanAlgorithm {
 		this.seedGenerator = MatsimRandom.getLocalInstance();
 	}
 
-	public void run(final PlanImpl plan) {
+	public void run(final Plan plan) {
 
 		if (this.doLogging) {
 			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...");
 		}
 		
 		LegTravelTimeEstimator legTravelTimeEstimator = this.legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
-				plan,
+				(PlanImpl) plan,
 				this.planomatConfigGroup.getSimLegInterpretation(), 
 				this.planomatConfigGroup.getRoutingCapability(), 
 				this.router);
@@ -170,16 +172,14 @@ public class Planomat implements PlanAlgorithm {
 	 * @param plan
 	 * @return
 	 */
-	protected TransportMode[] getPossibleModes(final PlanImpl plan) {
+	protected TransportMode[] getPossibleModes(final Plan plan) {
 		
 		// remove car option for agents that have no car available
 		EnumSet<TransportMode> possibleModesEnumSet = this.planomatConfigGroup.getPossibleModes().clone();
 		
-		String carAvail = plan.getPerson().getCarAvail();
-		if (carAvail != null) {
-			if (plan.getPerson().getCarAvail().equals("never")) {
-				possibleModesEnumSet.remove(TransportMode.car);
-			}
+		String carAvail = ((PersonImpl) plan.getPerson()).getCarAvail();
+		if ("never".equals(carAvail)) {
+			possibleModesEnumSet.remove(TransportMode.car);
 		}
 		TransportMode[] possibleModes = possibleModesEnumSet.toArray(new TransportMode[possibleModesEnumSet.size()]);
 
@@ -199,7 +199,7 @@ public class Planomat implements PlanAlgorithm {
 	protected double stepThroughPlan(
 			final StepThroughPlanAction action, 
 			final IChromosome individual, 
-			final PlanImpl plan, 
+			final Plan plan, 
 			final PlanAnalyzeSubtours planAnalyzeSubtours,
 			final LegTravelTimeEstimator legTravelTimeEstimator,
 			final TransportMode[] possibleModes) {
@@ -216,7 +216,7 @@ public class Planomat implements PlanAlgorithm {
 
 		ScoringFunction scoringFunction = null;
 		if (action.equals(StepThroughPlanAction.EVALUATE)) {
-			scoringFunction = this.scoringFunctionFactory.getNewScoringFunction(plan);
+			scoringFunction = this.scoringFunctionFactory.getNewScoringFunction((PlanImpl) plan);
 		}
 		// TODO this as a quick and dirty implementation that takes a lot of resources
 		// replace activity duration encoding with double [0.0,1.0] or time slots, respectively
@@ -229,7 +229,7 @@ public class Planomat implements PlanAlgorithm {
 		double oldNow = 0.0;
 
 		// solution of first gene, normalized to scenario duration, is end time of first activity 
-		origin = plan.getFirstActivity();
+		origin = ((PlanImpl) plan).getFirstActivity();
 		if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
 			origin.setStartTime(now);
 		}
@@ -257,7 +257,7 @@ public class Planomat implements PlanAlgorithm {
 			// move agent forward in time according to anticipated travel time...
 			///////////////////////////////////////////////////////////////////////////////////////////
 			leg = ((LegImpl) actslegs.get(geneIndex * 2 - 1));
-			destination = plan.getNextActivity(leg);
+			destination = ((PlanImpl) plan).getNextActivity(leg);
 
 			if (action.equals(StepThroughPlanAction.EVALUATE)) {
 				scoringFunction.startLeg(now, null);
@@ -278,7 +278,7 @@ public class Planomat implements PlanAlgorithm {
 					desiredMode, 
 					origin, 
 					destination,
-					plan.getActLegIndex(leg),
+					((PlanImpl) plan).getActLegIndex(leg),
 					now);
 			// TODO here the LegImpl copy constructor should be used.
 			leg.setMode(newLeg.getMode());
@@ -311,7 +311,7 @@ public class Planomat implements PlanAlgorithm {
 				destination.setStartTime(now);
 			}
 
-			if (destination != plan.getLastActivity()) {
+			if (destination != ((PlanImpl) plan).getLastActivity()) {
 				if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
 					positionInTimeInterval = this.seedGenerator.nextDouble();
 				}

@@ -20,7 +20,7 @@
 
 package org.matsim.population.filters;
 
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public abstract class AbstractPlanFilter implements PlanFilter, PlanAlgorithm {
@@ -28,9 +28,9 @@ public abstract class AbstractPlanFilter implements PlanFilter, PlanAlgorithm {
 	protected PlanAlgorithm nextAlgorithm = null;
 	private int count = 0;
 
-	abstract public boolean judge(PlanImpl plan);
+	abstract public boolean judge(Plan plan);
 
-	public void run(final PlanImpl plan) {
+	public void run(final Plan plan) {
 		if (judge(plan)) {
 			count();
 			this.nextAlgorithm.run(plan);

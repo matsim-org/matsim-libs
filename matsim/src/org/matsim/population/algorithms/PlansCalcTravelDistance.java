@@ -24,15 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements PlanAlgorithm {
@@ -57,11 +56,11 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		int nofPlans = person.getPlans().size();
 
 		for (int planId = 0; planId < nofPlans; planId++) {
-			PlanImpl plan = person.getPlans().get(planId);
+			Plan plan = person.getPlans().get(planId);
 			try {
 				handlePlan(plan);
 			} catch (Exception e) {
@@ -70,7 +69,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 		}
 	}
 
-	public void run(final PlanImpl plan) {
+	public void run(final Plan plan) {
 		try {
 			handlePlan(plan);
 		} catch (Exception e) {
@@ -82,7 +81,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 	// helper methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void handlePlan(final PlanImpl plan) throws Exception {
+	public void handlePlan(final Plan plan) throws Exception {
 		List<?> actslegs = plan.getPlanElements();
 		ActivityImpl fromAct = (ActivityImpl)actslegs.get(0);
 

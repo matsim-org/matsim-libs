@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -57,13 +58,13 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 	
 	private List<Snapshot> snaphots = new LinkedList<Snapshot>();
 	
-	private PersonImpl person;
+	private Person person;
 	
-	private Collection<PersonImpl> guidedPersons;
+	private Collection<Person> guidedPersons;
 	
-	private Collection<PersonImpl> replannedPersons;
+	private Collection<Person> replannedPersons;
 	
-	private Collection<PersonImpl> riskAversePersons;
+	private Collection<Person> riskAversePersons;
 	
 	private List<Integer> sampelsRiskAverse = new LinkedList<Integer>();
 	
@@ -74,8 +75,8 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 	public EUTRouterAnalyzer(ArrowPrattRiskAversionI utilFunction, SummaryWriter summaryWriter) {
 		this.utilFunction = utilFunction;
 		this.summaryWriter = summaryWriter;
-		replannedPersons = new HashSet<PersonImpl>();
-		riskAversePersons = new HashSet<PersonImpl>();
+		replannedPersons = new HashSet<Person>();
+		riskAversePersons = new HashSet<Person>();
 	}
 	
 	public void appendSnapshot(Path bestRoute, double bestRouteCosts, Path indiffRoute) {
@@ -89,7 +90,7 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 		snaphots.add(s);
 	}
 	
-	public void setNextPerson(PersonImpl person) {
+	public void setNextPerson(Person person) {
 		this.person = person;
 		replannedPersons.add(person);
 	}
@@ -98,21 +99,21 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 		guidedPersons.add(person);
 	}
 	
-	public Collection<PersonImpl> getGuidedPersons() {
+	public Collection<Person> getGuidedPersons() {
 		return guidedPersons;
 	}
 	
-	public Collection<PersonImpl> getReplanedPersons() {
+	public Collection<Person> getReplanedPersons() {
 		return replannedPersons;
 	}
 	
-	public Collection<PersonImpl> getRiskAversePersons() {
+	public Collection<Person> getRiskAversePersons() {
 		return riskAversePersons;
 	}
 	
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		snaphots = new LinkedList<Snapshot>();
-		guidedPersons = new HashSet<PersonImpl>();
+		guidedPersons = new HashSet<Person>();
 		person = null;
 		
 	}
@@ -121,7 +122,7 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 		try {
 			int totalRouteDiffers = 0;
 			int replannedTwice = 0;
-			Set<PersonImpl> riskyPersons = new HashSet<PersonImpl>();
+			Set<Person> riskyPersons = new HashSet<Person>();
 			/*
 			 * Dump iteration analysis...
 			 */
@@ -165,8 +166,8 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 			 * We need to do this here, since re-planning happens in
 			 * iteration-start event.
 			 */
-			replannedPersons = new HashSet<PersonImpl>();
-			riskAversePersons = new HashSet<PersonImpl>();
+			replannedPersons = new HashSet<Person>();
+			riskAversePersons = new HashSet<Person>();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -204,7 +205,7 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 
 	private class Snapshot {
 		
-		private PersonImpl person;
+		private Person person;
 		
 		private double ce;
 		

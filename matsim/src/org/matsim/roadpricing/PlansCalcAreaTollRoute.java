@@ -24,13 +24,13 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
@@ -70,7 +70,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	}
 
 	@Override
-	protected void handlePlan(final PlanImpl plan) {
+	protected void handlePlan(final Plan plan) {
 
 		boolean agentPaysToll = false;
 

@@ -20,8 +20,8 @@
 
 package playground.toronto.timeblur;
 
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -51,13 +51,13 @@ public class PersonBlurTimes extends AbstractPersonAlgorithm implements PlanAlgo
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
-		for (PlanImpl p : person.getPlans()) {
+	public void run(Person person) {
+		for (Plan p : person.getPlans()) {
 			this.run(p);
 		}
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 		pa.run(plan);
 	}
 }

@@ -24,6 +24,8 @@ import java.util.Random;
 
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
@@ -34,7 +36,6 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -69,11 +70,11 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		BasicOpeningTime ot = new OpeningTime(DayType.wkday,0,24*3600);
 		if (person.getPlans().size() != 1) { throw new RuntimeException("Each person must have one plan."); }
-		PlanImpl plan = person.getPlans().get(0);
-		Desires desires = person.createDesires("");
+		Plan plan = person.getPlans().get(0);
+		Desires desires = ((PersonImpl) person).createDesires("");
 		double time = 0.0;
 		for (PlanElement e : plan.getPlanElements()) {
 			if (e instanceof Activity) {

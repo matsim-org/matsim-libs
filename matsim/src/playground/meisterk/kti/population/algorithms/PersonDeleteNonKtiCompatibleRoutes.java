@@ -21,10 +21,10 @@
 package playground.meisterk.kti.population.algorithms;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
@@ -36,7 +36,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 public class PersonDeleteNonKtiCompatibleRoutes extends AbstractPersonAlgorithm {
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 
 		/*
 		 * Modify routes as follows:
@@ -47,8 +47,8 @@ public class PersonDeleteNonKtiCompatibleRoutes extends AbstractPersonAlgorithm 
 		 * (TODO) consider integration of PlansCalcRouteKti(Info) into org.matsim scenario
 		 * - Set new distance of car routes because the value is probably not correct (see KtiNodeNetworkRouteImpl).
 		 */
-		for (PlanImpl plan : person.getPlans()) {
-			for (BasicPlanElement pe : plan.getPlanElements()) {
+		for (Plan plan : person.getPlans()) {
+			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
 					if (leg.getMode().equals(TransportMode.pt)) {

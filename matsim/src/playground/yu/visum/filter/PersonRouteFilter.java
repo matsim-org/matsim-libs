@@ -6,10 +6,10 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /**
@@ -53,9 +53,9 @@ public class PersonRouteFilter extends PersonFilterA {
 	 * which should not exist in network(file).
 	 */
 	@Override
-	public boolean judge(PersonImpl person) {
-		List<PlanImpl> plans = person.getPlans();
-		for (PlanImpl plan : plans) {
+	public boolean judge(Person person) {
+		List<? extends Plan> plans = person.getPlans();
+		for (Plan plan : plans) {
 			if (plan.isSelected()) {
 				List<? extends BasicPlanElement> acts_Legs = plan.getPlanElements();
 				boolean even = false;

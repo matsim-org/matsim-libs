@@ -24,6 +24,7 @@ import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -183,7 +184,8 @@ public class PersonSetActChains extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person pp) {
+		PersonImpl person = (PersonImpl) pp;
 
 		String group = null;
 		if ((person.getAge() >= 0) && (person.getAge() < 6)) {

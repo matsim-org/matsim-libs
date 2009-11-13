@@ -22,7 +22,7 @@ package org.matsim.population.filters;
 
 import java.util.regex.Pattern;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.routes.PersonAlgorithm;
 
 /**
@@ -41,7 +41,7 @@ public class PersonIdFilter extends AbstractPersonFilter {
 	}
 
 	@Override
-	public boolean judge(PersonImpl person) {
+	public boolean judge(Person person) {
 
 		String personId = person.getId().toString();
 		

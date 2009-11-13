@@ -25,11 +25,12 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -115,7 +116,8 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person p) {
+		PersonImpl person = (PersonImpl) p;
 		Map<String,Object> atts = person.getCustomAttributes();
 		Household hh = (Household)atts.get(CAtts.HH_W);
 		
@@ -169,6 +171,6 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		if ((2 == mobtype) || (mobtype == 5)) { person.setCarAvail(ALWAYS); }
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 	}
 }

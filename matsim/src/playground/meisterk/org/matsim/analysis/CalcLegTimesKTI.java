@@ -28,6 +28,7 @@ import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
@@ -110,7 +111,7 @@ public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis impleme
 	}
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		// not used
 	}
 	

@@ -31,14 +31,13 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -94,12 +93,12 @@ public class KmlPlansVisualizer {
 		this.mainDoc.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(this.mainFolder));
 		// the writer
 		this.writer = new KMZWriter(filename);
-		Set<PlanImpl> planSetBig = filterPlans();
+		Set<Plan> planSetBig = filterPlans();
 		log.info("Found " + planSetBig.size() + " relevant plans");
 		int i = 0;
 		int max = 50;
-		Set<PlanImpl> planSet = new HashSet<PlanImpl>(max);
-		for (PlanImpl p : planSetBig) {
+		Set<Plan> planSet = new HashSet<Plan>(max);
+		for (Plan p : planSetBig) {
 			planSet.add(p);
 			i++;
 			if (i > max)
@@ -122,7 +121,7 @@ public class KmlPlansVisualizer {
 		log.info("Plans written to kmz: " + filename);
 	}
 
-	private Set<PlanImpl> filterPlans() {
+	private Set<Plan> filterPlans() {
 		PlanCollectFromAlgorithm collector = new PlanCollectFromAlgorithm();
 
 		RouteLinkFilter linkFilter = new RouteLinkFilter(collector);

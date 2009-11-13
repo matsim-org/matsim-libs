@@ -3,13 +3,13 @@ package playground.andreas.bln.pop;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -28,7 +28,7 @@ public class FilterPersonPlan extends NewPopulation {
 	}
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		
 		this.personshandled++;
 		
@@ -36,7 +36,7 @@ public class FilterPersonPlan extends NewPopulation {
 			System.err.println("Person got more than one plan");
 		} else {
 			
-			PlanImpl plan = person.getPlans().get(0);
+			Plan plan = person.getPlans().get(0);
 			boolean keepPlan = true;
 			
 			// only keep person if every leg is a car leg

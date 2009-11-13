@@ -20,8 +20,8 @@
 
 package playground.balmermi.modules;
 
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -47,12 +47,12 @@ public class PersonAnalysis extends AbstractPersonAlgorithm implements PlanAlgor
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		pCnt++;
 		elemCnt += person.getSelectedPlan().getPlanElements().size();
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 	}
 
 	//////////////////////////////////////////////////////////////////////

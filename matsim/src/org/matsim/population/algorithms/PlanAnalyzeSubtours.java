@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -53,7 +54,7 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 		super();
 	}
 
-	public void run(final PlanImpl plan) {
+	public void run(final Plan plan) {
 
 		this.locationIds = new ArrayList<Id>();
 

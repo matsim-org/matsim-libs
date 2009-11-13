@@ -5,14 +5,13 @@ package playground.yu.analysis;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -37,16 +36,16 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 	}
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		this.personId = person.getId();
 		run(person.getSelectedPlan());
 	}
 
-	public void run(final PlanImpl plan) {
+	public void run(final Plan plan) {
 		int c = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof LegImpl) {
-				double legDepTime = ((LegImpl) pe).getDepartureTime();
+			if (pe instanceof Leg) {
+				double legDepTime = ((Leg) pe).getDepartureTime();
 				if (legDepTime >= 86400.0) {
 					this.sw.writeln(this.personId + "\t" + legDepTime + "\t"
 							+ Time.writeTime(legDepTime) + "\t" + c);

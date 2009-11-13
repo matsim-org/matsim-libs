@@ -20,7 +20,7 @@
 
 package playground.balmermi.modules;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -34,7 +34,7 @@ public class PersonStupidDeleteKnowledgeForStreamingModule extends AbstractPerso
 	}
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		knowledges.getKnowledgesByPersonId().clear();
 	}
 }

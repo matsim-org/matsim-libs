@@ -4,9 +4,10 @@
 package playground.yu.analysis.MZComparison;
 
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -45,16 +46,17 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 	}
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		// count++;
-		PlanImpl pl = person.getSelectedPlan();
-		inTollRange = isInRange(pl.getFirstActivity().getLink(), toll);
+		Plan pl = person.getSelectedPlan();
+		inTollRange = isInRange(((PlanImpl) pl).getFirstActivity().getLink(), toll);
 		if (inTollRange)
 			count_toll++;
 		run(pl);
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan p) {
+		PlanImpl plan = (PlanImpl) p;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
 				double legDist = ((LegImpl) pe).getRoute().getDistance();// leg

@@ -29,6 +29,7 @@ import net.opengis.kml._2.PlacemarkType;
 import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -65,7 +66,7 @@ public class KmlPlansWriter {
 		this.featureFactory = new NetworkFeatureFactory(coordTransform);
 	}
 
-	public FolderType getPlansFolder(Set<PlanImpl> planSet) throws IOException {
+	public FolderType getPlansFolder(Set<Plan> planSet) throws IOException {
 		
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		
@@ -78,10 +79,10 @@ public class KmlPlansWriter {
 		FolderType planFolder;
 		LegImpl leg;
 		AbstractFeatureType abstractFeature;
-		for (PlanImpl plan : planSet) {
+		for (Plan plan : planSet) {
 			planFolder = kmlObjectFactory.createFolderType();
 			planFolder.setName("Selected Plan of Person: " + plan.getPerson().getId());
-			act = plan.getFirstActivity();
+			act = ((PlanImpl) plan).getFirstActivity();
 			do {
 				abstractFeature = this.featureFactory.createActFeature(act, this.networkNodeStyle);
 				if (abstractFeature.getClass().equals(PlacemarkType.class)) {
@@ -90,7 +91,7 @@ public class KmlPlansWriter {
 					log.warn("Not yet implemented: Adding act KML features of type " + abstractFeature.getClass());
 				}
 				
-				leg = plan.getNextLeg(act);
+				leg = ((PlanImpl) plan).getNextLeg(act);
 				abstractFeature = this.featureFactory.createLegFeature(leg, this.networkLinkStyle);
 				if (abstractFeature.getClass().equals(FolderType.class)) {
 					planFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
@@ -98,9 +99,9 @@ public class KmlPlansWriter {
 					log.warn("Not yet implemented: Adding leg KML features of type " + abstractFeature.getClass());
 				}
 
-				act = plan.getNextActivity(leg);
+				act = ((PlanImpl) plan).getNextActivity(leg);
 			}
-			while (plan.getNextLeg(act) != null);
+			while (((PlanImpl) plan).getNextLeg(act) != null);
 			folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(planFolder));
 		}
 		

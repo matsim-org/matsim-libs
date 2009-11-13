@@ -21,10 +21,10 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -80,7 +80,7 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 	}
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 
 //		this.analyseDepartures(person);
 //		this.analyseArrivals(person);
@@ -92,9 +92,9 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 		return this.numDeps;
 	}
 
-	private void analyseDepartures(final PersonImpl person) {
+	private void analyseDepartures(final Person person) {
 
-		PlanImpl plan = person.getPlans().get(0);
+		Plan plan = person.getPlans().get(0);
 
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
@@ -138,9 +138,9 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 		}
 	}
 
-	private void analyseArrivals(final PersonImpl person) {
+	private void analyseArrivals(final Person person) {
 
-		PlanImpl plan = person.getPlans().get(0);
+		Plan plan = person.getPlans().get(0);
 
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
@@ -191,9 +191,9 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 
 	}
 
-	private void analyseTraveling(final PersonImpl person) {
+	private void analyseTraveling(final Person person) {
 
-		PlanImpl plan = person.getPlans().get(0);
+		Plan plan = person.getPlans().get(0);
 
 		double depTime = -1.0, arrTime = -1.0;
 		int actIndex = -1;

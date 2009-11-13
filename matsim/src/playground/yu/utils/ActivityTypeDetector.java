@@ -29,12 +29,12 @@ import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -54,12 +54,12 @@ public class ActivityTypeDetector extends AbstractPersonAlgorithm implements
 	private Map<String, Double> latestStartTimes = new HashMap<String, Double>();
 	private Map<String, Tuple<Integer, Double>> avgDurs = new HashMap<String, Tuple<Integer, Double>>();
 
-	public void run(PersonImpl person) {
-		for (PlanImpl plan : person.getPlans())
+	public void run(Person person) {
+		for (Plan plan : person.getPlans())
 			run(plan);
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;

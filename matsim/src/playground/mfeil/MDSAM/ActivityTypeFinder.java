@@ -22,19 +22,19 @@ package playground.mfeil.MDSAM;
 
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.controler.Controler;
 
 import playground.mfeil.config.PlanomatXConfigGroup;
 
@@ -81,19 +81,19 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 		return this.actTypes;
 	}
 	
-	public List<String> getActTypes (PersonImpl agent){
+	public List<String> getActTypes (Person agent){
 		if (PlanomatXConfigGroup.getActTypes().equals("knowledge")){
 			return this.getKnActTypes(agent);
 		}
 		
 		else if (PlanomatXConfigGroup.getActTypes().equals("customized")){
 			List<String> agentKnActTypes = this.getKnActTypes(agent);
-			if (agent.getAge()<6){
+			if (((PersonImpl) agent).getAge()<6){
 				return agentKnActTypes;
 			}
 			// remove defined act types from overall list, unless in agent's knowledge
 			List<String> agentCuActTypes = new ArrayList<String>(this.actTypes);
-			if (agent.getAge()<18){
+			if (((PersonImpl) agent).getAge()<18){
 				if (!agentKnActTypes.contains("education_kindergarten"))agentCuActTypes.remove("education_kindergarten");
 				if (!agentKnActTypes.contains("education_higher"))agentCuActTypes.remove("education_higher");
 				if (!agentKnActTypes.contains("work_sector2"))agentCuActTypes.remove("work_sector2");
@@ -115,7 +115,7 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 		else return this.actTypes;
 	}
 	
-	private List<String> getKnActTypes (PersonImpl agent){
+	private List<String> getKnActTypes (Person agent){
 		// get act options of agent
 		Collection<ActivityOption> agentActOptions = ((ScenarioImpl)(this.controler.getScenarioData())).getKnowledges().getKnowledgesByPersonId().get(agent.getId()).getActivities();
 		// convert them into act types

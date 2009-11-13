@@ -28,11 +28,12 @@ import java.util.Vector;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -92,7 +93,8 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private final void setUpModeChoice(final PlanImpl plan, final PersonSubtour personSubtour) {	
+	private final void setUpModeChoice(final Plan pp, final PersonSubtour personSubtour) {
+		PlanImpl plan = (PlanImpl) pp;
 		// setting subtour parameters
 		if (plan == null) { throw new RuntimeException("a person does not have a selected plan."); }
 		Coord home_coord = null;
@@ -233,8 +235,8 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
-		PlanImpl plan = person.getSelectedPlan();
+	public void run(Person person) {
+		Plan plan = person.getSelectedPlan();
 		int subtour_idx =0;
 		TreeMap<Integer, ArrayList<Integer>> subtours = new TreeMap<Integer,ArrayList<Integer>>();
 		PersonSubTourExtractor pste = new PersonSubTourExtractor(this.persons);
@@ -252,7 +254,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 	}
 	
 	
-	public void run(PlanImpl plan){
+	public void run(Plan plan){
 	}
 }
 

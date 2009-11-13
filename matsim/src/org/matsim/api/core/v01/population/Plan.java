@@ -5,5 +5,6 @@ import org.matsim.api.basic.v01.population.PlanElement;
 
 public interface Plan extends BasicPlan<PlanElement> {
 
-
+	public Person getPerson();
+	
 }

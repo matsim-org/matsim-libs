@@ -2,14 +2,14 @@ package playground.andreas.bln.pop;
 
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -41,7 +41,7 @@ public class ShuffleCoords extends NewPopulation {
 	}
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		
 		try {
 			// Keep old person untouched
@@ -50,7 +50,7 @@ public class ShuffleCoords extends NewPopulation {
 		} catch (Exception e) {
 			// clones need to be handled
 			
-			PlanImpl plan = person.getPlans().get(0);
+			Plan plan = person.getPlans().get(0);
 			
 			CoordImpl coordOfHomeAct = null;
 			

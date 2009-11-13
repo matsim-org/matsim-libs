@@ -7,8 +7,8 @@ import java.util.Iterator;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 
 /**
  * judge, which transport mode was taken. This class can only be used with
@@ -18,12 +18,12 @@ import org.matsim.core.population.PlanImpl;
  * 
  */
 public class PlanModeJudger {
-	private static boolean useMode(PlanImpl plan, TransportMode mode) {
+	private static boolean useMode(Plan plan, TransportMode mode) {
 		for (Iterator<PlanElement> li = plan.getPlanElements().iterator(); li
 				.hasNext();) {
 			Object o = li.next();
-			if (o instanceof LegImpl) {
-				LegImpl l = (LegImpl) o;
+			if (o instanceof Leg) {
+				Leg l = (Leg) o;
 				if (!l.getMode().equals(mode)) {
 					return false;
 				}
@@ -32,13 +32,13 @@ public class PlanModeJudger {
 		return true;
 	}
 
-	public static TransportMode getMode(PlanImpl plan) {
+	public static TransportMode getMode(Plan plan) {
 		TransportMode tmpMode = null;
 		for (Iterator<PlanElement> li = plan.getPlanElements().iterator(); li
 				.hasNext();) {
 			Object o = li.next();
-			if (o instanceof LegImpl) {
-				LegImpl l = (LegImpl) o;
+			if (o instanceof Leg) {
+				Leg l = (Leg) o;
 				TransportMode tmpMode2 = l.getMode();
 				if (tmpMode != null) {
 					if (!tmpMode.equals(tmpMode2)) {
@@ -51,47 +51,47 @@ public class PlanModeJudger {
 		return tmpMode;
 	}
 
-	public static boolean useCar(PlanImpl plan) {
+	public static boolean useCar(Plan plan) {
 		return useMode(plan, TransportMode.car);
 	}
 
-	public static boolean usePt(PlanImpl plan) {
+	public static boolean usePt(Plan plan) {
 		return useMode(plan, TransportMode.pt);
 	}
 
-	public static boolean useMiv(PlanImpl plan) {
+	public static boolean useMiv(Plan plan) {
 		return useMode(plan, TransportMode.miv);
 	}
 
-	public static boolean useRide(PlanImpl plan) {
+	public static boolean useRide(Plan plan) {
 		return useMode(plan, TransportMode.ride);
 	}
 
-	public static boolean useMotorbike(PlanImpl plan) {
+	public static boolean useMotorbike(Plan plan) {
 		return useMode(plan, TransportMode.motorbike);
 	}
 
-	public static boolean useTrain(PlanImpl plan) {
+	public static boolean useTrain(Plan plan) {
 		return useMode(plan, TransportMode.train);
 	}
 
-	public static boolean useBus(PlanImpl plan) {
+	public static boolean useBus(Plan plan) {
 		return useMode(plan, TransportMode.bus);
 	}
 
-	public static boolean useTram(PlanImpl plan) {
+	public static boolean useTram(Plan plan) {
 		return useMode(plan, TransportMode.tram);
 	}
 
-	public static boolean useBike(PlanImpl plan) {
+	public static boolean useBike(Plan plan) {
 		return useMode(plan, TransportMode.bike);
 	}
 
-	public static boolean useWalk(PlanImpl plan) {
+	public static boolean useWalk(Plan plan) {
 		return useMode(plan, TransportMode.walk);
 	}
 
-	public static boolean useUndefined(PlanImpl plan) {
+	public static boolean useUndefined(Plan plan) {
 		return useMode(plan, TransportMode.undefined);
 	}
 }

@@ -1,6 +1,7 @@
 package playground.andreas.bln.pop;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -24,7 +25,9 @@ public class StripPersonPlan extends NewPopulation {
 	}
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person pp) {
+		
+		PersonImpl person = (PersonImpl) pp;
 		
 		this.personshandled++;
 		

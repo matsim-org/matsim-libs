@@ -29,15 +29,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * @author lnicolas
- *
  */
 public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -123,10 +122,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 		System.out.println("Total number of trips: " + stringArray.size());
 	}
 
-	/**
-	 * @see org.matsim.population.algorithms.PlanAlgorithm#run(org.matsim.core.population.PlanImpl)
-	 */
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 		List actslegs = plan.getPlanElements();
 		ActivityImpl fromAct = (ActivityImpl) actslegs.get(0);
 		NodeImpl fromNode = fromAct.getLink().getToNode();
@@ -162,8 +158,8 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 	}
 
 	@Override
-	public void run(PersonImpl person) {
-		for (PlanImpl plan : person.getPlans()) {
+	public void run(Person person) {
+		for (Plan plan : person.getPlans()) {
 			run(plan);
 		}
 	}

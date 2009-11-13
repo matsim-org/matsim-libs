@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -25,15 +26,15 @@ public class SNAdjustTimes implements PlanAlgorithm {
 	public SNAdjustTimes(playground.jhackney.controler.SNController3 controler){
 		this.controler=controler;
 	}
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 		adjustDepartureTimes(plan);
 	}
 
-	private void adjustDepartureTimes(PlanImpl plan) {
-		PersonImpl person = plan.getPerson();
+	private void adjustDepartureTimes(Plan plan) {
+		Person person = plan.getPerson();
 
 		//COPY THE SELECTED PLAN		    
-		PlanImpl newPlan = person.copySelectedPlan();
+		PlanImpl newPlan = ((PersonImpl) person).copySelectedPlan();
 
 		for (PlanElement pe : newPlan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
@@ -54,7 +55,7 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		}
 
 		newPlan.setScore(null);
-		person.setSelectedPlan(newPlan);
+		((PersonImpl) person).setSelectedPlan(newPlan);
 	}
 	private double getAvgFriendArrTime(ActivityImpl act) {
 		LinkedHashMap<ActivityFacilityImpl,ArrayList<TimeWindow>> twm = controler.getTwm();

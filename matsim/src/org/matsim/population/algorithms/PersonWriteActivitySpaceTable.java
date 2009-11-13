@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.knowledges.ActivitySpace;
@@ -129,7 +130,7 @@ public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		final Knowledge know = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 		if (know == null) {
 			Gbl.errorMsg("Knowledge is not defined!");
@@ -175,7 +176,10 @@ public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 
 					double area = Math.PI*a*b;
 
-					out.write(pid + "\t" + person.getAge() + "\t" + person.getSex() + "\t" + person.getCarAvail() + "\t"+ person.getLicense() + "\t"+ act_type + "\t" +
+					out.write(pid + "\t" + ((PersonImpl) person).getAge() + "\t" + 
+										((PersonImpl) person).getSex() + "\t" + 
+										((PersonImpl) person).getCarAvail() + "\t"+ 
+										((PersonImpl) person).getLicense() + "\t"+ act_type + "\t" +
 					          loc_cnts.get(act_type) + "\t" + as_type + "\t" +
 					          area + "\t" + cover + "\t" + x + "\t" + y + "\t" +
 					          theta + "\t" + a + "\t" + b + "\n");
@@ -207,7 +211,8 @@ public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 						angle += stepSize;
 					}
 
-					out.write(pid + "\t" + person.getAge() + "\t" + person.getSex() + "\t" + person.getCarAvail() + "\t"+ person.getLicense() + "\t"+ act_type + "\t" +
+					out.write(pid + "\t" + ((PersonImpl) person).getAge() + "\t" + ((PersonImpl) person).getSex() + "\t" + 
+										((PersonImpl) person).getCarAvail() + "\t"+ ((PersonImpl) person).getLicense() + "\t"+ act_type + "\t" +
 					          loc_cnts.get(act_type) + "\t" + as_type + "\t" +
 					          area + "\t" + cover + "\t" + x + "\t" + y + "\t" +
 					          theta + "\t" + a + "\t" + b + "\n");
@@ -233,7 +238,8 @@ public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 
 					double area = a*b*Math.sqrt(Math.PI)*(Math.pow(4.0,1.0-1.0/r)*dgamma(1.0+1.0/r)/dgamma(0.5+1/r));
 
-					out.write(pid + "\t" + person.getAge() + "\t" + person.getSex() + "\t" + person.getCarAvail() + "\t"+ person.getLicense() + "\t"+ act_type + "\t" +
+					out.write(pid + "\t" + ((PersonImpl) person).getAge() + "\t" + ((PersonImpl) person).getSex() + "\t" + 
+										((PersonImpl) person).getCarAvail() + "\t"+ ((PersonImpl) person).getLicense() + "\t"+ act_type + "\t" +
 					          loc_cnts.get(act_type) + "\t" + as_type + "\t" +
 					          area + "\t" + cover + "\t" + x + "\t" + y + "\t" +
 					          theta + "\t" + a + "\t" + b + "\t" + r + "\n");
@@ -260,7 +266,8 @@ public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 					// TODO: is that really correct? if yes, then the bean is something very special!
 					double area = 1.058049*a*b;
 
-					out.write(pid + "\t" + person.getAge() + "\t" + person.getSex() + "\t" + person.getCarAvail() + "\t"+ person.getLicense() + "\t"+ act_type + "\t" +
+					out.write(pid + "\t" + ((PersonImpl) person).getAge() + "\t" + ((PersonImpl) person).getSex() + "\t" + 
+										((PersonImpl) person).getCarAvail() + "\t"+ ((PersonImpl) person).getLicense() + "\t"+ act_type + "\t" +
 					          loc_cnts.get(act_type) + "\t" + as_type + "\t" +
 					          area + "\t" + cover + "\t" + x + "\t" + y + "\t" +
 					          theta + "\t" + a + "\t" + b + "\n");

@@ -23,9 +23,9 @@ package playground.marcel.pt.replanning;
 import java.util.Random;
 
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -49,11 +49,11 @@ public class TransitPlanMutateTimeAllocation implements PlanAlgorithm {
 		this.random = random;
 	}
 
-	public void run(final PlanImpl plan) {
+	public void run(final Plan plan) {
 		mutatePlan(plan);
 	}
 
-	private void mutatePlan(final PlanImpl plan) {
+	private void mutatePlan(final Plan plan) {
 
 		double now = 0;
 		boolean isFirst = true;

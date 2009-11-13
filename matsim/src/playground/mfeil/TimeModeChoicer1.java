@@ -23,15 +23,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.matsim.core.gbl.Gbl;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.network.BasicLegImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -191,7 +192,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 	//////////////////////////////////////////////////////////////////////
 	
 	
-	public void run (PlanImpl basePlan){
+	public void run (Plan basePlan){
 		
 		/*Do nothing if the plan has only one or two activities (=24h home)*/
 		if (basePlan.getPlanElements().size()<=3) return;
@@ -849,7 +850,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 			
 		double travelTime;
 		for (int i=1;i<=plan.getPlanElements().size()-2;i=i+2){
-		//	log.info("Ursprüngliche Reisezeit: "+(((LegImpl)(plan.getPlanElements().get(i))).getArrivalTime()-((LegImpl)(plan.getPlanElements().get(i))).getDepartureTime()));
+		//	log.info("Ursprï¿½ngliche Reisezeit: "+(((LegImpl)(plan.getPlanElements().get(i))).getArrivalTime()-((LegImpl)(plan.getPlanElements().get(i))).getDepartureTime()));
 			((LegImpl)(plan.getPlanElements().get(i))).setDepartureTime(now);
 //			statement was replaced by the one below
 //			travelTime = this.estimator.getInterpolation(plan.getPerson().getId(), now, (ActivityImpl)(plan.getPlanElements().get(i-1)), (ActivityImpl)(plan.getPlanElements().get(i+1)), (LegImpl)(plan.getPlanElements().get(i)));
@@ -930,7 +931,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 		}
 	}
 	
-	protected void cleanRoutes (PlanImpl plan){
+	protected void cleanRoutes (Plan plan){
 		
 		for (int i=1;i<plan.getPlanElements().size();i=i+2){
 //			statement was replaced by the one below

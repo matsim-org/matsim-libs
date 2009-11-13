@@ -26,9 +26,9 @@ import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -45,11 +45,12 @@ public class PopulationLegDistanceDistribution extends AbstractClassifiedFrequen
 		super(out);
 	}
 	
-	public void run(PersonImpl person) {
+	@Override
+	public void run(Person person) {
 		this.run(person.getSelectedPlan());
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {

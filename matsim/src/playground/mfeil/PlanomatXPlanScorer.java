@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.mfeil;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -46,8 +47,8 @@ public class PlanomatXPlanScorer extends PlanScorer {
 	}
 	
 	@Override
-	public double getScore(final PlanImpl plan) {
-		ScoringFunction function = this.factory.getNewScoringFunction(plan);
+	public double getScore(final Plan plan) {
+		ScoringFunction function = this.factory.getNewScoringFunction((PlanImpl) plan);
 		org.matsim.core.population.LegImpl leg;
 		org.matsim.core.population.ActivityImpl act;
 		for (int i = 1; i < plan.getPlanElements().size(); i++) {
@@ -70,7 +71,7 @@ public class PlanomatXPlanScorer extends PlanScorer {
 					}
 				}
 				
-				act = plan.getPreviousActivity(leg);
+				act = ((PlanImpl) plan).getPreviousActivity(leg);
 				function.endActivity(act.getEndTime());
 				function.startLeg(depTime, leg);
 				
@@ -82,7 +83,7 @@ public class PlanomatXPlanScorer extends PlanScorer {
 				}
 				
 				function.endLeg(arrTime);
-				act = plan.getNextActivity(leg);
+				act = ((PlanImpl) plan).getNextActivity(leg);
 				function.startActivity(act.getStartTime(), act);
 			}
 		}

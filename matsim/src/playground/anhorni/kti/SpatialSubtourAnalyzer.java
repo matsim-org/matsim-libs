@@ -10,13 +10,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -73,8 +74,8 @@ public class SpatialSubtourAnalyzer extends AbstractPersonAlgorithm {
 	}
 
 	@Override
-	public void run(PersonImpl person) {
-		PlanImpl selectedPlan = person.getSelectedPlan();
+	public void run(Person person) {
+		Plan selectedPlan = person.getSelectedPlan();
 		
 		SubtourStartLocations subtourStartLocationsExtractor = new SubtourStartLocations();
 
@@ -90,7 +91,7 @@ public class SpatialSubtourAnalyzer extends AbstractPersonAlgorithm {
 				final ActivityImpl act = (ActivityImpl) actslegs.get(j);
 
 				if (subtourStartLocations.containsKey(act.getFacilityId())) {
-					this.incrementCounter(act.getFacilityId(), selectedPlan
+					this.incrementCounter(act.getFacilityId(), ((PlanImpl) selectedPlan)
 							.getNextLeg(act).getMode());
 				}
 			}

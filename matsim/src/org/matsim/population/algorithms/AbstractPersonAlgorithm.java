@@ -21,9 +21,8 @@
 package org.matsim.population.algorithms;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.routes.PersonAlgorithm;
 import org.matsim.core.utils.misc.Counter;
 
@@ -31,11 +30,11 @@ public abstract class AbstractPersonAlgorithm implements PersonAlgorithm {
 
 	private final static Logger log = Logger.getLogger(AbstractPersonAlgorithm.class);
 
-	public final void run(final PopulationImpl plans) {
+	public final void run(final Population plans) {
 		log.info("running " + this.getClass().getName() + " algorithm...");
 		Counter counter = new Counter(" person # ");
 
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person p : plans.getPersons().values()) {
 			counter.incCounter();
 			this.run(p);
 		}
@@ -43,5 +42,5 @@ public abstract class AbstractPersonAlgorithm implements PersonAlgorithm {
 		log.info("done running algorithm.");
 	}
 
-	public abstract void run(PersonImpl person);
+	public abstract void run(Person person);
 }

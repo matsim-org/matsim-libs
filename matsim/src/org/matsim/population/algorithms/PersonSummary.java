@@ -20,6 +20,7 @@
 
 package org.matsim.population.algorithms;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -64,7 +65,8 @@ public class PersonSummary extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person pp) {
+		PersonImpl person = (PersonImpl) pp;
 		if (person.getAge() > 99) {
 //			Gbl.warningMsg(this.getClass(),"run(...)","[person_id=" + person.getId() + ", older than 99 years. Excluded from summary]");
 			return;

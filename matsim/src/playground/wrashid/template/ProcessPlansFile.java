@@ -1,10 +1,10 @@
 package playground.wrashid.template;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -40,7 +40,7 @@ public class ProcessPlansFile extends NewPopulation {
 		super(plans, filename);
 	}
 
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		this.popWriter.writePerson(person);
 
 	}

@@ -35,14 +35,14 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.io.IOUtils;
@@ -137,8 +137,8 @@ public class RouteSummaryTest {
 		}
 
 		@Override
-		public void run(final PersonImpl person) {
-			PlanImpl p = person.getSelectedPlan();
+		public void run(final Person person) {
+			Plan p = person.getSelectedPlan();
 			if (p != null)
 				if (PlanModeJudger.useCar(p)) {
 					for (PlanElement pe : p.getPlanElements()) {
@@ -146,9 +146,9 @@ public class RouteSummaryTest {
 
 							LegImpl l = (LegImpl) pe;
 
-							Id previousActLinkId = p.getPreviousActivity(l)
+							Id previousActLinkId = ((PlanImpl) p).getPreviousActivity(l)
 									.getLinkId();
-							Id nextActLinkId = p.getNextActivity(l).getLinkId();
+							Id nextActLinkId = ((PlanImpl) p).getNextActivity(l).getLinkId();
 
 							String odPair = previousActLinkId.toString() + "->"
 									+ nextActLinkId.toString();

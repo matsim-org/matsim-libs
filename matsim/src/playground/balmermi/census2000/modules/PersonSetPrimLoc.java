@@ -26,13 +26,13 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.matrices.Entry;
@@ -249,7 +249,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		ArrayList<ActivityImpl> work_list = new ArrayList<ActivityImpl>();
 		ArrayList<ActivityImpl> educ_list = new ArrayList<ActivityImpl>();
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
@@ -312,7 +312,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final PlanImpl plan) {
+	public void run(final Plan plan) {
 	}
 }
 

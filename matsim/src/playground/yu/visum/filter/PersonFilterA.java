@@ -3,7 +3,7 @@
  */
 package playground.yu.visum.filter;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * This class must be subclassed, the subclass usually provides implementations
@@ -41,7 +41,7 @@ public abstract class PersonFilterA extends Filter implements PersonFilterI {
 	 *      person) function
 	 *      000000000000000000000000000000000000000000000000000000000000
 	 */
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		if (judge(person)) {
 			count();
 			nextPersonFilter.run(person);
@@ -62,5 +62,5 @@ public abstract class PersonFilterA extends Filter implements PersonFilterI {
 	 * 
 	 * @param person A person to be judged.
 	 */
-	public abstract boolean judge(PersonImpl person);
+	public abstract boolean judge(Person person);
 }

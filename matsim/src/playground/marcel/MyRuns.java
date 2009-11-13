@@ -49,6 +49,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -60,8 +62,6 @@ import org.matsim.core.network.algorithms.NetworkCalcLanes;
 import org.matsim.core.network.algorithms.NetworkFalsifier;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -437,8 +437,8 @@ public class MyRuns {
 					new AbstractPersonAlgorithm() {
 
 						@Override
-						public void run(final PersonImpl person) {
-							PlanImpl plan = person.getSelectedPlan();
+						public void run(final Person person) {
+							Plan plan = person.getSelectedPlan();
 							if (plan == null) {
 								if (person.getPlans().size() == 0) return;
 								plan = person.getPlans().get(0);
@@ -446,7 +446,7 @@ public class MyRuns {
 							run(plan);
 						}
 
-						public void run(final PlanImpl plan) {
+						public void run(final Plan plan) {
 							final List actslegs = plan.getPlanElements();
 							for (int i = 1, max = actslegs.size(); i < max; i+=2) {
 								final LegImpl leg = (LegImpl)actslegs.get(i);

@@ -29,6 +29,9 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -36,8 +39,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -275,13 +276,13 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		Coord home_coord = null;
 		Coord prim_coord = null;
-		final PlanImpl plan = person.getSelectedPlan();
+		final Plan plan = person.getSelectedPlan();
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				final ActivityImpl act = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				final Activity act = (Activity) pe;
 				if (act.getType().startsWith(H)) {
 					if (act.getCoord() == null) { Gbl.errorMsg("Person id=" + person.getId() + " has no home coord!"); }
 					if (act.getCoord().equals(ZERO)) { Gbl.errorMsg("Person id=" + person.getId() + " has a ZERO home coord!"); }
@@ -349,7 +350,7 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final PlanImpl plan) {
+	public void run(final Plan plan) {
 	}
 }
 

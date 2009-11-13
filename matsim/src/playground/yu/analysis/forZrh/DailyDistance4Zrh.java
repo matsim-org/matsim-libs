@@ -29,13 +29,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -81,7 +81,7 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 	}
 
 	@Override
-	public void run(final PlanImpl plan) {
+	public void run(final Plan plan) {
 		double dayDist = 0.0;
 		double carDayDist = 0.0;
 		double ptDayDist = 0.0;
@@ -93,7 +93,7 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 			if (pe instanceof LegImpl) {
 				LegImpl bl = (LegImpl) pe;
 				ActType ats = null;
-				String tmpActType = plan.getNextActivity(bl).getType();
+				String tmpActType = ((PlanImpl) plan).getNextActivity(bl).getType();
 				if (tmpActType.startsWith("h"))
 					ats = ActType.home;
 				else if (tmpActType.startsWith("w"))
@@ -182,8 +182,8 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 					}
 					ptLegDistanceCounts[Math.min(100, (int) dist)]++;
 				} else if (bl.getMode().equals(TransportMode.walk)) {
-					dist = CoordUtils.calcDistance(plan.getPreviousActivity(bl)
-							.getLink().getCoord(), plan.getNextActivity(bl)
+					dist = CoordUtils.calcDistance(((PlanImpl) plan).getPreviousActivity(bl)
+							.getLink().getCoord(), ((PlanImpl) plan).getNextActivity(bl)
 							.getLink().getCoord()) * 1.5 / 1000.0;
 					wlkDist += dist;
 					wlkDayDist += dist;

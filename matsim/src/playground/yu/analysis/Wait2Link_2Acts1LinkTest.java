@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -39,9 +41,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -79,12 +78,12 @@ public class Wait2Link_2Acts1LinkTest {
 		private final Set<AgentLinkPair> agentLinks = new HashSet<AgentLinkPair>();
 
 		@Override
-		public void run(final PersonImpl person) {
+		public void run(final Person person) {
 			this.actsAtSameLink = false;
 			String tmpLinkId = null;
 			String nextTmpLinkId = null;
 			if (person != null) {
-				PlanImpl p = person.getSelectedPlan();
+				Plan p = person.getSelectedPlan();
 				if (p != null) {
 					List<PlanElement> actsLegs = p.getPlanElements();
 					int max = actsLegs.size();

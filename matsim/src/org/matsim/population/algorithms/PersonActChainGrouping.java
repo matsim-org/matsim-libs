@@ -25,10 +25,10 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 
 public class PersonActChainGrouping extends AbstractPersonAlgorithm {
 
@@ -51,14 +51,14 @@ public class PersonActChainGrouping extends AbstractPersonAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 
 		if (person.getPlans().size() != 1) {
 			Gbl.errorMsg("person id=" + person.getId() +
 			 " does not have exactly one plan.");
 		}
 
-		PlanImpl plan = person.getPlans().get(0);
+		Plan plan = person.getPlans().get(0);
 		StringBuilder chainBuilder = new StringBuilder((plan.getPlanElements().size() + 1) / 2);
 		for (int j = 0; j < plan.getPlanElements().size(); j = j + 2) {
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(j);

@@ -23,12 +23,11 @@
  */
 package playground.yu.newPlans;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
@@ -46,7 +45,7 @@ public class NewIdPlan extends NewPopulation {
 	}
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		if (Integer.parseInt(person.getId().toString()) <= 100)
 			this.pw.writePerson(person);
 	}

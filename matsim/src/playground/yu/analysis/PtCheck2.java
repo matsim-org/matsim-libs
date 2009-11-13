@@ -23,6 +23,7 @@ package playground.yu.analysis;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -80,7 +81,8 @@ public class PtCheck2 extends AbstractPersonAlgorithm {
 	}
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person pp) {
+		PersonImpl person = (PersonImpl) pp;
 		this.personCnt++;
 		if (person.getLicense().equals("yes")) {
 			this.licensedCnt++;

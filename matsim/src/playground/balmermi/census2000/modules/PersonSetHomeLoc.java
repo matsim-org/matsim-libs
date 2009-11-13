@@ -21,12 +21,12 @@
 package playground.balmermi.census2000.modules;
 
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -99,11 +99,11 @@ public class PersonSetHomeLoc extends AbstractPersonAlgorithm implements PlanAlg
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		Integer p_id = Integer.valueOf(person.getId().toString());
 		CoordImpl coord = persons.getPerson(p_id).getHousehold().getCoord();
 		ActivityFacilityImpl f = this.homeFacQuadTree.get(coord.getX(),coord.getY());
-		PlanImpl plan = person.getSelectedPlan();
+		Plan plan = person.getSelectedPlan();
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
@@ -118,6 +118,6 @@ public class PersonSetHomeLoc extends AbstractPersonAlgorithm implements PlanAlg
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 	}
 }

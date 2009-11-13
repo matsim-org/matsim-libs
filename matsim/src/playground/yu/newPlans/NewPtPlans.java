@@ -25,13 +25,14 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PlanImpl.Type;
@@ -48,7 +49,7 @@ import playground.yu.analysis.PlanModeJudger;
  * 
  */
 public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
-	private PersonImpl person;
+	private Person person;
 	private List<PlanImpl> copyPlans = new ArrayList<PlanImpl>();
 
 	// copyPlans: the copy of the plans.
@@ -67,10 +68,10 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 	}
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		if (Integer.parseInt(person.getId().toString()) < 1000000000) {
 			this.person = person;
-			for (PlanImpl pl : person.getPlans()) {
+			for (Plan pl : person.getPlans()) {
 				run(pl);
 			}
 			for (PlanImpl copyPlan : copyPlans) {
@@ -81,9 +82,9 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 		this.pw.writePerson(person);
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan plan) {
 		if (PlanModeJudger.useCar(plan))
-			plan.setType(Type.CAR);
+			((PlanImpl) plan).setType(Type.CAR);
 		PlanImpl ptPlan = new PlanImpl(person);
 		ptPlan.setType(Type.PT);
 		// Plan walkPlan = new PlanImpl(person);

@@ -8,15 +8,16 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -46,22 +47,23 @@ public class LinearDistanceExtractor extends AbstractPersonAlgorithm implements
 	}
 
 	@Override
-	public void run(PersonImpl person) {
-		PlanImpl plan = person.getSelectedPlan();
+	public void run(Person person) {
+		Plan plan = person.getSelectedPlan();
 		if (toll == null) {
 			personCnt++;
 			run(plan);
-		} else if (TollTools.isInRange(plan.getFirstActivity().getLink(), toll)) {
+		} else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity().getLink(), toll)) {
 			personCnt++;
 			run(plan);
 		}
 	}
 
-	public void run(PlanImpl plan) {
+	public void run(Plan p) {
+		PlanImpl plan = (PlanImpl) p;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof LegImpl) {
-				ActivityImpl previousAct = plan.getPreviousActivity((LegImpl) pe);
-				ActivityImpl nextAct = plan.getNextActivity((LegImpl) pe);
+			if (pe instanceof Leg) {
+				Activity previousAct = plan.getPreviousActivity((Leg) pe);
+				Activity nextAct = plan.getNextActivity((LegImpl) pe);
 				double legLD = CoordUtils.calcDistance(previousAct.getCoord(),
 						nextAct.getCoord());
 				if (previousAct.getType().startsWith("w")

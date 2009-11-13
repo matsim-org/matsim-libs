@@ -28,6 +28,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -53,7 +54,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 
 	protected FixedRouteLegTravelTimeEstimator(
-			PlanImpl plan,
+			Plan plan,
 			TravelTime linkTravelTimeEstimator,
 			DepartureDelayAverageCalculator depDelayCalc,
 			PlansCalcRoute plansCalcRoute,
@@ -138,7 +139,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 
 		double legTravelTimeEstimation = 0.0;
 
-		int legIndex = this.plan.getActLegIndex(legIntermediate);
+		int legIndex = ((PlanImpl) this.plan).getActLegIndex(legIntermediate);
 
 		if (legIntermediate.getMode().equals(TransportMode.car)) {
 
@@ -238,7 +239,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 					if (leg.getRoute() instanceof NetworkRouteWRefs) {
 						EnumMap<TransportMode, LegImpl> legInformation = new EnumMap<TransportMode, LegImpl>(TransportMode.class);
 						legInformation.put(leg.getMode(), new LegImpl(leg));
-						this.fixedRoutes.put(this.plan.getActLegIndex(leg), legInformation);
+						this.fixedRoutes.put(((PlanImpl) this.plan).getActLegIndex(leg), legInformation);
 					}
 				}
 			}

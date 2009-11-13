@@ -26,6 +26,8 @@ import java.util.TreeMap;
 
 import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
@@ -37,7 +39,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -74,7 +75,7 @@ public class ExternalModule implements PlanStrategyModule {
 	protected static final String ExternalConfigFileName = "config.xml";
 
 	/** holds a personId and the reference to the person for reloading the plans later */
-	private final TreeMap<Id, PersonImpl> persons = new TreeMap<Id, PersonImpl>();
+	private final TreeMap<Id, Person> persons = new TreeMap<Id, Person>();
 	protected PopulationWriter plansWriter = null;
 	private PopulationWriterHandler handler = null;
 	private BufferedWriter writer = null;
@@ -223,21 +224,21 @@ public class ExternalModule implements PlanStrategyModule {
 
 	private static class UpdatePlansAlgo extends AbstractPersonAlgorithm {
 
-		private final TreeMap<Id, PersonImpl> persons;
+		private final TreeMap<Id, Person> persons;
 
-		protected UpdatePlansAlgo(final TreeMap<Id, PersonImpl> persons) {
+		protected UpdatePlansAlgo(final TreeMap<Id, Person> persons) {
 			this.persons = persons;
 		}
 
 		@Override
-		public void run(final PersonImpl dummyperson) {
-			PlanImpl newplan = dummyperson.getPlans().get(0);
+		public void run(final Person dummyperson) {
+			Plan newplan = dummyperson.getPlans().get(0);
 			// Find the original person
 			Id Id = dummyperson.getId();
-			PersonImpl person = this.persons.get(Id);
+			Person person = this.persons.get(Id);
 
 			// replace / append the new plan
-			person.exchangeSelectedPlan(newplan, false);
+			((PersonImpl) person).exchangeSelectedPlan(newplan, false);
 		}
 	}
 

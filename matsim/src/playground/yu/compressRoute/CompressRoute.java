@@ -31,13 +31,13 @@ import java.util.Stack;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -81,16 +81,14 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 	/**
 	 * counts and writes the amount of "old" links and that of "new" filtered
 	 * links
-	 * 
-	 * @see org.matsim.population.algorithms.AbstractPersonAlgorithm#run(org.matsim.core.population.PersonImpl)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		int nofPlans = person.getPlans().size();
 
 		for (int planId = 0; planId < nofPlans; planId++) {
-			PlanImpl plan = person.getPlans().get(planId);
+			Plan plan = person.getPlans().get(planId);
 			List actsLegs = plan.getPlanElements();
 			Stack<Link> newLinks = new Stack<Link>();
 			for (int legId = 1; legId < actsLegs.size(); legId += 2) {

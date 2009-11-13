@@ -24,11 +24,10 @@ import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -72,7 +71,7 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	 * run the super method.
 	 */
 	@Override
-	public void run(final PersonImpl person)
+	public void run(final Person person)
 	{
 		setPerson(person);
 		
@@ -84,7 +83,7 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	 * run the super method.
 	 */
 	@Override
-	public void run(final PlanImpl plan)
+	public void run(final Plan plan)
 	{
 		setPerson(plan.getPerson());
 		

@@ -22,6 +22,7 @@ package org.matsim.core.scoring;
 
 import org.matsim.core.population.PlanImpl;
 
+
 /**
  * The <code>ScoringFunctionFactory</code> creates new scoring functions.
  * <br>

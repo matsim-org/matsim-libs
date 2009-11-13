@@ -25,9 +25,9 @@ import java.util.Random;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 
 /**
  * Changes the transportation mode of all legs in a plan to a randomly chosen
@@ -53,7 +53,7 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 		this.rng = rng;
 	}
 
-	public void run(final PlanImpl plan) {
+	public void run(final Plan plan) {
 		if (plan.getPlanElements().size() > 1) {
 			final TransportMode currentMode = ((BasicLeg) (plan.getPlanElements().get(1))).getMode();
 			int newModeIdx = this.rng.nextInt(this.possibleModes.length - 1);

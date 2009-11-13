@@ -21,21 +21,20 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.knowledges.Knowledges;
@@ -46,7 +45,6 @@ import org.matsim.planomat.Planomat;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.mfeil.MDSAM.ActivityTypeFinder;
 import playground.mfeil.config.PlanomatXConfigGroup;
@@ -128,7 +126,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	// run() method
 	//////////////////////////////////////////////////////////////////////
 	
-	public void run (PlanImpl plan){
+	public void run (Plan plan){
 		
 		//////////////////////////////////////////////////////////////////////
 		// Initialization
@@ -960,7 +958,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	}
 	
 	/* Removes the activity at the given position*/
-	private void removeAct (int position, PlanImpl basePlan){
+	private void removeAct (int position, Plan basePlan){
 		List<? extends BasicPlanElement> actslegs = basePlan.getPlanElements();
 		actslegs.remove(position*2);
 		actslegs.remove(position*2);
@@ -980,7 +978,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	}
 		
 	/* Checks whether a primary act is several times in the plan so that it can be dropped as requested*/
-	public boolean checkForSamePrimary (PlanImpl plan, int position){
+	public boolean checkForSamePrimary (Plan plan, int position){
 		
 		for (int i = 0; i<position*2;i+=2){
 			if (((ActivityImpl)(plan.getPlanElements().get(position*2))).getFacilityId().equals(((ActivityImpl)(plan.getPlanElements().get(i))).getFacilityId())	&&

@@ -22,12 +22,12 @@ package playground.yu.newPlans;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -51,7 +51,7 @@ public class NewSmallPlan extends NewPopulation {
 	}
 
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person person) {
 		// if (Math.random() < 0.12) {
 		pw.writePerson(person);
 		// }

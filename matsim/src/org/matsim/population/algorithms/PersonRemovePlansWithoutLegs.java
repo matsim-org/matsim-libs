@@ -20,8 +20,8 @@
 
 package org.matsim.population.algorithms;
 
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 
 /**
  * @author Marcel Rieser
@@ -39,9 +39,9 @@ public class PersonRemovePlansWithoutLegs extends AbstractPersonAlgorithm {
 
 
 	@Override
-	public void run(final PersonImpl person) {
+	public void run(final Person person) {
 		for (int i = 0; i < person.getPlans().size(); i++) {
-			PlanImpl plan = person.getPlans().get(i);
+			Plan plan = person.getPlans().get(i);
 
 			int size = plan.getPlanElements().size();
 			if (size < 3) {

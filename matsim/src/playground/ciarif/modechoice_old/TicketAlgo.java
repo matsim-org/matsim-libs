@@ -22,6 +22,7 @@ package playground.ciarif.modechoice_old;
 
 
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
@@ -43,7 +44,8 @@ public class TicketAlgo extends AbstractPersonAlgorithm {
 
   
 	@Override
-	public void run(PersonImpl person) {
+	public void run(Person pp) {
+		PersonImpl person = (PersonImpl) pp;
 		double rd3 = MatsimRandom.getRandom().nextDouble();
 		if (person.getEmployed() == "no") {
 			if (person.getCarAvail() == "always") {

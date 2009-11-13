@@ -28,11 +28,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.PlanScorer;
@@ -118,7 +120,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 	// run() method
 	//////////////////////////////////////////////////////////////////////
 	
-	public void run (PlanImpl plan){
+	public void run (Plan plan){
 		
 		OptimizedAgents agents = this.module.getOptimizedAgents();
 		
@@ -177,7 +179,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			// Gender
 			if (this.sex=="yes"){
 				try{
-					if (!plan.getPerson().getSex().equals(agents.getAgentPerson(j).getSex())) continue optimizedAgentsLoop;
+					if (!((PersonImpl) plan.getPerson()).getSex().equals(agents.getAgentPerson(j).getSex())) continue optimizedAgentsLoop;
 				}
 				catch (Exception e) {
 					Statistics.noSexAssignment = true;
@@ -187,7 +189,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			// License
 			if (this.license=="yes"){
 				try{
-					if (!plan.getPerson().getLicense().equals(agents.getAgentPerson(j).getLicense())) continue optimizedAgentsLoop;
+					if (!((PersonImpl) plan.getPerson()).getLicense().equals(agents.getAgentPerson(j).getLicense())) continue optimizedAgentsLoop;
 				}
 				catch (Exception e){
 					Statistics.noLicenseAssignment = true;
@@ -197,7 +199,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			// Car availability
 			if (this.car_avail=="yes"){
 				try{
-					if (!plan.getPerson().getCarAvail().equals(agents.getAgentPerson(j).getCarAvail())) continue optimizedAgentsLoop;
+					if (!((PersonImpl) plan.getPerson()).getCarAvail().equals(agents.getAgentPerson(j).getCarAvail())) continue optimizedAgentsLoop;
 				}
 				catch (Exception e){
 					Statistics.noCarAvailAssignment = true;
@@ -207,7 +209,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			// Employment status
 			if (this.employed=="yes"){
 				try{
-					if (!plan.getPerson().isEmployed().equals(agents.getAgentPerson(j).isEmployed())) continue optimizedAgentsLoop;
+					if (!((PersonImpl) plan.getPerson()).isEmployed().equals(agents.getAgentPerson(j).isEmployed())) continue optimizedAgentsLoop;
 				}
 				catch (Exception e){
 					Statistics.noEmploymentAssignment = true;
@@ -241,7 +243,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 			
 			// TODO @mfeil: exception handling missing
 			if (this.age=="yes"){
-				distanceAgent+= this.coefficients.getSingleCoef("age")* (plan.getPerson().getAge()-agents.getAgentPerson(j).getAge());
+				distanceAgent+= this.coefficients.getSingleCoef("age")* (((PersonImpl) plan.getPerson()).getAge()-agents.getAgentPerson(j).getAge());
 			}
 			
 			if (distanceAgent<distance){
@@ -284,9 +286,9 @@ public class AgentsAssigner implements PlanAlgorithm{
 	}
 	
 	
-	protected void writePlan (PlanImpl in, PlanImpl out){
+	protected void writePlan (Plan in, Plan out){
 		PlanImpl bestPlan = new org.matsim.core.population.PlanImpl (in.getPerson());
-		bestPlan.copyPlan(in);
+		bestPlan.copyPlan((PlanImpl) in);
 		List<PlanElement> al = (List<PlanElement>) out.getPlanElements();
 		
 		// NEW NEW NEW NEW NEW NEW NEW

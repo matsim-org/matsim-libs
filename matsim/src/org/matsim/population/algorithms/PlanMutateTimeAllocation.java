@@ -22,9 +22,9 @@ package org.matsim.population.algorithms;
 
 import java.util.Random;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -48,11 +48,11 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 		this.random = random;
 	}
 
-	public void run(final PlanImpl plan) {
+	public void run(final Plan plan) {
 		mutatePlan(plan);
 	}
 
-	private void mutatePlan(final PlanImpl plan) {
+	private void mutatePlan(final Plan plan) {
 
 		int max = plan.getPlanElements().size();
 

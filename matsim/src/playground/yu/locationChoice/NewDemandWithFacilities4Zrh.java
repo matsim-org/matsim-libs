@@ -29,6 +29,8 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -39,7 +41,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.Knowledge;
@@ -74,16 +75,16 @@ public class NewDemandWithFacilities4Zrh {
 		// }
 
 		@Override
-		public void run(final PersonImpl person) {
+		public void run(final Person person) {
 			currentPerson = (PersonImpl) person;
 			currentKnowledge = knowledges.getKnowledgesByPersonId().get(person.getId());
 			if (currentKnowledge == null)
 				knowledges.getFactory().createKnowledge(person.getId(), "");
-			for (PlanImpl plan : person.getPlans())
+			for (Plan plan : person.getPlans())
 				run(plan);
 		}
 
-		public void run(final PlanImpl plan) {
+		public void run(final Plan plan) {
 			for (PlanElement pe : plan.getPlanElements())
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;

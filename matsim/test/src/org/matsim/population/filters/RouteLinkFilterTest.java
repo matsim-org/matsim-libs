@@ -21,6 +21,7 @@
 package org.matsim.population.filters;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -104,7 +105,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 	/*package*/ static class TestAlgorithm implements PlanAlgorithm {
 
-		public void run(final PlanImpl plan) {
+		public void run(final Plan plan) {
 			assertTrue("1".equals(plan.getPerson().getId().toString())
 					|| "2".equals(plan.getPerson().getId().toString()));
 		}

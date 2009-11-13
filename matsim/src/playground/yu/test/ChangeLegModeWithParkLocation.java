@@ -14,6 +14,7 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -109,7 +110,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			this.rnd = rnd;
 		}
 
-		public void run(final PlanImpl plan) {
+		public void run(final Plan plan) {
 			List<PlanElement> pes = plan.getPlanElements();
 			int peSize = pes.size();
 			for (int i = 0; i < peSize; i += 2)
@@ -145,7 +146,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 					}
 				}
 				pes.clear();
-				plan.copyPlan(copyPlan);
+				((PlanImpl) plan).copyPlan(copyPlan);
 			}
 
 		}
