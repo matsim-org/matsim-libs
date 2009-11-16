@@ -1,7 +1,9 @@
 package playground.jjoubert.CommercialTraffic;
 
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.jfree.util.Log;
@@ -9,12 +11,17 @@ import org.matsim.testcases.MatsimTestCase;
 
 import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class SelectVehiclesTest extends MatsimTestCase{
 
 	public void testCountFiles() {
-		File testFolder = new File("~/MATSim/workspace/MATSimTestData/");
+		File testFolder = new File(getOutputDirectory());
 		assertTrue(emptyFolder(testFolder) );
 		boolean checkFolder = testFolder.mkdirs();
 		if(!checkFolder){
