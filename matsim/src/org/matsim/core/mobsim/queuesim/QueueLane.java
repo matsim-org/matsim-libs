@@ -34,6 +34,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
@@ -352,11 +353,16 @@ public class QueueLane {
 			
 			boolean addToBuffer = true;
 			if (veh.getDriver() instanceof TransitDriverAgent) {
+				// yyyy The way I understand the code, this can only happen at the start of a pt run, when the vehicle
+				// with the driver enters the traffic for the first time.  In contrast, pt vehicles at stops
+				// are handled via a separate data structure ("transitVehicleStopQueue") --???  kai, nov'09
 				TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
 				TransitStopFacility stop = driver.getNextTransitStop();
 				if ((stop != null) && (stop.getLink() == this.queueLink.getLink())) {
 				/* ignore delay from handleTransitStop, obviously, the transit
 				 * vehicle was parked here, so everybody should have border by now */
+					// yyyy It probably means "boarded" instead of "border".  But I still don't understand, since
+					// in the next couple of lanes the delay _is_ considered--???  kai, nov'09
 					double delay = driver.handleTransitStop(stop, now);
 					if (delay > 0.0) {
 						veh.setEarliestLinkExitTime(now + delay);
@@ -477,9 +483,17 @@ public class QueueLane {
 	protected boolean moveLane(final double now) {
 		updateBufferCapacity();
 
-		// move vehicles from link to buffer
+		// move vehicles from lane to buffer.  Includes possible vehicle arrival.  Which, I think, would only be triggered
+		// if this is the original lane.
 		moveLaneToBuffer(now);
 
+		// move vehicles from buffer to next lane.  This is, if I see this correctly, only relevant if this lane has "to-lanes".
+		// A lane can only have to-lanes if it is not an originalLane; in fact, if there are no original lanes at all.
+		// Something like
+		// if ( this.toLanes != null ) {
+		//    moveBufferToNextLane( now ) ;
+		// }
+		// might be easier to read?  In fact, I think even more could be done in terms of readability.  kai, nov'09
 		moveBufferToNextLane(now);
 
 		if (this.originalLane){
@@ -490,6 +504,8 @@ public class QueueLane {
 	}
 
 	private void moveBufferToNextLane(final double now) {
+		// because of the "this.toLanes != null", this method in my does something only when there are downstream
+		// lanes on the same link.  kai, nov'09
 		boolean moveOn = true;
 		while (moveOn && !this.bufferIsEmpty() && (this.toLanes != null)) {
 			QueueVehicle veh = this.buffer.peek();
