@@ -32,6 +32,8 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
+
+import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
@@ -59,11 +61,18 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	private static OTFOGLDrawer.FastColorizer colorizer = new OTFOGLDrawer.FastColorizer(
 			new double[] { 0.0, 30., 50.}, new Color[] {
 					Color.RED, Color.YELLOW, Color.GREEN});
+
 	
+	//for backward compatibility only
+	@Deprecated 
 	// for Padang time-based agents
 	/*package*/ final static RandomColorizer colorizer2 = new RandomColorizer(257);
+	//for backward compatibility only
+	@Deprecated 
 	/*package*/ final static OTFOGLDrawer.FastColorizer colorizer3 = new OTFOGLDrawer.FastColorizer(
 			new double[] { 0.0, 30., 120., 255. ,256.}, new Color[] {	Color.GREEN, Color.YELLOW, Color.RED, Color.RED, Color.BLUE});
+	//for backward compatibility only
+	@Deprecated 
 	/*package*/ final static OTFOGLDrawer.FastColorizer colorizer4 = new OTFOGLDrawer.FastColorizer(
 			 new double[] { 0.0, 20.,255.}, new Color[] {	new Color(0,255,128,0), Color.CYAN, Color.BLUE});
 	
@@ -114,10 +123,10 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			ByteBuffer colors =  null;
 			FloatBuffer vertex =  null;
 
-			for(int i = 0; i < posBuffers.size(); i++) {
-				colors = colBuffers.get(i);
-				vertex = posBuffers.get(i);
-				int remain = i == posBuffers.size()-1 ? count %BUFFERSIZE : BUFFERSIZE; //Math.min(vertex.limit() / 2, count - i*BUFFERSIZE);
+			for(int i = 0; i < this.posBuffers.size(); i++) {
+				colors = this.colBuffers.get(i);
+				vertex = this.posBuffers.get(i);
+				int remain = i == this.posBuffers.size()-1 ? this.count %BUFFERSIZE : BUFFERSIZE; //Math.min(vertex.limit() / 2, count - i*BUFFERSIZE);
 				colors.position(0);
 				vertex.position(0);
 				gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, colors);
@@ -126,12 +135,12 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			}
 
 			// for possibly adding data
-			vertex.position((count % BUFFERSIZE) * 2);
-			colors.position((count % BUFFERSIZE) * 4);
+			vertex.position((this.count % BUFFERSIZE) * 2);
+			colors.position((this.count % BUFFERSIZE) * 4);
 		}
 		
 		protected boolean isEmpty() {
-			return posBuffers.size() == 0;
+			return this.posBuffers.size() == 0;
 		}
 		
 		public void onDraw(GL gl) {
@@ -147,11 +156,11 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 
 			setTexture();
 			//texture = null;
-			if (texture != null) {
-				texture.enable();
+			if (this.texture != null) {
+				this.texture.enable();
 				gl.glEnable(GL.GL_TEXTURE_2D);
 				gl.glTexEnvf(GL.GL_POINT_SPRITE, GL.GL_COORD_REPLACE, GL.GL_TRUE);
-				texture.bind();	        	
+				this.texture.bind();	        	
 			}
 			gl.glDepthMask(false);
 
@@ -159,8 +168,8 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			
 			gl.glDisableClientState (GL.GL_COLOR_ARRAY);
 			gl.glDisableClientState (GL.GL_VERTEX_ARRAY); 
-			if (texture != null ) {
-				texture.disable();	
+			if (this.texture != null ) {
+				this.texture.disable();	
 			}
 
 			gl.glDisable(GL.GL_POINT_SPRITE);
@@ -174,10 +183,10 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			double mindist = Double.MAX_VALUE;
 			double dist = 0;
 			
-			for(int i = 0; i < posBuffers.size(); i++) {
-				vertex = posBuffers.get(i);
+			for(int i = 0; i < this.posBuffers.size(); i++) {
+				vertex = this.posBuffers.get(i);
 				vertex.position(0);
-				while (vertex.hasRemaining() && idx < count) {
+				while (vertex.hasRemaining() && idx < this.count) {
 					float x = vertex.get();
 					float y = vertex.get();
 					// DS We do not need z value here but need to fetch it from buffer!
@@ -196,23 +205,23 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 
 		public void addAgent(char[] id, float startX, float startY, Color mycolor, boolean saveId){
-			if (count % BUFFERSIZE == 0) {
-				vertexIN = BufferUtil.newFloatBuffer(BUFFERSIZE*2);
-				colorsIN = BufferUtil.newByteBuffer(BUFFERSIZE*4);
-				colBuffers.add(colorsIN);
-				posBuffers.add(vertexIN);
+			if (this.count % BUFFERSIZE == 0) {
+				this.vertexIN = BufferUtil.newFloatBuffer(BUFFERSIZE*2);
+				this.colorsIN = BufferUtil.newByteBuffer(BUFFERSIZE*4);
+				this.colBuffers.add(this.colorsIN);
+				this.posBuffers.add(this.vertexIN);
 			}
-			vertexIN.put(startX);
-			vertexIN.put(startY);
+			this.vertexIN.put(startX);
+			this.vertexIN.put(startY);
 			//vertexIN.put(0.f);
-			if (saveId) id2coord.put(Arrays.hashCode(id),count);
+			if (saveId) this.id2coord.put(Arrays.hashCode(id),this.count);
 			
-			colorsIN.put( (byte)mycolor.getRed());
-			colorsIN.put( (byte)mycolor.getGreen());
-			colorsIN.put((byte)mycolor.getBlue());
-			colorsIN.put( (byte)alpha);
+			this.colorsIN.put( (byte)mycolor.getRed());
+			this.colorsIN.put( (byte)mycolor.getGreen());
+			this.colorsIN.put((byte)mycolor.getBlue());
+			this.colorsIN.put( (byte)alpha);
 			
-			count++;
+			this.count++;
 			
 		}
 
@@ -222,9 +231,9 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
 			if (user != 2) {
-				drawer.addAgent(id, startX, startY, colorizer.getColor(color), true);
+				OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, colorizer.getColor(color), true);
 			} else {
-				drawer.addAgent(id, startX, startY, new Color(0.0f, 0.7f, 1.0f), true);
+				OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, new Color(0.0f, 0.7f, 1.0f), true);
 			}
 		}
 	
@@ -242,8 +251,9 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	
 	public class AgentPointDrawerBlue extends AgentPointDrawer {
 		
+		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-				drawer.addAgent(id, startX, startY, colorizerBlue.getColor(0.1 + 0.9*color), true);
+				OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, colorizerBlue.getColor(0.1 + 0.9*color), true);
 		}
 	}
 
@@ -256,25 +266,38 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			return new Color(idR, idG,idB,250);
 		}
 		
+		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			drawer.addAgent(id, startX, startY, getColorFromID(id), true);
+			OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, getColorFromID(id), true);
 		}
 	}
 
+	//for backward compatibility only
+	@Deprecated 
 	public class AgentPadangDrawer  extends AgentPointDrawer {
+		
+		
+		
 		public final AgentArrayDrawer drawerWave = new AgentArrayDrawer(){
+			@Override
 			protected void setAgentSize(){gl.glPointSize(10);}
+			@Override
 			protected void setTexture(){this.texture = null;}
 		};
 		public final AgentArrayDrawer drawerEvacuees = new AgentArrayDrawer(){
+			@Override
 			protected void setTexture(){this.texture = AgentDrawer.pedpng;}
 		};		
 		
 		
+		public AgentPadangDrawer() {
+			super();
+			Logger.getLogger(AgentPadangDrawer.class).warn("This class is deprecated and will be removed in further versions!");	
+		}
 		
 		public void drawAll() {
-			drawerWave.draw();
-			drawerEvacuees.draw();
+			this.drawerWave.draw();
+			this.drawerEvacuees.draw();
 		}
 	}
 
@@ -289,21 +312,24 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 	}
 
+	//for backward compatibility only
+	@Deprecated 
 	public class AgentPadangRegionDrawer extends AgentPadangDrawer {
 		
 		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			if (user !=-1) drawerEvacuees.addAgent(id, startX, startY, colorizer2.getColor(user), false);
-			else drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
+			if (user !=-1) this.drawerEvacuees.addAgent(id, startX, startY, colorizer2.getColor(user), false);
+			else this.drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
 		}
 	}
-
+	//for backward compatibility only
+	@Deprecated 
 	public class AgentPadangTimeDrawer extends AgentPadangDrawer {
 		
 		@Override
 		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-			if (user != -1) drawerEvacuees.addAgent(id, startX, startY, colorizer3.getColor(state),false);
-			else drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
+			if (user != -1) this.drawerEvacuees.addAgent(id, startX, startY, colorizer3.getColor(state),false);
+			else this.drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
 		}
 	}
 
@@ -315,10 +341,10 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 
 	@Override
 	public void draw() {
-		drawer.draw();
+		this.drawer.draw();
 
-		regiondrawer.drawAll();
-		timedrawer.drawAll();
+		this.regiondrawer.drawAll();
+		this.timedrawer.drawAll();
 		
 	}
 
@@ -333,10 +359,10 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	@Override
 	public Object newInstance(Class clazz) throws InstantiationException, IllegalAccessException {
 //		AgentPointDrawer drawer = (AgentPointDrawer)clazz.newInstance(this);
-		if (clazz == AgentPadangTimeDrawer.class) return timedrawer;
-		else if (clazz == AgentPadangRegionDrawer.class) return regiondrawer;
-		else if (clazz == AgentPointDrawerByID.class) return pointIDdrawer;
-		else return pointdrawer;
+		if (clazz == AgentPadangTimeDrawer.class) return this.timedrawer;
+		else if (clazz == AgentPadangRegionDrawer.class) return this.regiondrawer;
+		else if (clazz == AgentPointDrawerByID.class) return this.pointIDdrawer;
+		else return this.pointdrawer;
 	}
 
 	public int getDrawOrder() {
@@ -345,14 +371,14 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	}
 
 	public int getAgentIndex(Point2D.Double point) {
-		return drawer.getNearestAgent(point);
+		return this.drawer.getNearestAgent(point);
 	}
 
 	public Point2D.Double getAgentCoords(char [] id) {
 		int idNr = Arrays.hashCode(id);
-		Integer i = drawer.id2coord.get(idNr);
+		Integer i = this.drawer.id2coord.get(idNr);
 		if (i != null) {
-			FloatBuffer vertex = drawer.posBuffers.get(i / BUFFERSIZE);
+			FloatBuffer vertex = this.drawer.posBuffers.get(i / BUFFERSIZE);
 			int innerIdx = i % BUFFERSIZE;
 			float x = vertex.get(innerIdx*2);
 			float y = vertex.get(innerIdx*2+1);
