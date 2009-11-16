@@ -2,17 +2,17 @@ package playground.christoph.network;
 
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.network.BasicLinkImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 
-public class SubLinkV1 extends BasicLinkImpl implements Link{
+public class SubLinkV1 extends LinkImpl implements Link{
 
 	private LinkImpl parentLink;
 	
-	public SubLinkV1(NetworkLayer network, BasicNode from, BasicNode to, LinkImpl link)
+	public SubLinkV1(NetworkLayer network, BasicNode from, BasicNode to, LinkImpl link,
+		final double length, final double freespeed, final double capacity, final double numLanes)
 	{
-		super(network, link.getId(), from, to);
+		super(link.getId(), from, to, network, length, freespeed, capacity, numLanes);
 		this.parentLink = link;
 	}
 	

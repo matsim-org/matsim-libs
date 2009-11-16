@@ -15,7 +15,6 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -114,8 +113,8 @@ public class TestCellKnowledge {
 		
 		for(int j = 1; j < acts.size(); j++)
 		{						
-			NodeImpl startNode = acts.get(j-1).getLink().getToNode();
-			NodeImpl endNode = acts.get(j).getLink().getFromNode();
+			Node startNode = acts.get(j-1).getLink().getToNode();
+			Node endNode = acts.get(j).getLink().getFromNode();
 				
 			selectNodesDijkstra.setStartNode(startNode);
 			selectNodesDijkstra.setEndNode(endNode);

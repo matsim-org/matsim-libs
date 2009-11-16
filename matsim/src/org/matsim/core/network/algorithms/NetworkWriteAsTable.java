@@ -23,11 +23,11 @@ package org.matsim.core.network.algorithms;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
@@ -107,13 +107,13 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 		System.out.println("      capperiod = " + capperiod);
 
 		try {
-			for (NodeImpl n : network.getNodes().values()) {
+			for (Node n : network.getNodes().values()) {
 				this.out_n.write(n.getId() + "\t" + n.getCoord().getX() + "\t" + n.getCoord().getY() + "\n");
 				this.out_n.flush();
 			}
 			for (LinkImpl l : network.getLinks().values()) {
-				NodeImpl f = l.getFromNode();
-				NodeImpl t = l.getToNode();
+				Node f = l.getFromNode();
+				Node t = l.getToNode();
 				this.out_l.write(l.getId() + "\t" + f.getCoord().getX() + "\t" + f.getCoord().getY() + "\t");
 				this.out_l.write(t.getCoord().getX() + "\t" + t.getCoord().getY() + "\t" + l.getLength() + "\t");
 				this.out_l.write(l.getFreespeed(Time.UNDEFINED_TIME) + "\t" + (l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/capperiod) + "\t" + NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, l) + "\t1\n");

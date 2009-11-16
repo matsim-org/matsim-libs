@@ -31,6 +31,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -129,11 +130,11 @@ public class NetworkCutter {
 	}
 
 	// not perfect, but it's enough to test
-	private boolean inside(LinkImpl link) {
+	private boolean inside(Link link) {
 		return inside(link.getFromNode()) || inside(link.getToNode());
 	}
 
-	private boolean inside(NodeImpl node) {
+	private boolean inside(Node node) {
 		Coord crd = node.getCoord();
 		double x = crd.getX();
 		double y = crd.getY();

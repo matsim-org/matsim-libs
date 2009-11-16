@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
@@ -26,9 +27,6 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-import playground.mmoyo.PTRouter.PTLink;
-import playground.mmoyo.PTRouter.PTNode;
-import playground.mmoyo.PTRouter.PTValues;
 
 /**
  * Reads a TransitSchedule and creates from it:
@@ -114,7 +112,7 @@ public class LogicFactory{
 
 					/**Creates links*/
 					if (!first){
-						LinkImpl plainLink= createPlainLink(lastPlainNode, plainNode);
+						Link plainLink= createPlainLink(lastPlainNode, plainNode);
 						Id logicLinkId = new IdImpl(newLinkId++);
 						PTLink logicLink = new PTLink(logicLinkId, lastLogicNode, logicNode, logicNet, "Standard", avWalkSpeed); 
 						
@@ -209,11 +207,11 @@ public class LogicFactory{
 		int numInGoingStandards =0;
 		int numOutgoingStandards =0;
 		
-		for (LinkImpl inLink : fromNode.getInLinks().values())
-			if (inLink.getType().equals("Standard")) 	numInGoingStandards++;
+		for (Link inLink : fromNode.getInLinks().values())
+			if (((LinkImpl) inLink).getType().equals("Standard")) 	numInGoingStandards++;
 
-		for (LinkImpl outLink : toNode.getOutLinks().values())
-			if (outLink.getType().equals("Standard")) numOutgoingStandards++;
+		for (Link outLink : toNode.getOutLinks().values())
+			if (((LinkImpl) outLink).getType().equals("Standard")) numOutgoingStandards++;
 	
 		return (numInGoingStandards>0) && (numOutgoingStandards>0); 
 	}	
@@ -226,8 +224,8 @@ public class LogicFactory{
 	}
 	
 	/**returns -or creates if does not exist- a plain link between two nodes*/
-	private LinkImpl createPlainLink(NodeImpl fromNode, NodeImpl toNode){
-		LinkImpl linkImpl = null;
+	private Link createPlainLink(NodeImpl fromNode, NodeImpl toNode){
+		Link linkImpl = null;
 		if (!fromNode.getOutNodes().containsValue(toNode)){
 			double length= CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
 			linkImpl= plainNet.createAndAddLink(new IdImpl(newPlainLinkId++), fromNode, toNode, length, 1.0, 1.0 , 1);
@@ -235,7 +233,7 @@ public class LogicFactory{
 		
 		else{
 			//-> make better method : store and read in map
-			for (LinkImpl outLink : fromNode.getOutLinks().values()){
+			for (Link outLink : fromNode.getOutLinks().values()){
 				if (outLink.getToNode().equals(toNode)){
 					return outLink;
 				}

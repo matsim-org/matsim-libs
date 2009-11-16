@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -92,7 +91,7 @@ public class PlansCalcTravelDistance extends AbstractPersonAlgorithm implements 
 
 			LinkImpl startlink = fromAct.getLink();
 			if (startlink == null) throw new Exception("start link missing");
-			NodeImpl startnode = startlink.getFromNode();
+			Node startnode = startlink.getFromNode();
 
 			ArrayList<Node> nodes = new ArrayList<Node>();
 			nodes.add(startnode);

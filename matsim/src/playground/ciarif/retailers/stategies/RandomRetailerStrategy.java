@@ -6,7 +6,6 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.network.BasicLinkImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
@@ -29,7 +28,7 @@ public class RandomRetailerStrategy implements RetailerStrategy {
 	final public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> facilities, ArrayList<LinkRetailersImpl> allowedLinks) {
 		for (ActivityFacilityImpl f : facilities.values()) {
 			int rd = MatsimRandom.getRandom().nextInt(allowedLinks.size());
-			BasicLinkImpl link =(BasicLinkImpl)allowedLinks.get(rd);
+			Link link =allowedLinks.get(rd);
 			Utils.moveFacility(f,link,this.world);
 			this.movedFacilities.put(f.getId(),f);
 		}

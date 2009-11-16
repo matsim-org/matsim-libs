@@ -196,16 +196,16 @@ public class PathSetGenerator {
 		for (LinkImpl l : network.getLinks().values()) {
 
 			// find the beginning of the "oneway path" or "twoway path"
-			LinkImpl currLink = l;
-			NodeImpl fromNode = currLink.getFromNode();
+			Link currLink = l;
+			NodeImpl fromNode = (NodeImpl) currLink.getFromNode();
 			while ((fromNode.getIncidentNodes().size() == 2) &&
 					(((fromNode.getOutLinks().size() == 1) && (fromNode.getInLinks().size() == 1)) ||
 					((fromNode.getOutLinks().size() == 2) && (fromNode.getInLinks().size() == 2)))) {
-				Iterator<? extends LinkImpl> linkIt = fromNode.getInLinks().values().iterator();
-				LinkImpl prevLink = linkIt.next();
+				Iterator<? extends Link> linkIt = fromNode.getInLinks().values().iterator();
+				Link prevLink = linkIt.next();
 				if (prevLink.getFromNode().getId().equals(currLink.getToNode().getId())) { prevLink = linkIt.next(); }
 				currLink = prevLink;
-				fromNode = currLink.getFromNode();
+				fromNode = (NodeImpl) currLink.getFromNode();
 			}
 			
 			// create the street segment for the whole "one- or twoway path" (if not already exists)
@@ -214,15 +214,15 @@ public class PathSetGenerator {
 				s = new StreetSegment(new IdImpl("s"+currLink.getId()),currLink.getFromNode(),currLink.getToNode(),network,1,1,1,1);
 				s.links.add(currLink);
 				l2sMapping.put(currLink.getId(),s);
-				NodeImpl toNode = currLink.getToNode();
+				NodeImpl toNode = (NodeImpl) currLink.getToNode();
 				while ((toNode.getIncidentNodes().size() == 2) &&
 						(((toNode.getOutLinks().size() == 1) && (toNode.getInLinks().size() == 1)) ||
 						((toNode.getOutLinks().size() == 2) && (toNode.getInLinks().size() == 2)))) {
-					Iterator<? extends LinkImpl> linkIt = toNode.getOutLinks().values().iterator();
-					LinkImpl nextLink = linkIt.next();
+					Iterator<? extends Link> linkIt = toNode.getOutLinks().values().iterator();
+					Link nextLink = linkIt.next();
 					if (nextLink.getToNode().getId().equals(currLink.getFromNode().getId())) { nextLink = linkIt.next(); }
 					currLink = nextLink;
-					toNode = currLink.getToNode();
+					toNode = (NodeImpl) currLink.getToNode();
 					s.links.add(currLink);
 					l2sMapping.put(currLink.getId(),s);
 					s.setToNode(toNode);
@@ -240,14 +240,14 @@ public class PathSetGenerator {
 		log.info("done.");
 	}
 	
-	private void addLinkToNetwork(LinkImpl link) {
+	private void addLinkToNetwork(Link link) {
 		link.getFromNode().addOutLink(link);
 		link.getToNode().addInLink(link);
 	}
 
-	private void removeLinkFromNetwork(LinkImpl link) {
-		link.getFromNode().removeOutLink(link);
-		link.getToNode().removeInLink(link);
+	private void removeLinkFromNetwork(Link link) {
+		((NodeImpl) link.getFromNode()).removeOutLink(link);
+		((NodeImpl) link.getToNode()).removeInLink(link);
 	}
 
 	private final boolean containsPath(Set<Path> paths, Path path) {
@@ -280,14 +280,14 @@ public class PathSetGenerator {
 			
 			// remove the links from the network, calculate the least cost path and put the links back where they were
 			for (StreetSegment segment : streetSegmentSet) {
-				for (LinkImpl l : segment.links) {
+				for (Link l : segment.links) {
 					removeLinkFromNetwork(l);
 				}
 			}
 			Path path = router.calcLeastCostPath(origin,destination,depTime);
 			routeCnt++;
 			for (StreetSegment segment : streetSegmentSet) {
-				for (LinkImpl l : segment.links) {
+				for (Link l : segment.links) {
 					addLinkToNetwork(l);
 				}
 			}

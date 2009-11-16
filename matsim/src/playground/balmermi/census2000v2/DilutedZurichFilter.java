@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -36,7 +37,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -114,8 +114,8 @@ public class DilutedZurichFilter {
 
 		log.info("    extracting links of the aoi... " + (new Date()));
 		for (LinkImpl link : network.getLinks().values()) {
-			final NodeImpl from = link.getFromNode();
-			final NodeImpl to = link.getToNode();
+			final Node from = link.getFromNode();
+			final Node to = link.getToNode();
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
 				areaOfInterest.put(link.getId(),link);
 			}

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -97,13 +96,13 @@ public class NetworkFilterManager {
 					}
 				}
 				if (add) {
-					NodeImpl from = l.getFromNode();
-					NodeImpl to = l.getToNode();
+					Node from = l.getFromNode();
+					Node to = l.getToNode();
 					if (!net.getNodes().containsKey(from.getId())) {
-						net.getNodes().put(from.getId(), from);
+						net.getNodes().put(from.getId(), (NodeImpl) from);
 					}
 					if (!net.getNodes().containsKey(to.getId())){
-						net.getNodes().put(to.getId(), to);
+						net.getNodes().put(to.getId(), (NodeImpl) to);
 					}
 					net.getLinks().put(l.getId(), l);
 					linkCount++;

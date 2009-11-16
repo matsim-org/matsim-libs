@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NodeImpl;
@@ -125,13 +126,13 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 	public void run(Plan plan) {
 		List actslegs = plan.getPlanElements();
 		ActivityImpl fromAct = (ActivityImpl) actslegs.get(0);
-		NodeImpl fromNode = fromAct.getLink().getToNode();
+		Node fromNode = fromAct.getLink().getToNode();
 
 		for (int j = 2; j < actslegs.size(); j = j + 2) {
 			ActivityImpl toAct = (ActivityImpl) actslegs.get(j);
 
 			if (fromAct.getEndTime() >= 0) {
-				NodeImpl toNode = toAct.getLink().getFromNode();
+				Node toNode = toAct.getLink().getFromNode();
 				addStartTimeOccurrence(fromNode, toNode, fromAct.getEndTime());
 				this.travelZone.add(fromNode.getCoord().getX(), fromNode.getCoord()
 						.getY());
@@ -146,8 +147,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 		}
 	}
 
-	private void addStartTimeOccurrence(NodeImpl fromNode, NodeImpl toNode,
-			double startTime) {
+	private void addStartTimeOccurrence(Node fromNode, Node toNode, double startTime) {
 		NodePair np = new NodePair(fromNode, toNode);
 		StartTimeOccurrence occ = this.fromToMap.get(np);
 		if (occ == null) {
@@ -177,10 +177,10 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 	 */
 	static public class NodePair {
 
-		NodeImpl first;
-		NodeImpl second;
+		Node first;
+		Node second;
 
-		public NodePair(NodeImpl first, NodeImpl second) {
+		public NodePair(Node first, Node second) {
 			setFirst(first);
 			setSecond(second);
 		}
@@ -188,28 +188,28 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 		/**
 		 * @return the first
 		 */
-		public NodeImpl getFirst() {
+		public Node getFirst() {
 			return this.first;
 		}
 
 		/**
 		 * @param first the first to set
 		 */
-		private void setFirst(NodeImpl first) {
+		private void setFirst(Node first) {
 			this.first = first;
 		}
 
 		/**
 		 * @return the second
 		 */
-		public NodeImpl getSecond() {
+		public Node getSecond() {
 			return this.second;
 		}
 
 		/**
 		 * @param second the second to set
 		 */
-		private void setSecond(NodeImpl second) {
+		private void setSecond(Node second) {
 			this.second = second;
 		}
 
@@ -285,17 +285,17 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 		private static final long serialVersionUID = 1L;
 
 		public int compare(NodePair n1, NodePair n2) {
-			NodeImpl n1First = n1.getFirst();
-			NodeImpl n1Second = n1.getSecond();
-			NodeImpl n2First = n2.getFirst();
-			NodeImpl n2Second = n2.getSecond();
+			Node n1First = n1.getFirst();
+			Node n1Second = n1.getSecond();
+			Node n2First = n2.getFirst();
+			Node n2Second = n2.getSecond();
 
 			if (n1First.equals(n2First) && n1Second.equals(n2Second)) {
 				return 0;
 			} else if (n1First.equals(n2First)) {
-				return n1Second.compareTo(n2Second);
+				return n1Second.getId().compareTo(n2Second.getId());
 			} else {
-				return n1First.compareTo(n2First);
+				return n1First.getId().compareTo(n2First.getId());
 			}
 		}
 	}

@@ -20,15 +20,24 @@
 
 package org.matsim.core.network;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.network.BasicLinkImpl;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.world.AbstractLocation;
 
-public class LinkImpl extends BasicLinkImpl implements Link {
+public class LinkImpl extends AbstractLocation implements BasicLink, Link {
 
 	private final static Logger log = Logger.getLogger(LinkImpl.class);
 
@@ -36,6 +45,16 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
+	protected BasicNode from = null;
+	protected BasicNode to = null;
+
+	protected double length = Double.NaN;
+	protected double freespeed = Double.NaN;
+	protected double capacity = Double.NaN;
+	protected double nofLanes = Double.NaN;
+	
+	protected EnumSet<TransportMode> allowedModes = EnumSet.of(TransportMode.car);
+	
 	private double flowCapacity;
 
 	protected String type = null;
@@ -54,7 +73,11 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 	
 	public LinkImpl(final Id id, final BasicNode from, final BasicNode to,
 			final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
-		super(network, id, from, to);
+		super(network, id, 
+				new CoordImpl(0.5*(from.getCoord().getX() + to.getCoord().getX()), 0.5*(from.getCoord().getY() + to.getCoord().getY()))
+		);
+		this.from = from;
+		this.to = to;
 
 		// set attributes and do semantic checks
 		this.setLength(length);
@@ -145,14 +168,22 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
-	public NodeImpl getFromNode() {
-		return (NodeImpl)this.from;
+	public Node getFromNode() {
+		return (Node)this.from;
+	}
+	
+	public final boolean setFromNode(final BasicNode node) {
+		this.from = node;
+		return true;
 	}
 
-	@Override
-	public NodeImpl getToNode() {
-		return (NodeImpl)this.to;
+	public Node getToNode() {
+		return (Node)this.to;
+	}
+
+	public final boolean setToNode(final BasicNode node) {
+		this.to = node;
+		return true;
 	}
 
 	public double getFreespeedTravelTime(final double time) {
@@ -182,32 +213,63 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 		return Math.round((float)Math.max(this.nofLanes,1.0d));
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
+	/**
+	 * This method returns the capacity as set in the xml defining the network. Be aware
+	 * that this capacity is not normalized in time, it depends on the period set
+	 * in the network file (the capperiod attribute).
+	 *
+ 	 * @param time - the current time
+	 * @return the capacity per network's capperiod timestep
+	 */
+	public double getCapacity(final double time) { // not final since needed in TimeVariantLinkImpl
+		return this.capacity;
+	}
+	
 	public final void setCapacity(double capacityPerNetworkCapcityPeriod){
-		super.setCapacity(capacityPerNetworkCapcityPeriod);
+		this.capacity = capacityPerNetworkCapcityPeriod;
 		this.calculateFlowCapacity();
 	}
 	
-	@Override
+	/**
+	 * This method returns the freespeed velocity in meter per seconds.
+	 *
+	 * @param time - the current time
+	 * @return freespeed
+	 */
+	public double getFreespeed(final double time) { // not final since needed in TimeVariantLinkImpl
+		return this.freespeed;
+	}
+	
 	public final void setFreespeed(double freespeed) {
-		super.setFreespeed(freespeed);
+		this.freespeed = freespeed;
 		this.checkFreespeedSemantics();
 	}
 
-	@Override
+	public double getLength() {
+		return this.length;
+	}
+
 	public final void setLength(double length) {
-		super.setLength(length);
+		this.length = length;
 		this.checkLengthSemantics();
 	}
 
-	@Override
+	public double getNumberOfLanes(final double time) { // not final since needed in TimeVariantLinkImpl
+		return this.nofLanes;
+	}
+
 	public final void setNumberOfLanes(double lanes) {
-		super.setNumberOfLanes(lanes);
+		this.nofLanes = lanes;
 		this.checkNumberOfLanesSemantics();
+	}
+	
+	public final Set<TransportMode> getAllowedModes() {
+		return this.allowedModes.clone();
+	}
+	
+	public final void setAllowedModes(final Set<TransportMode> modes) {
+		this.allowedModes.clear();
+		this.allowedModes.addAll(modes);
 	}
 	
 	public final void setOrigId(final String id) {
@@ -216,6 +278,12 @@ public class LinkImpl extends BasicLinkImpl implements Link {
 
 	public void setType(final String type) {
 		this.type = type;
+	}
+
+	private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+		ois.defaultReadObject();
+		this.from.addOutLink(this);
+		this.to.addInLink(this);
 	}
 
 	@Override

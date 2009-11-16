@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.otf.drawer.OTFBackgroundTexturesDrawer;
@@ -19,7 +19,7 @@ public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 
 	protected static final double PI_HALF = Math.PI/2;
 	protected static final double TWO_PI = 2 * Math.PI;
-	protected final Map<NodeImpl,NodeInfo> infos = new HashMap<NodeImpl,NodeInfo>();
+	protected final Map<Node, NodeInfo> infos = new HashMap<Node, NodeInfo>();
 	protected final OTFBackgroundTexturesDrawer sbg;
 	private final NetworkLayer network;
 	
@@ -31,7 +31,7 @@ public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 	
 	
 	public void handleEvent(LinkEnterEventImpl event) {
-		LinkImpl l = (LinkImpl) event.getLink();
+		Link l = (Link) event.getLink();
 		if (l == null) {
 			l = this.network.getLink(event.getLinkId());
 		}
@@ -52,7 +52,7 @@ public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 	public void createArrows() {
 		for (NodeInfo ni : this.infos.values()) {
 			if (ni.outLinks.size() == 1) {
-				LinkImpl l = ni.outLinks.iterator().next();
+				Link l = ni.outLinks.iterator().next();
 				double xDiff = l.getToNode().getCoord().getX() - l.getFromNode().getCoord().getX();
 				CoordImpl f = (CoordImpl) l.getFromNode().getCoord();
 				CoordImpl t = (CoordImpl) l.getToNode().getCoord();
@@ -97,7 +97,7 @@ public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 	
 	
 	static class NodeInfo {
-		Set<LinkImpl> outLinks = new HashSet<LinkImpl>();
-		NodeImpl node;
+		Set<Link> outLinks = new HashSet<Link>();
+		Node node;
 	}
 }

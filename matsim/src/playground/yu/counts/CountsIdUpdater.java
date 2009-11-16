@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -104,7 +105,7 @@ public class CountsIdUpdater {
 					+ " doesn't exist in the new network!");
 			return null;
 		}
-		for (LinkImpl link : fromNode.getOutLinks().values())
+		for (Link link : fromNode.getOutLinks().values())
 			if (Integer.parseInt(link.getToNode().getId().toString()) == Integer
 					.parseInt(toNodeId.toString())) {
 				System.out.println("Link with fromNodeId "

@@ -26,12 +26,11 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -69,8 +68,8 @@ public class PlanFilter {
 				final Map<Id, LinkImpl> bigAOI = new HashMap<Id, LinkImpl>();
 
 				for (LinkImpl link : network.getLinks().values()) {
-					final NodeImpl from = link.getFromNode();
-					final NodeImpl to = link.getToNode();
+					final Node from = link.getFromNode();
+					final Node to = link.getToNode();
 					if ((CoordUtils.calcDistance(from.getCoord(), center) <= smallRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= smallRadius)) {
 						smallAOI.put(link.getId(),link);
 					}
@@ -78,8 +77,8 @@ public class PlanFilter {
 //				System.out.println("  aoi with radius=" + smallRadius + " contains " + smallAOI.size() + " links.");
 
 				for (LinkImpl link : network.getLinks().values()) {
-					final NodeImpl from = link.getFromNode();
-					final NodeImpl to = link.getToNode();
+					final Node from = link.getFromNode();
+					final Node to = link.getToNode();
 					if ((CoordUtils.calcDistance(from.getCoord(), center) <= bigRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= bigRadius)) {
 						bigAOI.put(link.getId(),link);
 					}
@@ -125,8 +124,8 @@ public class PlanFilter {
 		final Map<Id, LinkImpl> bigAOI = new HashMap<Id, LinkImpl>();
 
 		for (LinkImpl link : network.getLinks().values()) {
-			final NodeImpl from = link.getFromNode();
-			final NodeImpl to = link.getToNode();
+			final Node from = link.getFromNode();
+			final Node to = link.getToNode();
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= smallRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= smallRadius)) {
 				smallAOI.put(link.getId(),link);
 			}
@@ -137,15 +136,15 @@ public class PlanFilter {
 		subnet.setName("based on " + config.network().getInputFile());
 		subnet.setCapacityPeriod(network.getCapacityPeriod());
 		for (LinkImpl link : network.getLinks().values()) {
-			final NodeImpl from = link.getFromNode();
-			final NodeImpl to = link.getToNode();
+			final Node from = link.getFromNode();
+			final Node to = link.getToNode();
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= bigRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= bigRadius)) {
 				bigAOI.put(link.getId(),link);
-				NodeImpl fromNode = link.getFromNode();
+				Node fromNode = link.getFromNode();
 				if (!subnet.getNodes().containsKey(fromNode.getId())) {
 					subnet.createAndAddNode(fromNode.getId(), fromNode.getCoord());
 				}
-				NodeImpl toNode = link.getToNode();
+				Node toNode = link.getToNode();
 				if (!subnet.getNodes().containsKey(toNode.getId())) {
 					subnet.createAndAddNode(toNode.getId(), toNode.getCoord());
 				}

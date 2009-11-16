@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -129,9 +129,9 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 			log.info("  removed "+down_mapping.size()+" down-mappings (link).");
 			removeAllDownMappings();
 			NetworkLayer network = (NetworkLayer)layer.getDownRule().getDownLayer();
-			LinkImpl l = network.getNearestRightEntryLink(center);
-			addDownMapping(l);
-			l.addUpMapping(this);
+			Link l = network.getNearestRightEntryLink(center);
+			addDownMapping((LinkImpl) l);
+			((LinkImpl) l).addUpMapping(this);
 			log.info("  added "+down_mapping.size()+" down-mapping (link):");
 			log.info("  - link id="+l.getId());
 		}

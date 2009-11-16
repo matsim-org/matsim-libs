@@ -30,8 +30,9 @@ import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.feature.Feature;
-
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
@@ -252,9 +253,9 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 					// go through each other element (target link of the maneuver) of the sequence by sequence number
 					for (Id otherLinkId : mSequence.values()) {
 						// get the start link and the target link of the maneuver
-						LinkImpl inLink = n.getInLinks().get(new IdImpl(firstLinkid+"FT"));
+						Link inLink = n.getInLinks().get(new IdImpl(firstLinkid+"FT"));
 						if (inLink == null) { inLink = n.getInLinks().get(new IdImpl(firstLinkid+"TF")); }
-						LinkImpl outLink = n.getOutLinks().get(new IdImpl(otherLinkId+"FT"));
+						Link outLink = n.getOutLinks().get(new IdImpl(otherLinkId+"FT"));
 						if (outLink == null) { outLink = n.getOutLinks().get(new IdImpl(otherLinkId+"TF")); }
 						if ((inLink != null) && (outLink != null)) {
 							// start and target link found and they are incident to the given node
@@ -323,7 +324,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 					}
 				}
 				// expand the node
-				Tuple<ArrayList<NodeImpl>,ArrayList<LinkImpl>> t = neModule.expandNode(network,nodeId,turns,expansionRadius,linkSeparation);
+				Tuple<ArrayList<Node>,ArrayList<Link>> t = neModule.expandNode(network,nodeId,turns,expansionRadius,linkSeparation);
 				virtualNodesCnt += t.getFirst().size();
 				virtualLinksCnt += t.getSecond().size();
 				nodesAssignedCnt++;

@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -60,7 +62,7 @@ public class NetworkAnalyseRouteSet {
 	// Link atts: Laenge  VWeg  VWegEm  ParkW  Ampel  Bruecke  Tunnel  NatBel  DTVKat
 	// idx:       0       1     2       3      4      5        6       7       8
 	private final TreeMap<Id,double[]> link_atts = new TreeMap<Id, double[]>();
-	private final TreeMap<Id,ArrayList<NodeImpl>> routes = new TreeMap<Id, ArrayList<NodeImpl>>();
+	private final TreeMap<Id,ArrayList<Node>> routes = new TreeMap<Id, ArrayList<Node>>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -146,8 +148,8 @@ public class NetworkAnalyseRouteSet {
 				// example: 100000  13846      13703    9001  ...  8803     -1  1                    -1
 				// index:   0       1          2        3     4  ...
 
-				ArrayList<NodeImpl> node_routes = new ArrayList<NodeImpl>();
-				NodeImpl node = network.getNode(new IdImpl(entries[1].trim()));
+				ArrayList<Node> node_routes = new ArrayList<Node>();
+				Node node = network.getNode(new IdImpl(entries[1].trim()));
 				if (node == null) { Gbl.errorMsg("Node id=" + entries[1].trim() + " does not exist!"); }
 				node_routes.add(node);
 
@@ -173,7 +175,7 @@ public class NetworkAnalyseRouteSet {
 		System.out.println("      => # routes: " + this.routes.size());
 	}
 
-	private final void analysis(Id routeid, ArrayList<NodeImpl> route) {
+	private final void analysis(Id routeid, ArrayList<Node> route) {
 		double length = 0.0;
 		double rise_av = 0.0;
 		double rise_min = 0.0;
@@ -201,10 +203,10 @@ public class NetworkAnalyseRouteSet {
 		double tunnel_nofl = 0.0;
 		double ampel_nofl = 0.0;
 		for (int i=1; i<route.size(); i++) {
-			NodeImpl from = route.get(i-1);
-			NodeImpl to = route.get(i);
-			LinkImpl link = null;
-			for (LinkImpl l : from.getOutLinks().values()) { if (l.getToNode().getId().equals(to.getId())) { link = l; } }
+			Node from = route.get(i-1);
+			Node to = route.get(i);
+			Link link = null;
+			for (Link l : from.getOutLinks().values()) { if (l.getToNode().getId().equals(to.getId())) { link = l; } }
 			if (link == null) { Gbl.errorMsg("Something is wrong!"); }
 			double[] atts = this.link_atts.get(link.getId());
 
@@ -325,8 +327,8 @@ public class NetworkAnalyseRouteSet {
 		double tunnel_nofl = 0.0;
 		double ampel_nofl = 0.0;
 		for (LinkImpl link : network.getLinks().values()) {
-			NodeImpl from = link.getFromNode();
-			NodeImpl to = link.getToNode();
+			Node from = link.getFromNode();
+			Node to = link.getToNode();
 			double[] atts = this.link_atts.get(link.getId());
 			length += atts[LAENGE];
 			double gradient = this.node_heights.get(to.getId())-this.node_heights.get(from.getId());

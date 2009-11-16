@@ -5,15 +5,15 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 
 /**
  * Calculates and stores travel time according to the logicTransitSchedule object
@@ -62,7 +62,7 @@ public class TransitTravelTimeCalculator{
 					
 					/**finds the link that joins both stations, calculates and saves its travel time*/ 
 					if (!first){
-						for (LinkImpl lastLink : node.getInLinks().values()){
+						for (Link lastLink : node.getInLinks().values()){
 							if (lastLink.getFromNode().equals(lastNode)){
 								departureDelay= transitRouteStop.getDepartureOffset();
 								linkTravelTime= (departureDelay- lastDepartureDelay)/60; //stored in minutes

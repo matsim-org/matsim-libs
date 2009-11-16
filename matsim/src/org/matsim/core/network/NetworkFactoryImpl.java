@@ -28,6 +28,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.NodeNetworkRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
@@ -81,7 +82,7 @@ public class NetworkFactoryImpl implements Serializable, NetworkFactory {
 		return new NodeImpl(id, coord, type);
 	}
 
-	public LinkImpl createLink(final Id id, final NodeImpl from, final NodeImpl to,
+	public LinkImpl createLink(final Id id, final Node from, final Node to,
 			final NetworkLayer network, final double length, final double freespeedTT, final double capacity,
 			final double lanes) {
 		return this.linkFactory.createLink(id, from, to, network, length, freespeedTT, capacity, lanes);

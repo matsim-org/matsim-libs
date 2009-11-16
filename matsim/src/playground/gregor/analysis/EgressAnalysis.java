@@ -40,12 +40,11 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -207,7 +206,7 @@ public class EgressAnalysis {
 
 
 	private void initEgressNodes() {
-		for (LinkImpl link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			if (link.getId().toString().contains("el")) {
 				Id id = link.getFromNode().getId();
 				EgressNode  e = new EgressNode();
@@ -274,7 +273,7 @@ public class EgressAnalysis {
 	}
 
 	private class EgressNode {
-		NodeImpl node;
+		Node node;
 		int num_shortest;
 		int num_current;
 

@@ -23,13 +23,13 @@ package org.matsim.core.router;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -239,8 +239,8 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
 		if (toLink == null) throw new RuntimeException("toLink missing.");
 
-		NodeImpl startNode = fromLink.getToNode();	// start at the end of the "current" link
-		NodeImpl endNode = toLink.getFromNode(); // the target is the start of the link
+		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
+		Node endNode = toLink.getFromNode(); // the target is the start of the link
 
 //		CarRoute route = null;
 		Path path = null;
@@ -286,8 +286,8 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		Path path = null;
 //		CarRoute route = null;
 		if (toLink != fromLink) {
-			NodeImpl startNode = fromLink.getToNode();	// start at the end of the "current" link
-			NodeImpl endNode = toLink.getFromNode(); // the target is the start of the link
+			Node startNode = fromLink.getToNode();	// start at the end of the "current" link
+			Node endNode = toLink.getFromNode(); // the target is the start of the link
 			// do not drive/walk around, if we stay on the same link
 			path = this.routeAlgoFreeflow.calcLeastCostPath(startNode, endNode, depTime);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");

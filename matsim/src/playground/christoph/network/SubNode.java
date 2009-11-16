@@ -3,26 +3,24 @@ package playground.christoph.network;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.network.BasicNodeImpl;
 import org.matsim.core.network.NodeImpl;
 
-public class SubNode extends BasicNodeImpl implements Node{
+public class SubNode extends NodeImpl {
 
 	private Node parentNode;
 	private boolean equalsParent = false;
 	
 	public SubNode(Node node) 
 	{
-		super(node.getId(), node.getCoord());
+		super(node.getId(), node.getCoord(), null);
 		this.parentNode = node;
 	}
 
 	public SubNode(Node node, boolean equalsParent) 
 	{
-		super(node.getId(), node.getCoord());
+		super(node.getId(), node.getCoord(), null);
 		this.parentNode = node;
 		
 		if (equalsParent)
@@ -43,7 +41,7 @@ public class SubNode extends BasicNodeImpl implements Node{
 	 * Adds the InLink without Checking if it is already part
 	 * of the InLinksMap 
 	 */
-	public void addInLinkNoCheck(BasicLink inlink)
+	public void addInLinkNoCheck(Link inlink)
 	{
 		Id linkid = inlink.getId();
 		this.inlinks.put(linkid, inlink);
@@ -53,28 +51,26 @@ public class SubNode extends BasicNodeImpl implements Node{
 	 * Adds the OutLink without Checking if it is already part
 	 * of the OutLinksMap 
 	 */
-	public void addOutLinkNoCheck(BasicLink outlink) 
+	public void addOutLinkNoCheck(Link outlink) 
 	{
 		Id linkid = outlink.getId();
 		this.outlinks.put(linkid, outlink);
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
 	public Map<Id, ? extends Link> getInLinks()
 	{
 		if (equalsParent) return parentNode.getInLinks();
 			
-		return (Map<Id, Link>) super.getInLinks();
+		return super.getInLinks();
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Map<Id, ? extends Link> getOutLinks()
 	{
 		if (equalsParent) return parentNode.getInLinks();
 		
-		return (Map<Id, Link>)super.getOutLinks();
+		return super.getOutLinks();
 	}
 	
 	@Override

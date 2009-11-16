@@ -30,9 +30,10 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 /**
@@ -51,7 +52,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 	 */
 	private final TreeMap<String, String> ssLinks = new TreeMap<String, String>();
 
-	Map<String, LinkImpl> outLinksMap = new TreeMap<String, LinkImpl>();
+	Map<String, Link> outLinksMap = new TreeMap<String, Link>();
 
 	public SubsequentCapacity(final NetworkLayer network) {
 		links = network.getLinks();
@@ -76,10 +77,10 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 			toCompareAngles.clear();
 			outLinksMap.clear();
 
-			NodeImpl to = l.getToNode();
-			Collection<? extends LinkImpl> outLinks = to.getOutLinks().values();
+			Node to = l.getToNode();
+			Collection<? extends Link> outLinks = to.getOutLinks().values();
 
-			for (LinkImpl outLink : outLinks) {
+			for (Link outLink : outLinks) {
 				String outLinkId = outLink.getId().toString();
 				caps
 						.put(
@@ -139,8 +140,8 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 		Map<String, Double> thetas = new TreeMap<String, Double>();
 		List<String> minThetas = new ArrayList<String>();
 		String resultLinkId = "";
-		NodeImpl to = l.getToNode();
-		NodeImpl from = l.getFromNode();
+		Node to = l.getToNode();
+		Node from = l.getFromNode();
 
 		Coord cFrom = from.getCoord();
 		Coord cTo = to.getCoord();

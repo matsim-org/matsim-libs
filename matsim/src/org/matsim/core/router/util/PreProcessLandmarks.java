@@ -28,9 +28,8 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
-
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
@@ -126,15 +125,15 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		log.info("done in " + (System.currentTimeMillis() - now) + " ms");
 	}
 
-	private void expandLandmark(final NodeImpl startNode, final int landmarkIndex) {
+	private void expandLandmark(final Node startNode, final int landmarkIndex) {
 		LandmarksTravelTimeComparator comparator = new LandmarksTravelTimeComparator(this.nodeData, landmarkIndex);
-		PriorityQueue<NodeImpl> pendingNodes = new PriorityQueue<NodeImpl>(100, comparator);
+		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(100, comparator);
 		LandmarksData role = (LandmarksData) getNodeData(startNode);
 		role.setToLandmarkTravelTime(landmarkIndex, 0.0);
 		role.setFromLandmarkTravelTime(landmarkIndex, 0.0);
 		pendingNodes.add(startNode);
 		while (pendingNodes.isEmpty() == false) {
-			NodeImpl node = pendingNodes.poll();
+			Node node = pendingNodes.poll();
 			double toTravTime = ((LandmarksData) getNodeData(node)).getToLandmarkTravelTime(landmarkIndex);
 			expandLinks(landmarkIndex, pendingNodes, node.getInLinks().values(), toTravTime, false);
 			double fromTravTime = ((LandmarksData) getNodeData(node)).getFromLandmarkTravelTime(landmarkIndex);
@@ -142,13 +141,13 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		}
 	}
 
-	private void expandLinks(final int landmarkIndex, final PriorityQueue<NodeImpl> nodes,
-			final Collection<? extends LinkImpl> links, final double travTime, final boolean expandFromLandmark) {
+	private void expandLinks(final int landmarkIndex, final PriorityQueue<Node> nodes,
+			final Collection<? extends Link> links, final double travTime, final boolean expandFromLandmark) {
 		LandmarksData role;
-		Iterator<?> iter = links.iterator();
+		Iterator<? extends Link> iter = links.iterator();
 		while (iter.hasNext()) {
-			LinkImpl l = (LinkImpl) iter.next();
-			NodeImpl n;
+			Link l = iter.next();
+			Node n;
 			if (expandFromLandmark == true) {
 				n = l.getToNode();
 			} else {

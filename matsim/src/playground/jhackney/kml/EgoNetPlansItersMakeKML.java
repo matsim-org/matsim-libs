@@ -54,7 +54,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -954,12 +953,12 @@ public class EgoNetPlansItersMakeKML {
 
 		LineStringType lst = kmlObjectFactory.createLineStringType();
 
-		NodeImpl fromNode = link.getFromNode();
+		Node fromNode = link.getFromNode();
 		Coord fromNodeWorldCoord = fromNode.getCoord();
 		Coord fromNodeGeometryCoord = trafo.transform(new CoordImpl(fromNodeWorldCoord.getX(), fromNodeWorldCoord.getY()));
 		lst.getCoordinates().add(Double.toString(fromNodeGeometryCoord.getX()) + "," + Double.toString(fromNodeGeometryCoord.getY()) + ",0.0");
 
-		NodeImpl toNode = link.getToNode();
+		Node toNode = link.getToNode();
 		Coord toNodeWorldCoord = toNode.getCoord();
 		Coord toNodeGeometryCoord = trafo.transform(new CoordImpl(toNodeWorldCoord.getX(), toNodeWorldCoord.getY()));
 		lst.getCoordinates().add(Double.toString(toNodeGeometryCoord.getX()) + "," + Double.toString(toNodeGeometryCoord.getY()) + ",0.0");

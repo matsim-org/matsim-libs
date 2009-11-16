@@ -2,18 +2,17 @@ package playground.pieter.networkpruning;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NodeImpl;
 
 public class LoopSeekerRoot extends LoopSeekerNode{
 
-	ArrayList<LinkImpl> inWelds;
-	ArrayList<LinkImpl> outWelds;
+	ArrayList<Link> inWelds;
+	ArrayList<Link> outWelds;
 	
-	public ArrayList<NodeImpl> ringNodes;
+	public ArrayList<Node> ringNodes;
 
 	protected double loopLength;
 	protected double streetCap;
@@ -24,9 +23,9 @@ public class LoopSeekerRoot extends LoopSeekerNode{
 //	constructor
 	public LoopSeekerRoot(NodeImpl rootNode, double loopLength, double streetCap, double capPeriod){
 		super();
-		this.ringNodes = new ArrayList<NodeImpl>();
-		this.inWelds = new ArrayList<LinkImpl>();
-		this.outWelds = new ArrayList<LinkImpl>();
+		this.ringNodes = new ArrayList<Node>();
+		this.inWelds = new ArrayList<Link>();
+		this.outWelds = new ArrayList<Link>();
 		this.capPeriod = capPeriod;
 		this.streetCap=streetCap;
 		this.loopLength = loopLength;
@@ -39,16 +38,16 @@ public class LoopSeekerRoot extends LoopSeekerNode{
 
 	public void weldLinks(NodeImpl centroidNode) {
 		// welds inlinks and outlinks to said Node
-		Iterator<LinkImpl> inLinkIt = inWelds.iterator();
-		Iterator<LinkImpl> outLinkIt = outWelds.iterator();
+		Iterator<Link> inLinkIt = inWelds.iterator();
+		Iterator<Link> outLinkIt = outWelds.iterator();
 		while(inLinkIt.hasNext()){
-			LinkImpl currentInLink = inLinkIt.next();
-			currentInLink.getFromNode().removeInLink(currentInLink);
+			Link currentInLink = inLinkIt.next();
+			((NodeImpl) currentInLink.getFromNode()).removeInLink(currentInLink);
 			currentInLink.setToNode(centroidNode);
 		}
 		while(outLinkIt.hasNext()){
-			LinkImpl currentOutLink = outLinkIt.next();
-			currentOutLink.getFromNode().removeOutLink(currentOutLink);
+			Link currentOutLink = outLinkIt.next();
+			((NodeImpl) currentOutLink.getFromNode()).removeOutLink(currentOutLink);
 			currentOutLink.setFromNode(centroidNode);
 		}
 		

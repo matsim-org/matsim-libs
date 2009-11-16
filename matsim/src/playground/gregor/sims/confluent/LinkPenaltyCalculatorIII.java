@@ -14,7 +14,6 @@ import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
@@ -161,7 +160,7 @@ public class LinkPenaltyCalculatorIII implements LinkPenalty, AfterMobsimListene
 		for (NodeImpl node : this.net.getNodes().values()) {
 			List<LinkInfo> infos = new ArrayList<LinkInfo>();
 			int cinAll = 0;
-			for (LinkImpl link : node.getOutLinks().values()) {
+			for (Link link : node.getOutLinks().values()) {
 				LinkInfo li = this.linkInfos.get(link.getId());
 				if (li != null) {
 //					li.penalty = 0;

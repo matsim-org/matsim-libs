@@ -1,11 +1,11 @@
 package playground.pieter.networkpruning;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -49,27 +49,26 @@ public class NetworkPruner {
 	}
 
 	private void joinOneWayLinks() {
-		// TODO Auto-generated method stub
 		Map<Id,NodeImpl> nodeMap =  network.getNodes();
 		Iterator<NodeImpl> nodeIterator = nodeMap.values().iterator();
 		int linkJoinCount = 0;
 		while(nodeIterator.hasNext()){
 			 NodeImpl currentNode =nodeIterator.next();
-			 Map<Id,? extends LinkImpl> inLinks = currentNode.getInLinks();
-			 Map<Id,? extends LinkImpl> outLinks = currentNode.getOutLinks();
+			 Map<Id,? extends Link> inLinks = currentNode.getInLinks();
+			 Map<Id,? extends Link> outLinks = currentNode.getOutLinks();
 			 if(inLinks.size()==1 && outLinks.size()==1){
 				 //check that it's not a dead-end, and has same parameters
 				 double period = 1;
-				 LinkImpl inLink = inLinks.values().iterator().next();
-				 LinkImpl outLink = outLinks.values().iterator().next();
-				 NodeImpl fromNode = inLink.getFromNode();
-				 NodeImpl toNode = outLink.getToNode();
-				 double inFlow = inLink.getFlowCapacity(period);
-				 double outFlow = outLink.getFlowCapacity(period);
+				 Link inLink = inLinks.values().iterator().next();
+				 Link outLink = outLinks.values().iterator().next();
+				 Node fromNode = inLink.getFromNode();
+				 Node toNode = outLink.getToNode();
+				 double inFlow = inLink.getCapacity(period);
+				 double outFlow = outLink.getCapacity(period);
 				 double inSpeed = inLink.getFreespeed(period);
 				 double outSpeed = inLink.getFreespeed(period);
-				 int inLanes = inLink.getLanesAsInt(period);
-				 int outLanes = outLink.getLanesAsInt(period);
+				 double inLanes = inLink.getNumberOfLanes(period);
+				 double outLanes = outLink.getNumberOfLanes(period);
 				 double inLength = inLink.getLength();
 				 double outLength = outLink.getLength();
 				 if((!fromNode.equals(toNode)) &&

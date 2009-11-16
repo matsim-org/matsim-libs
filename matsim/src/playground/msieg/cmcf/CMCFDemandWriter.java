@@ -27,16 +27,15 @@ import java.io.Writer;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.xml.sax.SAXException;
@@ -186,7 +185,7 @@ public class CMCFDemandWriter{
 		while(tabs-- > 0)
 			tab += '\t';
 		//in advance, read input data and store all the demands accumulated:
-		Commodities<NodeImpl> com = new Commodities<NodeImpl>();
+		Commodities<Node> com = new Commodities<Node>();
 
 		PlanImpl plan;
 		ActivityImpl act1, act2;
@@ -202,7 +201,7 @@ public class CMCFDemandWriter{
 		//now write the output
 		log(tab+"<demands>\n", out);
 		int counter = 1;
-		for(Commodity<NodeImpl> c: com){
+		for(Commodity<Node> c: com){
 			if(c.getOrigin() == c.getDestination()){
 				log(tab+"\t<!--- Skipping commodity, because start node equals target --->", out);
 				continue;

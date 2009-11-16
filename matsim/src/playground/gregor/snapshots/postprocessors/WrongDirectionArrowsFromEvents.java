@@ -1,7 +1,7 @@
 package playground.gregor.snapshots.postprocessors;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -23,7 +23,7 @@ public class WrongDirectionArrowsFromEvents extends ConfluenceArrowsFromEvents{
 	public void createArrows() {
 		for (NodeInfo ni : this.infos.values()) {
 			if (ni.outLinks.size() < ni.node.getOutLinks().size()) {
-				for (LinkImpl l : ni.node.getOutLinks().values()) {
+				for (Link l : ni.node.getOutLinks().values()) {
 					if (ni.outLinks.contains(l)) {
 						continue;
 					}

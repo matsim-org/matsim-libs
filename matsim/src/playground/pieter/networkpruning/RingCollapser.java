@@ -6,8 +6,9 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -91,12 +92,11 @@ public class RingCollapser {
 	}
 
 	private boolean checkIfNodeQualifies(NodeImpl currentNode) {
-		// TODO Auto-generated method stub
 		boolean isStreetNode = false;
 		boolean isThruNode = false;
 //		first check that it has at least two inLinks and 2 outLinks, and that they are of street capacity
-		Map<Id, ? extends LinkImpl> inLinkMap = currentNode.getInLinks();
-		Map<Id, ? extends LinkImpl> outLinkMap = currentNode.getOutLinks();
+		Map<Id, ? extends Link> inLinkMap = currentNode.getInLinks();
+		Map<Id, ? extends Link> outLinkMap = currentNode.getOutLinks();
 		if(inLinkMap.size() >= 2 && outLinkMap.size() >= 2)
 			isThruNode = true;
 		isStreetNode = checkIfStreetNode(inLinkMap) && checkIfStreetNode(outLinkMap);
@@ -108,11 +108,10 @@ public class RingCollapser {
 
 
 
-	private boolean checkIfStreetNode(Map<Id, ? extends LinkImpl> linkMap) {
-		// TODO Auto-generated method stub
-		Iterator<? extends LinkImpl> linkIterator = linkMap.values().iterator();
+	private boolean checkIfStreetNode(Map<Id, ? extends Link> linkMap) {
+		Iterator<? extends Link> linkIterator = linkMap.values().iterator();
 		while(linkIterator.hasNext()){
-			LinkImpl currentLink = linkIterator.next();
+			Link currentLink = linkIterator.next();
 			if(currentLink.getCapacity(this.capPeriod) != this.streetCap)
 				return false;
 		}
@@ -120,12 +119,11 @@ public class RingCollapser {
 	}
 
 
-	private NodeImpl createCentroidNode(ArrayList<NodeImpl> ringNodePath) {
-			// TODO Auto-generated method stub
+	private NodeImpl createCentroidNode(ArrayList<Node> ringNodePath) {
 			double averageX = 0;
 			double averageY = 0;
 			int nodeCount = 0;
-			Iterator<NodeImpl> nodeIterator = ringNodePath.iterator();
+			Iterator<Node> nodeIterator = ringNodePath.iterator();
 			while (nodeIterator.hasNext()){
 				Coord currentCoord = nodeIterator.next().getCoord();
 				averageX += currentCoord.getX();

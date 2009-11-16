@@ -28,11 +28,10 @@ import java.util.Queue;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
@@ -65,13 +64,13 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 		Queue<NodeImpl> nodes = new LinkedList<NodeImpl>(network.getNodes().values());
 		while (nodes.peek() != null) {
 			NodeImpl n = nodes.poll();
-			HashMap<Id, List<LinkImpl>> toNodesMap = new HashMap<Id, List<LinkImpl>>();
-			for (LinkImpl l : n.getOutLinks().values()) {
-				List<LinkImpl> links = toNodesMap.get(l.getToNode().getId());
+			HashMap<Id, List<Link>> toNodesMap = new HashMap<Id, List<Link>>();
+			for (Link l : n.getOutLinks().values()) {
+				List<Link> links = toNodesMap.get(l.getToNode().getId());
 				if (links != null) {
 					links.add(l);
 				} else {
-					links = new ArrayList<LinkImpl>();
+					links = new ArrayList<Link>();
 					links.add(l);
 					toNodesMap.put(l.getToNode().getId(), links);
 				}
@@ -89,8 +88,8 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 		log.info("done.");
 	}
 
-	private void handleDblLinks(HashMap<Id, List<LinkImpl>> toNodesMap) {
-		for (List<LinkImpl> vec : toNodesMap.values()) {
+	private void handleDblLinks(HashMap<Id, List<Link>> toNodesMap) {
+		for (List<Link> vec : toNodesMap.values()) {
 			switch (vec.size()) {
 				case 1:
 					break;
@@ -113,7 +112,7 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 		}
 	}
 
-	private void splitLink(LinkImpl link) {
+	private void splitLink(Link link) {
 		this.network.removeLink(link);
 		double length = link.getLength()/2.0;
 		double freespeed = link.getFreespeed(Time.UNDEFINED_TIME);

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -132,13 +131,13 @@ public class NetworkImpl implements Network {
      * is successfully removed AND all incident links are removed successfully
      *
 	 */
-	public boolean removeNode(final NodeImpl node) {
+	public boolean removeNode(final Node node) {
 		Id id = node.getId();
 		NodeImpl n = this.nodes.get(id);
 
 		if (n == null) { return false; }
 
-		for (LinkImpl l : n.getIncidentLinks().values()) {
+		for (Link l : n.getIncidentLinks().values()) {
 			if (!this.removeLink(l)) {
 				throw new RuntimeException("Link id=" + l.getId() + " could not be removed while removing Node id=" + n.getId());
 			}
@@ -160,7 +159,7 @@ public class NetworkImpl implements Network {
 	 * @return <tt>true</tt> if the specified link is part of the network and
 	 * is successfully removed.
 	 */
-	public boolean removeLink(final LinkImpl link) {
+	public boolean removeLink(final Link link) {
 		// yy should eventually be added to the api.  kai, jul09
 		Id id = link.getId();
 		LinkImpl l = (LinkImpl)this.layerDelegate.getLocations().get(id);
@@ -170,10 +169,10 @@ public class NetworkImpl implements Network {
 			return false;
 		}
 
-		NodeImpl from = link.getFromNode();
-		from.removeOutLink(link);
-		NodeImpl to = link.getToNode();
-		to.removeInLink(link);
+		Node from = link.getFromNode();
+		((NodeImpl) from).removeOutLink(link);
+		Node to = link.getToNode();
+		((NodeImpl) to).removeInLink(link);
 
 		return this.layerDelegate.getLocations().remove(id) != null;
 	}
@@ -310,11 +309,11 @@ public class NetworkImpl implements Network {
 		// It would be nicer to find the nearest link on the "right" side of the coordinate.
 		// (For Great Britain it would be the "left" side. Could be a global config param...)
 		double shortestDistance = Double.MAX_VALUE;
-		for (LinkImpl link : nearestNode.getIncidentLinks().values()) {
-			double dist = link.calcDistance(coord);
+		for (Link link : nearestNode.getIncidentLinks().values()) {
+			double dist = ((LinkImpl) link).calcDistance(coord);
 			if (dist < shortestDistance) {
 				shortestDistance = dist;
-				nearestLink = link;
+				nearestLink = (LinkImpl) link;
 			}
 		}
 		if ( nearestLink == null ) {
@@ -369,9 +368,9 @@ public class NetworkImpl implements Network {
 	// TODO [balmermi] there should be only one 'getNearestLink' method
 	// which returns either the nearest 'left' or 'right' entry link, based on a global
 	// config param.
-	public LinkImpl getNearestRightEntryLink(final Coord coord) {
-		LinkImpl nearestRightLink = null;
-		LinkImpl nearestOverallLink = null;
+	public Link getNearestRightEntryLink(final Coord coord) {
+		Link nearestRightLink = null;
+		Link nearestOverallLink = null;
 		NodeImpl nearestNode = null;
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		nearestNode = this.nodeQuadTree.get(coord.getX(), coord.getY());
@@ -383,8 +382,8 @@ public class NetworkImpl implements Network {
 		// now find nearest link from the nearest node
 		double shortestRightDistance = Double.MAX_VALUE; // reset the value
 		double shortestOverallDistance = Double.MAX_VALUE; // reset the value
-		for (LinkImpl link : nearestNode.getIncidentLinks().values()) {
-			double dist = link.calcDistance(coord);
+		for (Link link : nearestNode.getIncidentLinks().values()) {
+			double dist = ((LinkImpl) link).calcDistance(coord);
 			if (dist <= shortestRightDistance) {
 				// Generate a vector representing the link
 				double[] linkVector = new double[2];

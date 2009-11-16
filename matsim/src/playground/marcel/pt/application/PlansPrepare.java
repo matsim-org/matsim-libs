@@ -27,10 +27,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -75,8 +75,8 @@ public class PlansPrepare {
 		log.info("  center: " + center.getX() + " / " + center.getY());
 		log.info("  radius: " + radius);
 		for (LinkImpl link : network.getLinks().values()) {
-			final NodeImpl from = link.getFromNode();
-			final NodeImpl to = link.getToNode();
+			final Node from = link.getFromNode();
+			final Node to = link.getToNode();
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
 				System.out.println("    link " + link.getId().toString());
 				areaOfInterest.put(link.getId(),link);

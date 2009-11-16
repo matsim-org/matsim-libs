@@ -32,7 +32,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -42,8 +41,8 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 class FilterPersons extends AbstractPersonAlgorithm{
 
-	public static Set<NodeImpl> relevantFromNodes = new HashSet<NodeImpl>();
-	public static Set<NodeImpl> relevantToNodes = new HashSet<NodeImpl>();
+	public static Set<Node> relevantFromNodes = new HashSet<Node>();
+	public static Set<Node> relevantToNodes = new HashSet<Node>();
 
 	public FilterPersons() {
 		super();

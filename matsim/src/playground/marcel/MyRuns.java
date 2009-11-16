@@ -49,6 +49,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -57,7 +58,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCalcLanes;
 import org.matsim.core.network.algorithms.NetworkFalsifier;
 import org.matsim.core.population.LegImpl;
@@ -125,16 +125,16 @@ public class MyRuns {
 		System.out.println("RUN: filterPlansWithRouteInArea");
 
 		final CoordImpl center = new CoordImpl(x, y);
-		final Map<Id, LinkImpl> areaOfInterest = new HashMap<Id, LinkImpl>();
+		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 		NetworkLayer network = sl.getScenario().getNetwork();
 
 		System.out.println("  extracting aoi... at " + (new Date()));
-		for (LinkImpl link : network.getLinks().values()) {
-			final NodeImpl from = link.getFromNode();
-			final NodeImpl to = link.getToNode();
+		for (Link link : network.getLinks().values()) {
+			final Node from = link.getFromNode();
+			final Node to = link.getToNode();
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
 				System.out.println("    link " + link.getId().toString());
 				areaOfInterest.put(link.getId(),link);
@@ -314,7 +314,7 @@ public class MyRuns {
 		System.out.println("RUN: subNetwork");
 
 		final CoordImpl center = new CoordImpl(x, y);
-		final Map<Id, LinkImpl> areaOfInterest = new HashMap<Id, LinkImpl>();
+		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
@@ -327,9 +327,9 @@ public class MyRuns {
 
 		System.out.println("  finding sub-networks... " + (new Date()));
 		for (double radius = minRadius; radius <= maxRadius; radius += radiusStep) {
-			for (LinkImpl link : network.getLinks().values()) {
-				final NodeImpl from = link.getFromNode();
-				final NodeImpl to = link.getToNode();
+			for (Link link : network.getLinks().values()) {
+				final Node from = link.getFromNode();
+				final Node to = link.getToNode();
 				if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
 					areaOfInterest.put(link.getId(),link);
 				}

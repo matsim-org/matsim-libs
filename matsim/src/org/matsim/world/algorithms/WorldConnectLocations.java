@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -114,12 +115,12 @@ public class WorldConnectLocations {
 		NetworkLayer subNetwork = new NetworkLayer();
 		// add nodes and links to the subNetwork
 		for (LinkImpl l : remainingLinks) {
-			NodeImpl fn = l.getFromNode();
-			NodeImpl nfn = subNetwork.getNode(fn.getId());
+			Node fn = l.getFromNode();
+			Node nfn = subNetwork.getNode(fn.getId());
 			if (nfn == null) { nfn = subNetwork.createAndAddNode(fn.getId(),fn.getCoord()); }
 
-			NodeImpl tn = l.getToNode();
-			NodeImpl ntn = subNetwork.getNode(tn.getId());
+			Node tn = l.getToNode();
+			Node ntn = subNetwork.getNode(tn.getId());
 			if (ntn == null) { ntn = subNetwork.createAndAddNode(tn.getId(),tn.getCoord()); }
 
 			subNetwork.createAndAddLink(l.getId(),nfn,ntn,l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME));
@@ -222,7 +223,7 @@ public class WorldConnectLocations {
 			ActivityFacilityImpl f = facilities.getFacilities().get(fid);
 			// add the nearest right entry link mapping to the facility f
 			// note: network could be a temporal copy of the one in the world. Therefore, get the original one.
-			MappedLocation l = network.getNearestRightEntryLink(f.getCoord());
+			MappedLocation l = (LinkImpl) network.getNearestRightEntryLink(f.getCoord());
 			l = world.getLayer(NetworkLayer.LAYER_TYPE).getLocation(l.getId());
 			if (!world.addMapping(f,l)) { throw new RuntimeException("could not add nearest right entry factivity<-->link mappings"); }
 		}

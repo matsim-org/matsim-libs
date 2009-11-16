@@ -1,16 +1,15 @@
 package playground.anhorni.crossborder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-
-import java.util.Collections;
-import java.util.Vector;
-import java.util.List;
 
 public class Relation {
 	
@@ -109,7 +108,7 @@ public class Relation {
 			Integer n_i=n_it.next();
 			NodeImpl node=network.getNode(Integer.toString(n_i));
 					
-			for (LinkImpl l : node.getOutLinks().values()) {
+			for (Link l : node.getOutLinks().values()) {
 				if (this.totalOutLinkCapacity>0.0) {
 					this.outLinkVolumes.add(new MyLink(l.getId(), this.volume*l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/this.totalOutLinkCapacity));					
 				}
@@ -124,7 +123,7 @@ public class Relation {
 			Integer n_i=n_it.next();
 			NodeImpl node=network.getNode(Integer.toString(n_i));
 		
-			for (LinkImpl l : node.getInLinks().values()) {
+			for (Link l : node.getInLinks().values()) {
 				if (this.totalInLinkCapacity>0.0) {
 					this.inLinkVolumes.add(new MyLink(l.getId(), this.volume*l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)/this.totalInLinkCapacity));
 				}
@@ -144,7 +143,7 @@ public class Relation {
 			Integer n_i=n_it.next();			
 			NodeImpl node=network.getNode(Integer.toString(n_i));
 			
-			for (LinkImpl l : node.getOutLinks().values()) {
+			for (Link l : node.getOutLinks().values()) {
 				this.totalOutLinkCapacity+=l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 			}
 		}
@@ -154,7 +153,7 @@ public class Relation {
 			Integer n_i=n_it.next();
 			NodeImpl node=network.getNode(Integer.toString(n_i));
 		
-			for (LinkImpl l : node.getInLinks().values()) {
+			for (Link l : node.getInLinks().values()) {
 				this.totalInLinkCapacity+=l.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME);
 			}//for
 		}

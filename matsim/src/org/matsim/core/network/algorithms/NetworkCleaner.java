@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -58,14 +58,14 @@ public class NetworkCleaner implements NetworkRunnable {
 	 * @param network the network the startNode is part of
 	 * @return cluster of nodes <pre>startNode</pre> is part of
 	 */
-	private Map<Id, NodeImpl> findCluster(final NodeImpl startNode, final NetworkLayer network) {
+	private Map<Id, Node> findCluster(final Node startNode, final NetworkLayer network) {
 
-		final Map<NodeImpl, DoubleFlagRole> nodeRoles = new HashMap<NodeImpl, DoubleFlagRole>(network.getNodes().size());
+		final Map<Node, DoubleFlagRole> nodeRoles = new HashMap<Node, DoubleFlagRole>(network.getNodes().size());
 
-		ArrayList<NodeImpl> pendingForward = new ArrayList<NodeImpl>();
-		ArrayList<NodeImpl> pendingBackward = new ArrayList<NodeImpl>();
+		ArrayList<Node> pendingForward = new ArrayList<Node>();
+		ArrayList<Node> pendingBackward = new ArrayList<Node>();
 
-		TreeMap<Id, NodeImpl> clusterNodes = new TreeMap<Id, NodeImpl>();
+		TreeMap<Id, Node> clusterNodes = new TreeMap<Id, Node>();
 		clusterNodes.put(startNode.getId(), startNode);
 		DoubleFlagRole r = getDoubleFlag(startNode, nodeRoles);
 		r.forwardFlag = true;
@@ -77,8 +77,8 @@ public class NetworkCleaner implements NetworkRunnable {
 		// step through the network in forward mode
 		while (pendingForward.size() > 0) {
 			int idx = pendingForward.size() - 1;
-			NodeImpl currNode = pendingForward.remove(idx); // get the last element to prevent object shifting in the array
-			for (NodeImpl node : currNode.getOutNodes().values()) {
+			Node currNode = pendingForward.remove(idx); // get the last element to prevent object shifting in the array
+			for (Node node : ((NodeImpl) currNode).getOutNodes().values()) {
 				r = getDoubleFlag(node, nodeRoles);
 				if (!r.forwardFlag) {
 					r.forwardFlag = true;
@@ -90,8 +90,8 @@ public class NetworkCleaner implements NetworkRunnable {
 		// now step through the network in backward mode
 		while (pendingBackward.size() > 0) {
 			int idx = pendingBackward.size()-1;
-			NodeImpl currNode = pendingBackward.remove(idx); // get the last element to prevent object shifting in the array
-			for (NodeImpl node : currNode.getInNodes().values()) {
+			Node currNode = pendingBackward.remove(idx); // get the last element to prevent object shifting in the array
+			for (Node node : ((NodeImpl) currNode).getInNodes().values()) {
 				r = getDoubleFlag(node, nodeRoles);
 				if (!r.backwardFlag) {
 					r.backwardFlag = true;
@@ -109,8 +109,8 @@ public class NetworkCleaner implements NetworkRunnable {
 
 	public void run(final Network network2) {
 		NetworkLayer network = (NetworkLayer) network2 ;
-		final Map<Id, NodeImpl> visitedNodes = new TreeMap<Id, NodeImpl>();
-		Map<Id, NodeImpl> biggestCluster = new TreeMap<Id, NodeImpl>();
+		final Map<Id, Node> visitedNodes = new TreeMap<Id, Node>();
+		Map<Id, Node> biggestCluster = new TreeMap<Id, Node>();
 
 		log.info("running " + this.getClass().getName() + " algorithm...");
 
@@ -118,11 +118,11 @@ public class NetworkCleaner implements NetworkRunnable {
 		log.info("  checking " + network.getNodes().size() + " nodes and " + 
 				network.getLinks().size() + " links for dead-ends...");
 		boolean stillSearching = true;
-		Iterator<? extends NodeImpl> iter = network.getNodes().values().iterator();
+		Iterator<? extends Node> iter = network.getNodes().values().iterator();
 		while (iter.hasNext() && stillSearching) {
-			NodeImpl startNode = iter.next();
+			Node startNode = iter.next();
 			if (!visitedNodes.containsKey(startNode.getId())) {
-				Map<Id, NodeImpl> cluster = this.findCluster(startNode, network);
+				Map<Id, Node> cluster = this.findCluster(startNode, network);
 				visitedNodes.putAll(cluster);
 				if (cluster.size() > biggestCluster.size()) {
 					biggestCluster = cluster;
@@ -150,7 +150,7 @@ public class NetworkCleaner implements NetworkRunnable {
 		log.info("done.");
 	}
 
-	private static DoubleFlagRole getDoubleFlag(final NodeImpl n, final Map<NodeImpl, DoubleFlagRole> nodeRoles) {
+	private static DoubleFlagRole getDoubleFlag(final Node n, final Map<Node, DoubleFlagRole> nodeRoles) {
 		DoubleFlagRole r = nodeRoles.get(n);
 		if (null == r) {
 			r = new DoubleFlagRole();

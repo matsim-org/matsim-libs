@@ -34,11 +34,12 @@ import javax.imageio.ImageIO;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -76,8 +77,8 @@ public class Getagentcoords {
 
 
 		// get evac links
-		NodeImpl evac1node = network.getNodes().get(new IdImpl("en1"));
-		Map<Id,? extends LinkImpl> evaclinks = null;		
+		Node evac1node = network.getNodes().get(new IdImpl("en1"));
+		Map<Id,? extends Link> evaclinks = null;		
 		if (evac1node != null) {
 			evaclinks = evac1node.getInLinks();
 			/*for (Link link : evaclinks.values()) {
@@ -90,7 +91,7 @@ public class Getagentcoords {
 		Color noexit = Color.BLACK;
 
 		if (evaclinks != null) {
-			for (LinkImpl link : evaclinks.values()) {
+			for (Link link : evaclinks.values()) {
 				colours.put(link.getId().toString(), Color.getHSBColor((float) ((colours.size()*7) % evaclinks.size() )/ (float) evaclinks.size(),1.0f,1.0f));
 				//colours.put(link.getId(), Color.getHSBColor(0.3f,1.0f,1.0f));
 				//System.out.println(colours.get(link.getId().toString()));
@@ -135,7 +136,7 @@ public class Getagentcoords {
 			System.out.println("miny "+ miny + " maxy " + maxy);
 
 			// print exits ...
-			for (LinkImpl link : evaclinks.values()) {
+			for (Link link : evaclinks.values()) {
 				Coord c = link.getFromNode().getCoord();
 				Double x = c.getX() * scalex + offsetx;
 				Double y = c.getY() * scaley + offsety;

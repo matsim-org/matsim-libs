@@ -25,9 +25,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
@@ -207,7 +208,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 * @return The {@link Tuple} of {@link ArrayList array lists} containing the new
 	 * {@link NodeImpl nodes}, new {@link LinkImpl links} resp.
 	 */
-	public final Tuple<ArrayList<NodeImpl>,ArrayList<LinkImpl>> expandNode(final NetworkLayer network, final Id nodeId, final ArrayList<Tuple<Id,Id>> turns, final double r, final double e) {
+	public final Tuple<ArrayList<Node>,ArrayList<Link>> expandNode(final NetworkLayer network, final Id nodeId, final ArrayList<Tuple<Id,Id>> turns, final double r, final double e) {
 		// check the input
 		if (Double.isNaN(r)) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
 		if (Double.isNaN(e)) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
@@ -225,16 +226,16 @@ public class NetworkExpandNode implements NetworkRunnable {
 		}
 		
 		// remove the node
-		Map<Id,LinkImpl> inlinks = new TreeMap<Id, LinkImpl>(node.getInLinks());
-		Map<Id,LinkImpl> outlinks = new TreeMap<Id, LinkImpl>(node.getOutLinks());
+		Map<Id,Link> inlinks = new TreeMap<Id, Link>(node.getInLinks());
+		Map<Id,Link> outlinks = new TreeMap<Id, Link>(node.getOutLinks());
 		if (!network.removeNode(node)) { throw new RuntimeException("nodeid="+nodeId+": Failed to remove node from the network."); }
 
-		ArrayList<NodeImpl> newNodes = new ArrayList<NodeImpl>(inlinks.size()+outlinks.size());
-		ArrayList<LinkImpl> newLinks = new ArrayList<LinkImpl>(turns.size());
+		ArrayList<Node> newNodes = new ArrayList<Node>(inlinks.size()+outlinks.size());
+		ArrayList<Link> newLinks = new ArrayList<Link>(turns.size());
 		// add new nodes and connect them with the in and out links
 		int nodeIdCnt = 0;
 		double d = Math.sqrt(r*r-e*e);
-		for (LinkImpl inlink : inlinks.values()) {
+		for (Link inlink : inlinks.values()) {
 			Coord c = node.getCoord();
 			Coord p = inlink.getFromNode().getCoord();
 			Coord pc = new CoordImpl(c.getX()-p.getX(),c.getY()-p.getY());
@@ -244,9 +245,9 @@ public class NetworkExpandNode implements NetworkRunnable {
 			NodeImpl n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
 			newNodes.add(n);
 			nodeIdCnt++;
-			network.createAndAddLink(inlink.getId(),inlink.getFromNode(),n,inlink.getLength(),inlink.getFreespeed(Time.UNDEFINED_TIME),inlink.getCapacity(Time.UNDEFINED_TIME),inlink.getNumberOfLanes(Time.UNDEFINED_TIME),inlink.getOrigId(),inlink.getType());
+			network.createAndAddLink(inlink.getId(),inlink.getFromNode(),n,inlink.getLength(),inlink.getFreespeed(Time.UNDEFINED_TIME),inlink.getCapacity(Time.UNDEFINED_TIME),inlink.getNumberOfLanes(Time.UNDEFINED_TIME),((LinkImpl) inlink).getOrigId(),((LinkImpl) inlink).getType());
 		}
-		for (LinkImpl outlink : outlinks.values()) {
+		for (Link outlink : outlinks.values()) {
 			Coord c = node.getCoord();
 			Coord p = outlink.getToNode().getCoord();
 			Coord cp = new CoordImpl(p.getX()-c.getX(),p.getY()-c.getY());
@@ -256,7 +257,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 			NodeImpl n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
 			newNodes.add(n);
 			nodeIdCnt++;
-			network.createAndAddLink(outlink.getId(),n,outlink.getToNode(),outlink.getLength(),outlink.getFreespeed(Time.UNDEFINED_TIME),outlink.getCapacity(Time.UNDEFINED_TIME),outlink.getNumberOfLanes(Time.UNDEFINED_TIME),outlink.getOrigId(),outlink.getType());
+			network.createAndAddLink(outlink.getId(),n,outlink.getToNode(),outlink.getLength(),outlink.getFreespeed(Time.UNDEFINED_TIME),outlink.getCapacity(Time.UNDEFINED_TIME),outlink.getNumberOfLanes(Time.UNDEFINED_TIME),((LinkImpl) outlink).getOrigId(),((LinkImpl) outlink).getType());
 		}
 		
 		// add virtual links for the turn restrictions
@@ -267,6 +268,6 @@ public class NetworkExpandNode implements NetworkRunnable {
 			LinkImpl l = network.createAndAddLink(new IdImpl(fromLink.getId()+"-"+i),fromLink.getToNode(),toLink.getFromNode(),CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()),fromLink.getFreespeed(Time.UNDEFINED_TIME),fromLink.getCapacity(Time.UNDEFINED_TIME),fromLink.getNumberOfLanes(Time.UNDEFINED_TIME),fromLink.getOrigId(),fromLink.getType());
 			newLinks.add(l);
 		}
-		return new Tuple<ArrayList<NodeImpl>, ArrayList<LinkImpl>>(newNodes,newLinks);
+		return new Tuple<ArrayList<Node>, ArrayList<Link>>(newNodes,newLinks);
 	}
 }

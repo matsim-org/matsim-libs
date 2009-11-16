@@ -4,24 +4,19 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.jdeqsim.*;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
+import org.matsim.core.mobsim.jdeqsim.Road;
+import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /*
@@ -188,10 +183,8 @@ public class PJDEQSimulation extends JDEQSimulation {
 			road = (ExtendedRoad) Road.getRoad(link.getId().toString());
 			
 			// mark roads, which go away from border roads
-			for (LinkImpl outLink : road.getLink().getToNode().getOutLinks()
-					.values()) {
-				tempRoad = (ExtendedRoad) Road.getRoad(outLink.getId()
-						.toString());
+			for (Link outLink : road.getLink().getToNode().getOutLinks().values()) {
+				tempRoad = (ExtendedRoad) Road.getRoad(outLink.getId().toString());
 
 				if (road.getThreadZoneId()!=tempRoad.getThreadZoneId()) {
 					road.setBorderZone(true);

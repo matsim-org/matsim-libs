@@ -11,13 +11,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.network.BasicLinkImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
-
-import org.opengis.go.display.primitive.GraphicLineString;
 
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.utils.Utils;
@@ -47,7 +44,7 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 				// only "interesting" facilities (large enough to notice differences in the customer data) 
 
 			int rd = MatsimRandom.getRandom().nextInt(allowedLinks.size());
-			BasicLinkImpl link = (BasicLinkImpl)allowedLinks.get(rd);
+			Link link = allowedLinks.get(rd);
 			log.info("The link " + link.getId() + " is proposed as new location for the facility " + f.getId());
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId());

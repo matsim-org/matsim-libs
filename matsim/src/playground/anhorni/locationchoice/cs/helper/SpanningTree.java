@@ -28,10 +28,11 @@ import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -72,31 +73,31 @@ public class SpanningTree {
 	//////////////////////////////////////////////////////////////////////
 
 	public static class NodeData {
-		private NodeImpl prev = null;
+		private Node prev = null;
 		private double cost = Double.MAX_VALUE;
 		private double time = 0;
 		public void reset() { this.prev = null; this.cost = Double.MAX_VALUE; this.time = 0; }
-		public void visit(final NodeImpl comingFrom, final double cost, final double time) {
+		public void visit(final Node comingFrom, final double cost, final double time) {
 			this.prev = comingFrom;
 			this.cost = cost;
 			this.time = time;
 		}
 		public double getCost() { return this.cost; }
 		public double getTime() { return this.time; }
-		public NodeImpl getPrevNode() { return this.prev; }
+		public Node getPrevNode() { return this.prev; }
 	}
 
-	static class ComparatorCost implements Comparator<NodeImpl> {
+	static class ComparatorCost implements Comparator<Node> {
 		protected Map<Id, ? extends NodeData> nodeData;
 		ComparatorCost(final Map<Id, ? extends NodeData> nodeData) { this.nodeData = nodeData; }
-		public int compare(final NodeImpl n1, final NodeImpl n2) {
+		public int compare(final Node n1, final Node n2) {
 			double c1 = getCost(n1);
 			double c2 = getCost(n2);
 			if (c1 < c2) return -1;
 			if (c1 > c2) return +1;
-			return n1.compareTo(n2);
+			return n1.getId().compareTo(n2.getId());
 		}
-		protected double getCost(final NodeImpl node) { return this.nodeData.get(node.getId()).getCost(); }
+		protected double getCost(final Node node) { return this.nodeData.get(node.getId()).getCost(); }
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -119,7 +120,7 @@ public class SpanningTree {
 		return this.nodeData;
 	}
 	
-	public final void getNodesByTravelTimeBudget(double travelTimeBudget, List<NodeImpl>  nodesList, List<Double> travelTimesList) {		
+	public final void getNodesByTravelTimeBudget(double travelTimeBudget, List<Node>  nodesList, List<Double> travelTimesList) {		
 		HashMap<Id,NodeData> tree = this.nodeData;
 		for (Id id : tree.keySet()) {
 			NodeData d = tree.get(id);
@@ -135,12 +136,12 @@ public class SpanningTree {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private void relaxNode(final NodeImpl n, PriorityQueue<NodeImpl> pendingNodes) {
+	private void relaxNode(final Node n, PriorityQueue<Node> pendingNodes) {
 		NodeData nData = nodeData.get(n.getId());
 		double currTime = nData.getTime();
 		double currCost = nData.getCost();
-		for (LinkImpl l : n.getOutLinks().values()) {
-			NodeImpl nn = l.getToNode();
+		for (Link l : n.getOutLinks().values()) {
+			Node nn = l.getToNode();
 			NodeData nnData = nodeData.get(nn.getId());
 			if (nnData == null) { nnData = new NodeData(); this.nodeData.put(nn.getId(),nnData); }
 			double visitCost = currCost+tcFunction.getLinkTravelCost(l,currTime);
@@ -166,10 +167,10 @@ public class SpanningTree {
 		nodeData.put(origin.getId(),d);
 		
 		ComparatorCost comparator = new ComparatorCost(nodeData);
-		PriorityQueue<NodeImpl> pendingNodes = new PriorityQueue<NodeImpl>(500,comparator);
+		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500,comparator);
 		relaxNode(this.origin,pendingNodes);
 		while (!pendingNodes.isEmpty()) {
-			NodeImpl n = pendingNodes.poll();
+			Node n = pendingNodes.poll();
 			relaxNode(n,pendingNodes);
 		}
 	}

@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -51,16 +49,16 @@ public class NetworkInverter {
 			numberOfNodesGenerated++;
 		}
 
-		for (NodeImpl node : this.originalNetwork.getNodes().values()) {
-			for (LinkImpl inLink : node.getInLinks().values()) {
-				for (LinkImpl outLink : node.getOutLinks().values()) {
+		for (Node node : this.originalNetwork.getNodes().values()) {
+			for (Link inLink : node.getInLinks().values()) {
+				for (Link outLink : node.getOutLinks().values()) {
 					LinkImpl link = this.invertedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated),
 							this.invertedNetwork.getNode(inLink.getId()), this.invertedNetwork.getNode(outLink.getId().toString()),
 							outLink.getLength(),
 							outLink.getFreespeed(Time.UNDEFINED_TIME),
 							outLink.getCapacity(Time.UNDEFINED_TIME),
 							outLink.getNumberOfLanes(Time.UNDEFINED_TIME));
-					link.setType(outLink.getType());
+					link.setType(((LinkImpl) outLink).getType());
 					numberOfLinksGenerated++;
 				}
 			}

@@ -28,15 +28,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 
-import playground.rost.graph.Border;
-import playground.rost.graph.BoundingBox;
-import playground.rost.graph.GraphAlgorithms;
 import playground.rost.graph.evacarea.EvacArea;
 
 public class AreaExtractor {
@@ -48,17 +46,17 @@ public class AreaExtractor {
 		boolean fromInHull;
 		boolean toInHull;
 		boolean deleteNode;
-		Map<NodeImpl,Boolean> nodeInHull = new HashMap<NodeImpl, Boolean>();
-		Set<LinkImpl> linksToRemove = new HashSet<LinkImpl>();
-		Set<NodeImpl> nodesToRemove = new HashSet<NodeImpl>();
-		Set<NodeImpl> explicitlyDoNotRemoveNode = new HashSet<NodeImpl>();
+		Map<Node,Boolean> nodeInHull = new HashMap<Node, Boolean>();
+		Set<Link> linksToRemove = new HashSet<Link>();
+		Set<Node> nodesToRemove = new HashSet<Node>();
+		Set<Node> explicitlyDoNotRemoveNode = new HashSet<Node>();
 		List<Node> hull = border.getDistHull();
 		BoundingBox bBox = new BoundingBox();
 		bBox.run(hull);
 		for(LinkImpl link : network.getLinks().values())
 		{
-			NodeImpl from = link.getFromNode();
-			NodeImpl to = link.getToNode();
+			Node from = link.getFromNode();
+			Node to = link.getToNode();
 			if(!nodeInHull.containsKey(from))
 			{
 				fromInHull = GraphAlgorithms.pointIsInPolygon(hull, from, bBox);
@@ -93,7 +91,7 @@ public class AreaExtractor {
 					explicitlyDoNotRemoveNode.add(to);
 			}
 		}
-		for(LinkImpl toDelete : linksToRemove)
+		for(Link toDelete : linksToRemove)
 		{
 			network.removeLink(toDelete);
 		}
@@ -112,19 +110,19 @@ public class AreaExtractor {
 				nodesToRemove.add(node);
 			}
 		}
-		for(NodeImpl toDelete : nodesToRemove)
+		for(Node toDelete : nodesToRemove)
 		{
 			if(!explicitlyDoNotRemoveNode.contains(toDelete))
 				network.removeNode(toDelete);
 		}
-		for(NodeImpl node : nodeInHull.keySet())
+		for(Node node : nodeInHull.keySet())
 		{
 			if(nodeInHull.get(node))
 			{
 				evacAreaNodeIds.add(node.getId().toString());
 			}
 		}
-		for(NodeImpl node : explicitlyDoNotRemoveNode)
+		for(Node node : explicitlyDoNotRemoveNode)
 		{
 			evacBorderNodeIds.add(node.getId().toString());
 		}

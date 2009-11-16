@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -66,13 +67,15 @@ public class NetworkSimplifier {
 
 			if(this.nodeTopoToMerge.contains(Integer.valueOf(nodeTopo.getTopoType(node)))){
 
-				List<LinkImpl> iLinks = new ArrayList<LinkImpl> (node.getInLinks().values());
+				List<Link> iLinks = new ArrayList<Link> (node.getInLinks().values());
 
-				for (LinkImpl inLink : iLinks) {
+				for (Link iL : iLinks) {
+					LinkImpl inLink = (LinkImpl) iL;
 
-					List<LinkImpl> oLinks = new ArrayList<LinkImpl> (node.getOutLinks().values());
+					List<Link> oLinks = new ArrayList<Link> (node.getOutLinks().values());
 
-					for (LinkImpl outLink : oLinks) {
+					for (Link oL : oLinks) {
+						LinkImpl outLink = (LinkImpl) oL;
 
 						if(inLink != null && outLink != null){
 							if(!outLink.getToNode().equals(inLink.getFromNode())){

@@ -27,7 +27,6 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.network.BasicLinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
@@ -81,7 +80,7 @@ public class NetworkReaderTeleatlas implements NetworkReader {
 	public boolean ignoreFrcType7onewayN = false;
 
 	/**
-	 * option parameter: the reader redefines the number of lanes (see permlanes in {@link BasicLinkImpl})
+	 * option parameter: the reader redefines the number of lanes (see permlanes in {@link LinkImpl})
 	 * if the value of <code>{@link #LINK_LANES_NAME}<1</code>. In that case the link gets 2 lanes for
 	 * <code>{@link #LINK_FRCTYP_NAME}</code> less or equal this parameter, 1 lane otherwise.
 	 * <p><b>Default:</b> <code>3</code></p>

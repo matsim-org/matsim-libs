@@ -27,22 +27,19 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.network.BasicLegImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -115,17 +112,17 @@ public class CMCFtoEvacConverter {
 			 NodeImpl fromnode = network.getNode(from);
 			 Coord coordfrom = fromnode.getCoord();
 			 Coord coordto = tonode.getCoord();
-			 LinkImpl fromlink = null;
-			 LinkImpl tolink = null;
+			 Link fromlink = null;
+			 Link tolink = null;
 			 //find edges
 			 if (!coordinates){
-				LinkedList<LinkImpl> tolinks = new LinkedList<LinkImpl>();
+				LinkedList<Link> tolinks = new LinkedList<Link>();
 				tolinks.addAll( tonode.getInLinks().values());
 				if(tolinks.isEmpty()){
 					throw new IllegalArgumentException(tonode.getOrigId()+ " has no ingoing edges!!!");
 				}
 				tolink = tolinks.getFirst();
-				LinkedList<LinkImpl> fromlinks = new LinkedList<LinkImpl>();
+				LinkedList<Link> fromlinks = new LinkedList<Link>();
 				fromlinks.addAll( fromnode.getOutLinks().values());
 				if(tolinks.isEmpty()){
 					throw new IllegalArgumentException(tonode.getOrigId()+ " has no outgoing edges!!!");

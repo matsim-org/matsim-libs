@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
@@ -69,11 +69,11 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 		return n;
 	}
 
-	public final LinkImpl createAndAddLink(final Id id, final NodeImpl fromNode, final NodeImpl toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
+	public final LinkImpl createAndAddLink(final Id id, final Node fromNode, final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
 		return createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
 	}
 
-	public final LinkImpl createAndAddLink(final Id id, final NodeImpl fromNode, final NodeImpl toNode, final double length, final double freespeed, final double capacity, final double numLanes, final String origId, final String type) {
+	public final LinkImpl createAndAddLink(final Id id, final Node fromNode, final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes, final String origId, final String type) {
 
 		if (this.nodes.get(fromNode.getId()) == null) {
 			throw new IllegalArgumentException(this+"[from="+fromNode+" does not exist]");

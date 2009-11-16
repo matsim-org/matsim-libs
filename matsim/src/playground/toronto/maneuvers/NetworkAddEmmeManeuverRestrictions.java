@@ -29,9 +29,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkExpandNode;
@@ -84,17 +85,17 @@ public class NetworkAddEmmeManeuverRestrictions {
 				Id nid = new IdImpl(entries[1]);
 				Id fnid = new IdImpl(entries[2]);
 				Id tnid = new IdImpl(entries[3]);
-				NodeImpl n = network.getNode(nid);
-				NodeImpl fn = network.getNode(fnid);
-				NodeImpl tn = network.getNode(tnid);
+				Node n = network.getNode(nid);
+				Node fn = network.getNode(fnid);
+				Node tn = network.getNode(tnid);
 				if ((n != null) && (fn != null) && (tn != null)) {
-					if (n.getInNodes().containsKey(fn.getId()) && (n.getOutNodes().containsKey(tn.getId()))) {
+					if (((NodeImpl) n).getInNodes().containsKey(fn.getId()) && (((NodeImpl) n).getOutNodes().containsKey(tn.getId()))) {
 						ArrayList<Tuple<Id,Id>> mns = illegalManeuvers.get(n.getId());
 						if (mns == null) { mns = new ArrayList<Tuple<Id,Id>>(); illegalManeuvers.put(n.getId(),mns); }
-						LinkImpl inlink = null;
-						for (LinkImpl l : n.getInLinks().values()) { if (l.getFromNode().getId().equals(fn.getId())) { inlink = l; } }
-						LinkImpl outlink = null;
-						for (LinkImpl l : n.getOutLinks().values()) { if (l.getToNode().getId().equals(tn.getId())) { outlink = l; } }
+						Link inlink = null;
+						for (Link l : n.getInLinks().values()) { if (l.getFromNode().getId().equals(fn.getId())) { inlink = l; } }
+						Link outlink = null;
+						for (Link l : n.getOutLinks().values()) { if (l.getToNode().getId().equals(tn.getId())) { outlink = l; } }
 						mns.add(new Tuple<Id, Id>(inlink.getId(),outlink.getId()));
 						mnCnt++;
 					}
@@ -137,8 +138,8 @@ public class NetworkAddEmmeManeuverRestrictions {
 			ArrayList<Tuple<Id,Id>> turns = new ArrayList<Tuple<Id,Id>>();
 			
 			NodeImpl n = network.getNode(nodeId);
-			for (LinkImpl inLink : n.getInLinks().values()) {
-				for (LinkImpl outLink : n.getOutLinks().values()) {
+			for (Link inLink : n.getInLinks().values()) {
+				for (Link outLink : n.getOutLinks().values()) {
 					Tuple<Id,Id> tuple = new Tuple<Id, Id>(inLink.getId(),outLink.getId());
 					if (!this.contains(tuple,mns)) {
 						if (removeUTurns) {
@@ -156,7 +157,7 @@ public class NetworkAddEmmeManeuverRestrictions {
 		}
 		for (Id nodeId : maneuvers.keySet()) {
 			ArrayList<Tuple<Id,Id>> turns = maneuvers.get(nodeId);
-			Tuple<ArrayList<NodeImpl>,ArrayList<LinkImpl>> t = neModule.expandNode(network,nodeId,turns,expansionRadius,linkSeparation);
+			Tuple<ArrayList<Node>,ArrayList<Link>> t = neModule.expandNode(network,nodeId,turns,expansionRadius,linkSeparation);
 			virtualNodesCnt += t.getFirst().size();
 			virtualLinksCnt += t.getSecond().size();
 			nodesAssignedCnt++;

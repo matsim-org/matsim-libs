@@ -19,7 +19,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
@@ -217,7 +216,7 @@ public class LinkPenaltyCalculatorII implements TravelCost, AfterMobsimListener,
 			int denominator = 0;
 			double nominator = 0.;
 			List<LinkInfo> infos = new ArrayList<LinkInfo>();
-			for (LinkImpl link : node.getOutLinks().values()) {
+			for (Link link : node.getOutLinks().values()) {
 				LinkInfo li = this.linkInfos.get(link.getId());
 				if (li != null) {
 					infos.add(li);

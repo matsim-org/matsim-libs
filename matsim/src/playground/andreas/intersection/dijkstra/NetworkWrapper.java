@@ -1,10 +1,11 @@
 package playground.andreas.intersection.dijkstra;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.misc.Time;
 
 public class NetworkWrapper {
@@ -32,16 +33,16 @@ public class NetworkWrapper {
 			numberOfNodesGenerated++;
 		}
 
-		for (NodeImpl node : networkLayer.getNodes().values()) {
-			for (LinkImpl inLink : node.getInLinks().values()) {
-				for (LinkImpl outLink : node.getOutLinks().values()) {
+		for (Node node : networkLayer.getNodes().values()) {
+			for (Link inLink : node.getInLinks().values()) {
+				for (Link outLink : node.getOutLinks().values()) {
 					LinkImpl link = wrappedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated),
 							wrappedNetwork.getNode(inLink.getId()), wrappedNetwork.getNode(outLink.getId().toString()),
 							outLink.getLength(),
 							outLink.getFreespeed(Time.UNDEFINED_TIME),
 							outLink.getCapacity(Time.UNDEFINED_TIME),
 							outLink.getNumberOfLanes(Time.UNDEFINED_TIME));
-					link.setType(outLink.getType());
+					link.setType(((LinkImpl) outLink).getType());
 					numberOfLinksGenerated++;
 				}
 			}
