@@ -29,6 +29,7 @@ import javax.media.opengl.GL;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -36,7 +37,6 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
@@ -86,7 +86,7 @@ public class QueryAgentPTBus implements OTFQuery {
 		this.agentId = id;
 	}
 
-	private static float[] buildRoute(PlanImpl plan) {
+	private static float[] buildRoute(Plan plan) {
 		float[] vertex = null;
 		List<Link> drivenLinks = new LinkedList<Link> ();
 		
@@ -130,7 +130,7 @@ public class QueryAgentPTBus implements OTFQuery {
 		
 		if (allIds.size()==0) return this;
 
-		PlanImpl plan = plans.getPersons().get(new IdImpl(allIds.get(0))).getSelectedPlan();
+		Plan plan = plans.getPersons().get(new IdImpl(allIds.get(0))).getSelectedPlan();
 
 //		this.acts = new Object [plan.getActsLegs().size()/2];
 //		for (int i=0;i< this.acts.length; i++) {

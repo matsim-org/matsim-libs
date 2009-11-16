@@ -24,8 +24,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -87,7 +87,7 @@ public class PtCheck2 extends AbstractPersonAlgorithm {
 		if (person.getLicense().equals("yes")) {
 			this.licensedCnt++;
 			// Plan.Type planType = person.getSelectedPlan().getType();
-			PlanImpl selectedPlan = person.getSelectedPlan();
+			Plan selectedPlan = person.getSelectedPlan();
 			if (
 			// (planType != null) && (Plan.Type.UNDEFINED != planType)
 			!PlanModeJudger.useUndefined(selectedPlan)) {

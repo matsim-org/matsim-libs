@@ -22,12 +22,12 @@ package org.matsim.core.mobsim.jdeqsim;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.BasicEventImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -52,7 +52,7 @@ public class EndLegMessage extends EventMessage {
 		// reset link index
 		this.vehicle.setLinkIndex(-1);
 
-		PlanImpl plan = this.vehicle.getOwnerPerson().getSelectedPlan();
+		Plan plan = this.vehicle.getOwnerPerson().getSelectedPlan();
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 		if ((actsLegs.size() > this.vehicle.getLegIndex())) {
 			this.vehicle.setCurrentLeg((LegImpl) actsLegs.get(this.vehicle.getLegIndex()));

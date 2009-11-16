@@ -39,13 +39,13 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -76,7 +76,7 @@ public class SelectedPlans2ESRIShape {
 	private final String outputDir;
 	private boolean writeActs = true;
 	private boolean writeLegs = true;
-	private ArrayList<PlanImpl> outputSamplePlans;
+	private ArrayList<Plan> outputSamplePlans;
 	private FeatureType featureTypeAct;
 	private FeatureType featureTypeLeg;
 	private final GeometryFactory geofac;
@@ -120,7 +120,7 @@ public class SelectedPlans2ESRIShape {
 	}
 
 	private void drawOutputSample() {
-		this.outputSamplePlans = new ArrayList<PlanImpl>();
+		this.outputSamplePlans = new ArrayList<Plan>();
 		for (PersonImpl pers : this.population.getPersons().values()) {
 			if (MatsimRandom.getRandom().nextDouble() <= this.outputSample) {
 				this.outputSamplePlans.add(pers.getSelectedPlan());
@@ -131,7 +131,7 @@ public class SelectedPlans2ESRIShape {
 	private void writeActs() throws IOException {
 		String outputFile = this.outputDir + "/acts.shp";
 		ArrayList<Feature> fts = new ArrayList<Feature>();
-		for (PlanImpl plan : this.outputSamplePlans) {
+		for (Plan plan : this.outputSamplePlans) {
 			String id = plan.getPerson().getId().toString();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
@@ -147,7 +147,7 @@ public class SelectedPlans2ESRIShape {
 	private void writeLegs() throws IOException {
 		String outputFile = this.outputDir + "/legs.shp";
 		ArrayList<Feature> fts = new ArrayList<Feature>();
-		for (PlanImpl plan : this.outputSamplePlans) {
+		for (Plan plan : this.outputSamplePlans) {
 			String id = plan.getPerson().getId().toString();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {

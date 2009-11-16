@@ -29,9 +29,9 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 
 /*
  * Removes Dead Ends from the Activity Maps in the Knowledge of a Person.
@@ -157,7 +157,7 @@ public class DeadEndRemover {
 	{
 		Map<Id, Node> activityNodesMap = new HashMap<Id, Node>();
 		
-		PlanImpl plan = person.getSelectedPlan();
+		Plan plan = person.getSelectedPlan();
 		
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {

@@ -19,14 +19,14 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.population;
 
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 
 
 public class DgPlanData {
 
 	private Double score = null;
 
-	private PlanImpl plan;
+	private Plan plan;
 	
 	public DgPlanData() {
 	}
@@ -43,13 +43,13 @@ public class DgPlanData {
 
 
 	
-	public PlanImpl getPlan() {
+	public Plan getPlan() {
 		return plan;
 	}
 
 
 	
-	public void setPlan(PlanImpl plan) {
+	public void setPlan(Plan plan) {
 		this.plan = plan;
 	}
 	

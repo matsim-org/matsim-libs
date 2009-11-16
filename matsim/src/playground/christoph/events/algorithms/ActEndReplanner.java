@@ -21,6 +21,7 @@
 package playground.christoph.events.algorithms;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -63,12 +64,12 @@ public class ActEndReplanner {
 		this.time = time;
 		this.replanner = replanner;
 
-		PlanImpl plan = person.getSelectedPlan();
-		this.betweenLeg = plan.getNextLeg(fromAct);
+		Plan plan = person.getSelectedPlan();
+		this.betweenLeg = ((PlanImpl) plan).getNextLeg(fromAct);
 	
 		if(betweenLeg != null)
 		{
-			toAct = (ActivityImpl)plan.getNextActivity(betweenLeg);
+			toAct = (ActivityImpl)((PlanImpl) plan).getNextActivity(betweenLeg);
 		}
 		else 
 		{
@@ -91,12 +92,12 @@ public class ActEndReplanner {
 		this.time = time;
 		this.replanner = replanner;
 
-		PlanImpl plan = person.getSelectedPlan();
-		this.betweenLeg = plan.getNextLeg(fromAct);
+		Plan plan = person.getSelectedPlan();
+		this.betweenLeg = ((PlanImpl) plan).getNextLeg(fromAct);
 	
 		if(betweenLeg != null)
 		{
-			toAct = (ActivityImpl)plan.getNextActivity(betweenLeg);
+			toAct = ((PlanImpl) plan).getNextActivity(betweenLeg);
 		}
 		else 
 		{
@@ -188,7 +189,7 @@ public class ActEndReplanner {
 //		fromAct.setEndTime(time);
 		
 		// save currently selected plan
-		PlanImpl currentPlan = person.getSelectedPlan();
+		Plan currentPlan = person.getSelectedPlan();
 		
 		// Create new Plan and select it.
 		// This Plan contains only the just ended and the next Activity.

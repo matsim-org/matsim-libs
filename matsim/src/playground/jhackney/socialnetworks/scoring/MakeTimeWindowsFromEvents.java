@@ -29,12 +29,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 
 import playground.jhackney.socialnetworks.algorithms.EventsMapStartEndTimes;
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
@@ -55,7 +55,7 @@ public class MakeTimeWindowsFromEvents {
 			//
 			PersonImpl person=(PersonImpl) persons[i];
 			ArrayList<TimeWindow> twList;
-			PlanImpl plan =person.getSelectedPlan();
+			Plan plan =person.getSelectedPlan();
 			ArrayList<ActivityStartEventImpl> startEvents =startMap.get(person);
 			ArrayList<ActivityEndEventImpl> endEvents = endMap.get(person);
 //30.12			for (int j=0;j<endEvents.size()+1;j++){

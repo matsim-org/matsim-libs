@@ -25,6 +25,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEventImpl;
@@ -38,7 +39,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.misc.Time;
@@ -127,7 +127,7 @@ public class EventModeActivityDurationAnalyser {
 
 		public void handleEvent(final ActivityEndEventImpl event) {
 			ActivityStartEventImpl startEvent = this.eventMap.get(new IdImpl(event.getPersonId().toString()));
-			PlanImpl p = this.plans.getPersons().get(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
+			Plan p = this.plans.getPersons().get(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
 			if (startEvent == null) { // must be the end of home_0
 				this.durTemp = event.getTime();
 			}
@@ -135,21 +135,21 @@ public class EventModeActivityDurationAnalyser {
 				this.durTemp = event.getTime() - startEvent.getTime();
 			}
 			if (event.getActType().equalsIgnoreCase("h")) {
-				if (p.getType().equals(PlanImpl.Type.CAR)) {
+				if (((PlanImpl) p).getType().equals(PlanImpl.Type.CAR)) {
 					this.homeActivityDurationsCar += this.durTemp;
 					this.homeActivityCarCount++;
 				}
-				else if (p.getType().equals(PlanImpl.Type.PT)){
+				else if (((PlanImpl) p).getType().equals(PlanImpl.Type.PT)){
 					this.homeActivityDurationsNonCar += this.durTemp;
 					this.homeActivityNonCarCount++;
 				}
 			}
 			else if (event.getActType().equalsIgnoreCase("w")) {
-				if (p.getType().equals(PlanImpl.Type.CAR)) {
+				if (((PlanImpl) p).getType().equals(PlanImpl.Type.CAR)) {
 					this.workActivityDurationsCar += this.durTemp;
 					this.workActivityCarCount++;
 				}
-				else if (p.getType().equals(PlanImpl.Type.PT)){
+				else if (((PlanImpl) p).getType().equals(PlanImpl.Type.PT)){
 					this.workActivityDurationsNonCar += this.durTemp;
 					this.workActivityNonCarCount++;
 				}
@@ -158,12 +158,12 @@ public class EventModeActivityDurationAnalyser {
 
 		public void handleEvent(final ActivityStartEventImpl event) {
 			this.eventMap.put(new IdImpl(event.getPersonId().toString()), event);
-			PlanImpl p = this.plans.getPersons().get(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
+			Plan p = this.plans.getPersons().get(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
 			if (event.getActType().equalsIgnoreCase("w")) {
-				if (p.getType().equals(PlanImpl.Type.PT)) {
+				if (((PlanImpl) p).getType().equals(PlanImpl.Type.PT)) {
 					this.ptStartTimeMap.incrementValue(event.getTime());
 				}
-				else if (p.getType().equals(PlanImpl.Type.CAR)) {
+				else if (((PlanImpl) p).getType().equals(PlanImpl.Type.CAR)) {
 					this.carStartTimeMap.incrementValue(event.getTime());
 			  }
 			}

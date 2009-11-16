@@ -24,11 +24,11 @@
 package playground.johannes.eut;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /**
@@ -51,11 +51,11 @@ public class RemoveDuplicatePlans implements BeforeMobsimListener {
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		int counter = 0;
-		for (PersonImpl p : event.getControler().getPopulation().getPersons().values()) {
-			PlanImpl selected = p.getSelectedPlan();
+		for (Person p : event.getControler().getPopulation().getPersons().values()) {
+			Plan selected = p.getSelectedPlan();
 			int cnt = p.getPlans().size();
 			for(int i = 0; i < cnt; i++) {
-				PlanImpl plan = p.getPlans().get(i);
+				Plan plan = p.getPlans().get(i);
 				if(selected != plan) {
 					if(comparePlans(selected, plan)) {
 						p.getPlans().remove(i);
@@ -71,7 +71,7 @@ public class RemoveDuplicatePlans implements BeforeMobsimListener {
 		log.warn("Removed " + counter +" plans.");
 	}
 
-	private boolean comparePlans(PlanImpl plan1, PlanImpl plan2) {
+	private boolean comparePlans(Plan plan1, Plan plan2) {
 		if (plan1.getPlanElements().size() > 1 && plan2.getPlanElements().size() > 1) {
 			boolean plansDiffer = false;
 			

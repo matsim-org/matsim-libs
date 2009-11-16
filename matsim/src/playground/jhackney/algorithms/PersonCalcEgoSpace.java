@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.knowledges.ActivitySpace;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
@@ -104,7 +103,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 		// make an arraylist called activities of all the home activities of the ego and his alters
 		ArrayList<ActivityOption> activities=new ArrayList<ActivityOption>();
 		// use morning home, the first act in each selected plan
-		Iterator<PersonImpl> e_it=egoNet.getAlters().iterator();
+		Iterator<Person> e_it=egoNet.getAlters().iterator();
 		while(e_it.hasNext()){
 			activities.add( ((ActivityImpl)(e_it.next().getSelectedPlan().getPlanElements().get(0))).getFacility().getActivityOption("home"));
 		}

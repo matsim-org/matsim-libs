@@ -27,6 +27,7 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -48,8 +49,8 @@ public class PopulationCut {
 		Set<Id> toRemove = new HashSet<Id>();
 		for (PersonImpl p : scenario.getPopulation().getPersons().values()) {
 			boolean removeIt = false;
-			for (PlanImpl plan : p.getPlans()) {
-				ActivityImpl a = plan.getFirstActivity();
+			for (Plan plan : p.getPlans()) {
+				ActivityImpl a = ((PlanImpl) plan).getFirstActivity();
 				Coord c = a.getCoord();
 				if (c == null) { removeIt = true; }
 				else {

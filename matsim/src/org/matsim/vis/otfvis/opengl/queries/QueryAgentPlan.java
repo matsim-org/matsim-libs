@@ -33,6 +33,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -40,7 +41,6 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
@@ -96,7 +96,7 @@ public class QueryAgentPlan implements OTFQuery {
 		this.agentId = id;
 	}
 
-	private static int countLines(PlanImpl plan) {
+	private static int countLines(Plan plan) {
 		int count = 0;
 		for (Object o : plan.getPlanElements()) {
 			if (o instanceof ActivityImpl) {
@@ -127,7 +127,7 @@ public class QueryAgentPlan implements OTFQuery {
 		setCol(pos, col);
 	}
 
-	public void buildRoute(PlanImpl plan) {
+	public void buildRoute(Plan plan) {
 		int count = countLines(plan);
 		if(count == 0) return;
 
@@ -168,7 +168,7 @@ public class QueryAgentPlan implements OTFQuery {
 		PersonImpl person = plans.getPersons().get(new IdImpl(this.agentId));
 		if (person == null) return this;
 
-		PlanImpl plan = person.getSelectedPlan();
+		Plan plan = person.getSelectedPlan();
 
 		this.acts = new Object [plan.getPlanElements().size()/2];
 

@@ -26,7 +26,7 @@ package playground.johannes.socialnetworks.graph.social.mcmc;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntObjectHashMap;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
@@ -37,7 +37,7 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
  * @author illenberger
  *
  */
-public class SNAdjacencyMatrix<P extends BasicPerson<?>> extends SpatialAdjacencyMatrix {
+public class SNAdjacencyMatrix<P extends Person> extends SpatialAdjacencyMatrix {
 
 	public SNAdjacencyMatrix(SocialNetwork<P> g) {
 		super(g);

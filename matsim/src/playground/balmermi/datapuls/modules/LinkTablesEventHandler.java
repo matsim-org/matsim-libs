@@ -34,6 +34,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -89,8 +90,8 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 			}
 			PersonImpl p = population.getPersons().get(event.getPersonId());
 			ActivityImpl fromAct = fromActs.get(p.getId());
-			LegImpl leg = p.getSelectedPlan().getNextLeg(fromAct);
-			ActivityImpl toAct = p.getSelectedPlan().getNextActivity(leg);
+			LegImpl leg = ((PlanImpl) p.getSelectedPlan()).getNextLeg(fromAct);
+			ActivityImpl toAct = ((PlanImpl) p.getSelectedPlan()).getNextActivity(leg);
 
 			out.write(event.getLinkId().toString()+"\t"+p.getId()+"\t");
 			out.write(fromAct.getType()+"\t"+fromAct.getFacilityId()+"\t");
@@ -101,12 +102,12 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 	public void handleEvent(ActivityEndEventImpl event) {
 		PersonImpl p = population.getPersons().get(event.getPersonId());
 		if (!fromActs.containsKey(p.getId())) {
-			fromActs.put(p.getId(),p.getSelectedPlan().getFirstActivity());
+			fromActs.put(p.getId(),((PlanImpl) p.getSelectedPlan()).getFirstActivity());
 		}
 		else {
 			ActivityImpl fromAct = fromActs.get(p.getId());
-			LegImpl leg = p.getSelectedPlan().getNextLeg(fromAct);
-			ActivityImpl toAct = p.getSelectedPlan().getNextActivity(leg);
+			LegImpl leg = ((PlanImpl) p.getSelectedPlan()).getNextLeg(fromAct);
+			ActivityImpl toAct = ((PlanImpl) p.getSelectedPlan()).getNextActivity(leg);
 			fromActs.put(p.getId(),toAct);
 		}
 	}

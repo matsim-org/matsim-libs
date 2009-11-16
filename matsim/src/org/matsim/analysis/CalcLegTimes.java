@@ -30,9 +30,9 @@ import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
 import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -77,7 +77,7 @@ public class CalcLegTimes implements BasicAgentDepartureEventHandler, BasicAgent
 		if (depTime != null && agent != null) {
 			double travTime = event.getTime() - depTime;
 			int legNr = this.agentLegs.get(event.getPersonId());
-			PlanImpl plan = agent.getSelectedPlan();
+			Plan plan = agent.getSelectedPlan();
 			int index = (legNr - 1) * 2;
 			String fromActType = ((ActivityImpl)plan.getPlanElements().get(index)).getType();
 			String toActType = ((ActivityImpl)plan.getPlanElements().get(index + 2)).getType();

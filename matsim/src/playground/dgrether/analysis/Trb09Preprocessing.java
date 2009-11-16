@@ -23,11 +23,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
@@ -62,8 +62,8 @@ public class Trb09Preprocessing {
 			ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
 			loader.loadScenario();
 			PopulationImpl pop = sc.getPopulation();
-			for (PersonImpl p : pop.getPersons().values()){
-				for (PlanImpl plan : p.getPlans()) {
+			for (Person p : pop.getPersons().values()){
+				for (Plan plan : p.getPlans()) {
 					for (PlanElement pe : plan.getPlanElements()){
 						if (pe instanceof Leg) {
 							LegImpl l = (LegImpl)pe;

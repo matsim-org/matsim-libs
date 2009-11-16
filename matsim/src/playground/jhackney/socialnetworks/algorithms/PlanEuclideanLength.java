@@ -20,13 +20,13 @@
 
 package playground.jhackney.socialnetworks.algorithms;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class PlanEuclideanLength {
 
-	public double getPlanLength(PlanImpl plan) {
+	public double getPlanLength(Plan plan) {
 
 		double length = 0.;
 		ActivityImpl fromAct = (ActivityImpl) plan.getPlanElements().get(0);

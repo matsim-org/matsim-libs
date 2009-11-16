@@ -29,7 +29,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -149,7 +148,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 		}
 
 		for (int i=0; i<person.getPlans().size(); i++) {
-			PlanImpl plan = person.getPlans().get(i);
+			Plan plan = person.getPlans().get(i);
 
 			int acts = 0;
 			for (int j=0; j<plan.getPlanElements().size(); j=j+2) {

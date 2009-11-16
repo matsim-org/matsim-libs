@@ -31,13 +31,13 @@ import javax.media.opengl.GL;
 
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -99,13 +99,13 @@ public class QueryAgentEvents extends QueryAgentPlan {
 	private MyEventsHandler handler = null;
 
 	
-	public OTFQuery query(QueueNetwork net, PopulationImpl plans, EventsManagerImpl events, OTFServerQuad quad) {
+	public OTFQuery query(QueueNetwork net, Population plans, EventsManagerImpl events, OTFServerQuad quad) {
 		if(handler == null) {
 			handler = new MyEventsHandler(agentId);
 			events.addHandler(handler);
-			PersonImpl person = plans.getPersons().get(new IdImpl(this.agentId));
+			Person person = plans.getPersons().get(new IdImpl(this.agentId));
 			if (person != null) {
-				PlanImpl plan = person.getSelectedPlan();
+				Plan plan = person.getSelectedPlan();
 				buildRoute(plan);
 			}
 			this.events = handler.getEvents();

@@ -23,6 +23,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
@@ -82,7 +83,7 @@ public class MatsimIo {
 	}
 
 
-	public static void writePlans(final PopulationImpl plans, final String filename) {
+	public static void writePlans(final Population plans, final String filename) {
 		PopulationWriter pwriter = new PopulationWriter(plans, filename, "v4", 1.0);
 //		pwriter.setWriterHandler(new PlansWriterHandlerImplV4());
 		pwriter.write();

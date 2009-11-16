@@ -29,10 +29,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 
@@ -45,14 +47,14 @@ import org.matsim.core.replanning.StrategyManager;
 public class StrategyManagerWithRemoveOldestPlan extends StrategyManager {
 	private Set<Id> noNewPlans = new HashSet<Id>();
 
-	public void run(final PopulationImpl population) {
+	public void run(final Population population) {
 		// initialize all strategies
 		for (PlanStrategy strategy : this.strategies)
 			strategy.init();
 
 		int maxPlansPerAgent = getMaxPlansPerAgent();
 		// then go through the population and assign each person to a strategy
-		for (PersonImpl person : population.getPersons().values()) {
+		for (Person person : population.getPersons().values()) {
 			if (maxPlansPerAgent > 0)
 				removeOldestPlan(person, maxPlansPerAgent);// removes the plan,
 			// which was not
@@ -76,21 +78,21 @@ public class StrategyManagerWithRemoveOldestPlan extends StrategyManager {
 		// make the new selected Plan "young" (with the biggest index in List),
 		// if no new plan was created by the strategy.
 		for (Id personId : noNewPlans) {
-			PersonImpl person = population.getPersons().get(personId);
+			Person person = population.getPersons().get(personId);
 			makeSelectedPlanYoung(person, person.getSelectedPlan());
 		}
 		// empty noNewPlans
 		noNewPlans.clear();
 	}
 
-	private void makeSelectedPlanYoung(PersonImpl person, PlanImpl selectedPlan) {
-		person.removePlan(selectedPlan);
+	private void makeSelectedPlanYoung(Person person, Plan selectedPlan) {
+		((PersonImpl) person).removePlan(selectedPlan);
 		person.addPlan(selectedPlan);
-		person.setSelectedPlan(selectedPlan);
+		((PersonImpl) person).setSelectedPlan(selectedPlan);
 	}
 
-	private void removeOldestPlan(PersonImpl person, int maxSize) {
-		List<PlanImpl> plans = person.getPlans();
+	private void removeOldestPlan(Person person, int maxSize) {
+		List<? extends Plan> plans = person.getPlans();
 		int size = plans.size();
 		if (size <= maxSize) {
 			return;
@@ -98,33 +100,33 @@ public class StrategyManagerWithRemoveOldestPlan extends StrategyManager {
 
 		HashMap<PlanImpl.Type, Integer> typeCounts = new HashMap<PlanImpl.Type, Integer>();
 		// initialize list of types
-		for (PlanImpl plan : plans) {
-			Integer cnt = typeCounts.get(plan.getType());
+		for (Plan plan : plans) {
+			Integer cnt = typeCounts.get(((PlanImpl) plan).getType());
 			if (cnt == null) {
-				typeCounts.put(plan.getType(), 1);
+				typeCounts.put(((PlanImpl) plan).getType(), 1);
 			} else {
-				typeCounts.put(plan.getType(), cnt + 1);
+				typeCounts.put(((PlanImpl) plan).getType(), cnt + 1);
 			}
 		}
 
 		while (size > maxSize) {
-			PlanImpl oldestPlan = null;
+			Plan oldestPlan = null;
 			for (int i = 0; i < size; i++) {
-				PlanImpl plan_i = plans.get(i);
-				if (typeCounts.get(plan_i.getType()) > 1) {
+				Plan plan_i = plans.get(i);
+				if (typeCounts.get(((PlanImpl) plan_i).getType()) > 1) {
 					oldestPlan = plan_i;
 					break;
 				}
 			}
 			if (oldestPlan != null) {
-				person.removePlan(oldestPlan);
+				((PersonImpl) person).removePlan(oldestPlan);
 				size = plans.size();
 				if (oldestPlan.isSelected()) {
-					person.setSelectedPlan(person.getRandomPlan());
+					((PersonImpl) person).setSelectedPlan(((PersonImpl) person).getRandomPlan());
 				}
 				// reduce the number of plans of this type
-				Integer cnt = typeCounts.get(oldestPlan.getType());
-				typeCounts.put(oldestPlan.getType(), cnt - 1);
+				Integer cnt = typeCounts.get(((PlanImpl) oldestPlan).getType());
+				typeCounts.put(((PlanImpl) oldestPlan).getType(), cnt - 1);
 			} else {
 				return; // should only happen if we have more different
 				// plan-types than maxSize

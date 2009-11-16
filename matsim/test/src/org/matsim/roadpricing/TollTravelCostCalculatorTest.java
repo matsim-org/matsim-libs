@@ -21,12 +21,13 @@
 package org.matsim.roadpricing;
 
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
@@ -152,8 +153,8 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 	 * @param population
 	 */
 	private void clearRoutes(final PopulationImpl population) {
-		for (PersonImpl person : population.getPersons().values()) {
-			for (PlanImpl plan : person.getPlans()) {
+		for (Person person : population.getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof LegImpl) {
 						((LegImpl) pe).setRoute(null);

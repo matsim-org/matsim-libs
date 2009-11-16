@@ -23,6 +23,7 @@ package playground.jhackney.socialnetworks.algorithms;
 import java.util.ArrayList;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -45,8 +46,8 @@ public class PersonCalculateActivitySpaces {
 		ActivityImpl myAct = (ActivityImpl) ego.getSelectedPlan().getPlanElements().get(0);
 		Coord egoHomeCoord = myAct.getCoord();
 		EgoNet personNet = (EgoNet)ego.getCustomAttributes().get(EgoNet.NAME);
-		ArrayList<PersonImpl> alters = personNet.getAlters();
-		for (PersonImpl myAlter : alters) {
+		ArrayList<Person> alters = personNet.getAlters();
+		for (Person myAlter : alters) {
 			//Coord myAlterCoord = (Coord) pfc.personGetCoords(myAlter,"home").get(0);
 			myAct = (ActivityImpl) myAlter.getSelectedPlan().getPlanElements().get(0);
 			Coord myAlterCoord = myAct.getCoord();

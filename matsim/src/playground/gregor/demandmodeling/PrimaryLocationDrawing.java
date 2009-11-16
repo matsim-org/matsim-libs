@@ -41,9 +41,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
@@ -222,7 +220,7 @@ public class PrimaryLocationDrawing {
 						}
 					}
 
-					double distance = CoordUtils.calcDistance(tmpZone.coord, pers.getRandomPlan().getFirstActivity().getCoord());
+					double distance = CoordUtils.calcDistance(tmpZone.coord, ((PlanImpl) pers.getRandomPlan()).getFirstActivity().getCoord());
 					double p = Math.exp(-BETA * distance);
 					if (p >= MatsimRandom.getRandom().nextDouble()) {
 						primActZone = tmpZone;

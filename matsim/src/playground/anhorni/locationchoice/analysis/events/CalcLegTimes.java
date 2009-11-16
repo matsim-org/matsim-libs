@@ -21,14 +21,16 @@
 package playground.anhorni.locationchoice.analysis.events;
 
 import java.util.TreeMap;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.population.PlanImpl;
 
 import playground.anhorni.locationchoice.preprocess.helper.Utils;
 
@@ -62,14 +64,14 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		if (depTime != null && agent != null) {
 			double travTime = event.getTime() - depTime;
 
-			PlanImpl plan = event.getPerson().getSelectedPlan();
+			Plan plan = event.getPerson().getSelectedPlan();
 			String actType;
 			
 			if (this.wayThere) {
-				actType = plan.getNextActivity(event.getLeg()).getType();
+				actType = ((PlanImpl) plan).getNextActivity(event.getLeg()).getType();
 			}
 			else {
-				actType = Utils.getActType(plan, plan.getNextActivity(event.getLeg()));
+				actType = Utils.getActType(plan, ((PlanImpl) plan).getNextActivity(event.getLeg()));
 			}
 			
 			// leisure_xxx

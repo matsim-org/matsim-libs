@@ -20,19 +20,17 @@
 
 package playground.balmermi;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.FacilityWRefs;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
@@ -40,7 +38,6 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
-import playground.balmermi.influenza.modules.PersonNoEducLessLeisure;
 import playground.balmermi.modules.PersonFacility2Link;
 
 public class ScenarioIO {
@@ -144,8 +141,8 @@ public class ScenarioIO {
 		preProcessLandmarks.run(network);
 		ReRouteLandmarks router = new ReRouteLandmarks(network,timeCostCalc,timeCostCalc,preProcessLandmarks);
 		router.prepareReplanning();
-		for (PersonImpl person : population.getPersons().values()) {
-			for (PlanImpl plan : person.getPlans()) {
+		for (Person person : population.getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
 				router.handlePlan(plan);
 			}
 		}

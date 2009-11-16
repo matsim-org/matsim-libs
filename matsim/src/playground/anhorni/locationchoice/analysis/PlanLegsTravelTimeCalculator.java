@@ -23,15 +23,16 @@ package playground.anhorni.locationchoice.analysis;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 
 import playground.anhorni.locationchoice.preprocess.helper.Utils;
 
 public class PlanLegsTravelTimeCalculator  extends PlanLegsTravelMeasureCalculator {
 		
-	public List<Double> handle(final PlanImpl plan, boolean wayThere) {		
+	@Override
+	public List<Double> handle(final Plan plan, boolean wayThere) {		
 		super.reset();		
 		final List<?> actslegs = plan.getPlanElements();
 				

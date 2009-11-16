@@ -32,6 +32,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -133,8 +134,8 @@ public class PajekWriter {
 			while (itLink.hasNext()) {
 				SocialNetEdge printLink = itLink.next();
 				int age = iter-printLink.getTimeLastUsed();
-				PersonImpl printPerson1 = printLink.getPersonFrom();
-				PersonImpl printPerson2 = printLink.getPersonTo();
+				Person printPerson1 = printLink.getPersonFrom();
+				Person printPerson2 = printLink.getPersonTo();
 
 				Coord xy1 = ((ActivityImpl) printPerson1.getSelectedPlan().getPlanElements().get(0)).getCoord();
 				Coord xy2 = ((ActivityImpl) printPerson2.getSelectedPlan().getPlanElements().get(0)).getCoord();

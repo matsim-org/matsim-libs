@@ -27,9 +27,9 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
 import playground.balmermi.census2000v2.data.CAtts;
@@ -70,9 +70,9 @@ public class PlansScenarioCut {
 	public final void run(PopulationImpl plans) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		Set<Id> removeids = new TreeSet<Id>();
-		Map<Id,PersonImpl> persons = plans.getPersons();
-		for (PersonImpl p : persons.values()) {
-			PlanImpl plan = p.getSelectedPlan();
+		Map<Id, ? extends Person> persons = plans.getPersons();
+		for (Person p : persons.values()) {
+			Plan plan = p.getSelectedPlan();
 			for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 				Coord c = act.getCoord();
@@ -84,7 +84,7 @@ public class PlansScenarioCut {
 		log.info("      # persons: " + persons.size());
 		log.info("      # persons to remove: " + removeids.size());
 		for (Id pid : removeids) {
-			PersonImpl p = persons.get(pid);
+			Person p = persons.get(pid);
 			Household hh_w = (Household)p.getCustomAttributes().get(CAtts.HH_W);
 			if (hh_w != null) { hh_w.getPersonsW().remove(pid); }
 			Household hh_z = (Household)p.getCustomAttributes().get(CAtts.HH_Z);

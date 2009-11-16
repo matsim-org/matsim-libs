@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 
 
@@ -38,15 +38,15 @@ public class AssignLeisureTripDistances {
 	private int getNumberOfShopActs() {
 		int numberOfShopActs = 0;
 		
-		Iterator<PersonImpl> person_it = this.plans.getPersons().values().iterator();
+		Iterator<? extends Person> person_it = this.plans.getPersons().values().iterator();
 		while (person_it.hasNext()) {
-			PersonImpl person = person_it.next();
+			Person person = person_it.next();
 			
 			// intitially only one plan is available
 			if (person.getPlans().size() > 1) {
 				log.error("More than one plan for person: " + person.getId());
 			}
-			PlanImpl selectedPlan = person.getSelectedPlan();
+			Plan selectedPlan = person.getSelectedPlan();
 						
 			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
@@ -72,7 +72,7 @@ public class AssignLeisureTripDistances {
 			if (person.getPlans().size() > 1) {
 				log.error("More than one plan for person: " + person.getId());
 			}
-			PlanImpl selectedPlan = person.getSelectedPlan();
+			Plan selectedPlan = person.getSelectedPlan();
 						
 			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {

@@ -29,10 +29,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 
 import playground.christoph.knowledge.container.MapKnowledge;
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -51,7 +51,7 @@ public class CreateKnownNodesMap {
 
 	public void collectSelectedNodes(PersonImpl p, NetworkLayer network, SelectNodes nodeSelector)
 	{		
-		PlanImpl plan = p.getSelectedPlan();
+		Plan plan = p.getSelectedPlan();
 		
 		// get Nodes from the Person's Knowledge
 		Map<Id, Node> nodesMap = null;

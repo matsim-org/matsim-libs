@@ -23,16 +23,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.core.basic.v01.population.BasicLegImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
@@ -84,15 +85,16 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		 * Do this in any case as the car routes are required in the setTimes() method. */
 		ArrayList <LinkNetworkRouteImpl> routes = new ArrayList<LinkNetworkRouteImpl>();
 		for (int i=1;i<plan.getPlanElements().size();i=i+2){
-			LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(((LegImpl)(plan.getPlanElements().get(i))).getRoute().getStartLink(), ((LegImpl)(plan.getPlanElements().get(i))).getRoute().getEndLink());
+			RouteWRefs oldRoute = ((LegImpl)(plan.getPlanElements().get(i))).getRoute();
+			LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLink(), oldRoute.getEndLink());
 
 		/*	List<Id> l = new ArrayList<Id>();
 			for (int j=0;j<((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().size();j++){
 				l.add(((Leg)(basePlan.getActsLegs().get(i))).getRoute().getLinkIds().get(j));
 			}*/
-			List<Id> l = ((NetworkRouteWRefs) ((LegImpl)(plan.getPlanElements().get(i))).getRoute()).getLinkIds();
+			List<Link> l = ((NetworkRouteWRefs) oldRoute).getLinks();
 
-			r.setLinkIds(l);
+			r.setLinks(oldRoute.getStartLink(), l, oldRoute.getEndLink());
 			routes.add(r);
 		}
 		this.routes = routes;
@@ -307,15 +309,15 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 				time = ((LegImpl)(bestSolution.get(i))).getTravelTime();
 				((LegImpl)al.get(i)).setTravelTime(time);
 				time = ((LegImpl)(bestSolution.get(i))).getDepartureTime();
-				((LegImpl)al.get(i)).setDepartureTime(time);
+				((Leg)al.get(i)).setDepartureTime(time);
 				time = ((LegImpl)(bestSolution.get(i))).getArrivalTime();
 				((LegImpl)al.get(i)).setArrivalTime(time);
-				BasicLegImpl mode = new BasicLegImpl(((LegImpl)(bestSolution.get(i))).getMode());
-				((LegImpl)al.get(i)).setMode(mode.getMode());
+				((Leg)al.get(i)).setMode(((LegImpl)(bestSolution.get(i))).getMode());
 				
-				LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(((LegImpl)(bestSolution.get(i))).getRoute().getStartLink(), ((LegImpl)(bestSolution.get(i))).getRoute().getEndLink());
-				List<Id> l = ((NetworkRouteWRefs) ((LegImpl)(bestSolution.get(i))).getRoute()).getLinkIds();
-				r.setLinkIds(l);
+				RouteWRefs oldRoute = ((LegImpl)(bestSolution.get(i))).getRoute();
+				LinkNetworkRouteImpl r = new LinkNetworkRouteImpl(oldRoute.getStartLink(), oldRoute.getEndLink());
+				List<Link> l = ((NetworkRouteWRefs) oldRoute).getLinks();
+				r.setLinks(oldRoute.getStartLink(), l, oldRoute.getEndLink());
 				((LegImpl)al.get(i)).setRoute(r);
 				
 			}

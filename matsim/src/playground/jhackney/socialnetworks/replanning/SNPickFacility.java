@@ -92,7 +92,7 @@ public class SNPickFacility implements PlanAlgorithm {
 		Person person = plan.getPerson();
 
 		//COPY THE SELECTED PLAN		    
-		PlanImpl newPlan = ((PersonImpl) person).copySelectedPlan();
+		Plan newPlan = ((PersonImpl) person).copySelectedPlan();
 
 		// Note that it is not changed, yet
 		boolean changed = false;
@@ -153,10 +153,10 @@ public class SNPickFacility implements PlanAlgorithm {
 //			Pick a new facility for it from the knowledge of alters and ego (LOGIT)
 //For each alter append its facList to existing facList
 			EgoNet egoNet = (EgoNet)person.getCustomAttributes().get(EgoNet.NAME);
-			ArrayList<PersonImpl> alters=egoNet.getAlters();
-			Iterator<PersonImpl> aIt=alters.iterator();
+			ArrayList<Person> alters=egoNet.getAlters();
+			Iterator<Person> aIt=alters.iterator();
 			while(aIt.hasNext()){
-				PersonImpl alter = aIt.next();
+				Person alter = aIt.next();
 				facList.clear();
 				facList.addAll(this.knowledges.getKnowledgesByPersonId().get(alter.getId()).getActivities(factype));
 				fIt=null;
@@ -188,7 +188,7 @@ public class SNPickFacility implements PlanAlgorithm {
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
 				if((newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLink() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink())){
-					ActivityImpl firstAct = newPlan.getFirstActivity();
+					ActivityImpl firstAct = ((PlanImpl) newPlan).getFirstActivity();
 					firstAct.setLink(f.getLink());
 					firstAct.setCoord(f.getCoord());
 					firstAct.setFacility(f);

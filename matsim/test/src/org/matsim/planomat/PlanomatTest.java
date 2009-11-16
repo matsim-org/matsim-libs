@@ -32,13 +32,13 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicPersonEvent;
 import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
@@ -174,7 +174,7 @@ public class PlanomatTest extends MatsimTestCase {
 		// first person
 		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
-		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		// actual test
 		testee.run(testPlan);
@@ -204,7 +204,7 @@ public class PlanomatTest extends MatsimTestCase {
 		// first person
 		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
-		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		PlanomatConfigGroup planomatConfigGroup = this.scenario.getConfig().planomat();
 		Planomat testee = new Planomat(null, null, planomatConfigGroup, null);
@@ -235,7 +235,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 	public void testStepThroughPlan_WriteBack() throws InvalidConfigurationException {
 
-		PlanImpl testPlan = null;
+		Plan testPlan = null;
 		IChromosome testChromosome = null;
 		LegTravelTimeEstimator ltte = null;
 

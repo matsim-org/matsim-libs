@@ -25,18 +25,16 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
-import org.apache.log4j.Logger;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.api.basic.v01.TransportMode;
-//import org.matsim.core.population.ActivityImpl;
-//import org.matsim.core.population.LegImpl;
 
 
 /**
@@ -118,8 +116,8 @@ public class TravelTimeComparer {
 			stream.print(position+"\t");
 			
 			for (int i=0;i<personOrig.getPlans().size();i++){
-				PlanImpl planOrig = personOrig.getPlans().get(i);
-				PlanImpl planNew = personNew.getPlans().get(i);
+				Plan planOrig = personOrig.getPlans().get(i);
+				Plan planNew = personNew.getPlans().get(i);
 				for (int j=1;j<planOrig.getPlanElements().size();j+=2){
 					if (((LegImpl)(planOrig.getPlanElements().get(j))).getMode().equals(TransportMode.car)){
 						value += ((LegImpl)(planOrig.getPlanElements().get(j))).getTravelTime();
@@ -252,8 +250,8 @@ public class TravelTimeComparer {
 		// compare populations
 		for (Iterator<PersonImpl> iterator = this.populationNew.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
-			PlanImpl planNew = person.getSelectedPlan();
-			PlanImpl planOrig = this.populationOrig.getPersons().get(person.getId()).getSelectedPlan();
+			Plan planNew = person.getSelectedPlan();
+			Plan planOrig = this.populationOrig.getPersons().get(person.getId()).getSelectedPlan();
 			
 			stream.print(person.getId()+"\t");
 			/*

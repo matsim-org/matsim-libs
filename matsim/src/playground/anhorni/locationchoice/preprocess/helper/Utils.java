@@ -3,7 +3,9 @@ package playground.anhorni.locationchoice.preprocess.helper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -98,14 +100,14 @@ public abstract class Utils {
 			return "undefined";
 	}	
 	
-	public static String getActType(PlanImpl plan, ActivityImpl act) {		
+	public static String getActType(Plan plan, ActivityImpl act) {		
 		if (!act.getType().startsWith("h")) {
 			return act.getType();
 		}
 		else {		// its a trip back home
 			// not the first home act!
-			if (plan.getPreviousLeg(act) != null) {
-				return getLongestActivityForRoundTrip(plan, plan.getPreviousActivity(plan.getPreviousLeg(act)));
+			if (((PlanImpl) plan).getPreviousLeg(act) != null) {
+				return getLongestActivityForRoundTrip((PlanImpl) plan, ((PlanImpl) plan).getPreviousActivity(((PlanImpl) plan).getPreviousLeg(act)));
 			}
 			else {
 				return "home";

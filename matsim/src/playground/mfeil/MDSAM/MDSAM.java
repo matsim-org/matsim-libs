@@ -27,11 +27,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.apache.log4j.Logger;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
 
@@ -93,7 +93,7 @@ public class MDSAM {
 			double [][] matrix = new double [person.getPlans().size()][person.getPlans().size()]; //store a person's similarities among plans
 			
 			for (int i=0;i<person.getPlans().size();i++){
-				PlanImpl plan = person.getPlans().get(i);
+				Plan plan = person.getPlans().get(i);
 				
 				if (this.printing){
 					stream.println("Person "+person.getId());
@@ -162,7 +162,7 @@ public class MDSAM {
 		return this.sims;
 	}
 	
-	public double runPlans(PlanImpl origPlan, PlanImpl comparePlan, PrintStream stream){
+	public double runPlans(Plan origPlan, Plan comparePlan, PrintStream stream){
 		
 		long runStartTime = System.currentTimeMillis();
 		this.counter++;

@@ -25,6 +25,7 @@ package playground.mfeil.MDSAM;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -102,8 +103,8 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 				log.info("Handled "+counter+" persons");
 				Gbl.printMemoryUsage();
 			}			
-			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				PlanImpl plan = iterator2.next();
+			for (Iterator<Plan> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
+				Plan plan = iterator2.next();
 				
 				LegTravelTimeEstimator estimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 						plan,
@@ -115,14 +116,14 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 				for (int i=1;i<plan.getPlanElements().size();i++){
 					if (i%2==1){
 						LegImpl leg = ((LegImpl)(plan.getPlanElements().get(i)));
-						leg.setDepartureTime(plan.getPreviousActivity(leg).getEndTime());
-						double travelTime = estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), plan.getPreviousActivity(leg).getEndTime(), plan.getPreviousActivity(leg), plan.getNextActivity(leg), leg, false);
+						leg.setDepartureTime(((PlanImpl) plan).getPreviousActivity(leg).getEndTime());
+						double travelTime = estimator.getLegTravelTimeEstimation(plan.getPerson().getId(), ((PlanImpl) plan).getPreviousActivity(leg).getEndTime(), ((PlanImpl) plan).getPreviousActivity(leg), ((PlanImpl) plan).getNextActivity(leg), leg, false);
 						leg.setTravelTime(travelTime);
 						leg.setArrivalTime(leg.getDepartureTime()+leg.getTravelTime());
 					}
 					else{
 						ActivityImpl act = ((ActivityImpl)(plan.getPlanElements().get(i)));
-						act.setStartTime(plan.getPreviousLeg(act).getArrivalTime());
+						act.setStartTime(((PlanImpl) plan).getPreviousLeg(act).getArrivalTime());
 						try {
 							act.setDuration(act.getEndTime()-act.getStartTime());
 							if (act.getDuration()<=0) {
@@ -135,7 +136,7 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 					}
 				}
 				// if plan too long make it invalid (set score to -100000)
-				if (plan.getLastActivity().getStartTime()-86400>plan.getFirstActivity().getEndTime()){
+				if (((PlanImpl) plan).getLastActivity().getStartTime()-86400>((PlanImpl) plan).getFirstActivity().getEndTime()){
 					plan.setScore(-100000.0);
 				}
 			}

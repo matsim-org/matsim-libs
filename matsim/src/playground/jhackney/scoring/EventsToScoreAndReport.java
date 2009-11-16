@@ -32,6 +32,7 @@ import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
 import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
@@ -114,7 +115,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 			sf.finish();
 
 			double score = sf.getScore();
-			PlanImpl plan = this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
+			Plan plan = this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
 			Double oldScore = plan.getScore();
 			if (oldScore == null) {
 				plan.setScore(score);
@@ -149,7 +150,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 			for (Map.Entry<String, playground.jhackney.scoring.EventSocScoringFunction> entry : this.agentScorers.entrySet()) {
 				String agentId = entry.getKey();
 				playground.jhackney.scoring.EventSocScoringFunction sf = entry.getValue();
-				PlanImpl plan = this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
+				Plan plan = this.population.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
 				Iterator actLegIter = plan.getPlanElements().iterator();
 				ActivityImpl act = (ActivityImpl) actLegIter.next(); // assume first plan element is always an Activity
 
@@ -195,7 +196,7 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 								e.printStackTrace();
 							}
 							legNumber++;
-					}else if (o instanceof ActivityImpl && !(act.equals(plan.getLastActivity()))) {
+					}else if (o instanceof ActivityImpl && !(act.equals(((PlanImpl) plan).getLastActivity()))) {
 						act = (ActivityImpl) o;
 						try {
 							muout.write("\t"+actNumber+"\t"+act.getType()+"\t"+sf.getDudur(act)+"\t"+sf.getDued(act)+"\t"+sf.getDula(act)+"\t"+sf.getDuld(act)+"\t"+sf.getDus(act)+"\t"+sf.getDuw(act)+"\t"+sf.getDusoc(act));

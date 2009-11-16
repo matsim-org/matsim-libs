@@ -51,6 +51,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -58,7 +60,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -292,22 +293,22 @@ public class EgoNetPlansMakeKML {
 		loadData(myPerson, 0, 1);
 
 		// Proceed to the EgoNet of myPerson
-		ArrayList<PersonImpl> persons = ((EgoNet)myPerson.getCustomAttributes().get(EgoNet.NAME)).getAlters();
-		Iterator<PersonImpl> altersIt= persons.iterator();
+		ArrayList<Person> persons = ((EgoNet)myPerson.getCustomAttributes().get(EgoNet.NAME)).getAlters();
+		Iterator<Person> altersIt= persons.iterator();
 
 		while(altersIt.hasNext()){
-			PersonImpl p = altersIt.next();
+			Person p = altersIt.next();
 			i++;
 			loadData(p,i,persons.size());
 		}
 
 		System.out.println(" ... done.");
 	}
-	public static void loadData(PersonImpl myPerson, int i, int nColors) {
+	public static void loadData(Person myPerson, int i, int nColors) {
 
 		System.out.println("    loading Plan data. Processing person ...");
 
-		PlanImpl myPlan = myPerson.getSelectedPlan();
+		Plan myPlan = myPerson.getSelectedPlan();
 
 		byte[] color = setColor(i, nColors+1);
 //		setFacStyles(color);
@@ -472,7 +473,7 @@ public class EgoNetPlansMakeKML {
 
 	}
 
-	private static void makeActKML(PersonImpl myPerson, ActivityImpl act, FolderType agentFolder, StyleType agentLinkStyle) {
+	private static void makeActKML(Person myPerson, ActivityImpl act, FolderType agentFolder, StyleType agentLinkStyle) {
 		// TODO Auto-generated method stub
 
 		String styleUrl = null;
@@ -525,7 +526,7 @@ public class EgoNetPlansMakeKML {
 		agentFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(pl));
 
 //		if (!fullActName.equals("evening home")) {
-		LinkImpl actLink = act.getLink();
+		Link actLink = act.getLink();
 
 		PlacemarkType agentLink = generateLinkPlacemark(actLink, agentLinkStyle, trafo);
 

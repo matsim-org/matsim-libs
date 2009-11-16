@@ -27,11 +27,12 @@ import java.util.List;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /**
@@ -53,13 +54,10 @@ public class PathSizeLogitSelector implements PlanSelector {
 		this.tau = Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "BrainExpBeta"));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.demandmodeling.replanning.selectors.PlanSelectorI#selectPlan(org.matsim.demandmodeling.plans.Person)
-	 */
-	public PlanImpl selectPlan(final PersonImpl person) {
+	public Plan selectPlan(final Person person) {
 
 		// First check if there are any unscored plans
-		PlanImpl selectedPlan = person.getRandomUnscoredPlan();
+		Plan selectedPlan = ((PersonImpl) person).getRandomUnscoredPlan();
 		if (selectedPlan != null) return selectedPlan;
 		// Okay, no unscored plans...
 
@@ -72,10 +70,10 @@ public class PathSizeLogitSelector implements PlanSelector {
 		// choose a random number over interval [0,sumWeights[
 		double selnum = wc.sumWeights*MatsimRandom.getRandom().nextDouble();
 		int idx = 0;
-		for (PlanImpl plan : person.getPlans()) {
+		for (Plan plan : person.getPlans()) {
 			selnum -= wc.weights[idx];
 			if (selnum <= 0.0) {
-				person.setSelectedPlan(plan);
+				((PersonImpl) person).setSelectedPlan(plan);
 				return plan;
 			}
 			idx++;
@@ -86,7 +84,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 	}
 
 	//updates the path size logit weights
-	private void calcPSLWeights(final List<PlanImpl> plans, final WeightsContainer wc) {
+	private void calcPSLWeights(final List<? extends Plan> plans, final WeightsContainer wc) {
 
 		wc.maxScore = Double.NEGATIVE_INFINITY;
 
@@ -95,7 +93,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 		//this gets the choice sets C_n
 		//TODO [GL] since the lack of information in Route(),
 		//the very first and the very last link of a path will be ignored - gl
-		for (PlanImpl plan : plans) {
+		for (Plan plan : plans) {
 
 			if (plan.getScore() > wc.maxScore) wc.maxScore = plan.getScore();
 
@@ -122,7 +120,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 
 		double sumweight = 0;
 		int idx = 0;
-		for (PlanImpl plan : plans){
+		for (Plan plan : plans){
 
 			double tmp = 0;
 			for (PlanElement pe : plan.getPlanElements()) {
@@ -162,7 +160,7 @@ public class PathSizeLogitSelector implements PlanSelector {
 		protected double[] weights;
 		protected double sumWeights;
 		protected double maxScore;
-		protected WeightsContainer(final List<PlanImpl> plans) {
+		protected WeightsContainer(final List<? extends Plan> plans) {
 			this.weights = new double[plans.size()];
 		}
 	}

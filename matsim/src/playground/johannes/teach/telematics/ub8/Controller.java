@@ -47,6 +47,8 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
@@ -64,9 +66,8 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.io.IOUtils;
@@ -148,8 +149,8 @@ public class Controller extends Controler {
 		public void notifyScoring(ScoringEvent event) {
 			double alpha = Double.parseDouble(event.getControler().getConfig().getParam("planCalcScore", "learningRate"));
 			
-			for(PersonImpl p : event.getControler().getPopulation().getPersons().values()) {
-				for(PlanImpl plan : p.getPlans()) {
+			for(Person p : event.getControler().getPopulation().getPersons().values()) {
+				for(Plan plan : p.getPlans()) {
 					double tt = 0;
 					LegImpl leg = (LegImpl)plan.getPlanElements().get(1);
 					RouteWRefs route = leg.getRoute();
@@ -194,7 +195,7 @@ public class Controller extends Controler {
 			
 			for(PersonImpl p : event.getControler().getPopulation().getPersons().values()) {
 				if(random.nextDouble() <= proba) {
-					PlanImpl plan = p.getSelectedPlan();
+					Plan plan = p.getSelectedPlan();
 					((LegImpl)plan.getPlanElements().get(1)).setRoute(route);
 				}
 			}

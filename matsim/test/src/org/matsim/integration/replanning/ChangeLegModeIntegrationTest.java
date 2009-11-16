@@ -22,6 +22,7 @@ package org.matsim.integration.replanning;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -83,7 +84,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 		// test that everything worked as expected
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
-		PlanImpl newPlan = person.getSelectedPlan();
+		Plan newPlan = person.getSelectedPlan();
 		LegImpl newLeg = (LegImpl) newPlan.getPlanElements().get(1);
 		assertEquals(TransportMode.walk, newLeg.getMode());
 		assertNotNull("the leg should now have a route.", newLeg.getRoute());

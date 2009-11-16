@@ -23,6 +23,7 @@ package org.matsim.core.router;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -234,8 +235,8 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	protected double handleCarLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
 		double travTime = 0;
-		LinkImpl fromLink = fromAct.getLink();
-		LinkImpl toLink = toAct.getLink();
+		Link fromLink = fromAct.getLink();
+		Link toLink = toAct.getLink();
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
 		if (toLink == null) throw new RuntimeException("toLink missing.");
 
@@ -278,8 +279,8 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		// TODO [MR] later: use special pt-router
 
 		int travTime = 0;
-		LinkImpl fromLink = fromAct.getLink();
-		LinkImpl toLink = toAct.getLink();
+		Link fromLink = fromAct.getLink();
+		Link toLink = toAct.getLink();
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
 		if (toLink == null) throw new RuntimeException("toLink missing.");
 
@@ -293,7 +294,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
 			// so let's calculate the final part.
-			double travelTimeLastLink = toLink.getFreespeedTravelTime(depTime + path.travelTime);
+			double travelTimeLastLink = ((LinkImpl) toLink).getFreespeedTravelTime(depTime + path.travelTime);
 			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * this.configGroup.getPtSpeedFactor());
 			RouteWRefs route = this.routeFactory.createRoute(TransportMode.pt, fromLink, toLink);
 //			route.setNodes(fromLink, path.nodes, toLink);

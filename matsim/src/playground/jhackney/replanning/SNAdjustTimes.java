@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
@@ -34,7 +33,7 @@ public class SNAdjustTimes implements PlanAlgorithm {
 		Person person = plan.getPerson();
 
 		//COPY THE SELECTED PLAN		    
-		PlanImpl newPlan = ((PersonImpl) person).copySelectedPlan();
+		Plan newPlan = ((PersonImpl) person).copySelectedPlan();
 
 		for (PlanElement pe : newPlan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {

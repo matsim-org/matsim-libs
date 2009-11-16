@@ -22,7 +22,8 @@ package org.matsim.core.replanning.selectors;
 
 import java.util.HashMap;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PlanImpl;
 
 /**
@@ -38,27 +39,27 @@ import org.matsim.core.population.PlanImpl;
  */
 public class WorstPlanForRemovalSelector implements PlanSelector {
 
-	public PlanImpl selectPlan(PersonImpl person) {
+	public Plan selectPlan(Person person) {
 
 		// hashmap that returns "Integer" count for given plans type:
 		HashMap<PlanImpl.Type, Integer> typeCounts = new HashMap<PlanImpl.Type, Integer>();
 
 		// count how many plans per type an agent has:
-		for (PlanImpl plan : person.getPlans()) {
-			Integer cnt = typeCounts.get(plan.getType());
+		for (Plan plan : person.getPlans()) {
+			Integer cnt = typeCounts.get(((PlanImpl) plan).getType());
 			if (cnt == null) {
-				typeCounts.put(plan.getType(), Integer.valueOf(1));
+				typeCounts.put(((PlanImpl) plan).getType(), Integer.valueOf(1));
 			} else {
-				typeCounts.put(plan.getType(), Integer.valueOf(cnt.intValue() + 1));
+				typeCounts.put(((PlanImpl) plan).getType(), Integer.valueOf(cnt.intValue() + 1));
 			}
 		}
 
-		PlanImpl worst = null;
+		Plan worst = null;
 		double worstScore = Double.POSITIVE_INFINITY;
-		for (PlanImpl plan : person.getPlans()) {
+		for (Plan plan : person.getPlans()) {
 
 			// if we have more than one plan of the same type:
-			if (typeCounts.get(plan.getType()).intValue() > 1) {
+			if (typeCounts.get(((PlanImpl) plan).getType()).intValue() > 1) {
 
 				// if there is a plan without score:
 				if (plan.getScore() == null) {
@@ -81,7 +82,7 @@ public class WorstPlanForRemovalSelector implements PlanSelector {
 		if (worst == null) {
 			// there is exactly one plan, or we have of each plan-type exactly one.
 			// select the one with worst score globally
-			for (PlanImpl plan : person.getPlans()) {
+			for (Plan plan : person.getPlans()) {
 				if (plan.getScore() == null) {
 					return plan;
 				}

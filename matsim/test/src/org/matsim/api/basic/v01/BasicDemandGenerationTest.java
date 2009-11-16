@@ -33,13 +33,14 @@ import org.matsim.api.basic.v01.population.BasicPopulationFactory;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
@@ -188,8 +189,8 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 	private void checkContent(PopulationImpl population) {
 		assertNotNull(population);
 		assertEquals(ids.size(), population.getPersons().size());
-		PersonImpl pers;
-		PlanImpl p;
+		Person pers;
+		Plan p;
 		for (Id id : ids){
 			pers = population.getPersons().get(id);
 			assertNotNull(pers);
@@ -201,18 +202,18 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 				BasicPlanElement element = p.getPlanElements().get(i);
 				assertNotNull(element);
 			}
-			assertEquals(this.homeEndTime, p.getFirstActivity().getEndTime(), EPSILON);
-			assertEquals(ids.get(0), p.getFirstActivity().getLinkId());
+			assertEquals(this.homeEndTime, ((PlanImpl) p).getFirstActivity().getEndTime(), EPSILON);
+			assertEquals(ids.get(0), ((PlanImpl) p).getFirstActivity().getLinkId());
 			assertEquals(this.workEndTime, ((BasicActivity)p.getPlanElements().get(2)).getEndTime(), EPSILON);
 			assertEquals(ids.get(2), ((BasicActivity)p.getPlanElements().get(2)).getLinkId());
-			assertEquals(Time.UNDEFINED_TIME, p.getLastActivity().getEndTime(), EPSILON);
-			assertEquals(ids.get(0), p.getLastActivity().getLinkId());
+			assertEquals(Time.UNDEFINED_TIME, ((PlanImpl) p).getLastActivity().getEndTime(), EPSILON);
+			assertEquals(ids.get(0), ((PlanImpl) p).getLastActivity().getLinkId());
 			
 			
-			assertEquals(TransportMode.car, p.getNextLeg(p.getFirstActivity()).getMode());
-			assertNull(p.getNextLeg(p.getFirstActivity()).getRoute());
-			assertEquals(TransportMode.car, p.getPreviousLeg(p.getLastActivity()).getMode());
-			assertNull(p.getPreviousLeg(p.getLastActivity()).getRoute());
+			assertEquals(TransportMode.car, ((PlanImpl) p).getNextLeg(((PlanImpl) p).getFirstActivity()).getMode());
+			assertNull(((PlanImpl) p).getNextLeg(((PlanImpl) p).getFirstActivity()).getRoute());
+			assertEquals(TransportMode.car, ((PlanImpl) p).getPreviousLeg(((PlanImpl) p).getLastActivity()).getMode());
+			assertNull(((PlanImpl) p).getPreviousLeg(((PlanImpl) p).getLastActivity()).getRoute());
 		}
 		
 		

@@ -27,11 +27,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.events.AgentReplanEventImpl;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -146,10 +146,10 @@ public class WithindayAgent extends PersonAgent {
 			log.trace("time: " + hours + ":" + min);
 		}
 		Link currentLink = this.getCurrentLink();
-		ActivityImpl nextAct = this.getPerson().getSelectedPlan().getNextActivity(this.getCurrentLeg());
-		LinkImpl destinationLink = nextAct.getLink();
+		ActivityImpl nextAct = ((PlanImpl) this.getPerson().getSelectedPlan()).getNextActivity(this.getCurrentLeg());
+		Link destinationLink = nextAct.getLink();
 		NetworkRouteWRefs alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
-		PlanImpl oldPlan = this.getPerson().getSelectedPlan();
+		Plan oldPlan = this.getPerson().getSelectedPlan();
 		LegImpl currentLeg = this.getCurrentLeg();
 		RouteWRefs oldRoute = currentLeg.getRoute();
 

@@ -42,6 +42,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -51,8 +53,6 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
@@ -122,8 +122,8 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		else  this.drivenLinks.put(driven, count + 1);
 	}
 
-	protected List<PlanImpl> getPersonsNOW(Population plans, QueueNetwork net) {
-		List<PlanImpl> actPersons = new ArrayList<PlanImpl>();
+	protected List<Plan> getPersonsNOW(Population plans, QueueNetwork net) {
+		List<Plan> actPersons = new ArrayList<Plan>();
 		QueueLink link = net.getLinks().get(linkId);
 		Collection<QueueVehicle> vehs = link.getAllVehicles();
 		for( QueueVehicle veh : vehs) actPersons.add(veh.getDriver().getPerson().getSelectedPlan());
@@ -131,11 +131,11 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		return actPersons;
 	}
 
-	protected List<PlanImpl> getPersons(PopulationImpl plans, QueueNetwork net) {
-		List<PlanImpl> actPersons = new ArrayList<PlanImpl>();
+	protected List<Plan> getPersons(Population plans, QueueNetwork net) {
+		List<Plan> actPersons = new ArrayList<Plan>();
 
-		for (PersonImpl person : plans.getPersons().values()) {
-			PlanImpl plan = person.getSelectedPlan();
+		for (Person person : plans.getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
 			List actslegs = plan.getPlanElements();
 			for (int i= 0; i< actslegs.size(); i++) {
 				if( i%2 == 0) {
@@ -164,10 +164,10 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		return actPersons;
 	}
 	
-	protected void collectLinksFromTrip(List<PlanImpl> actPersons) {
+	protected void collectLinksFromTrip(List<Plan> actPersons) {
 		// TODO kai Despite the name, this collects links from the "leg", not from the trip.  kai, jun09
 		boolean addthis = false;
-		for (PlanImpl plan : actPersons) {
+		for (Plan plan : actPersons) {
 			for (PlanElement pe : plan.getPlanElements()) {
 
 //				if( i%2 == 0) {
@@ -203,8 +203,8 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		}
 	}
 
-	protected void collectLinks(List<PlanImpl> actPersons) {
-		for (PlanImpl plan : actPersons) {
+	protected void collectLinks(List<Plan> actPersons) {
+		for (Plan plan : actPersons) {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;
@@ -239,7 +239,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 //		String start = link.getLink().getFromNode().getId().toString();
 //		String end = link.getLink().getToNode().getId().toString();
 		
-		List<PlanImpl> actPersons = nowOnly ? getPersonsNOW(plans, net) : getPersons(plans, net);
+		List<Plan> actPersons = nowOnly ? getPersonsNOW(plans, net) : getPersons(plans, net);
 
 		if(tripOnly) collectLinksFromTrip(actPersons);
 		else collectLinks(actPersons);

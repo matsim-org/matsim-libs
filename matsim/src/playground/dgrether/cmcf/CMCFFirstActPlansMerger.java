@@ -19,7 +19,7 @@
 package playground.dgrether.cmcf;
 
 import org.apache.log4j.Logger;
-
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -53,10 +53,10 @@ public class CMCFFirstActPlansMerger {
 		PopulationImpl plansCmcf = MatsimIo.loadPlans(cmcfPlansFile, net);
 		PopulationImpl plans = MatsimIo.loadPlans(plansFile, net);
 		for (PersonImpl p : plans.getPersons().values()) {
-			PlanImpl pl = p.getSelectedPlan();
-			LegImpl l = pl.getNextLeg(pl.getFirstActivity());
-			PlanImpl plcmcf = plansCmcf.getPersons().get(p.getId()).getSelectedPlan();
-			LegImpl lcmcf = plcmcf.getNextLeg(plcmcf.getFirstActivity());
+			Plan pl = p.getSelectedPlan();
+			LegImpl l = ((PlanImpl) pl).getNextLeg(((PlanImpl) pl).getFirstActivity());
+			Plan plcmcf = plansCmcf.getPersons().get(p.getId()).getSelectedPlan();
+			LegImpl lcmcf = ((PlanImpl) plcmcf).getNextLeg(((PlanImpl) plcmcf).getFirstActivity());
 			l.setRoute(lcmcf.getRoute());
 		}
 		MatsimIo.writePlans(plans, outPlansFile);

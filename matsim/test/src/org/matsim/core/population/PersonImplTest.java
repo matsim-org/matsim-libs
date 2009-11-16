@@ -21,6 +21,7 @@
 package org.matsim.core.population;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -59,7 +60,7 @@ public class PersonImplTest extends MatsimTestCase {
 		population.getPersons().put(person.getId(), person);
 
 		// now test if we all for plans without score are returned
-		PlanImpl plan = person.getRandomUnscoredPlan();
+		Plan plan = person.getRandomUnscoredPlan();
 		assertNull(plan.getScore());
 		plan.setScore(1.0);
 		plan = person.getRandomUnscoredPlan();

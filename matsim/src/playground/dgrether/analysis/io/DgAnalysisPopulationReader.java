@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -70,7 +71,7 @@ public class DgAnalysisPopulationReader {
 		// load first plans file
 		population = loadPopulationFile(firstPlanPath, sc.getNetwork());
 		new PlanCalcType().run(population);
-		PlanImpl plan;
+		Plan plan;
 		ActivityImpl act;
 		for (Id id : population.getPersons().keySet()) {
 			if (isExcludeTransit){
@@ -79,7 +80,7 @@ public class DgAnalysisPopulationReader {
 				}
 			}
 			plan = population.getPersons().get(id).getSelectedPlan();
-			act = plan.getFirstActivity();
+			act = ((PlanImpl) plan).getFirstActivity();
 			
 			DgPersonData personData;
 			personData = analysisPopulation.getPersonData().get(id);
@@ -135,7 +136,7 @@ public class DgAnalysisPopulationReader {
 		new PlanCalcType().run(population);
 		
 		analysisPopulation = new DgAnalysisPopulation();
-		PlanImpl plan = null ;
+		Plan plan = null ;
 		ActivityImpl act;
 		for (Id id : population.getPersons().keySet()) {
 			if ( whichPlan.equals( "selected" ) ) {
@@ -146,7 +147,7 @@ public class DgAnalysisPopulationReader {
 				log.error( " whichPlan not recognized; aborting ... " ) ;
 				System.exit( -1 ) ;
 			}
-			act = plan.getFirstActivity();
+			act = ((PlanImpl) plan).getFirstActivity();
 			DgPersonData personData = new DgPersonData();
 			personData.setFirstActivity(act);
 			DgPlanData pd = new DgPlanData();

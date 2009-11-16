@@ -28,12 +28,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -86,7 +86,7 @@ public class CarAvail extends AbstractPersonAlgorithm {
 		PersonImpl person = (PersonImpl) p;
 		String carAvail = person.getCarAvail();
 		if (carAvail != null) {
-			PlanImpl selectedPlan = person.getSelectedPlan();
+			Plan selectedPlan = person.getSelectedPlan();
 			if (carAvail.equals("never")) {
 				this.never_hasCar++;
 				if (

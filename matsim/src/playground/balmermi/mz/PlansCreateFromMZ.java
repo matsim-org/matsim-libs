@@ -31,11 +31,11 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -206,7 +206,7 @@ public class PlansCreateFromMZ {
 				}
 
 				// creating/getting plan
-				PlanImpl plan = person.getSelectedPlan();
+				Plan plan = person.getSelectedPlan();
 				if (plan == null) {
 					person.createAndAddPlan(true);
 					plan = person.getSelectedPlan();
@@ -218,7 +218,7 @@ public class PlansCreateFromMZ {
 					ActivityImpl from_act = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 					from_act.setEndTime(departure);
 					from_act.setDuration(from_act.getEndTime()-from_act.getStartTime());
-					LegImpl leg = plan.createAndAddLeg(mode);
+					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
@@ -226,7 +226,7 @@ public class PlansCreateFromMZ {
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
-					ActivityImpl act = plan.createAndAddActivity(acttype,to);
+					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
 					act.setStartTime(arrival);
 
 					// coordinate consistency check
@@ -236,9 +236,9 @@ public class PlansCreateFromMZ {
 					}
 				}
 				else {
-					ActivityImpl homeAct = plan.createAndAddActivity(HOME,from);
+					ActivityImpl homeAct = ((PlanImpl) plan).createAndAddActivity(HOME,from);
 					homeAct.setEndTime(departure);
-					LegImpl leg = plan.createAndAddLeg(mode);
+					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					leg.setArrivalTime(arrival);
@@ -246,7 +246,7 @@ public class PlansCreateFromMZ {
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
-					ActivityImpl act = plan.createAndAddActivity(acttype,to);
+					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
 					act.setStartTime(arrival);
 				}
 			}
@@ -277,8 +277,8 @@ public class PlansCreateFromMZ {
 
 	private final void setHomeLocations(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		for (PersonImpl p : plans.getPersons().values()) {
-			PlanImpl plan = p.getSelectedPlan();
-			ActivityImpl home = plan.getFirstActivity();
+			Plan plan = p.getSelectedPlan();
+			ActivityImpl home = ((PlanImpl) plan).getFirstActivity();
 			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 				if ((act.getCoord().getX() == home.getCoord().getX()) && (act.getCoord().getY() == home.getCoord().getY())) {
@@ -296,7 +296,7 @@ public class PlansCreateFromMZ {
 	private final Set<Id> identifyNonHomeBasedPlans(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (PersonImpl p : plans.getPersons().values()) {
-			PlanImpl plan = p.getSelectedPlan();
+			Plan plan = p.getSelectedPlan();
 			ActivityImpl last = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 			if (!last.getType().equals(HOME)) { ids.add(p.getId()); }
 		}
@@ -308,7 +308,7 @@ public class PlansCreateFromMZ {
 	private final Set<Id> identifyPlansWithTypeOther(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (PersonImpl p : plans.getPersons().values()) {
-			PlanImpl plan = p.getSelectedPlan();
+			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;
@@ -324,7 +324,7 @@ public class PlansCreateFromMZ {
 	private final Set<Id> identifyPlansModeTypeUndef(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (PersonImpl p : plans.getPersons().values()) {
-			PlanImpl plan = p.getSelectedPlan();
+			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
@@ -340,7 +340,7 @@ public class PlansCreateFromMZ {
 	private final Set<Id> identifyPlansWithRoundTrips(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (PersonImpl p : plans.getPersons().values()) {
-			PlanImpl plan = p.getSelectedPlan();
+			Plan plan = p.getSelectedPlan();
 			ActivityImpl prevAct = null;
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
@@ -365,7 +365,7 @@ public class PlansCreateFromMZ {
 		int cnt_p = 0;
 		for (PersonImpl p : plans.getPersons().values()) {
 			boolean has_changed = false;
-			PlanImpl plan = p.getSelectedPlan();
+			Plan plan = p.getSelectedPlan();
 			PlanImpl plan2 = new org.matsim.core.population.PlanImpl(p);
 			plan2.setSelected(true);
 			plan2.setScore(plan.getScore());
@@ -433,7 +433,7 @@ public class PlansCreateFromMZ {
 	private final Set<Id> identifyPlansNegDistance(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (PersonImpl p : plans.getPersons().values()) {
-			PlanImpl plan = p.getSelectedPlan();
+			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
@@ -449,7 +449,7 @@ public class PlansCreateFromMZ {
 	private final Set<Id> identifyPlansWithNegCoords(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (PersonImpl p : plans.getPersons().values()) {
-			PlanImpl plan = p.getSelectedPlan();
+			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;
@@ -465,7 +465,7 @@ public class PlansCreateFromMZ {
 	private final Set<Id> identifyPlansWithTooLongWalkTrips(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (PersonImpl p : plans.getPersons().values()) {
-			PlanImpl plan = p.getSelectedPlan();
+			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
 					LegImpl leg = (LegImpl) pe;
@@ -481,7 +481,7 @@ public class PlansCreateFromMZ {
 	private final Set<Id> identifyPlansInconsistentTimes(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (PersonImpl p : plans.getPersons().values()) {
-			PlanImpl plan = p.getSelectedPlan();
+			Plan plan = p.getSelectedPlan();
 			for (int i=0; i<plan.getPlanElements().size()-2; i=i+2) {
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 				if (act.getEndTime()<act.getStartTime()) { ids.add(p.getId()); }
@@ -495,7 +495,7 @@ public class PlansCreateFromMZ {
 	private final Set<Id> identifySingleActPlans(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
 		for (PersonImpl p : plans.getPersons().values()) {
-			PlanImpl plan = p.getSelectedPlan();
+			Plan plan = p.getSelectedPlan();
 			if (plan.getPlanElements().size() <= 1) { ids.add(p.getId()); }
 		}
 		return ids;

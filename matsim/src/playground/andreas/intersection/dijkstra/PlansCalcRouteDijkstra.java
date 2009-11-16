@@ -2,8 +2,8 @@ package playground.andreas.intersection.dijkstra;
 
 import java.util.ArrayList;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -52,8 +52,8 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 	@Override
 	protected double handleCarLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
 		double travTime = 0;
-		LinkImpl fromLink = fromAct.getLink();
-		LinkImpl toLink = toAct.getLink();
+		Link fromLink = fromAct.getLink();
+		Link toLink = toAct.getLink();
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
 		if (toLink == null) throw new RuntimeException("toLink missing.");
 

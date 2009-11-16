@@ -27,16 +27,16 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.CompressedNetworkRouteImpl;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
+import org.matsim.core.population.routes.CompressedNetworkRouteImpl;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -70,8 +70,8 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		controler.run();
 
 		PopulationImpl population = controler.getPopulation();
-		for (PersonImpl person : population.getPersons().values()) {
-			for (PlanImpl plan : person.getPlans()) {
+		for (Person person : population.getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof BasicLeg) {
 						BasicLeg leg = (BasicLeg) pe;
@@ -86,7 +86,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		Gbl.reset();
 		config.controler().setOutputDirectory(getOutputDirectory() + "/variant1");
 		ScenarioImpl scenario = new ScenarioImpl(config);
-		((NetworkLayer)scenario.getNetwork()).getFactory().setRouteFactory(TransportMode.car, new CompressedNetworkRouteFactory(scenario.getNetwork()));
+		scenario.getNetwork().getFactory().setRouteFactory(TransportMode.car, new CompressedNetworkRouteFactory(scenario.getNetwork()));
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
 		
@@ -98,7 +98,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		PopulationImpl population2 = controler2.getPopulation();
 		for (PersonImpl person : population2.getPersons().values()) {
 			int planCounter = 0;
-			for (PlanImpl plan : person.getPlans()) {
+			for (Plan plan : person.getPlans()) {
 				planCounter++;
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof BasicLeg) {

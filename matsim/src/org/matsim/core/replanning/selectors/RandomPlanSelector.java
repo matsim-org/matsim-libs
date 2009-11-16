@@ -20,8 +20,10 @@
 
 package org.matsim.core.replanning.selectors;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+
 
 /**
  * Select randomly one of the existing plans of the person.
@@ -34,7 +36,7 @@ public class RandomPlanSelector implements PlanSelector {
 	 * Choose a random plan from the person and return it.
 	 * @return The newly selected plan for this person; <code>null</code> if the person has no plans.
 	 */
-	public PlanImpl selectPlan(final PersonImpl person) {
-		return person.getRandomPlan();
+	public Plan selectPlan(final Person person) {
+		return ((PersonImpl) person).getRandomPlan();
 	}
 }

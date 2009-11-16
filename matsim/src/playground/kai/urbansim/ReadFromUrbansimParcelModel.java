@@ -24,9 +24,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -215,8 +213,8 @@ public class ReadFromUrbansimParcelModel {
 						newPop.addPerson(newPerson) ;
 						break ;
 					}
-					ActivityImpl oldHomeAct = oldPerson.getSelectedPlan().getFirstActivity();
-					ActivityImpl newHomeAct =    newPerson.getSelectedPlan().getFirstActivity() ;
+					ActivityImpl oldHomeAct = ((PlanImpl) oldPerson.getSelectedPlan()).getFirstActivity();
+					ActivityImpl newHomeAct =    ((PlanImpl) newPerson.getSelectedPlan()).getFirstActivity() ;
 					if ( actHasChanged ( oldHomeAct, newHomeAct, network ) ) { // act changed.  Accept new person:
 						newPop.addPerson(newPerson) ;
 						break ;

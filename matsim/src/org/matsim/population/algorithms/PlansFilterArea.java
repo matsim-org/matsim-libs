@@ -25,9 +25,9 @@ import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
 /**
@@ -83,7 +83,7 @@ public class PlansFilterArea {
 		for (int i=person.getPlans().size()-1; i>=0; i--) {
 			int cntActs = 0;
 			int cntOutside = 0;
-			PlanImpl plan = person.getPlans().get(i);
+			Plan plan = person.getPlans().get(i);
 
 			for (int j=0; j<plan.getPlanElements().size(); j+=2) {
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(j);

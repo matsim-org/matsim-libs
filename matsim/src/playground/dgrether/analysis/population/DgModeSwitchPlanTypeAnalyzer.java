@@ -48,7 +48,7 @@ public class DgModeSwitchPlanTypeAnalyzer {
 			DgPlanData planDataRun1 = d.getPlanData().get(DgAnalysisPopulation.RUNID1);
 			DgPlanData planDataRun2 = d.getPlanData().get(DgAnalysisPopulation.RUNID2);
 
-			Tuple<Type, Type> modeSwitchTuple = new Tuple<Type, Type>(planDataRun1.getPlan().getType(), planDataRun2.getPlan().getType());
+			Tuple<Type, Type> modeSwitchTuple = new Tuple<Type, Type>(((PlanImpl) planDataRun1.getPlan()).getType(), ((PlanImpl) planDataRun2.getPlan()).getType());
 
 			DgAnalysisPopulation p = this.classifiedPops.get(modeSwitchTuple);
 			if (p == null){

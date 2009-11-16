@@ -41,6 +41,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
@@ -136,8 +137,8 @@ public class LegDistance implements LinkEnterEventHandler,
 		if (toll == null)
 			this.distances.put(agentId, distance);
 		else {
-			if (TollTools.isInRange(ppl.getPersons().get(event.getPersonId())
-					.getSelectedPlan().getFirstActivity().getLink(), toll)) {
+			if (TollTools.isInRange(((PlanImpl) ppl.getPersons().get(event.getPersonId())
+					.getSelectedPlan()).getFirstActivity().getLink(), toll)) {
 				this.distances.put(agentId, distance);
 			}
 		}

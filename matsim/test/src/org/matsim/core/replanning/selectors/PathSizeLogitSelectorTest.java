@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
@@ -280,7 +281,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		int cnt3 = 0;
 
 		for (int i = 0; i < 10000; i++) {
-			PlanImpl plan = selector.selectPlan(person);
+			Plan plan = selector.selectPlan(person);
 			if (plan == p1) cnt1++;
 			if (plan == p2) cnt2++;
 			if (plan == p3) cnt3++;

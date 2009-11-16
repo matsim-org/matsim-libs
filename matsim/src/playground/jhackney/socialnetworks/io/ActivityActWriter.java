@@ -7,10 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
 /**
@@ -44,13 +44,13 @@ public class ActivityActWriter {
 	}
 	public void write(int iter, PopulationImpl myPlans){
 //		System.out.println("AAW will write to"+out.toString());
-		Iterator<PersonImpl> pIt = myPlans.getPersons().values().iterator();
+		Iterator<? extends Person> pIt = myPlans.getPersons().values().iterator();
 		while(pIt.hasNext()){
-			PersonImpl myPerson = (PersonImpl) pIt.next();
-			List<PlanImpl> myPersonPlans = myPerson.getPlans();
+			Person myPerson = pIt.next();
+			List<? extends Plan> myPersonPlans = myPerson.getPlans();
 
 			for (int i=0;i<myPersonPlans.size();i++){
-				PlanImpl myPlan = myPersonPlans.get(i);
+				Plan myPlan = myPersonPlans.get(i);
 				List<? extends BasicPlanElement> actsLegs=myPlan.getPlanElements();
 
 				for (int j=0;j<actsLegs.size()+1;j=j+2){
@@ -62,7 +62,6 @@ public class ActivityActWriter {
 						out.newLine();
 
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						System.out.println(myActivity.toString());
 						System.out.println(myAct.toString());
 						e.printStackTrace();

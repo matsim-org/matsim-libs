@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -124,7 +123,7 @@ public class PersonsSummaryTable extends AbstractPersonAlgorithm implements Plan
 		if (person.isEmployed()) { i++; }
 
 		// calc j index
-		PlanImpl plan = person.getPlans().get(0);
+		Plan plan = person.getPlans().get(0);
 		int l = 0;
 		int s = 0;
 		int e = 0;

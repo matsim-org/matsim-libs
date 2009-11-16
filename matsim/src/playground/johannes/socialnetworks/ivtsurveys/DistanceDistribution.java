@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -65,7 +66,7 @@ public class DistanceDistribution {
 		double xmax = 687000;
 		double ymax = 254000;
 		for(PersonImpl p : population.getPersons().values()) {
-			Coord c = p.getSelectedPlan().getFirstActivity().getCoord();
+			Coord c = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord();
 			if((c.getX() >= xmin) && (c.getX() <= xmax) && (c.getY() >= ymin) && (c.getY() <= ymax))
 				persons2.add(p);
 		}
@@ -76,8 +77,8 @@ public class DistanceDistribution {
 		for(PersonImpl p1 : population.getPersons().values()) {
 			persons2.remove(p1);
 			for(PersonImpl p2 : persons2) {
-				Coord c1 = p1.getSelectedPlan().getFirstActivity().getCoord();
-				Coord c2 = p2.getSelectedPlan().getFirstActivity().getCoord();
+				Coord c1 = ((PlanImpl) p1.getSelectedPlan()).getFirstActivity().getCoord();
+				Coord c2 = ((PlanImpl) p2.getSelectedPlan()).getFirstActivity().getCoord();
 				double d = CoordUtils.calcDistance(c1, c2);
 				double bin = Math.floor(d/binsize);
 				double val = hist.get(bin);

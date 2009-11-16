@@ -73,8 +73,8 @@ public class CutTrips implements PersonAlgorithm {
 				throw new RuntimeException("route is null. person=" + person.getId().toString());
 			}
 
-			LinkImpl depLink = ((ActivityImpl) plan.getPlanElements().get(legNr - 1)).getLink();
-			LinkImpl arrLink = ((ActivityImpl) plan.getPlanElements().get(legNr + 1)).getLink();
+			Link depLink = ((ActivityImpl) plan.getPlanElements().get(legNr - 1)).getLink();
+			Link arrLink = ((ActivityImpl) plan.getPlanElements().get(legNr + 1)).getLink();
 
 			// test departure link
 			if (this.aoi.containsKey(depLink.getId())) {

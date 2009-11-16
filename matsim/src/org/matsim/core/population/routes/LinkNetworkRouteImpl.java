@@ -28,8 +28,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.LinkNetworkRoute;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 
 /**
  * Implementation of {@link NetworkRouteWRefs} which internally stores the route as a series of {@link Link}s.
@@ -65,20 +63,6 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 			this.setDistance(dist);
 		}
 		return dist;
-	}
-
-	@Override
-	public void setLinkIds(final List<Id> linkIds) {
-		NetworkLayer network = (NetworkLayer)Gbl.getWorld().getLayer(NetworkLayer.LAYER_TYPE);
-		if (network == null) {
-			throw new RuntimeException("NetworkLayer does not exist in world.");
-		}
-
-		this.route.clear();
-		for (Id id : linkIds) {
-			this.route.add(network.getLink(id));
-		}
-		this.route.trimToSize();
 	}
 
 	public List<Id> getLinkIds() {

@@ -30,8 +30,6 @@ import org.matsim.api.basic.v01.Id;
  */
 public interface LinkNetworkRoute extends Route {
 	
-	public void setLinkIds(final List<Id> linkIds) ;
-	
 	public List<Id> getLinkIds() ;
 
 }

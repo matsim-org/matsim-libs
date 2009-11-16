@@ -27,6 +27,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -416,7 +417,7 @@ public class SocialNetwork {
 	 *                
 	 * @author jhackney
 	 */
-	public void makeSocialContact(PersonImpl person1, PersonImpl person2, int iteration, String linkType) {
+	public void makeSocialContact(Person person1, Person person2, int iteration, String linkType) {
 
 		SocialNetEdge newLink;
 		SocialNetEdge newOpposingLink;

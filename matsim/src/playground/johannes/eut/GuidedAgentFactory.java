@@ -30,15 +30,14 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.withinday.WithindayAgent;
@@ -68,9 +67,9 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory implements It
 	
 	private BufferedWriter writer;
 	
-	private Set<PersonImpl> guidedPersons;
+	private Set<Person> guidedPersons;
 	
-	private Map<PersonImpl, PlanImpl> selectedPlans;
+	private Map<Person, Plan> selectedPlans;
 	
 	private long randomSeed;
 	
@@ -96,7 +95,7 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory implements It
 	
 	@Override
 	public AgentContentment createAgentContentment(WithindayAgent agent) {
-		selectedPlans = new HashMap<PersonImpl, PlanImpl>();
+		selectedPlans = new HashMap<Person, Plan>();
 		random.nextDouble();
 		if(random.nextDouble() < equipmentFraction) {
 			if(analyzer != null)
@@ -121,7 +120,7 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory implements It
 		return router;
 	}
 	
-	public Set<PersonImpl> getGuidedPersons() {
+	public Set<Person> getGuidedPersons() {
 		return guidedPersons;
 	}
 
@@ -136,7 +135,7 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory implements It
 			e.printStackTrace();
 		}
 		random = new Random(randomSeed);
-		guidedPersons = new HashSet<PersonImpl>();
+		guidedPersons = new HashSet<Person>();
 	}
 
 //	public void notifyAfterMobsim(AfterMobsimEvent event) {
@@ -145,8 +144,8 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory implements It
 
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if (selectedPlans != null) {
-			for (PersonImpl person : selectedPlans.keySet()) {
-				person.exchangeSelectedPlan(selectedPlans.get(person), false);
+			for (Person person : selectedPlans.keySet()) {
+				((PersonImpl) person).exchangeSelectedPlan(selectedPlans.get(person), false);
 			}
 		}
 	}

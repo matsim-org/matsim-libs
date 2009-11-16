@@ -11,14 +11,13 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -172,8 +171,8 @@ public class MergeCoord {
 
 
 		// Find persons with walking trips over 60 minutes long
-		for (PersonImpl person : population.getPersons().values()) {
-			for(PlanImpl plan : person.getPlans()){
+		for (Person person : population.getPersons().values()) {
+			for(Plan plan : person.getPlans()){
 				for (PlanElement planelement : plan.getPlanElements()) {
 					
 					if(planelement instanceof LegImpl){					
@@ -252,8 +251,8 @@ public class MergeCoord {
 
 
 		// Find persons with walking trips over 60 minutes long
-		for (PersonImpl person : population.getPersons().values()) {
-			for(PlanImpl plan : person.getPlans()){
+		for (Person person : population.getPersons().values()) {
+			for(Plan plan : person.getPlans()){
 				for (PlanElement planelement : plan.getPlanElements()) {
 					
 					if(planelement instanceof LegImpl){					

@@ -33,10 +33,10 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -92,7 +92,7 @@ public class PlansCreateFromDataPuls {
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (PersonImpl p : population.getPersons().values()) {
-			Coord c = p.getPlans().get(0).getFirstActivity().getFacility().getCoord();
+			Coord c = ((PlanImpl) p.getPlans().get(0)).getFirstActivity().getFacility().getCoord();
 			if (c.getX() < minx) { minx = c.getX(); }
 			if (c.getY() < miny) { miny = c.getY(); }
 			if (c.getX() > maxx) { maxx = c.getX(); }
@@ -107,7 +107,7 @@ public class PlansCreateFromDataPuls {
 
 		log.info("    assinging persons to their group...");
 		for (PersonImpl p : population.getPersons().values()) {
-			Coord c = p.getPlans().get(0).getFirstActivity().getFacility().getCoord();
+			Coord c = ((PlanImpl) p.getPlans().get(0)).getFirstActivity().getFacility().getCoord();
 			if (p.getSex().equals("m")) {
 				if (p.getAge()<7) { qts.get(0).put(c.getX(),c.getY(),p); }
 				else if (p.getAge()<15) { qts.get(1).put(c.getX(),c.getY(),p); }
@@ -299,7 +299,7 @@ public class PlansCreateFromDataPuls {
 		}
 		// plan
 		if (cPerson.getPlans().size() != 1) { throw new RuntimeException("cpid="+cPerson.getId()+": does not have one plan"); }
-		PlanImpl cPlan = cPerson.getPlans().get(0);
+		Plan cPlan = cPerson.getPlans().get(0);
 		PlanImpl dPlan = dPerson.createAndAddPlan(true);
 		dPlan.copyPlan(cPlan);
 		dPlan.setPerson(dPerson);

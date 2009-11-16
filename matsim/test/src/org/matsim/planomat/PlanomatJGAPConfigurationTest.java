@@ -30,6 +30,7 @@ import org.jgap.impl.MutationOperator;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -72,8 +73,8 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 	public void testPlanWithoutLegs() {
 		
 		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
-		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
-		testPlan.removeActivity(2);
+		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+		((PlanImpl) testPlan).removeActivity(2);
 		this.runATest(1, 0, BestChromosomesSelector.class, 8, 2, 0.6);
 		
 	}
@@ -90,7 +91,7 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 		// first person
 		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
-		PlanImpl testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
+		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		PlanomatConfigGroup planomatConfigGroup = this.scenario.getConfig().planomat();
 		Planomat testee = new Planomat(null, null, planomatConfigGroup, null);

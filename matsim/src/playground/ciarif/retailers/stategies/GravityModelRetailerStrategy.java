@@ -3,6 +3,7 @@ package playground.ciarif.retailers.stategies;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
@@ -12,7 +13,8 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-//mport playground.ciarif.retailers.IO.WriteRetailersMatrices;
+import org.matsim.core.population.PlanImpl;
+
 import playground.ciarif.retailers.RetailerGA.RunRetailerGA;
 import playground.ciarif.retailers.data.Consumer;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
@@ -22,9 +24,6 @@ import playground.ciarif.retailers.models.GravityModel;
 import playground.ciarif.retailers.utils.Utils;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
-//import playground.ciarif.retailers.utils.Utils;
-//import playground.jjoubert.Utilities.DateString;
-//import playground.ciarif.retailers.IO.WriteRetailersMatrices;
 
 public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO check the arguments that are passed from this class to 
 	//the GravityModel class, in particular if it is really necessary to pass the controler. 
@@ -86,7 +85,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 	    	ActivityFacilityImpl af = c.getShoppingFacility();
     		double prob= prob_zone_shop.get(zone_index,shops_keys.get(af.getId()));
     		regressand_matrix.set(consumer_index, Math.log(prob/prob_zone_shop.viewRow(zone_index).zSum()));
-    		double dist1 = (af.getActivityOption("shop").getFacility().calcDistance(c.getPerson().getSelectedPlan().getFirstActivity().getCoord()));
+    		double dist1 = (af.getActivityOption("shop").getFacility().calcDistance(((PlanImpl) c.getPerson().getSelectedPlan()).getFirstActivity().getCoord()));
 	        if (dist1 == 0.0D) {
 	          dist1 = 10.0D;
 	          cases = cases+1;
@@ -96,7 +95,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 	        double dist2 = 0;
 	        double dim = 0;
     		for (ActivityFacilityImpl aaff:this.shops.values()) {
-    			dist2 = aaff.calcDistance(c.getPerson().getSelectedPlan().getFirstActivity().getCoord());
+    			dist2 = aaff.calcDistance(((PlanImpl) c.getPerson().getSelectedPlan()).getFirstActivity().getCoord());
     			sumDist = sumDist + dist2;
     			dim = aaff.getActivityOption("shop").getCapacity().doubleValue();
     			sumDim = sumDim + dim;

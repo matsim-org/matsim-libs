@@ -23,14 +23,12 @@
  */
 package playground.johannes.socialnetworks.utils;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
@@ -43,7 +41,7 @@ public class PopulationDensity {
 
 	private static final String MODULE_NAME = "densityGrid";
 	
-	public static void main(String[] args) throws FileNotFoundException, IOException {
+	public static void main(String[] args) {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(args[0]);
 		loader.loadScenario();
 		Scenario data = loader.getScenario();
@@ -52,14 +50,14 @@ public class PopulationDensity {
 		double resolution = Double.parseDouble(config.getParam(MODULE_NAME, "resolution"));
 		String output = config.getParam(MODULE_NAME, "output");
 		
-		PopulationImpl population = (PopulationImpl) data.getPopulation();//FIXME
+		Population population = data.getPopulation();
 				
 		double maxX = 0;
 		double maxY = 0;
 		double minX = Double.MAX_VALUE;
 		double minY = Double.MAX_VALUE;
-		for(PersonImpl person : population.getPersons().values()) {
-			Coord homeLoc = person.getSelectedPlan().getFirstActivity().getCoord();
+		for(Person person : population.getPersons().values()) {
+			Coord homeLoc = ((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord();
 			maxX = Math.max(maxX, homeLoc.getX());
 			maxY = Math.max(maxY, homeLoc.getY());
 			minX = Math.min(minX, homeLoc.getX());
@@ -68,8 +66,8 @@ public class PopulationDensity {
 		
 		SpatialGrid<Double> grid = new SpatialGrid<Double>(minX, minY, maxX, maxY, resolution);
 		
-		for(PersonImpl person : population.getPersons().values()) {
-			Coord homeLoc = person.getSelectedPlan().getFirstActivity().getCoord();
+		for(Person person : population.getPersons().values()) {
+			Coord homeLoc = ((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord();
 			
 			Double count = grid.getValue(homeLoc);
 			if(count == null)

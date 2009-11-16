@@ -7,7 +7,6 @@ import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -16,7 +15,7 @@ public class WriteActivityLocationsByType implements PlanAlgorithm{
 	public WriteActivityLocationsByType(PopulationImpl plans) {
 		Iterator<PersonImpl> planIt=plans.getPersons().values().iterator();
 		while(planIt.hasNext()){
-		PlanImpl myPlan=planIt.next().getSelectedPlan();
+		Plan myPlan=planIt.next().getSelectedPlan();
 		run(myPlan);
 		}
 	}

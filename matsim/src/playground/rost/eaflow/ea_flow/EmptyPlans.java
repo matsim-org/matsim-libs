@@ -25,13 +25,14 @@
 package playground.rost.eaflow.ea_flow;
 
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
@@ -117,8 +118,8 @@ public class EmptyPlans {
 		PlansCalcRoute router = new PlansCalcRoute(network, new FakeTravelTimeCost(), new FakeTravelTimeCost());
 		//PlansCalcRoute router = new PlansCalcRouteDijkstra(network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), new FakeTravelTimeCost());
 		for (Object O_person : population.getPersons().values()) {
-			PersonImpl person = (PersonImpl) O_person;
-			PlanImpl plan = person.getPlans().get(0);
+			Person person = (PersonImpl) O_person;
+			Plan plan = person.getPlans().get(0);
 			router.run(plan);
 		}
 

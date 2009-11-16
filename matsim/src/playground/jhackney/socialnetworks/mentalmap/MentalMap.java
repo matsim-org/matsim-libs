@@ -32,6 +32,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -41,7 +42,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.world.MappedLocation;
 
@@ -90,7 +90,7 @@ public class MentalMap {
 		this.knowledge=knowledge;
 	}
 
-	public void initializeActActivityMapRandom (PlanImpl myPlan){
+	public void initializeActActivityMapRandom (Plan myPlan){
 
 //		Associate each act in the plan with a random facility on the link
 
@@ -109,9 +109,9 @@ public class MentalMap {
 					}
 					
 					// Else the activity is null and we choose an activity to assign to the act
-					LinkImpl myLink = myAct.getLink();
+					Link myLink = myAct.getLink();
 					// These Locations are facilities by the new convention
-					Collection<MappedLocation> locations = myLink.getUpMapping().values();
+					Collection<MappedLocation> locations = ((LinkImpl) myLink).getUpMapping().values();
 					// These Objects are facilities by convention
 					Object[] facs =  locations.toArray();
 					// Assign a random activity (a facility) on the link to the act
@@ -131,7 +131,7 @@ public class MentalMap {
 		}
 	}
 
-	public void initializeActActivityMapFromFile(PlanImpl myPlan, ActivityFacilitiesImpl facilities, ActivityActReader aar){
+	public void initializeActActivityMapFromFile(Plan myPlan, ActivityFacilitiesImpl facilities, ActivityActReader aar){
 
 
 		if(aar==null) return;
@@ -155,7 +155,7 @@ public class MentalMap {
 		}
 	}
 
-	public void prepareActs(PlanImpl myPlan){
+	public void prepareActs(Plan myPlan){
 
 //		Tidy the acts up so they correspond to the expectations of the social net module.
 //		First, change the types to be the same as the facility types.
@@ -290,7 +290,7 @@ public class MentalMap {
 
 	public ActivityImpl getActFromActivity (PersonImpl person, ActivityOption myActivity){
 		ActivityImpl myAct=null;
-		for (PlanImpl myPlan : person.getPlans()) {
+		for (Plan myPlan : person.getPlans()) {
 			for (PlanElement pe : myPlan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;

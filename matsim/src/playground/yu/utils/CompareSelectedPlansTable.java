@@ -14,7 +14,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.charts.XYScatterChart;
@@ -104,9 +104,9 @@ public class CompareSelectedPlansTable {
 				out.write(person.getCarAvail() + ";");
 				out.write(person.isEmployed() + ";");
 
-				if (person.getSelectedPlan().getFirstActivity().getType()
+				if (((PlanImpl) person.getSelectedPlan()).getFirstActivity().getType()
 						.substring(0, 1).equals("h")) {
-					ActivityImpl act = person.getSelectedPlan().getFirstActivity();
+					ActivityImpl act = ((PlanImpl) person.getSelectedPlan()).getFirstActivity();
 					Coord crd = act.getCoord();
 					out.write(crd.getX() + ";");
 					out.write(crd.getY() + ";");
@@ -159,11 +159,11 @@ public class CompareSelectedPlansTable {
 				out.write(tp1 + ";");
 				out.write(tp0 + "->" + tp1 + ";");
 
-				ActivityImpl fa0 = person.getSelectedPlan().getFirstActivity();
+				ActivityImpl fa0 = ((PlanImpl) person.getSelectedPlan()).getFirstActivity();
 				double dpt0 = fa0.getEndTime();
 				boolean hact0 = fa0.getType().startsWith("h");
 				out.write((hact0 ? dpt0 : 0.0) + ";");
-				ActivityImpl fa1 = person_comp.getSelectedPlan().getFirstActivity();
+				ActivityImpl fa1 = ((PlanImpl) person_comp.getSelectedPlan()).getFirstActivity();
 				double dpt1 = fa1.getEndTime();
 				boolean hact1 = fa1.getType().startsWith("h");
 				out.write((hact1 ? dpt1 : 0.0) + ";");

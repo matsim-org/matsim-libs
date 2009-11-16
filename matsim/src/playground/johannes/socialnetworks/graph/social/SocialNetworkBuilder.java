@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
 
 
@@ -27,7 +27,7 @@ import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
  * @author illenberger
  *
  */
-public class SocialNetworkBuilder<P extends BasicPerson<?>> extends AbstractSparseGraphBuilder<SocialNetwork<P>, Ego<P>, SocialTie>{
+public class SocialNetworkBuilder<P extends Person> extends AbstractSparseGraphBuilder<SocialNetwork<P>, Ego<P>, SocialTie>{
 
 	public SocialNetworkBuilder() {
 		super(new SocialNetworkFactory<P>());

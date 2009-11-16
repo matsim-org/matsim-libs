@@ -22,9 +22,9 @@ package playground.jhackney.socialnetworks.interactions;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.knowledges.Knowledge;
 import org.matsim.knowledges.Knowledges;
 
@@ -54,8 +54,8 @@ public class PersonExchangeKnowledge {
 	 */
 	public void exchangeRandomFacilityKnowledge(SocialNetEdge curLink, String facType){
 //		Pay attention to your definition of the direction of arrows in the social network!
-		PersonImpl p2 = curLink.getPersonTo();
-		PersonImpl p1 = curLink.getPersonFrom();
+		Person p2 = curLink.getPersonTo();
+		Person p1 = curLink.getPersonFrom();
 
 		Knowledge k1 = this.knowledges.getKnowledgesByPersonId().get(p1.getId());
 		Knowledge k2 = this.knowledges.getKnowledgesByPersonId().get(p2.getId());
@@ -87,10 +87,10 @@ public class PersonExchangeKnowledge {
 	 */  
 	public void randomlyIntroduceBtoCviaA(SocialNetEdge myLink, int iteration) {
 
-		PersonImpl p1 = myLink.getPersonFrom();
-		PersonImpl p2 = myLink.getPersonTo();
+		Person p1 = myLink.getPersonFrom();
+		Person p2 = myLink.getPersonTo();
 
-		PersonImpl newFriend = ((EgoNet)p1.getCustomAttributes().get(EgoNet.NAME)).getRandomPerson();
+		Person newFriend = ((EgoNet)p1.getCustomAttributes().get(EgoNet.NAME)).getRandomPerson();
 		if ((newFriend != null) && (p2 != null)) {
 			net.makeSocialContact(newFriend, p2, iteration, "fof");
 		}

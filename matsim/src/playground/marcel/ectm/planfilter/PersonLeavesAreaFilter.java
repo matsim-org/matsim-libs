@@ -57,7 +57,7 @@ public class PersonLeavesAreaFilter extends AbstractPersonFilter {
 					if (!this.areaOfInterest.containsKey(link.getId())) return true;
 				}
 				// test departure link
-				LinkImpl link = ((ActivityImpl) plan.getPlanElements().get(i-1)).getLink();
+				Link link = ((ActivityImpl) plan.getPlanElements().get(i-1)).getLink();
 				if (link != null) {
 					if (!this.areaOfInterest.containsKey(link.getId())) return true;
 				}

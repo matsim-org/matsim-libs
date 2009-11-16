@@ -25,10 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
@@ -144,7 +144,7 @@ public class StrategyManager {
 	
 	private void removePlans(final PersonImpl person, final int maxNumberOfPlans) {
 		while (person.getPlans().size() > maxNumberOfPlans) {
-			PlanImpl plan = this.removalPlanSelector.selectPlan(person);
+			Plan plan = this.removalPlanSelector.selectPlan(person);
 			person.getPlans().remove(plan);
 			if (plan == person.getSelectedPlan()) {
 				person.setSelectedPlan(person.getRandomPlan());

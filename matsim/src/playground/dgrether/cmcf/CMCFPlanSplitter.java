@@ -19,15 +19,15 @@
 package playground.dgrether.cmcf;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 
 import playground.dgrether.DgPaths;
@@ -53,10 +53,10 @@ public class CMCFPlanSplitter {
 	public static void main(final String[] args) {
 		NetworkLayer net = MatsimIo.loadNetwork(DgPaths.IVTCHNET);
 //		Plans plansCmcf = MatsimIo.loadPlans(cmcfPlansFile);
-		PopulationImpl plans = MatsimIo.loadPlans(plansFile, net);
-		PopulationImpl plansOne = new PopulationImpl();
-		for (PersonImpl p : plans.getPersons().values()) {
-			PlanImpl pl = p.getSelectedPlan();
+		Population plans = MatsimIo.loadPlans(plansFile, net);
+		Population plansOne = new PopulationImpl();
+		for (Person p : plans.getPersons().values()) {
+			Plan pl = p.getSelectedPlan();
 		  int i = 0;
 		  for (PlanElement pe : pl.getPlanElements()) {
 		  	if (pe instanceof LegImpl) {
@@ -68,9 +68,9 @@ public class CMCFPlanSplitter {
 		  		PlanImpl planNew = new org.matsim.core.population.PlanImpl(pNew);
 		  		LegImpl leg = (LegImpl) pe;
 		  		
-		  		planNew.addActivity(pl.getPreviousActivity(leg));
+		  		planNew.addActivity(((PlanImpl) pl).getPreviousActivity(leg));
 		  		planNew.addLeg(leg);
-		  		planNew.addActivity(pl.getNextActivity(leg));
+		  		planNew.addActivity(((PlanImpl) pl).getNextActivity(leg));
 		  		
 		  		pNew.addPlan(planNew);
 		  		

@@ -23,11 +23,11 @@ package playground.balmermi.census2000v2.modules;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
 public class PlansAnalyse {
@@ -101,7 +101,7 @@ public class PlansAnalyse {
 			mt_cnt[idx]++;
 			// act types
 			if (p.getPlans().size() != 1) { Gbl.errorMsg("pid="+p.getId()+": There must be exactly one plan per person!"); }
-			PlanImpl plan = p.getPlans().get(0);
+			Plan plan = p.getPlans().get(0);
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl a = (ActivityImpl) pe;

@@ -32,27 +32,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-// matsim imports
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
-//playground imports
 import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
 import playground.dressler.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
-import playground.dressler.ea_flow.BellmanFordVertexIntervalls;
-import playground.dressler.ea_flow.Flow;
-import playground.dressler.ea_flow.GlobalFlowCalculationSettings;
-import playground.dressler.ea_flow.TimeExpandedPath;
 import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
 
 /**
@@ -123,14 +118,14 @@ public class MultiSourceEAF {
 		network.connect();
 		HashMap<Node,Integer> allnodes = new HashMap<Node,Integer>();
 
-		for(PersonImpl person : population.getPersons().values() ){
+		for(Person person : population.getPersons().values() ){
 
-			PlanImpl plan = person.getPlans().get(0);
-			if(plan.getFirstActivity().getLinkId()==null){
+			Plan plan = person.getPlans().get(0);
+			if(((PlanImpl) plan).getFirstActivity().getLinkId()==null){
 				continue;
 			}
 
-			Node node = network.getLink(plan.getFirstActivity().getLinkId()).getToNode();
+			Node node = network.getLink(((PlanImpl) plan).getFirstActivity().getLinkId()).getToNode();
 			if(allnodes.containsKey(node)){
 				int temp = allnodes.get(node);
 				allnodes.put(node, temp + 1);

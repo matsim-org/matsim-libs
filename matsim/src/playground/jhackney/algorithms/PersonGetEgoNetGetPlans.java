@@ -3,8 +3,8 @@ package playground.jhackney.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
@@ -21,8 +21,8 @@ public PersonGetEgoNetGetPlans(){
 		PopulationImpl socialPlans=new PopulationImpl();
 
 		socialPlans.addPerson(ego);
-		ArrayList<PersonImpl> alters = ((EgoNet)ego.getCustomAttributes().get(EgoNet.NAME)).getAlters();
-		Iterator<PersonImpl> a_it=alters.iterator();
+		ArrayList<Person> alters = ((EgoNet)ego.getCustomAttributes().get(EgoNet.NAME)).getAlters();
+		Iterator<Person> a_it=alters.iterator();
 		while(a_it.hasNext()){
 			socialPlans.addPerson(a_it.next());
 		}

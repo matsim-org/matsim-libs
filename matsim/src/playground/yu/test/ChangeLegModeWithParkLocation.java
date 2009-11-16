@@ -14,6 +14,7 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -24,7 +25,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -520,8 +520,8 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			Coord plCoord = ((ParkLocation) pl).act.getCoord();
 			Coord thisCoord = this.act.getCoord();
 
-			LinkImpl plLink = ((ParkLocation) pl).act.getLink();
-			LinkImpl thisLink = this.act.getLink();
+			Link plLink = ((ParkLocation) pl).act.getLink();
+			Link thisLink = this.act.getLink();
 
 			if (plCoord != null && thisCoord != null) {// they both have
 				// coordinates.

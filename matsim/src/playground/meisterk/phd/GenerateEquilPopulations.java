@@ -35,7 +35,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.modules.PlanomatModule;
 import org.matsim.core.replanning.modules.ReRouteDijkstra;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
@@ -104,15 +103,14 @@ public class GenerateEquilPopulations {
 		PlanomatModule planomat = new PlanomatModule(
 				dummyControler, 
 				emptyEvents, 
-				(NetworkLayer) scenario.getNetwork(), 
+				scenario.getNetwork(), 
 				scoringFunctionFactory, 
 				travelCostEstimator, 
 				tTravelEstimator);
 		
 		planomat.prepareReplanning();
 		for (PersonImpl person : scenario.getPopulation().getPersons().values()) {
-
-			PlanImpl plan = person.getPlans().get(0);
+			Plan plan = person.getPlans().get(0);
 			planomat.handlePlan(plan);
 			
 		}
@@ -174,7 +172,7 @@ public class GenerateEquilPopulations {
 		router.prepareReplanning();
 		for (PersonImpl person : scenario.getPopulation().getPersons().values()) {
 
-			PlanImpl plan = person.getPlans().get(0);
+			Plan plan = person.getPlans().get(0);
 			router.handlePlan(plan);
 			
 		}

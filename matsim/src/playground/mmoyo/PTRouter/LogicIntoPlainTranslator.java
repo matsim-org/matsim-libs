@@ -2,24 +2,20 @@ package playground.mmoyo.PTRouter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import org.matsim.api.basic.v01.Id;
+
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.api.core.v01.population.Leg;
-import playground.mmoyo.PTRouter.PTNode;
-import playground.mmoyo.PTRouter.PTLink;
 
 /**
  * Translates logic nodes and links into plain nodes and links. 
@@ -79,7 +75,7 @@ public class LogicIntoPlainTranslator {
 	/**translates the plans of a whole population*/
 	public void convertToPlain(PopulationImpl population){
 		for (PersonImpl person: population.getPersons().values()) {
-			PlanImpl plan = person.getPlans().get(0);
+			Plan plan = person.getPlans().get(0);
 			for (PlanElement pe : plan.getPlanElements()) {  
 				if (pe instanceof ActivityImpl) {  				
 					ActivityImpl act =  (ActivityImpl) pe;					

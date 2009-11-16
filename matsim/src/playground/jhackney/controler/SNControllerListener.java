@@ -27,8 +27,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -44,7 +44,6 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.knowledges.Knowledge;
@@ -381,7 +380,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 				k =  this.knowledges.getFactory().createKnowledge(person.getId(), "created by " + this.getClass().getName());
 			}
 			for (int ii = 0; ii < person.getPlans().size(); ii++) {
-				PlanImpl plan = person.getPlans().get(ii);
+				Plan plan = person.getPlans().get(ii);
 
 				// TODO balmermi: double check if this is the right place to create the MentalMap and the EgoNet
 				if (person.getCustomAttributes().get(MentalMap.NAME) == null) { person.getCustomAttributes().put(MentalMap.NAME,new MentalMap(k)); }

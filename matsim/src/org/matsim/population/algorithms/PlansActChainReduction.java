@@ -25,10 +25,10 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
 public class PlansActChainReduction {
@@ -58,7 +58,7 @@ public class PlansActChainReduction {
 				Gbl.errorMsg("[person_id=" + p.getId() + " does not have exactly one plan. not allowed.]");
 			}
 			String chain = "";
-			PlanImpl plan = p.getPlans().get(0);
+			Plan plan = p.getPlans().get(0);
 			for (int i=0; i<plan.getPlanElements().size(); i+=2) {
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 				chain = chain.concat(act.getType());

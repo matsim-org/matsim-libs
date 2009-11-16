@@ -33,11 +33,10 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -121,8 +120,8 @@ public class BKickHouseholdsCreatorZurich {
 		hhTxtWriter.write("personId\thomeX\thomeY\tincomePerYear");
 		hhTxtWriter.newLine();
 		
-		BasicPopulation<BasicPerson<BasicPlan>> pop = (BasicPopulation) scenario.getPopulation();
-		for (BasicPerson<BasicPlan> p : pop.getPersons().values()){
+		Population pop = scenario.getPopulation();
+		for (Person p : pop.getPersons().values()){
 			//create the households
 			HouseholdsFactory b = households.getFactory();
 			Household hh = b.createHousehold(p.getId());
@@ -232,15 +231,15 @@ public class BKickHouseholdsCreatorZurich {
 	
 	
 	private void checkGemeindenForPop(PopulationImpl population, FeatureSource fsource) throws IOException {
-		PlanImpl plan;
+		Plan plan;
 		int personsWithGemeinde = 0;
 		
-		for (PersonImpl p : population.getPersons().values()) {
+		for (Person p : population.getPersons().values()) {
 			plan = p.getPlans().get(0);
 			if (plan == null) {
 				throw new IllegalStateException("Person " + p.getId() + " has no plans");
 			}
-			Coord coord = plan.getFirstActivity().getCoord();
+			Coord coord = ((PlanImpl) plan).getFirstActivity().getCoord();
 			Iterator<Feature> it = fsource.getFeatures().iterator();
 			Feature f = null;
 			while (it.hasNext()) {
@@ -259,8 +258,8 @@ public class BKickHouseholdsCreatorZurich {
 	}
 
 	
-	private Feature getGemeindeFeatureForPerson(BasicPerson<BasicPlan> person, FeatureSource fsource) throws IOException {
-		BasicPlan plan;
+	private Feature getGemeindeFeatureForPerson(Person person, FeatureSource fsource) throws IOException {
+		Plan plan;
 		plan = person.getPlans().get(0);
 		if (plan == null) {
 			throw new IllegalStateException("Person " + person.getId() + " has no plans");

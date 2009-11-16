@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
@@ -32,8 +33,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 
@@ -178,7 +177,7 @@ public class ActivityDurationAnalyser {
 			this.simpleTypeActivityMap = new HashMap<String, List<ActivityImpl>>();
 		}
 
-		public void handlePlan(final PlanImpl plan) {
+		public void handlePlan(final Plan plan) {
 //			System.out.println("handling plan " + typeActivityMap);
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {

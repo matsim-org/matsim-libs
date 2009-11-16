@@ -20,26 +20,41 @@
 
 package org.matsim.core.population;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.population.BasicPlanImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.misc.Time;
 
-public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be better with inheritance because of protected c'tor of BasicPlanImpl, but BasicPlanImpl.getPlanElements() is read only
+public class PlanImpl implements Plan { //zzzz would be better with inheritance because of protected c'tor of BasicPlanImpl, but BasicPlanImpl.getPlanElements() is read only
 	/**
 	 * @deprecated use Leg.Mode instead
 	 */
 	@Deprecated
 	public enum Type { CAR, PT, RIDE, BIKE, WALK, UNDEFINED}
 
+	protected ArrayList<PlanElement> actsLegs = new ArrayList<PlanElement>();
+
+	private Double score = null;
+	private BasicPerson person = null;
+
+	private PlanImpl.Type type = null;
+
+	private boolean isSelected;
+
+	
 	/**
 	 * Constant describing the score of an unscored plan. <b>Do not use this constant in
 	 * comparisons</b>, but use <code>getScore() == null</code>
@@ -53,11 +68,10 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 	private final static String ACT_ERROR = "The order of 'acts'/'legs' is wrong in some way while trying to create an 'act'.";
 
 	public PlanImpl(final Person person) {
-		super(person);
+		this.person = person;
 	}
 
 	public PlanImpl() {
-		super();
 	}
 
 	public final ActivityImpl createAndAddActivity(final String type, final Coord coord) {
@@ -176,18 +190,48 @@ public class PlanImpl extends BasicPlanImpl implements Plan { //zzzz would be be
 		}
 	}
 
-	@Override
 	public final PersonImpl getPerson() {
-		return (PersonImpl) super.getPerson();
+		return (PersonImpl) this.person;
+	}
+	
+	public void setPerson(final BasicPerson person) {
+		this.person = person;
+	}
+	
+	public final Double getScore() {
+		return this.score;
+	}
+	
+	public void setScore(final Double score) {
+		this.score = score;
+	}
+	
+	public PlanImpl.Type getType() {
+		return this.type;
 	}
 
-	@Override
+	public void setType(PlanImpl.Type type) {
+		this.type = type;
+	}
+	
+	public final List<PlanElement> getPlanElements() {
+		return this.actsLegs;
+	}
+
+	public final void addLeg(final BasicLeg leg) {
+		if (this.actsLegs.size() %2 == 0 ) throw (new IllegalStateException("Error: Tried to insert leg at non-leg position"));
+		this.actsLegs.add(leg);
+	}
+
+	public final void addActivity(final BasicActivity act) {
+		if (this.actsLegs.size() %2 != 0 ) throw (new IllegalStateException("Error: Tried to insert act at non-act position"));
+		this.actsLegs.add(act);
+	}
+
 	public final boolean isSelected() {
 		return this.getPerson().getSelectedPlan() == this;
 	}
 
-
-	@Override
 	public void setSelected(final boolean selected) {
 		this.getPerson().setSelectedPlan(this);
 	}

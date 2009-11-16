@@ -1,6 +1,7 @@
 package playground.gregor.demandmodeling;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -23,9 +24,9 @@ public class RemoveRoutes {
 		new PopulationReaderMatsimV4(sc).readFile(sc.getConfig().plans().getInputFile());
 		PopulationImpl pop = sc.getPopulation();
 		for (PersonImpl pers : pop.getPersons().values()) {
-			PlanImpl plan = pers.getSelectedPlan();
-			plan.getNextLeg(plan.getFirstActivity()).setRoute(null);
-			plan.getNextActivity(plan.getNextLeg(plan.getFirstActivity())).setType("h");
+			Plan plan = pers.getSelectedPlan();
+			((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity()).setRoute(null);
+			((PlanImpl) plan).getNextActivity(((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity())).setType("h");
 		}
 		
 		new PopulationWriter(pop).write(sc.getConfig().plans().getOutputFile());

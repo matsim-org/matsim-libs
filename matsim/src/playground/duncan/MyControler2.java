@@ -33,6 +33,8 @@ import org.geotools.feature.FeatureIterator;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
@@ -105,13 +107,13 @@ public class MyControler2 {
 			}
 		}
 
-		for ( PersonImpl pp : population.getPersons().values() ) {
-			PlanImpl plan = pp.getSelectedPlan();
+		for ( Person pp : population.getPersons().values() ) {
+			Plan plan = pp.getSelectedPlan();
 			int idx = (int)( Math.random()*workPlaces.size() ) ; // TODO: replace by matsim rnd generator
 			Coord workCoord = workPlaces.get( idx ) ;
 //			workPlaces.remove( idx ) ;
 			// (with replacement.  W/o replacement, make sure that there are enough workplaces!)
-			playground.kai.urbansim.Utils.completePlanToHwh(plan, workCoord) ;
+			playground.kai.urbansim.Utils.completePlanToHwh((PlanImpl) plan, workCoord) ;
 		}
 
 		return population ;

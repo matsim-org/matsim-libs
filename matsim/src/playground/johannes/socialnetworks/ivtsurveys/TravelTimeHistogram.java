@@ -38,11 +38,14 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelCost;
@@ -182,7 +185,7 @@ public class TravelTimeHistogram {
 			TDoubleDoubleHashMap hist = new TDoubleDoubleHashMap();
 			for(PersonImpl p2 : population.getPersons().values()) {
 				Coord c1 = ego.homeloc;
-				Coord c2 = p2.getSelectedPlan().getFirstActivity().getCoord();
+				Coord c2 = ((PlanImpl) p2.getSelectedPlan()).getFirstActivity().getCoord();
 				double d = CoordUtils.calcDistance(c1, c2);
 				double bin = Math.floor(d/binsize);
 				double val = hist.get(bin);
@@ -390,10 +393,10 @@ public class TravelTimeHistogram {
 		
 	}
 	
-	private static int getPersons(Coord ego, double radius, PopulationImpl pop) {
+	private static int getPersons(Coord ego, double radius, Population pop) {
 		int count = 0;
-		for(PersonImpl p : pop.getPersons().values()) {
-			double r = CoordUtils.calcDistance(ego, p.getSelectedPlan().getFirstActivity().getCoord());
+		for(Person p : pop.getPersons().values()) {
+			double r = CoordUtils.calcDistance(ego, ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord());
 			if(r <= radius)
 				count++;
 		}

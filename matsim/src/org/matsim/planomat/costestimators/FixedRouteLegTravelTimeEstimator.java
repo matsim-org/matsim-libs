@@ -30,7 +30,6 @@ import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -198,7 +197,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 
 	}
 
-	protected double processDeparture(final LinkImpl link, final double start) {
+	protected double processDeparture(final Link link, final double start) {
 
 		double departureDelayEnd = start + this.tDepDelayCalc.getLinkDepartureDelay(link, start);
 		return departureDelayEnd;

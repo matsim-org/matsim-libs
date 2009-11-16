@@ -20,11 +20,11 @@
 
 package org.matsim.core.replanning;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -209,7 +209,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		// in each "iteration", an unscored plans should be selected
 		for (int i = 0; i < 4; i++) {
 			manager.run(population, i);
-			PlanImpl plan = person.getSelectedPlan();
+			Plan plan = person.getSelectedPlan();
 			assertNull("plan has not undefined score in iteration " + i, plan.getScore());
 			plan.setScore(Double.valueOf(i));
 		}
@@ -278,7 +278,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		}
 
 		@Override
-		public void run(final PersonImpl person) {
+		public void run(final Person person) {
 			this.counter++;
 			super.run(person);
 		}
@@ -302,7 +302,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 
 		public TestPlanSelector() {
 		}
-		public PlanImpl selectPlan(final PersonImpl person) {
+		public PlanImpl selectPlan(final Person person) {
 			throw new UnsupportedOperationException();
 		}
 

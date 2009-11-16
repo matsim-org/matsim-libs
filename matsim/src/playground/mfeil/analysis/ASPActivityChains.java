@@ -21,7 +21,6 @@
 package playground.mfeil.analysis;
 
 import java.io.File;
-import playground.mfeil.ActChainEqualityCheck;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -31,17 +30,19 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
+
+import playground.mfeil.ActChainEqualityCheck;
 
 
 /**
@@ -55,7 +56,7 @@ public class ASPActivityChains {
 	protected final PopulationImpl population;
 	protected String outputDir;
 	protected ArrayList<List<PlanElement>> activityChains;
-	protected ArrayList<ArrayList<PlanImpl>> plans;
+	protected ArrayList<ArrayList<Plan>> plans;
 	protected Map<String,Double> minimumTime;
 	protected Knowledges knowledges;
 	protected static final Logger log = Logger.getLogger(ASPActivityChains.class);
@@ -96,14 +97,14 @@ public class ASPActivityChains {
 		return this.activityChains;
 	}
 	
-	public ArrayList<ArrayList<PlanImpl>> getPlans (){
+	public ArrayList<ArrayList<Plan>> getPlans (){
 		return this.plans;
 	}
 	
 	private void initAnalysis(){
 		
 		this.activityChains = new ArrayList<List<PlanElement>>();
-		this.plans = new ArrayList<ArrayList<PlanImpl>>();
+		this.plans = new ArrayList<ArrayList<Plan>>();
 		ActChainEqualityCheck ac = new ActChainEqualityCheck();
 		Map<Id,PersonImpl> agents = this.population.getPersons();
 		for (PersonImpl person:agents.values()){
@@ -117,7 +118,7 @@ public class ASPActivityChains {
 			}
 			if (!alreadyIn){
 				this.activityChains.add(person.getSelectedPlan().getPlanElements());
-				this.plans.add(new ArrayList<PlanImpl>());
+				this.plans.add(new ArrayList<Plan>());
 				this.plans.get(this.plans.size()-1).add(person.getSelectedPlan());
 			}
 		}
@@ -211,7 +212,7 @@ public class ASPActivityChains {
 		ArrayList<String> takenActTypes = new ArrayList<String>();
 		for (int i=0; i<this.activityChains.size();i++){
 			for (int j=0; j<this.plans.get(i).size();j++){
-				PlanImpl plan = this.plans.get(i).get(j);
+				Plan plan = this.plans.get(i).get(j);
 				takenActTypes.clear();
 				//log.info("Plan of person "+plan.getPerson().getId());
 				//for (int z=0;z<plan.getPlanElements().size();z+=2){

@@ -24,12 +24,12 @@
 package playground.yu.analysis;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -48,12 +48,11 @@ public class CarIllegal extends AbstractPersonAlgorithm {
 	}
 
 	@Override
-	public void run(final Person p) {
-		if (p != null) {
-			PersonImpl person = (PersonImpl) p; 
-			PlanImpl selectedPlan = person.getSelectedPlan();
+	public void run(final Person person) {
+		if (person != null) {
+			Plan selectedPlan = person.getSelectedPlan();
 			if ((PlanModeJudger.useCar(selectedPlan))
-					&& (person.getAge() < 18 || person.getLicense()
+					&& (((PersonImpl) person).getAge() < 18 || ((PersonImpl) person).getLicense()
 							.equals("no")))
 				this.count++;
 		}

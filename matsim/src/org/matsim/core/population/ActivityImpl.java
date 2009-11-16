@@ -21,39 +21,54 @@
 package org.matsim.core.population;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.basic.v01.population.BasicActivityImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
-public class ActivityImpl extends BasicActivityImpl implements Activity {
+public class ActivityImpl implements BasicActivity, Activity {
 
+	private double endTime = Time.UNDEFINED_TIME;
+
+	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
+	private double startTime = Time.UNDEFINED_TIME;
+	
 	private double dur = Time.UNDEFINED_TIME;
 
-	public ActivityImpl(final String type, final LinkImpl link) {
-		super(type.intern());
+	private String type;
+	private Coord coord = null;
+	protected Link link = null;
+	protected ActivityFacilityImpl facility = null;
+	
+	private ActivityImpl(final String type) {
+		this.type = type.intern();
+	}
+	
+	public ActivityImpl(final String type, final Link link) {
+		this(type);
 		this.setLink(link);
 	}
 
 	public ActivityImpl(final String type, final Coord coord) {
-		super(type.intern());
+		this(type);
 		this.setCoord(coord);
 	}
 
 	public ActivityImpl(final String type, final ActivityFacilityImpl fac) {
-		super(type.intern());
+		this(type);
 		this.setFacility(fac);
 	}
 
-	public ActivityImpl(final String type, final Coord coord, final LinkImpl link) {
+	public ActivityImpl(final String type, final Coord coord, final Link link) {
 		this(type, link);
 		this.setCoord(coord);
 	}
 
 	public ActivityImpl(final ActivityImpl act) {
-		super(act.getType());
+		this(act.getType());
 		// Act coord could be null according to first c'tor!
 		Coord c = act.getCoord() == null ? null : new CoordImpl(act.getCoord());
 		this.setCoord(c);
@@ -64,14 +79,67 @@ public class ActivityImpl extends BasicActivityImpl implements Activity {
 		this.setFacility(act.getFacility());
 	}
 
-	public void setCoord( final Coord coord ) {
-		super.setCoord ( coord ) ;
+	public final double getEndTime() {
+		return this.endTime;
 	}
 	
-	public LinkImpl getLink(){
-		return (LinkImpl) super.getLink();
+	public final void setEndTime(final double endTime) {
+		this.endTime = endTime;
+	}
+
+	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
+	public final double getStartTime() {
+		return this.startTime;
+	}
+
+	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
+	public final void setStartTime(final double startTime) {
+		this.startTime = startTime;
 	}
 	
+	public final String getType() {
+		return this.type;
+	}
+
+	public final void setType(final String type) {
+		this.type = type.intern();
+	}
+	
+	public final Coord getCoord() {
+		return this.coord;
+	}
+
+	public void setCoord(final Coord coord) {
+		this.coord = coord;
+	}
+
+	public final Id getLinkId() { 
+		if (this.link != null)
+			return this.link.getId();
+		return null;
+	}
+	
+	public final Id getFacilityId() {
+		if (this.facility != null)
+			return this.facility.getId();
+		return null;
+	}
+	
+	public final void setFacility(final ActivityFacilityImpl facility) {
+		this.facility = facility;
+	}
+
+	public final void setLink(final Link link) {
+		this.link = link;
+	}
+	
+	public Link getLink() {
+		return this.link;
+	}
+
+	public ActivityFacilityImpl getFacility() {
+		return this.facility;
+	}
 	
 	@Override
 	public final String toString() {

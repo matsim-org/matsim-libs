@@ -31,7 +31,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -175,10 +175,10 @@ public class CreateSelectedPlansTables {
 				out.write(person.getEmployed()+"\t");
 
 
-				if (person.getSelectedPlan().getFirstActivity().getType().substring(0,1).equals("h")) {
-					out.write(person.getSelectedPlan().getFirstActivity().getCoord().getX()+"\t");
-					out.write(person.getSelectedPlan().getFirstActivity().getCoord().getY()+"\t");
-					out.write(person.getSelectedPlan().getFirstActivity().getLinkId()+"\t");
+				if (((PlanImpl) person.getSelectedPlan()).getFirstActivity().getType().substring(0,1).equals("h")) {
+					out.write(((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord().getX()+"\t");
+					out.write(((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord().getY()+"\t");
+					out.write(((PlanImpl) person.getSelectedPlan()).getFirstActivity().getLinkId()+"\t");
 				}
 				else {
 					// no home activity in the plan -> no home activity in the knowledge

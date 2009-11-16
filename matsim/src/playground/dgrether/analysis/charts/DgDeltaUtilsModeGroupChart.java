@@ -31,6 +31,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PlanImpl.Type;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -77,16 +78,16 @@ public class DgDeltaUtilsModeGroupChart implements DgChart {
 			Double scoreDiff = planDataRun2.getScore() - planDataRun1.getScore();
 			Tuple<Double, Double> t = new Tuple<Double, Double>(100.0*i/size, scoreDiff);
 			
-			if (planDataRun1.getPlan().getType().equals(Type.CAR) && planDataRun2.getPlan().getType().equals(Type.CAR)) {
+			if (((PlanImpl) planDataRun1.getPlan()).getType().equals(Type.CAR) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(Type.CAR)) {
 				valuesCarCar.add(t);
 			}
-			else if (planDataRun1.getPlan().getType().equals(Type.PT) && planDataRun2.getPlan().getType().equals(Type.PT)) {
+			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(Type.PT) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(Type.PT)) {
 				valuesPtPt.add(t);
 			}
-			else if (planDataRun1.getPlan().getType().equals(Type.PT) && planDataRun2.getPlan().getType().equals(Type.CAR)) {
+			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(Type.PT) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(Type.CAR)) {
 				valuesPtCar.add(t);
 			}
-			else if (planDataRun1.getPlan().getType().equals(Type.CAR) && planDataRun2.getPlan().getType().equals(Type.PT)){
+			else if (((PlanImpl) planDataRun1.getPlan()).getType().equals(Type.CAR) && ((PlanImpl) planDataRun2.getPlan()).getType().equals(Type.PT)){
 				valuesCarPt.add(t);
 			}
 		}

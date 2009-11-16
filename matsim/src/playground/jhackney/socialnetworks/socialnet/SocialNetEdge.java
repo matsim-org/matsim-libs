@@ -20,26 +20,26 @@
 
 package playground.jhackney.socialnetworks.socialnet;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
 
 public class SocialNetEdge implements Comparable<SocialNetEdge>{
 
-    private PersonImpl person1, person2;
+    private Person person1, person2;
     private int timeMade;
     private int timeLastUsed;
     private int timesMet=1;
     double strength=1.0;
     private String type;
 
-    public SocialNetEdge(PersonImpl a1, PersonImpl a2) {
+    public SocialNetEdge(Person a1, Person a2) {
 
 	person1 = a1;
 	person2 = a2;
     }
-    public PersonImpl getPersonFrom(){
+    public Person getPersonFrom(){
 	return person1;
     }
-    public PersonImpl getPersonTo(){
+    public Person getPersonTo(){
 	return person2;
     }
     public void setTimeMade(int i){

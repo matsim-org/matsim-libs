@@ -26,7 +26,6 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -62,7 +61,7 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 
 		assertEquals("population size.", 2, population.getPersons().size());
 		PersonImpl person1 = population.getPersons().get(new IdImpl("1"));
-		PlanImpl plan1 = person1.getPlans().get(0);
+		Plan plan1 = person1.getPlans().get(0);
 		LegImpl leg1a = (LegImpl) plan1.getPlanElements().get(1);
 		RouteWRefs route1a = leg1a.getRoute();
 		assertEquals("different startLink for first leg.", network.getLink(new IdImpl("1")), route1a.getStartLink());
@@ -77,7 +76,7 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		assertEquals("different endLink for third leg.", network.getLink(new IdImpl("1")), route1c.getEndLink());
 
 		PersonImpl person2 = population.getPersons().get(new IdImpl("2"));
-		PlanImpl plan2 = person2.getPlans().get(0);
+		Plan plan2 = person2.getPlans().get(0);
 		LegImpl leg2a = (LegImpl) plan2.getPlanElements().get(1);
 		RouteWRefs route2a = leg2a.getRoute();
 		assertEquals("different startLink for first leg.", network.getLink(new IdImpl("2")), route2a.getStartLink());

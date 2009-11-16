@@ -36,13 +36,14 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -111,12 +112,12 @@ public class Getagentcoords {
 					height,BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2D = image.createGraphics();
 
-			for (PersonImpl p : population.getPersons().values()) {
-				PlanImpl plan = p.getSelectedPlan();
+			for (Person p : population.getPersons().values()) {
+				Plan plan = p.getSelectedPlan();
 				// p.setVisualizerData(visualizerData)
 				if (plan == null) continue;
 
-				 Id i = plan.getFirstActivity().getLinkId();
+				 Id i = ((PlanImpl) plan).getFirstActivity().getLinkId();
 				 LinkImpl l = network.getLink(i);
 				 Coord c = l.getFromNode().getCoord();
 				//Coord c = plan.getFirstActivity().getCoord();
@@ -148,19 +149,19 @@ public class Getagentcoords {
 
 			Integer foundpeople = 0;
 			Integer notfoundpeople = 0;
-			for (PersonImpl p : population.getPersons().values()) {
-				PlanImpl plan = p.getSelectedPlan();
+			for (Person p : population.getPersons().values()) {
+				Plan plan = p.getSelectedPlan();
 				// p.setVisualizerData(visualizerData)
 				if (plan == null) {notfoundpeople++; continue;}
 
-				 Id i = plan.getFirstActivity().getLinkId();
+				 Id i = ((PlanImpl) plan).getFirstActivity().getLinkId();
 				 Link l = network.getLink(i);
 				 Coord c = l.getFromNode().getCoord();
 
 				//if (c == null) continue; // why would this happen? but happens ...
 
 				//System.out.println(c.getX() + " " + c.getY());
-				LegImpl leg = plan.getNextLeg(plan.getFirstActivity());
+				LegImpl leg = ((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity());
 				if (leg == null || evaclinks == null) {
 					notfoundpeople++;
 					continue;

@@ -3,12 +3,13 @@ package org.matsim.core.mobsim.jdeqsim.parallel;
 import java.util.List;
 
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.jdeqsim.Scheduler;
 import org.matsim.core.mobsim.jdeqsim.Vehicle;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 
 
 
@@ -23,7 +24,7 @@ public class PVehicle extends Vehicle {
 
 	// returns null, if there is no such Link, else the link
 	// needed for locking...
-	public LinkImpl getNextLinkInLeg() {
+	public Link getNextLinkInLeg() {
 		int nextLinkIndex = getLinkIndex() + 1;
 		LinkImpl[] linkRoute = getCurrentLinkRoute();
 
@@ -34,7 +35,7 @@ public class PVehicle extends Vehicle {
 		// if last link in leg, get first link of next leg
 		if (isCurrentLegFinished()) {
 
-			PlanImpl plan = getOwnerPerson().getSelectedPlan();
+			Plan plan = getOwnerPerson().getSelectedPlan();
 			List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 			return ((ActivityImpl) actsLegs.get(getLegIndex() + 1)).getLink();
 
@@ -51,7 +52,7 @@ public class PVehicle extends Vehicle {
 
 	// returns null, if there is no such Link, else the link
 	// needed for locking...
-	public LinkImpl getPreviousLinkInLeg() {
+	public Link getPreviousLinkInLeg() {
 		int previousLinkIndex = getLinkIndex() - 1;
 		LinkImpl[] linkRoute = getCurrentLinkRoute();
 
@@ -62,7 +63,7 @@ public class PVehicle extends Vehicle {
 		// if first link in leg, get the link of the last activity
 		if (previousLinkIndex < 0) {
 
-			PlanImpl plan = getOwnerPerson().getSelectedPlan();
+			Plan plan = getOwnerPerson().getSelectedPlan();
 			List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 			return ((ActivityImpl) actsLegs.get(getLegIndex() - 1)).getLink();
 

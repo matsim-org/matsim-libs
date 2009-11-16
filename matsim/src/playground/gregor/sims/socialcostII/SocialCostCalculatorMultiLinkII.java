@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
@@ -91,8 +92,8 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, QueueSimulat
 			if ( this.stuckedAgents.contains(pers.getId())) {
 				continue;
 			}
-			PlanImpl plan = pers.getSelectedPlan();
-			List<Id> links = ((NetworkRouteWRefs) plan.getNextLeg(plan.getFirstActivity()).getRoute()).getLinkIds();
+			Plan plan = pers.getSelectedPlan();
+			List<Id> links = ((NetworkRouteWRefs) ((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity()).getRoute()).getLinkIds();
 			traceAgentsRoute(links,pers.getId());
 			
 		}

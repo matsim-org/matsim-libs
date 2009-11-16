@@ -11,7 +11,6 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -33,7 +32,6 @@ import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
 @SuppressWarnings("unused")
@@ -93,9 +91,9 @@ ActivityStartEventHandler
 			String carAvail = person.getCarAvail(); // TODO: String??
 			person.getDesires(); // TODO: Do we understand this well enough to have it in the basic interface? 
 
-			List<PlanImpl> plans = person.getPlans() ;
+			List<Plan> plans = person.getPlans() ;
 			
-			for ( BasicPlan plan : plans ) {
+			for ( Plan plan : plans ) {
 //				BasicPlanImpl.ActLegIterator it = plan.getIterator() ;
 				// TODO ActLegIterator not in the basic interfaces
 				

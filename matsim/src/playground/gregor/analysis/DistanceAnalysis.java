@@ -225,7 +225,7 @@ public class DistanceAnalysis {
 
 
 		for (PersonImpl person : persons) {
-			LegImpl leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
+			LegImpl leg = ((PlanImpl) person.getSelectedPlan()).getNextLeg(((PlanImpl) person.getSelectedPlan()).getFirstActivity());
 			double l1 = leg.getRoute().getDistance();
 			List<Link> ls = ((NetworkRouteWRefs) leg.getRoute()).getLinks();
 			Link l = ls.get(ls.size()-1);
@@ -236,13 +236,13 @@ public class DistanceAnalysis {
 			dist[0] +=  l1;
 			dist[2] += person.getSelectedPlan().getScore().doubleValue();
 			PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
-			plan.addActivity(person.getSelectedPlan().getFirstActivity());
+			plan.addActivity(((PlanImpl) person.getSelectedPlan()).getFirstActivity());
 			LegImpl ll = new org.matsim.core.population.LegImpl(TransportMode.car);
 			ll.setArrivalTime(0.0);
 			ll.setDepartureTime(0.0);
 			ll.setTravelTime(0.0);
 			plan.addLeg(ll);
-			plan.addActivity(person.getSelectedPlan().getNextActivity(leg));
+			plan.addActivity(((PlanImpl) person.getSelectedPlan()).getNextActivity(leg));
 			this.router.run(plan);
 			LegImpl leg2 = plan.getNextLeg(plan.getFirstActivity());
 			double l2 = leg2.getRoute().getDistance();
@@ -278,7 +278,7 @@ public class DistanceAnalysis {
 
 		ArrayList<PersonImpl> ret = new ArrayList<PersonImpl>();
 		for (PersonImpl person : persons) {
-			Point p = MGC.coord2Point(person.getSelectedPlan().getFirstActivity().getCoord());
+			Point p = MGC.coord2Point(((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord());
 			if (polygon.contains(p)) {
 				ret.add(person);
 			}
@@ -289,7 +289,7 @@ public class DistanceAnalysis {
 
 		this.personTree = new QuadTree<PersonImpl>(0,0,3*this.envelope.getMaxX(),3*this.envelope.getMaxY());
 		for (PersonImpl person : this.population.getPersons().values()){
-			Coord c = person.getSelectedPlan().getFirstActivity().getCoord();
+			Coord c = ((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord();
 			this.personTree.put(c.getX(), c.getY(), person);
 		}
 

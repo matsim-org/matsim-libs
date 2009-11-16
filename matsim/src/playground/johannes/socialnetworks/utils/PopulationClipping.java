@@ -28,10 +28,11 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
@@ -70,17 +71,17 @@ public class PopulationClipping {
 		double minY = y;
 		double maxY = y + height;
 		
-		PopulationImpl pop = (PopulationImpl) data.getPopulation();//FIXME
-		List<PersonImpl> remove = new LinkedList<PersonImpl>();
-		for(PersonImpl p : pop.getPersons().values()) {
+		Population pop = data.getPopulation();
+		List<Person> remove = new LinkedList<Person>();
+		for(Person p : pop.getPersons().values()) {
 			for(int i = 1; i < p.getPlans().size(); i = 1)
 				p.getPlans().remove(i);
 			
-			PlanImpl selected = p.getSelectedPlan();
+			Plan selected = p.getSelectedPlan();
 			for(int i = 1; i < selected.getPlanElements().size(); i = 1) {
 				selected.getPlanElements().remove(i);
 			}
-			Coord c = p.getPlans().get(0).getFirstActivity().getCoord();
+			Coord c = ((PlanImpl) p.getPlans().get(0)).getFirstActivity().getCoord();
 			
 			if(r > 0) {
 				double dx = Math.abs(c.getX() - x);
@@ -93,7 +94,7 @@ public class PopulationClipping {
 			}
 		}
 		
-		for(PersonImpl p : remove)
+		for(Person p : remove)
 			pop.getPersons().remove(p.getId());
 		
 		PopulationWriter writer = new PopulationWriter(pop, outputDir + "plans.xml", "v4", 1);

@@ -32,9 +32,9 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.population.BasicLegImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
@@ -138,7 +138,7 @@ public class CMCFtoEvacConverter {
 //				 BasicActivityImpl work = new BasicActivityImpl("work");
 				 Activity home ;
 				 Activity work ;
-				 BasicLegImpl leg = new BasicLegImpl(TransportMode.walk);
+				 Leg leg = pb.createLeg(TransportMode.walk);
 				 if (coordinates){
 //					home.setCoord(coordfrom);
 //					work.setCoord(coordto);

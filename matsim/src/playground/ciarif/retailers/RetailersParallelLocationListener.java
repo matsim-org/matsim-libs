@@ -37,13 +37,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -56,7 +56,6 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.ciarif.retailers.IO.LinksRetailerReader;
 import playground.ciarif.retailers.IO.MakeATableFromXMLFacilities;
 import playground.ciarif.retailers.IO.PlansSummaryTable;
 import playground.ciarif.retailers.IO.RetailersSummaryWriter;
@@ -215,7 +214,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 			for (PersonImpl p : controler.getPopulation().getPersons().values()) {
 				pst.run(p,iter);
 				//for (Plan plan : p.getPlans()) {
-				PlanImpl plan = p.getSelectedPlan();
+				Plan plan = p.getSelectedPlan();
 					boolean routeIt = false;
 					for (PlanElement pe : plan.getPlanElements()) {
 						if (pe instanceof ActivityImpl) {
@@ -262,7 +261,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		log.info("minx = " + minx + "; miny = " + miny + "; maxx = " + maxx + "; maxy =" + maxy );
 		QuadTree<PersonImpl> personQuadTree = new QuadTree<PersonImpl>(minx, miny, maxx, maxy);
 		for (PersonImpl p : controler.getPopulation().getPersons().values()) {
-			Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();
+			Coord c = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacility().getCoord();
 			personQuadTree.put(c.getX(),c.getY(),p);
 		}
 		return personQuadTree;

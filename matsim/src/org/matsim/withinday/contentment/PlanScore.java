@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -165,7 +166,7 @@ public class PlanScore implements AgentContentment {
 			}
 			planIdx++;
 		}
-		ActivityImpl nextAct = this.agent.getPerson().getSelectedPlan().getNextActivity(leg);
+		ActivityImpl nextAct = ((PlanImpl) this.agent.getPerson().getSelectedPlan()).getNextActivity(leg);
 		double nextActDuration = (nextAct.getEndTime() - nextAct.getStartTime());
 
 		double score = calcPlanScore(time + duration, leg.getArrivalTime(), nextActDuration, this.zeroUtilDuration[planIdx]);
@@ -213,7 +214,7 @@ public class PlanScore implements AgentContentment {
 	}
 
 	private void calcReferenceVals() {
-		PlanImpl plan = this.agent.getPerson().getSelectedPlan();
+		Plan plan = this.agent.getPerson().getSelectedPlan();
 		int planEntries = plan.getPlanElements().size();
 		this.referenceScore = new double[planEntries + 1];
 		this.zeroUtilDuration = new double[planEntries + 1];
@@ -221,7 +222,7 @@ public class PlanScore implements AgentContentment {
 		for (Object o : plan.getPlanElements()) {
 			if (o instanceof LegImpl) {
 				LegImpl leg = (LegImpl)o;
-				ActivityImpl nextAct = this.agent.getPerson().getSelectedPlan().getNextActivity(leg);
+				ActivityImpl nextAct = ((PlanImpl) this.agent.getPerson().getSelectedPlan()).getNextActivity(leg);
 				double actDur = Math.max((nextAct.getEndTime() - nextAct.getStartTime()), 0.0d);
 				double endTime = Math.max(leg.getArrivalTime(), 0.0d);
 

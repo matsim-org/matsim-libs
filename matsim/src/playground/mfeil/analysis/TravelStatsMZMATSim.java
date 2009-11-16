@@ -25,16 +25,16 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
-import org.apache.log4j.Logger;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.api.basic.v01.TransportMode;
 
 
 
@@ -91,7 +91,7 @@ public class TravelStatsMZMATSim {
 		stream.print(name+"\t");
 		
 		for (Iterator<PersonImpl> iterator = population.getPersons().values().iterator(); iterator.hasNext();){
-			PlanImpl plan = iterator.next().getSelectedPlan();
+			Plan plan = iterator.next().getSelectedPlan();
 			for (int i=1;i<plan.getPlanElements().size();i+=2){
 				LegImpl leg = (LegImpl)plan.getPlanElements().get(i);
 				if (leg.getMode().equals(TransportMode.car)) {

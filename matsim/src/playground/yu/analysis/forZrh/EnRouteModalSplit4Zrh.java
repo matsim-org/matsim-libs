@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentEventImpl;
@@ -80,7 +81,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 		super(scenario, ppl, toll);
 	}
 
-	protected void internalCompute(int binIdx, AgentEventImpl ae, PlanImpl plan,
+	protected void internalCompute(int binIdx, AgentEventImpl ae, Plan plan,
 			double[] allCount, double[] carCount, double[] ptCount,
 			double[] wlkCount, double[] throughCount) {
 		allCount[binIdx]++;
@@ -136,10 +137,10 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 			double[] carCount, double[] ptCount, double[] wlkCount,
 			double[] throughCount) {
 		int binIdx = getBinIndex(ae.getTime());
-		PlanImpl selectedPlan = plans.getPersons().get(ae.getPersonId())
+		Plan selectedPlan = plans.getPersons().get(ae.getPersonId())
 				.getSelectedPlan();
 		if (toll != null) {
-			if (TollTools.isInRange(selectedPlan.getFirstActivity().getLink(),
+			if (TollTools.isInRange(((PlanImpl) selectedPlan).getFirstActivity().getLink(),
 					toll)) {
 				this.internalCompute(binIdx, ae, selectedPlan, allCount,
 						carCount, ptCount, wlkCount, throughCount);

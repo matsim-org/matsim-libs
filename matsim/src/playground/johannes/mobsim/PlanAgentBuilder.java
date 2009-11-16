@@ -27,11 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
 /**
@@ -119,7 +118,7 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 	 *         otherwise.
 	 */
 	protected boolean validatePerson(PersonImpl p) {
-		PlanImpl plan = p.getSelectedPlan();
+		Plan plan = p.getSelectedPlan();
 		if(plan == null) {
 			return false;
 		}

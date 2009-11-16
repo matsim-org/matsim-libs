@@ -2,11 +2,13 @@ package playground.mmoyo.precalculation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -17,8 +19,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-
-import java.util.TreeMap;
 
 public class PlanRouteCalculator {
 	///private ConnectionRate connectionRate = new ConnectionRate ();
@@ -49,7 +49,7 @@ public class PlanRouteCalculator {
 		long startTime = System.currentTimeMillis();
 		int found=0;
 		for (PersonImpl person: population.getPersons().values()) {
-			PlanImpl plan = person.getPlans().get(0);
+			Plan plan = person.getPlans().get(0);
 
 			int foundConns=0;
 			boolean first =true;
@@ -90,7 +90,7 @@ public class PlanRouteCalculator {
 				//if ( true ) {
 				//PersonImpl person = population.getPersons().get(new IdImpl("35420")); // 5636428  2949483 
 			PlanImpl newPlan = new PlanImpl(person);
-			PlanImpl plan = person.getPlans().get(0);
+			Plan plan = person.getPlans().get(0);
 			boolean first =true;
 			ActivityImpl lastAct = null;       
 			ActivityImpl thisAct= null;		 

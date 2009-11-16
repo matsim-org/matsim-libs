@@ -21,14 +21,16 @@
 package playground.anhorni.locationchoice.analysis.events;
 
 import java.util.TreeMap;
+
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class CalcLegDistances implements AgentDepartureEventHandler, AgentArrivalEventHandler {
@@ -57,13 +59,13 @@ public class CalcLegDistances implements AgentDepartureEventHandler, AgentArriva
 		Person agent = this.population.getPersons().get(event.getPersonId());
 			
 		if (depTime != null && agent != null) {
-			PlanImpl plan = event.getPerson().getSelectedPlan();
-			double travDistance = ((CoordImpl)plan.getPreviousActivity(event.getLeg()).getCoord()).calcDistance(
-					plan.getNextActivity(event.getLeg()).getCoord());
+			Plan plan = event.getPerson().getSelectedPlan();
+			double travDistance = ((CoordImpl)((PlanImpl) plan).getPreviousActivity(event.getLeg()).getCoord()).calcDistance(
+					((PlanImpl) plan).getNextActivity(event.getLeg()).getCoord());
 			
 			String actType;
 
-			actType = plan.getNextActivity(event.getLeg()).getType();
+			actType = ((PlanImpl) plan).getNextActivity(event.getLeg()).getType();
 			
 			// leisure_xxx
 			if (actType.startsWith("leisure")) actType = "leisure";

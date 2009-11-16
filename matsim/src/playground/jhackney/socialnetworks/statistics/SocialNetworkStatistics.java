@@ -34,6 +34,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -210,8 +212,8 @@ public class SocialNetworkStatistics {
 			// Average distance separating acquaintances
 			smDD.accumulate(dyadDist);
 			// Need persons to get Id's
-			PersonImpl pFrom = myEdge.getPersonFrom();
-			PersonImpl pTo = myEdge.getPersonTo();
+			Person pFrom = myEdge.getPersonFrom();
+			Person pTo = myEdge.getPersonTo();
 			// Average duration of a social link
 			double x1 = myEdge.getTimeLastUsed();
 			double x2 = myEdge.getTimesMet();
@@ -302,10 +304,10 @@ public class SocialNetworkStatistics {
 
 	private double getDyadDistance(SocialNetEdge myEdge) {
 		double dist = 0.;
-		PersonImpl pFrom = myEdge.getPersonFrom();
+		Person pFrom = myEdge.getPersonFrom();
 		Coord fromCoord = ((ActivityImpl) pFrom.getSelectedPlan().getPlanElements().get(
 				0)).getCoord();
-		PersonImpl pTo = myEdge.getPersonTo();
+		Person pTo = myEdge.getPersonTo();
 		Coord toCoord = ((ActivityImpl) pTo.getSelectedPlan().getPlanElements().get(0))
 		.getCoord();
 		dist = CoordUtils.calcDistance(fromCoord, toCoord);
@@ -402,8 +404,8 @@ public class SocialNetworkStatistics {
 			double pop=(Integer) myVertex.getUserDatum("population");
 
 			// Agent's Plan Type
-			PlanImpl thisPlan = myPerson.getSelectedPlan();
-			PlanImpl.Type planType = thisPlan.getType();
+			Plan thisPlan = myPerson.getSelectedPlan();
+			PlanImpl.Type planType = ((PlanImpl) thisPlan).getType();
 			if ((planType == null) || (planType == PlanImpl.Type.UNDEFINED)) {
 				planTypeString = new StringBuilder();
 				for (PlanElement pe : thisPlan.getPlanElements()) {

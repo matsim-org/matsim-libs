@@ -21,6 +21,7 @@
 package org.matsim.core.replanning.modules;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
@@ -29,7 +30,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -89,7 +89,7 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		testee.prepareReplanning();
 		for (PersonImpl person : this.scenario.getPopulation().getPersons().values()) {
 
-			PlanImpl plan = person.getPlans().get(TEST_PLAN_NR);
+			Plan plan = person.getPlans().get(TEST_PLAN_NR);
 			testee.handlePlan(plan);
 			
 		}

@@ -66,13 +66,6 @@ public class NodeNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		return cloned;
 	}
 
-	@Override
-	public void setLinkIds(final List<Id> linkids) {
-		throw new UnsupportedOperationException("Setting only the link ids is not possible at this " +
-				"level in the inheritance hierachy! If the Interfaces Link/Node/Route are used you " +
-				"have to set the route by object references not by Ids.");
-	}
-
 	public List<Node> getNodes() {
 		return this.route;
 	}

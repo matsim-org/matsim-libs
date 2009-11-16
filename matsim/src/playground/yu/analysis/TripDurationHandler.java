@@ -27,6 +27,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
@@ -38,8 +39,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -87,7 +86,7 @@ public class TripDurationHandler implements AgentDepartureEventHandler,
 			this.tmpDptTimes.remove(agentId);
 
 			// Type planType = event.agent.getSelectedPlan().getType();d
-			PlanImpl selectedPlan = plans.getPersons().get(
+			Plan selectedPlan = plans.getPersons().get(
 					new IdImpl(event.getPersonId().toString()))
 					.getSelectedPlan();
 			if (

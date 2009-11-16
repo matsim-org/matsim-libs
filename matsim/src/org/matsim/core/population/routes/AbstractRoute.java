@@ -21,16 +21,24 @@
 package org.matsim.core.population.routes;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.population.BasicRouteImpl;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * Default, abstract implementation of the {@link RouteWRefs}-interface.
  *
  * @author mrieser
  */
-public abstract class AbstractRoute extends BasicRouteImpl implements RouteWRefs {
+public abstract class AbstractRoute implements BasicRoute, RouteWRefs {
 
+	private double dist = Double.NaN;
+
+	private double travTime = Time.UNDEFINED_TIME;
+	
+	private Id startLinkId = null;
+	private Id endLinkId = null;
+	
 	private Link startLink = null;
 	private Link endLink = null;
 
@@ -44,11 +52,36 @@ public abstract class AbstractRoute extends BasicRouteImpl implements RouteWRefs
 	}
 
 	public AbstractRoute(final Link startLink, final Link endLink) {
-		super((startLink == null ? null : startLink.getId()), (endLink == null ? null : endLink.getId()));
+		this.startLinkId = (startLink == null ? null : startLink.getId());
+		this.endLinkId = (endLink == null ? null : endLink.getId());
 		this.startLink = startLink;
 		this.endLink = endLink;
 	}
 
+	public double getDistance() {
+		return dist;
+	}
+
+	public final void setDistance(final double dist) {
+		this.dist = dist;
+	}
+
+	public final double getTravelTime() {
+		return this.travTime;
+	}
+	
+	public final void setTravelTime(final double travTime) {
+		this.travTime = travTime;
+	}
+//	
+//	public Id getStartLinkId() {
+//		return this.startLinkId;
+//	}
+//	
+//	public Id getEndLinkId() {
+//		return this.endLinkId;
+//	}
+	
 	public Link getEndLink() {
 		return this.endLink;
 	}
@@ -65,12 +98,10 @@ public abstract class AbstractRoute extends BasicRouteImpl implements RouteWRefs
 		this.startLink = link;
 	}
 
-	@Override
 	public Id getStartLinkId() {
 		return (this.startLink == null ? null : this.startLink.getId());
 	}
 
-	@Override
 	public Id getEndLinkId() {
 		return (this.endLink == null ? null : this.endLink.getId());
 	}

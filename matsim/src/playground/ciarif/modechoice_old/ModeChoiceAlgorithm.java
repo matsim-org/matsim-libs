@@ -33,7 +33,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -233,7 +232,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 	public String detectTourMainActivity1 (PersonImpl person){
 
 		String main_type = "o";
-		PlanImpl plan = person.getSelectedPlan();
+		Plan plan = person.getSelectedPlan();
 		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {

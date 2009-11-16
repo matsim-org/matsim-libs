@@ -8,15 +8,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -27,10 +27,10 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.xml.sax.SAXException;
 
-import playground.mmoyo.PTRouter.PTRouter;
-import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.PTRouter.LogicFactory;
 import playground.mmoyo.PTRouter.LogicIntoPlainTranslator;
+import playground.mmoyo.PTRouter.PTRouter;
+import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 
 /** makes tests with the transit router on the 5x5 scenario*/
@@ -86,7 +86,7 @@ public class PTRouterTest extends MatsimTestCase {
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, plainNetwork);
 		plansReader.readFile(PLANFILE);
 		PersonImpl person = population.getPersons().get(new IdImpl("1")); 
-		PlanImpl plan = person.getPlans().get(0);
+		Plan plan = person.getPlans().get(0);
 
 		ActivityImpl act1 = (ActivityImpl)plan.getPlanElements().get(0);
 		ActivityImpl act2 = (ActivityImpl)plan.getPlanElements().get(2);

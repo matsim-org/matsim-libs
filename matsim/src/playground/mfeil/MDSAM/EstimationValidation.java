@@ -26,15 +26,16 @@ import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.apache.log4j.Logger;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.PlanScorer;
+
 import playground.mfeil.JohScoringFunctionEstimationFactory;
 
 
@@ -106,8 +107,8 @@ public class EstimationValidation {
 			double maxScore = -100000;
 			int rank = 1;
 			int counterIn = -1;
-			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				PlanImpl plan = iterator2.next();
+			for (Iterator<Plan> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
+				Plan plan = iterator2.next();
 				counterIn++;
 				if (plan.getScore() == null || plan.getScore()!=-100000){
 					plan.setScore(this.scorer.getScore(plan)+sims.get(counterOut).get(counterIn)*(-0.621));
@@ -120,8 +121,8 @@ public class EstimationValidation {
 			stream.print(maxScore+"\t"+rank+"\t");
 			
 			// Utilities
-			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				PlanImpl plan = iterator2.next();
+			for (Iterator<Plan> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
+				Plan plan = iterator2.next();
 				if (plan.getScore()!=-100000) {
 					stream.print((plan.getScore())+"\t");					
 				}

@@ -20,10 +20,10 @@
 
 package org.matsim.core.replanning.selectors;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 
 /**
  * Selects one of the existing plans of the person based on the
@@ -43,12 +43,12 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	/**
 	 * @return Returns a random plan from the person, random but according to its weight.
 	 */
-	public PlanImpl selectPlan(final PersonImpl person) {
+	public Plan selectPlan(final Person person) {
 
 		// Build the weights of all plans
 		// - first find the max. score of all plans of this person
 		double maxScore = Double.NEGATIVE_INFINITY;
-		for (PlanImpl plan : person.getPlans()) {
+		for (Plan plan : person.getPlans()) {
 			if ((plan.getScore() != null) && (plan.getScore().doubleValue() > maxScore)) {
 				maxScore = plan.getScore().doubleValue();
 			}
@@ -59,7 +59,7 @@ public class ExpBetaPlanSelector implements PlanSelector {
 		double sumWeights = 0.0;
 
 		int idx = 0;
-		for (PlanImpl plan : person.getPlans()) {
+		for (Plan plan : person.getPlans()) {
 			weights[idx] = calcPlanWeight(plan, maxScore);
 			sumWeights += weights[idx];
 			idx++;
@@ -68,7 +68,7 @@ public class ExpBetaPlanSelector implements PlanSelector {
 		// choose a random number over interval [0,sumWeights[
 		double selnum = sumWeights*MatsimRandom.getRandom().nextDouble();
 		idx = 0;
-		for (PlanImpl plan : person.getPlans()) {
+		for (Plan plan : person.getPlans()) {
 			selnum -= weights[idx];
 			if (selnum <= 0.0) {
 				return plan;
@@ -92,7 +92,7 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	 * @param maxScore
 	 * @return the weight of the plan
 	 */
-	protected double calcPlanWeight(final PlanImpl plan, final double maxScore) {
+	protected double calcPlanWeight(final Plan plan, final double maxScore) {
 		if (plan.getScore() == null) {
 			return Double.NaN;
 		}

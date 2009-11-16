@@ -3,14 +3,15 @@ package playground.jhackney.socialnetworks.statistics;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.world.MappedLocation;
 
 import playground.jhackney.socialnetworks.socialnet.SocialNetEdge;
 import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
-
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -52,7 +53,7 @@ public class GeoStatistics {
 			PersonImpl aPerson = iperson.next();
 //			Choose the first location in the plan and assume it's where the person lives
 
-			ActivityFacilityImpl aHome = aPerson.getSelectedPlan().getFirstActivity().getFacility();
+			ActivityFacilityImpl aHome = ((PlanImpl) aPerson.getSelectedPlan()).getFirstActivity().getFacility();
 			//			Each facility should only have one location but UpMapping is a TreeMap so pick the first entry
 			MappedLocation aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
 			if(this.locVertex.containsKey(aLoc)){
@@ -78,11 +79,11 @@ public class GeoStatistics {
 		while (ilinks.hasNext()) {
 			SocialNetEdge link = ilinks.next();
 
-			PersonImpl personA = link.getPersonFrom();
-			PersonImpl personB = link.getPersonTo();
+			Person personA = link.getPersonFrom();
+			Person personB = link.getPersonTo();
 
-			ActivityFacilityImpl aHome=personA.getSelectedPlan().getFirstActivity().getFacility();
-			ActivityFacilityImpl bHome=personB.getSelectedPlan().getFirstActivity().getFacility();
+			ActivityFacilityImpl aHome=((PlanImpl) personA.getSelectedPlan()).getFirstActivity().getFacility();
+			ActivityFacilityImpl bHome=((PlanImpl) personB.getSelectedPlan()).getFirstActivity().getFacility();
 			MappedLocation aLoc = aHome.getUpMapping().get(aHome.getUpMapping().firstKey());
 			MappedLocation bLoc = bHome.getUpMapping().get(bHome.getUpMapping().firstKey());
 

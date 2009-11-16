@@ -22,9 +22,10 @@
 package playground.anhorni.locationchoice.analysis;
 
 import java.util.List;
+
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.locationchoice.preprocess.helper.Utils;
@@ -37,7 +38,7 @@ public class PlanLegsTravelDistanceCalculator  extends PlanLegsTravelMeasureCalc
 	}
 	
 	
-	public List<Double> handle(final PlanImpl plan, boolean wayThere) {		
+	public List<Double> handle(final Plan plan, boolean wayThere) {		
 		super.reset();		
 		final List<?> actslegs = plan.getPlanElements();
 			

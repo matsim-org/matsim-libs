@@ -9,10 +9,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
@@ -49,7 +49,7 @@ public class ModeSplit extends AbstractPersonAlgorithm implements PlanAlgorithm 
 	}
 
 	public void run(final Plan plan) {
-		LinkImpl homeLoc = ((PlanImpl) plan).getFirstActivity().getLink();
+		Link homeLoc = ((PlanImpl) plan).getFirstActivity().getLink();
 		boolean inRange = false;
 		if (toll != null)
 			inRange = TollTools.isInRange(homeLoc, toll);

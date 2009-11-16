@@ -21,12 +21,10 @@
 package org.matsim.core.replanning.selectors;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.selectors.PlanSelector;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 /**
  * Test for {@link RandomPlanSelector}.
@@ -62,7 +60,7 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 		int cnt4 = 0;
 
 		for (int i = 0; i < 4000; i++) {
-			PlanImpl plan = selector.selectPlan(person);
+			Plan plan = selector.selectPlan(person);
 			if (plan == plan1) cnt1++;
 			if (plan == plan2) cnt2++;
 			if (plan == plan3) cnt3++;

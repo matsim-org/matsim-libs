@@ -13,8 +13,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 
-//import playground.ciarif.retailers.data.Consumer;
 import playground.ciarif.retailers.data.PersonRetailersImpl;
 import playground.ciarif.retailers.data.RetailZone;
 import playground.ciarif.retailers.data.RetailZones;
@@ -91,9 +91,9 @@ public double computePotential(ArrayList<Integer> solution){
         double pers_likelihood = 0.0D;
         double dist1 = 0.0D;
         
-        if (pr.getSelectedPlan().getFirstActivity().getFacility().calcDistance(coord) == 0.0D) dist1 = 10.0D;
+        if (((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility().calcDistance(coord) == 0.0D) dist1 = 10.0D;
         else {
-          dist1 = pr.getSelectedPlan().getFirstActivity().getFacility().calcDistance(coord);
+          dist1 = ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility().calcDistance(coord);
         }
         pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(c.getActivityOption("shop").getCapacity().doubleValue(), this.betas[1]);
         
@@ -110,20 +110,20 @@ public double computePotential(ArrayList<Integer> solution){
 		            int index = count;
 		            Coord coord1 = this.controler.getNetwork().getLink(this.first.get(solution.get(index))).getCoord();
 		            
-		            if (pr.getSelectedPlan().getFirstActivity().getFacility().calcDistance(coord1) == 0.0D) {
+		            if (((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility().calcDistance(coord1) == 0.0D) {
 		            	dist = 10.0D;
 		            }
 		            else {
-		              dist = pr.getSelectedPlan().getFirstActivity().getFacility().calcDistance(coord1);
+		              dist = ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility().calcDistance(coord1);
 		            }
 		
 		          }
-		          else if (s.calcDistance(pr.getSelectedPlan().getFirstActivity().getCoord()) == 0.0D) {
+		          else if (s.calcDistance(((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getCoord()) == 0.0D) {
 		        	  dist = 10.0D;
 		          } 
 		          
 		          else {
-		            dist = s.calcDistance(pr.getSelectedPlan().getFirstActivity().getCoord());
+		            dist = s.calcDistance(((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getCoord());
 		          }
 		          ++count;
 	          } 
@@ -162,10 +162,10 @@ public double computePotential(ArrayList<Integer> solution){
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (PersonImpl p : persons.values()) {
-			if (p.getSelectedPlan().getFirstActivity().getCoord().getX() < minx) { minx = p.getSelectedPlan().getFirstActivity().getCoord().getX(); }
-			if (p.getSelectedPlan().getFirstActivity().getCoord().getY() < miny) { miny = p.getSelectedPlan().getFirstActivity().getCoord().getY(); }
-			if (p.getSelectedPlan().getFirstActivity().getCoord().getX() > maxx) { maxx = p.getSelectedPlan().getFirstActivity().getCoord().getX(); }
-			if (p.getSelectedPlan().getFirstActivity().getCoord().getY() > maxy) { maxy = p.getSelectedPlan().getFirstActivity().getCoord().getY(); }
+			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX() < minx) { minx = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX(); }
+			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY() < miny) { miny = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY(); }
+			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX() > maxx) { maxx = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX(); }
+			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY() > maxy) { maxy = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY(); }
 		}
 		for (ActivityFacilityImpl shop : shops.values()) {
 			if (shop.getCoord().getX() < minx) { minx = shop.getCoord().getX(); }
@@ -198,7 +198,7 @@ public double computePotential(ArrayList<Integer> solution){
 					double y2= y1 + y_width;
 					RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
 					for (PersonImpl p : persons.values() ) {
-						Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();
+						Coord c = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacility().getCoord();
 						if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
 							rz.addPersonToQuadTree(c,p);
 						}		
@@ -257,7 +257,7 @@ public double computePotential(ArrayList<Integer> solution){
 				for (PersonImpl p : persons.values() ) { //TODO think if it is not better to put the following in a separate method
 					// like it is now it is not needed to go through all zones again in order to assign them persons and shops
 					// the other way is probably cleaner and this part below doesn't need to appear twice
-					Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();
+					Coord c = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacility().getCoord();
 					if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
 						rz.addPersonToQuadTree(c,p);
 					}		

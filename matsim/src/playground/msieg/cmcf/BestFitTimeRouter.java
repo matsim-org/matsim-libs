@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 
 import playground.msieg.structure.Commodity;
@@ -84,7 +85,7 @@ public class BestFitTimeRouter extends CMCFRouter {
 					PersonImpl person = null;
 					LegImpl leg = null;
 					for(PersonImpl p: unroutedPersons){
-						leg = p.getSelectedPlan().getNextLeg(p.getSelectedPlan().getFirstActivity());
+						leg = ((PlanImpl) p.getSelectedPlan()).getNextLeg(((PlanImpl) p.getSelectedPlan()).getFirstActivity());
 						Node from = leg.getRoute().getStartLink().getToNode(),
 								to = leg.getRoute().getEndLink().getFromNode();
 						if(path.get(0).getFromNode() == from
@@ -99,9 +100,9 @@ public class BestFitTimeRouter extends CMCFRouter {
 					NodeNetworkRouteImpl route = new NodeNetworkRouteImpl(leg.getRoute().getStartLink(), leg.getRoute().getEndLink());
 					route.setLinks(	leg.getRoute().getStartLink(), path, leg.getRoute().getEndLink());
 					leg.setRoute(route);
-					double depTime = person.getSelectedPlan().getFirstActivity().getStartTime()
-									+ i * (person.getSelectedPlan().getFirstActivity().getEndTime()
-											- person.getSelectedPlan().getFirstActivity().getStartTime())
+					double depTime = ((PlanImpl) person.getSelectedPlan()).getFirstActivity().getStartTime()
+									+ i * (((PlanImpl) person.getSelectedPlan()).getFirstActivity().getEndTime()
+											- ((PlanImpl) person.getSelectedPlan()).getFirstActivity().getStartTime())
 											/ this.timeSteps;
 					leg.setDepartureTime(depTime);
 					flowValues.put(path, --flow);

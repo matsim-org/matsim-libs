@@ -39,12 +39,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.population.BasicPersonImpl;
-import org.matsim.core.basic.v01.population.BasicPlanImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -117,12 +117,12 @@ public class IVT2009ToGraphML {
 		/*
 		 * create an empty population and social network
 		 */
-		BasicPopulation population = new PopulationImpl();
-		SocialNetwork<BasicPerson<?>> socialnet = new SocialNetwork<BasicPerson<?>>();
-		SocialNetworkBuilder<BasicPerson<?>> builder = new SocialNetworkBuilder<BasicPerson<?>>();
+		Population population = new PopulationImpl();
+		SocialNetwork<Person> socialnet = new SocialNetwork<Person>();
+		SocialNetworkBuilder<Person> builder = new SocialNetworkBuilder<Person>();
 		
-		Set<Ego<BasicPerson<?>>> alters = new HashSet<Ego<BasicPerson<?>>>();
-		Set egoSet = new HashSet<Ego<BasicPerson<BasicPlan<PlanElement>>>>();
+		Set<Ego<Person>> alters = new HashSet<Ego<Person>>();
+		Set egoSet = new HashSet<Ego<Person>>();
 		/*
 		 * go through all user ids
 		 */
@@ -167,19 +167,19 @@ public class IVT2009ToGraphML {
 					/*
 					 * create a person and an ego
 					 */
-					BasicPerson<?> egoPerson = createPerson(id, coord, age, population);
-					population.getPersons().put(egoPerson.getId(), egoPerson);
-					Ego<BasicPerson<?>> ego = builder.addVertex(socialnet, egoPerson);
+					Person egoPerson = createPerson(id, coord, age, population);
+					population.addPerson(egoPerson);
+					Ego<Person> ego = builder.addVertex(socialnet, egoPerson);
 					numEgos++;
 					egoSet.add(ego);
 					/*
 					 * create the alters
 					 */
 					for (int i = NUM_ALTERS_1; i > 0; i--) {
-						BasicPerson<BasicPlan<PlanElement>> alterPerson = createAlter(ALTER_1_KEY, i, egoData, id, population);
+						Person alterPerson = createAlter(ALTER_1_KEY, i, egoData, id, population);
 						if(alterPerson != null) {
-							population.getPersons().put(alterPerson.getId(), alterPerson);
-							Ego<BasicPerson<?>> alter = builder.addVertex(socialnet, alterPerson);
+							population.addPerson(alterPerson);
+							Ego<Person> alter = builder.addVertex(socialnet, alterPerson);
 							builder.addEdge(socialnet, ego, alter);
 							numAlters++;
 							alters.add(alter);
@@ -188,10 +188,10 @@ public class IVT2009ToGraphML {
 					}
 
 					for (int i = NUM_ALTERS_2; i > 0; i--) {
-						BasicPerson<BasicPlan<PlanElement>> alterPerson = createAlter(ALTER_2_KEY, i, egoData, id, population);
+						Person alterPerson = createAlter(ALTER_2_KEY, i, egoData, id, population);
 						if(alterPerson != null) {
-							population.getPersons().put(alterPerson.getId(), alterPerson);
-							Ego<BasicPerson<?>> alter = builder.addVertex(socialnet, alterPerson);
+							population.addPerson(alterPerson);
+							Ego<Person> alter = builder.addVertex(socialnet, alterPerson);
 							builder.addEdge(socialnet, ego, alter);
 							numAlters++;
 							alters.add(alter);
@@ -315,11 +315,11 @@ public class IVT2009ToGraphML {
 		return str;
 	}
 	
-	private static BasicPerson<BasicPlan<PlanElement>> createPerson(String id, Coord coord, String age, BasicPopulation population) {
-		BasicPersonImpl<BasicPlan<PlanElement>> person = new BasicPersonImpl<BasicPlan<PlanElement>>(new IdImpl(id));
+	private static Person createPerson(String id, Coord coord, String age, Population population) {
+		PersonImpl person = new PersonImpl(new IdImpl(id));
 		if(age != null)
 				person.setAge(Integer.parseInt(age));
-		BasicPlan<PlanElement> plan = new BasicPlanImpl(person);
+		Plan plan = new PlanImpl(person);
 		if(coord == null)
 			throw new NullPointerException("Null coordinates are not allowed.");
 //		BasicActivityImpl act = new BasicActivityImpl("home");
@@ -332,7 +332,7 @@ public class IVT2009ToGraphML {
 		return person;
 	}
 	
-	private static BasicPerson<BasicPlan<PlanElement>> createAlter(String alterKey, int counter, Map<String, String> egoData, String egoId, BasicPopulation population) {
+	private static Person createAlter(String alterKey, int counter, Map<String, String> egoData, String egoId, Population population) {
 		String name = getValue(egoData, alterKey+counter);
 		System.out.println(name);
 		String alterAge = getValue(egoData, makeKey(alterKey, ALTER_AGE_KEY, counter));

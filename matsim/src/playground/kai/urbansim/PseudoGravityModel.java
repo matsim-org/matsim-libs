@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -101,8 +102,8 @@ public class PseudoGravityModel {
 		
 		// compute the extent of the coordinates for persons:
 		for ( PersonImpl person : population.getPersons().values() ) {
-			PlanImpl plan = person.getSelectedPlan() ;
-			ActivityImpl act = plan.getFirstActivity();
+			Plan plan = person.getSelectedPlan() ;
+			ActivityImpl act = ((PlanImpl) plan).getFirstActivity();
 			Coord homeCoord = act.getCoord() ;
 			checkMax( homeCoord ) ;
 		}
@@ -134,7 +135,7 @@ public class PseudoGravityModel {
 		// for every worker, add it to the pseudoCell
 		for ( PersonImpl pp : population.getPersons().values() ) {
 			if ( pp.getEmployed().equals("yes") ) {
-				Coord cc = pp.getSelectedPlan().getFirstActivity().getCoord(); // awkward
+				Coord cc = ((PlanImpl) pp.getSelectedPlan()).getFirstActivity().getCoord(); // awkward
 				int bin = binFromXY( cc.getX(), cc.getY() ) ;
 				PseudoCell pc = pseudoCells.get(bin) ;
 //				System.out.println ( "adding a worker" ) ;
@@ -201,10 +202,10 @@ public class PseudoGravityModel {
 		
 		for ( PersonImpl pp : population.getPersons().values() ) {
 			// pull plan:
-			PlanImpl plan = pp.getSelectedPlan();
+			Plan plan = pp.getSelectedPlan();
 
 			// get home coordinates:
-			Coord homeCoord = pp.getSelectedPlan().getFirstActivity().getCoord(); // awkward
+			Coord homeCoord = ((PlanImpl) pp.getSelectedPlan()).getFirstActivity().getCoord(); // awkward
 			
 			// get relevant bin:
 			int homeBin = binFromXY( homeCoord.getX(), homeCoord.getY() ) ;
@@ -232,7 +233,7 @@ public class PseudoGravityModel {
 			// (it also does not really allocate the workplaces)
 			
 			// create work plan in destination pseudoCell:
-			Utils.completePlanToHwh(plan, workCoord) ;
+			Utils.completePlanToHwh((PlanImpl) plan, workCoord) ;
 
 		}
 	}

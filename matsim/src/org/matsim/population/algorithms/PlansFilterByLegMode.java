@@ -25,9 +25,9 @@ import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 
 /**
@@ -77,7 +77,7 @@ public class PlansFilterByLegMode {
 			PersonImpl person = plans.getPersons().get(personId);
 
 			for (int i=person.getPlans().size()-1; i>=0; i--) {
-				PlanImpl plan = person.getPlans().get(i);
+				Plan plan = person.getPlans().get(i);
 				boolean hasSearchedLegMode = false;
 				boolean hasOtherLegMode = false;
 

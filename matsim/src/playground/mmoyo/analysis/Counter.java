@@ -4,21 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.api.basic.v01.Id;
+
 import playground.mmoyo.PTRouter.LogicFactory;
+import playground.mmoyo.PTRouter.PTRouter;
 import playground.mmoyo.PTRouter.PTValues;
-import playground.mmoyo.PTRouter.PTRouter;;
 
 /**shows the average result values (travelTime, distance, number of transfers) of the whole population with different travel time and distance coefficients*/
 public class Counter {
@@ -86,7 +87,7 @@ public class Counter {
 			//if ( true ) {
 			//PersonImpl person = population.getPersons().get(new IdImpl("905449")); // 5228308   5636428  2949483 
  			System.out.println(timeCoefficient + " " + (numPlans++) + " id:" + person.getId());
-			PlanImpl plan = person.getPlans().get(0);
+			Plan plan = person.getPlans().get(0);
 
 			boolean first =true;
 			ActivityImpl lastAct = null;

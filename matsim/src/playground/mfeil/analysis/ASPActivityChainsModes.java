@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 
@@ -74,7 +74,7 @@ public class ASPActivityChainsModes extends ASPActivityChains{
 	private void initAnalysis(){
 		
 		this.activityChains = new ArrayList<List<PlanElement>>();
-		this.plans = new ArrayList<ArrayList<PlanImpl>>();
+		this.plans = new ArrayList<ArrayList<Plan>>();
 		ActChainEqualityCheck ac = new ActChainEqualityCheck();
 		Map<Id,PersonImpl> agents = this.population.getPersons();
 		for (PersonImpl person:agents.values()){
@@ -88,7 +88,7 @@ public class ASPActivityChainsModes extends ASPActivityChains{
 			}
 			if (!alreadyIn){
 				this.activityChains.add(person.getSelectedPlan().getPlanElements());
-				this.plans.add(new ArrayList<PlanImpl>());
+				this.plans.add(new ArrayList<Plan>());
 				this.plans.get(this.plans.size()-1).add(person.getSelectedPlan());
 			}
 		}

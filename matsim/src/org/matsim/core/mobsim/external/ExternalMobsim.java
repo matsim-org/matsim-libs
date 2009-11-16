@@ -27,7 +27,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.apache.log4j.Logger;
-
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
@@ -37,9 +38,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandler;
@@ -133,8 +131,8 @@ public class ExternalMobsim {
 		PopulationWriterHandler handler = plansWriter.getHandler();
 		plansWriter.writeStartPlans();
 		BufferedWriter writer = plansWriter.getWriter();
-		for (PersonImpl person : this.population.getPersons().values()) {
-			PlanImpl plan = person.getSelectedPlan();
+		for (Person person : this.population.getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
 			if (plan != null) {
 				/* we have to re-implement a custom writer here, because we only want to
 				 * write a single plan (the selected one) and not all plans of the person.

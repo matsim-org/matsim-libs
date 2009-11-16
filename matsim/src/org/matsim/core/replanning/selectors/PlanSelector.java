@@ -20,8 +20,8 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 
 /**
  * select a plan of a person
@@ -36,6 +36,6 @@ public interface PlanSelector {
 	 * @param person
 	 * @return selected plan, or null if the person has no plans.
 	 */
-	public PlanImpl selectPlan(PersonImpl person);
+	public Plan selectPlan(Person person);
 
 }

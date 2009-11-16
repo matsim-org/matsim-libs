@@ -21,8 +21,8 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 
 public class PersonSummary extends AbstractPersonAlgorithm {
 
@@ -120,7 +120,7 @@ public class PersonSummary extends AbstractPersonAlgorithm {
 		}
 
 		for (int i=0; i<person.getPlans().size(); i++) {
-			PlanImpl plan = person.getPlans().get(i);
+			Plan plan = person.getPlans().get(i);
 
 			int acts = plan.getPlanElements().size() / 2 + 1;
 			this.act_cnt += acts;

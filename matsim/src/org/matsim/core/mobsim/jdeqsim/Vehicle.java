@@ -24,11 +24,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /**
@@ -42,7 +42,7 @@ public class Vehicle extends SimUnit {
 	private PersonImpl ownerPerson = null;
 	private LegImpl currentLeg = null;
 	private int legIndex;
-	private LinkImpl currentLink = null;
+	private Link currentLink = null;
 	private int linkIndex;
 	private LinkImpl[] currentLinkRoute = null;
 
@@ -70,7 +70,7 @@ public class Vehicle extends SimUnit {
 			return;
 		}
 
-		PlanImpl plan = ownerPerson.getSelectedPlan();
+		Plan plan = ownerPerson.getSelectedPlan();
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 
 		/*
@@ -105,7 +105,7 @@ public class Vehicle extends SimUnit {
 	 * @return
 	 */
 	public ActivityImpl getPreviousActivity() {
-		PlanImpl plan = ownerPerson.getSelectedPlan();
+		Plan plan = ownerPerson.getSelectedPlan();
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 
 		for (int i = 0; i < actsLegs.size(); i++) {
@@ -123,7 +123,7 @@ public class Vehicle extends SimUnit {
 	 * @return
 	 */
 	public ActivityImpl getNextActivity() {
-		PlanImpl plan = ownerPerson.getSelectedPlan();
+		Plan plan = ownerPerson.getSelectedPlan();
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 
 		for (int i = 0; i < actsLegs.size(); i++) {
@@ -164,7 +164,7 @@ public class Vehicle extends SimUnit {
 		return legIndex;
 	}
 
-	public LinkImpl getCurrentLink() {
+	public Link getCurrentLink() {
 		return currentLink;
 	}
 
@@ -172,7 +172,7 @@ public class Vehicle extends SimUnit {
 		return linkIndex;
 	}
 
-	public void setCurrentLink(LinkImpl currentLink) {
+	public void setCurrentLink(Link currentLink) {
 		this.currentLink = currentLink;
 	}
 
@@ -196,7 +196,7 @@ public class Vehicle extends SimUnit {
 
 	// note: does not affect the link index
 	public void moveToFirstLinkInNextLeg() {
-		PlanImpl plan = getOwnerPerson().getSelectedPlan();
+		Plan plan = getOwnerPerson().getSelectedPlan();
 		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 		setCurrentLink(((ActivityImpl) actsLegs.get(getLegIndex() + 1)).getLink());
 	}
@@ -243,13 +243,13 @@ public class Vehicle extends SimUnit {
 
 	public void scheduleLeavePreviousRoadMessage(double scheduleTime) {
 		Road previousRoad = null;
-		LinkImpl previousLink = null;
+		Link previousLink = null;
 		/*
 		 * we need to handle the first road in a leg specially, because the load
 		 * to be left is accessed over the last act performed instead of the leg
 		 */
 		if (this.getLinkIndex() == 0) {
-			PlanImpl plan = ownerPerson.getSelectedPlan();
+			Plan plan = ownerPerson.getSelectedPlan();
 			List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
 			previousLink = ((ActivityImpl) actsLegs.get(legIndex - 1)).getLink();
 			previousRoad = Road.getRoad(previousLink.getId().toString());

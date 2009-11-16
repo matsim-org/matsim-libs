@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -14,9 +14,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.world.World;
 
 import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeBuilder;
@@ -65,7 +64,7 @@ public class ActivityDifferentiationShop {
 			if (person.getPlans().size() > 1) {
 				log.error("More than one plan for person: " + person.getId());
 			}
-			PlanImpl selectedPlan = person.getSelectedPlan();
+			Plan selectedPlan = person.getSelectedPlan();
 						
 			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
@@ -91,7 +90,7 @@ public class ActivityDifferentiationShop {
 			if (person.getPlans().size() > 1) {
 				log.error("More than one plan for person: " + person.getId());
 			}
-			PlanImpl selectedPlan = person.getSelectedPlan();
+			Plan selectedPlan = person.getSelectedPlan();
 						
 			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {

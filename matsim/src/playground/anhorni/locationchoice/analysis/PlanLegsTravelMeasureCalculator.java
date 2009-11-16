@@ -24,8 +24,7 @@ package playground.anhorni.locationchoice.analysis;
 import java.util.List;
 import java.util.Vector;
 
-//import org.apache.log4j.Logger;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 
 public abstract class PlanLegsTravelMeasureCalculator {
 	
@@ -39,7 +38,7 @@ public abstract class PlanLegsTravelMeasureCalculator {
 	protected boolean crowFly = false;	
 	protected List<Double> legTravelMeasures = new Vector<Double>();
 	
-	public abstract List<Double> handle(final PlanImpl plan, boolean wayThere);
+	public abstract List<Double> handle(final Plan plan, boolean wayThere);
 	
 	
 	public void reset() {

@@ -29,6 +29,7 @@ import java.util.HashMap;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
@@ -41,7 +42,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.misc.Time;
@@ -125,8 +125,8 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 	public void handleEvent(final AgentDepartureEventImpl event) {
 		if (toll != null) {
 			// only inhabitant from Kanton
-			if (TollTools.isInRange(plans.getPersons().get(event.getPersonId())
-					.getSelectedPlan().getFirstActivity().getLink(), toll))
+			if (TollTools.isInRange(((PlanImpl) plans.getPersons().get(event.getPersonId())
+					.getSelectedPlan()).getFirstActivity().getLink(), toll))
 				this.tmpDptTimes.put(event.getPersonId().toString(), event
 						.getTime());
 		} else
@@ -143,8 +143,8 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		String agentId = event.getPersonId().toString();
 		if (toll == null)
 			internalCompute(agentId, arrTime);
-		else if (TollTools.isInRange(plans.getPersons()
-				.get(event.getPersonId()).getSelectedPlan().getFirstActivity()
+		else if (TollTools.isInRange(((PlanImpl) plans.getPersons()
+				.get(event.getPersonId()).getSelectedPlan()).getFirstActivity()
 				.getLink(), toll))
 			internalCompute(agentId, arrTime);
 	}
@@ -157,8 +157,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 			this.travelTimes[binIdx] += travelTime;
 			this.arrCount[binIdx]++;
 
-			PlanImpl selectedplan = plans.getPersons().get(new IdImpl(agentId))
-					.getSelectedPlan();
+			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId)).getSelectedPlan();
 			TransportMode mode = PlanModeJudger.getMode(selectedplan);
 			switch (mode) {
 			case car:

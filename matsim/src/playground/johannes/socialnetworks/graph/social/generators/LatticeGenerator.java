@@ -20,13 +20,13 @@
 package playground.johannes.socialnetworks.graph.social.generators;
 
 import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicPopulationFactory;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.population.BasicPersonImpl;
-import org.matsim.core.basic.v01.population.BasicPlanImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -36,24 +36,24 @@ import org.matsim.core.utils.geometry.CoordImpl;
  */
 public class LatticeGenerator {
 
-	public BasicPopulation<BasicPerson<?>> generate(int width, int hight) {
+	public Population generate(int width, int hight) {
 //		SocialNetwork<BasicPerson<?>> socialnet = new SocialNetwork<BasicPerson<?>>();
-		BasicPopulation population = new PopulationImpl();
+		Population population = new PopulationImpl();
 		int counter = 0;
 		for(int row = 1; row < hight; row+=1) {
 			for(int col = 1; col < width; col+=1) {
-				BasicPerson<BasicPlan<?>> person = new BasicPersonImpl<BasicPlan<?>>(new IdImpl(counter));
+				Person person = new PersonImpl(new IdImpl(counter));
 				counter++;
 				
-				BasicPlan<?> plan = new BasicPlanImpl(person);
+				Plan plan = new PlanImpl(person);
 //				BasicActivityImpl act = new BasicActivityImpl("home");
 //				act.setCoord(new CoordImpl(col, row));
-				BasicPopulationFactory pb = population.getFactory() ;
+				PopulationFactory pb = population.getFactory() ;
 				BasicActivity act = pb.createActivityFromCoord("home", new CoordImpl(col,row) ); 
 				plan.addActivity(act);
 				person.addPlan( plan ) ;
 				
-				population.getPersons().put(person.getId(), person);
+				population.addPerson(person);
 //				socialnet.addEgo(person);
 			}
 		}

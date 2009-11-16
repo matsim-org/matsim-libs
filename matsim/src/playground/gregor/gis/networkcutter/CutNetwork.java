@@ -31,6 +31,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -84,17 +86,17 @@ public class CutNetwork {
 		max_x = 652088.;
 		max_y = 9894785.;
 		
-		ConcurrentLinkedQueue<PlanImpl> q = new ConcurrentLinkedQueue<PlanImpl>();
+		ConcurrentLinkedQueue<Plan> q = new ConcurrentLinkedQueue<Plan>();
 		for (PersonImpl pers : pop.getPersons().values()) {
-			PlanImpl p = pers.getSelectedPlan();
-			CoordImpl c = (CoordImpl) p.getFirstActivity().getCoord();
+			Plan p = pers.getSelectedPlan();
+			CoordImpl c = (CoordImpl) ((PlanImpl) p).getFirstActivity().getCoord();
 			if (!isWithin(c)) {
 				q.add(p);
 			}
 		}
 		while (q.size() > 0) {
-			PlanImpl p = q.poll();
-			PersonImpl pers = p.getPerson();
+			Plan p = q.poll();
+			Person pers = p.getPerson();
 			pop.getPersons().remove(pers.getId());
 		}
 		System.out.println(pop.getPersons().size());

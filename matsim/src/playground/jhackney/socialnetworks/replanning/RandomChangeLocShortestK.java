@@ -86,7 +86,7 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 		Person person = plan.getPerson();
 
 		//COPY THE SELECTED PLAN		    
-		PlanImpl newPlan = ((PersonImpl) person).copySelectedPlan();
+		Plan newPlan = ((PersonImpl) person).copySelectedPlan();
 
 		// Note that it is not changed, yet
 		boolean changed = false;
@@ -148,7 +148,7 @@ public class RandomChangeLocShortestK implements PlanAlgorithm {
 				}
 				// If the last activity was chosen, make sure the first activity is also changed
 				if((newAct.getType() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType()) && (newAct.getLink() == ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getLink())){
-					ActivityImpl firstAct = newPlan.getFirstActivity();
+					ActivityImpl firstAct = ((PlanImpl) newPlan).getFirstActivity();
 					firstAct.setLink(fFromKnowledge.getLink());
 					firstAct.setCoord(fFromKnowledge.getCoord());
 					firstAct.setFacility(fFromKnowledge);

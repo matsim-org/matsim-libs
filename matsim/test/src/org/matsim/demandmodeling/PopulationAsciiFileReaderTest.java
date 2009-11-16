@@ -21,6 +21,7 @@ package org.matsim.demandmodeling;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -56,18 +57,18 @@ public class PopulationAsciiFileReaderTest extends MatsimTestCase {
 		assertEquals(99, p2.getAge());
 		assertEquals("m", p1.getSex());
 		assertEquals("f", p2.getSex());
-		PlanImpl plan1 = p1.getSelectedPlan();
-		PlanImpl plan2 = p2.getSelectedPlan();
+		Plan plan1 = p1.getSelectedPlan();
+		Plan plan2 = p2.getSelectedPlan();
 		assertNotNull(plan1);
 		assertNotNull(plan2);
-		ActivityImpl a11 = plan1.getFirstActivity();
-		ActivityImpl a12 = plan1.getNextActivity(plan1.getNextLeg(a11));
+		ActivityImpl a11 = ((PlanImpl) plan1).getFirstActivity();
+		ActivityImpl a12 = ((PlanImpl) plan1).getNextActivity(((PlanImpl) plan1).getNextLeg(a11));
 		assertNotNull(a11);
 		assertNotNull(a12);
 		assertEquals("h", a11.getType());
 		assertEquals("w", a12.getType());
-		ActivityImpl a21 = plan2.getFirstActivity();
-		ActivityImpl a22 = plan2.getNextActivity(plan2.getNextLeg(a21));
+		ActivityImpl a21 = ((PlanImpl) plan2).getFirstActivity();
+		ActivityImpl a22 = ((PlanImpl) plan2).getNextActivity(((PlanImpl) plan2).getNextLeg(a21));
 		assertNotNull(a21);
 		assertNotNull(a22);
 		assertEquals("h", a21.getType());

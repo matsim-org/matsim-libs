@@ -22,6 +22,7 @@ package playground.rost.eaflow.util;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
@@ -75,18 +76,18 @@ public class DDcontroller {
 
 		if (testplans) {
 			for (PersonImpl person : population.getPersons().values()) {
-				PlanImpl plan = person.getSelectedPlan();
+				Plan plan = person.getSelectedPlan();
 				if (plan == null) {
 					System.out.println("Person " + person.getId() + " has no plan.");
 					continue;
 				}
-				ActivityImpl act = plan.getFirstActivity();
+				ActivityImpl act = ((PlanImpl) plan).getFirstActivity();
 				if (act == null) {
 					System.out.println("Person " + person.getId() + " has no act.");
 					continue;
 				}
 
-				LegImpl leg = plan.getNextLeg(act);
+				LegImpl leg = ((PlanImpl) plan).getNextLeg(act);
 				if (leg == null) {
 					System.out.println("Person " + person.getId() + " has no leg.");
 					continue;

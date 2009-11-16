@@ -21,21 +21,27 @@
 package org.matsim.core.population;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.basic.v01.population.BasicLegImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
-public class LegImpl extends BasicLegImpl implements Leg {
+public class LegImpl implements BasicLeg, Leg {
+	
+	protected BasicRoute route = null;
+	
+	private double depTime = Time.UNDEFINED_TIME;
+	private double travTime = Time.UNDEFINED_TIME;
+	private TransportMode mode;
 
 	private double arrTime = Time.UNDEFINED_TIME;
 
-	
 	public LegImpl(final TransportMode mode) {
-		super(mode);
+		this.mode = mode;
 	}
 
 	/**
@@ -44,7 +50,7 @@ public class LegImpl extends BasicLegImpl implements Leg {
 	 * @param leg
 	 */
 	public LegImpl(final LegImpl leg) {
-		super(leg.getMode());
+		this(leg.getMode());
 		this.setDepartureTime(leg.getDepartureTime());
 		this.setTravelTime(leg.getTravelTime());
 		this.setArrivalTime(leg.getArrivalTime());
@@ -60,6 +66,30 @@ public class LegImpl extends BasicLegImpl implements Leg {
 		}
 	}
 	
+	public final TransportMode getMode() {
+		return this.mode;
+	}
+
+	public final void setMode(TransportMode mode) {
+		this.mode = mode;
+	}
+
+	public final double getDepartureTime() {
+		return this.depTime;
+	}
+
+	public final void setDepartureTime(final double depTime) {
+		this.depTime = depTime;
+	}
+
+	public final double getTravelTime() {
+		return this.travTime;
+	}
+
+	public final void setTravelTime(final double travTime) {
+		this.travTime = travTime;
+	}
+
 	public final double getArrivalTime() {
 		return this.arrTime;
 	}
@@ -68,10 +98,12 @@ public class LegImpl extends BasicLegImpl implements Leg {
 		this.arrTime = arrTime;
 	}
 
-
-	@Override
 	public RouteWRefs getRoute() {
 		return (RouteWRefs) this.route;
+	}
+	
+	public final void setRoute(BasicRoute route) {
+		this.route = route;
 	}
 
 	@Override

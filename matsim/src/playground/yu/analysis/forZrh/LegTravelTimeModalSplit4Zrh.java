@@ -3,6 +3,7 @@
  */
 package playground.yu.analysis.forZrh;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -10,8 +11,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -61,7 +60,7 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 			this.travelTimes[binIdx] += travelTime;
 			this.arrCount[binIdx]++;
 
-			PlanImpl selectedplan = plans.getPersons().get(new IdImpl(agentId))
+			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
 					.getSelectedPlan();
 			if (Integer.parseInt(agentId) < 1000000000) {
 				if (PlanModeJudger.useCar(selectedplan)) {

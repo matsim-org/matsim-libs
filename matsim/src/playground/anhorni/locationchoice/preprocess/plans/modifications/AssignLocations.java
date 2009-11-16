@@ -23,14 +23,14 @@ package playground.anhorni.locationchoice.preprocess.plans.modifications;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
-//import org.apache.log4j.Logger;
+
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.locationchoice.preprocess.helper.QuadTreeRing;
@@ -95,20 +95,20 @@ public class AssignLocations {
 	}
 	
 
-	public void run(PopulationImpl plans, String type) {	
-		Iterator<PersonImpl> person_it = plans.getPersons().values().iterator();
+	public void run(Population plans, String type) {	
+		Iterator<? extends Person> person_it = plans.getPersons().values().iterator();
 		while (person_it.hasNext()) {
-			PersonImpl person = person_it.next();
+			Person person = person_it.next();
 		
 			if (person.getPlans().size() != 1) {
 				Gbl.errorMsg("pid = "+person.getId()+" : There must be exactly one plan."); 
 			}
-			PlanImpl plan = person.getSelectedPlan();
+			Plan plan = person.getSelectedPlan();
 			this.run(plan, type);
 		}
 	}
 
-	private void run(PlanImpl plan, String type) {
+	private void run(Plan plan, String type) {
 		for (int i = 0; i < plan.getPlanElements().size(); i = i + 2) {
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			if (act.getFacility() == null && act.getType().equals(type)) {

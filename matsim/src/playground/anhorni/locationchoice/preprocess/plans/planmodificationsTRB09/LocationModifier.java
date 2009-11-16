@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -16,8 +18,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -69,7 +69,7 @@ public class LocationModifier extends Modifier {
 	private void assignRandomLocation(Coord coords, double radius) {
 
 		log.info("running assignRandomLocation:");
-		Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
+		Iterator<? extends Person> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
 
 		ArrayList<ActivityFacilityImpl> zhShopFacilities = (ArrayList<ActivityFacilityImpl>)this.shopFacQuadTree.get(coords.getX(), coords.getY(), radius);
@@ -79,12 +79,12 @@ public class LocationModifier extends Modifier {
 		
 
 		while (person_iter.hasNext()) {
-			PersonImpl person = person_iter.next();
+			Person person = person_iter.next();
 				counter.incCounter();
 
-				Iterator<PlanImpl> plan_iter = person.getPlans().iterator();
+				Iterator<? extends Plan> plan_iter = person.getPlans().iterator();
 				while (plan_iter.hasNext()) {
-					PlanImpl plan = plan_iter.next();
+					Plan plan = plan_iter.next();
 
 					if (this.shop_facilities.size()>0) {
 						exchangeFacilities("s", zhShopFacilities, plan);
@@ -100,7 +100,7 @@ public class LocationModifier extends Modifier {
 	}
 
 	private void exchangeFacilities(final String type, ArrayList<ActivityFacilityImpl>  exchange_facilities,
-			final PlanImpl plan) {
+			final Plan plan) {
 
 			final List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {

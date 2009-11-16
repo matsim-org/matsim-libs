@@ -10,15 +10,13 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.io.IOUtils;
@@ -141,11 +139,11 @@ public class ModdedConverter {
 						// this line is about the same person as the line before.
 						// "extend" the plan of that person with a Leg and an Act
 
-						PlanImpl pl = this.pop.getPersons().get(new IdImpl(personId)).getSelectedPlan();
+						Plan pl = this.pop.getPersons().get(new IdImpl(personId)).getSelectedPlan();
 						endTime = convertTime(tabs[3]);
 						double dur = endTime - this.tmpEndTime;
 
-						LegImpl leg = pl.createAndAddLeg(TransportMode.car);
+						LegImpl leg = ((PlanImpl) pl).createAndAddLeg(TransportMode.car);
 						leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 						Coord tmpCoord;
@@ -160,7 +158,7 @@ public class ModdedConverter {
 							tmpCoord = getRandomCoordInZone(tabs[6]);
 						}
 						this.tmpType = tabs[7];
-						ActivityImpl act = pl.createAndAddActivity(tabs[4], tmpCoord);
+						ActivityImpl act = ((PlanImpl) pl).createAndAddActivity(tabs[4], tmpCoord);
 						act.setEndTime(convertTime(tabs[3]));
 						act.setDuration(dur);
 					} else {
@@ -170,9 +168,9 @@ public class ModdedConverter {
 
 						if (!this.pop.getPersons().isEmpty()) {
 							PersonImpl p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
-							PlanImpl tmpPl = p.getSelectedPlan();
+							Plan tmpPl = p.getSelectedPlan();
 
-							LegImpl leg = tmpPl.createAndAddLeg(TransportMode.car);
+							LegImpl leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
 							leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 							// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 
@@ -188,7 +186,7 @@ public class ModdedConverter {
 								this.count2+=1;
 								System.out.println(personId);
 							}
-							ActivityImpl lastAct = tmpPl.createAndAddActivity(this.tmpTabs[7], tmpCoord2);
+							ActivityImpl lastAct = ((PlanImpl) tmpPl).createAndAddActivity(this.tmpTabs[7], tmpCoord2);
 						}
 
 						PersonImpl p = new PersonImpl(new IdImpl(personId));
@@ -239,7 +237,7 @@ public class ModdedConverter {
 			}
 		}else{
 			PersonImpl p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
-			PlanImpl tmpPl = p.getSelectedPlan();
+			PlanImpl tmpPl = (PlanImpl) p.getSelectedPlan();
 
 			LegImpl leg = tmpPl.createAndAddLeg(TransportMode.car);
 			leg.setDepartureTime(convertTime(this.tmpTabs[3]));

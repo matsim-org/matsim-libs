@@ -129,11 +129,11 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 	@Override
 	public void run(final Person person) {
 		this.person = (PersonImpl) person;
-		PlanImpl plan = this.person.getSelectedPlan();
+		Plan plan = this.person.getSelectedPlan();
 		if (toll == null) {
 			count++;
 			run(plan);
-		} else if (TollTools.isInRange(plan.getFirstActivity().getLink(), toll)) {
+		} else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity().getLink(), toll)) {
 			count++;
 			run(plan);
 		}

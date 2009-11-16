@@ -40,12 +40,12 @@ import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -290,7 +290,7 @@ public class KMLPersonWriter {
 		
 		if (this.person != null)
 		{
-			PlanImpl selectedPlan = this.person.getSelectedPlan();
+			Plan selectedPlan = this.person.getSelectedPlan();
 			if (selectedPlan != null)
 			{
 				for (PlanElement pe : selectedPlan.getPlanElements()) {
@@ -323,7 +323,7 @@ public class KMLPersonWriter {
 		
 		if (this.person != null)
 		{
-			PlanImpl selectedPlan = this.person.getSelectedPlan();
+			Plan selectedPlan = this.person.getSelectedPlan();
 			if (selectedPlan != null)
 			{
 				for (PlanElement pe : selectedPlan.getPlanElements()) {

@@ -32,12 +32,12 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.basic.v01.population.PlanElement;
-import org.matsim.core.basic.v01.population.BasicLegImpl;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -147,7 +147,7 @@ public class Wardrop {
 	{		
 		for (PersonImpl person : population.getPersons().values()) 
 		{
-			PlanImpl plan = person.getSelectedPlan();
+			Plan plan = person.getSelectedPlan();
 			
 			ArrayList<BasicActivity> acts = new ArrayList<BasicActivity>();
 			for (PlanElement pe : plan.getPlanElements()) {
@@ -539,9 +539,6 @@ public class Wardrop {
 		return results;
 	}
 
-	/*
-	 * 
-	 */
 	public double calcMeanLinksPerTrip()
 	{
 		int linkCounter = 0;
@@ -550,15 +547,15 @@ public class Wardrop {
 		
 		for (PersonImpl person : population.getPersons().values()) 
 		{
-			PlanImpl plan = person.getSelectedPlan();
+			Plan plan = person.getSelectedPlan();
 						
 			//ArrayList<BasicLegImpl> legs = new ArrayList<BasicLegImpl>();
 
 			for (PlanElement planElement : plan.getPlanElements())
 			{
-				if (planElement instanceof BasicLegImpl)
+				if (planElement instanceof Leg)
 				{
-					BasicLegImpl leg = (BasicLegImpl) planElement;
+					Leg leg = (Leg) planElement;
 					
 					if (leg.getRoute() instanceof NetworkRouteWRefs)
 					{

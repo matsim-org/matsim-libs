@@ -175,18 +175,18 @@ public class EgressAnalysis {
 	private void handlePlans() {
 			log.info("handle plans");
 			for (PersonImpl person : this.population.getPersons().values()) {
-				LegImpl leg = person.getSelectedPlan().getNextLeg(person.getSelectedPlan().getFirstActivity());
+				LegImpl leg = ((PlanImpl) person.getSelectedPlan()).getNextLeg(((PlanImpl) person.getSelectedPlan()).getFirstActivity());
 				List<Node> route = ((NetworkRouteWRefs) leg.getRoute()).getNodes();
 				Node node = route.get(route.size()-2);
 				this.egressNodes.get(node.getId()).num_current++;
 				PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
-				plan.addActivity(person.getSelectedPlan().getFirstActivity());
+				plan.addActivity(((PlanImpl) person.getSelectedPlan()).getFirstActivity());
 				LegImpl l = new org.matsim.core.population.LegImpl(TransportMode.car);
 				l.setDepartureTime(0.0);
 				l.setTravelTime(0.0);
 				l.setArrivalTime(0.0);
 				plan.addLeg(l);
-				plan.addActivity(person.getSelectedPlan().getNextActivity(leg));
+				plan.addActivity(((PlanImpl) person.getSelectedPlan()).getNextActivity(leg));
 				this.router.run(plan);
 				LegImpl leg2 = plan.getNextLeg(plan.getFirstActivity());
 				List<Node> route2 = ((NetworkRouteWRefs) leg2.getRoute()).getNodes();
@@ -195,11 +195,6 @@ public class EgressAnalysis {
 
 			}
 			log.info("done.");
-
-
-
-
-
 	}
 
 

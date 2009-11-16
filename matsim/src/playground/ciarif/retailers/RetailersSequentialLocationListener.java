@@ -26,26 +26,23 @@ package playground.ciarif.retailers;
  * @author ciarif
  */
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -55,13 +52,11 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
 
 import playground.ciarif.retailers.IO.FileRetailerReader;
-import playground.ciarif.retailers.IO.LinksRetailerReader;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.data.RetailZone;
 import playground.ciarif.retailers.data.RetailZones;
 import playground.ciarif.retailers.data.Retailer;
 import playground.ciarif.retailers.data.Retailers;
-import playground.ciarif.retailers.stategies.GravityModelRetailerStrategy;
 
 public class RetailersSequentialLocationListener implements StartupListener, IterationEndsListener {
 	
@@ -179,7 +174,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 			int counter = 0;
 			for (PersonImpl p : controler.getPopulation().getPersons().values()) {
 				
-				PlanImpl plan = p.getSelectedPlan(); 
+				Plan plan = p.getSelectedPlan(); 
 				boolean routeIt = false;
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof ActivityImpl) {
@@ -208,10 +203,10 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (PersonImpl p : persons) {
-			if (p.getSelectedPlan().getFirstActivity().getCoord().getX() < minx) { minx = p.getSelectedPlan().getFirstActivity().getCoord().getX(); }
-			if (p.getSelectedPlan().getFirstActivity().getCoord().getY() < miny) { miny = p.getSelectedPlan().getFirstActivity().getCoord().getY(); }
-			if (p.getSelectedPlan().getFirstActivity().getCoord().getX() > maxx) { maxx = p.getSelectedPlan().getFirstActivity().getCoord().getX(); }
-			if (p.getSelectedPlan().getFirstActivity().getCoord().getY() > maxy) { maxy = p.getSelectedPlan().getFirstActivity().getCoord().getY(); }
+			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX() < minx) { minx = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX(); }
+			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY() < miny) { miny = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY(); }
+			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX() > maxx) { maxx = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX(); }
+			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY() > maxy) { maxy = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY(); }
 		}
 		for (ActivityFacilityImpl shop : shops) {
 			if (shop.getCoord().getX() < minx) { minx = shop.getCoord().getX(); }
@@ -239,7 +234,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 				double y2= y1 + y_width;
 				RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
 				for (PersonImpl p : persons ) {
-					Coord c = p.getSelectedPlan().getFirstActivity().getFacility().getCoord();
+					Coord c = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacility().getCoord();
 					if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
 						rz.addPersonToQuadTree(c,p);
 					}		

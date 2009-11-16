@@ -5,6 +5,7 @@ package playground.yu.utils;
 
 import java.util.Collection;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 
@@ -20,7 +21,7 @@ public class TollTools {
 	 * @return a boolean value, whether a <code>Link</code> belongs to toll
 	 *         area.
 	 */
-	public static boolean isInRange(LinkImpl loc, RoadPricingScheme toll) {
+	public static boolean isInRange(Link loc, RoadPricingScheme toll) {
 		return toll.getLinks().contains(loc);
 	}
 

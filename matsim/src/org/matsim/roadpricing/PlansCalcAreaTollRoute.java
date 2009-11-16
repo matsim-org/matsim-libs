@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -104,8 +103,8 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 				// it is a car leg...
 
 				// # init some values before searching for routes:
-				LinkImpl fromLink = fromAct.getLink();
-				LinkImpl toLink = toAct.getLink();
+				Link fromLink = fromAct.getLink();
+				Link toLink = toAct.getLink();
 				if (fromLink == null) {
 					throw new RuntimeException("fromLink missing.");
 				}
@@ -258,7 +257,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @return true if the route leads into an active tolling area and an agent
 	 * taking this route will likely have to pay the toll, false otherwise.
 	 */
-	private boolean routeOverlapsTollLinks(final LinkImpl startLink, final Path route, final LinkImpl endLink, final double depTime) {
+	private boolean routeOverlapsTollLinks(final Link startLink, final Path route, final Link endLink, final double depTime) {
 		double time = depTime;
 
 		// handle first link

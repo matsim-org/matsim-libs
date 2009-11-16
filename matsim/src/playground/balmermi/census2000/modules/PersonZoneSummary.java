@@ -34,7 +34,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -162,7 +161,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final int calcChainIndex(PlanImpl plan, int offset) {
+	private final int calcChainIndex(Plan plan, int offset) {
 		int w = 0; int e = 0; int s = 0; int l = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
@@ -179,7 +178,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		return index + offset;
 	}
 
-	private final int calcPlanIndex(PlanImpl plan, int offset) {
+	private final int calcPlanIndex(Plan plan, int offset) {
 		double dist = 0.0;
 		ActivityImpl prevAct = null;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -199,7 +198,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		else { return 4 + offset; }
 	}
 
-	private final int countActs(PlanImpl plan) {
+	private final int countActs(Plan plan) {
 		int cnt = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
@@ -209,7 +208,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		return cnt;
 	}
 
-	private final int[] countTrips(PlanImpl plan) {
+	private final int[] countTrips(Plan plan) {
 		int[] cnts = {0,0,0,0,0};
 		ActivityImpl prevAct = null;
 		for (PlanElement pe : plan.getPlanElements()) {

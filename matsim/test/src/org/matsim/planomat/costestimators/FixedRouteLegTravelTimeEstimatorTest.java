@@ -28,6 +28,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -40,7 +42,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
@@ -60,8 +61,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 	private static final int TEST_LEG_NR = 0;
 	private static final int TIME_BIN_SIZE = 900;
 
-	protected PersonImpl testPerson = null;
-	protected PlanImpl testPlan = null;
+	protected Person testPerson = null;
+	protected Plan testPlan = null;
 	protected LegImpl testLeg = null;
 	protected ActivityImpl originAct = null;
 	protected ActivityImpl destinationAct = null;
@@ -141,7 +142,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			double departureTime = Time.parseTime("06:03:00");
 			
 			LegImpl newLeg = null;
-			newLeg = testee.getNewLeg(testLeg.getMode(), originAct, destinationAct, this.testPlan.getActLegIndex(testLeg), departureTime);
+			newLeg = testee.getNewLeg(testLeg.getMode(), originAct, destinationAct, ((PlanImpl) this.testPlan).getActLegIndex(testLeg), departureTime);
 
 			double legTravelTime = 0.0;
 			legTravelTime = newLeg.getTravelTime();
@@ -149,13 +150,13 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			double expectedLegEndTime = departureTime;
 
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
-				expectedLegEndTime += originAct.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
+				expectedLegEndTime += ((LinkImpl) originAct.getLink()).getFreespeedTravelTime(Time.UNDEFINED_TIME);
 			}
 			for (Link link : links) {
 				expectedLegEndTime += link.getLength()/link.getFreespeed(Time.UNDEFINED_TIME);
 			}
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-				expectedLegEndTime += destinationAct.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
+				expectedLegEndTime += ((LinkImpl) destinationAct.getLink()).getFreespeedTravelTime(Time.UNDEFINED_TIME);
 			}			
 			assertEquals(expectedLegEndTime, departureTime + legTravelTime, MatsimTestCase.EPSILON);
 
@@ -172,20 +173,20 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				events.processEvent(event);
 			}
 
-			newLeg = testee.getNewLeg(testLeg.getMode(), originAct, destinationAct, this.testPlan.getActLegIndex(testLeg), departureTime);
+			newLeg = testee.getNewLeg(testLeg.getMode(), originAct, destinationAct, ((PlanImpl) this.testPlan).getActLegIndex(testLeg), departureTime);
 			legTravelTime = newLeg.getTravelTime();
 
 			expectedLegEndTime = departureTime;
 			expectedLegEndTime += depDelay;
 
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
-				expectedLegEndTime += originAct.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
+				expectedLegEndTime += ((LinkImpl) originAct.getLink()).getFreespeedTravelTime(Time.UNDEFINED_TIME);
 			}
 			for (Link link : links) {
 				expectedLegEndTime += link.getLength()/link.getFreespeed(Time.UNDEFINED_TIME);
 			}
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-				expectedLegEndTime += destinationAct.getLink().getFreespeedTravelTime(Time.UNDEFINED_TIME);
+				expectedLegEndTime += ((LinkImpl) destinationAct.getLink()).getFreespeedTravelTime(Time.UNDEFINED_TIME);
 			}			
 			assertEquals(expectedLegEndTime, departureTime + legTravelTime, MatsimTestCase.EPSILON);
 			
@@ -214,7 +215,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 			departureTime = Time.parseTime("06:10:00");
 			
-			newLeg = testee.getNewLeg(testLeg.getMode(), originAct, destinationAct, this.testPlan.getActLegIndex(testLeg), departureTime);
+			newLeg = testee.getNewLeg(testLeg.getMode(), originAct, destinationAct, ((PlanImpl) this.testPlan).getActLegIndex(testLeg), departureTime);
 			legTravelTime = newLeg.getTravelTime();
 
 			expectedLegEndTime = departureTime;
@@ -233,7 +234,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			// test public transport mode
 			departureTime = Time.parseTime("06:10:00");
 			
-			newLeg = testee.getNewLeg(TransportMode.pt, originAct, destinationAct, this.testPlan.getActLegIndex(testLeg), departureTime);
+			newLeg = testee.getNewLeg(TransportMode.pt, originAct, destinationAct, ((PlanImpl) this.testPlan).getActLegIndex(testLeg), departureTime);
 			legTravelTime = newLeg.getTravelTime();
 			
 			// the free speed travel time from h to w in equil-test, as simulated by Cetin, is 15 minutes

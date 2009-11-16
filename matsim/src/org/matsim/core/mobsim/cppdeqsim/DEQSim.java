@@ -33,6 +33,8 @@ import java.util.List;
 
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
@@ -42,7 +44,6 @@ import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
@@ -155,11 +156,11 @@ public class DEQSim extends ExternalMobsim {
 		System.out.println("done writing plans for deqsim. " + (new Date()));
 	}
 
-	public static void writePerson(final DataOutputStream out, final PersonImpl person) throws IOException {
+	public static void writePerson(final DataOutputStream out, final Person person) throws IOException {
 		// person id, int, 32bit
 		out.writeInt(Integer.parseInt(person.getId().toString()));
 
-		PlanImpl plan = person.getSelectedPlan();
+		Plan plan = person.getSelectedPlan();
 		// # legs, int, 32bit
 		out.writeInt((plan.getPlanElements().size()-1) / 2);
 

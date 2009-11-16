@@ -211,7 +211,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("Rectifying act types...");
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
-			PlanImpl plan = person.getSelectedPlan();
+			Plan plan = person.getSelectedPlan();
 			for (int i=0;i<plan.getPlanElements().size();i+=2){
 				ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(i);
 				/*if (act.getType().equalsIgnoreCase("h")) act.setType("home");
@@ -231,7 +231,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("Adding links and routes to original plans...");
 		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = iterator.next();
-			PlanImpl plan = person.getSelectedPlan();
+			Plan plan = person.getSelectedPlan();
 			this.linker.run(plan);
 			for (int j=1;j<plan.getPlanElements().size();j++){
 				if (j%2==1){
@@ -267,7 +267,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		ASPActivityChainsModes analyzer = new ASPActivityChainsModes(this.population);
 		analyzer.run();
 		ArrayList<List<PlanElement>> ac = analyzer.getActivityChains();
-		ArrayList<ArrayList<PlanImpl>> pl = analyzer.getPlans();
+		ArrayList<ArrayList<Plan>> pl = analyzer.getPlans();
 		log.info("done.");
 		List<Integer> ranking = new ArrayList<Integer>();
 		for (int i=0;i<pl.size();i++){
@@ -280,8 +280,8 @@ public class PlansConstructor implements PlanStrategyModule{
 			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-51,0))){ //51
 //			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-2,0))){
 				this.actChains.add(ac.get(i));
-				for (Iterator<PlanImpl> iterator = pl.get(i).iterator(); iterator.hasNext();){
-					PlanImpl plan = iterator.next();
+				for (Iterator<Plan> iterator = pl.get(i).iterator(); iterator.hasNext();){
+					Plan plan = iterator.next();
 					agents.add(plan.getPerson().getId());
 				}
 			}
@@ -302,7 +302,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		ASPActivityChainsModesAccumulated analyzer = new ASPActivityChainsModesAccumulated(this.population);
 		analyzer.run();
 		ArrayList<List<PlanElement>> ac = analyzer.getActivityChains();
-		ArrayList<ArrayList<PlanImpl>> pl = analyzer.getPlans();
+		ArrayList<ArrayList<Plan>> pl = analyzer.getPlans();
 		log.info("done.");
 		
 		this.actChains = new ArrayList<List<PlanElement>>();
@@ -316,8 +316,8 @@ public class PlansConstructor implements PlanStrategyModule{
 			}
 			randomField.add(random);
 			this.actChains.add(ac.get(random));
-			for (Iterator<PlanImpl> iterator = pl.get(random).iterator(); iterator.hasNext();){
-				PlanImpl plan = iterator.next();
+			for (Iterator<Plan> iterator = pl.get(random).iterator(); iterator.hasNext();){
+				Plan plan = iterator.next();
 				agents.add(plan.getPerson().getId());
 			}
 		}
@@ -338,7 +338,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		ASPActivityChainsModesAccumulated analyzer = new ASPActivityChainsModesAccumulated(this.population);
 		analyzer.run();
 		ArrayList<List<PlanElement>> ac = analyzer.getActivityChains();
-		ArrayList<ArrayList<PlanImpl>> pl = analyzer.getPlans();
+		ArrayList<ArrayList<Plan>> pl = analyzer.getPlans();
 		log.info("done.");
 		
 		List<Integer> ranking = new ArrayList<Integer>();
@@ -353,8 +353,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		for (int i=0;i<pl.size();i++){
 			if (pl.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-20,0))){ 
 				this.actChains.add(ac.get(i));
-				for (Iterator<PlanImpl> iterator = pl.get(i).iterator(); iterator.hasNext();){
-					PlanImpl plan = iterator.next();
+				for (Iterator<Plan> iterator = pl.get(i).iterator(); iterator.hasNext();){
+					Plan plan = iterator.next();
 					agents.add(plan.getPerson().getId());
 				}
 			}
@@ -370,8 +370,8 @@ public class PlansConstructor implements PlanStrategyModule{
 			if (ac.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-40,0))  &&
 				!this.actChains.contains(ac.get(i))	){ 
 				this.actChains.add(ac.get(i));
-				for (Iterator<PlanImpl> iterator = pl.get(i).iterator(); iterator.hasNext();){
-					PlanImpl plan = iterator.next();
+				for (Iterator<Plan> iterator = pl.get(i).iterator(); iterator.hasNext();){
+					Plan plan = iterator.next();
 					agents.add(plan.getPerson().getId());
 				}
 			}
@@ -431,7 +431,7 @@ public class PlansConstructor implements PlanStrategyModule{
 									this.modifyLocationCoord(act);
 								}
 								else if (act.getType().equalsIgnoreCase("h")) {
-									act.setCoord(person.getSelectedPlan().getFirstActivity().getCoord());
+									act.setCoord(((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord());
 								}
 							}
 							plan.addActivity((BasicActivity)act);
@@ -442,8 +442,8 @@ public class PlansConstructor implements PlanStrategyModule{
 						}
 					}
 					
-					plan.getFirstActivity().setCoord(person.getSelectedPlan().getFirstActivity().getCoord());
-					plan.getLastActivity().setCoord(person.getSelectedPlan().getLastActivity().getCoord());
+					plan.getFirstActivity().setCoord(((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord());
+					plan.getLastActivity().setCoord(((PlanImpl) person.getSelectedPlan()).getLastActivity().getCoord());
 					
 					this.linker.run(plan);
 					
@@ -687,17 +687,17 @@ public class PlansConstructor implements PlanStrategyModule{
 			}
 			stream.print(position+"\t");
 			int counterPlan = -1;
-			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				PlanImpl plan = iterator2.next();
+			for (Iterator<Plan> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
+				Plan plan = iterator2.next();
 				counterPlan++;
-				PlanImpl planFirstPerson = this.population.getPersons().get(firstPersonId).getPlans().get(counterPlan);
+				Plan planFirstPerson = this.population.getPersons().get(firstPersonId).getPlans().get(counterPlan);
 				
 				// Plan has only one act
 				if (plan.getPlanElements().size()==1) stream.print("24\t");
 				
 				else {
 					// First and last home act
-					stream.print((((ActivityImpl)(plan.getFirstActivity())).getEndTime()+86400-((ActivityImpl)(plan.getLastActivity())).getStartTime())/3600+"\t");
+					stream.print((((ActivityImpl)(((PlanImpl) plan).getFirstActivity())).getEndTime()+86400-((ActivityImpl)(((PlanImpl) plan).getLastActivity())).getStartTime())/3600+"\t");
 				
 					// All inner acts
 					/*// Old version with fixed act/mode chain
@@ -734,8 +734,8 @@ public class PlansConstructor implements PlanStrategyModule{
 				// Similarity attribute
 				stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
 			}
-			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				PlanImpl plan = iterator2.next();
+			for (Iterator<Plan> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
+				Plan plan = iterator2.next();
 				
 				// Plan not executable, drop from choice set
 				if (plan.getScore()!=null && plan.getScore()==-100000.0)	stream.print(0+"\t");
@@ -1553,17 +1553,17 @@ public class PlansConstructor implements PlanStrategyModule{
 			}
 			stream.print(position+"\t");
 			int counterPlan = -1;
-			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				PlanImpl plan = iterator2.next();
+			for (Iterator<Plan> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
+				Plan plan = iterator2.next();
 				counterPlan++;
-				PlanImpl planFirstPerson = this.population.getPersons().get(firstPersonId).getPlans().get(counterPlan);
+				Plan planFirstPerson = this.population.getPersons().get(firstPersonId).getPlans().get(counterPlan);
 				
 				// Plan has only one act
 				if (plan.getPlanElements().size()==1) stream.print("24\t");
 				
 				else {
 					// First and last home act
-					stream.print((((ActivityImpl)(plan.getFirstActivity())).getEndTime()+86400-((ActivityImpl)(plan.getLastActivity())).getStartTime())/3600+"\t");
+					stream.print((((ActivityImpl)(((PlanImpl) plan).getFirstActivity())).getEndTime()+86400-((ActivityImpl)(((PlanImpl) plan).getLastActivity())).getStartTime())/3600+"\t");
 				
 					// All inner acts
 					// Old version with fixed act/mode chain
@@ -1605,8 +1605,8 @@ public class PlansConstructor implements PlanStrategyModule{
 				// Similarity attribute
 				stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
 			}
-			for (Iterator<PlanImpl> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				PlanImpl plan = iterator2.next();
+			for (Iterator<Plan> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
+				Plan plan = iterator2.next();
 				
 				// Plan not executable, drop from choice set
 				if (plan.getScore()!=null && plan.getScore()==-100000.0)	stream.print(0+"\t");

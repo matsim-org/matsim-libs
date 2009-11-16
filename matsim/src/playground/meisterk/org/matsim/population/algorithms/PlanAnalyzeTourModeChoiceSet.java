@@ -31,6 +31,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -181,7 +182,7 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
 						currentLocation = ((PlanImpl) plan).getFirstActivity().getFacility();
 					} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
-						currentLocation = ((PlanImpl) plan).getFirstActivity().getLink();
+						currentLocation = (LinkImpl) ((PlanImpl) plan).getFirstActivity().getLink();
 					}
 					modeTracker.put(mode, currentLocation);
 				}
@@ -202,13 +203,13 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
 						requiredLocation = ((PlanImpl) plan).getPreviousActivity(currentLeg).getFacility();
 					} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
-						requiredLocation = ((PlanImpl) plan).getPreviousActivity(currentLeg).getLink();
+						requiredLocation = (LinkImpl) ((PlanImpl) plan).getPreviousActivity(currentLeg).getLink();
 					}
 					if (currentLocation.equals(requiredLocation)) {
 						if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
 							nextLocation = ((PlanImpl) plan).getNextActivity(currentLeg).getFacility();
 						} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
-							nextLocation = ((PlanImpl) plan).getNextActivity(currentLeg).getLink();
+							nextLocation = (LinkImpl) ((PlanImpl) plan).getNextActivity(currentLeg).getLink();
 						}
 						modeTracker.put(legMode, nextLocation);
 					} else {
@@ -232,8 +233,8 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 				allowedLocations.add(((PlanImpl) plan).getLastActivity().getFacility());
 			} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link
 					.equals(tripStructureAnalysisLayer)) {
-				allowedLocations.add(((PlanImpl) plan).getFirstActivity().getLink());
-				allowedLocations.add(((PlanImpl) plan).getLastActivity().getLink());
+				allowedLocations.add((LinkImpl) ((PlanImpl) plan).getFirstActivity().getLink());
+				allowedLocations.add((LinkImpl) ((PlanImpl) plan).getLastActivity().getLink());
 			}
 			
 			Iterator<TransportMode> modeTrackerCheck = modeTracker.keySet().iterator();

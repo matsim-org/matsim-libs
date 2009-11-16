@@ -9,6 +9,8 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -17,7 +19,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -29,8 +30,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
-import playground.mmoyo.PTRouter.LogicFactory;
-import playground.mmoyo.PTRouter.LogicIntoPlainTranslator;
 import playground.mmoyo.TransitSimulation.SimplifyPtLegs;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 
@@ -95,7 +94,7 @@ public class PTActWriter {
 		//if (true){	
 			//PersonImpl person = population.getPersons().get(new IdImpl("2180188"));   //2180188
 	
-			PlanImpl plan = person.getPlans().get(0);
+			Plan plan = person.getPlans().get(0);
 	 		ActivityImpl act1 = (ActivityImpl)plan.getPlanElements().get(0);
 			ActivityImpl act2 = (ActivityImpl)plan.getPlanElements().get(2);
 			List<Leg> legList = transitRouteFinder.calculateRoute (act1, act2, person);
@@ -128,7 +127,7 @@ public class PTActWriter {
 			//if ( true ) {
 			//PersonImpl person = population.getPersons().get(new IdImpl("905449")); // 5228308   5636428  2949483 
  			System.out.println(numPlans + " id:" + person.getId());
-			PlanImpl plan = person.getPlans().get(0);
+			Plan plan = person.getPlans().get(0);
 
 			boolean first =true;
 			boolean addPerson= true;
@@ -356,7 +355,7 @@ public class PTActWriter {
 		}//for Link
 	}//insert
 
-	private ActivityImpl newPTAct(final String type, final Coord coord, final LinkImpl link, final double startTime, final double endTime){
+	private ActivityImpl newPTAct(final String type, final Coord coord, final Link link, final double startTime, final double endTime){
 		ActivityImpl ptAct= new ActivityImpl(type, coord, link);
 		ptAct.setStartTime(startTime);
 		ptAct.setEndTime(endTime);

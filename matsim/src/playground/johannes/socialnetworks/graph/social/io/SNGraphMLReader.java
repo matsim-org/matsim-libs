@@ -53,7 +53,7 @@ import playground.johannes.socialnetworks.graph.social.SocialTie;
  * @author illenberger
  *
  */
-public class SNGraphMLReader<P extends BasicPerson<?>> extends AbstractGraphMLReader<SocialNetwork<P>, Ego<P>, SocialTie> {
+public class SNGraphMLReader<P extends Person> extends AbstractGraphMLReader<SocialNetwork<P>, Ego<P>, SocialTie> {
 
 	private static final String WSPACE = " ";
 	
