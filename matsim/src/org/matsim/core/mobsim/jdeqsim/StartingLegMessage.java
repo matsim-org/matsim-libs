@@ -26,7 +26,7 @@ import org.matsim.core.events.BasicEventImpl;
 
 /**
  * The micro-simulation internal handler for starting a leg.
- *
+ * 
  * @author rashid_waraich
  */
 public class StartingLegMessage extends EventMessage {
@@ -40,28 +40,43 @@ public class StartingLegMessage extends EventMessage {
 	public void handleMessage() {
 		// if current leg is in car mode, then enter request in first road
 		if (vehicle.getCurrentLeg().getMode().equals(TransportMode.car)) {
-			Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
-			road.enterRequest(vehicle, getMessageArrivalTime());
-		} else {
-			// move to first link in next leg and schedule an end leg message
-			vehicle.moveToFirstLinkInNextLeg();
-			Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
 
-			vehicle.scheduleEndLegMessage(getMessageArrivalTime() + vehicle.getCurrentLeg().getTravelTime(),
-					road);
+			// if empty leg, then end leg, else simulate leg
+			if (vehicle.getCurrentLinkRoute().length == 0) {
+				// move to first link in next leg and schedule an end leg
+				// message
+				// duration of leg = 0 (departure and arrival time is the same)
+				scheduleEndLegMessage(getMessageArrivalTime());
+
+			} else {
+				// start the new leg
+				Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
+				road.enterRequest(vehicle, getMessageArrivalTime());
+			}
+
+		} else {
+			scheduleEndLegMessage(getMessageArrivalTime() + vehicle.getCurrentLeg().getTravelTime());
 		}
+	}
+
+	private void scheduleEndLegMessage(double time) {
+		// move to first link in next leg and schedule an end leg message
+		vehicle.moveToFirstLinkInNextLeg();
+		Road road = Road.getRoad(vehicle.getCurrentLink().getId().toString());
+		vehicle.scheduleEndLegMessage(time, road);
 	}
 
 	public void processEvent() {
 		BasicEventImpl event = null;
 
 		// schedule ActEndEvent
-		event = new ActivityEndEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson(),
-				vehicle.getCurrentLink(), vehicle.getPreviousActivity());
+		event = new ActivityEndEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson(), vehicle.getCurrentLink(), vehicle
+				.getPreviousActivity());
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
 		// schedule AgentDepartureEvent
-		event = new AgentDepartureEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson(), vehicle.getCurrentLink(), vehicle.getCurrentLeg());
+		event = new AgentDepartureEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson(), vehicle.getCurrentLink(),
+				vehicle.getCurrentLeg());
 
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
