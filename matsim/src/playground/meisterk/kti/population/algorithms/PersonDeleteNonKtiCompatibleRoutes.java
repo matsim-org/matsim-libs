@@ -54,10 +54,10 @@ public class PersonDeleteNonKtiCompatibleRoutes extends AbstractPersonAlgorithm 
 					if (leg.getMode().equals(TransportMode.pt)) {
 						leg.setRoute(null);
 					} else if (leg.getMode().equals(TransportMode.car)) {
-						// invalidate distance information
-						leg.getRoute().setDistance(Double.NaN);
-						// set new distance information
-						leg.getRoute().setDistance(leg.getRoute().getDistance());
+						if (leg.getRoute() != null) {
+							leg.getRoute().setDistance(Double.NaN);
+							leg.getRoute().setDistance(leg.getRoute().getDistance());
+						}
 					} else {
 						// do nothing
 					}
