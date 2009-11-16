@@ -35,7 +35,7 @@ public class OTFSnapshotGenerator {
 
 	private final static String lsFile = "../../../workspace/vsp-cvs/studies/padang/gis/network_v20080618/d_ls.shp";
 
-	private final static double VIS_OUTPUT_SAMPLE = 1.;
+	private final static double VIS_OUTPUT_SAMPLE = 0.1;
 	
 	private final ScenarioImpl scenario;
 	private final String eventsFile;

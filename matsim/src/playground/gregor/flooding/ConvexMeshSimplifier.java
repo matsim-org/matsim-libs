@@ -3,10 +3,8 @@ package playground.gregor.flooding;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -17,6 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 import org.apache.log4j.Logger;
+import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -29,6 +28,7 @@ import org.geotools.feature.SchemaException;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.evacuation.flooding.FloodingInfo;
 import org.matsim.evacuation.flooding.FloodingReader;
@@ -57,26 +57,25 @@ public class ConvexMeshSimplifier {
 
 	private static final boolean DEBUG = true;
 	List<List<Integer>> geos = new ArrayList<List<Integer>>();
-	private boolean run  = true;
 
 
-	private final FloodingReader reader;
+	private FloodingReader reader;
 
 
 	private List<FloodingInfo> fis;
 
 	private final Set<Edge> removed = new HashSet<Edge>();
 	private final Set<Edge> marked = new HashSet<Edge>();
-	private final Set<Edge> marked2 = new HashSet<Edge>();
-	private final Set<Edge> warn = new HashSet<Edge>();
-	private final Set<Edge> produced = new HashSet<Edge>();
+//	private final List<Edge> marked2 = new ArrayList<Edge>();
+//	private final Set<Edge> warn = new HashSet<Edge>();
+//	private final Set<Edge> produced = new HashSet<Edge>();
 
 	private Map<Integer, Integer> mapping;
 
 	private Map<Coordinate, Integer> coordKeyMap;
 	private QuadTree<Coordinate> coordQuadTree;
 
-	private QuadTree<Polygon> polygons;
+	//	private QuadTree<Polygon> polygons;
 
 
 
@@ -91,115 +90,100 @@ public class ConvexMeshSimplifier {
 
 	private FeatureType ftLine;
 
+	private boolean initialized = false;
+
 	public ConvexMeshSimplifier(String netcdf) {
 		this.reader = new FloodingReader(netcdf);
 		this.reader.setReadTriangles(true);
 		this.reader.setReadFloodingSeries(true);
+		this.reader.setMaxTimeStep(90);
 		double offsetEast = 632968.461027224;
 		double offsetNorth = 9880201.726;
 		this.reader.setOffset(offsetEast, offsetNorth);
 	}
 
+	
+	public ConvexMeshSimplifier(String netcdf, String aoi) {
+		this.reader = new FloodingReader(netcdf);
+		this.reader.setReadTriangles(true);
+		this.reader.setReadFloodingSeries(true);
+		this.reader.setMaxTimeStep(90);
+		
+		try {
+			FeatureSource geocoll = ShapeFileReader.readDataFile(aoi);
+			Feature ft =  (Feature) geocoll.getFeatures().iterator().next();
+			Geometry geo = ft.getDefaultGeometry();
+			this.reader.setFloodingArea(geo);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		double offsetEast = 632968.461027224;
+		double offsetNorth = 9880201.726;
+		this.reader.setOffset(offsetEast, offsetNorth);
+	}
+
+
+	public ArrayList<List<FloodingInfo>> getInundationGeometries(){
+		
+		ArrayList<List<FloodingInfo>> ret = new ArrayList<List<FloodingInfo>>();
+		
+		if (!this.initialized  ) {
+			run();
+		}
+		for (List<Integer> geo : this.geos) {
+			List<FloodingInfo> info = new ArrayList<FloodingInfo>();
+			for (int i = 0; i < geo.size()-1; i++) {
+				Integer idx = this.mapping.get(geo.get(i));
+				info.add(this.fis.get(idx));
+			}
+			ret.add(info);
+		}
+		
+		return ret;
+	}
+	
 	private void run() {
 		this.fis = this.reader.getFloodingInfos();
 
 		this.mapping = this.reader.getIdxMapping();
-		//		List<List<Integer>> geos = new ArrayList<List<Integer>>();
-		//		for (int [] tri : this.reader.getTriangles()) {
-		//			List<Integer> geo = new ArrayList<Integer>();
-		//			boolean add = true;
-		//			for (int i = 0; i < 3; i++) {
-		//				if (this.mapping.get(tri[i]) == null) {
-		//					add = false;
-		//					break;
-		//				}
-		//				geo.add(tri[i]);
-		//			}
-		//			geo.add(tri[0]);
-		//			if (add){
-		//				geos.add(geo);
-		//			}
-		//		}
-		//		dump2(geos);
-		//		if (true) {
-		//			return;
-		//		}
-		Queue<Edge> tmp = loadNetwork();
-		//		loadNetwork();
+		Stack<Edge> edges = loadNetwork();
 		loadCoordMapping();
+		this.reader = null;
+		//		Queue<Edge> edges = new ConcurrentLinkedQueue<Edge>();
 
-//		Queue<Edge> edges = new ConcurrentLinkedQueue<Edge>();
-		Edge e1 = getE1();
-//		edges.add(e1);
-		Stack<Edge> stack = new Stack<Edge>();
-		stack.addAll(tmp);
+		//		edges.clear();
+		edges.push(getE1());
+		//		edges.add(e1);
 		//		tmp.clear();
 
-		log.info("run 1 ");
-		runEdgesIII(e1);
+		runEdgesII(edges);
 
-		for (int i = 20; i < 10; i++) {
-			tmp.clear();
-			tmp.addAll(this.produced);
-			this.produced.clear();
-			stack.addAll(tmp);
-			List<Edge> warn = new ArrayList<Edge>(this.warn);
-			Collections.shuffle(warn);
-			stack.addAll(warn);
-			this.warn.clear();
-			log.info("run " + i + "  " + stack.size() + " edges left!");
-			runEdgesII(stack);
-		}
-//		tmp.clear();
-//		tmp.addAll(this.produced);
-//		this.produced.clear();
-//		stack.addAll(this.warn);
-//		this.warn.clear();
-//		
-//		log.info("run 3 " + stack.size() + " edges left!");
-//		runEdgesII(stack);
-//
-//		tmp.clear();
-//		tmp.addAll(this.produced);
-//		this.produced.clear();
-//		stack.addAll(this.warn);
-//		this.warn.clear();
-//		log.info("run 4 " + stack.size() + " edges left!");
-//		runEdgesII(stack);
-//
-//		tmp.clear();
-//		tmp.addAll(this.produced);
-//		this.produced.clear();
-//		stack.addAll(this.warn);
-//		this.warn.clear();
-//		log.info("run 5 " + stack.size() + " edges left!");
-//		runEdgesII(stack);
-		
-		
-		dump(this.geos,"../../tmp/geometries.shp",true);
+
+
 		if (DEBUG) {
+			dump(this.geos,"../../tmp/geometries.shp",true);
 			List<List<Integer>> geos = new ArrayList<List<Integer>>();
-			for (Set<Edge> es : this.network.values()) {
-				for (Edge e : es) {
-					List<Integer> geo = new ArrayList<Integer>();
-					geo.add(e.from);
-					geo.add(e.to);
-					geos.add(geo);
-				}
-			}
-			dump(geos,"../../tmp/edges.shp",false);
-			geos.clear();
 			//			for (Set<Edge> es : this.network.values()) {
+			//				for (Edge e : es) {
+			//					List<Integer> geo = new ArrayList<Integer>();
+			//					geo.add(e.from);
+			//					geo.add(e.to);
+			//					geos.add(geo);
+			//				}
+			//			}
+			//			dump(geos,"../../tmp/edges.shp",false);
+			geos.clear();
 			for (Edge e : this.removed) {
 				List<Integer> geo = new ArrayList<Integer>();
 				geo.add(e.from);
 				geo.add(e.to);
 				geos.add(geo);
 			}
-			//			}
 			dump(geos,"../../tmp/removed.shp",false);
-			geos.clear();
-			//			for (Set<Edge> es : this.network.values()) {
+//			geos.clear();
 //			for (Edge e : this.marked2) {
 //				List<Integer> geo = new ArrayList<Integer>();
 //				geo.add(e.from);
@@ -210,66 +194,52 @@ public class ConvexMeshSimplifier {
 //			dump(geos,"../../tmp/marked2.shp",false);
 
 		}
-	}
-	
-	
-	
-	private void runEdgesIII(Edge edge) {
-		Queue<Edge> edges = new ConcurrentLinkedQueue<Edge>();
-		edges.add(edge);
 		
-		while (!edges.isEmpty()) {
-			if (edges.size() % 1000 == 0) {
-				System.out.println(edges.size());
-			}
-
-			if (this.geos.size() == 20736) {
-				this.run = false;
-			}
-			if (!this.run) {
-				break;
-			}
-
-			//			System.out.println("removed.size: " + this.removed.size());
-			if (this.removed.contains(edges.peek())) {
-				edges.poll();
-			} else {
-				Queue<Edge> tmp = runEdge(edges.poll());
-				edges.addAll(tmp);
-			}
-		}
-
+		this.initialized = true;
 	}
-	
+
+
 
 	private void runEdgesII(Stack<Edge> edges) {
+		int next = 1;
 		while (!edges.isEmpty()) {
-			if (edges.size() % 1000 == 0) {
-				System.out.println(edges.size());
-			}
 
-			//			if (this.geos.size() == 100) {
-			//				this.run = false;
-			//			}
-			if (!this.run) {
-				break;
-			}
-
-			//			System.out.println("removed.size: " + this.removed.size());
 			if (this.removed.contains(edges.peek())) {
-				edges.pop();
+				Edge e = edges.pop();
+				e.successors.clear();
+				this.marked.remove(e);
+				
 			} else {
-				runEdge(edges.pop());
+				Queue<Edge> tmp = runEdgeII(edges.pop());
+				while(tmp.size() > 0) {
+					edges.push(tmp.poll());
+				}
+			}
+			if (this.geos.size() >= next) {
+				log.info("convex geos found: " + this.geos.size());
+				next *= 2;
+			}
+			if (this.geos.size() % 10000 == 0) {
+				for (Set<Edge> es : this.network.values()) {
+					Stack<Edge> rm = new Stack<Edge>();
+					for (Edge e: es) {
+						if (this.removed.contains(e)) {
+							rm.push(e);
+						}
+					}
+					for (Edge e : rm) {
+						es.remove(e);
+					}
+				}
 			}
 		}
-
+		log.info("convex geos found: " + this.geos.size());
 	}
 
 	private void loadCoordMapping() {
 		this.coordKeyMap = new HashMap<Coordinate, Integer>();
 		Envelope e = this.reader.getEnvelope();
 		this.coordQuadTree = new QuadTree<Coordinate>(e.getMinX(), e.getMinY(), e.getMaxX(), e.getMaxY());
-		this.polygons = new QuadTree<Polygon>(e.getMinX(), e.getMinY(), e.getMaxX(), e.getMaxY());
 		for (Entry<Integer, Integer> entry : this.mapping.entrySet()) {
 			Coordinate c = this.fis.get(entry.getValue()).getCoordinate();
 			this.coordKeyMap.put(c, entry.getKey());
@@ -278,197 +248,117 @@ public class ConvexMeshSimplifier {
 
 	}
 
-	private Queue<Edge> runEdge(Edge e) {
-		
+
+	private Queue<Edge> runEdgeII(Edge root) {
+
+
 		Queue<Edge> ret = new ConcurrentLinkedQueue<Edge>();
-		//		Edge e = edges.poll();
-		//		Edge e = stack.pop();
-		Edge e0 = e;
-		Stack<Integer> coords = new Stack<Integer>();
-		Set<Integer> fwdH = new HashSet<Integer>();
 
-		Stack<Integer> coordsReverse = new Stack<Integer>();
-		Set<Integer> rwdH = new HashSet<Integer>();
+		Set<Integer> el = new HashSet<Integer>();
+		Stack<Edge> elStack = new Stack<Edge>();
+		Set<Edge> blamed = new HashSet<Edge>();
 
-		Integer coord = e.to;
-		coords.push(coord);
-		fwdH.add(coord);
-		Integer coordReverse = e.from;
-		coordsReverse.push(coordReverse);
-		rwdH.add(coordReverse);
-		Edge rev = new Edge(e.to,e.from);
+		el.add(root.to);
+		elStack.push(root);
+		Edge current = root;
 
-		List<Integer> nn = new ArrayList<Integer>();
-		nn.add(e.from);
-		nn.add(e.to);
+		boolean turnRight = true;
+		do {
+			current = getNextEdgeConvex(current, blamed, turnRight);
 
-		boolean runForward = true;
-		boolean runBackward = true;
-		boolean success = false;
-
-		//		System.out.println(this.geos.size());
-
-		while (runForward || runBackward) {
-
-			if (runForward) {
-				e = getNextEdgeConvex(e,true);
-				if (e == null) {
-					break;
-				}
-				coords.push(e.to);
-			}
-
-			if (runBackward) {
-				rev = getNextEdgeConvex(rev,false);
-				if (rev == null) {
-					break;
+			if (current == null) {
+				current = elStack.pop();
+				el.remove(current.to);
+				Stack<Edge> stack = current.successors;
+				while (!stack.isEmpty()) {
+					Edge e = stack.pop();
+					blamed.remove(e);
+					while (!e.successors.isEmpty()) {
+						stack.push(e.successors.pop());
+					}
 				}
 
-				coordsReverse.push(rev.to);
-			}
+				blamed.add(current);
 
-			if (e.to == coordsReverse.get(0)) {
-				//				System.out.println("valid forward circle size:" + coords.size());
-				coords.push(coords.firstElement());
-				success = true;
-				break;
-			} else if (runForward && fwdH.contains(e.to)) {
-				//				System.out.println("invalid forward circle");
-				runForward = false;
-			}
-
-			if (fwdH.contains(rev.to)) {
-				//				System.out.println("backward match");
-				Stack<Integer> tmp = coords;
-				coords.clear();
-
-				//				handleForwardMatch(coords,coordsReverse,false);
-				//				coords = coordsReverse;
-				//				success = true;
-				break;
-			}
-			if (rwdH.contains(e.to)) {
-				//				if (this.geos.size() == 81) {
-				//					this.run = false;
-				//					this.geos.clear();
-				//					this.geos.add(coords);
-				//					this.geos.add(coordsReverse);
-				////					this.geos.add(nn);
-				//					break;
-				//				}
-				//				System.out.println("forward match");
-				success = handleForwardMatch(coords,coordsReverse,true);
-				//				success = true;
-				break;
-			}
-
-			if (fwdH.contains(e.to)) {
-				break;
-			}
-			if (rwdH.contains(rev.to)) {
-				break;
-			}
-
-			if (rev.to == coords.get(0)) {
-				//				System.out.println("valid backward circle  size:" + coordsReverse.size());
-				coordsReverse.push(coordsReverse.firstElement());
-				coords.clear();
-				while (!coordsReverse.isEmpty()) {
-					coords.push(coordsReverse.pop());
-				}
-				success = true;
-				break;
-			} else if (runBackward && rwdH.contains(rev.to)) {
-				//				System.out.println("invalid backward circle!");
-				runBackward = false;
-			}
-
-			if (runForward) {
-				fwdH.add(e.to);
-			}
-			if (runBackward) {
-				rwdH.add(rev.to);
+				if (elStack.size() == 0) {
+					if (!turnRight) {
+						el.add(root.to);
+						elStack.push(root);
+						current = root;
+						turnRight = false;
+					} else {
+						return ret;
+					}
+				} 
+				current = elStack.peek();
+			} else if (!current.equals(root) && el.contains(current.to)) {
+				elStack.peek().successors.add(current);
+				current.successors.clear();
+				blamed.add(current);
+				current = elStack.peek();
+			} else {
+				elStack.peek().successors.add(current);
+				current.successors.clear();
+				elStack.push(current);
+				el.add(current.to);
 			}
 
 
-		}
-		if (!success) {
-			if (!this.warn.contains(e0)) {
-				this.warn.add(e0);
-				//				edges.add(e0);
-			}
-			return ret;
+		}while (!current.equals(root) || elStack.size() == 1);
+
+
+
+		cleanUp(elStack,el);
+
+
+		List<Integer> coords = new ArrayList<Integer>();
+
+		Edge e = elStack.pop();
+		coords.add(e.to);
+		while (!elStack.isEmpty()) {
+			e = elStack.pop();
+			ret.add(new Edge(e.to,e.from));
+			coords.add(e.to);
 		}
 
-		fwdH.clear();
-		fwdH.addAll(coords);
-		if (cleanUp(coords,fwdH)) {
-			Iterator<Integer> it = coords.iterator();
-			int e1 = it.next();
-			while (it.hasNext()) {
-				int e2 = it.next();
-				//			Edge edge = new Edge(e2,e1);
-				ret.add(new Edge(e2,e1));
-				ret.add(new Edge(e1,e2));
-				e1 = e2;
-			}
-			this.geos.add(coords);
-			System.out.println("Geos: " + this.geos.size() + " current size:" + coords.size());
-		}
-		//		geos.add(coordsReverse);
-		//		geos.add(nn);
-
+		this.geos.add(coords);
 		return ret;
-
 	}
 
-	private boolean cleanUp(Stack<Integer> coords, Set<Integer> fwdH) {
+
+
+	private boolean cleanUp(Stack<Edge> coords, Set<Integer> el) {
 
 		Coordinate [] shell = new Coordinate[coords.size()];
+		Set<Edge> shellEdges = new HashSet<Edge>();
 		int pos = 0;
 
 		Envelope e = new Envelope();
-		for (Integer i : coords) {
-			int idx = this.mapping.get(i);
+		for (Edge edge : coords) {
+			int idx = this.mapping.get(edge.to);
+			shellEdges.add(edge);
 			Coordinate c = this.fis.get(idx).getCoordinate();
 			shell[pos++] = c;
 			e.expandToInclude(c.x, c.y);
 		}
 		LinearRing lr = this.geofac.createLinearRing(shell);
 		Polygon p = this.geofac.createPolygon(lr, null);
-		Polygon ppp = this.polygons.get(p.getCentroid().getX(), p.getCentroid().getY());
-
-		if (ppp != null && p.equals(ppp)) {
-			return false;
-		}
-		this.polygons.put(p.getCentroid().getX(), p.getCentroid().getY(), p);
 
 		Collection<Coordinate> values = new ArrayList<Coordinate>();
 		this.coordQuadTree.get(e.getMinX(), e.getMinY(), e.getMaxX(), e.getMaxY(), values);
 		for (Coordinate c : values) {
-			Point pp = this.geofac.createPoint(c);
-			if (p.contains(pp) && p.getExteriorRing().distance(pp) > 0.01) {
-				//				if (p.getExteriorRing().distance(pp) < 0.01) {
-				//					throw new RuntimeException();
-				//				}
+			Point point = this.geofac.createPoint(c);
+			if (p.contains(point) && p.getExteriorRing().distance(point) > 0.01) {
 				int idx = this.coordKeyMap.get(c);
-				this.mapping.remove(idx);
 				Set<Edge> s = this.network.get(idx);
 				if (s == null) {
-					this.network.remove(idx);
 					continue;
 				}
 
 				for (Edge edge : s) {
 					this.removed.add(edge);
 					this.removed.add(new Edge(edge.to,edge.from));
-					//					Set<Edge> tmp  = this.network.get(edge.to);
-					//					if (tmp != null) {
-					//						Edge tmpE = new Edge(edge.to,edge.from);
-					//
-					//						tmp.remove(tmpE);
-					//						this.removed.add(tmpE);
-					//					}
+
 				}
 
 				this.network.remove(idx);
@@ -478,97 +368,38 @@ public class ConvexMeshSimplifier {
 
 		//walk around the shell and remove edges cutting geometry
 		for (int i = 1; i < coords.size(); i++) {
-			Set<Edge> s = this.network.get(coords.get(i));
-			Stack<Edge> rm = new Stack<Edge>();
+			Set<Edge> s = this.network.get(coords.get(i).to);
 			int j = i + 1;
 			if (j >= coords.size()) {
 				j = 1;
 			}
+			int pred = coords.get(i-1).to;
+			int succ = coords.get(j).to;
+
 			for (Edge edge : s) {
-				if ((edge.to != coords.get(i-1) && edge.to != coords.get(j)) && fwdH.contains(edge.to)) {
-					rm.add(edge);
+				if ((edge.to != pred) && (edge.to != succ) && el.contains(edge.to)) {
 					this.removed.add(edge);
+
 				}
 			}
-			while (!rm.isEmpty()) {
-				s.remove(rm.pop());
-			}
 		}
+
+
 		for (int i = 1; i < coords.size(); i++) {
-			Edge ee = new Edge(coords.get(i-1),coords.get(i));
-			if (this.marked.contains(ee)) {
-				this.removed.add(ee);
+			Edge edge = coords.get(i);
+			if (this.marked.contains(edge)) {
+				this.removed.add(edge);
 
-				this.removed.add(new Edge(coords.get(i),coords.get(i-1)));
+				this.removed.add(new Edge(edge.to,edge.from));
 			} else {
-				this.marked.add(ee);
-				this.marked.add(new Edge(coords.get(i),coords.get(i-1)));
+				this.marked.add(edge);
+				this.marked.add(new Edge(edge.to,edge.from));
 			}
 		}
 		return true;
 	}
 
-	private boolean handleForwardMatch(Stack<Integer> coords,
-			Stack<Integer> coordsReverse, boolean turnRight) {
-		int fwdTop = coords.peek();
-		while (coordsReverse.peek()  != fwdTop) {
-			coordsReverse.pop();
-		}
 
-		double gamma = 0;
-		coords.pop();
-		coordsReverse.pop();
-		Edge e1 = new Edge(coords.peek(),fwdTop);
-		Edge e2 = new Edge(fwdTop,coordsReverse.peek());
-		gamma = getAngle(e1,e2,turnRight);
-		boolean addEdge = false;
-		while (gamma <=0 || gamma > Math.PI) {
-			//DEBUG
-			if (coordsReverse.size() == 1) {
-				return false;
-			}
-			coordsReverse.pop();
-			e1 = new Edge(coords.peek(),fwdTop);
-			e2 = new Edge(fwdTop,coordsReverse.peek());
-			gamma = getAngle(e1,e2,turnRight);
-			addEdge = true;
-
-
-
-		}
-		coords.push(fwdTop);
-		if (addEdge) {
-			addEdge(fwdTop,coordsReverse.peek());
-		}
-		while (!coordsReverse.isEmpty()) {
-			coords.push(coordsReverse.pop());
-		}
-		coords.push(coords.firstElement());
-		return true;
-	}
-
-	private void addEdge(int from, int to) {
-		if (from == to) {
-			System.err.println("from == to");
-			return;
-		}
-		Set<Edge> node = this.network.get(from);
-		if (node == null) {
-			node = new HashSet<Edge>();
-			this.network.put(from, node);
-		}
-		Edge e = new Edge(from, to);
-		node.add(e);
-		this.produced.add(e);
-		Set<Edge> node2 = this.network.get(to);
-		if (node2 == null) {
-			node2 = new HashSet<Edge>();
-			this.network.put(to, node2);
-		}
-		Edge e2 =new Edge(to, from);
-		node2.add(e2);
-		this.produced.add(e2);
-	}
 
 	private double getAngle(Edge e1, Edge e2, boolean turnRight) {
 		Integer idx = this.mapping.get(e1.to);
@@ -588,8 +419,13 @@ public class ConvexMeshSimplifier {
 		return gamma;
 	}
 
-	private Edge getNextEdgeConvex(Edge e, boolean turnRight) {
+
+	private Edge getNextEdgeConvex(Edge e, Set<Edge> blamed, boolean turnRight) {
 		Set<Edge> fwd = this.network.get(e.to);
+		if (fwd == null) {
+			return null;
+		}
+		
 		Integer idx = this.mapping.get(e.to);
 		if (idx == null) {
 			return null;
@@ -604,7 +440,7 @@ public class ConvexMeshSimplifier {
 		Edge bestEdge = null;
 		for (Edge tmp : fwd) {
 
-			if (this.removed.contains(tmp)) {
+			if (this.removed.contains(tmp) || blamed.contains(tmp) ) {
 				continue;
 			}
 
@@ -708,10 +544,9 @@ public class ConvexMeshSimplifier {
 
 
 
-	//TODO this method may be void
-	private Queue<Edge> loadNetwork() {
-		Queue<Edge> edges = new ConcurrentLinkedQueue<Edge>();
+	private Stack<Edge> loadNetwork() {
 
+		Stack<Edge> ret = new Stack<Edge>();
 		List<int[]> tris = this.reader.getTriangles();
 		for (int [] tri : tris) {
 			int j = 2;
@@ -721,9 +556,6 @@ public class ConvexMeshSimplifier {
 				Integer idx0  = this.mapping.get(tri[j]);
 				Integer idx1  = this.mapping.get(tri[i]);
 
-
-
-
 				if (idx0 == null || idx1 == null ) {
 					j = i;
 					continue;
@@ -732,16 +564,13 @@ public class ConvexMeshSimplifier {
 					j = i;
 					continue;
 				}
-				//				addEdge(idx0, idx1);
 				Set<Edge> node = this.network.get(tri[j]);
 				if (node == null) {
 					node = new HashSet<Edge>();
 					this.network.put(tri[j], node);
 				}
 				Edge e = new Edge(tri[j], tri[i]);
-				edges.add(e);
 				Edge e2 =new Edge(tri[i], tri[j]);
-				edges.add(e2);
 				node.add(e);
 				Set<Edge> node2 = this.network.get(tri[i]);
 				if (node2 == null) {
@@ -750,15 +579,11 @@ public class ConvexMeshSimplifier {
 				}
 				node2.add(e2);
 				j = i;
-				//				Set<Edge> nodeReverse = this.networkReverse.get(tri[i]);
-				//				if (nodeReverse == null) {
-				//					nodeReverse = new HashSet<Edge>();
-				//					this.networkReverse.put(tri[i], nodeReverse);
-				//				}
-				//				nodeReverse.add(e);
+				ret.push(e2);
+				ret.push(e);
 			}
 		}
-		return edges;
+		return ret;
 	}
 
 
@@ -766,6 +591,8 @@ public class ConvexMeshSimplifier {
 		int from;
 		int to;
 		int hash;
+
+		Stack<Edge> successors = new Stack<Edge>();
 
 		public Edge(int n1, int n2) {
 			this.from = n1;
@@ -783,12 +610,15 @@ public class ConvexMeshSimplifier {
 		public boolean equals(Object obj) {
 			return this.hash == obj.hashCode();
 		}
+
 	}
 
 
 	public static void main(String [] args) {
-		String netcdf = MY_STATIC_STUFF.SWW_ROOT + "/" + MY_STATIC_STUFF.SWW_PREFIX + 2 + MY_STATIC_STUFF.SWW_SUFFIX;
-		new ConvexMeshSimplifier(netcdf).run();
+		String netcdf = MY_STATIC_STUFF.SWW_ROOT + "/" + MY_STATIC_STUFF.SWW_PREFIX + 1 + MY_STATIC_STUFF.SWW_SUFFIX;
+		String aoi = MY_STATIC_STUFF.SWW_ROOT + "/aoi.shp";
+//		new BasicInundationGeometryLoader(netcdf).getInundationGeometries();
+		new ConvexMeshSimplifier(netcdf,aoi).run();
 
 	}
 

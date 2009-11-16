@@ -67,7 +67,7 @@ public class OTFInundationDrawer extends OTFTimeDependentDrawer {
 //			zoom /= 2;
 //		}
 		this.data.floodingData.get(zoom).get(miX,miY,mxX,mxY,fic);
-		while (fic.size() > 80000) {
+		while (fic.size() > 60000) {
 			fic.clear();
 			zoom *= 4;
 			this.data.floodingData.get(zoom).get(miX,miY,mxX,mxY,fic);	

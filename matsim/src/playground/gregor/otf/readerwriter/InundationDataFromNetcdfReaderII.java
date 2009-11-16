@@ -20,6 +20,7 @@ import org.matsim.evacuation.flooding.FloodingReader;
 
 import playground.gregor.MY_STATIC_STUFF;
 import playground.gregor.collections.gnuclasspath.TreeMap;
+import playground.gregor.flooding.ConvexMeshSimplifier;
 import playground.gregor.otf.readerwriter.InundationData.InundationGeometry;
 import playground.gregor.otf.readerwriter.InundationData.Polygon;
 import playground.gregor.otf.readerwriter.InundationData.Quad;
@@ -176,9 +177,12 @@ public class InundationDataFromNetcdfReaderII {
 		ArrayList<Float> xcoords = new ArrayList<Float>();
 		ArrayList<Float> ycoords = new ArrayList<Float>();
 		ArrayList<float []> walshs = new ArrayList<float[]>();
+		
+		String aoi = MY_STATIC_STUFF.SWW_ROOT + "/aoi.shp";
 		for (int i = 0; i < MY_STATIC_STUFF.SWW_COUNT; i++) {
 			String file = MY_STATIC_STUFF.SWW_ROOT + "/" + MY_STATIC_STUFF.SWW_PREFIX + i + MY_STATIC_STUFF.SWW_SUFFIX;
-			BasicInundationGeometryLoader reader = new BasicInundationGeometryLoader(file);
+//			BasicInundationGeometryLoader reader = new BasicInundationGeometryLoader(file);
+			ConvexMeshSimplifier reader = new ConvexMeshSimplifier(file,aoi);
 			ArrayList<List<FloodingInfo>> fgis = reader.getInundationGeometries();
 			reader = null;
 
