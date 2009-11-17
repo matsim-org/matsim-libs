@@ -3,6 +3,7 @@ package playground.ciarif.flexibletransports.scoring;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -30,7 +31,8 @@ public class FtScoringFunctionFactory extends CharyparNagelScoringFunctionFactor
 			this.facilityPenalties = facilityPenalties;
 		}
 	
-		public ScoringFunction getNewScoringFunction(PlanImpl plan) {
+		@Override
+		public ScoringFunction getNewScoringFunction(Plan plan) {
 			
 			ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 			
@@ -39,7 +41,7 @@ public class FtScoringFunctionFactory extends CharyparNagelScoringFunctionFactor
 					super.getParams(), 
 					this.facilityPenalties));
 			scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
-					plan, 
+					(PlanImpl) plan, 
 					super.getParams(),
 					config,
 					this.ftConfigGroup));

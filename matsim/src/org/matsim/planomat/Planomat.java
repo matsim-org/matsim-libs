@@ -216,7 +216,7 @@ public class Planomat implements PlanAlgorithm {
 
 		ScoringFunction scoringFunction = null;
 		if (action.equals(StepThroughPlanAction.EVALUATE)) {
-			scoringFunction = this.scoringFunctionFactory.getNewScoringFunction((PlanImpl) plan);
+			scoringFunction = this.scoringFunctionFactory.getNewScoringFunction(plan);
 		}
 		// TODO this as a quick and dirty implementation that takes a lot of resources
 		// replace activity duration encoding with double [0.0,1.0] or time slots, respectively
