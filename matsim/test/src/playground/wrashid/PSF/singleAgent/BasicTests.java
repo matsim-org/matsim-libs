@@ -121,7 +121,7 @@ public class BasicTests extends MatsimTestCase {
 		// allow small delta of one second (because the output time in the log
 		// file is truncated
 		// check the time of the entrance of the last link
-		assertEquals(energyConsumption.getTempEnteranceTimeOfLastLink(), 60129, 1);
+		assertEquals(energyConsumption.getTempEnteranceTimeOfLastLink(), 61459, 1);
 		LinkEnergyConsumptionLog energyLog = energyConsumption.getLinkEnergyConsumption().get(0);
 		assertEquals(energyLog.getEnterTime(), 21670, 1);
 		assertEquals(energyLog.getLeaveTime(), 22029, 1);
