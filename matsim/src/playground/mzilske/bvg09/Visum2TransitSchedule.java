@@ -11,6 +11,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
@@ -129,7 +130,27 @@ public class Visum2TransitSchedule {
 				}
 			}
 			if (tLine.getRoutes().size() > 0) {
-				this.schedule.addTransitLine(tLine);
+				
+				boolean keepPlan = false;
+				for (TransitRoute tRoute : tLine.getRoutes().values()) {
+					for (TransitRouteStop tStop : tRoute.getStops()){
+						Coord xyMin = new CoordImpl(4590999.0, 5805999.0);
+						Coord xyMax = new CoordImpl(4606021.0, 5822001.0);
+						double nodeX = tStop.getStopFacility().getCoord().getX();
+						double nodeY = tStop.getStopFacility().getCoord().getY();
+						if(nodeX >= xyMin.getX() && nodeX <= xyMax.getX() && nodeY >= xyMin.getY() && nodeY <= xyMax.getY()){
+							keepPlan = true;
+							break;
+						}		
+					}
+					
+				}
+				if(keepPlan){
+					this.schedule.addTransitLine(tLine);
+				} else {
+					log.warn("The line " + tLine.getId() + " was not added to the transit schedule because it does not serve stops within m44/344 area.");
+				}
+
 			} else {
 				log.warn("The line " + tLine.getId() + " was not added to the transit schedule because it does not contain any routes.");
 			}
