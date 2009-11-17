@@ -24,7 +24,9 @@
 package playground.yu.test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -75,25 +77,28 @@ public class BusLineAllocator {
 	}
 
 	private NetworkImpl network;
-	private Map<Id, Tuple<Coord, Coord>> coordPairs;// <ptLinkId,<fromNodeCoord,toNodeCoord>>
-	private Map<Id, Path> resultPaths = new HashMap<Id, Path>();// linkId linkId
-	// linkId (never
-	// pt linkId)
+	private Map<Id, List<Tuple<Id, Tuple<Coord, Coord>>>> coordPairs;// <ptRouteId,<ptLinkId<fromNodeCoord,toNodeCoord>>>
+	/*
+	 * <ptRouteId,List<ptLinkId,Path(linkId linkId linkId (never pt linkId))>>
+	 */
+	private Map<Id, List<Tuple<Id, Path>>> resultPaths = new HashMap<Id, List<Tuple<Id, Path>>>();
 	private String outputFile;
 	private Dijkstra dijkstra;
-	private Id tmpPtLinkId = null;
+	private Id tmpPtLinkId = null, tmpPtRouteId = null;
 
 	/**
 	 * @param network
 	 *            a nomral MATsim <code>NetworkImpl</code>, in which there
 	 *            aren't "pt" links
 	 * @param stopCoords
-	 *            a Collection of bus lines
+	 *            a Collection of
+	 *            <ptRouteId,<ptLinkId<fromNodeCoord,toNodeCoord>>>
 	 * @param outputFile
 	 *            file path of the output file
 	 */
 	public BusLineAllocator(NetworkImpl network,
-			Map<Id, Tuple<Coord, Coord>> coordPairs, String outputFile) {
+			Map<Id, List<Tuple<Id, Tuple<Coord, Coord>>>> coordPairs,
+			String outputFile) {
 		this.network = network;
 		this.coordPairs = coordPairs;
 		this.outputFile = outputFile;
@@ -102,24 +107,48 @@ public class BusLineAllocator {
 	}
 
 	protected void allocateAllRouteLinks() {
-		for (Entry<Id, Tuple<Coord, Coord>> coordPair : coordPairs.entrySet()) {
-			tmpPtLinkId = coordPair.getKey();
-			allocateRouteLink(coordPair.getValue());
+		for (Entry<Id, List<Tuple<Id, Tuple<Coord, Coord>>>> routeLinkCoordPair : coordPairs
+				.entrySet()) {
+			tmpPtRouteId = routeLinkCoordPair.getKey();
+			for (Tuple<Id, Tuple<Coord, Coord>> linkCoordPair : routeLinkCoordPair
+					.getValue()) {
+				List<Tuple<Id, Path>> resultList = resultPaths
+						.get(tmpPtRouteId);
+				if (resultList == null)
+					resultList = new ArrayList<Tuple<Id, Path>>();
+				resultList.add(new Tuple<Id, Path>(linkCoordPair.getFirst(),
+						allocateRouteLink(linkCoordPair.getSecond())));
+			}
 		}
 	}
 
-	private static Map<Id, Tuple<Coord, Coord>> createCoordPairs(
+	private void rectifyAllocations() {
+
+	}
+
+	/**
+	 * @return 
+	 *         Map<TransitRouteId,List<Tuple<TransitLinkId,Tuple<fromCoord,toCoord
+	 *         >>>>
+	 */
+	private static Map<Id, List<Tuple<Id, Tuple<Coord, Coord>>>> createCoordPairs(
 			NetworkLayer ptNet, TransitSchedule schedule) {
-		Map<Id, Tuple<Coord, Coord>> coordPairs = new HashMap<Id, Tuple<Coord, Coord>>();
+		Map<Id, List<Tuple<Id, Tuple<Coord, Coord>>>> coordPairs = new HashMap<Id, List<Tuple<Id, Tuple<Coord, Coord>>>>();
 		for (TransitLine ptLine : schedule.getTransitLines().values()) {
 			for (TransitRoute ptRoute : ptLine.getRoutes().values()) {
+				List<Tuple<Id, Tuple<Coord, Coord>>> ptLinkCoordPairs = coordPairs
+						.get(ptRoute.getId());
+				if (ptLinkCoordPairs == null)
+					ptLinkCoordPairs = new ArrayList<Tuple<Id, Tuple<Coord, Coord>>>();
+
 				NetworkRouteWRefs route = ptRoute.getRoute();
 				Link startLink = route.getStartLink();
 
 				if (startLink.getLength() > 0) {
-					coordPairs.put(startLink.getId(), new Tuple<Coord, Coord>(
-							startLink.getFromNode().getCoord(), startLink
-									.getToNode().getCoord()));
+					ptLinkCoordPairs.add(new Tuple<Id, Tuple<Coord, Coord>>(
+							startLink.getId(), new Tuple<Coord, Coord>(
+									startLink.getFromNode().getCoord(),
+									startLink.getToNode().getCoord())));
 					System.out.println("ptLink :\t" + startLink.getId()
 							+ "\tis the first link of a route.");
 				} else
@@ -129,9 +158,11 @@ public class BusLineAllocator {
 
 				for (Link link : route.getLinks()) {
 					if (link.getLength() > 0)
-						coordPairs.put(link.getId(), new Tuple<Coord, Coord>(
-								link.getFromNode().getCoord(), link.getToNode()
-										.getCoord()));
+						ptLinkCoordPairs
+								.add(new Tuple<Id, Tuple<Coord, Coord>>(link
+										.getId(), new Tuple<Coord, Coord>(link
+										.getFromNode().getCoord(), link
+										.getToNode().getCoord())));
 					else
 						System.err.println("ptLink : " + link.getId()
 								+ "\thas a length of\t" + link.getLength()
@@ -140,9 +171,10 @@ public class BusLineAllocator {
 
 				Link endLink = route.getEndLink();
 				if (endLink.getLength() > 0)
-					coordPairs.put(endLink.getId(), new Tuple<Coord, Coord>(
-							endLink.getFromNode().getCoord(), endLink
-									.getToNode().getCoord()));
+					ptLinkCoordPairs.add(new Tuple<Id, Tuple<Coord, Coord>>(
+							endLink.getId(), new Tuple<Coord, Coord>(endLink
+									.getFromNode().getCoord(), endLink
+									.getToNode().getCoord())));
 				else
 					System.err.println("ptLink : " + endLink.getId()
 							+ "\thas a length of\t" + endLink.getLength()
@@ -152,16 +184,7 @@ public class BusLineAllocator {
 		return coordPairs;
 	}
 
-	// private void allocateLine(TransitLine line) {
-	// for (TransitRoute transitRoute : line.getRoutes().values()) {
-	// NetworkRouteWRefs route = transitRoute.getRoute();
-	// allocateRouteLink(route.getStartLink());
-	// for(Link link:route.getLinks())
-	// allocateRouteLink(route.getEndLink());
-	// }
-	//
-	// }
-	private void allocateRouteLink(Tuple<Coord, Coord> coordPair) {
+	private Path allocateRouteLink(Tuple<Coord, Coord> coordPair) {
 		Node firstNode = network.getNearestNode(coordPair.getFirst());
 		Node secondNode = network.getNearestNode(coordPair.getSecond());
 		if (firstNode.equals(secondNode))
@@ -169,20 +192,24 @@ public class BusLineAllocator {
 					+ "\thas the same \"from-node\" and \"to-node\" : "
 					+ firstNode.getId()
 					+ "\t. Maybe it is a startLink of a route");
-		resultPaths.put(tmpPtLinkId, dijkstra.calcLeastCostPath(firstNode,
-				secondNode, 0));
+		return dijkstra.calcLeastCostPath(firstNode, secondNode, 0);
 	}
 
 	// route.getStartLink().getFromNode().getCoord()
 
 	private void output() {
 		SimpleWriter writer = new SimpleWriter(outputFile);
-		writer.writeln("ptlinkId\t:\tlinks");
-		for (Entry<Id, Path> pathEntry : resultPaths.entrySet()) {
-			StringBuffer line = new StringBuffer(pathEntry.getKey() + "\t:\t");
-			for (Link link : pathEntry.getValue().links)
-				line.append(link.getId() + "\t");
-			writer.writeln(line.toString());
+		writer.writeln("ptRouteId\t:\tptlinkId\t:\tlinks");
+		for (Entry<Id, List<Tuple<Id, Path>>> routeLinkPathEntry : resultPaths
+				.entrySet()) {
+			for (Tuple<Id, Path> linkPathPair : routeLinkPathEntry.getValue()) {
+				StringBuffer line = new StringBuffer(routeLinkPathEntry
+						.getKey()
+						+ "\t:\t" + linkPathPair.getFirst() + "\t:\t");
+				for (Link link : linkPathPair.getSecond().links)
+					line.append(link.getId() + "\t");
+				writer.writeln(line.toString());
+			}
 		}
 		writer.close();
 	}
@@ -196,7 +223,7 @@ public class BusLineAllocator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String multiModalNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.xml", transitScheduleFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/scheduleTest.xml", carNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.car.mini.xml", outputFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/busLineAllocation.txt";
+		String multiModalNetworkFile = "bvg09/network.multimodal.mini.xml", transitScheduleFile = "bvg09/transitSchedule.networkOevModellBln.xml", carNetworkFile = "bvg09/network.car.mini.xml", outputFile = "bvg09/busLineAllocation.txt";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
