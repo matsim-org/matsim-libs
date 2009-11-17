@@ -33,6 +33,10 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 	public void handleEvent(LinkEnterEventImpl event) {
 		Id personId = event.getPersonId();
 
+		if (!energyConsumption.containsKey(personId)) {
+			energyConsumption.put(personId, new EnergyConsumption());
+		}
+		
 		EnergyConsumption eConsumption = energyConsumption.get(personId);
 
 		eConsumption.setTempEnteranceTimeOfLastLink(event.getTime());
