@@ -21,13 +21,21 @@
 package playground.meisterk.kti.router;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteWRefs;
 
 public class KtiNodeNetworkRouteFactory implements RouteFactory {
 
+	final private PlanomatConfigGroup planomatConfigGroup;
+
+	public KtiNodeNetworkRouteFactory(PlanomatConfigGroup simLegInterpretation) {
+		super();
+		this.planomatConfigGroup = simLegInterpretation;
+	}
+
 	public RouteWRefs createRoute(Link startLink, Link endLink) {
-		return new KtiNodeNetworkRouteImpl(startLink, endLink);
+		return new KtiNodeNetworkRouteImpl(startLink, endLink, this.planomatConfigGroup.getSimLegInterpretation());
 	}
 
 }

@@ -21,6 +21,8 @@
 package playground.meisterk.kti.router;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 
 /**
@@ -33,17 +35,31 @@ import org.matsim.core.population.routes.NodeNetworkRouteImpl;
  */
 public class KtiNodeNetworkRouteImpl extends NodeNetworkRouteImpl {
 
-	public KtiNodeNetworkRouteImpl(Link fromLink, Link toLink) {
+	final private PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
+
+	public KtiNodeNetworkRouteImpl(Link fromLink, Link toLink, SimLegInterpretation simLegInterpretation) {
 		super(fromLink, toLink);
+		this.simLegInterpretation = simLegInterpretation;
 	}
 
 	@Override
 	public double calcDistance() {
-		
+
 		double distance = super.calcDistance();
-		distance += this.getStartLink().getLength();
+
+		if (!this.getStartLink().equals(this.getEndLink())) {
+			PlanomatConfigGroup.SimLegInterpretation simLegInterpretation = this.simLegInterpretation;
+			switch (simLegInterpretation) {
+			case CetinCompatible:
+				distance += this.getEndLink().getLength();
+				break;
+			case CharyparEtAlCompatible:
+				distance += this.getStartLink().getLength();
+				break;
+			}
+		}
 		return distance;
-		
+
 	}
 
 }

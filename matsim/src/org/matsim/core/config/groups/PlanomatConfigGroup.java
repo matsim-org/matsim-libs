@@ -310,4 +310,8 @@ public class PlanomatConfigGroup extends Module {
 		PlanomatConfigParameter.TRIP_STRUCTURE_ANALYSIS_LAYER.setActualValue(newValue.toString());
 	}
 
+	public void setSimLegInterpretation(PlanomatConfigGroup.SimLegInterpretation newValue) {
+		PlanomatConfigParameter.SIM_LEG_INTERPRETATION.setActualValue(newValue.toString());
+	}
+
 }
