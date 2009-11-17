@@ -24,6 +24,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.LegImpl;
@@ -59,7 +60,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 
 	private final static Logger log = Logger.getLogger(LegScoringFunction.class);
 
-	public LegScoringFunction(PlanImpl plan,
+	public LegScoringFunction(Plan plan,
 			CharyparNagelScoringParameters params,
 			Config config,
 			KtiConfigGroup ktiConfigGroup) {

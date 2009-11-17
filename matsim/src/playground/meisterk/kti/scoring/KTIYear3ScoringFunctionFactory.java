@@ -23,8 +23,8 @@ package playground.meisterk.kti.scoring;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
@@ -48,7 +48,7 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.char
 		this.facilityPenalties = facilityPenalties;
 	}
 
-	public ScoringFunction getNewScoringFunction(PlanImpl plan) {
+	public ScoringFunction getNewScoringFunction(Plan plan) {
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
