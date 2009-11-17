@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleReader;
 import org.matsim.transitSchedule.api.TransitStopFacility;
@@ -73,12 +74,17 @@ public class BusStopAllocator {
 		this.outputFile = outputFile;
 	}
 
-	protected void allocateAllStops() {
+	protected void allocateAllStops1() {
 		for (TransitStopFacility stop : stops)
-			allocateStop(stop);
+			allocateStop1(stop);
 	}
 
-	private void allocateStop(TransitStopFacility stop) {
+	protected void allocateAllStops2() {
+		for (TransitStopFacility stop : stops)
+			allocateStop2(stop);
+	}
+
+	private void allocateStop1(TransitStopFacility stop) {
 		Coord stopCoord = stop.getCoord();
 		Id stopId = stop.getId();
 		Link link = network.getNearestLink(stopCoord);
@@ -96,6 +102,24 @@ public class BusStopAllocator {
 		}
 	}
 
+	private void allocateStop2(TransitStopFacility stop) {
+		Coord stopCoord = stop.getCoord();
+		Id stopId = stop.getId();
+		Link link = network.getNearestRightEntryLink(stopCoord);
+		resultIds.put(stopId, link.getId());
+		if (link != null) {
+			Collection<NodeImpl> nodes = network.getNearestNodes(stopCoord, 25);
+			String isToNode = null;
+			if (nodes.contains(link.getToNode()))
+				isToNode = "to";
+			else if (nodes.contains(link.getFromNode()))
+				isToNode = "from";
+			else
+				isToNode = network.getNearestNode(stopCoord).getId().toString();
+			resultIsToNodes.put(stopId, isToNode);
+		}
+	}
+
 	private void output() {
 		SimpleWriter writer = new SimpleWriter(outputFile);
 		writer.writeln("stopId\tlinkId\tfrom_to_nodeId");
@@ -106,8 +130,13 @@ public class BusStopAllocator {
 		writer.close();
 	}
 
-	public void run() {
-		allocateAllStops();
+	public void run1() {
+		allocateAllStops1();
+		output();
+	}
+
+	public void run2() {
+		allocateAllStops2();
 		output();
 	}
 
@@ -115,7 +144,10 @@ public class BusStopAllocator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String multiModalNetworkFile = "bvg09/network.multimodal.mini.xml", transitScheduleFile = "bvg09/transitSchedule.networkOevModellBln.xml", carNetworkFile = "bvg09/network.car.mini.xml", outputFile = "bvg09/stopAllocation.txt";
+		String multiModalNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.xml", 
+		transitScheduleFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/scheduleTest.xml", 
+		carNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.car.mini.xml", 
+		outputFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/stopAllocation2.txt";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
@@ -140,6 +172,6 @@ public class BusStopAllocator {
 
 		BusStopAllocator stopAllocator = new BusStopAllocator(carNetwork,
 				schedule.getFacilities().values(), outputFile);
-		stopAllocator.run();
+		stopAllocator.run2();
 	}
 }
