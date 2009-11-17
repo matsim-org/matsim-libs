@@ -58,10 +58,11 @@ public class DoublePlan extends NewPopulation {
 	public void run(Person person) {
 		pw.writePerson(person);
 		tmpPerson = person;
-		// String oldId = person.getId().toString();
-		int oldId = Integer.parseInt(person.getId().toString());
+		String oldId = person.getId().toString();
+		// int oldId = Integer.parseInt(person.getId().toString());
 		// produce new Person with new Id
-		createNewPerson(Integer.toString(oldId + 100));
+		for (int i = 1; i < 100; i++)
+			createNewPerson(oldId + i);
 		// createNewPerson(oldId + "A");
 		// createNewPerson(oldId + "B");
 		// createNewPerson(oldId + "C");
@@ -76,9 +77,9 @@ public class DoublePlan extends NewPopulation {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		String networkFilename = "examples/equil/network.xml";
-		String plansFilename = "../matsimTests/breakdown/plans100withPt.xml";
-		String outputPlansFilename = "../matsimTests/breakdown/plans200withPt.xml";
+		String networkFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.xml";
+		String plansFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/test.xml";
+		String outputPlansFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/testCarPop.xml";
 
 		ScenarioImpl s = new ScenarioImpl();
 

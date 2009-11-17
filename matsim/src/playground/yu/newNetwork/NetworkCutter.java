@@ -114,7 +114,8 @@ public class NetworkCutter {
 						resetBoundary(((ActivityImpl) pe).getCoord());
 					else {
 						RouteWRefs route = ((LegImpl) pe).getRoute();
-						if (route != null && (route instanceof NetworkRouteWRefs))
+						if (route != null
+								&& (route instanceof NetworkRouteWRefs))
 							resetBoundary((NetworkRouteWRefs) route, net);
 					}
 		Set<LinkImpl> links = new HashSet<LinkImpl>();
@@ -218,9 +219,9 @@ public class NetworkCutter {
 	public static void main(String[] args) {
 		new NetworkCutter()
 				.run(new String[] {
-						"../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml",
-						"test/input/playground/yu/test/ChangeLegModeWithParkLocationTest/testLegChainModes/plans1.xml",
-						"test/input/playground/yu/test/ChangeLegModeWithParkLocationTest/testLegChainModes/network.xml.gz" });
+						"../berlin-bvg09/pt/baseplan_900s_smallnetwork/network.multimodal.xml.gz",
+						"../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/plan.routedOevModell.BVB344.xml",
+						"../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.xml.gz" });
 	}
 
 }

@@ -39,10 +39,10 @@ public class XStats2Chart {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		String fileBase = "../runs-svn/run765/";
+		String fileBase = "../runs-svn/run766/";
 		// String fileBase = "../matsimTests/breakdown/output/";
-//		 String inputFile = fileBase + "traveldistancestats.txt";
-		String inputFile = fileBase + "scorestats.txt";
+		 String inputFile = fileBase + "traveldistancestats.txt";
+//		String inputFile = fileBase + "scorestats.txt";
 		String chartFile = inputFile.replace("txt", "png");
 		// /////////////////////////////////////////////
 		int maxIter = 1001;
