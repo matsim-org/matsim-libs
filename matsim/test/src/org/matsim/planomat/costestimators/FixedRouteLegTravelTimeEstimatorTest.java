@@ -25,11 +25,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -90,7 +90,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		// only plan of that person
 		this.testPlan = this.testPerson.getPlans().get(TEST_PLAN_NR);
 		// first leg
-		List<? extends BasicPlanElement> actsLegs = this.testPlan.getPlanElements();
+		List<? extends PlanElement> actsLegs = this.testPlan.getPlanElements();
 		this.testLeg = (LegImpl) actsLegs.get(TEST_LEG_NR + 1);
 		// activities before and after leg
 		this.originAct = (ActivityImpl) actsLegs.get(TEST_LEG_NR);

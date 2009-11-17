@@ -30,8 +30,8 @@ import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -211,7 +211,7 @@ public class Planomat implements PlanAlgorithm {
 		ActivityImpl origin = null;
 		ActivityImpl destination = null;
 
-		List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
+		List<? extends PlanElement> actslegs = plan.getPlanElements();
 		int numLegs = actslegs.size() / 2;
 
 		ScoringFunction scoringFunction = null;

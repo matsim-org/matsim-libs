@@ -27,10 +27,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;

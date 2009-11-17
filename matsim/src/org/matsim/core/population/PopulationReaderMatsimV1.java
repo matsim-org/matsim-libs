@@ -28,7 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -57,7 +57,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	private final static String LEG = "leg";
 	private final static String ROUTE = "route";
 
-	private final BasicPopulation plans;
+	private final Population plans;
 	private final NetworkLayer network;
 
 	private PersonImpl currperson = null;
@@ -71,7 +71,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 
 	private ActivityImpl prevAct = null;
 
-	public PopulationReaderMatsimV1(final BasicPopulation plans, final NetworkLayer network) {
+	public PopulationReaderMatsimV1(final Population plans, final NetworkLayer network) {
 		this.plans = plans;
 		this.network = network;
 	}
@@ -109,7 +109,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 			if (this.plans instanceof PopulationImpl) {
 				((PopulationImpl) this.plans).addPerson(this.currperson);
 			} else {
-				this.plans.getPersons().put(this.currperson.getId(), this.currperson);
+				this.plans.addPerson(this.currperson);
 			}
 			this.currperson = null;
 		}

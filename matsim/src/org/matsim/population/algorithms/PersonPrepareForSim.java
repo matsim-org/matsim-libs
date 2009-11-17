@@ -21,9 +21,9 @@
 package org.matsim.population.algorithms;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -67,7 +67,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		for (Plan plan : person.getPlans()) {
 			boolean needsXY2Links = false;
 			boolean needsReRoute = false;
-			for (BasicPlanElement pe : plan.getPlanElements()) {
+			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;
 					if (act.getLink() == null) {

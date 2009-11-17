@@ -30,12 +30,9 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -57,21 +54,19 @@ public class SNGraphMLReader<P extends Person> extends AbstractGraphMLReader<Soc
 
 	private static final String WSPACE = " ";
 	
-	private BasicPopulation<P> population;
+	private Population population;
 	
 	private SocialNetworkBuilder<P> builder;
 	
-	public SNGraphMLReader(BasicPopulation<P> population) {
+	public SNGraphMLReader(Population population) {
 		this.population = population;
 	}
 	
-//	@SuppressWarnings("unchecked")
 	@Override
 	public SocialNetwork<P> readGraph(String file) {
-		return (SocialNetwork<P>) super.readGraph(file);
+		return super.readGraph(file);
 	}
 
-//	@SuppressWarnings("unchecked")
 	@Override
 	protected SocialTie addEdge(Ego<P> v1, Ego<P> v2,
 			Attributes attrs) {
@@ -86,15 +81,15 @@ public class SNGraphMLReader<P extends Person> extends AbstractGraphMLReader<Soc
 		return e;
 	}
 
-//	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	@Override
 	protected Ego<P> addVertex(Attributes attrs) {
 		String id = attrs.getValue(SNGraphML.PERSON_ID_TAG);
-		P person = population.getPersons().get(new IdImpl(id));
+		P person = (P) population.getPersons().get(new IdImpl(id));
 		if(person == null)
 			throw new NullPointerException(String.format("Person with id %1$s not found!", id));
 		
-		return builder.addVertex((SocialNetwork<P>)getGraph(), person);
+		return builder.addVertex(getGraph(), person);
 	}
 
 	@Override
@@ -116,7 +111,7 @@ public class SNGraphMLReader<P extends Person> extends AbstractGraphMLReader<Soc
 		return g;
 	}
 	
-	public static <P extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> Set<Ego<P>> readAnonymousVertices(SocialNetwork<P> socialnet, String filename) {
+	public static <P extends Person> Set<Ego<P>> readAnonymousVertices(SocialNetwork<P> socialnet, String filename) {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(filename));
 			Set<Ego<P>> egos = new HashSet<Ego<P>>();

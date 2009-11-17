@@ -33,7 +33,7 @@ import net.opengis.kml._2.LinkType;
 import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.StyleType;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
@@ -43,7 +43,7 @@ import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectStyle;
  * @author illenberger
  *
  */
-public class SNKMLEgoAlterSytle<P extends BasicPerson<?>> implements KMLObjectStyle<SocialNetwork<P>, Ego<P>> {
+public class SNKMLEgoAlterSytle<P extends Person> implements KMLObjectStyle<SocialNetwork<P>, Ego<P>> {
 
 	private Set<Ego<P>> sampledVertices;
 		

@@ -21,7 +21,7 @@ package playground.johannes.socialnetworks.survey.ivt2009;
 
 import java.util.Set;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.SparseVertex;
 
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
@@ -31,7 +31,7 @@ import playground.johannes.socialnetworks.snowball2.SampledGraph;
  * @author illenberger
  *
  */
-public class SampledSocialNet<P extends BasicPerson<?>> extends SocialNetwork<P> implements SampledGraph {
+public class SampledSocialNet<P extends Person> extends SocialNetwork<P> implements SampledGraph {
 
 	@SuppressWarnings("unchecked")
 	public Set<? extends SampledSocialTie> getEdges() {

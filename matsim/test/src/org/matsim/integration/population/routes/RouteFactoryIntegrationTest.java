@@ -23,12 +23,12 @@ package org.matsim.integration.population.routes;
 import java.util.Collection;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicRoute;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
@@ -73,9 +73,9 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
-					if (pe instanceof BasicLeg) {
-						BasicLeg leg = (BasicLeg) pe;
-						BasicRoute route = leg.getRoute();
+					if (pe instanceof Leg) {
+						Leg leg = (Leg) pe;
+						Route route = leg.getRoute();
 						assertTrue(route instanceof NodeNetworkRouteImpl); // that must be different from the class used below
 					}
 				}
@@ -101,9 +101,9 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 			for (Plan plan : person.getPlans()) {
 				planCounter++;
 				for (PlanElement pe : plan.getPlanElements()) {
-					if (pe instanceof BasicLeg) {
-						BasicLeg leg = (BasicLeg) pe;
-						BasicRoute route = leg.getRoute();
+					if (pe instanceof Leg) {
+						Leg leg = (Leg) pe;
+						Route route = leg.getRoute();
 						assertTrue("person: " + person.getId() + "; plan: " + planCounter, route instanceof CompressedNetworkRouteImpl);
 					}
 				}

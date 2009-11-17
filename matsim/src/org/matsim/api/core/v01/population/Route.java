@@ -20,12 +20,29 @@
 
 package org.matsim.api.core.v01.population;
 
-import org.matsim.api.basic.v01.population.BasicRoute;
+import java.io.Serializable;
+
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.MatsimPopulationObject;
 
 /**
  * @author nagel
  *
  */
-public interface Route extends BasicRoute {
+public interface Route extends Serializable, MatsimPopulationObject {
+
+	public double getDistance();
+
+	public void setDistance(final double distance);
+
+	/** @deprecated -- use leg.getTravelTime() instead. kai, aug09 */ 
+	public double getTravelTime();
+
+	/** @deprecated -- use leg.setTravelTime() instead. kai, aug09 */
+	public void setTravelTime(final double travelTime);
+
+	public Id getStartLinkId();
+
+	public Id getEndLinkId();
 
 }

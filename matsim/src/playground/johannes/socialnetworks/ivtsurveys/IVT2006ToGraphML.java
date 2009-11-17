@@ -31,11 +31,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicPopulationFactory;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -152,8 +152,8 @@ public class IVT2006ToGraphML {
 //		act.setCoord(transform.transform(new CoordImpl(Double.parseDouble(x),
 //				Double.parseDouble(y))));
 		
-		BasicPopulationFactory pb = population.getFactory() ;
-		BasicActivity act = pb.createActivityFromCoord(HOME_ACT_TYPE,new CoordImpl(Double.parseDouble(x),
+		PopulationFactory pb = population.getFactory() ;
+		Activity act = pb.createActivityFromCoord(HOME_ACT_TYPE,new CoordImpl(Double.parseDouble(x),
 				Double.parseDouble(y))) ;
 		
 		plan.addActivity(act);

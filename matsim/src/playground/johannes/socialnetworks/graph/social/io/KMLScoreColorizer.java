@@ -21,32 +21,23 @@ package playground.johannes.socialnetworks.graph.social.io;
 
 import gnu.trove.TDoubleObjectHashMap;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import net.opengis.kml._2.LinkType;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.api.core.v01.population.Plan;
 
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.graph.social.SocialNetwork;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle;
-import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 
 /**
  * @author illenberger
  *
  */
-public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<BasicPerson<?>>, Ego<BasicPerson<?>>> {
+public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<Person>, Ego<Person>> {
 
 	private Map<Ego<?>, String> styleIds = new HashMap<Ego<?>, String>();
 	
@@ -87,13 +78,13 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<BasicPe
 	}
 
 	@Override
-	protected TDoubleObjectHashMap<String> getValues(SocialNetwork<BasicPerson<?>> graph) {
+	protected TDoubleObjectHashMap<String> getValues(SocialNetwork<Person> graph) {
 		TDoubleObjectHashMap<String> values = new TDoubleObjectHashMap<String>();
 	
-		for(Ego<BasicPerson<?>> ego : graph.getVertices()) {
-			BasicPerson<?> person = ego.getPerson();
+		for(Ego<Person> ego : graph.getVertices()) {
+			Person person = ego.getPerson();
 			double sum = 0;
-			for(BasicPlan<?> plan : person.getPlans()) {
+			for(Plan plan : person.getPlans()) {
 				Double score = plan.getScore();
 				if(score != null)
 					sum += score; 	
@@ -112,7 +103,7 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<BasicPe
 		return values;
 	}
 
-	public String getObjectSytleId(Ego<BasicPerson<?>> object) {
+	public String getObjectSytleId(Ego<Person> object) {
 		return styleIds.get(object);
 	}
 	
@@ -140,7 +131,7 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<BasicPe
 	 * @see playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle#getValue(playground.johannes.socialnetworks.graph.Vertex)
 	 */
 	@Override
-	protected double getValue(Ego<BasicPerson<?>> vertex) {
+	protected double getValue(Ego<Person> vertex) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

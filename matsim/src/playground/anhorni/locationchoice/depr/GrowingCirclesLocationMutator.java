@@ -27,11 +27,10 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -337,7 +336,7 @@ public class GrowingCirclesLocationMutator extends AbstractPersonAlgorithm imple
 			}
 
 			// clear the route
-			final List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
+			final List<? extends PlanElement> actslegs = plan.getPlanElements();
 			for (int j = 1; j < actslegs.size(); j=j+2) {
 				final LegImpl leg = (LegImpl)actslegs.get(j);
 				leg.setRoute(null);

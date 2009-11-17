@@ -24,11 +24,10 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -115,7 +114,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 			 * 4			Other means */
 
 			Plan plan = person.getSelectedPlan();
-			List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
+			List<? extends PlanElement> acts_legs = plan.getPlanElements();
 			if (index == 0) {
 				for (int i=1; i < acts_legs.size()-1; i=i+2) {
 					LegImpl leg = (LegImpl)acts_legs.get(i);
@@ -233,7 +232,7 @@ public class ModeChoiceAlgorithm extends AbstractPersonAlgorithm {
 
 		String main_type = "o";
 		Plan plan = person.getSelectedPlan();
-		List<? extends BasicPlanElement> acts_legs = plan.getPlanElements();
+		List<? extends PlanElement> acts_legs = plan.getPlanElements();
 
 		for (int i=2; i<acts_legs.size(); i=i+2) {
 			String type = ((ActivityImpl)acts_legs.get(i)).getType();

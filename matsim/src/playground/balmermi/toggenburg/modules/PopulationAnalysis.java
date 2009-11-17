@@ -6,7 +6,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -36,7 +36,7 @@ public class PopulationAnalysis {
 	//////////////////////////////////////////////////////////////////////
 	
 	private final void populationStats(PopulationImpl population, Set<IdImpl> toggenLinks) {
-		// Geschlechter Verteilung (Anzahl), Altersverteilung, Fahrausweis, Autoverfügbarkeit, Berufstätig, öV Abo Verfügbarkeit
+		// Geschlechter Verteilung (Anzahl), Altersverteilung, Fahrausweis, Autoverfï¿½gbarkeit, Berufstï¿½tig, ï¿½V Abo Verfï¿½gbarkeit
 		// index  : 0..99  100    101  102  103          104           105          106       107       108    109     110     111
 		// meaning: 0..99  >=100  m    f    licenseTrue  licenseFalse  availAlways  availSom  availNev  eTrue  eFalse  ptTrue  ptFalse
 		int[] stats = new int[112];

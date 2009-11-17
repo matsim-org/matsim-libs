@@ -29,10 +29,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.population.Person;
 
 import playground.johannes.socialnetworks.graph.GraphAnalyser;
@@ -94,7 +90,7 @@ public class NetworkAnalyzer {
 	}
 
 	public static void analyze(
-			SocialNetwork<? extends BasicPerson<? extends BasicPlan<? extends BasicPlanElement>>> socialnet,
+			SocialNetwork<? extends Person> socialnet,
 			String output, boolean extended, SpatialGrid<Double> densityGrid) {
 		GraphAnalyser.analyze(socialnet, output, extended);
 

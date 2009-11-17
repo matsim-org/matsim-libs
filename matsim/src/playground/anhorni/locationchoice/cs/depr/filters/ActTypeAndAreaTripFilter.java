@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 
@@ -39,7 +39,7 @@ public class ActTypeAndAreaTripFilter extends TripFilter {
 	@Override
 	protected boolean filterPlan(final Plan plan, String mode) {
 		boolean choiceSetAdded = false;		
-		final List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
+		final List<? extends PlanElement> actslegs = plan.getPlanElements();
 		ActivityImpl previousAct = (ActivityImpl)actslegs.get(0);
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			ActivityImpl act = (ActivityImpl)actslegs.get(j);

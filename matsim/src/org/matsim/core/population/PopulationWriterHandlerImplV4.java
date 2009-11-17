@@ -23,13 +23,13 @@ package org.matsim.core.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.Gbl;
@@ -57,7 +57,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <plans ... > ... </plans>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPlans(final BasicPopulation plans, final BufferedWriter out) throws IOException {
+	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
 		out.write("<plans");
 		if (plans.getName() != null) {
 			out.write(" name=\"" + plans.getName() + "\"");
@@ -73,7 +73,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <person ... > ... </person>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPerson(final BasicPerson p, final BufferedWriter out) throws IOException {
+	public void startPerson(final Person p, final BufferedWriter out) throws IOException {
 		out.write("\t<person id=\"");
 		out.write(p.getId().toString());
 		out.write("\"");
@@ -295,7 +295,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <plan ... > ... </plan>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPlan(final BasicPlan plan, final BufferedWriter out) throws IOException {
+	public void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
 		out.write("\t\t<plan");
 		if (plan.getScore() != null) {
 			out.write(" score=\"");
@@ -325,7 +325,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <act ... > ... </act>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startAct(final BasicActivity act, final BufferedWriter out) throws IOException {
+	public void startAct(final Activity act, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<act type=\"");
 		out.write(act.getType());
 		out.write("\"");
@@ -374,7 +374,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <leg ... > ... </leg>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startLeg(final BasicLeg leg, final BufferedWriter out) throws IOException {
+	public void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<leg mode=\"");
 		out.write(leg.getMode().toString());
 		out.write("\"");
@@ -407,7 +407,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <route ... > ... </route>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startRoute(final BasicRoute route, final BufferedWriter out) throws IOException {
+	public void startRoute(final Route route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route");
 		if (!Double.isNaN(route.getDistance())) {
 			out.write(" dist=\"");

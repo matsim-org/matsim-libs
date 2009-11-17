@@ -29,8 +29,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -78,7 +78,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private final static String LEG = "leg";
 	private final static String ROUTE = "route";
 
-	private final BasicPopulation plans;
+	private final Population plans;
 	private final NetworkLayer network;
 	private final ActivityFacilitiesImpl facilities;
 	private Knowledges knowledges;
@@ -109,7 +109,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	 * @deprecated use PoopulationReaderMatsimV4(Scenario)
 	 */
 	@Deprecated
-	public PopulationReaderMatsimV4(final BasicPopulation pop, final NetworkLayer network, final ActivityFacilitiesImpl facilities, final Knowledges knowledges) {
+	public PopulationReaderMatsimV4(final Population pop, final NetworkLayer network, final ActivityFacilitiesImpl facilities, final Knowledges knowledges) {
 		this.plans = pop;
 		this.network = network;
 		this.facilities = facilities;
@@ -174,7 +174,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 			if (this.plans instanceof PopulationImpl) {
 				((PopulationImpl) this.plans).addPerson(this.currperson);
 			} else {
-				this.plans.getPersons().put(this.currperson.getId(), this.currperson);
+				this.plans.addPerson(this.currperson);
 			}
 			this.currperson = null;
 		} else if (DESIRES.equals(name)) {

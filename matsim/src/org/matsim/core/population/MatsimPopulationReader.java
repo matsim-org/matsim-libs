@@ -26,17 +26,16 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-
-import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * A reader for plans-files of MATSim. This reader recognizes the format of the plans-file and uses
@@ -51,7 +50,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	private final static String PLANS_V1 = "plans_v1.dtd";
 	private final static String PLANS_V4 = "plans_v4.dtd";
 	
-	private final BasicPopulation plans;
+	private final Population plans;
 	private final NetworkLayer network;
 	private final ActivityFacilitiesImpl facilities;
 	private MatsimXmlParser delegate = null;
@@ -65,7 +64,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	 * @param plans The data structure where to store the persons with their plans.
 	 * @param network The network the plans are linked to, e.g. for routes, locations, ...
 	 */
-	public MatsimPopulationReader(final BasicPopulation plans, final NetworkLayer network) {
+	public MatsimPopulationReader(final Population plans, final NetworkLayer network) {
 		this.plans = plans;
 		this.network = network;
 		this.facilities = (ActivityFacilitiesImpl) Gbl.getWorld().getLayer(ActivityFacilitiesImpl.LAYER_TYPE);
@@ -75,11 +74,11 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	public MatsimPopulationReader(final ScenarioImpl scenario) {
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
-		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
-		this.knowledges = ((ScenarioImpl) scenario).getKnowledges();
+		this.facilities = scenario.getActivityFacilities();
+		this.knowledges = scenario.getKnowledges();
 	}
 
-	public MatsimPopulationReader(BasicPopulation population, NetworkLayer network, Knowledges knowledges) {
+	public MatsimPopulationReader(Population population, NetworkLayer network, Knowledges knowledges) {
 		this(population, network);
 		this.knowledges = knowledges;
 	}

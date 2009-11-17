@@ -8,9 +8,9 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -102,7 +102,7 @@ public class LocationModifier extends Modifier {
 	private void exchangeFacilities(final String type, ArrayList<ActivityFacilityImpl>  exchange_facilities,
 			final Plan plan) {
 
-			final List<? extends BasicPlanElement> actslegs = plan.getPlanElements();
+			final List<? extends PlanElement> actslegs = plan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
 				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 				if (act.getType().startsWith(type)) {

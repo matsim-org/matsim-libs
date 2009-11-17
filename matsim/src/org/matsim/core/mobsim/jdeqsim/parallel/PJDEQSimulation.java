@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
@@ -106,7 +106,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 			// System.out.println(((Activity)
 			// (person.getSelectedPlan().getPlanElements().get(0))).getCoord().getX());
 
-			List<? extends BasicPlanElement> actsLegs = person
+			List<? extends PlanElement> actsLegs = person
 					.getSelectedPlan().getPlanElements();
 
 			// count each link of each route...

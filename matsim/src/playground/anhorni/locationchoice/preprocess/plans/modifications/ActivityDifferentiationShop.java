@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -66,7 +66,7 @@ public class ActivityDifferentiationShop {
 			}
 			Plan selectedPlan = person.getSelectedPlan();
 						
-			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
+			final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
 				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 				if (act.getType().startsWith("shop")) {
@@ -92,7 +92,7 @@ public class ActivityDifferentiationShop {
 			}
 			Plan selectedPlan = person.getSelectedPlan();
 						
-			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
+			final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
 				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 				if (act.getType().startsWith("shop")) {

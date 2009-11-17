@@ -10,8 +10,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -165,7 +165,7 @@ ActivityStartEventHandler
 //			hAct.setFacility( fac ) ;
 //			plan.addAct( hAct ) ;
 			
-			BasicLeg leg = pb.createLeg(TransportMode.bike) ;
+			Leg leg = pb.createLeg(TransportMode.bike) ;
 			plan.addLeg( leg ) ;
 			
 			List<Id> routeIdList = new ArrayList<Id>() ;

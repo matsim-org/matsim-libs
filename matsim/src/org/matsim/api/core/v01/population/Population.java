@@ -20,15 +20,28 @@
 
 package org.matsim.api.core.v01.population;
 
-import org.matsim.api.basic.v01.population.BasicPopulation;
+import java.io.Serializable;
+import java.util.Map;
+
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 /**
  * Root class of the population description (previously also called "plans file")
  */
-public interface Population extends BasicPopulation<Person> {
+public interface Population extends MatsimToplevelContainer, Serializable {
 	
 	public PopulationFactory getFactory();
 	
+	public String getName();
 	
+	public void setName(String name);
+
+	public Map<Id,? extends Person> getPersons();
+	
+	public void addPerson(final Person p); 
+
+	/** @deprecated use getFactory() */
+	public PopulationFactory getPopulationBuilder();
 
 }

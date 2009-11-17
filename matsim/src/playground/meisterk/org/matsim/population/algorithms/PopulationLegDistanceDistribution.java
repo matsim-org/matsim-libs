@@ -25,9 +25,9 @@ import java.io.PrintStream;
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 

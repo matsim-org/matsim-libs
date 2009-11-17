@@ -21,7 +21,7 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicLeg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -91,9 +91,9 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("home", new CoordImpl(0, 0));
 		algo.run(plan);
-		assertEquals("unexpected leg mode in leg 1.", TransportMode.pt, ((BasicLeg) plan.getPlanElements().get(1)).getMode());
-		assertEquals("unexpected leg mode in leg 2.", TransportMode.pt, ((BasicLeg) plan.getPlanElements().get(3)).getMode());
-		assertEquals("unexpected leg mode in leg 3.", TransportMode.pt, ((BasicLeg) plan.getPlanElements().get(5)).getMode());
+		assertEquals("unexpected leg mode in leg 1.", TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
+		assertEquals("unexpected leg mode in leg 2.", TransportMode.pt, ((Leg) plan.getPlanElements().get(3)).getMode());
+		assertEquals("unexpected leg mode in leg 3.", TransportMode.pt, ((Leg) plan.getPlanElements().get(5)).getMode());
 	}
 
 }

@@ -32,8 +32,8 @@ import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicActivity;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -159,7 +159,7 @@ public class BKickHouseholdsCreatorZurich {
 	    StringBuffer sb = new StringBuffer();
 	    sb.append(p.getId());
 	    sb.append("\t");
-	    Coord coord = ((BasicActivity)p.getPlans().get(0).getPlanElements().get(0)).getCoord();
+	    Coord coord = ((Activity)p.getPlans().get(0).getPlanElements().get(0)).getCoord();
 	    sb.append(coord.getX());
 	    sb.append("\t");
 	    sb.append(coord.getY());
@@ -264,7 +264,7 @@ public class BKickHouseholdsCreatorZurich {
 		if (plan == null) {
 			throw new IllegalStateException("Person " + person.getId() + " has no plans");
 		}
-		Coord coord = ((BasicActivity)plan.getPlanElements().get(0)).getCoord();
+		Coord coord = ((Activity)plan.getPlanElements().get(0)).getCoord();
 		Iterator<Feature> it = fsource.getFeatures().iterator();
 		Feature f = null;
 		while (it.hasNext()) {

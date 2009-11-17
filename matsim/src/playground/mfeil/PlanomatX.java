@@ -24,10 +24,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
@@ -959,7 +958,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	
 	/* Removes the activity at the given position*/
 	private void removeAct (int position, Plan basePlan){
-		List<? extends BasicPlanElement> actslegs = basePlan.getPlanElements();
+		List<? extends PlanElement> actslegs = basePlan.getPlanElements();
 		actslegs.remove(position*2);
 		actslegs.remove(position*2);
 	}

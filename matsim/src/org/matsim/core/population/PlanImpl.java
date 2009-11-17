@@ -26,19 +26,16 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.misc.Time;
 
-public class PlanImpl implements Plan { //zzzz would be better with inheritance because of protected c'tor of BasicPlanImpl, but BasicPlanImpl.getPlanElements() is read only
+public class PlanImpl implements Plan {
 	/**
 	 * @deprecated use Leg.Mode instead
 	 */
@@ -48,7 +45,7 @@ public class PlanImpl implements Plan { //zzzz would be better with inheritance 
 	protected ArrayList<PlanElement> actsLegs = new ArrayList<PlanElement>();
 
 	private Double score = null;
-	private BasicPerson person = null;
+	private Person person = null;
 
 	private PlanImpl.Type type = null;
 
@@ -194,7 +191,7 @@ public class PlanImpl implements Plan { //zzzz would be better with inheritance 
 		return (PersonImpl) this.person;
 	}
 	
-	public void setPerson(final BasicPerson person) {
+	public void setPerson(final Person person) {
 		this.person = person;
 	}
 	
@@ -218,12 +215,12 @@ public class PlanImpl implements Plan { //zzzz would be better with inheritance 
 		return this.actsLegs;
 	}
 
-	public final void addLeg(final BasicLeg leg) {
+	public final void addLeg(final Leg leg) {
 		if (this.actsLegs.size() %2 == 0 ) throw (new IllegalStateException("Error: Tried to insert leg at non-leg position"));
 		this.actsLegs.add(leg);
 	}
 
-	public final void addActivity(final BasicActivity act) {
+	public final void addActivity(final Activity act) {
 		if (this.actsLegs.size() %2 != 0 ) throw (new IllegalStateException("Error: Tried to insert act at non-act position"));
 		this.actsLegs.add(act);
 	}

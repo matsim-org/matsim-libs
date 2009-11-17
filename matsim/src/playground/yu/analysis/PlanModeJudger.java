@@ -6,9 +6,9 @@ package playground.yu.analysis;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 
 /**
  * judge, which transport mode was taken. This class can only be used with

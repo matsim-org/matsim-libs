@@ -25,8 +25,8 @@ package playground.johannes.socialnetworks.graph.social;
 
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 
@@ -34,12 +34,12 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
  * @author illenberger
  *
  */
-public class Ego<P extends BasicPerson<?>> extends SpatialSparseVertex {
+public class Ego<P extends Person> extends SpatialSparseVertex {
 
 	private P person;
 	
 	protected Ego(P person) {
-		super(((BasicActivity) person.getPlans().get(0).getPlanElements().get(0)).getCoord());
+		super(((Activity) person.getPlans().get(0).getPlanElements().get(0)).getCoord());
 		this.person = person;
 	}
 	

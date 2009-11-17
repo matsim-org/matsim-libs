@@ -20,9 +20,9 @@
 
 package org.matsim.roadpricing;
 
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;

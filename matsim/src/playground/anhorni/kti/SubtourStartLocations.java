@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -20,7 +20,7 @@ public class SubtourStartLocations implements PlanAlgorithm {
 		this.locationIds = new TreeMap<Id, Integer>();
 
 		Id locationId = null;
-		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
+		List<? extends PlanElement> actsLegs = plan.getPlanElements();
 		for (int i=0; i < actsLegs.size(); i++) {
 			if (actsLegs.get(i) instanceof ActivityImpl) {
 				locationId = ((ActivityImpl) actsLegs.get(i)).getFacilityId();

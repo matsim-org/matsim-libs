@@ -3,10 +3,10 @@
  */
 package playground.yu.analysis.MZComparison;
 
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;

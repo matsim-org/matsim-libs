@@ -242,7 +242,7 @@ public class TestSpeed extends TestCase {
 		startTime();
 		for(org.matsim.api.core.v01.population.Person p : population.getPersons().values()) {
 			for(org.matsim.api.core.v01.population.Plan plan : p.getPlans()) {
-				for(org.matsim.api.basic.v01.population.PlanElement e : plan.getPlanElements()) {
+				for(org.matsim.api.core.v01.population.PlanElement e : plan.getPlanElements()) {
 					if(e instanceof org.matsim.api.core.v01.population.Leg) {
 						org.matsim.api.core.v01.population.Route route = ((org.matsim.api.core.v01.population.Leg)e).getRoute();
 //						((NodeNetworkRoute)route).getLinks();

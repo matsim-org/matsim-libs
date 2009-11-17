@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
 
 
@@ -27,7 +27,7 @@ import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
  * @author illenberger
  *
  */
-public class SampledSocialNetBuilder <P extends BasicPerson<?>> extends AbstractSparseGraphBuilder<SampledSocialNet<P>, SampledEgo<P>, SampledSocialTie> {
+public class SampledSocialNetBuilder <P extends Person> extends AbstractSparseGraphBuilder<SampledSocialNet<P>, SampledEgo<P>, SampledSocialTie> {
 
 	public SampledSocialNetBuilder() {
 		super(new SampledSocialNetFactory<P>());

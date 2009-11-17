@@ -20,9 +20,9 @@
 package playground.johannes.socialnetworks.graph.spatial;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 
 /**
  * @author illenberger
@@ -30,13 +30,13 @@ import org.matsim.api.basic.v01.population.BasicPopulation;
  */
 public class GridUtils {
 
-	public static SpatialGrid<Double> createDensityGrid(BasicPopulation<?> population, double resolution) {
+	public static SpatialGrid<Double> createDensityGrid(Population population, double resolution) {
 		double maxX = 0;
 		double maxY = 0;
 		double minX = Double.MAX_VALUE;
 		double minY = Double.MAX_VALUE;
-		for(BasicPerson<?> person : population.getPersons().values()) {
-			Coord homeLoc = ((BasicActivity)person.getPlans().get(0).getPlanElements().get(0)).getCoord();
+		for(Person person : population.getPersons().values()) {
+			Coord homeLoc = ((Activity)person.getPlans().get(0).getPlanElements().get(0)).getCoord();
 			maxX = Math.max(maxX, homeLoc.getX());
 			maxY = Math.max(maxY, homeLoc.getY());
 			minX = Math.min(minX, homeLoc.getX());
@@ -44,8 +44,8 @@ public class GridUtils {
 		}
 		
 		SpatialGrid<Double> grid = new SpatialGrid<Double>(minX, minY, maxX, maxY, resolution);
-		for(BasicPerson<?> person : population.getPersons().values()) {
-			Coord homeLoc = ((BasicActivity)person.getPlans().get(0).getPlanElements().get(0)).getCoord();
+		for(Person person : population.getPersons().values()) {
+			Coord homeLoc = ((Activity)person.getPlans().get(0).getPlanElements().get(0)).getCoord();
 			Double count = grid.getValue(homeLoc);
 			if(count == null)
 				count = 0.0;

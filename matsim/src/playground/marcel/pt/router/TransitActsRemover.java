@@ -23,10 +23,10 @@ package playground.marcel.pt.router;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 

@@ -22,9 +22,9 @@ package org.matsim.core.mobsim.jdeqsim;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -71,7 +71,7 @@ public class Vehicle extends SimUnit {
 		}
 
 		Plan plan = ownerPerson.getSelectedPlan();
-		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
+		List<? extends PlanElement> actsLegs = plan.getPlanElements();
 
 		/*
 		 * return at this point, if a person just performs one activity during
@@ -106,7 +106,7 @@ public class Vehicle extends SimUnit {
 	 */
 	public ActivityImpl getPreviousActivity() {
 		Plan plan = ownerPerson.getSelectedPlan();
-		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
+		List<? extends PlanElement> actsLegs = plan.getPlanElements();
 
 		for (int i = 0; i < actsLegs.size(); i++) {
 			if (actsLegs.get(i) == currentLeg) {
@@ -124,7 +124,7 @@ public class Vehicle extends SimUnit {
 	 */
 	public ActivityImpl getNextActivity() {
 		Plan plan = ownerPerson.getSelectedPlan();
-		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
+		List<? extends PlanElement> actsLegs = plan.getPlanElements();
 
 		for (int i = 0; i < actsLegs.size(); i++) {
 			if (actsLegs.get(i) == currentLeg) {
@@ -197,7 +197,7 @@ public class Vehicle extends SimUnit {
 	// note: does not affect the link index
 	public void moveToFirstLinkInNextLeg() {
 		Plan plan = getOwnerPerson().getSelectedPlan();
-		List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
+		List<? extends PlanElement> actsLegs = plan.getPlanElements();
 		setCurrentLink(((ActivityImpl) actsLegs.get(getLegIndex() + 1)).getLink());
 	}
 
@@ -250,7 +250,7 @@ public class Vehicle extends SimUnit {
 		 */
 		if (this.getLinkIndex() == 0) {
 			Plan plan = ownerPerson.getSelectedPlan();
-			List<? extends BasicPlanElement> actsLegs = plan.getPlanElements();
+			List<? extends PlanElement> actsLegs = plan.getPlanElements();
 			previousLink = ((ActivityImpl) actsLegs.get(legIndex - 1)).getLink();
 			previousRoad = Road.getRoad(previousLink.getId().toString());
 		} else if (this.getLinkIndex() >= 1) {

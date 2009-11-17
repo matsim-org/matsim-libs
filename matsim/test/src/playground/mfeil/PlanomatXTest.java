@@ -46,11 +46,12 @@ import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.PlanElement;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 
 import playground.mfeil.MDSAM.ActivityTypeFinder;
 import playground.mfeil.FilesForTests.Initializer;

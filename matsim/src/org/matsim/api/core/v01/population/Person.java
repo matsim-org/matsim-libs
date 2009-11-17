@@ -19,11 +19,27 @@
 
 package org.matsim.api.core.v01.population;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
+import java.io.Serializable;
+import java.util.List;
+
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.Identifiable;
 import org.matsim.utils.customize.Customizable;
 
 /**
  * @author dgrether
  */
-public interface Person extends BasicPerson<Plan>, Customizable{
+public interface Person extends Identifiable, Serializable, Customizable{
+	
+	public List<? extends Plan> getPlans();
+
+	public void setId(final Id id);
+	/**
+	 * adds the plan to the Person's List of plans and
+	 * sets the reference to this person in the Plan instance.
+	 */
+	public boolean addPlan(final Plan p);
+
+	public Plan getSelectedPlan();
+
 }

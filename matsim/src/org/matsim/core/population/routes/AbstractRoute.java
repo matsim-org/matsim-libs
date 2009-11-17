@@ -21,7 +21,6 @@
 package org.matsim.core.population.routes;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.Time;
 
@@ -30,7 +29,7 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author mrieser
  */
-public abstract class AbstractRoute implements BasicRoute, RouteWRefs {
+public abstract class AbstractRoute implements RouteWRefs {
 
 	private double dist = Double.NaN;
 

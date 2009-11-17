@@ -22,8 +22,8 @@ package playground.balmermi.census2000v2.modules;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;

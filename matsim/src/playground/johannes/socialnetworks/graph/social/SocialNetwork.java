@@ -27,9 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.contrib.sna.graph.SparseEdge;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.SparseVertex;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
@@ -38,7 +36,7 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
  * @author illenberger
  *
  */
-public class SocialNetwork<P extends BasicPerson<?>> extends SpatialSparseGraph {
+public class SocialNetwork<P extends Person> extends SpatialSparseGraph {
 	
 	private Map<P, Ego<P>> personEgoMapping = new HashMap<P, Ego<P>>();
 	

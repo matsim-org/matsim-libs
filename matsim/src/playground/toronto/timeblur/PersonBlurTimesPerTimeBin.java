@@ -22,9 +22,9 @@ package playground.toronto.timeblur;
 
 import java.util.Random;
 
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;

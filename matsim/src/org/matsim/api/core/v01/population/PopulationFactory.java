@@ -19,24 +19,36 @@
 
 package org.matsim.api.core.v01.population;
 
+import java.io.Serializable;
+
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPopulationFactory;
+import org.matsim.core.api.internal.MatsimFactory;
 
 /**
  * @author dgrether
  */
-public interface PopulationFactory extends BasicPopulationFactory {
+public interface PopulationFactory extends Serializable, MatsimFactory {
 
+	/**
+	 * Creates a new Route object
+	 * @param currentRouteLinkIds List of Ids including the start and the end Link Id of the route's links
+	 * @return a BasicRoute Object with the links set accordingly
+	 * @deprecated needs to be verified
+	 */
+//	public BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds); // TODO [MR] check this
+	// disabled until everything else is figured out
+	
+	
+	
 	Person createPerson(Id id);
 	/**
 	 * @deprecated use createPlan() instead. the reference to the Person
 	 * is set when calling Person.addPlan(Plan p).
 	 */
 	@Deprecated
-	Plan createPlan(BasicPerson person);
+	Plan createPlan(Person person);
 
 	Plan createPlan();
 	

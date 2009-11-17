@@ -9,9 +9,9 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -82,7 +82,7 @@ public class SpatialSubtourAnalyzer extends AbstractPersonAlgorithm {
 		subtourStartLocationsExtractor.run(selectedPlan);
 		TreeMap<Id, Integer> subtourStartLocations = subtourStartLocationsExtractor.getSubtourStartLocations();
 								
-		final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
+		final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 		
 //		if (actslegs.size() < 6) continue;
 		if (actslegs.size() >= 6) {

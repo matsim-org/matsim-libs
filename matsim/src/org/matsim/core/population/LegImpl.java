@@ -21,18 +21,17 @@
 package org.matsim.core.population;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
-public class LegImpl implements BasicLeg, Leg {
+public class LegImpl implements Leg {
 	
-	protected BasicRoute route = null;
+	protected Route route = null;
 	
 	private double depTime = Time.UNDEFINED_TIME;
 	private double travTime = Time.UNDEFINED_TIME;
@@ -102,7 +101,7 @@ public class LegImpl implements BasicLeg, Leg {
 		return (RouteWRefs) this.route;
 	}
 	
-	public final void setRoute(BasicRoute route) {
+	public final void setRoute(Route route) {
 		this.route = route;
 	}
 

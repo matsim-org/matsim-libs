@@ -36,11 +36,11 @@ import net.opengis.kml._2.StyleType;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -173,7 +173,7 @@ public class KMLPersonPlanWriter {
 		for (Iterator iterator = this.personsPlan.getPlanElements().iterator(); iterator.hasNext();) {
 			PlanElement planElement = (PlanElement) iterator.next();
 
-			if (planElement instanceof BasicActivity) {
+			if (planElement instanceof Activity) {
 
 				ActivityImpl act = (ActivityImpl) planElement;
 				fromCoords = act.getCoord();
@@ -292,8 +292,8 @@ public class KMLPersonPlanWriter {
 			Plan selectedPlan = this.person.getSelectedPlan();
 			if (selectedPlan != null) {
 				for (PlanElement planElement : selectedPlan.getPlanElements()) {
-					if (planElement instanceof BasicActivity) {
-						BasicActivity act = (BasicActivity) planElement;
+					if (planElement instanceof Activity) {
+						Activity act = (Activity) planElement;
 						this.activityLinks.add(this.network.getLink(act.getLinkId()));
 					}
 				}

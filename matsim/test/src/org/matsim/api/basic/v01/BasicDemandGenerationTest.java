@@ -23,19 +23,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicPopulationFactory;
-import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -86,13 +84,13 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		
 		this.createFakeNetwork(sc, (NetworkLayer)sc.getNetwork());
 		
-		BasicPopulation pop = sc.getPopulation();
-		BasicPopulationFactory builder = pop.getFactory();
-		BasicPerson person;
-		BasicPlan plan;
-		BasicActivity activity;
-		BasicLeg leg;
-		BasicRoute route;
+		Population pop = sc.getPopulation();
+		PopulationFactory builder = pop.getFactory();
+		Person person;
+		Plan plan;
+		Activity activity;
+		Leg leg;
+		Route route;
 		
 		for (int i = 0; i < ids.size(); i++){
 			//create the person and add it to the population
@@ -101,14 +99,14 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 			assertNotNull(person);
 			//but not added to population
 			assertEquals(i, pop.getPersons().size());
-			pop.getPersons().put(person.getId(), person);
+			pop.addPerson(person);
 			assertEquals(i+1, pop.getPersons().size());
 			//create the plan and add it to the person
 			plan = builder.createPlan(person);
 			assertNotNull(plan);
 			assertEquals(plan.getPerson(), person);
 			assertEquals(0, person.getPlans().size());
-			person.getPlans().add(plan);
+			person.addPlan(plan);
 			assertEquals(1, person.getPlans().size());
 			//create the plan elements
 			activity = builder.createActivityFromLinkId("h", ids.get(0));
@@ -199,13 +197,13 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 			p = pers.getPlans().get(0);
 			assertNotNull(p);
 			for (int i = 0; i < p.getPlanElements().size(); i++){
-				BasicPlanElement element = p.getPlanElements().get(i);
+				PlanElement element = p.getPlanElements().get(i);
 				assertNotNull(element);
 			}
 			assertEquals(this.homeEndTime, ((PlanImpl) p).getFirstActivity().getEndTime(), EPSILON);
 			assertEquals(ids.get(0), ((PlanImpl) p).getFirstActivity().getLinkId());
-			assertEquals(this.workEndTime, ((BasicActivity)p.getPlanElements().get(2)).getEndTime(), EPSILON);
-			assertEquals(ids.get(2), ((BasicActivity)p.getPlanElements().get(2)).getLinkId());
+			assertEquals(this.workEndTime, ((Activity)p.getPlanElements().get(2)).getEndTime(), EPSILON);
+			assertEquals(ids.get(2), ((Activity)p.getPlanElements().get(2)).getLinkId());
 			assertEquals(Time.UNDEFINED_TIME, ((PlanImpl) p).getLastActivity().getEndTime(), EPSILON);
 			assertEquals(ids.get(0), ((PlanImpl) p).getLastActivity().getLinkId());
 			

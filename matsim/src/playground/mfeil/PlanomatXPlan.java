@@ -21,8 +21,8 @@ package playground.mfeil;
 
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PlanImpl;
 
 
@@ -52,7 +52,7 @@ public class PlanomatXPlan extends PlanImpl implements Comparable<PlanomatXPlan>
 //		else return -1;
 	}
 	
-	public void setActsLegs (List<? extends BasicPlanElement> actslegs){
+	public void setActsLegs (List<? extends PlanElement> actslegs){
 		List planElemenst = getPlanElements();
 		planElemenst.clear();
 		planElemenst.addAll(actslegs);

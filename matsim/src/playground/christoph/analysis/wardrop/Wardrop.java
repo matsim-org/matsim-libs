@@ -30,10 +30,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.NetworkLayer;
@@ -149,18 +149,18 @@ public class Wardrop {
 		{
 			Plan plan = person.getSelectedPlan();
 			
-			ArrayList<BasicActivity> acts = new ArrayList<BasicActivity>();
+			ArrayList<Activity> acts = new ArrayList<Activity>();
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof BasicActivity) {
-					acts.add((BasicActivity) pe);
+				if (pe instanceof Activity) {
+					acts.add((Activity) pe);
 				}
 			}
 			
 			// The last Act is only the end of a leg and not the beginning of a new one!
 			for(int i = 0; i < acts.size() - 1; i++)
 			{
-				BasicActivity startAct = acts.get(i);
-				BasicActivity endAct = acts.get(i + 1);
+				Activity startAct = acts.get(i);
+				Activity endAct = acts.get(i + 1);
 				
 				Coord startCoord = startAct.getCoord();
 				Coord endCoord = endAct.getCoord();

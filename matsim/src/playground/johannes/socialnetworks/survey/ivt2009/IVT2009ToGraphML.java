@@ -37,8 +37,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -217,7 +216,7 @@ public class IVT2009ToGraphML {
 		graphWriter.write(socialnet, output + "ivt2009.graphml");
 		
 		KMLWriter kmlwriter = new KMLWriter();
-		KMLObjectStyle<SocialNetwork<BasicPerson<?>>, Ego<BasicPerson<?>>> vertexStyle = new SNKMLEgoAlterSytle<BasicPerson<?>>(egoSet, kmlwriter.getVertexIconLink());
+		KMLObjectStyle<SocialNetwork<Person>, Ego<Person>> vertexStyle = new SNKMLEgoAlterSytle<Person>(egoSet, kmlwriter.getVertexIconLink());
 		kmlwriter.setVertexStyle(vertexStyle);
 		kmlwriter.setCoordinateTransformation(new CH1903LV03toWGS84());
 		kmlwriter.write(socialnet, output+"socialnet.kmz");
@@ -324,7 +323,7 @@ public class IVT2009ToGraphML {
 			throw new NullPointerException("Null coordinates are not allowed.");
 //		BasicActivityImpl act = new BasicActivityImpl("home");
 //		act.setCoord(coord);
-		BasicActivity act = population.getFactory().createActivityFromCoord("home", coord);
+		Activity act = population.getFactory().createActivityFromCoord("home", coord);
 		
 		plan.addActivity(act);
 		person.addPlan(plan);

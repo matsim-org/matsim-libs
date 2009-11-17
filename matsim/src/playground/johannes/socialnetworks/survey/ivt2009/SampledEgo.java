@@ -21,7 +21,7 @@ package playground.johannes.socialnetworks.survey.ivt2009;
 
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.johannes.socialnetworks.graph.social.Ego;
 import playground.johannes.socialnetworks.snowball2.SampledVertex;
@@ -31,7 +31,7 @@ import playground.johannes.socialnetworks.snowball2.SnowballAttributes;
  * @author illenberger
  *
  */
-public class SampledEgo<P extends BasicPerson<?>> extends Ego<P> implements SampledVertex {
+public class SampledEgo<P extends Person> extends Ego<P> implements SampledVertex {
 
 	private SnowballAttributes attributes;
 	

@@ -19,16 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.GraphFactory;
-
-import visad.data.netcdf.UnsupportedOperationException;
 
 /**
  * @author illenberger
  *
  */
-public class SocialNetworkFactory<P extends BasicPerson<?>> implements GraphFactory<SocialNetwork<P>, Ego<P>, SocialTie>{
+public class SocialNetworkFactory<P extends Person> implements GraphFactory<SocialNetwork<P>, Ego<P>, SocialTie>{
 
 	public SocialTie createEdge() {
 		return new SocialTie(0);

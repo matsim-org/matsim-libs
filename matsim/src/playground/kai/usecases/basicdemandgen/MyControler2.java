@@ -34,14 +34,14 @@ import org.geotools.feature.FeatureIterator;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicPopulationFactory;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
@@ -55,11 +55,11 @@ public class MyControler2 {
 	private static final Logger log = Logger.getLogger(MyControler2.class);
 
 	@SuppressWarnings("unchecked")
-	private static BasicPopulation createPlansFromShp(final FeatureSource n) {
+	private static Population createPlansFromShp(final FeatureSource n) {
 		Scenario sc = new ScenarioImpl() ;
 		
-		BasicPopulation population = sc.getPopulation() ;
-		BasicPopulationFactory pb = population.getFactory() ;
+		Population population = sc.getPopulation() ;
+		PopulationFactory pb = population.getFactory() ;
 
 		// get all features from the shp file:
 		FeatureIterator it = null; try {
@@ -98,15 +98,15 @@ public class MyControler2 {
 			for ( int ii=0 ; ii<nPersons ; ii++ ) {
 				Id id = sc.createId( Long.toString( popCnt ) ); popCnt++ ;
 
-				BasicPerson person = pb.createPerson(id); 
-				population.getPersons().put( id, person ) ;
+				Person person = pb.createPerson(id); 
+				population.addPerson(person);
 				
-				BasicPlan plan = pb.createPlan(person) ;
-				person.getPlans().add(plan) ;
+				Plan plan = pb.createPlan(person) ;
+				person.addPlan(plan) ;
 				
 				plan.setSelected(true) ; // will also work without
 
-				BasicActivity act = pb.createActivityFromCoord("home",coord) ;
+				Activity act = pb.createActivityFromCoord("home",coord) ;
 				plan.getPlanElements().add(act) ;
 			}
 
@@ -116,28 +116,27 @@ public class MyControler2 {
 			}
 		}
 
-		for ( Object oo : population.getPersons().values() ) {
-			BasicPerson pp = (BasicPerson) oo ;
-			BasicPlan plan = (BasicPlan) pp.getPlans().get(0) ;
+		for ( Person pp : population.getPersons().values() ) {
+			Plan plan = pp.getPlans().get(0) ;
 			
 			int idx = (int)( Math.random()*workPlaces.size() ) ; // TODO: replace by matsim rnd generator
 			Coord workCoord = workPlaces.get( idx ) ;
 //			workPlaces.remove( idx ) ;
 			// (with replacement.  W/o replacement, make sure that there are enough workplaces!)
 			
-			BasicLeg legH2W = pb.createLeg(TransportMode.car) ;
+			Leg legH2W = pb.createLeg(TransportMode.car) ;
 			plan.getPlanElements().add(legH2W) ;
 			
-			BasicActivity workAct = pb.createActivityFromCoord("work", workCoord ) ;
+			Activity workAct = pb.createActivityFromCoord("work", workCoord ) ;
 			plan.getPlanElements().add(workAct) ;
 			
-			BasicLeg legW2H = pb.createLeg(TransportMode.bike) ;
+			Leg legW2H = pb.createLeg(TransportMode.bike) ;
 			plan.getPlanElements().add(legW2H) ;
 			
-			BasicActivity homeAct1 = (BasicActivity) plan.getPlanElements().get(0) ;
+			Activity homeAct1 = (Activity) plan.getPlanElements().get(0) ;
 			Coord homeCoord = homeAct1.getCoord() ;
 
-			BasicActivity homeAct2 = pb.createActivityFromCoord("home", homeCoord ) ;
+			Activity homeAct2 = pb.createActivityFromCoord("home", homeCoord ) ;
 			plan.getPlanElements().add(homeAct2) ;
 			
 		}
@@ -149,7 +148,7 @@ public class MyControler2 {
 
 		final String shpFile = "/Users/nagel/shared-svn/studies/countries/ca/vancouver/facilities/shp/landuse.shp";
 
-		BasicPopulation plans=null ;
+		Population plans=null ;
 		try {
 			plans = createPlansFromShp( ShapeFileReader.readDataFile(shpFile) );
 		} catch (IOException e) {

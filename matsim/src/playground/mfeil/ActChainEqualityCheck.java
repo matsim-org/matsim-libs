@@ -23,7 +23,7 @@ package playground.mfeil;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 

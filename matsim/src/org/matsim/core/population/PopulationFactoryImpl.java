@@ -25,10 +25,10 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPerson;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
@@ -70,11 +70,11 @@ public class PopulationFactoryImpl implements PopulationFactory {
 		return new PlanImpl();
 	}
 
-	public PlanImpl createPlan(final BasicPerson person) {
+	public PlanImpl createPlan(final Person person) {
 		if (!(person instanceof PersonImpl)) {
 			throw new IllegalArgumentException("person must be of type PersonImpl.");
 		}
-		return new PlanImpl((PersonImpl) person);
+		return new PlanImpl(person);
 	}
 
 	public ActivityImpl createActivityFromCoord(final String actType, final Coord coord) {

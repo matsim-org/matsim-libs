@@ -24,9 +24,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -178,10 +178,10 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		}
 		int [][] moves 									= new int [neighbourhood_size][2];
 		int [] position									= new int [2];
-		List<? extends BasicPlanElement> [] initialNeighbourhood 			= new ArrayList [neighbourhood_size];
-		List<? extends BasicPlanElement> [] neighbourhood 					= new ArrayList [java.lang.Math.min(NEIGHBOURHOOD_SIZE, neighbourhood_size)];
+		List<? extends PlanElement> [] initialNeighbourhood 			= new ArrayList [neighbourhood_size];
+		List<? extends PlanElement> [] neighbourhood 					= new ArrayList [java.lang.Math.min(NEIGHBOURHOOD_SIZE, neighbourhood_size)];
 		double []score					 				= new double [neighbourhood_size];
-		List<? extends BasicPlanElement> bestSolution						= new ArrayList<BasicPlanElement>();
+		List<? extends PlanElement> bestSolution						= new ArrayList<PlanElement>();
 		int pointer;
 		int currentIteration							= 1;
 		int lastImprovement 							= 0;
@@ -292,7 +292,7 @@ public class TimeModeChoicer2 extends TimeModeChoicer1 implements org.matsim.pop
 		
 		/* Update the plan with the final solution */ 		
 	//	stream.println("Selected solution\t"+bestScore);
-		List<? extends BasicPlanElement> al = basePlan.getPlanElements();
+		List<? extends PlanElement> al = basePlan.getPlanElements();
 		basePlan.setScore(bestScore);
 		
 		double time;

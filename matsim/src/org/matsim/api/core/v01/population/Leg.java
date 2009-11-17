@@ -20,12 +20,24 @@
 
 package org.matsim.api.core.v01.population;
 
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.basic.v01.TransportMode;
 
-public interface Leg extends BasicLeg, PlanElement {
+public interface Leg extends PlanElement {
 
-	// in order to get correct type(s):
+	public TransportMode getMode();
+
+	public void setMode(TransportMode mode);
+
 	public Route getRoute();
+
+	public void setRoute(Route route);
+
+	public double getDepartureTime();
+
+	public void setDepartureTime(final double seconds);
+
+	public double getTravelTime();
+
+	public void setTravelTime(final double seconds);
 
 }

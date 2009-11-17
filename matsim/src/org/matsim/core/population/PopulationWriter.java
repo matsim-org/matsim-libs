@@ -24,13 +24,12 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicRoute;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -48,7 +47,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	private boolean fileOpened = false;
 
 	private PopulationWriterHandler handler = null;
-	private final BasicPopulation population;
+	private final Population population;
 	private Knowledges knowledges = null;
 
 	private final static Logger log = Logger.getLogger(PopulationWriter.class);
@@ -62,7 +61,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	 *
 	 * @param population the population to write to file
 	 */
-	public PopulationWriter(final BasicPopulation population) {
+	public PopulationWriter(final Population population) {
 		this(population, Gbl.getConfig().plans().getOutputFile(), Gbl.getConfig().plans().getOutputVersion());
 	}
 
@@ -76,7 +75,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	 * @param filename the filename where to write the data
 	 * @param version specifies the file-format
 	 */
-	public PopulationWriter(final BasicPopulation population, final String filename, final String version) {
+	public PopulationWriter(final Population population, final String filename, final String version) {
 		this(population, filename, version, Gbl.getConfig().plans().getOutputSample());
 	}
 
@@ -91,7 +90,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	 * @param version specifies the file-format
 	 * @param fraction of persons to write to the plans file
 	 */
-	public PopulationWriter(final BasicPopulation population, final String filename, final String version,
+	public PopulationWriter(final Population population, final String filename, final String version,
 			final double fraction) {
 		super();
 		this.population = population;
@@ -118,7 +117,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	 * @param version specifies the file-format
 	 * @param fraction of persons to write to the plans file
 	 */
-	public PopulationWriter(final BasicPopulation population, final Knowledges knowledges, final String filename, final String version,
+	public PopulationWriter(final Population population, final Knowledges knowledges, final String filename, final String version,
 			final double fraction) {
 		super();
 		this.population = population;
@@ -135,7 +134,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 		}
 	}
 
-	public PopulationWriter(final BasicPopulation population, final String filename) {
+	public PopulationWriter(final Population population, final String filename) {
 		this(population, filename, "v4", 1.0);
 	}
 
@@ -189,7 +188,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 		}
 	}
 
-	public final void writePerson(final BasicPerson person) {
+	public final void writePerson(final Person person) {
 		//	 write only the defined fraction
 		if ((this.write_person_fraction < 1.0) && (MatsimRandom.getRandom().nextDouble() >= this.write_person_fraction)) {
 			return;
@@ -277,21 +276,20 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 
 			}
 			// plans
-			for (Object o : person.getPlans()) {
-				BasicPlan plan = (BasicPlan) o;
+			for (Plan plan : person.getPlans()) {
 				this.handler.startPlan(plan, this.out);
 				// act/leg
 				for (Object pe : plan.getPlanElements()) {
-					if (pe instanceof BasicActivity) {
-						BasicActivity act = (BasicActivity) pe;
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
 						this.handler.startAct(act, this.out);
 						this.handler.endAct(this.out);
 					}
-					else if (pe instanceof BasicLeg) {
-						BasicLeg leg = (BasicLeg) pe;
+					else if (pe instanceof Leg) {
+						Leg leg = (Leg) pe;
 						this.handler.startLeg(leg, this.out);
 						// route
-						BasicRoute route = leg.getRoute();
+						Route route = leg.getRoute();
 						if (route != null) {
 							this.handler.startRoute(route, this.out);
 							this.handler.endRoute(this.out);
@@ -311,8 +309,8 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	}
 
 	public final void writePersons() {
-		for (Object p : this.population.getPersons().values()) {
-			writePerson((BasicPerson) p);
+		for (Person p : this.population.getPersons().values()) {
+			writePerson(p);
 		}
 	}
 

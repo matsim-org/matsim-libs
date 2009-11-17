@@ -28,7 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPopulation;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -60,7 +60,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 	private final static String LEG = "leg";
 	private final static String ROUTE = "route";
 
-	private final BasicPopulation plans;
+	private final Population plans;
 	private final NetworkLayer network;
 	private PersonImpl currperson = null;
 	private PlanImpl currplan = null;
@@ -72,7 +72,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 
 	private static final Logger log = Logger.getLogger(PopulationReaderMatsimV0.class);
 
-	protected PopulationReaderMatsimV0(final BasicPopulation plans, final NetworkLayer network) {
+	protected PopulationReaderMatsimV0(final Population plans, final NetworkLayer network) {
 		this.plans = plans;
 		this.network = network;
 	}
@@ -102,7 +102,7 @@ public class PopulationReaderMatsimV0 extends MatsimXmlParser implements Populat
 			if (this.plans instanceof PopulationImpl) {
 				((PopulationImpl) this.plans).addPerson(this.currperson);
 			} else {
-				this.plans.getPersons().put(this.currperson.getId(), this.currperson);
+				this.plans.addPerson(this.currperson);
 			}
 			this.currperson = null;
 		} else if (PLAN.equals(name)) {

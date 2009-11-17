@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social.generators;
 
-import org.matsim.api.basic.v01.population.BasicActivity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -49,7 +49,7 @@ public class LatticeGenerator {
 //				BasicActivityImpl act = new BasicActivityImpl("home");
 //				act.setCoord(new CoordImpl(col, row));
 				PopulationFactory pb = population.getFactory() ;
-				BasicActivity act = pb.createActivityFromCoord("home", new CoordImpl(col,row) ); 
+				Activity act = pb.createActivityFromCoord("home", new CoordImpl(col,row) ); 
 				plan.addActivity(act);
 				person.addPlan( plan ) ;
 				

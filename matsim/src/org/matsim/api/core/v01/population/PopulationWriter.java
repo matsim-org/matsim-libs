@@ -20,7 +20,6 @@
 
 package org.matsim.api.core.v01.population;
 
-import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.api.internal.MatsimWriter;
 
 /**
@@ -29,9 +28,9 @@ import org.matsim.core.api.internal.MatsimWriter;
  */
 public class PopulationWriter implements MatsimWriter {
 
-	private final BasicPopulation population;
+	private final Population population;
 
-	public PopulationWriter(BasicPopulation population) {
+	public PopulationWriter(Population population) {
 		this.population = population;
 	}
 	

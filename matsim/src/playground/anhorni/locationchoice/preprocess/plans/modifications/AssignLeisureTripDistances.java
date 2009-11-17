@@ -4,9 +4,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -48,7 +48,7 @@ public class AssignLeisureTripDistances {
 			}
 			Plan selectedPlan = person.getSelectedPlan();
 						
-			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
+			final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
 				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 				if (act.getType().startsWith("shop")) {
@@ -74,7 +74,7 @@ public class AssignLeisureTripDistances {
 			}
 			Plan selectedPlan = person.getSelectedPlan();
 						
-			final List<? extends BasicPlanElement> actslegs = selectedPlan.getPlanElements();
+			final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 			for (int j = 0; j < actslegs.size(); j=j+2) {
 				final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 				if (act.getType().startsWith("shop")) {

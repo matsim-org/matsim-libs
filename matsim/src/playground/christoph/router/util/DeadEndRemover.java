@@ -26,10 +26,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 

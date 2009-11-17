@@ -23,9 +23,9 @@ package playground.balmermi.census2000v2.modules;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -146,7 +146,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	//////////////////////////////////////////////////////////////////////
 
 	private final void varyTimes(Plan p) {
-		List<? extends BasicPlanElement> acts_legs = p.getPlanElements();
+		List<? extends PlanElement> acts_legs = p.getPlanElements();
 
 		// draw a new random number until the new end time >= 0.0
 		double bias = MatsimRandom.getRandom().nextInt(3600)-1800.0; // [-1800,1800[

@@ -11,10 +11,10 @@ import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
 import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.basic.v01.network.BasicNode;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -74,8 +74,8 @@ BasicActivityEndEventHandler
 			
 			for ( Plan plan : plans ) {
 				for ( Object oo : plan.getPlanElements() ) {
-					if ( oo instanceof BasicActivity ) {
-						BasicActivity act = (BasicActivity) oo ;
+					if ( oo instanceof Activity ) {
+						Activity act = (Activity) oo ;
 						act.getCoord() ; // deprecated ????
 						act.getEndTime() ;
 						Id facId = act.getFacilityId();
@@ -88,8 +88,8 @@ BasicActivityEndEventHandler
 //						fac.getActivityOptions();
 //						fac.getLinkId();
 						
-					} else if ( oo instanceof BasicLeg ) {
-						BasicLeg leg = (BasicLeg) oo ;
+					} else if ( oo instanceof Leg ) {
+						Leg leg = (Leg) oo ;
 						leg.getDepartureTime();
 						leg.getMode();
 						leg.getRoute();
@@ -120,7 +120,7 @@ BasicActivityEndEventHandler
 			
 //			person.addPlan(newPlan) ; // now the person has the plan twice.
 			
-			BasicActivity act = null ;
+			Activity act = null ;
 			
 			// construct activity from coord:
 			Coord coord = sc.createCoord(1.,1.) ;
@@ -138,7 +138,7 @@ BasicActivityEndEventHandler
 			act.setType("home") ;
 			act.setStartTime(122.) ;
 			
-			BasicLeg leg = pb.createLeg(TransportMode.bike) ;
+			Leg leg = pb.createLeg(TransportMode.bike) ;
 			plan.addLeg( leg ) ;
 			
 			List<Id> routeIdList = new ArrayList<Id>() ;

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.GraphFactory;
 
 
@@ -27,7 +27,7 @@ import org.matsim.contrib.sna.graph.GraphFactory;
  * @author illenberger
  *
  */
-public class SampledSocialNetFactory<P extends BasicPerson<?>> implements GraphFactory<SampledSocialNet<P>, SampledEgo<P>, SampledSocialTie> {
+public class SampledSocialNetFactory<P extends Person> implements GraphFactory<SampledSocialNet<P>, SampledEgo<P>, SampledSocialTie> {
 
 	public SampledSocialTie createEdge() {
 		return new SampledSocialTie(0);

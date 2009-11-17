@@ -25,8 +25,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 

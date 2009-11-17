@@ -3,7 +3,6 @@
  */
 package playground.kai.urbansim;
 
-import org.matsim.api.basic.v01.population.BasicPopulation;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.world.Layer;

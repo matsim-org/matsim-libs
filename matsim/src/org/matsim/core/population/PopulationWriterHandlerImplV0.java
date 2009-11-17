@@ -23,13 +23,13 @@ package org.matsim.core.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
-import org.matsim.api.basic.v01.population.BasicPopulation;
-import org.matsim.api.basic.v01.population.BasicRoute;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.population.routes.GenericRoute;
@@ -41,13 +41,6 @@ import org.matsim.knowledges.Knowledge;
 import org.matsim.population.Desires;
 
 public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
-
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
-	@SuppressWarnings("unused")
-	private static final int DEBUG_LEVEL = 0;
 
 	//////////////////////////////////////////////////////////////////////
 	//
@@ -64,7 +57,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <plans ... > ... </plans>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPlans(final BasicPopulation plans, final BufferedWriter out) throws IOException {
+	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
 		out.write("<plans>\n\n");
 	}
 
@@ -76,7 +69,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <person ... > ... </person>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPerson(final BasicPerson person, final BufferedWriter out) throws IOException {
+	public void startPerson(final Person person, final BufferedWriter out) throws IOException {
 		out.write("\t<person");
 		out.write(" id=\"" + person.getId() + "\"");
 		out.write(">\n");
@@ -196,7 +189,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <plan ... > ... </plan>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startPlan(final BasicPlan plan, final BufferedWriter out) throws IOException {
+	public void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
 		out.write("\t\t<plan");
 		if (plan.getScore() != null)
 			out.write(" score=\"" + plan.getScore().toString() + "\"");
@@ -215,7 +208,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <act ... > ... </act>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startAct(final BasicActivity act, final BufferedWriter out) throws IOException {
+	public void startAct(final Activity act, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<act");
 		out.write(" type=\"" + act.getType() + "\"");
 		if (act.getCoord() != null) {
@@ -244,7 +237,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <leg ... > ... </leg>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startLeg(final BasicLeg leg, final BufferedWriter out) throws IOException {
+	public void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<leg");
 		out.write(" mode=\"" + leg.getMode() + "\"");
 		if (leg.getDepartureTime() != Integer.MIN_VALUE)
@@ -267,7 +260,7 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	// <route ... > ... </route>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startRoute(final BasicRoute route, final BufferedWriter out) throws IOException {
+	public void startRoute(final Route route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route>");
 
 		if (route instanceof NetworkRouteWRefs) {

@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;

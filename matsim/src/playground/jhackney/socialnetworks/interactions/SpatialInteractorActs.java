@@ -25,9 +25,9 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;

@@ -29,9 +29,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;

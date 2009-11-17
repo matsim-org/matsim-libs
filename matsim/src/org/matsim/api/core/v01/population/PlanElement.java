@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAct.java
+ * PlanElement.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,41 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.api.basic.v01.population;
+package org.matsim.api.core.v01.population;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.matsim.core.api.internal.MatsimPopulationObject;
 
+public interface PlanElement extends Serializable, MatsimPopulationObject {
 
-/**
-* @author dgrether
-*/
-public interface BasicPlan<P extends BasicPlanElement> extends Serializable, MatsimPopulationObject {
-	// yyyyyy should be parameterized in terms of "Person".
-	// yyyy In contrast, (Basic)PlanElement is NOT needed.
-
-	public List<P> getPlanElements();
-
-	public void addLeg(final BasicLeg leg);
-
-	public void addActivity(final BasicActivity act);
-
-	public boolean isSelected();
-	
-	public void setSelected(boolean selected);
-
-	public void setScore(Double score);
-	
-	public Double getScore();
-
-	public BasicPerson getPerson();
-	/**
-	 * Sets the reference to the person in the BasicPlan instance.
-	 * This is done automatically if using Person.addPlan(). Make
-	 * sure that the bidirectional reference is set correctly if
-	 * you are using this method!.
-	 */
-	public void setPerson(BasicPerson person);
 }

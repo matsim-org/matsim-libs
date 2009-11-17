@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
-import org.matsim.api.basic.v01.population.BasicPerson;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectDescriptor;
 
@@ -27,9 +27,9 @@ import playground.johannes.socialnetworks.graph.spatial.io.KMLObjectDescriptor;
  * @author illenberger
  *
  */
-public class KMLSnowballDescriptor implements KMLObjectDescriptor<SampledEgo<BasicPerson<?>>> {
+public class KMLSnowballDescriptor implements KMLObjectDescriptor<SampledEgo<Person>> {
 
-	public String getDescription(SampledEgo<BasicPerson<?>> object) {
+	public String getDescription(SampledEgo<Person> object) {
 		StringBuilder builder = new StringBuilder();
 		
 		builder.append("Name: ");
@@ -51,7 +51,7 @@ public class KMLSnowballDescriptor implements KMLObjectDescriptor<SampledEgo<Bas
 		return builder.toString();
 	}
 
-	public String getName(SampledEgo<BasicPerson<?>> object) {
+	public String getName(SampledEgo<Person> object) {
 		return object.getPerson().getId().toString();
 	}
 

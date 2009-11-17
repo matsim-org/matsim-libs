@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -51,7 +51,7 @@ public class ActivityActWriter {
 
 			for (int i=0;i<myPersonPlans.size();i++){
 				Plan myPlan = myPersonPlans.get(i);
-				List<? extends BasicPlanElement> actsLegs=myPlan.getPlanElements();
+				List<? extends PlanElement> actsLegs=myPlan.getPlanElements();
 
 				for (int j=0;j<actsLegs.size()+1;j=j+2){
 					ActivityImpl myAct= (ActivityImpl) actsLegs.get(j);

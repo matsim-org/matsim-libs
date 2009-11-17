@@ -6,10 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
@@ -205,7 +204,7 @@ public class SNPickFacility implements PlanAlgorithm {
 				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).addActivity(f.getActivityOption(factype));
 //				System.out.println(" Activity locatoin changed this many activities:"+k.getActivities().size());
 				//		 loop over all <leg>s, remove route-information
-				List<? extends BasicPlanElement> bestactslegs = newPlan.getPlanElements();
+				List<? extends PlanElement> bestactslegs = newPlan.getPlanElements();
 				for (int j = 1; j < bestactslegs.size(); j=j+2) {
 					LegImpl leg = (LegImpl)bestactslegs.get(j);
 					leg.setRoute(null);

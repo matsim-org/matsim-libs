@@ -23,9 +23,9 @@ package org.matsim.core.mobsim.queuesim;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.population.ActivityImpl;

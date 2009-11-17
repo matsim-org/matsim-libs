@@ -45,11 +45,12 @@ import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.PlanElement;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.BasicPlanElement;
 
 import playground.mfeil.FilesForTests.Initializer;
 import playground.mfeil.FilesForTests.JohScoringTestFunctionFactory;
@@ -166,7 +167,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		
 		double planActTime = ((ActivityImpl)(newPlan.getPlanElements().get(0))).getEndTime();
 		
-		List<? extends BasicPlanElement> newPlanActsLegs = this.testee.copyActsLegs(newPlan.getPlanElements());
+		List<? extends PlanElement> newPlanActsLegs = this.testee.copyActsLegs(newPlan.getPlanElements());
 		
 		// deep copy of acts (complete act) and leg times (only times!) so that time change in newPlan does not affect plan
 		((ActivityImpl)(newPlanActsLegs.get(0))).setEndTime(0.0);
@@ -217,8 +218,8 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		
 		/* 1. Just the very normal case: increase an act, decrease another one */
 		/* Copy planElements */
-		List<? extends BasicPlanElement> alIn = this.testee.copyActsLegs(newPlan.getPlanElements()); 
-		List<? extends BasicPlanElement> alCheck = this.testee.copyActsLegs(newPlan.getPlanElements()); 
+		List<? extends PlanElement> alIn = this.testee.copyActsLegs(newPlan.getPlanElements()); 
+		List<? extends PlanElement> alCheck = this.testee.copyActsLegs(newPlan.getPlanElements()); 
 		
 		// Run testee
 		this.testee.increaseTime(newPlan, alIn, 0, 2, planAnalyzeSubtours, subtourDis);
@@ -305,8 +306,8 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		
 		/* 1. Just the very normal case: decrease an act, increase another one */
 		/* Copy planElements */
-		List<? extends BasicPlanElement> alIn = this.testee.copyActsLegs(newPlan.getPlanElements()); 
-		List<? extends BasicPlanElement> alCheck = this.testee.copyActsLegs(newPlan.getPlanElements()); 
+		List<? extends PlanElement> alIn = this.testee.copyActsLegs(newPlan.getPlanElements()); 
+		List<? extends PlanElement> alCheck = this.testee.copyActsLegs(newPlan.getPlanElements()); 
 		
 		// Run testee
 		this.testee.decreaseTime(newPlan, alIn, 0, 2, planAnalyzeSubtours, subtourDis);

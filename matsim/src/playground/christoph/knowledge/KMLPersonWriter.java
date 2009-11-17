@@ -35,12 +35,12 @@ import net.opengis.kml._2.StyleType;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicLeg;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -294,8 +294,8 @@ public class KMLPersonWriter {
 			if (selectedPlan != null)
 			{
 				for (PlanElement pe : selectedPlan.getPlanElements()) {
-					if (pe instanceof BasicLeg) {
-						BasicLeg leg = (BasicLeg) pe;
+					if (pe instanceof Leg) {
+						Leg leg = (Leg) pe;
 						
 						if (leg.getRoute() instanceof NetworkRouteWRefs)
 						{
@@ -327,8 +327,8 @@ public class KMLPersonWriter {
 			if (selectedPlan != null)
 			{
 				for (PlanElement pe : selectedPlan.getPlanElements()) {
-					if (pe instanceof BasicActivity) {
-						BasicActivity act = (BasicActivity) pe;
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
 						activityLinks.add(network.getLink(act.getLinkId()));
 					}
 				}

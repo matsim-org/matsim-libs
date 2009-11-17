@@ -20,15 +20,14 @@
 package playground.johannes.socialnetworks.graph.social.util;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.population.BasicActivity;
-import org.matsim.api.basic.v01.population.BasicPerson;
-import org.matsim.api.basic.v01.population.BasicPlan;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
@@ -49,7 +48,7 @@ public class ScoreGrid {
 		loader.loadScenario();
 		ScenarioImpl scenario = loader.getScenario();
 		PopulationImpl population = scenario.getPopulation();
-		CoordinateTransformation transform = new CH1903LV03toWGS84();
+//		CoordinateTransformation transform = new CH1903LV03toWGS84();
 //		SocialNetwork<Person> socialnet = new SocialNetwork<Person>(population);
 
 		SpatialGrid<Double> densityGrid2 = SpatialGrid.readFromFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/popdensity/popdensity.1000.xml");
@@ -61,17 +60,17 @@ public class ScoreGrid {
 		SpatialGrid<Double> densityGrid = new SpatialGrid<Double>(densityGrid2.getXmin(), densityGrid2.getYmin(), densityGrid2.getXmax(), densityGrid2.getYmax(), densityGrid2.getResolution());
 		SpatialGrid<Double> scoreSums = new SpatialGrid<Double>(densityGrid2.getXmin(), densityGrid2.getYmin(), densityGrid2.getXmax(), densityGrid2.getYmax(), densityGrid2.getResolution());
 		
-		for(BasicPerson<?> person : population.getPersons().values()) {
-			Coord homeLoc = ((BasicActivity)person.getPlans().get(0).getPlanElements().get(0)).getCoord();
+		for(Person person : population.getPersons().values()) {
+			Coord homeLoc = ((Activity)person.getPlans().get(0).getPlanElements().get(0)).getCoord();
 //			homeLoc = transform.transform(homeLoc);
 			
 			double sum = 0;
-			for(BasicPlan<?> plan : person.getPlans()) {
+			for(Plan plan : person.getPlans()) {
 				Double score = plan.getScore();
 				if(score != null)
 					sum += score; 	
 			}
-			double avr = sum/(double)person.getPlans().size(); 
+			double avr = sum/person.getPlans().size(); 
 			
 			Double val = scoreSums.getValue(homeLoc);
 			if(val == null)
