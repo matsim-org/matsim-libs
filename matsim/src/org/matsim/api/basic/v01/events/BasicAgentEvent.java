@@ -21,9 +21,12 @@
 package org.matsim.api.basic.v01.events;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 
 public interface BasicAgentEvent extends BasicPersonEvent {
 
 	public Id getLinkId();
+	
+	public TransportMode getLegMode();
 
 }

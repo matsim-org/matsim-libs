@@ -154,24 +154,24 @@ public class EventsReaderDEQv1 {
 		}
 	}
 
-	public static final BasicEventImpl createEvent(final double time, final int agentID, final int linkID, final int flag) {
+	public static final BasicEventImpl createEvent(final double time, final int agentId, final int linkId, final int flag) {
 		BasicEventImpl event = null;
 
 		switch (flag) {
 			case 2:
-				event = new LinkLeaveEventImpl(time, new IdImpl(agentID), new IdImpl(linkID));
+				event = new LinkLeaveEventImpl(time, new IdImpl(agentId), new IdImpl(linkId));
 				break;
 			case 5:
-				event = new LinkEnterEventImpl(time, new IdImpl(agentID), new IdImpl(linkID));
+				event = new LinkEnterEventImpl(time, new IdImpl(agentId), new IdImpl(linkId));
 				break;
 			case 4:
-				event = new AgentWait2LinkEventImpl(time, new IdImpl(agentID), new IdImpl(linkID));
+				event = new AgentWait2LinkEventImpl(time, new IdImpl(agentId), new IdImpl(linkId), null);
 				break;
 			case 6:
-				event = new AgentDepartureEventImpl(time, new IdImpl(agentID), new IdImpl(linkID));
+				event = new AgentDepartureEventImpl(time, new IdImpl(agentId), new IdImpl(linkId), null);
 				break;
 			case 0:
-				event = new AgentArrivalEventImpl(time, new IdImpl(agentID), new IdImpl(linkID));
+				event = new AgentArrivalEventImpl(time, new IdImpl(agentId), new IdImpl(linkId), null);
 				break;
 			default:
 				throw new RuntimeException("unknown event type: " + flag);

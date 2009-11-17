@@ -21,6 +21,7 @@
 package org.matsim.planomat.costestimators;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
@@ -71,7 +72,7 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		events.printEventHandlers();
 
 		// this gives a delay of 36s
-		AgentDepartureEventImpl depEvent = new AgentDepartureEventImpl(6.01 * 3600, PERSON_ID, LINK_ID);
+		AgentDepartureEventImpl depEvent = new AgentDepartureEventImpl(6.01 * 3600, PERSON_ID, LINK_ID, TransportMode.car);
 		LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(6.02 * 3600, PERSON_ID, LINK_ID);
 
 		for (BasicEventImpl event : new BasicEventImpl[]{depEvent, leaveEvent}) {
@@ -82,7 +83,7 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		assertEquals(depDelay, 36.0, EPSILON);
 
 		// let's add another delay of 72s, should result in an average of 54s
-		depEvent = new AgentDepartureEventImpl(6.02 * 3600, PERSON_ID, LINK_ID);
+		depEvent = new AgentDepartureEventImpl(6.02 * 3600, PERSON_ID, LINK_ID, TransportMode.car);
 		leaveEvent = new LinkLeaveEventImpl(6.04 * 3600, PERSON_ID, LINK_ID);
 
 		for (BasicEventImpl event : new BasicEventImpl[]{depEvent, leaveEvent}) {

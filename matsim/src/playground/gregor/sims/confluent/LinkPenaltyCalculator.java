@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -13,7 +14,6 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
@@ -96,7 +96,7 @@ public class LinkPenaltyCalculator implements LinkPenalty, AfterMobsimListener {
 		this.it = iteration;
 	}
 
-	public void handleEvent(AgentStuckEventImpl event) {
+	public void handleEvent(BasicAgentStuckEvent event) {
 		LinkInfo info = getLinkInfo(event.getLinkId());
 		info.cin++;
 		info.cumTT += STUCK_PENALTY;

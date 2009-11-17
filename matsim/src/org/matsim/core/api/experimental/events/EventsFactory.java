@@ -20,6 +20,7 @@
 package org.matsim.core.api.experimental.events;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimFactory;
 
 
@@ -34,13 +35,13 @@ public interface EventsFactory extends MatsimFactory {
 
 	LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId);
 
-	AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId);
+	AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId, final TransportMode legMode);
 
-	AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId);
+	AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId, final TransportMode legMode);
 
-	AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId);
+	AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId, final TransportMode legMode);
 
-	AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId);
+	AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId, final TransportMode legMode);
 
 	ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, String acttype);
 

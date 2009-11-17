@@ -76,16 +76,16 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 				data = this.builder.createLinkEnterEvent(time, agentId, linkId);
 				break;
 			case 3:
-				data = this.builder.createAgentStuckEvent(time, agentId, linkId);
+				data = this.builder.createAgentStuckEvent(time, agentId, linkId, null);
 				break;
 			case 4:
-				data = this.builder.createAgentWait2LinkEvent(time, agentId, linkId);
+				data = this.builder.createAgentWait2LinkEvent(time, agentId, linkId, null);
 				break;
 			case 6:
-				data = this.builder.createAgentDepartureEvent(time, agentId, linkId);
+				data = this.builder.createAgentDepartureEvent(time, agentId, linkId, null);
 				break;
 			case 0:
-				data = this.builder.createAgentArrivalEvent(time, agentId, linkId);
+				data = this.builder.createAgentArrivalEvent(time, agentId, linkId, null);
 				break;
 			case 7:
 				if ("".equals(acttype) && (desc != null)) {

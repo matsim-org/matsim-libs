@@ -4,12 +4,12 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
 /*
@@ -19,7 +19,7 @@ import org.matsim.core.events.handler.LinkLeaveEventHandler;
  * => we need to assign a different such curve to each agent (we need to put this attribute to the agent)
  * 
  */
-public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentWait2LinkEventHandler {
+public class LogEnergyConsumption implements BasicLinkEnterEventHandler, LinkLeaveEventHandler, BasicAgentWait2LinkEventHandler {
 
 	private static final Logger log = Logger.getLogger(LogEnergyConsumption.class);
 	Controler controler;
@@ -30,7 +30,7 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 	 * 
 	 * @see org.matsim.core.events.handler.LinkEnterEventHandler#handleEvent(org.matsim.core.events.LinkEnterEvent)
 	 */
-	public void handleEvent(LinkEnterEventImpl event) {
+	public void handleEvent(BasicLinkEnterEvent event) {
 		Id personId = event.getPersonId();
 
 		if (!energyConsumption.containsKey(personId)) {
@@ -76,7 +76,7 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 	 * 
 	 * @see org.matsim.core.events.handler.AgentWait2LinkEventHandler#handleEvent(org.matsim.core.events.AgentWait2LinkEvent)
 	 */
-	public void handleEvent(AgentWait2LinkEventImpl event) {
+	public void handleEvent(BasicAgentWait2LinkEvent event) {
 		Id personId = event.getPersonId();
 		if (!energyConsumption.containsKey(personId)) {
 			energyConsumption.put(personId, new EnergyConsumption());

@@ -20,8 +20,8 @@
 
 package org.matsim.core.events;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -30,10 +30,11 @@ import org.matsim.testcases.MatsimTestCase;
 public class AgentWait2LinkEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		final AgentWait2LinkEventImpl event1 = new AgentWait2LinkEventImpl(8463.7301, new IdImpl("483"), new IdImpl("783"));
+		final AgentWait2LinkEventImpl event1 = new AgentWait2LinkEventImpl(8463.7301, new IdImpl("483"), new IdImpl("783"), TransportMode.car);
 		final AgentWait2LinkEventImpl event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
 		assertEquals(event1.getPersonId().toString(), event2.getPersonId().toString());
 		assertEquals(event1.getLinkId().toString(), event2.getLinkId().toString());
+		assertEquals(event1.getLegMode().toString(), event2.getLegMode().toString());
 	}
 }

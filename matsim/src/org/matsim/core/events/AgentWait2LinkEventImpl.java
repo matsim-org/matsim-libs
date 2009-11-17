@@ -21,6 +21,7 @@
 package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -34,8 +35,8 @@ public class AgentWait2LinkEventImpl extends AgentEventImpl implements AgentWait
 		super(time, agent, link, leg);
 	}
 
-	public AgentWait2LinkEventImpl(final double time, final Id agentId, final Id linkId) {
-		super(time, agentId, linkId);
+	public AgentWait2LinkEventImpl(final double time, final Id agentId, final Id linkId, final TransportMode legMode) {
+		super(time, agentId, linkId, legMode);
 	}
 
 	@Override

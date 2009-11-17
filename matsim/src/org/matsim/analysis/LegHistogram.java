@@ -39,12 +39,12 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.AgentStuckEventHandler;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -53,7 +53,7 @@ import org.matsim.core.utils.misc.Time;
  * Counts the number of vehicles departed, arrived or got stuck per time bin
  * based on events.
  */
-public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
+public class LegHistogram implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler, BasicAgentStuckEventHandler {
 
 	private int iteration = 0;
 	private final int binSize;
@@ -85,29 +85,29 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 
 	/* Implementation of EventHandler-Interfaces */
 
-	public void handleEvent(final AgentDepartureEventImpl event) {
+	public void handleEvent(final BasicAgentDepartureEvent event) {
 		int index = getBinIndex(event.getTime());
 		allModesData.countsDep[index]++;
-		if (event.getLeg() != null) {
-			ModeData modeData = getDataForMode(event.getLeg().getMode());
+		if (event.getLegMode() != null) {
+			ModeData modeData = getDataForMode(event.getLegMode());
 			modeData.countsDep[index]++;
 		}
 	}
 
-	public void handleEvent(final AgentArrivalEventImpl event) {
+	public void handleEvent(final BasicAgentArrivalEvent event) {
 		int index = getBinIndex(event.getTime());
 		allModesData.countsArr[index]++;
-		if (event.getLeg() != null) {
-			ModeData modeData = getDataForMode(event.getLeg().getMode());
+		if (event.getLegMode() != null) {
+			ModeData modeData = getDataForMode(event.getLegMode());
 			modeData.countsArr[index]++;
 		}
 	}
 
-	public void handleEvent(final AgentStuckEventImpl event) {
+	public void handleEvent(final BasicAgentStuckEvent event) {
 		int index = getBinIndex(event.getTime());
 		allModesData.countsStuck[index]++;
-		if (event.getLeg() != null) {
-			ModeData modeData = getDataForMode(event.getLeg().getMode());
+		if (event.getLegMode() != null) {
+			ModeData modeData = getDataForMode(event.getLegMode());
 			modeData.countsStuck[index]++;
 		}
 	}

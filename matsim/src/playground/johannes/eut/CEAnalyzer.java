@@ -79,7 +79,7 @@ public class CEAnalyzer implements IterationEndsListener, ShutdownListener {
 			readPersons(personsFile, plans);
 		}
 		for (PersonImpl p : persons) {
-			Double tripDur = stats.getTripDurations().get(p);
+			Double tripDur = stats.getTripDurations().get(p.getId());
 			if (tripDur != null) { // F***ing withinday bug!
 				List<Double> personSamples = samples.get(p);
 				if (personSamples == null) {

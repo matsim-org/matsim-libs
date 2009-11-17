@@ -28,14 +28,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.matsim.api.basic.v01.events.BasicAgentEvent;
+import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentEventImpl;
-import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -57,7 +57,7 @@ import playground.yu.utils.TollTools;
  * 
  */
 public class LegDistance implements LinkEnterEventHandler,
-		AgentArrivalEventHandler, AgentStuckEventHandler {
+		AgentArrivalEventHandler, BasicAgentStuckEventHandler {
 	private final NetworkLayer network;
 	private int binSize;
 	private double[] legDistances;
@@ -80,7 +80,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		return bin;
 	}
 
-	protected void handleEventIntern(AgentEventImpl ae) {
+	protected void handleEventIntern(BasicAgentEvent ae) {
 		int binIdx = getBinIndex(ae.getTime());
 		Double distance = this.distances.remove(ae.getPersonId().toString());
 		if (distance != null) {
@@ -148,7 +148,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		handleEventIntern(event);
 	}
 
-	public void handleEvent(AgentStuckEventImpl event) {
+	public void handleEvent(BasicAgentStuckEvent event) {
 		handleEventIntern(event);
 	}
 

@@ -21,6 +21,7 @@
 package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -34,8 +35,8 @@ public class AgentArrivalEventImpl extends AgentEventImpl implements AgentArriva
 		super(time, agent, link, leg);
 	}
 
-	public AgentArrivalEventImpl(final double time, final Id agentId, final Id linkId) {
-		super(time, agentId, linkId);
+	public AgentArrivalEventImpl(final double time, final Id agentId, final Id linkId, final TransportMode legMode) {
+		super(time, agentId, linkId, legMode);
 	}
 
 	@Override

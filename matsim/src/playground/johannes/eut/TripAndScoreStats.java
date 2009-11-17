@@ -32,6 +32,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -40,11 +45,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -52,13 +52,13 @@ import org.matsim.core.utils.io.IOUtils;
  *
  */
 public class TripAndScoreStats implements StartupListener, ShutdownListener,
-		IterationEndsListener, AgentWait2LinkEventHandler, AgentArrivalEventHandler {
+		IterationEndsListener, BasicAgentWait2LinkEventHandler, BasicAgentArrivalEventHandler {
 
 	private final static String TAB = "\t";
 	
-	private Map<PersonImpl, Double> departures;
+	private Map<Id, Double> departures;
 	
-	private Map<PersonImpl, Double> tripDurations;
+	private Map<Id, Double> tripDurations;
 	
 	private EUTRouterAnalyzer analyzer;
 	
@@ -160,7 +160,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		
 		double sum = 0;
 		for(Person p : persons) {
-			Double d = tripDurations.get(p);
+			Double d = tripDurations.get(p.getId());
 			if(d != null) {// unfortunately this can happen -> within-day bug!
 				sum += d;
 				samples.add(d);
@@ -182,21 +182,21 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		return sum/(double)persons.size();
 	}
 	
-	public void handleEvent(AgentWait2LinkEventImpl event) {
-		departures.put(event.getPerson(), event.getTime());
+	public void handleEvent(BasicAgentWait2LinkEvent event) {
+		departures.put(event.getPersonId(), event.getTime());
 	}
 
 	public void reset(int iteration) {
-		departures = new HashMap<PersonImpl, Double>();
-		tripDurations = new HashMap<PersonImpl, Double>();
+		departures = new HashMap<Id, Double>();
+		tripDurations = new HashMap<Id, Double>();
 	}
 
-	public void handleEvent(AgentArrivalEventImpl event) {
-		Double time = departures.get(event.getPerson());
+	public void handleEvent(BasicAgentArrivalEvent event) {
+		Double time = departures.get(event.getPersonId());
 		if(time != null) {
 			double deltaT = event.getTime() - time;
-			tripDurations.put(event.getPerson(), deltaT); // TODO: Does not work with round trips!
-			departures.remove(event.getPerson());
+			tripDurations.put(event.getPersonId(), deltaT); // TODO: Does not work with round trips!
+			departures.remove(event.getPersonId());
 		}
 		
 	}
@@ -273,7 +273,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		return sum/(double)samples.size();
 	}
 
-	public Map<PersonImpl, Double> getTripDurations() {
+	public Map<Id, Double> getTripDurations() {
 		return tripDurations;
 	}
 }

@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
 import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
@@ -58,10 +57,7 @@ import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.events.handler.AgentReplanEventHandler;
-import org.matsim.core.events.handler.AgentStuckEventHandler;
-import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.events.handler.LinkEnterEventHandler;
@@ -325,9 +321,9 @@ public class EventsManagerImpl implements EventsManager {
 		} else if (klass == BasicLinkEnterEvent.class) {
 			((BasicLinkEnterEventHandler)handler).handleEvent((BasicLinkEnterEvent)ev);
 			return true;
-		} else if (klass == AgentWait2LinkEventImpl.class) {
-			((AgentWait2LinkEventHandler)handler).handleEvent((AgentWait2LinkEventImpl)ev);
-			return true;
+//		} else if (klass == AgentWait2LinkEventImpl.class) {
+//			((AgentWait2LinkEventHandler)handler).handleEvent((AgentWait2LinkEventImpl)ev);
+//			return true;
 		} else if (klass == BasicAgentWait2LinkEvent.class) {
 			((BasicAgentWait2LinkEventHandler)handler).handleEvent((BasicAgentWait2LinkEvent)ev);
 			return true;
@@ -355,15 +351,15 @@ public class EventsManagerImpl implements EventsManager {
 		} else if (klass == BasicActivityStartEvent.class) {
 			((BasicActivityStartEventHandler)handler).handleEvent((BasicActivityStartEvent)ev);
 			return true;
-		} else if (klass == AgentStuckEventImpl.class) {
-			((AgentStuckEventHandler)handler).handleEvent((AgentStuckEventImpl)ev);
-			return true;
+//		} else if (klass == AgentStuckEventImpl.class) {
+//			((AgentStuckEventHandler)handler).handleEvent((AgentStuckEventImpl)ev);
+//			return true;
 		} else if (klass == BasicAgentStuckEvent.class) {
 			((BasicAgentStuckEventHandler)handler).handleEvent((BasicAgentStuckEvent)ev);
 			return true;
-		} else if (klass == AgentMoneyEventImpl.class) {
-			((AgentMoneyEventHandler)handler).handleEvent((AgentMoneyEventImpl)ev);
-			return true;
+//		} else if (klass == AgentMoneyEventImpl.class) {
+//			((AgentMoneyEventHandler)handler).handleEvent((AgentMoneyEventImpl)ev);
+//			return true;
 		} else if (klass == BasicAgentMoneyEvent.class) {
 			((BasicAgentMoneyEventHandler)handler).handleEvent((BasicAgentMoneyEvent)ev);
 			return true;

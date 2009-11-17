@@ -35,14 +35,14 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.AgentStuckEventHandler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -217,7 +217,7 @@ public class EventFilesEvacuationTimeCompare {
 	}
 
 	
-	private class TravelTimesFromEvents implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
+	private class TravelTimesFromEvents implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler, BasicAgentStuckEventHandler {
 
 		private final HashMap<String,AgentInfo> ttimes;
 		private final QuadTree<AgentInfo> ttimesTree = new QuadTree<AgentInfo>(EventFilesEvacuationTimeCompare.ENVELOPE.getMinX(),EventFilesEvacuationTimeCompare.ENVELOPE.getMinY(),EventFilesEvacuationTimeCompare.ENVELOPE.getMaxX(),EventFilesEvacuationTimeCompare.ENVELOPE.getMaxY());
@@ -243,7 +243,7 @@ public class EventFilesEvacuationTimeCompare {
 			
 		}
 
-		public void handleEvent(final AgentDepartureEventImpl event) {
+		public void handleEvent(final BasicAgentDepartureEvent event) {
 			AgentInfo ai = new AgentInfo();
 			ai.time = 3*3600; //event.getTime();
 			LinkImpl link = EventFilesEvacuationTimeCompare.this.network.getLink(event.getLinkId().toString());
@@ -257,14 +257,14 @@ public class EventFilesEvacuationTimeCompare {
 			
 		}
 
-		public void handleEvent(final AgentArrivalEventImpl event) {
+		public void handleEvent(final BasicAgentArrivalEvent event) {
 			AgentInfo ai = this.ttimes.get(event.getPersonId().toString());
 			ai.time = event.getTime() - ai.time;
 			this.ttimesTree.put(ai.c.x, ai.c.y, ai);
 			
 		}
 
-		public void handleEvent(final AgentStuckEventImpl event) {
+		public void handleEvent(final BasicAgentStuckEvent event) {
 			this.ttimes.remove(event.getPersonId().toString());
 			
 		}

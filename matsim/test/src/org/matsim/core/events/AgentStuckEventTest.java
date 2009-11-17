@@ -20,8 +20,8 @@
 
 package org.matsim.core.events;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -30,10 +30,11 @@ import org.matsim.testcases.MatsimTestCase;
 public class AgentStuckEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		final AgentStuckEventImpl event1 = new AgentStuckEventImpl(81153.3, new IdImpl("a007"), new IdImpl("link1"));
+		final AgentStuckEventImpl event1 = new AgentStuckEventImpl(81153.3, new IdImpl("a007"), new IdImpl("link1"), TransportMode.walk);
 		final AgentStuckEventImpl event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
 		assertEquals(event1.getPersonId(), event2.getPersonId());
 		assertEquals(event1.getLinkId(), event2.getLinkId());
+		assertEquals(event1.getLegMode(), event2.getLegMode());
 	}
 }

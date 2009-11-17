@@ -136,7 +136,7 @@ public class BenefitAnalyzer implements IterationEndsListener, ShutdownListener,
 		double benefitsumExpTT = 0;
 		double benefitsumCE = 0;
 		for(Person p : ceMap.keySet()) {
-			Double triptime = tripStats.getTripDurations().get(p);
+			Double triptime = tripStats.getTripDurations().get(p.getId());
 			if (triptime != null) { // unfortunately this can happen -> withinday bug
 				double ce = ceMap.get(p);
 				double expTT = expTTMap.get(p);

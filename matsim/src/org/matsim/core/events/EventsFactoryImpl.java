@@ -20,6 +20,7 @@
 package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -52,24 +53,24 @@ public class EventsFactoryImpl implements EventsFactory {
 		return new ActivityStartEventImpl(time, agentId, linkId, acttype);
 	}
 
-	public AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId) {
-		return new AgentArrivalEventImpl(time, agentId, linkId);
+	public AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId, final TransportMode legMode) {
+		return new AgentArrivalEventImpl(time, agentId, linkId, legMode);
 	}
 
-	public AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId) {
-		return new AgentDepartureEventImpl(time, agentId, linkId);
+	public AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId, final TransportMode legMode) {
+		return new AgentDepartureEventImpl(time, agentId, linkId, legMode);
 	}
 
 	public AgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney) {
 		return new AgentMoneyEventImpl(time, agentId, amountMoney);
 	}
 
-	public AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId) {
-		return new AgentStuckEventImpl(time, agentId, linkId);
+	public AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId, final TransportMode legMode) {
+		return new AgentStuckEventImpl(time, agentId, linkId, legMode);
 	}
 
-	public AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId) {
-		return new AgentWait2LinkEventImpl(time, agentId, linkId);
+	public AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId, final TransportMode legMode) {
+		return new AgentWait2LinkEventImpl(time, agentId, linkId, legMode);
 	}
 
 	public LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId) {

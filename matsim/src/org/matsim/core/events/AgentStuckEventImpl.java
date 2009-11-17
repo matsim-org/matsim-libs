@@ -21,6 +21,7 @@
 package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -34,8 +35,8 @@ public class AgentStuckEventImpl extends AgentEventImpl implements AgentStuckEve
 		super(time, agent, link, leg);
 	}
 
-	public AgentStuckEventImpl(final double time, final Id agentId, final Id linkId) {
-		super(time, agentId, linkId);
+	public AgentStuckEventImpl(final double time, final Id agentId, final Id linkId, final TransportMode legMode) {
+		super(time, agentId, linkId, legMode);
 	}
 
 	@Override

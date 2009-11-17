@@ -28,6 +28,7 @@ import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
 import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
 import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
 import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
 import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
 import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
@@ -36,11 +37,11 @@ import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
@@ -50,11 +51,10 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 public class EventWriterTXT implements EventWriter, BasicActivityEndEventHandler, BasicActivityStartEventHandler, BasicAgentArrivalEventHandler, 
-		BasicAgentDepartureEventHandler, BasicAgentStuckEventHandler, AgentMoneyEventHandler, 
+		BasicAgentDepartureEventHandler, BasicAgentStuckEventHandler, BasicAgentMoneyEventHandler, 
 		BasicAgentWait2LinkEventHandler, BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler {
 	
 	/* Implement all the different event handlers by its own. Future event types will no longer be
@@ -173,7 +173,7 @@ public class EventWriterTXT implements EventWriter, BasicActivityEndEventHandler
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 3, AgentStuckEventImpl.EVENT_TYPE);
 	}
 
-	public void handleEvent(AgentMoneyEvent event) {
+	public void handleEvent(BasicAgentMoneyEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), null, 9, AgentMoneyEventImpl.EVENT_TYPE + "\t" + event.getAmount());
 	}
 

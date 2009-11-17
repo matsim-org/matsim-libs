@@ -8,6 +8,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
+import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -15,21 +22,14 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.ActivityEndEventHandler;
-import org.matsim.core.events.handler.ActivityStartEventHandler;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -184,27 +184,27 @@ ActivityStartEventHandler
 
 	}
 
-	public void handleEvent(ActivityEndEventImpl event) {
-		String str = event.getEventType(); // TODO: String?  Not an enum??
+	public void handleEvent(BasicActivityEndEvent event) {
+//		String str = event.getEventType(); // TODO: String?  Not an enum??
 		Map<String,String> attribs = event.getAttributes() ; // TODO: String?  may be ok ... 
 	}
 
-	public void handleEvent(AgentDepartureEventImpl event) {
+	public void handleEvent(BasicAgentDepartureEvent event) {
 	}
 
-	public void handleEvent(AgentWait2LinkEventImpl event) {
+	public void handleEvent(BasicAgentWait2LinkEvent event) {
 	}
 
-	public void handleEvent(LinkLeaveEventImpl event) {
+	public void handleEvent(BasicLinkLeaveEvent event) {
 	}
 
-	public void handleEvent(LinkEnterEventImpl event) {
+	public void handleEvent(BasicLinkEnterEvent event) {
 	}
 
-	public void handleEvent(AgentArrivalEventImpl event) {
+	public void handleEvent(BasicAgentArrivalEvent event) {
 	}
 
-	public void handleEvent(ActivityStartEventImpl event) {
+	public void handleEvent(BasicActivityStartEvent event) {
 	}
 
 	public void reset(int iteration) {

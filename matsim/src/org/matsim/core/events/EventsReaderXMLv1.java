@@ -22,12 +22,12 @@ package org.matsim.core.events;
 
 import java.util.Stack;
 
-import org.xml.sax.Attributes;
-
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
 import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEvent;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
 
 public class EventsReaderXMLv1 extends MatsimXmlParser {
 
@@ -77,24 +77,36 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 					new IdImpl(atts.getValue(ActivityStartEventImpl.ATTRIBUTE_LINK)),
 					atts.getValue(ActivityStartEventImpl.ATTRIBUTE_ACTTYPE)));
 		} else if (AgentArrivalEventImpl.EVENT_TYPE.equals(eventType)) {
+			String legMode = atts.getValue(AgentArrivalEventImpl.ATTRIBUTE_LEGMODE);
+			TransportMode mode = legMode == null ? null : TransportMode.valueOf(legMode);
 			this.events.processEvent(this.builder.createAgentArrivalEvent(time,
 					new IdImpl(atts.getValue(AgentArrivalEventImpl.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(AgentArrivalEventImpl.ATTRIBUTE_LINK))));
+					new IdImpl(atts.getValue(AgentArrivalEventImpl.ATTRIBUTE_LINK)),
+					mode));
 		} else if (AgentDepartureEventImpl.EVENT_TYPE.equals(eventType)) {
+			String legMode = atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_LEGMODE);
+			TransportMode mode = legMode == null ? null : TransportMode.valueOf(legMode);
 			this.events.processEvent(this.builder.createAgentDepartureEvent(time,
 					new IdImpl(atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_LINK))));
+					new IdImpl(atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_LINK)),
+					mode));
 		} else if (AgentWait2LinkEventImpl.EVENT_TYPE.equals(eventType)) {
+			String legMode = atts.getValue(AgentWait2LinkEventImpl.ATTRIBUTE_LEGMODE);
+			TransportMode mode = legMode == null ? null : TransportMode.valueOf(legMode);
 			this.events.processEvent(this.builder.createAgentWait2LinkEvent(time,
 					new IdImpl(atts.getValue(AgentWait2LinkEventImpl.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(AgentWait2LinkEventImpl.ATTRIBUTE_LINK))));
+					new IdImpl(atts.getValue(AgentWait2LinkEventImpl.ATTRIBUTE_LINK)),
+					mode));
 		} else if (AgentStuckEventImpl.EVENT_TYPE.equals(eventType)) {
+			String legMode = atts.getValue(AgentStuckEventImpl.ATTRIBUTE_LEGMODE);
+			TransportMode mode = legMode == null ? null : TransportMode.valueOf(legMode);
 			this.events.processEvent(this.builder.createAgentStuckEvent(time,
 					new IdImpl(atts.getValue(AgentStuckEventImpl.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(AgentStuckEventImpl.ATTRIBUTE_LINK))));
+					new IdImpl(atts.getValue(AgentStuckEventImpl.ATTRIBUTE_LINK)),
+					mode));
 		} else if (AgentMoneyEventImpl.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.createAgentMoneyEvent(time,
-					new IdImpl(atts.getValue(AgentStuckEventImpl.ATTRIBUTE_PERSON)),
+					new IdImpl(atts.getValue(AgentMoneyEventImpl.ATTRIBUTE_PERSON)),
 					Double.parseDouble(atts.getValue(AgentMoneyEventImpl.ATTRIBUTE_AMOUNT))));
 		} else if (PersonEntersVehicleEventImpl.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.createPersonEntersVehicleEvent(time,

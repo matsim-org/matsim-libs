@@ -1,16 +1,16 @@
 package playground.kai.usecases.mobsim;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 
@@ -35,20 +35,21 @@ public class Mobsim {
 
 		Id agentId = sc.createId("agentId");
 		Id linkId = sc.createId("linkId");
+		TransportMode legMode = TransportMode.car;
 		double time = 1. ;
 		
 		ActivityEndEvent aee = eb.createActivityEndEvent( time, agentId, linkId, "actType" ) ; 
 		ev.processEvent( aee ) ;
 
-		AgentDepartureEvent ade = eb.createAgentDepartureEvent( time, agentId, linkId ) ;
+		AgentDepartureEvent ade = eb.createAgentDepartureEvent( time, agentId, linkId, legMode ) ;
 
-		AgentWait2LinkEvent aw2le = eb.createAgentWait2LinkEvent(time,agentId,linkId) ;
+		AgentWait2LinkEvent aw2le = eb.createAgentWait2LinkEvent(time,agentId,linkId, legMode) ;
 
 		LinkLeaveEvent lle = eb.createLinkLeaveEvent( time, agentId, linkId ) ;
 
 		LinkEnterEvent lee = eb.createLinkEnterEvent( time, agentId, linkId ) ;
 
-		AgentArrivalEvent aae = eb.createAgentArrivalEvent( time, agentId, linkId ) ;
+		AgentArrivalEvent aae = eb.createAgentArrivalEvent( time, agentId, linkId, legMode ) ;
 
 		ActivityStartEvent ase = eb.createActivityStartEvent( time, agentId, linkId, "acttype" ) ;
 

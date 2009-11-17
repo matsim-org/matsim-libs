@@ -20,8 +20,8 @@
 
 package org.matsim.core.events;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -31,9 +31,10 @@ public class AgentDepartureEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
 		final AgentDepartureEventImpl event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
-				new AgentDepartureEventImpl(25669.05, new IdImpl("921"), new IdImpl("390")));
+				new AgentDepartureEventImpl(25669.05, new IdImpl("921"), new IdImpl("390"), TransportMode.train));
 		assertEquals(25669.05, event.getTime(), EPSILON);
 		assertEquals("921", event.getPersonId().toString());
 		assertEquals("390", event.getLinkId().toString());
+		assertEquals("train", event.getLegMode().toString());
 	}
 }
