@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.BasicEventImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
@@ -100,6 +101,12 @@ public class EndLegMessage extends EventMessage {
 	public void processEvent() {
 		BasicEventImpl event = null;
 
+		// schedule enter link event
+		event = new LinkEnterEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson(), vehicle.getCurrentLink());
+
+		SimulationParameters.getProcessEventThread().processEvent(event);
+		
+		
 		// schedule AgentArrivalEvent
 		event = new AgentArrivalEventImpl(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson(), this.vehicle.getCurrentLink(), this.vehicle.getCurrentLeg());
 

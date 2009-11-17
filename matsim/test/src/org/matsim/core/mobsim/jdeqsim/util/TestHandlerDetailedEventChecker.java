@@ -78,6 +78,12 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 					act = (ActivityImpl) pe;
 					
 					if (leg != null) {
+						// each leg ends with enter on act link
+						assertTrue(list.get(index) instanceof LinkEnterEventImpl);
+						assertTrue(act.getLinkId().toString().equalsIgnoreCase(
+								((LinkEnterEventImpl) list.get(index)).getLinkId().toString()));
+						index++;
+						
 						// each leg ends with arrival on act link
 						assertTrue(list.get(index) instanceof AgentArrivalEventImpl);
 						assertTrue(act.getLinkId().toString().equalsIgnoreCase(
