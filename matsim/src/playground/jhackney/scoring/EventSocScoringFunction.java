@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.SocNetConfigGroup;
@@ -45,7 +46,7 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 //	private final playground.jhackney.scoring.CharyparNagelScoringFunctiosuperon;
 	private final Plan plan;
 //	private final TrackEventsOverlap teo;
-	private final LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats;
+	private final LinkedHashMap<Activity,ArrayList<Double>> actStats;
 	private final String factype;
 
 	private double friendFoeRatio=0.;
@@ -62,7 +63,7 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 	LinkedHashMap<ActivityImpl,Double> dusoc=new LinkedHashMap<ActivityImpl,Double>();
 
 //	public SocScoringFunctionEvent(final Plan plan, final playground.jhackney.scoring.CharyparNagelScoringFunction scoringFunction, String factype, final LinkedHashMap<Act,ArrayList<Double>> actStats) {
-	public EventSocScoringFunction(final Plan plan, String factype, final LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats) {
+	public EventSocScoringFunction(final Plan plan, String factype, final LinkedHashMap<Activity,ArrayList<Double>> actStats) {
 //		this.paidToll = paidToll;
 		super(plan);
 		this.plan = plan;

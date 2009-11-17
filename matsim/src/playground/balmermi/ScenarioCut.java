@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -103,7 +104,7 @@ public class ScenarioCut {
 							if (n.getCoord().getY() > max.getY()) { max.setY(n.getCoord().getY()); }
 						}
 						if (a.getFacilityId() != null) {
-							ActivityFacilityImpl f = a.getFacility();
+							ActivityFacility f = a.getFacility();
 							if (f.getCoord().getX() < min.getX()) { min.setX(f.getCoord().getX()); }
 							if (f.getCoord().getY() < min.getY()) { min.setY(f.getCoord().getY()); }
 							if (f.getCoord().getX() > max.getX()) { max.setX(f.getCoord().getX()); }

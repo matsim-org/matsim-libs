@@ -28,9 +28,8 @@ import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
 import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 
 /**
  * Computes average departure delay on a link in a given time slot.
@@ -39,7 +38,7 @@ import org.matsim.api.basic.v01.network.BasicNode;
  */
 public class DepartureDelayAverageCalculator implements BasicAgentDepartureEventHandler, BasicLinkLeaveEventHandler {
 
-	private BasicNetwork<? extends BasicNode, ? extends BasicLink> network;
+	private Network network;
 	private int timeBinSize;
 	private HashMap<DepartureEvent, Double> departureEventsTimes = new HashMap<DepartureEvent, Double>();
 	private final HashMap<Id, DepartureDelayData> linkData;
@@ -50,7 +49,7 @@ public class DepartureDelayAverageCalculator implements BasicAgentDepartureEvent
 	// Constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public DepartureDelayAverageCalculator(BasicNetwork<? extends BasicNode, ? extends BasicLink> network, int timeBinSize) {
+	public DepartureDelayAverageCalculator(Network network, int timeBinSize) {
 		super();
 		this.network = network;
 		this.timeBinSize = timeBinSize;
@@ -65,7 +64,7 @@ public class DepartureDelayAverageCalculator implements BasicAgentDepartureEvent
 	 * @param departureTime
 	 * @return departure delay estimation
 	 */
-	public double getLinkDepartureDelay(BasicLink link, double departureTime) {
+	public double getLinkDepartureDelay(Link link, double departureTime) {
 		DepartureDelayData ddd = this.getDepartureDelayRole(link.getId());
 		if (ddd == null) {
 			return 0.0;

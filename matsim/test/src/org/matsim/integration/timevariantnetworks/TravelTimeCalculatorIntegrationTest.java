@@ -20,13 +20,13 @@
 
 package org.matsim.integration.timevariantnetworks;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.TimeVariantLinkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
@@ -49,11 +49,11 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		network.setCapacityPeriod(3600.0);
 
 		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
-		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(200, 0));
-		NodeImpl node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(300, 0));
-		LinkImpl link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
+		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(200, 0));
+		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(300, 0));
+		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 		TimeVariantLinkImpl link2 = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
 		network.createAndAddLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
 
@@ -83,11 +83,11 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		network.setCapacityPeriod(3600.0);
 
 		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
-		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(200, 0));
-		NodeImpl node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(300, 0));
-		LinkImpl link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
+		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(200, 0));
+		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(300, 0));
+		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 		TimeVariantLinkImpl link2 = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
 		network.createAndAddLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
 

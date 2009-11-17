@@ -27,7 +27,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -179,7 +178,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *
 	 * @param modeRestriction {@link TransportMode}s that can be used to find a route
 	 *
-	 * @see BasicLink#setAllowedModes(Set)
+	 * @see Link#setAllowedModes(Set)
 	 */
 	public void setModeRestriction(final Set<TransportMode> modeRestriction) {
 		if (modeRestriction == null) {

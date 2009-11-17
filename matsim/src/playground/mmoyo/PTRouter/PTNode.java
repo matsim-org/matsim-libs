@@ -2,10 +2,11 @@ package playground.mmoyo.PTRouter;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 /**
@@ -19,7 +20,7 @@ public class PTNode extends NodeImpl {
 	private TransitRouteStop transitRouteStop;
 	private double[]arrDep;  
 	private Link inStandardLink;
-	private NodeImpl plainNode;
+	private Node plainNode;
 	
 	public PTNode(final Id id, final Coord coord) {
 		super(id, coord, null);
@@ -49,11 +50,11 @@ public class PTNode extends NodeImpl {
 		this.inStandardLink = inStandardLink;
 	}
 
-	public NodeImpl getPlainNode() {
+	public Node getPlainNode() {
 		return plainNode;
 	}
 
-	public void setPlainNode(NodeImpl plainNode) {
+	public void setPlainNode(Node plainNode) {
 		this.plainNode = plainNode;
 	}
 

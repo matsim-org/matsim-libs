@@ -27,10 +27,9 @@ import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
@@ -83,8 +82,8 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 	/*package*/ TransitLine redLine = null;
 	/*package*/ TransitLine blueLine = null;
 	/*package*/ TransitLine greenLine = null;
-	private final NodeImpl[] nodes = new NodeImpl[17];
-	private final LinkImpl[] links = new LinkImpl[26];
+	private final Node[] nodes = new Node[17];
+	private final Link[] links = new Link[26];
 	private final TransitStopFacility[] stopFacilities = new TransitStopFacility[24];
 
 	public Fixture() {

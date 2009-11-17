@@ -9,7 +9,6 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
@@ -48,7 +47,7 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 	 */
 	private LinkedList<TTElement> ttimes = new LinkedList<TTElement>();
 
-	private Map<BasicLink, Averager> averagedTTimes = new HashMap<BasicLink, Averager>();
+	private Map<Link, Averager> averagedTTimes = new HashMap<Link, Averager>();
 
 //	private SimTimeI simTime;
 
@@ -132,7 +131,7 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 			/*
 			 * Average the remaining travel time elements...
 			 */
-			this.averagedTTimes = new HashMap<BasicLink, Averager>();
+			this.averagedTTimes = new HashMap<Link, Averager>();
 			for (TTElement e : this.ttimes) {
 				Averager a = this.averagedTTimes.get(e.getLink());
 				if (a == null) {
@@ -148,7 +147,7 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 		return this;
 	}
 
-	public int getLinkTravelTime_s(BasicLink link, int time_s) {
+	public int getLinkTravelTime_s(Link link, int time_s) {
 		Averager a = this.averagedTTimes.get(link);
 		if (a == null) {
 			/*
@@ -160,7 +159,7 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 		}
 	}
 
-	public double getLinkTravelCost(BasicLink link, int time_s) {
+	public double getLinkTravelCost(Link link, int time_s) {
 		return this.getLinkTravelTime_s(link, time_s);
 	}
 
@@ -178,19 +177,19 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 
 	private class TTElement {
 
-		private final BasicLink link;
+		private final Link link;
 
 		private final int timeStamp;
 
 		private final int ttime;
 
-		public TTElement(BasicLink link, int timeStamp, int ttime) {
+		public TTElement(Link link, int timeStamp, int ttime) {
 			this.link = link;
 			this.timeStamp = timeStamp;
 			this.ttime = ttime;
 		}
 
-		public BasicLink getLink() {
+		public Link getLink() {
 			return this.link;
 		}
 

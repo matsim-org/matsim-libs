@@ -11,7 +11,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -74,7 +74,7 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 		}
 
 		@Override
-		protected double getLinkWidth(final BasicLink link) {
+		protected double getLinkWidth(final Link link) {
 			return super.getLinkWidth(link) * 2.0;
 		}
 

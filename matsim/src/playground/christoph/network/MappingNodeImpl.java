@@ -7,7 +7,6 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.christoph.network.mapping.Mapping;
@@ -47,14 +46,14 @@ public class MappingNodeImpl extends MappingNode {
 		return this.outLinks;
 	}
 
-	public boolean addInLink(BasicLink link)
+	public boolean addInLink(Link link)
 	{
-		return (this.inLinks.put(link.getId(), (Link) link) != null);
+		return (this.inLinks.put(link.getId(), link) != null);
 	}
 
-	public boolean addOutLink(BasicLink link)
+	public boolean addOutLink(Link link)
 	{
-		return (this.outLinks.put(link.getId(), (Link)link) != null);
+		return (this.outLinks.put(link.getId(), link) != null);
 	}
 
 	public Coord getCoord()

@@ -26,6 +26,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
@@ -35,16 +37,13 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRoute;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.ScoringFunction;
@@ -112,11 +111,11 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		// generate network
 		this.network = new NetworkLayer();
 
-		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(    0.0, 0.0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(  500.0, 0.0));
-		NodeImpl node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl( 5500.0, 0.0));
-		NodeImpl node4 = network.createAndAddNode(new IdImpl(4), new CoordImpl( 6000.0, 0.0));
-		NodeImpl node5 = network.createAndAddNode(new IdImpl(5), new CoordImpl(11000.0, 0.0));
+		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(    0.0, 0.0));
+		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(  500.0, 0.0));
+		Node node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl( 5500.0, 0.0));
+		Node node4 = network.createAndAddNode(new IdImpl(4), new CoordImpl( 6000.0, 0.0));
+		Node node5 = network.createAndAddNode(new IdImpl(5), new CoordImpl(11000.0, 0.0));
 		network.createAndAddLink(new IdImpl(1020), node1, node2, 500, 25, 3600, 1);
 		network.createAndAddLink(new IdImpl(2010), node2, node1, 500, 25, 3600, 1);
 		network.createAndAddLink(new IdImpl(2030), node2, node3, 500, 25, 3600, 1);
@@ -139,15 +138,15 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		// generate plan
 		plan = person.createAndAddPlan(true);
 
-		ActivityImpl act = plan.createAndAddActivity("home", facilityHome);
-		LinkImpl link = this.network.getLink("2030");
+		ActivityImpl act = (ActivityImpl) plan.createAndAddActivity("home", facilityHome);
+		Link link = this.network.getLink("2030");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		LegImpl leg = this.plan.createAndAddLeg(TransportMode.car);
 		RouteWRefs route = network.getFactory().createRoute(TransportMode.car, this.network.getLink("2030"), this.network.getLink("3040"));
 		leg.setRoute(route);
 
-		act = plan.createAndAddActivity("work_sector3", facilityWork);
+		act = (ActivityImpl) plan.createAndAddActivity("work_sector3", facilityWork);
 		link = this.network.getLink("3040");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
@@ -157,7 +156,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		((GenericRoute) route).setRouteDescription(this.network.getLink("3040"), "bla", this.network.getLink("4050"));
 		leg.setRoute(route);
 
-		act = plan.createAndAddActivity("leisure", facilityLeisure);
+		act = (ActivityImpl) plan.createAndAddActivity("leisure", facilityLeisure);
 		link = this.network.getLink("4050");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
@@ -167,15 +166,15 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		((GenericRoute) route).setRouteDescription(this.network.getLink("3040"), "bla", this.network.getLink("4050"));
 		leg.setRoute(route);
 
-		act = plan.createAndAddActivity("work_sector3", facilityWork);
+		act = (ActivityImpl) plan.createAndAddActivity("work_sector3", facilityWork);
 		link = this.network.getLink("3040");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
 		leg = this.plan.createAndAddLeg(TransportMode.car);
-		route = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, this.network.getLink("3040"), this.network.getLink("2030"));
+		route = network.getFactory().createRoute(TransportMode.car, this.network.getLink("3040"), this.network.getLink("2030"));
 		leg.setRoute(route);
 
-		act = plan.createAndAddActivity("home", facilityHome);
+		act = (ActivityImpl) plan.createAndAddActivity("home", facilityHome);
 		link = this.network.getLink("2030");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
@@ -183,7 +182,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		route = network.getFactory().createRoute(TransportMode.bike, this.network.getLink("2030"), this.network.getLink("1020"));
 		leg.setRoute(route);
 
-		act = plan.createAndAddActivity("shop", facilityShop);
+		act = (ActivityImpl) plan.createAndAddActivity("shop", facilityShop);
 		link = this.network.getLink("1020");
 		act.setLink(link);
 		act.setCoord(link.getCoord());
@@ -191,7 +190,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		route = network.getFactory().createRoute(TransportMode.bike, this.network.getLink("1020"), this.network.getLink("2030"));
 		leg.setRoute(route);
 
-		act = plan.createAndAddActivity("home", facilityHome);
+		act = (ActivityImpl) plan.createAndAddActivity("home", facilityHome);
 		link = this.network.getLink("2030");
 		act.setLink(link);
 		act.setCoord(link.getCoord());

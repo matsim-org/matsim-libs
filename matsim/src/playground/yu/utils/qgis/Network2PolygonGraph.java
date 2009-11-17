@@ -34,7 +34,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
@@ -87,7 +87,7 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 				cap, type, freespeed });
 	}
 
-	protected LinearRing getLinearRing(BasicLink link) {
+	protected LinearRing getLinearRing(Link link) {
 		// //////////////////////////////////////////////////////////////
 		double width = getLinkWidth(link);
 		// //////////////////////////////////////////////////////////////
@@ -110,10 +110,10 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 				from, to, toB, fromB, from }), this.geofac);
 	}
 
-	protected double getLinkWidth(BasicLink link) {
+	protected double getLinkWidth(Link link) {
 		return link.getCapacity(Time.UNDEFINED_TIME)
 				/ network.getCapacityPeriod() * 3600.0 / 50.0;
-	}// TODO override
+	}
 
 	@Override
 	public Collection<Feature> getFeatures() throws SchemaException,
@@ -121,7 +121,7 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 		for (int i = 0; i < attrTypes.size(); i++)
 			defaultFeatureTypeFactory.addType(attrTypes.get(i));
 		FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
-		for (LinkImpl link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			LinearRing lr = getLinearRing(link);
 			Polygon p = new Polygon(lr, null, this.geofac);
 			MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, this.geofac);
@@ -134,7 +134,7 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 			o[4] = link.getLength();
 			o[5] = link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 					/ network.getCapacityPeriod() * 3600.0;
-			o[6] = (link.getType() != null) ? Integer.parseInt(link.getType())
+			o[6] = (((LinkImpl) link).getType() != null) ? Integer.parseInt(((LinkImpl) link).getType())
 					: 0;
 			o[7] = link.getFreespeed(0);
 			for (int i = 0; i < parameters.size(); i++) {

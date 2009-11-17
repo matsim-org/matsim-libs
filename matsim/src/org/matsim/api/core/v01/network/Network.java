@@ -20,11 +20,54 @@
 
 package org.matsim.api.core.v01.network;
 
-import org.matsim.api.basic.v01.network.BasicNetwork;
+import java.io.Serializable;
+import java.util.Map;
 
-public interface Network extends BasicNetwork<Node, Link> {
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 
+/**
+ * A topological network representation.
+ */
+public interface Network extends MatsimToplevelContainer, Serializable {
+
+	/**
+	 * Returns the builder for network elements
+	 * @return
+	 */
 	public NetworkFactory getFactory();
+
+  /**
+   * Returns a set of this network's nodes. This set might be empty, but it
+   * should not be <code>null</code>.
+   *
+   * @return a set of this network's nodes
+   */
+  public Map<Id, ? extends Node> getNodes();
+
+  /**
+   * Returns a set of this network's links. This set might be empty, but it
+   * should not be <code>null</code>.
+   *
+   * @return a set of this network's links
+   */
+  public Map<Id, ? extends Link> getLinks();
+
+  /**
+   * Returns the time period over which
+   * the capacity of the given links has been measured.
+   * The default is set to one hour, i.e. 3600.0 sec.
+   * @return the time period in seconds, default 3600.0 sec.
+   */
+  public double getCapacityPeriod();
+
+
+  /**
+   * Returns the lane width of the network's links.
+   * @return the lane width in meter
+   */
+  public double getEffectiveLaneWidth();
+	
 	
 	public void addNode( Node nn ) ;
 	// "void" can still be changed into "boolean" or "Node", see "Collection" or "Map" interface.

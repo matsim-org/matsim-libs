@@ -60,7 +60,7 @@ public class NetworkDoubleLinks {
 		Node fn = l.getFromNode();
 		Node tn = l.getToNode();
 		Coord nc = new CoordImpl(0.5*(fn.getCoord().getX()+tn.getCoord().getX()),0.5*(fn.getCoord().getY()+tn.getCoord().getY()));
-		NodeImpl n = network.createAndAddNode(new IdImpl(l.getId()+suffix),nc,((NodeImpl) fn).getType());
+		Node n = network.createAndAddNode(new IdImpl(l.getId()+suffix),nc,((NodeImpl) fn).getType());
 		network.removeLink(l);
 		LinkImpl l1new = network.createAndAddLink(l.getId(),l.getFromNode(),n,0.5*l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME),l.getOrigId(),l.getType());
 		LinkImpl l2new = network.createAndAddLink(new IdImpl(l.getId()+suffix),n,l.getToNode(),0.5*l.getLength(),l.getFreespeed(Time.UNDEFINED_TIME),l.getCapacity(Time.UNDEFINED_TIME),l.getNumberOfLanes(Time.UNDEFINED_TIME),l.getOrigId(),l.getType());

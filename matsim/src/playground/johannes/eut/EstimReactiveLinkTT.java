@@ -37,7 +37,6 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
@@ -61,7 +60,7 @@ public class EstimReactiveLinkTT implements
 	
 	private Map<Id, LinkTTCalculator> linkTTCalculators;
 
-	private BasicLink lastQueriedLink;
+	private Link lastQueriedLink;
 
 	private double lastQueryTime;
 

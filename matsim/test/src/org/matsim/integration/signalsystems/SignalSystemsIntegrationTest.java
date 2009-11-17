@@ -32,16 +32,6 @@ import org.matsim.testcases.MatsimTestCase;
 public class SignalSystemsIntegrationTest extends MatsimTestCase {
 
 	private final static String CONFIG_FILE_NAME = "signalSystemsIntegrationConfig.xml";
-	
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
 
 	public void testSignalSystems() {
 		Config config = this.loadConfig(this.getClassInputDirectory() + CONFIG_FILE_NAME);

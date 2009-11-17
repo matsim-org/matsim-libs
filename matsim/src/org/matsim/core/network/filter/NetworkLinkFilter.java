@@ -19,7 +19,8 @@
 
 package org.matsim.core.network.filter;
 
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
+
 
 /**
  * Implement this interface to filter the links of a network
@@ -29,6 +30,6 @@ import org.matsim.core.network.LinkImpl;
  */
 public interface NetworkLinkFilter {
 
-	public boolean judgeLink(LinkImpl l);
+	public boolean judgeLink(Link l);
 
 }

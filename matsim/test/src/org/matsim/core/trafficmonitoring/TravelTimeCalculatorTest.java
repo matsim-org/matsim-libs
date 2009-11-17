@@ -30,6 +30,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
@@ -39,7 +41,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -165,9 +166,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		NetworkLayer network = scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
-		LinkImpl link1 = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
+		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
+		Link link1 = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
 
 		int timeBinSize = 15*60;
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());

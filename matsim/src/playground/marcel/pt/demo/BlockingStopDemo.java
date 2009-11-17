@@ -28,13 +28,13 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -93,7 +93,7 @@ public class BlockingStopDemo {
 	private void createNetwork() {
 		NetworkLayer network = this.scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		NodeImpl[] nodes = new NodeImpl[nOfLinks * 2 + 2];
+		Node[] nodes = new Node[nOfLinks * 2 + 2];
 		for (int i = 0; i <= nOfLinks; i++) {
 			nodes[i           ] = network.createAndAddNode(this.ids[i           ], this.scenario.createCoord(i * 500, 0));
 			nodes[i+nOfLinks+1] = network.createAndAddNode(this.ids[i+nOfLinks+1], this.scenario.createCoord(i * 500, 500));

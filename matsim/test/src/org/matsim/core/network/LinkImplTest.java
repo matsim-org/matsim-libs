@@ -21,6 +21,7 @@
 package org.matsim.core.network;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -49,15 +50,15 @@ public class LinkImplTest extends MatsimTestCase {
 		 * and another link with no special slope to also test possible special cases.
 		 */
 		final NetworkLayer network = new NetworkLayer();
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(0, 1000));
-		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1000, 2000));
-		NodeImpl node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(2000, 2000));
-		NodeImpl node5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(1000, 0));
-		LinkImpl link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1000, 1, 3600, 1);
-		LinkImpl link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 1500, 1, 3600, 1);
-		LinkImpl link3 = network.createAndAddLink(new IdImpl("3"), node3, node4, 1000, 1, 3600, 1);
-		LinkImpl link4 = network.createAndAddLink(new IdImpl("4"), node4, node5, 2800, 1, 3600, 1);
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(0, 1000));
+		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1000, 2000));
+		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(2000, 2000));
+		Node node5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(1000, 0));
+		LinkImpl link1 = (LinkImpl) network.createAndAddLink(new IdImpl("1"), node1, node2, 1000, 1, 3600, 1);
+		LinkImpl link2 = (LinkImpl) network.createAndAddLink(new IdImpl("2"), node2, node3, 1500, 1, 3600, 1);
+		LinkImpl link3 = (LinkImpl) network.createAndAddLink(new IdImpl("3"), node3, node4, 1000, 1, 3600, 1);
+		LinkImpl link4 = (LinkImpl) network.createAndAddLink(new IdImpl("4"), node4, node5, 2800, 1, 3600, 1);
 
 		// do the following cases for each link
 
@@ -144,9 +145,9 @@ public class LinkImplTest extends MatsimTestCase {
 	public void testSetAttributes() {
 		NetworkLayer network = new NetworkLayer();
 		network.setCapacityPeriod(3600.0);
-		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(50, 50));
-		LinkImpl link1 = network.createAndAddLink(new IdImpl(1), node1, node2, 500.0, 10.0, 1000.0, 1.0);
+		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(50, 50));
+		LinkImpl link1 = (LinkImpl) network.createAndAddLink(new IdImpl(1), node1, node2, 500.0, 10.0, 1000.0, 1.0);
 		assertEquals("wrong freespeed traveltime.", 50.0, link1.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON);
 		link1.setLength(1000.0);
 		assertEquals("wrong freespeed traveltime.", 100.0, link1.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON);

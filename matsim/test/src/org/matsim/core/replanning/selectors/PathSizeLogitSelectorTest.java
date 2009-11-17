@@ -322,12 +322,12 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		//             (5)
 		
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl n1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0,10));
-		NodeImpl n2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(3,2));
-		NodeImpl n3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(0,0));
-		NodeImpl n4 = network.createAndAddNode(new IdImpl(4), new CoordImpl(4,1));
-		NodeImpl n5 = network.createAndAddNode(new IdImpl(5), new CoordImpl(0,-1));
-		NodeImpl n6 = network.createAndAddNode(new IdImpl(6), new CoordImpl(0,11));
+		Node n1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0,10));
+		Node n2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(3,2));
+		Node n3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(0,0));
+		Node n4 = network.createAndAddNode(new IdImpl(4), new CoordImpl(4,1));
+		Node n5 = network.createAndAddNode(new IdImpl(5), new CoordImpl(0,-1));
+		Node n6 = network.createAndAddNode(new IdImpl(6), new CoordImpl(0,11));
 		network.createAndAddLink(new IdImpl(1), n1, n3, 10, 1, 10, 1);
 		network.createAndAddLink(new IdImpl(2), n1, n2, 8, 1, 10, 1);
 		network.createAndAddLink(new IdImpl(3), n2, n3, 2, 1, 10, 1);

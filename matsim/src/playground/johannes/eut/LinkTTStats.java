@@ -26,10 +26,8 @@ package playground.johannes.eut;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelTime;
 
@@ -39,19 +37,19 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class LinkTTStats {
 	
-	private Map<BasicLink, LinkAttributes> attributes;
+	private Map<Link, LinkAttributes> attributes;
 	
-	public LinkTTStats(BasicNetwork<Node, Link> network, TravelTime travelTimes, int binsize) {
+	public LinkTTStats(Network network, TravelTime travelTimes, int binsize) {
 		this(network, travelTimes, binsize, 0, 86400);
 	}
 	
-	public LinkTTStats(BasicNetwork<Node,Link> network, TravelTime travelTimes, int start, int end, int binsize) {
-		attributes = new HashMap<BasicLink, LinkAttributes>();
+	public LinkTTStats(Network network, TravelTime travelTimes, int start, int end, int binsize) {
+		attributes = new HashMap<Link, LinkAttributes>();
 		analyze(network, travelTimes, start, end, binsize);
 	}
 	
-	private void analyze(BasicNetwork<Node,Link> network, TravelTime travelTimes, int start, int end, int binsize) {
-		for(BasicLink link : network.getLinks().values()) {
+	private void analyze(Network network, TravelTime travelTimes, int start, int end, int binsize) {
+		for(Link link : network.getLinks().values()) {
 			double min = Double.MAX_VALUE;
 			double max = Double.MIN_VALUE;
 			double sum = 0;
@@ -88,7 +86,7 @@ public class LinkTTStats {
 		}
 	}
 	
-	public LinkAttributes getLinkAttributes(BasicLink link) {
+	public LinkAttributes getLinkAttributes(Link link) {
 		return attributes.get(link);
 	}
 	

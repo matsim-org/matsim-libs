@@ -181,7 +181,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 						ActivityImpl act = (ActivityImpl) pe;
 						if (movedFacilities.containsKey(act.getFacilityId())) { //TODO use here another movedFacilities object, this one very 
 							// likely contains too much persons in it!!!!
-							act.setLink(act.getFacility().getLink());
+							act.setLink(((ActivityFacilityImpl) act.getFacility()).getLink());
 							routeIt = true;
 						}
 					}

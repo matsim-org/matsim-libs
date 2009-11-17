@@ -1,19 +1,15 @@
 package playground.ciarif.retailers.data;
 
-
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 
 public class LinkRetailersImpl extends LinkImpl  { //AbstractLocation implements BasicLink {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	protected BasicNode from = null;
-	protected BasicNode to = null;
+	protected Node from = null;
+	protected Node to = null;
 
 	protected int maxFacOnLink = 0;
 	protected double length = Double.NaN;

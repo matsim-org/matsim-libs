@@ -23,12 +23,10 @@ package org.matsim.core.utils.misc;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -120,7 +118,7 @@ public class NetworkUtilsTest extends MatsimTestCase {
 		int numOfLinks = 5;
 		
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl[] nodes = new NodeImpl[numOfLinks+1];
+		Node[] nodes = new Node[numOfLinks+1];
 		for (int i = 0; i <= numOfLinks; i++) {
 			nodes[i] = network.createAndAddNode(new IdImpl(i), new CoordImpl(1000 * i, 0));
 		}

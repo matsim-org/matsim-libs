@@ -14,7 +14,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
-import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -23,7 +22,6 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.VisData;
 import org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
@@ -355,14 +353,13 @@ class CALink extends QueueLink {
 	}
 
 
-};
+}
 
 // (end of class)
 //###########################################
 //###########################################
 
 class OTFServerQUADCA extends OTFServerQuad {
-
 
 	private static final long serialVersionUID = 1L;
 
@@ -371,8 +368,8 @@ class OTFServerQUADCA extends OTFServerQuad {
 	public OTFServerQUADCA(double minX, double minY, double maxX, double maxY) {
 		super(minX, minY, maxX, maxY);
 		NetworkLayer net = new NetworkLayer();
-		BasicNode node1 = net.createAndAddNode(new IdImpl("0"), new CoordImpl(0, 500));
-		BasicNode node2 = net.createAndAddNode(new IdImpl("1"), new CoordImpl(CALink.LINKLEN, 500));
+		org.matsim.api.core.v01.network.Node node1 = net.createAndAddNode(new IdImpl("0"), new CoordImpl(0, 500));
+		org.matsim.api.core.v01.network.Node node2 = net.createAndAddNode(new IdImpl("1"), new CoordImpl(CALink.LINKLEN, 500));
 
 		LinkImpl lk = new LinkImpl(new IdImpl("0"), node1, node2, net, CALink.LINKLEN,0,0, CALink.LANECOUNT);
 		link = new CALink(lk, null, null);
@@ -384,7 +381,6 @@ class OTFServerQUADCA extends OTFServerQuad {
 		writer.setSrc(link);
 		put(CALink.LINKLEN/2, 500, writer);
 	}
-
 
 }
 
@@ -478,7 +474,7 @@ public class CALinkOTFVis extends Thread {
 			super(address);
 			this.delay = 20;
 
-			verbot = createButton("�-Verbot ist AUS", "vb", null, "toggle �berholverbot");
+			verbot = createButton("Ü-Verbot ist AUS", "vb", null, "toggle Überholverbot");
 			verbot.putClientProperty("JButton.buttonType","text");
 			verbot.setBorderPainted(true);
 			verbot.setMargin(new Insets(10, 10, 10, 10));

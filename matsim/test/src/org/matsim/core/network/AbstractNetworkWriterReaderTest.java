@@ -25,6 +25,8 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -71,9 +73,9 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 
 	private void doTestAllowedModes(final Set<TransportMode> modes, final String filename) {
 		NetworkLayer network1 = new NetworkLayer();
-		NodeImpl n1 = network1.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl n2 = network1.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
-		LinkImpl l1 = network1.createAndAddLink(new IdImpl("1"), n1, n2, 1000.0, 10.0, 3600.0, 1.0);
+		Node n1 = network1.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node n2 = network1.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
+		Link l1 = network1.createAndAddLink(new IdImpl("1"), n1, n2, 1000.0, 10.0, 3600.0, 1.0);
 		l1.setAllowedModes(modes);
 		
 		writeNetwork(network1, filename);

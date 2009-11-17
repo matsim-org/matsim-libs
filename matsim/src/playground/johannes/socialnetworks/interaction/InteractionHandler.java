@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
@@ -40,7 +40,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -67,7 +66,7 @@ public class InteractionHandler implements ActivityStartEventHandler,
 	}
 	
 	public void handleEvent(ActivityStartEventImpl event) {
-		ActivityFacilityImpl f = event.getAct().getFacility();
+		ActivityFacility f = event.getAct().getFacility();
 		PhysicalFacility pf = pfacilities.get(f);
 //		if(pf == null) {
 //			pf = new PhysicalFacility();
@@ -85,7 +84,7 @@ public class InteractionHandler implements ActivityStartEventHandler,
 
 	public void handleEvent(ActivityEndEventImpl event) {
 		if(!event.getAct().getType().equalsIgnoreCase("home")) {
-		ActivityFacilityImpl f = event.getAct().getFacility();
+		ActivityFacility f = event.getAct().getFacility();
 		PhysicalFacility pf = pfacilities.get(f);
 		
 		if(pf == null)

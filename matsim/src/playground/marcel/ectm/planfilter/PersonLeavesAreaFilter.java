@@ -24,11 +24,10 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.filters.AbstractPersonFilter;
@@ -38,9 +37,9 @@ import org.matsim.population.filters.AbstractPersonFilter;
  */
 public class PersonLeavesAreaFilter extends AbstractPersonFilter {
 
-	private final Map<Id, LinkImpl> areaOfInterest;
+	private final Map<Id, Link> areaOfInterest;
 
-	public PersonLeavesAreaFilter(final PersonAlgorithm nextAlgorithm, final Map<Id, LinkImpl> areaOfInterest) {
+	public PersonLeavesAreaFilter(final PersonAlgorithm nextAlgorithm, final Map<Id, Link> areaOfInterest) {
 		this.nextAlgorithm = nextAlgorithm;
 		this.areaOfInterest = areaOfInterest;
 	}
@@ -49,7 +48,7 @@ public class PersonLeavesAreaFilter extends AbstractPersonFilter {
 	public boolean judge(final Person person) {
 		for (Plan plan : person.getPlans()) {
 			for (int i = 1, n = plan.getPlanElements().size(); i < n; i+=2) {
-				LegImpl leg = (LegImpl) plan.getPlanElements().get(i);
+				Leg leg = (Leg) plan.getPlanElements().get(i);
 				if (leg.getRoute() == null) {
 					return false;
 				}

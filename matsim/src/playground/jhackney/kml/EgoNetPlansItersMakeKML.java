@@ -439,7 +439,7 @@ public class EgoNetPlansItersMakeKML {
 			if (o instanceof ActivityImpl) {
 				ActivityImpl myAct = (ActivityImpl) o;
 	//			Activity myActivity =myPerson.getKnowledge().getMentalMap().getActivity(myAct).getFacility().toString();
-				String myActivity=myAct.getFacility().getActivityOption(myAct.getType()).toString();
+				String myActivity=myAct.getFacility().getActivityOptions().get(myAct.getType()).toString();
 				//Above lines call code that results in a null pointer. Test
 				// michi's new change. Note the Act.setFacility() might not
 				// always be kept up-to-date by socialNetowrk code, check this. JH 02-07-2008

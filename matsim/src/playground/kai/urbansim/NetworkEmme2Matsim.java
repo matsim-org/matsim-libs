@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -67,9 +68,9 @@ public class NetworkEmme2Matsim {
 						String idStr = parts[1] ;
 						String xxStr = parts[2] ;
 						String yyStr = parts[3] ;
-						NodeImpl node = network.createAndAddNode(new IdImpl(idStr), new CoordImpl(xxStr,yyStr)) ;
+						Node node = network.createAndAddNode(new IdImpl(idStr), new CoordImpl(xxStr,yyStr)) ;
 						if ( NW_NAME==PSRC ) {
-							node.setOrigId(parts[7]);		
+							((NodeImpl) node).setOrigId(parts[7]);		
 						}
 //						checkMax( xxStr, yyStr ) ;
 					} else {

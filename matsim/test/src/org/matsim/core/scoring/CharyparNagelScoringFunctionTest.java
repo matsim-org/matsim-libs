@@ -21,16 +21,15 @@
 package org.matsim.core.scoring;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -79,17 +78,17 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		scoring.addActivityParams(params);
 		
 		this.network = new NetworkLayer();
-		NodeImpl node1 = this.network.createAndAddNode(new IdImpl("1"), new CoordImpl(    0.0, 0.0));
-		NodeImpl node2 = this.network.createAndAddNode(new IdImpl("2"), new CoordImpl(  500.0, 0.0));
-		NodeImpl node3 = this.network.createAndAddNode(new IdImpl("3"), new CoordImpl( 5500.0, 0.0));
-		NodeImpl node4 = this.network.createAndAddNode(new IdImpl("4"), new CoordImpl( 6000.0, 0.0));
-		NodeImpl node5 = this.network.createAndAddNode(new IdImpl("5"), new CoordImpl(11000.0, 0.0));
-		NodeImpl node6 = this.network.createAndAddNode(new IdImpl("6"), new CoordImpl(11500.0, 0.0));
-		LinkImpl link1 = this.network.createAndAddLink(new IdImpl("1"), node1, node2, 500, 25, 3600, 1);
+		Node node1 = this.network.createAndAddNode(new IdImpl("1"), new CoordImpl(    0.0, 0.0));
+		Node node2 = this.network.createAndAddNode(new IdImpl("2"), new CoordImpl(  500.0, 0.0));
+		Node node3 = this.network.createAndAddNode(new IdImpl("3"), new CoordImpl( 5500.0, 0.0));
+		Node node4 = this.network.createAndAddNode(new IdImpl("4"), new CoordImpl( 6000.0, 0.0));
+		Node node5 = this.network.createAndAddNode(new IdImpl("5"), new CoordImpl(11000.0, 0.0));
+		Node node6 = this.network.createAndAddNode(new IdImpl("6"), new CoordImpl(11500.0, 0.0));
+		Link link1 = this.network.createAndAddLink(new IdImpl("1"), node1, node2, 500, 25, 3600, 1);
 		this.network.createAndAddLink(new IdImpl("2"), node2, node3, 5000, 50, 3600, 1);
-		LinkImpl link3 = this.network.createAndAddLink(new IdImpl("3"), node3, node4, 500, 25, 3600, 1);
+		Link link3 = this.network.createAndAddLink(new IdImpl("3"), node3, node4, 500, 25, 3600, 1);
 		this.network.createAndAddLink(new IdImpl("4"), node4, node5, 5000, 50, 3600, 1);
-		LinkImpl link5 = this.network.createAndAddLink(new IdImpl(5), node5, node6, 500, 25, 3600, 1);
+		Link link5 = this.network.createAndAddLink(new IdImpl(5), node5, node6, 500, 25, 3600, 1);
 
 		this.person = new PersonImpl(new IdImpl(1));
 		this.plan = this.person.createAndAddPlan(true);

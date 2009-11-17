@@ -29,12 +29,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
-public class NodeImpl implements BasicNode, Node {
+public class NodeImpl implements Node {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -99,7 +97,7 @@ public class NodeImpl implements BasicNode, Node {
 		this.type = type == null ? null : type.intern();
 	}
 	
-	public final boolean addInLink(BasicLink inlink) {
+	public final boolean addInLink(Link inlink) {
 		Id linkid = inlink.getId();
 		if (this.inlinks.containsKey(linkid)) {
 			throw new IllegalArgumentException(this + "[inlink_id=" + inlink.getId() + " already exists]");
@@ -107,11 +105,11 @@ public class NodeImpl implements BasicNode, Node {
 		if (this.outlinks.containsKey(linkid)) {
 			log.warn(this + "[inlink_id=" + inlink.getId() + " is now in- and out-link]");
 		}
-		this.inlinks.put(linkid, (Link) inlink);
+		this.inlinks.put(linkid, inlink);
 		return true; // yy should return true only if collection changed as result of call
 	}
 
-	public final boolean addOutLink(BasicLink outlink) {
+	public final boolean addOutLink(Link outlink) {
 		Id linkid = outlink.getId();
 		if (this.outlinks.containsKey(linkid)) {
 			throw new IllegalArgumentException(this + "[inlink_id=" + outlink.getId() + " already exists]");
@@ -119,7 +117,7 @@ public class NodeImpl implements BasicNode, Node {
 		if (this.inlinks.containsKey(linkid)) {
 			log.warn(this.toString() + "[outlink_id=" + outlink + " is now in- and out-link]");
 		}
-		this.outlinks.put(linkid, (Link) outlink);
+		this.outlinks.put(linkid, outlink);
 		return true ; // yy should return true only if collection changed as result of call
 	}
 

@@ -36,7 +36,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -73,7 +73,7 @@ public class Volume2PolygonGraph extends Network2PolygonGraph {
 	}
 
 	@Override
-	protected double getLinkWidth(BasicLink link) {
+	protected double getLinkWidth(Link link) {
 		Integer i = (Integer) parameters.get(0).get(link.getId());
 		return ((double) i.intValue()) / 20.0;
 	}

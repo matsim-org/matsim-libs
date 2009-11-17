@@ -27,6 +27,7 @@ import java.util.Vector;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -74,7 +75,7 @@ public class AssignLocations {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void assignLocation(ActivityImpl act, ActivityFacilityImpl start, ActivityFacilityImpl end) {
+	private final void assignLocation(ActivityImpl act, ActivityFacility start, ActivityFacility end) {
 		CoordImpl c_start = (CoordImpl)start.getCoord();
 		CoordImpl c_end   = (CoordImpl)end.getCoord();
 
@@ -113,7 +114,7 @@ public class AssignLocations {
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			if (act.getFacility() == null && act.getType().equals(type)) {
 				// get the prev act with a facility
-				ActivityFacilityImpl start = null;
+				ActivityFacility start = null;
 				for (int b = i - 2; b >= 0; b = b - 2) {
 					ActivityImpl b_act = (ActivityImpl)plan.getPlanElements().get(b);
 					if (b_act.getFacility() != null) {
@@ -122,7 +123,7 @@ public class AssignLocations {
 					}
 				}
 				// get the next act with a facility
-				ActivityFacilityImpl end = null;
+				ActivityFacility end = null;
 				for (int a = i + 2; a < plan.getPlanElements().size(); a = a + 2) {
 					ActivityImpl a_act = (ActivityImpl)plan.getPlanElements().get(a);
 					if (a_act.getFacility() != null) {

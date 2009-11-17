@@ -64,13 +64,13 @@ public class PersonConsolidateInitDemand extends AbstractPersonAlgorithm impleme
 		ActivityImpl act = plan.getFirstActivity();
 		while (act != plan.getLastActivity()) {
 			String actType = act.getType();
-			ActivityOption ao = act.getFacility().getActivityOption(actType);
+			ActivityOption ao = act.getFacility().getActivityOptions().get(actType);
 			if (ao == null) { throw new RuntimeException("Person id="+plan.getPerson().getId()+": act of type="+actType+" does not fit to facility id="+act.getFacility().getId()+"!"); }
 			actOptions.add(ao);
 			act = plan.getNextActivity(plan.getNextLeg(act));
 		}
 		String actType = act.getType();
-		ActivityOption ao = act.getFacility().getActivityOption(actType);
+		ActivityOption ao = act.getFacility().getActivityOptions().get(actType);
 		if (ao == null) { throw new RuntimeException("Person id="+plan.getPerson().getId()+": act of type="+actType+" does not fit to facility id="+act.getFacility().getId()+"!"); }
 		actOptions.add(ao);
 

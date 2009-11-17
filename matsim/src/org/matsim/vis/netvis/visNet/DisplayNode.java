@@ -25,14 +25,14 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.vis.netvis.drawableNet.DrawableNodeI;
 
 /**
  * @author gunnar
  */
-public class DisplayNode implements DrawableNodeI, BasicNode {
+public class DisplayNode implements DrawableNodeI, Node {
 
 	// -------------------- CLASS VARIABLES --------------------
 
@@ -40,8 +40,8 @@ public class DisplayNode implements DrawableNodeI, BasicNode {
 
 	// -------------------- MEMBER VARIABLES --------------------
 
-	private final Map<Id, BasicLink> inLinks;
-	private final Map<Id, BasicLink> outLinks;
+	private final Map<Id, Link> inLinks;
+	private final Map<Id, Link> outLinks;
 	private Coord coord = null;
 	private double displayValue;
 	private String displayLabel;
@@ -51,8 +51,8 @@ public class DisplayNode implements DrawableNodeI, BasicNode {
 
 	public DisplayNode(Id id, DisplayNet network) {
 		this.id = id;
-		inLinks = new TreeMap<Id, BasicLink>();
-		outLinks = new TreeMap<Id, BasicLink>();
+		inLinks = new TreeMap<Id, Link>();
+		outLinks = new TreeMap<Id, Link>();
 	}
 
 	// -------------------- SETTERS --------------------
@@ -67,21 +67,21 @@ public class DisplayNode implements DrawableNodeI, BasicNode {
 
 	// -------------------- IMPLEMENTATION of BasicNodeI --------------------
 
-	public boolean addInLink(BasicLink link) {
+	public boolean addInLink(Link link) {
 		inLinks.put(link.getId(), link);
 		return true;
 	}
 
-	public boolean addOutLink(BasicLink link) {
+	public boolean addOutLink(Link link) {
 		outLinks.put(link.getId(), link);
 		return true;
 	}
 
-	public Map<Id, ? extends BasicLink> getInLinks() {
+	public Map<Id, ? extends Link> getInLinks() {
 		return inLinks;
 	}
 
-	public Map<Id, ? extends BasicLink> getOutLinks() {
+	public Map<Id, ? extends Link> getOutLinks() {
 		return outLinks;
 	}
 

@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -114,7 +115,7 @@ public class ScenarioDilute {
 		double radius = 30000.0;
 		final CoordImpl center = new CoordImpl(733400.0,243600.0);
 
-		final Map<Id, LinkImpl> areaOfInterest = new HashMap<Id, LinkImpl>();
+		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 		System.out.println("=> area of interest (aoi): center=" + center + "; radius=" + radius);
 		for (LinkImpl link : network.getLinks().values()) {
 			final Node from = link.getFromNode();

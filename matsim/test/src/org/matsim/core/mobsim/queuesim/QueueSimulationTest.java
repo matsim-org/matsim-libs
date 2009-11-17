@@ -693,7 +693,7 @@ public class QueueSimulationTest extends TestCase {
 	 */
 	public void testCircleAsRoute() {
 		Fixture f = new Fixture();
-		LinkImpl link4 = f.network.createAndAddLink(new IdImpl(4), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
+		Link link4 = f.network.createAndAddLink(new IdImpl(4), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
 
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl plan = person.createAndAddPlan(true);
@@ -746,7 +746,7 @@ public class QueueSimulationTest extends TestCase {
 	 */
 	public void testRouteWithEndLinkTwice() {
 		Fixture f = new Fixture();
-		LinkImpl link4 = f.network.createAndAddLink(new IdImpl(4), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
+		Link link4 = f.network.createAndAddLink(new IdImpl(4), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
 
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl plan = person.createAndAddPlan(true);
@@ -889,12 +889,12 @@ public class QueueSimulationTest extends TestCase {
 		Fixture f = new Fixture();
 
 		/* enhance network */
-		NodeImpl node5 = f.network.createAndAddNode(new IdImpl("5"), new CoordImpl(3100, 0));
-		NodeImpl node6 = f.network.createAndAddNode(new IdImpl("6"), new CoordImpl(3200, 0));
-		NodeImpl node7 = f.network.createAndAddNode(new IdImpl("7"), new CoordImpl(3300, 0));
+		Node node5 = f.network.createAndAddNode(new IdImpl("5"), new CoordImpl(3100, 0));
+		Node node6 = f.network.createAndAddNode(new IdImpl("6"), new CoordImpl(3200, 0));
+		Node node7 = f.network.createAndAddNode(new IdImpl("7"), new CoordImpl(3300, 0));
 		f.network.createAndAddLink(new IdImpl("4"), f.node4, node5, 1000, 10, 6000, 2);
-		LinkImpl link5 = f.network.createAndAddLink(new IdImpl("5"), node5, node6, 100, 10, 60000, 9);
-		LinkImpl link6 = f.network.createAndAddLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
+		Link link5 = f.network.createAndAddLink(new IdImpl("5"), node5, node6, 100, 10, 60000, 9);
+		Link link6 = f.network.createAndAddLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
 
 		// create a person with a car-leg from link1 to link5, but an incomplete route
 		PersonImpl person = new PersonImpl(new IdImpl(0));
@@ -1059,13 +1059,13 @@ public class QueueSimulationTest extends TestCase {
 	private static final class Fixture {
 		final Config config;
 		final NetworkLayer network;
-		final NodeImpl node1;
-		final NodeImpl node2;
-		final NodeImpl node3;
-		final NodeImpl node4;
-		final LinkImpl link1;
-		final LinkImpl link2;
-		final LinkImpl link3;
+		final Node node1;
+		final Node node2;
+		final Node node3;
+		final Node node4;
+		final Link link1;
+		final Link link2;
+		final Link link3;
 		final PopulationImpl plans;
 		final ArrayList<Node> nodes3;
 		final ArrayList<Node> nodes23;

@@ -22,10 +22,10 @@ package org.matsim.core.population;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -212,11 +212,11 @@ public class PlanImplTest extends MatsimTestCase {
 
 	public void testCopyPlan_NetworkRoute() {
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
-		NodeImpl node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(2000, 0));
-		LinkImpl link1 = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
-		LinkImpl link2 = network.createAndAddLink(new IdImpl(2), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
+		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
+		Node node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(2000, 0));
+		Link link1 = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
+		Link link2 = network.createAndAddLink(new IdImpl(2), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
 		
 		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));
@@ -240,11 +240,11 @@ public class PlanImplTest extends MatsimTestCase {
 
 	public void testCopyPlan_GenericRoute() {
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
-		NodeImpl node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(2000, 0));
-		LinkImpl link1 = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
-		LinkImpl link2 = network.createAndAddLink(new IdImpl(2), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
+		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
+		Node node3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(2000, 0));
+		Link link1 = network.createAndAddLink(new IdImpl(1), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
+		Link link2 = network.createAndAddLink(new IdImpl(2), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
 		
 		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));

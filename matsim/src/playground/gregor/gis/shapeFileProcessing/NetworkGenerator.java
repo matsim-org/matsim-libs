@@ -25,6 +25,7 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -44,7 +45,7 @@ public class NetworkGenerator {
 	private Collection<Feature> features;
 	private Envelope envelope;
 //	private QuadTree<LineString> tree;
-	private QuadTree<NodeImpl> nodes;
+	private QuadTree<Node> nodes;
 //	private HashSet<LineString> lineStrings;
 	private NetworkLayer network;
 	private int nodeId;
@@ -103,7 +104,7 @@ public class NetworkGenerator {
 
 		log.info("parsing features, building up NetworkLayer and running  NetworkCleaner as well ...");
 		this.network = new NetworkLayer();
-		this.nodes = new QuadTree<NodeImpl>(this.envelope.getMinX(), this.envelope.getMinY(), this.envelope.getMaxX(), this.envelope.getMaxY());		
+		this.nodes = new QuadTree<Node>(this.envelope.getMinX(), this.envelope.getMinY(), this.envelope.getMaxX(), this.envelope.getMaxY());		
 		this.nodeId = 0;
 		this.linkId = 0;
 		
@@ -135,12 +136,12 @@ public class NetworkGenerator {
 	
 	
 	private String getNode(Point p) {
-		Collection<NodeImpl> tmp = this.nodes.get(p.getX(), p.getY(), GISToMatsimConverter.CATCH_RADIUS);
+		Collection<Node> tmp = this.nodes.get(p.getX(), p.getY(), GISToMatsimConverter.CATCH_RADIUS);
 		if (tmp.size() > 1) {
 			throw new RuntimeException("two different nodes on the same location is not allowd!");
 		} 
 		if (tmp.size() == 0) {
-			NodeImpl n = network.createAndAddNode(new IdImpl(this.nodeId++), new CoordImpl(p.getX(), p.getY()));
+			Node n = network.createAndAddNode(new IdImpl(this.nodeId++), new CoordImpl(p.getX(), p.getY()));
 			addNode(n);
 			return n.getId().toString();
 		} else {
@@ -148,11 +149,8 @@ public class NetworkGenerator {
 		}
 	}
 
-
-	private void addNode(NodeImpl n){
+	private void addNode(Node n){
 		this.nodes.put(n.getCoord().getX(),n.getCoord().getY(),n);
 	}
-	
-
 
 }

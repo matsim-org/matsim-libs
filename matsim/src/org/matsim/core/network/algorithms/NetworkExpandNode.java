@@ -242,7 +242,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 			double lpc = Math.sqrt(pc.getX()*pc.getX()+pc.getY()*pc.getY());
 			double x = p.getX()+(1-d/lpc)*pc.getX()+e/lpc*pc.getY();
 			double y = p.getY()+(1-d/lpc)*pc.getY()-e/lpc*pc.getX();
-			NodeImpl n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
+			Node n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
 			newNodes.add(n);
 			nodeIdCnt++;
 			network.createAndAddLink(inlink.getId(),inlink.getFromNode(),n,inlink.getLength(),inlink.getFreespeed(Time.UNDEFINED_TIME),inlink.getCapacity(Time.UNDEFINED_TIME),inlink.getNumberOfLanes(Time.UNDEFINED_TIME),((LinkImpl) inlink).getOrigId(),((LinkImpl) inlink).getType());
@@ -254,7 +254,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 			double lcp = Math.sqrt(cp.getX()*cp.getX()+cp.getY()*cp.getY());
 			double x = c.getX()+d/lcp*cp.getX()+e/lcp*cp.getY();
 			double y = c.getY()+d/lcp*cp.getY()-e/lcp*cp.getX();
-			NodeImpl n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
+			Node n = network.createAndAddNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y),node.getType());
 			newNodes.add(n);
 			nodeIdCnt++;
 			network.createAndAddLink(outlink.getId(),n,outlink.getToNode(),outlink.getLength(),outlink.getFreespeed(Time.UNDEFINED_TIME),outlink.getCapacity(Time.UNDEFINED_TIME),outlink.getNumberOfLanes(Time.UNDEFINED_TIME),((LinkImpl) outlink).getOrigId(),((LinkImpl) outlink).getType());

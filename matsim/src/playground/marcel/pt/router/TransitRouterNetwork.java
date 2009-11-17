@@ -28,8 +28,6 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -89,11 +87,11 @@ import org.matsim.world.Layer;
 			return this.outgoingLinks;
 		}
 
-		public boolean addInLink(final BasicLink link) {
+		public boolean addInLink(final Link link) {
 			throw new UnsupportedOperationException();
 		}
 
-		public boolean addOutLink(final BasicLink link) {
+		public boolean addOutLink(final Link link) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -159,7 +157,7 @@ import org.matsim.world.Layer;
 			throw new UnsupportedOperationException();
 		}
 
-		public boolean setFromNode(final BasicNode node) {
+		public boolean setFromNode(final Node node) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -171,7 +169,7 @@ import org.matsim.world.Layer;
 			throw new UnsupportedOperationException();
 		}
 
-		public boolean setToNode(final BasicNode node) {
+		public boolean setToNode(final Node node) {
 			throw new UnsupportedOperationException();
 		}
 

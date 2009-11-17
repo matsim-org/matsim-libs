@@ -105,7 +105,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 		// use morning home, the first act in each selected plan
 		Iterator<Person> e_it=egoNet.getAlters().iterator();
 		while(e_it.hasNext()){
-			activities.add( ((ActivityImpl)(e_it.next().getSelectedPlan().getPlanElements().get(0))).getFacility().getActivityOption("home"));
+			activities.add( ((ActivityImpl)(e_it.next().getSelectedPlan().getPlanElements().get(0))).getFacility().getActivityOptions().get("home"));
 		}
 		
 		Iterator<ActivityOption> a_it = null;

@@ -14,7 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
@@ -22,7 +22,6 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.core.mobsim.queuesim.VisData;
 import org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree.Rect;
@@ -88,7 +87,7 @@ class CALink extends QueueLink {
 
 	MyCAVeh[][] cells = new MyCAVeh[LANECOUNT][LINKLEN] ; 
 
-	public CALink(LinkImpl l, QueueNetwork queueNetwork, QueueNode toNode) {
+	public CALink(Link l, QueueNetwork queueNetwork, QueueNode toNode) {
 		super(l, queueNetwork, toNode);
 		MyCAVeh veh = new MyCAVeh(3) ;
 		veh.setTruck(true) ;
@@ -298,7 +297,7 @@ class CALink extends QueueLink {
 		return true;
 	}
 
-};
+}
 
 // (end of class)
 //###########################################
@@ -314,10 +313,10 @@ class OTFServerQUADCA extends OTFServerQuad {
 	public OTFServerQUADCA(double minX, double minY, double maxX, double maxY) {
 		super(minX, minY, maxX, maxY);
 		NetworkLayer net = new NetworkLayer();
-		BasicNode node1 = net.createAndAddNode(new IdImpl("0"), new CoordImpl(0, 500));
-		BasicNode node2 = net.createAndAddNode(new IdImpl("1"), new CoordImpl(CALink.LINKLEN, 500));
+		org.matsim.api.core.v01.network.Node node1 = net.createAndAddNode(new IdImpl("0"), new CoordImpl(0, 500));
+		org.matsim.api.core.v01.network.Node node2 = net.createAndAddNode(new IdImpl("1"), new CoordImpl(CALink.LINKLEN, 500));
 
-		LinkImpl lk = new LinkImpl(new IdImpl("0"), node1, node2, net, CALink.LINKLEN,0,0, CALink.LANECOUNT);
+		Link lk = new LinkImpl(new IdImpl("0"), node1, node2, net, CALink.LINKLEN,0,0, CALink.LANECOUNT);
 		link = new CALink(lk, null, null);
 	}
 

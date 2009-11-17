@@ -33,7 +33,6 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.functors.OrPredicate;
-import org.matsim.api.basic.v01.network.BasicLink;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -76,7 +75,7 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 		
 		if (!riskyLinks.isEmpty()) {
 			List<Predicate> linkPlanPredicates = new LinkedList<Predicate>();
-			for (BasicLink link : riskyLinks) {
+			for (Link link : riskyLinks) {
 				linkPlanPredicates.add(new LinkPlanPredicate(link));
 			}
 
@@ -130,9 +129,9 @@ public class TraversedRiskyLink implements StartupListener, ShutdownListener, It
 	
 	private class LinkPlanPredicate implements Predicate {
 
-		private BasicLink predicateLink;
+		private Link predicateLink;
 		
-		public LinkPlanPredicate(BasicLink link) {
+		public LinkPlanPredicate(Link link) {
 			predicateLink = link;
 		}
 		

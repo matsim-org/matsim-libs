@@ -29,6 +29,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -145,20 +147,20 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
 	private void startNode(final Attributes atts) {
 		//TODO dg refactor network to support factory and remove cast
-		NodeImpl node = ((NetworkLayer)this.network).createAndAddNode( new IdImpl(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
-		node.setType(atts.getValue("type"));
+		Node node = ((NetworkLayer)this.network).createAndAddNode( new IdImpl(atts.getValue("id")), new CoordImpl(atts.getValue("x"), atts.getValue("y")));
+		((NodeImpl) node).setType(atts.getValue("type"));
 		if (atts.getValue("origid") != null) {
-			node.setOrigId(atts.getValue("origid"));
+			((NodeImpl) node).setOrigId(atts.getValue("origid"));
 		}
 	}
 
 	private void startLink(final Attributes atts) {
 		//TODO dg refactor network to support factory/builder and remove cast
-		LinkImpl l = ((NetworkLayer)this.network).createAndAddLink(new IdImpl(atts.getValue("id")), this.network.getNode(new IdImpl(atts.getValue("from"))), this.network.getNode(new IdImpl(atts.getValue("to"))),
+		Link l = ((NetworkLayer)this.network).createAndAddLink(new IdImpl(atts.getValue("id")), this.network.getNode(new IdImpl(atts.getValue("from"))), this.network.getNode(new IdImpl(atts.getValue("to"))),
 				Double.parseDouble(atts.getValue("length")), Double.parseDouble(atts.getValue("freespeed")), Double.parseDouble(atts.getValue("capacity")),
 				Double.parseDouble(atts.getValue("permlanes")));
-		l.setOrigId(atts.getValue("origid"));
-		l.setType(atts.getValue("type"));
+		((LinkImpl) l).setOrigId(atts.getValue("origid"));
+		((LinkImpl) l).setType(atts.getValue("type"));
 		if (atts.getValue("modes") != null) {
 			String[] strModes = StringUtils.explode(atts.getValue("modes"), ',');
 			if ((strModes.length == 1) && strModes[0].equals("")) {

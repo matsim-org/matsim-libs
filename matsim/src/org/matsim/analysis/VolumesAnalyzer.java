@@ -27,9 +27,7 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Network;
 
 /**
  * Counts the number of vehicles leaving a link, aggregated into time bins of a specified size.
@@ -43,7 +41,7 @@ public class VolumesAnalyzer implements BasicLinkLeaveEventHandler {
 	private final int maxSlotIndex;
 	private final Map<Id, int[]> links;
 
-	public VolumesAnalyzer(final int timeBinSize, final int maxTime, final BasicNetwork<? extends BasicNode, ? extends BasicLink> network) {
+	public VolumesAnalyzer(final int timeBinSize, final int maxTime, final Network network) {
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
 		this.maxSlotIndex = (this.maxTime/this.timeBinSize) + 1;

@@ -52,13 +52,13 @@ public class NetworkInverter {
 		for (Node node : this.originalNetwork.getNodes().values()) {
 			for (Link inLink : node.getInLinks().values()) {
 				for (Link outLink : node.getOutLinks().values()) {
-					LinkImpl link = this.invertedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated),
+					Link link = this.invertedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated),
 							this.invertedNetwork.getNode(inLink.getId()), this.invertedNetwork.getNode(outLink.getId().toString()),
 							outLink.getLength(),
 							outLink.getFreespeed(Time.UNDEFINED_TIME),
 							outLink.getCapacity(Time.UNDEFINED_TIME),
 							outLink.getNumberOfLanes(Time.UNDEFINED_TIME));
-					link.setType(((LinkImpl) outLink).getType());
+					((LinkImpl) link).setType(((LinkImpl) outLink).getType());
 					numberOfLinksGenerated++;
 				}
 			}

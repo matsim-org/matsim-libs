@@ -26,17 +26,18 @@ import java.util.EnumSet;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -67,7 +68,7 @@ public class ControlerTest extends MatsimTestCase {
 
 		person1 = new PersonImpl(new IdImpl(1));
 		PlanImpl plan1 = person1.createAndAddPlan(true);
-		ActivityImpl a1 = plan1.createAndAddActivity("h", f.link1);
+		Activity a1 = plan1.createAndAddActivity("h", f.link1);
 		a1.setEndTime(7.0*3600);
 		LegImpl leg1 = plan1.createAndAddLeg(TransportMode.car);
 		NetworkRouteWRefs route1 = (NetworkRouteWRefs)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
@@ -81,7 +82,7 @@ public class ControlerTest extends MatsimTestCase {
 
 		PersonImpl person2 = new PersonImpl(new IdImpl(2));
 		PlanImpl plan2 = person2.createAndAddPlan(true);
-		ActivityImpl a2 = plan2.createAndAddActivity("h", f.link1);
+		Activity a2 = plan2.createAndAddActivity("h", f.link1);
 		a2.setEndTime(7.0*3600);
 		LegImpl leg2 = plan2.createAndAddLeg(TransportMode.car);
 		NetworkRouteWRefs route2 = (NetworkRouteWRefs)f.network.getFactory().createRoute(TransportMode.car, f.link1, f.link3);
@@ -143,8 +144,8 @@ public class ControlerTest extends MatsimTestCase {
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		// create a very simple network with one link only and an empty population
 		NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(100, 0));
+		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(100, 0));
 		network.createAndAddLink(new IdImpl(1), node1, node2, 100, 1, 3600, 1);
 
 		final Controler controler = new Controler(scenario);
@@ -178,14 +179,14 @@ public class ControlerTest extends MatsimTestCase {
 		person1 = new PersonImpl(new IdImpl(1));
 		// --- plan 1 ---
 		PlanImpl plan1 = person1.createAndAddPlan(true);
-		ActivityImpl a1 = plan1.createAndAddActivity("h", f.link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
+		Activity a1 = plan1.createAndAddActivity("h", f.link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 		a1.setEndTime(7.0*3600);
 		leg1 = plan1.createAndAddLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
 		plan1.createAndAddActivity("h", f.link3);
 		// --- plan 2 ---
 		PlanImpl plan2 = person1.createAndAddPlan(true);
-		ActivityImpl a2 = plan2.createAndAddActivity("h", f.link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
+		Activity a2 = plan2.createAndAddActivity("h", f.link1);//(String)null, null, "1", "00:00:00", "07:00:00", "07:00:00", "no");
 		a2.setEndTime(7.0*3600);
 
 		leg2 = plan2.createAndAddLeg(TransportMode.car);
@@ -227,31 +228,31 @@ public class ControlerTest extends MatsimTestCase {
 		Fixture f = new Fixture(config);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
-		PopulationImpl population = f.scenario.getPopulation();
+		Population population = f.scenario.getPopulation();
 		PersonImpl person1 = null;
-		ActivityImpl act1a = null;
-		ActivityImpl act1b = null;
-		ActivityImpl act2a = null;
-		ActivityImpl act2b = null;
-		LegImpl leg1 = null;
-		LegImpl leg2 = null;
+		Activity act1a = null;
+		Activity act1b = null;
+		Activity act2a = null;
+		Activity act2b = null;
+		Leg leg1 = null;
+		Leg leg2 = null;
 
 		person1 = new PersonImpl(new IdImpl(1));
 		// --- plan 1 ---
-		PlanImpl plan1 = person1.createAndAddPlan(true);
-		act1a = plan1.createAndAddActivity("h", new CoordImpl(-50.0, 10.0));
+		Plan plan1 = person1.createAndAddPlan(true);
+		act1a = ((PlanImpl) plan1).createAndAddActivity("h", new CoordImpl(-50.0, 10.0));
 		act1a.setEndTime(7.0*3600);
-		leg1 = plan1.createAndAddLeg(TransportMode.car);
+		leg1 = ((PlanImpl) plan1).createAndAddLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		act1b = plan1.createAndAddActivity("h", new CoordImpl(1075.0, -10.0));
+		act1b = ((PlanImpl) plan1).createAndAddActivity("h", new CoordImpl(1075.0, -10.0));
 		// --- plan 2 ---
-		PlanImpl plan2 = person1.createAndAddPlan(true);
-		act2a = plan2.createAndAddActivity("h", new CoordImpl(-50.0, -10.0));
+		Plan plan2 = person1.createAndAddPlan(true);
+		act2a = ((PlanImpl) plan2).createAndAddActivity("h", new CoordImpl(-50.0, -10.0));
 		act2a.setEndTime(7.9*3600);
-		leg2 = plan2.createAndAddLeg(TransportMode.car);
+		leg2 = ((PlanImpl) plan2).createAndAddLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
-		act2b = plan2.createAndAddActivity("h", new CoordImpl(1111.1, 10.0));
-		population.getPersons().put(person1.getId(), person1);
+		act2b = ((PlanImpl) plan2).createAndAddActivity("h", new CoordImpl(1111.1, 10.0));
+		population.addPerson(person1);
 
 		// Complete the configuration for our test case
 		// - set scoring parameters
@@ -273,10 +274,10 @@ public class ControlerTest extends MatsimTestCase {
 		 * otherwise, everything is fine. */
 
 		// check that BOTH plans have their act-locations calculated
-		assertEquals(f.link1, act1a.getLink());
-		assertEquals(f.link3, act1b.getLink());
-		assertEquals(f.link1, act2a.getLink());
-		assertEquals(f.link3, act2b.getLink());
+		assertEquals(f.link1.getId(), act1a.getLinkId());
+		assertEquals(f.link3.getId(), act1b.getLinkId());
+		assertEquals(f.link1.getId(), act2a.getLinkId());
+		assertEquals(f.link3.getId(), act2b.getLinkId());
 
 		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
 		assertNotNull(leg1.getRoute());
@@ -443,13 +444,13 @@ public class ControlerTest extends MatsimTestCase {
 	private static class Fixture {
 		final ScenarioImpl scenario;
 		final NetworkLayer network;
-		NodeImpl node1 = null;
-		NodeImpl node2 = null;
-		NodeImpl node3 = null;
-		NodeImpl node4 = null;
-		LinkImpl link1 = null;
-		LinkImpl link2 = null;
-		LinkImpl link3 = null;
+		Node node1 = null;
+		Node node2 = null;
+		Node node3 = null;
+		Node node4 = null;
+		Link link1 = null;
+		Link link2 = null;
+		Link link3 = null;
 
 		protected Fixture(final Config config) {
 			this.scenario = new ScenarioImpl(config);

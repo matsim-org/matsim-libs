@@ -22,19 +22,16 @@ package org.matsim.analysis;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -68,8 +65,8 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		plan.createAndAddLeg(TransportMode.undefined);
 		plan.createAndAddActivity("act5", new CoordImpl(200.0, 200.0));
 		this.network = new NetworkLayer();
-		NodeImpl fromNode = this.network.createAndAddNode(new IdImpl("123456"), new CoordImpl(100.0, 100.0));
-		NodeImpl toNode = this.network.createAndAddNode(new IdImpl("789012"), new CoordImpl(200.0, 200.0));
+		Node fromNode = this.network.createAndAddNode(new IdImpl("123456"), new CoordImpl(100.0, 100.0));
+		Node toNode = this.network.createAndAddNode(new IdImpl("789012"), new CoordImpl(200.0, 200.0));
 		this.network.createAndAddLink(DEFAULT_LINK_ID, fromNode, toNode, Math.sqrt(20000.0), 13.333, 2000, 1);
 	}
 

@@ -30,6 +30,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -118,7 +119,7 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 		double freespeed = link.getFreespeed(Time.UNDEFINED_TIME);
 		double capacity = link.getCapacity(Time.UNDEFINED_TIME);
 		double permlanes = link.getNumberOfLanes(Time.UNDEFINED_TIME);
-		NodeImpl medianNode = this.network.createAndAddNode(getNewNodeId(), link.getCoord());
+		Node medianNode = this.network.createAndAddNode(getNewNodeId(), link.getCoord());
 		this.network.createAndAddLink(link.getId(), link.getFromNode(), medianNode, length, freespeed, capacity, permlanes);
 		this.network.createAndAddLink(getNewLinkId(), medianNode, link.getToNode(), length, freespeed, capacity, permlanes);
 	}

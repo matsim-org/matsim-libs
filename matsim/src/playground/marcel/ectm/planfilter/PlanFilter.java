@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
@@ -64,10 +65,10 @@ public class PlanFilter {
 		for (double smallRadius : smallRadiuses) {
 			for (double bigRadius : bigRadiuses) {
 
-				final Map<Id, LinkImpl> smallAOI = new HashMap<Id, LinkImpl>();
-				final Map<Id, LinkImpl> bigAOI = new HashMap<Id, LinkImpl>();
+				final Map<Id, Link> smallAOI = new HashMap<Id, Link>();
+				final Map<Id, Link> bigAOI = new HashMap<Id, Link>();
 
-				for (LinkImpl link : network.getLinks().values()) {
+				for (Link link : network.getLinks().values()) {
 					final Node from = link.getFromNode();
 					final Node to = link.getToNode();
 					if ((CoordUtils.calcDistance(from.getCoord(), center) <= smallRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= smallRadius)) {
@@ -76,7 +77,7 @@ public class PlanFilter {
 				}
 //				System.out.println("  aoi with radius=" + smallRadius + " contains " + smallAOI.size() + " links.");
 
-				for (LinkImpl link : network.getLinks().values()) {
+				for (Link link : network.getLinks().values()) {
 					final Node from = link.getFromNode();
 					final Node to = link.getToNode();
 					if ((CoordUtils.calcDistance(from.getCoord(), center) <= bigRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= bigRadius)) {
@@ -120,10 +121,10 @@ public class PlanFilter {
 
 		System.out.println("  finding AOI links");
 
-		final Map<Id, LinkImpl> smallAOI = new HashMap<Id, LinkImpl>();
-		final Map<Id, LinkImpl> bigAOI = new HashMap<Id, LinkImpl>();
+		final Map<Id, Link> smallAOI = new HashMap<Id, Link>();
+		final Map<Id, Link> bigAOI = new HashMap<Id, Link>();
 
-		for (LinkImpl link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			final Node from = link.getFromNode();
 			final Node to = link.getToNode();
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= smallRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= smallRadius)) {

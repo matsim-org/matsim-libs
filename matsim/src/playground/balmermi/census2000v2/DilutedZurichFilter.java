@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -109,7 +110,7 @@ public class DilutedZurichFilter {
 		log.info("  calculate area of interest... ");
 		double radius = 30000.0;
 		final CoordImpl center = new CoordImpl(683518.0,246836.0);
-		final Map<Id, LinkImpl> areaOfInterest = new HashMap<Id, LinkImpl>();
+		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 		log.info("    => area of interest (aoi): center=" + center + "; radius=" + radius);
 
 		log.info("    extracting links of the aoi... " + (new Date()));

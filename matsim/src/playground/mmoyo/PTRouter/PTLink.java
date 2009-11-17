@@ -1,12 +1,12 @@
 package playground.mmoyo.PTRouter;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
 
 public class PTLink extends LinkImpl{
 	private TransitRoute transitRoute;
@@ -16,7 +16,7 @@ public class PTLink extends LinkImpl{
 	private double walkTime = Double.NaN;
 	private byte aliasType ;   //1= access, 2= standard, 3= transfer 4= detTransfer 5= Egress
 
-	public PTLink(final Id id, final BasicNode from, final BasicNode to, final NetworkLayer network, final String type, double avWalkSpeed) {
+	public PTLink(final Id id, final Node from, final Node to, final NetworkLayer network, final String type, double avWalkSpeed) {
 		super(id, from, to, network, 0, 10, 9999 , 1);
 		this.setType(type);
 

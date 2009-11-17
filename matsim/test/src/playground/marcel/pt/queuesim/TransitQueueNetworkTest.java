@@ -31,6 +31,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -47,7 +48,6 @@ import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -987,10 +987,10 @@ public class TransitQueueNetworkTest extends TestCase {
 
 			// setup: network
 			NetworkLayer network = scenario.getNetwork();
-			NodeImpl node1 = network.createAndAddNode(id1, scenario.createCoord(   0, 0));
-			NodeImpl node2 = network.createAndAddNode(id2, scenario.createCoord(1000, 0));
-			NodeImpl node3 = network.createAndAddNode(id3, scenario.createCoord(2000, 0));
-			NodeImpl node4 = network.createAndAddNode(id4, scenario.createCoord(3000, 0));
+			Node node1 = network.createAndAddNode(id1, scenario.createCoord(   0, 0));
+			Node node2 = network.createAndAddNode(id2, scenario.createCoord(1000, 0));
+			Node node3 = network.createAndAddNode(id3, scenario.createCoord(2000, 0));
+			Node node4 = network.createAndAddNode(id4, scenario.createCoord(3000, 0));
 			Link[] links = new Link[4];
 			links[1] = network.createAndAddLink(id1, node1, node2, 1000.0, 10.0, 3600.0, 1);
 			links[2] = network.createAndAddLink(id2, node2, node3, 1000.0, 10.0, 3600.0, 1);

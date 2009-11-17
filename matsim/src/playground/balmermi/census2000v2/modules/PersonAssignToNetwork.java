@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -73,7 +74,7 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
-				act.setLink(act.getFacility().getLink());
+				act.setLink(((ActivityFacilityImpl) act.getFacility()).getLink());
 			}
 		}
 		this.router.run(plan);

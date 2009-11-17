@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.core.v01.network.Link;
 
 
 /**
@@ -27,7 +27,7 @@ public class TimevariantValueStorage {
 
     private final int binCnt;
     
-    private final Map<BasicLink, double[]> valueMap = new LinkedHashMap<BasicLink, double[]>();
+    private final Map<Link, double[]> valueMap = new LinkedHashMap<Link, double[]>();
 //    private final Map<BasicLinkI, double[]> valueMap = new THashMap<BasicLinkI, double[]>();
 
     // -------------------- CONSTRUCTION --------------------
@@ -67,7 +67,7 @@ public class TimevariantValueStorage {
         return (time - startTime) / binSize;
     }
     
-    protected double getBinValue(BasicLink link, int bin) {
+    protected double getBinValue(Link link, int bin) {
     	double[] values = valueMap.get(link);
     	if(values == null)
     		return 0;
@@ -75,7 +75,7 @@ public class TimevariantValueStorage {
     		return values[bin];
     }
     
-    protected void setBinValue(BasicLink link, int bin, double value) {
+    protected void setBinValue(Link link, int bin, double value) {
 		double[] values = valueMap.get(link);
 		
 		if (values == null) {
@@ -100,11 +100,11 @@ public class TimevariantValueStorage {
 		values[bin] = value;
 	}
     
-    public double getValue(BasicLink link, int time) {
+    public double getValue(Link link, int time) {
     	return getBinValue(link, getBin(time));
     }
 
-    public void setValue(BasicLink link, int time, double value) {
+    public void setValue(Link link, int time, double value) {
     	setBinValue(link, getBin(time), value);
     }
     
@@ -113,7 +113,7 @@ public class TimevariantValueStorage {
     public void accumulate(TimevariantValueStorage storage, double weight) {
     	if(isCompatibleWith(storage)) {
     		double oldWeigth = 1 - weight;
-    		for(BasicLink link : valueMap.keySet()) {
+    		for(Link link : valueMap.keySet()) {
     			double[] newValues = storage.valueMap.get(link);
     			if(newValues != null) {
     				double[] oldValues = valueMap.get(link);
@@ -134,13 +134,13 @@ public class TimevariantValueStorage {
     
     public double getAverage() {
     	double sum = 0;
-    	for(BasicLink link : valueMap.keySet()) {
+    	for(Link link : valueMap.keySet()) {
     		sum += getLinkAverage(link);
     	}
     	return sum/(double)valueMap.size();
     }
     
-    public double getLinkAverage(BasicLink link) {
+    public double getLinkAverage(Link link) {
     	double[] values = valueMap.get(link);
     	double sum = 0;
     	for(double d : values)
@@ -156,7 +156,7 @@ public class TimevariantValueStorage {
 
     public String toString() {
     	StringBuilder builder = new StringBuilder();
-        for(BasicLink link : valueMap.keySet()) {
+        for(Link link : valueMap.keySet()) {
         	double[] values = valueMap.get(link);
         	builder.append(link.getId().toString());
         	for(int i = 0; i < binCnt; i++) {

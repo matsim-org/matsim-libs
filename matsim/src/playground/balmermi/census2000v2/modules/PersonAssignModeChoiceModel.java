@@ -30,6 +30,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -142,7 +143,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 	private final int getUrbanDegree(ArrayList<Integer> act_indices, Plan p) {
 		ActivityImpl act = (ActivityImpl)p.getPlanElements().get(act_indices.get(0));
-		Zone zone = (Zone)act.getFacility().getUpMapping().values().iterator().next();
+		Zone zone = (Zone)((ActivityFacilityImpl) act.getFacility()).getUpMapping().values().iterator().next();
 		return this.municipalities.getMunicipality(zone.getId()).getRegType();
 	}
 	
@@ -329,7 +330,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 				ActivityImpl st_startact = (ActivityImpl)person.getSelectedPlan().getPlanElements().get(act_indices.get(0));
 				ActivityImpl st_endact = (ActivityImpl)person.getSelectedPlan().getPlanElements().get(act_indices.get(act_indices.size()-1));
 				Coord start_coord = st_startact.getFacility().getCoord();
-				Zone zone = (Zone)st_startact.getFacility().getUpMapping().values().iterator().next();
+				Zone zone = (Zone)((ActivityFacilityImpl) st_startact.getFacility()).getUpMapping().values().iterator().next();
 				out.write(start_coord.getX()+"\t");
 				out.write(start_coord.getY()+"\t");
 				out.write(this.getUrbanDegree(act_indices,p)+"\t");

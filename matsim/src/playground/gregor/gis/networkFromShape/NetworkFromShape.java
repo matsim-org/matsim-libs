@@ -1,7 +1,6 @@
 package playground.gregor.gis.networkFromShape;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -10,6 +9,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -20,7 +20,6 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -48,7 +47,7 @@ public class NetworkFromShape {
 			Coordinate c = geo.getGeometryN(0).getCentroid().getCoordinate();
 			Coord coord = MGC.coordinate2Coord(c);
 			Integer id = (Integer) f.getAttribute(1);
-			NodeImpl n = net.createAndAddNode(new IdImpl(id), coord);
+			Node n = net.createAndAddNode(new IdImpl(id), coord);
 			if (n == null) {
 				System.out.println("id:" + id);
 			}

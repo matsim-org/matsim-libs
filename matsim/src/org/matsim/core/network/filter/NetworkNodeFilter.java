@@ -19,7 +19,7 @@
 
 package org.matsim.core.network.filter;
 
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Node;
 
 /**
  * Implement this interface to filter the nodes of a network
@@ -29,6 +29,6 @@ import org.matsim.api.basic.v01.network.BasicNode;
  */
 public interface NetworkNodeFilter {
 
-	public boolean judgeNode(BasicNode n);
+	public boolean judgeNode(Node n);
 
 }

@@ -22,10 +22,9 @@ package org.matsim.population.filters;
 
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -44,9 +43,9 @@ public class ActLinkFilterTest extends MatsimTestCase {
 
 		// fixture: 2 links and 2 persons
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(100.0, 100.0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(200.0, 200.0));
-		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(300.0, 300.0));
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(100.0, 100.0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(200.0, 200.0));
+		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(300.0, 300.0));
 
 		network.createAndAddLink(new IdImpl("1"), node1, node2, 1000.0, 20, 200, 2);
 		network.createAndAddLink(new IdImpl("2"), node2, node3, 1000.0, 20, 200, 2);

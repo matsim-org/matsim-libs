@@ -73,7 +73,7 @@ public class RingCollapser {
 			if(!rootNode.loopFound)	// no ring was found, move on to next node
 				continue;
 //			a ring was found, all links to and from ringnodes (except for the links making up the ring) need to be connected to the centroid;
-			NodeImpl centroidNode = createCentroidNode(rootNode.ringNodes);
+			Node centroidNode = createCentroidNode(rootNode.ringNodes);
 			rootNode.weldLinks(centroidNode);
 			break;
 		}
@@ -119,7 +119,7 @@ public class RingCollapser {
 	}
 
 
-	private NodeImpl createCentroidNode(ArrayList<Node> ringNodePath) {
+	private Node createCentroidNode(ArrayList<Node> ringNodePath) {
 			double averageX = 0;
 			double averageY = 0;
 			int nodeCount = 0;
@@ -133,7 +133,7 @@ public class RingCollapser {
 			averageX /= nodeCount;
 			averageY /= nodeCount;
 	//		create centroidNode;
-			NodeImpl centroidNode = this.network.createAndAddNode(new IdImpl(++this.maxNodeId), new CoordImpl(averageX, averageY));
+			Node centroidNode = this.network.createAndAddNode(new IdImpl(++this.maxNodeId), new CoordImpl(averageX, averageY));
 			return centroidNode;
 		}
 

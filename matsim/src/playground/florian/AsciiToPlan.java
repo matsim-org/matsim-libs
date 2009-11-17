@@ -10,11 +10,11 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -119,7 +119,7 @@ public class AsciiToPlan {
 			//Erzeuge Homeactivity
 			Coord coord1 = new CoordImpl(homex,homey);
 			String type = "h";
-			ActivityImpl home1 = plan.createAndAddActivity(type, coord1);
+			Activity home1 = plan.createAndAddActivity(type, coord1);
 			home1.setEndTime(start);
 			
 //			plan.addLeg(pb.createLeg(TransportMode.car)); //<--- muss beim Hereinnehmen des Switch Befehls entfernt werden
@@ -143,7 +143,7 @@ public class AsciiToPlan {
 				default: type = "h";
 			}
 			String typeHaupt = type;
-			ActivityImpl work = plan.createAndAddActivity(type, coord2);
+			Activity work = plan.createAndAddActivity(type, coord2);
 			work.setStartTime(start);
 			work.setEndTime(start + dur);
 //			plan.addLeg(pb.createLeg(TransportMode.car)); // <--- muss beim Hereinnehmen des Switch Befehls entfernt werden!!!
@@ -158,7 +158,7 @@ public class AsciiToPlan {
 			
 			//Erzeuge 2. Homeactivity
 			type = "h";
-			ActivityImpl home2 = plan.createAndAddActivity(type, coord1);
+			Activity home2 = plan.createAndAddActivity(type, coord1);
 			home2.setStartTime(start + dur);
 			
 			try {

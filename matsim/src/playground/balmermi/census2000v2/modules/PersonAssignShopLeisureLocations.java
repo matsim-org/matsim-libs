@@ -242,7 +242,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		double dy = c_end.getX() - c_start.getX();
 		if ((dx == 0.0) && (dy == 0.0)) {
 			// c_start and c_end equal
-			Zone z = (Zone)((ActivityImpl)plan.getPlanElements().get(start)).getFacility().getUpMapping().values().iterator().next();
+			Zone z = (Zone)((ActivityFacilityImpl) ((ActivityImpl)plan.getPlanElements().get(start)).getFacility()).getUpMapping().values().iterator().next();
 			double r = 0.5*Math.sqrt((z.getMax().getX()-z.getMin().getX())*(z.getMax().getY()-z.getMin().getY()));
 			for (int i=start+2; i<end; i=i+2) {
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
@@ -288,13 +288,13 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 				ActivityFacilityImpl start = null;
 				for (int b=i-2; b>=0; b=b-2) {
 					ActivityImpl b_act = (ActivityImpl)plan.getPlanElements().get(b);
-					if (b_act.getFacility() != null) { start = b_act.getFacility(); break; }
+					if (b_act.getFacility() != null) { start = (ActivityFacilityImpl) b_act.getFacility(); break; }
 				}
 				// get the next act with a facility
 				ActivityFacilityImpl end = null;
 				for (int a=i+2; a<plan.getPlanElements().size(); a=a+2) {
 					ActivityImpl a_act = (ActivityImpl)plan.getPlanElements().get(a);
-					if (a_act.getFacility() != null) { end = a_act.getFacility(); break; }
+					if (a_act.getFacility() != null) { end = (ActivityFacilityImpl) a_act.getFacility(); break; }
 				}
 				if ((start == null) || (end == null)) { Gbl.errorMsg("That should not happen!"); }
 				this.assignRemainingLocations(act,start,end);

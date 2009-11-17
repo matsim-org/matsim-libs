@@ -23,10 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
@@ -42,13 +41,13 @@ public class NetworkFilterManager {
 	private static final Logger log = Logger
 			.getLogger(NetworkFilterManager.class);
 	
-	private final BasicNetwork<NodeImpl, LinkImpl> network;
+	private final Network network;
 	
 	private List<NetworkLinkFilter> linkFilters;
 	
 	private List<NetworkNodeFilter> nodeFilters;
 	
-	public NetworkFilterManager(final BasicNetwork<NodeImpl, LinkImpl> net) {
+	public NetworkFilterManager(final Network net) {
 		this.network = net;
 		this.linkFilters = new ArrayList<NetworkLinkFilter>();
 		this.nodeFilters = new ArrayList<NetworkNodeFilter>();
@@ -66,13 +65,13 @@ public class NetworkFilterManager {
 	 * Call this method to filter the network.
 	 * @return
 	 */
-	public BasicNetwork<Node, Link> applyFilters() {
+	public Network applyFilters() {
 		log.info("applying filters to network...");
 		int nodeCount = 0;
 		int linkCount = 0;
 		NetworkLayer net = new NetworkLayer();
 		if (!this.nodeFilters.isEmpty()) {
-			for (NodeImpl n : this.network.getNodes().values()) {
+			for (Node n : this.network.getNodes().values()) {
 				boolean add = true;
 				for (NetworkNodeFilter f : nodeFilters) {
 					if (!f.judgeNode(n)) {
@@ -81,13 +80,13 @@ public class NetworkFilterManager {
 					}
 				}
 				if (add) {
-					net.getNodes().put(n.getId(), n);
+					net.addNode(n);
 					nodeCount++;
 				}
 			}
 		}
 		if (!this.linkFilters.isEmpty()) {
-			for (LinkImpl l : this.network.getLinks().values()) {
+			for (Link l : this.network.getLinks().values()) {
 				boolean add = true;
 				for (NetworkLinkFilter f : linkFilters) {
 					if (!f.judgeLink(l)) {
@@ -104,7 +103,7 @@ public class NetworkFilterManager {
 					if (!net.getNodes().containsKey(to.getId())){
 						net.getNodes().put(to.getId(), (NodeImpl) to);
 					}
-					net.getLinks().put(l.getId(), l);
+					net.addLink(l);
 					linkCount++;
 				}
 			}			

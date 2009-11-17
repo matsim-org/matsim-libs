@@ -8,6 +8,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.events.EventsManagerImpl;
@@ -15,7 +16,6 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
@@ -158,12 +158,12 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 		Id n1 = this.sc.createId("1");
 
 		
-		NodeImpl node0 = (this.network).createAndAddNode(n0, this.sc.createCoord(0,0));
-		NodeImpl node1 = (this.network).createAndAddNode(n1, this.sc.createCoord(10,0));
+		Node node0 = (this.network).createAndAddNode(n0, this.sc.createCoord(0,0));
+		Node node1 = (this.network).createAndAddNode(n1, this.sc.createCoord(10,0));
 		
 		
 		
-		this.link0 = (this.network).createAndAddLink(this.l0,node0,node1,100,10,1,1);
+		this.link0 = (LinkImpl) (this.network).createAndAddLink(this.l0,node0,node1,100,10,1,1);
 		
 		
 		

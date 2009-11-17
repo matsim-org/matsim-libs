@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -424,14 +423,14 @@ public class MultiNodeDijkstraTest extends TestCase {
 
 		public Fixture() {
 			this.network = new NetworkLayer();
-			NodeImpl node1 = this.network.createAndAddNode(new IdImpl(1), new CoordImpl(1000,    0));
-			NodeImpl node2 = this.network.createAndAddNode(new IdImpl(2), new CoordImpl( 500,    0));
-			NodeImpl node3 = this.network.createAndAddNode(new IdImpl(3), new CoordImpl(   0,    0));
-			NodeImpl node4 = this.network.createAndAddNode(new IdImpl(4), new CoordImpl(1000, 2000));
-			NodeImpl node5 = this.network.createAndAddNode(new IdImpl(5), new CoordImpl( 500, 2000));
-			NodeImpl node6 = this.network.createAndAddNode(new IdImpl(6), new CoordImpl(   0, 2000));
-			NodeImpl node7 = this.network.createAndAddNode(new IdImpl(7), new CoordImpl( 500,  500));
-			NodeImpl node8 = this.network.createAndAddNode(new IdImpl(8), new CoordImpl( 500, 1500));
+			Node node1 = this.network.createAndAddNode(new IdImpl(1), new CoordImpl(1000,    0));
+			Node node2 = this.network.createAndAddNode(new IdImpl(2), new CoordImpl( 500,    0));
+			Node node3 = this.network.createAndAddNode(new IdImpl(3), new CoordImpl(   0,    0));
+			Node node4 = this.network.createAndAddNode(new IdImpl(4), new CoordImpl(1000, 2000));
+			Node node5 = this.network.createAndAddNode(new IdImpl(5), new CoordImpl( 500, 2000));
+			Node node6 = this.network.createAndAddNode(new IdImpl(6), new CoordImpl(   0, 2000));
+			Node node7 = this.network.createAndAddNode(new IdImpl(7), new CoordImpl( 500,  500));
+			Node node8 = this.network.createAndAddNode(new IdImpl(8), new CoordImpl( 500, 1500));
 			this.network.createAndAddLink(new IdImpl(1), node1, node7, 1000.0, 10.0, 2000.0, 1);
 			this.network.createAndAddLink(new IdImpl(2), node2, node7, 1000.0, 10.0, 2000.0, 1);
 			this.network.createAndAddLink(new IdImpl(3), node3, node7, 1000.0, 10.0, 2000.0, 1);

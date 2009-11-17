@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
@@ -50,11 +51,11 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 		this.factory.setNetwork(this);
 	}
 
-	public final NodeImpl createAndAddNode(final Id id, final Coord coord) {
+	public final Node createAndAddNode(final Id id, final Coord coord) {
 		return createAndAddNode(id, coord, null);
 	}
 
-	public final NodeImpl createAndAddNode(final Id id, final Coord coord, final String nodeType) {
+	public final Node createAndAddNode(final Id id, final Coord coord, final String nodeType) {
 		if (this.nodes.containsKey(id)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
@@ -69,7 +70,7 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 		return n;
 	}
 
-	public final LinkImpl createAndAddLink(final Id id, final Node fromNode, final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
+	public final Link createAndAddLink(final Id id, final Node fromNode, final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
 		return createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
 	}
 

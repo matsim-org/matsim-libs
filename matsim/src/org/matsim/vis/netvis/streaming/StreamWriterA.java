@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.vis.netvis.config.ConfigModuleI;
 import org.matsim.vis.netvis.config.GeneralConfig;
 import org.matsim.vis.netvis.config.IndexationConfig;
@@ -74,7 +74,7 @@ public abstract class StreamWriterA implements SimStateWriterI {
      * Complete constructor containing all information for use of this writer
      * without further configuration.
      */
-    protected StreamWriterA(BasicNetwork network, String networkFileName,
+    protected StreamWriterA(Network network, String networkFileName,
             IndexationConfig indexConfig, String filePrefix, String fileSuffix,
             int timeStepLength_s, int bufferSize) {
 
@@ -97,7 +97,7 @@ public abstract class StreamWriterA implements SimStateWriterI {
 
     // -------------------- GETTERS --------------------
 
-    public BasicNetwork getNetwork() {
+    public Network getNetwork() {
         return streamConfig.getNetwork();
     }
 

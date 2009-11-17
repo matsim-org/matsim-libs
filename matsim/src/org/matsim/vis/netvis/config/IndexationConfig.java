@@ -30,9 +30,9 @@ import java.util.Map;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
@@ -82,19 +82,19 @@ public class IndexationConfig extends DefaultHandler {
 
 	// -------------------- MEMBER VARIABLES --------------------
 
-	private BasicNetwork<BasicNode, BasicLink> network; // only for xml parsing
+	private Network network; // only for xml parsing
 
-	private List<BasicNode> nodes;
+	private List<Node> nodes;
 
-	private List<BasicLink> links;
+	private List<Link> links;
 
-	private Map<BasicNode, Integer> node2index;
+	private Map<Node, Integer> node2index;
 
-	private Map<BasicLink, Integer> link2index;
+	private Map<Link, Integer> link2index;
 
-	private Map<Integer, BasicNode> index2node;
+	private Map<Integer, Node> index2node;
 
-	private Map<Integer, BasicLink> index2link;
+	private Map<Integer, Link> index2link;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -105,7 +105,7 @@ public class IndexationConfig extends DefaultHandler {
 	 * @param network
 	 * @param fileName
 	 */
-	public IndexationConfig(BasicNetwork<BasicNode, BasicLink> network, String fileName) {
+	public IndexationConfig(Network network, String fileName) {
 		this.network = network;
 		read(fileName);
 		this.network = null;
@@ -116,17 +116,17 @@ public class IndexationConfig extends DefaultHandler {
 	 * <code>network</code>.
 	 * @param network
 	 */
-	public IndexationConfig(BasicNetwork<BasicNode, BasicLink> network) {
-		createNodeIndices(new ArrayList<BasicNode>(network.getNodes().values()));
-		createLinkIndices(new ArrayList<BasicLink>(network.getLinks().values()));
+	public IndexationConfig(Network network) {
+		createNodeIndices(new ArrayList<Node>(network.getNodes().values()));
+		createLinkIndices(new ArrayList<Link>(network.getLinks().values()));
 	}
 
-	private void createNodeIndices(List<BasicNode> nodes) {
+	private void createNodeIndices(List<Node> nodes) {
 		this.nodes = Collections.unmodifiableList(nodes);
-		node2index = new LinkedHashMap<BasicNode, Integer>();
-		index2node = new LinkedHashMap<Integer, BasicNode>();
+		node2index = new LinkedHashMap<Node, Integer>();
+		index2node = new LinkedHashMap<Integer, Node>();
 		for (int i = 0; i < nodes.size(); i++) {
-			BasicNode node = nodes.get(i);
+			Node node = nodes.get(i);
 			if (node != null) {
 				node2index.put(node, i);
 				index2node.put(i, node);
@@ -136,12 +136,12 @@ public class IndexationConfig extends DefaultHandler {
 		index2node = Collections.unmodifiableMap(index2node);
 	}
 
-	private void createLinkIndices(List<BasicLink> links) {
+	private void createLinkIndices(List<Link> links) {
 		this.links = Collections.unmodifiableList(links);
-		link2index = new LinkedHashMap<BasicLink, Integer>();
-		index2link = new LinkedHashMap<Integer, BasicLink>();
+		link2index = new LinkedHashMap<Link, Integer>();
+		index2link = new LinkedHashMap<Integer, Link>();
 		for (int i = 0; i < links.size(); i++) {
-			BasicLink link = links.get(i);
+			Link link = links.get(i);
 			if (link != null) {
 				link2index.put(link, i);
 				index2link.put(i, link);
@@ -159,11 +159,11 @@ public class IndexationConfig extends DefaultHandler {
 
 	// -------------------- CONTENT ACCESS --------------------
 
-	public List<BasicNode> getIndexedNodeView() {
+	public List<Node> getIndexedNodeView() {
 		return nodes;
 	}
 
-	public List<BasicLink> getIndexedLinkView() {
+	public List<Link> getIndexedLinkView() {
 		return links;
 	}
 	//
@@ -208,8 +208,8 @@ public class IndexationConfig extends DefaultHandler {
 	// -------------------- READING --------------------
 
 	void read(String fileName) {
-		nodes = new ArrayList<BasicNode>();
-		links = new ArrayList<BasicLink>();
+		nodes = new ArrayList<Node>();
+		links = new ArrayList<Link>();
 
 		try {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -233,7 +233,7 @@ public class IndexationConfig extends DefaultHandler {
 	}
 
 	private void startNode(Attributes attrs) {
-		BasicNode node = network.getNodes().get(new IdImpl(attrs.getValue(NODE_ID_ATTR)));
+		Node node = network.getNodes().get(new IdImpl(attrs.getValue(NODE_ID_ATTR)));
 		if (node != null)
 			nodes.add(node);
 		else
@@ -241,7 +241,7 @@ public class IndexationConfig extends DefaultHandler {
 	}
 
 	private void startLink(Attributes attrs) {
-		BasicLink link = network.getLinks().get(new IdImpl(attrs.getValue(LINK_ID_ATTR)));
+		Link link = network.getLinks().get(new IdImpl(attrs.getValue(LINK_ID_ATTR)));
 		if (link != null)
 			links.add(link);
 		else
@@ -263,7 +263,7 @@ public class IndexationConfig extends DefaultHandler {
 		result.append(indent + "\t<" + NETWORK_ELEM + ">" + newline);
 		result.append(indent + "\t\t<" + NODES_ELEM + ">" + newline);
 
-		for (BasicNode node : getIndexedNodeView()) {
+		for (Node node : getIndexedNodeView()) {
 			if (node != null)
 				result.append(indent + "\t\t\t<" + NODE_ELEM + " "
 						+ NODE_ID_ATTR + "=" + quote + node.getId().toString()
@@ -277,7 +277,7 @@ public class IndexationConfig extends DefaultHandler {
 		result.append(indent + "\t\t</" + NODES_ELEM + ">" + newline);
 		result.append(indent + "\t\t<" + LINKS_ELEM + ">" + newline);
 
-		for (BasicLink link : getIndexedLinkView()) {
+		for (Link link : getIndexedLinkView()) {
 			if (link != null)
 				result.append(indent + "\t\t\t<" + LINK_ELEM + " "
 						+ LINK_ID_ATTR + "=" + quote + link.getId().toString()

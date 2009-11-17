@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Vector;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 
@@ -32,7 +33,7 @@ public class TimeWindowCalcTimeCorrelations {
 	 * @param out1name
 	 * @author jhackney
 	 */
-	public TimeWindowCalcTimeCorrelations(LinkedHashMap<ActivityFacilityImpl,ArrayList<TimeWindow>> timeWindowMap, String out2name, String out1name){ 
+	public TimeWindowCalcTimeCorrelations(LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap, String out2name, String out1name){ 
 		// First identify the overlapping Acts and the Persons involved
 		Object[] facs = timeWindowMap.keySet().toArray();
 		Vector<Double> tbins=new Vector<Double>();
@@ -77,7 +78,7 @@ public class TimeWindowCalcTimeCorrelations {
 				double tdur_egonet=tf_egonet-ti_egonet;
 				tdur_egonet=(tdur_egonet+numbins*binwidth)%(numbins*binwidth);
 				int n_egonet=0;
-				double dist_egonet=tw1.act.getFacility().calcDistance(((ActivityImpl)(tw1.person.getSelectedPlan().getPlanElements().get(0))).getFacility().getCoord());
+				double dist_egonet=((ActivityFacilityImpl) tw1.act.getFacility()).calcDistance(((ActivityImpl)(tw1.person.getSelectedPlan().getPlanElements().get(0))).getFacility().getCoord());
 
 				double ti_act=tw1.startTime;
 				ti_act=(ti_act+numbins*binwidth)%(numbins*binwidth);
@@ -90,7 +91,7 @@ public class TimeWindowCalcTimeCorrelations {
 
 				for (int iii=ii+1;iii<visits.length;iii++){
 					TimeWindow tw2 = (TimeWindow) visits[iii];
-					double dist_alter=tw2.act.getFacility().calcDistance(((ActivityImpl)(tw2.person.getSelectedPlan().getPlanElements().get(0))).getFacility().getCoord());
+					double dist_alter=((ActivityFacilityImpl) tw2.act.getFacility()).calcDistance(((ActivityImpl)(tw2.person.getSelectedPlan().getPlanElements().get(0))).getFacility().getCoord());
 
 					// Others there who are friends
 					if(CompareTimeWindows.overlapTimePlaceTypeFriend(tw1, tw2)){

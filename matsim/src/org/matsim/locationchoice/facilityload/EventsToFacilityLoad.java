@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
@@ -71,7 +72,7 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 	 * Home activities are excluded.
 	 */
 	public void handleEvent(final ActivityStartEventImpl event) {
-		ActivityFacilityImpl facility = event.getAct().getFacility();
+		ActivityFacility facility = event.getAct().getFacility();
 		if (!(event.getAct().getType().startsWith("h") || event.getAct().getType().startsWith("tta"))) {
 			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addArrival(event.getTime());
 		}
@@ -82,7 +83,7 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 	 * Home activities are excluded
 	 */
 	public void handleEvent(final ActivityEndEventImpl event) {
-		ActivityFacilityImpl facility = event.getAct().getFacility();
+		ActivityFacility facility = event.getAct().getFacility();
 		if (!(event.getAct().getType().startsWith("h") || event.getAct().getType().startsWith("tta"))) {
 			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addDeparture(event.getTime());
 		}

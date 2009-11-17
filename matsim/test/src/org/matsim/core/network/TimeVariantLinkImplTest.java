@@ -20,6 +20,8 @@
 
 package org.matsim.core.network;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
@@ -40,12 +42,12 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		NetworkFactoryImpl nf = new NetworkFactoryImpl();
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		final NetworkLayer network = new NetworkLayer(nf);
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(0, 1000));
-		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1000, 2000));
-		NodeImpl node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(2000, 2000));
-		final LinkImpl link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1000, 1.667, 3600, 1);
-		final LinkImpl link3 = network.createAndAddLink(new IdImpl("3"), node3, node4, 1000, 1.667, 3600, 1);
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(0, 1000));
+		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1000, 2000));
+		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(2000, 2000));
+		final Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1000, 1.667, 3600, 1);
+		final Link link3 = network.createAndAddLink(new IdImpl("3"), node3, node4, 1000, 1.667, 3600, 1);
 
 		final double [] queryDates = {org.matsim.core.utils.misc.Time.UNDEFINED_TIME, 0., 1., 2., 3., 4.};
 
@@ -77,8 +79,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		final NetworkLayer network = new NetworkLayer(nf);
 
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 
 		// test base values
@@ -117,8 +119,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		final NetworkLayer network = new NetworkLayer(nf);
 
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 
 		// test base values
@@ -157,8 +159,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		final NetworkLayer network = new NetworkLayer(nf);
 
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 
 		// test base values
@@ -252,8 +254,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		final NetworkLayer network = new NetworkLayer(nf);
 		network.setCapacityPeriod(3600.0);
 
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 
 		// test base values
@@ -286,8 +288,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		final NetworkLayer network = new NetworkLayer(nf);
 		network.setCapacityPeriod(3600.0);
 
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
 
 		// test base values
@@ -326,8 +328,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		network.setCapacityPeriod(3600.0);
 
 		// the network has 2 nodes and 1 link, the length is 75 and has by default 4 lanes with a lanes with a cell size of 7.5 m --> storage cap = 40
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("1"), node1, node2, 75, 10, 3600, 4);
 		// add a lanes change to 2 at 8am.
 		NetworkChangeEvent change1 = new NetworkChangeEvent(8*3600.0);
@@ -376,9 +378,9 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		network.setCapacityPeriod(3600.0);
 
 		// the network has 2 nodes and 1 link, the length is 75 and has  a flow capacity of 1 Veh/s by default
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
-		LinkImpl link = network.createAndAddLink(new IdImpl("1"), node1, node2, 75, 10, 3600, 4);
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
+		Link link = network.createAndAddLink(new IdImpl("1"), node1, node2, 75, 10, 3600, 4);
 		// add a flow capacity change to 2 Veh/s at 8am.
 		NetworkChangeEvent change1 = new NetworkChangeEvent(8*3600.0);
 		change1.addLink(link);

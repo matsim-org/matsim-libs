@@ -28,7 +28,9 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -40,9 +42,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.EventsToScore;
@@ -125,8 +125,8 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 //	private TrackEventsOverlap teo=null;
 	private EventsMapStartEndTimes epp=null;
 	private MakeTimeWindowsFromEvents teo=null;
-	private LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats=null;
-	private LinkedHashMap<ActivityFacilityImpl,ArrayList<TimeWindow>> twm=null;
+	private LinkedHashMap<Activity,ArrayList<Double>> actStats=null;
+	private LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm=null;
 	private EventsToScore scoring =null;
 
 	private final Logger log = Logger.getLogger(SNControllerListener.class);

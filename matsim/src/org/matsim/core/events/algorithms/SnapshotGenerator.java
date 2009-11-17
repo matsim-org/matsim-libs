@@ -41,8 +41,6 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNetwork;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.SimulationConfigGroup;
@@ -475,7 +473,7 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 
 	private class NetStateWriter extends DisplayNetStateWriter implements SnapshotWriter {
 
-		public NetStateWriter(final BasicNetwork network, final String networkFileName,
+		public NetStateWriter(final Network network, final String networkFileName,
 				final VisConfig visConfig, final String filePrefix, final int timeStepLength_s, final int bufferSize) {
 			super(network, networkFileName, visConfig, filePrefix, timeStepLength_s, bufferSize);
 		}
@@ -506,18 +504,18 @@ public class SnapshotGenerator implements BasicAgentDepartureEventHandler, Basic
 		/* methods for DisplayNetStateWriter */
 
 		@Override
-		protected String getLinkDisplLabel(final BasicLink link) {
+		protected String getLinkDisplLabel(final Link link) {
 			return link.getId().toString();
 		}
 
 		@Override
-		protected double getLinkDisplValue(final BasicLink link, final int index) {
+		protected double getLinkDisplValue(final Link link, final int index) {
 			EventLink mylink = SnapshotGenerator.this.eventLinks.get(link.getId());
 			return (mylink.buffer.size() + mylink.drivingQueue.size()) / mylink.spaceCap;
 		}
 
 		@Override
-		protected Collection<? extends DrawableAgentI> getAgentsOnLink(final BasicLink link) {
+		protected Collection<? extends DrawableAgentI> getAgentsOnLink(final Link link) {
 			EventLink mylink = SnapshotGenerator.this.eventLinks.get(link.getId());
 			Collection<EventAgent> agents = new ArrayList<EventAgent>(mylink.buffer.size() + mylink.drivingQueue.size());
 			agents.addAll(mylink.buffer);

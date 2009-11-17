@@ -31,6 +31,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -104,9 +105,9 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// setup: network
 		NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(   0, 0));
-		NodeImpl node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(1000, 0));
-		NodeImpl node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(2000, 0));
+		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(   0, 0));
+		Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(1000, 0));
+		Node node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(2000, 0));
 		Link link1 = network.createAndAddLink(scenario.createId("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
 		Link link2 = network.createAndAddLink(scenario.createId("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
 
@@ -224,8 +225,8 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// setup: network
 		NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(   0, 0));
-		NodeImpl node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(1000, 0));
+		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(   0, 0));
+		Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(1000, 0));
 		network.createAndAddLink(scenario.createId("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
 
 		// setup: transit schedule
@@ -281,12 +282,12 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// setup: network
 		NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(   0, 0));
-		NodeImpl node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(1000, 0));
-		NodeImpl node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(2000, 0));
-		NodeImpl node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord(3000, 0));
-		NodeImpl node5 = network.createAndAddNode(scenario.createId("5"), scenario.createCoord(4000, 0));
-		NodeImpl node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord(5000, 0));
+		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(   0, 0));
+		Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(1000, 0));
+		Node node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(2000, 0));
+		Node node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord(3000, 0));
+		Node node5 = network.createAndAddNode(scenario.createId("5"), scenario.createCoord(4000, 0));
+		Node node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord(5000, 0));
 		Link link1 = network.createAndAddLink(scenario.createId("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
 		Link link2 = network.createAndAddLink(scenario.createId("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
 		Link link3 = network.createAndAddLink(scenario.createId("3"), node3, node4, 1000.0, 10.0, 3600.0, 1);

@@ -20,8 +20,8 @@
 
 package org.matsim.vis.netvis.visNet;
 
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.vis.netvis.config.IndexationConfig;
 import org.matsim.vis.netvis.drawableNet.DrawableLinkI;
 import org.matsim.vis.netvis.drawableNet.DrawableNodeI;
@@ -35,12 +35,12 @@ public class DisplayNetState extends NetStateA {
     }
 
     @Override
-		protected final BufferedStateA newNodeState(BasicNode node) {
+		protected final BufferedStateA newNodeState(Node node) {
         return new DisplayNodeState((DrawableNodeI) node);
     }
 
     @Override
-		protected final BufferedStateA newLinkState(BasicLink link) {
+		protected final BufferedStateA newLinkState(Link link) {
         return new DisplayLinkState((DrawableLinkI) link);
     }
 

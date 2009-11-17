@@ -29,15 +29,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.world.AbstractLocation;
 
-public class LinkImpl extends AbstractLocation implements BasicLink, Link {
+public class LinkImpl extends AbstractLocation implements Link {
 
 	private final static Logger log = Logger.getLogger(LinkImpl.class);
 
@@ -45,8 +43,8 @@ public class LinkImpl extends AbstractLocation implements BasicLink, Link {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	protected BasicNode from = null;
-	protected BasicNode to = null;
+	protected Node from = null;
+	protected Node to = null;
 
 	protected double length = Double.NaN;
 	protected double freespeed = Double.NaN;
@@ -71,7 +69,7 @@ public class LinkImpl extends AbstractLocation implements BasicLink, Link {
 	static private double plWarnCnt = 0 ;
 	static private double lengthWarnCnt = 0;
 	
-	public LinkImpl(final Id id, final BasicNode from, final BasicNode to,
+	public LinkImpl(final Id id, final Node from, final Node to,
 			final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
 		super(network, id, 
 				new CoordImpl(0.5*(from.getCoord().getX() + to.getCoord().getX()), 0.5*(from.getCoord().getY() + to.getCoord().getY()))
@@ -169,19 +167,19 @@ public class LinkImpl extends AbstractLocation implements BasicLink, Link {
 	//////////////////////////////////////////////////////////////////////
 
 	public Node getFromNode() {
-		return (Node)this.from;
+		return this.from;
 	}
 	
-	public final boolean setFromNode(final BasicNode node) {
+	public final boolean setFromNode(final Node node) {
 		this.from = node;
 		return true;
 	}
 
 	public Node getToNode() {
-		return (Node)this.to;
+		return this.to;
 	}
 
-	public final boolean setToNode(final BasicNode node) {
+	public final boolean setToNode(final Node node) {
 		this.to = node;
 		return true;
 	}

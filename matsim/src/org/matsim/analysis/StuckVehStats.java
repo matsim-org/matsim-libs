@@ -30,9 +30,8 @@ import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.misc.Time;
 
 public class StuckVehStats implements BasicAgentDepartureEventHandler, BasicAgentStuckEventHandler, BasicAgentWait2LinkEventHandler {
@@ -44,9 +43,9 @@ public class StuckVehStats implements BasicAgentDepartureEventHandler, BasicAgen
 	private int[] waitTimes = new int[2*60 + 1]; // the time an agent spends waiting to enter a link from parking; counts per minute up to 2 hours
 	private int[] driveTimes = new int[2*60 + 1]; // the time an agent spends driving until it is stuck; counts per minute up to 2 hours
 	private int[] travelTimes = new int[2*60 + 1]; // the time an agent spends traveling (wait2link + drive) until it is stuck
-	private BasicNetwork<? extends BasicNode, ? extends BasicLink> network = null;
+	private Network network = null;
 	
-	public StuckVehStats(BasicNetwork<? extends BasicNode, ? extends BasicLink> network) {
+	public StuckVehStats(Network network) {
 		this.network = network;
 		reset(-1);
 	}
@@ -137,7 +136,7 @@ public class StuckVehStats implements BasicAgentDepartureEventHandler, BasicAgen
 		System.out.println("LINK\tCAPACITY\tFREESPEED\tLENGTH\tcountStuck\ttimesStuck");
 		for (Id linkId : stuckLinkTimes.keySet()) {
 			ArrayList<Double> times = stuckLinkTimes.get(linkId);
-			BasicLink link = network.getLinks().get(linkId);
+			Link link = network.getLinks().get(linkId);
 			System.out.print(linkId + "\t" + link.getCapacity(Time.UNDEFINED_TIME) + "\t" + link.getFreespeed(Time.UNDEFINED_TIME) + "\t" + link.getLength() + "\t" + times.size() + "\t");
 			for (Double time : times) System.out.print(time + " ");
 			System.out.println();

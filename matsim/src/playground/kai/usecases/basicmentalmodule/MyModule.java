@@ -9,10 +9,10 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
 import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -45,16 +45,16 @@ BasicActivityEndEventHandler
 	public void prepareReplanning() { 
 		
 		// go through network and copy to my personal network:
-		for ( BasicNode bn : net.getNodes().values() ) {
+		for ( Node bn : net.getNodes().values() ) {
 			Id id = bn.getId();
 			Coord coord = bn.getCoord(); 
 		}
-		for ( BasicLink bl : net.getLinks().values() ) {
+		for ( Link bl : net.getLinks().values() ) {
 
 			Id id = bl.getId() ;
 
-			BasicNode fNode = bl.getFromNode();
-			BasicNode tNode = bl.getToNode() ;
+			Node fNode = bl.getFromNode();
+			Node tNode = bl.getToNode() ;
 			double len = bl.getLength() ;
 
 			double fs = bl.getFreespeed(0.) ; 

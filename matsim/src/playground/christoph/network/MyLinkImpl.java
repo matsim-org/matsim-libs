@@ -21,7 +21,7 @@
 package playground.christoph.network;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 
@@ -40,7 +40,7 @@ public class MyLinkImpl extends LinkImpl{
 	protected double travelTime;
 	protected double travelCost;
 	
-	public MyLinkImpl(Id id, BasicNode from, BasicNode to, NetworkLayer network, double length, double freespeed, double capacity, double lanes)
+	public MyLinkImpl(Id id, Node from, Node to, NetworkLayer network, double length, double freespeed, double capacity, double lanes)
 	{
 		super(id, from, to, network, length, freespeed, capacity, lanes);
 	}

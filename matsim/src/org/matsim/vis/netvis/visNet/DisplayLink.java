@@ -26,21 +26,23 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.vis.netvis.DisplayableLinkI;
 import org.matsim.vis.netvis.DrawableAgentI;
 import org.matsim.vis.netvis.drawableNet.DrawableLinkI;
+import org.matsim.world.Layer;
 
 /**
  * @author gunnar
  */
-public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLink {
+public class DisplayLink implements DisplayableLinkI, DrawableLinkI, Link {
 
-	private BasicNode fromNode;
-	private BasicNode toNode;
+	private Node fromNode;
+	private Node toNode;
 	public static final double LANE_WIDTH = 4.0;
 	private double length_m = 0;
 	private double lanes = 0;
@@ -148,21 +150,21 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLink {
 
 	// -------------------- IMPLEMENTATION OF BasicLinkI --------------------
 
-	public boolean setFromNode(BasicNode node) {
+	public boolean setFromNode(Node node) {
 		this.fromNode = node;
 		return true;
 	}
 
-	public boolean setToNode(BasicNode node) {
+	public boolean setToNode(Node node) {
 		this.toNode = node;
 		return true;
 	}
 
-	public BasicNode getFromNode() {
+	public Node getFromNode() {
 		return this.fromNode;
 	}
 
-	public BasicNode getToNode() {
+	public Node getToNode() {
 		return this.toNode;
 	}
 
@@ -243,9 +245,16 @@ public class DisplayLink implements DisplayableLinkI, DrawableLinkI, BasicLink {
 		this.agents = newAgents;
 	}
 
-
 	public Id getId() {
 		return this.id;
+	}
+
+	public Layer getLayer() {
+		throw new UnsupportedOperationException();
+	}
+
+	public Coord getCoord() {
+		throw new UnsupportedOperationException();
 	}
 
 }

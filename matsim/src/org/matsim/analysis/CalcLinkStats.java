@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -137,7 +137,7 @@ public class CalcLinkStats {
 		this.count = 0;
 
 		// initialize our data-table
-		for (BasicLink link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			LinkData data = new LinkData(new int[NOF_STATS][this.nofHours + 1], new double[NOF_STATS][this.nofHours]);
 			this.linkData.put(link.getId(), data);
 		}

@@ -65,8 +65,8 @@ public class LogicFactory{
 			
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
 				List<TransitRouteStop> logicTransitStops = new ArrayList<TransitRouteStop>();
-				NodeImpl lastLogicNode = null;
-				NodeImpl lastPlainNode=null;
+				Node lastLogicNode = null;
+				Node lastPlainNode=null;
 				boolean first=true;
 				
 				
@@ -86,7 +86,7 @@ public class LogicFactory{
 					
 					/**Creates nodes*/
 					//plain node
-					NodeImpl plainNode= createPlainNode(transitStopFacility);
+					Node plainNode= createPlainNode(transitStopFacility);
 					
 					//logicNode
 					Coord coord = transitStopFacility.getCoord();
@@ -224,9 +224,9 @@ public class LogicFactory{
 	}
 	
 	/**returns -or creates if does not exist- a plain link between two nodes*/
-	private Link createPlainLink(NodeImpl fromNode, NodeImpl toNode){
+	private Link createPlainLink(Node fromNode, Node toNode){
 		Link linkImpl = null;
-		if (!fromNode.getOutNodes().containsValue(toNode)){
+		if (!((NodeImpl) fromNode).getOutNodes().containsValue(toNode)){
 			double length= CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
 			linkImpl= plainNet.createAndAddLink(new IdImpl(newPlainLinkId++), fromNode, toNode, length, 1.0, 1.0 , 1);
 		}
@@ -242,8 +242,8 @@ public class LogicFactory{
 		return linkImpl;
 	}
 	
-	private NodeImpl createPlainNode(TransitStopFacility transitStopFacility){
-		NodeImpl plainNode = null;
+	private Node createPlainNode(TransitStopFacility transitStopFacility){
+		Node plainNode = null;
 		Id id = transitStopFacility.getId();
 		if (this.plainNet.getNodes().containsKey(id)){
 			plainNode = plainNet.getNode(id);

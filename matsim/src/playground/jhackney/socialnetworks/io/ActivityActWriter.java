@@ -55,7 +55,7 @@ public class ActivityActWriter {
 
 				for (int j=0;j<actsLegs.size()+1;j=j+2){
 					ActivityImpl myAct= (ActivityImpl) actsLegs.get(j);
-					ActivityOption myActivity=myAct.getFacility().getActivityOption(myAct.getType());
+					ActivityOption myActivity=myAct.getFacility().getActivityOptions().get(myAct.getType());
 //					System.out.println(" AAW DEBUG J=: "+j);
 					try {
 						out.write(iter+" "+myPerson.getId()+" "+myActivity.getFacility().getId()+" "+myActivity.getType());

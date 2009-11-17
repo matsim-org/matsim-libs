@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -67,7 +68,7 @@ public class PlansPrepare {
 	}
 
 	public void createDilutedPlans(final CoordImpl center, final double radius, final String fromFile, final String toFile) {
-		final Map<Id, LinkImpl> areaOfInterest = new HashMap<Id, LinkImpl>();
+		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 
 		NetworkLayer network = this.scenario.getNetwork();
 

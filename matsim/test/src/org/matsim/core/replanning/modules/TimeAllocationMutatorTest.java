@@ -21,16 +21,14 @@
 package org.matsim.core.replanning.modules;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
@@ -104,11 +102,11 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		// setup network
 		NetworkLayer network = new NetworkLayer();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
-		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(200, 0));
-		NodeImpl node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(300, 0));
-		LinkImpl link1 = network.createAndAddLink(new IdImpl("0"), node1, node2, 100, 5, 100, 1);
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
+		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(200, 0));
+		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(300, 0));
+		Link link1 = network.createAndAddLink(new IdImpl("0"), node1, node2, 100, 5, 100, 1);
 		network.createAndAddLink(new IdImpl("1"), node2, node3, 100, 5, 100, 1);
 		network.createAndAddLink(new IdImpl("2"), node3, node4, 100, 5, 100, 1);
 

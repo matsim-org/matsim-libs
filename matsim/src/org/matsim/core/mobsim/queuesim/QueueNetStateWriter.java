@@ -22,8 +22,8 @@ package org.matsim.core.mobsim.queuesim;
 
 import java.util.Collection;
 
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.vis.netvis.DisplayNetStateWriter;
 import org.matsim.vis.netvis.VisConfig;
 
@@ -39,26 +39,26 @@ import org.matsim.vis.netvis.VisConfig;
 	private final QueueNetwork queueNetwork;
 
     @Override
-    protected Collection<org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink> getAgentsOnLink(final BasicLink link) {
+    protected Collection<org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink> getAgentsOnLink(final Link link) {
     		QueueLink qlink = this.queueNetwork.getQueueLink(link.getId());
         return qlink.getVisData().getDrawableCollection();
     }
 
-    public QueueNetStateWriter(final QueueNetwork queueNetwork, final BasicNetwork network, final String networkFileName,
+    public QueueNetStateWriter(final QueueNetwork queueNetwork, final Network network, final String networkFileName,
     		final VisConfig visConfig, final String filePrefix, final int timeStepLength_s, final int bufferSize) {
         super(network, networkFileName, visConfig, filePrefix, timeStepLength_s, bufferSize);
         this.queueNetwork = queueNetwork;
     }
 
     @Override
-    protected double getLinkDisplValue(final BasicLink link, final int index) {
+    protected double getLinkDisplValue(final Link link, final int index) {
         QueueLink mylink = this.queueNetwork.getQueueLink(link.getId());
         double value = writeSpaceCap ? mylink.getVisData().getDisplayableSpaceCapValue() : mylink.getVisData().getDisplayableTimeCapValue();
         return value;
     }
 
     @Override
-    protected String getLinkDisplLabel(final BasicLink link) {
+    protected String getLinkDisplLabel(final Link link) {
         return link.getId().toString();
     }
 

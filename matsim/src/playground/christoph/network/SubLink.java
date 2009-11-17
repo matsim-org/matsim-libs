@@ -5,8 +5,6 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -83,9 +81,9 @@ public class SubLink implements Link{
 		// nothing to do...
 	}
 
-	public boolean setFromNode(BasicNode node)
+	public boolean setFromNode(Node node)
 	{
-		this.from = (Node)node;
+		this.from = node;
 		return true;
 	}
 
@@ -99,9 +97,9 @@ public class SubLink implements Link{
 		// nothing to do...
 	}
 
-	public boolean setToNode(BasicNode node)
+	public boolean setToNode(Node node)
 	{
-		this.to = (Node)node;
+		this.to = node;
 		return true;
 	}
 

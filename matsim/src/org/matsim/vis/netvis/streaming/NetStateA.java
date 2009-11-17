@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.vis.netvis.config.IndexationConfig;
 
 /**
@@ -60,13 +60,13 @@ public abstract class NetStateA implements StateI {
 
         states = new ArrayList<BufferedStateA>();
 
-        for (BasicNode node : indexConfig.getIndexedNodeView())
+        for (Node node : indexConfig.getIndexedNodeView())
             if (node != null)
                 states.add(newNodeState(node));
             else
                 states.add(null);
 
-        for (BasicLink link : indexConfig.getIndexedLinkView())
+        for (Link link : indexConfig.getIndexedLinkView())
             if (link != null)
                 states.add(newLinkState(link));
             else
@@ -87,9 +87,9 @@ public abstract class NetStateA implements StateI {
 
     // -------------------- INTERFACE DEFINITION --------------------
 
-    protected abstract BufferedStateA newNodeState(BasicNode node);
+    protected abstract BufferedStateA newNodeState(Node node);
 
-    protected abstract BufferedStateA newLinkState(BasicLink link);
+    protected abstract BufferedStateA newLinkState(Link link);
 
     // --------------------- IMPLEMENTATION OF BasicStateI ---------------------
 

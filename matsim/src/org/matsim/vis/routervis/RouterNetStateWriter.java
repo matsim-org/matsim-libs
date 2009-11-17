@@ -23,8 +23,8 @@ package org.matsim.vis.routervis;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNetwork;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.vis.netvis.DisplayNetStateWriter;
 import org.matsim.vis.netvis.VisConfig;
 
@@ -36,7 +36,7 @@ public class RouterNetStateWriter extends DisplayNetStateWriter {
 	//holds the information of the links explored so far
 	private HashMap<Id,LinkAttribute> linkStates;
 
-	public RouterNetStateWriter(BasicNetwork network, String networkFileName, VisConfig visConfig, String filePrefix, int timeStepLength_s, int bufferSize) {
+	public RouterNetStateWriter(Network network, String networkFileName, VisConfig visConfig, String filePrefix, int timeStepLength_s, int bufferSize) {
 		super(network,networkFileName,visConfig,filePrefix,timeStepLength_s,bufferSize);
 
 		this.linkStates = new HashMap<Id,LinkAttribute>();
@@ -78,7 +78,7 @@ public class RouterNetStateWriter extends DisplayNetStateWriter {
 	//NetStateWriter Stuff
 	///////////////////////////////////////////////////////////////
 	@Override
-	protected double getLinkDisplValue(final BasicLink link, final int index) {
+	protected double getLinkDisplValue(final Link link, final int index) {
 		LinkAttribute attrib = linkStates.get(link.getId());
 		if (attrib == null) {
 			return 0;
@@ -87,7 +87,7 @@ public class RouterNetStateWriter extends DisplayNetStateWriter {
 	}
 
 	@Override
-	protected String getLinkDisplLabel(final BasicLink link) {
+	protected String getLinkDisplLabel(final Link link) {
 		LinkAttribute attrib = linkStates.get(link.getId());
 		if (attrib == null) {
 			return "null";

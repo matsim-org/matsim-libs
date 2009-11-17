@@ -22,14 +22,14 @@ package org.matsim.integration.replanning;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -58,9 +58,9 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 		// setup network
 		NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
-		LinkImpl link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10, 3600, 1);
+		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
+		Link link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10, 3600, 1);
 
 		// setup population with one person
 		PopulationImpl population = scenario.getPopulation();

@@ -91,9 +91,9 @@ public double computePotential(ArrayList<Integer> solution){
         double pers_likelihood = 0.0D;
         double dist1 = 0.0D;
         
-        if (((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility().calcDistance(coord) == 0.0D) dist1 = 10.0D;
+        if (((ActivityFacilityImpl) ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility()).calcDistance(coord) == 0.0D) dist1 = 10.0D;
         else {
-          dist1 = ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility().calcDistance(coord);
+          dist1 = ((ActivityFacilityImpl) ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility()).calcDistance(coord);
         }
         pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(c.getActivityOption("shop").getCapacity().doubleValue(), this.betas[1]);
         
@@ -110,11 +110,11 @@ public double computePotential(ArrayList<Integer> solution){
 		            int index = count;
 		            Coord coord1 = this.controler.getNetwork().getLink(this.first.get(solution.get(index))).getCoord();
 		            
-		            if (((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility().calcDistance(coord1) == 0.0D) {
+		            if (((ActivityFacilityImpl) ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility()).calcDistance(coord1) == 0.0D) {
 		            	dist = 10.0D;
 		            }
 		            else {
-		              dist = ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility().calcDistance(coord1);
+		              dist = ((ActivityFacilityImpl) ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility()).calcDistance(coord1);
 		            }
 		
 		          }

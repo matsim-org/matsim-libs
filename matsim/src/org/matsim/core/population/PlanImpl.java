@@ -26,13 +26,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.misc.Time;
 
 public class PlanImpl implements Plan {
@@ -78,7 +78,7 @@ public class PlanImpl implements Plan {
 		return a;
 	}
 
-	public final ActivityImpl createAndAddActivity(final String type, final ActivityFacilityImpl fac) {
+	public final ActivityImpl createAndAddActivity(final String type, final ActivityFacility fac) {
 		verifyCreateAct();
 		ActivityImpl a = new ActivityImpl(type, fac);
 		getPlanElements().add(a);
@@ -86,7 +86,7 @@ public class PlanImpl implements Plan {
 	}
 
 
-	public final ActivityImpl createAndAddActivity(final String type, final LinkImpl link) {
+	public final ActivityImpl createAndAddActivity(final String type, final Link link) {
 		verifyCreateAct();
 		ActivityImpl a = new ActivityImpl(type, link);
 		getPlanElements().add(a);

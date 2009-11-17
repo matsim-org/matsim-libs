@@ -2,10 +2,10 @@ package org.matsim.vis.netvis;
 
 import java.awt.geom.AffineTransform;
 
-import org.matsim.api.basic.v01.network.BasicLink;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.vis.netvis.drawableNet.DrawableLinkI;
 
-public interface DisplayableLinkI extends DrawableLinkI, BasicLink {
+public interface DisplayableLinkI extends DrawableLinkI, Link {
 
 	public double getStartEasting();
 

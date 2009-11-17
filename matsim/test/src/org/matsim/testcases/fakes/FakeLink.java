@@ -26,7 +26,6 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.world.Layer;
@@ -105,7 +104,7 @@ public class FakeLink implements Link {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean setFromNode(final BasicNode node) {
+	public boolean setFromNode(final Node node) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -117,7 +116,7 @@ public class FakeLink implements Link {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean setToNode(final BasicNode node) {
+	public boolean setToNode(final Node node) {
 		throw new UnsupportedOperationException();
 	}
 

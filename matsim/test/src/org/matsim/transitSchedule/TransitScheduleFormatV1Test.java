@@ -28,10 +28,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -60,15 +59,15 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 	public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
 		// prepare required data
 		NetworkLayer network = new NetworkLayer();
-		NodeImpl n1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl n2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(0, 0));
-		NodeImpl n3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(0, 0));
-		NodeImpl n4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(0, 0));
-		NodeImpl n5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(0, 0));
-		LinkImpl l1 = network.createAndAddLink(new IdImpl("1"), n1, n2, 1000, 10, 3600, 1.0);
-		LinkImpl l2 = network.createAndAddLink(new IdImpl("2"), n2, n3, 1000, 10, 3600, 1.0);
-		LinkImpl l3 = network.createAndAddLink(new IdImpl("3"), n3, n4, 1000, 10, 3600, 1.0);
-		LinkImpl l4 = network.createAndAddLink(new IdImpl("4"), n4, n5, 1000, 10, 3600, 1.0);
+		Node n1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node n2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(0, 0));
+		Node n3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(0, 0));
+		Node n4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(0, 0));
+		Node n5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(0, 0));
+		Link l1 = network.createAndAddLink(new IdImpl("1"), n1, n2, 1000, 10, 3600, 1.0);
+		Link l2 = network.createAndAddLink(new IdImpl("2"), n2, n3, 1000, 10, 3600, 1.0);
+		Link l3 = network.createAndAddLink(new IdImpl("3"), n3, n4, 1000, 10, 3600, 1.0);
+		Link l4 = network.createAndAddLink(new IdImpl("4"), n4, n5, 1000, 10, 3600, 1.0);
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule1 = builder.createTransitSchedule();

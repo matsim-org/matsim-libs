@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -35,7 +36,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
@@ -56,9 +56,9 @@ public class TransitAgentTest extends TestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 
 		NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
-		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
+		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));
 		network.createAndAddLink(new IdImpl("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
 		network.createAndAddLink(new IdImpl("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
 
@@ -96,9 +96,9 @@ public class TransitAgentTest extends TestCase {
 		ScenarioImpl scenario = new ScenarioImpl();
 
 		NetworkLayer network = scenario.getNetwork();
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
-		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
+		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));
 		network.createAndAddLink(new IdImpl("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
 		network.createAndAddLink(new IdImpl("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
 

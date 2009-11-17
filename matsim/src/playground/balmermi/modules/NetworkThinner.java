@@ -49,10 +49,10 @@ public class NetworkThinner {
 		for (Link l : list) { network.removeLink(l); }
 		// add a new link
 		double length = 0.0; for (Link l : list) { length += l.getLength(); }
-		LinkImpl newLink = network.createAndAddLink(first.getId(),fromNode,toNode,length,first.getFreespeed(Time.UNDEFINED_TIME),first.getCapacity(Time.UNDEFINED_TIME),first.getNumberOfLanes(Time.UNDEFINED_TIME));
-		newLink.setType(((LinkImpl) first).getType());
+		Link newLink = network.createAndAddLink(first.getId(),fromNode,toNode,length,first.getFreespeed(Time.UNDEFINED_TIME),first.getCapacity(Time.UNDEFINED_TIME),first.getNumberOfLanes(Time.UNDEFINED_TIME));
+		((LinkImpl) newLink).setType(((LinkImpl) first).getType());
 		// always assign the origId of the first link (for convenience)
-		newLink.setOrigId(((LinkImpl) first).getOrigId());
+		((LinkImpl) newLink).setOrigId(((LinkImpl) first).getOrigId());
 		
 		// mapping info
 		for (Link l : list) { log.info("    mapping: "+l.getId()+" => "+newLink.getId()); }

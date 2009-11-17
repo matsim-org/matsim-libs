@@ -32,11 +32,9 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
@@ -45,6 +43,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Counter;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * Reads in an OSM-File, exported from <a href="http://openstreetmap.org/" target="_blank">OpenStreetMap</a>,
@@ -446,13 +446,13 @@ public class OsmNetworkReader {
 		if(network.getNode(fromNode.id) != null && network.getNode(toNode.id) != null){
 		
 			if (!onewayReverse) {
-				LinkImpl l = network.createAndAddLink(new IdImpl(this.id), network.getNode(fromNode.id), network.getNode(toNode.id), length, freespeed, capacity, nofLanes);
-				l.setOrigId(origId);
+				Link l = network.createAndAddLink(new IdImpl(this.id), network.getNode(fromNode.id), network.getNode(toNode.id), length, freespeed, capacity, nofLanes);
+				((LinkImpl) l).setOrigId(origId);
 				this.id++;
 			}
 			if (!oneway) {
-				LinkImpl l = network.createAndAddLink(new IdImpl(this.id), network.getNode(toNode.id), network.getNode(fromNode.id), length, freespeed, capacity, nofLanes);
-				l.setOrigId(origId);
+				Link l = network.createAndAddLink(new IdImpl(this.id), network.getNode(toNode.id), network.getNode(fromNode.id), length, freespeed, capacity, nofLanes);
+				((LinkImpl) l).setOrigId(origId);
 				this.id++;
 			}
 		

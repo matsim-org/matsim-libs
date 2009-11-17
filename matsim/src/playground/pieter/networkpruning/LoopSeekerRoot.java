@@ -36,7 +36,7 @@ public class LoopSeekerRoot extends LoopSeekerNode{
 		makeOffspring();
 	}
 
-	public void weldLinks(NodeImpl centroidNode) {
+	public void weldLinks(Node centroidNode) {
 		// welds inlinks and outlinks to said Node
 		Iterator<Link> inLinkIt = inWelds.iterator();
 		Iterator<Link> outLinkIt = outWelds.iterator();

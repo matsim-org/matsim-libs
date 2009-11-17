@@ -46,7 +46,7 @@ public class EventSocScoringFunction implements ScoringFunction{
 	private final ScoringFunction scoringFunction;
 	private final Plan plan;
 //	private final TrackEventsOverlap teo;
-	private final LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats;
+	private final LinkedHashMap<Activity,ArrayList<Double>> actStats;
 	private final String factype;
 
 	private double friendFoeRatio=0.;
@@ -60,7 +60,7 @@ public class EventSocScoringFunction implements ScoringFunction{
 	private double betaLogNFriends= Double.parseDouble(socnetConfig.getBeta3());
 	private double betaTimeWithFriends= Double.parseDouble(socnetConfig.getBeta4());
 
-	public EventSocScoringFunction(final Plan plan, final ScoringFunction scoringFunction, String factype, final LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats) {
+	public EventSocScoringFunction(final Plan plan, final ScoringFunction scoringFunction, String factype, final LinkedHashMap<Activity,ArrayList<Double>> actStats) {
 //		this.paidToll = paidToll;
 		this.scoringFunction = scoringFunction;
 		this.plan = plan;

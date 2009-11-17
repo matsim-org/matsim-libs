@@ -25,13 +25,8 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkChangeEventsParser;
-import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
@@ -45,9 +40,9 @@ public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{
 		NetworkFactoryImpl nf = new NetworkFactoryImpl();
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		final NetworkLayer network = new NetworkLayer(nf);
-		NodeImpl node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		NodeImpl node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(0, 1000));
-		NodeImpl node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1000, 2000));
+		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(0, 1000));
+		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1000, 2000));
 		network.createAndAddLink(new IdImpl("1"), node1, node2, 1000, 1.667, 3600, 1);
 		network.createAndAddLink(new IdImpl("2"), node2, node3, 1500, 1.667, 3600, 1);
 

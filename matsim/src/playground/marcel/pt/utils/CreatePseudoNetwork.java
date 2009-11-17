@@ -31,10 +31,9 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.collections.Tuple;
@@ -60,10 +59,10 @@ public class CreatePseudoNetwork {
 	private final NetworkLayer network;
 	private final String prefix;
 
-	private final Map<Tuple<NodeImpl, NodeImpl>, LinkImpl> links = new HashMap<Tuple<NodeImpl, NodeImpl>, LinkImpl>();
-	private final Map<Tuple<NodeImpl, NodeImpl>, TransitStopFacility> stopFacilities = new HashMap<Tuple<NodeImpl, NodeImpl>, TransitStopFacility>();
-	private final Map<TransitStopFacility, NodeImpl> nodes = new HashMap<TransitStopFacility, NodeImpl>();
-	private final Map<TransitStopFacility, NodeImpl> startNodes = new HashMap<TransitStopFacility, NodeImpl>();
+	private final Map<Tuple<Node, Node>, Link> links = new HashMap<Tuple<Node, Node>, Link>();
+	private final Map<Tuple<Node, Node>, TransitStopFacility> stopFacilities = new HashMap<Tuple<Node, Node>, TransitStopFacility>();
+	private final Map<TransitStopFacility, Node> nodes = new HashMap<TransitStopFacility, Node>();
+	private final Map<TransitStopFacility, Node> startNodes = new HashMap<TransitStopFacility, Node>();
 	private final Map<TransitStopFacility, List<TransitStopFacility>> facilityCopies = new HashMap<TransitStopFacility, List<TransitStopFacility>>();
 
 	private long linkIdCounter = 0;
@@ -114,7 +113,7 @@ public class CreatePseudoNetwork {
 		TransitStopFacility fromFacility = (fromStop == null) ? null : fromStop.getStopFacility();
 		TransitStopFacility toFacility = toStop.getStopFacility();
 
-		NodeImpl fromNode;
+		Node fromNode;
 		if (fromStop == null) {
 			fromNode = this.startNodes.get(toFacility);
 			if (fromNode == null) {
@@ -129,14 +128,14 @@ public class CreatePseudoNetwork {
 			fromNode = this.network.createAndAddNode(new IdImpl(this.prefix + this.nodeIdCounter++), fromFacility.getCoord());
 			this.nodes.put(fromFacility, fromNode);
 		}
-		NodeImpl toNode = this.nodes.get(toFacility);
+		Node toNode = this.nodes.get(toFacility);
 		if (toNode == null) {
 			toNode = this.network.createAndAddNode(new IdImpl(this.prefix + this.nodeIdCounter++), toFacility.getCoord());
 			this.nodes.put(toFacility, toNode);
 		}
 
-		Tuple<NodeImpl, NodeImpl> connection = new Tuple<NodeImpl, NodeImpl>(fromNode, toNode);
-		LinkImpl link = this.links.get(connection);
+		Tuple<Node, Node> connection = new Tuple<Node, Node>(fromNode, toNode);
+		Link link = this.links.get(connection);
 		if (link == null) {
 			link = this.network.createAndAddLink(new IdImpl(this.prefix + this.linkIdCounter++), fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()), 30.0 / 3.6, 500, 1);
 			link.setAllowedModes(this.transitModes);
@@ -167,9 +166,9 @@ public class CreatePseudoNetwork {
 	}
 
 	public Link getLinkBetweenStops(final TransitStopFacility fromStop, final TransitStopFacility toStop) {
-		NodeImpl fromNode = this.nodes.get(fromStop);
-		NodeImpl toNode = this.nodes.get(toStop);
-		Tuple<NodeImpl, NodeImpl> connection = new Tuple<NodeImpl, NodeImpl>(fromNode, toNode);
+		Node fromNode = this.nodes.get(fromStop);
+		Node toNode = this.nodes.get(toStop);
+		Tuple<Node, Node> connection = new Tuple<Node, Node>(fromNode, toNode);
 		return this.links.get(connection);
 	}
 

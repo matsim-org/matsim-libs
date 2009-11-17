@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
@@ -89,7 +88,7 @@ public class MappingLinkImpl extends MappingLink {
 		
 	}
 
-	public boolean setFromNode(BasicNode node) {
+	public boolean setFromNode(Node node) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -104,7 +103,7 @@ public class MappingLinkImpl extends MappingLink {
 		
 	}
 
-	public boolean setToNode(BasicNode node) {
+	public boolean setToNode(Node node) {
 		// TODO Auto-generated method stub
 		return false;
 	}

@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -55,7 +56,7 @@ public class CharyparNagelOpenTimesScoringFunction extends ActivityScoringFuncti
 
 		boolean foundAct = false;
 
-		ActivityFacilityImpl facility = act.getFacility();
+		ActivityFacility facility = act.getFacility();
 		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
 		String facilityActType = null;
 		Set<BasicOpeningTime> opentimes = null;
@@ -69,9 +70,9 @@ public class CharyparNagelOpenTimesScoringFunction extends ActivityScoringFuncti
 				// choose appropriate opentime:
 				// either wed or wkday
 				// if none is given, use undefined opentimes
-				opentimes = facility.getActivityOption(facilityActType).getOpeningTimes(DayType.wed);
+				opentimes = ((ActivityFacilityImpl) facility).getActivityOption(facilityActType).getOpeningTimes(DayType.wed);
 				if (opentimes == null) {
-					opentimes = facility.getActivityOption(facilityActType).getOpeningTimes(DayType.wkday);
+					opentimes = ((ActivityFacilityImpl) facility).getActivityOption(facilityActType).getOpeningTimes(DayType.wkday);
 				}
 				if (opentimes != null) {
 					// ignoring lunch breaks with the following procedure:

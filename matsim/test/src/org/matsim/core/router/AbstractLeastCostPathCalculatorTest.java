@@ -26,10 +26,11 @@ import java.util.EnumSet;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -306,8 +307,8 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 	 */
 	private static class MultiModeFixture {
 		/*package*/ final NetworkLayer network = new NetworkLayer();
-		/*package*/ final NodeImpl[] nodes = new NodeImpl[8];
-		/*package*/ final LinkImpl[] links = new LinkImpl[12];
+		/*package*/ final Node[] nodes = new NodeImpl[8];
+		/*package*/ final Link[] links = new LinkImpl[12];
 
 		public MultiModeFixture() {
 			this.network.setCapacityPeriod(3600.0);

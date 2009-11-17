@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
@@ -43,9 +43,9 @@ import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
  */
 public class TrackEventsOverlap implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	LinkedHashMap<ActivityFacilityImpl,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<ActivityFacilityImpl,ArrayList<TimeWindow>>();
-	LinkedHashMap<ActivityImpl,Double> startMap = new LinkedHashMap<ActivityImpl,Double>();
-	LinkedHashMap<ActivityImpl,Double> endMap = new LinkedHashMap<ActivityImpl,Double>();
+	LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>>();
+	LinkedHashMap<Activity,Double> startMap = new LinkedHashMap<Activity,Double>();
+	LinkedHashMap<Activity,Double> endMap = new LinkedHashMap<Activity,Double>();
 
 	static final private Logger log = Logger.getLogger(TrackEventsOverlap.class);
 
@@ -69,7 +69,7 @@ public class TrackEventsOverlap implements ActivityStartEventHandler, ActivityEn
 		if(eventStartTime>0){// if a valid start event is found, make a timeWindow and add to Map
 			PersonImpl agent = event.getPerson();
 
-			ActivityFacilityImpl facility = event.getAct().getFacility();
+			ActivityFacility facility = event.getAct().getFacility();
 			if(this.timeWindowMap.containsKey(facility)){
 				ArrayList<TimeWindow> windowList=timeWindowMap.get(facility);
 				windowList.add(new TimeWindow(eventStartTime,eventEndTime, agent, event.getAct()));
@@ -98,7 +98,7 @@ public class TrackEventsOverlap implements ActivityStartEventHandler, ActivityEn
 		if(eventEndTime>0){// if a valid end time is found, make a timeWindow and add to Map
 			PersonImpl agent = event.getPerson();
 
-			ActivityFacilityImpl facility = event.getAct().getFacility();
+			ActivityFacility facility = event.getAct().getFacility();
 			if(this.timeWindowMap.containsKey(facility)){
 				ArrayList<TimeWindow> windowList=timeWindowMap.get(facility);
 				windowList.add(new TimeWindow(eventStartTime,eventEndTime, agent, event.getAct()));
@@ -123,7 +123,7 @@ public class TrackEventsOverlap implements ActivityStartEventHandler, ActivityEn
 		this.timeWindowMap.clear();
 	}
 
-	public LinkedHashMap<ActivityFacilityImpl,ArrayList<TimeWindow>> getTimeWindowMap(){
+	public LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> getTimeWindowMap(){
 		return this.timeWindowMap;
 	}
 

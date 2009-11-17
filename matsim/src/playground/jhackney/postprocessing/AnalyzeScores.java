@@ -22,13 +22,13 @@ package playground.jhackney.postprocessing;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
@@ -92,8 +92,8 @@ public class AnalyzeScores {
 		EventsManagerImpl events = new EventsManagerImpl();
 		EventsMapStartEndTimes epp;
 		MakeTimeWindowsFromEvents teo=null;
-		LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats=null;
-		LinkedHashMap<ActivityFacilityImpl,ArrayList<TimeWindow>> twm=null;
+		LinkedHashMap<Activity,ArrayList<Double>> actStats=null;
+		LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> twm=null;
 		playground.jhackney.scoring.EventsToScoreAndReport scoring =null;
 //		EventsToScore scoring=null;
 		

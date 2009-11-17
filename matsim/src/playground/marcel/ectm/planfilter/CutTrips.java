@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -39,9 +38,9 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 public class CutTrips implements PersonAlgorithm {
 
 	private final PersonAlgorithm nextAlgorithm;
-	private final Map<Id, LinkImpl> aoi;
+	private final Map<Id, Link> aoi;
 
-	public CutTrips(final PersonAlgorithm nextAlgorithm, final Map<Id, LinkImpl> aoi) {
+	public CutTrips(final PersonAlgorithm nextAlgorithm, final Map<Id, Link> aoi) {
 		this.nextAlgorithm = nextAlgorithm;
 		this.aoi = aoi;
 	}

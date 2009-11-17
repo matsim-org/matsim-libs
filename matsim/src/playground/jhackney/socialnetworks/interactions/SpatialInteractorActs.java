@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -129,7 +130,7 @@ public class SpatialInteractorActs {
 			for (PlanElement pe : plan1.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act1 = (ActivityImpl) pe;
-					ActivityOption activity1=act1.getFacility().getActivityOption(act1.getType());
+					ActivityOption activity1=((ActivityFacilityImpl) act1.getFacility()).getActivityOption(act1.getType());
 					ArrayList<Person> actList=new ArrayList<Person>();
 					
 					if(!activityMap.keySet().contains(activity1)){

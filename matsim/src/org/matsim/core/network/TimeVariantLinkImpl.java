@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicNode;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
 /**
@@ -38,33 +38,25 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	
 	private TreeMap<Double,NetworkChangeEvent> changeEvents;
 	
-	
-	
 	private int aFreespeedEvents = 1;
-	private double [] aFreespeedValues;
-	private double [] aFreespeedTimes;
+	private double[] aFreespeedValues;
+	private double[] aFreespeedTimes;
 	
 	private int aFlowCapacityEvents = 1;
-	private double [] aFlowCapacityValues;
-	private double [] aFlowCapacityTimes;
-	
-	
+	private double[] aFlowCapacityValues;
+	private double[] aFlowCapacityTimes;
 	
 	private int aLanesEvents = 1;
-	private double [] aLanesValues;
-	private double [] aLanesTimes;
+	private double[] aLanesValues;
+	private double[] aLanesTimes;
 	
-	
-	
-
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public TimeVariantLinkImpl(final Id id, final BasicNode from, final BasicNode to, final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
+	public TimeVariantLinkImpl(final Id id, final Node from, final Node to, final NetworkLayer network, final double length, final double freespeed, final double capacity, final double lanes) {
 		super(id, from, to, network, length, freespeed, capacity, lanes);
 	}
 

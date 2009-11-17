@@ -24,11 +24,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.network.BasicLink;
-import org.matsim.api.basic.v01.network.BasicNetwork;
-import org.matsim.api.basic.v01.network.BasicNode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -41,7 +40,7 @@ import org.matsim.vis.netvis.DisplayableNetI;
  * @author gunnar
  *
  */
-public class DisplayNet implements BasicNetwork, DisplayableNetI {
+public class DisplayNet implements Network, DisplayableNetI {
 
 	// -------------------- MEMBER VARIABLES --------------------
 
@@ -59,26 +58,26 @@ public class DisplayNet implements BasicNetwork, DisplayableNetI {
 	public DisplayNet(final NetworkLayer layer) {
 		this.capacityPeriod = layer.getCapacityPeriod();
 		// first create nodes
-		for (BasicNode node : layer.getNodes().values()) {
+		for (Node node : layer.getNodes().values()) {
 			DisplayNode node2 = new DisplayNode(node.getId(), this);
 			node2.setCoord(((NodeImpl) node).getCoord());
 			this.nodes.put(node2.getId(), node2);
 		}
 
 		// second, create links
-		for (BasicLink link : layer.getLinks().values()) {
+		for (Link link : layer.getLinks().values()) {
 			DisplayLink link2 = new DisplayLink(link.getId(), this);
 
-			BasicNode from = this.getNodes().get(link.getFromNode().getId());
+			Node from = this.getNodes().get(link.getFromNode().getId());
 			from.addOutLink(link2);
 			link2.setFromNode(from);
 
-			BasicNode to = this.getNodes().get(link.getToNode().getId());
+			Node to = this.getNodes().get(link.getToNode().getId());
 			to.addInLink(link2);
 			link2.setToNode(to);
 
 			link2.setLength_m(((LinkImpl) link).getLength());
-			link2.setNumberOfLanes(NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, (Link) link));
+			link2.setNumberOfLanes(NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 
 			this.links.put(link2.getId(), link2);
 		}
@@ -145,6 +144,12 @@ public class DisplayNet implements BasicNetwork, DisplayableNetI {
 		throw new UnsupportedOperationException("Not available in this class");
 	}
 
+	public void addLink(Link ll) {
+		throw new UnsupportedOperationException();
+	}
 
+	public void addNode(Node nn) {
+		throw new UnsupportedOperationException();
+	}
 
 }

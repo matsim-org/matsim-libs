@@ -28,7 +28,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -51,11 +50,11 @@ import org.matsim.world.WorldUtils;
  */
 public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 
-	private final Map<Id, LinkImpl> areaOfInterest;
+	private final Map<Id, Link> areaOfInterest;
 	private Coord aoiCenter = null;
 	private double aoiRadius = 0.0;
 
-	public PersonIntersectAreaFilter(final PersonAlgorithm nextAlgorithm, final Map<Id, LinkImpl> areaOfInterest) {
+	public PersonIntersectAreaFilter(final PersonAlgorithm nextAlgorithm, final Map<Id, Link> areaOfInterest) {
 		this.nextAlgorithm = nextAlgorithm;
 		this.areaOfInterest = areaOfInterest;
 	}

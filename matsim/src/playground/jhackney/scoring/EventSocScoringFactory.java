@@ -3,8 +3,8 @@ package playground.jhackney.scoring;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 
@@ -13,10 +13,10 @@ public class EventSocScoringFactory implements ScoringFunctionFactory {
 
 	private String factype;
 //	private TrackEventsOverlap teo;
-	private LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats;
+	private LinkedHashMap<Activity,ArrayList<Double>> actStats;
 	private playground.jhackney.scoring.CharyparNagelScoringFunctionFactory factory;
 
-	public EventSocScoringFactory(String factype,LinkedHashMap<ActivityImpl,ArrayList<Double>> actStats) {
+	public EventSocScoringFactory(String factype,LinkedHashMap<Activity,ArrayList<Double>> actStats) {
 		this.factype=factype;
 		this.actStats=actStats;
 
