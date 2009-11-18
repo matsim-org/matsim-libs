@@ -48,6 +48,14 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+/**<p>
+ * This is, I think, a configurable wrapper/adapter class that essentially uses 
+ * <tt>(new DijkstraFactory()).createPathCalculator( costCalculator, timeCalculator )</tt> 
+ * to bundle costCalculator and timeCalculator with the Dijkstra s.p. algorithm into a MATSim Person/PlanAlgo.
+ * </p><p>
+ * Dijkstra can be replaced by something else by using the <tt>factory</tt> parameter.
+ * </p>
+ */
 public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private static final Logger log = Logger.getLogger(PlansCalcRoute.class);
