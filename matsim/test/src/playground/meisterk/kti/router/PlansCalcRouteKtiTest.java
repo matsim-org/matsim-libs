@@ -83,6 +83,44 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		
 	}
 
+	public void testHandleLeg() {
+		
+		double departureTime = Time.parseTime("06:00:00");
+		
+		PlansCalcRouteKti testee = new PlansCalcRouteKti(
+				config.plansCalcRoute(), 
+				network, 
+				null, 
+				null, 
+				new DijkstraFactory(), 
+				plansCalcRouteKtiInfo);
+		
+		
+		for (TransportMode mode : TransportMode.values()) {
+			
+			LegImpl leg = new LegImpl(mode);
+			ActivityImpl fromAct = new ActivityImpl("home", network.getLink("1"));
+			fromAct.setCoord(new CoordImpl(1050.0, 1050.0));
+			ActivityImpl toAct = new ActivityImpl("work", network.getLink("1"));
+			toAct.setCoord(new CoordImpl(1052.0, 1052.0));
+			
+			try {
+				double travelTime = testee.handleLeg(leg, fromAct, toAct, departureTime);
+				assertEquals("Wrong returned travel time for mode \"" + mode.toString() + "\".", 0.0, travelTime);
+				assertEquals("Wrong leg departure time for mode \"" + mode.toString() + "\".", departureTime, leg.getDepartureTime());
+				assertEquals("Wrong leg travel time for mode \"" + mode.toString() + "\".", 0.0, leg.getTravelTime());
+				assertEquals("Wrong leg arrival time for mode \"" + mode.toString() + "\".", departureTime, leg.getArrivalTime());
+				assertEquals("Wrong distance for mode \"" + mode.toString() + "\".", 0.0, leg.getRoute().getDistance());
+			} catch (RuntimeException e) {
+				System.out.println(e.toString());
+			}
+			
+		}
+		
+		
+		
+	}
+	
 	public void testHandleSwissPtLeg() {
 		
 		PersonImpl person = new PersonImpl(new IdImpl("123"));

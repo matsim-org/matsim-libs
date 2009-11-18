@@ -20,13 +20,16 @@
 
 package playground.meisterk.kti.router;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
@@ -37,16 +40,21 @@ import org.matsim.world.MappedLocation;
 
 
 /**
- * Special Routing Module for finding (more or less) realistic public transit travel times.
- * 
- * The travel time of a leg with mode 'pt' (meaning pseudo/public transport) 
- * is estimated by a municipality-to-municipality travel time matrix, plus walk-speed access to and egress from the next pt stop.
+ * Modifications of the roting module for the KTI project.
  * 
  * @author mrieser
+ * @author meisterk
  *
  */
 public class PlansCalcRouteKti extends PlansCalcRoute {
 
+	/**
+	 * Transport modes which are considered in the kti project.
+	 * 
+	 * Use this set to check whether the mode of a leg is allowed or not.
+	 */
+	public static final EnumSet<TransportMode> KTI_MODES = EnumSet.of(TransportMode.car, TransportMode.bike, TransportMode.pt, TransportMode.walk);
+	
 	private final NetworkLayer network;
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	
@@ -64,12 +72,50 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	
 	@Override
 	public double handleLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
-		if (TransportMode.pt.equals(leg.getMode())) {
-			return handleSwissPtLeg(fromAct, leg, toAct, depTime);
+
+		TransportMode mode = leg.getMode();
+		if (!KTI_MODES.contains(mode)) {
+			throw new RuntimeException("cannot handle legmode '" + mode.toString() + "'.");
 		}
-		return super.handleLeg(leg, fromAct, toAct, depTime);
+		
+		double travelTime = 0.0;
+		
+		Link fromLink = fromAct.getLink();
+		Link toLink = toAct.getLink();
+		if (fromLink.equals(toLink)) {
+			// create an empty route == staying on place if toLink == endLink
+			RouteWRefs route = this.getRouteFactory().createRoute(mode, fromLink, toLink);
+			route.setTravelTime(travelTime);
+			if (Double.isNaN(route.getDistance())) {
+				route.setDistance(0.0);
+			}
+			leg.setRoute(route);
+			leg.setDepartureTime(depTime);
+			leg.setTravelTime(travelTime);
+			leg.setArrivalTime(depTime + travelTime);
+		} else {
+			if (mode.equals(TransportMode.pt)) {
+				travelTime = handleSwissPtLeg(fromAct, leg, toAct, depTime);
+			} else {
+				travelTime = super.handleLeg(leg, fromAct, toAct, depTime);
+			}
+		}
+		
+		return travelTime;
 	}
 
+	/**
+	 * Make use of the Swiss National transport model to find more or less realistic travel times.
+	 * 
+	 * The travel time of a leg with mode 'pt' (meaning pseudo/public transport) 
+	 * is estimated by a municipality-to-municipality travel time matrix, plus walk-speed access to and egress from the next pt stop.
+	 * 
+	 * @param fromAct
+	 * @param leg
+	 * @param toAct
+	 * @param depTime
+	 * @return
+	 */
 	public double handleSwissPtLeg(final ActivityImpl fromAct, final LegImpl leg, final ActivityImpl toAct, final double depTime) {
 		
 		double travelTime = 0.0;
