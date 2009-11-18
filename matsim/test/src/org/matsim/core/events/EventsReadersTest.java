@@ -24,22 +24,22 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
@@ -47,9 +47,9 @@ import org.xml.sax.SAXException;
 public class EventsReadersTest extends MatsimTestCase {
 
 
-	static class TestHandler implements BasicActivityEndEventHandler, BasicAgentDepartureEventHandler, BasicAgentWait2LinkEventHandler,
-			BasicLinkLeaveEventHandler, BasicLinkEnterEventHandler, BasicAgentArrivalEventHandler, BasicActivityStartEventHandler,
-			BasicAgentStuckEventHandler {
+	static class TestHandler implements ActivityEndEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler,
+			LinkLeaveEventHandler, LinkEnterEventHandler, AgentArrivalEventHandler, ActivityStartEventHandler,
+			AgentStuckEventHandler {
 
 		public int eventCounter = 0;
 
@@ -57,7 +57,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			this.eventCounter = 0;
 		}
 
-		public void handleEvent(final BasicActivityEndEvent event) {
+		public void handleEvent(final ActivityEndEvent event) {
 			this.eventCounter++;
 			assertEquals("expected activity-End-Event to be event #1", 1, this.eventCounter);
 			assertEquals(21610.0, event.getTime(), 0.0);
@@ -65,7 +65,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals(new IdImpl("2"), event.getLinkId());
 		}
 
-		public void handleEvent(final BasicAgentDepartureEvent event) {
+		public void handleEvent(final AgentDepartureEvent event) {
 			this.eventCounter++;
 			assertEquals("expected agentDeparture-Event to be event #2", 2, this.eventCounter);
 			assertEquals(21620.0, event.getTime(), 0.0);
@@ -73,7 +73,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("3", event.getLinkId().toString());
 		}
 
-		public void handleEvent(final BasicAgentWait2LinkEvent event) {
+		public void handleEvent(final AgentWait2LinkEvent event) {
 			this.eventCounter++;
 			assertEquals("expected wait2link-Event to be event #3", 3, this.eventCounter);
 			assertEquals(21630.0, event.getTime(), 0.0);
@@ -81,7 +81,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("4", event.getLinkId().toString());
 		}
 
-		public void handleEvent(final BasicLinkLeaveEvent event) {
+		public void handleEvent(final LinkLeaveEvent event) {
 			this.eventCounter++;
 			assertEquals("expected linkleave-Event to be event #4", 4, this.eventCounter);
 			assertEquals(21640.0, event.getTime(), 0.0);
@@ -89,7 +89,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("5", event.getLinkId().toString());
 		}
 
-		public void handleEvent(final BasicLinkEnterEvent event) {
+		public void handleEvent(final LinkEnterEvent event) {
 			this.eventCounter++;
 			assertEquals("expected linkleave-Event to be event #5", 5, this.eventCounter);
 			assertEquals(21650.0, event.getTime(), 0.0);
@@ -97,7 +97,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("6", event.getLinkId().toString());
 		}
 
-		public void handleEvent(final BasicAgentArrivalEvent event) {
+		public void handleEvent(final AgentArrivalEvent event) {
 			this.eventCounter++;
 			assertEquals("expected agentArrival-Event to be event #6", 6, this.eventCounter);
 			assertEquals(21660.0, event.getTime(), 0.0);
@@ -105,7 +105,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("7", event.getLinkId().toString());
 		}
 
-		public void handleEvent(final BasicActivityStartEvent event) {
+		public void handleEvent(final ActivityStartEvent event) {
 			this.eventCounter++;
 			assertEquals("expected activityStart-Event to be event #7", 7, this.eventCounter);
 			assertEquals(21670.0, event.getTime(), 0.0);
@@ -113,7 +113,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals(new IdImpl("8"), event.getLinkId());
 		}
 
-		public void handleEvent(final BasicAgentStuckEvent event) {
+		public void handleEvent(final AgentStuckEvent event) {
 			this.eventCounter++;
 			assertEquals("expected agentStuck-Event to be event #8", 8, this.eventCounter);
 			assertEquals(21680.0, event.getTime(), 0.0);

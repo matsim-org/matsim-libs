@@ -27,15 +27,15 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -138,7 +138,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	 * 
 	 * @author mrieser
 	 */
-	private static class LinkAnalyzer implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler {
+	private static class LinkAnalyzer implements LinkEnterEventHandler, LinkLeaveEventHandler {
 		private final String linkId;
 		protected double firstCarEnter = Double.POSITIVE_INFINITY;
 		protected double lastCarEnter = Double.NEGATIVE_INFINITY;
@@ -171,7 +171,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			this.leaveTimes.clear();
 		}
 
-		public void handleEvent(final BasicLinkEnterEvent event) {
+		public void handleEvent(final LinkEnterEvent event) {
 			if (event.getLinkId().toString().equals(this.linkId)) {
 				this.enterTimes.add(Double.valueOf(event.getTime()));
 				if (event.getTime() < this.firstCarEnter) this.firstCarEnter = event.getTime();
@@ -179,7 +179,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			}
 		}
 
-		public void handleEvent(final BasicLinkLeaveEvent event) {
+		public void handleEvent(final LinkLeaveEvent event) {
 			if (event.getLinkId().toString().equals(this.linkId)) {
 				this.leaveTimes.add(Double.valueOf(event.getTime()));
 				if (event.getTime() < this.firstCarLeave) this.firstCarLeave = event.getTime();
@@ -466,7 +466,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	private static class BottleneckTravelTimeAnalyzer implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler {
+	private static class BottleneckTravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
 		private final HashMap<Id, Double> agentDepTimes = new HashMap<Id, Double>(); // <AgentId, Time>
 		private final HashSet<Id> agentSeen = new HashSet<Id>();
@@ -479,14 +479,14 @@ public class BetaTravelTest extends MatsimTestCase {
 			this.arrTimes = new double[popSize];
 		}
 
-		public void handleEvent(final BasicAgentDepartureEvent event) {
+		public void handleEvent(final AgentDepartureEvent event) {
 			if (!this.agentSeen.contains(event.getPersonId())) { // only store first departure
 				this.agentDepTimes.put(event.getPersonId(), Double.valueOf(event.getTime()));
 				this.agentSeen.add(event.getPersonId());
 			}
 		}
 
-		public void handleEvent(final BasicAgentArrivalEvent event) {
+		public void handleEvent(final AgentArrivalEvent event) {
 			Double depTime = this.agentDepTimes.remove(event.getPersonId());
 			if (depTime != null) {
 				this.depTimes[this.agentCounter] = depTime.doubleValue() / 3600.0;

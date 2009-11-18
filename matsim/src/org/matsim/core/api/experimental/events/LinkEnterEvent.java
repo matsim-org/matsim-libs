@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLinkEnterEvent.java
+ * LinkEnterEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,9 +20,7 @@
 
 package org.matsim.core.api.experimental.events;
 
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 
-
-public interface LinkEnterEvent extends BasicLinkEnterEvent {
+public interface LinkEnterEvent extends LinkEvent {
 
 }

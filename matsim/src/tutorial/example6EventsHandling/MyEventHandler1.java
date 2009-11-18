@@ -1,50 +1,50 @@
 package tutorial.example6EventsHandling;
 
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 /**
  * This event handler prints some event information to the console.
  * @author dgrether
  *
  */
-public class MyEventHandler1 implements BasicLinkEnterEventHandler,
-	BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler,
-	BasicAgentDepartureEventHandler{
+public class MyEventHandler1 implements LinkEnterEventHandler,
+	LinkLeaveEventHandler, AgentArrivalEventHandler,
+	AgentDepartureEventHandler{
 
 	public void reset(int iteration) {
 		System.out.println("reset...");
 	}
 
 
-	public void handleEvent(BasicLinkEnterEvent event) {
-		System.out.println("BasicLinkEnterEvent");
+	public void handleEvent(LinkEnterEvent event) {
+		System.out.println("LinkEnterEvent");
 		System.out.println("Time: " + event.getTime());
 		System.out.println("LinkId: " + event.getLinkId());
 		System.out.println("PersonId: " + event.getPersonId());
 	}
 
-	public void handleEvent(BasicLinkLeaveEvent event) {
-		System.out.println("BasicLinkLeaveEvent");
+	public void handleEvent(LinkLeaveEvent event) {
+		System.out.println("LinkLeaveEvent");
 		System.out.println("Time: " + event.getTime());
 		System.out.println("LinkId: " + event.getLinkId());
 		System.out.println("PersonId: " + event.getPersonId());
 	}
 
-	public void handleEvent(BasicAgentArrivalEvent event) {
-		System.out.println("BasicAgentArrivalEvent");
+	public void handleEvent(AgentArrivalEvent event) {
+		System.out.println("AgentArrivalEvent");
 		System.out.println("Time: " + event.getTime());
 		System.out.println("LinkId: " + event.getLinkId());
 		System.out.println("PersonId: " + event.getPersonId());
 	}
 
-	public void handleEvent(BasicAgentDepartureEvent event) {
-		System.out.println("BasicAgentDepartureEvent");
+	public void handleEvent(AgentDepartureEvent event) {
+		System.out.println("AgentDepartureEvent");
 		System.out.println("Time: " + event.getTime());
 		System.out.println("LinkId: " + event.getLinkId());
 		System.out.println("PersonId: " + event.getPersonId());

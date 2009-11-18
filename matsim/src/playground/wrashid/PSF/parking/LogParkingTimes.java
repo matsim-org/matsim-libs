@@ -3,20 +3,13 @@ package playground.wrashid.PSF.parking;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
-import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.events.handler.ActivityEndEventHandler;
-import org.matsim.core.events.handler.ActivityStartEventHandler;
+import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
+import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
 
-public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEventHandler {
+public class LogParkingTimes implements DeprecatedActivityStartEventHandler, DeprecatedActivityEndEventHandler {
 
 	Controler controler;
 	HashMap<Id, ParkingTimes> parkingTimes = new HashMap<Id, ParkingTimes>();

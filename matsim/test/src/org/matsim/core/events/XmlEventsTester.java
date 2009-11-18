@@ -25,7 +25,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.testcases.utils.EventsCollector;
 
@@ -47,7 +47,7 @@ public abstract class XmlEventsTester extends TestCase {
 	 * @param event the event to test
 	 * @return the read-in event
 	 */
-	public static <T extends BasicEventImpl> T testWriteReadXml(final String eventsFile, final T event) {
+	public static <T extends Event> T testWriteReadXml(final String eventsFile, final T event) {
 		EventWriterXML writer = new EventWriterXML(eventsFile);
 		writer.handleEvent(event);
 		writer.closeFile();
@@ -59,7 +59,7 @@ public abstract class XmlEventsTester extends TestCase {
 		new MatsimEventsReader(events).readFile(eventsFile);
 
 		assertEquals("there must be 1 event.", 1, collector.getEvents().size());
-		BasicEvent readEvent = collector.getEvents().iterator().next();
+		Event readEvent = collector.getEvents().iterator().next();
 		assertEquals("event has wrong class.", event.getClass(), readEvent.getClass());
 
 		Map<String, String> writtenAttributes = event.getAttributes();

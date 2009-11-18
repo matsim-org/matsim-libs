@@ -21,13 +21,12 @@
 package org.matsim.core.router;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -72,7 +71,6 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * The routing algorithm to be used for finding routes on the network with actual travel times.
 	 */
 	private final LeastCostPathCalculator routeAlgo;
-
 	/**
 	 * The routing algorithm to be used for finding pt routes, based on the empty network, with freeflow travel times.
 	 */
@@ -117,21 +115,17 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, 
 			final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
-
 		this.routeAlgo = factory.createPathCalculator(network, costCalculator, timeCalculator);
-
-		FreespeedTravelTimeCost ptTimeCostCalc = new FreespeedTravelTimeCost(-1.0, 0.0, 0.0);		
+		FreespeedTravelTimeCost ptTimeCostCalc = new FreespeedTravelTimeCost(-1.0, 0.0, 0.0);
 		this.routeAlgoPtFreeflow = factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
 
 		this.routeFactory = network.getFactory();
-
 		if (group != null) {
 			this.configGroup = group;
 		}
 		else {
 			log.warn(NO_CONFIGGROUP_SET_WARNING);
 		}
-
 	}
 	
 	/**

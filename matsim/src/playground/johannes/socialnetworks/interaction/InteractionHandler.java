@@ -34,8 +34,8 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.handler.ActivityEndEventHandler;
-import org.matsim.core.events.handler.ActivityStartEventHandler;
+import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
+import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -46,8 +46,8 @@ import org.matsim.core.utils.io.IOUtils;
  * @author illenberger
  *
  */
-public class InteractionHandler implements ActivityStartEventHandler,
-		ActivityEndEventHandler {
+public class InteractionHandler implements DeprecatedActivityStartEventHandler,
+DeprecatedActivityEndEventHandler {
 
 	private InteractionSelector selector;
 	

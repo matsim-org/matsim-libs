@@ -24,24 +24,24 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
@@ -53,9 +53,9 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-public class EventWriterTXT implements EventWriter, BasicActivityEndEventHandler, BasicActivityStartEventHandler, BasicAgentArrivalEventHandler, 
-		BasicAgentDepartureEventHandler, BasicAgentStuckEventHandler, BasicAgentMoneyEventHandler, 
-		BasicAgentWait2LinkEventHandler, BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler {
+public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, ActivityStartEventHandler, AgentArrivalEventHandler, 
+		AgentDepartureEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler, 
+		AgentWait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 	
 	/* Implement all the different event handlers by its own. Future event types will no longer be
 	 * suitable to be written to a TXT-format file, but will have additional attributes that need to be
@@ -153,39 +153,39 @@ public class EventWriterTXT implements EventWriter, BasicActivityEndEventHandler
 		return this.timeString;
 	}
 
-	public void handleEvent(BasicActivityEndEvent event) {
+	public void handleEvent(ActivityEndEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 8, ActivityEndEventImpl.EVENT_TYPE + " " + event.getActType());
 	}
 
-	public void handleEvent(BasicActivityStartEvent event) {
+	public void handleEvent(ActivityStartEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 7, ActivityStartEventImpl.EVENT_TYPE + " " + event.getActType());
 	}
 
-	public void handleEvent(BasicAgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 0, AgentArrivalEventImpl.EVENT_TYPE);
 	}
 
-	public void handleEvent(BasicAgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 6, AgentDepartureEventImpl.EVENT_TYPE);
 	}
 	
-	public void handleEvent(BasicAgentStuckEvent event) {
+	public void handleEvent(AgentStuckEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 3, AgentStuckEventImpl.EVENT_TYPE);
 	}
 
-	public void handleEvent(BasicAgentMoneyEvent event) {
+	public void handleEvent(AgentMoneyEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), null, 9, AgentMoneyEventImpl.EVENT_TYPE + "\t" + event.getAmount());
 	}
 
-	public void handleEvent(BasicAgentWait2LinkEvent event) {
+	public void handleEvent(AgentWait2LinkEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 4, AgentWait2LinkEventImpl.EVENT_TYPE);
 	}
 
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 5, LinkEnterEventImpl.EVENT_TYPE);
 	}
 
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 2, LinkLeaveEventImpl.EVENT_TYPE);
 	}
 }

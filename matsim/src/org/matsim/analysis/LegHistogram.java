@@ -39,12 +39,12 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -53,7 +53,7 @@ import org.matsim.core.utils.misc.Time;
  * Counts the number of vehicles departed, arrived or got stuck per time bin
  * based on events.
  */
-public class LegHistogram implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler, BasicAgentStuckEventHandler {
+public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
 
 	private int iteration = 0;
 	private final int binSize;
@@ -85,7 +85,7 @@ public class LegHistogram implements BasicAgentDepartureEventHandler, BasicAgent
 
 	/* Implementation of EventHandler-Interfaces */
 
-	public void handleEvent(final BasicAgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		int index = getBinIndex(event.getTime());
 		allModesData.countsDep[index]++;
 		if (event.getLegMode() != null) {
@@ -94,7 +94,7 @@ public class LegHistogram implements BasicAgentDepartureEventHandler, BasicAgent
 		}
 	}
 
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		int index = getBinIndex(event.getTime());
 		allModesData.countsArr[index]++;
 		if (event.getLegMode() != null) {
@@ -103,7 +103,7 @@ public class LegHistogram implements BasicAgentDepartureEventHandler, BasicAgent
 		}
 	}
 
-	public void handleEvent(final BasicAgentStuckEvent event) {
+	public void handleEvent(final AgentStuckEvent event) {
 		int index = getBinIndex(event.getTime());
 		allModesData.countsStuck[index]++;
 		if (event.getLegMode() != null) {

@@ -27,17 +27,17 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
-import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 
-public class ActTimesCollector implements BasicActivityStartEventHandler, BasicActivityEndEventHandler {
+public class ActTimesCollector implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private static final Logger log = Logger.getLogger(ActTimesCollector.class);
 	
@@ -57,7 +57,7 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 		population = null;
 	}
 	
-	public void handleEvent(BasicActivityStartEvent event) 
+	public void handleEvent(ActivityStartEvent event) 
 	{	
 		Id personId = event.getPersonId();
 		Id linkId = event.getLinkId();
@@ -112,7 +112,7 @@ public class ActTimesCollector implements BasicActivityStartEventHandler, BasicA
 		}
 	}
 
-	public void handleEvent(BasicActivityEndEvent event)
+	public void handleEvent(ActivityEndEvent event)
 	{
 		Id personId = event.getPersonId();
 		Id linkId = event.getLinkId();

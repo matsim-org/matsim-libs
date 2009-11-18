@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAgentMoneyEvent.java
+ * AgentMoneyEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,8 +20,8 @@
 
 package org.matsim.core.api.experimental.events;
 
-import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
+public interface AgentMoneyEvent extends PersonEvent {
 
-public interface AgentMoneyEvent extends BasicAgentMoneyEvent {
+	public double getAmount();
 
 }

@@ -33,7 +33,7 @@ public class MyStrategy extends PlanStrategy {
 		
 		addStrategyModule(mod) ;
 		
-//		BasicEvents events = sc.getEvents() ;
+//		Events events = sc.getEvents() ;
 //		events.addHandler( mod ) ;
 		// FIXME
 		

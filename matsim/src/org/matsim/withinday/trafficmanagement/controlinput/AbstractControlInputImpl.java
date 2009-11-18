@@ -29,16 +29,16 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
@@ -49,8 +49,8 @@ import org.matsim.withinday.trafficmanagement.ControlInput;
  *
  */
 public abstract class AbstractControlInputImpl implements ControlInput,
-		BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler,
-		BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler {
+		AgentDepartureEventHandler, AgentArrivalEventHandler,
+		LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	private static final Logger log = Logger
 			.getLogger(AbstractControlInputImpl.class);
@@ -234,7 +234,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 	}
 
 	// memorize linkEnterEvents on the first links of the two alternative routes:
-	public void handleEvent(final BasicLinkEnterEvent event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		// count the agents on the route links
 
 		if (event.getLinkId().equals(this.firstLinkOnMainRoute)) {
@@ -252,7 +252,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 
 	}
 
-	public void handleEvent(final BasicLinkLeaveEvent event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		// decrease current #agents
 		if (this.numberOfAgents.containsKey(event.getLinkId())) {
 			int number = this.numberOfAgents.get(event.getLinkId());
@@ -309,7 +309,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		}
 	}
 
-	public void handleEvent(final BasicAgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		// increase number of agents on the route links
 		if (this.numberOfAgents.containsKey(event.getLinkId())) {
 			int number = this.numberOfAgents.get(event.getLinkId());
@@ -318,7 +318,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		}
 	}
 
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		// decrease number of agents on the route links
 		if (this.numberOfAgents.containsKey(event.getLinkId())) {
 			int number = this.numberOfAgents.get(event.getLinkId());
@@ -356,7 +356,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		return naturalBottleNeck;
 	}
 
-	protected void updateFlow(final int flowResolution, final BasicLinkLeaveEvent event) {
+	protected void updateFlow(final int flowResolution, final LinkLeaveEvent event) {
 
 		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
 				.get(event.getLinkId());
@@ -412,7 +412,7 @@ public abstract class AbstractControlInputImpl implements ControlInput,
 		return ttFS;
 	}
 
-	protected void updateFlow(final double flowUpdateTime, final BasicLinkLeaveEvent event) {
+	protected void updateFlow(final double flowUpdateTime, final LinkLeaveEvent event) {
 
 		LinkedList<Double> list = (LinkedList<Double>) this.enterLinkEventTimes
 				.get(event.getLinkId());

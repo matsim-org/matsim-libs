@@ -33,10 +33,10 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
@@ -187,14 +187,14 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	@Override
-	public void handleEvent(final BasicAgentArrivalEvent arrival) {
+	public void handleEvent(final AgentArrivalEvent arrival) {
 		SpeedCounter sc = speedCounters.get(arrival.getLinkId().toString());
 		if (sc != null)
 			sc.removeTmpEnterTime(arrival.getPersonId().toString());
 	}
 
 	@Override
-	public void handleEvent(final BasicLinkEnterEvent enter) {
+	public void handleEvent(final LinkEnterEvent enter) {
 		String linkId = enter.getLinkId().toString();
 		SpeedCounter sc = speedCounters.get(linkId);
 		if (sc == null) {
@@ -209,7 +209,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	@Override
-	public void handleEvent(final BasicLinkLeaveEvent leave) {
+	public void handleEvent(final LinkLeaveEvent leave) {
 		double time = leave.getTime();
 		int timeBin = getBinIdx(time);
 		String linkId = leave.getLinkId().toString();

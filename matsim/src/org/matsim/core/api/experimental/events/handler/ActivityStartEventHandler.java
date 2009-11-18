@@ -20,8 +20,9 @@
 
 package org.matsim.core.api.experimental.events.handler;
 
-import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.events.handler.EventHandler;
 
-public interface ActivityStartEventHandler extends BasicActivityStartEventHandler {
-	
+public interface ActivityStartEventHandler extends EventHandler {
+	public void handleEvent (ActivityStartEvent event);
 }

@@ -21,12 +21,12 @@ package org.matsim.integration;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -85,7 +85,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 	}
 	
 	
-	private class TestSingleIterationEventHandler implements BasicLinkEnterEventHandler, BasicActivityStartEventHandler, BasicActivityEndEventHandler {
+	private class TestSingleIterationEventHandler implements LinkEnterEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
 
 		private final double agent1LeaveHomeTime, agent2LeaveHomeTime;
 
@@ -98,7 +98,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 			this.agent2LeaveHomeTime = agent2LeaveHomeTime;
 		}
 
-		public void handleEvent(final BasicLinkEnterEvent e) {
+		public void handleEvent(final LinkEnterEvent e) {
 			log.debug("Enter Link:" + e.getLinkId().toString() + " at Time: " + e.getTime());
 			if (e.getLinkId().equals(id6)) {
 				this.agentOneTime = this.agent1LeaveHomeTime + 1.0;
@@ -130,7 +130,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 			}
 		}
 
-		public void handleEvent(final BasicActivityStartEvent e) {
+		public void handleEvent(final ActivityStartEvent e) {
 			log.debug("Start Activity " + e.getActType() + " : Time: " + Time.writeTime(e.getTime()) + " Agent: " + e.getPersonId().toString());
 			log.debug("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()));
 			if (e.getPersonId().equals(id1)) {
@@ -199,7 +199,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 			}
 		}
 
-		public void handleEvent(final BasicActivityEndEvent e) {
+		public void handleEvent(final ActivityEndEvent e) {
 			log.debug("End Activity " + e.getActType() + " : Time: " + Time.writeTime(e.getTime()) + " Agent: " + e.getPersonId().toString());
 			log.debug("Score: " + EquilTwoAgentsTest.this.planScorer.getAgentScore(e.getPersonId()));
 

@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 
 
-public class EventStatistics implements BasicAgentArrivalEventHandler, BasicAgentDepartureEventHandler  {
+public class EventStatistics implements AgentArrivalEventHandler, AgentDepartureEventHandler  {
 
 	HashMap<Id,Double> legStartTime=new HashMap<Id,Double>();
 	HashMap<Id,Double> totalTravelTime=new HashMap<Id,Double>();
@@ -44,12 +44,12 @@ public class EventStatistics implements BasicAgentArrivalEventHandler, BasicAgen
 		}
 	}
 
-	public void handleEvent(BasicAgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		// TODO Auto-generated method stub
 		legStartTime.put(event.getPersonId(), event.getTime());
 	}
 
-	public void handleEvent(BasicAgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		// TODO Auto-generated method stub
 		double tripTravelTime=event.getTime() -  legStartTime.get(event.getPersonId());
 		double travelTimeSum=0;

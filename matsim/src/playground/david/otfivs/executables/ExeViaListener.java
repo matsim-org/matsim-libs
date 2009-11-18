@@ -28,7 +28,7 @@ import java.util.UUID;
 
 import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
-import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.PlansDumping;
@@ -70,10 +70,10 @@ public class ExeViaListener {
 		protected boolean useResetable = true;
 		
 		public static class MyEvents extends EventsManagerImpl{
-			public List<BasicEvent> events = new ArrayList<BasicEvent>();
+			public List<Event> events = new ArrayList<Event>();
 
 			@Override
-			public void processEvent(BasicEvent event) {
+			public void processEvent(Event event) {
 				events.add(event);
 			}
 			
@@ -125,8 +125,8 @@ public class ExeViaListener {
 			Gbl.printElapsedTime();
 			Gbl.startMeasurement();
 			System.out.println("Event handling");
-			List<BasicEvent> myEvents = ((MyEvents)this.events).events;
-			for(BasicEvent event : myEvents) events.processEvent(event);
+			List<Event> myEvents = ((MyEvents)this.events).events;
+			for(Event event : myEvents) events.processEvent(event);
 			this.events = events;
 			Gbl.printElapsedTime();
 		}

@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
@@ -37,7 +37,7 @@ import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
 import org.matsim.world.ZoneLayer;
 
-public class CalcODMatrices implements BasicAgentArrivalEventHandler, BasicAgentDepartureEventHandler {
+public class CalcODMatrices implements AgentArrivalEventHandler, AgentDepartureEventHandler {
 
 	private final NetworkLayer network;
 	private final ZoneLayer tvzLayer;
@@ -54,7 +54,7 @@ public class CalcODMatrices implements BasicAgentArrivalEventHandler, BasicAgent
 		this.matrix = matrix;
 	}
 
-	public void handleEvent(final BasicAgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		double time = event.getTime();
 		if ((time < this.minTime) || (time >= this.maxTime)) {
 			return;
@@ -67,7 +67,7 @@ public class CalcODMatrices implements BasicAgentArrivalEventHandler, BasicAgent
 		}
 	}
 
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		double time = event.getTime();
 		if (time < this.minTime) {
 			return;

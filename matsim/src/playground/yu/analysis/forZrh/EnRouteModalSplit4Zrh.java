@@ -8,11 +8,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicAgentEvent;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -81,7 +81,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 		super(scenario, ppl, toll);
 	}
 
-	protected void internalCompute(int binIdx, BasicAgentEvent ae, Plan plan,
+	protected void internalCompute(int binIdx, AgentEvent ae, Plan plan,
 			double[] allCount, double[] carCount, double[] ptCount,
 			double[] wlkCount, double[] throughCount) {
 		allCount[binIdx]++;
@@ -111,13 +111,13 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 	}
 
 	@Override
-	public void handleEvent(BasicAgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		internalHandleEvent(event, this.arr, this.carArr, this.ptArr, wlkArr,
 				throughArr);
 	}
 
 	@Override
-	public void handleEvent(BasicAgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		Id id = event.getPersonId();
 		Integer itg = legCounts.get(id);
 		if (itg == null)
@@ -128,12 +128,12 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 	}
 
 	@Override
-	public void handleEvent(BasicAgentStuckEvent event) {
+	public void handleEvent(AgentStuckEvent event) {
 		internalHandleEvent(event, this.stuck, this.carStuck, null, null,
 				this.throughStuck);
 	}
 
-	protected void internalHandleEvent(BasicAgentEvent ae, double[] allCount,
+	protected void internalHandleEvent(AgentEvent ae, double[] allCount,
 			double[] carCount, double[] ptCount, double[] wlkCount,
 			double[] throughCount) {
 		int binIdx = getBinIndex(ae.getTime());

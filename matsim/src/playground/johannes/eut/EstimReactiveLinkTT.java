@@ -29,15 +29,15 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -48,10 +48,10 @@ import org.matsim.core.router.util.TravelTime;
  *
  */
 public class EstimReactiveLinkTT implements
-		BasicLinkEnterEventHandler,
-		BasicLinkLeaveEventHandler,
-		BasicAgentArrivalEventHandler,
-		BasicAgentWait2LinkEventHandler,
+		LinkEnterEventHandler,
+		LinkLeaveEventHandler,
+		AgentArrivalEventHandler,
+		AgentWait2LinkEventHandler,
 		TravelTime {
 
 //	private QueueNetwork queueNetwork;
@@ -77,19 +77,19 @@ public class EstimReactiveLinkTT implements
 		this.linkTTCalculators = new LinkedHashMap<Id, LinkTTCalculator>();
 	}
 
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		increaseCount(event.getLinkId(), event.getPersonId(), (int) event.getTime());
 	}
 
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		decreaseCount(event.getLinkId(), event.getPersonId(), (int) event.getTime());
 	}
 
-	public void handleEvent(BasicAgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		decreaseCount(event.getLinkId(), event.getPersonId(), (int) event.getTime());
 	}
 
-	public void handleEvent(BasicAgentWait2LinkEvent event) {
+	public void handleEvent(AgentWait2LinkEvent event) {
 		increaseCount(event.getLinkId(), event.getPersonId(), (int) event.getTime());
 	}
 

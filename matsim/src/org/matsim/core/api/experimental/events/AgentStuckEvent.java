@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAgentStuckEvent.java
+ * AgentStuckEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,9 +20,6 @@
 
 package org.matsim.core.api.experimental.events;
 
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-
-
-public interface AgentStuckEvent extends BasicAgentStuckEvent {
+public interface AgentStuckEvent extends AgentEvent {
 
 }

@@ -26,17 +26,17 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.utils.io.IOUtils;
 
-public class Events2Stats implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler, BasicAgentMoneyEventHandler {
+public class Events2Stats implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentMoneyEventHandler {
 
 	HashMap<Id,Double> startTimes = new HashMap<Id,Double>();
 	double oaTime = 0;
@@ -63,7 +63,7 @@ public class Events2Stats implements BasicAgentDepartureEventHandler, BasicAgent
 		}
 	}
 	
-	public void handleEvent(final BasicAgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		this.startTimes.put(event.getPersonId(), event.getTime());
 		
 	}
@@ -72,12 +72,12 @@ public class Events2Stats implements BasicAgentDepartureEventHandler, BasicAgent
 		
 	}
 
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		this.oaTime += event.getTime() - this.startTimes.get(event.getPersonId());
 		this.numAgents++;
 	}
 	
-	public void handleEvent(final BasicAgentMoneyEvent event) {
+	public void handleEvent(final AgentMoneyEvent event) {
 		this.numUtilityEvents++;
 		this.cumUt += event.getAmount();
 		

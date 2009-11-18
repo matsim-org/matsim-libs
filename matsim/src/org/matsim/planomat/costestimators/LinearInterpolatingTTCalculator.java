@@ -23,13 +23,13 @@ package org.matsim.planomat.costestimators;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -49,7 +49,7 @@ import org.matsim.core.utils.misc.Time;
  *
  */
 public class LinearInterpolatingTTCalculator
-implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler, TravelTime {
+implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, TravelTime {
 
 	// EnterEvent implements Comparable based on linkId and vehId. This means that the key-pair <linkId, vehId> must always be unique!
 	private final HashMap<EnterEvent, Double> enterEvents = new HashMap<EnterEvent, Double>();
@@ -214,12 +214,12 @@ implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentArr
 		resetTravelTimes();
 	}
 
-	public void handleEvent(final BasicLinkEnterEvent event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		EnterEvent e = new EnterEvent(event.getLinkId(), event.getPersonId());
 		this.enterEvents.put(e, event.getTime());
 	}
 
-	public void handleEvent(final BasicLinkLeaveEvent event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		EnterEvent e = new EnterEvent(event.getLinkId(), event.getPersonId());
 		Double starttime = this.enterEvents.remove(e);
 		if (starttime != null) {
@@ -231,7 +231,7 @@ implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentArr
 		}
 	}
 
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		// remove EnterEvents from list when an agent arrives.
 		// otherwise, the activity duration would counted as travel time, when the
 		// agent departs again and leaves the link!

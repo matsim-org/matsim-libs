@@ -35,10 +35,10 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.LinkImpl;
@@ -196,7 +196,7 @@ public class NetworkClearanceAnalysis {
 		}
 	}
 	
-	private static class EventsHandler implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler{
+	private static class EventsHandler implements LinkEnterEventHandler, LinkLeaveEventHandler{
 
 		private final Map<String, PolygonInfo> linkMapping;
 
@@ -204,7 +204,7 @@ public class NetworkClearanceAnalysis {
 			this.linkMapping = linkMapping;
 		}
 		
-		public void handleEvent(final BasicLinkEnterEvent event) {
+		public void handleEvent(final LinkEnterEvent event) {
 			if (event.getLinkId().toString().contains("el")) {
 				return;
 			}
@@ -220,7 +220,7 @@ public class NetworkClearanceAnalysis {
 			// TODO Auto-generated method stub
 		}
 
-		public void handleEvent(final BasicLinkLeaveEvent event) {
+		public void handleEvent(final LinkLeaveEvent event) {
 			if (event.getLinkId().toString().contains("el")) {
 				return;
 			}

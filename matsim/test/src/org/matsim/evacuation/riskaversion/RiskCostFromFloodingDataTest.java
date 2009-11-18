@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigReaderMatsimV1;
 import org.matsim.core.events.EventsManagerImpl;
@@ -146,10 +146,10 @@ public class RiskCostFromFloodingDataTest extends MatsimTestCase {
 		assertEquals(refCost, apc.penalty,delta);
 	}
 	
-	private static class AgentPenaltyCalculator implements BasicAgentMoneyEventHandler {
+	private static class AgentPenaltyCalculator implements AgentMoneyEventHandler {
 		double penalty = 0.;
 		
-		public void handleEvent(BasicAgentMoneyEvent event) {
+		public void handleEvent(AgentMoneyEvent event) {
 			this.penalty += event.getAmount();
 		}
 

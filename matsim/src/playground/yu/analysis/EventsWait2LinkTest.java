@@ -24,8 +24,8 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
@@ -34,7 +34,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
 
 public class EventsWait2LinkTest {
-	public static class EventsWait2Link implements BasicAgentWait2LinkEventHandler {
+	public static class EventsWait2Link implements AgentWait2LinkEventHandler {
 		private BufferedWriter writer = null;
 
 		public EventsWait2Link(final String outputFilename) {
@@ -49,7 +49,7 @@ public class EventsWait2LinkTest {
 			}
 		}
 
-		public void handleEvent(final BasicAgentWait2LinkEvent event) {
+		public void handleEvent(final AgentWait2LinkEvent event) {
 			try {
 				writer.write(event.getPersonId().toString() + "\t"
 						+ event.getLinkId().toString() + "\n");

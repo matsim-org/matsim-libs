@@ -29,11 +29,11 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
-import org.matsim.api.basic.v01.events.BasicPersonEvent;
-import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
@@ -62,17 +62,17 @@ public class QueryAgentEvents extends QueryAgentPlan {
 
 	public List<String> events = new ArrayList<String>();
 
-	public  class MyEventsHandler implements BasicPersonEventHandler, Serializable{
+	public  class MyEventsHandler implements PersonEventHandler, Serializable{
 
 		private static final long serialVersionUID = 1L;
 		private final String agentId;
-		public List<BasicPersonEvent> orig_events = new ArrayList<BasicPersonEvent>();
+		public List<PersonEvent> orig_events = new ArrayList<PersonEvent>();
 		
 		public MyEventsHandler(String agentId) {
 			this.agentId = agentId;
 		}
 
-		public void handleEvent(BasicPersonEvent event) {
+		public void handleEvent(PersonEvent event) {
 			if(event.getPersonId().toString().equals(this.agentId)){
 				orig_events.add(event);
 			}
@@ -84,7 +84,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 		
 		public List<String> getEvents () {
 			events = new ArrayList<String>();
-			for (BasicPersonEvent event : orig_events) {
+			for (PersonEvent event : orig_events) {
 				events.add(event.toString());
 			}
 			orig_events.clear();

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLinkLeaveEvent.java
+ * LinkLeaveEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,8 +20,6 @@
 
 package org.matsim.core.api.experimental.events;
 
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-
-public interface LinkLeaveEvent extends BasicLinkLeaveEvent {
+public interface LinkLeaveEvent extends LinkEvent {
 
 }

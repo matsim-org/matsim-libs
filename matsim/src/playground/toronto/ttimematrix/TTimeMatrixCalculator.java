@@ -31,15 +31,15 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 
-public class TTimeMatrixCalculator implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler {
+public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -54,7 +54,7 @@ public class TTimeMatrixCalculator implements BasicAgentDepartureEventHandler, B
 
 	private int hour = 0;
 	private Map<Id,Map<Id,Tuple<Double,Integer>>> ttimeMatrix = new HashMap<Id, Map<Id,Tuple<Double,Integer>>>();
-	private final Map<String,BasicAgentDepartureEvent> departures = new HashMap<String,BasicAgentDepartureEvent>();
+	private final Map<String,AgentDepartureEvent> departures = new HashMap<String,AgentDepartureEvent>();
 	
 	private final Map<String,String> matrix = new TreeMap<String, String>();
 	
@@ -229,12 +229,12 @@ public class TTimeMatrixCalculator implements BasicAgentDepartureEventHandler, B
 	// event handlers
 	//////////////////////////////////////////////////////////////////////
 	
-	public void handleEvent(BasicAgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		departures.put(event.getPersonId().toString(),event);
 	}
 
-	public void handleEvent(BasicAgentArrivalEvent event) {
-		BasicAgentDepartureEvent dEvent = departures.remove(event.getPersonId().toString());
+	public void handleEvent(AgentArrivalEvent event) {
+		AgentDepartureEvent dEvent = departures.remove(event.getPersonId().toString());
 		if (dEvent == null) throw new RuntimeException("Missing AgentDepartureEvent for AgentArrivalEvent: " + event.toString());
 		else if (event.getTime() < hour*3600) {
 			throw new RuntimeException("At hour "+hour+": AgentArrivalEvent too early! ("+event.toString()+")");

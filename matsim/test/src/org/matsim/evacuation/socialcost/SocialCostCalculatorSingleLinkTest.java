@@ -5,10 +5,10 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.events.EventsManagerImpl;
@@ -170,10 +170,10 @@ public class SocialCostCalculatorSingleLinkTest extends MatsimTestCase {
 	}
 
 
-	private static class AgentPenaltyCalculator implements BasicAgentMoneyEventHandler {
+	private static class AgentPenaltyCalculator implements AgentMoneyEventHandler {
 		double penalty = 0.;
 		
-		public void handleEvent(BasicAgentMoneyEvent event) {
+		public void handleEvent(AgentMoneyEvent event) {
 			this.penalty += event.getAmount();
 		}
 

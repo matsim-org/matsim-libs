@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.api.basic.v01.events.BasicEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
@@ -32,7 +32,7 @@ public class TraVolCal extends FinalEventFilterA {
 
 	// --------------------------OVERRIDE METHODS------------------------
 	@Override
-	public void handleEvent(final BasicEvent enter) {
+	public void handleEvent(final Event enter) {
 		if (enter instanceof LinkEnterEventImpl) {
 			count();
 			long hour = (long) (enter.getTime() / 3600);
@@ -43,7 +43,7 @@ public class TraVolCal extends FinalEventFilterA {
 //			LinkEnterEvent ele = rebuildEventLinkEnter((LinkEnterEvent) enter);
 			String linkId = null;
 			try {
-				linkId = ((BasicLinkEnterEvent) enter).getLinkId().toString();
+				linkId = ((LinkEnterEvent) enter).getLinkId().toString();
 			} catch (NullPointerException npe) {
 				System.err.println(npe);
 			}

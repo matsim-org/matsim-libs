@@ -20,8 +20,8 @@
 
 package playground.toronto.example;
 
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.network.NetworkLayer;
 
 /**
@@ -29,7 +29,7 @@ import org.matsim.core.network.NetworkLayer;
  *
  * @author mrieser
  */
-public class CalcVehicleKilometerTraveled implements BasicLinkEnterEventHandler {
+public class CalcVehicleKilometerTraveled implements LinkEnterEventHandler {
 
 	private final static int NUM_OF_HOURS = 30;
 
@@ -41,7 +41,7 @@ public class CalcVehicleKilometerTraveled implements BasicLinkEnterEventHandler 
 		this.network = network;
 	}
 	
-	public void handleEvent(final BasicLinkEnterEvent event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		int hour = (int) event.getTime() / 3600;
 		this.travelDistanceSum[hour] += this.network.getLinks().get(event.getLinkId()).getLength(); // this assumes link.length is specified in meters!
 	}

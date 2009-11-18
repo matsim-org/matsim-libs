@@ -28,10 +28,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -46,8 +46,8 @@ import org.matsim.core.population.PopulationReader;
  * @author ychen
  * 
  */
-public class TraVolCnter implements BasicLinkEnterEventHandler,
-		BasicLinkLeaveEventHandler {
+public class TraVolCnter implements LinkEnterEventHandler,
+		LinkLeaveEventHandler {
 	/**
 	 * netVols<tIndex, netVol>
 	 */
@@ -58,7 +58,7 @@ public class TraVolCnter implements BasicLinkEnterEventHandler,
 	 */
 	private final HashMap<String, Double> agentTimer = new HashMap<String, Double>();
 
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		// TODO save entertime into agentTimer
 		String agentId = event.getPersonId().toString();
 		if (!agentTimer.containsKey(agentId))
@@ -68,7 +68,7 @@ public class TraVolCnter implements BasicLinkEnterEventHandler,
 					.println("error: a left link event of this agent dispears!");
 	}
 
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		String agentId = event.getPersonId().toString();
 		if (agentTimer.containsKey(agentId)) {
 			for (int tbIdx = agentTimer.remove(agentId).intValue(); tbIdx <= event

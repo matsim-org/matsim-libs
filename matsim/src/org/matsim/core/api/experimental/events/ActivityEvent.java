@@ -20,9 +20,13 @@
 
 package org.matsim.core.api.experimental.events;
 
-import org.matsim.api.basic.v01.events.BasicActivityEvent;
+import org.matsim.api.basic.v01.Id;
 
 
-public interface ActivityEvent extends BasicActivityEvent {
+public interface ActivityEvent extends PersonEvent {
+
+	public String getActType();
+
+	public Id getLinkId();
 
 }

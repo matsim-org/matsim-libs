@@ -28,10 +28,10 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
@@ -109,7 +109,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		ttcalc.setTravelTimeAggregator(aggregator);
 		ttcalc.setTravelTimeDataFactory(ttDataFactory);
 		events2.addHandler(ttcalc);
-		for (BasicEvent e : collector.getEvents()) {
+		for (Event e : collector.getEvents()) {
 			events2.processEvent(e);
 		}
 		

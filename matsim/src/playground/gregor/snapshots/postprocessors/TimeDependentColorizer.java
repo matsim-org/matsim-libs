@@ -23,19 +23,19 @@ package playground.gregor.snapshots.postprocessors;
 
 import java.util.HashMap;
 
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 
 import playground.gregor.snapshots.writers.PositionInfo;
 
 
 
 
-public class TimeDependentColorizer implements PostProcessorI, BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler, BasicAgentStuckEventHandler{
+public class TimeDependentColorizer implements PostProcessorI, AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler{
 
 //	private final Plans plans;
 	private final HashMap<String,EventAgent> agents = new HashMap<String,EventAgent>();
@@ -58,7 +58,7 @@ public class TimeDependentColorizer implements PostProcessorI, BasicAgentDepartu
 		pos.setType(Math.min(time,255));
 	}
 
-	public void handleEvent(BasicAgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		EventAgent e = new EventAgent();
 //		e.starttime = event.getTime();
 		e.starttime = 3 * 3600;
@@ -71,7 +71,7 @@ public class TimeDependentColorizer implements PostProcessorI, BasicAgentDepartu
 		
 	}
 
-	public void handleEvent(BasicAgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		EventAgent e = this.agents.get(event.getPersonId().toString());
 		e.endtime = event.getTime();
 		
@@ -85,7 +85,7 @@ public class TimeDependentColorizer implements PostProcessorI, BasicAgentDepartu
 	}
 
 
-	public void handleEvent(BasicAgentStuckEvent event) {
+	public void handleEvent(AgentStuckEvent event) {
 		EventAgent e = this.agents.get(event.getPersonId().toString());
 		e.endtime = 30 * 3600;
 		

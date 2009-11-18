@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -24,7 +24,7 @@ import org.matsim.evacuation.base.Building;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 
-public class ShelterInputCounterSocialCost implements BasicLinkLeaveEventHandler, BeforeMobsimListener, AfterMobsimListener{
+public class ShelterInputCounterSocialCost implements LinkLeaveEventHandler, BeforeMobsimListener, AfterMobsimListener{
 
 	
 	private final HashMap<Id, Building> shelterLinkMapping;
@@ -91,7 +91,7 @@ public class ShelterInputCounterSocialCost implements BasicLinkLeaveEventHandler
 	}
 	
 	
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		LinkInfo li = this.infos.get(event.getLinkId());
 		if (li != null) {
 			li.count++;

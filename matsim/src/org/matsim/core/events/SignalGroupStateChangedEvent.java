@@ -20,7 +20,7 @@
 package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.signalsystems.control.SignalGroupState;
 
 
@@ -29,7 +29,7 @@ import org.matsim.signalsystems.control.SignalGroupState;
  * @author dgrether
  *
  */
-public interface SignalGroupStateChangedEvent extends BasicEvent{
+public interface SignalGroupStateChangedEvent extends Event{
 
 	public final static String EVENT_TYPE = "signalGroupStateChangedEvent";
 	

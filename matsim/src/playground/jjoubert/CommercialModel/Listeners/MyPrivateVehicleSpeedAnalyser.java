@@ -25,19 +25,19 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.NetworkLayer;
 
 import playground.jjoubert.CommercialTraffic.SAZone;
 
-public class MyPrivateVehicleSpeedAnalyser implements BasicLinkEnterEventHandler, 
-													  BasicLinkLeaveEventHandler, 
-													  BasicAgentArrivalEventHandler{
+public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler, 
+													  LinkLeaveEventHandler, 
+													  AgentArrivalEventHandler{
 	private Map<Id, SAZone> map;
 	private Map<Id, ArrayList<ArrayList<Double>>> linkSpeeds;
 	private Map<Id, Double> eventMap;
@@ -66,7 +66,7 @@ public class MyPrivateVehicleSpeedAnalyser implements BasicLinkEnterEventHandler
 		}
 	}
 
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 
 		Id linkId = event.getLinkId();
 		if(map.containsKey(linkId)){
@@ -101,7 +101,7 @@ public class MyPrivateVehicleSpeedAnalyser implements BasicLinkEnterEventHandler
 	 * 			 is not an issue since then event's speed will probably be the free speed anyway.)</i>  
 	 * </ul> 
 	 */
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		if(this.weighLinksByUse){
 			addSpeedToZone(event);			
 		} else{
@@ -110,12 +110,12 @@ public class MyPrivateVehicleSpeedAnalyser implements BasicLinkEnterEventHandler
 	}
 	
 	
-	public void handleEvent(BasicAgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		eventMap.remove(event.getPersonId());		
 	}
 
 	
-	private void addSpeedToZone(BasicLinkLeaveEvent event){
+	private void addSpeedToZone(LinkLeaveEvent event){
 		if(eventMap.containsKey(event.getPersonId())){
 			int hour = (int) Math.floor((event.getTime()) / 3600);
 			Double speed = (this.networkLayer.getLink(event.getLinkId()).getLength() / 	// in meters 
@@ -131,7 +131,7 @@ public class MyPrivateVehicleSpeedAnalyser implements BasicLinkEnterEventHandler
 	}
 
 	
-	public void addSpeedToLink(BasicLinkLeaveEvent event) {
+	public void addSpeedToLink(LinkLeaveEvent event) {
 		if(eventMap.containsKey(event.getPersonId())){
 			int hour = (int) Math.floor((event.getTime()) / 3600);
 			Double speed = (this.networkLayer.getLink(event.getLinkId()).getLength() / 	// in meters 

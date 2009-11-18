@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAgentWait2LinkEvent.java
+ * AgentWait2LinkEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,9 +20,6 @@
 
 package org.matsim.core.api.experimental.events;
 
-import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
-
-
-public interface AgentWait2LinkEvent extends BasicAgentWait2LinkEvent {
+public interface AgentWait2LinkEvent extends AgentEvent {
 
 }

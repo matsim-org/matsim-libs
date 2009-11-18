@@ -20,10 +20,10 @@
 
 package playground.marcel.modules.template;
 
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -98,8 +98,8 @@ public class Template implements MatsimModule {
 		
 		// *** EventHandler *********************
 		
-		BasicAgentArrivalEventHandler eventHandler = new BasicAgentArrivalEventHandler() {
-			public void handleEvent(BasicAgentArrivalEvent event) {
+		AgentArrivalEventHandler eventHandler = new AgentArrivalEventHandler() {
+			public void handleEvent(AgentArrivalEvent event) {
 			}
 			public void reset(int iteration) {
 			}

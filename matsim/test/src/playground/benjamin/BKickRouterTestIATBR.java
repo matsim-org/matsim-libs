@@ -21,8 +21,8 @@
 package playground.benjamin;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.StartupEvent;
@@ -80,14 +80,14 @@ public class BKickRouterTestIATBR extends MatsimTestCase {
 	}
 	
 	
-	private static class EventHandler implements BasicLinkEnterEventHandler{
+	private static class EventHandler implements LinkEnterEventHandler{
 		
 		boolean link3Ok = false;
 		boolean link8Ok = false;
 		boolean link10Ok = false;
 		
 		//links 3, 8, 10 
-		public void handleEvent(BasicLinkEnterEvent e) {
+		public void handleEvent(LinkEnterEvent e) {
 			if (e.getLinkId().equals(new IdImpl("3")) && e.getPersonId().equals(new IdImpl("2"))) {
 				link3Ok = true;
 			}

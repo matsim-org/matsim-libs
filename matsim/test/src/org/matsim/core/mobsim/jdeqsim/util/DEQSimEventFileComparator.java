@@ -3,7 +3,7 @@ package org.matsim.core.mobsim.jdeqsim.util;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.matsim.api.basic.v01.events.BasicPersonEvent;
+import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.mobsim.jdeqsim.EventLog;
@@ -24,7 +24,7 @@ public class DEQSimEventFileComparator extends TestHandlerDetailedEventChecker {
 	 * vehicles are dealt with in different ways
 	 */
 	public void checkAssertions() {
- 		LinkedList<BasicPersonEvent> copyEventList=new LinkedList<BasicPersonEvent>();
+ 		LinkedList<PersonEvent> copyEventList=new LinkedList<PersonEvent>();
  		
  		// remove ActStartEvent and ActEndEvent, because this does not exist in
 		// c++ DEQSim

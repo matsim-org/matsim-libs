@@ -20,8 +20,9 @@
 
 package org.matsim.core.api.experimental.events.handler;
 
-import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
+import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.events.handler.EventHandler;
 
-public interface PersonEventHandler extends BasicPersonEventHandler {
-	
+public interface PersonEventHandler extends EventHandler {
+	public void handleEvent (PersonEvent event);
 }

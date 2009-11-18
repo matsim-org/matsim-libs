@@ -5,15 +5,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.utils.misc.IntegerCache;
 
 import playground.gregor.MY_STATIC_STUFF;
 
-public class TimebinHistogram implements BasicLinkEnterEventHandler {
+public class TimebinHistogram implements LinkEnterEventHandler {
 
 	
 	HashMap<String,LinkInfo> linkInfos = new HashMap<String, LinkInfo>();
@@ -25,7 +25,7 @@ public class TimebinHistogram implements BasicLinkEnterEventHandler {
 		// TODO Auto-generated method stub
 	}
 
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		LinkInfo li = this.linkInfos.get(event.getLinkId().toString());
 		if (li == null) {
 			li = new LinkInfo();

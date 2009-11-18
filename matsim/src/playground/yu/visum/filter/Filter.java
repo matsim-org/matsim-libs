@@ -20,9 +20,9 @@ public class Filter implements FilterI {
 	 */
 	/**
 	 * This function is called inside function: void
-	 * org.matsim.playground.filters.filter.EventFilter.handleEvent(BasicEvent
+	 * org.matsim.playground.filters.filter.EventFilter.handleEvent(Event
 	 * event) and void
-	 * org.matsim.playground.filters.filter.EventFilter.handleEvent(BasicEvent
+	 * org.matsim.playground.filters.filter.EventFilter.handleEvent(Event
 	 * event), if this Filter is not the last one.
 	 */
 	public void count() {

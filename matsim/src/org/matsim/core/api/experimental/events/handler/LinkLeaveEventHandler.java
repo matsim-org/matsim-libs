@@ -20,7 +20,9 @@
 
 package org.matsim.core.api.experimental.events.handler;
 
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.events.handler.EventHandler;
 
-public interface LinkLeaveEventHandler extends BasicLinkLeaveEventHandler {
+public interface LinkLeaveEventHandler extends EventHandler {
+	public void handleEvent (LinkLeaveEvent event);
 }

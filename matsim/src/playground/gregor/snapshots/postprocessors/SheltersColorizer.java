@@ -5,14 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.BuildingsShapeReader;
 
-public class SheltersColorizer implements BasicLinkLeaveEventHandler {
+public class SheltersColorizer implements LinkLeaveEventHandler {
 
 	Map<String,ShelterInfo> shelters = new HashMap<String,ShelterInfo>();
 	Map<String,ArrayList<Tuple<Integer,Double>>> occupancies = null;
@@ -32,7 +32,7 @@ public class SheltersColorizer implements BasicLinkLeaveEventHandler {
 	}
 	
 	
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		if (event.getLinkId().toString().contains("sl") && event.getLinkId().toString().contains("a")) {
 			String id = event.getLinkId().toString().replace("sl","");
 			id = id.replace("a", "");

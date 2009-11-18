@@ -24,10 +24,10 @@ import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -40,7 +40,7 @@ import org.matsim.core.population.PlanImpl;
  */
 @Deprecated
 public class MyRecentEventsBasedEstimator
-implements LegTravelTimeEstimator, BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler {
+implements LegTravelTimeEstimator, AgentDepartureEventHandler, AgentArrivalEventHandler {
 
 	public void resetPlanSpecificInformation() {
 	}
@@ -105,7 +105,7 @@ implements LegTravelTimeEstimator, BasicAgentDepartureEventHandler, BasicAgentAr
 	public void reset(final int iteration) {
 	}
 
-	public void handleEvent(final BasicAgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 
 		DepartureEvent depEvent = new DepartureEvent(event.getPersonId());
 
@@ -113,7 +113,7 @@ implements LegTravelTimeEstimator, BasicAgentDepartureEventHandler, BasicAgentAr
 		this.departureEventsLinkIDs.put(depEvent, event.getLinkId());
 	}
 
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 
 		Id agentId = event.getPersonId();
 

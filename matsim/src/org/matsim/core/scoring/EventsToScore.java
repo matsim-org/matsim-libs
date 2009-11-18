@@ -24,21 +24,21 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -54,8 +54,8 @@ import org.matsim.core.utils.collections.Tuple;
  * 
  * @author mrieser
  */
-public class EventsToScore implements BasicAgentArrivalEventHandler, BasicAgentDepartureEventHandler, BasicAgentStuckEventHandler,
-		BasicAgentMoneyEventHandler, BasicActivityStartEventHandler, BasicActivityEndEventHandler {
+public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
+		AgentMoneyEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private PopulationImpl population = null;
 	private ScoringFunctionFactory sfFactory = null;
@@ -86,7 +86,7 @@ public class EventsToScore implements BasicAgentArrivalEventHandler, BasicAgentD
 		return 1 + index.intValue();
 	}
 	
-	public void handleEvent(final BasicAgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(event.getPersonId());
 		if (data != null) {
 			int index = increaseAgentPlanElementIndex(event.getPersonId());
@@ -94,28 +94,28 @@ public class EventsToScore implements BasicAgentArrivalEventHandler, BasicAgentD
 		}
 	}
 
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
 		if (sf != null) {
 			sf.endLeg(event.getTime());
 		}
 	}
 
-	public void handleEvent(final BasicAgentStuckEvent event) {
+	public void handleEvent(final AgentStuckEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
 		if (sf != null) {
 			sf.agentStuck(event.getTime());
 		}
 	}
 
-	public void handleEvent(final BasicAgentMoneyEvent event) {
+	public void handleEvent(final AgentMoneyEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
 		if (sf != null) {
 			sf.addMoney(event.getAmount());
 		}
 	}
 
-	public void handleEvent(final BasicActivityStartEvent event) {
+	public void handleEvent(final ActivityStartEvent event) {
 		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(event.getPersonId());
 		if (data != null) {
 			int index = increaseAgentPlanElementIndex(event.getPersonId());
@@ -123,7 +123,7 @@ public class EventsToScore implements BasicAgentArrivalEventHandler, BasicAgentD
 		}
 	}
 
-	public void handleEvent(final BasicActivityEndEvent event) {
+	public void handleEvent(final ActivityEndEvent event) {
 		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
 		if (sf != null) {
 			sf.endActivity(event.getTime());

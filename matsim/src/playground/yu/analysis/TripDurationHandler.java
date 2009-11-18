@@ -27,11 +27,11 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -46,8 +46,8 @@ import org.matsim.core.utils.io.IOUtils;
  * @author yu
  * 
  */
-public class TripDurationHandler implements BasicAgentDepartureEventHandler,
-		BasicAgentArrivalEventHandler {
+public class TripDurationHandler implements AgentDepartureEventHandler,
+		AgentArrivalEventHandler {
 	// private final NetworkLayer network;
 
 	private final PopulationImpl plans;
@@ -71,11 +71,11 @@ public class TripDurationHandler implements BasicAgentDepartureEventHandler,
 		this.plans = plans;
 	}
 
-	public void handleEvent(final BasicAgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		this.tmpDptTimes.put(event.getPersonId().toString(), event.getTime());
 	}
 
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		double time = event.getTime();
 		String agentId = event.getPersonId().toString();
 		Double dptTime = this.tmpDptTimes.get(agentId);

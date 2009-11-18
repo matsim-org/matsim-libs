@@ -29,11 +29,11 @@ import java.util.HashMap;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -62,8 +62,8 @@ import playground.yu.utils.io.SimpleWriter;
  * @author ychen
  * 
  */
-public class LegTravelTimeModalSplit implements BasicAgentDepartureEventHandler,
-		BasicAgentArrivalEventHandler {
+public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
+		AgentArrivalEventHandler {
 
 	protected final PopulationImpl plans;
 
@@ -122,7 +122,7 @@ public class LegTravelTimeModalSplit implements BasicAgentDepartureEventHandler,
 		this.toll = toll;
 	}
 
-	public void handleEvent(final BasicAgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		if (toll != null) {
 			// only inhabitant from Kanton
 			if (TollTools.isInRange(((PlanImpl) plans.getPersons().get(event.getPersonId())
@@ -138,7 +138,7 @@ public class LegTravelTimeModalSplit implements BasicAgentDepartureEventHandler,
 		this.tmpDptTimes.clear();
 	}
 
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		double arrTime = event.getTime();
 		String agentId = event.getPersonId().toString();
 		if (toll == null)

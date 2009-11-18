@@ -24,7 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Map;
 
-import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -61,7 +61,7 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 		closeFile();
 	}
 
-	public void handleEvent(final BasicEvent event) {
+	public void handleEvent(final Event event) {
 		StringBuilder eventXML = new StringBuilder("\t<event ");
 		Map<String, String> attr = event.getAttributes();
 		for (Map.Entry<String, String> entry : attr.entrySet()) {

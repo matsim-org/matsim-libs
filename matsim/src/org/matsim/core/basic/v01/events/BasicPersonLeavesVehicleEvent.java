@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicPersonEvent.java
+ * PersonEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,9 +21,9 @@
 package org.matsim.core.basic.v01.events;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicPersonEvent;
+import org.matsim.core.api.experimental.events.PersonEvent;
 
-public interface BasicPersonLeavesVehicleEvent extends BasicPersonEvent {
+public interface BasicPersonLeavesVehicleEvent extends PersonEvent {
 
 	public Id getVehicleId();
 

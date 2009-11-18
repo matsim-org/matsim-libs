@@ -33,11 +33,11 @@ import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -52,7 +52,7 @@ import org.matsim.core.utils.io.IOUtils;
  *
  */
 public class TripAndScoreStats implements StartupListener, ShutdownListener,
-		IterationEndsListener, BasicAgentWait2LinkEventHandler, BasicAgentArrivalEventHandler {
+		IterationEndsListener, AgentWait2LinkEventHandler, AgentArrivalEventHandler {
 
 	private final static String TAB = "\t";
 	
@@ -182,7 +182,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		return sum/(double)persons.size();
 	}
 	
-	public void handleEvent(BasicAgentWait2LinkEvent event) {
+	public void handleEvent(AgentWait2LinkEvent event) {
 		departures.put(event.getPersonId(), event.getTime());
 	}
 
@@ -191,7 +191,7 @@ public class TripAndScoreStats implements StartupListener, ShutdownListener,
 		tripDurations = new HashMap<Id, Double>();
 	}
 
-	public void handleEvent(BasicAgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		Double time = departures.get(event.getPersonId());
 		if(time != null) {
 			double deltaT = event.getTime() - time;

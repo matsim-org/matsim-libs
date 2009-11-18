@@ -1,13 +1,13 @@
 package tutorial.example6EventsHandling;
 
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 /**
  * This EventHandler implementation counts the travel time of
  * all agents and provides the average travel time per
@@ -15,9 +15,9 @@ import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
  * @author dgrether
  *
  */
-public class MyEventHandler2 implements BasicLinkEnterEventHandler,
-	BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler,
-	BasicAgentDepartureEventHandler{
+public class MyEventHandler2 implements LinkEnterEventHandler,
+	LinkLeaveEventHandler, AgentArrivalEventHandler,
+	AgentDepartureEventHandler{
 
 	private double travelTime = 0.0;
 	
@@ -35,19 +35,19 @@ public class MyEventHandler2 implements BasicLinkEnterEventHandler,
 		this.travelTime = 0.0;
 	}
 
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		this.travelTime -= event.getTime();
 	}
 
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		this.travelTime += event.getTime();
 	}
 
-	public void handleEvent(BasicAgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		this.travelTime += event.getTime();
 	}
 
-	public void handleEvent(BasicAgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		this.travelTime -= event.getTime();
 	}
 }

@@ -39,14 +39,14 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -66,8 +66,8 @@ import playground.johannes.socialnetworks.statistics.Distribution;
  * @author illenberger
  *
  */
-public class Analyzer implements StartupListener, IterationEndsListener, BasicAgentDepartureEventHandler,
-		BasicAgentArrivalEventHandler, BasicLinkEnterEventHandler, ShutdownListener, IterationStartsListener {
+public class Analyzer implements StartupListener, IterationEndsListener, AgentDepartureEventHandler,
+		AgentArrivalEventHandler, LinkEnterEventHandler, ShutdownListener, IterationStartsListener {
 
 	private Set<Person> riskyUsers;
 	
@@ -77,9 +77,9 @@ public class Analyzer implements StartupListener, IterationEndsListener, BasicAg
 	
 	private Set<Plan> safePlans;
 	
-	private HashMap<Id, BasicAgentDepartureEvent> events; // personId
+	private HashMap<Id, AgentDepartureEvent> events; // personId
 	
-	private HashMap<Id, BasicAgentDepartureEvent> eventsReturn; // personId
+	private HashMap<Id, AgentDepartureEvent> eventsReturn; // personId
 	
 	private HashMap<Id, Double> traveltimes; // personId
 	
@@ -150,8 +150,8 @@ public class Analyzer implements StartupListener, IterationEndsListener, BasicAg
 		riskyTriptime = 0;
 		safeTriptime = 0;
 		returnTripTime = 0;
-		events = new HashMap<Id, BasicAgentDepartureEvent>();
-		eventsReturn = new HashMap<Id, BasicAgentDepartureEvent>();
+		events = new HashMap<Id, AgentDepartureEvent>();
+		eventsReturn = new HashMap<Id, AgentDepartureEvent>();
 		traveltimes = new HashMap<Id, Double>();
 		
 		
@@ -258,7 +258,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, BasicAg
 			return String.valueOf(val);
 	}
 
-	public void handleEvent(BasicLinkEnterEvent event) { 
+	public void handleEvent(LinkEnterEvent event) { 
 		if(event.getLinkId().toString().equals("4"))
 			riskyUsers.add(controler.getPopulation().getPersons().get(event.getPersonId()));
 		else if(event.getLinkId().toString().equals("5"))
@@ -305,15 +305,15 @@ public class Analyzer implements StartupListener, IterationEndsListener, BasicAg
 		return scoresum/(double)persons.size();
 	}
 	
-	public void handleEvent(BasicAgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		if(event.getLinkId().toString().equals("1"))
 			events.put(event.getPersonId(), event);
 		else
 			eventsReturn.put(event.getPersonId(), event);
 	}
 
-	public void handleEvent(BasicAgentArrivalEvent event) {
-		BasicAgentDepartureEvent e = events.get(event.getPersonId());
+	public void handleEvent(AgentArrivalEvent event) {
+		AgentDepartureEvent e = events.get(event.getPersonId());
 		if(e != null) {
 			events.remove(event.getPersonId());
 			double triptime = event.getTime() - e.getTime();

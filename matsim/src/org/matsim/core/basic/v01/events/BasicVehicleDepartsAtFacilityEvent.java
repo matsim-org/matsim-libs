@@ -21,12 +21,12 @@
 package org.matsim.core.basic.v01.events;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.core.api.experimental.events.Event;
 
 /**
  * @author mrieser
  */
-public interface BasicVehicleDepartsAtFacilityEvent extends BasicEvent {
+public interface BasicVehicleDepartsAtFacilityEvent extends Event {
 
 	public static final String EVENT_TYPE = "VehicleDepartsAtFacility";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";

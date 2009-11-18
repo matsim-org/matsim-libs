@@ -29,8 +29,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -41,11 +41,11 @@ import org.matsim.core.utils.io.IOUtils;
  * @author illenberger
  *
  */
-public class LinkCounter implements BasicLinkEnterEventHandler, IterationEndsListener, IterationStartsListener {
+public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener, IterationStartsListener {
 
 	private int count;
 	
-	private List<BasicLinkEnterEvent> events;
+	private List<LinkEnterEvent> events;
 	
 	private BufferedWriter writer;
 	
@@ -69,7 +69,7 @@ public class LinkCounter implements BasicLinkEnterEventHandler, IterationEndsLis
 			e.printStackTrace();
 		}
 	}
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		if(firstEvent == 0)
 			firstEvent = (int) event.getTime();
 		
@@ -81,7 +81,7 @@ public class LinkCounter implements BasicLinkEnterEventHandler, IterationEndsLis
 	}
 
 	public void reset(int iteration) {
-		events = new LinkedList<BasicLinkEnterEvent>();
+		events = new LinkedList<LinkEnterEvent>();
 		firstEvent = 0;
 		lastEvent = 0;
 	}
@@ -90,7 +90,7 @@ public class LinkCounter implements BasicLinkEnterEventHandler, IterationEndsLis
 		int binsize = 60;
 		int bincount = (lastEvent-firstEvent)/binsize;
 		int[] bins = new int[bincount];
-		for(BasicLinkEnterEvent e : events) {
+		for(LinkEnterEvent e : events) {
 			int idx = ((int)e.getTime() - firstEvent)/binsize;
 			bins[idx]++;
 		}

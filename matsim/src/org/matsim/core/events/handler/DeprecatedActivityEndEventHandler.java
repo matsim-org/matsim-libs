@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAgentEvent.java
+ * ActEndEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,15 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.api.basic.v01.events;
+package org.matsim.core.events.handler;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.events.ActivityEndEventImpl;
 
-public interface BasicAgentEvent extends BasicPersonEvent {
-
-	public Id getLinkId();
-	
-	public TransportMode getLegMode();
-
+/** @deprecated use {@link ActivityEndEventHandler} */
+@Deprecated
+public interface DeprecatedActivityEndEventHandler extends EventHandler {
+	public void handleEvent (ActivityEndEventImpl event);
 }

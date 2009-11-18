@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -39,6 +38,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.config.Config;
@@ -264,7 +264,7 @@ public class MixedLaneTest extends TestCase {
 		boolean hasCollectedLink3Event = false;
 		boolean hasCollectedLink2Event = false;
 
-		public void handleEvent(BasicLinkEnterEvent event) {
+		public void handleEvent(LinkEnterEvent event) {
 			if (event.getLinkId().equals(id2)){
 				assertEquals(id1, event.getPersonId());
 				hasCollectedLink2Event = true;

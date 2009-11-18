@@ -26,11 +26,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -45,7 +45,7 @@ import org.matsim.core.utils.misc.Time;
  * Also calculates the average trip duration.
  * Trips ended because of vehicles being stuck are not counted.
  */
-public class CalcLegTimes implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler {
+public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
 	private static final int SLOT_SIZE = 300;	// 5-min slots
 	private static final int MAXINDEX = 12; // slots 0..11 are regular slots, slot 12 is anything above
@@ -61,7 +61,7 @@ public class CalcLegTimes implements BasicAgentDepartureEventHandler, BasicAgent
 		this.population = population;
 	}
 
-	public void handleEvent(final BasicAgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 		Integer cnt = this.agentLegs.get(event.getPersonId());
 		if (cnt == null) {
@@ -71,7 +71,7 @@ public class CalcLegTimes implements BasicAgentDepartureEventHandler, BasicAgent
 		}
 	}
 
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		PersonImpl agent = this.population.getPersons().get(event.getPersonId());
 		if (depTime != null && agent != null) {

@@ -9,18 +9,18 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
@@ -42,10 +42,10 @@ import org.matsim.core.utils.collections.Tuple;
  * than the Freespeed Travel Times. 
  */
 
-public class LinkReplanningMap implements BasicLinkEnterEventHandler,
-		BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler,
-		BasicAgentDepartureEventHandler, BasicAgentWait2LinkEventHandler,
-		BasicAgentStuckEventHandler {
+public class LinkReplanningMap implements LinkEnterEventHandler,
+		LinkLeaveEventHandler, AgentArrivalEventHandler,
+		AgentDepartureEventHandler, AgentWait2LinkEventHandler,
+		AgentStuckEventHandler {
 	
 	private QueueNetwork queueNetwork;
 
@@ -68,7 +68,7 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 	}
 	
 	// set the earliest possible leave link time as replanning time 
-	public void handleEvent(BasicLinkEnterEvent event)
+	public void handleEvent(LinkEnterEvent event)
 	{
 		double now = event.getTime();
 		QueueLink queueLink = queueNetwork.getQueueLink(event.getLinkId());
@@ -80,7 +80,7 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 		}
 	}
 
-	public void handleEvent(BasicLinkLeaveEvent event)
+	public void handleEvent(LinkLeaveEvent event)
 	{
 		synchronized(replanningMap)
 		{
@@ -88,7 +88,7 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 		}
 	}
 
-	public void handleEvent(BasicAgentArrivalEvent event)
+	public void handleEvent(AgentArrivalEvent event)
 	{
 		synchronized(replanningMap)
 		{
@@ -97,7 +97,7 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 	}
 
 	// Nothing to do here...
-	public void handleEvent(BasicAgentDepartureEvent event)
+	public void handleEvent(AgentDepartureEvent event)
 	{
 
 	}
@@ -106,7 +106,7 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 	 * Person is added directly to the Buffer Queue so we don't need a
 	 * time offset here.
 	 */
-	public void handleEvent(BasicAgentWait2LinkEvent event)
+	public void handleEvent(AgentWait2LinkEvent event)
 	{		
 		synchronized(replanningMap)
 		{
@@ -114,7 +114,7 @@ public class LinkReplanningMap implements BasicLinkEnterEventHandler,
 		}
 	}
 
-	public void handleEvent(BasicAgentStuckEvent event)
+	public void handleEvent(AgentStuckEvent event)
 	{
 		synchronized(replanningMap)
 		{

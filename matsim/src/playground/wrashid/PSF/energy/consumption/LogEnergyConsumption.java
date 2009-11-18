@@ -4,13 +4,13 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.Controler;
 
 /*
@@ -20,7 +20,7 @@ import org.matsim.core.controler.Controler;
  * => we need to assign a different such curve to each agent (we need to put this attribute to the agent)
  * 
  */
-public class LogEnergyConsumption implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentWait2LinkEventHandler {
+public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentWait2LinkEventHandler {
 
 	private static final Logger log = Logger.getLogger(LogEnergyConsumption.class);
 	Controler controler;
@@ -31,7 +31,7 @@ public class LogEnergyConsumption implements BasicLinkEnterEventHandler, BasicLi
 	 * 
 	 * @see org.matsim.core.events.handler.LinkEnterEventHandler#handleEvent(org.matsim.core.events.LinkEnterEvent)
 	 */
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		Id personId = event.getPersonId();
 
 		if (!energyConsumption.containsKey(personId)) {
@@ -47,7 +47,7 @@ public class LogEnergyConsumption implements BasicLinkEnterEventHandler, BasicLi
 		energyConsumption = new HashMap<Id, EnergyConsumption>();
 	}
 
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		Id personId = event.getPersonId();
 
 		EnergyConsumption eConsumption = energyConsumption.get(personId);
@@ -78,7 +78,7 @@ public class LogEnergyConsumption implements BasicLinkEnterEventHandler, BasicLi
 	 * 
 	 * @see org.matsim.core.events.handler.AgentWait2LinkEventHandler#handleEvent(org.matsim.core.events.AgentWait2LinkEvent)
 	 */
-	public void handleEvent(BasicAgentWait2LinkEvent event) {
+	public void handleEvent(AgentWait2LinkEvent event) {
 		Id personId = event.getPersonId();
 		if (!energyConsumption.containsKey(personId)) {
 			energyConsumption.put(personId, new EnergyConsumption());

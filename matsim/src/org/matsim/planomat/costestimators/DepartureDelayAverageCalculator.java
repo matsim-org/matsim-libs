@@ -24,19 +24,19 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 /**
  * Computes average departure delay on a link in a given time slot.
  *
  * @author meisterk
  */
-public class DepartureDelayAverageCalculator implements BasicAgentDepartureEventHandler, BasicLinkLeaveEventHandler {
+public class DepartureDelayAverageCalculator implements AgentDepartureEventHandler, LinkLeaveEventHandler {
 
 	private Network network;
 	private int timeBinSize;
@@ -131,12 +131,12 @@ public class DepartureDelayAverageCalculator implements BasicAgentDepartureEvent
 		return this.linkData.get(linkId);
 	}
 
-	public void handleEvent(BasicAgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		DepartureEvent depEvent = new DepartureEvent(event.getPersonId());
 		this.departureEventsTimes.put(depEvent, event.getTime());
 	}
 
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		DepartureEvent removeMe = new DepartureEvent(event.getPersonId());
 		Double departureTime = departureEventsTimes.remove(removeMe);
 		if (departureTime != null) {

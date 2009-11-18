@@ -6,8 +6,8 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
-import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
@@ -24,7 +24,7 @@ import playground.christoph.router.util.KnowledgeTools;
  * This Class takes care of the Data Exchange between the Persons 
  * and the Database that contains their Knowledge. 
  */
-public class KnowledgeDBStorageHandler extends Thread implements BasicActivityStartEventHandler, QueueSimulationBeforeSimStepListener{
+public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEventHandler, QueueSimulationBeforeSimStepListener{
 
 	private ArrayList<PersonImpl> newPersons = new ArrayList<PersonImpl>();
 	private LinkedList<PersonImpl> personsToProcess = new LinkedList<PersonImpl>();
@@ -148,7 +148,7 @@ public class KnowledgeDBStorageHandler extends Thread implements BasicActivitySt
 		}
 	}
 
-	public synchronized void handleEvent(BasicActivityStartEvent event)
+	public synchronized void handleEvent(ActivityStartEvent event)
 	{
 		PersonImpl person = population.getPersons().get(event.getPersonId());
 		NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);

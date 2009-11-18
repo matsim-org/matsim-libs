@@ -23,22 +23,22 @@ package playground.toronto.example;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 
 // a simple example how to implement an eventsHandler
 // More eventsHandler can be found under org.matsim.events.*
 // compare them with example events files
 // more examples can be found under test/src: org.matsim.events
-public class DailyLinkVolumeCalc implements BasicLinkLeaveEventHandler {
+public class DailyLinkVolumeCalc implements LinkLeaveEventHandler {
 
 	// stores the number of leaveLinkEvents per link
 	private static TreeMap<Id,Integer> counts = new TreeMap<Id, Integer>();
 
 	// implementation of a LinkLeaveEventHandler method
 	// it fills up the TreeMap
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		Id id = new IdImpl(event.getLinkId().toString());
 		Integer cnt = counts.get(id);
 		if (cnt == null) {

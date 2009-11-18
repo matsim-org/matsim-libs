@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicEventHandler.java
+ * EventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,8 +20,8 @@
 
 package org.matsim.core.events.handler;
 
-import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.core.api.experimental.events.Event;
 
 public interface BasicEventHandler extends EventHandler {
-	public void handleEvent (BasicEvent event);
+	public void handleEvent (Event event);
 }

@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.charts.XYScatterChart;
 
@@ -41,7 +41,7 @@ import org.matsim.core.utils.charts.XYScatterChart;
  *
  * @author mrieser
  */
-public class QVDiagramm implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler {
+public class QVDiagramm implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler {
 
 	/** The id of the link we're interesetd in. */
 	private final Id linkId;
@@ -80,21 +80,21 @@ public class QVDiagramm implements BasicLinkEnterEventHandler, BasicLinkLeaveEve
 		this.linkLength = link.getLength();
 	}
 
-	public void handleEvent(final BasicLinkEnterEvent event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		// Store the enter time of this agent if it's on the link we're interested in.
 		if (this.linkId.equals(event.getLinkId())) {
 			this.agents.put(event.getPersonId(), Double.valueOf(event.getTime()));
 		}
 	}
 
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		// delete the enter time, because the agent won't leave this link for a while now...
 		if (this.linkId.equals(event.getLinkId())) {
 			this.agents.remove(event.getPersonId());
 		}
 	}
 
-	public void handleEvent(final BasicLinkLeaveEvent event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		if (this.linkId.equals(event.getLinkId())) {
 			if ((int)event.getTime() / this.binSize != this.timeBinIndex) {
 				// the event is from a new time bin, finish the old one.

@@ -25,14 +25,14 @@ package playground.yu.analysis;
 
 import java.util.TreeMap;
 
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.utils.TollTools;
@@ -43,8 +43,8 @@ import playground.yu.utils.TollTools;
  * @author ychen
  * 
  */
-public class CalcNetAvgSpeed implements BasicLinkEnterEventHandler,
-		BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler {
+public class CalcNetAvgSpeed implements LinkEnterEventHandler,
+		LinkLeaveEventHandler, AgentArrivalEventHandler {
 	/**
 	 * @param lengthSum
 	 *            - the sum of all the covered distance [km].
@@ -70,7 +70,7 @@ public class CalcNetAvgSpeed implements BasicLinkEnterEventHandler,
 		this.toll = toll;
 	}
 
-	public void handleEvent(BasicLinkEnterEvent enter) {
+	public void handleEvent(LinkEnterEvent enter) {
 		if (toll == null)
 			this.enterTimes
 					.put(enter.getPersonId().toString(), enter.getTime());
@@ -89,7 +89,7 @@ public class CalcNetAvgSpeed implements BasicLinkEnterEventHandler,
 		this.timeSum = 0;
 	}
 
-	public void handleEvent(BasicLinkLeaveEvent leave) {
+	public void handleEvent(LinkLeaveEvent leave) {
 		Double enterTime = this.enterTimes.remove(leave.getPersonId()
 				.toString());
 		if (enterTime != null) {
@@ -105,7 +105,7 @@ public class CalcNetAvgSpeed implements BasicLinkEnterEventHandler,
 		return ((this.timeSum != 0.0) ? this.lengthSum / this.timeSum : 0.0);
 	}
 
-	public void handleEvent(BasicAgentArrivalEvent arrival) {
+	public void handleEvent(AgentArrivalEvent arrival) {
 		String id = arrival.getPersonId().toString();
 		if (this.enterTimes.containsKey(id)) {
 			this.enterTimes.remove(id);

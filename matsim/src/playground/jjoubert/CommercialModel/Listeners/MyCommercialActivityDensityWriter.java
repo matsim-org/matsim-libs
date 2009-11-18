@@ -23,12 +23,12 @@ package playground.jjoubert.CommercialModel.Listeners;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
-import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 
-public class MyCommercialActivityDensityWriter implements BasicActivityStartEventHandler{
+public class MyCommercialActivityDensityWriter implements ActivityStartEventHandler{
 	
 	private BufferedWriter outputGapDensity;
 	private NetworkLayer network;
@@ -42,7 +42,7 @@ public class MyCommercialActivityDensityWriter implements BasicActivityStartEven
 
 	}
 
-	public void handleEvent(BasicActivityStartEvent event) {
+	public void handleEvent(ActivityStartEvent event) {
 
 		if(event.getActType().equalsIgnoreCase("minor")){
 			double timeSeconds = event.getTime();

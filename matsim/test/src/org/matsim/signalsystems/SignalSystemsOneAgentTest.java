@@ -21,9 +21,9 @@ package org.matsim.signalsystems;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
@@ -47,7 +47,7 @@ import org.matsim.testcases.MatsimTestCase;
  * @author dgrether
  */
 public class SignalSystemsOneAgentTest extends MatsimTestCase implements
-		BasicLinkEnterEventHandler {
+		LinkEnterEventHandler {
 
 	
 	private static final Logger log = Logger.getLogger(SignalSystemsOneAgentTest.class);
@@ -110,7 +110,7 @@ public class SignalSystemsOneAgentTest extends MatsimTestCase implements
 		sim.run();
 	}
 
-	public void handleEvent(BasicLinkEnterEvent e) {
+	public void handleEvent(LinkEnterEvent e) {
 		log.info("LinkEnter: " + e.getLinkId().toString() + " time: " + e.getTime());
 		if (e.getLinkId().equals(id1)){
 			assertEquals(1.0, e.getTime(), EPSILON);

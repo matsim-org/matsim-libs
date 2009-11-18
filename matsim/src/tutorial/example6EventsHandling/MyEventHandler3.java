@@ -1,7 +1,7 @@
 package tutorial.example6EventsHandling;
 
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 /**
@@ -12,7 +12,7 @@ import org.matsim.core.utils.charts.XYLineChart;
  * @author dgrether
  *
  */
-public class MyEventHandler3 implements BasicLinkEnterEventHandler {
+public class MyEventHandler3 implements LinkEnterEventHandler {
 
 	private double[] volumeLink6;
 
@@ -33,7 +33,7 @@ public class MyEventHandler3 implements BasicLinkEnterEventHandler {
 		this.volumeLink6 = new double[24];
 	}
 
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		if (event.getLinkId().equals(new IdImpl("6"))) {
 			this.volumeLink6[getSlot(event.getTime())]++;
 		}	

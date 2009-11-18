@@ -29,10 +29,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
@@ -247,7 +247,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 
 
 	@Override
-	public void handleEvent(final BasicLinkEnterEvent event) {
+	public void handleEvent(final LinkEnterEvent event) {
 
 		// Must be done before super.handleEvent as that removes entries
 		if (this.ttMeasured.containsKey(event.getLinkId())) {
@@ -268,7 +268,7 @@ public class ControlInputSB extends AbstractControlInputImpl {
 	}
 
 	@Override
-	public void handleEvent(final BasicLinkLeaveEvent event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 
 		// Must be done before super.handleEvent as that removes entries
 		if (this.ttMeasured.containsKey(event.getLinkId())

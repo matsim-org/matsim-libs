@@ -23,14 +23,14 @@ package playground.balmermi.datapuls.modules;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
-public class DailyLinkVolumeCalc implements BasicLinkLeaveEventHandler {
+public class DailyLinkVolumeCalc implements LinkLeaveEventHandler {
 
 	private static TreeMap<Id,Integer> counts = new TreeMap<Id, Integer>();
 
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		Id id = event.getLinkId();
 		Integer cnt = counts.get(id);
 		if (cnt == null) {

@@ -34,9 +34,6 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.events.BasicEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -45,6 +42,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEventImpl;
@@ -189,7 +189,7 @@ public class QueueSimulationTest extends TestCase {
 		sim.run();
 
 		/* finish */
-		List<BasicEvent> allEvents = collector.getEvents();
+		List<Event> allEvents = collector.getEvents();
 		assertEquals("wrong number of events.", 4, collector.getEvents().size());
 		assertEquals("wrong type of 1st event.", ActivityEndEventImpl.class, allEvents.get(0).getClass());
 		assertEquals("wrong type of 2nd event.", AgentDepartureEventImpl.class, allEvents.get(1).getClass());
@@ -232,7 +232,7 @@ public class QueueSimulationTest extends TestCase {
 		sim.run();
 
 		/* finish */
-		List<BasicEvent> allEvents = collector.getEvents();
+		List<Event> allEvents = collector.getEvents();
 		assertEquals("wrong number of events.", 4, allEvents.size());
 		assertEquals("wrong type of 1st event.", ActivityEndEventImpl.class, allEvents.get(0).getClass());
 		assertEquals("wrong type of 2nd event.", AgentDepartureEventImpl.class, allEvents.get(1).getClass());
@@ -248,9 +248,9 @@ public class QueueSimulationTest extends TestCase {
 		assertEquals("wrong link in 4th event.", f.link1.getId(), ((ActivityStartEventImpl) allEvents.get(3)).getLinkId());
 	}
 
-	/*package*/ static class LinkEnterEventCollector implements BasicLinkEnterEventHandler {
-		public final ArrayList<BasicLinkEnterEvent> events = new ArrayList<BasicLinkEnterEvent>();
-		public void handleEvent(final BasicLinkEnterEvent event) {
+	/*package*/ static class LinkEnterEventCollector implements LinkEnterEventHandler {
+		public final ArrayList<LinkEnterEvent> events = new ArrayList<LinkEnterEvent>();
+		public void handleEvent(final LinkEnterEvent event) {
 			this.events.add(event);
 		}
 		public void reset(final int iteration) {
@@ -567,7 +567,7 @@ public class QueueSimulationTest extends TestCase {
 		sim.run();
 
 		/* finish */
-		List<BasicEvent> allEvents = collector.getEvents();
+		List<Event> allEvents = collector.getEvents();
 		assertEquals("wrong number of events.", 11, allEvents.size());
 		assertEquals("wrong type of event.", ActivityEndEventImpl.class, allEvents.get(0).getClass());
 		assertEquals("wrong type of event.", AgentDepartureEventImpl.class, allEvents.get(1).getClass());
@@ -621,7 +621,7 @@ public class QueueSimulationTest extends TestCase {
 		}
 
 		/* finish */
-		List<BasicEvent> allEvents = collector.getEvents();
+		List<Event> allEvents = collector.getEvents();
 		assertEquals("wrong number of events.", 6, allEvents.size());
 		assertEquals("wrong type of event.", ActivityEndEventImpl.class, allEvents.get(0).getClass());
 		assertEquals("wrong type of event.", AgentDepartureEventImpl.class, allEvents.get(1).getClass());
@@ -720,7 +720,7 @@ public class QueueSimulationTest extends TestCase {
 		sim.run();
 
 		/* finish */
-		List<BasicEvent> allEvents = collector.getEvents();
+		List<Event> allEvents = collector.getEvents();
 		assertEquals("wrong number of events.", 13, allEvents.size());
 		assertEquals("wrong type of event.", ActivityEndEventImpl.class, allEvents.get(0).getClass());
 		assertEquals("wrong type of event.", AgentDepartureEventImpl.class, allEvents.get(1).getClass());
@@ -773,7 +773,7 @@ public class QueueSimulationTest extends TestCase {
 		sim.run();
 
 		/* finish */
-		List<BasicEvent> allEvents = collector.getEvents();
+		List<Event> allEvents = collector.getEvents();
 		assertEquals("wrong number of events.", 17, allEvents.size());
 		assertEquals("wrong type of event.", ActivityEndEventImpl.class, allEvents.get(0).getClass());
 		assertEquals("wrong type of event.", AgentDepartureEventImpl.class, allEvents.get(1).getClass());
@@ -984,14 +984,14 @@ public class QueueSimulationTest extends TestCase {
 	 *
 	 * @author mrieser
 	 */
-	private final static class EnterLinkEventCounter implements BasicLinkEnterEventHandler {
+	private final static class EnterLinkEventCounter implements LinkEnterEventHandler {
 		private final String linkId;
 		private int counter = 0;
 		public EnterLinkEventCounter(final String linkId) {
 			this.linkId = linkId;
 		}
 
-		public void handleEvent(final BasicLinkEnterEvent event) {
+		public void handleEvent(final LinkEnterEvent event) {
 			if (event.getLinkId().toString().equals(this.linkId)) this.counter++;
 		}
 
@@ -1005,10 +1005,10 @@ public class QueueSimulationTest extends TestCase {
 	}
 
 	/*package*/ final static class FirstLastEventCollector implements BasicEventHandler {
-		public BasicEvent firstEvent = null;
-		public BasicEvent lastEvent = null;
+		public Event firstEvent = null;
+		public Event lastEvent = null;
 		
-		public void handleEvent(final BasicEvent event) {
+		public void handleEvent(final Event event) {
 			if (firstEvent == null) {
 				firstEvent = event;
 			}

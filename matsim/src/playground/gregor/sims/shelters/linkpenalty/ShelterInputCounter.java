@@ -5,9 +5,9 @@ import java.util.SortedMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
@@ -19,7 +19,7 @@ import org.matsim.signalsystems.control.SignalSystemController;
 
 import playground.gregor.collections.gnuclasspath.TreeMap;
 
-public class ShelterInputCounter implements BasicLinkLeaveEventHandler, BeforeMobsimListener {
+public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimListener {
 
 	private SortedMap<Id, SignalSystemController> scs;
 	private final HashMap<Id,Counter> counts = new HashMap<Id, Counter>();
@@ -37,7 +37,7 @@ public class ShelterInputCounter implements BasicLinkLeaveEventHandler, BeforeMo
 		}
 	}
 
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		Counter c = this.counts.get(event.getLinkId()); 
 		if (c != null) {
 			c.count++;

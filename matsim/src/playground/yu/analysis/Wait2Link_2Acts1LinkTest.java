@@ -29,11 +29,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
@@ -129,7 +129,7 @@ public class Wait2Link_2Acts1LinkTest {
 		}
 	}
 
-	public static class Wait2Link implements BasicAgentWait2LinkEventHandler {
+	public static class Wait2Link implements AgentWait2LinkEventHandler {
 		private final Set<AgentLinkPair> agentLinksPairs;
 		private BufferedWriter writer;
 		private int overlapCount;
@@ -151,7 +151,7 @@ public class Wait2Link_2Acts1LinkTest {
 			this.overlapCount = 0;
 		}
 
-		public void handleEvent(final BasicAgentWait2LinkEvent event) {
+		public void handleEvent(final AgentWait2LinkEvent event) {
 			for (AgentLinkPair alp : this.agentLinksPairs)
 				if (alp.agentId.equals(event.getPersonId().toString())
 						&& alp.linkId.equals(event.getLinkId().toString())) {

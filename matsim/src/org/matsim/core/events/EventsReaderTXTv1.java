@@ -24,7 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.basic.v01.IdImpl;
@@ -64,9 +64,9 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 
 	}
 
-	 public BasicEvent createEvent(final EventsManagerImpl events, final double time, final Id agentId,
+	 public Event createEvent(final EventsManagerImpl events, final double time, final Id agentId,
 			final Id linkId, final int flag, final String desc, final String acttype) {
-		 BasicEvent data = null;
+		 Event data = null;
 
 		switch (flag) {
 			case 2:
@@ -115,7 +115,7 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 	protected void parseLine(final String line) {
 		String[] result = StringUtils.explode(line, '\t', 7);
 		if (result.length == 7) {
-			BasicEvent data = createEvent(this.events, Double.parseDouble(result[0]),	// time
+			Event data = createEvent(this.events, Double.parseDouble(result[0]),	// time
 					new IdImpl(result[1]),		// vehID
 					new IdImpl(result[3]),		// linkID
 					//Integer.parseInt(result[4]),		// nodeID

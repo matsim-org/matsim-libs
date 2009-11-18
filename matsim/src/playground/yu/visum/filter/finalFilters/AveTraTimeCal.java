@@ -52,7 +52,7 @@ public class AveTraTimeCal extends LinkAveCalA {
 	/*-----------------------OVERRIDE MOTHODS--------------------------*/
 	/**
 	 * Accumulates the traveltime; Is called in void
-	 * org.matsim.playground.filters.filter.finalFilters.LinkAveCalA.handleEvent(BasicEvent
+	 * org.matsim.playground.filters.filter.finalFilters.LinkAveCalA.handleEvent(Event
 	 * event)
 	 */
 	@Override

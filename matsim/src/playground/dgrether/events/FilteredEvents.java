@@ -21,7 +21,7 @@ package playground.dgrether.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.PersonEventImpl;
 
@@ -57,7 +57,7 @@ public class FilteredEvents extends EventsManagerImpl {
 	 * Otherwise nothing is done at all.
 	 */
 	@Override
-	public void processEvent(final BasicEvent event) {
+	public void processEvent(final Event event) {
 		if (event instanceof PersonEventImpl) {
 			boolean doProcess = true;
 			for (EventFilter f : this.filters) {

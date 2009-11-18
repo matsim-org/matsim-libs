@@ -28,13 +28,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentEvent;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
@@ -56,8 +56,8 @@ import playground.yu.utils.TollTools;
  * @author ychen
  * 
  */
-public class LegDistance implements BasicLinkEnterEventHandler,
-		BasicAgentArrivalEventHandler, BasicAgentStuckEventHandler {
+public class LegDistance implements LinkEnterEventHandler,
+		AgentArrivalEventHandler, AgentStuckEventHandler {
 	private final NetworkLayer network;
 	private int binSize;
 	private double[] legDistances;
@@ -80,7 +80,7 @@ public class LegDistance implements BasicLinkEnterEventHandler,
 		return bin;
 	}
 
-	protected void handleEventIntern(BasicAgentEvent ae) {
+	protected void handleEventIntern(AgentEvent ae) {
 		int binIdx = getBinIndex(ae.getTime());
 		Double distance = this.distances.remove(ae.getPersonId().toString());
 		if (distance != null) {
@@ -120,7 +120,7 @@ public class LegDistance implements BasicLinkEnterEventHandler,
 		this.ppl = ppl;
 	}
 
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		String linkId = event.getLinkId().toString();
 		LinkImpl l = this.network.getLink(linkId);
 		String agentId = event.getPersonId().toString();
@@ -144,11 +144,11 @@ public class LegDistance implements BasicLinkEnterEventHandler,
 		}
 	}
 
-	public void handleEvent(BasicAgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		handleEventIntern(event);
 	}
 
-	public void handleEvent(BasicAgentStuckEvent event) {
+	public void handleEvent(AgentStuckEvent event) {
 		handleEventIntern(event);
 	}
 

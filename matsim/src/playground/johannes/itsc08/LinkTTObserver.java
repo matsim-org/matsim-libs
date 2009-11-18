@@ -27,10 +27,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -41,11 +41,11 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.eut.EstimReactiveLinkTT;
 
-public class LinkTTObserver implements BasicLinkLeaveEventHandler, BasicLinkEnterEventHandler, IterationStartsListener, IterationEndsListener {
+public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHandler, IterationStartsListener, IterationEndsListener {
 
 	private EstimReactiveLinkTT linktt;
 	
-	private Map<Id, BasicLinkEnterEvent> events; // personId
+	private Map<Id, LinkEnterEvent> events; // personId
 	
 	private BufferedWriter realTTWriter;
 	
@@ -58,9 +58,9 @@ public class LinkTTObserver implements BasicLinkLeaveEventHandler, BasicLinkEnte
 		this.linktt = linktt;
 	}
 	
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		if(event.getLinkId().toString().equals("2")) {
-			BasicLinkEnterEvent enter = events.remove(event.getPersonId());
+			LinkEnterEvent enter = events.remove(event.getPersonId());
 			double realTT = event.getTime() - enter.getTime();
 			try {
 				realTTWriter.write(String.valueOf(enter.getTime()));
@@ -77,10 +77,10 @@ public class LinkTTObserver implements BasicLinkLeaveEventHandler, BasicLinkEnte
 	}
 
 	public void reset(int iteration) {
-		events = new HashMap<Id, BasicLinkEnterEvent>();
+		events = new HashMap<Id, LinkEnterEvent>();
 	}
 
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		events.put(event.getPersonId(), event);
 		
 		double estimTT = linktt.getLinkTravelTime(link, event.getTime());

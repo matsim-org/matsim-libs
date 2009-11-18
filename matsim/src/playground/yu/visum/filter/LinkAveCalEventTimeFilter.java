@@ -1,6 +1,6 @@
 package playground.yu.visum.filter;
 
-import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.utils.misc.Time;
@@ -19,7 +19,7 @@ public class LinkAveCalEventTimeFilter extends EventFilterA {
 	}
 
 	@Override
-	public boolean judge(BasicEvent event) {
+	public boolean judge(Event event) {
 		if ((event.getClass() == (LinkEnterEventImpl.class))
 				|| (event.getClass() == (LinkLeaveEventImpl.class))) {
 			return judgeTime(event.getTime());

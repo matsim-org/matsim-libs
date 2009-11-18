@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAgentArrivalEvent.java
+ * AgentArrivalEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,9 +20,6 @@
 
 package org.matsim.core.api.experimental.events;
 
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-
-
-public interface AgentArrivalEvent extends BasicAgentArrivalEvent {
+public interface AgentArrivalEvent extends AgentEvent {
 
 }

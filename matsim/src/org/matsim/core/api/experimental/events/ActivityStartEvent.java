@@ -20,8 +20,6 @@
 
 package org.matsim.core.api.experimental.events;
 
-import org.matsim.api.basic.v01.events.BasicActivityStartEvent;
-
-public interface ActivityStartEvent extends BasicActivityStartEvent {
+public interface ActivityStartEvent extends ActivityEvent {
 
 }

@@ -28,8 +28,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.handler.ActivityEndEventHandler;
-import org.matsim.core.events.handler.ActivityStartEventHandler;
+import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
+import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -39,7 +39,7 @@ import org.matsim.core.facilities.ActivityOption;
  * Uses FacilityPenalty to manage the facililities' loads by taking care of activity start and end events.
  */
 
-public class EventsToFacilityLoad implements ActivityStartEventHandler, ActivityEndEventHandler {
+public class EventsToFacilityLoad implements DeprecatedActivityStartEventHandler, DeprecatedActivityEndEventHandler {
 
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);

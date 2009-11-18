@@ -23,10 +23,10 @@ package playground.yu.bottleneck;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -37,7 +37,7 @@ import org.matsim.core.utils.misc.Time;
  * @author ychen
  *
  */
-public class BottleneckTraVol implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler {
+public class BottleneckTraVol implements LinkEnterEventHandler, LinkLeaveEventHandler {
 //	--------------------------MEMBER VARIABLES---------------------------------
 	private BufferedWriter out = null;
 	private int cnt;
@@ -53,7 +53,7 @@ public class BottleneckTraVol implements BasicLinkEnterEventHandler, BasicLinkLe
 	/**
 	 * measures the amount of the agents on the link with bottleneck by every "entering"-Event
 	 */
-	public void handleEvent(final BasicLinkEnterEvent event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		if (event.getLinkId().toString().equals("15")) {
 			writeLine(Time.writeTime(event.getTime() - 1) + "\t" + cnt);
 			writeLine(Time.writeTime(event.getTime()) + "\t" + (++cnt));
@@ -62,7 +62,7 @@ public class BottleneckTraVol implements BasicLinkEnterEventHandler, BasicLinkLe
 	/**
 	 * measures the amount of the agents on the link with bottleneck by every "leaving"-Event
 	 */
-	public void handleEvent(final BasicLinkLeaveEvent event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		if (event.getLinkId().toString().equals("15")) {
 			writeLine(Time.writeTime(event.getTime() - 1) + "\t" + cnt);
 			writeLine(Time.writeTime(event.getTime()) + "\t" + (--cnt));

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicEvent.java
+ * Event.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,9 +23,9 @@ package org.matsim.core.events;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.core.api.experimental.events.Event;
 
-public abstract class BasicEventImpl implements BasicEvent {
+public abstract class BasicEventImpl implements Event {
 
 	public final static String ATTRIBUTE_TIME = "time";
 	public final static String ATTRIBUTE_TYPE = "type";

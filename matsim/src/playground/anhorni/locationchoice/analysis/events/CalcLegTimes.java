@@ -23,18 +23,18 @@ package playground.anhorni.locationchoice.analysis.events;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 
 import playground.anhorni.locationchoice.preprocess.helper.Utils;
 
-public class CalcLegTimes implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler {
+public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
 	private Population population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
@@ -49,7 +49,7 @@ public class CalcLegTimes implements BasicAgentDepartureEventHandler, BasicAgent
 		this.wayThere = wayThere;
 	}
 
-	public void handleEvent(BasicAgentDepartureEvent event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 	}
 
@@ -74,7 +74,7 @@ public class CalcLegTimes implements BasicAgentDepartureEventHandler, BasicAgent
 		return (Activity) plan.getPlanElements().get(count*2);
 	}
 	
-	public void handleEvent(BasicAgentArrivalEvent event) {
+	public void handleEvent(AgentArrivalEvent event) {
 		increaseAgentArrivalCount(event.getPersonId());
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		Person agent = this.population.getPersons().get(event.getPersonId());

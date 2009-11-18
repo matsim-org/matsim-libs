@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 
@@ -34,8 +34,8 @@ import org.matsim.core.gbl.Gbl;
  * @author rashid_waraich
  */
 public class ProcessEventThread implements Runnable {
-	ArrayList<BasicEvent> preInputBuffer = null;
-	ConcurrentListSPSC<BasicEvent> eventQueue = null;
+	ArrayList<Event> preInputBuffer = null;
+	ConcurrentListSPSC<Event> eventQueue = null;
 	EventsManagerImpl events;
 	CyclicBarrier cb = null;
 	private int preInputBufferMaxLength;
@@ -44,12 +44,12 @@ public class ProcessEventThread implements Runnable {
 			CyclicBarrier cb) {
 		this.events = events;
 		this.preInputBufferMaxLength = preInputBufferMaxLength;
-		eventQueue = new ConcurrentListSPSC<BasicEvent>();
-		preInputBuffer = new ArrayList<BasicEvent>();
+		eventQueue = new ConcurrentListSPSC<Event>();
+		preInputBuffer = new ArrayList<Event>();
 		this.cb = cb;
 	}
 
-	public synchronized void processEvent(BasicEvent event) {
+	public synchronized void processEvent(Event event) {
 		// first approach (quick on office computer, but not on satawal)
 		// eventQueue.add(event);
 
@@ -63,7 +63,7 @@ public class ProcessEventThread implements Runnable {
 
 	public void run() {
 		// process events, until LastEventOfIteration arrives
-		BasicEvent nextEvent = null;
+		Event nextEvent = null;
 		while (true) {
 			nextEvent = eventQueue.remove();
 			if (nextEvent != null) {

@@ -26,10 +26,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
@@ -43,8 +43,8 @@ import org.matsim.core.utils.io.IOUtils;
  * 
  * @author ychen
  */
-public class TimeWriter implements BasicAgentDepartureEventHandler,
-		BasicAgentArrivalEventHandler {
+public class TimeWriter implements AgentDepartureEventHandler,
+		AgentArrivalEventHandler {
 	// -------------------------MEMBER
 	// VARIABLES---------------------------------
 	private BufferedWriter out = null;
@@ -61,7 +61,7 @@ public class TimeWriter implements BasicAgentDepartureEventHandler,
 	 * If an agent departures, will the information be saved in a hashmap
 	 * (agentDepTimes).
 	 */
-	public void handleEvent(final BasicAgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		if (!this.agentDepTimes.containsKey(event.getPersonId().toString())) { // only
 																				// store
 																				// first
@@ -74,7 +74,7 @@ public class TimeWriter implements BasicAgentDepartureEventHandler,
 	 * If an agent arrives, will the "agent-ID", "depTime" and "arrTime" be
 	 * written in a .txt-file
 	 */
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		String agentId = event.getPersonId().toString();
 		if (agentDepTimes.containsKey(agentId)) {
 			int depT = (int) agentDepTimes.remove(agentId).doubleValue();

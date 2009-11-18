@@ -8,19 +8,19 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
@@ -33,10 +33,10 @@ import org.matsim.core.network.NetworkLayer;
 
 import playground.christoph.network.MyLinkImpl;
 
-public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
-		BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler,
-		BasicAgentDepartureEventHandler, BasicAgentWait2LinkEventHandler,
-		BasicAgentStuckEventHandler, QueueSimulationAfterSimStepListener,
+public class LinkVehiclesCounter implements LinkEnterEventHandler,
+		LinkLeaveEventHandler, AgentArrivalEventHandler,
+		AgentDepartureEventHandler, AgentWait2LinkEventHandler,
+		AgentStuckEventHandler, QueueSimulationAfterSimStepListener,
 		QueueSimulationInitializedListener {
 
 	/*
@@ -122,8 +122,8 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		}
 	}
 
-	public synchronized void handleEvent(BasicLinkEnterEvent event) {
-//		log.info("BasicLinkEnterEvent " + event.getLinkId().toString() + " " + event.getTime());
+	public synchronized void handleEvent(LinkEnterEvent event) {
+//		log.info("LinkEnterEvent " + event.getLinkId().toString() + " " + event.getTime());
 
 		Id id = event.getLinkId();
 
@@ -139,8 +139,8 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		countChangedMap.put(id, count + 1);
 	}
 
-	public synchronized void handleEvent(BasicLinkLeaveEvent event) {
-//		log.info("BasicLinkLeaveEvent " + event.getLinkId().toString() + " " + event.getTime());
+	public synchronized void handleEvent(LinkLeaveEvent event) {
+//		log.info("LinkLeaveEvent " + event.getLinkId().toString() + " " + event.getTime());
 
 		Id id = event.getLinkId();
 
@@ -156,8 +156,8 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		countChangedMap.put(id, count - 1);
 	}
 
-	public synchronized void handleEvent(BasicAgentArrivalEvent event) {
-//		log.info("BasicAgentArrivalEvent " + event.getLinkId().toString() + " " + event.getTime());
+	public synchronized void handleEvent(AgentArrivalEvent event) {
+//		log.info("AgentArrivalEvent " + event.getLinkId().toString() + " " + event.getTime());
 
 		Id id = event.getLinkId();
 
@@ -181,8 +181,8 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 	 * Structure of this method: Have a look at
 	 * QueueSimulation.agentDeparts()...
 	 */
-	public synchronized void handleEvent(BasicAgentDepartureEvent event) {
-//		log.info("BasicAgentDepartureEvent " + event.getLinkId().toString() + " " + event.getTime());
+	public synchronized void handleEvent(AgentDepartureEvent event) {
+//		log.info("AgentDepartureEvent " + event.getLinkId().toString() + " " + event.getTime());
 
 		// Handling depends on the Route of the Agent
 		Leg leg = ((AgentDepartureEventImpl) event).getLeg();
@@ -236,8 +236,8 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		}
 	}
 
-	public synchronized void handleEvent(BasicAgentWait2LinkEvent event) {
-//		log.info("BasicAgentWait2LinkEvent " + event.getLinkId().toString() + " " + event.getTime());
+	public synchronized void handleEvent(AgentWait2LinkEvent event) {
+//		log.info("AgentWait2LinkEvent " + event.getLinkId().toString() + " " + event.getTime());
 
 		Id id = event.getLinkId();
 
@@ -251,8 +251,8 @@ public class LinkVehiclesCounter implements BasicLinkEnterEventHandler,
 		bufferMap.put(id, vehCount);
 	}
 
-	public synchronized void handleEvent(BasicAgentStuckEvent event) {
-//		log.info("BasicAgentStuckEvent " + event.getLinkId().toString() + " " + event.getTime());
+	public synchronized void handleEvent(AgentStuckEvent event) {
+//		log.info("AgentStuckEvent " + event.getLinkId().toString() + " " + event.getTime());
 
 		lostVehicles++;
 

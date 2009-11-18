@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLinkEvent.java
+ * LinkEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,9 +20,10 @@
 
 package org.matsim.core.api.experimental.events;
 
-import org.matsim.api.basic.v01.events.BasicLinkEvent;
+import org.matsim.api.basic.v01.Id;
 
+public interface LinkEvent extends PersonEvent {
 
-public interface LinkEvent extends BasicLinkEvent {
+	public Id getLinkId();
 
 }

@@ -1,7 +1,7 @@
 package org.matsim.core.events.parallelEventsHandler;
 
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
@@ -88,7 +88,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 
 	}
 
-	private static class Handler1 implements BasicLinkLeaveEventHandler {
+	private static class Handler1 implements LinkLeaveEventHandler {
 
 		private int numberOfProcessedMessages = 0;
 
@@ -100,7 +100,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 			this.numberOfProcessedMessages = 0;
 		}
 
-		public void handleEvent(final BasicLinkLeaveEvent event) {
+		public void handleEvent(final LinkLeaveEvent event) {
 			this.numberOfProcessedMessages++;
 		}
 

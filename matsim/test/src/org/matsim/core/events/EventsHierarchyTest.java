@@ -22,7 +22,7 @@ package org.matsim.core.events;
 
 import java.util.Map;
 
-import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -47,13 +47,13 @@ public class EventsHierarchyTest extends MatsimTestCase {
 	
 	/* Build a hierarchy of interfaces and classes */
 	
-	private interface A extends BasicEvent { }
+	private interface A extends Event { }
 
-	private interface B extends BasicEvent { }
+	private interface B extends Event { }
 	
 	private interface C extends A { }
 	
-	/** this interface now extends from BasicEvent on two hierarchy-paths, to test
+	/** this interface now extends from Event on two hierarchy-paths, to test
 	 * that it is still recognized as only one event-type.
 	 */
 	private interface D extends B, C { }
@@ -75,7 +75,7 @@ public class EventsHierarchyTest extends MatsimTestCase {
 
 		/*package*/ int counter = 0;
 		
-		public void handleEvent(BasicEvent event) {
+		public void handleEvent(Event event) {
 			this.counter++;
 		}
 

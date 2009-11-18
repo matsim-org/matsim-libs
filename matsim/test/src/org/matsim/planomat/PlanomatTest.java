@@ -29,10 +29,10 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.events.BasicPersonEvent;
-import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -324,7 +324,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 	}
 
-	private static final class ScenarioCreatePersonEventHandler implements BasicPersonEventHandler{
+	private static final class ScenarioCreatePersonEventHandler implements PersonEventHandler{
 
 		private ScenarioImpl scenario;
 
@@ -332,7 +332,7 @@ public class PlanomatTest extends MatsimTestCase {
 			this.scenario = scenario;
 		}
 
-		public void handleEvent(BasicPersonEvent event) {
+		public void handleEvent(PersonEvent event) {
 			if (!this.scenario.getPopulation().getPersons().containsKey(event.getPersonId()))
 			  this.scenario.getPopulation().addPerson(this.scenario.getPopulation().getFactory().createPerson(event.getPersonId()));
 		}

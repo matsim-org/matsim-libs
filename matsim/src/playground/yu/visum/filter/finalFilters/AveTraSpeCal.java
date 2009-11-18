@@ -50,7 +50,7 @@ public class AveTraSpeCal extends LinkAveCalA {
 
 	/**
 	 * Accumulates the travelspeed; Is called in void
-	 * org.matsim.playground.filters.filter.finalFilters.LinkAveCalA.handleEvent(BasicEvent
+	 * org.matsim.playground.filters.filter.finalFilters.LinkAveCalA.handleEvent(Event
 	 * event)
 	 */
 	@Override

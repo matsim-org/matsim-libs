@@ -5,13 +5,13 @@ import java.util.LinkedList;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.events.BasicPersonEvent;
-import org.matsim.api.basic.v01.events.handler.BasicPersonEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
@@ -31,10 +31,10 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestCase;
 
-public class TestHandlerDetailedEventChecker extends MatsimTestCase implements BasicPersonEventHandler {
+public class TestHandlerDetailedEventChecker extends MatsimTestCase implements PersonEventHandler {
 
-	protected HashMap<Id, LinkedList<BasicPersonEvent>> events = new HashMap<Id, LinkedList<BasicPersonEvent>>();
-	public LinkedList<BasicPersonEvent> allEvents = new LinkedList<BasicPersonEvent>();
+	protected HashMap<Id, LinkedList<PersonEvent>> events = new HashMap<Id, LinkedList<PersonEvent>>();
+	public LinkedList<PersonEvent> allEvents = new LinkedList<PersonEvent>();
 	// private HashMap<Id, ExpectedNumberOfEvents> expectedNumberOfMessages =
 	// new HashMap<Id, ExpectedNumberOfEvents>();
 	protected boolean printEvent = true;
@@ -46,7 +46,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 
 		// all events of one agent must have ascending time stamps
 		double lastTimeStamp;
-		for (LinkedList<BasicPersonEvent> list : events.values()) {
+		for (LinkedList<PersonEvent> list : events.values()) {
 			lastTimeStamp = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < list.size(); i++) {
 				if (lastTimeStamp > list.get(i).getTime()) {
@@ -65,7 +65,7 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 
 		// compare plan and events for each agent
 		// compare: type of events, linkId
-		for (LinkedList<BasicPersonEvent> list : events.values()) {
+		for (LinkedList<PersonEvent> list : events.values()) {
 			Person p = population.getPersons().get(list.get(0).getPersonId());
 			// printEvents(list.get(0).agentId);
 			Plan plan = p.getSelectedPlan();
@@ -146,9 +146,9 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements B
 		}
 	}
 
-	public void handleEvent(BasicPersonEvent event) {
+	public void handleEvent(PersonEvent event) {
 		if (!events.containsKey(event.getPersonId())) {
-			events.put(event.getPersonId(), new LinkedList<BasicPersonEvent>());
+			events.put(event.getPersonId(), new LinkedList<PersonEvent>());
 		}
 		events.get(event.getPersonId()).add(event);
 		if (printEvent) {

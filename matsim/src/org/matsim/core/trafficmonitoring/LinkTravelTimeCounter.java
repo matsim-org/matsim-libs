@@ -24,19 +24,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 
 /**
  * @author dgrether
  */
-public class LinkTravelTimeCounter implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler {
+public class LinkTravelTimeCounter implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler {
 	/**
 	 * singleton variable
 	 */
@@ -55,7 +55,7 @@ public class LinkTravelTimeCounter implements BasicLinkEnterEventHandler, BasicL
 		((EventsManagerImpl)events).addHandler(instance);
 	}
 
-	public void handleEvent(final BasicLinkEnterEvent event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		this.enterEvents.put(event.getPersonId(), Double.valueOf(event.getTime()));
 	}
 
@@ -64,14 +64,14 @@ public class LinkTravelTimeCounter implements BasicLinkEnterEventHandler, BasicL
 		this.travelTimes.clear();
 	}
 
-	public void handleEvent(final BasicLinkLeaveEvent event) {
+	public void handleEvent(final LinkLeaveEvent event) {
 		Double startTime = this.enterEvents.get(event.getPersonId());
 		if (startTime != null) {
 			this.travelTimes.put(event.getLinkId(), event.getTime() - startTime.doubleValue());
 		}
 	}
 
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		this.enterEvents.remove(event.getPersonId());
 	}
 

@@ -24,16 +24,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
@@ -56,8 +56,8 @@ import org.matsim.core.utils.collections.Tuple;
  * @author mrieser
  */
 public class TravelTimeCalculator
-		implements TravelTime, LinkToLinkTravelTime, BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, 
-		BasicAgentArrivalEventHandler, BasicAgentStuckEventHandler {
+		implements TravelTime, LinkToLinkTravelTime, LinkEnterEventHandler, LinkLeaveEventHandler, 
+		AgentArrivalEventHandler, AgentStuckEventHandler {
 	
 	private static final String ERROR_STUCK_AND_LINKTOLINK = "Using the stuck feature with turning move travel times is not available. As the next link of a stucked" +
 	"agent is not known the turning move travel time cannot be calculated!";
@@ -72,7 +72,7 @@ public class TravelTimeCalculator
 	
 	private Map<Tuple<Id, Id>, DataContainer> linkToLinkData;
 	
-	private final Map<Id, BasicLinkEnterEvent> linkEnterEvents;
+	private final Map<Id, LinkEnterEvent> linkEnterEvents;
 
 	private final boolean calculateLinkTravelTimes;
 
@@ -99,13 +99,13 @@ public class TravelTimeCalculator
 			// assume that every link has 2 outgoing links as default
 			this.linkToLinkData = new ConcurrentHashMap<Tuple<Id, Id>, DataContainer>((int) (network.getLinks().size() * 1.4 * 2));
 		}
-		this.linkEnterEvents = new ConcurrentHashMap<Id, BasicLinkEnterEvent>();
+		this.linkEnterEvents = new ConcurrentHashMap<Id, LinkEnterEvent>();
 		
 		this.reset(0);
 	}
 
-	public void handleEvent(final BasicLinkEnterEvent e) {
-		BasicLinkEnterEvent oldEvent = this.linkEnterEvents.remove(e.getPersonId());
+	public void handleEvent(final LinkEnterEvent e) {
+		LinkEnterEvent oldEvent = this.linkEnterEvents.remove(e.getPersonId());
 		if ((oldEvent != null) && this.calculateLinkToLinkTravelTimes) {
 			Tuple<Id, Id> fromToLink = new Tuple<Id, Id>(oldEvent.getLinkId(), e.getLinkId());
 			DataContainer data = getLinkToLinkTravelTimeData(fromToLink, true);
@@ -115,9 +115,9 @@ public class TravelTimeCalculator
 		this.linkEnterEvents.put(e.getPersonId(), e);
 	}
 
-	public void handleEvent(final BasicLinkLeaveEvent e) {
+	public void handleEvent(final LinkLeaveEvent e) {
 		if (this.calculateLinkTravelTimes) {
-			BasicLinkEnterEvent oldEvent = this.linkEnterEvents.get(e.getPersonId());
+			LinkEnterEvent oldEvent = this.linkEnterEvents.get(e.getPersonId());
   		if (oldEvent != null) {
   			DataContainer data = getTravelTimeData(e.getLinkId(), true);
   			this.aggregator.addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
@@ -126,15 +126,15 @@ public class TravelTimeCalculator
 		}
 	}
 
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		/* remove EnterEvents from list when an agent arrives.
 		 * otherwise, the activity duration would counted as travel time, when the
 		 * agent departs again and leaves the link! */
 		this.linkEnterEvents.remove(event.getPersonId());
 	}
 
-	public void handleEvent(BasicAgentStuckEvent event) {
-		BasicLinkEnterEvent e = this.linkEnterEvents.remove(event.getPersonId());
+	public void handleEvent(AgentStuckEvent event) {
+		LinkEnterEvent e = this.linkEnterEvents.remove(event.getPersonId());
 		if (e != null) {
 			DataContainer data = getTravelTimeData(e.getLinkId(), true);
 			data.needsConsolidation = true;

@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.handler.ActivityEndEventHandler;
-import org.matsim.core.events.handler.ActivityStartEventHandler;
+import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
+import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
-public class EventsMapStartEndTimes implements ActivityStartEventHandler, ActivityEndEventHandler {
+public class EventsMapStartEndTimes implements DeprecatedActivityStartEventHandler, DeprecatedActivityEndEventHandler {
 
 	public LinkedHashMap<PersonImpl, ArrayList<ActivityStartEventImpl>> startMap = new LinkedHashMap<PersonImpl,ArrayList<ActivityStartEventImpl>>();
 	public LinkedHashMap<PersonImpl, ArrayList<ActivityEndEventImpl>> endMap = new LinkedHashMap<PersonImpl,ArrayList<ActivityEndEventImpl>>();

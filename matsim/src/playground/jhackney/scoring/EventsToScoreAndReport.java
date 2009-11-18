@@ -28,15 +28,15 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -60,7 +60,7 @@ import org.matsim.core.scoring.ScoringFunction;
  * @author mrieser
  * @author jhackney
  */
-public class EventsToScoreAndReport implements BasicAgentArrivalEventHandler, BasicAgentDepartureEventHandler, BasicAgentStuckEventHandler, BasicAgentMoneyEventHandler {
+public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler {
 
 	private PopulationImpl population = null;
 	private playground.jhackney.scoring.EventSocScoringFactory sfFactory = null;
@@ -81,24 +81,24 @@ public class EventsToScoreAndReport implements BasicAgentArrivalEventHandler, Ba
 		this.learningRate = learningRate;
 	}
 
-	public void handleEvent(final BasicAgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.getPersonId().toString());
 		sf.endActivity(event.getTime());
 		sf.startLeg(event.getTime(), null);//event.getLeg();
 	}
 
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.getPersonId().toString());
 		sf.endLeg(event.getTime());
 		sf.startActivity(event.getTime(), null);
 	}
 
-	public void handleEvent(final BasicAgentStuckEvent event) {
+	public void handleEvent(final AgentStuckEvent event) {
 		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.getPersonId().toString());
 		sf.agentStuck(event.getTime());
 	}
 
-	public void handleEvent(final BasicAgentMoneyEvent event) {
+	public void handleEvent(final AgentMoneyEvent event) {
 		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.getPersonId().toString());
 		sf.addMoney(event.getAmount());
 	}

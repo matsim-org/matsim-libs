@@ -6,16 +6,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.otf.drawer.OTFBackgroundTexturesDrawer;
 
-public class ConfluenceArrowsFromEvents implements BasicLinkEnterEventHandler{
+public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 
 	protected static final double PI_HALF = Math.PI/2;
 	protected static final double TWO_PI = 2 * Math.PI;
@@ -28,7 +28,7 @@ public class ConfluenceArrowsFromEvents implements BasicLinkEnterEventHandler{
 		this.network = network;
 	}
 	
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		Link l = this.network.getLink(event.getLinkId());
 		NodeInfo ni = this.infos.get(l.getFromNode());
 		if (ni == null) {

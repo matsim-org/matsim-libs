@@ -23,11 +23,11 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicLinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.LinkEvent;
 
-public abstract class LinkEventImpl extends PersonEventImpl implements BasicLinkEvent {
+public abstract class LinkEventImpl extends PersonEventImpl implements LinkEvent {
 
 	public static final String ATTRIBUTE_LINK = "link";
 

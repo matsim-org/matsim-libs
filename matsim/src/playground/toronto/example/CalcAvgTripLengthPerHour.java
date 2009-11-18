@@ -24,12 +24,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 
@@ -38,7 +38,7 @@ import org.matsim.core.network.NetworkLayer;
  *
  * @author mrieser
  */
-public class CalcAvgTripLengthPerHour implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler, BasicLinkEnterEventHandler {
+public class CalcAvgTripLengthPerHour implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler {
 
 	private final static int NUM_OF_HOURS = 30;
 
@@ -54,12 +54,12 @@ public class CalcAvgTripLengthPerHour implements BasicAgentDepartureEventHandler
 		this.network = network;
 	}
 	
-	public void handleEvent(final BasicAgentDepartureEvent event) {
+	public void handleEvent(final AgentDepartureEvent event) {
 		this.travelStartPerAgent.put(event.getPersonId(), event.getTime());
 		this.travelDistancePerAgent.put(event.getPersonId(), 0.0);
 	}
 	
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		Double distance = this.travelDistancePerAgent.remove(event.getPersonId());
 
 		if (distance > 0.0) {
@@ -70,7 +70,7 @@ public class CalcAvgTripLengthPerHour implements BasicAgentDepartureEventHandler
 		}
 	}
 
-	public void handleEvent(final BasicLinkEnterEvent event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		Double distance = this.travelDistancePerAgent.get(event.getPersonId());
 		LinkImpl link = this.network.getLinks().get(event.getLinkId());
 		distance = distance + link.getLength();

@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.handler.ActivityEndEventHandler;
-import org.matsim.core.events.handler.ActivityStartEventHandler;
+import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
+import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
 import org.matsim.core.population.PersonImpl;
 
 import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
@@ -41,7 +41,7 @@ import playground.jhackney.socialnetworks.mentalmap.TimeWindow;
  *
  * @author jhackney
  */
-public class TrackEventsOverlapII implements ActivityStartEventHandler, ActivityEndEventHandler {
+public class TrackEventsOverlapII implements DeprecatedActivityStartEventHandler, DeprecatedActivityEndEventHandler {
 
 	LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>>();
 	LinkedHashMap<Activity,Double> startMap = new LinkedHashMap<Activity,Double>();

@@ -119,7 +119,7 @@ public class ActEndReplanner {
 	}
 	
 	// used when acting as EventHandler
-	public void handleEvent(BasicActivityEndEvent event) {
+	public void handleEvent(ActivityEndEvent event) {
 
 		
 		Id personId = event.getPersonId();
@@ -131,7 +131,7 @@ public class ActEndReplanner {
 		{
 			this.time = event.getTime();
 
-// TODO: We need the current Activity... (was part of ActivityEndEvents but not of BasicActivityEndEvents)
+// TODO: We need the current Activity... (was part of ActivityEndEvents but not of ActivityEndEvents)
 //			this.fromAct = event.getAct();
 			
 			PlanImpl plan = person.getSelectedPlan();

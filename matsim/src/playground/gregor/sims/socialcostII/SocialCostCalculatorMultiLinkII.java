@@ -7,12 +7,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
@@ -29,7 +29,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.IntegerCache;
 
-public class SocialCostCalculatorMultiLinkII implements TravelCost, QueueSimulationBeforeCleanupListener, BeforeMobsimListener, BasicLinkEnterEventHandler, BasicAgentStuckEventHandler{
+public class SocialCostCalculatorMultiLinkII implements TravelCost, QueueSimulationBeforeCleanupListener, BeforeMobsimListener, LinkEnterEventHandler, AgentStuckEventHandler{
 
 	
 	private final NetworkLayer network;
@@ -159,7 +159,7 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, QueueSimulat
 		
 	}
 
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		LinkInfo li = getLinkInfo(event.getLinkId());
 		li.incrementInFlow(getTimeBin(event.getTime()));
 		li.setAgentEnterTime(event.getPersonId(), event.getTime());
@@ -172,7 +172,7 @@ public class SocialCostCalculatorMultiLinkII implements TravelCost, QueueSimulat
 //		getLinkInfo(event.getLinkId()).incrementOutFlow(this.maxK);
 //	}
 
-	public void handleEvent(BasicAgentStuckEvent event) {
+	public void handleEvent(AgentStuckEvent event) {
 		this.stuckedAgents.add(event.getPersonId());
 		
 	}

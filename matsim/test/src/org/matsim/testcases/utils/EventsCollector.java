@@ -23,7 +23,7 @@ package org.matsim.testcases.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.events.BasicEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.handler.BasicEventHandler;
 
 /**
@@ -32,9 +32,9 @@ import org.matsim.core.events.handler.BasicEventHandler;
  * @author mrieser
  */
 public class EventsCollector implements BasicEventHandler {
-	private final List<BasicEvent> events = new ArrayList<BasicEvent>(50);
+	private final List<Event> events = new ArrayList<Event>(50);
 
-	public void handleEvent(final BasicEvent event) {
+	public void handleEvent(final Event event) {
 		this.events.add(event);
 	}
 
@@ -42,7 +42,7 @@ public class EventsCollector implements BasicEventHandler {
 		this.events.clear();
 	}
 	
-	public List<BasicEvent> getEvents() {
+	public List<Event> getEvents() {
 		return this.events;
 	}
 }

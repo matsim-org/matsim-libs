@@ -25,8 +25,8 @@ import java.io.Writer;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 
 /* This is a much simpler version of VolumesAnalyzer */
 /**
@@ -34,13 +34,13 @@ import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
  *
  * @author mrieser
  */
-public class VolumesCounter implements BasicLinkEnterEventHandler {
+public class VolumesCounter implements LinkEnterEventHandler {
 
 	private final TreeMap<Id, Integer> links = new TreeMap<Id, Integer>();
 
 	private static Integer ONE = Integer.valueOf(1);
 	
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		Integer volume = this.links.get(event.getLinkId());
 		if (volume == null) {
 			volume = ONE;

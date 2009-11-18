@@ -8,14 +8,14 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
@@ -34,7 +34,7 @@ import org.matsim.core.utils.misc.IntegerCache;
 
 import playground.gregor.sims.run.MarginalCostControlerMultiLink;
 
-public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimListener, QueueSimulationBeforeCleanupListener, BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentStuckEventHandler{
+public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimListener, QueueSimulationBeforeCleanupListener, LinkEnterEventHandler, LinkLeaveEventHandler, AgentStuckEventHandler{
 
 	private static final Logger  log = Logger.getLogger(SocialCostCalculatorMultiLink.class);
 	
@@ -253,18 +253,18 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 		
 	}
 
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		LinkInfo li = getLinkInfo(event.getLinkId());
 		li.incrementInFlow(getTimeBin(event.getTime()));
 		li.setAgentEnterTime(event.getPersonId(), event.getTime());
 	}
 
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		this.maxK = getTimeBin(event.getTime());
 		getLinkInfo(event.getLinkId()).incrementOutFlow(this.maxK);
 	}
 
-	public void handleEvent(BasicAgentStuckEvent event) {
+	public void handleEvent(AgentStuckEvent event) {
 		this.stuckedAgents.add(event.getPersonId());
 		
 	}

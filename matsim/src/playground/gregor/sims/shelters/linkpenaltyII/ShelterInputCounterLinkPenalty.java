@@ -4,18 +4,18 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.evacuation.base.Building;
 
-public class ShelterInputCounterLinkPenalty implements BasicLinkLeaveEventHandler, BasicLinkEnterEventHandler {
+public class ShelterInputCounterLinkPenalty implements LinkLeaveEventHandler, LinkEnterEventHandler {
 
 	private static final Logger log = Logger.getLogger(ShelterInputCounterLinkPenalty.class);
 
@@ -53,7 +53,7 @@ public class ShelterInputCounterLinkPenalty implements BasicLinkLeaveEventHandle
 		return 0.;
 	}
 
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		LinkInfo li = this.linkInfos.get(event.getLinkId()); 
 		if (li != null) {
 			li.count++;
@@ -77,7 +77,7 @@ public class ShelterInputCounterLinkPenalty implements BasicLinkLeaveEventHandle
 		}
 	}
 	
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 //		LinkInfo li = this.linkInfos.get(event.getLinkId()); 
 //		if (li != null) {
 //			li.count++;

@@ -20,8 +20,9 @@
 
 package org.matsim.core.api.experimental.events.handler;
 
-import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.events.handler.EventHandler;
 
-public interface AgentStuckEventHandler extends BasicAgentStuckEventHandler {
-
+public interface AgentStuckEventHandler extends EventHandler {
+	public void handleEvent (AgentStuckEvent event);
 }

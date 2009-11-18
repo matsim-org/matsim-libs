@@ -23,11 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
@@ -38,7 +38,7 @@ import org.matsim.testcases.MatsimTestCase;
  * @author dgrether
  */
 public class TravelTimeTest extends MatsimTestCase implements
-		BasicLinkLeaveEventHandler, BasicLinkEnterEventHandler {
+		LinkLeaveEventHandler, LinkEnterEventHandler {
 
   private Map<Id, Map<Id, Double>> agentTravelTimes;
 
@@ -107,7 +107,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 		assertEquals(360.0, travelTimes.get(new IdImpl(23)).intValue(), EPSILON);
 	}
 
-	public void handleEvent(BasicLinkEnterEvent event) {
+	public void handleEvent(LinkEnterEvent event) {
 		Map<Id, Double> travelTimes = this.agentTravelTimes.get(event.getPersonId());
 		if (travelTimes == null) {
 			travelTimes = new HashMap<Id, Double>();
@@ -116,7 +116,7 @@ public class TravelTimeTest extends MatsimTestCase implements
 		travelTimes.put(event.getLinkId(), Double.valueOf(event.getTime()));
 	}
 
-	public void handleEvent(BasicLinkLeaveEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		Map<Id, Double> travelTimes = this.agentTravelTimes.get(event.getPersonId());
 		if (travelTimes != null) {
 			Double d = travelTimes.get(event.getLinkId());

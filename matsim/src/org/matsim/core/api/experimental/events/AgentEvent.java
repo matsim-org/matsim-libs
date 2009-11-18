@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicAgentEvent.java
+ * AgentEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,9 +20,13 @@
 
 package org.matsim.core.api.experimental.events;
 
-import org.matsim.api.basic.v01.events.BasicAgentEvent;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.TransportMode;
 
+public interface AgentEvent extends PersonEvent {
 
-public interface AgentEvent extends BasicAgentEvent {
+	public Id getLinkId();
+	
+	public TransportMode getLegMode();
 
 }

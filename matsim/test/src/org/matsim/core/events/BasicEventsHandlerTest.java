@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicEventsHandlerTest.java
+ * EventsHandlerTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,8 +20,8 @@
 
 package org.matsim.core.events;
 
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -32,9 +32,9 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class BasicEventsHandlerTest extends MatsimTestCase {
 
-	public void testBasicLinkEnterEventHandler() {
+	public void testLinkEnterEventHandler() {
 		EventsManagerImpl events = new EventsManagerImpl();
-		MyBasicLinkEnterEventHandler handler = new MyBasicLinkEnterEventHandler();
+		MyLinkEnterEventHandler handler = new MyLinkEnterEventHandler();
 		events.addHandler(handler);
 		events.printEventHandlers();
 		
@@ -48,11 +48,11 @@ public class BasicEventsHandlerTest extends MatsimTestCase {
 	}
 	
 	
-	/*package*/ static class MyBasicLinkEnterEventHandler implements BasicLinkEnterEventHandler {
+	/*package*/ static class MyLinkEnterEventHandler implements LinkEnterEventHandler {
 
 		/*package*/ int counter = 0;
 		
-		public void handleEvent(BasicLinkEnterEvent event) {
+		public void handleEvent(LinkEnterEvent event) {
 			this.counter++;
 		}
 

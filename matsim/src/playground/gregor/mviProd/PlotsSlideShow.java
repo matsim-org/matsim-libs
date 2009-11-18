@@ -23,13 +23,13 @@ package playground.gregor.mviProd;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 
 
-public class PlotsSlideShow implements BasicAgentArrivalEventHandler  {
+public class PlotsSlideShow implements AgentArrivalEventHandler  {
 
 
 	private static final int RESOLUTION = 60;
@@ -98,7 +98,7 @@ public class PlotsSlideShow implements BasicAgentArrivalEventHandler  {
 	}
 	
 	
-	public void handleEvent(final BasicAgentArrivalEvent event) {
+	public void handleEvent(final AgentArrivalEvent event) {
 		this.evacuated++;
 		if (this.time == 0) {
 			this.offset = (int)event.getTime();

@@ -8,18 +8,18 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
-import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
-import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
-import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
-import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
-import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
-import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
-import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueLane;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
@@ -40,10 +40,10 @@ import playground.christoph.network.MyLinkImpl;
  * Additional a List of Links with changed VehicleCount per TimeStep is
  * created.
  */
-public class LinkVehiclesCounter2 implements BasicLinkEnterEventHandler,
-		BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler,
-		BasicAgentDepartureEventHandler, BasicAgentWait2LinkEventHandler,
-		BasicAgentStuckEventHandler, QueueSimulationAfterSimStepListener,
+public class LinkVehiclesCounter2 implements LinkEnterEventHandler,
+		LinkLeaveEventHandler, AgentArrivalEventHandler,
+		AgentDepartureEventHandler, AgentWait2LinkEventHandler,
+		AgentStuckEventHandler, QueueSimulationAfterSimStepListener,
 		QueueSimulationInitializedListener {
 
 	private QueueNetwork queueNetwork;
@@ -87,36 +87,36 @@ public class LinkVehiclesCounter2 implements BasicLinkEnterEventHandler,
 		}
 	}
 
-	public synchronized void handleEvent(BasicLinkEnterEvent event) {
+	public synchronized void handleEvent(LinkEnterEvent event) {
 
 		Id id = event.getLinkId();
 		changedLinkSet.add(id);
 	}
 
-	public synchronized void handleEvent(BasicLinkLeaveEvent event) {
+	public synchronized void handleEvent(LinkLeaveEvent event) {
 
 		Id id = event.getLinkId();
 		changedLinkSet.add(id);
 	}
 
-	public synchronized void handleEvent(BasicAgentArrivalEvent event) {
+	public synchronized void handleEvent(AgentArrivalEvent event) {
 
 		Id id = event.getLinkId();
 		changedLinkSet.add(id);
 	}
 
-	public synchronized void handleEvent(BasicAgentDepartureEvent event) {
+	public synchronized void handleEvent(AgentDepartureEvent event) {
 		
 		Id id = event.getLinkId();
 		changedLinkSet.add(id);
 	}
 
-	public synchronized void handleEvent(BasicAgentWait2LinkEvent event) {
+	public synchronized void handleEvent(AgentWait2LinkEvent event) {
 
 		// nothing to do...
 	}
 
-	public synchronized void handleEvent(BasicAgentStuckEvent event) {
+	public synchronized void handleEvent(AgentStuckEvent event) {
 
 		// nothing to do...
 	}

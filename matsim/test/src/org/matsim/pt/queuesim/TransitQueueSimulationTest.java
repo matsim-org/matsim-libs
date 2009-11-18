@@ -28,7 +28,6 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.basic.v01.events.BasicEvent;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -39,6 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
 import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEvent;
@@ -554,10 +554,10 @@ public class TransitQueueSimulationTest extends TestCase {
 	}
 	
 	/*package*/ final static class FirstLastEventCollector implements BasicEventHandler {
-		public BasicEvent firstEvent = null;
-		public BasicEvent lastEvent = null;
+		public Event firstEvent = null;
+		public Event lastEvent = null;
 		
-		public void handleEvent(final BasicEvent event) {
+		public void handleEvent(final Event event) {
 			if (firstEvent == null) {
 				firstEvent = event;
 			}
@@ -664,9 +664,9 @@ public class TransitQueueSimulationTest extends TestCase {
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		new TransitQueueSimulation(scenario, events).run();
-		List<BasicEvent> allEvents = collector.getEvents();
+		List<Event> allEvents = collector.getEvents();
 		
-		for (BasicEvent event : allEvents) {
+		for (Event event : allEvents) {
 			System.out.println(event.toString());
 		}
 
