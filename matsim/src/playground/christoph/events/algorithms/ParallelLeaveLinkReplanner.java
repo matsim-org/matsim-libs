@@ -83,6 +83,7 @@ public class ParallelLeaveLinkReplanner extends ParallelReplanner {
 		}
 	}
 	
+	@Override
 	public void init()
 	{		
 		this.timeStepStartBarrier = new CyclicBarrier(numOfThreads + 1);

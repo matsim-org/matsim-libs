@@ -30,6 +30,7 @@ public class EmptyControlInputImpl extends AbstractControlInputImpl {
 
 	private double nashTime;
 
+	@Override
 	public double getNashTime() {
 		return this.nashTime;
 	}

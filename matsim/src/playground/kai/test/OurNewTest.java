@@ -32,6 +32,7 @@ interface Person extends BasicPerson<Plan> {
 }
 
 class PersonImpl extends BasicPersonImpl<Plan> implements Person {
+	@Override
 	public List<PlanImpl> getPlans() {
 		return (List<PlanImpl>) plans ;
 	}

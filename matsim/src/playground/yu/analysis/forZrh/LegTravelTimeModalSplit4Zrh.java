@@ -80,6 +80,7 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 		}
 	}
 
+	@Override
 	public void write(final String filename) {
 		SimpleWriter sw = new SimpleWriter(filename);
 		sw

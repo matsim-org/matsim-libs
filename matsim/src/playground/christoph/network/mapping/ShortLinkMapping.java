@@ -33,16 +33,19 @@ public class ShortLinkMapping extends Mapping{
 		this.output = output;
 	}
 	
+	@Override
 	public Link[] getInput()
 	{
 		return input;
 	}
 	
+	@Override
 	public Node getOutput()
 	{
 		return output;
 	}
 
+	@Override
 	public double getLength()
 	{
 		if (input[0] instanceof MappingInfo)
@@ -52,6 +55,7 @@ public class ShortLinkMapping extends Mapping{
 		else return input[0].getLength();
 	}
 	
+	@Override
 	public List<MappingInfo> getMappedObjects()
 	{
 		List<MappingInfo> list = new ArrayList<MappingInfo>();

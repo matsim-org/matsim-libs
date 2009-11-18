@@ -74,6 +74,7 @@ public class SocialNetwork<P extends Person> extends SpatialSparseGraph {
 //			return null;
 //	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public Set<? extends Ego<P>> getVertices() {
 		return (Set<? extends Ego<P>>) super.getVertices();

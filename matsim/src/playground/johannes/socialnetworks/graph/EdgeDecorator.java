@@ -46,6 +46,7 @@ public class EdgeDecorator<E extends Edge> extends SparseEdge {
 	 *            
 	 *  @deprecated
 	 */
+	@Deprecated
 	protected EdgeDecorator(VertexDecorator<?> v1, VertexDecorator<?> v2,
 			E delegate) {
 		super(v1, v2);

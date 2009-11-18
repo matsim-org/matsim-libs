@@ -29,6 +29,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class PlanomatJGAPChromosomeTest extends MatsimTestCase {
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 	}

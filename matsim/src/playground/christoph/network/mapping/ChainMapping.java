@@ -22,16 +22,19 @@ public class ChainMapping extends Mapping{
 		this.output = output;
 	}
 	
+	@Override
 	public List<MappingInfo> getInput()
 	{
 		return input;
 	}
 	
+	@Override
 	public Link getOutput()
 	{
 		return output;
 	}
 
+	@Override
 	public double getLength()
 	{
 		double length = 0.0;
@@ -42,6 +45,7 @@ public class ChainMapping extends Mapping{
 		return length;
 	}
 	
+	@Override
 	public List<MappingInfo> getMappedObjects()
 	{
 		List<MappingInfo> list = new ArrayList<MappingInfo>();

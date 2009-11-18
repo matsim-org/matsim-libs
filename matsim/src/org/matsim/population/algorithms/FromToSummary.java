@@ -218,6 +218,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 		 * @param other
 		 * @return <code>true</code> if the Nodes in other are the same as in this and appear in the same order
 		 */
+		@Override
 		public boolean equals(Object other) {
 			if (other instanceof NodePair) {
 				NodePair o = (NodePair) other;
@@ -226,6 +227,7 @@ public class FromToSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			return false;
 		}
 		
+		@Override
 		public int hashCode() {
 			return getFirst().hashCode() & getSecond().hashCode();
 		}

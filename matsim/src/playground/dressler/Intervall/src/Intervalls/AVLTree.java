@@ -45,6 +45,7 @@ extends      SearchTree
 	    balance = 0 ;
 	}
 
+	@Override
 	public String toString ( )
 	{
 	    StringBuffer strbuf = new StringBuffer( super.toString() ) ;
@@ -236,7 +237,8 @@ if ( ROTATE )
      * @return the object itself if it is the first one with its key,
      *         otherwise the found object with same key
      */
-    public Intervall insert ( Intervall obj )
+    @Override
+		public Intervall insert ( Intervall obj )
     {
     /* insert object normally */
 
@@ -314,7 +316,8 @@ if ( ROTATE )
      * @param object whose key is searched
      * @return removed object if any was found, null otherwise
      */
-    public Intervall remove ( Intervall obj )
+    @Override
+		public Intervall remove ( Intervall obj )
     {
 	/* locate node to be deleted */
 

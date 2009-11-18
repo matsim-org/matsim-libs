@@ -42,6 +42,7 @@ public class EnterRoadMessage extends EventMessage {
 		priority = SimulationParameters.PRIORITY_ENTER_ROAD_MESSAGE;
 	}
 
+	@Override
 	public void processEvent() {
 		BasicEventImpl event = null;
 

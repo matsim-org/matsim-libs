@@ -144,6 +144,7 @@ public class VertexIntervalls {
 	 * Geves a String representation of all stored Intervalls linewise
 	 * @return String representation
 	 */
+	@Override
 	public String toString(){
 		String l,r;
 		switch (Intervall.getMode()){

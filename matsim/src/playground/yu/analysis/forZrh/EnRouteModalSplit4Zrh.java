@@ -157,6 +157,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 	 * @param bw
 	 *            The data stream where to write the gathered data.
 	 */
+	@Override
 	public void write(final BufferedWriter bw) {
 		calcOnRoute();
 		try {
@@ -226,6 +227,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 	 * @param filename
 	 *            The name of a file where to write the gathered data.
 	 */
+	@Override
 	public void write(final String filename) {
 		BufferedWriter bw;
 		try {
@@ -240,6 +242,7 @@ public class EnRouteModalSplit4Zrh extends EnRouteModalSplit {
 		}
 	}
 
+	@Override
 	public void writeCharts(final String filename) {
 		int length = enRoute.length;
 		double[] xs = new double[length];

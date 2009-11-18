@@ -163,6 +163,7 @@ public class SparseGraph implements Graph {
 	 * 
 	 * @return a short description for this grpah.
 	 */
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder(60);
 		builder.append("SparseGraph: ");

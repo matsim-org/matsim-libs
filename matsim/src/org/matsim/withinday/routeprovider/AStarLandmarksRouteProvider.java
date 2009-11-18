@@ -58,6 +58,7 @@ public class AStarLandmarksRouteProvider extends AbstractRouteProvider {
 		super.setPriority(priority);
 	}
 
+	@Override
 	public NetworkRouteWRefs requestRoute(final Link departureLink, final Link destinationLink,
 			final double time) {
 		Path path = this.landmarksAStar.calcLeastCostPath(departureLink.getToNode(), destinationLink.getFromNode(), time);

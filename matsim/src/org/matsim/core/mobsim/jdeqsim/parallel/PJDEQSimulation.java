@@ -72,6 +72,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 		log = Logger.getLogger(JDEQSimulation.class);
 	}
 
+	@Override
 	public void run() {
 		log = Logger.getLogger(PJDEQSimulation.class);
 

@@ -44,6 +44,7 @@ public class SNAdjacencyMatrix<P extends Person> extends SpatialAdjacencyMatrix 
 	}
 
 	
+	@Override
 	public SocialNetwork<P> getGraph() {
 		SocialNetworkBuilder<P> builder = new SocialNetworkBuilder<P>();
 		SocialNetwork<P> g = new SocialNetwork<P>();
@@ -70,6 +71,7 @@ public class SNAdjacencyMatrix<P extends Person> extends SpatialAdjacencyMatrix 
 		return g;
 	}
 	
+	@Override
 	@SuppressWarnings("unchecked")
 	public Ego<P> getVertex(int i) {
 		return (Ego<P>) super.getVertex(i);

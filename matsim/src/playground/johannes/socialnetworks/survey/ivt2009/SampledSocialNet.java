@@ -33,11 +33,13 @@ import playground.johannes.socialnetworks.snowball2.SampledGraph;
  */
 public class SampledSocialNet<P extends Person> extends SocialNetwork<P> implements SampledGraph {
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public Set<? extends SampledSocialTie> getEdges() {
 		return (Set<? extends SampledSocialTie>) super.getEdges();
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public Set<? extends SampledEgo<P>> getVertices() {
 		return (Set<? extends SampledEgo<P>>) super.getVertices();

@@ -21,16 +21,19 @@ public class ParallelLinkMapping extends Mapping{
 		this.output = output;
 	}
 	
+	@Override
 	public List<Link> getInput()
 	{
 		return input;
 	}
 	
+	@Override
 	public Link getOutput()
 	{
 		return output;
 	}
 
+	@Override
 	public double getLength()
 	{
 		double length = 0.0;
@@ -46,6 +49,7 @@ public class ParallelLinkMapping extends Mapping{
 		return length / input.size();
 	}
 	
+	@Override
 	public List<MappingInfo> getMappedObjects()
 	{
 		List<MappingInfo> list = new ArrayList<MappingInfo>();

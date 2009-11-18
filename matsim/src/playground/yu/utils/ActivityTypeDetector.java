@@ -54,6 +54,7 @@ public class ActivityTypeDetector extends AbstractPersonAlgorithm implements
 	private Map<String, Double> latestStartTimes = new HashMap<String, Double>();
 	private Map<String, Tuple<Integer, Double>> avgDurs = new HashMap<String, Tuple<Integer, Double>>();
 
+	@Override
 	public void run(Person person) {
 		for (Plan plan : person.getPlans())
 			run(plan);

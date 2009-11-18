@@ -85,6 +85,7 @@ public class XYScatterLineChart extends XYScatterChart {
 	 * @param ys
 	 *            The y values.
 	 */
+	@Override
 	public void addSeries(final String title, final double[] xs,
 			final double[] ys) {
 		XYSeries series = new XYSeries(title, false, true);

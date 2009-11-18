@@ -154,7 +154,8 @@ public class TimevariantValueStorage {
                 && this.binSize == other.binSize && this.binCnt == other.binCnt);
     }
 
-    public String toString() {
+    @Override
+		public String toString() {
     	StringBuilder builder = new StringBuilder();
         for(Link link : valueMap.keySet()) {
         	double[] values = valueMap.get(link);

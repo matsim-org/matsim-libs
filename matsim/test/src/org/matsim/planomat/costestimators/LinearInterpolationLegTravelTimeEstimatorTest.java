@@ -47,6 +47,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends MatsimTestCas
 	
 	private final static Logger logger = Logger.getLogger(LinearInterpolationLegTravelTimeEstimatorTest.class);
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 	}

@@ -540,19 +540,22 @@ public boolean focusOnId(String id){
    
        
         tview.addControlListener(new ControlAdapter() {
-            public void itemEntered(VisualItem item, MouseEvent e) {
+            @Override
+						public void itemEntered(VisualItem item, MouseEvent e) {
                 if ( item.canGetString(label) ) {
                 	String ids = item.getString(label);
                     title.setText(ids);
                 }
             }
             
-            public void itemExited(VisualItem item, MouseEvent e) {
+            @Override
+						public void itemExited(VisualItem item, MouseEvent e) {
                 title.setText(null);
             }
         });
         tview.addControlListener(new ControlAdapter() {
-        	public void itemClicked(VisualItem item, MouseEvent e) { 
+        	@Override
+					public void itemClicked(VisualItem item, MouseEvent e) { 
                 if(item.canGetInt("level")){
                 	String ids = item.getString(label);
                 	int level = item.getInt("level");
@@ -633,7 +636,8 @@ public boolean focusOnId(String id){
         private Point2D m_cur   = new Point2D.Double();
         private int     m_bias  = 150;
         
-        public void run(double frac) {
+        @Override
+				public void run(double frac) {
             TupleSet ts = m_vis.getFocusGroup(Visualization.FOCUS_ITEMS);
             if ( ts.getTupleCount() == 0 )
                 return;
@@ -673,7 +677,8 @@ public boolean focusOnId(String id){
             super(group, VisualItem.FILLCOLOR);
         }
         
-        public int getColor(VisualItem item) {
+        @Override
+				public int getColor(VisualItem item) {
             if ( m_vis.isInGroup(item, Visualization.SEARCH_ITEMS) )
                 return ColorLib.rgb(255,190,190);
             else if ( m_vis.isInGroup(item, Visualization.FOCUS_ITEMS) )

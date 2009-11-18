@@ -45,6 +45,7 @@ public class GenerateEquilPopulationsTest extends MatsimTestCase {
 		
 	private static final Logger logger = Logger.getLogger(GenerateEquilPopulationsTest.class);
 	
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		Config config = super.loadConfig(this.getClassInputDirectory() + "config.xml");

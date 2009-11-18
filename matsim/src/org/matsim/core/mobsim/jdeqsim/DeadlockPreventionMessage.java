@@ -45,6 +45,7 @@ public class DeadlockPreventionMessage extends EventMessage {
 		super(scheduler, vehicle);
 	}
 
+	@Override
 	public void processEvent() {
 		// don't do anything
 	}

@@ -43,6 +43,7 @@ public class DegreeCorrelationStats extends GraphPropertyEstimator {
 		openStatsWriters("dcorrelation");
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public DescriptiveStatistics calculate(GraphProjection<SampledGraph, SampledVertex, SampledEdge> g, int iteration) {
 		double product = 0;

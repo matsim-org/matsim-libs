@@ -53,6 +53,7 @@ public class PopulationDensityVisSquare extends JPanel implements MapPaintCallba
 		this.setPreferredSize(new Dimension(drawWidth + borderSize, drawHeight+borderSize + infoHeight ));
 	}
 	
+	@Override
 	public void paintComponent( Graphics g )
 	{
 		if(map == null)
@@ -78,7 +79,7 @@ public class PopulationDensityVisSquare extends JPanel implements MapPaintCallba
 		g.setColor(Color.black);
 		g.drawString("" + pplInSquare, borderSize/2 + 5, drawHeight /2);
 		g.setColor(Color.black);
-		g.drawString("ppl / km²:" + pplPerKM2, borderSize/2 + 5, drawHeight + borderSize + infoHeight / 2);
+		g.drawString("ppl / kmï¿½:" + pplPerKM2, borderSize/2 + 5, drawHeight + borderSize + infoHeight / 2);
 
 	}
 	

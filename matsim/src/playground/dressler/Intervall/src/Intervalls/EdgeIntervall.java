@@ -151,6 +151,7 @@ public class EdgeIntervall extends Intervall
 	 *@param t point to split at
 	 *@return new Interval 
 	 */
+	@Override
 	public EdgeIntervall splitAt(final int t){
 		Intervall j =super.splitAt(t);
 		EdgeIntervall k = new EdgeIntervall(j);
@@ -203,6 +204,7 @@ public class EdgeIntervall extends Intervall
 	 * @param tau value to be shifted by
 	 * @return EdgeIntervall in the positive integers null if the shift does not intersect the positive integers
 	 */
+	@Override
 	public EdgeIntervall shiftPositive(final int tau){
 		Intervall tmp = super.shiftPositive(tau);
 		if(tmp == null)
@@ -217,6 +219,7 @@ public class EdgeIntervall extends Intervall
 	 * Example: "[1,2) f: 2"
 	 * @return String representation
 	 */
+	@Override
 	public String toString()
 	{
 		return "[" + this.getLowBound() + "," + this.getHighBound() + ") f: " + this.getFlow(); 

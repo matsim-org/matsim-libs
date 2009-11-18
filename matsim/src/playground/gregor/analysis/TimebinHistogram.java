@@ -76,6 +76,7 @@ public class TimebinHistogram implements LinkEnterEventHandler {
 	}
 	
 	
+	@Override
 	public String toString() {
 		StringBuffer buff = new StringBuffer();
 		for (LinkInfo li : this.linkInfos.values()) {

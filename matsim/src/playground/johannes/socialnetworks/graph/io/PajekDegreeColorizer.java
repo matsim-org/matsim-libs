@@ -54,10 +54,12 @@ public class PajekDegreeColorizer<V extends Vertex, E extends Edge> extends Paje
 		logScale = flag;
 	}
 	
+	@Override
 	public String getEdgeColor(E e) {
 		return getColor(-1);
 	}
 
+	@Override
 	public String getVertexFillColor(V ego) {
 		int k = ego.getNeighbours().size();
 		double color = -1;

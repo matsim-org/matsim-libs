@@ -40,6 +40,7 @@ public class KtiPtRouteTest extends MatsimTestCase {
 	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = null;
 	private KtiConfigGroup ktiConfigGroup = null;
 	
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		

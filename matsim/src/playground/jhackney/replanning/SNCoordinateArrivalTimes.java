@@ -38,7 +38,8 @@ public class SNCoordinateArrivalTimes extends AbstractMultithreadedModule {
     	this.controler=controler;
     }
 
-    public PlanAlgorithm getPlanAlgoInstance() {
+    @Override
+		public PlanAlgorithm getPlanAlgoInstance() {
 
     	return new SNAdjustTimes(this.controler);
     }

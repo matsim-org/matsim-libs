@@ -36,10 +36,12 @@ public class SpatialVertexDecorator<V extends SpatialVertex> extends VertexDecor
 		super(delegate);
 	}
 
+	@Override
 	public List<? extends SpatialEdgeDecorator<?>> getEdges() {
 		return (List<? extends SpatialEdgeDecorator<?>>) super.getEdges();
 	}
 
+	@Override
 	public List<? extends SpatialVertexDecorator<V>> getNeighbours() {
 		return (List<? extends SpatialVertexDecorator<V>>) super.getNeighbours();
 	}

@@ -37,6 +37,7 @@ public class Point {
 	
 	}
 	
+	@Override
 	public boolean equals(Object other)
 	{
 		if(other instanceof Point)
@@ -48,6 +49,7 @@ public class Point {
 	}
 	
 	
+	@Override
 	public int hashCode()
 	{
 		long bits = java.lang.Double.doubleToLongBits(x);

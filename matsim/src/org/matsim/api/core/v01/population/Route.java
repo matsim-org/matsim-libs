@@ -36,9 +36,11 @@ public interface Route extends Serializable, MatsimPopulationObject {
 	public void setDistance(final double distance);
 
 	/** @deprecated -- use leg.getTravelTime() instead. kai, aug09 */ 
+	@Deprecated
 	public double getTravelTime();
 
 	/** @deprecated -- use leg.setTravelTime() instead. kai, aug09 */
+	@Deprecated
 	public void setTravelTime(final double travelTime);
 
 	public Id getStartLinkId();

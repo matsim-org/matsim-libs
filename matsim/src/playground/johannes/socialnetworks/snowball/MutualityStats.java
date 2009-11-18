@@ -52,6 +52,7 @@ public class MutualityStats extends GraphPropertyEstimator {
 		openStatsWriters("mutuality");
 	}
 
+	@Override
 	public DescriptiveStatistics calculate(
 			GraphProjection<SampledGraph, SampledVertex, SampledEdge> graph,
 			int iteration) {

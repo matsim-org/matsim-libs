@@ -58,7 +58,8 @@ extends      BinTree
     /**
      * @return current number of tree nodes
      */
-    public int getSize ( )
+    @Override
+		public int getSize ( )
     {
 	return _size ;
     }

@@ -85,6 +85,7 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 	 * currently replanned Person to the Time- and CostCalculators so they
 	 * can decide if the Person knows a Node / Link or not.
 	 */
+	@Override
 	protected void initReplanningRouter() {
 		replanners = new ArrayList<PlanAlgorithm>();
 		

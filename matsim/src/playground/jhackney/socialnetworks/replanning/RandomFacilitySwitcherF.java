@@ -57,7 +57,8 @@ public class RandomFacilitySwitcherF extends AbstractMultithreadedModule {
     	this.facs = facs;
     }
 
-    public PlanAlgorithm getPlanAlgoInstance() {
+    @Override
+		public PlanAlgorithm getPlanAlgoInstance() {
 //	return new SNSecLocShortest(factypes, network, tcost, ttime);
 	return new RandomChangeLocationF(factypes, network, tcost, ttime, facs);
     }

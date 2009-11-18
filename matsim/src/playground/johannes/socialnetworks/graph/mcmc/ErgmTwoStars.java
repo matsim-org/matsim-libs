@@ -29,6 +29,7 @@ package playground.johannes.socialnetworks.graph.mcmc;
  */
 public class ErgmTwoStars extends ErgmTerm {
 
+	@Override
 	public double changeStatistic(AdjacencyMatrix m, int i, int j, boolean y_ij) {
 		if(y_ij) {
 			return getTheta() * -(m.countNeighbours(i) + m.countNeighbours(j) - 2);

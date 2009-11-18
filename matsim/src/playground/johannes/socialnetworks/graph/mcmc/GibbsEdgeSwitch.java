@@ -25,6 +25,7 @@ package playground.johannes.socialnetworks.graph.mcmc;
  */
 public class GibbsEdgeSwitch extends GibbsEdgeFlip {
 
+	@Override
 	public boolean step(AdjacencyMatrix y, ConditionalDistribution d) {
 		boolean accept = false;
 		int idx_ij = random.nextInt(edges.length);

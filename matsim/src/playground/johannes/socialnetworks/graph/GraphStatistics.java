@@ -486,6 +486,7 @@ public class GraphStatistics {
 		 * @deprecated
 		 * 
 		 */
+		@Deprecated
 		protected CentralityEdge(CentralityVertex<V> v1, CentralityVertex<V> v2, E delegate) {
 			super(v1, v2,delegate);
 		}
@@ -527,6 +528,7 @@ public class GraphStatistics {
 //			edgeCentrality = new TObjectDoubleHashMap<EdgeDecorator<?>>(cGraph.getEdges().size());
 		}
 		
+		@Override
 		public void run() {
 			long dkTime = 0;
 			long cTime = 0;

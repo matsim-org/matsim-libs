@@ -102,7 +102,8 @@ public class OTFVisDualView extends OnTheFlyClientFileQuad{
 //	        search.setForeground(FOREGROUND);
 
 	        addControlListener(new ControlAdapter() {
-	        	public void itemClicked(VisualItem item, MouseEvent e) { 
+	        	@Override
+						public void itemClicked(VisualItem item, MouseEvent e) { 
 	                if(item.canGetInt("level")){
 	                	String ids = item.getString("name");
 	                	int level = item.getInt("level");

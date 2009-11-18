@@ -24,6 +24,7 @@ import org.matsim.api.basic.v01.events.handler.BasicActivityStartEventHandler;
 import org.matsim.core.events.ActivityStartEventImpl;
 
 /** @deprecated use {@link BasicActivityStartEventHandler} */
+@Deprecated
 public interface ActivityStartEventHandler extends EventHandler {
 	public void handleEvent (ActivityStartEventImpl event);
 }

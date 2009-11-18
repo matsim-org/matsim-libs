@@ -64,6 +64,7 @@ public class TimeOptimizerWIGIC extends TimeOptimizer implements PlanAlgorithm {
 	//////////////////////////////////////////////////////////////////////
 	
 	
+	@Override
 	public void run (PlanImpl basePlan){
 		
 		if (basePlan.getPlanElements().size()==1) return;		

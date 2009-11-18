@@ -103,6 +103,7 @@ public class KMLScoreColorizer extends KMLVertexColorStyle<SocialNetwork<Person>
 		return values;
 	}
 
+	@Override
 	public String getObjectSytleId(Ego<Person> object) {
 		return styleIds.get(object);
 	}

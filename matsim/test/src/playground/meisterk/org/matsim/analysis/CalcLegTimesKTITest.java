@@ -58,6 +58,7 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 		960.0 * 60.0, 
 	};
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 	}

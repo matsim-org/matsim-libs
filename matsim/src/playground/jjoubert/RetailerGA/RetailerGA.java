@@ -208,6 +208,7 @@ public class RetailerGA {
 		this.cdf = new CumulativeDistribution(x, y);
 	}
 
+	@Override
 	public String toString(){
 		Collections.sort(this.generation);
 		String result = "";

@@ -60,6 +60,7 @@ public class Commodity<V> {
 		return res;
 	}
 	
+	@Override
 	public String toString(){
 		return "Commodity: "+this.origin+" -> "+this.demand+" ("+this.demand+")";
 	}

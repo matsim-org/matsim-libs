@@ -53,6 +53,7 @@ public class RetailerGenome implements Comparable<RetailerGenome>, Cloneable{
 		}
 	}
 	
+	@Override
 	public ArrayList<Integer> clone(){
 		ArrayList<Integer> result = new ArrayList<Integer>(genome.size());
 		for (Integer integer : this.genome) {

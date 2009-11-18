@@ -111,6 +111,7 @@ public class Population2SpatialGraph {
 	
 		private boolean ignore = false;
 		
+		@Override
 		public void startElement(String uri, String localName, String name,
 				Attributes atts) throws SAXException {
 			if(!ignore && ACT_TAG.equalsIgnoreCase(name)) {	

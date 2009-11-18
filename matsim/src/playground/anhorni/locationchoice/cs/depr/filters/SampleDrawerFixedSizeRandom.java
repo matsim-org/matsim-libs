@@ -16,6 +16,7 @@ public class SampleDrawerFixedSizeRandom extends SampleDrawer {
 		this.maxSizeOfChoiceSets = maxSizeOfChoiceSets;
 	}
 	
+	@Override
 	public void drawSample(List<ChoiceSet> choiceSets) {
 		
 		log.info("Sample choice sets to the size : " + this.maxSizeOfChoiceSets);

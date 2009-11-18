@@ -41,6 +41,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 	private NetworkLayer network = null;
 	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = null;
 	
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 

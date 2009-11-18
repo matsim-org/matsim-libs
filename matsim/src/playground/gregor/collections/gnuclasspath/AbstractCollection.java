@@ -433,7 +433,8 @@ public abstract class AbstractCollection<E>
    *
    * @return a String representation of the Collection
    */
-  public String toString()
+  @Override
+	public String toString()
   {
     Iterator itr = iterator();
     StringBuffer r = new StringBuffer("[");

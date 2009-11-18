@@ -23,6 +23,7 @@ public class MyDijkstra extends Dijkstra{
 	}
 
 	/** Validates that the expanded nodes correspond to a valid path*/
+	@Override
 	protected boolean canPassLink(final Link link) {
 		LinkImpl lastLink = (LinkImpl)getData(link.getFromNode()).getPrevLink();
 		LinkImpl thisLink = (LinkImpl)link;

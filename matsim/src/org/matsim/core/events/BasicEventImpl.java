@@ -50,6 +50,7 @@ public abstract class BasicEventImpl implements BasicEvent {
 		return this.time;
 	}
 	
+	@Override
 	public String toString() {
 		Map<String,String> attr = this.getAttributes() ;
 		StringBuilder eventXML = new StringBuilder("\t<event ");

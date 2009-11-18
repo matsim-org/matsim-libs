@@ -45,6 +45,7 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 		this.facilityPenalties = facilityPenalties;
 	}
 	
+	@Override
 	public void finish() {
 
 		super.finish();
@@ -58,6 +59,7 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 		this.penalty.clear();
 	}
 
+	@Override
 	protected double calcActScore(final double arrivalTime, final double departureTime, final ActivityImpl act) {
 
 		ActivityUtilityParameters params = this.params.utilParams.get(act.getType());

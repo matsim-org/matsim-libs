@@ -109,6 +109,7 @@ public class PersonImpl implements Person {
 	}
 	
 	/** @deprecated this function is not tested.  kai, oct'09 */
+	@Deprecated
 	public Plan getBestPlan() {
 		if ( this.getPlans().size() == 0 ) {
 			return null ;

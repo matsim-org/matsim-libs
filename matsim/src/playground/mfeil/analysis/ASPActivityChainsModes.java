@@ -66,6 +66,7 @@ public class ASPActivityChainsModes extends ASPActivityChains{
 		this.outputDir = "./plans";
 	}
 	
+	@Override
 	public void run(){
 		this.initAnalysis();
 		this.analyze();
@@ -94,6 +95,7 @@ public class ASPActivityChainsModes extends ASPActivityChains{
 		}
 	}
 	
+	@Override
 	protected void analyze(){
 	
 		PrintStream stream1;

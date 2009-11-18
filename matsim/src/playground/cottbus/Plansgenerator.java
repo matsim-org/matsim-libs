@@ -84,6 +84,7 @@ public class Plansgenerator {
 	 * @param HOME_END_TIME
 	 * @deprecated
 	 */
+	@Deprecated
 	private void createDenverTest(final int HOME_END_TIME) {
 		int currentId = 1;
 		int duration = 1 * 3600;
@@ -167,6 +168,7 @@ public class Plansgenerator {
 	 * @param HOME_END_TIME
 	 * @deprecated
 	 */
+	@Deprecated
 	private void createDenverIndividual(final int HOME_END_TIME) {
 		int currentId = 1;
 		int duration = (int)(0.5 * 3600);

@@ -70,6 +70,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 
 	private HashMap<Integer, EnumMap<TransportMode, LegImpl>> fixedRoutes = new HashMap<Integer, EnumMap<TransportMode, LegImpl>>();
 
+	@Override
 	public LegImpl getNewLeg(
 			TransportMode mode, 
 			ActivityImpl actOrigin,
@@ -132,6 +133,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 		return newLeg;
 	}
 
+	@Override
 	public double getLegTravelTimeEstimation(Id personId, double departureTime,
 			ActivityImpl actOrigin, ActivityImpl actDestination,
 			LegImpl legIntermediate, boolean doModifyLeg) {

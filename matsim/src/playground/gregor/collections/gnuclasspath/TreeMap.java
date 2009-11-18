@@ -289,7 +289,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
   /**
    * Clears the Map so it has no keys. This is O(1).
    */
-  public void clear()
+  @Override
+	public void clear()
   {
     if (size > 0)
       {
@@ -305,7 +306,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    *
    * @return the clone
    */
-  public Object clone()
+  @Override
+	public Object clone()
   {
     TreeMap copy = null;
     try
@@ -351,7 +353,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    * @throws NullPointerException if key is null and the comparator is not
    *         tolerant of nulls
    */
-  public boolean containsKey(Object key)
+  @Override
+	public boolean containsKey(Object key)
   {
     return getNode((K) key) != nil;
   }
@@ -363,7 +366,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    * @param value the value to look for
    * @return true if the value appears in a mapping
    */
-  public boolean containsValue(Object value)
+  @Override
+	public boolean containsValue(Object value)
   {
     Node node = firstNode();
     while (node != nil)
@@ -388,7 +392,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    * @see #values()
    * @see Map.Entry
    */
-  public Set<Map.Entry<K,V>> entrySet()
+  @Override
+	public Set<Map.Entry<K,V>> entrySet()
   {
     if (entries == null)
       // Create an AbstractSet with custom implementations of those methods
@@ -424,7 +429,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    * @see #put(Object, Object)
    * @see #containsKey(Object)
    */
-  public V get(Object key)
+  @Override
+	public V get(Object key)
   {
     // Exploit fact that nil.value == null.
     return getNode((K) key).value;
@@ -483,7 +489,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    * @see #values()
    * @see #entrySet()
    */
-  public Set<K> keySet()
+  @Override
+	public Set<K> keySet()
   {
     if (keys == null)
       // Create an AbstractSet with custom implementations of those methods
@@ -521,7 +528,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    * @see #get(Object)
    * @see Object#equals(Object)
    */
-  public V put(K key, V value)
+  @Override
+	public V put(K key, V value)
   {
     Node<K,V> current = root;
     Node<K,V> parent = nil;
@@ -574,7 +582,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    * @throws NullPointerException if a key in m is null, and the comparator
    *         does not tolerate nulls
    */
-  public void putAll(Map<? extends K, ? extends V> m)
+  @Override
+	public void putAll(Map<? extends K, ? extends V> m)
   {
     Iterator itr = m.entrySet().iterator();
     int pos = m.size();
@@ -598,7 +607,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    * @throws NullPointerException if key is null, but the comparator does
    *         not tolerate nulls
    */
-  public V remove(Object key)
+  @Override
+	public V remove(Object key)
   {
     Node<K, V> n = getNode((K)key);
     if (n == nil)
@@ -614,7 +624,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    *
    * @return the size
    */
-  public int size()
+  @Override
+	public int size()
   {
     return size;
   }
@@ -725,24 +736,28 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
    * @see #keySet()
    * @see #entrySet()
    */
-  public Collection<V> values()
+  @Override
+	public Collection<V> values()
   {
     if (values == null)
       // We don't bother overriding many of the optional methods, as doing so
       // wouldn't provide any significant performance advantage.
       values = new AbstractCollection<V>()
       {
-        public int size()
+        @Override
+				public int size()
         {
           return size;
         }
 
-        public Iterator<V> iterator()
+        @Override
+				public Iterator<V> iterator()
         {
           return new TreeIterator(VALUES);
         }
 
-        public void clear()
+        @Override
+				public void clear()
         {
           TreeMap.this.clear();
         }
@@ -1637,7 +1652,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
       return descendingMap;
     }
     
-    public void clear()
+    @Override
+		public void clear()
     {
       Node next = lowestGreaterThan(minKey, true);
       Node max = lowestGreaterThan(maxKey, false);
@@ -1654,12 +1670,14 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
       return comparator;
     }
 
-    public boolean containsKey(Object key)
+    @Override
+		public boolean containsKey(Object key)
     {
       return keyInRange((K) key) && TreeMap.this.containsKey(key);
     }
 
-    public boolean containsValue(Object value)
+    @Override
+		public boolean containsValue(Object value)
     {
       Node node = lowestGreaterThan(minKey, true);
       Node max = lowestGreaterThan(maxKey, false);
@@ -1672,7 +1690,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
       return false;
     }
 
-    public Set<Map.Entry<K,V>> entrySet()
+    @Override
+		public Set<Map.Entry<K,V>> entrySet()
     {
       if (entries == null)
         // Create an AbstractSet with custom implementations of those methods
@@ -1714,7 +1733,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
 	return null;
     }
 
-    public V get(Object key)
+    @Override
+		public V get(Object key)
     {
       if (keyInRange((K) key))
         return TreeMap.this.get(key);
@@ -1734,7 +1754,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
 				 successor(getNode(toKey)).key : toKey));
     }
 
-    public Set<K> keySet()
+    @Override
+		public Set<K> keySet()
     {
       if (this.keys == null)
         // Create an AbstractSet with custom implementations of those methods
@@ -1815,21 +1836,24 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
       return e;
     }
 
-    public V put(K key, V value)
+    @Override
+		public V put(K key, V value)
     {
       if (! keyInRange(key))
         throw new IllegalArgumentException("Key outside range");
       return TreeMap.this.put(key, value);
     }
 
-    public V remove(Object key)
+    @Override
+		public V remove(Object key)
     {
       if (keyInRange((K)key))
         return TreeMap.this.remove(key);
       return null;
     }
 
-    public int size()
+    @Override
+		public int size()
     {
       Node node = lowestGreaterThan(minKey, true);
       Node max = lowestGreaterThan(maxKey, false);
@@ -1869,26 +1893,30 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
 			maxKey);
     }
 
-    public Collection<V> values()
+    @Override
+		public Collection<V> values()
     {
       if (this.values == null)
         // Create an AbstractCollection with custom implementations of those
         // methods that can be overriden easily and efficiently.
         this.values = new AbstractCollection()
         {
-          public int size()
+          @Override
+					public int size()
           {
             return SubMap.this.size();
           }
 
-          public Iterator<V> iterator()
+          @Override
+					public Iterator<V> iterator()
           {
             Node first = lowestGreaterThan(minKey, true);
             Node max = lowestGreaterThan(maxKey, false);
             return new TreeIterator(VALUES, first, max);
           }
 
-          public void clear()
+          @Override
+					public void clear()
           {
             SubMap.this.clear();
           }
@@ -1899,31 +1927,36 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
     private class KeySet
       extends AbstractSet<K>
     {
-      public int size()
+      @Override
+			public int size()
       {
 	return SubMap.this.size();
       }
       
-      public Iterator<K> iterator()
+      @Override
+			public Iterator<K> iterator()
       {
 	Node first = lowestGreaterThan(minKey, true);
 	Node max = lowestGreaterThan(maxKey, false);
 	return new TreeIterator(KEYS, first, max);
       }
       
-      public void clear()
+      @Override
+			public void clear()
       {
 	SubMap.this.clear();
       }
       
-      public boolean contains(Object o)
+      @Override
+			public boolean contains(Object o)
       {
 	if (! keyInRange((K) o))
 	  return false;
 	return getNode((K) o) != nil;
       }
       
-      public boolean remove(Object o)
+      @Override
+			public boolean remove(Object o)
       {
 	if (! keyInRange((K) o))
 	  return false;
@@ -2039,24 +2072,28 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
     extends AbstractSet<Entry<K,V>>
   {
     
-    public int size()
+    @Override
+		public int size()
     {
       return SubMap.this.size();
     }
     
-    public Iterator<Map.Entry<K,V>> iterator()
+    @Override
+		public Iterator<Map.Entry<K,V>> iterator()
     {
       Node first = lowestGreaterThan(minKey, true);
       Node max = lowestGreaterThan(maxKey, false);
       return new TreeIterator(ENTRIES, first, max);
     }
     
-    public void clear()
+    @Override
+		public void clear()
     {
       SubMap.this.clear();
     }
     
-    public boolean contains(Object o)
+    @Override
+		public boolean contains(Object o)
     {
       if (! (o instanceof Map.Entry))
 	return false;
@@ -2068,7 +2105,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
       return n != nil && AbstractSet.equals(me.getValue(), n.value);
     }
     
-    public boolean remove(Object o)
+    @Override
+		public boolean remove(Object o)
     {
       if (! (o instanceof Map.Entry))
 	return false;
@@ -2585,7 +2623,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
       return entries;
     }
 
-    public boolean equals(Object o)
+    @Override
+		public boolean equals(Object o)
     {
       return map.equals(o);
     }
@@ -2615,7 +2654,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
       return map.get(key);
     }
 
-    public int hashCode()
+    @Override
+		public int hashCode()
     {
       return map.hashCode();
     }
@@ -2731,7 +2771,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
       return new DescendingMap(map.headMap(fromKey, inclusive));
     }
 
-    public String toString()
+    @Override
+		public String toString()
     {
       StringBuilder r = new StringBuilder("{");
       final Iterator<Entry<DK,DV>> it = entrySet().iterator();
@@ -2754,12 +2795,14 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
         // methods that can be overriden easily and efficiently.
         values = new AbstractCollection()
 	  {
-	    public int size()
+	    @Override
+			public int size()
 	    {
 	      return size();
 	    }
 	    
-	    public Iterator<DV> iterator()
+	    @Override
+			public Iterator<DV> iterator()
 	    {
 	      return new Iterator<DV>()
 		{	  
@@ -2795,7 +2838,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
 		};
 	    }
 	    
-	    public void clear()
+	    @Override
+			public void clear()
 	    {
 	      clear();
 	    }
@@ -2812,27 +2856,32 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
     extends AbstractSet<K>
   {
 
-    public int size()
+    @Override
+		public int size()
     {
       return size;
     }
 
-    public Iterator<K> iterator()
+    @Override
+		public Iterator<K> iterator()
     {
       return new TreeIterator(KEYS);
     }
 
-    public void clear()
+    @Override
+		public void clear()
     {
       TreeMap.this.clear();
     }
     
-    public boolean contains(Object o)
+    @Override
+		public boolean contains(Object o)
     {
       return containsKey(o);
     }
     
-    public boolean remove(Object key)
+    @Override
+		public boolean remove(Object key)
     {
       Node<K,V> n = getNode((K) key);
       if (n == nil)
@@ -3016,7 +3065,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
       return set;
     }
 
-    public boolean equals(Object o)
+    @Override
+		public boolean equals(Object o)
     {
       return set.equals(o);
     }
@@ -3031,7 +3081,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
       return set.ceiling(e);
     }
 
-    public int hashCode()
+    @Override
+		public int hashCode()
     {
       return set.hashCode();
     }
@@ -3169,7 +3220,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
       return array;
     }
 
-    public String toString()
+    @Override
+		public String toString()
     {
       StringBuilder r = new StringBuilder("[");
       final Iterator<D> it = iterator();
@@ -3191,22 +3243,26 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
   private class EntrySet
     extends AbstractSet<Entry<K,V>>
   {
-    public int size()
+    @Override
+		public int size()
     {
       return size;
     }
     
-    public Iterator<Map.Entry<K,V>> iterator()
+    @Override
+		public Iterator<Map.Entry<K,V>> iterator()
     {
       return new TreeIterator(ENTRIES);
     }
     
-    public void clear()
+    @Override
+		public void clear()
     {
       TreeMap.this.clear();
     }
 
-    public boolean contains(Object o)
+    @Override
+		public boolean contains(Object o)
     {
       if (! (o instanceof Map.Entry))
 	return false;
@@ -3215,7 +3271,8 @@ public class TreeMap<K, V> extends AbstractMap<K, V>
       return n != nil && AbstractSet.equals(me.getValue(), n.value);
     }
     
-    public boolean remove(Object o)
+    @Override
+		public boolean remove(Object o)
     {
       if (! (o instanceof Map.Entry))
 	return false;

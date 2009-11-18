@@ -31,11 +31,13 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
  */
 public class SampledSpatialSparseGraph extends SpatialSparseGraph implements SampledSpatialGraph {
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public Set<? extends SampledSpatialSparseEdge> getEdges() {
 		return (Set<? extends SampledSpatialSparseEdge>) super.getEdges();
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public Set<? extends SampledSpatialSparseVertex> getVertices() {
 		return (Set<? extends SampledSpatialSparseVertex>) super.getVertices();

@@ -21,16 +21,19 @@ public class SingleNodeMapping extends Mapping{
 		this.output = output;
 	}
 	
+	@Override
 	public Node getInput()
 	{
 		return input;
 	}
 	
+	@Override
 	public Node getOutput()
 	{
 		return output;
 	}
 	
+	@Override
 	public double getLength()
 	{
 		if (input instanceof MappingInfo)
@@ -41,6 +44,7 @@ public class SingleNodeMapping extends Mapping{
 		else return 0.0;
 	}
 	
+	@Override
 	public List<MappingInfo> getMappedObjects()
 	{
 		if (input instanceof MappingInfo)

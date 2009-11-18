@@ -25,6 +25,7 @@ public class BasicTests extends MatsimTestCase {
 
 	Controler controler;
 	
+	@Override
 	protected void setUp() throws Exception {
 		// TODO Auto-generated method stub
 		super.setUp();

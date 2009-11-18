@@ -67,6 +67,7 @@ public class PopulationDensity extends JPanel implements MapPaintCallback {
 
 		this.addComponentListener(new ComponentAdapter() 
 		{
+			@Override
 			public void componentResized(ComponentEvent e)
 			{
 				setSliderAttributes();

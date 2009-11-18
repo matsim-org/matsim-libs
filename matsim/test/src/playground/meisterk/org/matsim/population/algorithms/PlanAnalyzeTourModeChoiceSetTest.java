@@ -60,6 +60,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 	private Config config;
 	
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.config = super.loadConfig(PlanAnalyzeTourModeChoiceSetTest.CONFIGFILE);

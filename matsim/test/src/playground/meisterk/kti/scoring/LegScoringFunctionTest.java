@@ -51,6 +51,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 	private PlanImpl testPlan = null;
 	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = null;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.config = super.loadConfig(null);

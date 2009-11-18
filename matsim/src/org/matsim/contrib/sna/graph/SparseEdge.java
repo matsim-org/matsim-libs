@@ -44,6 +44,7 @@ public class SparseEdge implements Edge {
 	 *            one of the two vertices the edge is to be connected to.
 	 *            @deprecated
 	 */
+	@Deprecated
 	public SparseEdge(SparseVertex v1, SparseVertex v2) {
 		vertices = new Tuple<SparseVertex, SparseVertex>(v1, v2);
 	}

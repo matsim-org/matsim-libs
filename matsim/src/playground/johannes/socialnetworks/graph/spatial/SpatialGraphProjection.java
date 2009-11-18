@@ -34,10 +34,12 @@ public class SpatialGraphProjection<G extends SpatialGraph, V extends SpatialVer
 		super(delegate);
 	}
 
+	@Override
 	public Set<? extends SpatialEdgeDecorator<E>> getEdges() {
 		return (Set<? extends SpatialEdgeDecorator<E>>) super.getEdges();
 	}
 
+	@Override
 	public Set<? extends SpatialVertexDecorator<V>> getVertices() {
 		return (Set<? extends SpatialVertexDecorator<V>>) super.getVertices();
 	}

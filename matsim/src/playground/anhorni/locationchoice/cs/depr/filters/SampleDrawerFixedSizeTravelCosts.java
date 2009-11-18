@@ -19,6 +19,7 @@ public class SampleDrawerFixedSizeTravelCosts extends SampleDrawer {
 		this.crowFly = crowFly;
 	}
 	
+	@Override
 	public void drawSample(List<ChoiceSet> choiceSets) {
 		
 		log.info("Sample choice sets to max. size : " + this.maxSizeOfChoiceSets);

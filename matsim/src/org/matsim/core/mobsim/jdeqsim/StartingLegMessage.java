@@ -66,6 +66,7 @@ public class StartingLegMessage extends EventMessage {
 		vehicle.scheduleEndLegMessage(time, road);
 	}
 
+	@Override
 	public void processEvent() {
 		BasicEventImpl event = null;
 

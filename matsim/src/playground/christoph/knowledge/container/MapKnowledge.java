@@ -50,6 +50,7 @@ public class MapKnowledge extends BasicNodeKnowledge{
 		else return false;
 	}
 	
+	@Override
 	public synchronized Map<Id, Node> getKnownNodes() 
 	{
 		if (isWhiteList) return nodes;
@@ -78,6 +79,7 @@ public class MapKnowledge extends BasicNodeKnowledge{
 		return nodes;
 	}
 		
+	@Override
 	public void setKnownNodes(Map<Id, Node> nodes)
 	{
 		// If we have a network, we can check, whether using a Black- or WhiteList would be better.

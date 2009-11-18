@@ -26,6 +26,7 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 /**
  * @deprecated use {@link BasicLinkLeaveEventHandler}
  */
+@Deprecated
 public interface LinkLeaveEventHandler extends EventHandler {
 	public void handleEvent (LinkLeaveEventImpl event);
 }

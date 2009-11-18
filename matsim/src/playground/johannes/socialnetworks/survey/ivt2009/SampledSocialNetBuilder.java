@@ -33,6 +33,7 @@ public class SampledSocialNetBuilder <P extends Person> extends AbstractSparseGr
 		super(new SampledSocialNetFactory<P>());
 	}
 
+	@Override
 	public SampledEgo<P> addVertex(SampledSocialNet<P> g) {
 		throw new UnsupportedOperationException("Don't know what to with that...");
 	}

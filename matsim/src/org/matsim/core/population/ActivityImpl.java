@@ -33,6 +33,7 @@ public class ActivityImpl implements Activity {
 	private double endTime = Time.UNDEFINED_TIME;
 
 	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
+	@Deprecated
 	private double startTime = Time.UNDEFINED_TIME;
 	
 	private double dur = Time.UNDEFINED_TIME;
@@ -87,11 +88,13 @@ public class ActivityImpl implements Activity {
 	}
 
 	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
+	@Deprecated
 	public final double getStartTime() {
 		return this.startTime;
 	}
 
 	/** @deprecated I don't think this is used/interpreted anywhere. Kai, jun09 */
+	@Deprecated
 	public final void setStartTime(final double startTime) {
 		this.startTime = startTime;
 	}
@@ -162,6 +165,7 @@ public class ActivityImpl implements Activity {
 	 * @return the duration in seconds
 	 * @deprecated define algo with activity_end_time.  kn, jun09
 	 */
+	@Deprecated
 	public double calculateDuration() {
 		if ((this.getStartTime() == Time.UNDEFINED_TIME) && (this.getEndTime() == Time.UNDEFINED_TIME)) {
 			if (this.getDuration() != Time.UNDEFINED_TIME) {
@@ -183,11 +187,13 @@ public class ActivityImpl implements Activity {
 	}
 
 	/** @deprecated define algo with activity_end_time.  kn, jun09 */
+	@Deprecated
 	public double getDuration() {
 		return this.dur;
 	}
 
 	/** @deprecated define algo with activity_end_time.  kn, jun09 */
+	@Deprecated
 	public void setDuration(final double dur) {
 		this.dur = dur;
 	}

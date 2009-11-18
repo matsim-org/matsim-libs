@@ -43,6 +43,7 @@ public class CorrelationStatsWeighted extends GraphPropertyEstimator {
 		openStatsWriters("dcorrelation-weighted");
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public DescriptiveStatistics calculate(GraphProjection<SampledGraph, SampledVertex, SampledEdge> g, int iteration) {
 		double product = 0;

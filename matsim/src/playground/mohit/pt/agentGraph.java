@@ -56,6 +56,7 @@ public class agentGraph extends Frame implements ActionListener{
 		  s = ae.getActionCommand();
 		  repaint();
 		 }
+	@Override
 	public void paint(Graphics g)
 	{
 		g.setColor(Color.red);

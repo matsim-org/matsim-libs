@@ -35,10 +35,12 @@ public class SpatialEdgeDecorator<E extends SpatialEdge> extends EdgeDecorator<E
 		super(delegate);
 	}
 
+	@Override
 	public SpatialVertexDecorator<?> getOpposite(Vertex v) {
 		return (SpatialVertexDecorator<?>) super.getOpposite(v);
 	}
 
+	@Override
 	public Tuple<? extends SpatialVertexDecorator<?>, ? extends SpatialVertexDecorator<?>> getVertices() {
 		return (Tuple<? extends SpatialVertexDecorator<?>, ? extends SpatialVertexDecorator<?>>) super.getVertices();
 	}

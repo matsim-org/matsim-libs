@@ -30,6 +30,7 @@ public class CircularWardropZones extends WardropZonesImpl{
 		createMapping();
 	}
 	
+	@Override
 	public int getZonesCount()
 	{
 		return zonesX * zonesY;
@@ -56,6 +57,7 @@ public class CircularWardropZones extends WardropZonesImpl{
 	}
 	
 	
+	@Override
 	public void createMapping()
 	{
 		if (!validMapping)
@@ -102,6 +104,7 @@ public class CircularWardropZones extends WardropZonesImpl{
 		return super.getZones(node);
 	}
 	
+	@Override
 	public List<Integer> getZones(Coord coord)
 	{
 		List<Integer> zones = new ArrayList<Integer>();
@@ -116,6 +119,7 @@ public class CircularWardropZones extends WardropZonesImpl{
 	}
 
 	// returns the coordinates of the centre of the given zone
+	@Override
 	public Coord getZoneCentre(int zone)
 	{
 		if (zoneCentres.containsKey(zone)) return zoneCentres.get(zone);

@@ -26,6 +26,7 @@ package org.matsim.core.api.internal;
  * @deprecated this is just there to mark the other writers
  *
  */
+@Deprecated
 public interface MatsimSomeWriter {
 
 }

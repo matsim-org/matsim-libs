@@ -30,6 +30,7 @@ package playground.johannes.socialnetworks.graph.mcmc;
  */
 public class ErgmDensity extends ErgmTerm {
 
+	@Override
 	public double changeStatistic(AdjacencyMatrix m, int i, int j, boolean y_ij) {
 		return - getTheta();
 	}

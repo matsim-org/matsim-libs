@@ -29,6 +29,7 @@ import org.matsim.core.config.Config;
  *
  * @deprecated this is, as of now, a _proposal_.  
  */
+@Deprecated
 public class ScenarioFactoryImpl {
 	
 	public Scenario createScenario() {

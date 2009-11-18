@@ -59,6 +59,7 @@ import org.matsim.core.utils.misc.Time;
  * @author mrieser
  * @deprecated use JDEQSim instead of C++-DEQSim
  */
+@Deprecated
 public class DEQSim extends ExternalMobsim {
 
 	private static final String CONFIG_MODULE = "deqsim";

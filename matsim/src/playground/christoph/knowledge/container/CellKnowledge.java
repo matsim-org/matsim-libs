@@ -41,6 +41,7 @@ public class CellKnowledge extends BasicNodeKnowledge {
 	}
 	
 	
+	@Override
 	public Map<Id, Node> getKnownNodes()
 	{
 		Map<Id, Node> nodes = new HashMap<Id, Node>();

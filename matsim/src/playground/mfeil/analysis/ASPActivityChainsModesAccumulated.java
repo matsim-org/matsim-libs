@@ -62,6 +62,7 @@ public class ASPActivityChainsModesAccumulated extends ASPActivityChainsModes{
 	//	this.outputDir = "./plans";
 	}
 	
+	@Override
 	public void run(){
 		this.initAnalysis();
 		this.analyze();

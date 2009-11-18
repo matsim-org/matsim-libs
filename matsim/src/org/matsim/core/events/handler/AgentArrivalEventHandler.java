@@ -24,6 +24,7 @@ import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.core.events.AgentArrivalEventImpl;
 
 /** @deprecated {@link BasicAgentArrivalEventHandler} */
+@Deprecated
 public interface AgentArrivalEventHandler extends EventHandler {
 	public void handleEvent (AgentArrivalEventImpl event);
 }

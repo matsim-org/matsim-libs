@@ -47,6 +47,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 	private PopulationImpl population = null;
 	private NetworkLayer network = null;
 	
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		super.loadConfig(null);

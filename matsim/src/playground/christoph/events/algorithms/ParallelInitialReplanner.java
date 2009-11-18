@@ -39,6 +39,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 	
 	protected static boolean removeKnowledge = false;
 	
+	@Override
 	public void init()
 	{
 	}

@@ -28,7 +28,8 @@ import org.jdesktop.animation.timing.interpolation.Evaluator;
  *
  */
 public class EvaluatorPoint3f extends Evaluator<Point3f> {
-    public Point3f evaluate(Point3f v0, Point3f v1, float fraction) {
+    @Override
+		public Point3f evaluate(Point3f v0, Point3f v1, float fraction) {
         float x = v0.getX() + ((v1.getX() - v0.getX()) * fraction + .5f);
         float y = v0.getY() + ((v1.getY() - v0.getY()) * fraction + .5f);
         float z = v0.getZ() + ((v1.getZ() - v0.getZ()) * fraction + .5f);

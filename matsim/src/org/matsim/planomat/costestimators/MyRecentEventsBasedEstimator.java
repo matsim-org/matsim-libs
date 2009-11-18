@@ -38,6 +38,7 @@ import org.matsim.core.population.PlanImpl;
  * @deprecated This estimator is deprecated because it leads to wrong results, and it is referenced nowhere. 
  * It's (possibly wrong) results were reported in STRC and IATBR papers of 2006.
  */
+@Deprecated
 public class MyRecentEventsBasedEstimator
 implements LegTravelTimeEstimator, BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler {
 

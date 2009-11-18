@@ -153,6 +153,7 @@ public class GoogleLocationLookup {
 				
 		}
 		
+		@Override
 		public void characters(final char[] ch, final int start, final int length) throws SAXException {
 			if(buffer != null)
 				buffer.append(ch, start, length);
@@ -162,7 +163,7 @@ public class GoogleLocationLookup {
 	public static void main(String args[]) throws UnsupportedEncodingException {
 		GoogleLocationLookup lookup = new GoogleLocationLookup();
 		
-		Coord c = lookup.locationToCoord(URLEncoder.encode("wilhelmshšher str. 9, 12161 berlin", "UTF-8"));
+		Coord c = lookup.locationToCoord(URLEncoder.encode("wilhelmshï¿½her str. 9, 12161 berlin", "UTF-8"));
 		System.out.println("x="+c.getX()+", y="+c.getY());
 	}
 }

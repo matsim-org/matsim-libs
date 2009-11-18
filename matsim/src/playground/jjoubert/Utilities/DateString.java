@@ -31,6 +31,7 @@ public class DateString extends GregorianCalendar{
 	 */
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public String toString(){
 		String result = null;
 		int year = this.get(YEAR);

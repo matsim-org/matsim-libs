@@ -42,11 +42,13 @@ public class SampledEgo<P extends Person> extends Ego<P> implements SampledVerte
 		attributes = new SnowballAttributes();
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public List<? extends SampledSocialTie> getEdges() {
 		return (List<? extends SampledSocialTie>) super.getEdges();
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public List<? extends SampledEgo<P>> getNeighbours() {
 		return (List<? extends SampledEgo<P>>) super.getNeighbours();

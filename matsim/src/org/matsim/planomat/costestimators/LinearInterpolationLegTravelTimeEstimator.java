@@ -47,6 +47,7 @@ import org.matsim.world.Location;
  * @deprecated This class is marked as deprecated because the algorithm has too a long computation time to be useful.
  *
  */
+@Deprecated
 public class LinearInterpolationLegTravelTimeEstimator implements
 LegTravelTimeEstimator {
 

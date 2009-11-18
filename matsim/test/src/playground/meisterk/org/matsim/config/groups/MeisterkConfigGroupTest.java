@@ -30,6 +30,7 @@ public class MeisterkConfigGroupTest extends MatsimTestCase {
 
 	private MeisterkConfigGroup meisterk;
 	
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.meisterk = new MeisterkConfigGroup();

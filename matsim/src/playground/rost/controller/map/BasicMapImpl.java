@@ -259,6 +259,7 @@ public class BasicMapImpl extends JPanel implements BasicMap{
 		
 		this.addComponentListener(new ComponentAdapter() 
 		{
+			@Override
 			public void componentResized(ComponentEvent e)
 			{
 				adaptToAspectRatio();
@@ -344,6 +345,7 @@ public class BasicMapImpl extends JPanel implements BasicMap{
 		return zoom;
 	}
 	
+	@Override
 	public synchronized void paintComponent( Graphics g )
 	{
 		g.clearRect(0, 0, this.getWidth(),this.getHeight());

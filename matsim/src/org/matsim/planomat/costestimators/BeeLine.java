@@ -38,6 +38,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * 
  * @deprecated This estimator is marked as deprecated because there are better estimators, and it is referenced nowhere.
  */
+@Deprecated
 public class BeeLine implements LegTravelTimeEstimator {
 	
 	public void resetPlanSpecificInformation() {

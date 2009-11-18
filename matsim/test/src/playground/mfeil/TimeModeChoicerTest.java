@@ -67,6 +67,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 	private TimeModeChoicer1 testee;
 	private ScenarioImpl scenario_input;
 
+	@Override
 	protected void setUp() throws Exception {
 
 		super.setUp();

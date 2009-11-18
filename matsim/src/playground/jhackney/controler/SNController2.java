@@ -31,6 +31,7 @@ public class SNController2 extends Controler {
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
 //	@Override
+	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new StrategyManager();
 		SocialStrategyManagerConfigLoader.load(this, this.getConfig(), manager);

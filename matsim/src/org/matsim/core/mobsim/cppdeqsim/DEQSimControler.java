@@ -27,6 +27,7 @@ import org.matsim.core.controler.Controler;
  * @author mrieser
  * @deprecated use JDEQSim instead of C++-DEQSim
  */
+@Deprecated
 public class DEQSimControler extends Controler {
 
 	public DEQSimControler(final String[] args) {

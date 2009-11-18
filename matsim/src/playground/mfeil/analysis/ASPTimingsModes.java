@@ -49,6 +49,7 @@ public class ASPTimingsModes extends ASPActivityChains {
 		super (population, knowledges, outputDir);
 	}
 	
+	@Override
 	protected void analyze(){
 		
 		ArrayList<List<PlanElement>> legs = new ArrayList<List<PlanElement>>();

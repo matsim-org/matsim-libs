@@ -84,7 +84,8 @@ public abstract class AbstractSet<E>
    * @param o the Object to be tested for equality with this Set
    * @return true if the given object is equal to this Set
    */
-  public boolean equals(Object o)
+  @Override
+	public boolean equals(Object o)
   {
     return (o == this
 	    || (o instanceof Set && ((Set) o).size() == size()
@@ -99,7 +100,8 @@ public abstract class AbstractSet<E>
    *
    * @return a hash code for this Set
    */
-  public int hashCode()
+  @Override
+	public int hashCode()
   {
     Iterator<E> itr = iterator();
     int hash = 0;
@@ -126,7 +128,8 @@ public abstract class AbstractSet<E>
    * @see Collection#contains(Object)
    * @see Iterator#remove()
    */
-  public boolean removeAll(Collection<?> c)
+  @Override
+	public boolean removeAll(Collection<?> c)
   {
     int oldsize = size();
     int count = c.size();

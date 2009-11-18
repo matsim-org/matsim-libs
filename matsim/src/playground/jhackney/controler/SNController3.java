@@ -43,6 +43,7 @@ public class SNController3 extends Controler {
 	/**
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
+	@Override
 	protected StrategyManager loadStrategyManager() {
 
 		StrategyManager manager = new StrategyManager();

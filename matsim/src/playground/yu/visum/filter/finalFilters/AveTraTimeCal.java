@@ -55,6 +55,7 @@ public class AveTraTimeCal extends LinkAveCalA {
 	 * org.matsim.playground.filters.filter.finalFilters.LinkAveCalA.handleEvent(BasicEvent
 	 * event)
 	 */
+	@Override
 	public void compute(LinkEnterEventImpl enter, double leaveTime_s) {
 		double tt = leaveTime_s - enter.getTime();
 		try {

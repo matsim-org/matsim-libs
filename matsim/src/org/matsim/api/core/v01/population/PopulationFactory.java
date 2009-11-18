@@ -37,6 +37,7 @@ public interface PopulationFactory extends Serializable, MatsimFactory {
 	 * @return a BasicRoute Object with the links set accordingly
 	 * @deprecated needs to be verified
 	 */
+@Deprecated
 //	public BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds); // TODO [MR] check this
 	// disabled until everything else is figured out
 	

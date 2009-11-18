@@ -79,6 +79,7 @@ abstract class BinTree
 	    return ( parent != null  &&  parent.left == this ) ;
 	}
 
+	@Override
 	public String toString ( )                 // conversion to string
 	{
 	    return ( obj != null  ?  obj.toString()  :  "*" ) ;
@@ -382,7 +383,8 @@ abstract class BinTree
      *
      * @return string representation of tree
      */
-    public String toString ( )
+    @Override
+		public String toString ( )
     {
 	StringBuffer strbuf = new StringBuffer( this.getClass() + ": " ) ;
 

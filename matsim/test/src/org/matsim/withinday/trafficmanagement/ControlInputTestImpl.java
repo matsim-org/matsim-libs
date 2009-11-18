@@ -31,10 +31,12 @@ import org.matsim.withinday.trafficmanagement.controlinput.AbstractControlInputI
  */
 public class ControlInputTestImpl extends AbstractControlInputImpl {
 
+	@Override
 	public double getNashTime() {
 		return 0;
 	}
 
+	@Override
 	public void finishIteration() {
 	}
 

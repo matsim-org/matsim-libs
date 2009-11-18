@@ -90,6 +90,7 @@ public class ParallelEvents extends EventsManagerImpl {
 	}
 
 	
+	@Override
 	public void addHandler(final EventHandler handler) {
 		synchronized (this) {
 			events[numberOfAddedEventsHandler].addHandler(handler);
@@ -99,6 +100,7 @@ public class ParallelEvents extends EventsManagerImpl {
 	}
 	
 	
+	@Override
 	public void resetHandlers(final int iteration) {
 		synchronized (this) {
 			for (int i=0;i<events.length;i++){
@@ -108,6 +110,7 @@ public class ParallelEvents extends EventsManagerImpl {
 	}
 	
 	
+	@Override
 	public void resetCounter() {
 		synchronized (this) {
 			for (int i=0;i<events.length;i++){
@@ -117,6 +120,7 @@ public class ParallelEvents extends EventsManagerImpl {
 	}
 	
 	
+	@Override
 	public void removeHandler(final EventHandler handler) {
 		synchronized (this) {
 			for (int i=0;i<events.length;i++){
@@ -126,6 +130,7 @@ public class ParallelEvents extends EventsManagerImpl {
 	}
 	
 	
+	@Override
 	public void clearHandlers() {
 		synchronized (this) {
 			for (int i=0;i<events.length;i++){
@@ -135,6 +140,7 @@ public class ParallelEvents extends EventsManagerImpl {
 	}
 	
 	
+	@Override
 	public void printEventHandlers() {
 		synchronized (this) {
 			for (int i=0;i<events.length;i++){
@@ -157,6 +163,7 @@ public class ParallelEvents extends EventsManagerImpl {
 	// When one simulation iteration is finish, it must call this method,
 	// so that it can communicate to the threads, that the simulation is 
 	// finished and that it can await the event handler threads.
+	@Override
 	public void finishProcessing() {
 		for (int i = 0; i < eventsProcessThread.length; i++) {
 			eventsProcessThread[i].close();
@@ -173,6 +180,7 @@ public class ParallelEvents extends EventsManagerImpl {
 	
 	// create event handler threads
 	// prepare for next iteration
+	@Override
 	public void initProcessing(){
 		// reset this class, so that it can be reused for the next iteration
 		for (int i = 0; i < numberOfThreads; i++) {

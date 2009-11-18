@@ -39,6 +39,7 @@ public class OTFSlaveHost extends OTFHostControlBar {
 			InterruptedException, NotBoundException {
 		super(address, false);
 	}
+	@Override
 	protected void readConstData(OTFClientQuad clientQ) throws RemoteException {
 		clientQ.getConstData();
 	}

@@ -90,6 +90,7 @@ public class SpatialPajekWriter extends PajekWriter<SpatialSparseGraph, SpatialS
 
 		private static final String COLOR_BLACK = "13";
 
+		@Override
 		public String getVertexFillColor(SpatialSparseVertex v) {
 			return COLOR_BLACK;
 		}

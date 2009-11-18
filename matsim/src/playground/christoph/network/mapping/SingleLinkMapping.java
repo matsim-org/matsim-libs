@@ -21,16 +21,19 @@ public class SingleLinkMapping extends Mapping{
 		this.output = output;
 	}
 	
+	@Override
 	public Link getInput()
 	{
 		return input;
 	}
 	
+	@Override
 	public Link getOutput()
 	{
 		return output;
 	}
 
+	@Override
 	public double getLength()
 	{
 		if (input instanceof MappingInfo)
@@ -40,6 +43,7 @@ public class SingleLinkMapping extends Mapping{
 		else return input.getLength();
 	}
 	
+	@Override
 	public List<MappingInfo> getMappedObjects()
 	{
 		if (input instanceof MappingInfo)

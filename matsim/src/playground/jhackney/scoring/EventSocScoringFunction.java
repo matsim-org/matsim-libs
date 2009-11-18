@@ -81,27 +81,35 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 //				return 0;
 //			}
 	}
+	@Override
 	public double getUdur(ActivityImpl a){
 		return super.getUdur(a);
 	}
+	@Override
 	public double getUw(ActivityImpl a){
 		return super.getUw(a);
 	}
+	@Override
 	public double getUs(ActivityImpl a){
 		return super.getUs(a);
 	}
+	@Override
 	public double getUla(ActivityImpl a){
 		return super.getUla(a);
 	}
+	@Override
 	public double getUed(ActivityImpl a){
 		return super.getUed(a);
 	}
+	@Override
 	public double getUld(ActivityImpl a){
 		return super.getUld(a);
 	}
+	@Override
 	public double getUlegt(LegImpl l){
 		return super.getUlegt(l);
 	}
+	@Override
 	public double getUlegd(LegImpl l){
 		return super.getUlegd(l);
 	}
@@ -109,27 +117,35 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 	public double getDusoc(ActivityImpl a){
 		return dusoc.get(a);
 	}
+	@Override
 	public double getDudur(ActivityImpl a){
 		return super.getDudur(a);
 	}
+	@Override
 	public double getDuw(ActivityImpl a){
 		return super.getDuw(a);
 	}
+	@Override
 	public double getDus(ActivityImpl a){
 		return super.getDus(a);
 	}
+	@Override
 	public double getDula(ActivityImpl a){
 		return super.getDula(a);
 	}
+	@Override
 	public double getDued(ActivityImpl a){
 		return super.getDued(a);
 	}
+	@Override
 	public double getDuld(ActivityImpl a){
 		return super.getDuld(a);
 	}
+	@Override
 	public double getDulegt(LegImpl l){
 		return super.getDulegt(l);
 	}
+	@Override
 	public double getDulegd(LegImpl l){
 		return super.getDulegd(l);
 	}
@@ -139,6 +155,7 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 	 *
 	 * @see org.matsim.scoring.super#finish()
 	 */
+	@Override
 	public void finish() {
 		super.finish();
 		for (PlanElement pe : this.plan.getPlanElements()) {
@@ -169,6 +186,7 @@ public class EventSocScoringFunction extends playground.jhackney.scoring.Charypa
 	}
 
 
+	@Override
 	public double getScore() {
 		
 //		usoc.add(betaFriendFoe*this.friendFoeRatio+

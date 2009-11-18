@@ -31,6 +31,7 @@ package playground.johannes.socialnetworks.graph.mcmc;
  */
 public class ErgmTriangles extends ErgmTerm {
 	
+	@Override
 	public double changeStatistic(AdjacencyMatrix m, int i, int j, boolean y_ij) {
 		return getTheta() * -m.countCommonNeighbours(i, j);
 	}

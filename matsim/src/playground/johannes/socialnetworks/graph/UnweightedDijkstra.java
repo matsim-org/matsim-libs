@@ -204,6 +204,7 @@ public class UnweightedDijkstra<V extends Vertex> {
 		/**
 		 * @see {@link GraphProjection#getVertex(Vertex)}
 		 */
+		@Override
 		public DijkstraVertex getVertex(V v) {
 			return (DijkstraVertex) super.getVertex(v);
 		}

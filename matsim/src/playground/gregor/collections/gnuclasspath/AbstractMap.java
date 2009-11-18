@@ -187,7 +187,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
    * @see Cloneable
    * @see Object#clone()
    */
-  protected Object clone() throws CloneNotSupportedException
+  @Override
+	protected Object clone() throws CloneNotSupportedException
   {
     AbstractMap<K, V> copy = (AbstractMap<K, V>) super.clone();
     // Clear out the caches; they are stale.
@@ -252,7 +253,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
    * @return true if the object equals this map
    * @see Set#equals(Object)
    */
-  public boolean equals(Object o)
+  @Override
+	public boolean equals(Object o)
   {
     return (o == this
 	    || (o instanceof Map
@@ -293,7 +295,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
    * @see Map.Entry#hashCode()
    * @see Set#hashCode()
    */
-  public int hashCode()
+  @Override
+	public int hashCode()
   {
     return entrySet().hashCode();
   }
@@ -339,7 +342,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
 	 *
 	 * @return The number of keys.
 	 */
-        public int size()
+        @Override
+				public int size()
         {
           return AbstractMap.this.size();
         }
@@ -351,7 +355,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
 	 * @param key The key to search for.
 	 * @return True if the key was found, false otherwise.
  	 */
-        public boolean contains(Object key)
+        @Override
+				public boolean contains(Object key)
         {
           return containsKey(key);
         }
@@ -363,7 +368,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
 	 *
 	 * @return An iterator over the keys.
 	 */
-        public Iterator<K> iterator()
+        @Override
+				public Iterator<K> iterator()
         {
           return new Iterator<K>()
           {
@@ -527,7 +533,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
    * @return a String representation
    * @see Map.Entry#toString()
    */
-  public String toString()
+  @Override
+	public String toString()
   {
     Iterator<Map.Entry<K, V>> entries = entrySet().iterator();
     StringBuilder r = new StringBuilder("{");
@@ -575,7 +582,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
 	 *
 	 * @return The number of values.
 	 */
-       public int size()
+       @Override
+			public int size()
         {
           return AbstractMap.this.size();
         }
@@ -587,7 +595,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
 	 * @param value The value to search for.
 	 * @return True if the value was found, false otherwise.
 	 */
-        public boolean contains(Object value)
+        @Override
+				public boolean contains(Object value)
         {
           return containsValue(value);
         }
@@ -599,7 +608,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
 	 *
 	 * @return An iterator over the values.
 	 */
-        public Iterator<V> iterator()
+        @Override
+				public Iterator<V> iterator()
         {
           return new Iterator<V>()
           {
@@ -734,7 +744,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
      * @param o the object to compare
      * @return <code>true</code> if it is equal
      */
-    public boolean equals(Object o)
+    @Override
+		public boolean equals(Object o)
     {
       if (! (o instanceof Map.Entry))
         return false;
@@ -780,7 +791,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
      *
      * @return the hash code
      */
-    public int hashCode()
+    @Override
+		public int hashCode()
     {
       return (AbstractMap.hashCode(key) ^ AbstractMap.hashCode(value));
     }
@@ -813,7 +825,8 @@ public abstract class AbstractMap<K, V> implements Map<K, V>
      *
      * @return the string representation
      */
-    public String toString()
+    @Override
+		public String toString()
     {
       return key + "=" + value;
     }

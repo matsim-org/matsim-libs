@@ -38,6 +38,7 @@ public class PlanLegsTravelDistanceCalculator  extends PlanLegsTravelMeasureCalc
 	}
 	
 	
+	@Override
 	public List<Double> handle(final Plan plan, boolean wayThere) {		
 		super.reset();		
 		final List<?> actslegs = plan.getPlanElements();

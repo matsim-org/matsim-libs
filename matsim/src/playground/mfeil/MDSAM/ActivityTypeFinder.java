@@ -59,6 +59,7 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 		this.actTypes = new ArrayList<String>();
 	}
 	
+	@Override
 	public void run (final ActivityFacilitiesImpl facilities) {
 		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
 			run(f);

@@ -52,10 +52,12 @@ public class PajekClusteringColorizer<V extends Vertex, E extends Edge> extends 
 		c_max = StatUtils.max(clustering.getValues());
 	}
 	
+	@Override
 	public String getEdgeColor(E e) {
 		return getColor(-1);
 	}
 
+	@Override
 	public String getVertexFillColor(V ego) {
 		double c = clustering.get(ego);
 		double color = (c - c_min) / (c_max - c_min);

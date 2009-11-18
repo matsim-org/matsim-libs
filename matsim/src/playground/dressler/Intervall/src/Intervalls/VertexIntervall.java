@@ -188,6 +188,7 @@ public class VertexIntervall extends Intervall {
 	 *@param t point to split at
 	 *@return new Interval 
 	 */
+	@Override
 	public VertexIntervall splitAt(int t){
 		boolean newdist = this.getReachable();
 		Intervall j =super.splitAt(t);
@@ -201,6 +202,7 @@ public class VertexIntervall extends Intervall {
 		return k;
 	}
 	
+	@Override
 	public String toString()
 	{
 		if(this._predecessor != null)

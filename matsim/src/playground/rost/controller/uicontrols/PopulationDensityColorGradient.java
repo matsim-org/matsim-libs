@@ -38,6 +38,7 @@ public class PopulationDensityColorGradient extends JPanel {
 		this.height = height;
 	}
 	
+	@Override
 	public void paintComponent( Graphics g )
 	{
 		int width = this.getWidth() - border;;

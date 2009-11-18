@@ -59,6 +59,7 @@ public class KeepOnlyMIVPlans extends NewPopulation {
 		super(plans, filename);
 	}
 
+	@Override
 	public void run(Person person) {
 		
 		if(person.getPlans().size() != 1){

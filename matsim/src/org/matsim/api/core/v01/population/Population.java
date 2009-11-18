@@ -42,6 +42,7 @@ public interface Population extends MatsimToplevelContainer, Serializable {
 	public void addPerson(final Person p); 
 
 	/** @deprecated use getFactory() */
+	@Deprecated
 	public PopulationFactory getPopulationBuilder();
 
 }

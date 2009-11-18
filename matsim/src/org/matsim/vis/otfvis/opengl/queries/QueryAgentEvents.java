@@ -115,6 +115,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 		}
 	}
 
+	@Override
 	public QueryAgentEvents clone() {
 		QueryAgentEvents result = new QueryAgentEvents();
 		result.handler = this.handler;
@@ -127,6 +128,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 
 		return result;
 	}
+	@Override
 	public void draw(OTFDrawer drawer) {
 		if(drawer instanceof OTFOGLDrawer) {
 			draw((OTFOGLDrawer)drawer);
@@ -147,6 +149,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 		gl.glDisable(GL.GL_LINE_SMOOTH);
 	}
 
+	@Override
 	public void draw(OTFOGLDrawer drawer) {
 		if(this.vertex == null) return;
 
@@ -214,6 +217,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 
 	}
 
+	@Override
 	public void remove() {
 		// Check if we have already generated InfoText Objects, otherwise drop deleting
 		if (this.calcOffset == true) return;
@@ -226,10 +230,12 @@ public class QueryAgentEvents extends QueryAgentPlan {
 	}
 	
 	// this must be done every time again until it is removed
+	@Override
 	public boolean isAlive() {
 		return true;
 	}
 
+	@Override
 	public Type getType() {
 		return OTFQuery.Type.AGENT;
 	}

@@ -71,6 +71,7 @@ public class PMessageQueue extends MessageQueue {
 	 * 
 	 * @param m
 	 */
+	@Override
 	public void putMessage(Message m) {
 		// TODO: this should function also during initialization of the
 		// simulation!!!
@@ -202,6 +203,7 @@ public class PMessageQueue extends MessageQueue {
 	 * 
 	 * @param m
 	 */
+	@Override
 	public void removeMessage(Message m) {
 		boolean inLowerThreadCurrently = Thread.currentThread().getId() == idOfLowerThread ? true
 				: false;
@@ -218,6 +220,7 @@ public class PMessageQueue extends MessageQueue {
 	 * 
 	 * @return
 	 */
+	@Override
 	public Message getNextMessage() {
 		boolean inLowerThreadCurrently = Thread.currentThread().getId() == idOfLowerThread ? true
 				: false;
@@ -400,6 +403,7 @@ public class PMessageQueue extends MessageQueue {
 	// synchronization in getNextmessage, we do
 	// not need it here also... (here we only read...)
 	// (basically performance improvement...)
+	@Override
 	public boolean isEmpty() {
 		// synchronized (this) {
 		return queueThread1.size() + queueThread2.size() == 0;

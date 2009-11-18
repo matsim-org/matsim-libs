@@ -28,6 +28,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class KtiConfigGroupTest extends MatsimTestCase {
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 	}

@@ -113,6 +113,7 @@ public class TimeExpandedPath {
 		/**
 		 * Method returning a String representation of the PathEdge
 		 */
+		@Override
 		public String toString(){
 			String s = this.startTime + " " + edge.getFromNode().getId().toString()+"-->" + edge.getToNode().getId().toString() + " " +this.arrivalTime;
 			if(!this.forward){
@@ -392,6 +393,7 @@ public class TimeExpandedPath {
 	/**
 	 * returns a String representation of the Path
 	 */
+	@Override
 	public String toString(){
 		StringBuilder strb = new StringBuilder();
 		strb.append("f: "+this._flow+" on: ");

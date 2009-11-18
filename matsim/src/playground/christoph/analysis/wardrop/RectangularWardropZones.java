@@ -37,6 +37,7 @@ public class RectangularWardropZones extends WardropZonesImpl{
 		createMapping();
 	}
 	
+	@Override
 	public int getZonesCount()
 	{
 		return zonesX * zonesY;
@@ -54,6 +55,7 @@ public class RectangularWardropZones extends WardropZonesImpl{
 		validMapping = false;
 	}
 	
+	@Override
 	public void createMapping()
 	{
 		if (!validMapping)
@@ -96,6 +98,7 @@ public class RectangularWardropZones extends WardropZonesImpl{
 		return super.getZones(node);
 	}
 	
+	@Override
 	public List<Integer> getZones(Coord coord)
 	{
 		double dx = (xMax - xMin) / zonesX;
@@ -118,6 +121,7 @@ public class RectangularWardropZones extends WardropZonesImpl{
 	}
 
 	// returns the coordinates of the centre of the given zone
+	@Override
 	public Coord getZoneCentre(int zone)
 	{
 		if (zoneCentres.containsKey(zone)) return zoneCentres.get(zone);

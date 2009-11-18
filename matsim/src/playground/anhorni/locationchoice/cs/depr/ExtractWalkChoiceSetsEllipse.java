@@ -37,6 +37,7 @@ public class ExtractWalkChoiceSetsEllipse extends ChoiceSetExtractor {
 	}
 	
 	
+	@Override
 	protected void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type,
 			Controler controler, int tt) {
 

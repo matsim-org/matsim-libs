@@ -87,21 +87,25 @@ public class LoopMapping extends Mapping{
 		length = length / 2;
 	}
 	
+	@Override
 	public List<MappingInfo> getInput()
 	{
 		return input;
 	}
 	
+	@Override
 	public Node getOutput()
 	{
 		return output;
 	}
 
+	@Override
 	public double getLength()
 	{
 		return length;
 	}
 
+	@Override
 	public List<MappingInfo> getMappedObjects()
 	{
 		List<MappingInfo> list = new ArrayList<MappingInfo>();

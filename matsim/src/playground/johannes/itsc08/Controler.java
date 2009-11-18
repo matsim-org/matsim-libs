@@ -96,6 +96,7 @@ public class Controler extends WithindayControler {
 //		addControlerListener(obs);
 	}
 
+	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager m = new StrategyManager();
 		m.addStrategy(new PlanStrategy(new ExpBetaPlanChanger()), 0.98);

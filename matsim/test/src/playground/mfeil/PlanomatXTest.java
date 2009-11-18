@@ -68,6 +68,7 @@ public class PlanomatXTest extends MatsimTestCase{
 	private PlanomatX testee;
 	private ScenarioImpl scenario_input;
 
+	@Override
 	protected void setUp() throws Exception {
 
 		super.setUp();

@@ -43,6 +43,7 @@ public class MyTestXmlObject {
 		this.test = test;
 	}
 	
+	@Override
 	public String toString(){
 		String result = "Object is of type " 
 			+ this.type 

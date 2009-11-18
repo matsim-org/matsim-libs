@@ -21,6 +21,7 @@ public class OTFNoDynDataLinkHandler extends OTFDefaultLinkHandler {
 		public void writeDynData(ByteBuffer out) throws IOException {
 			// do nothing
 		}
+		@Override
 		public OTFDataWriter<QueueLink> getWriter() {
 			return new Writer();
 		}

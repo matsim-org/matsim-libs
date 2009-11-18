@@ -40,6 +40,7 @@ public class GibbsEdgeFlip extends GibbsSampler {
 		super(seed);
 	}
 
+	@Override
 	public void sample(AdjacencyMatrix y, ConditionalDistribution d, SampleHandler handler) {
 		int N = y.getVertexCount();
 		int M = y.getEdgeCount();
@@ -58,6 +59,7 @@ public class GibbsEdgeFlip extends GibbsSampler {
 		super.sample(y, d, handler);
 	}
 	
+	@Override
 	public boolean step(AdjacencyMatrix y, ConditionalDistribution d) {
 		boolean accept = false;
 		int idx_ij = random.nextInt(edges.length);

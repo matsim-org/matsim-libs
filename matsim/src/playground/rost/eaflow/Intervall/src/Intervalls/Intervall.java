@@ -503,6 +503,7 @@ implements Comparable<Intervall>
 	 * Gives a String representation of abn Intervall with correct brackets
 	 * @return String representation
 	 */
+	@Override
 	public String toString(){
 		String l,r;
 		switch (mode){

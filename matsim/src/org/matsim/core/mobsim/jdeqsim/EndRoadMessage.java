@@ -52,6 +52,7 @@ public class EndRoadMessage extends EventMessage {
 		super(scheduler, vehicle);
 	}
 
+	@Override
 	public void processEvent() {
 		// don't need to output any event
 	}

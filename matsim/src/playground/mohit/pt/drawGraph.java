@@ -41,6 +41,7 @@ public class drawGraph extends Frame implements ItemListener{
 		// TODO Auto-generated method stub
 		
 	}
+	@Override
 	public void paint(Graphics g){
 		g.setColor(Color.red);
 		g.drawLine(100,100,100,1200); // y-axis

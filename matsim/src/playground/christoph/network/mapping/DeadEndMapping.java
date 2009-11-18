@@ -21,21 +21,25 @@ public class DeadEndMapping extends Mapping{
 		this.output = output;
 	}
 	
+	@Override
 	public List<MappingInfo> getInput()
 	{
 		return input;
 	}
 	
+	@Override
 	public Node getOutput()
 	{
 		return output;
 	}
 
+	@Override
 	public double getLength()
 	{
 		return 0.0;
 	}
 	
+	@Override
 	public List<MappingInfo> getMappedObjects()
 	{
 		List<MappingInfo> list = new ArrayList<MappingInfo>();

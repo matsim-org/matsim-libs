@@ -39,6 +39,7 @@ public class BottleneckControler extends Controler {
 		super(args);
 	}
 
+	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new StrategyManager();
 		manager.setMaxPlansPerAgent(5);

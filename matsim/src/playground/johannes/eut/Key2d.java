@@ -18,13 +18,15 @@ public class Key2d<K1, K2> {
         this.subKey2 = subKey2;
     }
 
-    public boolean equals(Object o) {
+    @Override
+		public boolean equals(Object o) {
         Key2d other = (Key2d) o;
         return (this.subKey1.equals(other.subKey1) && this.subKey2
                 .equals(other.subKey2));
     }
 
-    public int hashCode() {
+    @Override
+		public int hashCode() {
         /*
          * According to the List interface (for exactly two non-null elements).
          */
