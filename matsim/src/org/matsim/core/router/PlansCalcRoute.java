@@ -21,12 +21,13 @@
 package org.matsim.core.router;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.population.PlanElement;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -63,10 +64,11 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * The routing algorithm to be used for finding routes on the network with actual travel times.
 	 */
 	private final LeastCostPathCalculator routeAlgo;
+
 	/**
-	 * The routing algorithm to be used for finding routes in the empty network, with freeflow travel times.
+	 * The routing algorithm to be used for finding pt routes, based on the empty network, with freeflow travel times.
 	 */
-	private final LeastCostPathCalculator routeAlgoFreeflow;
+	private final LeastCostPathCalculator routeAlgoPtFreeflow;
 	
 	/**
 	 * if not set via constructor use the default values 
@@ -97,26 +99,39 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		this(null, network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
 	
-	/**
-	 * Uses the speed factors from the config group and the rerouting of the factory 
+	/**Does the following (as far as I can see):<ul>
+	 * <li> sets routeAlgo to the path calculator defined by <tt>factory</tt>, using <tt>costCalculator</tt> and <tt>timeCalculator</tt> as arguments </li>
+	 * <li> sets routeAlgoPtFreeflow to "-1 utils/sec" (which is <it>enormous</it>--????) </li>
+	 * <li> sets configGroup to <tt>group</tt> but it is not clear where this will be used.
+	 * </ul>
+	 * [[old javadoc: Uses the speed factors from the config group and the rerouting of the factory]] 
 	 */
 	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, 
 			final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
+
 		this.routeAlgo = factory.createPathCalculator(network, costCalculator, timeCalculator);
-		FreespeedTravelTimeCost ptTimeCostCalc = new FreespeedTravelTimeCost(-1.0, 0.0, 0.0);
-		this.routeAlgoFreeflow = factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
+
+		FreespeedTravelTimeCost ptTimeCostCalc = new FreespeedTravelTimeCost(-1.0, 0.0, 0.0);		
+		this.routeAlgoPtFreeflow = factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
+
 		this.routeFactory = network.getFactory();
+
 		if (group != null) {
 			this.configGroup = group;
 		}
 		else {
 			log.warn(NO_CONFIGGROUP_SET_WARNING);
 		}
+
 	}
 	
 	/**
-	 * Creates a rerouting strategy module using dijkstra rerouting
+	 * Creates a rerouting strategy module using dijkstra rerouting.  Does the following (as far as I can see):<ul>
+	 * <li> sets routeAlgo to the path calculator defined by <tt>new DijkstraFactory()</tt>, using <tt>costCalculator</tt> and <tt>timeCalculator</tt> as arguments </li>
+	 * <li> sets routeAlgoPtFreeflow to "-1 utils/sec" (which is <it>enormous</it>--????) </li>
+	 * <li> sets configGroup to <tt>group</tt> but it is not clear where this will be used.
+	 * </ul>
 	 */
 	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(group, network, costCalculator, timeCalculator, new DijkstraFactory());
@@ -131,7 +146,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	public PlansCalcRoute(final NetworkLayer network, final LeastCostPathCalculator router, final LeastCostPathCalculator routerFreeflow) {
 		super();
 		this.routeAlgo = router;
-		this.routeAlgoFreeflow = routerFreeflow;
+		this.routeAlgoPtFreeflow = routerFreeflow;
 		this.routeFactory = network.getFactory();
 		log.warn(NO_CONFIGGROUP_SET_WARNING);
 	}
@@ -141,7 +156,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	}
 	
 	public final LeastCostPathCalculator getPtFreeflowLeastCostPathCalculator(){
-		return this.routeAlgoFreeflow;
+		return this.routeAlgoPtFreeflow;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -290,7 +305,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 			Node endNode = toLink.getFromNode(); // the target is the start of the link
 			// do not drive/walk around, if we stay on the same link
-			path = this.routeAlgoFreeflow.calcLeastCostPath(startNode, endNode, depTime);
+			path = this.routeAlgoPtFreeflow.calcLeastCostPath(startNode, endNode, depTime);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
 			// so let's calculate the final part.
