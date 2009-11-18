@@ -18,25 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt;
+package org.matsim.pt;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-public abstract class AllTests {
+public class AllTests {
 
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 
-		suite.addTestSuite(VehicleImplTest.class);
-		suite.addTest(playground.marcel.pt.config.AllTests.suite());
-		suite.addTest(playground.marcel.pt.fares.AllTests.suite());
-		suite.addTest(playground.marcel.pt.router.AllTests.suite());
-		suite.addTest(playground.marcel.pt.utils.AllTests.suite());
-
-		suite.addTest(playground.marcel.pt.controler.AllTests.suite());
+		suite.addTest(org.matsim.pt.routes.AllTests.suite());
+		suite.addTest(org.matsim.pt.queuesim.AllTests.suite());
 
 		return suite;
 	}
+
 
 }
