@@ -29,7 +29,8 @@ import org.matsim.core.utils.misc.Time;
 
 /**
  * CostCalculator and TravelTimeCalculator for Links based on freespeed on links and
- * distance costs if set
+ * distance costs if set.  It sets the <em> function </em> that is to be used with calls
+ * <tt>getLinkTravelTime( link, time)</tt> and <tt>getLinkTravelCost( link, time )</tt>.
  *
  * @author mrieser
  * @author dgrether
@@ -40,9 +41,9 @@ public class FreespeedTravelTimeCost implements TravelMinCost, TravelTime {
 	private final double marginalUtlOfDistance;
 	/**
 	 * 
-	 * @param scaledTravelFactor must be scaled, i.e. per second
-	 * @param scaledPerformingFactor must be scaled, i.e. per second
-	 * @param scaledMarginalUtilityOfDistance must be scaled, i.e. per meter
+	 * @param scaledMarginalUtilityOfTraveling. Must be scaled, i.e. per second.  Usually negative.
+	 * @param scaledMarginalUtilityOfPerforming. Must be scaled, i.e. per second.  Usually positive.
+	 * @param scaledMarginalUtilityOfDistance. Must be scaled, i.e. per meter.  Usually negative.
 	 */
 	public FreespeedTravelTimeCost(double scaledMarginalUtilityOfTraveling, double scaledMarginalUtilityOfPerforming, 
 			double scaledMarginalUtilityOfDistance){
