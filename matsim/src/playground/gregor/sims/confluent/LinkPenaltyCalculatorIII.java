@@ -6,14 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
 import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -33,14 +34,16 @@ public class LinkPenaltyCalculatorIII implements LinkPenalty, AfterMobsimListene
 	private static final double gamma = 0.5;
 	
 	private final HashMap<Id,LinkInfo> linkInfos = new HashMap<Id, LinkInfo>();
-	private final List<AgentArrivalEventImpl> arrivedPersons = new ArrayList<AgentArrivalEventImpl>();
+	private final List<BasicAgentArrivalEvent> arrivedPersons = new ArrayList<BasicAgentArrivalEvent>();
 
 	private int it;
 
 	private NetworkLayer net;
+	private Population pop;
 	
-	public LinkPenaltyCalculatorIII(NetworkLayer net) {
+	public LinkPenaltyCalculatorIII(NetworkLayer net, Population pop) {
 		this.net = net;
+		this.pop = pop;
 	}
 	
 	public double getLinkCost(Link link) {
@@ -68,8 +71,8 @@ public class LinkPenaltyCalculatorIII implements LinkPenalty, AfterMobsimListene
 
 
 	private void scorePlans(EventsManagerImpl events) {
-		for (AgentArrivalEventImpl e : this.arrivedPersons) {
-			Person pers = e.getPerson();
+		for (BasicAgentArrivalEvent e : this.arrivedPersons) {
+			Person pers = this.pop.getPersons().get(e.getPersonId());
 			Plan plan = pers.getSelectedPlan();
 			List<Id> links = ((NetworkRouteWRefs) ((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity()).getRoute()).getLinkIds();
 			for (Id id : links) {
@@ -107,14 +110,13 @@ public class LinkPenaltyCalculatorIII implements LinkPenalty, AfterMobsimListene
 		
 	}
 	
-	public void handleEvent(AgentArrivalEventImpl event) {
+	public void handleEvent(BasicAgentArrivalEvent event) {
 		this.arrivedPersons.add(event);
-		
 	}
 	
 	private void updateAvgTT() {
-		for (AgentArrivalEventImpl e : this.arrivedPersons) {
-			Person pers = e.getPerson();
+		for (BasicAgentArrivalEvent e : this.arrivedPersons) {
+			Person pers = this.pop.getPersons().get(e.getPersonId());
 			Plan plan = pers.getSelectedPlan();
 			List<Id> links = ((NetworkRouteWRefs) ((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity()).getRoute()).getLinkIds();
 			Collections.reverse(links);

@@ -29,23 +29,23 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author illenberger
  *
  */
-public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener, IterationStartsListener {
+public class LinkCounter implements BasicLinkEnterEventHandler, IterationEndsListener, IterationStartsListener {
 
 	private int count;
 	
-	private List<LinkEnterEventImpl> events;
+	private List<BasicLinkEnterEvent> events;
 	
 	private BufferedWriter writer;
 	
@@ -69,19 +69,19 @@ public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener
 			e.printStackTrace();
 		}
 	}
-	public void handleEvent(LinkEnterEventImpl event) {
+	public void handleEvent(BasicLinkEnterEvent event) {
 		if(firstEvent == 0)
 			firstEvent = (int) event.getTime();
 		
 		lastEvent = (int)event.getTime();
-		if(event.getLink().getId().toString().equals("1100")) {
+		if(event.getLinkId().toString().equals("1100")) {
 			events.add(event);
 			count++;
 		}
 	}
 
 	public void reset(int iteration) {
-		events = new LinkedList<LinkEnterEventImpl>();
+		events = new LinkedList<BasicLinkEnterEvent>();
 		firstEvent = 0;
 		lastEvent = 0;
 	}
@@ -90,7 +90,7 @@ public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener
 		int binsize = 60;
 		int bincount = (lastEvent-firstEvent)/binsize;
 		int[] bins = new int[bincount];
-		for(LinkEnterEventImpl e : events) {
+		for(BasicLinkEnterEvent e : events) {
 			int idx = ((int)e.getTime() - firstEvent)/binsize;
 			bins[idx]++;
 		}

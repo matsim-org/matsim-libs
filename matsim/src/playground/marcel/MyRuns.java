@@ -669,7 +669,7 @@ public class MyRuns {
 //		convertPlans(args);
 //		readPlans(args);
 //		removeLinkAndRoute(args);
-		createSample(args);
+//		createSample(args);
 
 		/* ***   DEMAND MODELING   *** */
 
@@ -744,6 +744,14 @@ public class MyRuns {
 //		someTest(args);
 
 		Gbl.printSystemInfo();
+		
+		String[] array = {"a", "b", "c"};
+		String[][] array2 = {{"A1", "B1"}, {"A2", "B2"}};
+		for (String[] sub : array2) {
+			for (String str : sub) {
+				System.out.println(str);
+			}
+		}
 
 		System.out.println("stop at " + (new Date()));
 		System.exit(0); // currently only used for calcRouteMT();

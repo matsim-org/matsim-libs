@@ -37,10 +37,10 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -58,7 +58,7 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class StaticSnapshotGenerator implements LinkEnterEventHandler {
+public class StaticSnapshotGenerator implements BasicLinkEnterEventHandler {
 	
 	private static final String CVSROOT = "../vsp-cvs";
 	private final static Logger log = Logger.getLogger(StaticSnapshotGenerator.class);
@@ -121,7 +121,7 @@ public class StaticSnapshotGenerator implements LinkEnterEventHandler {
 	
 
 
-	public void handleEvent(final LinkEnterEventImpl event) {
+	public void handleEvent(final BasicLinkEnterEvent event) {
 		double time = event.getTime();
 		if (time > this.oldTime + SNAPSHOT_PERIOD) {
 			this.oldTime = time;

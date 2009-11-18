@@ -33,10 +33,11 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -181,25 +182,25 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 	public double getAvgSpeed(final Id linkId, final double time) {
 		SpeedCounter sc = speedCounters.get(linkId.toString());
-		return sc != null ? sc.getSpeed(getBinIdx(time)) : network.getLink(
+		return sc != null ? sc.getSpeed(getBinIdx(time)) : network.getLinks().get(
 				linkId).getFreespeed(time) * 3.6;
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEventImpl arrival) {
+	public void handleEvent(final BasicAgentArrivalEvent arrival) {
 		SpeedCounter sc = speedCounters.get(arrival.getLinkId().toString());
 		if (sc != null)
 			sc.removeTmpEnterTime(arrival.getPersonId().toString());
 	}
 
 	@Override
-	public void handleEvent(final LinkEnterEventImpl enter) {
+	public void handleEvent(final BasicLinkEnterEvent enter) {
 		String linkId = enter.getLinkId().toString();
 		SpeedCounter sc = speedCounters.get(linkId);
 		if (sc == null) {
 			double[] freeSpeeds = new double[nofBins];
 			for (int i = 0; i < nofBins - 1; i++)
-				freeSpeeds[i] = network.getLink(linkId).getFreespeed(
+				freeSpeeds[i] = network.getLinks().get(linkId).getFreespeed(
 						i * 86400.0 / nofBins);
 			sc = new SpeedCounter(freeSpeeds);
 		}
@@ -208,7 +209,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	@Override
-	public void handleEvent(final LinkLeaveEventImpl leave) {
+	public void handleEvent(final BasicLinkLeaveEvent leave) {
 		double time = leave.getTime();
 		int timeBin = getBinIdx(time);
 		String linkId = leave.getLinkId().toString();
@@ -217,9 +218,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 			Double enterTime = sc.removeTmpEnterTime(leave.getPersonId()
 					.toString());
 			if (enterTime != null) {
-				LinkImpl l = (LinkImpl) leave.getLink();
-				if (l == null)
-					l = network.getLink(linkId);
+				Link l = network.getLinks().get(leave.getLinkId());
 				if (l != null) {
 					sc.lengthSumAppend(timeBin, l.getLength());
 					sc.timeSumAppend(timeBin, time - enterTime);
@@ -256,7 +255,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 			out.write(head.toString());
 			out.flush();
 
-			for (LinkImpl l : interestLinks == null ? network.getLinks().values()
+			for (Link l : interestLinks == null ? network.getLinks().values()
 					: interestLinks) {
 				Id linkId = l.getId();
 				StringBuffer line = new StringBuffer(linkId.toString());
@@ -302,7 +301,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 	public Set<Id> getInterestLinkIds() {
 		Set<Id> interestLinkIds = new HashSet<Id>();
-		for (LinkImpl link : interestLinks == null ? network.getLinks().values()
+		for (Link link : interestLinks == null ? network.getLinks().values()
 				: interestLinks) {
 			interestLinkIds.add(link.getId());
 		}

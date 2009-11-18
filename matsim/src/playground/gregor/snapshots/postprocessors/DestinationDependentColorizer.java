@@ -22,13 +22,13 @@ package playground.gregor.snapshots.postprocessors;
 
 import java.util.HashMap;
 
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 
 import playground.gregor.snapshots.writers.PositionInfo;
 
 
-public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveEventHandler {
+public class DestinationDependentColorizer implements PostProcessorI, BasicLinkLeaveEventHandler {
 
 	private final static int NUM_OF_COLOR_SLOTS = 256;
 	
@@ -74,7 +74,7 @@ public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveE
 //		
 //	}
 
-	public void handleEvent(final LinkLeaveEventImpl event) {
+	public void handleEvent(final BasicLinkLeaveEvent event) {
 		if (event.getLinkId().toString().contains("shelter")) {
 			this.destNodeMapping.put(event.getPersonId().toString(),event.getLinkId().toString().replace("shelter", ""));
 		} else if (event.getLinkId().toString().contains("rev_el")) {
@@ -84,10 +84,8 @@ public class DestinationDependentColorizer implements PostProcessorI, LinkLeaveE
 		}  else if (event.getLinkId().toString().contains("rev_")) {
 			this.destNodeMapping.put(event.getPersonId().toString(),event.getLinkId().toString().replace("rev_", ""));
 		}
-
-		
-		
 	}
+
 	public void reset(final int iteration) {
 		// TODO Auto-generated method stub
 		

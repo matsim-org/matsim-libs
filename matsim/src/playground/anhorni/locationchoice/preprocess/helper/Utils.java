@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -100,7 +101,7 @@ public abstract class Utils {
 			return "undefined";
 	}	
 	
-	public static String getActType(Plan plan, ActivityImpl act) {		
+	public static String getActType(Plan plan, Activity act) {		
 		if (!act.getType().startsWith("h")) {
 			return act.getType();
 		}

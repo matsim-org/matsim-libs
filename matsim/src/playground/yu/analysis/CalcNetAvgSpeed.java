@@ -25,14 +25,14 @@ package playground.yu.analysis;
 
 import java.util.TreeMap;
 
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.utils.TollTools;
@@ -43,8 +43,8 @@ import playground.yu.utils.TollTools;
  * @author ychen
  * 
  */
-public class CalcNetAvgSpeed implements LinkEnterEventHandler,
-		LinkLeaveEventHandler, AgentArrivalEventHandler {
+public class CalcNetAvgSpeed implements BasicLinkEnterEventHandler,
+		BasicLinkLeaveEventHandler, BasicAgentArrivalEventHandler {
 	/**
 	 * @param lengthSum
 	 *            - the sum of all the covered distance [km].
@@ -52,7 +52,7 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 	 *            - the sum of all the drivingtime [h]
 	 */
 	private double lengthSum, timeSum;
-	protected NetworkLayer network = null;
+	protected Network network = null;
 	/*
 	 * enterTimes<String agentId, Double enteringtime>
 	 */
@@ -60,27 +60,22 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 	private RoadPricingScheme toll = null;
 
 	// --------------------------CONSTRUCTOR------------------
-	/**
-	 *
-	 */
-	public CalcNetAvgSpeed(final NetworkLayer network) {
+	public CalcNetAvgSpeed(final Network network) {
 		this.network = network;
 		this.enterTimes = new TreeMap<String, Double>();
 	}
 
-	public CalcNetAvgSpeed(NetworkLayer network, RoadPricingScheme toll) {
+	public CalcNetAvgSpeed(Network network, RoadPricingScheme toll) {
 		this(network);
 		this.toll = toll;
 	}
 
-	public void handleEvent(LinkEnterEventImpl enter) {
+	public void handleEvent(BasicLinkEnterEvent enter) {
 		if (toll == null)
 			this.enterTimes
 					.put(enter.getPersonId().toString(), enter.getTime());
 		else {
-			LinkImpl link = (LinkImpl) enter.getLink();
-			if (link == null)
-				link = network.getLink(enter.getLinkId().toString());
+			Link link = network.getLinks().get(enter.getLinkId());
 			if (link != null)
 				if (TollTools.isInRange(link, toll))
 					this.enterTimes.put(enter.getPersonId().toString(), enter
@@ -94,14 +89,11 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 		this.timeSum = 0;
 	}
 
-	public void handleEvent(LinkLeaveEventImpl leave) {
+	public void handleEvent(BasicLinkLeaveEvent leave) {
 		Double enterTime = this.enterTimes.remove(leave.getPersonId()
 				.toString());
 		if (enterTime != null) {
-			LinkImpl l = (LinkImpl) leave.getLink();
-			if (l == null) {
-				l = this.network.getLink(leave.getLinkId().toString());
-			}
+			Link l = this.network.getLinks().get(leave.getLinkId());
 			if (l != null) {
 				this.lengthSum += l.getLength() / 1000.0;
 				this.timeSum += (leave.getTime() - enterTime.doubleValue()) / 3600.0;
@@ -113,7 +105,7 @@ public class CalcNetAvgSpeed implements LinkEnterEventHandler,
 		return ((this.timeSum != 0.0) ? this.lengthSum / this.timeSum : 0.0);
 	}
 
-	public void handleEvent(AgentArrivalEventImpl arrival) {
+	public void handleEvent(BasicAgentArrivalEvent arrival) {
 		String id = arrival.getPersonId().toString();
 		if (this.enterTimes.containsKey(id)) {
 			this.enterTimes.remove(id);

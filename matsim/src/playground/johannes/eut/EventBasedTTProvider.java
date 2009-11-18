@@ -9,13 +9,13 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.router.util.TravelTime;
 
@@ -29,8 +29,8 @@ import org.matsim.core.router.util.TravelTime;
  * @author illenberger
  *
  */
-public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, LinkLeaveEventHandler,
-		AgentArrivalEventHandler {
+public class EventBasedTTProvider implements TravelTime, BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler,
+		BasicAgentArrivalEventHandler {
 
 	// =====================================================================
 	// private fields
@@ -47,7 +47,7 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 	 */
 	private LinkedList<TTElement> ttimes = new LinkedList<TTElement>();
 
-	private Map<Link, Averager> averagedTTimes = new HashMap<Link, Averager>();
+	private Map<Id, Averager> averagedTTimes = new HashMap<Id, Averager>(); // linkId
 
 //	private SimTimeI simTime;
 
@@ -66,14 +66,14 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 	// instance methods
 	// =====================================================================
 
-	public void handleEvent(LinkEnterEventImpl event) {
+	public void handleEvent(BasicLinkEnterEvent event) {
 		Key2d<String, String> key = new Key2d<String, String>(event.getLinkId().toString(),
 				event.getPersonId().toString());
 		this.enterEvents.put(key, event.getTime());
 
 	}
 
-	public void handleEvent(LinkLeaveEventImpl event) {
+	public void handleEvent(BasicLinkLeaveEvent event) {
 		Key2d<String, String> key = new Key2d<String, String>(event.getLinkId().toString(),
 				event.getPersonId().toString());
 		Double t1 = this.enterEvents.remove(key);
@@ -81,14 +81,14 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 		if (t1 != null) {
 			double deltaT = event.getTime() - t1;
 			if (deltaT >= 0) {
-				this.ttimes.add(new TTElement(event.getLink(), (int) event.getTime(),
+				this.ttimes.add(new TTElement(event.getLinkId(), (int) event.getTime(),
 						(int) deltaT));
 //				eventsAvailable = true;
 			}
 		}
 	}
 
-	public void handleEvent(AgentArrivalEventImpl event) {
+	public void handleEvent(BasicAgentArrivalEvent event) {
 		/*
 		 * Arrival event does not count as travel time!
 		 */
@@ -131,12 +131,12 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 			/*
 			 * Average the remaining travel time elements...
 			 */
-			this.averagedTTimes = new HashMap<Link, Averager>();
+			this.averagedTTimes = new HashMap<Id, Averager>();
 			for (TTElement e : this.ttimes) {
-				Averager a = this.averagedTTimes.get(e.getLink());
+				Averager a = this.averagedTTimes.get(e.getLinkId());
 				if (a == null) {
 					a = new Averager();
-					this.averagedTTimes.put(e.getLink(), a);
+					this.averagedTTimes.put(e.getLinkId(), a);
 				}
 				a.add(e.getTtime());
 			}
@@ -148,7 +148,7 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 	}
 
 	public int getLinkTravelTime_s(Link link, int time_s) {
-		Averager a = this.averagedTTimes.get(link);
+		Averager a = this.averagedTTimes.get(link.getId());
 		if (a == null) {
 			/*
 			 * TODO: Replace this with a free travel time provider!
@@ -177,20 +177,20 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 
 	private class TTElement {
 
-		private final Link link;
+		private final Id linkId;
 
 		private final int timeStamp;
 
 		private final int ttime;
 
-		public TTElement(Link link, int timeStamp, int ttime) {
-			this.link = link;
+		public TTElement(Id linkId, int timeStamp, int ttime) {
+			this.linkId = linkId;
 			this.timeStamp = timeStamp;
 			this.ttime = ttime;
 		}
 
-		public Link getLink() {
-			return this.link;
+		public Id getLinkId() {
+			return this.linkId;
 		}
 
 		public int getTimeStamp() {
@@ -203,7 +203,6 @@ public class EventBasedTTProvider implements TravelTime, LinkEnterEventHandler, 
 	}
 
 	public double getLinkTravelTime(Link link, double time) {
-		// TODO Auto-generated method stub
 		return getLinkTravelTime_s(link, (int) time);
 	}
 }

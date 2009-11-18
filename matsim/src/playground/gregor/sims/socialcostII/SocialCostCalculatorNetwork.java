@@ -25,16 +25,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
@@ -42,7 +42,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.IntegerCache;
 import org.matsim.core.utils.misc.Time;
 
-public class SocialCostCalculatorNetwork implements IterationStartsListener,  AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
+public class SocialCostCalculatorNetwork implements IterationStartsListener,  BasicAgentDepartureEventHandler, BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler{
 
 	private final int travelTimeBinSize;
 	private final int numSlots;
@@ -104,7 +104,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 	}
 
 	
-	public void handleEvent(final LinkEnterEventImpl event) {
+	public void handleEvent(final BasicLinkEnterEvent event) {
 
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
@@ -128,7 +128,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 	
 	
 
-	public void handleEvent(final AgentDepartureEventImpl event) {
+	public void handleEvent(final BasicAgentDepartureEvent event) {
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
 		ai.enterTime = event.getTime();
@@ -137,7 +137,7 @@ public class SocialCostCalculatorNetwork implements IterationStartsListener,  Ag
 		info.agentsOnLink++;
 	}
 	
-	public void handleEvent(final LinkLeaveEventImpl event) {
+	public void handleEvent(final BasicLinkLeaveEvent event) {
 		
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		info.agentsOnLink--;

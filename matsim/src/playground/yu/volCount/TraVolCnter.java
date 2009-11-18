@@ -28,16 +28,15 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
@@ -47,8 +46,8 @@ import org.matsim.core.population.PopulationReader;
  * @author ychen
  * 
  */
-public class TraVolCnter implements LinkEnterEventHandler,
-		LinkLeaveEventHandler {
+public class TraVolCnter implements BasicLinkEnterEventHandler,
+		BasicLinkLeaveEventHandler {
 	/**
 	 * netVols<tIndex, netVol>
 	 */
@@ -59,14 +58,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 	 */
 	private final HashMap<String, Double> agentTimer = new HashMap<String, Double>();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.matsim.demandmodeling.events.handler.EventHandlerLinkEnterI#handleEvent
-	 * (org.matsim.demandmodeling.events.EventLinkEnter)
-	 */
-	public void handleEvent(LinkEnterEventImpl event) {
+	public void handleEvent(BasicLinkEnterEvent event) {
 		// TODO save entertime into agentTimer
 		String agentId = event.getPersonId().toString();
 		if (!agentTimer.containsKey(agentId))
@@ -76,14 +68,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 					.println("error: a left link event of this agent dispears!");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.matsim.demandmodeling.events.handler.EventHandlerLinkLeaveI#handleEvent
-	 * (org.matsim.demandmodeling.events.EventLinkLeave)
-	 */
-	public void handleEvent(LinkLeaveEventImpl event) {
+	public void handleEvent(BasicLinkLeaveEvent event) {
 		String agentId = event.getPersonId().toString();
 		if (agentTimer.containsKey(agentId)) {
 			for (int tbIdx = agentTimer.remove(agentId).intValue(); tbIdx <= event

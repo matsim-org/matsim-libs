@@ -20,14 +20,14 @@
 
 package playground.marcel.template;
 
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 
-public class TemplateEventHandler implements AgentDepartureEventHandler {
+public class TemplateEventHandler implements BasicAgentDepartureEventHandler {
 
 	private int counter = 0;
 	
-	public void handleEvent(final AgentDepartureEventImpl event) {
+	public void handleEvent(final BasicAgentDepartureEvent event) {
 		this.counter++;
 	}
 

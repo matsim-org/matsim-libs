@@ -24,13 +24,13 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-public class OutFlowRate implements AgentArrivalEventHandler {
+public class OutFlowRate implements BasicAgentArrivalEventHandler {
 	
 	
 	private final String events;
@@ -58,7 +58,7 @@ public class OutFlowRate implements AgentArrivalEventHandler {
 	}
 	
 	
-	public void handleEvent(final AgentArrivalEventImpl event) {
+	public void handleEvent(final BasicAgentArrivalEvent event) {
 		this.evacuated++;
 		if (this.time == 0) {
 			this.offset = (int)event.getTime();

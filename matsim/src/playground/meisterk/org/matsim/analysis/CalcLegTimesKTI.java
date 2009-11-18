@@ -28,11 +28,11 @@ import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
@@ -44,7 +44,7 @@ import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFr
  * @author meisterk
  *
  */
-public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler {
 
 	private PopulationImpl population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
@@ -54,7 +54,7 @@ public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis impleme
 		this.population = pop;
 	}
 
-	public void handleEvent(AgentDepartureEventImpl event) {
+	public void handleEvent(BasicAgentDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 	}
 
@@ -63,13 +63,13 @@ public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis impleme
 		this.frequencies.clear();
 	}
 
-	public void handleEvent(AgentArrivalEventImpl event) {
+	public void handleEvent(BasicAgentArrivalEvent event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		PersonImpl agent = this.population.getPersons().get(event.getPersonId());
 		if (depTime != null && agent != null) {
 
 			double travelTime = event.getTime() - depTime;
-			TransportMode mode = event.getLeg().getMode();
+			TransportMode mode = event.getLegMode();
 
 			Frequency frequency = null;
 			ResizableDoubleArray rawData = null;

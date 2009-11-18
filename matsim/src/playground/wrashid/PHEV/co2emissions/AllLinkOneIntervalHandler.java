@@ -3,14 +3,14 @@ package playground.wrashid.PHEV.co2emissions;
 import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.network.NetworkLayer;
 
 /**
  * This class computes the summary of co2 emissions per link for a specified interval.
  */
-public class AllLinkOneIntervalHandler implements LinkLeaveEventHandler {
+public class AllLinkOneIntervalHandler implements BasicLinkLeaveEventHandler {
 
 	// key: linkId, value: emissions
 	private HashMap<Id, Double> co2EmissionsWholeDay=new HashMap<Id, Double>();
@@ -35,7 +35,7 @@ public class AllLinkOneIntervalHandler implements LinkLeaveEventHandler {
 		this.intervalEnd=intervalEnd;
 	}
 	
-	public void handleEvent(LinkLeaveEventImpl event) {
+	public void handleEvent(BasicLinkLeaveEvent event) {
 		// only the events in the given interval are considered
 		if (event.getTime()<intervalStart  || event.getTime()>intervalEnd){
 			return;

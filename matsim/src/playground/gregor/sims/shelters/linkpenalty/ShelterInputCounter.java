@@ -5,12 +5,12 @@ import java.util.SortedMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -19,12 +19,12 @@ import org.matsim.signalsystems.control.SignalSystemController;
 
 import playground.gregor.collections.gnuclasspath.TreeMap;
 
-public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimListener {
+public class ShelterInputCounter implements BasicLinkLeaveEventHandler, BeforeMobsimListener {
 
 	private SortedMap<Id, SignalSystemController> scs;
 	private final HashMap<Id,Counter> counts = new HashMap<Id, Counter>();
 	private final HashMap<Id, Building> shelterLinkMapping;
-	private final HashMap<LinkImpl,LinkInfo> linkInfos = new HashMap<LinkImpl, LinkInfo>();
+	private final HashMap<Id,LinkInfo> linkInfos = new HashMap<Id, LinkInfo>();
 	
 	public ShelterInputCounter(NetworkLayer network, HashMap<Id,Building> shelterLinkMapping) {
 		
@@ -37,20 +37,20 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 		}
 	}
 
-	public void handleEvent(LinkLeaveEventImpl event) {
-		Counter c = this.counts.get(event.getLink().getId()); 
+	public void handleEvent(BasicLinkLeaveEvent event) {
+		Counter c = this.counts.get(event.getLinkId()); 
 		if (c != null) {
 			c.count++;
-			Building b = this.shelterLinkMapping.get(event.getLink().getId());
+			Building b = this.shelterLinkMapping.get(event.getLinkId());
 			c.count++;
 			if (c.count > b.getShelterSpace()) {
 //				AgentMoneyEvent e = new AgentMoneyEvent(event.getTime(),event.getPersonId(),-(c.count - b.getShelterSpace())/10.);
 				AgentMoneyEventImpl e = new AgentMoneyEventImpl(event.getTime(),event.getPersonId(),-12*6);
 				QueueSimulation.getEvents().processEvent(e);
-				LinkInfo li = this.linkInfos.get(event.getLink());
+				LinkInfo li = this.linkInfos.get(event.getLinkId());
 				if (li == null) {
 					li = new LinkInfo();
-					this.linkInfos.put((LinkImpl) event.getLink(), li);
+					this.linkInfos.put(event.getLinkId(), li);
 					li.penalties.put(0.0, new LinkPenalty());
 				}
 				
@@ -99,7 +99,7 @@ public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimL
 	}
 
 	public double getLinkPenalty(Link link, double time) {
-		LinkInfo li = this.linkInfos.get(link);
+		LinkInfo li = this.linkInfos.get(link.getId());
 		if (li == null) {
 			return 0.;
 		}

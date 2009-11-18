@@ -28,16 +28,16 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
 import org.matsim.api.basic.v01.events.BasicAgentMoneyEvent;
 import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentMoneyEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -60,7 +60,7 @@ import org.matsim.core.scoring.ScoringFunction;
  * @author mrieser
  * @author jhackney
  */
-public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDepartureEventHandler, BasicAgentStuckEventHandler, BasicAgentMoneyEventHandler {
+public class EventsToScoreAndReport implements BasicAgentArrivalEventHandler, BasicAgentDepartureEventHandler, BasicAgentStuckEventHandler, BasicAgentMoneyEventHandler {
 
 	private PopulationImpl population = null;
 	private playground.jhackney.scoring.EventSocScoringFactory sfFactory = null;
@@ -81,13 +81,13 @@ public class EventsToScoreAndReport implements AgentArrivalEventHandler, AgentDe
 		this.learningRate = learningRate;
 	}
 
-	public void handleEvent(final AgentDepartureEventImpl event) {
+	public void handleEvent(final BasicAgentDepartureEvent event) {
 		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.getPersonId().toString());
 		sf.endActivity(event.getTime());
-		sf.startLeg(event.getTime(), event.getLeg());
+		sf.startLeg(event.getTime(), null);//event.getLeg();
 	}
 
-	public void handleEvent(final AgentArrivalEventImpl event) {
+	public void handleEvent(final BasicAgentArrivalEvent event) {
 		playground.jhackney.scoring.EventSocScoringFunction sf = getScoringFunctionForAgent(event.getPersonId().toString());
 		sf.endLeg(event.getTime());
 		sf.startActivity(event.getTime(), null);

@@ -23,29 +23,31 @@ package playground.anhorni.locationchoice.analysis.events;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-public class CalcLegDistances implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class CalcLegDistances implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler {
 
 	private Population population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
 	private final TreeMap<String, Double> sumTripDistancesByModeAndActType = new TreeMap<String, Double>();
 	private final TreeMap<String, Integer> sumTripsByModeAndActType = new TreeMap<String, Integer>();
+	private final TreeMap<Id, Integer> agentArrivalCounts = new TreeMap<Id, Integer>();
+
 
 	public CalcLegDistances(Population population) {
 		super();
 		this.population = population;
 	}
 
-	public void handleEvent(AgentDepartureEventImpl event) {
+	public void handleEvent(BasicAgentDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 	}
 
@@ -54,18 +56,43 @@ public class CalcLegDistances implements AgentDepartureEventHandler, AgentArriva
 		this.sumTripsByModeAndActType.clear();
 	}
 
-	public void handleEvent(AgentArrivalEventImpl event) {
+	private void increaseAgentArrivalCount(Id agentId) {
+		Integer count = this.agentArrivalCounts.get(agentId);
+		if (count == null) {
+			this.agentArrivalCounts.put(agentId, Integer.valueOf(1));
+		} else {
+			this.agentArrivalCounts.put(agentId, Integer.valueOf(1 + count.intValue()));
+		}
+	}
+	
+	private Activity getAgentsNextActivity(Plan plan) {
+		int count = this.agentArrivalCounts.get(plan.getPerson().getId()).intValue();
+		// assuming strict order Activity, Leg, Activity, Leg, Activity
+		// count is the number of the current Leg, starting at 1
+		return (Activity) plan.getPlanElements().get(count*2);
+	}
+
+	private Activity getAgentsPreviousActivity(Plan plan) {
+		int count = this.agentArrivalCounts.get(plan.getPerson().getId()).intValue();
+		// assuming strict order Activity, Leg, Activity, Leg, Activity
+		// count is the number of the current Leg, starting at 1
+		return (Activity) plan.getPlanElements().get(count*2 - 2);
+	}
+	
+	public void handleEvent(BasicAgentArrivalEvent event) {
+		increaseAgentArrivalCount(event.getPersonId());
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		Person agent = this.population.getPersons().get(event.getPersonId());
 			
 		if (depTime != null && agent != null) {
-			Plan plan = event.getPerson().getSelectedPlan();
-			double travDistance = ((CoordImpl)((PlanImpl) plan).getPreviousActivity(event.getLeg()).getCoord()).calcDistance(
-					((PlanImpl) plan).getNextActivity(event.getLeg()).getCoord());
+			Plan plan = agent.getSelectedPlan();
+			Activity nextAct = getAgentsNextActivity(plan);
+			double travDistance = ((CoordImpl)getAgentsPreviousActivity(plan).getCoord()).calcDistance(
+					nextAct.getCoord());
 			
 			String actType;
 
-			actType = ((PlanImpl) plan).getNextActivity(event.getLeg()).getType();
+			actType = nextAct.getType();
 			
 			// leisure_xxx
 			if (actType.startsWith("leisure")) actType = "leisure";
@@ -74,10 +101,10 @@ public class CalcLegDistances implements AgentDepartureEventHandler, AgentArriva
 			
 			if (actType.startsWith("education")) actType = "education";
 			
-			String key = event.getLeg().getMode().toString() + "_" + actType;
+			String key = event.getLegMode().toString() + "_" + actType;
 			
 			if (actType.equals("shop_grocery") || actType.equals("shop_nongrocery")) {
-				String shopKey = event.getLeg().getMode().toString() + "_shop";
+				String shopKey = event.getLegMode().toString() + "_shop";
 				
 				Double oldSumTripDistancesShop = this.sumTripDistancesByModeAndActType.get(shopKey);
 				if (oldSumTripDistancesShop == null) oldSumTripDistancesShop = 0.0;
@@ -94,7 +121,7 @@ public class CalcLegDistances implements AgentDepartureEventHandler, AgentArriva
 			
 			Integer oldSumTrips = this.sumTripsByModeAndActType.get(key);
 			if (oldSumTrips == null) oldSumTrips = 0;
-			this.sumTripsByModeAndActType.put(event.getLeg().getMode().toString() + "_" + actType, oldSumTrips + 1);
+			this.sumTripsByModeAndActType.put(event.getLegMode().toString() + "_" + actType, oldSumTrips + 1);
 		}
 	}
 	

@@ -55,13 +55,9 @@ import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.handler.ActivityStartEventHandler;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.AgentReplanEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
 /**
  * EventHandling
@@ -309,32 +305,17 @@ public class EventsManagerImpl implements EventsManager {
 	// this method is purely for performance reasons and need not be implemented
 	private boolean callHandlerFast(final Class<?> klass, final BasicEvent ev, final EventHandler handler) {
 
-		if (klass == LinkLeaveEventImpl.class) {
-			((LinkLeaveEventHandler)handler).handleEvent((LinkLeaveEventImpl)ev);
-			return true;
-		} else if (klass == BasicLinkLeaveEvent.class) {
+		if (klass == BasicLinkLeaveEvent.class) {
 				((BasicLinkLeaveEventHandler)handler).handleEvent((BasicLinkLeaveEvent)ev);
 				return true;
-		} else if (klass == LinkEnterEventImpl.class) {
-			((LinkEnterEventHandler)handler).handleEvent((LinkEnterEventImpl)ev);
-			return true;
 		} else if (klass == BasicLinkEnterEvent.class) {
 			((BasicLinkEnterEventHandler)handler).handleEvent((BasicLinkEnterEvent)ev);
 			return true;
-//		} else if (klass == AgentWait2LinkEventImpl.class) {
-//			((AgentWait2LinkEventHandler)handler).handleEvent((AgentWait2LinkEventImpl)ev);
-//			return true;
 		} else if (klass == BasicAgentWait2LinkEvent.class) {
 			((BasicAgentWait2LinkEventHandler)handler).handleEvent((BasicAgentWait2LinkEvent)ev);
 			return true;
-		} else if (klass == AgentArrivalEventImpl.class) {
-			((AgentArrivalEventHandler)handler).handleEvent((AgentArrivalEventImpl)ev);
-			return true;
 		} else if (klass == BasicAgentArrivalEvent.class) {
 			((BasicAgentArrivalEventHandler)handler).handleEvent((BasicAgentArrivalEvent)ev);
-			return true;
-		} else if (klass == AgentDepartureEventImpl.class) {
-			((AgentDepartureEventHandler)handler).handleEvent((AgentDepartureEventImpl)ev);
 			return true;
 		} else if (klass == BasicAgentDepartureEvent.class) {
 			((BasicAgentDepartureEventHandler)handler).handleEvent((BasicAgentDepartureEvent)ev);
@@ -351,15 +332,9 @@ public class EventsManagerImpl implements EventsManager {
 		} else if (klass == BasicActivityStartEvent.class) {
 			((BasicActivityStartEventHandler)handler).handleEvent((BasicActivityStartEvent)ev);
 			return true;
-//		} else if (klass == AgentStuckEventImpl.class) {
-//			((AgentStuckEventHandler)handler).handleEvent((AgentStuckEventImpl)ev);
-//			return true;
 		} else if (klass == BasicAgentStuckEvent.class) {
 			((BasicAgentStuckEventHandler)handler).handleEvent((BasicAgentStuckEvent)ev);
 			return true;
-//		} else if (klass == AgentMoneyEventImpl.class) {
-//			((AgentMoneyEventHandler)handler).handleEvent((AgentMoneyEventImpl)ev);
-//			return true;
 		} else if (klass == BasicAgentMoneyEvent.class) {
 			((BasicAgentMoneyEventHandler)handler).handleEvent((BasicAgentMoneyEvent)ev);
 			return true;

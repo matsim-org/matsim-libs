@@ -26,12 +26,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -43,8 +43,8 @@ import org.matsim.core.utils.io.IOUtils;
  * 
  * @author ychen
  */
-public class TimeWriter implements AgentDepartureEventHandler,
-		AgentArrivalEventHandler {
+public class TimeWriter implements BasicAgentDepartureEventHandler,
+		BasicAgentArrivalEventHandler {
 	// -------------------------MEMBER
 	// VARIABLES---------------------------------
 	private BufferedWriter out = null;
@@ -61,7 +61,7 @@ public class TimeWriter implements AgentDepartureEventHandler,
 	 * If an agent departures, will the information be saved in a hashmap
 	 * (agentDepTimes).
 	 */
-	public void handleEvent(final AgentDepartureEventImpl event) {
+	public void handleEvent(final BasicAgentDepartureEvent event) {
 		if (!this.agentDepTimes.containsKey(event.getPersonId().toString())) { // only
 																				// store
 																				// first
@@ -74,7 +74,7 @@ public class TimeWriter implements AgentDepartureEventHandler,
 	 * If an agent arrives, will the "agent-ID", "depTime" and "arrTime" be
 	 * written in a .txt-file
 	 */
-	public void handleEvent(final AgentArrivalEventImpl event) {
+	public void handleEvent(final BasicAgentArrivalEvent event) {
 		String agentId = event.getPersonId().toString();
 		if (agentDepTimes.containsKey(agentId)) {
 			int depT = (int) agentDepTimes.remove(agentId).doubleValue();

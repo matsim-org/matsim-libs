@@ -26,17 +26,17 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
@@ -45,7 +45,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.IntegerCache;
 import org.matsim.core.utils.misc.Time;
 
-public class SocialCostCalculatorNetworkIII implements TravelCost, IterationStartsListener,  AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
+public class SocialCostCalculatorNetworkIII implements TravelCost, IterationStartsListener,  BasicAgentDepartureEventHandler, BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler{
 
 	private final int travelTimeBinSize;
 	private final int numSlots;
@@ -108,7 +108,7 @@ public class SocialCostCalculatorNetworkIII implements TravelCost, IterationStar
 	}
 
 	
-	public void handleEvent(final LinkEnterEventImpl event) {
+	public void handleEvent(final BasicLinkEnterEvent event) {
 
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
@@ -136,7 +136,7 @@ public class SocialCostCalculatorNetworkIII implements TravelCost, IterationStar
 	
 	
 
-	public void handleEvent(final AgentDepartureEventImpl event) {
+	public void handleEvent(final BasicAgentDepartureEvent event) {
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		AgentInfo ai = getAgentInfo(event.getPersonId().toString());
 		ai.enterTime = event.getTime();
@@ -145,7 +145,7 @@ public class SocialCostCalculatorNetworkIII implements TravelCost, IterationStar
 //		info.agentsOnLink++;
 	}
 	
-	public void handleEvent(final LinkLeaveEventImpl event) {
+	public void handleEvent(final BasicLinkLeaveEvent event) {
 		
 		LinkInfo info = getLinkInfo(event.getLinkId().toString());
 		AgentInfo ai = getAgentInfo(event.getPersonId().toString());

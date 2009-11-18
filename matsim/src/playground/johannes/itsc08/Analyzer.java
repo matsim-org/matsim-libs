@@ -39,6 +39,12 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -49,12 +55,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -66,8 +66,8 @@ import playground.johannes.socialnetworks.statistics.Distribution;
  * @author illenberger
  *
  */
-public class Analyzer implements StartupListener, IterationEndsListener, AgentDepartureEventHandler,
-		AgentArrivalEventHandler, LinkEnterEventHandler, ShutdownListener, IterationStartsListener {
+public class Analyzer implements StartupListener, IterationEndsListener, BasicAgentDepartureEventHandler,
+		BasicAgentArrivalEventHandler, BasicLinkEnterEventHandler, ShutdownListener, IterationStartsListener {
 
 	private Set<Person> riskyUsers;
 	
@@ -77,11 +77,11 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 	
 	private Set<Plan> safePlans;
 	
-	private HashMap<Person, AgentDepartureEventImpl> events;
+	private HashMap<Id, BasicAgentDepartureEvent> events; // personId
 	
-	private HashMap<Person, AgentDepartureEventImpl> eventsReturn;
+	private HashMap<Id, BasicAgentDepartureEvent> eventsReturn; // personId
 	
-	private HashMap<Person, Double> traveltimes;
+	private HashMap<Id, Double> traveltimes; // personId
 	
 	private double riskyTriptime;
 	
@@ -150,9 +150,9 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		riskyTriptime = 0;
 		safeTriptime = 0;
 		returnTripTime = 0;
-		events = new HashMap<Person, AgentDepartureEventImpl>();
-		eventsReturn = new HashMap<Person, AgentDepartureEventImpl>();
-		traveltimes = new HashMap<Person, Double>();
+		events = new HashMap<Id, BasicAgentDepartureEvent>();
+		eventsReturn = new HashMap<Id, BasicAgentDepartureEvent>();
+		traveltimes = new HashMap<Id, Double>();
 		
 		
 	}
@@ -258,12 +258,11 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			return String.valueOf(val);
 	}
 
-	public void handleEvent(LinkEnterEventImpl event) { 
-		if(event.getLink().getId().toString().equals("4"))
-			riskyUsers.add(event.getPerson());
-		else if(event.getLink().getId().toString().equals("5"))
-			safeUsers.add(event.getPerson());
-		
+	public void handleEvent(BasicLinkEnterEvent event) { 
+		if(event.getLinkId().toString().equals("4"))
+			riskyUsers.add(controler.getPopulation().getPersons().get(event.getPersonId()));
+		else if(event.getLinkId().toString().equals("5"))
+			safeUsers.add(controler.getPopulation().getPersons().get(event.getPersonId()));
 	}
 
 	private double getAvrScorePlan(Set<Plan> plans) {
@@ -301,25 +300,26 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 		
 		double scoresum = 0;
 		for(Person p : persons) {
-			scoresum += traveltimes.get(p);
+			scoresum += traveltimes.get(p.getId());
 		}
 		return scoresum/(double)persons.size();
 	}
 	
-	public void handleEvent(AgentDepartureEventImpl event) {
+	public void handleEvent(BasicAgentDepartureEvent event) {
 		if(event.getLinkId().toString().equals("1"))
-			events.put(event.getPerson(), event);
+			events.put(event.getPersonId(), event);
 		else
-			eventsReturn.put(event.getPerson(), event);
+			eventsReturn.put(event.getPersonId(), event);
 	}
 
-	public void handleEvent(AgentArrivalEventImpl event) {
-		AgentDepartureEventImpl e = events.get(event.getPerson());
+	public void handleEvent(BasicAgentArrivalEvent event) {
+		BasicAgentDepartureEvent e = events.get(event.getPersonId());
 		if(e != null) {
-			events.remove(event.getPerson());
+			events.remove(event.getPersonId());
 			double triptime = event.getTime() - e.getTime();
-			traveltimes.put(event.getPerson(), triptime);
-			if (((NetworkRouteWRefs) ((LegImpl)event.getPerson().getSelectedPlan().getPlanElements().get(1)).getRoute()).getNodes().get(1).getId().toString().equals("3")) {
+			traveltimes.put(event.getPersonId(), triptime);
+			Person person = this.controler.getPopulation().getPersons().get(event.getPersonId());
+			if (((NetworkRouteWRefs) ((LegImpl)person.getSelectedPlan().getPlanElements().get(1)).getRoute()).getNodes().get(1).getId().toString().equals("3")) {
 				riskyTriptime += triptime;
 //				if(controler.getIteration() % 2 == 0) { //FIXME: needs to be consistent with IncidentGenerator!!!
 				if(inicidents.isBadDay()) {
@@ -333,7 +333,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			} else
 				safeTriptime += triptime;
 			
-			if(controler.getGuidedPersons().contains(event.getPerson()))
+			if(controler.getGuidedPersons().contains(person))
 				addTravelTime(guidedTripTimes, (int)e.getTime(), triptime);
 			
 			
@@ -348,9 +348,9 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 			
 		}
 		
-		e = eventsReturn.get(event.getPerson());
+		e = eventsReturn.get(event.getPersonId());
 		if(e != null) {
-			events.remove(event.getPerson());
+			events.remove(event.getPersonId());
 			double triptime = event.getTime() - e.getTime();
 			returnTripTime += triptime;
 //			System.err.println(triptime);

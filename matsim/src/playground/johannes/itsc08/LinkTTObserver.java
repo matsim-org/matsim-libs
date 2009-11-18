@@ -26,26 +26,26 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.johannes.eut.EstimReactiveLinkTT;
 
-public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHandler, IterationStartsListener, IterationEndsListener {
+public class LinkTTObserver implements BasicLinkLeaveEventHandler, BasicLinkEnterEventHandler, IterationStartsListener, IterationEndsListener {
 
 	private EstimReactiveLinkTT linktt;
 	
-	private Map<PersonImpl, LinkEnterEventImpl> events;
+	private Map<Id, BasicLinkEnterEvent> events; // personId
 	
 	private BufferedWriter realTTWriter;
 	
@@ -58,9 +58,9 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 		this.linktt = linktt;
 	}
 	
-	public void handleEvent(LinkLeaveEventImpl event) {
+	public void handleEvent(BasicLinkLeaveEvent event) {
 		if(event.getLinkId().toString().equals("2")) {
-			LinkEnterEventImpl enter = events.remove(event.getPerson());
+			BasicLinkEnterEvent enter = events.remove(event.getPersonId());
 			double realTT = event.getTime() - enter.getTime();
 			try {
 				realTTWriter.write(String.valueOf(enter.getTime()));
@@ -77,12 +77,11 @@ public class LinkTTObserver implements LinkLeaveEventHandler, LinkEnterEventHand
 	}
 
 	public void reset(int iteration) {
-		events = new HashMap<PersonImpl, LinkEnterEventImpl>();
-		
+		events = new HashMap<Id, BasicLinkEnterEvent>();
 	}
 
-	public void handleEvent(LinkEnterEventImpl event) {
-		events.put(event.getPerson(), event);
+	public void handleEvent(BasicLinkEnterEvent event) {
+		events.put(event.getPersonId(), event);
 		
 		double estimTT = linktt.getLinkTravelTime(link, event.getTime());
 		try {

@@ -26,10 +26,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.ActivityEndEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.basic.v01.events.BasicActivityEndEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicActivityEndEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -38,7 +38,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEndEventHandler  {
+public class LinkTablesEventHandler implements BasicLinkLeaveEventHandler, BasicActivityEndEventHandler  {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -79,7 +79,7 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 	// event handlers
 	//////////////////////////////////////////////////////////////////////
 	
-	public void handleEvent(LinkLeaveEventImpl event) {
+	public void handleEvent(BasicLinkLeaveEvent event) {
 		try {
 			if ((currentBin+1)*timeBinSize<=event.getTime()) {
 				currentBin++;
@@ -99,7 +99,7 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 		} catch (Exception e) { Gbl.errorMsg(e); }
 	}
 
-	public void handleEvent(ActivityEndEventImpl event) {
+	public void handleEvent(BasicActivityEndEvent event) {
 		PersonImpl p = population.getPersons().get(event.getPersonId());
 		if (!fromActs.containsKey(p.getId())) {
 			fromActs.put(p.getId(),((PlanImpl) p.getSelectedPlan()).getFirstActivity());

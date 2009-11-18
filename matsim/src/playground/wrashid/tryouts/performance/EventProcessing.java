@@ -2,10 +2,11 @@ package playground.wrashid.tryouts.performance;
 
 import java.util.LinkedList;
 
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
 
 // this events processing relies on creating artifical events, intead of reading them
@@ -63,9 +64,9 @@ public class EventProcessing {
 
 	}
 	
-	private class Handler1 implements LinkLeaveEventHandler {
+	private class Handler1 implements BasicLinkLeaveEventHandler {
 
-		public void handleEvent(LinkLeaveEventImpl event) {
+		public void handleEvent(BasicLinkLeaveEvent event) {
 			LinkedList<Double> list=new LinkedList<Double>();
 			for (int i = 0; i < 100; i++) {
 				list.add(Math.sin(i));
@@ -74,7 +75,6 @@ public class EventProcessing {
 
 		public void reset(int iteration) {
 			// TODO Auto-generated method stub
-
 		}
 		
 		public Handler1(){

@@ -27,19 +27,18 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -47,8 +46,8 @@ import org.matsim.core.utils.io.IOUtils;
  * @author yu
  * 
  */
-public class CarDepartureCounter implements AgentDepartureEventHandler,
-		AgentArrivalEventHandler {
+public class CarDepartureCounter implements BasicAgentDepartureEventHandler,
+		BasicAgentArrivalEventHandler {
 	private final PopulationImpl ppl;
 
 	private int cdc = 0, cac = 0;
@@ -103,7 +102,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		System.exit(0);
 	}
 
-	public void handleEvent(final AgentDepartureEventImpl event) {
+	public void handleEvent(final BasicAgentDepartureEvent event) {
 		PersonImpl p = this.ppl.getPersons().get(
 				new IdImpl(event.getPersonId().toString()));
 		if (PlanModeJudger.useCar(p.getSelectedPlan()))
@@ -119,7 +118,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		return this.cdc;
 	}
 
-	public void handleEvent(final AgentArrivalEventImpl event) {
+	public void handleEvent(final BasicAgentArrivalEvent event) {
 		PersonImpl p = this.ppl.getPersons().get(
 				new IdImpl(event.getPersonId().toString()));
 		if (PlanModeJudger.useCar(p.getSelectedPlan()))

@@ -27,7 +27,7 @@ public class ConfluentCostController extends Controler {
 	@Override
 	protected void setUp() {
 		
-		LinkPenaltyCalculatorII lpc = new LinkPenaltyCalculatorII(this.network);
+		LinkPenaltyCalculatorII lpc = new LinkPenaltyCalculatorII(this.network, this.population);
 		this.events.addHandler(lpc);
 		addControlerListener(lpc);
 		if (this.travelTimeCalculator == null) {

@@ -28,13 +28,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -44,8 +44,8 @@ import org.matsim.core.utils.io.IOUtils;
  * @author ychen
  * 
  */
-public class DpDurWriter implements AgentDepartureEventHandler,
-		AgentArrivalEventHandler {
+public class DpDurWriter implements BasicAgentDepartureEventHandler,
+		BasicAgentArrivalEventHandler {
 	private int maxDur = 0;
 
 	private BufferedWriter out = null;
@@ -133,12 +133,12 @@ public class DpDurWriter implements AgentDepartureEventHandler,
 		}
 	}
 
-	public void handleEvent(AgentDepartureEventImpl event) {
+	public void handleEvent(BasicAgentDepartureEvent event) {
 		String agentId = event.getPersonId().toString();
 		agentDepTimes.put(agentId, (int) event.getTime());
 	}
 
-	public void handleEvent(AgentArrivalEventImpl event) {
+	public void handleEvent(BasicAgentArrivalEvent event) {
 		String agentId = event.getPersonId().toString();
 		if (agentDepTimes.containsKey(agentId)) {
 			int depT = agentDepTimes.remove(agentId);

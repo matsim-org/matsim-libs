@@ -35,12 +35,12 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -196,7 +196,7 @@ public class NetworkClearanceAnalysis {
 		}
 	}
 	
-	private static class EventsHandler implements LinkEnterEventHandler, LinkLeaveEventHandler{
+	private static class EventsHandler implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler{
 
 		private final Map<String, PolygonInfo> linkMapping;
 
@@ -204,7 +204,7 @@ public class NetworkClearanceAnalysis {
 			this.linkMapping = linkMapping;
 		}
 		
-		public void handleEvent(final LinkEnterEventImpl event) {
+		public void handleEvent(final BasicLinkEnterEvent event) {
 			if (event.getLinkId().toString().contains("el")) {
 				return;
 			}
@@ -218,10 +218,9 @@ public class NetworkClearanceAnalysis {
 
 		public void reset(final int iteration) {
 			// TODO Auto-generated method stub
-			
 		}
 
-		public void handleEvent(final LinkLeaveEventImpl event) {
+		public void handleEvent(final BasicLinkLeaveEvent event) {
 			if (event.getLinkId().toString().contains("el")) {
 				return;
 			}
@@ -230,10 +229,7 @@ public class NetworkClearanceAnalysis {
 			if (pi.agents <= 1 && pi.clearanceTime == 0) {
 				pi.clearanceTime = event.getTime();
 			}
-
 		}
-		
-		
 		
 	}
 	

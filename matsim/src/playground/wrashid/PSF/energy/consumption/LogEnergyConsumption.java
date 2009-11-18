@@ -6,11 +6,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.events.BasicAgentWait2LinkEvent;
 import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.BasicLinkLeaveEvent;
 import org.matsim.api.basic.v01.events.handler.BasicAgentWait2LinkEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicLinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.handler.LinkLeaveEventHandler;
 
 /*
  * During driving energy is being "consumed", log that for each vehicle and leg.
@@ -19,7 +20,7 @@ import org.matsim.core.events.handler.LinkLeaveEventHandler;
  * => we need to assign a different such curve to each agent (we need to put this attribute to the agent)
  * 
  */
-public class LogEnergyConsumption implements BasicLinkEnterEventHandler, LinkLeaveEventHandler, BasicAgentWait2LinkEventHandler {
+public class LogEnergyConsumption implements BasicLinkEnterEventHandler, BasicLinkLeaveEventHandler, BasicAgentWait2LinkEventHandler {
 
 	private static final Logger log = Logger.getLogger(LogEnergyConsumption.class);
 	Controler controler;
@@ -46,13 +47,14 @@ public class LogEnergyConsumption implements BasicLinkEnterEventHandler, LinkLea
 		energyConsumption = new HashMap<Id, EnergyConsumption>();
 	}
 
-	public void handleEvent(LinkLeaveEventImpl event) {
+	public void handleEvent(BasicLinkLeaveEvent event) {
 		Id personId = event.getPersonId();
 
 		EnergyConsumption eConsumption = energyConsumption.get(personId);
 
 		double entranceTime = eConsumption.getTempEnteranceTimeOfLastLink();
-		double consumption = EnergyConsumptionInfo.getEnergyConsumption(event.getLink(), event.getTime() - entranceTime,
+		Link link = controler.getNetwork().getLinks().get(event.getLinkId());
+		double consumption = EnergyConsumptionInfo.getEnergyConsumption(link, event.getTime() - entranceTime,
 				EnergyConsumptionInfo.getVehicleType(personId));
 		eConsumption.addEnergyConsumptionLog(new LinkEnergyConsumptionLog(event.getLinkId(), eConsumption
 				.getTempEnteranceTimeOfLastLink(), event.getTime(), consumption));

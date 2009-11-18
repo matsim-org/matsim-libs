@@ -28,15 +28,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
 import org.matsim.api.basic.v01.events.BasicAgentEvent;
 import org.matsim.api.basic.v01.events.BasicAgentStuckEvent;
+import org.matsim.api.basic.v01.events.BasicLinkEnterEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
 import org.matsim.api.basic.v01.events.handler.BasicAgentStuckEventHandler;
-import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.api.basic.v01.events.handler.BasicLinkEnterEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.LinkEnterEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -56,8 +56,8 @@ import playground.yu.utils.TollTools;
  * @author ychen
  * 
  */
-public class LegDistance implements LinkEnterEventHandler,
-		AgentArrivalEventHandler, BasicAgentStuckEventHandler {
+public class LegDistance implements BasicLinkEnterEventHandler,
+		BasicAgentArrivalEventHandler, BasicAgentStuckEventHandler {
 	private final NetworkLayer network;
 	private int binSize;
 	private double[] legDistances;
@@ -120,7 +120,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		this.ppl = ppl;
 	}
 
-	public void handleEvent(LinkEnterEventImpl event) {
+	public void handleEvent(BasicLinkEnterEvent event) {
 		String linkId = event.getLinkId().toString();
 		LinkImpl l = this.network.getLink(linkId);
 		String agentId = event.getPersonId().toString();
@@ -144,7 +144,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		}
 	}
 
-	public void handleEvent(AgentArrivalEventImpl event) {
+	public void handleEvent(BasicAgentArrivalEvent event) {
 		handleEventIntern(event);
 	}
 

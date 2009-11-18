@@ -23,23 +23,24 @@ package playground.anhorni.locationchoice.analysis.events;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.basic.v01.events.BasicAgentArrivalEvent;
+import org.matsim.api.basic.v01.events.BasicAgentDepartureEvent;
+import org.matsim.api.basic.v01.events.handler.BasicAgentArrivalEventHandler;
+import org.matsim.api.basic.v01.events.handler.BasicAgentDepartureEventHandler;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.population.PlanImpl;
 
 import playground.anhorni.locationchoice.preprocess.helper.Utils;
 
-public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class CalcLegTimes implements BasicAgentDepartureEventHandler, BasicAgentArrivalEventHandler {
 
 	private Population population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
 	private final TreeMap<String, Double> sumTripDurationsByModeAndActType = new TreeMap<String, Double>();
 	private final TreeMap<String, Integer> sumTripsByModeAndActType = new TreeMap<String, Integer>();
+	private final TreeMap<Id, Integer> agentArrivalCounts = new TreeMap<Id, Integer>();
 	private boolean wayThere = false;
 
 	public CalcLegTimes(Population population, boolean wayThere) {
@@ -48,7 +49,7 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		this.wayThere = wayThere;
 	}
 
-	public void handleEvent(AgentDepartureEventImpl event) {
+	public void handleEvent(BasicAgentDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 	}
 
@@ -57,21 +58,38 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		this.sumTripsByModeAndActType.clear();
 	}
 
-	public void handleEvent(AgentArrivalEventImpl event) {
+	private void increaseAgentArrivalCount(Id agentId) {
+		Integer count = this.agentArrivalCounts.get(agentId);
+		if (count == null) {
+			this.agentArrivalCounts.put(agentId, Integer.valueOf(1));
+		} else {
+			this.agentArrivalCounts.put(agentId, Integer.valueOf(1 + count.intValue()));
+		}
+	}
+	
+	private Activity getAgentsNextActivity(Plan plan) {
+		int count = this.agentArrivalCounts.get(plan.getPerson().getId()).intValue();
+		// assuming strict order Activity, Leg, Activity, Leg, Activity
+		// count is the number of the current Leg, starting at 1
+		return (Activity) plan.getPlanElements().get(count*2);
+	}
+	
+	public void handleEvent(BasicAgentArrivalEvent event) {
+		increaseAgentArrivalCount(event.getPersonId());
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		Person agent = this.population.getPersons().get(event.getPersonId());
 			
 		if (depTime != null && agent != null) {
 			double travTime = event.getTime() - depTime;
 
-			Plan plan = event.getPerson().getSelectedPlan();
+			Plan plan = agent.getSelectedPlan();
 			String actType;
 			
 			if (this.wayThere) {
-				actType = ((PlanImpl) plan).getNextActivity(event.getLeg()).getType();
+				actType = getAgentsNextActivity(plan).getType();//((PlanImpl) plan).getNextActivity(event.getLeg()).getType();
 			}
 			else {
-				actType = Utils.getActType(plan, ((PlanImpl) plan).getNextActivity(event.getLeg()));
+				actType = Utils.getActType(plan, getAgentsNextActivity(plan));
 			}
 			
 			// leisure_xxx
@@ -81,10 +99,10 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 			
 			if (actType.startsWith("education")) actType = "education";
 			
-			String key = event.getLeg().getMode().toString() + "_" + actType;
+			String key = event.getLegMode().toString() + "_" + actType;
 			
 			if (actType.equals("shop_grocery") || actType.equals("shop_nongrocery")) {
-				String shopKey = event.getLeg().getMode().toString() + "_shop";
+				String shopKey = event.getLegMode().toString() + "_shop";
 				
 				Double oldSumTripDurationShop = this.sumTripDurationsByModeAndActType.get(shopKey);
 				if (oldSumTripDurationShop == null) oldSumTripDurationShop = 0.0;
@@ -101,7 +119,7 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 			
 			Integer oldSumTrips = this.sumTripsByModeAndActType.get(key);
 			if (oldSumTrips == null) oldSumTrips = 0;
-			this.sumTripsByModeAndActType.put(event.getLeg().getMode().toString() + "_" + actType, oldSumTrips + 1);
+			this.sumTripsByModeAndActType.put(event.getLegMode().toString() + "_" + actType, oldSumTrips + 1);
 		}
 	}
 	
