@@ -27,11 +27,16 @@ import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
-/**
+/**<p>
  * CostCalculator and TravelTimeCalculator for Links based on freespeed on links and
  * distance costs if set.  It sets the <em> function </em> that is to be used with calls
  * <tt>getLinkTravelTime( link, time)</tt> and <tt>getLinkTravelCost( link, time )</tt>.
- *
+ * </p><p>
+ * The unit of "cost" is defined by the input: if the marginal utilities are given in "utils per second", then 
+ * cost is in "utils"; if the marginal utilities are given in "euros per second", then cost is in "euros".
+ * When the CharyparNagelScoringFunction is used, the values come from the config file, where one is also free to 
+ * interpret the units. 
+ * </p>
  * @author mrieser
  * @author dgrether
  */
