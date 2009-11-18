@@ -13,4 +13,6 @@ public interface Umlauf extends Identifiable {
 	
 	public void setVehicleId(Id vehicleId);
 
+	Id getLineId();
+
 }

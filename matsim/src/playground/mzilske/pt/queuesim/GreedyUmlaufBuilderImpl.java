@@ -19,21 +19,28 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 	
 	public class UmlaufKey {
 		
+		private Id lineId;
 		private Id stopFacilityId;
 		private double lastArrivalTime;
 		private Id umlaufId;
+		
 
 		public Id getUmlaufId() {
 			return umlaufId;
 		}
 
-		public UmlaufKey(Id stopFacilityId, double lastArrivalTime, Id umlaufId) {
+		public UmlaufKey(Id lineId, Id stopFacilityId, double lastArrivalTime, Id umlaufId) {
 			super();
+			this.lineId = lineId;
 			this.stopFacilityId = stopFacilityId;
 			this.lastArrivalTime = lastArrivalTime;
 			this.umlaufId = umlaufId;
 		}
 
+		public Id getLineId() {
+			return lineId;
+		}
+		
 		public Id getStopFacility() {
 			return stopFacilityId;
 		}
@@ -43,7 +50,7 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 		}
 		
 		public String toString() {
-			return stopFacilityId + " at " + lastArrivalTime;
+			return stopFacilityId + " at " + lastArrivalTime + "(" + getLineId() + ")";
 		}
 		
 
@@ -64,11 +71,16 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 			if (c != 0) {
 				return c;
 			} else {
-				int cc = Double.compare(o1.getLastArrivalTime(), o2.getLastArrivalTime());
+				int cc = o1.getLineId().compareTo(o2.getLineId()); 
 				if (cc != 0) {
 					return cc;
 				} else {
-					return o1.getUmlaufId().compareTo(o2.getUmlaufId());
+					int ccc = Double.compare(o1.getLastArrivalTime(), o2.getLastArrivalTime());
+					if (ccc != 0) {
+						return ccc;
+					} else {
+						return o1.getUmlaufId().compareTo(o2.getUmlaufId());
+					}
 				}
 			}
 		}
@@ -96,7 +108,6 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 		}
 		createUmlaufStuecke();
 		int id = 0;
-		int i=0;
 		for (UmlaufStueck umlaufStueck : umlaufStuecke) {
 			Umlauf umlauf = findFittingUmlauf(umlaufStueck);
 			if (umlauf == null) {
@@ -106,9 +117,7 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 			}
 			interpolator.addUmlaufStueckToUmlauf(umlaufStueck, umlauf);
 			umlaeufe.put(getKey(umlauf), umlauf);
-			++i;
 		}
-		int j = umlaeufe.size();
 		return umlaeufe.values();
 	}
 	
@@ -144,13 +153,14 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 	}
 
 	private UmlaufKey getKey(Umlauf umlauf) {
-		return new UmlaufKey(getLastStopPostAreaId(umlauf), getLastArrivalTime(umlauf), umlauf.getId());
+		return new UmlaufKey(umlauf.getLineId(), getLastStopPostAreaId(umlauf), getLastArrivalTime(umlauf), umlauf.getId());
 	}
 
 	private Umlauf findFittingUmlauf(UmlaufStueck umlaufStueck) {
-		Id firstStopFacilityId = umlaufStueck.getRoute().getStops().get(0).getStopFacility().getStopPostAreaId();
-		UmlaufKey earliestAtPoint = new UmlaufKey(firstStopFacilityId, 0.0, new IdImpl(0));
-		UmlaufKey latestAtPoint = new UmlaufKey(firstStopFacilityId, umlaufStueck.getDeparture().getDepartureTime(), new IdImpl(0));
+		Id firstStopPostAreaId = umlaufStueck.getRoute().getStops().get(0).getStopFacility().getStopPostAreaId();
+		Id lineId = umlaufStueck.getLine().getId();
+		UmlaufKey earliestAtPoint = new UmlaufKey(lineId, firstStopPostAreaId, 0.0, new IdImpl(0));
+		UmlaufKey latestAtPoint = new UmlaufKey(lineId, firstStopPostAreaId, umlaufStueck.getDeparture().getDepartureTime(), new IdImpl(0));
 		log("Looking between " + earliestAtPoint + " and " + latestAtPoint);
 		SortedMap<UmlaufKey,Umlauf> fittingUmlaeufe = umlaeufe.subMap(earliestAtPoint, latestAtPoint);
 		Umlauf fittingUmlauf;

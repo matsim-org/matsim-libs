@@ -232,7 +232,7 @@ public class DataPrepare {
 
 		long vehId = 0;
 		for (Umlauf umlauf : umlaeufe) {
-			BasicVehicle veh = vb.createVehicle(new IdImpl("mzi_"+ Long.toString(vehId++)), vehicleType);
+			BasicVehicle veh = vb.createVehicle(new IdImpl("veh_"+ Long.toString(vehId++)), vehicleType);
 			this.scenario.getVehicles().getVehicles().put(veh.getId(), veh);
 			umlauf.setVehicleId(veh.getId());
 		}

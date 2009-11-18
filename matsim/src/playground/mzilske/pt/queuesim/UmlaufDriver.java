@@ -68,7 +68,7 @@ public class UmlaufDriver implements TransitDriverAgent {
 		this.umlauf = umlauf;
 		this.agentTracker = thisAgentTracker;
 		this.sim = transitQueueSimulation;
-		this.dummyPerson = new PersonImpl(new IdImpl("ptDrvr_Uml_" + umlauf.getId()));
+		this.dummyPerson = new PersonImpl(new IdImpl("pt_"+umlauf.getId()+"_line_"+umlauf.getLineId()));
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
 		setNextLeg();
 	}
