@@ -89,8 +89,9 @@ public class DgOtfStarter {
 		
 		filename = network;
 		
-		filename = "/home/dgrether/svnworkspace/matsim/test/input/playground/benjamin/BKickRouterTestIATBR/network.xml";
-		
+//		filename = "/home/dgrether/svnworkspace/matsim/test/input/playground/benjamin/BKickRouterTestIATBR/network.xml";
+		filename = "/media/data/work/programming/rubyWorkspace/demandGeneration/network.xml.gz";
+				
 		if (filename.endsWith(".veh.gz")) {
 			tVehStarter(filename, network);
 		}
