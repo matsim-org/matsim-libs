@@ -21,6 +21,8 @@
 package playground.marcel.pt;
 
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.pt.queuesim.TransitQueueVehicle;
+import org.matsim.pt.queuesim.TransitVehicle;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.BasicVehicleCapacity;
 import org.matsim.vehicles.BasicVehicleCapacityImpl;
@@ -29,8 +31,6 @@ import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 
 import playground.marcel.pt.fakes.FakePassengerAgent;
-import playground.marcel.pt.queuesim.TransitQueueVehicle;
-import playground.marcel.pt.queuesim.TransitVehicle;
 
 public class VehicleImplTest extends MatsimTestCase {
 

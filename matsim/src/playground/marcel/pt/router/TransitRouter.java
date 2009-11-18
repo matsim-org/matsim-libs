@@ -40,6 +40,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -49,7 +50,6 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 import playground.marcel.pt.router.MultiNodeDijkstra.InitialNode;
 import playground.marcel.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import playground.marcel.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
-import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
 public class TransitRouter {
 

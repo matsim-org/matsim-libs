@@ -39,6 +39,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -49,8 +51,6 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 import playground.marcel.OTFDemo;
 import playground.marcel.pt.analysis.RouteOccupancy;
 import playground.marcel.pt.analysis.VehicleTracker;
-import playground.marcel.pt.queuesim.TransitQueueSimulation;
-import playground.marcel.pt.routes.ExperimentalTransitRoute;
 import playground.marcel.pt.utils.CreateVehiclesForSchedule;
 
 public class TwoLinesDemo {

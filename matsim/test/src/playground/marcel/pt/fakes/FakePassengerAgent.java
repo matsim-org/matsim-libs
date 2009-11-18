@@ -20,11 +20,11 @@
 
 package playground.marcel.pt.fakes;
 
+import org.matsim.pt.queuesim.PassengerAgent;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.marcel.pt.queuesim.PassengerAgent;
 
 /**
  * A very simple implementation of the interface {@link PassengerAgent} for

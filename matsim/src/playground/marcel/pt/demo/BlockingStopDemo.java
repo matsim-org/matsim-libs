@@ -44,6 +44,8 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -59,8 +61,6 @@ import org.matsim.vehicles.VehiclesFactory;
 import playground.marcel.OTFDemo;
 import playground.marcel.pt.analysis.TransitRouteAccessEgressAnalysis;
 import playground.marcel.pt.analysis.VehicleTracker;
-import playground.marcel.pt.queuesim.TransitQueueSimulation;
-import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
 public class BlockingStopDemo {
 

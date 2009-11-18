@@ -23,9 +23,10 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.queuesim.TransitQueueSimulation;
+
 import playground.marcel.pt.config.TransitConfigGroup;
 import playground.marcel.pt.controler.TransitControler;
-import playground.marcel.pt.queuesim.TransitQueueSimulation;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
 //import org.matsim.run.OTFVis;
 import playground.marcel.OTFDemo;

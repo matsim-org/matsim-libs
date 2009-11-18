@@ -39,6 +39,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -55,8 +57,6 @@ import playground.marcel.OTFDemo;
 import playground.marcel.pt.analysis.RouteTimeDiagram;
 import playground.marcel.pt.analysis.TransitRouteAccessEgressAnalysis;
 import playground.marcel.pt.analysis.VehicleTracker;
-import playground.marcel.pt.queuesim.TransitQueueSimulation;
-import playground.marcel.pt.routes.ExperimentalTransitRoute;
 
 public class AccessEgressDemo {
 

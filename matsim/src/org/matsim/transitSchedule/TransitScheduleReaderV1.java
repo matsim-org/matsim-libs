@@ -108,14 +108,28 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 		} else if (Constants.ROUTE_PROFILE.equals(name)) {
 			this.currentRouteProfile = new TempRoute();
 		} else if (Constants.LINK.equals(name)) {
-			LinkImpl link = this.network.getLinks().get(new IdImpl(atts.getValue(Constants.REF_ID)));
-			if (link == null) {
-				throw new RuntimeException("no link with id " + atts.getValue(Constants.REF_ID));
+			String linkStr = atts.getValue(Constants.REF_ID);
+			if (!linkStr.contains(" ")) {
+				LinkImpl link = this.network.getLinks()
+						.get(new IdImpl(linkStr));
+				if (link == null)
+					throw new RuntimeException("no link with id " + linkStr);
+				this.currentRouteProfile.addLink(link);
+			} else {
+				String[] links = linkStr.split(" ");
+				for (int i = 0; i < links.length; i++) {
+					LinkImpl link = this.network.getLinks().get(
+							new IdImpl(links[i]));
+					if (link == null)
+						throw new RuntimeException("no link with id "
+								+ links[i]);
+					this.currentRouteProfile.addLink(link);
+				}
 			}
-			this.currentRouteProfile.addLink(link);
 		} else if (Constants.STOP.equals(name)) {
 			Id id = new IdImpl(atts.getValue(Constants.REF_ID));
-			TransitStopFacility facility = this.schedule.getFacilities().get(id);
+			TransitStopFacility facility = this.schedule.getFacilities()
+					.get(id);
 			if (facility == null) {
 				throw new RuntimeException("no stop/facility with id " + atts.getValue(Constants.REF_ID));
 			}

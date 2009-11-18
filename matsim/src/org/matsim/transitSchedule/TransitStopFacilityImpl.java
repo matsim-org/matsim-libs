@@ -35,6 +35,7 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	private static final long serialVersionUID = 1L;
 
 	private final Id id;
+	private Id stopPostAreaId;
 	private final Coord coord;
 	private Link link = null;
 	private final boolean isBlockingLane;
@@ -44,6 +45,7 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 		this.id = id;
 		this.coord = coord;
 		this.isBlockingLane = isBlockingLane;
+		this.stopPostAreaId = id;
 	}
 
 	public Link getLink() {
@@ -85,5 +87,13 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	public String toString() {
 		return "TransitStopFacilityImpl_" + this.id;
 	}
-
+	
+	public Id getStopPostAreaId() {
+		return stopPostAreaId;
+	}
+	
+	public void setStopPostAreaId(Id stopPostAreaId) {
+		this.stopPostAreaId = stopPostAreaId;
+	}
+	
 }

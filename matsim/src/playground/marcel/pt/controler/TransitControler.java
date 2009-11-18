@@ -38,15 +38,15 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.BasicVehicleReaderV1;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.config.TransitConfigGroup;
-import playground.marcel.pt.queuesim.TransitQueueSimulation;
 import playground.marcel.pt.replanning.TransitStrategyManagerConfigLoader;
 import playground.marcel.pt.router.PlansCalcTransitRoute;
-import playground.marcel.pt.routes.ExperimentalTransitRouteFactory;
 
 /**
  * @author mrieser

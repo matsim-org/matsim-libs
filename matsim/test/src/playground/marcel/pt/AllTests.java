@@ -31,9 +31,9 @@ public abstract class AllTests {
 		suite.addTestSuite(VehicleImplTest.class);
 		suite.addTest(playground.marcel.pt.config.AllTests.suite());
 		suite.addTest(playground.marcel.pt.fares.AllTests.suite());
-		suite.addTest(playground.marcel.pt.routes.AllTests.suite());
+		suite.addTest(org.matsim.pt.routes.AllTests.suite());
 		suite.addTest(playground.marcel.pt.router.AllTests.suite());
-		suite.addTest(playground.marcel.pt.queuesim.AllTests.suite());
+		suite.addTest(org.matsim.pt.queuesim.AllTests.suite());
 		suite.addTest(playground.marcel.pt.utils.AllTests.suite());
 
 		suite.addTest(playground.marcel.pt.controler.AllTests.suite());

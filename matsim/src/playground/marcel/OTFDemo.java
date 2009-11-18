@@ -21,6 +21,7 @@
 package playground.marcel;
 
 import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
@@ -33,7 +34,6 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
-import playground.marcel.pt.otfvis.FacilityDrawer;
 
 
 
