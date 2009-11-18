@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 
 public class FacilitiesReduceTypes {
@@ -59,12 +59,12 @@ public class FacilitiesReduceTypes {
 		log.info("    running " + this.getClass().getName() + " module...");
 		
 		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-			TreeMap<String,ActivityOption> h_map = new TreeMap<String, ActivityOption>();
-			TreeMap<String,ActivityOption> w_map = new TreeMap<String, ActivityOption>();
-			TreeMap<String,ActivityOption> e_map = new TreeMap<String, ActivityOption>();
-			TreeMap<String,ActivityOption> s_map = new TreeMap<String, ActivityOption>();
-			TreeMap<String,ActivityOption> l_map = new TreeMap<String, ActivityOption>();
-			TreeMap<String,ActivityOption> t_map = new TreeMap<String, ActivityOption>();
+			TreeMap<String,ActivityOptionImpl> h_map = new TreeMap<String, ActivityOptionImpl>();
+			TreeMap<String,ActivityOptionImpl> w_map = new TreeMap<String, ActivityOptionImpl>();
+			TreeMap<String,ActivityOptionImpl> e_map = new TreeMap<String, ActivityOptionImpl>();
+			TreeMap<String,ActivityOptionImpl> s_map = new TreeMap<String, ActivityOptionImpl>();
+			TreeMap<String,ActivityOptionImpl> l_map = new TreeMap<String, ActivityOptionImpl>();
+			TreeMap<String,ActivityOptionImpl> t_map = new TreeMap<String, ActivityOptionImpl>();
 			for (String t : f.getActivityOptions().keySet()) {
 				if (t.equals("home")) {
 					h_map.put(t,f.getActivityOption(t));
@@ -104,15 +104,15 @@ public class FacilitiesReduceTypes {
 			f.setDesc(desc.toString());
 			
 			if (!s_map.isEmpty()) {
-				ActivityOption old_act = s_map.values().iterator().next();
-				ActivityOption new_act = f.createActivityOption("shop");
+				ActivityOptionImpl old_act = s_map.values().iterator().next();
+				ActivityOptionImpl new_act = f.createActivityOption("shop");
 				new_act.setCapacity(old_act.getCapacity());
 				new_act.setOpeningTimes(old_act.getOpeningTimes());
 				f.getActivityOptions().remove(old_act.getType());
 			}
 			if (!l_map.isEmpty()) {
-				ActivityOption old_act = l_map.values().iterator().next();
-				ActivityOption new_act = f.createActivityOption("leisure");
+				ActivityOptionImpl old_act = l_map.values().iterator().next();
+				ActivityOptionImpl new_act = f.createActivityOption("leisure");
 				new_act.setCapacity(old_act.getCapacity());
 				new_act.setOpeningTimes(old_act.getOpeningTimes());
 				f.getActivityOptions().remove(old_act.getType());

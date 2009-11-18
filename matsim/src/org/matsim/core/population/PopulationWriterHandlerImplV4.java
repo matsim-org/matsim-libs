@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -42,7 +42,7 @@ import org.matsim.knowledges.ActivitySpaceBean;
 import org.matsim.knowledges.ActivitySpaceCassini;
 import org.matsim.knowledges.ActivitySpaceEllipse;
 import org.matsim.knowledges.ActivitySpaceSuperEllipse;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.population.Desires;
 
 public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
@@ -158,7 +158,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <knowledge ... > ... </knowledge>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startKnowledge(final Knowledge knowledge, final BufferedWriter out) throws IOException {
+	public void startKnowledge(final KnowledgeImpl knowledge, final BufferedWriter out) throws IOException {
 		out.write("\t\t<knowledge");
 		if (knowledge.getDescription() != null)
 			out.write(" desc=\"" + knowledge.getDescription() + "\"");
@@ -240,7 +240,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 //		out.write("\t\t\t\t</location>\n");
 //	}
 
-	public void startPrimaryLocation(final ActivityOption activity, final BufferedWriter out) throws IOException {
+	public void startPrimaryLocation(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<location");
 		out.write(" id=\"" + activity.getFacility().getId() + "\"");
 		out.write(" isPrimary=\"" + "yes" + "\"");
@@ -251,7 +251,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 		out.write("\t\t\t\t</location>\n");
 	}
 
-	public void startSecondaryLocation(final ActivityOption activity, final BufferedWriter out) throws IOException {
+	public void startSecondaryLocation(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<location");
 		out.write(" id=\"" + activity.getFacility().getId() + "\"");
 		out.write(">\n");
@@ -265,7 +265,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <capacity ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startCapacity(final ActivityOption activtiy, final BufferedWriter out) throws IOException {
+	public void startCapacity(final ActivityOptionImpl activtiy, final BufferedWriter out) throws IOException {
 		if (activtiy.getCapacity() != Integer.MAX_VALUE) {
 			out.write("\t\t\t\t\t<capacity");
 			out.write(" value=\"" + activtiy.getCapacity() + "\"");
@@ -280,7 +280,7 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 	// <opentime ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startOpentime(final OpeningTime opentime, final BufferedWriter out) throws IOException {
+	public void startOpentime(final OpeningTimeImpl opentime, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t\t<opentime");
 		out.write(" day=\"" + opentime.getDay() + "\"");
 		out.write(" start_time=\"" + Time.writeTime(opentime.getStartTime()) + "\"");

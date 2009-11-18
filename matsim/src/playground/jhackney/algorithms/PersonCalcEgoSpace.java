@@ -26,11 +26,11 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.ActivitySpace;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.utils.optimization.BeanObjective;
@@ -89,7 +89,7 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 
 		// Check if knowledge exists
 
-		final Knowledge know = this.knowledges.getKnowledgesByPersonId().get(person.getId());
+		final KnowledgeImpl know = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 
 		if (know == null) {
 			throw new RuntimeException("Knowledge is not defined!");
@@ -101,14 +101,14 @@ public class PersonCalcEgoSpace extends AbstractPersonAlgorithm {
 		}
 		
 		// make an arraylist called activities of all the home activities of the ego and his alters
-		ArrayList<ActivityOption> activities=new ArrayList<ActivityOption>();
+		ArrayList<ActivityOptionImpl> activities=new ArrayList<ActivityOptionImpl>();
 		// use morning home, the first act in each selected plan
 		Iterator<Person> e_it=egoNet.getAlters().iterator();
 		while(e_it.hasNext()){
 			activities.add( ((ActivityImpl)(e_it.next().getSelectedPlan().getPlanElements().get(0))).getFacility().getActivityOptions().get("home"));
 		}
 		
-		Iterator<ActivityOption> a_it = null;
+		Iterator<ActivityOptionImpl> a_it = null;
 		// get all home activities of the alters and the ego
 		a_it = activities.iterator();
 		

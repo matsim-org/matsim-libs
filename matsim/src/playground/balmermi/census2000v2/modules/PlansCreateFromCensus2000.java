@@ -35,7 +35,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
@@ -43,7 +43,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.Layer;
 import org.matsim.world.MappedLocation;
@@ -124,7 +124,7 @@ public class PlansCreateFromCensus2000 {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private ActivityOption chooseEducActBasedOnSchoolType(final PersonImpl p, String act_type) {
+	private ActivityOptionImpl chooseEducActBasedOnSchoolType(final PersonImpl p, String act_type) {
 		if (act_type.equals(CAtts.ACT_EKIGA) || act_type.equals(CAtts.ACT_EPRIM)) { // assign nearest act
 			QuadTree<ActivityFacilityImpl> qt = this.fqts.get(act_type);
 			ActivityFacilityImpl home_f = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(0).getFacility();
@@ -132,7 +132,7 @@ public class PlansCreateFromCensus2000 {
 			return educ_f.getActivityOption(act_type);
 		}
 		else if (act_type.equals(CAtts.ACT_ESECO)) { // search in home zone and expanding
-			List<ActivityOption> acts = new ArrayList<ActivityOption>();
+			List<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>();
 			ActivityFacilityImpl home_f = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(0).getFacility();
 			Zone zone = (Zone)home_f.getUpMapping().values().iterator().next();
 			Coord max = new CoordImpl(((Zone)zone).getMax());
@@ -143,10 +143,10 @@ public class PlansCreateFromCensus2000 {
 				qt.get(min.getX(),min.getY(),max.getX(),max.getY(),fs);
 				if (!fs.isEmpty()) {
 					for (ActivityFacilityImpl f : fs) {
-						ActivityOption a = f.getActivityOption(act_type);
+						ActivityOptionImpl a = f.getActivityOption(act_type);
 						for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 					}
-					ActivityOption act = acts.get(MatsimRandom.getRandom().nextInt(acts.size()));
+					ActivityOptionImpl act = acts.get(MatsimRandom.getRandom().nextInt(acts.size()));
 					if (act == null) { Gbl.errorMsg("That should not happen!"); }
 					return act;
 				}
@@ -162,12 +162,12 @@ public class PlansCreateFromCensus2000 {
 			QuadTree<ActivityFacilityImpl> qt = this.fqts.get(act_type);
 			List<ActivityFacilityImpl> fs = new ArrayList<ActivityFacilityImpl>();
 			qt.get(qt.getMinEasting()-1.0,qt.getMinNorthing()-1.0,qt.getMaxEasting()+1.0,qt.getMaxNorthing()+1.0,fs);
-			List<ActivityOption> acts = new ArrayList<ActivityOption>();
+			List<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>();
 			for (ActivityFacilityImpl f : fs) {
-				ActivityOption a = f.getActivityOption(act_type);
+				ActivityOptionImpl a = f.getActivityOption(act_type);
 				for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 			}
-			ActivityOption act = acts.get(MatsimRandom.getRandom().nextInt(acts.size()));
+			ActivityOptionImpl act = acts.get(MatsimRandom.getRandom().nextInt(acts.size()));
 			if (act == null) { Gbl.errorMsg("That should not happen!"); }
 			return act;
 		}
@@ -208,15 +208,15 @@ public class PlansCreateFromCensus2000 {
 		int sgde = Integer.parseInt(entries[CAtts.I_SGDE]);
 		MappedLocation zone = municipalityLayer.getLocation(new IdImpl(sgde));
 		if (zone != null) {
-			List<ActivityOption> acts = new ArrayList<ActivityOption>();
+			List<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>();
 			for (MappedLocation l : zone.getDownMapping().values()) {
-				ActivityOption a = ((ActivityFacilityImpl)l).getActivityOption(act_type);
+				ActivityOptionImpl a = ((ActivityFacilityImpl)l).getActivityOption(act_type);
 				if (a != null) { acts.add(a); }
 			}
 			if (!acts.isEmpty()) {
-				List<ActivityOption> acts_weighted = new ArrayList<ActivityOption>();
-				for (ActivityOption a : acts) { for (int i=0; i<a.getCapacity(); i++) { acts_weighted.add(a); } }
-				ActivityOption act = acts_weighted.get(MatsimRandom.getRandom().nextInt(acts_weighted.size()));
+				List<ActivityOptionImpl> acts_weighted = new ArrayList<ActivityOptionImpl>();
+				for (ActivityOptionImpl a : acts) { for (int i=0; i<a.getCapacity(); i++) { acts_weighted.add(a); } }
+				ActivityOptionImpl act = acts_weighted.get(MatsimRandom.getRandom().nextInt(acts_weighted.size()));
 				if (act == null) { Gbl.errorMsg("That should not happen!"); }
 				this.knowledges.getKnowledgesByPersonId().get(p.getId()).addActivity(act, false); // set activity in given zone
 			}
@@ -235,10 +235,10 @@ public class PlansCreateFromCensus2000 {
 					qt.get(min.getX(),min.getY(),max.getX(),max.getY(),fs);
 					if (!fs.isEmpty()) {
 						for (ActivityFacilityImpl f : fs) {
-							ActivityOption a = f.getActivityOption(act_type);
+							ActivityOptionImpl a = f.getActivityOption(act_type);
 							for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 						}
-						ActivityOption act = acts.get(MatsimRandom.getRandom().nextInt(acts.size()));
+						ActivityOptionImpl act = acts.get(MatsimRandom.getRandom().nextInt(acts.size()));
 						if (act == null) { Gbl.errorMsg("That should not happen!"); }
 						this.knowledges.getKnowledgesByPersonId().get(p.getId()).addActivity(act, false); // set activity in expanded given zone
 					}
@@ -247,7 +247,7 @@ public class PlansCreateFromCensus2000 {
 		}
 		else {
 			log.debug("        pid="+p.getId()+", act_type="+act_type+": no educ zone defined! Assigning according act_type!");
-			ActivityOption act = this.chooseEducActBasedOnSchoolType(p,act_type);
+			ActivityOptionImpl act = this.chooseEducActBasedOnSchoolType(p,act_type);
 			if (act == null) { Gbl.errorMsg("That should not happen!"); }
 			this.knowledges.getKnowledgesByPersonId().get(p.getId()).addActivity(act, false);
 			this.knowledges.getKnowledgesByPersonId().get(p.getId()).setDescription(this.knowledges.getKnowledgesByPersonId().get(p.getId()).getDescription()+"("+CAtts.P_SGDE+":"+sgde+")");
@@ -377,15 +377,15 @@ public class PlansCreateFromCensus2000 {
 		if (facs.isEmpty()) { Gbl.errorMsg("THAT SHOULD NEVER HAPPEN!"); }
 		
 		// 7. choose an activity at a facility (weighted for capacity)
-		List<ActivityOption> acts_weighted = new ArrayList<ActivityOption>();
+		List<ActivityOptionImpl> acts_weighted = new ArrayList<ActivityOptionImpl>();
 		for (ActivityFacilityImpl f : facs) {
 			for (String a : w_acts) {
-				ActivityOption act = f.getActivityOption(a);
+				ActivityOptionImpl act = f.getActivityOption(a);
 				if (act != null) { for (int i=0; i<act.getCapacity(); i++) { acts_weighted.add(act); } }
 			}
 		}
 		log.trace("        pid="+p.getId()+", jobnr="+job+", acts_weighted size="+acts_weighted.size());
-		ActivityOption act_choosen = acts_weighted.get(MatsimRandom.getRandom().nextInt(acts_weighted.size()));
+		ActivityOptionImpl act_choosen = acts_weighted.get(MatsimRandom.getRandom().nextInt(acts_weighted.size()));
 		this.knowledges.getKnowledgesByPersonId().get(p.getId()).addActivity(act_choosen, false);
 	}
 	
@@ -406,7 +406,7 @@ public class PlansCreateFromCensus2000 {
 		Map<String,Object> p_atts = p.getCustomAttributes();
 
 		// adding home knowledge
-		Knowledge k = this.knowledges.getKnowledgesByPersonId().get(p.getId());
+		KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(p.getId());
 		if (k == null) { k = this.knowledges.getFactory().createKnowledge(p.getId(), ""); }
 		String desc = "";
 		if (wkat == 1) {

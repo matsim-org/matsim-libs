@@ -32,7 +32,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  */
 public interface Knowledges extends MatsimToplevelContainer {
 
-	public Map<Id, Knowledge> getKnowledgesByPersonId();
+	public Map<Id, KnowledgeImpl> getKnowledgesByPersonId();
 
 	public KnowledgesFactory getFactory();
 

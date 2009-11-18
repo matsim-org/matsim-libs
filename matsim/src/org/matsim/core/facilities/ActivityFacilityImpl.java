@@ -48,7 +48,7 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 
 	private final static Logger log = Logger.getLogger(ActivityFacilityImpl.class);
 	
-	private final TreeMap<String, ActivityOption> activities = new TreeMap<String, ActivityOption>();
+	private final TreeMap<String, ActivityOptionImpl> activities = new TreeMap<String, ActivityOptionImpl>();
 	private String desc = null;
 	
 	//////////////////////////////////////////////////////////////////////
@@ -72,12 +72,12 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final ActivityOption createActivityOption(final String type) {
+	public final ActivityOptionImpl createActivityOption(final String type) {
 		if (this.activities.containsKey(type)) {
 			Gbl.errorMsg(this + "[type=" + type + " already exists]");
 		}
 		String type2 = type.intern();
-		ActivityOption a = new ActivityOption(type2, this);
+		ActivityOptionImpl a = new ActivityOptionImpl(type2, this);
 		this.activities.put(type2, a);
 		return a;
 	}
@@ -155,11 +155,11 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 		return this.desc;
 	}
 	
-	public final TreeMap<String,ActivityOption> getActivityOptions() {
+	public final TreeMap<String,ActivityOptionImpl> getActivityOptions() {
 		return this.activities;
 	}
 
-	public final ActivityOption getActivityOption(final String type) {
+	public final ActivityOptionImpl getActivityOption(final String type) {
 		return this.activities.get(type);
 	}
 

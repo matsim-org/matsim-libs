@@ -5,7 +5,7 @@ import java.util.TreeMap;
 
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 
 public class CapacityCalculator {
 	
@@ -151,9 +151,9 @@ public class CapacityCalculator {
 			
 			for (int i = 0; i < nogaTypes.length; i++) {						
 				if (facility.getActivityOption(nogaTypes[i]) != null) {
-					Iterator<ActivityOption> options_it = facility.getActivityOptions().values().iterator();
+					Iterator<ActivityOptionImpl> options_it = facility.getActivityOptions().values().iterator();
 					while (options_it.hasNext()) {
-						ActivityOption actOpt = options_it.next();
+						ActivityOptionImpl actOpt = options_it.next();
 						
 						// if there is a shopping or leisure act in the same buidling
 						if (actOpt.getType().startsWith(type)) {

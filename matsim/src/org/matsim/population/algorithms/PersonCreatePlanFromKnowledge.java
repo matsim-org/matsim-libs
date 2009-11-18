@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -46,7 +46,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 	public void run(final Person person) {
 		PlanImpl p = ((PersonImpl) person).createAndAddPlan(true);
 		ActivityFacilityImpl home_facility = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities("home").get(0).getFacility();
-		ArrayList<ActivityOption> acts = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities();
+		ArrayList<ActivityOptionImpl> acts = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities();
 
 		// first act end time = [7am.9am]
 		int time = 7*3600 + (MatsimRandom.getRandom().nextInt(2*3600));
@@ -69,7 +69,7 @@ public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 		// in between acts
 		for (int i=0; i<nof_acts; i++) {
 			int act_index = MatsimRandom.getRandom().nextInt(acts.size());
-			ActivityOption act = acts.get(act_index);
+			ActivityOptionImpl act = acts.get(act_index);
 			ActivityFacilityImpl f = act.getFacility();
 			a = p.createAndAddActivity(act.getType(),f.getCoord());
 			a.setLink(f.getLink());

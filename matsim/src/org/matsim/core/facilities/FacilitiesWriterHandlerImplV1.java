@@ -23,7 +23,6 @@ package org.matsim.core.facilities;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.utils.misc.Time;
 
 public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
@@ -76,7 +75,7 @@ public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
 	// <activity ... > ... </activity>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startActivity(final ActivityOption activity, final BufferedWriter out) throws IOException {
+	public void startActivity(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException {
 		out.write("\t\t<activity");
 		out.write(" type=\"" + activity.getType() + "\"");
 		out.write(">\n");
@@ -90,7 +89,7 @@ public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
 	// <capacity ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startCapacity(final ActivityOption activity, final BufferedWriter out) throws IOException {
+	public void startCapacity(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException {
 		if (activity.getCapacity() != Integer.MAX_VALUE) {
 			out.write("\t\t\t<capacity");
 			out.write(" value=\"" + activity.getCapacity() + "\"");
@@ -105,7 +104,7 @@ public class FacilitiesWriterHandlerImplV1 implements FacilitiesWriterHandler {
 	// <opentime ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startOpentime(final BasicOpeningTime opentime, final BufferedWriter out) throws IOException {
+	public void startOpentime(final OpeningTime opentime, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<opentime");
 		out.write(" day=\"" + opentime.getDay() + "\"");
 		out.write(" start_time=\"" + Time.writeTime(opentime.getStartTime()) + "\"");

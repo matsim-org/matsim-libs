@@ -26,10 +26,10 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.knowledges.ActivitySpace;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.utils.optimization.BeanObjective;
 import org.matsim.utils.optimization.CassiniObjective;
@@ -87,12 +87,12 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 
 		// Check if knowledge exists
 		
-		final Knowledge know = this.knowledges.getKnowledgesByPersonId().get(person.getId());
+		final KnowledgeImpl know = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 		if (know == null) {
 			throw new RuntimeException("Knowledge is not defined!");
 		}
 
-		Iterator<ActivityOption> a_it = null;
+		Iterator<ActivityOptionImpl> a_it = null;
 		if (activity_type.equals("all")) { a_it = know.getActivities().iterator(); }
 		else { a_it = know.getActivities(this.activity_type).iterator(); }
 		// Creating coordinate list

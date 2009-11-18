@@ -25,9 +25,9 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
@@ -59,7 +59,7 @@ public class CharyparNagelOpenTimesScoringFunction extends ActivityScoringFuncti
 		ActivityFacility facility = act.getFacility();
 		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
 		String facilityActType = null;
-		Set<BasicOpeningTime> opentimes = null;
+		Set<OpeningTime> opentimes = null;
 
 		while (facilityActTypeIterator.hasNext() && !foundAct) {
 
@@ -81,7 +81,7 @@ public class CharyparNagelOpenTimesScoringFunction extends ActivityScoringFuncti
 					openInterval[0] = Double.MAX_VALUE;
 					openInterval[1] = Double.MIN_VALUE;
 					
-					for (BasicOpeningTime opentime : opentimes) {
+					for (OpeningTime opentime : opentimes) {
 
 						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
 						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());

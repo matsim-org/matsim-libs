@@ -31,7 +31,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -253,7 +253,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			model.setDistanceTour(this.calcTourDistance(act_indices,p));
 			// dist_h_w; // distance between home and work or education facility (in km)
 			Coord h_coord = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_HOME).get(0).getFacility().getCoord();
-			ArrayList<ActivityOption> prim_acts = new ArrayList<ActivityOption>();
+			ArrayList<ActivityOptionImpl> prim_acts = new ArrayList<ActivityOptionImpl>();
 			prim_acts.addAll(this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_W2));
 			prim_acts.addAll(this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_W3));
 			prim_acts.addAll(this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities(CAtts.ACT_EKIGA));

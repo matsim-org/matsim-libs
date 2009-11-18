@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.core.population.PersonImpl;
 
@@ -70,9 +70,9 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 		log.info("Searching available activity types done.");
 	}
 	public void run(ActivityFacilityImpl facility){
-		Collection<ActivityOption> facActTypes = facility.getActivityOptions().values();
-		for (Iterator<ActivityOption> iterator = facActTypes.iterator();iterator.hasNext();){
-			ActivityOption act = iterator.next();
+		Collection<ActivityOptionImpl> facActTypes = facility.getActivityOptions().values();
+		for (Iterator<ActivityOptionImpl> iterator = facActTypes.iterator();iterator.hasNext();){
+			ActivityOptionImpl act = iterator.next();
 			if (!this.actTypes.contains(act.getType())){
 				this.actTypes.add(act.getType());
 			}
@@ -118,11 +118,11 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 	
 	private List<String> getKnActTypes (Person agent){
 		// get act options of agent
-		Collection<ActivityOption> agentActOptions = ((ScenarioImpl)(this.controler.getScenarioData())).getKnowledges().getKnowledgesByPersonId().get(agent.getId()).getActivities();
+		Collection<ActivityOptionImpl> agentActOptions = ((ScenarioImpl)(this.controler.getScenarioData())).getKnowledges().getKnowledgesByPersonId().get(agent.getId()).getActivities();
 		// convert them into act types
 		List<String> agentActTypes = new ArrayList<String>();
-		for (Iterator<ActivityOption> iterator = agentActOptions.iterator();iterator.hasNext();){
-			ActivityOption act = iterator.next();
+		for (Iterator<ActivityOptionImpl> iterator = agentActOptions.iterator();iterator.hasNext();){
+			ActivityOptionImpl act = iterator.next();
 			if (!agentActTypes.contains(act.getType())){
 				agentActTypes.add(act.getType());
 			}

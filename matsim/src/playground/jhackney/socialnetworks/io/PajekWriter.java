@@ -39,7 +39,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.Location;
 import org.matsim.world.MappedLocation;
@@ -113,7 +113,7 @@ public class PajekWriter {
 			int iperson = 1;
 			while (itPerson.hasNext()) {
 				PersonImpl p = itPerson.next();
-				final Knowledge know = this.knowledges.getKnowledgesByPersonId().get(p.getId());
+				final KnowledgeImpl know = this.knowledges.getKnowledgesByPersonId().get(p.getId());
 				if (know == null) {
 					Gbl.errorMsg("Knowledge is not defined!");
 				}

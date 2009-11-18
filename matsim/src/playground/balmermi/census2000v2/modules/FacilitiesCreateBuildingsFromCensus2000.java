@@ -30,7 +30,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.world.Layer;
@@ -117,7 +117,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 				if (f == null) {
 					// create new home facility id
 					f = facilities.createFacility(f_id,coord);
-					ActivityOption act = f.createActivityOption(CAtts.ACT_HOME);
+					ActivityOptionImpl act = f.createActivityOption(CAtts.ACT_HOME);
 					act.setCapacity(1);
 
 					// store some info
@@ -133,7 +133,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 					}
 
 					// add 1 to capacity
-					ActivityOption act = f.getActivityOption(CAtts.ACT_HOME);
+					ActivityOptionImpl act = f.getActivityOption(CAtts.ACT_HOME);
 					act.setCapacity(act.getCapacity()+1);
 
 					// store some info

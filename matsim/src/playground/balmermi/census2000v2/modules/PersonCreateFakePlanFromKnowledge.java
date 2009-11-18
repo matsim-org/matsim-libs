@@ -25,14 +25,14 @@ import java.util.ArrayList;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -68,10 +68,10 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 
 	@Override
 	public void run(final Person person) {
-		Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
+		KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 
-		ActivityOption home = null;
-		ArrayList<ActivityOption> home_acts = k.getActivities(CAtts.ACT_HOME);
+		ActivityOptionImpl home = null;
+		ArrayList<ActivityOptionImpl> home_acts = k.getActivities(CAtts.ACT_HOME);
 		if (home_acts.size()==0) { Gbl.errorMsg("pid="+person.getId()+", kdesc="+k.getDescription()+": no home activity defined"); }
 		else if (home_acts.size()==1) { home = home_acts.get(0); }
 		else if (home_acts.size()==2) {
@@ -82,15 +82,15 @@ public class PersonCreateFakePlanFromKnowledge extends AbstractPersonAlgorithm {
 		}
 		else { Gbl.errorMsg("pid="+person.getId()+", kdesc="+k.getDescription()+": more than 2 home activities defined"); }
 
-		ActivityOption work = null;
+		ActivityOptionImpl work = null;
 		for (int i=0; i<this.w_acts.length;i++) {  // that only works if we know that there is at most one work activity
-			ArrayList<ActivityOption> work_acts = k.getActivities(this.w_acts[i]);
+			ArrayList<ActivityOptionImpl> work_acts = k.getActivities(this.w_acts[i]);
 			if (!work_acts.isEmpty()) { work = work_acts.get(0); }
 		}
 		
-		ActivityOption educ = null;
+		ActivityOptionImpl educ = null;
 		for (int i=0; i<this.e_acts.length;i++) {  // that only works if we know that there is at most one educ activity
-			ArrayList<ActivityOption> educ_acts = k.getActivities(this.e_acts[i]);
+			ArrayList<ActivityOptionImpl> educ_acts = k.getActivities(this.e_acts[i]);
 			if (!educ_acts.isEmpty()) { educ = educ_acts.get(0); }
 		}
 		

@@ -25,10 +25,10 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -62,14 +62,14 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 	}
 
 	public void run(Plan plan) {
-		Knowledge k = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId());
+		KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId());
 		if (k == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no knowledge defined!"); }
 		if (!k.setPrimaryFlag(true)) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no activities defined!"); }
-		ArrayList<ActivityOption> prim_acts = k.getActivities(true);
+		ArrayList<ActivityOptionImpl> prim_acts = k.getActivities(true);
 		for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			String curr_type = act.getType();
-			ActivityOption a = act.getFacility().getActivityOptions().get(curr_type);
+			ActivityOptionImpl a = act.getFacility().getActivityOptions().get(curr_type);
 			if (a == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": Inconsistency with f_id="+act.getFacility()+"!"); }
 			if (!prim_acts.contains(a)) { k.addActivity(a,false); }
 		}

@@ -27,12 +27,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -71,7 +71,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 
 	@Override
 	public void run(final Person person) {
-		BasicOpeningTime ot = new OpeningTime(DayType.wkday,0,24*3600);
+		OpeningTime ot = new OpeningTimeImpl(DayType.wkday,0,24*3600);
 		if (person.getPlans().size() != 1) { throw new RuntimeException("Each person must have one plan."); }
 		Plan plan = person.getPlans().get(0);
 		Desires desires = ((PersonImpl) person).createDesires("");
@@ -126,13 +126,13 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 					if (af == null) {
 						af = activityFacilities.createFacility(new IdImpl(id),c);
 						id++;
-						ActivityOption ao = af.createActivityOption(a.getType());
+						ActivityOptionImpl ao = af.createActivityOption(a.getType());
 						ao.setCapacity(1.0);
 						if (a.getType().equals("tta")){ ao.addOpeningTime(ot); }
 						facs.put(af.getCoord().getX(),af.getCoord().getY(),af);
 					}
 					else if (((CoordImpl)af.getCoord()).equals(c)) {
-						ActivityOption ao = af.getActivityOption(a.getType());
+						ActivityOptionImpl ao = af.getActivityOption(a.getType());
 						if (ao == null) {
 							ao = af.createActivityOption(a.getType());
 							ao.setCapacity(1.0);
@@ -142,7 +142,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 					else {
 						af = activityFacilities.createFacility(new IdImpl(id),c);
 						id++;
-						ActivityOption ao = af.createActivityOption(a.getType());
+						ActivityOptionImpl ao = af.createActivityOption(a.getType());
 						ao.setCapacity(1.0);
 						if (a.getType().equals("tta")){ ao.addOpeningTime(ot); }
 						facs.put(af.getCoord().getX(),af.getCoord().getY(),af);

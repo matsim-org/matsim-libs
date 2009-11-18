@@ -27,14 +27,14 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.world.MappedLocation;
 
@@ -70,20 +70,20 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		double startTime = -1.0;
 		double endTime = -1.0;
 
-		Map<DayType, SortedSet<BasicOpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<BasicOpeningTime>>();
+		Map<DayType, SortedSet<OpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
 
 		List<MappedLocation> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
-		ActivityOption shopsOf2005ShopAct = ((ActivityFacilityImpl) closestShops.get(0)).getActivityOption(FacilitiesProductionKTI.ACT_TYPE_SHOP);
+		ActivityOptionImpl shopsOf2005ShopAct = ((ActivityFacilityImpl) closestShops.get(0)).getActivityOption(FacilitiesProductionKTI.ACT_TYPE_SHOP);
 		if (shopsOf2005ShopAct != null) {
 			closestShopOpentimes = shopsOf2005ShopAct.getOpeningTimes();
 		} else {
 			log.info("shop activity object of closest shop facility is null.");
 		}
-		Map<String, ActivityOption> activities = facility.getActivityOptions();
+		Map<String, ActivityOptionImpl> activities = facility.getActivityOptions();
 
 		// remove all existing opentimes
-		for (ActivityOption a : activities.values()) {
-			a.setOpeningTimes(new TreeMap<DayType, SortedSet<BasicOpeningTime>>());
+		for (ActivityOptionImpl a : activities.values()) {
+			a.setOpeningTimes(new TreeMap<DayType, SortedSet<OpeningTime>>());
 		}
 
 		// if only presence code and work are present
@@ -92,7 +92,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 				// standard daily opentimes for industry sector
 				if (activities.containsKey(FacilitiesProductionKTI.WORK_SECTOR2)) {
 					for (DayType day : weekDays) {
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR2).addOpeningTime(new OpeningTime(
+						activities.get(FacilitiesProductionKTI.WORK_SECTOR2).addOpeningTime(new OpeningTimeImpl(
 								day,
 								7.0 * 3600,
 								18.0 * 3600));
@@ -101,23 +101,23 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 				} else if (activities.containsKey(FacilitiesProductionKTI.WORK_SECTOR3)) {
 					// eliminate lunch break
 					for (DayType day : days) {
-						SortedSet<BasicOpeningTime> dailyOpentime = closestShopOpentimes.get(day);
+						SortedSet<OpeningTime> dailyOpentime = closestShopOpentimes.get(day);
 						if (dailyOpentime != null) {
 							switch(dailyOpentime.size()) {
 								case 2:
 									startTime = Math.min(
-											((OpeningTime) dailyOpentime.toArray()[0]).getStartTime(),
-											((OpeningTime) dailyOpentime.toArray()[1]).getStartTime());
+											((OpeningTimeImpl) dailyOpentime.toArray()[0]).getStartTime(),
+											((OpeningTimeImpl) dailyOpentime.toArray()[1]).getStartTime());
 									endTime = Math.max(
-											((OpeningTime) dailyOpentime.toArray()[0]).getEndTime(),
-											((OpeningTime) dailyOpentime.toArray()[1]).getEndTime());
+											((OpeningTimeImpl) dailyOpentime.toArray()[0]).getEndTime(),
+											((OpeningTimeImpl) dailyOpentime.toArray()[1]).getEndTime());
 									break;
 								case 1:
-									startTime = ((OpeningTime) dailyOpentime.toArray()[0]).getStartTime();
-									endTime = ((OpeningTime) dailyOpentime.toArray()[0]).getEndTime();
+									startTime = ((OpeningTimeImpl) dailyOpentime.toArray()[0]).getStartTime();
+									endTime = ((OpeningTimeImpl) dailyOpentime.toArray()[0]).getEndTime();
 									break;
 							}
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
@@ -136,15 +136,15 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_KINDERGARTEN, activityType) ||
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_PRIMARY, activityType)) {
 						for (DayType day : weekDays) {
-							activities.get(activityType).addOpeningTime(new OpeningTime(
+							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
 									8.0 * 3600,
 									12.0 * 3600));
-							activities.get(activityType).addOpeningTime(new OpeningTime(
+							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
 									13.5 * 3600,
 									17.0 * 3600));
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 									day,
 									8.0 * 3600,
 									17.0 * 3600));
@@ -153,11 +153,11 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_SECONDARY, activityType) ||
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_OTHER, activityType)) {
 						for (DayType day : weekDays) {
-							activities.get(activityType).addOpeningTime(new OpeningTime(
+							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
 									8.0 * 3600,
 									18.0 * 3600));
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 									day,
 									8.0 * 3600,
 									18.0 * 3600));
@@ -165,20 +165,20 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 					} else if (
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_HIGHER, activityType)) {
 						for (DayType day : weekDays) {
-							activities.get(activityType).addOpeningTime(new OpeningTime(
+							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
 									7.0 * 3600,
 									22.0 * 3600));
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 									day,
 									7.0 * 3600,
 									22.0 * 3600));
 						}
-						activities.get(activityType).addOpeningTime(new OpeningTime(
+						activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 								DayType.sat,
 								8.0 * 3600,
 								12.0 * 3600));
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 								DayType.sat,
 								8.0 * 3600,
 								12.0 * 3600));
@@ -200,11 +200,11 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 								startTime = 9.0 * 3600;
 								endTime = 18.0 * 3600;
 							}
-							activities.get(activityType).addOpeningTime(new OpeningTime(
+							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
@@ -214,11 +214,11 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 						for (DayType day : days) {
 							startTime = 9.0 * 3600;
 							endTime = 24.0 * 3600;
-							activities.get(activityType).addOpeningTime(new OpeningTime(
+							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
@@ -228,11 +228,11 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 						for (DayType day : days) {
 							startTime = 14.0 * 3600;
 							endTime = 24.0 * 3600;
-							activities.get(activityType).addOpeningTime(new OpeningTime(
+							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));
-							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTime(
+							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
 									day,
 									startTime,
 									endTime));

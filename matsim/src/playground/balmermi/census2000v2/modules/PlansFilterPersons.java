@@ -26,7 +26,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -89,8 +89,8 @@ public class PlansFilterPersons {
 				p.getCustomAttributes().remove(CAtts.HH_Z);
 
 				if (this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).size() == 2) {
-					ActivityOption a0 = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(0);
-					ActivityOption a1 = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(1);
+					ActivityOptionImpl a0 = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(0);
+					ActivityOptionImpl a1 = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(1);
 					if (a0.getFacility().getId().equals(f.getId())) {
 						if (!this.knowledges.getKnowledgesByPersonId().get(p.getId()).removeActivity(a0)) { Gbl.errorMsg("pid="+p.getId()+": That must not happen!"); }
 					}

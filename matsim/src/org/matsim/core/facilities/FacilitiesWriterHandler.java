@@ -23,7 +23,6 @@ package org.matsim.core.facilities;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.utils.io.WriterHandler;
 
 interface FacilitiesWriterHandler extends WriterHandler {
@@ -48,7 +47,7 @@ interface FacilitiesWriterHandler extends WriterHandler {
 	// <activity ... > ... </activity>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startActivity(final ActivityOption activity, final BufferedWriter out) throws IOException;
+	public void startActivity(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException;
 
 	public void endActivity(final BufferedWriter out) throws IOException;
 
@@ -56,7 +55,7 @@ interface FacilitiesWriterHandler extends WriterHandler {
 	// <capacity ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startCapacity(final ActivityOption activity, final BufferedWriter out) throws IOException;
+	public void startCapacity(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException;
 
 	public void endCapacity(final BufferedWriter out) throws IOException;
 
@@ -64,7 +63,7 @@ interface FacilitiesWriterHandler extends WriterHandler {
 	// <opentime ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startOpentime(final BasicOpeningTime opentime, final BufferedWriter out) throws IOException;
+	public void startOpentime(final OpeningTime opentime, final BufferedWriter out) throws IOException;
 
 	public void endOpentime(final BufferedWriter out) throws IOException;
 }

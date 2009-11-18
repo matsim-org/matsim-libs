@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class FacilitiesSummary {
@@ -49,9 +49,9 @@ public class FacilitiesSummary {
 			if (f.getCoord().getX() < min_coord.getX()) { min_coord.setX(f.getCoord().getX()); }
 			if (f.getCoord().getY() < min_coord.getY()) { min_coord.setY(f.getCoord().getY()); }
 
-			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
+			Iterator<ActivityOptionImpl> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
-				ActivityOption a = a_it.next();
+				ActivityOptionImpl a = a_it.next();
 				act_cnt++;
 				if (a.getCapacity() != Integer.MAX_VALUE) {
 					if (a.getType().equals("home")) {

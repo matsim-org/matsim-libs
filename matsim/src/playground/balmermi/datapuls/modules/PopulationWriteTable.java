@@ -12,7 +12,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -36,7 +36,7 @@ public class PopulationWriteTable {
 		log.info("init " + this.getClass().getName() + " module...");
 		log.info("  extract actOptTypes...");
 		for (ActivityFacilityImpl facility : facilities.getFacilities().values()) {
-			for (ActivityOption actOpt : facility.getActivityOptions().values()) {
+			for (ActivityOptionImpl actOpt : facility.getActivityOptions().values()) {
 				if (!actOpt.getType().startsWith("B")) {
 					actOptTypes.add(actOpt.getType());
 				}

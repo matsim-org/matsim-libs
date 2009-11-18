@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -292,7 +292,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		List<PlanElement> al = (List<PlanElement>) out.getPlanElements();
 		
 		// NEW NEW NEW NEW NEW NEW NEW
-		ArrayList<ActivityOption> primActs = new ArrayList<ActivityOption>(this.knowledges.getKnowledgesByPersonId().get(out.getPerson().getId()).getActivities(true));
+		ArrayList<ActivityOptionImpl> primActs = new ArrayList<ActivityOptionImpl>(this.knowledges.getKnowledgesByPersonId().get(out.getPerson().getId()).getActivities(true));
 		
 		for (int i=2;i<bestPlan.getPlanElements().size()-2;i+=2){
 			if (!primActs.isEmpty()){

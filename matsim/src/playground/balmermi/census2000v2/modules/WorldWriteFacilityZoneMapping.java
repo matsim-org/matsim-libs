@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.world.MappedLocation;
 import org.matsim.world.World;
@@ -72,7 +72,7 @@ public class WorldWriteFacilityZoneMapping {
 			out.flush();
 			for (MappedLocation f : world.getLayer(ActivityFacilitiesImpl.LAYER_TYPE).getLocations().values()) {
 				if (f.getUpMapping().size() == 0) {
-					Collection<ActivityOption> acts = ((ActivityFacilityImpl)f).getActivityOptions().values();
+					Collection<ActivityOptionImpl> acts = ((ActivityFacilityImpl)f).getActivityOptions().values();
 					if (acts.size() != 1) { Gbl.errorMsg("f_id="+f.getId()+": That must never happen!"); }
 					else if (!acts.iterator().next().getType().equals("tta")) { Gbl.errorMsg("f_id="+f.getId()+": That must never happen either!"); }
 					else { log.info("      f_id="+f.getId()+" has no zone mapping (outside CH, act_type='tta')"); }

@@ -25,10 +25,10 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.OpeningTime;
 
 public class FacilitiesCombine {
 
@@ -46,26 +46,26 @@ public class FacilitiesCombine {
 
 	private final void combine(ActivityFacilityImpl f,ActivityFacilityImpl f2) {
 		System.out.println("      Combining f_id=" + f.getId() + " into f2_id=" + f2.getId());
-		Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
+		Iterator<ActivityOptionImpl> a_it = f.getActivityOptions().values().iterator();
 		while (a_it.hasNext()) {
-			ActivityOption a = a_it.next();
+			ActivityOptionImpl a = a_it.next();
 			if (f2.getActivityOption(a.getType()) == null) {
-				ActivityOption a2 = f2.createActivityOption(a.getType());
+				ActivityOptionImpl a2 = f2.createActivityOption(a.getType());
 				a2.setCapacity(a.getCapacity());
 			}
 			else {
-				ActivityOption a2 = f2.getActivityOption(a.getType());
+				ActivityOptionImpl a2 = f2.getActivityOption(a.getType());
 				double cap2 = a2.getCapacity();
 				double cap = a.getCapacity();
 				if ((cap < Integer.MAX_VALUE) && (cap2 < Integer.MAX_VALUE)) { a2.setCapacity(cap + cap2); }
 				else { a2.setCapacity(Integer.MAX_VALUE); }
 			}
-			Iterator<SortedSet<BasicOpeningTime>> ts_it = a.getOpeningTimes().values().iterator();
+			Iterator<SortedSet<OpeningTime>> ts_it = a.getOpeningTimes().values().iterator();
 			while (ts_it.hasNext()) {
-				SortedSet<BasicOpeningTime> ts = ts_it.next();
-				Iterator<BasicOpeningTime> o_it = ts.iterator();
+				SortedSet<OpeningTime> ts = ts_it.next();
+				Iterator<OpeningTime> o_it = ts.iterator();
 				while (o_it.hasNext()) {
-					BasicOpeningTime o = o_it.next();
+					OpeningTime o = o_it.next();
 					f2.getActivityOption(a.getType()).addOpeningTime(o);
 				}
 			}

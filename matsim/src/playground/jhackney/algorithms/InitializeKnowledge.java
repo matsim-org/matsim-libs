@@ -8,7 +8,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 
 import playground.jhackney.socialnetworks.io.ActivityActReader;
@@ -46,7 +46,7 @@ public class InitializeKnowledge {
 		while (p_it.hasNext()) {
 			PersonImpl person=p_it.next();
 
-			Knowledge k = knowledges.getKnowledgesByPersonId().get(person.getId());
+			KnowledgeImpl k = knowledges.getKnowledgesByPersonId().get(person.getId());
 			if(k ==null){
 				k = knowledges.getFactory().createKnowledge(person.getId(), "created by " + this.getClass().getName());
 			}

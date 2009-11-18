@@ -26,18 +26,18 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.utils.misc.Time;
 
 public class FacilitiesOpentimesKTIYear1 {
 
-	private TreeMap<String, OpeningTime> openingTimes = new TreeMap<String, OpeningTime>();
+	private TreeMap<String, OpeningTimeImpl> openingTimes = new TreeMap<String, OpeningTimeImpl>();
 	
 	private final static Logger log = Logger.getLogger(FacilitiesOpentimesKTIYear1.class);
 
@@ -47,14 +47,14 @@ public class FacilitiesOpentimesKTIYear1 {
 		this.loadOpeningTimes();
 
 		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
+			Iterator<ActivityOptionImpl> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
 
-				ActivityOption a = a_it.next();
+				ActivityOptionImpl a = a_it.next();
 				String actType = a.getType();
 
 				// delete all existing open times info
-				Map<DayType, SortedSet<BasicOpeningTime>> o = a.getOpeningTimes();
+				Map<DayType, SortedSet<OpeningTime>> o = a.getOpeningTimes();
 				o.clear();
 
 				if (openingTimes.containsKey(actType)) {
@@ -68,9 +68,9 @@ public class FacilitiesOpentimesKTIYear1 {
 	}
 
 	private void loadOpeningTimes() {
-		openingTimes.put("work", new OpeningTime(DayType.wkday, Time.parseTime("7:00"), Time.parseTime("18:00")));
-		openingTimes.put("shop", new OpeningTime(DayType.wkday, Time.parseTime("8:00"), Time.parseTime("20:00")));
-		openingTimes.put("education", new OpeningTime(DayType.wkday, Time.parseTime("7:00"), Time.parseTime("18:00")));
-		openingTimes.put("leisure", new OpeningTime(DayType.wkday, Time.parseTime("6:00"), Time.parseTime("24:00")));
+		openingTimes.put("work", new OpeningTimeImpl(DayType.wkday, Time.parseTime("7:00"), Time.parseTime("18:00")));
+		openingTimes.put("shop", new OpeningTimeImpl(DayType.wkday, Time.parseTime("8:00"), Time.parseTime("20:00")));
+		openingTimes.put("education", new OpeningTimeImpl(DayType.wkday, Time.parseTime("7:00"), Time.parseTime("18:00")));
+		openingTimes.put("leisure", new OpeningTimeImpl(DayType.wkday, Time.parseTime("6:00"), Time.parseTime("24:00")));
 	}
 }

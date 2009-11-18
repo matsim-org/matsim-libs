@@ -31,5 +31,5 @@ import org.matsim.core.api.internal.MatsimFactory;
  *
  */public interface KnowledgesFactory extends MatsimFactory {
 
-	public Knowledge createKnowledge(final Id personId, final String desc);
+	public KnowledgeImpl createKnowledge(final Id personId, final String desc);
 }

@@ -27,14 +27,14 @@ import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.knowledges.ActivitySpace;
 import org.matsim.knowledges.ActivitySpaceBean;
 import org.matsim.knowledges.ActivitySpaceCassini;
 import org.matsim.knowledges.ActivitySpaceEllipse;
 import org.matsim.knowledges.ActivitySpaceSuperEllipse;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -63,7 +63,7 @@ public class PersonDrawActivitySpace extends AbstractPersonAlgorithm {
 	// private methods
 	// ////////////////////////////////////////////////////////////////////
 
-	private final void writeLocations(ActivityOption a, FileWriter fw)
+	private final void writeLocations(ActivityOptionImpl a, FileWriter fw)
 			throws IOException {
 		BufferedWriter out = new BufferedWriter(fw);
 		Coord c = a.getFacility().getCoord();
@@ -89,7 +89,7 @@ public class PersonDrawActivitySpace extends AbstractPersonAlgorithm {
 
 	@Override
 	public void run(Person person) {
-		final Knowledge know = this.knowledges.getKnowledgesByPersonId().get(person.getId());
+		final KnowledgeImpl know = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 		if (know == null) {
 			Gbl.errorMsg("Knowledge is not defined!");
 		}
@@ -107,9 +107,9 @@ public class PersonDrawActivitySpace extends AbstractPersonAlgorithm {
 			out_gpl.write("#unset key\n");
 			out_gpl.write("plot \\\n");
 
-			Iterator<ActivityOption> a_it = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities().iterator();
+			Iterator<ActivityOptionImpl> a_it = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivities().iterator();
 			while (a_it.hasNext()) {
-				ActivityOption a = a_it.next();
+				ActivityOptionImpl a = a_it.next();
 				String at = a.getType();
 
 				if (at.equals("home")) {

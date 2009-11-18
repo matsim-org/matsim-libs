@@ -34,7 +34,7 @@ import org.matsim.api.basic.v01.Id;
  */
 public class KnowledgesImpl implements Knowledges {
 
-	private Map<Id, Knowledge> knowledgeByPersonId = new HashMap<Id, Knowledge>();
+	private Map<Id, KnowledgeImpl> knowledgeByPersonId = new HashMap<Id, KnowledgeImpl>();
 	private KnowledgesFactory factory = new KnowledgesFactoryImpl(this);
 	
 	public KnowledgesImpl(){
@@ -44,7 +44,7 @@ public class KnowledgesImpl implements Knowledges {
 	/**
 	 * @see org.matsim.knowledges.Knowledges#getKnowledgesByPersonId()
 	 */
-	public Map<Id, Knowledge> getKnowledgesByPersonId() {
+	public Map<Id, KnowledgeImpl> getKnowledgesByPersonId() {
 		return this.knowledgeByPersonId;
 	}
 	

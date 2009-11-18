@@ -30,13 +30,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -216,13 +216,13 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 	public void testOpenLongEnough() {
 
-		ActivityOption actOpt = null;
+		ActivityOptionImpl actOpt = null;
 
 		actOpt = this.facilities.getFacilities().get(new IdImpl("3")).getActivityOption("work_sector3");
-		actOpt.addOpeningTime(new OpeningTime(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("18:00:00")));
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("18:00:00")));
 
 		actOpt = this.facilities.getFacilities().get(new IdImpl("5")).getActivityOption("leisure");
-		actOpt.addOpeningTime(new OpeningTime(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("16:00:00")));
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("16:00:00")));
 
 		// []{end home, work_sector3, leisure, work_Sector3, home, shop, start home, finish, reset}
 		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:10:00",  "00:10:00", "00:10:00", "00:10:00", "00:10:00", "02:40:00", "00:00:00"};
@@ -243,14 +243,14 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 	public void testWaiting() {
 
-		ActivityOption actOpt = null;
+		ActivityOptionImpl actOpt = null;
 
 		actOpt = this.facilities.getFacilities().get(new IdImpl("3")).getActivityOption("work_sector3");
-		actOpt.addOpeningTime(new OpeningTime(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("14:00:00")));
-		actOpt.addOpeningTime(new OpeningTime(DayType.wed, Time.parseTime("15:15:00"), Time.parseTime("20:00:00")));
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("14:00:00")));
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("15:15:00"), Time.parseTime("20:00:00")));
 
 		actOpt = this.facilities.getFacilities().get(new IdImpl("5")).getActivityOption("leisure");
-		actOpt.addOpeningTime(new OpeningTime(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
 
 		// []{end home, work_sector3, leisure, work_Sector3, home, shop, start home, finish, reset}
 		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:30:00",  "00:30:00", "00:30:00", "00:30:00", "00:30:00", "03:00:00", "00:00:00"};
@@ -271,18 +271,18 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 	public void testOverlapping() {
 
-		ActivityOption actOpt = null;
+		ActivityOptionImpl actOpt = null;
 
 		actOpt = this.facilities.getFacilities().get(new IdImpl("3")).getActivityOption("work_sector3");
-		actOpt.addOpeningTime(new OpeningTime(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("10:00:00")));
-		actOpt.addOpeningTime(new OpeningTime(DayType.wed, Time.parseTime("10:30:00"), Time.parseTime("14:00:00")));
-		actOpt.addOpeningTime(new OpeningTime(DayType.wed, Time.parseTime("15:15:00"), Time.parseTime("20:00:00")));
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("10:00:00")));
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("10:30:00"), Time.parseTime("14:00:00")));
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("15:15:00"), Time.parseTime("20:00:00")));
 
 		actOpt = this.facilities.getFacilities().get(new IdImpl("5")).getActivityOption("leisure");
-		actOpt.addOpeningTime(new OpeningTime(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
 
 		actOpt = this.facilities.getFacilities().get(new IdImpl("7")).getActivityOption("shop");
-		actOpt.addOpeningTime(new OpeningTime(DayType.wed, Time.parseTime("12:00:00"), Time.parseTime("27:00:00")));
+		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("12:00:00"), Time.parseTime("27:00:00")));
 
 		// []{end home, work_sector3, leisure, work_Sector3, home, shop, start home, finish, reset}
 		String[] expectedTooShortDurationsSequence = new String[]{"00:00:00", "00:00:00", "00:30:00",  "00:30:00", "00:30:00", "00:30:00", "00:30:00", "03:00:00", "00:00:00"};

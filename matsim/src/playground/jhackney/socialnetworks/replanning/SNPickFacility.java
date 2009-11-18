@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
@@ -21,7 +21,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -134,13 +134,13 @@ public class SNPickFacility implements PlanAlgorithm {
 			ActivityImpl newAct = (actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
 
 //			Get agent's knowledge
-			Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
+			KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 
-			LinkedHashMap<ActivityOption,Integer> facMap=new LinkedHashMap<ActivityOption,Integer>();
-			ArrayList<ActivityOption> facList=k.getActivities(factype);
-			Iterator<ActivityOption> fIt=facList.iterator();
+			LinkedHashMap<ActivityOptionImpl,Integer> facMap=new LinkedHashMap<ActivityOptionImpl,Integer>();
+			ArrayList<ActivityOptionImpl> facList=k.getActivities(factype);
+			Iterator<ActivityOptionImpl> fIt=facList.iterator();
 			while(fIt.hasNext()){
-				ActivityOption activity=fIt.next();
+				ActivityOptionImpl activity=fIt.next();
 				if(!(facMap.containsKey(activity))){
 					facMap.put(activity,1);
 				}else{
@@ -161,7 +161,7 @@ public class SNPickFacility implements PlanAlgorithm {
 				fIt=null;
 				fIt=facList.iterator();
 				while(fIt.hasNext()){
-					ActivityOption activity=fIt.next();
+					ActivityOptionImpl activity=fIt.next();
 					if(!(facMap.keySet().contains(activity))){
 						facMap.put(activity,1);
 					}else{
@@ -228,7 +228,7 @@ public class SNPickFacility implements PlanAlgorithm {
 		}
 	}
 
-	private ActivityFacilityImpl getFacByLogit(LinkedHashMap<ActivityOption, Integer> facMap) {
+	private ActivityFacilityImpl getFacByLogit(LinkedHashMap<ActivityOptionImpl, Integer> facMap) {
 		ActivityFacilityImpl fac=null;
 		Object[] nums=facMap.values().toArray();
 		Double[] p= new Double[nums.length];
@@ -252,7 +252,7 @@ public class SNPickFacility implements PlanAlgorithm {
 				pick=i;
 			}
 		}
-		fac=((ActivityOption) facMap.keySet().toArray()[pick]).getFacility();
+		fac=((ActivityOptionImpl) facMap.keySet().toArray()[pick]).getFacility();
 		return fac;
 	}
 

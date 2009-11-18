@@ -46,7 +46,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.EventsToScore;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
@@ -375,7 +375,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		while (p_it.hasNext()) {
 			PersonImpl person=p_it.next();
 
-			Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
+			KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 			if(k ==null){
 				k =  this.knowledges.getFactory().createKnowledge(person.getId(), "created by " + this.getClass().getName());
 			}

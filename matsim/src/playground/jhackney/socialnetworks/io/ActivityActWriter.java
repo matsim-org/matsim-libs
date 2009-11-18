@@ -9,7 +9,7 @@ import java.util.List;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationImpl;
 
@@ -55,7 +55,7 @@ public class ActivityActWriter {
 
 				for (int j=0;j<actsLegs.size()+1;j=j+2){
 					ActivityImpl myAct= (ActivityImpl) actsLegs.get(j);
-					ActivityOption myActivity=myAct.getFacility().getActivityOptions().get(myAct.getType());
+					ActivityOptionImpl myActivity=myAct.getFacility().getActivityOptions().get(myAct.getType());
 //					System.out.println(" AAW DEBUG J=: "+j);
 					try {
 						out.write(iter+" "+myPerson.getId()+" "+myActivity.getFacility().getId()+" "+myActivity.getType());

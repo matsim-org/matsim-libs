@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -56,8 +56,8 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 
 	private final ActivityFacilitiesImpl facilities;
 
-	private QuadTree<ActivityOption> shopActQuadTree = null;
-	private QuadTree<ActivityOption> leisActQuadTree = null;
+	private QuadTree<ActivityOptionImpl> shopActQuadTree = null;
+	private QuadTree<ActivityOptionImpl> leisActQuadTree = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -82,9 +82,9 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
+		ArrayList<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>();
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-			for (ActivityOption a : f.getActivityOptions().values()) {
+			for (ActivityOptionImpl a : f.getActivityOptions().values()) {
 				if (a.getType().equals(CAtts.ACT_S1) || a.getType().equals(CAtts.ACT_S2) || a.getType().equals(CAtts.ACT_S3) ||
 				    a.getType().equals(CAtts.ACT_S4) || a.getType().equals(CAtts.ACT_S5) || a.getType().equals(CAtts.ACT_SOTHR)) {
 					acts.add(a);
@@ -100,8 +100,8 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		maxx += 1.0;
 		maxy += 1.0;
 		log.info("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		this.shopActQuadTree = new QuadTree<ActivityOption>(minx, miny, maxx, maxy);
-		for (ActivityOption a : acts) {
+		this.shopActQuadTree = new QuadTree<ActivityOptionImpl>(minx, miny, maxx, maxy);
+		for (ActivityOptionImpl a : acts) {
 			this.shopActQuadTree.put(a.getFacility().getCoord().getX(),a.getFacility().getCoord().getY(),a);
 		}
 		log.info("      done.");
@@ -113,9 +113,9 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
+		ArrayList<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>();
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-			for (ActivityOption a : f.getActivityOptions().values()) {
+			for (ActivityOptionImpl a : f.getActivityOptions().values()) {
 				if (a.getType().equals(CAtts.ACT_LC) || a.getType().equals(CAtts.ACT_LG) || a.getType().equals(CAtts.ACT_LS)) {
 					acts.add(a);
 					if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
@@ -130,8 +130,8 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		maxx += 1.0;
 		maxy += 1.0;
 		log.info("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		this.leisActQuadTree = new QuadTree<ActivityOption>(minx, miny, maxx, maxy);
-		for (ActivityOption a : acts) {
+		this.leisActQuadTree = new QuadTree<ActivityOptionImpl>(minx, miny, maxx, maxy);
+		for (ActivityOptionImpl a : acts) {
 			this.leisActQuadTree.put(a.getFacility().getCoord().getX(),a.getFacility().getCoord().getY(),a);
 		}
 		log.info("      done.");
@@ -141,7 +141,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final ActivityOption getActivity(Collection<ActivityOption> activities, String act_type) {
+	private final ActivityOptionImpl getActivity(Collection<ActivityOptionImpl> activities, String act_type) {
 		ArrayList<String> act_types = new ArrayList<String>();
 		if (act_type.startsWith(S)) {
 			act_types.add(CAtts.ACT_S1); act_types.add(CAtts.ACT_S2); act_types.add(CAtts.ACT_S3);
@@ -154,12 +154,12 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			Gbl.errorMsg("act_type="+act_type+" not allowed!");
 		}
 		
-		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
+		ArrayList<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>();
 		ArrayList<Integer> sum_cap_acts = new ArrayList<Integer>();
 		int sum_cap = 0;
-		Iterator<ActivityOption> a_it = activities.iterator();
+		Iterator<ActivityOptionImpl> a_it = activities.iterator();
 		while (a_it.hasNext()) {
-			ActivityOption a = a_it.next();
+			ActivityOptionImpl a = a_it.next();
 			sum_cap += a.getCapacity();
 			sum_cap_acts.add(sum_cap);
 			acts.add(a);
@@ -176,7 +176,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final QuadTree<ActivityOption> getActivities(String act_type) {
+	private final QuadTree<ActivityOptionImpl> getActivities(String act_type) {
 		if (act_type.startsWith(S)) { return this.shopActQuadTree; }
 		else if (act_type.startsWith(L)) { return this.leisActQuadTree; }
 		else { Gbl.errorMsg("act_type=" + act_type + " not allowed!"); return null; }
@@ -184,8 +184,8 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final ActivityOption getActivity(Coord coord, double radius, String act_type) {
-		Collection<ActivityOption> acts = this.getActivities(act_type).get(coord.getX(),coord.getY(),radius);
+	private final ActivityOptionImpl getActivity(Coord coord, double radius, String act_type) {
+		Collection<ActivityOptionImpl> acts = this.getActivities(act_type).get(coord.getX(),coord.getY(),radius);
 		if (acts.isEmpty()) {
 			if (radius > 200000.0) { Gbl.errorMsg("radius>200'000 meters and still no facility found!"); }
 			return this.getActivity(coord,2.0*radius,act_type);
@@ -193,8 +193,8 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		return this.getActivity(acts,act_type);
 	}
 
-	private final ActivityOption getActivity(Coord coord1, Coord coord2, double radius, String act_type) {
-		Collection<ActivityOption> acts = this.getActivities(act_type).get(coord1.getX(),coord1.getY(),radius);
+	private final ActivityOptionImpl getActivity(Coord coord1, Coord coord2, double radius, String act_type) {
+		Collection<ActivityOptionImpl> acts = this.getActivities(act_type).get(coord1.getX(),coord1.getY(),radius);
 		acts.addAll(this.getActivities(act_type).get(coord2.getX(),coord2.getY(),radius));
 		if (acts.isEmpty()) {
 			if (radius > 200000.0) { Gbl.errorMsg("radius>200'000 meters and still no facility found!"); }
@@ -215,7 +215,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			// c_start and c_end equal
 			Zone z = (Zone)start.getUpMapping().values().iterator().next();
 			double r = 0.5*Math.sqrt((z.getMax().getX()-z.getMin().getX())*(z.getMax().getY()-z.getMin().getY()));
-			ActivityOption activity = this.getActivity(c_start,r,act.getType());
+			ActivityOptionImpl activity = this.getActivity(c_start,r,act.getType());
 			act.setType(activity.getType());
 			act.setFacility(activity.getFacility());
 			act.setCoord(act.getFacility().getCoord());
@@ -227,7 +227,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			dy = dy/6.0;
 			Coord c1 = new CoordImpl(c_start.getX()+dx,c_start.getY()+dy);
 			Coord c2 = new CoordImpl(c_end.getX()-dx,c_end.getY()+dy);
-			ActivityOption activity = this.getActivity(c1,c2,r,act.getType());
+			ActivityOptionImpl activity = this.getActivity(c1,c2,r,act.getType());
 			act.setType(activity.getType());
 			act.setFacility(activity.getFacility());
 			act.setCoord(act.getFacility().getCoord());
@@ -246,7 +246,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			double r = 0.5*Math.sqrt((z.getMax().getX()-z.getMin().getX())*(z.getMax().getY()-z.getMin().getY()));
 			for (int i=start+2; i<end; i=i+2) {
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
-				ActivityOption activity = this.getActivity(c_start,r,act.getType());
+				ActivityOptionImpl activity = this.getActivity(c_start,r,act.getType());
 				act.setType(activity.getType());
 				act.setFacility(activity.getFacility());
 				act.setCoord(act.getFacility().getCoord());
@@ -261,7 +261,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			Coord c2 = new CoordImpl(c_end.getX()-dx,c_end.getY()+dy);
 			for (int i=start+2; i<end; i=i+2) {
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
-				ActivityOption activity = this.getActivity(c1,c2,r,act.getType());
+				ActivityOptionImpl activity = this.getActivity(c1,c2,r,act.getType());
 				act.setType(activity.getType());
 				act.setFacility(activity.getFacility());
 				act.setCoord(act.getFacility().getCoord());

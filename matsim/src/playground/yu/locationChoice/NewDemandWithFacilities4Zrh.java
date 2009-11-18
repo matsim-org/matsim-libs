@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -43,7 +43,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -60,7 +60,7 @@ public class NewDemandWithFacilities4Zrh {
 		private ActivityFacilitiesImpl afs = null;
 		private Map<Coord, ActivityFacilityImpl> afMap = null;
 		private PersonImpl currentPerson = null;
-		private Knowledge currentKnowledge = null;
+		private KnowledgeImpl currentKnowledge = null;
 		private long facCnt = 0;
 		private Knowledges knowledges;
 
@@ -102,7 +102,7 @@ public class NewDemandWithFacilities4Zrh {
 				afMap.put(coord, af);
 			}
 			act.setFacility(af);
-			ActivityOption ao = af.getActivityOption(type);
+			ActivityOptionImpl ao = af.getActivityOption(type);
 			if (ao == null)
 				ao = af.createActivityOption(type);
 			// 3 primary type in Zurich scenario

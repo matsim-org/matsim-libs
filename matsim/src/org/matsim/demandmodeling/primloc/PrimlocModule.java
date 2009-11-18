@@ -65,14 +65,14 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.world.Layer;
@@ -138,7 +138,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		if( !agentHasPrimaryActivityInPlan( guy ) )
 			return;
 				
-		Knowledge knowledge = this.knowledges.getKnowledgesByPersonId().get(guy.getId());
+		KnowledgeImpl knowledge = this.knowledges.getKnowledgesByPersonId().get(guy.getId());
 		ActivityFacilityImpl home = knowledge.getActivities("home").get(0).getFacility();
 		Zone homezone = (Zone) zoneLayer.getNearestLocations( home.getCoord(), null).get(0);
 		if( homezone == null )
@@ -171,7 +171,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			// Change the knowledge of the person
 			if( overwriteKnowledge )
 				knowledge.removeActivities( primaryActivityName );
-			knowledge.addActivity(new ActivityOption(primaryActivityName, workplace), true);
+			knowledge.addActivity(new ActivityOptionImpl(primaryActivityName, workplace), true);
 		}
 	}
 
@@ -325,7 +325,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		// and maintain a list of Facilities per Zone
 		core.J = new double[ core.numZ ];
 		for( ActivityFacilityImpl facility : facilities.getFacilities().values() ){
-			ActivityOption act = facility.getActivityOption( primaryActivityName );
+			ActivityOptionImpl act = facility.getActivityOption( primaryActivityName );
 			if( act != null ){
 				ArrayList<MappedLocation> list = zoneLayer.getNearestLocations( facility.getCoord(), null);
 				Zone zone = (Zone) list.get(0);

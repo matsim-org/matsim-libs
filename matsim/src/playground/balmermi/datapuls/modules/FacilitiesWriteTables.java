@@ -29,7 +29,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -58,7 +58,7 @@ public class FacilitiesWriteTables {
 		log.info("  extract actOptTypes...");
 		Set<String> actOptTypes = new TreeSet<String>();
 		for (ActivityFacilityImpl facility : facilities.getFacilities().values()) {
-			for (ActivityOption actOpt : facility.getActivityOptions().values()) {
+			for (ActivityOptionImpl actOpt : facility.getActivityOptions().values()) {
 				actOptTypes.add(actOpt.getType());
 			}
 		}
@@ -74,7 +74,7 @@ public class FacilitiesWriteTables {
 		out.write("ID\tX\tY\tCAPACITY\n");
 		out.flush();
 		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-			ActivityOption ao = f.getActivityOption(actOptType);
+			ActivityOptionImpl ao = f.getActivityOption(actOptType);
 			if (ao != null) {
 				out.write(f.getId().toString()+"\t");
 				out.write(f.getCoord().getX()+"\t");

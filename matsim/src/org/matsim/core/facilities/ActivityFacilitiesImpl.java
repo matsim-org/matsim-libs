@@ -169,7 +169,7 @@ public class ActivityFacilitiesImpl extends LayerImpl implements ActivityFacilit
 		Iterator<? extends ActivityFacilityImpl> iter = this.getFacilities().values().iterator();
 		while (iter.hasNext()){
 			ActivityFacilityImpl f = iter.next();
-			Map<String, ActivityOption> a = f.getActivityOptions();
+			Map<String, ActivityOptionImpl> a = f.getActivityOptions();
 			if(a.containsKey(act_type)){
 				facs.put(f.getId(),f);
 			}

@@ -25,11 +25,11 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -66,27 +66,27 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 		if (plan == null) { Gbl.errorMsg("pid="+person.getId()+": no plan exists."); }
 
 		// knowledge
-		Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
+		KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 		if (k == null) { Gbl.errorMsg("pid="+person.getId()+": no knowledge exists."); }
 
 		// home act
 		if (k.getActivities(CAtts.ACT_HOME).size() != 1) { Gbl.errorMsg("pid="+person.getId()+": There must be only one '"+CAtts.ACT_HOME+"' in the knowledge."); }
-		ActivityOption home_act = k.getActivities(CAtts.ACT_HOME).get(0);
+		ActivityOptionImpl home_act = k.getActivities(CAtts.ACT_HOME).get(0);
 		
 		// work acts
-		ArrayList<ActivityOption> work_acts = new ArrayList<ActivityOption>(k.getActivities(CAtts.ACT_W2));
+		ArrayList<ActivityOptionImpl> work_acts = new ArrayList<ActivityOptionImpl>(k.getActivities(CAtts.ACT_W2));
 		work_acts.addAll(k.getActivities(CAtts.ACT_W3));
 		
 		// educ acts
-		ArrayList<ActivityOption> educ_acts = new ArrayList<ActivityOption>(k.getActivities(CAtts.ACT_EKIGA));
+		ArrayList<ActivityOptionImpl> educ_acts = new ArrayList<ActivityOptionImpl>(k.getActivities(CAtts.ACT_EKIGA));
 		educ_acts.addAll(k.getActivities(CAtts.ACT_EPRIM));
 		educ_acts.addAll(k.getActivities(CAtts.ACT_ESECO));
 		educ_acts.addAll(k.getActivities(CAtts.ACT_EHIGH));
 		educ_acts.addAll(k.getActivities(CAtts.ACT_EOTHR));
 
-		ActivityOption prev_home = null;
-		ActivityOption prev_work = null;
-		ActivityOption prev_educ = null;
+		ActivityOptionImpl prev_home = null;
+		ActivityOptionImpl prev_work = null;
+		ActivityOptionImpl prev_educ = null;
 		
 		for (int i=0; i<plan.getPlanElements().size(); i++) {
 			if (i%2 == 0) {
@@ -102,9 +102,9 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 				}
 				else if (act.getType().startsWith("w")) {
 					if (work_acts.isEmpty()) { Gbl.errorMsg("pid="+person.getId()+": plan contains 'w' act but no location known!"); }
-					ActivityOption work_act = null;
+					ActivityOptionImpl work_act = null;
 					if (prev_work != null) {
-						ArrayList<ActivityOption> rest = new ArrayList<ActivityOption>(work_acts);
+						ArrayList<ActivityOptionImpl> rest = new ArrayList<ActivityOptionImpl>(work_acts);
 						rest.remove(prev_work);
 						if (rest.isEmpty()) { work_act = prev_work; log.warn("TODO pid="+person.getId()+": assign another work act."); }
 						else { work_act = rest.get(MatsimRandom.getRandom().nextInt(rest.size())); }
@@ -121,9 +121,9 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 				}
 				else if (act.getType().startsWith("e")) {
 					if (educ_acts.isEmpty()) { Gbl.errorMsg("pid="+person.getId()+": plan contains 'e' act but no location known!"); }
-					ActivityOption educ_act = null;
+					ActivityOptionImpl educ_act = null;
 					if (prev_educ != null) {
-						ArrayList<ActivityOption> rest = new ArrayList<ActivityOption>(educ_acts);
+						ArrayList<ActivityOptionImpl> rest = new ArrayList<ActivityOptionImpl>(educ_acts);
 						rest.remove(prev_educ);
 						if (rest.isEmpty()) { educ_act = prev_educ; log.warn("TODO pid="+person.getId()+": assign another educ act."); }
 						else { educ_act = rest.get(MatsimRandom.getRandom().nextInt(rest.size())); }

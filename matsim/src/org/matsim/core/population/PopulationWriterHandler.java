@@ -29,11 +29,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.utils.io.WriterHandler;
 import org.matsim.knowledges.ActivitySpace;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.population.Desires;
 
 public interface PopulationWriterHandler extends WriterHandler {
@@ -82,7 +82,7 @@ public interface PopulationWriterHandler extends WriterHandler {
 	// <knowledge ... > ... </knowledge>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startKnowledge(final Knowledge knowledge, final BufferedWriter out) throws IOException;
+	public void startKnowledge(final KnowledgeImpl knowledge, final BufferedWriter out) throws IOException;
 
 	public void endKnowledge(final BufferedWriter out) throws IOException;
 
@@ -118,11 +118,11 @@ public interface PopulationWriterHandler extends WriterHandler {
 
 //	public void endLocation(final BufferedWriter out) throws IOException;
 
-	public void startPrimaryLocation(final ActivityOption activity, final BufferedWriter out) throws IOException;
+	public void startPrimaryLocation(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException;
 
 	public void endPrimaryLocation(final BufferedWriter out) throws IOException;
 
-	public void startSecondaryLocation(final ActivityOption activity, final BufferedWriter out) throws IOException;
+	public void startSecondaryLocation(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException;
 
 	public void endSecondaryLocation(final BufferedWriter out) throws IOException;
 
@@ -130,7 +130,7 @@ public interface PopulationWriterHandler extends WriterHandler {
 	// <capacity ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startCapacity(final ActivityOption activity, final BufferedWriter out) throws IOException;
+	public void startCapacity(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException;
 
 	public void endCapacity(final BufferedWriter out) throws IOException;
 
@@ -138,7 +138,7 @@ public interface PopulationWriterHandler extends WriterHandler {
 	// <opentime ... />
 	//////////////////////////////////////////////////////////////////////
 
-	public void startOpentime(final OpeningTime opentime, final BufferedWriter out) throws IOException;
+	public void startOpentime(final OpeningTimeImpl opentime, final BufferedWriter out) throws IOException;
 
 	public void endOpentime(final BufferedWriter out) throws IOException;
 

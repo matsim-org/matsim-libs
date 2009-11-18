@@ -10,7 +10,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -74,7 +74,7 @@ public class TreesBuilder {
 		TreeMap<String, TreeMap<Id, ActivityFacilityImpl>> trees = new TreeMap<String, TreeMap<Id, ActivityFacilityImpl>>();
 		// get all types of activities
 		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-			Map<String, ActivityOption> activities = f.getActivityOptions();
+			Map<String, ActivityOptionImpl> activities = f.getActivityOptions();
 			
 			// do not add facility if it is not in region of interest ------------------------
 			if (regionalScenario) {
@@ -82,9 +82,9 @@ public class TreesBuilder {
 			}
 			// -------------------------------------------------------------------------------
 			
-			Iterator<ActivityOption> act_it = activities.values().iterator();
+			Iterator<ActivityOptionImpl> act_it = activities.values().iterator();
 			while (act_it.hasNext()) {
-				ActivityOption act = act_it.next();
+				ActivityOptionImpl act = act_it.next();
 				
 				// do only add activities of flexibleTypes if flexibleTypes != null
 				if (this.flexibleTypes.size() == 0 ||  this.flexibleTypes.contains(act.getType())) {

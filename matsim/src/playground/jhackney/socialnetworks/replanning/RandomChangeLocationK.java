@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
@@ -38,7 +38,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -132,13 +132,13 @@ public class RandomChangeLocationK  implements PlanAlgorithm{
 			ActivityImpl newAct = (actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
 
 //			Get agent's knowledge
-			Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
+			KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 
 			// Replace with plan.getRandomActivity(type)
 
 //			Pick a random ACTIVITY of this type from knowledge
 
-			List<ActivityOption> actList = k.getActivities(factype);
+			List<ActivityOptionImpl> actList = k.getActivities(factype);
 			if(actList.size()>0){
 				ActivityFacilityImpl fFromKnowledge = actList.get(MatsimRandom.getRandom().nextInt( actList.size())).getFacility();
 

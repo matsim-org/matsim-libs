@@ -33,7 +33,7 @@ import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;

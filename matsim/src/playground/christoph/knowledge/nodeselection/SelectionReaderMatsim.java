@@ -39,7 +39,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -68,7 +68,7 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 	protected PopulationImpl population;
 	protected NetworkLayer network;
 	protected PersonImpl person;
-	protected Knowledge currentKnowledge;
+	protected KnowledgeImpl currentKnowledge;
 	protected Map<Id, NodeImpl> currentNodes;
 	protected Map<Id, LinkImpl> currentLinks;
 	protected List<String> currentNodesList;

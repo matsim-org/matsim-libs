@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -45,7 +45,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Desires;
 
@@ -198,11 +198,11 @@ public class PlansCreateFromDataPuls {
 				ActivityFacilityImpl af = datapulsFacilities.getFacilities().get(fid);
 				if (af == null) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" not found in facilities."); }
 				if (af.getActivityOptions().size() != 1) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" must have only one activity option."); }
-				ActivityOption a = af.getActivityOption("home");
+				ActivityOptionImpl a = af.getActivityOption("home");
 				if (a == null) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" does not contain 'home'."); }
 				
 				PersonImpl p = (PersonImpl)population.getFactory().createPerson(id);
-				Knowledge k = kn.getKnowledgesByPersonId().get(p.getId());
+				KnowledgeImpl k = kn.getKnowledgesByPersonId().get(p.getId());
 				if (k != null) { throw new RuntimeException("pid="+p.getId()+": knowledge already exist."); }
 				k = kn.getFactory().createKnowledge(p.getId(),null);
 				kn.getKnowledgesByPersonId().put(p.getId(),k);
@@ -256,7 +256,7 @@ public class PlansCreateFromDataPuls {
 	
 	//////////////////////////////////////////////////////////////////////
 
-	private final void mapDemand(PersonImpl dPerson, Knowledge dKnowledge, PersonImpl cPerson, Knowledge cKnowledge) {
+	private final void mapDemand(PersonImpl dPerson, KnowledgeImpl dKnowledge, PersonImpl cPerson, KnowledgeImpl cKnowledge) {
 		// demographics
 		dPerson.setCarAvail(cPerson.getCarAvail());
 		dPerson.setEmployed(cPerson.getEmployed());
@@ -271,7 +271,7 @@ public class PlansCreateFromDataPuls {
 			dDesires.putActivityDuration(type,cPerson.getDesires().getActivityDurations().get(type));
 		}
 		// knowledge
-		for (ActivityOption cActivityOption : cKnowledge.getActivities(true)) {
+		for (ActivityOptionImpl cActivityOption : cKnowledge.getActivities(true)) {
 			if (!cActivityOption.getType().equals("home")) {
 				ActivityFacilityImpl cFacility = cActivityOption.getFacility();
 				ActivityFacilityImpl dFacility = this.datapulsFacilityGroups.get(cActivityOption.getType()).get(cFacility.getCoord().getX(),cFacility.getCoord().getY());
@@ -280,11 +280,11 @@ public class PlansCreateFromDataPuls {
 				if (distance > 500.0) {
 					log.warn("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+", dfid="+dFacility.getId()+", acttype="+cActivityOption.getType()+": distance="+distance+" > 500 meters.");
 				}
-				ActivityOption dActivityOption = new ActivityOption(cActivityOption.getType(),dFacility);
+				ActivityOptionImpl dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),dFacility);
 				dKnowledge.addActivity(dActivityOption,true);
 			}
 		}
-		for (ActivityOption cActivityOption : cKnowledge.getActivities(false)) {
+		for (ActivityOptionImpl cActivityOption : cKnowledge.getActivities(false)) {
 			if (!cActivityOption.getType().equals("home")) {
 				ActivityFacilityImpl cFacility = cActivityOption.getFacility();
 				ActivityFacilityImpl dFacility = this.datapulsFacilityGroups.get(cActivityOption.getType()).get(cFacility.getCoord().getX(),cFacility.getCoord().getY());
@@ -293,7 +293,7 @@ public class PlansCreateFromDataPuls {
 				if (distance > 500.0) {
 					log.warn("dpid="+dPerson.getId()+", cpid="+cPerson.getId()+", cfid="+cFacility.getId()+", dfid="+dFacility.getId()+", acttype="+cActivityOption.getType()+": distance="+distance+" > 500 meters.");
 				}
-				ActivityOption dActivityOption = new ActivityOption(cActivityOption.getType(),dFacility);
+				ActivityOptionImpl dActivityOption = new ActivityOptionImpl(cActivityOption.getType(),dFacility);
 				dKnowledge.addActivity(dActivityOption,false);
 			}
 		}
@@ -306,7 +306,7 @@ public class PlansCreateFromDataPuls {
 		for (PlanElement e : dPlan.getPlanElements()) {
 			if (e instanceof ActivityImpl) {
 				ActivityImpl a = (ActivityImpl)e;
-				ArrayList<ActivityOption> acts = dKnowledge.getActivities(a.getType());
+				ArrayList<ActivityOptionImpl> acts = dKnowledge.getActivities(a.getType());
 				if (acts.isEmpty()) { throw new RuntimeException("pid="+dPerson.getId()+", aType="+a.getType()+": not defined in knowledge!"); }
 				ActivityFacilityImpl f = acts.get(random.nextInt(acts.size())).getFacility();
 				a.setCoord(f.getCoord());

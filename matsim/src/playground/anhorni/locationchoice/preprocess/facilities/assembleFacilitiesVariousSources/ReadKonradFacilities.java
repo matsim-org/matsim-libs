@@ -6,12 +6,12 @@ import java.util.SortedSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.facilities.OpeningTime.DayType;
 
 public class ReadKonradFacilities {
 	
@@ -68,7 +68,7 @@ public class ReadKonradFacilities {
 			
 			int i = 0;
 			for (DayType day : DayType.values()) {				
-				SortedSet<BasicOpeningTime>  set = facility.getActivityOption("shop").getOpeningTimes(day);
+				SortedSet<OpeningTime>  set = facility.getActivityOption("shop").getOpeningTimes(day);
 				if (set != null) {
 					if (set.size() == 2) {
 						opentimes[i][2] = set.first().getStartTime();

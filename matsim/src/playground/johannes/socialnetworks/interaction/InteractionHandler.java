@@ -38,7 +38,7 @@ import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
 import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -115,7 +115,7 @@ DeprecatedActivityEndEventHandler {
 			writer.write(TAB);
 			writer.write(String.valueOf(pf.concurrentVisitors.getMean()));
 			writer.write(TAB);
-			for(ActivityOption opt : f.getActivityOptions().values()) {
+			for(ActivityOptionImpl opt : f.getActivityOptions().values()) {
 				writer.write(opt.getType());
 				writer.write(WSPACE);
 			}

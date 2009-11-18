@@ -28,7 +28,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 
 public class FacilitiesPrepareEC2000 {
 
@@ -63,7 +63,7 @@ public class FacilitiesPrepareEC2000 {
 		for (ActivityFacilityImpl af : afs.values()) {
 			ActivityFacilityImpl afNew = facilities.createFacility(new IdImpl(Integer.parseInt(af.getId().toString())+ID_SHIFT),af.getCoord());
 			afNew.getActivityOptions().putAll(af.getActivityOptions());
-			for (ActivityOption ao : afNew.getActivityOptions().values()) {
+			for (ActivityOptionImpl ao : afNew.getActivityOptions().values()) {
 				if (ao.getCapacity() < 1) { ao.setCapacity(1.0); capCnt++; }
 			}
 		}
@@ -80,8 +80,8 @@ public class FacilitiesPrepareEC2000 {
 		int shopCnt = 0;
 		int leisCnt = 0;
 		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-			TreeMap<String,ActivityOption> s_map = new TreeMap<String, ActivityOption>();
-			TreeMap<String,ActivityOption> l_map = new TreeMap<String, ActivityOption>();
+			TreeMap<String,ActivityOptionImpl> s_map = new TreeMap<String, ActivityOptionImpl>();
+			TreeMap<String,ActivityOptionImpl> l_map = new TreeMap<String, ActivityOptionImpl>();
 			for (String t : f.getActivityOptions().keySet()) {
 				if (t.equals("shop_other") || t.equals("shop_retail_get1000sqm") || t.equals("shop_retail_get100sqm") ||
 				    t.equals("shop_retail_get400sqm") || t.equals("shop_retail_gt2500sqm") || t.equals("shop_retail_lt100sqm")) {
@@ -95,16 +95,16 @@ public class FacilitiesPrepareEC2000 {
 			if (l_map.size() > 1) { throw new RuntimeException("fid="+f.getId()+": more than one leisure activity!"); }
 
 			if (!s_map.isEmpty()) {
-				ActivityOption old_act = s_map.values().iterator().next();
-				ActivityOption new_act = f.createActivityOption("shop");
+				ActivityOptionImpl old_act = s_map.values().iterator().next();
+				ActivityOptionImpl new_act = f.createActivityOption("shop");
 				new_act.setCapacity(old_act.getCapacity());
 				new_act.setOpeningTimes(old_act.getOpeningTimes());
 				f.getActivityOptions().remove(old_act.getType());
 				shopCnt++;
 			}
 			if (!l_map.isEmpty()) {
-				ActivityOption old_act = l_map.values().iterator().next();
-				ActivityOption new_act = f.createActivityOption("leisure");
+				ActivityOptionImpl old_act = l_map.values().iterator().next();
+				ActivityOptionImpl new_act = f.createActivityOption("leisure");
 				new_act.setCapacity(old_act.getCapacity());
 				new_act.setOpeningTimes(old_act.getOpeningTimes());
 				f.getActivityOptions().remove(old_act.getType());

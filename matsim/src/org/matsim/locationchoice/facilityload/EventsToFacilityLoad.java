@@ -32,7 +32,7 @@ import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
 import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 
 /*
  * @author anhorni
@@ -56,9 +56,9 @@ public class EventsToFacilityLoad implements DeprecatedActivityStartEventHandler
 			ActivityFacilityImpl f = iter_fac.next();
 			
 			double capacity = Double.MAX_VALUE;
-			Iterator<? extends ActivityOption> iter_act = f.getActivityOptions().values().iterator();
+			Iterator<? extends ActivityOptionImpl> iter_act = f.getActivityOptions().values().iterator();
 			while (iter_act.hasNext()){
-				ActivityOption act = iter_act.next();
+				ActivityOptionImpl act = iter_act.next();
 				if (act.getCapacity() < capacity) {
 					capacity = act.getCapacity();
 				}

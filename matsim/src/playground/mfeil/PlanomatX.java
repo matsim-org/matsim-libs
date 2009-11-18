@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -154,7 +154,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		ArrayList<PlanomatXPlan> solutionLong			= new ArrayList<PlanomatXPlan>();
 		boolean warningTabu;
 		/* Primary activities of agent */
-		ArrayList<ActivityOption> primActs			= this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true);
+		ArrayList<ActivityOptionImpl> primActs			= this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(true);
 		/* Activity types that may be included */
 		List<String> actTypes							= this.finder.getActTypes(plan.getPerson());
 		
@@ -445,7 +445,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	//////////////////////////////////////////////////////////////////////
 	
 	public void createNeighbourhood (PlanomatXPlan [] neighbourhood, int[][]infoOnNeighbourhood, 
-			List<String> actTypes, ArrayList<ActivityOption> primActs) {
+			List<String> actTypes, ArrayList<ActivityOptionImpl> primActs) {
 		
 		if (neighbourhood[0].getPlanElements().size()>=5){
 			int neighbourPos;
@@ -480,7 +480,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			
 	
 	
-	public int[] changeOrder (PlanomatXPlan basePlan, int [] positions, ArrayList<ActivityOption> primActs){
+	public int[] changeOrder (PlanomatXPlan basePlan, int [] positions, ArrayList<ActivityOptionImpl> primActs){
 	
 		List<PlanElement> actslegs = basePlan.getPlanElements();
 		
@@ -520,7 +520,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	}
 	
 	public int[] changeNumber (PlanomatXPlan basePlan, int [] positions, int [] actsToBeAdded, 
-			List<String> actTypes, ArrayList<ActivityOption> primActs){
+			List<String> actTypes, ArrayList<ActivityOptionImpl> primActs){
 				
 		if(MatsimRandom.getRandom().nextDouble()>=WEIGHT_INC_NUMBER){
 			
@@ -675,7 +675,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	
 	
 	public int[] changeType (PlanomatXPlan basePlan, int [] position, int[]actsToBeChanged, 
-			List<String> actTypes, ArrayList<ActivityOption> primActs){
+			List<String> actTypes, ArrayList<ActivityOptionImpl> primActs){
 		
 		// NEW NEW NEW NEW NEW NEW NEW NEW NE
 		OuterLoop:
@@ -966,7 +966,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	
 	// NEW NEW NEW NEW NEW NEW NEW NEW NEW
 	/* Checks whether an act is primary*/
-	public boolean checkPrimary (ActivityImpl act, ArrayList<ActivityOption> primActs){
+	public boolean checkPrimary (ActivityImpl act, ArrayList<ActivityOptionImpl> primActs){
 		
 		for (int i = 0; i<primActs.size();i++){
 			if (act.getFacilityId().equals(primActs.get(i).getFacility().getId())	&&	act.getType().equals(primActs.get(i).getType())){

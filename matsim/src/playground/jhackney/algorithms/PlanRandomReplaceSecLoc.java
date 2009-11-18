@@ -55,7 +55,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -144,7 +144,7 @@ public class PlanRandomReplaceSecLoc  implements PlanAlgorithm{
 			ActivityImpl newAct = (ActivityImpl)(actsOfFacType.get(MatsimRandom.getRandom().nextInt(actsOfFacType.size())));
 
 //			Get agent's knowledge
-			Knowledge k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
+			KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 
 			// Replace with plan.getRandomActivity(type)
 

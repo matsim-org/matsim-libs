@@ -33,10 +33,10 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -73,9 +73,9 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 
 	private static final DayType DEFAULT_DAY = DayType.wed;
-	private static final SortedSet<BasicOpeningTime> DEFAULT_OPENING_TIME = new TreeSet<BasicOpeningTime>();
+	private static final SortedSet<OpeningTime> DEFAULT_OPENING_TIME = new TreeSet<OpeningTime>();
 	static {
-		BasicOpeningTime defaultOpeningTime = new OpeningTime(ActivityScoringFunction.DEFAULT_DAY, Double.MIN_VALUE, Double.MAX_VALUE);
+		OpeningTime defaultOpeningTime = new OpeningTimeImpl(ActivityScoringFunction.DEFAULT_DAY, Double.MIN_VALUE, Double.MAX_VALUE);
 		ActivityScoringFunction.DEFAULT_OPENING_TIME.add(defaultOpeningTime);
 	}
 
@@ -117,10 +117,10 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		///////////////////////////////////////////////////////////////////
 		else {
 
-			SortedSet<BasicOpeningTime> openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
+			SortedSet<OpeningTime> openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
 			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element, 
 			// assume facility is always open
-			ActivityOption actOpt = act.getFacility().getActivityOptions().get(act.getType());
+			ActivityOptionImpl actOpt = act.getFacility().getActivityOptions().get(act.getType());
 			if (actOpt != null) {
 				openTimes = actOpt.getOpeningTimes(ActivityScoringFunction.DEFAULT_DAY);
 				if (openTimes == null) {
@@ -138,7 +138,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			double activityStart, activityEnd; // hold effective activity start and end due to facility opening times
 			double scoreImprovement; // calculate score improvement only as basis for facility load penalties
 			double openingTime, closingTime; // hold time information of an opening time interval
-			for (BasicOpeningTime openTime : openTimes) {
+			for (OpeningTime openTime : openTimes) {
 
 				// see explanation comments for processing opening time intervals in super class
 				openingTime = openTime.getStartTime();

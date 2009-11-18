@@ -25,11 +25,11 @@ import java.util.Iterator;
 
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 
 public class PlansDefineKnowledge {
@@ -46,13 +46,13 @@ public class PlansDefineKnowledge {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		// get home, work and other activities
-		ArrayList<ActivityOption> home_acts = new ArrayList<ActivityOption>();
-		ArrayList<ActivityOption> work_acts = new ArrayList<ActivityOption>();
-		ArrayList<ActivityOption> other_acts = new ArrayList<ActivityOption>();
+		ArrayList<ActivityOptionImpl> home_acts = new ArrayList<ActivityOptionImpl>();
+		ArrayList<ActivityOptionImpl> work_acts = new ArrayList<ActivityOptionImpl>();
+		ArrayList<ActivityOptionImpl> other_acts = new ArrayList<ActivityOptionImpl>();
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
+			Iterator<ActivityOptionImpl> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
-				ActivityOption a = a_it.next();
+				ActivityOptionImpl a = a_it.next();
 				if (a.getType().equals("home")) { home_acts.add(a); }
 				else if (a.getType().equals("work")) { work_acts.add(a); }
 				else { other_acts.add(a); }
@@ -63,7 +63,7 @@ public class PlansDefineKnowledge {
 		Iterator<PersonImpl> p_it = plans.getPersons().values().iterator();
 		while (p_it.hasNext()) {
 			PersonImpl p = p_it.next();
-			Knowledge k = this.knowledges.getFactory().createKnowledge(p.getId(), "created by " + this.getClass().getName());
+			KnowledgeImpl k = this.knowledges.getFactory().createKnowledge(p.getId(), "created by " + this.getClass().getName());
 			int index = MatsimRandom.getRandom().nextInt(home_acts.size());
 			k.addActivity(home_acts.get(index),true);
 			index = MatsimRandom.getRandom().nextInt(work_acts.size());

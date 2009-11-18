@@ -22,13 +22,13 @@ package org.matsim.core.scoring;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.facilities.BasicOpeningTime.DayType;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
@@ -58,17 +58,17 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		Coord defaultCoord = new CoordImpl(0.0, 0.0);
 		ActivityFacilityImpl testFacility = facilities.createFacility(new IdImpl(0), defaultCoord);
 
-		ActivityOption noWedAndWkDay = testFacility.createActivityOption(CharyparNagelOpenTimesScoringFunctionTest.UNUSED_OPENTIME_ACTIVITY_TYPE);
-		noWedAndWkDay.addOpeningTime(new OpeningTime(DayType.fri, 8.0 * 3600, 16.0 * 3600));
+		ActivityOptionImpl noWedAndWkDay = testFacility.createActivityOption(CharyparNagelOpenTimesScoringFunctionTest.UNUSED_OPENTIME_ACTIVITY_TYPE);
+		noWedAndWkDay.addOpeningTime(new OpeningTimeImpl(DayType.fri, 8.0 * 3600, 16.0 * 3600));
 
-		ActivityOption wkdayActivity = testFacility.createActivityOption(CharyparNagelOpenTimesScoringFunctionTest.ONE_WKDAY_ACTIVITY_TYPE);
-		wkdayActivity.addOpeningTime(new OpeningTime(DayType.wkday, 7.5 * 3600, 18.0 * 3600));
+		ActivityOptionImpl wkdayActivity = testFacility.createActivityOption(CharyparNagelOpenTimesScoringFunctionTest.ONE_WKDAY_ACTIVITY_TYPE);
+		wkdayActivity.addOpeningTime(new OpeningTimeImpl(DayType.wkday, 7.5 * 3600, 18.0 * 3600));
 
-		ActivityOption wednesdayActivity = testFacility.createActivityOption(CharyparNagelOpenTimesScoringFunctionTest.TWO_WEDNESDAY_ACTIVITY_TYPE);
-		wednesdayActivity.addOpeningTime(new OpeningTime(DayType.wed, 6.0 * 3600, 11.0 * 3600));
-		wednesdayActivity.addOpeningTime(new OpeningTime(DayType.wed, 13.0 * 3600, 19.0 * 3600));
+		ActivityOptionImpl wednesdayActivity = testFacility.createActivityOption(CharyparNagelOpenTimesScoringFunctionTest.TWO_WEDNESDAY_ACTIVITY_TYPE);
+		wednesdayActivity.addOpeningTime(new OpeningTimeImpl(DayType.wed, 6.0 * 3600, 11.0 * 3600));
+		wednesdayActivity.addOpeningTime(new OpeningTimeImpl(DayType.wed, 13.0 * 3600, 19.0 * 3600));
 		// this one should be ignored
-		wednesdayActivity.addOpeningTime(new OpeningTime(DayType.wkday, 4.0 * 3600, 20.0 * 3600));
+		wednesdayActivity.addOpeningTime(new OpeningTimeImpl(DayType.wkday, 4.0 * 3600, 20.0 * 3600));
 
 		// here, we don't test the scoring function itself, but just the method to retrieve opening times
 		// we don't really need persons and plans, they're just used to initialize the ScoringFunction object

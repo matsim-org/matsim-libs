@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 
 /**
  * <p>
@@ -59,9 +59,9 @@ public class FacilitiesSetCapacity {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
 		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-			Iterator<ActivityOption> act_it = f.getActivityOptions().values().iterator();
+			Iterator<ActivityOptionImpl> act_it = f.getActivityOptions().values().iterator();
 			while (act_it.hasNext()) {
-				ActivityOption activity = act_it.next();
+				ActivityOptionImpl activity = act_it.next();
 				if ((activity.getCapacity() <= 0) || (activity.getCapacity() == Integer.MAX_VALUE)) {
 					activity.setCapacity(1);
 					if (HOME.equals(activity.getType())) {

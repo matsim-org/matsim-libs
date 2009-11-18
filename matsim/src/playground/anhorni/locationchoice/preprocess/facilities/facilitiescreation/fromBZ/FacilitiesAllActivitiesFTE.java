@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -132,7 +132,7 @@ public class FacilitiesAllActivitiesFTE {
 		String X, Y, attributeId, tempFacilityId, activityId = null;
 		HashSet<String> presenceCodeItems = null;
 		ActivityFacilityImpl f;
-		ActivityOption a;
+		ActivityOptionImpl a;
 
 		loadCensus();
 

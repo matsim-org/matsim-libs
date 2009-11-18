@@ -29,7 +29,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
@@ -60,17 +60,17 @@ public class PersonConsolidateInitDemand extends AbstractPersonAlgorithm impleme
 		if (plan.getPerson().getPlans().size() != 1) { throw new RuntimeException("Person id="+plan.getPerson().getId()+" must have exactly one plan."); }
 
 		// get the activity options of the plan
-		List<ActivityOption> actOptions = new ArrayList<ActivityOption>();
+		List<ActivityOptionImpl> actOptions = new ArrayList<ActivityOptionImpl>();
 		ActivityImpl act = plan.getFirstActivity();
 		while (act != plan.getLastActivity()) {
 			String actType = act.getType();
-			ActivityOption ao = act.getFacility().getActivityOptions().get(actType);
+			ActivityOptionImpl ao = act.getFacility().getActivityOptions().get(actType);
 			if (ao == null) { throw new RuntimeException("Person id="+plan.getPerson().getId()+": act of type="+actType+" does not fit to facility id="+act.getFacility().getId()+"!"); }
 			actOptions.add(ao);
 			act = plan.getNextActivity(plan.getNextLeg(act));
 		}
 		String actType = act.getType();
-		ActivityOption ao = act.getFacility().getActivityOptions().get(actType);
+		ActivityOptionImpl ao = act.getFacility().getActivityOptions().get(actType);
 		if (ao == null) { throw new RuntimeException("Person id="+plan.getPerson().getId()+": act of type="+actType+" does not fit to facility id="+act.getFacility().getId()+"!"); }
 		actOptions.add(ao);
 
@@ -78,14 +78,14 @@ public class PersonConsolidateInitDemand extends AbstractPersonAlgorithm impleme
 		Desires d = plan.getPerson().getDesires();
 		if (d == null) { throw new RuntimeException("Person id="+plan.getPerson().getId()+": no desires defined!"); }
 		//   check if all acts in the plan are referred by the desires
-		for (ActivityOption actOption : actOptions) {
+		for (ActivityOptionImpl actOption : actOptions) {
 			if (d.getActivityDuration(actOption.getType()) == Time.UNDEFINED_TIME) { throw new RuntimeException("Person id="+plan.getPerson().getId()+": desires of type="+actOption.getType()+" missing!"); }
 		}
 		//   check and delete acts in desires that are not used
 		Set<String> actTypesToDelete = new TreeSet<String>();
 		for (String actTypeDes : d.getActivityDurations().keySet()) {
 			boolean toDelete = true;
-			for (ActivityOption actOption : actOptions) {
+			for (ActivityOptionImpl actOption : actOptions) {
 				if (actTypeDes.equals(actOption.getType())) { toDelete = false; }
 			}
 			if (toDelete) { actTypesToDelete.add(actTypeDes); }
@@ -98,36 +98,36 @@ public class PersonConsolidateInitDemand extends AbstractPersonAlgorithm impleme
 		// check knowledge
 		if (knowledges == null) { throw new RuntimeException("Person id="+plan.getPerson().getId()+": no knowledge defined!"); }
 		//   check if all acts in the plan are referred by the knowledge
-		for (ActivityOption actOption : actOptions) {
+		for (ActivityOptionImpl actOption : actOptions) {
 			if (knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities(actOption.getType()).isEmpty()) { throw new RuntimeException("Person id="+plan.getPerson().getId()+": knowledge act of type="+actOption.getType()+" missing!"); }
 		}
 		//   check and delete acts in knowledge that are not used
-		List<ActivityOption> aoKToDelete = new ArrayList<ActivityOption>();
-		for (ActivityOption actOptionK : knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities()) {
+		List<ActivityOptionImpl> aoKToDelete = new ArrayList<ActivityOptionImpl>();
+		for (ActivityOptionImpl actOptionK : knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities()) {
 			boolean toDelete = true;
-			for (ActivityOption actOption : actOptions) {
+			for (ActivityOptionImpl actOption : actOptions) {
 				if (actOptionK.equals(actOption)) { toDelete = false; }
 			}
 			if (toDelete) { aoKToDelete.add(actOptionK); }
 		}
-		for (ActivityOption aok : aoKToDelete) {
+		for (ActivityOptionImpl aok : aoKToDelete) {
 			log.info("Person id="+plan.getPerson().getId()+": removing act="+aok.getType()+" of knowledge.");
 			if (!knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).removeActivity(aok)) { throw new RuntimeException("Person id="+plan.getPerson().getId()+": could not remove act="+aok.getType()+" from knowledge!"); }
 		}
 		
 		// doublecheck everything again...
-		List<ActivityOption> kActOptions = knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities();
+		List<ActivityOptionImpl> kActOptions = knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).getActivities();
 		if (!kActOptions.containsAll(actOptions) || !actOptions.containsAll(kActOptions)) {
 			throw new RuntimeException("Person id="+plan.getPerson().getId()+": plan<=>know does not fit!");
 		}
 		Set<String> dActTypes = plan.getPerson().getDesires().getActivityDurations().keySet();
 		Set<String> pActTypes = new HashSet<String>();
-		for (ActivityOption aop : actOptions) { pActTypes.add(aop.getType()); }
+		for (ActivityOptionImpl aop : actOptions) { pActTypes.add(aop.getType()); }
 		if (!dActTypes.equals(pActTypes)) {
 			throw new RuntimeException("Person id="+plan.getPerson().getId()+": plan<=>des does not fit!");
 		}
 		Set<String> kActTypes = new TreeSet<String>();
-		for (ActivityOption aok : kActOptions) { kActTypes.add(aok.getType()); }
+		for (ActivityOptionImpl aok : kActOptions) { kActTypes.add(aok.getType()); }
 		if (!dActTypes.equals(kActTypes)) {
 			throw new RuntimeException("Person id="+plan.getPerson().getId()+": know<=>des does not fit!");
 		}

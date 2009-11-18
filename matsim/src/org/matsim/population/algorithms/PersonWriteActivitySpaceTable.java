@@ -36,7 +36,7 @@ import org.matsim.knowledges.ActivitySpaceBean;
 import org.matsim.knowledges.ActivitySpaceCassini;
 import org.matsim.knowledges.ActivitySpaceEllipse;
 import org.matsim.knowledges.ActivitySpaceSuperEllipse;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.utils.optimization.BeanObjective;
 import org.matsim.utils.optimization.CassiniObjective;
@@ -131,7 +131,7 @@ public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 
 	@Override
 	public void run(Person person) {
-		final Knowledge know = this.knowledges.getKnowledgesByPersonId().get(person.getId());
+		final KnowledgeImpl know = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 		if (know == null) {
 			Gbl.errorMsg("Knowledge is not defined!");
 		}

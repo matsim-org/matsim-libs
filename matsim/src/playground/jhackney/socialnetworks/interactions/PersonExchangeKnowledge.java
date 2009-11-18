@@ -23,9 +23,9 @@ package playground.jhackney.socialnetworks.interactions;
 import java.util.List;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.knowledges.Knowledge;
+import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 
 import playground.jhackney.socialnetworks.mentalmap.MentalMap;
@@ -57,22 +57,22 @@ public class PersonExchangeKnowledge {
 		Person p2 = curLink.getPersonTo();
 		Person p1 = curLink.getPersonFrom();
 
-		Knowledge k1 = this.knowledges.getKnowledgesByPersonId().get(p1.getId());
-		Knowledge k2 = this.knowledges.getKnowledgesByPersonId().get(p2.getId());
+		KnowledgeImpl k1 = this.knowledges.getKnowledgesByPersonId().get(p1.getId());
+		KnowledgeImpl k2 = this.knowledges.getKnowledgesByPersonId().get(p2.getId());
 
 //		Get a random facility (activity--> facility)
 		//from Person 2's knowledge and add it to Person 1's
-		List<ActivityOption> act2List = k2.getActivities(facType);
+		List<ActivityOptionImpl> act2List = k2.getActivities(facType);
 		if(act2List.size()>=1){
-			ActivityOption activity2=act2List.get(MatsimRandom.getRandom().nextInt( act2List.size()));
+			ActivityOptionImpl activity2=act2List.get(MatsimRandom.getRandom().nextInt( act2List.size()));
 			((MentalMap)p1.getCustomAttributes().get(MentalMap.NAME)).addActivity(activity2);
 		}
 
 //		If person2 has an edge pointed toward person1, let p1 share information with p2
 		if(((EgoNet)p2.getCustomAttributes().get(EgoNet.NAME)).knows(p1)){
-			List<ActivityOption> act1List = k1.getActivities(facType);
+			List<ActivityOptionImpl> act1List = k1.getActivities(facType);
 			if(act1List.size()>=1){
-				ActivityOption activity1=act1List.get(MatsimRandom.getRandom().nextInt( act1List.size()));
+				ActivityOptionImpl activity1=act1List.get(MatsimRandom.getRandom().nextInt( act1List.size()));
 				((MentalMap)p2.getCustomAttributes().get(MentalMap.NAME)).addActivity(activity1);
 			}
 		}
