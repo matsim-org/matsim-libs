@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VehicleArrivesAtFacilityEvent.java
+ * Event.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,47 +18,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01.events;
+package org.matsim.core.events;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.BasicEventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
-/**
- * @author mrieser
- */
-public class BasicVehicleDepartsAtFacilityEventImpl extends BasicEventImpl implements
-		BasicVehicleDepartsAtFacilityEvent {
+public abstract class EventImpl implements Event {
 
-	private final Id vehicleId;
-	private final Id facilityId;
+	public final static String ATTRIBUTE_TIME = "time";
+	public final static String ATTRIBUTE_TYPE = "type";
 
-	public BasicVehicleDepartsAtFacilityEventImpl(final double time, final Id vehicleId, final Id facilityId) {
-		super(time);
-		this.vehicleId = vehicleId;
-		this.facilityId = facilityId;
+	private final double time;
+
+	public EventImpl(final double time) {
+		this.time = time;
 	}
 
-	public Id getFacilityId() {
-		return this.facilityId;
-	}
-
-	public Id getVehicleId() {
-		return this.vehicleId;
-	}
-
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-
-	@Override
 	public Map<String, String> getAttributes() {
-		Map<String, String> attributes = super.getAttributes();
-		attributes.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		attributes.put(ATTRIBUTE_FACILITY, this.facilityId.toString());
-		return attributes;
+		Map<String, String> attr = new LinkedHashMap<String, String>();
+		attr.put(ATTRIBUTE_TIME, Double.toString(this.time));
+		attr.put(ATTRIBUTE_TYPE, getEventType());
+		return attr;
 	}
 
+	/** @return a unique, descriptive name for this event type, used to identify event types in files. */
+	abstract public String getEventType();
+
+	public double getTime() {
+		return this.time;
+	}
+	
+	@Override
+	public String toString() {
+		Map<String,String> attr = this.getAttributes() ;
+		StringBuilder eventXML = new StringBuilder("\t<event ");
+		for (Map.Entry<String, String> entry : attr.entrySet()) {
+			eventXML.append(entry.getKey());
+			eventXML.append("=\"");
+			eventXML.append(entry.getValue());
+			eventXML.append("\" ");
+		}
+		eventXML.append(" />");
+		return eventXML.toString();
+	}
 }
+
+

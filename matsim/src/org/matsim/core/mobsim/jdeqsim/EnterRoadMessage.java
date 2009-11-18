@@ -20,7 +20,7 @@
 package org.matsim.core.mobsim.jdeqsim;
 
 import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.BasicEventImpl;
+import org.matsim.core.events.EventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 
 /**
@@ -44,7 +44,7 @@ public class EnterRoadMessage extends EventMessage {
 
 	@Override
 	public void processEvent() {
-		BasicEventImpl event = null;
+		EventImpl event = null;
 
 		// the first EnterLink in a leg is a Wait2LinkEvent
 		if (vehicle.getLinkIndex() == -1) {

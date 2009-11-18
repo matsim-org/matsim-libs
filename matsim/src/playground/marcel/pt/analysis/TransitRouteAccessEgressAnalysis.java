@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.events.BasicPersonEntersVehicleEvent;
-import org.matsim.core.basic.v01.events.BasicPersonLeavesVehicleEvent;
-import org.matsim.core.basic.v01.events.handlers.BasicPersonEntersVehicleEventHandler;
-import org.matsim.core.basic.v01.events.handlers.BasicPersonLeavesVehicleEventHandler;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -42,7 +42,7 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
  *
  * @author mrieser
  */
-public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicleEventHandler, BasicPersonLeavesVehicleEventHandler {
+public class TransitRouteAccessEgressAnalysis implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 	public final TransitRoute transitRoute;
 	public Map<Id, Departure> headings = null;
@@ -55,7 +55,7 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 		this.vehTracker = vehicleTracker;
 	}
 
-	public void handleEvent(final BasicPersonEntersVehicleEvent event) {
+	public void handleEvent(final PersonEntersVehicleEvent event) {
 		if (this.headings == null) {
 			collectHeadingsInfo();
 		}
@@ -72,7 +72,7 @@ public class TransitRouteAccessEgressAnalysis implements BasicPersonEntersVehicl
 		}
 	}
 
-	public void handleEvent(final BasicPersonLeavesVehicleEvent event) {
+	public void handleEvent(final PersonLeavesVehicleEvent event) {
 		if (this.headings == null) {
 			collectHeadingsInfo();
 		}

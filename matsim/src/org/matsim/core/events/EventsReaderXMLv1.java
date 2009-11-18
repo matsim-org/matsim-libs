@@ -24,8 +24,6 @@ import java.util.Stack;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
-import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEvent;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -116,14 +114,14 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			this.events.processEvent(this.builder.createPersonLeavesVehicleEvent(time,
 					new IdImpl(atts.getValue(PersonLeavesVehicleEventImpl.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(PersonLeavesVehicleEventImpl.ATTRIBUTE_VEHICLE))));
-		} else if (BasicVehicleArrivesAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
+		} else if (VehicleArrivesAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.createVehicleArrivesAtFacilityEvent(time,
-					new IdImpl(atts.getValue(BasicVehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE)),
-					new IdImpl(atts.getValue(BasicVehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY))));			
-		} else if (BasicVehicleDepartsAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
+					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE)),
+					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY))));			
+		} else if (VehicleDepartsAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.createVehicleDepartsAtFacilityEvent(time,
-					new IdImpl(atts.getValue(BasicVehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE)),
-					new IdImpl(atts.getValue(BasicVehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY))));			
+					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE)),
+					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY))));			
 		}
 	}
 

@@ -38,10 +38,10 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
-import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEvent;
-import org.matsim.core.basic.v01.events.handlers.BasicVehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.basic.v01.events.handlers.BasicVehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -54,14 +54,14 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
  *
  * @author mrieser
  */
-public class RouteTimeDiagram implements BasicVehicleArrivesAtFacilityEventHandler, BasicVehicleDepartsAtFacilityEventHandler {
+public class RouteTimeDiagram implements VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 
 	/**
 	 * Map containing for each vehicle a list of positions, stored as StopFacility Ids and the time.
 	 */
 	private final Map<Id, List<Tuple<Id, Double>>> positions = new HashMap<Id, List<Tuple<Id, Double>>>();
 
-	public void handleEvent(final BasicVehicleArrivesAtFacilityEvent event) {
+	public void handleEvent(final VehicleArrivesAtFacilityEvent event) {
 		List<Tuple<Id, Double>> list = this.positions.get(event.getVehicleId());
 		if (list == null) {
 			list = new ArrayList<Tuple<Id, Double>>();
@@ -70,7 +70,7 @@ public class RouteTimeDiagram implements BasicVehicleArrivesAtFacilityEventHandl
 		list.add(new Tuple<Id, Double>(event.getFacilityId(), Double.valueOf(event.getTime())));
 	}
 
-	public void handleEvent(final BasicVehicleDepartsAtFacilityEvent event) {
+	public void handleEvent(final VehicleDepartsAtFacilityEvent event) {
 		List<Tuple<Id, Double>> list = this.positions.get(event.getVehicleId());
 		if (list == null) {
 			list = new ArrayList<Tuple<Id, Double>>();

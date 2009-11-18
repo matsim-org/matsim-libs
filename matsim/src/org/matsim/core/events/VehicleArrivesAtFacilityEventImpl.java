@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicVehicleArrivesAtFacilityEventHandler.java
+ * VehicleArrivesAtFacilityEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,16 +18,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01.events.handlers;
+package org.matsim.core.events;
 
-import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
-import org.matsim.core.events.handler.EventHandler;
+import java.util.Map;
+
+import org.matsim.api.basic.v01.Id;
 
 /**
  * @author mrieser
  */
-public interface BasicVehicleArrivesAtFacilityEventHandler extends EventHandler {
+public class VehicleArrivesAtFacilityEventImpl extends EventImpl implements
+		VehicleArrivesAtFacilityEvent {
 
-	public void handleEvent(BasicVehicleArrivesAtFacilityEvent event);
-	
+	private final Id vehicleId;
+	private final Id facilityId;
+
+	public VehicleArrivesAtFacilityEventImpl(final double time, final Id vehicleId, final Id facilityId) {
+		super(time);
+		this.vehicleId = vehicleId;
+		this.facilityId = facilityId;
+	}
+
+	public Id getFacilityId() {
+		return this.facilityId;
+	}
+
+	public Id getVehicleId() {
+		return this.vehicleId;
+	}
+
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attributes = super.getAttributes();
+		attributes.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+		attributes.put(ATTRIBUTE_FACILITY, this.facilityId.toString());
+		return attributes;
+	}
+
 }

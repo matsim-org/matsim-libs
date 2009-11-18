@@ -36,7 +36,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.BasicEventImpl;
+import org.matsim.core.events.EventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
@@ -128,7 +128,7 @@ public class EventsReaderDEQv1 {
 		int nofReaders = readerList.size();
 		BinaryEventsReader[] readers = readerList.toArray(new BinaryEventsReader[nofReaders]);
 		int idxEarliestEvent = -1;
-		BasicEventImpl earliestEvent = null;
+		EventImpl earliestEvent = null;
 		while (nofReaders > 0) {
 			// assume the first reader has the earliest event
 			idxEarliestEvent = 0;
@@ -154,8 +154,8 @@ public class EventsReaderDEQv1 {
 		}
 	}
 
-	public static final BasicEventImpl createEvent(final double time, final int agentId, final int linkId, final int flag) {
-		BasicEventImpl event = null;
+	public static final EventImpl createEvent(final double time, final int agentId, final int linkId, final int flag) {
+		EventImpl event = null;
 
 		switch (flag) {
 			case 2:
@@ -181,8 +181,8 @@ public class EventsReaderDEQv1 {
 
 
 	private static class BinaryEventsReader {
-		BasicEventImpl event = null;
-		private BasicEventImpl next = null;
+		EventImpl event = null;
+		private EventImpl next = null;
 		private final DataInputStream in;
 		private final String filename;
 
@@ -221,7 +221,7 @@ public class EventsReaderDEQv1 {
 			}
 		}
 
-		public BasicEventImpl getEvent() {
+		public EventImpl getEvent() {
 			return this.event;
 		}
 	}

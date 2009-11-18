@@ -31,12 +31,6 @@ import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.basic.v01.events.BasicPersonEntersVehicleEvent;
-import org.matsim.core.basic.v01.events.BasicPersonLeavesVehicleEvent;
-import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
-import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEventImpl;
-import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEvent;
-import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEventImpl;
 
 
 /**
@@ -81,19 +75,19 @@ public class EventsFactoryImpl implements EventsFactory {
 		return new LinkLeaveEventImpl(time, agentId, linkId);
 	}
 	
-	public BasicPersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+	public PersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
 		return new PersonEntersVehicleEventImpl(time, personId, vehicleId);
 	}
 	
-	public BasicPersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+	public PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
 		return new PersonLeavesVehicleEventImpl(time, personId, vehicleId);
 	}
 	
-	public BasicVehicleArrivesAtFacilityEvent createVehicleArrivesAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId) {
-		return new BasicVehicleArrivesAtFacilityEventImpl(time, vehicleId, facilityId);
+	public VehicleArrivesAtFacilityEvent createVehicleArrivesAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId) {
+		return new VehicleArrivesAtFacilityEventImpl(time, vehicleId, facilityId);
 	}
 	
-	public BasicVehicleDepartsAtFacilityEvent createVehicleDepartsAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId) {
-		return new BasicVehicleDepartsAtFacilityEventImpl(time, vehicleId, facilityId);
+	public VehicleDepartsAtFacilityEvent createVehicleDepartsAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId) {
+		return new VehicleDepartsAtFacilityEventImpl(time, vehicleId, facilityId);
 	}
 }

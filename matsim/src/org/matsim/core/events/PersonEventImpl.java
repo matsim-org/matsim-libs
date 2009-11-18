@@ -30,7 +30,7 @@ import org.matsim.core.population.PersonImpl;
 /**
  * @author mrieser
  */
-public abstract class PersonEventImpl extends BasicEventImpl implements PersonEvent {
+public abstract class PersonEventImpl extends EventImpl implements PersonEvent {
 
 	public static final String ATTRIBUTE_PERSON = "person";
 

@@ -2,7 +2,7 @@ package org.matsim.core.events.parallelEventsHandler;
 
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.BasicEventImpl;
+import org.matsim.core.events.EventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 
@@ -10,13 +10,13 @@ import org.matsim.core.events.LinkLeaveEventImpl;
  * Probably this class will be needed, when event handling will be adapted for parallel JDEQSim
  */
 public class ComparableEvent implements Comparable<ComparableEvent> {
-	private BasicEventImpl event;
+	private EventImpl event;
 
-	public ComparableEvent(BasicEventImpl be){
+	public ComparableEvent(EventImpl be){
 		this.event = be;
 	}
 	
-	public BasicEventImpl getEvent(){
+	public EventImpl getEvent(){
 		return event;
 	}
 

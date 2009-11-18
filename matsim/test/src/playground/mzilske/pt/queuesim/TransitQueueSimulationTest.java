@@ -40,8 +40,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
-import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
@@ -53,6 +51,8 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEventImpl;
+import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
@@ -777,14 +777,14 @@ public class TransitQueueSimulationTest extends TestCase {
 		assertTrue(allEvents.get(6) instanceof AgentDepartureEventImpl); // pt-driver
 		assertTrue(allEvents.get(7) instanceof AgentWait2LinkEventImpl); // pt-vehicle
 		
-		assertTrue(allEvents.get(8) instanceof BasicVehicleArrivesAtFacilityEvent);
+		assertTrue(allEvents.get(8) instanceof VehicleArrivesAtFacilityEvent);
 		assertTrue(allEvents.get(9) instanceof PersonEntersVehicleEventImpl);
-		assertTrue(allEvents.get(10) instanceof BasicVehicleDepartsAtFacilityEvent);
+		assertTrue(allEvents.get(10) instanceof VehicleDepartsAtFacilityEvent);
 		
 		assertTrue(allEvents.get(11) instanceof LinkLeaveEventImpl); // pt-vehicle
 		assertTrue(allEvents.get(12) instanceof LinkEnterEventImpl); // pt-vehicle
 		
-		assertTrue(allEvents.get(13) instanceof BasicVehicleArrivesAtFacilityEvent); // pt-vehicle
+		assertTrue(allEvents.get(13) instanceof VehicleArrivesAtFacilityEvent); // pt-vehicle
 		assertTrue(allEvents.get(14) instanceof PersonLeavesVehicleEventImpl);
 		
 		assertTrue(allEvents.get(15) instanceof AgentArrivalEventImpl);
@@ -798,7 +798,7 @@ public class TransitQueueSimulationTest extends TestCase {
 		assertTrue(allEvents.get(20) instanceof ActivityStartEventImpl);
 		assertEquals("w", ((ActivityStartEventImpl) allEvents.get(20)).getActType());
 		
-		assertTrue(allEvents.get(21) instanceof BasicVehicleDepartsAtFacilityEvent);
+		assertTrue(allEvents.get(21) instanceof VehicleDepartsAtFacilityEvent);
 		assertTrue(allEvents.get(22) instanceof AgentArrivalEventImpl); // pt-driver
 	}
 }

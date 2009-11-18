@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonEvent.java
+ * VehicleArrivesAtFacilityEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,13 +18,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01.events;
+package org.matsim.core.events;
+
+import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.events.PersonEvent;
 
-public interface BasicPersonEntersVehicleEvent extends PersonEvent {
+/**
+ * @author mrieser
+ */
+public class VehicleDepartsAtFacilityEventImpl extends EventImpl implements
+		VehicleDepartsAtFacilityEvent {
 
-	public Id getVehicleId();
+	private final Id vehicleId;
+	private final Id facilityId;
+
+	public VehicleDepartsAtFacilityEventImpl(final double time, final Id vehicleId, final Id facilityId) {
+		super(time);
+		this.vehicleId = vehicleId;
+		this.facilityId = facilityId;
+	}
+
+	public Id getFacilityId() {
+		return this.facilityId;
+	}
+
+	public Id getVehicleId() {
+		return this.vehicleId;
+	}
+
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attributes = super.getAttributes();
+		attributes.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+		attributes.put(ATTRIBUTE_FACILITY, this.facilityId.toString());
+		return attributes;
+	}
 
 }

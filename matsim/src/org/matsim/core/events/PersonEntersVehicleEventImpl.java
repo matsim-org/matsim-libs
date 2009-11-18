@@ -24,14 +24,13 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.events.BasicPersonEntersVehicleEvent;
 import org.matsim.vehicles.BasicVehicle;
 
 /**
  *
  * @author mrieser
  */
-public class PersonEntersVehicleEventImpl extends PersonEventImpl implements BasicPersonEntersVehicleEvent {
+public class PersonEntersVehicleEventImpl extends PersonEventImpl implements PersonEntersVehicleEvent {
 
 	public static final String EVENT_TYPE = "PersonEntersVehicle";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";

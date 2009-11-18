@@ -11,11 +11,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEventImpl;
-import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEventImpl;
+import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
+import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.Simulation;
@@ -139,7 +139,7 @@ public class UmlaufDriver implements TransitDriverAgent {
 
 		EventsManager events = TransitQueueSimulation.getEvents();
 		if (this.lastHandledStop != stop) {
-			events.processEvent(new BasicVehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
+			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
 		}
 
 		int freeCapacity = this.vehicle.getPassengerCapacity() - this.vehicle.getPassengers().size();
@@ -202,7 +202,7 @@ public class UmlaufDriver implements TransitDriverAgent {
 		}
 
 		if (stopTime == 0.0) {
-			events.processEvent(new BasicVehicleDepartsAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
+			events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
 			if (this.stopIterator.hasNext()) {
 				this.nextStop = this.stopIterator.next();
 			} else {

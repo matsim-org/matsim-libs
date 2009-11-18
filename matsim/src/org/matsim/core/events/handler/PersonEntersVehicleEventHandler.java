@@ -20,8 +20,8 @@
 
 package org.matsim.core.events.handler;
 
-import org.matsim.core.events.PersonEntersVehicleEventImpl;
+import org.matsim.core.events.PersonEntersVehicleEvent;
 
 public interface PersonEntersVehicleEventHandler extends EventHandler {
-	public void handleEvent(PersonEntersVehicleEventImpl event);
+	public void handleEvent(PersonEntersVehicleEvent event);
 }

@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.BasicEventImpl;
+import org.matsim.core.events.EventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -99,7 +99,7 @@ public class EndLegMessage extends EventMessage {
 
 	@Override
 	public void processEvent() {
-		BasicEventImpl event = null;
+		EventImpl event = null;
 
 		// schedule enter link event
 		event = new LinkEnterEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson(), vehicle.getCurrentLink());

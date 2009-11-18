@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkLeaveEventHandler.java
+ * PersonEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,11 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01.events.handlers;
+package org.matsim.core.events;
 
-import org.matsim.core.basic.v01.events.BasicPersonLeavesVehicleEvent;
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.events.PersonEvent;
 
-public interface BasicPersonLeavesVehicleEventHandler extends EventHandler {
-	public void handleEvent (BasicPersonLeavesVehicleEvent event);
+public interface PersonEntersVehicleEvent extends PersonEvent {
+
+	public Id getVehicleId();
+
 }

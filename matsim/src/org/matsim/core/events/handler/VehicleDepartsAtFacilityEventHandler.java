@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkLeaveEventHandler.java
+ * BasicVehicleArrivesAtFacilityEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,11 +18,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01.events.handlers;
+package org.matsim.core.events.handler;
 
-import org.matsim.core.basic.v01.events.BasicPersonEntersVehicleEvent;
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 
-public interface BasicPersonEntersVehicleEventHandler extends EventHandler {
-	public void handleEvent (BasicPersonEntersVehicleEvent event);
+/**
+ * @author mrieser
+ */
+public interface VehicleDepartsAtFacilityEventHandler extends EventHandler {
+
+	public void handleEvent(VehicleDepartsAtFacilityEvent event);
+	
 }

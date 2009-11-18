@@ -24,10 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.events.BasicVehicleArrivesAtFacilityEvent;
-import org.matsim.core.basic.v01.events.BasicVehicleDepartsAtFacilityEvent;
-import org.matsim.core.basic.v01.events.handlers.BasicVehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.basic.v01.events.handlers.BasicVehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 
 /**
  * Tracks at which facility a vehicle is currently located. If a vehicle departs at a facility,
@@ -36,15 +36,15 @@ import org.matsim.core.basic.v01.events.handlers.BasicVehicleDepartsAtFacilityEv
  *
  * @author mrieser
  */
-public class VehicleTracker implements BasicVehicleArrivesAtFacilityEventHandler, BasicVehicleDepartsAtFacilityEventHandler {
+public class VehicleTracker implements VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 
 	private final Map<Id, Id> vehicleFacilityMap = new HashMap<Id, Id>();
 	
-	public void handleEvent(BasicVehicleArrivesAtFacilityEvent event) {
+	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		this.vehicleFacilityMap.put(event.getVehicleId(), event.getFacilityId());
 	}
 
-	public void handleEvent(BasicVehicleDepartsAtFacilityEvent event) {
+	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		this.vehicleFacilityMap.remove(event.getVehicleId());
 		
 	}

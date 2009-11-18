@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicVehicleArrivesAtFacilityEvent.java
+ * BasicVehicleDepartsAtFacilityEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.basic.v01.events;
+package org.matsim.core.events;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
@@ -26,14 +26,13 @@ import org.matsim.core.api.experimental.events.Event;
 /**
  * @author mrieser
  */
-public interface BasicVehicleArrivesAtFacilityEvent extends Event {
+public interface VehicleDepartsAtFacilityEvent extends Event {
 
-	public static final String EVENT_TYPE = "VehicleArrivesAtFacility";
+	public static final String EVENT_TYPE = "VehicleDepartsAtFacility";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_FACILITY = "facility";
 
 	public Id getVehicleId();
 	
 	public Id getFacilityId();
-	
 }

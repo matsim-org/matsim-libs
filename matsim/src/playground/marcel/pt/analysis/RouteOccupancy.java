@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.events.PersonEntersVehicleEventImpl;
-import org.matsim.core.events.PersonLeavesVehicleEventImpl;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.transitSchedule.api.Departure;
@@ -54,7 +54,7 @@ public class RouteOccupancy implements PersonEntersVehicleEventHandler, PersonLe
 		this.tracker = tracker;
 	}
 
-	public void handleEvent(final PersonEntersVehicleEventImpl event) {
+	public void handleEvent(final PersonEntersVehicleEvent event) {
 		if (this.routeVehicles == null) {
 			collectVehiclesInfo();
 		}
@@ -69,7 +69,7 @@ public class RouteOccupancy implements PersonEntersVehicleEventHandler, PersonLe
 		}
 	}
 
-	public void handleEvent(final PersonLeavesVehicleEventImpl event) {
+	public void handleEvent(final PersonLeavesVehicleEvent event) {
 		if (this.routeVehicles == null) {
 			collectVehiclesInfo();
 		}

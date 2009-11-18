@@ -29,7 +29,7 @@ import org.matsim.signalsystems.control.SignalGroupState;
  * @author dgrether
  *
  */
-public class SignalGroupStateChangedEventImpl extends BasicEventImpl implements SignalGroupStateChangedEvent {
+public class SignalGroupStateChangedEventImpl extends EventImpl implements SignalGroupStateChangedEvent {
 	private SignalGroupState newState;
 	private Id signalGroupId;
 	private Id signalSystemId;
