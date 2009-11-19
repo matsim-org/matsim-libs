@@ -53,7 +53,12 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	 * 
 	 * Use this set to check whether the mode of a leg is allowed or not.
 	 */
-	public static final EnumSet<TransportMode> KTI_MODES = EnumSet.of(TransportMode.car, TransportMode.bike, TransportMode.pt, TransportMode.walk);
+	public static final EnumSet<TransportMode> KTI_MODES = EnumSet.of(
+			TransportMode.car, 
+			TransportMode.bike, 
+			TransportMode.pt, 
+			TransportMode.walk, 
+			TransportMode.ride);
 	
 	private final NetworkLayer network;
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
@@ -76,7 +81,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 		TransportMode mode = leg.getMode();
 
 		// TODO meisterk: This is a shortcut. Please find a general solution for that. [balmermi]
-		if (mode == TransportMode.ride) { mode = TransportMode.car; }
+//		if (mode == TransportMode.ride) { mode = TransportMode.car; }
 
 		if (!KTI_MODES.contains(mode)) {
 			throw new RuntimeException("cannot handle legmode '" + mode.toString() + "'.");
