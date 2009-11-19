@@ -74,6 +74,10 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	public double handleLeg(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
 
 		TransportMode mode = leg.getMode();
+
+		// TODO meisterk: This is a shortcut. Please find a general solution for that. [balmermi]
+		if (mode == TransportMode.ride) { mode = TransportMode.car; }
+
 		if (!KTI_MODES.contains(mode)) {
 			throw new RuntimeException("cannot handle legmode '" + mode.toString() + "'.");
 		}
