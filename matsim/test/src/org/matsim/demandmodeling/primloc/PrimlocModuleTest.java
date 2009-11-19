@@ -20,21 +20,19 @@
 
 package org.matsim.demandmodeling.primloc;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
@@ -83,21 +81,27 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		this.config.plans().setOutputSample(1.0);
 	}
 
+	@Override
+	protected void tearDown() throws Exception {
+		this.config = null;
+		super.tearDown();
+	}
+	
 	public void testModule() {
 
 		System.out.println("TEST MODULE PRIMLOC:");
 
-		Config config = Gbl.getConfig();
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
 
 		// reading all available input
 
 		System.out.println("  reading world xml file... ");
-		World world = Gbl.createWorld();
+		World world = scenario.getWorld();
 		new MatsimWorldReader(world).readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  creating network layer... ");
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");
@@ -105,17 +109,17 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		Knowledges knowledges = new KnowledgesImpl();
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(population, network, knowledges);
+		Knowledges knowledges = scenario.getKnowledges();
+		MatsimPopulationReader populationReader = new MatsimPopulationReader(scenario);
 		populationReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 

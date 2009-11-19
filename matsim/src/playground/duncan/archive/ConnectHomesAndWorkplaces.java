@@ -24,21 +24,20 @@ package playground.duncan.archive;
 
 import java.io.PrintWriter;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.RandomLocationMutator;
 import org.matsim.world.MatsimWorldReader;
@@ -50,45 +49,47 @@ public class ConnectHomesAndWorkplaces {
 
 	public void run(final String[] args) {
 
-		// create/read the config:
+		String configFile;
 		if ( args.length==0 ) {
-			this.config = Gbl.createConfig(new String[] {"./src/playground/duncan/h2w-config.xml"});
+			configFile = "./src/playground/duncan/h2w-config.xml";
 		} else {
-			this.config = Gbl.createConfig(args) ;
+			configFile = args[0] ;
 		}
+		ScenarioImpl scenario = new ScenarioLoaderImpl(configFile).getScenario();
+		
+		this.config = scenario.getConfig();
 		ConfigWriter configwriter = new ConfigWriter(this.config, new PrintWriter(System.out));
 		configwriter.write();
 
 		// create the control(l)er:
-		final Controler controler = new Controler(this.config);
+		final Controler controler = new Controler(scenario);
 //		controler.loadData() ;
 		// (I think that the control(l)er is only needed to make the locationchoice module happy;
 		// there is no logical reason why it is necessary. Kai)
 
 		// create/read the network:
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 
 		// create/read the world (probably empty input file)
-		final World world = Gbl.createWorld();
+		final World world = scenario.getWorld();
 		if (this.config.world().getInputFile() != null) {
 			final MatsimWorldReader worldReader = new MatsimWorldReader(world);
 			worldReader.readFile(this.config.world().getInputFile());
 		}
-		world.setNetworkLayer(network);
 		world.complete();
 
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl() ;
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities() ;
 		MatsimFacilitiesReader fr = new MatsimFacilitiesReader( facilities ) ;
 		fr.readFile( this.config.facilities().getInputFile() ) ;
 
 		// create the locachoice object:
-		Knowledges knowledges = new KnowledgesImpl();
+		Knowledges knowledges = scenario.getKnowledges() ;
 		LocationMutator locachoice = new RandomLocationMutator(controler.getNetwork(), controler, knowledges) ;
 
-		final PopulationImpl plans = new PopulationImpl();
+		final PopulationImpl plans = scenario.getPopulation() ;
 		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans, network, knowledges);
+		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, knowledges);
 		plans.addAlgorithm(locachoice);
 		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added

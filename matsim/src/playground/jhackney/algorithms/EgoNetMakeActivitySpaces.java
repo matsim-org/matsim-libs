@@ -28,9 +28,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.population.algorithms.PersonCalcActivitySpace;
 import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
 import org.matsim.world.World;
@@ -57,10 +55,10 @@ public class EgoNetMakeActivitySpaces {
 		NetworkLayer network =Scenario.readNetwork();
 		
 		System.out.println("  reading plans xml file... ");
-		PopulationImpl plans = new PopulationImpl();
-		Knowledges knowledges = new KnowledgesImpl();
 		System.out.println(config.plans().getInputFile());
-		new MatsimPopulationReader(plans, network, knowledges).readFile(config.plans().getInputFile());
+		new MatsimPopulationReader(Scenario.getScenarioImpl()).readFile(config.plans().getInputFile());
+		PopulationImpl plans = Scenario.getScenarioImpl().getPopulation();
+		Knowledges knowledges = Scenario.getScenarioImpl().getKnowledges();
 		System.out.println("  done.");
 		
 		ActivityFacilitiesImpl facilities = Scenario.readFacilities();

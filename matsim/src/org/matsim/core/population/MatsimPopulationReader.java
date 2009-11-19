@@ -63,7 +63,9 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	 *
 	 * @param plans The data structure where to store the persons with their plans.
 	 * @param network The network the plans are linked to, e.g. for routes, locations, ...
+	 * @deprecated use {@link #MatsimPopulationReader(ScenarioImpl)}
 	 */
+	@Deprecated // use MatsimPopulationReader(Scenario)
 	public MatsimPopulationReader(final Population plans, final NetworkLayer network) {
 		this.plans = plans;
 		this.network = network;
@@ -76,11 +78,6 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 		this.network = scenario.getNetwork();
 		this.facilities = scenario.getActivityFacilities();
 		this.knowledges = scenario.getKnowledges();
-	}
-
-	public MatsimPopulationReader(Population population, NetworkLayer network, Knowledges knowledges) {
-		this(population, network);
-		this.knowledges = knowledges;
 	}
 
 	@Override

@@ -20,6 +20,7 @@
 
 package playground.jhackney;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.EventsManagerImpl;
@@ -30,10 +31,8 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scoring.EventsToScore;
@@ -72,8 +71,9 @@ public abstract class Scenario {
 	private static final String out2 = thisrun+".out";
 	private static final String out1 = "AgentsAtActivities"+thisrun+".out";
 
-	private static final Config config= Gbl.createConfig(null);
-	private static final World world= Gbl.createWorld();
+	private static final ScenarioImpl scenario = new ScenarioImpl();
+//	private static final Config config= Gbl.createConfig(null);
+//	private static final World world= Gbl.createWorld();
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -91,6 +91,7 @@ public abstract class Scenario {
 
 	public static final Config setUpScenarioConfig() {
 //		config = Gbl.createConfig(null);
+		Config config = scenario.getConfig();
 
 		config.config().setOutputFile(output_directory + "output_config.xml");
 
@@ -159,15 +160,15 @@ public abstract class Scenario {
 //	}
 	public static final World readWorld() {
 		System.out.println("  reading world xml file... ");
-		new MatsimWorldReader(world).readFile(config.world().getInputFile());
+		new MatsimWorldReader(scenario.getWorld()).readFile(scenario.getConfig().world().getInputFile());
 		System.out.println("  done.");
-		return world;
+		return scenario.getWorld();
 	}
 
 	public static final ActivityFacilitiesImpl readFacilities() {
 		System.out.println("  reading facilities xml file... ");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
-		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		new MatsimFacilitiesReader(facilities).readFile(scenario.getConfig().facilities().getInputFile());
 		System.out.println("  done.");
 		return facilities;
 	}
@@ -175,8 +176,8 @@ public abstract class Scenario {
 	public static final NetworkLayer readNetwork() {
 		System.out.println("  reading the network xml file...");
 		System.out.println(Gbl.getConfig().network().getInputFile());
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(network).readFile(scenario.getConfig().network().getInputFile());
 		System.out.println("  done.");
 		return network;
 	}
@@ -196,41 +197,41 @@ public abstract class Scenario {
 //		return Matrices.getSingleton();
 //	}
 
-	public static final PopulationImpl readPlans(final NetworkLayer network) {
+	public static final PopulationImpl readPlans() {
 		System.out.println("  reading plans xml file... ");
-		PopulationImpl plans = new PopulationImpl();
-		System.out.println(config.plans().getInputFile());
-		new MatsimPopulationReader(plans, network).readFile(config.plans().getInputFile());
+		PopulationImpl plans = scenario.getPopulation();
+		System.out.println(scenario.getConfig().plans().getInputFile());
+		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 		System.out.println("  done.");
 		return plans;
 	}
 
 
 	
-	public static final PopulationImpl readPlans(final NetworkLayer network, final int i) {
+	public static final PopulationImpl readPlans(final int i) {
 		System.out.println("  reading plans xml file... ");
 		PopulationImpl plans = new PopulationImpl();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
-		String filename=input_directory +config.plans().getInputFile();
+		String filename=input_directory +scenario.getConfig().plans().getInputFile();
 		System.out.println(filename);
-		new MatsimPopulationReader(plans, network).readFile(filename);
+		new MatsimPopulationReader(scenario).readFile(filename);
 
 		System.out.println("  done.");
 		return plans;
 	}
 
-	public static final PopulationImpl readPlansAndKnowledges(final NetworkLayer network, Knowledges kn) {
+	public static final PopulationImpl readPlansAndKnowledges() {
 		System.out.println("  reading plans xml file... ");
 		PopulationImpl plans = new PopulationImpl();
-		System.out.println(config.plans().getInputFile());
-		new MatsimPopulationReader(plans, (NetworkLayer) network, kn).readFile(config.plans().getInputFile());
+		System.out.println(scenario.getConfig().plans().getInputFile());
+		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 		System.out.println("  done.");
 		return plans;
 	}
 
 	public static final EventsManagerImpl readEvents(final int i, final EventsMapStartEndTimes epp) {
 		System.out.println("  reading plans xml file... ");
-		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+config.events().getInputFile();
+		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+scenario.getConfig().events().getInputFile();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(epp);
@@ -297,14 +298,20 @@ public abstract class Scenario {
 
 	public static final void writeConfig() {
 		System.out.println("  writing config xml file... ");
-		new ConfigWriter(config).write();
+		new ConfigWriter(scenario.getConfig()).write();
 		System.out.println("  done.");
 	}
 	public static Config getConfig(){
-		return config;
+		return scenario.getConfig();
 	}
 	public static World getWorld() {
-		return world;
+		return scenario.getWorld();
+	}
+	public static ScenarioImpl getScenarioImpl() {
+		return scenario;
+	}
+	public static Knowledges getKnowledges() {
+		return scenario.getKnowledges();
 	}
 	public static String getSNOutDir(){
 		return output_directory;

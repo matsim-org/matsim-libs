@@ -139,7 +139,7 @@ public class NewDemandWithFacilities4Zrh {
 		Knowledges knowledges = scenario.getKnowledges();
 		
 		PopulationImpl pop = scenario.getPopulation();
-		new MatsimPopulationReader(pop, net, knowledges).readFile(inputPopFilename);
+		new MatsimPopulationReader(scenario).readFile(inputPopFilename);
 
 		ActivityFacilitiesImpl afs = scenario.getActivityFacilities();
 

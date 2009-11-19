@@ -22,6 +22,7 @@ package playground.jhackney;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
@@ -29,12 +30,9 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.counts.Counts;
@@ -78,8 +76,9 @@ public abstract class ScenarioConfig {
 	private static String matsFileName=null;
 	private static String popFileName=null;
 
-	private static final Config config= Gbl.createConfig(null);
-	private static final World world= Gbl.createWorld();
+	private static final ScenarioImpl scenario = new ScenarioImpl();
+//	private static final Config config= Gbl.createConfig(null);
+//	private static final World world= Gbl.createWorld();
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -97,6 +96,7 @@ public abstract class ScenarioConfig {
 
 	public static final void setUpScenarioConfig() {
 //		config = Gbl.createConfig(null);
+		Config config = scenario.getConfig();
 		CharyparNagelScoringConfigGroup scoring = config.charyparNagelScoring();
 
 		configFileName = input_directory + "output_config.xml";
@@ -208,24 +208,24 @@ public abstract class ScenarioConfig {
 	public static final Config readConfig(){
 		System.out.println("  Reading Config xml file ... ");
 		try {
-			new MatsimConfigReader(config).readFile(configFileName, dtdFileName);
+			new MatsimConfigReader(scenario.getConfig()).readFile(configFileName, dtdFileName);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		System.out.println("  Done");
-		return config;
+		return scenario.getConfig();
 	}
 	public static final World readWorld() {
 		System.out.println("  reading world xml file... ");
 //		new MatsimWorldReader(Gbl.getWorld()).readFile(Gbl.getConfig().world().getInputFile());
-		new MatsimWorldReader(world).readFile(worldFileName);
+		new MatsimWorldReader(scenario.getWorld()).readFile(worldFileName);
 		System.out.println("  done.");
-		return world;
+		return scenario.getWorld();
 	}
 
 	public static final ActivityFacilitiesImpl readFacilities() {
 		System.out.println("  reading facilities xml file... ");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 //		new MatsimFacilitiesReader(facilities).readFile(Gbl.getConfig().facilities().getInputFile());
 		new MatsimFacilitiesReader(facilities).readFile(facsFileName);
 		System.out.println("  done.");
@@ -234,8 +234,8 @@ public abstract class ScenarioConfig {
 
 	public static final NetworkLayer readNetwork() {
 		System.out.println("  reading the network xml file...");
-		System.out.println(config.network().getInputFile());
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		System.out.println(scenario.getConfig().network().getInputFile());
+		NetworkLayer network = scenario.getNetwork();
 //		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
 		new MatsimNetworkReader(network).readFile(netFileName);
 		System.out.println("  done.");
@@ -245,7 +245,7 @@ public abstract class ScenarioConfig {
 	public static final Counts readCounts() {
 		System.out.println("  reading the counts...");
 		final Counts counts = new Counts();
-		new MatsimCountsReader(counts).readFile(config.counts().getCountsFileName());
+		new MatsimCountsReader(counts).readFile(scenario.getConfig().counts().getCountsFileName());
 
 		System.out.println("  done.");
 		return counts;
@@ -288,7 +288,7 @@ public abstract class ScenarioConfig {
 		PopulationImpl plans = new PopulationImpl();
 		String filename=input_directory +popFileName;
 		System.out.println(filename);
-		new MatsimPopulationReader(plans, (NetworkLayer) network, kn).readFile(filename);
+		new MatsimPopulationReader(scenario).readFile(filename);
 		System.out.println("  done.");
 		return plans;
 	}
@@ -296,7 +296,7 @@ public abstract class ScenarioConfig {
 
 	public static final EventsManagerImpl readEvents(final int i, final EventsMapStartEndTimes epp) {
 		System.out.println("  reading plans xml file... ");
-		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+config.events().getInputFile();
+		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+scenario.getConfig().events().getInputFile();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(epp);
@@ -380,7 +380,7 @@ public abstract class ScenarioConfig {
 //		System.out.println("  done.");
 //	}
 	public static Config getConfig(){
-		return config;
+		return scenario.getConfig();
 	}
 	public static String getSNOutDir(){
 		return output_directory;

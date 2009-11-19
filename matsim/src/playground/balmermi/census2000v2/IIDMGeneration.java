@@ -21,7 +21,7 @@
 package playground.balmermi.census2000v2;
 
 import org.apache.log4j.Logger;
-
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -31,10 +31,9 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
@@ -70,8 +69,9 @@ public class IIDMGeneration {
 
 		log.info("MATSim-DB: create iidm.");
 
-		Config config = Gbl.createConfig(args);
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).getScenario();
+		Config config = scenario.getConfig();
+		World world = scenario.getWorld();
 		
 		//////////////////////////////////////////////////////////////////////
 
@@ -95,7 +95,7 @@ public class IIDMGeneration {
 		log.info("  done.");
 
 		log.info("  reading facilities xml file...");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		world.complete();
 		log.info("  done.");
@@ -130,9 +130,9 @@ public class IIDMGeneration {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reding plans xml file... ");
-		PopulationImpl pop = new PopulationImpl();
-		Knowledges knowledges =  new KnowledgesImpl();
-		new MatsimPopulationReader(pop, null, knowledges).readFile(config.plans().getInputFile());
+		PopulationImpl pop = scenario.getPopulation();
+		Knowledges knowledges =  scenario.getKnowledges();
+		new MatsimPopulationReader(scenario).readFile(config.plans().getInputFile());
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

@@ -40,7 +40,7 @@ public class ScenarioParsing {
 
 		Scenario.readWorld();
 		NetworkLayer network = Scenario.readNetwork();
-		PopulationImpl plans = Scenario.readPlans(network);
+		PopulationImpl plans = Scenario.readPlans();
 		
 //		System.out.println("  reading world xml file... ");
 //		final MatsimWorldReader worldReader = new MatsimWorldReader(Gbl.getWorld());

@@ -27,7 +27,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
@@ -64,8 +63,7 @@ public class AnalyzeTimeCorrelations {
 		int isoc=0;
 //		read in plans
 		System.out.println(" Initializing the plans ...");
-		knowledges = new KnowledgesImpl();
-		plans = Scenario.readPlansAndKnowledges(network, knowledges);
+		plans = Scenario.readPlansAndKnowledges();
 		System.out.println("... done");
 
 		System.out.println(" Initializing agent knowledge about geography ...");
