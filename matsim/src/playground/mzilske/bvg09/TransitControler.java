@@ -105,8 +105,7 @@ public class TransitControler extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		TransitQueueSimulation sim = new TransitQueueSimulation(
-				this.scenarioData, this.events);
+		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
 		sim.startOTFServer("livesim");
 		OTFDemo.ptConnect("livesim");
 		sim.run();

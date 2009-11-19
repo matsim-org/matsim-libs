@@ -71,19 +71,19 @@ public class DataPrepare {
 	private static final Logger log = Logger.getLogger(DataPrepare.class);
 
 	// INPUT FILES
-	private final static String VISUM_FILE = "/Users/michaelzilske/Desktop/visumnet_utf8woBOM.net";
-	private final static String NETWORK_FILE = "/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
-	private final static String INPUT_PLANS_FILE = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.sample.xml.gz";
+	private static String InVisumNetFile = "/Users/michaelzilske/Desktop/visumnet_utf8woBOM.net";
+	private static String InNetworkFile = "/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
+	private static String InInputPlansFileWithXY2Links = "/Volumes/Data/VSP/coding/eclipse35/thesis-data/application/plans.census2000ivtch1pct.dilZh30km.sample.xml.gz";
 
 	// INTERMEDIARY FILES
-	private final static String TRANSIT_NETWORK_FILE = "../berlin-bvg09/pt/alles_mit_umlaeufen/test/transit_network.xml";
-	private final static String TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE = "/Users/michaelzilske/Desktop/transit_schedule_without_network.xml";
+	private static String IntermediateTransitNetworkFile = "../berlin-bvg09/pt/alles_mit_umlaeufen/test/transit_network.xml";
+	private static String IntermediateTransitScheduleWithoutNetworkFile = "/Users/michaelzilske/Desktop/transit_schedule_without_network.xml";
 
 	// OUTPUT FILES
-	private final static String TRANSIT_SCHEDULE_WITH_NETWORK_FILE = "../berlin-bvg09/pt/alles_mit_umlaeufen/test/transitSchedule.networkOevModellBln.xml";
-	private final static String VEHICLE_FILE = "../berlin-bvg09/pt/alles_mit_umlaeufen/test/vehicles.oevModellBln.xml";
-	private final static String MULTIMODAL_NETWORK_FILE = "../berlin-bvg09/pt/alles_mit_umlaeufen/test/network.multimodal.mini.xml";
-	private final static String ROUTED_PLANS_FILE = "../berlin-bvg09/pt/alles_mit_umlaeufen/test/plan.routedOevModell.BVB344.moreLegPlan_Agent.xml";
+	private static String OutTransitScheduleWithNetworkFile = "../berlin-bvg09/pt/alles_mit_umlaeufen/test/transitSchedule.networkOevModellBln.xml";
+	private static String OutVehicleFile = "../berlin-bvg09/pt/alles_mit_umlaeufen/test/vehicles.oevModellBln.xml";
+	private static String OutMultimodalNetworkFile = "../berlin-bvg09/pt/alles_mit_umlaeufen/test/network.multimodal.mini.xml";
+	private static String OutRoutedPlanFile = "../berlin-bvg09/pt/alles_mit_umlaeufen/test/plan.routedOevModell.BVB344.moreLegPlan_Agent.xml";
 
 
 	private final ScenarioImpl scenario;
@@ -105,7 +105,7 @@ public class DataPrepare {
 		final VisumNetwork vNetwork = new VisumNetwork();
 		try {
 			log.info("reading visum network.");
-			new VisumNetworkReader(vNetwork).read(VISUM_FILE);
+			new VisumNetworkReader(vNetwork).read(InVisumNetFile);
 			log.info("converting visum data to TransitSchedule.");
 			Visum2TransitSchedule converter = new Visum2TransitSchedule(vNetwork, this.scenario.getTransitSchedule(), this.scenario.getVehicles());
 
@@ -132,12 +132,12 @@ public class DataPrepare {
 	private void writeScheduleAndVehicles() throws IOException,
 			FileNotFoundException {
 		log.info("writing TransitSchedule to file.");
-		new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write(TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE);
+		new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write(IntermediateTransitScheduleWithoutNetworkFile);
 		log.info("writing vehicles to file.");
-		new VehicleWriterV1(this.scenario.getVehicles()).writeFile(VEHICLE_FILE);
-		new NetworkWriter(pseudoNetwork, TRANSIT_NETWORK_FILE).write();
+		new VehicleWriterV1(this.scenario.getVehicles()).writeFile(OutVehicleFile);
+		new NetworkWriter(pseudoNetwork, IntermediateTransitNetworkFile).write();
 		try {
-			new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(TRANSIT_SCHEDULE_WITH_NETWORK_FILE);
+			new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(OutTransitScheduleWithNetworkFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -152,10 +152,10 @@ public class DataPrepare {
 		NetworkLayer transitNetwork = new NetworkLayer();
 		NetworkLayer streetNetwork = new NetworkLayer();
 		try {
-			new MatsimNetworkReader(transitNetwork).parse(TRANSIT_NETWORK_FILE);
-			new MatsimNetworkReader(streetNetwork).parse(NETWORK_FILE);
+			new MatsimNetworkReader(transitNetwork).parse(IntermediateTransitNetworkFile);
+			new MatsimNetworkReader(streetNetwork).parse(InNetworkFile);
 			MergeNetworks.merge(streetNetwork, "", transitNetwork, "", this.scenario.getNetwork());
-			new NetworkWriter(this.scenario.getNetwork(), MULTIMODAL_NETWORK_FILE).write();
+			new NetworkWriter(this.scenario.getNetwork(), OutMultimodalNetworkFile).write();
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -168,7 +168,7 @@ public class DataPrepare {
 	protected void routePopulation() {
 		PopulationImpl pop = this.scenario.getPopulation();
 		try {
-			new MatsimPopulationReader(this.scenario).parse(INPUT_PLANS_FILE);
+			new MatsimPopulationReader(this.scenario).parse(InInputPlansFileWithXY2Links);
 			pop.printPlansCount();
 		} catch (SAXException e) {
 			e.printStackTrace();
@@ -187,7 +187,7 @@ public class DataPrepare {
 		log.info("start pt-router");
 		router.run(pop);
 		log.info("write routed plans out.");
-		new PopulationWriter(pop).write(ROUTED_PLANS_FILE);
+		new PopulationWriter(pop).write(OutRoutedPlanFile);
 	}
 
 	protected void visualizeRouterNetwork() {
@@ -241,6 +241,49 @@ public class DataPrepare {
 
 	private void emptyVehicles() {
 		this.scenario.getVehicles().getVehicles().clear();
+	}
+	
+
+	public static void run(String inVisumFile, String inNetworkFile, String inInputPlansFile,
+			String interTransitNetworkFile, String interTransitScheduleWithoutNetworkFile,
+			String outTransitScheduleWithNetworkFile, String outVehicleFile, String outMultimodalNetworkFile, 
+			String outRoutedPlansFile){
+		
+		DataPrepare.InVisumNetFile = inVisumFile;
+		DataPrepare.InNetworkFile = inNetworkFile;
+		DataPrepare.InInputPlansFileWithXY2Links = inInputPlansFile;
+		
+		DataPrepare.IntermediateTransitNetworkFile = interTransitNetworkFile;
+		DataPrepare.IntermediateTransitScheduleWithoutNetworkFile = interTransitScheduleWithoutNetworkFile;
+		
+		DataPrepare.OutTransitScheduleWithNetworkFile = outTransitScheduleWithNetworkFile;
+		DataPrepare.OutVehicleFile = outVehicleFile;
+		DataPrepare.OutMultimodalNetworkFile = outMultimodalNetworkFile;
+		DataPrepare.OutRoutedPlanFile = outRoutedPlansFile;
+				
+		DataPrepare app = new DataPrepare();
+		app.prepareConfig();
+		app.convertSchedule();
+		app.createNetworkFromSchedule();
+		app.emptyVehicles();
+		app.buildUmlaeufe();
+		
+		try {
+			app.writeScheduleAndVehicles();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		app.mergeNetworks();
+		app.routePopulation();
+//		app.visualizeRouterNetwork();
+
+		log.info("done.");
 	}
 
 	public static void main(final String[] args) {

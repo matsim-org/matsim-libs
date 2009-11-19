@@ -1,5 +1,8 @@
 package playground.andreas.bln.pop;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -13,6 +16,8 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+
+import playground.mzilske.bvg09.DataPrepare;
 
 public class DeriveSmallScenarioFromBigOne {
 	private static final Logger log = Logger.getLogger(DeriveSmallScenarioFromBigOne.class);
@@ -35,6 +40,15 @@ public class DeriveSmallScenarioFromBigOne {
 		String popGeoFilterOut = "./baseplan_900s_subset.xml.gz";
 		String setBoundingBoxOut = "./baseplan_900s_subset_bb.xml.gz";
 		String xy2linksOut = "./baseplan_900s_subset_bb_xy2links_ba.xml.gz";
+		
+		//DataPrepare
+		String inVisumFile = "D:/Berlin/BVG/berlin-bvg09/net/pt/visumnet_utf8woBOM.net";
+		String interTransitNetworkFile = "./inter.network.oevModellBln.xml";
+		String interTransitScheduleWithoutNetworkFile = "./inter.OevModellBln.xml";
+		String outTransitScheduleWithNetworkFile = "./transitSchedule.xml.gz";
+		String outVehicleFile = "./vehicles.xml.gz";
+		String outMultimodalNetworkFile = "./network.multimodal.xml.gz";
+		String outRoutedPlansFile = "./plan.routedOevModell.xml.gz";
 		
 		Coord minXY = new CoordImpl(4590999.0, 5805999.0);
 		Coord maxXY = new CoordImpl(4606021.0, 5822001.0);
@@ -111,9 +125,22 @@ public class DeriveSmallScenarioFromBigOne {
 				
 		log.info("End XY2Links");
 		
+		log.info("Start DataPrepare");
+		
+		DataPrepare.run(inVisumFile, smallNetworkFile, xy2linksOut,
+				interTransitNetworkFile, interTransitScheduleWithoutNetworkFile,
+				outTransitScheduleWithNetworkFile, outVehicleFile, outMultimodalNetworkFile, outRoutedPlansFile);
+				
+		log.info("End DataPrepare");		
+		
 		log.info("End DeriveSmallScenarioFromBigOne");
-		log.info("Please rerun DataPrepare with: " + smallNetworkFile + " as networkFile, "
-				+ xy2linksOut + " as plans file and the corresponding visum file");
+		
+		log.info("Please rerun your simulation with: " + outMultimodalNetworkFile + " as networkFile, "
+				+ outRoutedPlansFile + " as plans file, " + outVehicleFile + " as pt vehicles file and "
+				+ outTransitScheduleWithNetworkFile + " as the pt schedule file.");
+		
+//		log.info("Please rerun DataPrepare with: " + smallNetworkFile + " as networkFile, "
+//				+ xy2linksOut + " as plans file and the corresponding visum file");
 
 		Gbl.printElapsedTime();
 	}
