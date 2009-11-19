@@ -39,6 +39,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.fakes.FakeLink;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
@@ -55,7 +56,6 @@ import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 
-import playground.marcel.pt.fakes.FakeAgent;
 
 /**
  * @author mrieser

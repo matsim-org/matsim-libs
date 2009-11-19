@@ -45,6 +45,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
@@ -54,8 +55,6 @@ import playground.marcel.pt.config.TransitConfigGroup;
  * @author mrieser
  */
 public class PlansCalcTransitRoute extends PlansCalcRoute {
-
-	public final static String TRANSIT_ACTIVITY_TYPE = "pt interaction";
 
 	private final TransitActsRemover transitLegsRemover = new TransitActsRemover();
 	private final TransitRouterConfig routerConfig = new TransitRouterConfig();
@@ -160,12 +159,12 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 								i++;
 								if (leg2.getRoute() instanceof ExperimentalTransitRoute) {
 									ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg2.getRoute();
-									ActivityImpl act = new ActivityImpl(TRANSIT_ACTIVITY_TYPE, this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), (LinkImpl) tRoute.getStartLink());
+									ActivityImpl act = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), (LinkImpl) tRoute.getStartLink());
 									act.setDuration(0.0);
 									planElements.add(i, act);
 									nextCoord = this.schedule.getFacilities().get(tRoute.getEgressStopId()).getCoord();
 								} else { // walk legs don't have a coord, use the coord from the last egress point
-									ActivityImpl act = new ActivityImpl(TRANSIT_ACTIVITY_TYPE, nextCoord, (LinkImpl) ((RouteWRefs) leg2.getRoute()).getStartLink());
+									ActivityImpl act = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, nextCoord, (LinkImpl) ((RouteWRefs) leg2.getRoute()).getStartLink());
 									act.setDuration(0.0);
 									planElements.add(i, act);
 								}

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.fakes;
+package org.matsim.pt.fakes;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;

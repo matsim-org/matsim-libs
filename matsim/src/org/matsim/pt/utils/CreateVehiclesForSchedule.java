@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.utils;
+package org.matsim.pt.utils;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.transitSchedule.api.Departure;
@@ -34,6 +34,7 @@ import org.matsim.vehicles.VehiclesFactory;
 
 /**
  * Creates a vehicle of type "defaultTransitVehicleType" for each departure.
+ * Useful for tests and demos.
  *
  * @author mrieser
  */

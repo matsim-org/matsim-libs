@@ -31,14 +31,14 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface PopulationFactory extends Serializable, MatsimFactory {
 
-	/**
-	 * Creates a new Route object
-	 * @param currentRouteLinkIds List of Ids including the start and the end Link Id of the route's links
-	 * @return a BasicRoute Object with the links set accordingly
-	 * @deprecated needs to be verified
-	 */
-@Deprecated
-//	public BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds); // TODO [MR] check this
+//	/**
+//	 * Creates a new Route object
+//	 * @param currentRouteLinkIds List of Ids including the start and the end Link Id of the route's links
+//	 * @return a BasicRoute Object with the links set accordingly
+//	 * @deprecated needs to be verified
+//	 */
+//@Deprecated
+//	public BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
 	// disabled until everything else is figured out
 	
 	

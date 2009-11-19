@@ -30,6 +30,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.pt.PtConstants;
 
 public class TransitActsRemoverTest extends TestCase {
 
@@ -40,32 +41,32 @@ public class TransitActsRemoverTest extends TestCase {
 		plan.addActivity(new ActivityImpl("h", dummyCoord));
 
 		plan.addLeg(new LegImpl(TransportMode.walk));
-		plan.addActivity(new ActivityImpl(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+		plan.addActivity(new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
 		plan.addLeg(new LegImpl(TransportMode.pt));
-		plan.addActivity(new ActivityImpl(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+		plan.addActivity(new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
 		plan.addLeg(new LegImpl(TransportMode.walk));
 		
 		plan.addActivity(new ActivityImpl("w", dummyCoord));
 		
 		plan.addLeg(new LegImpl(TransportMode.walk));
-		plan.addActivity(new ActivityImpl(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+		plan.addActivity(new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
 		plan.addLeg(new LegImpl(TransportMode.pt));
-		plan.addActivity(new ActivityImpl(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+		plan.addActivity(new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
 		// direct connection without walking
 		plan.addLeg(new LegImpl(TransportMode.pt));
-		plan.addActivity(new ActivityImpl(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+		plan.addActivity(new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
 		plan.addLeg(new LegImpl(TransportMode.walk));
 
 		plan.addActivity(new ActivityImpl("s", dummyCoord));
 		
 		plan.addLeg(new LegImpl(TransportMode.walk));
-		plan.addActivity(new ActivityImpl(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+		plan.addActivity(new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
 		plan.addLeg(new LegImpl(TransportMode.pt));
-		plan.addActivity(new ActivityImpl(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+		plan.addActivity(new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
 		plan.addLeg(new LegImpl(TransportMode.walk)); // connection with walking
-		plan.addActivity(new ActivityImpl(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+		plan.addActivity(new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
 		plan.addLeg(new LegImpl(TransportMode.pt));
-		plan.addActivity(new ActivityImpl(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+		plan.addActivity(new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
 		plan.addLeg(new LegImpl(TransportMode.walk));
 		
 		plan.addActivity(new ActivityImpl("h", dummyCoord));

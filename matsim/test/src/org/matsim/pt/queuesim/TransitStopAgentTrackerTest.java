@@ -25,13 +25,13 @@ import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.pt.queuesim.PassengerAgent;
 import org.matsim.pt.queuesim.TransitStopAgentTracker;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.marcel.pt.fakes.FakeAgent;
 
 /**
  * @author mrieser

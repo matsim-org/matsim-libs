@@ -29,13 +29,14 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.PtConstants;
 
 /**
  * Removes all transit activities (like "pt -interaction") as well as the legs
  * following those activities. In addition, all legs with mode "walk"
  * are set to mode "pt" to be routed again with the transit. 
  * 
- * @see PlansCalcTransitRoute#TRANSIT_ACTIVITY_TYPE
+ * @see PtConstants#TRANSIT_ACTIVITY_TYPE
  * 
  * @author mrieser
  */
@@ -47,7 +48,7 @@ public class TransitActsRemover implements PlanAlgorithm {
 			PlanElement pe = planElements.get(i);
 			if (pe instanceof Activity) {
 				Activity act = (Activity) pe;
-				if (PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {
+				if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {
 					((PlanImpl) plan).removeActivity(i);
 					n -= 2;
 					i--; // i will be incremented again in next loop-iteration, so we'll check the next act

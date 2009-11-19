@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.fakes;
+package org.matsim.pt.fakes;
 
 import org.matsim.pt.queuesim.PassengerAgent;
 import org.matsim.transitSchedule.api.TransitLine;

@@ -67,7 +67,9 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.transitSchedule.api.Departure;
@@ -85,8 +87,6 @@ import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
-import playground.marcel.pt.router.PlansCalcTransitRoute;
-import playground.marcel.pt.utils.CreateVehiclesForSchedule;
 
 /**
  * @author mrieser
@@ -635,13 +635,13 @@ public class TransitQueueSimulationTest extends TestCase {
 		Route route1 = new GenericRouteImpl(link1, link1);
 		route1.setTravelTime(10.0);
 		leg1.setRoute(route1);
-		Activity act2 = pb.createActivityFromLinkId(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, link1.getId());
+		Activity act2 = pb.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, link1.getId());
 		act2.setEndTime(0.0);
 		Leg leg2 = pb.createLeg(TransportMode.pt);
 		Route route2 = new ExperimentalTransitRoute(stopFacility1, tLine, tRoute, stopFacility2);
 		route2.setTravelTime(100.0);
 		leg2.setRoute(route2);
-		Activity act3 = pb.createActivityFromLinkId(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, link1.getId());
+		Activity act3 = pb.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, link1.getId());
 		act3.setEndTime(0.0);
 		Leg leg3 = pb.createLeg(TransportMode.walk);
 		Route route3 = new GenericRouteImpl(link2, link2);
@@ -677,9 +677,9 @@ public class TransitQueueSimulationTest extends TestCase {
 		assertTrue(allEvents.get(1) instanceof AgentDepartureEventImpl);
 		assertTrue(allEvents.get(2) instanceof AgentArrivalEventImpl);
 		assertTrue(allEvents.get(3) instanceof ActivityStartEventImpl);
-		assertEquals(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEventImpl) allEvents.get(3)).getActType());
+		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEventImpl) allEvents.get(3)).getActType());
 		assertTrue(allEvents.get(4) instanceof ActivityEndEventImpl); // zero activity duration, waiting at stop is considered as leg
-		assertEquals(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEventImpl) allEvents.get(4)).getActType());
+		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEventImpl) allEvents.get(4)).getActType());
 		assertTrue(allEvents.get(5) instanceof AgentDepartureEventImpl);
 		
 		assertTrue(allEvents.get(6) instanceof AgentDepartureEventImpl); // pt-driver
@@ -697,9 +697,9 @@ public class TransitQueueSimulationTest extends TestCase {
 		
 		assertTrue(allEvents.get(15) instanceof AgentArrivalEventImpl);
 		assertTrue(allEvents.get(16) instanceof ActivityStartEventImpl);
-		assertEquals(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEventImpl) allEvents.get(16)).getActType());
+		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEventImpl) allEvents.get(16)).getActType());
 		assertTrue(allEvents.get(17) instanceof ActivityEndEventImpl); // zero activity duration, waiting at stop is considered as leg
-		assertEquals(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEventImpl) allEvents.get(17)).getActType());
+		assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEventImpl) allEvents.get(17)).getActType());
 		
 		assertTrue(allEvents.get(18) instanceof AgentDepartureEventImpl); // walk
 		assertTrue(allEvents.get(19) instanceof AgentArrivalEventImpl);

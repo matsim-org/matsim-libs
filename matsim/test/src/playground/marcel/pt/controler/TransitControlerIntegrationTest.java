@@ -43,6 +43,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -50,8 +51,6 @@ import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-
-import playground.marcel.pt.utils.CreateVehiclesForSchedule;
 
 public class TransitControlerIntegrationTest extends MatsimTestCase {
 

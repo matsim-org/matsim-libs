@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.pt.fakes.FakePassengerAgent;
 import org.matsim.pt.queuesim.PassengerAgent;
 import org.matsim.pt.queuesim.TransitVehicle;
 import org.matsim.vehicles.BasicVehicle;
@@ -35,7 +36,6 @@ import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 
-import playground.marcel.pt.fakes.FakePassengerAgent;
 
 /**
  * @author mrieser

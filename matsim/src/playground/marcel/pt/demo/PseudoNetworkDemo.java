@@ -41,12 +41,12 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.pt.queuesim.TransitQueueSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreatePseudoNetwork;
+import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
 import playground.marcel.OTFDemo;
-import playground.marcel.pt.utils.CreateVehiclesForSchedule;
 
 public class PseudoNetworkDemo {
 

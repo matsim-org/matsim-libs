@@ -28,8 +28,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.PtConstants;
 
-import playground.marcel.pt.router.PlansCalcTransitRoute;
 
 /**
  * Copy/Paste of PlanMutateTimeAllocation, but with special handling
@@ -82,7 +82,7 @@ public class TransitPlanMutateTimeAllocation implements PlanAlgorithm {
 
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
-					if (!act.getType().equals(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE)) {
+					if (!act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 						if (this.useActivityDurations) {
 							if (act.getDuration() != Time.UNDEFINED_TIME) {
 								// mutate the durations of all 'middle' activities

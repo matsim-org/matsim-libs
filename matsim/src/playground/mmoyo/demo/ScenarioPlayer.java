@@ -24,8 +24,6 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.xml.sax.SAXException;
-
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -37,11 +35,12 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.queuesim.TransitQueueSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
+import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
+import org.xml.sax.SAXException;
 
 import playground.marcel.OTFDemo;
-import playground.marcel.pt.utils.CreateVehiclesForSchedule;
 
 /**
  * @author mrieser

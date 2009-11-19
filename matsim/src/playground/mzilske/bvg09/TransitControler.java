@@ -38,6 +38,7 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.BasicVehicleReaderV1;
@@ -85,7 +86,7 @@ public class TransitControler extends Controler {
 		formats.add(EventsFileFormat.xml);
 		this.config.controler().setEventsFileFormats(formats);
 
-		ActivityParams params = new ActivityParams(PlansCalcTransitRoute.TRANSIT_ACTIVITY_TYPE);
+		ActivityParams params = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		params.setTypicalDuration(120.0);
 		this.config.charyparNagelScoring().addActivityParams(params);
 
