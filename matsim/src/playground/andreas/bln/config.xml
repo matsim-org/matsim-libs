@@ -5,13 +5,13 @@
 	
 	<module name="network">
 <!--		<param name="inputNetworkFile" value="./test/scenarios/berlin/network.xml.gz" />-->
-		<param name="inputNetworkFile" value="E:/eclwrk/berlin-bvg09/net/miv_big/m44_344_big.xml.gz"/>
+		<param name="inputNetworkFile" value="D:/Berlin/BVG/berlin-bvg09/net/miv_small/m44_344_small_ba.xml.gz"/>
 	</module>
 
 	<module name="plans">
 <!--		<param name="inputPlansFile" value="z:/output/raw_plans_out_w.xml" />-->
-		<param name="inputPlansFile" value="E:/eclwrk/berlin-bvg09/pop/baseplan_10x_900s.xml.gz" />
-		<param name="outputPlansFile" value="./baseplan_10x_900s_xy2links.xml.gz" />
+		<param name="inputPlansFile" value="D:/Berlin/BVG/berlin-bvg09/pop/baseplan_900s_subset_bb.xml.gz" />
+		<param name="outputPlansFile" value="./baseplan_900s_subset_bb_xy2links.xml.gz" />
 	</module>
 
 	<module name="controler">
