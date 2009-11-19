@@ -15,16 +15,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.evacuation.collections.gnuclasspath.TreeMap;
 import org.matsim.evacuation.flooding.FloodingInfo;
 import org.matsim.evacuation.flooding.FloodingReader;
+import org.matsim.evacuation.otfvis.readerwriter.InundationData;
+import org.matsim.evacuation.otfvis.readerwriter.InundationData.InundationGeometry;
+import org.matsim.evacuation.otfvis.readerwriter.InundationData.Polygon;
+import org.matsim.evacuation.otfvis.readerwriter.InundationData.Quad;
+import org.matsim.evacuation.otfvis.readerwriter.InundationData.Triangle;
 
 import playground.gregor.MY_STATIC_STUFF;
-import playground.gregor.collections.gnuclasspath.TreeMap;
 import playground.gregor.flooding.ConvexMeshSimplifier;
-import playground.gregor.otf.readerwriter.InundationData.InundationGeometry;
-import playground.gregor.otf.readerwriter.InundationData.Polygon;
-import playground.gregor.otf.readerwriter.InundationData.Quad;
-import playground.gregor.otf.readerwriter.InundationData.Triangle;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -59,6 +60,7 @@ public class InundationDataFromNetcdfReaderII {
 	public InundationDataFromNetcdfReaderII(double on, double oe) {
 		this.offsetNorth = on;
 		this.offsetEast = oe;
+		System.out.println(on + " " + oe );
 
 	}
 
@@ -178,11 +180,11 @@ public class InundationDataFromNetcdfReaderII {
 		ArrayList<Float> ycoords = new ArrayList<Float>();
 		ArrayList<float []> walshs = new ArrayList<float[]>();
 		
-		String aoi = MY_STATIC_STUFF.SWW_ROOT + "/aoi.shp";
+//		String aoi = MY_STATIC_STUFF.SWW_ROOT + "/aoi.shp";
 		for (int i = 0; i < MY_STATIC_STUFF.SWW_COUNT; i++) {
 			String file = MY_STATIC_STUFF.SWW_ROOT + "/" + MY_STATIC_STUFF.SWW_PREFIX + i + MY_STATIC_STUFF.SWW_SUFFIX;
 //			BasicInundationGeometryLoader reader = new BasicInundationGeometryLoader(file);
-			ConvexMeshSimplifier reader = new ConvexMeshSimplifier(file,aoi);
+			ConvexMeshSimplifier reader = new ConvexMeshSimplifier(file);//,aoi);
 			ArrayList<List<FloodingInfo>> fgis = reader.getInundationGeometries();
 			reader = null;
 
@@ -434,6 +436,13 @@ public class InundationDataFromNetcdfReaderII {
 
 	}
 
+	
+	public static void main(String [] args){
+		double on = 9870000.0;
+		double oe = 643000.0;
+		 
+		new InundationDataFromNetcdfReaderII(on, oe).createData();
+	}
 
 
 

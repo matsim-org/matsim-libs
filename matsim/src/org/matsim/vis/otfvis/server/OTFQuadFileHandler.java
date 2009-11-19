@@ -73,7 +73,7 @@ public class OTFQuadFileHandler {
 	// the version number should be increased to imply a compatibility break
 	public static final int VERSION = 1;
 	// minor version increase does not break compatibility
-	public static final int MINORVERSION = 5;
+	public static final int MINORVERSION = 6;
 
 	public static class Writer implements SimStateWriterI, SnapshotWriter {
 		protected final QueueNetwork net;
@@ -141,7 +141,7 @@ public class OTFQuadFileHandler {
 			Gbl.startMeasurement();
 
 			onAdditionalQuadData(this.connect);
-			
+
 			this.quad.fillQuadTree(this.connect);
 			System.out.print("fill writer Quad on Server: ");
 			Gbl.printElapsedTime();
@@ -283,7 +283,7 @@ public class OTFQuadFileHandler {
 				String currentEntry = entry.getName();
 				if (currentEntry.contains("step")) {
 					String[] spliti = StringUtils
-							.explode(currentEntry, '.', 10);
+					.explode(currentEntry, '.', 10);
 
 					double time_s = Double.parseDouble(spliti[1]);
 					if (this.nextTime == -1)
@@ -305,7 +305,7 @@ public class OTFQuadFileHandler {
 			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
 			ZipEntry entry = zipFile.getEntry("step." + time_string + ".bin");
 			byte[] buffer = new byte[(int) this.timesteps.get(time_s)
-					.longValue()]; // DS TODO Might be bigger than int??
+			                         .longValue()]; // DS TODO Might be bigger than int??
 
 			this.inFile = new DataInputStream(new BufferedInputStream(zipFile
 					.getInputStream(entry), 1000000));
@@ -339,26 +339,28 @@ public class OTFQuadFileHandler {
 			}
 		}
 
-//		public void closeFile() {
-//			try {
-//				this.zipFile.close();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//
-//		}
+		//		public void closeFile() {
+		//			try {
+		//				this.zipFile.close();
+		//			} catch (IOException e) {
+		//				e.printStackTrace();
+		//			}
+		//
+		//		}
 
 		public static class OTFObjectInputStream extends
-				ObjectInputStream {
+		ObjectInputStream {
 			public OTFObjectInputStream(final InputStream in)
-					throws IOException {
+			throws IOException {
 				super(in);
 			}
 
 			@Override
 			protected Class resolveClass(final ObjectStreamClass desc)
-					throws IOException, ClassNotFoundException {
-				if((version >= 1) && (minorversion >=5))super.resolveClass(desc);
+			throws IOException, ClassNotFoundException {
+				if((version >= 1) && (minorversion >=6)) {
+					return super.resolveClass(desc);
+				}
 				// these remappings only happen with older file versions
 				String name = desc.getName();
 				System.out.println("try to resolve " + name);
@@ -367,23 +369,31 @@ public class OTFQuadFileHandler {
 					return OTFServerQuad.class;
 				} else if (name.startsWith("org.matsim.utils.vis.otfvis")) {
 					name = name.replaceFirst("org.matsim.utils.vis.otfvis",
-							"org.matsim.vis.otfvis");
+					"org.matsim.vis.otfvis");
 					return Class.forName(name);
 				}else if (name.startsWith("playground.david.vis")) {
 					name = name.replaceFirst("playground.david.vis",
-							"org.matsim.utils.vis.otfvis");
+					"org.matsim.utils.vis.otfvis");
 					return Class.forName(name);
 				} else if (name.startsWith("org.matsim.utils.vis.otfivs")) {
 					name = name.replaceFirst("org.matsim.utils.vis.otfivs",
-							"org.matsim.vis.otfvis");
+					"org.matsim.vis.otfvis");
 					return Class.forName(name);
 				} else if (name.startsWith("org.matsim.mobsim")) {
 					name = name.replaceFirst("org.matsim.mobsim",
-							"org.matsim.core.mobsim");
+					"org.matsim.core.mobsim");
 					return Class.forName(name);
 				} else if (name.startsWith("org.matsim.utils.collections")) {
 					name = name.replaceFirst("org.matsim.utils.collections",
-							"org.matsim.core.utils.collections");
+					"org.matsim.core.utils.collections");
+					return Class.forName(name);
+				}else if (name.startsWith("playground.gregor.otf.readerwriter")) {
+					name = name.replaceFirst("playground.gregor.otf.readerwriter",
+					"org.matsim.evacuation.otfvis.readerwriter");
+					return Class.forName(name);
+				}else if (name.startsWith("playground.gregor.otf.drawer")) {
+					name = name.replaceFirst("playground.gregor.otf.drawer",
+					"org.matsim.evacuation.otfvis.drawer");
 					return Class.forName(name);
 				}
 				return super.resolveClass(desc);
@@ -400,7 +410,7 @@ public class OTFQuadFileHandler {
 						.getInputStream(quadEntry));
 				try {
 					this.quad = (OTFServerQuad) new OTFObjectInputStream(is)
-							.readObject();
+					.readObject();
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}
@@ -459,7 +469,7 @@ public class OTFQuadFileHandler {
 				if (offset != size) {
 					throw new IOException(
 							"READ SIZE did not fit! File corrupted! in second "
-									+ timenextTime);
+							+ timenextTime);
 				}
 
 			} catch (IOException e) {
@@ -478,16 +488,16 @@ public class OTFQuadFileHandler {
 			// );
 			if (this.id == null)
 				readQuad();
-				readConnect(connect);
+			readConnect(connect);
 			if ((id != null) && !id.equals(this.id))
 				throw new RemoteException(
-						"id does not match, set id to NULL will match ALL!");
+				"id does not match, set id to NULL will match ALL!");
 
 			return this.quad;
 		}
 
 		public byte[] getQuadConstStateBuffer(final String id)
-				throws RemoteException {
+		throws RemoteException {
 			byte[] buffer = null;
 			try {
 				ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
@@ -506,7 +516,7 @@ public class OTFQuadFileHandler {
 		}
 
 		public byte[] getQuadDynStateBuffer(final String id, final Rect bounds)
-				throws RemoteException {
+		throws RemoteException {
 			// DS TODO bounds is ignored, maybe throw exception if bounds !=
 			// null??
 			if (this.actBuffer == null)
@@ -540,17 +550,17 @@ public class OTFQuadFileHandler {
 					foundTime = time;
 					break;
 				}else 
-				if (searchDirection == TimePreference.EARLIER) {
-					if (timestep >= time) {
-						// take next lesser time than requested, if not exacty
-						// the same
-						foundTime = lastTime;
+					if (searchDirection == TimePreference.EARLIER) {
+						if (timestep >= time) {
+							// take next lesser time than requested, if not exacty
+							// the same
+							foundTime = lastTime;
+							break;
+						}
+					} else if (timestep >= time) {
+						foundTime = timestep; // the exact time or one biggers
 						break;
 					}
-				} else if (timestep >= time) {
-					foundTime = timestep; // the exact time or one biggers
-					break;
-				}
 				lastTime = timestep;
 			}
 			if (foundTime == -1)

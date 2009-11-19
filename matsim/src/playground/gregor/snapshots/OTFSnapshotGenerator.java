@@ -17,9 +17,9 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.evacuation.otfvis.drawer.OTFBackgroundTexturesDrawer;
 
 import playground.gregor.MY_STATIC_STUFF;
-import playground.gregor.otf.drawer.OTFBackgroundTexturesDrawer;
 import playground.gregor.snapshots.postprocessors.ConfluenceArrowsFromEvents;
 import playground.gregor.snapshots.postprocessors.DestinationDependentColorizer;
 import playground.gregor.snapshots.postprocessors.EvacuationLinksTeleporter;
@@ -35,7 +35,7 @@ public class OTFSnapshotGenerator {
 
 	private final static String lsFile = "../../../workspace/vsp-cvs/studies/padang/gis/network_v20080618/d_ls.shp";
 
-	private final static double VIS_OUTPUT_SAMPLE = 0.1;
+	private final static double VIS_OUTPUT_SAMPLE = 1.;
 	
 	private final ScenarioImpl scenario;
 	private final String eventsFile;

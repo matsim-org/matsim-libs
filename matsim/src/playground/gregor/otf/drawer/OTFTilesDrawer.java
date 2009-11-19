@@ -18,9 +18,10 @@ import javax.media.opengl.glu.GLU;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.evacuation.otfvis.drawer.Tile;
+import org.matsim.evacuation.otfvis.readerwriter.TileLoader;
 import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 
-import playground.gregor.otf.readerwriter.TileLoader;
 
 import com.sun.opengl.util.texture.TextureCoords;
 import com.sun.opengl.util.texture.TextureIO;

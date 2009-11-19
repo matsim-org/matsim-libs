@@ -290,10 +290,10 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		};		
 		
 		
-		public AgentPadangDrawer() {
-			super();
-			Logger.getLogger(AgentPadangDrawer.class).warn("This class is deprecated and will be removed in further versions!");	
-		}
+//		public AgentPadangDrawer() {
+//			super();
+//			Logger.getLogger(AgentPadangDrawer.class).warn("This class is deprecated and will be removed in further versions!");	
+//		}
 		
 		public void drawAll() {
 			this.drawerWave.draw();

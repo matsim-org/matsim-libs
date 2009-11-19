@@ -34,6 +34,21 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.evacuation.otfvis.drawer.AgentReader;
+import org.matsim.evacuation.otfvis.drawer.AgentWriter;
+import org.matsim.evacuation.otfvis.drawer.OTFBackgroundTexturesDrawer;
+import org.matsim.evacuation.otfvis.drawer.OTFSheltersDrawer;
+import org.matsim.evacuation.otfvis.drawer.TimeDependentTrigger;
+import org.matsim.evacuation.otfvis.readerwriter.InundationDataReader;
+import org.matsim.evacuation.otfvis.readerwriter.InundationDataWriter;
+import org.matsim.evacuation.otfvis.readerwriter.PolygonDataReader;
+import org.matsim.evacuation.otfvis.readerwriter.PolygonDataWriter;
+import org.matsim.evacuation.otfvis.readerwriter.SheltersReader;
+import org.matsim.evacuation.otfvis.readerwriter.SheltersWriter;
+import org.matsim.evacuation.otfvis.readerwriter.TextureDataWriter;
+import org.matsim.evacuation.otfvis.readerwriter.TextutreDataReader;
+import org.matsim.evacuation.otfvis.readerwriter.TileDrawerDataReader;
+import org.matsim.evacuation.otfvis.readerwriter.TileDrawerDataWriter;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
@@ -48,20 +63,8 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 
-import playground.gregor.otf.drawer.OTFBackgroundTexturesDrawer;
-import playground.gregor.otf.drawer.OTFSheltersDrawer;
-import playground.gregor.otf.drawer.TimeDependentTrigger;
 import playground.gregor.otf.readerwriter.InundationDataFromBinaryFileReader;
-import playground.gregor.otf.readerwriter.InundationDataReader;
-import playground.gregor.otf.readerwriter.InundationDataWriter;
-import playground.gregor.otf.readerwriter.PolygonDataReader;
-import playground.gregor.otf.readerwriter.PolygonDataWriter;
-import playground.gregor.otf.readerwriter.SheltersReader;
-import playground.gregor.otf.readerwriter.SheltersWriter;
-import playground.gregor.otf.readerwriter.TextureDataWriter;
-import playground.gregor.otf.readerwriter.TextutreDataReader;
-import playground.gregor.otf.readerwriter.TileDrawerDataReader;
-import playground.gregor.otf.readerwriter.TileDrawerDataWriter;
+import playground.gregor.otf.readerwriter.InundationDataFromNetcdfReaderII;
 
 
 public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
@@ -83,7 +86,7 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 	final private static float [] linksColor = new float [] {.5f,.5f,.5f,.7f};
 	final private static float [] nodesColor = new float [] {.4f,.4f,.4f,.7f};
 
-	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
+	private final AgentWriter writer = new AgentWriter();
 	private final boolean insertWave = true;
 
 	public MVISnapshotWriter(final QueueNetwork net, final String vehFileName, final String outFileName, final double intervall_s) {
@@ -129,18 +132,26 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 		connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
 		
-		connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.NoQuadDrawer.class);
-		connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
+//		connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
+//		connect.add(OTFLinkAgentsHandler.class,  SimpleStaticNetLayer.NoQuadDrawer.class);
 		
-		connect.add(OTFAgentsListHandler.class, OGLAgentPointLayer.AgentPadangTimeDrawer.class);
-		connect.add(OGLAgentPointLayer.AgentPadangTimeDrawer.class, OGLAgentPointLayer.class);
+		
+		connect.add(AgentWriter.class,  AgentReader.class);
+	
+//		connect.add(AgentReader.class, AgentReceiver.class);
+		
+		
+//		connect.add(OGLAgentPointLayer.AgentPadangTimeDrawer.class, OGLAgentPointLayer.class);
 		
 		
 		connect.add(SimpleStaticNetLayer.NoQuadDrawer.class, SimpleStaticNetLayer.class);
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.NoQuadDrawer.class);
+		
+		
+		
+		
 		connect.add(TileDrawerDataWriter.class,TileDrawerDataReader.class);
 		//		connect.add(InundationDataWriter.class,InundationDataReader.class);
 		//		connect.add(InundationDataReader.class,Dummy.class);

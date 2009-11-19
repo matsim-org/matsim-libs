@@ -12,8 +12,8 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.evacuation.otfvis.drawer.OTFBackgroundTexturesDrawer;
 
-import playground.gregor.otf.drawer.OTFBackgroundTexturesDrawer;
 
 public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 

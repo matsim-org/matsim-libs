@@ -4,8 +4,8 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.evacuation.otfvis.drawer.OTFBackgroundTexturesDrawer;
 
-import playground.gregor.otf.drawer.OTFBackgroundTexturesDrawer;
 
 public class WrongDirectionArrowsFromEvents extends ConfluenceArrowsFromEvents{
 

@@ -69,6 +69,12 @@ public class OTFAgentsListHandler extends OTFDataReader {
 			this.type = type;
 			this.user = userdata;
 		}
+		public int getType() {
+			return this.type;
+		}
+		public int getUser() {
+			return this.user;
+		}
 
 	}
 
@@ -96,12 +102,12 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
 			// Write additional agent data
-			out.putInt(positions.size());
+			out.putInt(this.positions.size());
 
-			for (ExtendedPositionInfo pos : positions) {
+			for (ExtendedPositionInfo pos : this.positions) {
 				writeAgent(pos, out);
 			}
-			positions.clear();
+			this.positions.clear();
 		}
 
 	}
@@ -117,9 +123,9 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 			OTFDataSimpleAgentReceiver drawer = null;
 			try {
-				drawer = (OTFDataSimpleAgentReceiver) graph.newInstance(agentReceiverClass);
+				drawer = (OTFDataSimpleAgentReceiver) graph.newInstance(this.agentReceiverClass);
 				drawer.setAgent(id.toCharArray(), x, y, type, user, speed);
-				agents.add(drawer);
+				this.agents.add(drawer);
 			} catch (InstantiationException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
@@ -132,7 +138,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 		// read additional agent data
-		agents.clear();
+		this.agents.clear();
 
 		int count = in.getInt();
 		for(int i= 0; i< count; i++) readAgent(in, graph);
@@ -156,7 +162,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 	@Override
 	public void invalidate(SceneGraph graph) {
 		// invalidate agent receivers
-		for(OTFDataSimpleAgentReceiver agent : agents) agent.invalidate(graph);
+		for(OTFDataSimpleAgentReceiver agent : this.agents) agent.invalidate(graph);
 	}
 
 
@@ -178,9 +184,9 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 				OTFDataSimpleAgentReceiver drawer = null;
 				try {
-					drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver) graph.newInstance(agentReceiverClass);
+					drawer = (org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver) graph.newInstance(this.agentReceiverClass);
 					drawer.setAgent(id.toCharArray(), x, y, 0, state, color);
-					agents.add(drawer);
+					this.agents.add(drawer);
 				} catch (InstantiationException e) {
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {

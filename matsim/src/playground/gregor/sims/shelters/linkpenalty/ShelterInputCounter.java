@@ -15,9 +15,9 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.evacuation.base.Building;
+import org.matsim.evacuation.collections.gnuclasspath.TreeMap;
 import org.matsim.signalsystems.control.SignalSystemController;
 
-import playground.gregor.collections.gnuclasspath.TreeMap;
 
 public class ShelterInputCounter implements LinkLeaveEventHandler, BeforeMobsimListener {
 
