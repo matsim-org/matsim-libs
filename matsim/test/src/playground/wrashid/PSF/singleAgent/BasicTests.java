@@ -61,20 +61,20 @@ public class BasicTests extends MatsimTestCase {
 		ChargeLog chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(0);
 
 		// the first charging opportunity at work is used (it has low tariff)
-		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 22989, 1);
-		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 23104, 1);
+		assertEquals(22989, chargeLogOfAgentOne.getStartChargingTime(),  1);
+		assertEquals(23104, chargeLogOfAgentOne.getEndChargingTime(),  1);
 
 		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(1);
 
 		// when the vehicle arrives at home, there is high tariff, therefore the
 		// vehicle doesn't start charging
 		// immediately, but waits until low tariff starts)
-		assertEquals(chargeLogOfAgentOne.getStartChargingTime(), 72000, 1);
-		assertEquals(chargeLogOfAgentOne.getEndChargingTime(), 72085, 1);
+		assertEquals(72000, chargeLogOfAgentOne.getStartChargingTime(),  1);
+		assertEquals(72085, chargeLogOfAgentOne.getEndChargingTime(),  1);
 		
 		
 		// after charging the battery of the agent is full (allow for small rounding error)
-		assertEquals(chargeLogOfAgentOne.getEndSOC(), ParametersPSF.getDefaultMaxBatteryCapacity(), 0.1);
+		assertEquals(ParametersPSF.getDefaultMaxBatteryCapacity(), chargeLogOfAgentOne.getEndSOC(),  0.1);
 		
 		
 		// the agent should charge twice.
@@ -100,12 +100,12 @@ public class BasicTests extends MatsimTestCase {
 
 		// allow small delta of one second (because the output time in the log
 		// file is truncated
-		assertEquals(parkingTimes.getFirstParkingDepartTime(), 21610, 1);
-		assertEquals(parkingTimes.getLastParkingArrivalTime(), 61449, 1);
+		assertEquals(21610, parkingTimes.getFirstParkingDepartTime(),  1);
+		assertEquals(61449, parkingTimes.getLastParkingArrivalTime(),  1);
 
 		ParkLog parkLog = parkingTimes.getParkingTimes().get(0);
-		assertEquals(parkLog.getStartParkingTime(), 22989, 1);
-		assertEquals(parkLog.getEndParkingTime(), 59349, 1);
+		assertEquals(22989, parkLog.getStartParkingTime(),  1);
+		assertEquals(59349, parkLog.getEndParkingTime(),  1);
 	}
 
 	public void testLogEnergyConsumption() {
@@ -122,10 +122,10 @@ public class BasicTests extends MatsimTestCase {
 		// allow small delta of one second (because the output time in the log
 		// file is truncated
 		// check the time of the entrance of the last link
-		assertEquals(energyConsumption.getTempEnteranceTimeOfLastLink(), 61459, 1);
+		assertEquals(61459, energyConsumption.getTempEnteranceTimeOfLastLink(),  1);
 		LinkEnergyConsumptionLog energyLog = energyConsumption.getLinkEnergyConsumption().get(0);
-		assertEquals(energyLog.getEnterTime(), 21670, 1);
-		assertEquals(energyLog.getLeaveTime(), 22029, 1);
+		assertEquals(21670, energyLog.getEnterTime(),  1);
+		assertEquals(22029,  energyLog.getLeaveTime(),1);
 	}
 
 }
