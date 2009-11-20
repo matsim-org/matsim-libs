@@ -65,6 +65,15 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 	private Plan currentPlan = null;
 	private final List<Tuple<Leg, List<Leg>>> legReplacements = new LinkedList<Tuple<Leg, List<Leg>>>();
 
+	/**
+	 * This essentially does the following (if I see correctly):<ul>
+	 * <li> It passes the arguments <tt>config, network, costCalculator, timeCalculator, factory</tt> through to the "normal"
+	 *      PlanCalcRoute. </li>
+	 * <li> It restricts the usable part of the network for the above to "car". </li>
+	 * <li> It sets a non-configurable TransitRouter, based on <tt>schedule</tt> and an internally defined TransitRouterConfig. </li>
+	 * <li> It remembers <tt>transitConfig</tt>.
+	 * </ul>
+	 */
 	public PlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final NetworkLayer network,
 			final TravelCost costCalculator, final TravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
