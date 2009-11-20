@@ -114,16 +114,6 @@
         <artifactId>maven-surefire-report-plugin</artifactId>
         <version>2.4.3</version>
       </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>javancss-maven-plugin</artifactId>
-        <version>2.0-beta-2</version>
-        <configuration>
-          <includes>
-            <include>org/matsim/**/*.java</include>
-          </includes>
-        </configuration>
-      </plugin>
     </plugins>
   </reporting>
   
@@ -206,39 +196,44 @@
       </build>
     </profile>
 
-		<profile>
-			<!-- special settings for some plugins only used on the hudson build server -->
-			<!-- must be manually activated with "mvn -Phudson ..." and the corresponding goals -->
-			<id>hudson</id>
-			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<groupId>org.codehaus.mojo</groupId>
-							<artifactId>cobertura-maven-plugin</artifactId>
-							<version>2.3</version>
-							<configuration>
-								<formats>
-									<format>xml</format>
-								</formats>
-							</configuration>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
-			<reporting>
+	<profile>
+		<!-- special settings for some plugins only used on the hudson build server -->
+		<!-- must be manually activated with "mvn -Phudson ..." and the corresponding goals -->
+		<id>hudson</id>
+		<build>
+			<pluginManagement>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-pmd-plugin</artifactId>
-						<version>2.4</version>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>cobertura-maven-plugin</artifactId>
+						<version>2.3</version>
 						<configuration>
-							<targetJdk>${compileSource}</targetJdk>
+							<formats>
+								<format>xml</format>
+							</formats>
 						</configuration>
 					</plugin>
 				</plugins>
-			</reporting>
-		</profile>
+			</pluginManagement>
+		</build>
+		<reporting>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-pmd-plugin</artifactId>
+					<version>2.4</version>
+					<configuration>
+						<targetJdk>${compileSource}</targetJdk>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>javancss-maven-plugin</artifactId>
+					<version>2.0</version>
+				</plugin>
+			</plugins>
+		</reporting>
+	</profile>
 
   </profiles>
   
