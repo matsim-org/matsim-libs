@@ -4,7 +4,9 @@ import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.PSF.ParametersPSFMutator;
@@ -21,10 +23,10 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 public class GeneralTestOptimizedCharger extends MatsimTestCase implements
 		ParametersPSFMutator {
 
-	String configFile;
+	Controler controler;
 
-	public GeneralTestOptimizedCharger(String configFile) {
-		this.configFile = configFile;
+	public GeneralTestOptimizedCharger(Controler controler) {
+		this.controler = controler;
 	}
 
 	public void mutateParameters() {
@@ -32,9 +34,7 @@ public class GeneralTestOptimizedCharger extends MatsimTestCase implements
 	}
 
 	public void optimizedChargerTest() {
-		Controler controler = new Controler(this.configFile);
 		controler.addControlerListener(new AddEnergyScoreListener());
-		controler.setOverwriteFiles(true);
 
 		LogEnergyConsumption logEnergyConsumption = new LogEnergyConsumption(
 				controler);
