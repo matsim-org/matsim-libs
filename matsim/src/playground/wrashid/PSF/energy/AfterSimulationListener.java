@@ -48,6 +48,8 @@ public class AfterSimulationListener implements AfterMobsimListener {
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 
 		optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes.getParkingTimes());
+		optimizedCharger.outputOptimizationData();
+		
 		chargingTimes = optimizedCharger.getChargingTimes();
 
 		ChargingTimes.printEnergyUsageStatistics(chargingTimes, ParametersPSF.getHubLinkMapping());

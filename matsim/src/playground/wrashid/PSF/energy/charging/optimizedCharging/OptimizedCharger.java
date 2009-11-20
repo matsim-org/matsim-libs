@@ -89,11 +89,11 @@ public class OptimizedCharger {
 
 		}
 		
-		outputOptimizationData();
+		
 
 	}
 	
-	private void outputOptimizationData(){
+	public void outputOptimizationData(){
 		// write out charging events to file, if specified
 		// TODO: 'remove parameter main.chargingTimesOutputFilePath from config'
 		if (ParametersPSF.getMainChargingTimesOutputFilePath()!=null){
