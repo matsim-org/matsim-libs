@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -119,8 +118,8 @@ public class CountsCreator {
 		System.exit(-1) ;
 
 	
-		CountsWriter cw = new CountsWriter(counts, "./output/counts.xml");
-		cw.write();
+		CountsWriter cw = new CountsWriter(counts);
+		cw.writeFile("./output/counts.xml");
 		log.info("counts written successfully to: ./output/counts.xml");
 	}
 

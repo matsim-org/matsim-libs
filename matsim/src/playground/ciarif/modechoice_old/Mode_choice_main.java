@@ -23,14 +23,12 @@ package playground.ciarif.modechoice_old;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkSummary;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.Knowledges;
@@ -169,7 +167,7 @@ public class Mode_choice_main {
 
 		System.out.println("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.write();
+		world_writer.writeFile(config.world().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");

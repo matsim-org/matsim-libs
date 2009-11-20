@@ -20,15 +20,16 @@
 
 package org.matsim.world;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.internal.MatsimFileWriter;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.Writer;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
-public class WorldWriter extends Writer {
+public class WorldWriter extends MatsimXmlWriter implements MatsimFileWriter {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -36,6 +37,7 @@ public class WorldWriter extends Writer {
 
 	private WorldWriterHandler writerhandler = null;
 	private final World world;
+	private String dtd;
 
 	private final static Logger log = Logger.getLogger(WorldWriter.class);
 
@@ -44,24 +46,13 @@ public class WorldWriter extends Writer {
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Creates a new WorldWriter with the output-file-location from the current configuration.
-	 *
-	 * @param world The world to be written to file.
-	 */
-	public WorldWriter(final World world) {
-		this(world, Gbl.getConfig().world().getOutputFile());
-	}
-
-	/**
 	 * Creates a new WorldWriter to write the specified world to the specified file.
 	 *
 	 * @param world
-	 * @param filename
 	 */
-	public WorldWriter(final World world, final String filename) {
+	public WorldWriter(final World world) {
 		super();
 		this.world = world;
-		this.outfile = filename;
 		// always write out latest version, currently v2
 		this.dtd = "http://www.matsim.org/files/dtd/world_v2.dtd";
 		this.writerhandler = new WorldWriterHandlerImplV2();
@@ -71,19 +62,19 @@ public class WorldWriter extends Writer {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void writeLayer(final Layer l) {
+	private final void writeLayer(final Layer l, final BufferedWriter out) {
 		if (l instanceof ZoneLayer) {
 			try {
-				this.writerhandler.startLayer((ZoneLayer)l, this.out);
+				this.writerhandler.startLayer((ZoneLayer)l, out);
 				Iterator<? extends MappedLocation> z_it = l.getLocations().values().iterator();
 				while (z_it.hasNext()) {
 					Zone z = (Zone)z_it.next();
-					this.writerhandler.startZone(z, this.out);
-					this.writerhandler.endZone(this.out);
+					this.writerhandler.startZone(z, out);
+					this.writerhandler.endZone(out);
 				}
-				this.writerhandler.endLayer(this.out);
-				this.writerhandler.writeSeparator(this.out);
-				this.out.flush();
+				this.writerhandler.endLayer(out);
+				this.writerhandler.writeSeparator(out);
+				out.flush();
 			}
 			catch (IOException e) {
 				Gbl.errorMsg(e);
@@ -97,21 +88,20 @@ public class WorldWriter extends Writer {
 	private final void writeRule(final MappingRule m) {
 		if ((m.getDownLayer() instanceof ZoneLayer)) {
 			try {
-				this.writerhandler.startMapping(m, this.out);
+				this.writerhandler.startMapping(m, this.writer);
 				Iterator<? extends MappedLocation> dz_it = m.getDownLayer().getLocations().values().iterator();
 				while (dz_it.hasNext()) {
 					Zone dz = (Zone)dz_it.next();
 					Iterator<MappedLocation> uz_it = dz.getUpMapping().values().iterator();
 					while (uz_it.hasNext()) {
 						Zone uz = (Zone)uz_it.next();
-						this.writerhandler.startRef(dz, uz, this.out);
-						this.writerhandler.endRef(this.out);
-						this.out.flush();
+						this.writerhandler.startRef(dz, uz, this.writer);
+						this.writerhandler.endRef(this.writer);
 					}
 				}
-				this.writerhandler.endMapping(this.out);
-				this.writerhandler.writeSeparator(this.out);
-				this.out.flush();
+				this.writerhandler.endMapping(this.writer);
+				this.writerhandler.writeSeparator(this.writer);
+				this.writer.flush();
 			}
 			catch (IOException e) {
 				Gbl.errorMsg(e);
@@ -126,21 +116,21 @@ public class WorldWriter extends Writer {
 	// write methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
-	public final void write() {
+	public final void writeFile(final String filename) {
 		try {
-			this.out = IOUtils.getBufferedWriter(this.outfile);
-			writeDtdHeader("world");
-			this.out.flush();
-			this.writerhandler.startWorld(this.world, this.out);
-			this.writerhandler.writeSeparator(this.out);
-			this.out.flush();
+			openFile(filename);
+			writeXmlHead();
+			writeDoctype("world", this.dtd);
+			this.writer.flush();
+			this.writerhandler.startWorld(this.world, this.writer);
+			this.writerhandler.writeSeparator(this.writer);
+			this.writer.flush();
 			Layer l = this.world.getBottomLayer();
 			if (l != null) {
-				this.writeLayer(l);
+				this.writeLayer(l, this.writer);
 				while (l.getUpRule() != null) {
 					l = l.getUpRule().getUpLayer();
-					this.writeLayer(l);
+					this.writeLayer(l, this.writer);
 				}
 			}
 			l = this.world.getBottomLayer();
@@ -154,9 +144,9 @@ public class WorldWriter extends Writer {
 					}
 				}
 			}
-			this.writerhandler.endWorld(this.out);
-			this.out.flush();
-			this.out.close();
+			this.writerhandler.endWorld(this.writer);
+			this.writer.flush();
+			close();
 		}
 		catch (IOException e) {
 			Gbl.errorMsg(e);

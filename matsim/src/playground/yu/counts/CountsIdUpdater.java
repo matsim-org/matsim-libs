@@ -94,7 +94,7 @@ public class CountsIdUpdater {
 								+ oldCountId);
 			}
 		}
-		new CountsWriter(newCounts, newCountsFile).write();
+		new CountsWriter(newCounts).writeFile(newCountsFile);
 	}
 
 	private static Id searchLinkPerNodeIdPair(final Id fromNodeId,

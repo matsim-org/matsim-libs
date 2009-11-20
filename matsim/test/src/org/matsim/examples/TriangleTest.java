@@ -21,7 +21,6 @@
 package org.matsim.examples;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -33,7 +32,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkSummary;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -201,7 +199,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  writing world xml file... ");
-		new WorldWriter(world).write();
+		new WorldWriter(world).writeFile(this.config.world().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing config xml file... ");

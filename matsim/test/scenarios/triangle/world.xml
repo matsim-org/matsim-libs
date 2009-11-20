@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE world SYSTEM "http://www.matsim.org/files/dtd/world_v2.dtd">
-
 <world name="test triangle world">
 
 <!-- ====================================================================== -->

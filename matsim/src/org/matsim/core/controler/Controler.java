@@ -335,8 +335,8 @@ public class Controler {
 		final String PARALLEL_EVENT_HANDLING = "parallelEventHandling";
 		final String NUMBER_OF_THREADS = "numberOfThreads";
 		final String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
-		String numberOfThreads = Gbl.getConfig().findParam(PARALLEL_EVENT_HANDLING, NUMBER_OF_THREADS);
-		String estimatedNumberOfEvents = Gbl.getConfig().findParam(PARALLEL_EVENT_HANDLING, ESTIMATED_NUMBER_OF_EVENTS);
+		String numberOfThreads = this.config.findParam(PARALLEL_EVENT_HANDLING, NUMBER_OF_THREADS);
+		String estimatedNumberOfEvents = this.config.findParam(PARALLEL_EVENT_HANDLING, ESTIMATED_NUMBER_OF_EVENTS);
 
 		if (numberOfThreads != null) {
 			int numOfThreads = Integer.parseInt(numberOfThreads);
@@ -413,7 +413,7 @@ public class Controler {
 			// dump network
 			new NetworkWriter(this.network, this.getNameForOutputFilename("output_network.xml.gz")).write();
 			// dump world
-			new WorldWriter(this.getWorld(), this.getNameForOutputFilename("output_world.xml.gz")).write();
+			new WorldWriter(this.getWorld()).writeFile(this.getNameForOutputFilename("output_world.xml.gz"));
 			// dump config
 			new ConfigWriter(this.config, this.getNameForOutputFilename("output_config.xml.gz")).write();
 			// dump facilities
@@ -778,7 +778,7 @@ public class Controler {
 		if (this.externalMobsim == null) {
 			final String JDEQ_SIM = "JDEQSim";
 			final String NUMBER_OF_THREADS = "numberOfThreads";
-			String numberOfThreads = Gbl.getConfig().findParam(JDEQ_SIM, NUMBER_OF_THREADS);
+			String numberOfThreads = this.config.findParam(JDEQ_SIM, NUMBER_OF_THREADS);
 			int numOfThreads = 0;
 
 			if (numberOfThreads != null) {

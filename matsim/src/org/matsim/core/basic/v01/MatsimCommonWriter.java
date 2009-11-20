@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.basic.v01;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Writer;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.basic.v01.population.PopulationSchemaV5Names;
@@ -36,7 +36,7 @@ public class MatsimCommonWriter extends MatsimXmlWriter {
 
 //	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 	
-	public MatsimCommonWriter(Writer writer) {
+	public MatsimCommonWriter(BufferedWriter writer) {
 		this.writer = writer;
 	}
 	

@@ -29,6 +29,7 @@ import org.matsim.core.gbl.Gbl;
 /**
  * Usage of this class discouraged. It will be deprecated soon. Please
  * use {@link MatsimXmlWriter} for writing XML files.
+ * @deprecated use {@link MatsimXmlWriter} instead
  */
 public abstract class Writer extends AbstractMatsimWriter implements MatsimNofileWriter {
 
@@ -51,7 +52,7 @@ public abstract class Writer extends AbstractMatsimWriter implements MatsimNofil
 	// write methods
 	//////////////////////////////////////////////////////////////////////
 
-	public abstract void write();
+//	public abstract void write();
 
 	protected void writeDtdHeader(final String root_elem) {
 		try {

@@ -63,8 +63,8 @@ public class CountsParserWriterTest extends MatsimTestCase {
 		// check if xml file not empty
 
 		String filename = this.getOutputDirectory() + "output_counts.xml";
-		CountsWriter counts_writer = new CountsWriter(fixture.counts, filename);
-		counts_writer.write();
+		CountsWriter counts_writer = new CountsWriter(fixture.counts);
+		counts_writer.writeFile(filename);
 		File f = new File(filename);
 		assertTrue(f.length() > 0.0);
 	}

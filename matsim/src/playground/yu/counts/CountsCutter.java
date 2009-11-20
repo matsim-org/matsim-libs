@@ -101,9 +101,8 @@ public class CountsCutter {
 
 		// ------------------WRITE COUNTSFILE----------------
 		for (int i = 0; i < fragmentsNo; i++) {
-			new CountsWriter(countsArray[i],
-					"../matsimTests/Calibration/test/countsIVTCH." + i + ".xml")
-					.write();
+			new CountsWriter(countsArray[i])
+					.writeFile("../matsimTests/Calibration/test/countsIVTCH." + i + ".xml");
 			System.out.println("countsIVTCH." + i + ".xml contains\t"
 					+ countsCounter[i] + "\tcountstations.");
 		}

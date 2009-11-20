@@ -66,7 +66,6 @@ public class ConfigWriter extends Writer {
 	// write methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public final void write() {
 		try {
 			if (this.outstream == null) {

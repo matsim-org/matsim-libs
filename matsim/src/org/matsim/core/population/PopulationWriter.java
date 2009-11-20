@@ -332,7 +332,6 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	/**
 	 * Writes all plans to the file. If plans-streaming is on, this will end the writing and close the file.
 	 */
-	@Override
 	public void write() {
 		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
 			log.info("PlansStreaming is on -- plans already written, just closing file if it's open.");

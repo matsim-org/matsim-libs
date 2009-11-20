@@ -165,7 +165,7 @@ public class IIDMGenerationPart2 {
 
 		log.info("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.write();
+		world_writer.writeFile(config.world().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing config xml file... ");

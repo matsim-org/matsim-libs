@@ -105,7 +105,7 @@ public class CountsConverter {
 			}
 		}
 		// ------------------WRITE COUNTSFILE----------------
-		new CountsWriter(counts, "../berlin data/link_counts_PKW_hrs0-24.xml")
-				.write();
+		new CountsWriter(counts)
+				.writeFile("../berlin data/link_counts_PKW_hrs0-24.xml");
 	}
 }

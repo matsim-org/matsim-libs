@@ -24,6 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationImpl;
@@ -39,7 +40,7 @@ public abstract class TriangleScenario {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	public static final long CHECKSUM_WORLD_EMPTY = 565556558;
+	public static final long CHECKSUM_WORLD_EMPTY = 4202206189L;
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -92,7 +93,7 @@ public abstract class TriangleScenario {
 	public static final void writeWorld(final World world) {
 		System.out.println("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.write();
+		world_writer.writeFile(Gbl.getConfig().world().getOutputFile());
 		System.out.println("  done.");
 	}
 
@@ -106,7 +107,7 @@ public abstract class TriangleScenario {
 	public static final void writeMatrices(final Matrices matrices) {
 		System.out.println("  writing matrices xml file... ");
 		MatricesWriter matrices_writer = new MatricesWriter(matrices);
-		matrices_writer.write();
+		matrices_writer.writeFile(Gbl.getConfig().matrices().getOutputFile());
 		System.out.println("  done.");
 	}
 

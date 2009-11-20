@@ -152,7 +152,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 
 		System.out.println("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.write();
+		world_writer.writeFile(config.world().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");

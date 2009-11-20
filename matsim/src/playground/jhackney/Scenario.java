@@ -292,7 +292,7 @@ public abstract class Scenario {
 
 	public static final void writeWorld(final World world) {
 		System.out.println("  writing world xml file... ");
-		new WorldWriter(world).write();
+		new WorldWriter(world).writeFile(scenario.getConfig().world().getOutputFile());
 		System.out.println("  done.");
 	}
 

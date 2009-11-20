@@ -181,7 +181,7 @@ public class InitDemandCreation {
 
 		System.out.println("  writing matrices xml file... ");
 		MatricesWriter mat_writer = new MatricesWriter(matrices);
-		mat_writer.write();
+		mat_writer.writeFile(Gbl.getConfig().matrices().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing facilities xml file... ");
@@ -191,7 +191,7 @@ public class InitDemandCreation {
 
 		System.out.println("  writing world xml file... ");
 		WorldWriter world_writer = new WorldWriter(world);
-		world_writer.write();
+		world_writer.writeFile(config.world().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");

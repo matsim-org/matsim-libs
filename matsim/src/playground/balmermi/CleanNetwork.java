@@ -60,7 +60,7 @@ public class CleanNetwork {
 		nwat.run(network);
 		nwat.close();
 		
-		new CountsWriter(counts,"../../output/output_counts.xml.gz").write();
+		new CountsWriter(counts).writeFile("../../output/output_counts.xml.gz");
 		new NetworkWriter(network,"../../output/output_network.xml.gz").write();
 	}
 

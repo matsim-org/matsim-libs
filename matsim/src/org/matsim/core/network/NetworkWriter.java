@@ -46,7 +46,6 @@ public class NetworkWriter extends Writer {
 		this.handler = new NetworkWriterHandlerImplV1();
 	}
 
-	@Override
 	public void write() {
 		try {
 			this.out = IOUtils.getBufferedWriter(this.outfile);

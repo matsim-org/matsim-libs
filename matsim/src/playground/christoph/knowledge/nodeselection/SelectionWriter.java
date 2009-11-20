@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -185,7 +184,6 @@ public class SelectionWriter extends Writer {
 	/*
 	 * Write a single file containing all data.
 	 */
-	@Override
 	public void write() 
 	{
 		this.writeStartSelection(description);

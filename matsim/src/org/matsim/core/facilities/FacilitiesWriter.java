@@ -67,7 +67,6 @@ public class FacilitiesWriter extends Writer {
 	// write methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
 	public final void write() {
 		this.writeOpenAndInit();
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {

@@ -24,11 +24,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.matsim.core.api.internal.MatsimFileWriter;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.Writer;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
-public class MatricesWriter extends Writer {
+public class MatricesWriter extends MatsimXmlWriter implements MatsimFileWriter {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -36,6 +36,7 @@ public class MatricesWriter extends Writer {
 
 	private MatricesWriterHandler handler = null;
 	private final Matrices matrices;
+	private String dtd;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -44,7 +45,6 @@ public class MatricesWriter extends Writer {
 	public MatricesWriter(final Matrices matrices) {
 		super();
 		this.matrices = matrices;
-		this.outfile = Gbl.getConfig().matrices().getOutputFile();
 		// always write out in newest version, currently v1
 		this.dtd = "http://matsim.org/files/dtd/matrices_v1.dtd";
 		this.handler = new MatricesWriterHandlerImplV1();
@@ -54,44 +54,37 @@ public class MatricesWriter extends Writer {
 	// write methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
-	public final void write() {
+	public final void writeFile(final String filename) {
 		try {
-			this.out = IOUtils.getBufferedWriter(this.outfile);
-			writeDtdHeader("matrices");
-			this.out.flush();
-			this.handler.startMatrices(this.matrices, this.out);
-			this.handler.writeSeparator(this.out);
+			openFile(filename);
+			writeXmlHead();
+			writeDoctype("matrices", this.dtd);
+			this.handler.startMatrices(this.matrices, this.writer);
+			this.handler.writeSeparator(this.writer);
 			Iterator<Matrix> m_it = this.matrices.getMatrices().values().iterator();
 			while (m_it.hasNext()) {
 				Matrix m = m_it.next();
-				this.handler.startMatrix(m, this.out);
+				this.handler.startMatrix(m, this.writer);
 				Iterator<ArrayList<Entry>> eal_it = m.getFromLocations().values().iterator();
 				while (eal_it.hasNext()) {
 					ArrayList<Entry> eal = eal_it.next();
 					Iterator<Entry> e_it = eal.iterator();
 					while (e_it.hasNext()) {
 						Entry e = e_it.next();
-						this.handler.startEntry(e, this.out);
-						this.handler.endEntry(this.out);
+						this.handler.startEntry(e, this.writer);
+						this.handler.endEntry(this.writer);
 					}
 				}
-				this.handler.endMatrix(this.out);
-				this.handler.writeSeparator(this.out);
-				this.out.flush();
+				this.handler.endMatrix(this.writer);
+				this.handler.writeSeparator(this.writer);
+				this.writer.flush();
 			}
-			this.handler.endMatrices(this.out);
-			this.out.flush();
-			this.out.close();
+			this.handler.endMatrices(this.writer);
+			close();
 		}
 		catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-	}
-
-	public final void writeFile(final String filename) {
-		this.outfile = filename;
-		write();
 	}
 
 	//////////////////////////////////////////////////////////////////////

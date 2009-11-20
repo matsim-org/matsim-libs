@@ -26,46 +26,33 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.Vector;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.internal.MatsimFileWriter;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.Writer;
-import org.matsim.counts.algorithms.graphs.helper.Comp;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
-public class CountsWriter extends Writer {
+public class CountsWriter extends MatsimXmlWriter implements MatsimFileWriter {
 
 	private CountsWriterHandler handler = null;
 	private final Counts counts;
 
 	public CountsWriter(final Counts counts) {
-		this(counts,
-				Gbl.getConfig().counts().getOutputFile());
-	}
-
-	public CountsWriter(final Counts counts, final String filename) {
 		this.counts = counts;
-		this.outfile = filename;
-		this.dtd = null;
 
 		// use the newest writer-version by default
 		this.handler = new CountsWriterHandlerImplV1();
 	}
 
-	@Override
-	public final void write() {
+	public final void writeFile(final String filename) {
 		try {
-
-			this.out = IOUtils.getBufferedWriter(this.outfile);
+			openFile(filename);
 
 			// write custom header
-			this.out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-			this.out.flush();
+			writeXmlHead();
 
-			this.handler.startCounts(this.counts, this.out);
-			this.handler.writeSeparator(this.out);
+			this.handler.startCounts(this.counts, this.writer);
+			this.handler.writeSeparator(this.writer);
 			
 			List<Count> countsTemp = new Vector<Count>();
 			countsTemp.addAll(this.counts.getCounts().values());
@@ -80,30 +67,25 @@ public class CountsWriter extends Writer {
 				volumesTemp.addAll(c.getVolumes().values());
 				Collections.sort(volumesTemp, new VolumeComparator());
 				
-				this.handler.startCount(c,this.out);
+				this.handler.startCount(c,this.writer);
 
 				// volume iterator
 				Iterator<Volume> vol_it = volumesTemp.iterator();
 				while (vol_it.hasNext()) {
 					Volume v = vol_it.next();
-					this.handler.startVolume(v, this.out);
-					this.handler.endVolume(this.out);
+					this.handler.startVolume(v, this.writer);
+					this.handler.endVolume(this.writer);
 				}
-				this.handler.endCount(this.out);
-				this.handler.writeSeparator(this.out);
-				this.out.flush();
+				this.handler.endCount(this.writer);
+				this.handler.writeSeparator(this.writer);
+				this.writer.flush();
 			}
-			this.handler.endCounts(this.out);
-			this.out.close();
+			this.handler.endCounts(this.writer);
+			close();
 		}
 		catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-	}
-
-	public final void writeFile(final String filename) {
-		this.outfile = filename;
-		write();
 	}
 
 	@Override

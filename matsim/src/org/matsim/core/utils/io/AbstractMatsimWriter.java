@@ -20,8 +20,8 @@
 
 package org.matsim.core.utils.io;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Writer;
 
 
 /**
@@ -36,7 +36,7 @@ public abstract class AbstractMatsimWriter {
 	protected static final String NL = "\n";
 
 	/** The writer output can be written to. */
-	protected Writer writer = null;
+	protected BufferedWriter writer = null;
 
 	/** Whether or not the output is gzip-compressed. If <code>null</code>, the
 	 * usage of compression is decided by the filename (whether it ends with .gz
@@ -75,6 +75,7 @@ public abstract class AbstractMatsimWriter {
 	 */
 	protected void close() throws IOException {
 		if (this.writer != null) {
+			this.writer.flush();
 			this.writer.close();
 			this.writer = null;
 		}

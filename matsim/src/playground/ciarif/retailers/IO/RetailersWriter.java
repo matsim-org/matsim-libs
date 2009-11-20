@@ -5,7 +5,6 @@ import org.matsim.core.utils.io.Writer;
 
 public class RetailersWriter extends Writer {
 
-	@Override
 	public void write() {
 		// TODO Auto-generated method stub
 		
