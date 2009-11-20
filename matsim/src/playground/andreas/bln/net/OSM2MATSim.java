@@ -11,7 +11,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkSegmentDoubleLinks;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.run.NetworkCleaner;
 import org.xml.sax.SAXException;
@@ -84,7 +83,7 @@ public class OSM2MATSim {
 //		osmReader.setHierarchyLayer(52.43, 12.97, 52.35, 13.16, 5); // Potsdam
 //		osmReader.setHierarchyLayer(52.56, 13.13, 52.51, 13.21, 5); // Spandau
 
-//		osmReader.setHierarchyLayer(52.494, 13.413, 52.461, 13.440, 6); // Hermannstraße
+//		osmReader.setHierarchyLayer(52.494, 13.413, 52.461, 13.440, 6); // Hermannstraï¿½e
 		osmReader.setHierarchyLayer(52.51, 13.37, 52.38, 13.54, 5); // M44/344 weitere Umgebung
 		osmReader.setHierarchyLayer(52.495, 13.410, 52.407, 13.465, 6); // M44/344 komplett		
 		
@@ -120,7 +119,7 @@ public class OSM2MATSim {
 		
 		System.out.println("...done");
 		
-		new NetworkWriter(network, outputFile + ".xml.gz").write();
+		new NetworkWriter(network).writeFile(outputFile + ".xml.gz");
 		new NetworkCleaner().run(new String[] {outputFile + ".xml.gz", outputFile + "_cl.xml.gz"});
 		System.out.println("NetworkCleaner...done");
 
@@ -135,12 +134,12 @@ public class OSM2MATSim {
 		nsimply.setNodesToMerge(nodeTypesToMerge);
 //		nsimply.setMergeLinkStats(true);
 		nsimply.run(network);
-		new NetworkWriter(network, outputFile + "_cl_simple.xml.gz").write();
+		new NetworkWriter(network).writeFile(outputFile + "_cl_simple.xml.gz");
 		System.out.println("NetworkSimplifier...done");
 		
 		NetworkSegmentDoubleLinks networkDoubleLinks = new NetworkSegmentDoubleLinks();
 		networkDoubleLinks.run(network);
-		new NetworkWriter(network, outputFile + "_cl_simple_dl.xml.gz").write();
+		new NetworkWriter(network).writeFile(outputFile + "_cl_simple_dl.xml.gz");
 		System.out.println("NetworkDoubleLinks...done");
 		System.out.println("Converting...done");
 

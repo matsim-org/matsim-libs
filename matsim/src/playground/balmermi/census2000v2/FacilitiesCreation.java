@@ -82,7 +82,7 @@ public class FacilitiesCreation {
 		
 		System.out.println("  writing facilities xml file... ");
 		FacilitiesWriter fac_writer = new FacilitiesWriter(facilities);
-		fac_writer.write();
+		fac_writer.writeFile(config.facilities().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
@@ -91,8 +91,7 @@ public class FacilitiesCreation {
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(config);
-		config_writer.write();
+		new ConfigWriter(config).writeFile(config.config().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("done.");

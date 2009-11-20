@@ -23,16 +23,14 @@ package playground.mfeil.analysis;
 
 import java.util.Iterator;
 
-
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
-import playground.balmermi.algos.*;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.*;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 
 
 /**
@@ -76,7 +74,7 @@ public class AssignFacs {
 
 		new AssignFacs(scenario.getActivityFacilities(), scenario.getPopulation(), outputDir);
 		
-		new PopulationWriter(scenario.getPopulation(), outputDir);
+//		new PopulationWriter(scenario.getPopulation(), outputDir);
 		log.info("Analysis of plan finished.");
 	}
 

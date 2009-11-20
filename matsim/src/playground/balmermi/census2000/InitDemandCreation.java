@@ -117,6 +117,7 @@ public class InitDemandCreation {
 		PopulationImpl plans = new PopulationImpl();
 		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
+		plansWriter.startStreaming(config.plans().getOutputFile());
 		PopulationReader plansReader = new MatsimPopulationReader(plans, null);
 		System.out.println("  done.");
 
@@ -154,7 +155,7 @@ public class InitDemandCreation {
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
-		plansWriter.write();
+		plansWriter.closeStreaming();
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -185,8 +186,7 @@ public class InitDemandCreation {
 		System.out.println("  done.");
 
 		System.out.println("  writing facilities xml file... ");
-		FacilitiesWriter fac_writer = new FacilitiesWriter(facilities);
-		fac_writer.write();
+		new FacilitiesWriter(facilities).writeFile(config.facilities().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
@@ -195,8 +195,7 @@ public class InitDemandCreation {
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(config);
-		config_writer.write();
+		new ConfigWriter(config).writeFile(config.config().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("done.");

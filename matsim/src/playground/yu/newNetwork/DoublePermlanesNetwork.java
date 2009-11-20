@@ -59,7 +59,7 @@ public class DoublePermlanesNetwork {
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputNetFilename);
-		new NetworkWriter(network, outputNetFilename).write();
+		new NetworkWriter(network).writeFile(outputNetFilename);
 	}
 
 }

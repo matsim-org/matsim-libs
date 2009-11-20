@@ -51,8 +51,7 @@ public class FacilitiesTypeReduction {
 		System.out.println("  done.");
 		
 		System.out.println("  writing facilities xml file... ");
-		FacilitiesWriter fac_writer = new FacilitiesWriter(facilities);
-		fac_writer.write();
+		new FacilitiesWriter(facilities).writeFile(config.facilities().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("TEST SUCCEEDED.");

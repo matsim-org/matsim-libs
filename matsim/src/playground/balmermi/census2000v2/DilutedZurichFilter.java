@@ -131,6 +131,7 @@ public class DilutedZurichFilter {
 		PopulationImpl pop = new PopulationImpl();
 		pop.setIsStreaming(true);
 		PopulationWriter pop_writer = new PopulationWriter(pop);
+		pop_writer.startStreaming(config.plans().getOutputFile());
 		PopulationReader pop_reader = new MatsimPopulationReader(pop, network);
 		System.out.println("  done.");
 
@@ -146,7 +147,7 @@ public class DilutedZurichFilter {
 
 		System.out.println("  reading, processing, writing plans...");
 		pop_reader.readFile(config.plans().getInputFile());
-		pop_writer.write();
+		pop_writer.closeStreaming();
 		pop.printPlansCount();
 		System.out.println("    => filtered persons: " + filter.getCount());
 		System.out.println("  done.");
@@ -154,15 +155,15 @@ public class DilutedZurichFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  writing network xml file... ");
-		new NetworkWriter(network).write();
+		new NetworkWriter(network).writeFile(config.network().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write();
+		new FacilitiesWriter(facilities).writeFile(config.facilities().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing config xml file... ");
-		new ConfigWriter(config).write();
+		new ConfigWriter(config).writeFile(config.config().getOutputFile());
 		log.info("  done.");
 
 		log.info("done.");

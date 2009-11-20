@@ -129,8 +129,7 @@ public class IVT2006ToGraphML {
 		 * Write population and social network...
 		 */
 		logger.info("Writing population to " + popfilename);
-		PopulationWriter popWriter = new PopulationWriter(population, popfilename);
-		popWriter.write();
+		new PopulationWriter(population).writeFile(popfilename);
 		
 		logger.info("Writing social network to " + graphfile);
 		SNGraphMLWriter graphWriter = new SNGraphMLWriter();

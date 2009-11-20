@@ -333,9 +333,8 @@ public class ModdedConverterE {
 		c.setPop(new PopulationImpl());
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
-			PopulationWriter writer = new PopulationWriter(c.pop,
-					newPlansFilename, "v4", 1.0);
-			writer.writeStartPlans();
+			PopulationWriter writer = new PopulationWriter(c.pop);
+			writer.writeStartPlans(newPlansFilename);
 			String line;// = reader.readLine();
 			do {
 				line = reader.readLine();

@@ -56,9 +56,7 @@ public class PlansMutateTimeAllocation {
 			for (Plan plan : person.getPlans())
 				pmta.run(plan);
 
-		new PopulationWriter(population,
-				"D:/fromNB04/wm/Toronto/toronto/plans/xy/plansBlurred.xml.gz")
-				.write();
+		new PopulationWriter(population).writeFile("D:/fromNB04/wm/Toronto/toronto/plans/xy/plansBlurred.xml.gz");
 
 		System.out.println("done.");
 	}

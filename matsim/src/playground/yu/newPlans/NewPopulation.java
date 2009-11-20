@@ -23,6 +23,7 @@
  */
 package playground.yu.newPlans;
 
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -38,12 +39,12 @@ public abstract class NewPopulation extends AbstractPersonAlgorithm {
 
 	public NewPopulation(final PopulationImpl plans) {
 		this.pw = new PopulationWriter(plans);
-		this.pw.writeStartPlans();
+		this.pw.writeStartPlans(Gbl.getConfig().plans().getOutputFile());
 	}
 
 	public NewPopulation(final PopulationImpl population, final String filename) {
-		this.pw = new PopulationWriter(population, filename, "v4");
-		this.pw.writeStartPlans();
+		this.pw = new PopulationWriter(population);
+		this.pw.writeStartPlans(filename);
 	}
 
 

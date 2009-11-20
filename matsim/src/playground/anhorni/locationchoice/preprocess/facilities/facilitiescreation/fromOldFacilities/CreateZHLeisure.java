@@ -3,9 +3,9 @@ package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreati
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
@@ -67,7 +67,7 @@ public class CreateZHLeisure {
 					IdImpl id = new IdImpl(3000000 + cnt);
 					cnt++;
 					this.facilities.createFacility(id, coord);				
-					ActivityFacilityImpl facility = (ActivityFacilityImpl)this.facilities.getFacilities().get(id);
+					ActivityFacilityImpl facility = this.facilities.getFacilities().get(id);
 					facility.createActivityOption("leisure");
 					facility.getActivityOption("leisure").setCapacity(1.0);
 					facility.getActivityOption("leisure").addOpeningTime(new OpeningTimeImpl(DayType.wk, 9.0 * 3600, 24.0 * 3600));
@@ -79,7 +79,6 @@ public class CreateZHLeisure {
 	
 	private void writeFacilities() {
 		log.info("Number of facilities: " + this.facilities.getFacilities().size());
-		FacilitiesWriter writer = new FacilitiesWriter(this.facilities, "output/facilitiesgeneration/facilities.xml.gz");
-		writer.write();				
+		new FacilitiesWriter(this.facilities).writeFile("output/facilitiesgeneration/facilities.xml.gz");
 	}
 }

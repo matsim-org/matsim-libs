@@ -24,7 +24,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 
 
 public class ManeuverCreation {
@@ -65,7 +64,7 @@ public class ManeuverCreation {
 		new NetworkCleaner().run(network);
 
 		System.out.println("writing xml file...");
-		new NetworkWriter(network,outputdir+"/output_network.xml.gz").write();
+		new NetworkWriter(network).writeFile(outputdir+"/output_network.xml.gz");
 		System.out.println("done.");
 
 //		System.out.println("writing txt files...");

@@ -20,6 +20,7 @@
 
 package org.matsim.core.population;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -30,28 +31,27 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.internal.MatsimFileWriter;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.Writer;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.knowledges.ActivitySpace;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Desires;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
-public class PopulationWriter extends Writer implements PersonAlgorithm {
+public class PopulationWriter extends MatsimXmlWriter implements MatsimFileWriter, PersonAlgorithm {
 
 	private final double write_person_fraction;
 	private boolean fileOpened = false;
 
-	private PopulationWriterHandler handler = null;
+	private PopulationWriterHandler handler = new PopulationWriterHandlerImplV4();
 	private final Population population;
 	private Knowledges knowledges = null;
-
+	
 	private final static Logger log = Logger.getLogger(PopulationWriter.class);
-
 
 	/**
 	 * Creates a new PlansWriter to write out the specified plans to the file and with version
@@ -62,7 +62,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	 * @param population the population to write to file
 	 */
 	public PopulationWriter(final Population population) {
-		this(population, Gbl.getConfig().plans().getOutputFile(), Gbl.getConfig().plans().getOutputVersion());
+		this(population, (Gbl.getConfig() == null ? 1.0 : Gbl.getConfig().plans().getOutputSample()));
 	}
 
 	/**
@@ -72,97 +72,37 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	 * If plans-streaming is off, the file will not be created until {@link #write()} is called.
 	 *
 	 * @param population the population to write to file
-	 * @param filename the filename where to write the data
-	 * @param version specifies the file-format
-	 */
-	public PopulationWriter(final Population population, final String filename, final String version) {
-		this(population, filename, version, Gbl.getConfig().plans().getOutputSample());
-	}
-
-	/**
-	 * Creates a new PlansWriter to write out the specified plans to the specified file and with
-	 * the specified version.
-	 * If plans-streaming is on, the file will already be opened and the file-header be written.
-	 * If plans-streaming is off, the file will not be created until {@link #write()} is called.
-	 *
-	 * @param population the population to write to file
-	 * @param filename the filename where to write the data
-	 * @param version specifies the file-format
 	 * @param fraction of persons to write to the plans file
 	 */
-	public PopulationWriter(final Population population, final String filename, final String version,
-			final double fraction) {
+	public PopulationWriter(final Population population, final double fraction) {
 		super();
 		this.population = population;
-		this.outfile = filename;
 		this.write_person_fraction = fraction;
-		createHandler(version);
-
-		if (this.population instanceof PopulationImpl) {
-			if (((PopulationImpl) this.population).isStreaming()) {
-				// write the file head if it is used with streaming.
-				writeStartPlans();
-			}
-		}
 	}
-
-	/**
-	 * Creates a new PlansWriter to write out the specified plans to the specified file and with
-	 * the specified version and also writes knowledges to the xml.
-	 * If plans-streaming is on, the file will already be opened and the file-header be written.
-	 * If plans-streaming is off, the file will not be created until {@link #write()} is called.
-	 *
-	 * @param population the population to write to file
-	 * @param filename the filename where to write the data
-	 * @param version specifies the file-format
-	 * @param fraction of persons to write to the plans file
-	 */
-	public PopulationWriter(final Population population, final Knowledges knowledges, final String filename, final String version,
-			final double fraction) {
-		super();
-		this.population = population;
-		this.outfile = filename;
-		this.write_person_fraction = fraction;
-		this.knowledges = knowledges;
-		createHandler(version);
-
-		if (this.population instanceof PopulationImpl) {
-			if (((PopulationImpl) this.population).isStreaming()) {
-				// write the file head if it is used with streaming.
-				writeStartPlans();
-			}
-		}
-	}
-
-	public PopulationWriter(final Population population, final String filename) {
-		this(population, filename, "v4", 1.0);
-	}
-
-
 
 	public PopulationWriter(final PopulationImpl pop, final Knowledges knowledges2) {
 		this(pop);
 		this.knowledges = knowledges2;
 	}
-
-	public PopulationWriter(final PopulationImpl population2, final Knowledges knowledges2, final String iterationFilename, final String outversion) {
-		this(population2, knowledges2, iterationFilename, outversion, 1.0);
-	}
-
-	/**
-	 * Just a helper method to instantiate the correct handler
-	 * @param version
-	 */
-	private void createHandler(final String version) {
-		if (version.equals("v4")) {
-			this.dtd = "http://www.matsim.org/files/dtd/plans_v4.dtd";
-			this.handler = new PopulationWriterHandlerImplV4();
-		} else if (version.equals("v0")) {
-			this.dtd = "http://www.matsim.org/files/dtd/plans_v0.dtd";
-			this.handler = new PopulationWriterHandlerImplV0();
+	
+	public void startStreaming(final String filename) {
+		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
+			// write the file head if it is used with streaming.
+			writeStartPlans(filename);
+		} else {
+			log.error("Cannot start streaming. Streaming must be activated in the Population.");
 		}
-		else {
-			throw new IllegalArgumentException("output version \"" + version + "\" not known.");
+	}
+	
+	public void closeStreaming() {
+		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
+			if (this.fileOpened) {
+				writeEndPlans();
+			} else {
+				log.error("Cannot close streaming. File is not open.");
+			}
+		} else {
+			log.error("Cannot close streaming. Streaming must be activated in the Population.");
 		}
 	}
 
@@ -174,14 +114,13 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	// write methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void writeStartPlans() {
+	public final void writeStartPlans(final String filename) {
 		try {
-			this.out = IOUtils.getBufferedWriter(this.outfile);
+			openFile(filename);
 			this.fileOpened = true;
-			this.handler.writeHeaderAndStartElement(this.out);
-//			this.writeHeader("plans");
-			this.handler.startPlans(this.population, this.out);
-			this.handler.writeSeparator(this.out);
+			this.handler.writeHeaderAndStartElement(this.writer);
+			this.handler.startPlans(this.population, this.writer);
+			this.handler.writeSeparator(this.writer);
 		}
 		catch (IOException e) {
 			Gbl.errorMsg(e);
@@ -194,7 +133,7 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 			return;
 		}
 		try {
-			this.handler.startPerson(person,this.out);
+			this.handler.startPerson(person,this.writer);
 			if (person instanceof PersonImpl) {
 				PersonImpl p = (PersonImpl)person;
 				// travelcards
@@ -202,26 +141,26 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 					Iterator<String> t_it = p.getTravelcards().iterator();
 					while (t_it.hasNext()) {
 						String t = t_it.next();
-						this.handler.startTravelCard(t,this.out);
-						this.handler.endTravelCard(this.out);
+						this.handler.startTravelCard(t,this.writer);
+						this.handler.endTravelCard(this.writer);
 					}
 				}
 				// desires
 				if (p.getDesires() != null) {
 					Desires d = p.getDesires();
-					this.handler.startDesires(d,this.out);
+					this.handler.startDesires(d,this.writer);
 					if (d.getActivityDurations() != null) {
 						for (String act_type : d.getActivityDurations().keySet()) {
-							this.handler.startActDur(act_type,d.getActivityDurations().get(act_type),this.out);
-							this.handler.endActDur(this.out);
+							this.handler.startActDur(act_type,d.getActivityDurations().get(act_type),this.writer);
+							this.handler.endActDur(this.writer);
 						}
 					}
-					this.handler.endDesires(this.out);
+					this.handler.endDesires(this.writer);
 				}
 				// knowledge
 				if ((this.knowledges != null) && (this.knowledges.getKnowledgesByPersonId().get(p.getId()) != null)) {
 					KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(p.getId());
-					this.handler.startKnowledge(k, this.out);
+					this.handler.startKnowledge(k, this.writer);
 					// activity spaces
 					if (k.getActivitySpaces() != null) {
 						Iterator<ActivitySpace> as_it = k.getActivitySpaces().iterator();
@@ -230,46 +169,46 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 							if (!as.isComplete()) {
 								Gbl.errorMsg("[person_id="+p.getId()+" holds an incomplete act-space.]");
 							}
-							this.handler.startActivitySpace(as, this.out);
+							this.handler.startActivitySpace(as, this.writer);
 							// params
 							Iterator<String> name_it = as.getParams().keySet().iterator();
 							while (name_it.hasNext()) {
 								String name = name_it.next();
 								Double val = as.getParams().get(name);
-								this.handler.startParam(name, val.toString(), this.out);
-								this.handler.endParam(this.out);
+								this.handler.startParam(name, val.toString(), this.writer);
+								this.handler.endParam(this.writer);
 							}
-							this.handler.endActivitySpace(this.out);
+							this.handler.endActivitySpace(this.writer);
 						}
 					}
 					// activities
 					Iterator<String> at_it = k.getActivityTypes().iterator();
 					while (at_it.hasNext()) {
 						String act_type = at_it.next();
-						this.handler.startActivity(act_type,this.out);
+						this.handler.startActivity(act_type,this.writer);
 						// locations (primary)
 						for (ActivityOptionImpl a : k.getActivities(act_type,true)) {
-							this.handler.startPrimaryLocation(a,this.out);
-							this.handler.endPrimaryLocation(this.out);
+							this.handler.startPrimaryLocation(a,this.writer);
+							this.handler.endPrimaryLocation(this.writer);
 						}
 						// locations (secondary)
 						for (ActivityOptionImpl a : k.getActivities(act_type,false)) {
-							this.handler.startSecondaryLocation(a,this.out);
-							this.handler.endSecondaryLocation(this.out);
+							this.handler.startSecondaryLocation(a,this.writer);
+							this.handler.endSecondaryLocation(this.writer);
 						}
 //					Iterator<Activity> a_it = k.getActivities(act_type).iterator();
 //					while (a_it.hasNext()) {
 //						Facility f = a_it.next().getFacility();
-//						this.handler.startLocation(f,this.out);
+//						this.handler.startLocation(f,this.writer);
 //						/* TODOx [balmermi] Here, usually capacity and opentimes
 //						 * are also written. But since it is now already defined by the facilities
 //						 * there is no need to write it. the act type and the facilitiy id
 //						 * is enough. (well... i think) */
-//						this.handler.endLocation(this.out);
+//						this.handler.endLocation(this.writer);
 //					}
-						this.handler.endActivity(this.out);
+						this.handler.endActivity(this.writer);
 					}
-					this.handler.endKnowledge(this.out);
+					this.handler.endKnowledge(this.writer);
 				}
 
 
@@ -277,31 +216,31 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 			}
 			// plans
 			for (Plan plan : person.getPlans()) {
-				this.handler.startPlan(plan, this.out);
+				this.handler.startPlan(plan, this.writer);
 				// act/leg
 				for (Object pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
 						Activity act = (Activity) pe;
-						this.handler.startAct(act, this.out);
-						this.handler.endAct(this.out);
+						this.handler.startAct(act, this.writer);
+						this.handler.endAct(this.writer);
 					}
 					else if (pe instanceof Leg) {
 						Leg leg = (Leg) pe;
-						this.handler.startLeg(leg, this.out);
+						this.handler.startLeg(leg, this.writer);
 						// route
 						Route route = leg.getRoute();
 						if (route != null) {
-							this.handler.startRoute(route, this.out);
-							this.handler.endRoute(this.out);
+							this.handler.startRoute(route, this.writer);
+							this.handler.endRoute(this.writer);
 						}
-						this.handler.endLeg(this.out);
+						this.handler.endLeg(this.writer);
 					}
 				}
-				this.handler.endPlan(this.out);
+				this.handler.endPlan(this.writer);
 			}
-			this.handler.endPerson(this.out);
-			this.handler.writeSeparator(this.out);
-			this.out.flush();
+			this.handler.endPerson(this.writer);
+			this.handler.writeSeparator(this.writer);
+			this.writer.flush();
 		}
 		catch (IOException e) {
 			Gbl.errorMsg(e);
@@ -317,9 +256,9 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	public final void writeEndPlans() {
 		if (this.fileOpened) {
 			try {
-				this.handler.endPlans(this.out);
-				this.out.flush();
-				this.out.close();
+				this.handler.endPlans(this.writer);
+				this.writer.flush();
+				this.writer.close();
 			}
 			catch (IOException e) {
 				Gbl.errorMsg(e);
@@ -332,26 +271,36 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 	/**
 	 * Writes all plans to the file. If plans-streaming is on, this will end the writing and close the file.
 	 */
-	public void write() {
-		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
-			log.info("PlansStreaming is on -- plans already written, just closing file if it's open.");
-			if (this.fileOpened) {
-				writeEndPlans();
-			}
-		} else {
-			this.writeStartPlans();
+	private void write(final String filename) {
+//		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
+//			log.info("PlansStreaming is on -- plans already written, just closing file if it's open.");
+//			if (this.fileOpened) {
+//				writeEndPlans();
+//			}
+//		} else {
+			this.writeStartPlans(filename);
 			this.writePersons();
 			this.writeEndPlans();
-		}
+//		}
+	}
+
+	public void writeFileV0(final String filename) {
+		this.handler = new PopulationWriterHandlerImplV0();
+		write(filename);
+	}
+	
+	public void writeFileV4(final String filename) {
+		this.handler = new PopulationWriterHandlerImplV4();
+		write(filename);
 	}
 
 	/**
-	 * Writes to a file given as parameter.
+	 * Writes all plans to the file.
+	 * 
 	 * @param filename path to the file.
 	 */
 	public void writeFile(final String filename){
-		this.outfile = filename;
-		write();
+		write(filename);
 		log.info("Population written to: " + filename);
 	}
 
@@ -359,6 +308,10 @@ public class PopulationWriter extends Writer implements PersonAlgorithm {
 		return this.handler;
 	}
 
+	public BufferedWriter getWriter() {
+		return this.writer;
+	}
+	
 	// implementation of PersonAlgorithm
 	// this is primarily to use the PlansWriter with filters and other algorithms.
 	public void run(final Person person) {

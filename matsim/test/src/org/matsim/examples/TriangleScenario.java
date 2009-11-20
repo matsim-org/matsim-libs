@@ -85,8 +85,7 @@ public abstract class TriangleScenario {
 
 	public static final void writePlans(PopulationImpl plans) {
 		System.out.println("  writing plans xml file... ");
-		PopulationWriter plans_writer = new PopulationWriter(plans);
-		plans_writer.write();
+		new PopulationWriter(plans).writeFile(Gbl.getConfig().plans().getOutputFile());
 		System.out.println("  done.");
 	}
 
@@ -99,8 +98,7 @@ public abstract class TriangleScenario {
 
 	public static final void writeFacilities(ActivityFacilitiesImpl facilities) {
 		System.out.println("  writing facilities xml file... ");
-		FacilitiesWriter facilities_writer = new FacilitiesWriter(facilities);
-		facilities_writer.write();
+		new FacilitiesWriter(facilities).writeFile(Gbl.getConfig().facilities().getOutputFile());
 		System.out.println("  done.");
 	}
 
@@ -114,14 +112,13 @@ public abstract class TriangleScenario {
 	public static final void writeNetwork(NetworkLayer network) {
 		System.out.println("  writing network xml file... ");
 		NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write();
+		network_writer.writeFile(Gbl.getConfig().network().getOutputFile());
 		System.out.println("  done.");
 	}
 
 	public static final void writeConfig(final Config config) {
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(config);
-		config_writer.write();
+		new ConfigWriter(config).writeFile(config.config().getOutputFile());
 		System.out.println("  done.");
 	}
 }

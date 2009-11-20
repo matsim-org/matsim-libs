@@ -93,6 +93,7 @@ public class MergePlans {
 		PopulationImpl plansA = new PopulationImpl();
 		plansA.setIsStreaming(true);
 		PopulationWriter pw = new PopulationWriter(plansA);
+		pw.startStreaming(config.plans().getOutputFile());
 		new MatsimPopulationReader(plansA, network).readFile(plansFilenameA);
 		new CopyPlans(pw).run(plansA);
 
@@ -100,6 +101,6 @@ public class MergePlans {
 		plansB.setIsStreaming(true);
 		new MatsimPopulationReader(plansB, network).readFile(plansFilenameB);
 		new PersonIdCopyPlans(pw, lower_limit).run(plansB);
-		pw.write();
+		pw.closeStreaming();
 	}
 }

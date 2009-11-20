@@ -86,7 +86,7 @@ public class NetworkFromShape {
 
 		new NetworkCleaner().run(net);
 		
-		new NetworkWriter(net,"./network.xml").write();
+		new NetworkWriter(net).writeFile("./network.xml");
 		
 		ShapeFileWriter.writeGeometries(fts, "");
 	}

@@ -65,8 +65,7 @@ public class NetworkCleaner {
 
 		new org.matsim.core.network.algorithms.NetworkCleaner().run(network);
 
-		final NetworkWriter network_writer = new NetworkWriter(network, outputNetworkFile);
-		network_writer.write();
+		new NetworkWriter(network).writeFile(outputNetworkFile);
 	}
 	
 	/** Runs the network cleaning algorithms over the network read in from the argument list, and

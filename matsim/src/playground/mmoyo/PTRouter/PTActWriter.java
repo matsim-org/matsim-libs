@@ -80,7 +80,7 @@ public class PTActWriter {
 		}
 		
 		System.out.println("writing output plan file..." + outputFile );
-		new PopulationWriter(this.population, outputFile, "v4").write();
+		new PopulationWriter(this.population).writeFile(outputFile);
 		System.out.println("done");	
 	}
 
@@ -196,7 +196,7 @@ public class PTActWriter {
 		System.out.println("translation lasted: " + (System.currentTimeMillis()-startTime));
 		
 		System.out.println("writing output plan file...");
-		new PopulationWriter(newPopulation, outputFile, "v4").write();
+		new PopulationWriter(newPopulation).writeFile(outputFile);
 		System.out.println("Done");
 		System.out.println("plans:        " + numPlans + "\n--------------");
 		System.out.println("\nTrips:      " + trips +  "\nfound: "  +  found +  "\ninWalkRange:  "+ inWalkRange + "\nnulls:        " + nulls + "\nlessThan2Node:" + lessThan2Node);

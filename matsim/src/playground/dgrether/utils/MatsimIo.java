@@ -60,8 +60,7 @@ public class MatsimIo {
 	}
 
 	public static void writeConfig(final Config config, final String filename) {
-		ConfigWriter configWriter = new ConfigWriter(config, filename);
-		configWriter.write();
+		new ConfigWriter(config).writeFile(filename);
 	}
 
 	public static NetworkLayer loadNetwork(final String filename) {
@@ -84,9 +83,8 @@ public class MatsimIo {
 
 
 	public static void writePlans(final Population plans, final String filename) {
-		PopulationWriter pwriter = new PopulationWriter(plans, filename, "v4", 1.0);
+		new PopulationWriter(plans).writeFile(filename);
 //		pwriter.setWriterHandler(new PlansWriterHandlerImplV4());
-		pwriter.write();
 	}
 
 }

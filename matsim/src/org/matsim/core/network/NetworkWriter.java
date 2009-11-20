@@ -23,57 +23,55 @@ package org.matsim.core.network;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.internal.MatsimFileWriter;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.Writer;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
-public class NetworkWriter extends Writer {
+public class NetworkWriter extends MatsimXmlWriter implements MatsimFileWriter {
 
-	private NetworkWriterHandler handler = null;
 	private final NetworkLayer network;
 
 	public NetworkWriter(final Network network) {
-		this(network, Gbl.getConfig().network().getOutputFile());
-	}
-
-	public NetworkWriter(final Network network, final String filename) {
-
 		super();
 		this.network = (NetworkLayer) network;
-		this.outfile = filename;
+	}
+	
+	public void writeFile(final String filename) {
 		// always write out in newest version, currently v1
-		this.dtd = "http://www.matsim.org/files/dtd/network_v1.dtd";
-		this.handler = new NetworkWriterHandlerImplV1();
+		writeFileV1(filename);
 	}
 
-	public void write() {
+	public void writeFileV1(final String filename) {
+		String dtd = "http://www.matsim.org/files/dtd/network_v1.dtd";
+		NetworkWriterHandler handler = new NetworkWriterHandlerImplV1();
+
 		try {
-			this.out = IOUtils.getBufferedWriter(this.outfile);
+			openFile(filename);
+			writeXmlHead();
+			writeDoctype("network", dtd);
 
-			this.writeDtdHeader("network");
-
-			this.handler.startNetwork(this.network, this.out);
-			this.handler.writeSeparator(this.out);
-			this.handler.startNodes(this.network, this.out);
-			for (NodeImpl n : this.network.getNodes().values()) {
-				this.handler.startNode(n, this.out);
-				this.handler.endNode(this.out);
+			handler.startNetwork(network, this.writer);
+			handler.writeSeparator(this.writer);
+			handler.startNodes(network, this.writer);
+			for (NodeImpl n : network.getNodes().values()) {
+				handler.startNode(n, this.writer);
+				handler.endNode(this.writer);
 			}
-			this.handler.endNodes(this.out);
-			this.handler.writeSeparator(this.out);
-			this.handler.startLinks(this.network, this.out);
-			for (LinkImpl l : this.network.getLinks().values()) {
-				this.handler.startLink(l, this.out);
-				this.handler.endLink(this.out);
+			handler.endNodes(this.writer);
+			handler.writeSeparator(this.writer);
+			handler.startLinks(network, this.writer);
+			for (LinkImpl l : network.getLinks().values()) {
+				handler.startLink(l, this.writer);
+				handler.endLink(this.writer);
 			}
-			this.handler.endLinks(this.out);
-			this.handler.writeSeparator(this.out);
-			this.handler.endNetwork(this.out);
-			this.out.close();
+			handler.endLinks(this.writer);
+			handler.writeSeparator(this.writer);
+			handler.endNetwork(this.writer);
+			this.writer.close();
 		}
 		catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
 	}
-
+	
 }

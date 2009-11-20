@@ -176,7 +176,7 @@ public class AsciiToPlan {
 		} while(zeile!=null);
 		
 		//Alles fertig --- Ergebnis ausgeben.
-		new PopulationWriter(pop,OUTPUT_FILE,"v4",SAMPLE_SIZE).write();
+		new PopulationWriter(pop,SAMPLE_SIZE).writeFile(OUTPUT_FILE);
 		System.out.println("Ausgabe erzeugt - Es wurden " + wert + " Personen eingelesen.");
 		
 		

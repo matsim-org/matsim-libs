@@ -36,8 +36,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.balmermi.modules.FacilitiesRandomizeHectareCoordinates;
-import playground.balmermi.modules.PersonConsolidateInitDemand;
-import playground.balmermi.modules.PersonFacility2Link;
 import playground.balmermi.modules.PersonResetCoordAndLink;
 import playground.balmermi.modules.PersonStupidDeleteKnowledgeForStreamingModule;
 
@@ -121,17 +119,18 @@ public class ScenarioStreaming {
 		System.out.println("done. (complete world)");
 		
 		System.out.println("writing facilities...");
-		new FacilitiesWriter(af).write();
+		new FacilitiesWriter(af).writeFile(config.facilities().getOutputFile());
 		System.out.println("done. (writing facilities)");
 
 		System.out.println("writing network...");
-		new NetworkWriter(network).write();
+		new NetworkWriter(network).writeFile(config.network().getOutputFile());
 		System.out.println("done. (writing network)");
 
-		final PopulationImpl population = (PopulationImpl)sl.getScenario().getPopulation();
+		final PopulationImpl population = sl.getScenario().getPopulation();
 		population.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		PopulationWriter plansWriter = new PopulationWriter(population,sl.getScenario().getKnowledges());
+		plansWriter.startStreaming(sl.getScenario().getConfig().plans().getOutputFile());
 
 		System.out.println("adding algorithms...");
 		population.addAlgorithm(new PersonResetCoordAndLink());
@@ -143,7 +142,7 @@ public class ScenarioStreaming {
 		System.out.println("stream population...");
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
-		plansWriter.write();
+		plansWriter.closeStreaming();
 		Gbl.printMemoryUsage();
 		System.out.println("done. (stream population)");
 	}

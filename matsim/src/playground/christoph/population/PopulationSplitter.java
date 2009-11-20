@@ -22,7 +22,6 @@ package playground.christoph.population;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
@@ -128,7 +127,6 @@ public class PopulationSplitter {
 		fileCounter++;
 		
 		log.info("Writing split File.");
-		PopulationWriter pw = new PopulationWriter(pop, outputFileName + fileCounter + ".xml.gz");
-		pw.write();
+		new PopulationWriter(pop).writeFile(outputFileName + fileCounter + ".xml.gz");
 	}
 }

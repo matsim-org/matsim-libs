@@ -29,7 +29,6 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.EventsManagerImpl;
@@ -176,8 +175,7 @@ public class OTFVis {
 
 		log.info("Complete config dump:");
 		StringWriter writer = new StringWriter();
-		ConfigWriter configwriter = new ConfigWriter(loader.getScenario().getConfig(), new PrintWriter(writer));
-		configwriter.write();
+		new ConfigWriter(loader.getScenario().getConfig()).writeStream(new PrintWriter(writer));
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
 		

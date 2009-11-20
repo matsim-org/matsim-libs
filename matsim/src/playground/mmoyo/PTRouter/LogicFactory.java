@@ -261,8 +261,8 @@ public class LogicFactory{
 		} catch (IOException ex) {
 			System.out.println(this + ex.getMessage());
 		}
-		new NetworkWriter(logicNet, outLogicNetFile).write();
-		new NetworkWriter(plainNet, outPlainNetFile).write();
+		new NetworkWriter(logicNet).writeFile(outLogicNetFile);
+		new NetworkWriter(plainNet).writeFile(outPlainNetFile);
 		System.out.println("done.");
 	}
 

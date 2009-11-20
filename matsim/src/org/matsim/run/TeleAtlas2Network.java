@@ -73,7 +73,7 @@ public class TeleAtlas2Network {
 		
 		if (writeNetworkXmlFile) {
 			System.out.println("writing xml file...");
-			new NetworkWriter(network,outputDir+"/output_network.xml.gz").write();
+			new NetworkWriter(network).writeFile(outputDir+"/output_network.xml.gz");
 			System.out.println("done.");
 		}
 		if (writeNetworkTxtFile) {

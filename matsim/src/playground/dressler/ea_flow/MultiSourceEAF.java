@@ -581,13 +581,7 @@ public class MultiSourceEAF {
 //						router.run(plan);
 //					}
 //				}
-				PopulationWriter popwriter = new PopulationWriter(output, outputplansfile);
-
-				try {
-				  popwriter.write();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				new PopulationWriter(output).writeFile(outputplansfile);
 			}
 		}
 		if(_debug){

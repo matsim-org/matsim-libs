@@ -629,7 +629,7 @@ public class EventControler extends Controler {
 			String dtdFile = "./src/playground/christoph/knowledge/nodeselection/Selection.dtd";
 
 			// write single File
-			new SelectionWriter(this.population, outPutFile, dtdFile, "1.0","dummy").write();
+			new SelectionWriter(this.population, dtdFile, "1.0","dummy").writeFile(outPutFile);
 
 			// write multiple Files automatically
 			// new SelectionWriter(this.population, outPutFile, dtdFile, "1.0",

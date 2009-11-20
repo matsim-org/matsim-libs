@@ -117,7 +117,8 @@ public abstract class Gbl {
 
 	@Deprecated
 	public static final void setConfig(final Config config) {
-		Gbl.config = config;
+		System.out.println("@@@ set config to: " + config);
+		Gbl.config = config; 
 	}
 
 	//////////////////////////////////////////////////////////////////////

@@ -24,20 +24,19 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.matsim.core.api.internal.MatsimFileWriter;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.Writer;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
-public class ConfigWriter extends Writer {
+public class ConfigWriter extends MatsimXmlWriter implements MatsimFileWriter {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private java.io.Writer outstream = null;
-
 	private final Config config;
 	private ConfigWriterHandler handler = null;
+	private String dtd = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -50,13 +49,12 @@ public class ConfigWriter extends Writer {
 	public ConfigWriter(final Config config, final java.io.Writer writer) {
 		super();
 		this.config = config;
-		this.outstream = writer;
+		this.writer = new BufferedWriter(writer);
 		this.handler = new ConfigWriterHandlerImplV1();
 	}
 
 	public ConfigWriter(final Config config, final String filename) {
 		this.config = config;
-		this.outfile = filename;
 		// always write the latest version, currently v1
 		this.dtd = "http://www.matsim.org/files/dtd/config_v1.dtd";
 		this.handler = new ConfigWriterHandlerImplV1();
@@ -66,29 +64,43 @@ public class ConfigWriter extends Writer {
 	// write methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void write() {
+	public final void writeStream(final java.io.Writer writer) {
 		try {
-			if (this.outstream == null) {
-				this.out = IOUtils.getBufferedWriter(this.outfile);
-			} else {
-				this.out = new BufferedWriter(this.outstream);
-			}
-			writeDtdHeader("config");
-			this.out.flush();
+			this.writer = new BufferedWriter(writer);
+			write();
+			this.writer.flush();
+			this.writer = null;
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+	}
+	
+	public final void writeFile(final String filename) {
+		try {
+			openFile(filename);
+			write();
+			close();
+		}
+		catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+	}
+	
+	private final void write() {
+		try {
+			writeXmlHead();
+			writeDoctype("config", this.dtd);
 
-			this.handler.startConfig(this.config, this.out);
-			this.handler.writeSeparator(this.out);
+			this.handler.startConfig(this.config, this.writer);
+			this.handler.writeSeparator(this.writer);
 			Iterator<Module> m_it = this.config.getModules().values().iterator();
 			while (m_it.hasNext()) {
 				Module m = m_it.next();
-				this.handler.writeModule(m, this.out);
-				this.handler.writeSeparator(this.out);
+				this.handler.writeModule(m, this.writer);
+				this.handler.writeSeparator(this.writer);
 			}
-			this.handler.endConfig(this.out);
-			this.out.flush();
-			if (this.outstream == null) {
-				this.out.close();
-			}
+			this.handler.endConfig(this.writer);
+			this.writer.flush();
 		}
 		catch (IOException e) {
 			Gbl.errorMsg(e);

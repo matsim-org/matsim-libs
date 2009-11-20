@@ -55,6 +55,7 @@ public class InitTimesVariation {
 		PopulationImpl plans = new PopulationImpl();
 		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
+		plansWriter.startStreaming(config.plans().getOutputFile());
 		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 
@@ -70,19 +71,18 @@ public class InitTimesVariation {
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
 		plans.printPlansCount();
-		plansWriter.write();
+		plansWriter.closeStreaming();
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  writing network xml file... ");
 		NetworkWriter net_writer = new NetworkWriter(network);
-		net_writer.write();
+		net_writer.writeFile(config.network().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(config);
-		config_writer.write();
+		new ConfigWriter(config).writeFile(config.config().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("done.");

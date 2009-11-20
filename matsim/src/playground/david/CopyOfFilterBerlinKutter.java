@@ -93,8 +93,7 @@ public class CopyOfFilterBerlinKutter {
 		plansReader.readFile(popFileName);
 //		population.runAlgorithms();
 
-		PopulationWriter plansWriter = new PopulationWriter(relevantPopulation, outpopFileName, "v4");
-		plansWriter.write();
+		new PopulationWriter(relevantPopulation).writeFile(outpopFileName);
 	}
 
 }

@@ -21,7 +21,6 @@
 package playground.balmermi.datapuls;
 
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
@@ -90,7 +89,7 @@ public class PopulationCreation {
 		System.out.println("done. (running modules)");
 
 		System.out.println("writing population...");
-		new PopulationWriter(datapulsPopulation,datapulsKnowledges,args[3],"v4",1.0).write();
+		new PopulationWriter(datapulsPopulation,datapulsKnowledges).writeFile(args[3]);
 		System.out.println("done. (writing population)");
 	}
 }

@@ -21,10 +21,8 @@
 package org.matsim.population;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV4;
@@ -57,7 +55,7 @@ public class DesiresTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  writing population file...");
-		new PopulationWriter(pop,super.getOutputDirectory()+"plans.xml","v4").write();
+		new PopulationWriter(pop).writeFile(super.getOutputDirectory()+"plans.xml");
 		log.info("  done.");
 
 		log.info("  clean up population...");
@@ -70,7 +68,7 @@ public class DesiresTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  writing population file again...");
-		new PopulationWriter(pop,super.getOutputDirectory()+"plans.equal.xml","v4").write();
+		new PopulationWriter(pop).writeFile(super.getOutputDirectory()+"plans.equal.xml");
 		log.info("  done.");
 
 		log.info("  check for identity ofthe two population...");

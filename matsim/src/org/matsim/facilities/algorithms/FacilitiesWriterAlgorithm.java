@@ -35,10 +35,10 @@ public class FacilitiesWriterAlgorithm extends AbstractFacilityAlgorithm {
 
 	private FacilitiesWriter facilitiesWriter = null;
 
-	public FacilitiesWriterAlgorithm(final ActivityFacilitiesImpl facilities) {
+	public FacilitiesWriterAlgorithm(final ActivityFacilitiesImpl facilities, final String filename) {
 		super();
 		this.facilitiesWriter = new FacilitiesWriter(facilities);
-		this.facilitiesWriter.writeOpenAndInit();
+		this.facilitiesWriter.writeOpenAndInit(filename);
 	}
 
 	public void run(final ActivityFacilityImpl facility) {

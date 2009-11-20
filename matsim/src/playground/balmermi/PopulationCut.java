@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -66,7 +65,7 @@ public class PopulationCut {
 		for (Id id : toRemove) { scenario.getPopulation().getPersons().remove(id); }
 		System.out.println("=> "+scenario.getPopulation().getPersons().size()+" persons left.");
 		System.out.println("done. " + (new Date()));
-		new PopulationWriter((PopulationImpl)scenario.getPopulation(),scenario.getKnowledges()).write();
+		new PopulationWriter(scenario.getPopulation(),scenario.getKnowledges()).writeFile(scenario.getConfig().plans().getOutputFile());
 	}
 	
 	//////////////////////////////////////////////////////////////////////

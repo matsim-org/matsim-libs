@@ -116,20 +116,12 @@ public class EmptyPlans {
 		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
 		PlansCalcRoute router = new PlansCalcRoute(network, new FakeTravelTimeCost(), new FakeTravelTimeCost());
 		//PlansCalcRoute router = new PlansCalcRouteDijkstra(network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), new FakeTravelTimeCost());
-		for (Object O_person : population.getPersons().values()) {
-			Person person = (Person) O_person;
+		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getPlans().get(0);
 			router.run(plan);
 		}
 
-		PopulationWriter popwriter = new PopulationWriter(population, outputplansfile);
-
-		try {
-			popwriter.write();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}								
-
+		new PopulationWriter(population).writeFile(outputplansfile);
 
 		if(_debug){
 			System.out.println("done");

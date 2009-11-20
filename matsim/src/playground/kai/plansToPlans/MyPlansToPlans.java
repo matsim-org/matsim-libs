@@ -42,8 +42,7 @@ public class MyPlansToPlans {
 
 	public void run(final String[] args) {
 		this.config = Gbl.createConfig(new String[]{"../padang/dlr-network/pconfig.xml"});
-		ConfigWriter configwriter = new ConfigWriter(this.config, new PrintWriter(System.out));
-		configwriter.write();
+		new ConfigWriter(this.config).writeStream(new PrintWriter(System.out));
 
 //		final World world = Gbl.getWorld();
 //
@@ -59,11 +58,12 @@ public class MyPlansToPlans {
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		plansWriter.startStreaming(this.config.plans().getOutputFile());
 //		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
 		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();
-		plansWriter.write();
+		plansWriter.closeStreaming();
 
 		System.out.println("done.");
 	}

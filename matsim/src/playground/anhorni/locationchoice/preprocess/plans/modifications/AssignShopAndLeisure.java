@@ -5,14 +5,12 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -89,11 +87,10 @@ public class AssignShopAndLeisure {
 	private void writePlans(String variant) {
 		PopulationWriter writer;
 		if (variant.equals("0")) {
-			writer = new PopulationWriter(this.plans, this.outpath + "plans0.xml.gz");
+			new PopulationWriter(this.plans).writeFile(this.outpath + "plans0.xml.gz");
 		}
 		else {
-			writer = new PopulationWriter(this.plans, this.outpath + "plans1.xml.gz");
+			new PopulationWriter(this.plans).writeFile(this.outpath + "plans1.xml.gz");
 		}
-		writer.write();
 	}
 }

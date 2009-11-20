@@ -22,7 +22,6 @@ package playground.balmermi.datapuls;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 
@@ -73,6 +72,6 @@ public class FacilitiesCreation {
 		new FacilitiesAddDataPulsBuildings(args[2]).run(facilities);
 		log.info("number of facilities ec2000 & tta & datapuls: "+facilities.getFacilities().size());
 
-		new FacilitiesWriter(facilities,args[3]).write();
+		new FacilitiesWriter(facilities).writeFile(args[3]);
 	}
 }

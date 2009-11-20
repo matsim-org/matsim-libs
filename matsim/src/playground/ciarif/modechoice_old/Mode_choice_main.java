@@ -156,13 +156,12 @@ public class Mode_choice_main {
 		System.out.println("  done.");
 
 		System.out.println("  writing plans xml file... ");
-		PopulationWriter plans_writer = new PopulationWriter(plans);
-		plans_writer.write();
+		new PopulationWriter(plans).writeFile(config.plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing network xml file... ");
 		NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write();
+		network_writer.writeFile(config.network().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
@@ -171,8 +170,7 @@ public class Mode_choice_main {
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(config);
-		config_writer.write();
+		new ConfigWriter(config).writeFile(config.config().getOutputFile());
 		System.out.println("  done.");
 		System.out.println("TEST SUCCEEDED.");
 		System.out.println();

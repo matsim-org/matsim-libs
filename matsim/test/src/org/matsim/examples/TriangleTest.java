@@ -26,7 +26,6 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -187,15 +186,15 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("\n");
 
 		log.info("  writing plans xml file... ");
-		new PopulationWriter(plans, kn, Gbl.getConfig().plans().getOutputFile(), Gbl.getConfig().plans().getOutputVersion(), Gbl.getConfig().plans().getOutputSample()).write();
+		new PopulationWriter(plans, kn).writeFile(this.config.plans().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing network xml file... ");
-		new NetworkWriter(network).write();
+		new NetworkWriter(network).writeFile(this.config.network().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write();
+		new FacilitiesWriter(facilities).writeFile(this.config.facilities().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing world xml file... ");
@@ -203,7 +202,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  writing config xml file... ");
-		new ConfigWriter(this.config).write();
+		new ConfigWriter(this.config).writeFile(this.config.config().getOutputFile());
 		log.info("  done.");
 
 		this.compareOutputNetwork();

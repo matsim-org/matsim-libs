@@ -27,22 +27,23 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.internal.MatsimFileWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.Writer;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.KnowledgeTools;
 
-public class SelectionWriter extends Writer {
+public class SelectionWriter extends MatsimXmlWriter implements MatsimFileWriter {
 
 	private boolean fileOpened = false;
 	private String description = "";
 	private String dtdFile;
+	private String outfile;
+	private String dtd;
 	//private int numDigits = 3;
-	private FileNameCreator fileNameCreator;
 	
 	private SelectionWriterHandler handler = null;
 	private final PopulationImpl population;
@@ -59,15 +60,13 @@ public class SelectionWriter extends Writer {
 	 * @param filename the filename where to write the data
 	 * @param version specifies the file-format
 	 */
-	public SelectionWriter(final PopulationImpl population, final String filename, final String dtdFile, final String version, final String description)
+	public SelectionWriter(final PopulationImpl population, final String dtdFile, final String version, final String description)
 	{
 		super();
 		
 		this.population = population;
-		this.outfile = filename;
 		this.dtdFile = dtdFile;
 		this.description = description;
-		this.fileNameCreator = new FileNameCreator(this.outfile);
 		createHandler(this.dtdFile);
 		
 		this.knowledgeTools = new KnowledgeTools();
@@ -95,11 +94,12 @@ public class SelectionWriter extends Writer {
 	public final void writeStartSelection(String description) 
 	{
 		try {
-			this.out = IOUtils.getBufferedWriter(this.outfile);
+			openFile(this.outfile);
 			this.fileOpened = true;
-			this.writeDtdHeader("selection");
-			this.handler.startSelection(description, out);
-			this.handler.writeSeparator(this.out);
+			this.writeXmlHead();
+			this.writeDoctype("selection", this.dtd);
+			this.handler.startSelection(description, this.writer);
+			this.handler.writeSeparator(this.writer);
 		}
 		catch (IOException e) {
 			Gbl.errorMsg(e);
@@ -110,25 +110,25 @@ public class SelectionWriter extends Writer {
 	{
 		try 
 		{
-			this.handler.startPerson(p,this.out);
+			this.handler.startPerson(p,this.writer);
 
 			// NodeKnowledge
 			if (p.getCustomAttributes().containsKey("NodeKnowledge")) 
 			{
 				NodeKnowledge nodeKnowledge = (NodeKnowledge)p.getCustomAttributes().get("NodeKnowledge");
 				
-				this.handler.startKnowledge(nodeKnowledge, this.out);
+				this.handler.startKnowledge(nodeKnowledge, this.writer);
 				
 					// activity space
-					this.handler.startActivitySpace(out);
+					this.handler.startActivitySpace(this.writer);
 					
 						// Nodes
-						this.handler.startNodes(out);
+						this.handler.startNodes(this.writer);
 						
 						Map<Id, Node> nodesMap = knowledgeTools.getKnownNodes(p);
-						this.handler.nodes(nodesMap, out);
+						this.handler.nodes(nodesMap, this.writer);
 						
-						this.handler.endNodes(out);
+						this.handler.endNodes(this.writer);
 				
 						// Links - not used yet and not implemented yet in the KnowledgeTools
 		/*				this.handler.startLinks(out);
@@ -138,14 +138,14 @@ public class SelectionWriter extends Writer {
 						
 						this.handler.endLinks(out);
 		*/							
-					this.handler.endActivitySpace(out);
+					this.handler.endActivitySpace(this.writer);
 				
-				this.handler.endKnowledge(out);	
+				this.handler.endKnowledge(this.writer);	
 			}
 			
-			this.handler.endPerson(out);
-			this.handler.writeSeparator(out);
-			this.out.flush();
+			this.handler.endPerson(this.writer);
+			this.handler.writeSeparator(this.writer);
+			this.writer.flush();
 		}
 		catch (IOException e) 
 		{
@@ -170,9 +170,9 @@ public class SelectionWriter extends Writer {
 		{
 			try 
 			{
-				this.handler.endSelection(this.out);
-				this.out.flush();
-				this.out.close();
+				this.handler.endSelection(this.writer);
+				this.writer.flush();
+				close();
 			}
 			catch (IOException e) 
 			{
@@ -184,8 +184,9 @@ public class SelectionWriter extends Writer {
 	/*
 	 * Write a single file containing all data.
 	 */
-	public void write() 
+	public void writeFile(final String filename) 
 	{
+		this.outfile = filename;
 		this.writeStartSelection(description);
 		this.writePersons();
 		this.writeEndSelection();
@@ -194,8 +195,9 @@ public class SelectionWriter extends Writer {
 	/*
 	 * Splits up the population in some files with n person in each of them (except the last one...).
 	 */
-	public void write(int n)
+	public void write(int n, final String filename)
 	{
+		FileNameCreator fileNameCreator = new FileNameCreator(filename);
 		// don't allow zero persons per file
 		if(n == 0) n = this.population.getPersons().size();
 
@@ -239,7 +241,7 @@ public class SelectionWriter extends Writer {
 			if (i % n == 0)
 			{
 				//this.outfile = new String(header + "_" + nf.format(i / n) + ending);
-				this.outfile = this.fileNameCreator.getNextFileName();
+				this.outfile = fileNameCreator.getNextFileName();
 				log.info(this.outfile);
 				this.writeStartSelection(description);
 			}
@@ -254,25 +256,25 @@ public class SelectionWriter extends Writer {
 			i++;
 		}
 		
-		this.outfile = this.fileNameCreator.getBaseFileName();
+		this.outfile = fileNameCreator.getBaseFileName();
 		
-		log.info("Splitted the created knowledge selection into " + this.fileNameCreator.getFileCounter() + " files.");
+		log.info("Splitted the created knowledge selection into " + fileNameCreator.getFileCounter() + " files.");
 	}
 	
-	public void setNumDigits(int numDigits)
-	{
-		//this.numDigits = numDigits;
-		this.fileNameCreator.setNumDigits(numDigits);
-	}
-	
-	public int getNumDigits()
-	{
-		//return this.numDigits;
-		return this.fileNameCreator.getNumDigits();
-	}
-
-	public SelectionWriterHandler getHandler() {
-		return this.handler;
-	}
-	
+//	public void setNumDigits(int numDigits)
+//	{
+//		//this.numDigits = numDigits;
+//		this.fileNameCreator.setNumDigits(numDigits);
+//	}
+//	
+//	public int getNumDigits()
+//	{
+//		//return this.numDigits;
+//		return this.fileNameCreator.getNumDigits();
+//	}
+//
+//	public SelectionWriterHandler getHandler() {
+//		return this.handler;
+//	}
+//	
 }

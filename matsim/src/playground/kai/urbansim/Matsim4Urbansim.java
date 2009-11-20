@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -90,8 +89,7 @@ public class Matsim4Urbansim {
 		ActivityFacilitiesImpl zones      = new ActivityFacilitiesImpl("urbansim zones", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING) ;
 		readFromUrbansim.readFacilities( facilities, zones ) ;
 
-		FacilitiesWriter facWriter = new FacilitiesWriter(facilities,PATH_TO_OPUS_MATSIM+"tmp/locations.xml.gz") ;
-		facWriter.write();
+		new FacilitiesWriter(facilities).writeFile(PATH_TO_OPUS_MATSIM+"tmp/locations.xml.gz") ;
 
 		PopulationImpl oldPop ;
 		if ( config.plans().getInputFile() != null ) {
@@ -112,8 +110,7 @@ public class Matsim4Urbansim {
 		oldPop=null ;
 		System.gc() ;
 
-		PopulationWriter popWriter = new PopulationWriter(newPop,PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz","v4",1) ;
-		popWriter.write();
+		new PopulationWriter(newPop).writeFile(PATH_TO_OPUS_MATSIM+"tmp/pop.xml.gz");
 
 		log.info("### DONE with demand generation from urbansim ###") ;
 

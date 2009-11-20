@@ -1,14 +1,12 @@
 package playground.anhorni.locationchoice.preprocess.plans.planmodificationsTRB09;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -117,7 +115,7 @@ public class PlanModifications {
 	}
 
 	private void writePlans() {
-		new PopulationWriter(this.plans, this.outputpath , "v4", 1.0).write();
+		new PopulationWriter(this.plans).writeFile(this.outputpath);
 		log.info("plans written to: " + this.outputpath);
 	}
 

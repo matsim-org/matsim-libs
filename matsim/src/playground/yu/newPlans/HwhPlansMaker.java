@@ -61,7 +61,7 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 			loadActType(eduActs, i);
 		}
 		pw = new PopulationWriter(plans);
-		pw.writeStartPlans();
+		pw.writeStartPlans(config.plans().getOutputFile());
 	}
 
 	protected void loadActType(Set<String> acts, int i) {

@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
-
 <network name="triangle test network">
 
 <!-- ====================================================================== -->

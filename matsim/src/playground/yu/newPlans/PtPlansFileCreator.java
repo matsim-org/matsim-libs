@@ -174,13 +174,8 @@ public class PtPlansFileCreator {
 		new MatsimNetworkReader(pfc.getNetwork()).readFile(netFilename);
 
 		pfc.setPop(new PopulationImpl());
-		PopulationWriter writer = new PopulationWriter(pfc.getPop(),
-				newPlansFilename, "v4", 1.0);
-		writer.writeStartPlans();
-		// TODO
 		pfc.createPersons();
-		writer.writePersons();
-		writer.writeEndPlans();
+		new PopulationWriter(pfc.getPop()).writeFile(newPlansFilename);
 		System.out.println("done.");
 	}
 }

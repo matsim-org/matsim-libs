@@ -48,6 +48,7 @@ public class PersonStreaming {
 		PopulationImpl plans = new PopulationImpl();
 		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
+		plansWriter.startStreaming(config.plans().getOutputFile());
 		//SubtoursWriteTable subtoursWriteTable = new SubtoursWriteTable ("output/output_persons_subtours.txt");
 		PopulationReader plansReader = new MatsimPopulationReader(plans, null);
 		System.out.println("  done.");
@@ -82,7 +83,7 @@ public class PersonStreaming {
 		plans.printPlansCount();
 		//PersonInitDemandSummaryTable pidst = new PersonInitDemandSummaryTable("output/output_persons.txt", pmcm.getPersonSubtours());
 		//pidst.write();
-		plansWriter.write();
+		plansWriter.closeStreaming();
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

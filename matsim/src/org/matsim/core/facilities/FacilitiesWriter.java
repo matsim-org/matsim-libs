@@ -25,39 +25,27 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.SortedSet;
 
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.Writer;
+import org.matsim.core.api.internal.MatsimFileWriter;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
-public class FacilitiesWriter extends Writer {
+public class FacilitiesWriter extends MatsimXmlWriter implements MatsimFileWriter {
 
 	private FacilitiesWriterHandler handler = null;
 	private final ActivityFacilitiesImpl facilities;
+	private String dtd;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Creates a new FacilitiesWriter to write the specified facilities to the file
-	 * specified as output-file in the current configuration.
+	 * Creates a new FacilitiesWriter to write the specified facilities to the file.
 	 *
 	 * @param facilities
 	 */
 	public FacilitiesWriter(final ActivityFacilitiesImpl facilities) {
-		this(facilities, Gbl.getConfig().facilities().getOutputFile());
-	}
-
-	/**
-	 * Creates a new FacilitiesWriter to write the specified facilities to the specified file.
-	 *
-	 * @param facilities
-	 * @param filename
-	 */
-	public FacilitiesWriter(final ActivityFacilitiesImpl facilities, final String filename) {
 		super();
 		this.facilities = facilities;
-		this.outfile = filename;
 		// always use newest version, currently v1
 		this.dtd = "http://www.matsim.org/files/dtd/facilities_v1.dtd";
 		this.handler = new FacilitiesWriterHandlerImplV1();
@@ -67,20 +55,21 @@ public class FacilitiesWriter extends Writer {
 	// write methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void write() {
-		this.writeOpenAndInit();
+	public final void writeFile(final String filename) {
+		this.writeOpenAndInit(filename);
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
 			this.writeFacility(f);
 		}
 		this.writeFinish();
 	}
 
-	public final void writeOpenAndInit() {
+	public final void writeOpenAndInit(final String filename) {
 		try {
-			this.out = IOUtils.getBufferedWriter(this.outfile);
-			writeDtdHeader("facilities");
-			this.handler.startFacilities(this.facilities, this.out);
-			this.handler.writeSeparator(this.out);
+			openFile(filename);
+			this.writeXmlHead();
+			this.writeDoctype("facilities", this.dtd);
+			this.handler.startFacilities(this.facilities, this.writer);
+			this.handler.writeSeparator(this.writer);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -90,28 +79,28 @@ public class FacilitiesWriter extends Writer {
 
 	public final void writeFacility(final ActivityFacilityImpl f) {
 		try {
-			this.handler.startFacility(f, this.out);
+			this.handler.startFacility(f, this.writer);
 			Iterator<ActivityOptionImpl> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
 				ActivityOptionImpl a = a_it.next();
-				this.handler.startActivity(a, this.out);
-				this.handler.startCapacity(a, this.out);
-				this.handler.endCapacity(this.out);
+				this.handler.startActivity(a, this.writer);
+				this.handler.startCapacity(a, this.writer);
+				this.handler.endCapacity(this.writer);
 				Iterator<SortedSet<OpeningTime>> o_set_it = a.getOpeningTimes().values().iterator();
 				while (o_set_it.hasNext()) {
 					SortedSet<OpeningTime> o_set = o_set_it.next();
 					Iterator<OpeningTime> o_it = o_set.iterator();
 					while (o_it.hasNext()) {
 						OpeningTime o = o_it.next();
-						this.handler.startOpentime(o, this.out);
-						this.handler.endOpentime(this.out);
+						this.handler.startOpentime(o, this.writer);
+						this.handler.endOpentime(this.writer);
 					}
 				}
-				this.handler.endActivity(this.out);
+				this.handler.endActivity(this.writer);
 			}
-			this.handler.endFacility(this.out);
-			this.handler.writeSeparator(this.out);
-			this.out.flush();
+			this.handler.endFacility(this.writer);
+			this.handler.writeSeparator(this.writer);
+			this.writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -119,9 +108,9 @@ public class FacilitiesWriter extends Writer {
 
 	public final void writeFinish() {
 		try {
-			this.handler.endFacilities(this.out);
-			this.out.flush();
-			this.out.close();
+			this.handler.endFacilities(this.writer);
+			this.writer.flush();
+			this.writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -119,12 +119,13 @@ public class InitRoutes {
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		plansWriter.startStreaming(config.plans().getOutputFile());
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc)));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();
-		plansWriter.write();
+		plansWriter.closeStreaming();
 
 		System.out.println("done.");
 	}

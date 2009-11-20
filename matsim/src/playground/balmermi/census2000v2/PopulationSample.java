@@ -92,6 +92,7 @@ public class PopulationSample {
 		PopulationImpl pop = new PopulationImpl();
 		pop.setIsStreaming(true);
 		PopulationWriter pop_writer = new PopulationWriter(pop);
+		pop_writer.startStreaming(config.plans().getOutputFile());
 		pop.addAlgorithm(pop_writer);
 		PopulationReader pop_reader = new MatsimPopulationReader(pop, network);
 		Gbl.printMemoryUsage();
@@ -102,7 +103,7 @@ public class PopulationSample {
 
 		System.out.println("  reading, processing, writing plans...");
 		pop_reader.readFile(config.plans().getInputFile());
-		pop_writer.write();
+		pop_writer.closeStreaming();
 		pop.printPlansCount();
 		Gbl.printMemoryUsage();
 		System.out.println("  done.");
@@ -110,17 +111,17 @@ public class PopulationSample {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  writing network xml file... ");
-		new NetworkWriter(network).write();
+		new NetworkWriter(network).writeFile(config.network().getOutputFile());
 		Gbl.printMemoryUsage();
 		log.info("  done.");
 
 		log.info("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write();
+		new FacilitiesWriter(facilities).writeFile(config.facilities().getOutputFile());
 		Gbl.printMemoryUsage();
 		log.info("  done.");
 
 		log.info("  writing config xml file... ");
-		new ConfigWriter(config).write();
+		new ConfigWriter(config).writeFile(config.config().getOutputFile());
 		Gbl.printMemoryUsage();
 		log.info("  done.");
 

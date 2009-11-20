@@ -20,17 +20,13 @@
 package playground.christoph.network;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -99,7 +95,7 @@ public class ReNumberNetwork {
 		for (NodeImpl node : newNodes) network.addNode(node);
 		for (NodeImpl node : oldNodes) network.getNodes().remove(node.getId());
 		
-		new NetworkWriter(network, outputNetworkFile).write();
+		new NetworkWriter(network).writeFile(outputNetworkFile);
 			
 		log.info("done!");
 	}

@@ -108,7 +108,7 @@ public class PrimaryLocationDrawing {
 		PopulationImpl pop = getPopulation(ftDist,zones);
 		PlansCalcRoute router = new PlansCalcRoute(this.network,new FreespeedTravelTimeCost(),new FreespeedTravelTimeCost(), new DijkstraFactory());
 		router.run(pop);
-		new PopulationWriter(pop,this.demandFilename, "v4").write();
+		new PopulationWriter(pop).writeFile(this.demandFilename);
 	}
 
 

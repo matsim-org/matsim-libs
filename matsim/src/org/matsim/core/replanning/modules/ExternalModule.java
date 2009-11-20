@@ -24,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.TreeMap;
 
-import org.jfree.util.Log;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -44,7 +43,6 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandler;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PersonCalcTimes;
@@ -92,19 +90,15 @@ public class ExternalModule implements PlanStrategyModule {
 	}
 
 	public void prepareReplanning() {
-		this.persons.clear();
-		this.plansWriter = getPlansWriterHandler();
-		this.plansWriter.writeStartPlans();
-		this.handler = this.plansWriter.getHandler();
-		this.writer = this.plansWriter.getWriter();
-	}
-
-	protected PopulationWriter getPlansWriterHandler() {
 		String filename = this.outFileRoot + this.moduleId + ExternalInFileName;
-		String version = "v4";
 		PopulationImpl pop = new PopulationImpl();
 		pop.setIsStreaming(true);
-		return new PopulationWriter(pop, filename, version);
+		this.plansWriter = new PopulationWriter(pop);
+		
+		this.persons.clear();
+		this.plansWriter.writeStartPlans(filename);
+		this.handler = this.plansWriter.getHandler();
+		this.writer = this.plansWriter.getWriter();
 	}
 
 	public void handlePlan(final Plan plan) {
@@ -179,23 +173,7 @@ public class ExternalModule implements PlanStrategyModule {
 	}
 
 	private void writeExternalExeConfig() {
-		BufferedWriter bWriter = null;
-		try {
-			bWriter = IOUtils.getBufferedWriter(this.outFileRoot + this.moduleId + ExternalConfigFileName);
-			ConfigWriter configWriter = new ConfigWriter(this.extConfig, bWriter);
-			configWriter.write();
-			bWriter.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} finally {
-			try {
-				if (bWriter != null) {
-					bWriter.close();
-				}
-			} catch (IOException e2) {
-				Log.warn(e2.getMessage(), e2);
-			}
-		}
+		new ConfigWriter(this.extConfig).writeFile(this.outFileRoot + this.moduleId + ExternalConfigFileName);
 	}
 
 	private boolean callExe() {

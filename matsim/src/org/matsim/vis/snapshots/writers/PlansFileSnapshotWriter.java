@@ -20,7 +20,6 @@
 
 package org.matsim.vis.snapshots.writers;
 
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -41,7 +40,6 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 	private final String filePrefix;
 	private final String fileSuffix;
 
-	private String version = null;
 	private String filename = null;
 
 	private double currenttime = -1;
@@ -51,8 +49,6 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 	public PlansFileSnapshotWriter(final String snapshotFilePrefix, final String snapshotFileSuffix){
 		this.filePrefix = snapshotFilePrefix;
 		this.fileSuffix = snapshotFileSuffix;
-
-		this.version = Gbl.getConfig().plans().getOutputVersion();
 	}
 
 	public void beginSnapshot(final double time) {
@@ -72,8 +68,7 @@ public class PlansFileSnapshotWriter implements SnapshotWriter {
 	 * {@link org.matsim.core.population.PopulationWriter}
 	 */
 	private void writePlans() {
-		PopulationWriter pw = new PopulationWriter(this.plans, this.filename, this.version);
-		pw.write();
+		new PopulationWriter(this.plans).writeFile(this.filename);
 	}
 
 	public void addAgent(final PositionInfo position) {

@@ -47,7 +47,7 @@ public class PopulationWriter implements MatsimWriter {
 	 * @param filename
 	 */
 	public void writeV4(final String filename) {
-		new org.matsim.core.population.PopulationWriter(population, filename, "v4", 1.0).write();
+		new org.matsim.core.population.PopulationWriter(population).writeFileV4(filename);
 	}
 
 

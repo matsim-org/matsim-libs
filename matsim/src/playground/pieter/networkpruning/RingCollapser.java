@@ -54,7 +54,7 @@ public class RingCollapser {
 		System.out.println("Number of rings collapsed: " + this.ringCollapseCount);
 		
 		if(!this.outFile.equals(null)){
-			new NetworkWriter(this.network,this.outFile).write();			
+			new NetworkWriter(this.network).writeFile(this.outFile);			
 		}
 		System.out.println("File written to "+ this.outFile);
 	}

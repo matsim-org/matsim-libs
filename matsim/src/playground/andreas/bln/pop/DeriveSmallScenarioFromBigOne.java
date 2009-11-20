@@ -1,8 +1,5 @@
 package playground.andreas.bln.pop;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -117,11 +114,12 @@ public class DeriveSmallScenarioFromBigOne {
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		plansWriter.startStreaming(config.plans().getOutputFile());
 		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links((NetworkLayer) network));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
-		plansWriter.write();
+		plansWriter.closeStreaming();
 				
 		log.info("End XY2Links");
 		

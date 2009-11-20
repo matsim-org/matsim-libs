@@ -101,9 +101,7 @@ public class NetworkCutter {
 
 		run(network, pop);
 
-		final NetworkWriter network_writer = new NetworkWriter(network,
-				outputNetworkFile);
-		network_writer.write();
+		new NetworkWriter(network).writeFile(outputNetworkFile);
 	}
 
 	public void run(NetworkLayer net, PopulationImpl pop) {

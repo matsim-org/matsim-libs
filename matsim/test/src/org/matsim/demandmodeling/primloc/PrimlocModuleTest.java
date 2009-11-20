@@ -138,16 +138,16 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		// writing all available input
 
 		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(population).write();
+		new PopulationWriter(population).writeFile(config.plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write();
+		new FacilitiesWriter(facilities).writeFile(config.facilities().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing network xml file... ");
 		NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write();
+		network_writer.writeFile(config.network().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
@@ -156,8 +156,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(config);
-		config_writer.write();
+		new ConfigWriter(config).writeFile(config.config().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("TEST SUCCEEDED.");

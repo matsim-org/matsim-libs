@@ -30,7 +30,6 @@ import java.util.StringTokenizer;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -39,7 +38,6 @@ import org.matsim.core.network.NetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.xml.sax.SAXException;
 
 import playground.msieg.structure.HashPathFlow;
@@ -136,9 +134,7 @@ public abstract class CMCFRouter implements NetworkReader{
 
 	public void writePlans(final String outPlansFile){
 		//MatsimIo.writePlans(this.population, outPlansFile);
-		PopulationWriter pwriter = new PopulationWriter(this.population, outPlansFile, "v4", 1.0);
-		pwriter.setWriterHandler(new PopulationWriterHandlerImplV4());
-		pwriter.write();
+		new PopulationWriter(this.population).writeFile(outPlansFile);
 	}
 
 	abstract public void route();

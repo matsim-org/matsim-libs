@@ -11,7 +11,6 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
@@ -27,9 +26,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.charts.XYLineChart;
-
-import playground.wrashid.PSF.energy.charging.ChargeLog;
-import playground.wrashid.PSF.energy.charging.ChargingTimes;
 
 public class GeneralLib {
 
@@ -86,8 +82,7 @@ public class GeneralLib {
 	 * Write the facilities to the specified file.
 	 */
 	public static void writeActivityFacilities(ActivityFacilitiesImpl facilities, String facilitiesFile) {
-		FacilitiesWriter facilitiesWriter = new FacilitiesWriter(facilities, facilitiesFile);
-		facilitiesWriter.write();
+		new FacilitiesWriter(facilities).writeFile(facilitiesFile);
 	}
 
 	/**

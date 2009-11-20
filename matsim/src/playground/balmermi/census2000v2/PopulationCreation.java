@@ -133,8 +133,7 @@ public class PopulationCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  writing plans xml file... ");
-		PopulationWriter plans_writer = new PopulationWriter(plans);
-		plans_writer.write();
+		new PopulationWriter(plans).writeFile(config.plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing households txt file... ");
@@ -142,8 +141,7 @@ public class PopulationCreation {
 		System.out.println("  done.");
 
 		System.out.println("  writing facilities xml file... ");
-		FacilitiesWriter fac_writer = new FacilitiesWriter(facilities);
-		fac_writer.write();
+		new FacilitiesWriter(facilities).writeFile(config.facilities().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing world xml file... ");
@@ -152,8 +150,7 @@ public class PopulationCreation {
 		System.out.println("  done.");
 
 		System.out.println("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(config);
-		config_writer.write();
+		new ConfigWriter(config).writeFile(config.config().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("done.");

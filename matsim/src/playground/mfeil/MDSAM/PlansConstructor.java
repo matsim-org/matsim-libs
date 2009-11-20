@@ -250,7 +250,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	
 	protected void writePlans(String outputFile){
 		log.info("Writing plans...");
-		new PopulationWriter(this.population, outputFile).write();
+		new PopulationWriter(this.population).writeFile(outputFile);
 		log.info("done.");
 	}
 	

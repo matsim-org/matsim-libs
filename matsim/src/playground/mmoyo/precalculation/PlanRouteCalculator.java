@@ -121,7 +121,7 @@ public class PlanRouteCalculator {
 			newPopulation.addPerson(person);
 
 			System.out.println("writing output plan file...");
-			new PopulationWriter(newPopulation, outputFile, "v4").write();
+			new PopulationWriter(newPopulation).writeFile(outputFile);
 			System.out.println("Done");
 		}
 	}

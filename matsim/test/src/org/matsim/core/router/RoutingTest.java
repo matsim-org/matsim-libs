@@ -21,13 +21,11 @@
 package org.matsim.core.router;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -120,9 +118,7 @@ public class RoutingTest extends MatsimTestCase {
 		String outPlansName = getOutputDirectory() + provider.getName() + ".plans.xml.gz";
 
 		calcRoute(provider, network, population);
-		PopulationWriter plansWriter = new PopulationWriter(population, outPlansName,
-				config.plans().getOutputVersion());
-		plansWriter.write();
+		new PopulationWriter(population).writeFile(outPlansName);
 		final long routerChecksum = CRCChecksum.getCRCFromFile(outPlansName);
 		log.info("routerChecksum = " + routerChecksum + " file: " + outPlansName);
 		assertEquals("different plans files.", referenceChecksum, routerChecksum);

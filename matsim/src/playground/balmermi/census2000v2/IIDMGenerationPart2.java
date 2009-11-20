@@ -128,6 +128,7 @@ public class IIDMGenerationPart2 {
 		Knowledges knowledges =  new KnowledgesImpl();
 		pop.setIsStreaming(true);
 		PopulationWriter pop_writer = new PopulationWriter(pop, knowledges);
+		pop_writer.startStreaming(config.plans().getOutputFile());
 		PopulationReader pop_reader = new MatsimPopulationReader(pop, null);
 		System.out.println("  done.");
 
@@ -148,7 +149,7 @@ public class IIDMGenerationPart2 {
 		pop.addAlgorithm(pop_writer);
 		pop_reader.readFile(config.plans().getInputFile());
 		pop.printPlansCount();
-		pop_writer.write();
+		pop_writer.closeStreaming();
 		pamcm.close();
 		System.out.println("  done.");
 
@@ -159,8 +160,7 @@ public class IIDMGenerationPart2 {
 		log.info("  done.");
 
 		log.info("  writing facilities xml file... ");
-		FacilitiesWriter fac_writer = new FacilitiesWriter(facilities);
-		fac_writer.write();
+		new FacilitiesWriter(facilities).writeFile(config.facilities().getOutputFile());
 		log.info("  done.");
 
 		log.info("  writing world xml file... ");
@@ -169,8 +169,7 @@ public class IIDMGenerationPart2 {
 		log.info("  done.");
 
 		log.info("  writing config xml file... ");
-		ConfigWriter config_writer = new ConfigWriter(config);
-		config_writer.write();
+		new ConfigWriter(config).writeFile(config.config().getOutputFile());
 		log.info("  done.");
 
 		log.info("done.");

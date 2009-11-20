@@ -1,5 +1,6 @@
 package playground.wrashid.tryouts.plan;
 
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -17,12 +18,12 @@ public abstract class NewPopulation extends AbstractPersonAlgorithm {
 
 	public NewPopulation(final PopulationImpl population) {
 		this.popWriter = new PopulationWriter(population);
-		this.popWriter.writeStartPlans();
+		this.popWriter.writeStartPlans(Gbl.getConfig().plans().getOutputFile());
 	}
 
 	public NewPopulation(final PopulationImpl population, final String filename) {
-		this.popWriter = new PopulationWriter(population, filename, "v4");
-		this.popWriter.writeStartPlans();
+		this.popWriter = new PopulationWriter(population);
+		this.popWriter.writeStartPlans(filename);
 	}
 
 

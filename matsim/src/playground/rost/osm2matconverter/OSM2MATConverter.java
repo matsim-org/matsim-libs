@@ -304,8 +304,7 @@ public class OSM2MATConverter {
 		try {
 			NetworkLayer network = readOSM(inputfile);
 			network.setCapacityPeriod(1); //TODO changed
-			NetworkWriter writer = new NetworkWriter(network, outfile);
-			writer.write();
+			new NetworkWriter(network).writeFile(outfile);
 			System.out.println(inputfile + "  converted successfully \n"
 					+ "output written in: " + outfile);
 		} catch (JAXBException e) {

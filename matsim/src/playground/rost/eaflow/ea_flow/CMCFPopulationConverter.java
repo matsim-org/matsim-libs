@@ -151,9 +151,8 @@ public class CMCFPopulationConverter {
 			NetworkReaderMatsimV1 netreader = new NetworkReaderMatsimV1(network);
 			netreader.parse(netfile);
 			PopulationImpl population = readCMCFDemands(inputfile,network,coordinates); 
-			PopulationWriter writer = new PopulationWriter(population, outfile);
+			new PopulationWriter(population).writeFile(outfile);
 //			PopulationWriterV5 writer = new PopulationWriterV5( population);
-			writer.write();
 			System.out.println(inputfile+"conveted "+"output written in :"+outfile);
 		} catch (JDOMException e) {
 			e.printStackTrace();

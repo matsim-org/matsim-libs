@@ -58,14 +58,13 @@ import net.opengis.kml._2.TimeSpanType;
 import org.apache.commons.io.FileUtils;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
@@ -202,13 +201,13 @@ public class ShopsOf2005ToFacilities {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
 
 		ShopsOf2005ToFacilities.prepareRawDataForGeocoding();
-//		ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities();
+//		ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities(config);
 //		ShopsOf2005ToFacilities.shopsToTXT();
 //		ShopsOf2005ToFacilities.shopsToOpentimesKML();
-//		ShopsOf2005ToFacilities.applyOpentimesToEnterpriseCensus();
+//		ShopsOf2005ToFacilities.applyOpentimesToEnterpriseCensus(config);
 
 	}
 
@@ -226,7 +225,7 @@ public class ShopsOf2005ToFacilities {
 
 	}
 
-	private static void transformGeocodedKMLToFacilities() {
+	private static void transformGeocodedKMLToFacilities(Config config) {
 
 		ActivityFacilitiesImpl shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
 
@@ -267,7 +266,7 @@ public class ShopsOf2005ToFacilities {
 
 		System.out.println("Writing facilities xml file... ");
 		FacilitiesWriter facilities_writer = new FacilitiesWriter(shopsOf2005);
-		facilities_writer.write();
+		facilities_writer.writeFile(config.facilities().getOutputFile());
 		System.out.println("Writing facilities xml file...done.");
 
 	}
@@ -1708,7 +1707,7 @@ public class ShopsOf2005ToFacilities {
 		}
 	}
 
-	private static void applyOpentimesToEnterpriseCensus() {
+	private static void applyOpentimesToEnterpriseCensus(Config config) {
 
 		ActivityFacilitiesImpl facilities_input = new ActivityFacilitiesImpl("Switzerland based on Enterprise census 2000.", ActivityFacilitiesImpl.FACILITIES_USE_STREAMING);
 
@@ -1718,7 +1717,7 @@ public class ShopsOf2005ToFacilities {
 		FacilitiesOpentimesKTIYear2 facilitiesOpentimesKTIYear2 = new FacilitiesOpentimesKTIYear2();
 		facilitiesOpentimesKTIYear2.init();
 
-		FacilitiesWriterAlgorithm writerAlgo = new FacilitiesWriterAlgorithm(facilities_output);
+		FacilitiesWriterAlgorithm writerAlgo = new FacilitiesWriterAlgorithm(facilities_output, config.facilities().getOutputFile());
 
 		for (FacilityAlgorithm facilitiesAlgorithm : new FacilityAlgorithm[]{facilitiesOpentimesKTIYear2, writerAlgo}) {
 			facilities_input.addAlgorithm(facilitiesAlgorithm);

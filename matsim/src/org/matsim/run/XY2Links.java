@@ -24,7 +24,6 @@ import java.util.Iterator;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -102,14 +101,15 @@ public class XY2Links {
 		NetworkLayer network = sl.getScenario().getNetwork();
 		this.config = sl.getScenario().getConfig();
 
-		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
+		final PopulationImpl plans = sl.getScenario().getPopulation();		plans.setIsStreaming(true);
+		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links((NetworkLayer) network));
+		plansWriter.startStreaming(this.config.plans().getOutputFile());
+		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();
-		plansWriter.write();
+		plansWriter.closeStreaming();
 
 		System.out.println("done.");
 	}

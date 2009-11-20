@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
@@ -59,24 +58,21 @@ public class DemandGenerationTest extends MatsimTestCase {
 	private final double homeEndTime = 9*3600.0;
 	private final double workEndTime = 19*3600.0;
 	private List<Id> ids = new ArrayList<Id>();
-	private final Scenario sc = new ScenarioImpl();
+	private Scenario sc = null;
 	
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
+		this.sc = new ScenarioImpl();
 		for (int i = 1; i <= 6; i++){
 			ids.add(sc.createId(Integer.toString(i)));
 		}
 	}
 
-	/**
-	 * @see junit.framework.TestCase#tearDown()
-	 */
 	@Override
 	protected void tearDown() throws Exception {
+		this.sc = null;
+		this.ids = null;
 		super.tearDown();
 	}
 	

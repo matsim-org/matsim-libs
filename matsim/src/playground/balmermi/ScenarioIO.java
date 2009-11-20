@@ -119,11 +119,11 @@ public class ScenarioIO {
 		System.out.println("done. (complete world)");
 		
 		System.out.println("writing facilities...");
-		new FacilitiesWriter(af).write();
+		new FacilitiesWriter(af).writeFile(config.facilities().getOutputFile());
 		System.out.println("done. (writing facilities)");
 
 		System.out.println("writing network...");
-		new NetworkWriter(network).write();
+		new NetworkWriter(network).writeFile(config.network().getOutputFile());
 		System.out.println("done. (writing network)");
 
 		System.out.println("loading population...");
@@ -151,7 +151,7 @@ public class ScenarioIO {
 		System.out.println("done. (running algorithms)");
 
 		System.out.println("writing population...");
-		new PopulationWriter(population,sl.getScenario().getKnowledges()).write();
+		new PopulationWriter(population,sl.getScenario().getKnowledges()).writeFile(config.plans().getOutputFile());
 		System.out.println("done. (writing population)");
 
 //		System.out.println("running algorithms...");

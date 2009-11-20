@@ -105,13 +105,14 @@ public class MyRuns {
 		plans.setIsStreaming(true);
 		plans.addAlgorithm(new PersonFilterSelectedPlan());
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		plansWriter.startStreaming(scenario.getConfig().plans().getOutputFile());
 		plans.addAlgorithm(plansWriter);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 
 		System.out.println("  reading and writing plans...");
 		plansReader.readFile(scenario.getConfig().plans().getInputFile());
 		plans.printPlansCount();
-		plansWriter.write();
+		plansWriter.closeStreaming();
 		System.out.println("  done.");
 
 		System.out.println("RUN: filterSelectedPlans finished.");
@@ -161,8 +162,7 @@ public class MyRuns {
 		new PlansFilterByLegMode(TransportMode.car, false).run(scenario.getPopulation());
 
 		System.out.println("  writing plans...");
-		final PopulationWriter plansWriter = new PopulationWriter(scenario.getPopulation());
-		plansWriter.write();
+		new PopulationWriter(scenario.getPopulation()).writeFile(scenario.getConfig().plans().getOutputFile());
 
 		System.out.println("RUN: filterCars finished.");
 		System.out.println();
@@ -185,8 +185,7 @@ public class MyRuns {
 		new PlansFilterByLegMode(TransportMode.pt, true).run(plans);
 
 		System.out.println("  writing plans...");
-		final PopulationWriter plansWriter = new PopulationWriter(plans);
-		plansWriter.write();
+		new PopulationWriter(plans).writeFile(scenario.getConfig().plans().getOutputFile());
 
 		System.out.println("RUN: filterPt finished.");
 		System.out.println();
@@ -208,8 +207,7 @@ public class MyRuns {
 		new PersonRemovePlansWithoutLegs().run(scenario.getPopulation());
 		new PlansFilterPersonHasPlans().run(scenario.getPopulation());
 
-		final PopulationWriter plansWriter = new PopulationWriter(scenario.getPopulation());
-		plansWriter.write();
+		new PopulationWriter(scenario.getPopulation()).writeFile(scenario.getConfig().plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("RUN: filterWork finished.");
@@ -225,8 +223,7 @@ public class MyRuns {
 		new PlanFilterActTypes(new String[] {"work1", "work2", "work3", "edu", "uni"}).run(scenario.getPopulation());
 		new PlansFilterPersonHasPlans().run(scenario.getPopulation());
 
-		final PopulationWriter plansWriter = new PopulationWriter(scenario.getPopulation());
-		plansWriter.write();
+		new PopulationWriter(scenario.getPopulation()).writeFile(scenario.getConfig().plans().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("RUN: filterWorkEdu finished.");
@@ -249,6 +246,7 @@ public class MyRuns {
 		final PopulationImpl plans = sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		plansWriter.startStreaming(config.plans().getOutputFile());
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		System.out.println("  done.");
 
@@ -259,7 +257,7 @@ public class MyRuns {
 		System.out.println("  reading, processing, writing plans...");
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(config.plans().getInputFile());
-		plansWriter.write();
+		plansWriter.closeStreaming();
 		System.out.println("  done.");
 
 		System.out.println("RUN: removeLinkAndRoute finished.");
@@ -273,12 +271,13 @@ public class MyRuns {
 
 		final PopulationImpl plans = sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
-		final PopulationWriter plansWriter = new PopulationWriter(plans, config.plans().getOutputFile(), "v4", config.plans().getOutputSample());
+		final PopulationWriter plansWriter = new PopulationWriter(plans);
+		plansWriter.startStreaming(config.plans().getOutputFile());
 		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(config.plans().getInputFile());
-		plansWriter.write();
+		plansWriter.closeStreaming();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -300,7 +299,7 @@ public class MyRuns {
 
 		System.out.println("  writing the network...");
 		final NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write();
+		network_writer.writeFile(sl.getScenario().getConfig().network().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("RUN: calcNofLanes finished.");
@@ -367,13 +366,14 @@ public class MyRuns {
 
 		System.out.println("  writing the falsified network...");
 		final NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write();
+		network_writer.writeFile(sl.getScenario().getConfig().network().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  processing plans...");
 		final PopulationImpl population = scenario.getPopulation();
 		population.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(population);
+		plansWriter.startStreaming(scenario.getConfig().plans().getOutputFile());
 		final PopulationReader plansReader = new MatsimPopulationReader(population, network);
 		population.addAlgorithm(new ActLocationFalsifier(200));
 		population.addAlgorithm(new XY2Links(network));
@@ -382,7 +382,7 @@ public class MyRuns {
 		population.addAlgorithm(plansWriter);
 		plansReader.readFile(scenario.getConfig().plans().getInputFile());
 		population.printPlansCount();
-		plansWriter.write();
+		plansWriter.closeStreaming();
 		System.out.println("  done.");
 
 		System.out.println("RUN: falsifyNetAndPlans finished.");
@@ -752,6 +752,11 @@ public class MyRuns {
 				System.out.println(str);
 			}
 		}
+		int i = 0;
+		for (i = 0; i<5;i++) {
+			System.out.print(i);
+		}
+		System.out.print(i);
 
 		System.out.println("stop at " + (new Date()));
 		System.exit(0); // currently only used for calcRouteMT();

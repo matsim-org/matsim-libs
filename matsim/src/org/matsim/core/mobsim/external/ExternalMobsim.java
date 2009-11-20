@@ -21,10 +21,8 @@
 package org.matsim.core.mobsim.external;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
@@ -114,22 +112,16 @@ public class ExternalMobsim {
 		module.addParam("startTime", simConfig.getParam(CONFIG_MODULE, "startTime"));
 		module.addParam("endTime", simConfig.getParam(CONFIG_MODULE, "endTime"));
 
-		PrintWriter writer = null;
-		File configfile = new File(iterationConfigFile);
-		writer = new PrintWriter(configfile);
-		ConfigWriter configwriter = new ConfigWriter(extConfig, writer);
-		configwriter.write();
-		writer.close();
+		new ConfigWriter(extConfig).writeFile(iterationConfigFile);
 	}
 
 	protected void writePlans(final String iterationPlansFile) throws FileNotFoundException, IOException {
 		log.info("writing plans for external mobsim");
-		String version = "v4";
 		PopulationImpl pop = new PopulationImpl();
 		pop.setIsStreaming(true);
-		PopulationWriter plansWriter = new PopulationWriter(pop, iterationPlansFile, version);
+		PopulationWriter plansWriter = new PopulationWriter(pop);
 		PopulationWriterHandler handler = plansWriter.getHandler();
-		plansWriter.writeStartPlans();
+		plansWriter.writeStartPlans(iterationPlansFile);
 		BufferedWriter writer = plansWriter.getWriter();
 		for (Person person : this.population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();

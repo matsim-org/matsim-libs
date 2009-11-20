@@ -408,18 +408,18 @@ public class Controler {
 			}
 			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
 			// dump plans
-			new PopulationWriter(this.population, (this.getScenarioData()).getKnowledges(), this
-					.getNameForOutputFilename("output_plans.xml.gz"), this.config.plans().getOutputVersion()).write();
+			new PopulationWriter(this.population, (this.getScenarioData()).getKnowledges()).writeFile(this
+							.getNameForOutputFilename("output_plans.xml.gz"));
 			// dump network
-			new NetworkWriter(this.network, this.getNameForOutputFilename("output_network.xml.gz")).write();
+			new NetworkWriter(this.network).writeFile(this.getNameForOutputFilename("output_network.xml.gz"));
 			// dump world
 			new WorldWriter(this.getWorld()).writeFile(this.getNameForOutputFilename("output_world.xml.gz"));
 			// dump config
-			new ConfigWriter(this.config, this.getNameForOutputFilename("output_config.xml.gz")).write();
+			new ConfigWriter(this.config).writeFile(this.getNameForOutputFilename("output_config.xml.gz"));
 			// dump facilities
 			ActivityFacilitiesImpl facilities = this.getFacilities();
 			if (facilities != null) {
-				new FacilitiesWriter(facilities, this.getNameForOutputFilename("output_facilities.xml.gz")).write();
+				new FacilitiesWriter(facilities).writeFile(this.getNameForOutputFilename("output_facilities.xml.gz"));
 			}
 			if (this.network.getFactory().isTimeVariant()) {
 				new NetworkChangeEventsWriter().write(this.getNameForOutputFilename("output_change_events.xml.gz"), this.network.getNetworkChangeEvents());
@@ -523,8 +523,7 @@ public class Controler {
 		this.config.checkConsistency();
 		log.info("Complete config dump:");
 		StringWriter writer = new StringWriter();
-		ConfigWriter configwriter = new ConfigWriter(this.config, new PrintWriter(writer));
-		configwriter.write();
+		new ConfigWriter(this.config).writeStream(new PrintWriter(writer));
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
 

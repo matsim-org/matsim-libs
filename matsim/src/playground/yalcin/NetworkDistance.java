@@ -105,7 +105,7 @@ public class NetworkDistance {
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
 		new NetworkTransform(ct).run(network);
-		new NetworkWriter(network, wgs84NetworkFilename).write();
+		new NetworkWriter(network).writeFile(wgs84NetworkFilename);
 	}
 
 	public static void findDistances() {

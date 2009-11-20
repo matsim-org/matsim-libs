@@ -90,7 +90,7 @@ public class KtiPtTester {
 		}
 		counter.printCounter();
 		Gbl.printRoundTime();
-		new PopulationWriter(population, this.config.plans().getOutputFile(), this.config.plans().getOutputVersion()).write();
+		new PopulationWriter(population).writeFile(this.config.plans().getOutputFile());
 		Gbl.printRoundTime();
 	}
 

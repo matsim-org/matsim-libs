@@ -34,6 +34,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -154,10 +155,11 @@ public class PlanFilter {
 						link.getCapacity(Time.UNDEFINED_TIME), link.getNumberOfLanes(Time.UNDEFINED_TIME));
 			}
 		}
-		new NetworkWriter(subnet, "ivtch-osm_zrh14km.xml").write();
+		new NetworkWriter(subnet).writeFile("ivtch-osm_zrh14km.xml");
 
-		final PopulationWriter plansWriter = new PopulationWriter(population, "plans_miv_zrh7km_cut14km_transitincl_10pct.xml", "v4");
-		plansWriter.writeStartPlans();
+		final PopulationWriter plansWriter = new PopulationWriter(population);
+		plansWriter.setWriterHandler(new PopulationWriterHandlerImplV4());
+		plansWriter.writeStartPlans("plans_miv_zrh7km_cut14km_transitincl_10pct.xml");
 		final CutTrips cutAlgo = new CutTrips(plansWriter, bigAOI);
 		final PersonIntersectAreaFilter insideFilter = new PersonIntersectAreaFilter(cutAlgo, smallAOI);
 		insideFilter.run(population);

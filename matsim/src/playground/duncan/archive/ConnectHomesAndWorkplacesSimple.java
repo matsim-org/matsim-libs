@@ -23,10 +23,8 @@ package playground.duncan.archive;
  */
 
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
@@ -44,8 +42,7 @@ public class ConnectHomesAndWorkplacesSimple {
 
 		// program locachoice here
 
-		PopulationWriter popWriter = new PopulationWriter(population,"newfilename","v4",1 ) ;
-		popWriter.write();
+		new PopulationWriter(population).writeFile("newfilename");
 
 	}
 

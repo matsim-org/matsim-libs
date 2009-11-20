@@ -45,7 +45,6 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -294,9 +293,9 @@ public class ScenarioCut {
 			reducePopulation(scenario);
 		}
 		calcExtent(scenario);
-		new NetworkWriter(scenario.getNetwork()).write();
-		new FacilitiesWriter(scenario.getActivityFacilities()).write();
-		new PopulationWriter((PopulationImpl)scenario.getPopulation(),scenario.getKnowledges()).write();
+		new NetworkWriter(scenario.getNetwork()).writeFile(scenario.getConfig().network().getOutputFile());
+		new FacilitiesWriter(scenario.getActivityFacilities()).writeFile(scenario.getConfig().facilities().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(),scenario.getKnowledges()).writeFile(scenario.getConfig().plans().getOutputFile());
 	}
 	
 	//////////////////////////////////////////////////////////////////////

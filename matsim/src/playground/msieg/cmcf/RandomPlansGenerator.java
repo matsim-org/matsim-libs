@@ -36,12 +36,9 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.router.Dijkstra;
@@ -187,15 +184,11 @@ public class RandomPlansGenerator {
 	}
 
 	public void writePlans(final PopulationImpl plans){
-		PopulationWriter pwriter = new PopulationWriter(plans);
-		pwriter.setWriterHandler(new PopulationWriterHandlerImplV4());
-		pwriter.write();
+		new PopulationWriter(plans).writeFile(Gbl.getConfig().plans().getOutputFile());
 	}
 
-	public void writePlans(final PopulationImpl plans, final String file){
-		PopulationWriter pwriter = new PopulationWriter(plans, file, "v4", 1.0);
-		pwriter.setWriterHandler(new PopulationWriterHandlerImplV4());
-		pwriter.write();
+	public void writePlans(final PopulationImpl plans, final String file) {
+		new PopulationWriter(plans).writeFile(file);
 	}
 
 	public static void main(final String[] args) {

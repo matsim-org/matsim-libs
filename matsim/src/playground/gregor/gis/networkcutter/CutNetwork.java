@@ -212,9 +212,9 @@ public class CutNetwork {
 		cutIt(net,parser.getEvents(),pop,evacuationAreaLinks);
 		System.out.println(evacuationAreaLinks.size());
 		
-		new NetworkWriter(net,"tmp2/network.xml").write();
+		new NetworkWriter(net).writeFile("tmp2/network.xml");
 		new NetworkChangeEventsWriter().write("tmp2/changeEvents.xml", parser.getEvents());
-		new PopulationWriter(pop,"tmp2/population.xml").write();
+		new PopulationWriter(pop).writeFile("tmp2/population.xml");
 		try {
 			new EvacuationAreaFileWriter(evacuationAreaLinks).writeFile("tmp2/evacuationArea.xml");
 		} catch (IOException e) {

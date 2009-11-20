@@ -78,8 +78,7 @@ public class GTFNetCreator {
 			}
 		}
 
-		new NetworkWriter(network,
-				"../schweiz-ivtch/network/ivtch-changed-with-GTF.xml").write();
+		new NetworkWriter(network).writeFile("../schweiz-ivtch/network/ivtch-changed-with-GTF.xml");
 
 		System.out.println("done!");
 	}

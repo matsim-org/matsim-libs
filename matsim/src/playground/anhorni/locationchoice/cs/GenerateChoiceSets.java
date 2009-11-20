@@ -10,13 +10,11 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.cppdeqsim.DEQSimControler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
@@ -201,7 +199,7 @@ public class GenerateChoiceSets {
 		}
 		else {
 			this.choiceSetPopulation = this.createChoiceSetPopulationFromMZ();
-			new PopulationWriter(this.choiceSetPopulation, this.outdir+"/MZPopulation.txt", "v4").write();
+			new PopulationWriter(this.choiceSetPopulation).writeFile(this.outdir+"/MZPopulation.txt");
 
 			// TODO: maybe also optimize area?
 			this.choiceSets.setCarChoiceSets(this.filter.apply(this.choiceSetPopulation, "car"));

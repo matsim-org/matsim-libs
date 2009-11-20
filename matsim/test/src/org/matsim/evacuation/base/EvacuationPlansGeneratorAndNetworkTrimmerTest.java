@@ -30,10 +30,10 @@ public class EvacuationPlansGeneratorAndNetworkTrimmerTest extends MatsimTestCas
 		
 		new EvacuationPlansGenerator(pop,net,net.getLink("el1")).run();
 		
-		new PopulationWriter(pop,c.plans().getOutputFile()).write();
+		new PopulationWriter(pop).writeFile(c.plans().getOutputFile());
 		assertEquals("different plans-files.", CRCChecksum.getCRCFromFile(refPlans),	CRCChecksum.getCRCFromFile(c.plans().getOutputFile()));
 		
-		new NetworkWriter(net,c.network().getOutputFile()).write();
+		new NetworkWriter(net).writeFile(c.network().getOutputFile());
 		assertEquals("different network-files.", CRCChecksum.getCRCFromFile(refNet),	CRCChecksum.getCRCFromFile(c.network().getOutputFile()));
 	}
 }

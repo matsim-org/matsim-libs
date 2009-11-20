@@ -157,8 +157,7 @@ public class DaganzoScenarioGenerator {
 		createIds(scenario);
 		//create the plans and write them
 		createPlans(scenario);
-		PopulationWriter pwriter = new PopulationWriter(scenario.getPopulation(), plansOut);
-		pwriter.write();
+		new PopulationWriter(scenario.getPopulation()).writeFile(plansOut);
 		if (isUseLanes) {
 			config.scenario().setUseLanes(true);
 			config.network().setLaneDefinitionsFile(LANESOUTPUTFILE);
@@ -184,8 +183,7 @@ public class DaganzoScenarioGenerator {
 		
 		//create and write the config with the correct paths to the files created above
 		createConfig(config);
-		ConfigWriter configWriter = new ConfigWriter(config, configOut);
-		configWriter.write();
+		new ConfigWriter(config).writeFile(configOut);
 
 		log.info("scenario written!");
 	}

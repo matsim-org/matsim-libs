@@ -208,8 +208,7 @@ public class NetworkSimplifier {
 //		nsimply.setMergeLinkStats(true);
 		nsimply.run(network);
 
-		final NetworkWriter network_writer = new NetworkWriter(network, "./bb_5.out.xml.gz");
-		network_writer.write();
+		new NetworkWriter(network).writeFile("./bb_5.out.xml.gz");
 		
 	}
 }

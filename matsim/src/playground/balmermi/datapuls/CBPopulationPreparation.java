@@ -21,7 +21,6 @@
 package playground.balmermi.datapuls;
 
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -58,7 +57,8 @@ public class CBPopulationPreparation {
 		final PopulationImpl population = new PopulationImpl();
 		population.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(population,null);
-		PopulationWriter plansWriter = new PopulationWriter(population,args[1].trim());
+		PopulationWriter plansWriter = new PopulationWriter(population);
+		plansWriter.startStreaming(args[1].trim());
 		
 		ActivityFacilitiesImpl afs = new ActivityFacilitiesImpl();
 
@@ -70,12 +70,12 @@ public class CBPopulationPreparation {
 		System.out.println("stream population...");
 		plansReader.readFile(args[0].trim());
 		population.printPlansCount();
-		plansWriter.write();
+		plansWriter.closeStreaming();
 		Gbl.printMemoryUsage();
 		System.out.println("done. (stream population)");
 
 		System.out.println("writing facilities...");
-		new FacilitiesWriter(afs,args[2].trim()).write();
+		new FacilitiesWriter(afs).writeFile(args[2].trim());
 		System.out.println("done. (writing facilities)");
 	}
 }

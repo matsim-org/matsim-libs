@@ -45,7 +45,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
@@ -205,9 +204,8 @@ public class IVT2009ToGraphML {
 		/*
 		 * Write population and social network...
 		 */
-		logger.info("Writing population to " + output+"ivt2009.plans.xml");
-		PopulationWriter popWriter = new PopulationWriter(population, output+"ivt2009.plans.xml");
-//		popWriter.write();
+//		logger.info("Writing population to " + output+"ivt2009.plans.xml");
+//		new PopulationWriter(population).writeFile(output+"ivt2009.plans.xml");
 		
 		logger.info("Writing social network to " + output + "ivt2009.graphml");
 //		SNGraphMLWriter graphWriter = new SNGraphMLWriter();

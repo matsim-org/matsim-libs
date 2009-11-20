@@ -522,7 +522,7 @@ public class BusLineAllocator {
 				}
 			}
 		}
-		new PopulationWriter(pop, newPopFile).write();
+		new PopulationWriter(pop).writeFile(newPopFile);
 	}
 
 	private void generateNewNetwork(String newNetFilename) {
@@ -543,7 +543,7 @@ public class BusLineAllocator {
 			carNetwork.addLink(link);
 			carNetwork.addNode(link.getFromNode());
 		}
-		new NetworkWriter(carNetwork, newNetFilename).write();
+		new NetworkWriter(carNetwork).writeFile(newNetFilename);
 	}
 
 	/**

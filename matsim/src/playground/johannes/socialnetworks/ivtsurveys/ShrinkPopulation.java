@@ -47,8 +47,8 @@ public class ShrinkPopulation {
 //		loader.loadPopulation();
 		PopulationImpl population = data.getPopulation();
 		double sample = Double.parseDouble(args[2]);
-		PopulationWriter writer = new PopulationWriter(population, args[1], "v4", sample);
-		writer.write();
+		PopulationWriter writer = new PopulationWriter(population, sample);
+		writer.writeFile(args[1]);
 
 	}
 

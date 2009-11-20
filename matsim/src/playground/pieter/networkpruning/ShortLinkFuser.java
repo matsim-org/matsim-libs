@@ -61,7 +61,7 @@ public class ShortLinkFuser {
 		System.out.println("Pruning  done. Shortest link is " + this.shortestLink);
 		System.out.println("One way links removed: " + this.oneWayLinkJointCount);
 		System.out.println("Two way links removed: " + this.twoWayLinkJointCount);
-		new NetworkWriter(this.network,this.outFile).write();
+		new NetworkWriter(this.network).writeFile(this.outFile);
 		System.out.println("File written to "+ this.outFile);
 	}
 

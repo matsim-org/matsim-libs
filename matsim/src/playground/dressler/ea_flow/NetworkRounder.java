@@ -21,7 +21,10 @@
 
 package playground.dressler.ea_flow;
 
-import org.matsim.core.network.*;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkWriter;
 
 /**
  * @author Manuel Schneider
@@ -150,16 +153,12 @@ public class NetworkRounder {
 		
 		if (outputfile_forEAF != null) {
 		  NetworkLayer network = roundNetwork(inputfile,cap, flowCapacityFactor, lengthFactor, true);
-		  NetworkWriter writer = new NetworkWriter( network, outputfile_forEAF);
-		  writer.write();
+		  new NetworkWriter(network).writeFile(outputfile_forEAF);
 		}
 		if (outputfile_forMatsim != null) {
 			  // Matsim needs the real transit time ("false") & capacity ("1.0d")
 			  NetworkLayer network = roundNetwork(inputfile,cap, 1.0d, lengthFactor, false);
-			  NetworkWriter writer = new NetworkWriter( network, outputfile_forMatsim);
-			  writer.write();
+			  new NetworkWriter(network).writeFile(outputfile_forMatsim);
 		}
-			
-		
 	}
 }

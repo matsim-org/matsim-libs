@@ -192,11 +192,16 @@ public class ReducePopulationExe {
 
 		relevantPopulation = new PopulationImpl();
 		relevantPopulation.setIsStreaming(true);
-		plansWriter1 = new PopulationWriter(relevantPopulation, outpopFileName + "1p.xml", "v4");
-		plansWriter10 = new PopulationWriter(relevantPopulation, outpopFileName + "10p.xml", "v4");
-		plansWriter25 = new PopulationWriter(relevantPopulation, outpopFileName + "25p.xml", "v4");
-		plansWriter50 = new PopulationWriter(relevantPopulation, outpopFileName + "50p.xml", "v4");
-		plansWriter100 = new PopulationWriter(relevantPopulation, outpopFileName + "100p.xml", "v4");
+		plansWriter1 = new PopulationWriter(relevantPopulation);
+		plansWriter10 = new PopulationWriter(relevantPopulation);
+		plansWriter25 = new PopulationWriter(relevantPopulation);
+		plansWriter50 = new PopulationWriter(relevantPopulation);
+		plansWriter100 = new PopulationWriter(relevantPopulation);
+		plansWriter1.startStreaming(outpopFileName + "1p.xml");
+		plansWriter10.startStreaming(outpopFileName + "10p.xml");
+		plansWriter25.startStreaming(outpopFileName + "25p.xml");
+		plansWriter50.startStreaming(outpopFileName + "50p.xml");
+		plansWriter100.startStreaming(outpopFileName + "100p.xml");
 
 		PopulationImpl population = new PopulationImpl();
 		population.setIsStreaming(true);
@@ -220,7 +225,7 @@ public class ReducePopulationExe {
 
 		for(LinkImpl link : nolinkList)network.removeLink(link);
 		
-		new NetworkWriter(network, outnetFileName).write();
+		new NetworkWriter(network).writeFile(outnetFileName);
 		
 	}
 

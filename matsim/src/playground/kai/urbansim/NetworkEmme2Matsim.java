@@ -144,8 +144,7 @@ public class NetworkEmme2Matsim {
 		log.info("... finished cleaning network.\n") ;
 
 		log.info("writing network ...") ;
-		NetworkWriter nwWriter = new NetworkWriter(network,"/home/nagel/tmp/net.xml.gz") ;
-		nwWriter.write() ;
+		new NetworkWriter(network).writeFile("/home/nagel/tmp/net.xml.gz");
 		log.info("... finished writing network.\n") ;
 	}
 

@@ -372,8 +372,7 @@ public class BlnPlansGenerator {
 			pop.addPerson(person);
 			numberOfPersonWithPlans++;
 		}		
-		PopulationWriter writer = new PopulationWriter(pop, filename, "v4");
-		writer.write();
+		new PopulationWriter(pop).writeFile(filename);
 		log.info(numberOfPersonWithPlans + " persons were written to " + filename);
 	}
 

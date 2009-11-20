@@ -157,7 +157,7 @@ public class AsciiToPlan {
 		} while(zeile!=null);
 		
 		//Alles fertig --- Ergebnis ausgeben.
-		new PopulationWriter(pop,OUTPUT_FILE).write();
+		new PopulationWriter(pop).writeFile(OUTPUT_FILE);
 		System.out.println("Ausgabe erzeugt");
 		
 		

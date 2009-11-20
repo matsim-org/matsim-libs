@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
@@ -56,7 +57,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 	private final double homeEndTime = 9*3600.0;
 	private final double workEndTime = 19*3600.0;
 	private List<Id> ids = new ArrayList<Id>();
-	private final Scenario sc = new ScenarioImpl();
+	private Scenario sc = null;
 	
 	/**
 	 * @see junit.framework.TestCase#setUp()
@@ -64,19 +65,18 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
+		this.sc = new ScenarioImpl();
 		for (int i = 1; i <= 6; i++){
 			ids.add(sc.createId(Integer.toString(i)));
 		}
 	}
-
-	/**
-	 * @see junit.framework.TestCase#tearDown()
-	 */
+	
 	@Override
 	protected void tearDown() throws Exception {
+		this.sc = null;
+		this.ids = null;
 		super.tearDown();
 	}
-	
 	
 	public void testDemandGeneration(){
 		Config conf = sc.getConfig();
@@ -156,6 +156,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		
 		//write created population
 		PopulationWriter writer = new PopulationWriter(pop);
+		Config config = Gbl.getConfig();
 		writer.write(this.getOutputDirectory() + populationFile);
 		File outfile = new File(this.getOutputDirectory() + populationFile);
 		assertTrue(outfile.exists());

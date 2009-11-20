@@ -296,10 +296,8 @@ public class MyRuns {
 		psfaet.run(population);
 		
 		logger.info("Writing plans file...");
-		PopulationWriter plans_writer = new PopulationWriter(population);
-		plans_writer.write();
+		new PopulationWriter(population).writeFile(scenario.getConfig().plans().getOutputFile());
 		logger.info("Writing plans file...DONE.");
-		
 	}
 	
 	public static PopulationImpl initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos, NetworkLayer network) {

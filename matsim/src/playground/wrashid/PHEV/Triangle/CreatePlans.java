@@ -14,9 +14,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.KnowledgeImpl;
@@ -112,7 +110,7 @@ public class CreatePlans {
 
 
 
-		new PopulationWriter(plans).write();
+		new PopulationWriter(plans).writeFile(config.plans().getOutputFile());
 	}
 
 }

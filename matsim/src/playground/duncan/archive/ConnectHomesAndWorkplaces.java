@@ -58,8 +58,8 @@ public class ConnectHomesAndWorkplaces {
 		ScenarioImpl scenario = new ScenarioLoaderImpl(configFile).getScenario();
 		
 		this.config = scenario.getConfig();
-		ConfigWriter configwriter = new ConfigWriter(this.config, new PrintWriter(System.out));
-		configwriter.write();
+		ConfigWriter configwriter = new ConfigWriter(this.config);
+		configwriter.writeStream(new PrintWriter(System.out));
 
 		// create the control(l)er:
 		final Controler controler = new Controler(scenario);
@@ -91,13 +91,14 @@ public class ConnectHomesAndWorkplaces {
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, knowledges);
+		plansWriter.startStreaming(config.plans().getOutputFile());
 		plans.addAlgorithm(locachoice);
 		plans.addAlgorithm(plansWriter); // planswriter must be the last algorithm added
 
 		// I don't know why this works:
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();
-		plansWriter.write();
+		plansWriter.closeStreaming();
 
 		System.out.println("done.");
 	}

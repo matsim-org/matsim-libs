@@ -34,7 +34,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -59,9 +58,6 @@ public class Plansgenerator {
 		Config config = Gbl.createConfig(null);
 		config.addCoreModules();
 
-		config.plans().setOutputVersion("v4");
-		config.plans().setOutputFile(plansOut);
-
 		this.network = this.loadNetwork(networkFilename);
 	}
 
@@ -72,11 +68,7 @@ public class Plansgenerator {
 		
 		createDenverStraight(HOME_END_TIME);
 
-		PopulationWriter pwriter = new PopulationWriter(this.plans);
-		pwriter.setWriterHandler(new PopulationWriterHandlerImplV4());
-		pwriter.write();
-
-
+		new PopulationWriter(this.plans).writeFile(plansOut);
 	}
 	
 	/**

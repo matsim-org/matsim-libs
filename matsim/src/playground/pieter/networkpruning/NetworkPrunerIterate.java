@@ -58,7 +58,7 @@ public class NetworkPrunerIterate {
 		System.out.println("One way links removed: " + this.oneWayLinkJointCount);
 		System.out.println("Two way links removed: " + this.twoWayLinkJointCount);
 		System.out.println("Leaves shorter than " + this.shortLeafLength + " removed: " + this.shortLeafRemovedCount);
-		new NetworkWriter(this.network,this.outFile).write();
+		new NetworkWriter(this.network).writeFile(this.outFile);
 		System.out.println("File written to "+ this.outFile);
 	}
 

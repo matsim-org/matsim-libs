@@ -127,10 +127,11 @@ public class ScenarioDilute {
 		System.out.println("=> aoi contains: " + areaOfInterest.size() + " links.");
 		System.out.println(" done. " + (new Date()));
 
-		final PopulationImpl population = (PopulationImpl)sl.getScenario().getPopulation();
+		final PopulationImpl population = sl.getScenario().getPopulation();
 		population.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		PopulationWriter plansWriter = new PopulationWriter(population,sl.getScenario().getKnowledges());
+		plansWriter.startStreaming(sl.getScenario().getConfig().plans().getOutputFile());
 
 		System.out.println("adding algorithms...");
 		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(plansWriter,areaOfInterest);
@@ -143,7 +144,7 @@ public class ScenarioDilute {
 		System.out.println("stream population...");
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
-		plansWriter.write();
+		plansWriter.closeStreaming();
 		Gbl.printMemoryUsage();
 		System.out.println("done. (stream population)");
 	}

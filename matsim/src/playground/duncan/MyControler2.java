@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -121,13 +122,14 @@ public class MyControler2 {
 
 	public static void main(final String[] args) {
 
+		Config config;
 		// parse the config arguments so we have a config.  generate scenario data from this
 		if ( args.length==0 ) {
-			Gbl.createConfig(new String[] {"./src/playground/duncan/myconfig1.xml"});
+			config = Gbl.createConfig(new String[] {"./src/playground/duncan/myconfig1.xml"});
 		} else {
-			Gbl.createConfig(args) ;
+			config = Gbl.createConfig(args) ;
 		}
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(Gbl.getConfig());
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		loader.loadNetwork();
 		ScenarioImpl scenarioData = loader.getScenario();
 
@@ -141,8 +143,7 @@ public class MyControler2 {
 		}
 
 		// write the population for debugging purposes
-		PopulationWriter popWriter = new PopulationWriter(scenarioData.getPopulation(),"pop.xml.gz","v4",1) ;
-		popWriter.write();
+		new PopulationWriter(scenarioData.getPopulation()).writeFile("pop.xml.gz") ;
 
 		log.info("### DONE with demand generation from urbansim ###") ;
 

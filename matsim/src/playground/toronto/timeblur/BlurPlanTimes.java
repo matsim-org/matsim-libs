@@ -43,11 +43,12 @@ public class BlurPlanTimes {
 		population.setIsStreaming(true);
 		PersonBlurTimes pbt = new PersonBlurTimes(mutationRange);
 		population.addAlgorithm(pbt);
-		PopulationWriter pw = new PopulationWriter(population,outputPlansFile);
+		PopulationWriter pw = new PopulationWriter(population);
+		pw.startStreaming(outputPlansFile);
 		population.addAlgorithm(pw);
 		new MatsimPopulationReader(population, network).readFile(inputPlansFile);
 		population.printPlansCount();
-		pw.writeEndPlans();
+		pw.closeStreaming();
 		System.out.println("done.");
 	}
 	
@@ -64,11 +65,12 @@ public class BlurPlanTimes {
 		population.setIsStreaming(true);
 		PersonUniformBlurTimesPerTimeBin pubtptb = new PersonUniformBlurTimesPerTimeBin(binSize);
 		population.addAlgorithm(pubtptb);
-		PopulationWriter pw = new PopulationWriter(population,outputPlansFile);
+		PopulationWriter pw = new PopulationWriter(population);
+		pw.startStreaming(outputPlansFile);
 		population.addAlgorithm(pw);
 		new MatsimPopulationReader(population, network).readFile(inputPlansFile);
 		population.printPlansCount();
-		pw.writeEndPlans();
+		pw.closeStreaming();
 		System.out.println("done.");
 	}
 
@@ -86,11 +88,12 @@ public class BlurPlanTimes {
 		population.setIsStreaming(true);
 		PersonBlurTimesPerTimeBin pbtptb = new PersonBlurTimesPerTimeBin(mutationRange,binSize);
 		population.addAlgorithm(pbtptb);
-		PopulationWriter pw = new PopulationWriter(population,outputPlansFile);
+		PopulationWriter pw = new PopulationWriter(population);
+		pw.startStreaming(outputPlansFile);
 		population.addAlgorithm(pw);
 		new MatsimPopulationReader(population, network).readFile(inputPlansFile);
 		population.printPlansCount();
-		pw.writeEndPlans();
+		pw.closeStreaming();
 		System.out.println("done.");
 	}
 

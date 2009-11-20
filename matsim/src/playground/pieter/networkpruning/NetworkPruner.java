@@ -45,7 +45,7 @@ public class NetworkPruner {
 		new NetworkSummary().run(network);
 
 		System.out.println("  done.");
-		new NetworkWriter(this.network,this.outFile).write();
+		new NetworkWriter(this.network).writeFile(this.outFile);
 	}
 
 	private void joinOneWayLinks() {

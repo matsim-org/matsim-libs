@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
 
-
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
@@ -144,8 +143,7 @@ public class IncreasingDemandRunner {
 			
 			Gbl.getConfig().controler().setOutputDirectory(topDir+File.separatorChar+"out"+agents+"random");
 			Gbl.getConfig().plans().setInputFile(popFile);
-			ConfigWriter cw = new ConfigWriter(Gbl.getConfig(), topDir+File.separatorChar+"config"+agents+"rand.xml");
-			cw.write();
+			new ConfigWriter(Gbl.getConfig()).writeFile(topDir+File.separatorChar+"config"+agents+"rand.xml");
 			
 			//Step 3: create demand file for cmcf
 			CMCFDemandWriter cdw = new CMCFDemandWriter(netFile, popFile);
@@ -203,8 +201,7 @@ public class IncreasingDemandRunner {
 			//Step 6: create new config File
 			Gbl.getConfig().controler().setOutputDirectory(topDir+File.separatorChar+"out"+agents+"routed");
 			Gbl.getConfig().plans().setInputFile(popFile);
-			cw = new ConfigWriter(Gbl.getConfig(), topDir+File.separatorChar+"config"+agents+"rout.xml");
-			cw.write();
+			new ConfigWriter(Gbl.getConfig()).writeFile(topDir+File.separatorChar+"config"+agents+"rout.xml");
 		}
 	}
 }

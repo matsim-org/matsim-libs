@@ -60,6 +60,6 @@ public class NetworkFreeSpeedAdapter {
 		// } catch (IOException e) {
 		// e.printStackTrace();
 		// }
-		new NetworkWriter(network, outputNetFilename).write();
+		new NetworkWriter(network).writeFile(outputNetFilename);
 	}
 }

@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
@@ -62,7 +61,7 @@ public class EctmSim extends ExternalMobsim {
 		final File plansFile = new File(iterationPlansFile);
 		ectmConfig.setParam("MatsimPlansLoader", "plansfile", plansFile.getAbsolutePath());
 
-		new ConfigWriter(ectmConfig, iterationConfigFile).write();
+		new ConfigWriter(ectmConfig).writeFile(iterationConfigFile);
 	}
 
 	@Override

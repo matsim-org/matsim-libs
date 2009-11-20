@@ -90,6 +90,7 @@ public class ModeChoiceNavteqMain {
 
 //		PlansParser plansParser = new MatsimPopulationReader(plans);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
+		plansWriter.startStreaming(config.plans().getOutputFile());
 		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
 		System.out.println("  done.");
 		System.out.println("  adding plans algorithm... ");
@@ -107,7 +108,7 @@ public class ModeChoiceNavteqMain {
 		modeAnalyzer.writeStatistics("/var/tmp/ciarif/matsim/modeChoice/modeStatistics.csv");
 		modeAnalyzer.writeStatistics("C:/Documents and Settings/ciarif/sandbox00/vsp-cvs/" +
 				"devel/matsim/matsimJ/output/schweiz-navtech/modeStatistics.csv");
-		plansWriter.write();
+		plansWriter.closeStreaming();
 		System.out.println("  done.");
 		System.out.println("RUN: ModeChoiceAlgorithm finished.");
 		System.out.println();

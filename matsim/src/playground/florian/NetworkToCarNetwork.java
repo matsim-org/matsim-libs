@@ -1,13 +1,14 @@
 package playground.florian;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
@@ -88,10 +89,10 @@ public class NetworkToCarNetwork {
 		
 		new NetworkCleaner().run(net3);
 		//Das neue Netzwerk ist fertig --- Erzeuge Ausgabe
-		new NetworkWriter(net3,OUTPUT_FILE).write();
+		new NetworkWriter(net3).writeFile(OUTPUT_FILE);
 		System.out.println("Ausgabe in die Datei " + OUTPUT_FILE + " ist fertig");
 		System.out.println("Statistik:");
-		System.out.println("Es wurden " + j + " Nodes und " + i + " Links hinzugef�gt!");
+		System.out.println("Es wurden " + j + " Nodes und " + i + " Links hinzugefügt!");
 		System.out.println("Von den " + i + " Links sind " + g + " Links einspurig und " + (i-g) + " Links mehrspurig.");
 	}
 

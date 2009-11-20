@@ -22,11 +22,9 @@ package org.matsim.core.mobsim.cppdeqsim;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -125,12 +123,7 @@ public class DEQSim extends ExternalMobsim {
 		module.addParam("carSize", simConfig.getParam(DEQSim.CONFIG_MODULE, "carSize"));
 		module.addParam("gapTravelSpeed", simConfig.getParam(DEQSim.CONFIG_MODULE, "gapTravelSpeed"));
 
-		PrintWriter writer = new PrintWriter(new File(iterationConfigFile));
-
-		ConfigWriter configwriter = new ConfigWriter(deqConfig, writer);
-		configwriter.write();
-		writer.flush();
-		writer.close();
+		new ConfigWriter(deqConfig).writeFile(iterationConfigFile);
 	}
 
 	@Override
