@@ -108,6 +108,7 @@ public class InundationDataFromNetcdfReaderII {
 		for (int i = 1; i < this.inundationData.powerLookUp.length; i++) {
 			//			QuadTree<InundationGeometry> tmp = scaleTriangles(triangles,mapping);
 			QuadTree<InundationGeometry> tmp =  scaleGeometries(triangles,mapping);
+			tmp =  scaleGeometries(tmp,mapping);
 			//			tmp =  scaleTriangles(tmp,mapping);
 			//			tmp =  scaleTriangles(tmp,mapping);
 			double zoom = this.inundationData.powerLookUp[i];

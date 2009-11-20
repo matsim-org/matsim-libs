@@ -395,6 +395,10 @@ public class OTFQuadFileHandler {
 					name = name.replaceFirst("playground.gregor.otf.drawer",
 					"org.matsim.evacuation.otfvis.drawer");
 					return Class.forName(name);
+				}else if (name.startsWith("playground.gregor.collections")) {
+					name = name.replaceFirst("playground.gregor.collections",
+					"org.matsim.evacuation.collections");
+					return Class.forName(name);
 				}
 				return super.resolveClass(desc);
 			}
