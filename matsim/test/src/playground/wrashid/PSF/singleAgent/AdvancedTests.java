@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -35,7 +36,9 @@ public class AdvancedTests extends MatsimTestCase {
 	HashMap<Id, ChargingTimes> chargingTimes;
 
 	private void initTest(String configFile) {
-		controler = new Controler(configFile);
+		Config config = loadConfig(configFile);
+		controler = new Controler(config);
+
 		controler.addControlerListener(new AddEnergyScoreListener());
 		controler.setOverwriteFiles(true);
 

@@ -5,7 +5,9 @@ import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.PSF.ParametersPSF;
@@ -29,10 +31,14 @@ public class BasicTests extends MatsimTestCase {
 	protected void setUp() throws Exception {
 		// TODO Auto-generated method stub
 		super.setUp();
+
 		
-		controler = new Controler("test/input/playground/wrashid/PSF/singleAgent/" + "config.xml");
+		Gbl.reset();
+		Config config = loadConfig("test/input/playground/wrashid/PSF/singleAgent/" + "config.xml");
+		
+		controler = new Controler(config);
+		
 		controler.addControlerListener(new AddEnergyScoreListener());
-		controler.setOverwriteFiles(true);
 	}
 	
 	/*
