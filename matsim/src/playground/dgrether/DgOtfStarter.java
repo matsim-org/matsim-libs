@@ -31,7 +31,7 @@ public class DgOtfStarter {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String base = "/media/data/work/cvsRep/vsp-cvs/runs/run";
+		String base = "/media/data/work/repos/runs-svn/run";
 		 
 		String network = DgPaths.IVTCHNET;
 		
@@ -46,6 +46,9 @@ public class DgOtfStarter {
 		
 		//base case ersa 
 		String file = "583/run583.it800.T.mvi";
+		
+		//bkickscoring
+		file = "881/it.3000/881.3000.Zurich.otfvis.mvi";
 		
 		//toll case ersa
 //		String file = "585/run585.it800.T.mvi";
@@ -87,11 +90,13 @@ public class DgOtfStarter {
 		
 //		filename = DgPaths.RUNBASE + "run710/it.1000/1000.analysis/710.vis.mvi";
 		
-		filename = network;
+//		filename = network;
 		
 //		filename = "/home/dgrether/svnworkspace/matsim/test/input/playground/benjamin/BKickRouterTestIATBR/network.xml";
-		filename = "/media/data/work/programming/rubyWorkspace/demandGeneration/network.xml.gz";
-				
+//		filename = "/media/data/work/programming/rubyWorkspace/demandGeneration/network.xml.gz";
+		
+		
+		
 		if (filename.endsWith(".veh.gz")) {
 			tVehStarter(filename, network);
 		}
