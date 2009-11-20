@@ -24,5 +24,7 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 public interface LinkLeaveEventHandler extends EventHandler {
+	
 	public void handleEvent (LinkLeaveEvent event);
+
 }

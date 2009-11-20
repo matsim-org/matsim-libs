@@ -26,11 +26,11 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * A reader for events-files of MATSim. This reader recognizes the format of the events-file and uses
@@ -40,14 +40,14 @@ import org.matsim.core.utils.io.MatsimXmlParser;
  */
 public class MatsimEventsReader implements MatsimSomeReader {
 
-	private final EventsManagerImpl events;
+	private final EventsManager events;
 
 	/**
 	 * Creates a new reader for MATSim events files.
 	 *
 	 * @param events The Events-object that handles the events.
 	 */
-	public MatsimEventsReader(final EventsManagerImpl events) {
+	public MatsimEventsReader(final EventsManager events) {
 		this.events = events;
 	}
 
@@ -58,10 +58,10 @@ public class MatsimEventsReader implements MatsimSomeReader {
 	 */
 	public void readFile(final String filename) {
 		if (filename.endsWith(".txt") || filename.endsWith(".txt.gz")) {
-			new EventsReaderTXTv1(this.events).readFile(filename);
-			this.events.printEventsCount();
+			new EventsReaderTXTv1((EventsManagerImpl) this.events).readFile(filename);
+			((EventsManagerImpl) this.events).printEventsCount();
 		} else if (filename.endsWith(".xml") || filename.endsWith(".xml.gz")) {
-			new XmlEventsReader(this.events).readFile(filename);
+			new XmlEventsReader((EventsManagerImpl) this.events).readFile(filename);
 		} else {
 			throw new IllegalArgumentException("Cannot recognize the format of the events-file " + filename);
 		}
