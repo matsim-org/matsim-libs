@@ -49,7 +49,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -78,7 +77,7 @@ import playground.yu.utils.io.SimpleWriter;
  * @author yu
  * 
  */
-public class BusLineAllocator {
+public class BusLineAllocatorSmallVersionTest {
 	private class TravelCostFunctionDistance implements TravelCost {
 		/** returns only the link length */
 		public double getLinkTravelCost(Link link, double time) {
@@ -120,14 +119,10 @@ public class BusLineAllocator {
 	private Link tmpPtLink = null;
 	private Id tmpPtRouteId = null;
 	private Set<Link> startLinks = new HashSet<Link>(),
-			endLinks = new HashSet<Link>(),
-			// nullLinks = new HashSet<Link>(),
-			links2add = new HashSet<Link>();
-	// private Set<Node> nodes2add = new HashSet<Node>();
-	// private Map<Link, Node> startLinksNewToNodes = new HashMap<Link, Node>();
+			endLinks = new HashSet<Link>(), links2add = new HashSet<Link>();
 	private TransitSchedule schedule;
+	// private NetworkLayer multiModalNetwork;
 	private boolean hasStartLink = false;
-	private NetworkLayer multiModalNetwork;
 	private static Set<TransportMode> modes = new HashSet<TransportMode>();
 
 	/**
@@ -140,11 +135,11 @@ public class BusLineAllocator {
 	 * @param outputFile
 	 *            file path of the output file
 	 */
-	public BusLineAllocator(NetworkLayer carNetwork,
+	public BusLineAllocatorSmallVersionTest(NetworkLayer carNetwork,
 			NetworkLayer multiModalNetwork, TransitSchedule schedule,
 			String outputFile) {
 		this.carNetwork = carNetwork;
-		this.multiModalNetwork = multiModalNetwork;
+		// this.multiModalNetwork = multiModalNetwork;
 		this.schedule = schedule;
 		this.coordPairs = createCoordPairs(schedule);
 		this.outputFile = outputFile;
@@ -243,115 +238,95 @@ public class BusLineAllocator {
 		}
 		carNetwork.connect();
 		/*-----------add links to multiModalNet-------------*/
-		for (Link link : links2add) {
-
-			Node from = link.getFromNode(), to = link.getToNode();
-			Id fromId = from.getId(), toId = to.getId();
-
-			Link mmlink = multiModalNetwork.getLink(link.getId());
-
-			if (mmlink == null) {
-				NodeImpl mmFrom = multiModalNetwork.getNode(fromId), mmTo = multiModalNetwork
-						.getNode(toId);
-				// fromNode
-				if (mmFrom == null)/* this node with this Id dosn't exist. */
-					mmFrom = (NodeImpl) multiModalNetwork.createAndAddNode(
-							fromId, from.getCoord());
-				else if (!mmFrom.getCoord().equals(from.getCoord()))/*
-																	 * exists
-																	 * and the
-																	 * different
-																	 * Coord
-																	 */
-					mmFrom.setCoord(from.getCoord());
-				// toNode
-				if (mmTo == null)
-					mmTo = (NodeImpl) multiModalNetwork.createAndAddNode(toId,
-							to.getCoord());
-				else if (!mmTo.getCoord().equals(to.getCoord()))/*
-																 * exits and the
-																 * same Coord
-																 */
-					mmTo.setCoord(to.getCoord());
-
-				mmlink = multiModalNetwork.createAndAddLink(link.getId(),
-						mmFrom, mmTo, link.getLength(), link.getFreespeed(0),
-						link.getCapacity(0), link.getNumberOfLanes(0));
-
-			} else/* mml exists with the same linkId */{
-				Id mmFromId = mmlink.getFromNode().getId(), mmToId = mmlink
-						.getToNode().getId();
-				// fromNode
-				if (mmFromId.equals(fromId)) {
-					if (!mmlink.getFromNode().getCoord()
-							.equals(from.getCoord()))
-						((NodeImpl) mmlink.getFromNode()).setCoord(from
-								.getCoord());
-				} else/* different id, mmFrom should be newly defined */{
-					Map<Id, ? extends Link> mmFromInLinks = mmlink
-							.getFromNode().getInLinks(), mmFromOutLinks = mmlink
-							.getFromNode().getOutLinks();
-
-					NodeImpl mmFrom = multiModalNetwork.getNode(fromId);
-
-					if (mmFrom == null)/* this node with this Id dosn't exist. */
-						mmFrom = (NodeImpl) multiModalNetwork.createAndAddNode(
-								fromId, from.getCoord());
-					else if (!mmFrom.getCoord().equals(from.getCoord()))/*
-																		 * exists
-																		 * and
-																		 * the
-																		 * different
-																		 * Coord
-																		 */
-						mmFrom.setCoord(from.getCoord());
-					// transplant old inLinks and outLinks to the new mmFrom
-					for (Link inlink : mmFromInLinks.values())
-						mmFrom.addInLink(inlink);
-					for (Link outLink : mmFromOutLinks.values())
-						mmFrom.addOutLink(outLink);
-					multiModalNetwork.removeNode(mmlink.getFromNode());
-					mmlink.setFromNode(mmFrom);
-				}
-
-				// toNode
-				if (mmToId.equals(toId)) {
-					if (!mmlink.getToNode().getCoord().equals(to.getCoord()))
-						((NodeImpl) mmlink.getToNode()).setCoord(to.getCoord());
-				} else/* different id, mmTo should be newly defined */{
-					Map<Id, ? extends Link> mmToInLinks = mmlink.getToNode()
-							.getInLinks(), mmToOutLinks = mmlink.getToNode()
-							.getOutLinks();
-
-					NodeImpl mmTo = multiModalNetwork.getNode(toId);
-
-					if (mmTo == null)/* this node with this Id dosn't exist. */
-						mmTo = (NodeImpl) multiModalNetwork.createAndAddNode(
-								toId, to.getCoord());
-					else if (!mmTo.getCoord().equals(to.getCoord()))/*
-																	 * exists
-																	 * and the
-																	 * different
-																	 * Coord
-																	 */
-						mmTo.setCoord(to.getCoord());
-					// transplant old inLinks and outLinks to the new mmTo
-					for (Link inlink : mmToInLinks.values())
-						mmTo.addInLink(inlink);
-					for (Link outLink : mmToOutLinks.values())
-						mmTo.addOutLink(outLink);
-					multiModalNetwork.removeNode(mmlink.getToNode());
-					mmlink.setToNode(mmTo);
-				}
-				
-				mmlink.setLength(link.getLength());
-				mmlink.setFreespeed(link.getFreespeed(0));
-				mmlink.setCapacity(link.getCapacity(0));
-				mmlink.setNumberOfLanes(link.getNumberOfLanes(0));
-			}
-			mmlink.setAllowedModes(modes);
-		}
-		multiModalNetwork.connect();
+		// for (Link link : links2add) {
+		//
+		// Node from = link.getFromNode(), to = link.getToNode();
+		// Id fromId = from.getId(), toId = to.getId();
+		//
+		// Link mmlink = multiModalNetwork.getLink(link.getId());
+		//
+		// if (mmlink == null) {
+		// NodeImpl mmFrom = multiModalNetwork.getNode(fromId), mmTo =
+		// multiModalNetwork
+		// .getNode(toId);
+		// //fromNode
+		// if (mmFrom == null)/* this node with this Id dosn't exist. */
+		// mmFrom = (NodeImpl) multiModalNetwork.createAndAddNode(
+		// fromId, from.getCoord());
+		// else if (!mmFrom.getCoord().equals(from.getCoord()))/*
+		// * exists
+		// * and the
+		// * different
+		// * Coord
+		// */
+		// mmFrom.setCoord(from.getCoord());
+		// //toNode
+		// if (mmTo == null)
+		// mmTo = (NodeImpl) multiModalNetwork.createAndAddNode(toId,
+		// to.getCoord());
+		// else if (!mmTo.getCoord().equals(to.getCoord()))/*
+		// * exits and the
+		// * same Coord
+		// */
+		// mmTo.setCoord(to.getCoord());
+		//				
+		//					
+		//
+		// mmlink = multiModalNetwork.createAndAddLink(link
+		// .getId(), mmFrom, mmTo, link.getLength(), link
+		// .getFreespeed(0), link.getCapacity(0), link
+		// .getNumberOfLanes(0));
+		//				
+		// } else/* mml exists with the same linkId */{
+		// NodeImpl mmFrom = (NodeImpl) mmlink.getFromNode(), mmTo = (NodeImpl)
+		// mmlink
+		// .getToNode();
+		// // fromNode
+		// if (mmFrom.getId().equals(fromId)) {
+		// if (!mmFrom.getCoord().equals(from.getCoord()))
+		// mmFrom.setCoord(from.getCoord());
+		// } else/* different id, mmFrom should be newly defined */{
+		// mmFrom = multiModalNetwork.getNode(fromId);
+		// if (mmFrom == null)/* this node with this Id dosn't exist. */
+		// mmFrom = (NodeImpl) multiModalNetwork.createAndAddNode(
+		// fromId, from.getCoord());
+		// else if (!mmFrom.getCoord().equals(from.getCoord()))/*
+		// * exists
+		// * and
+		// * the
+		// * different
+		// * Coord
+		// */
+		// mmFrom.setCoord(from.getCoord());
+		// mmlink.setFromNode(mmFrom);
+		// }
+		//				
+		// // toNode
+		// if (mmTo.getId().equals(toId)) {
+		// if (!mmTo.getCoord().equals(to.getCoord()))
+		// mmTo.setCoord(to.getCoord());
+		// } else/* different id, mmTo should be newly defined */{
+		// mmTo = multiModalNetwork.getNode(toId);
+		// if (mmTo == null)/* this node with this Id dosn't exist. */
+		// mmTo = (NodeImpl) multiModalNetwork.createAndAddNode(
+		// toId, to.getCoord());
+		// else if (!mmTo.getCoord().equals(to.getCoord()))/*
+		// * exists
+		// * and the
+		// * different
+		// * Coord
+		// */
+		// mmTo.setCoord(to.getCoord());
+		// mmlink.setToNode(mmTo);
+		// }
+		// mmlink.setLength(link.getLength());
+		// mmlink.setFreespeed(link.getFreespeed(0));
+		// mmlink.setCapacity(link.getCapacity(0));
+		// mmlink.setNumberOfLanes(link.getNumberOfLanes(0));
+		// }
+		// mmlink.setAllowedModes(modes);
+		// }
+		// multiModalNetwork.connect();
 
 	}
 
@@ -379,14 +354,8 @@ public class BusLineAllocator {
 				Node fromNode = null, toNode = null;
 				for (int j = 0; j < pathA.size(); j++) {
 					Id id = pathA.get(j);
-
-					// TEST--------------------------------------------------
-
-					if (!multiModalNetwork.getLink(id).getFromNode().getId()
-							.toString().startsWith("tr_")) {
-						fromNode = multiModalNetwork.getLink(id).getFromNode();
-						// carNet???????????????????
-						// TEST--------------------------------------------------
+					if (!id.toString().startsWith("tr_")) {
+						fromNode = carNetwork.getLink(id).getFromNode();
 						positionA = j;
 						break;
 					}
@@ -395,13 +364,8 @@ public class BusLineAllocator {
 				int positionB = 0;
 				for (int j = pathB.size() - 1; j >= 0; j--) {
 					Id id = pathB.get(j);
-					// TEST------------------------------------------------
-
-					if (!multiModalNetwork.getLink(id).getToNode().getId()
-							.toString().startsWith("tr_")) {
-						toNode = multiModalNetwork.getLink(id).getToNode();
-						// carNet?????????????????????????????
-						// TEST----------------------------------------------
+					if (!id.toString().startsWith("tr_")) {
+						toNode = carNetwork.getLink(id).getToNode();
 						positionB = j;
 						break;
 					}
@@ -518,93 +482,40 @@ public class BusLineAllocator {
 																		 * Path.links
 																		 */();
 				tmpLinksA.addAll(pathA);
+				System.out.println(">>>>>linNo.485\tpathA\t" + pathA);
 				for (Id linkId : tmpLinksA)
 					if (!rtfPath.contains(linkId)) {
-//						if (linkId.toString().startsWith("tr_")) {
-//							System.out.println("rtfPath\t" + rtfPath);
-//							System.out.println(">>>>>ExitNo.402\tpathA\t"
-//									+ pathA);
-//							System.exit(1);
-//						}
+						if (linkId.toString().startsWith("tr_")) {
+							System.out.println("rtfPath\t" + rtfPath);
+							System.out.println(">>>>>linNo.402\tpathA\t"
+									+ pathA);
+							System.exit(1);
+						}
 						pathA.remove(linkId);
 					}
-
+				System.out.println(">>>>>linNo.496\tpathA\t" + pathA);
+				System.out.println(">>>>>linNo.497\tpathB\t" + pathB);
 				tmpLinksB.addAll(pathB);
 				for (Id linkId : tmpLinksB)
 					if (!rtfPath.contains(linkId)) {
 
-//						if (linkId.toString().startsWith("tr_")) {
-//							System.out.println("rtfPath\t" + rtfPath);
-//							System.out.println(">>>>>lineNo.415\tpathB\t"
-//									+ pathB);
-//							System.exit(1);
-//						}
+						if (linkId.toString().startsWith("tr_")) {
+							System.out.println("rtfPath\t" + rtfPath);
+							System.out.println(">>>>>lineNo.415\tpathB\t"
+									+ pathB);
+							System.exit(1);
+						}
 						pathB.remove(linkId);
 					}
-
+				System.out.println(">>>>>linNo.510\tpathB\t" + pathB);
 				if (!isSubList(pathA, pathB, rtfPath)) {
 					pathA.clear();
 					pathB.clear();
 					pathB.addAll(tmpLinksB);
 					pathA.addAll(tmpLinksA);
 				}
-				/* already reduced ?*/{
-					Id lastA = pathA.get(pathA.size() - 1), firstB = pathB
-							.get(0);
-					Node lastANode = carNetwork.getLink(lastA).getToNode(), firstBNode = carNetwork
-							.getLink(firstB).getFromNode();
-					if (!lastANode.equals(firstBNode))/* different nodes */{
-						Path path = null;
-						if (!lastANode.getId().toString().startsWith("tr_")
-								&& !firstBNode.getId().toString().startsWith(
-										"tr_")) {
-							path = dijkstra.calcLeastCostPath(lastANode,
-									firstBNode, 0);
-						} else {
-							path = new Dijkstra(multiModalNetwork,
-									new TravelCostFunctionDistance(),
-									new TravelTimeFunctionFree())
-									.calcLeastCostPath(lastANode, firstBNode, 0);
-						}
-						if (path != null) {
-							Coord ptLinkAToCoord = multiModalNetwork.getLink(
-									ptLinkIdStrA).getToNode().getCoord();
-							double minDist = 10000;
-							Link nearestLink = null;
-							int nearestPos = -1;
-							for (int i = 0; i < path.links.size(); i++) {
-								Link link = path.links.get(i);
-								double tmpDist = CoordUtils.calcDistance(
-										ptLinkAToCoord, link.getToNode()
-												.getCoord());
-								if (tmpDist < minDist) {
-									minDist = tmpDist;
-									nearestLink = link;
-									nearestPos = i;
-								}
-							}
-							if (nearestLink != null)
-								for (int i = 0; i < path.links.size(); i++) {
-									Link link = path.links.get(i);
-									if (i <= nearestPos)
-										pathA.add(link.getId());
-									else
-										pathB.add(i - nearestPos - 1, link
-												.getId());
-								}
-						} else {
-							System.err.println(">>>>>ExitNo.588\troute:\t"
-									+ routeId + "\tptLink:\t" + ptLinkIdStrA
-									+ "\tlastANode\t" + lastANode
-									+ "\tpahtA:\t" + pathA);
-							System.err.println(">>>>>ExitNo.592\troute:\t"
-									+ routeId + "\tptLink:\t" + ptLinkIdStrB
-									+ "\tfirstBNode\t" + firstBNode
-									+ "\tpahtB:\t" + pathB);
-							System.exit(590);
-						}
-					}
-				}
+				System.out.println(">>>>>linNo.517\tpathA\t" + pathA);
+				System.out.println(">>>>>linNo.518\tpathA\t" + pathB);
 
 				tmpLinksRtf.addAll(pathA);
 
@@ -617,8 +528,9 @@ public class BusLineAllocator {
 				}
 				boolean tmp = false;
 				if (indexA > 0 && pathA.size() - 1 - indexA < pathB.size()) {
-					tmp = true;
+					tmp=true;
 					for (int i = 0; i <= pathA.size() - 1 - indexA; i++) {
+						
 						tmp = tmp
 								&& (pathB.get(i).equals(pathA.get(i + indexA)));
 						if (!tmp)
@@ -630,7 +542,7 @@ public class BusLineAllocator {
 				subList.addAll(pathA.subList(indexA, pathA.size()));
 				if (tmp)
 					pathA.removeAll(subList);
-
+				System.out.println(">>>>>linNo.543\tpathA\t" + pathA);
 				// for (Id linkId : tmpLinksRtf)
 				// if (pathB.contains(linkId)) {
 				// if (linkId.toString().startsWith("tr_")) {
@@ -737,7 +649,6 @@ public class BusLineAllocator {
 			System.err.println("ptLink : " + link.getId()
 					+ "\thas a length of\t" + link.getLength()
 					+ "\t[m], and its fromCoord and toCoord is same.");
-			
 			links2add.add(link);
 		}
 		return toReturn;
@@ -785,10 +696,10 @@ public class BusLineAllocator {
 				}
 			}
 		} else if (!firstInRange && !secondInRange/* both outside */) {
-//			Node fromNode = tmpPtLink.getFromNode(), toNode = tmpPtLink
-//					.getToNode();
-//			fromNode.getOutLinks().clear();
-//			toNode.getInLinks().clear();
+			Node fromNode = tmpPtLink.getFromNode(), toNode = tmpPtLink
+					.getToNode();
+			fromNode.getOutLinks().clear();
+			toNode.getInLinks().clear();
 			links2add.add(tmpPtLink);
 			linkIds.add(tmpPtLink.getId());
 		} else/* one outside, one inside */{
@@ -890,22 +801,20 @@ public class BusLineAllocator {
 			if (linkIds != null) {
 				if (linkIds.size() > 0)
 					/*------with carNet-----*/
-					// stop.setLink(carNetwork.getLink(linkIds
-					// .get(linkIds.size() - 1)));
-					/*-----with multiModalNetwork-----*/
-					stop.setLink(multiModalNetwork.getLink(linkIds.get(linkIds
-							.size() - 1)));
+					stop.setLink(carNetwork.getLink(linkIds
+							.get(linkIds.size() - 1)));
+				/*-----with multiModalNetwork-----*/
+				// stop.setLink(carNetwork.getLink(linkIds.get(linkIds
+				// .size() - 1)));
 			}
 		}
 
 		Map<Id, NetworkRouteWRefs> ptRouteIdRoutes = convertResult2();
 		for (TransitLine ptLine : schedule.getTransitLines().values())
 			for (Entry<Id, TransitRoute> ptRouteIdRoutePair : ptLine
-					.getRoutes().entrySet()) {
-				if(ptRouteIdRoutes.containsKey(ptRouteIdRoutePair.getKey()))
+					.getRoutes().entrySet())
 				ptRouteIdRoutePair.getValue().setRoute(
 						ptRouteIdRoutes.get(ptRouteIdRoutePair.getKey()));
-			}
 
 		try {
 			new TransitScheduleWriter(schedule)
@@ -992,11 +901,11 @@ public class BusLineAllocator {
 
 			}
 			/*-----with carNetwork-----*/
+			endLink = carNetwork.getLink(routeLinks.removeLast());
+			startLink = carNetwork.getLink(routeLinks.remove(0));
+			/*-----with multiModalNetwork-----*/
 			// endLink = carNetwork.getLink(routeLinks.removeLast());
 			// startLink = carNetwork.getLink(routeLinks.remove(0));
-			/*-----with multiModalNetwork-----*/
-			endLink = multiModalNetwork.getLink(routeLinks.removeLast());
-			startLink = multiModalNetwork.getLink(routeLinks.remove(0));
 			NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink,
 					endLink);
 			route.setLinks(startLink, ids2links(routeLinks), endLink);
@@ -1009,9 +918,9 @@ public class BusLineAllocator {
 		List<Link> links = new ArrayList<Link>();
 		for (Id id : ids) {
 			/*-----with carNetwork-----*/
-			// links.add(carNetwork.getLink(id));
+			links.add(carNetwork.getLink(id));
 			/*-----with multiModalNetwork-----*/
-			links.add(multiModalNetwork.getLink(id));
+			// links.add(carNetwork.getLink(id));
 		}
 		return links;
 	}
@@ -1032,7 +941,7 @@ public class BusLineAllocator {
 						if (links != null) {
 							if (links.size() == 0) {
 								System.err
-										.println(">>>>>lineNo.786\tlinks size==0, ptlinkId:\t"
+										.println(">>>>>lineNo.937\tlinks size==0, ptlinkId:\t"
 												+ linkId
 												+ "\tperson:\t"
 												+ person.getId());
@@ -1042,8 +951,8 @@ public class BusLineAllocator {
 							act.setLink(carNetwork.getLink(links.get(links
 									.size() - 1)));
 							/*-----with multiModalNetwork-----*/
-							act.setLink(multiModalNetwork.getLink(links
-									.get(links.size() - 1)));
+							// act.setLink(carNetwork.getLink(links.get(links
+							// .size() - 1)));
 						}
 					}
 				}
@@ -1054,44 +963,45 @@ public class BusLineAllocator {
 
 	private void generateNewNetwork(String newNetFilename) {
 		/*-----------carNetwork with only Bus----------*/
-		// new NetworkWriter(carNetwork).writeFile(newNetFilename);
+		new NetworkWriter(carNetwork).writeFile(newNetFilename);
 		/*-----------multiModalNetwork incl. Bus----------*/
-		new NetworkWriter(multiModalNetwork).writeFile(newNetFilename);
+		// new NetworkWriter(carNetwork).writeFile(newNetFilename);
 	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		String multiModalNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.xml";
+		String transitScheduleFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/transitSchedule.networkOevModellBln.xml";
+		String carNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.car.mini.xml";
+		String outputFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test2/busLineAllocation.txt";
+		String popFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/plan.routedOevModell.BVB344.moreLegPlan_Agent.xml";
+
+		String newNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test2/newNetTest.xml";
+		String newTransitScheduleFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test2/newScheduleTest.xml";
+		String newPopFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test2/newPopTest.xml";
+
 		// String multiModalNetworkFile =
-		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.xml";
+		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/network.multimodal.xml.gz";
 		// String transitScheduleFile =
-		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/transitSchedule.networkOevModellBln.xml";
+		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/transitSchedule.networkOevModellBln.xml.gz";
 		// String carNetworkFile =
-		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.car.mini.xml";
+		// "../berlin-bvg09/net/miv_small/m44_344_small_ba.xml.gz";
 		// String outputFile =
-		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/busLineAllocation.txt";
+		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/busLineAllocationBigger.txt";
 		// String popFile =
-		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/plan.routedOevModell.BVB344.moreLegPlan_Agent.xml";
+		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/plan.routedOevModell.xml.gz";
 		//
-		// String newNetworkFile =
-		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newNetTest.xml";
-		// String newTransitScheduleFile =
-		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newScheduleTest.xml";
-		// String newPopFile =
-		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newPopTest.xml";
-
-		String multiModalNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/network.multimodal.xml.gz";
-		String transitScheduleFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/transitSchedule.networkOevModellBln.xml.gz";
-		String carNetworkFile = "../berlin-bvg09/net/miv_small/m44_344_small_ba.xml.gz";
-		String outputFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/busLineAllocationBigger.txt";
-		String popFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/plan.routedOevModell.xml.gz";
-
-		// String newNetworkFile =
+		// // String newNetworkFile =
+		// //
 		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newNetBiggerTest.xml";
-		String newNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newMultiModalNetBiggerTest.xml";
-		String newTransitScheduleFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newScheduleBigger.xml";
-		String newPopFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newPopBiggerTest.xml";
+		// String newNetworkFile =
+		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newMultiModalNetBiggerTest.xml";
+		// String newTransitScheduleFile =
+		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newScheduleBigger.xml";
+		// String newPopFile =
+		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newPopBiggerTest.xml";
 
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
@@ -1114,8 +1024,8 @@ public class BusLineAllocator {
 		NetworkLayer carNetwork = new NetworkLayer();
 		new MatsimNetworkReader(carNetwork).readFile(carNetworkFile);
 
-		BusLineAllocator busLineAllocator = new BusLineAllocator(carNetwork,
-				multiModalNetwork, schedule, outputFile);
+		BusLineAllocatorSmallVersionTest busLineAllocator = new BusLineAllocatorSmallVersionTest(
+				carNetwork, multiModalNetwork, schedule, outputFile);
 		busLineAllocator.run();
 		busLineAllocator.generateNewNetwork(newNetworkFile);
 		busLineAllocator.generateNewSchedule(newTransitScheduleFile);
