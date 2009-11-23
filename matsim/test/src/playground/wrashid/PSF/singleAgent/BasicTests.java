@@ -29,14 +29,13 @@ public class BasicTests extends MatsimTestCase {
 	
 	@Override
 	protected void setUp() throws Exception {
-		// TODO Auto-generated method stub
 		super.setUp();
-
 		
 		Gbl.reset();
 		Config config = loadConfig("test/input/playground/wrashid/PSF/singleAgent/" + "config.xml");
 		
 		controler = new Controler(config);
+		controler.setCreateGraphs(false);
 		
 		controler.addControlerListener(new AddEnergyScoreListener());
 	}

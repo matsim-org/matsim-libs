@@ -20,6 +20,7 @@ public class TestConfig4  extends MatsimTestCase {
 		String configFilePath="test/input/playground/wrashid/PSF/converter/addParkings/config4.xml";
 		Config config = loadConfig(configFilePath);
 		Controler controler = new Controler(config);
+		controler.setCreateGraphs(false);
 		new GeneralTestOptimizedCharger(controler).optimizedChargerTest();
 	} 
 	  

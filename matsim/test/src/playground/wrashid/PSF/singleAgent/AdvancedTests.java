@@ -18,7 +18,6 @@ import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF.energy.charging.optimizedCharging.OptimizedCharger;
 import playground.wrashid.PSF.energy.consumption.LogEnergyConsumption;
 import playground.wrashid.PSF.parking.LogParkingTimes;
-import playground.wrashid.PSF.parking.ParkingTimes;
 
 /**
  * Note: Cannot simply inherit from class TestCase, but must inherit from
@@ -40,7 +39,7 @@ public class AdvancedTests extends MatsimTestCase {
 		controler = new Controler(config);
 
 		controler.addControlerListener(new AddEnergyScoreListener());
-		controler.setOverwriteFiles(true);
+		controler.setCreateGraphs(false);
 
 		logEnergyConsumption = new LogEnergyConsumption(controler);
 		logParkingTimes = new LogParkingTimes(controler);

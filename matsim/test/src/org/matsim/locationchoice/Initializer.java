@@ -17,7 +17,7 @@ public class Initializer {
 		String	path = testCase.getPackageInputDirectory() + "config.xml";		
 		testCase.loadConfig(path);
 		this.controler = new Controler(Gbl.getConfig());
-		this.controler.setOverwriteFiles(true);		
+		this.controler.setCreateGraphs(false);
 		this.controler.run();
 	}
 
