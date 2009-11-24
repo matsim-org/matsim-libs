@@ -81,10 +81,12 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 				Integer.class);
 		AttributeType freespeed = AttributeTypeFactory.newAttributeType(
 				"freespeed", Double.class);
+		AttributeType transMode = AttributeTypeFactory.newAttributeType(
+				"transMode", String.class);
 		defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
 		defaultFeatureTypeFactory.setName("link");
-		defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, id, fromNode, toNode, length,
-				cap, type, freespeed });
+		defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, id,
+				fromNode, toNode, length, cap, type, freespeed, transMode });
 	}
 
 	protected LinearRing getLinearRing(Link link) {
@@ -125,18 +127,20 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 			LinearRing lr = getLinearRing(link);
 			Polygon p = new Polygon(lr, null, this.geofac);
 			MultiPolygon mp = new MultiPolygon(new Polygon[] { p }, this.geofac);
-			int size = 8 + parameters.size();
+			int size = 9 + parameters.size();
 			Object[] o = new Object[size];
 			o[0] = mp;
 			o[1] = link.getId().toString();
 			o[2] = link.getFromNode().getId().toString();
 			o[3] = link.getToNode().getId().toString();
 			o[4] = link.getLength();
-			o[5] = link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
+			o[5] = link
+					.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 					/ network.getCapacityPeriod() * 3600.0;
-			o[6] = (((LinkImpl) link).getType() != null) ? Integer.parseInt(((LinkImpl) link).getType())
-					: 0;
+			o[6] = (((LinkImpl) link).getType() != null) ? Integer
+					.parseInt(((LinkImpl) link).getType()) : 0;
 			o[7] = link.getFreespeed(0);
+			o[8]=link.getAllowedModes();
 			for (int i = 0; i < parameters.size(); i++) {
 				o[i + 8] = parameters.get(i).get(link.getId());
 			}
