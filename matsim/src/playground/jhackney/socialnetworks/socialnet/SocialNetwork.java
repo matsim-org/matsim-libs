@@ -28,12 +28,12 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.SocNetConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.jhackney.socialnetworks.io.MakeSocialNetworkFromFile;
@@ -65,7 +65,7 @@ public class SocialNetwork {
 	double remove_p= Double.parseDouble(socnetConfig.getSocNetLinkRemovalP());
 	double remove_age= Double.parseDouble(socnetConfig.getSocNetLinkRemovalAge());
 	private double degree_saturation_rate= Double.parseDouble(socnetConfig.getDegSat());
-	private Collection<PersonImpl> persons;
+	private Collection<? extends Person> persons;
 
 	// a Collection of all the Links in the network
 	//public ArrayList<SocialNetEdge> linksList = new ArrayList<SocialNetEdge>();
@@ -77,7 +77,7 @@ public class SocialNetwork {
 
 	private final static Logger log = Logger.getLogger(SocialNetwork.class);
 
-	public SocialNetwork(PopulationImpl plans) {
+	public SocialNetwork(Population plans) {
 
 		this.persons=plans.getPersons().values();
 
@@ -138,7 +138,7 @@ public class SocialNetwork {
 	 *  and to link them; stratified sampling.
 	 * @param plans
 	 */
-	private void initEuclidRandomNetwork(PopulationImpl plans) {
+	private void initEuclidRandomNetwork(Population plans) {
 
 		int kbar = Integer.parseInt(socnetConfig.getSocNetKbar());
 		log.info("Links the Persons together in UNDIRECTED distance-dependent Erdos/Renyi random graph.");
@@ -195,7 +195,7 @@ public class SocialNetwork {
 	 * 
 	 * @author jhackney
 	 */
-	private void initBASocialNetwork(PopulationImpl plans) {
+	private void initBASocialNetwork(Population plans) {
 
 		double gamma = 2.5; //
 		int kbar=Integer.parseInt(socnetConfig.getSocNetKbar()); 
@@ -265,11 +265,11 @@ public class SocialNetwork {
 	}
 
 	/**
-	 * Generates a classical (Erd�s/Renyi) undirected random graph of degree kbar
+	 * Generates a classical (Erdös/Renyi) undirected random graph of degree kbar
 	 * @author jhackney
 	 * 
 	 */
-	void initRandomSocialNetwork( PopulationImpl plans ){
+	void initRandomSocialNetwork( Population plans ){
 
 		int kbar = Integer.parseInt(socnetConfig.getSocNetKbar());
 		log.info("Links the Persons together in UNDIRECTED Erdos/Renyi random graph. Dorogovtsev and Mendes 2003.");
@@ -298,7 +298,7 @@ public class SocialNetwork {
 	/**
 	 * Not implemented
 	 */
-	void initWattsSocialNetwork( PopulationImpl plans ){
+	void initWattsSocialNetwork( Population plans ){
 
 		log.info(socnetConfig.getSocNetAlgo()+" Unsupported.");
 		throw new UnsupportedOperationException();
@@ -307,7 +307,7 @@ public class SocialNetwork {
 	/**
 	 * Not implemented
 	 */
-	void initJGNSocialNetwork(PopulationImpl plans) {
+	void initJGNSocialNetwork(Population plans) {
 
 		log.info(socnetConfig.getSocNetAlgo()+" Unsupported. To generate a similar network, initialize a random network and let a small number of agents introduce friends to each other.");
 		throw new UnsupportedOperationException();
@@ -316,7 +316,7 @@ public class SocialNetwork {
 	/**
 	 * Unsupported. Use "random" keyword and kbar = 0
 	 */
-	void initEmptySocialNetwork( PopulationImpl plans) {
+	void initEmptySocialNetwork( Population plans) {
 
 		log.info(socnetConfig.getSocNetAlgo()+" Unsupported. Use a \"random\" social network instead, with kbar=0");
 		throw new UnsupportedOperationException();
@@ -331,7 +331,7 @@ public class SocialNetwork {
 	 * 
 	 * @author jhackney
 	 */
-	void initReadInNetwork(PopulationImpl plans){
+	void initReadInNetwork(Population plans){
 
 		String filename = socnetConfig.getInDirName()+ "socialnets/stats/edge.txt";
 		new MakeSocialNetworkFromFile(this, plans).read(filename, Integer.valueOf(socnetConfig.getInitIter()).intValue());
@@ -702,7 +702,7 @@ public class SocialNetwork {
 		return linksList;
 	}
 
-	public Collection<PersonImpl> getNodes(){
+	public Collection<? extends Person> getNodes(){
 		return this.persons;
 	}
 

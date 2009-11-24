@@ -80,7 +80,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimFileWrite
 		this.write_person_fraction = fraction;
 	}
 
-	public PopulationWriter(final PopulationImpl pop, final Knowledges knowledges2) {
+	public PopulationWriter(final Population pop, final Knowledges knowledges2) {
 		this(pop);
 		this.knowledges = knowledges2;
 	}

@@ -7,7 +7,6 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.PSF.ParametersPSF;
@@ -30,9 +29,7 @@ public class BasicTests extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		
-		Gbl.reset();
-		Config config = loadConfig("test/input/playground/wrashid/PSF/singleAgent/" + "config.xml");
+		Config config = loadConfig("test/input/playground/wrashid/PSF/singleAgent/config.xml");
 		
 		controler = new Controler(config);
 		controler.setCreateGraphs(false);
@@ -87,7 +84,7 @@ public class BasicTests extends MatsimTestCase {
 		
 		// check, if charging events are written out
 		File outputChargingLog= new File(ParametersPSF.getMainChargingTimesOutputFilePath());
-		assertTrue(outputChargingLog.exists());
+		assertTrue("output charging log does not exist. expected at " + outputChargingLog.getPath(), outputChargingLog.exists());
 	}
 	 
 	

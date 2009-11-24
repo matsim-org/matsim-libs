@@ -2,9 +2,9 @@ package playground.ciarif.retailers.utils;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.world.World;
@@ -31,14 +31,14 @@ public abstract class Utils {
 	}
 	
 	// BAD CODE STYLE but keep that anyway for the moment
-	private static QuadTree<PersonImpl> personQuadTree = null;
+	private static QuadTree<Person> personQuadTree = null;
 	private static QuadTree<ActivityFacilityImpl> facilityQuadTree = null;
 	
-	public static final void setPersonQuadTree(QuadTree<PersonImpl> personQuadTree) {
+	public static final void setPersonQuadTree(QuadTree<Person> personQuadTree) {
 		Utils.personQuadTree = personQuadTree;
 	}
 	
-	public static final QuadTree<PersonImpl> getPersonQuadTree() {
+	public static final QuadTree<Person> getPersonQuadTree() {
 		return Utils.personQuadTree;
 	}
 	

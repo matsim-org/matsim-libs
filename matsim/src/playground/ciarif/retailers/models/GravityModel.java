@@ -8,11 +8,11 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 import playground.ciarif.retailers.data.PersonRetailersImpl;
@@ -37,7 +37,7 @@ public class GravityModel
   private RetailZones retailZones = new RetailZones();
   private Map<Id, ActivityFacilityImpl> retailersFacilities;
   private TreeMap<Integer,String> first;
-  private Map<Id, PersonImpl> persons;
+  private Map<Id, ? extends Person> persons;
   private int counter=0;
   private int nextCounterMsg =1;
   
@@ -67,7 +67,7 @@ public void init() {
 	this.findScenarioShops(controlerFacilities);
 	Gbl.printMemoryUsage();
 	
-	for  (PersonImpl p:controler.getPopulation().getPersons().values()) {
+	for  (Person p:controler.getPopulation().getPersons().values()) {
 		PersonRetailersImpl pr = new PersonRetailersImpl(p);
 		this.retailersPersons.put(pr.getId(), pr);
 	}
@@ -161,7 +161,7 @@ public double computePotential(ArrayList<Integer> solution){
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (PersonImpl p : persons.values()) {
+		for (Person p : persons.values()) {
 			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX() < minx) { minx = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX(); }
 			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY() < miny) { miny = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY(); }
 			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX() > maxx) { maxx = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX(); }
@@ -197,7 +197,7 @@ public double computePotential(ArrayList<Integer> solution){
 					double y1= miny + j*y_width;
 					double y2= y1 + y_width;
 					RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
-					for (PersonImpl p : persons.values() ) {
+					for (Person p : persons.values() ) {
 						Coord c = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacility().getCoord();
 						if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
 							rz.addPersonToQuadTree(c,p);
@@ -254,7 +254,7 @@ public double computePotential(ArrayList<Integer> solution){
 				double y1= miny + j*y_width;
 				double y2= y1 + y_width;
 				RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
-				for (PersonImpl p : persons.values() ) { //TODO think if it is not better to put the following in a separate method
+				for (Person p : persons.values() ) { //TODO think if it is not better to put the following in a separate method
 					// like it is now it is not needed to go through all zones again in order to assign them persons and shops
 					// the other way is probably cleaner and this part below doesn't need to appear twice
 					Coord c = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacility().getCoord();

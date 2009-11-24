@@ -33,6 +33,7 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
@@ -41,8 +42,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
@@ -66,7 +65,7 @@ public class DEQSim extends ExternalMobsim {
 
 	private IterationStopWatch stopwatch = null;
 
-	public DEQSim(final PopulationImpl population, final EventsManagerImpl events) {
+	public DEQSim(final Population population, final EventsManagerImpl events) {
 		super(population, events);
 	}
 
@@ -137,7 +136,7 @@ public class DEQSim extends ExternalMobsim {
 			// # persons, int, 32bit
 			out.writeInt(this.population.getPersons().size());
 			// for each person...
-			for (PersonImpl person : this.population.getPersons().values()) {
+			for (Person person : this.population.getPersons().values()) {
 				writePerson(out, person);
 			}
 			out.close();

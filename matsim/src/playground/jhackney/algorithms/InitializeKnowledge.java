@@ -3,11 +3,11 @@ package playground.jhackney.algorithms;
 import java.io.File;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 
@@ -16,7 +16,7 @@ import playground.jhackney.socialnetworks.mentalmap.MentalMap;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
 
 public class InitializeKnowledge {
-	public InitializeKnowledge(final PopulationImpl plans, final ActivityFacilitiesImpl facilities, Knowledges knowledges){
+	public InitializeKnowledge(final Population plans, final ActivityFacilitiesImpl facilities, Knowledges knowledges){
 
 		ActivityActReader aar = null;
 
@@ -42,9 +42,9 @@ public class InitializeKnowledge {
 
 		System.out.println(" ... done");
 
-		Iterator<PersonImpl> p_it = plans.getPersons().values().iterator();
+		Iterator<? extends Person> p_it = plans.getPersons().values().iterator();
 		while (p_it.hasNext()) {
-			PersonImpl person=p_it.next();
+			Person person=p_it.next();
 
 			KnowledgeImpl k = knowledges.getKnowledgesByPersonId().get(person.getId());
 			if(k ==null){

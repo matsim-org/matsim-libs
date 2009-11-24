@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
@@ -35,7 +36,6 @@ import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 
 public class ActTimesCollector implements ActivityStartEventHandler, ActivityEndEventHandler {
 
@@ -45,7 +45,7 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 	protected TreeMap<Id, EventData> data = new TreeMap<Id, EventData>();
 	//protected NetworkLayer network;
 	protected NetworkLayer network;
-	protected PopulationImpl population;
+	protected Population population;
 	
 	protected double startTime = 0.0;
 	protected double endTime = Double.MAX_VALUE;
@@ -275,12 +275,12 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 		return network;
 	}
 	
-	public void setPopulation(PopulationImpl pop)
+	public void setPopulation(Population pop)
 	{
 		population = pop;
 	}
 	
-	public PopulationImpl getPopulation()
+	public Population getPopulation()
 	{
 		return population;
 	}

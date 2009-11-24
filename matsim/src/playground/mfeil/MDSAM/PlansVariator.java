@@ -28,12 +28,12 @@ import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
@@ -93,7 +93,7 @@ public class PlansVariator implements PlanAlgorithm {
 		this.noOfMaxActs = java.lang.Math.max(this.noOfMaxActs, plan.getPlanElements().size()/2);
 		
 		/* Remove all non-selected plans */
-		PopulationImpl pop = controler.getPopulation();
+		Population pop = controler.getPopulation();
 		for (int i=0;i<(pop.getPersons().get(plan.getPerson().getId())).getPlans().size();i++){
 			if (!(pop.getPersons().get(plan.getPerson().getId())).getPlans().get(i).isSelected()){
 				pop.getPersons().get(plan.getPerson().getId()).getPlans().remove(i);

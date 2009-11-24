@@ -33,11 +33,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
@@ -85,7 +84,7 @@ public class PajekWriter {
 
 	}
 
-	public void write(TreeSet<SocialNetEdge> links, PopulationImpl plans, int iter) {
+	public void write(TreeSet<SocialNetEdge> links, Population plans, int iter) {
 		BufferedWriter pjnet = null;
 
 		// from config
@@ -109,10 +108,8 @@ public class PajekWriter {
 //			System.out.print(" *Vertices " + numPersons + " \n");
 			pjnet.write("*Vertices " + numPersons+"\r\n");
 
-			Iterator<PersonImpl> itPerson = plans.getPersons().values().iterator();
 			int iperson = 1;
-			while (itPerson.hasNext()) {
-				PersonImpl p = itPerson.next();
+			for (Person p : plans.getPersons().values()) {
 				final KnowledgeImpl know = this.knowledges.getKnowledgesByPersonId().get(p.getId());
 				if (know == null) {
 					Gbl.errorMsg("Knowledge is not defined!");
@@ -125,7 +122,6 @@ public class PajekWriter {
 //				log.info(iperson + " " + p.getId() + " ["+xy.getX() +" "+xy.getY()+"]\n");
 				this.pajekIndex.put(p.getId(),iperson);
 				iperson++;
-
 			}
 			pjnet.write("*Edges\r\n");
 
@@ -161,7 +157,7 @@ public class PajekWriter {
 		}
 		//}
 	}
-	public void writeGeo(PopulationImpl plans, SocialNetwork snet, int iter) {
+	public void writeGeo(Population plans, SocialNetwork snet, int iter) {
 
 		GeoStatistics gstat = new GeoStatistics(plans, snet);
 		Graph g = gstat.makeJungGraph();

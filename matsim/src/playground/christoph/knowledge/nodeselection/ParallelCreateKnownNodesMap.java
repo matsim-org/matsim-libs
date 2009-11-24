@@ -28,10 +28,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.christoph.knowledge.container.MapKnowledge;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
@@ -57,7 +57,7 @@ public class ParallelCreateKnownNodesMap {
 	 * @param nodeSelectors
 	 * @param numberOfThreads
 	 */
-	public static void run(final PopulationImpl population, final NetworkLayer network, final ArrayList<SelectNodes> nodeSelectors, final int numberOfThreads)
+	public static void run(final Population population, final NetworkLayer network, final ArrayList<SelectNodes> nodeSelectors, final int numberOfThreads)
 	{
 		int numOfThreads = Math.max(numberOfThreads, 1); // it should be at least 1 here; we allow 0 in other places for "no threads"
 		
@@ -99,7 +99,7 @@ public class ParallelCreateKnownNodesMap {
 		
 		// distribute workload between threads, as long as threads are not yet started, so we don't need synchronized data structures
 		int i = 0;
-		for (PersonImpl person : population.getPersons().values()) 
+		for (Person person : population.getPersons().values()) 
 		{
 			selectorThreads[i % numOfThreads].handlePerson(person);
 			i++;
@@ -143,7 +143,7 @@ public class ParallelCreateKnownNodesMap {
 		private final NetworkLayer network;
 		private final ArrayList<SelectNodes> nodeSelectors;
 		private final SelectNodes[][] nodeSelectorArray;
-		private final List<PersonImpl> persons = new LinkedList<PersonImpl>();
+		private final List<Person> persons = new LinkedList<Person>();
 		
 		public SelectNodesThread(final int i, NetworkLayer network, final SelectNodes nodeSelectorArray[][], final ArrayList<SelectNodes> nodeSelectors)
 		{
@@ -153,7 +153,7 @@ public class ParallelCreateKnownNodesMap {
 			this.nodeSelectors = nodeSelectors;
 		}
 
-		public void handlePerson(final PersonImpl person)
+		public void handlePerson(final Person person)
 		{
 			this.persons.add(person);
 		}
@@ -162,7 +162,7 @@ public class ParallelCreateKnownNodesMap {
 		{
 			int numRuns = 0;
 			
-			for (PersonImpl person : this.persons)
+			for (Person person : this.persons)
 			{	
 				/* 
 				 * If person has no Knowledge create at least the knowledge structure to

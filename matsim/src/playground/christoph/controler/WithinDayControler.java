@@ -21,15 +21,14 @@
 package playground.christoph.controler;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -248,7 +247,7 @@ public class WithinDayControler extends Controler {
 		actEndReplanningCounter = 0;
 		leaveLinkReplanningCounter = 0;
 
-		for (PersonImpl person : this.getPopulation().getPersons().values())
+		for (Person person : this.getPopulation().getPersons().values())
 		{
 			// get Person's Custom Attributes
 			Map<String, Object> customAttributes = person.getCustomAttributes();
@@ -315,11 +314,7 @@ public class WithinDayControler extends Controler {
 	 */
 	protected void setReplanners() 
 	{
-		Iterator<PersonImpl> PersonIterator = this.getPopulation().getPersons().values().iterator();
-		while (PersonIterator.hasNext())
-		{
-			PersonImpl p = PersonIterator.next();
-
+		for (Person p : this.getPopulation().getPersons().values()) {
 			Map<String, Object> customAttributes = p.getCustomAttributes();
 			customAttributes.put("Replanner", replanners.get(0));
 		}
@@ -327,9 +322,9 @@ public class WithinDayControler extends Controler {
 
 	protected void doInitialReplanning()
 	{
-		ArrayList<PersonImpl> personsToReplan = new ArrayList<PersonImpl>();
+		ArrayList<Person> personsToReplan = new ArrayList<Person>();
 
-		for (PersonImpl person : this.getPopulation().getPersons().values()) {
+		for (Person person : this.getPopulation().getPersons().values()) {
 			boolean replanning = (Boolean) person.getCustomAttributes().get("initialReplanning");
 
 			if (replanning)

@@ -3,17 +3,15 @@ package playground.christoph.controler;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.router.Dijkstra;
 
 import playground.christoph.events.EventControler;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
-import playground.christoph.router.DijkstraWrapper;
 import playground.christoph.router.KnowledgePlansCalcRoute;
 import playground.christoph.router.costcalculators.KnowledgeTravelCostWrapper;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
@@ -89,7 +87,7 @@ public class IterativeKnowledgeControler extends Controler{
 //		DijkstraWrapper dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, test, network);
 //		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(network, dijkstraWrapper, dijkstraWrapper);
 		
-		for (PersonImpl person : this.getPopulation().getPersons().values())
+		for (Person person : this.getPopulation().getPersons().values())
 		{
 			dijkstraRouter.run(person.getSelectedPlan());
 		}
@@ -99,7 +97,7 @@ public class IterativeKnowledgeControler extends Controler{
 	{
 		log.info("Loading Knowledge from Database");
 		
-		for (PersonImpl person : this.getPopulation().getPersons().values()) 
+		for (Person person : this.getPopulation().getPersons().values()) 
 		{
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 

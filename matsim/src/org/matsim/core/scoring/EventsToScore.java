@@ -26,22 +26,22 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 /**
@@ -57,7 +57,7 @@ import org.matsim.core.utils.collections.Tuple;
 public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
 		AgentMoneyEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
 
-	private PopulationImpl population = null;
+	private Population population = null;
 	private ScoringFunctionFactory sfFactory = null;
 	private final TreeMap<Id, Tuple<Plan, ScoringFunction>> agentScorers = new TreeMap<Id, Tuple<Plan, ScoringFunction>>();
 	private final TreeMap<Id, Integer> agentPlanElementIndex = new TreeMap<Id, Integer>();
@@ -65,11 +65,11 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	private long scoreCount = 0;
 	private final double learningRate;
 
-	public EventsToScore(final PopulationImpl population, final ScoringFunctionFactory factory) {
+	public EventsToScore(final Population population, final ScoringFunctionFactory factory) {
 		this(population, factory, Gbl.getConfig().charyparNagelScoring().getLearningRate());
 	}
 
-	public EventsToScore(final PopulationImpl population, final ScoringFunctionFactory factory, final double learningRate) {
+	public EventsToScore(final Population population, final ScoringFunctionFactory factory, final double learningRate) {
 		super();
 		this.population = population;
 		this.sfFactory = factory;
@@ -190,7 +190,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	private Tuple<Plan, ScoringFunction> getScoringDataForAgent(final Id agentId) {
 		Tuple<Plan, ScoringFunction> data = this.agentScorers.get(agentId);
 		if (data == null) {
-			PersonImpl person = this.population.getPersons().get(agentId);
+			Person person = this.population.getPersons().get(agentId);
 			if (person == null) {
 				return null;
 			}

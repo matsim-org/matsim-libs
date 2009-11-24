@@ -23,12 +23,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /**
@@ -39,14 +39,14 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 public class Vehicle extends SimUnit {
 
 	private static final Logger log = Logger.getLogger(Vehicle.class);
-	private PersonImpl ownerPerson = null;
+	private Person ownerPerson = null;
 	private LegImpl currentLeg = null;
 	private int legIndex;
 	private Link currentLink = null;
 	private int linkIndex;
 	private LinkImpl[] currentLinkRoute = null;
 
-	public Vehicle(Scheduler scheduler, PersonImpl ownerPerson) {
+	public Vehicle(Scheduler scheduler, Person ownerPerson) {
 		super(scheduler);
 		this.ownerPerson = ownerPerson;
 		initialize();
@@ -152,7 +152,7 @@ public class Vehicle extends SimUnit {
 		this.legIndex = legIndex;
 	}
 
-	public PersonImpl getOwnerPerson() {
+	public Person getOwnerPerson() {
 		return ownerPerson;
 	}
 

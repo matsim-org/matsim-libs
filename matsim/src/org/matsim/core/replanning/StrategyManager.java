@@ -25,11 +25,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
@@ -108,7 +109,7 @@ public class StrategyManager {
 	 * @param population
 	 * @param iteration the current iteration we're handling
 	 */
-	public void run(final PopulationImpl population, final int iteration) {
+	public void run(final Population population, final int iteration) {
 		handleChangeRequests(iteration);
 		run(population);
 	}
@@ -119,15 +120,15 @@ public class StrategyManager {
 	 *
 	 * @param population
 	 */
-	public void run(final PopulationImpl population) {
+	public void run(final Population population) {
 		// initialize all strategies
 		for (PlanStrategy strategy : this.strategies) {
 			strategy.init();
 		}
 		// then go through the population and assign each person to a strategy
-		for (PersonImpl person : population.getPersons().values()) {
+		for (Person person : population.getPersons().values()) {
 			if ((this.maxPlansPerAgent > 0) && (person.getPlans().size() > this.maxPlansPerAgent)) {
-				removePlans(person, this.maxPlansPerAgent);
+				removePlans((PersonImpl) person, this.maxPlansPerAgent);
 			}
 			PlanStrategy strategy = this.chooseStrategy();
 			if (strategy != null) {

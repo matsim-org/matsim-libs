@@ -31,12 +31,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.knowledges.KnowledgeImpl;
@@ -65,9 +65,9 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 	// Writes a List Ids (Strings) - needs less memory while parsing a file but nodesMap has to be created afterwards.
 	public static boolean writeNodesList = false;
 	
-	protected PopulationImpl population;
+	protected Population population;
 	protected NetworkLayer network;
-	protected PersonImpl person;
+	protected Person person;
 	protected KnowledgeImpl currentKnowledge;
 	protected Map<Id, NodeImpl> currentNodes;
 	protected Map<Id, LinkImpl> currentLinks;
@@ -82,7 +82,7 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 
 	private Knowledges knowledges;
 			
-	public SelectionReaderMatsim(NetworkLayer network, PopulationImpl population, Knowledges knowledges)
+	public SelectionReaderMatsim(NetworkLayer network, Population population, Knowledges knowledges)
 	{
 		this.network = network;
 		this.population = population;

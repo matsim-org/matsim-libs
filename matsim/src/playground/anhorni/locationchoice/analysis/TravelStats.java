@@ -30,6 +30,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -37,7 +38,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -67,7 +67,7 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 	final private static int INDEX_EXECUTED = 3;
 	final private static int INDEX_MEDIANEXECUTED = 4;
 
-	private PopulationImpl population;
+	private Population population;
 	private final boolean createPNG;
 	private double[][] history = null;
 	private int minIteration = 0;

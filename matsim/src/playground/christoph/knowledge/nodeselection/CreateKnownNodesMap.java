@@ -28,11 +28,11 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 
 import playground.christoph.knowledge.container.MapKnowledge;
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -49,7 +49,7 @@ public class CreateKnownNodesMap {
 	 * Implementing them direct in the nodeSelectors could be a good solution...
 	 */
 
-	public void collectSelectedNodes(PersonImpl p, NetworkLayer network, SelectNodes nodeSelector)
+	public void collectSelectedNodes(Person p, NetworkLayer network, SelectNodes nodeSelector)
 	{		
 		Plan plan = p.getSelectedPlan();
 		

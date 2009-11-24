@@ -26,15 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
-
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
-import org.matsim.core.controler.corelisteners.PlansScoring;
-import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -49,12 +45,10 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.executables.OTFVisController;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
 import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
@@ -151,7 +145,7 @@ QueueSimulationAfterSimStepListener {
 
 	private QueueNetwork queueNetwork;
 	protected OnTheFlyServer myOTFServer;
-	private PopulationImpl population;
+	private Population population;
 	private EventsManagerImpl events;
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {

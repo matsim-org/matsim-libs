@@ -7,22 +7,11 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -33,14 +22,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
-import javax.swing.event.TableModelEvent;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
+import org.matsim.api.core.v01.population.Person;
 
 import prefuse.Constants;
 import prefuse.Display;
@@ -69,15 +52,12 @@ import prefuse.data.Node;
 import prefuse.data.Tree;
 import prefuse.data.Tuple;
 import prefuse.data.event.TupleSetListener;
-import prefuse.data.expression.Predicate;
-import prefuse.data.io.TreeMLReader;
 import prefuse.data.search.PrefixSearchTupleSet;
 import prefuse.data.search.SearchTupleSet;
-import prefuse.data.tuple.AbstractTupleSet;
 import prefuse.data.tuple.TupleSet;
+import prefuse.render.AbstractShapeRenderer;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.EdgeRenderer;
-import prefuse.render.AbstractShapeRenderer;
 import prefuse.render.LabelRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.FontLib;
@@ -227,7 +207,7 @@ public static class MTree extends Tree {
 					child.setString("name", Integer.toString(i));
 					child.setInt("level", -1);
 					if(fillRef) {
-						PersonImpl p = m_pop.getPerson(i);
+						Person p = m_pop.getPerson(i);
 						child.set("ref", p);
 					}
 					this.addChildEdge(parent, child);

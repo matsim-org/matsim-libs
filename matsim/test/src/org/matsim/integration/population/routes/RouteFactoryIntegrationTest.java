@@ -28,13 +28,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.CompressedNetworkRouteImpl;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
@@ -69,7 +68,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		controler.setWriteEventsInterval(0);
 		controler.run();
 
-		PopulationImpl population = controler.getPopulation();
+		Population population = controler.getPopulation();
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
@@ -95,8 +94,8 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		controler2.setWriteEventsInterval(0);
 		controler2.run();
 
-		PopulationImpl population2 = controler2.getPopulation();
-		for (PersonImpl person : population2.getPersons().values()) {
+		Population population2 = controler2.getPopulation();
+		for (Person person : population2.getPersons().values()) {
 			int planCounter = 0;
 			for (Plan plan : person.getPlans()) {
 				planCounter++;

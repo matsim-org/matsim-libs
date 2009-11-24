@@ -14,6 +14,7 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
@@ -27,7 +28,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
@@ -664,10 +664,9 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			// int itr = event.getIteration();
 
 			// get the leg modes of the selected plan of the first Person
-			for (Iterator<PersonImpl> pIt = ctl.getPopulation().getPersons()
-					.values().iterator(); pIt.hasNext();) {
+			for (Person p : ctl.getPopulation().getPersons().values()) {
 				StringBuilder legChainModes = new StringBuilder("|");
-				for (PlanElement pe : pIt.next().getSelectedPlan()
+				for (PlanElement pe : p.getSelectedPlan()
 						.getPlanElements())
 					if (pe instanceof LegImpl)
 						legChainModes.append(((LegImpl) pe).getMode() + "|");

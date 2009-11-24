@@ -39,9 +39,9 @@ import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -102,12 +102,12 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 
 //	private final OTFNetHandler handler = null;
-	private transient PopulationImpl pop = null;
+	private transient Population pop = null;
 	public transient ByteArrayOutputStream out = null;
 	public transient QueueNetwork network = null;
 	public transient EventsManager events;
 
-	protected OnTheFlyServer(String ReadableName, QueueNetwork network, PopulationImpl population, EventsManager events) throws RemoteException {
+	protected OnTheFlyServer(String ReadableName, QueueNetwork network, Population population, EventsManager events) throws RemoteException {
 		super(0, new SslRMIClientSocketFactory(),	new SslRMIServerSocketFactory());
 		this.userReadableName = ReadableName;
 		this.network = network;
@@ -117,7 +117,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		OTFDataWriter.setServer(this);
 	}
 
-	protected OnTheFlyServer(String ReadableName, QueueNetwork network, PopulationImpl population, EventsManager events, boolean noSSL) throws RemoteException {
+	protected OnTheFlyServer(String ReadableName, QueueNetwork network, Population population, EventsManager events, boolean noSSL) throws RemoteException {
 		super(0);
 		this.userReadableName = ReadableName;
 		this.network = network;
@@ -128,7 +128,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 //	public static boolean useSSL = true;
 	
-	public static OnTheFlyServer createInstance(String ReadableName, QueueNetwork network, PopulationImpl population, EventsManager events, boolean useSSL) {
+	public static OnTheFlyServer createInstance(String ReadableName, QueueNetwork network, Population population, EventsManager events, boolean useSSL) {
 		OnTheFlyServer result = null;
 		
 //		OnTheFlyServer.useSSL = useSSL;

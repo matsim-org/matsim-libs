@@ -30,6 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -65,7 +66,7 @@ import playground.yu.utils.io.SimpleWriter;
 public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
 
-	protected final PopulationImpl plans;
+	protected final Population plans;
 
 	protected RoadPricingScheme toll = null;
 
@@ -89,7 +90,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 	 *
 	 */
 	public LegTravelTimeModalSplit(final int binSize, final int nofBins,
-			final PopulationImpl plans) {
+			final Population plans) {
 		this.plans = plans;
 		this.binSize = binSize;
 
@@ -109,11 +110,11 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		othersArrCount = new int[nofBins + 1];
 	}
 
-	public LegTravelTimeModalSplit(final int binSize, final PopulationImpl plans) {
+	public LegTravelTimeModalSplit(final int binSize, final Population plans) {
 		this(binSize, 30 * 3600 / binSize + 1, plans);
 	}
 
-	public LegTravelTimeModalSplit(final PopulationImpl plans) {
+	public LegTravelTimeModalSplit(final Population plans) {
 		this(300, plans);
 	}
 

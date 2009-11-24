@@ -34,6 +34,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
@@ -44,7 +45,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -142,7 +142,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		
 		
 		//Retail zones are created
-		Collection<PersonImpl> persons = controler.getPopulation().getPersons().values();
+		Collection<? extends Person> persons = controler.getPopulation().getPersons().values();
 		log.info("Number of retail zones = "+  n);//TODO solve better this problem of n and number of zones, names given here are confusing
 		this.createZonesFromScenario(persons, this.findScenarioShops(), n, samplingRatePersons, samplingRateShops);
 		
@@ -172,7 +172,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 				//gmrs.moveFacilities();
 			//movedFacilities = gmrs.getMovedFacilities();
 			int counter = 0;
-			for (PersonImpl p : controler.getPopulation().getPersons().values()) {
+			for (Person p : controler.getPopulation().getPersons().values()) {
 				
 				Plan plan = p.getSelectedPlan(); 
 				boolean routeIt = false;
@@ -196,13 +196,13 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		}	
 	}
 	
-	private void createZonesFromScenario (Collection<PersonImpl> persons, ArrayList<ActivityFacilityImpl> shops, int n, double samplingRatePersons, double samplingRateShops) {
+	private void createZonesFromScenario (Collection<? extends Person> persons, ArrayList<ActivityFacilityImpl> shops, int n, double samplingRatePersons, double samplingRateShops) {
 		
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (PersonImpl p : persons) {
+		for (Person p : persons) {
 			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX() < minx) { minx = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX(); }
 			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY() < miny) { miny = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY(); }
 			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX() > maxx) { maxx = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX(); }
@@ -233,7 +233,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 				double y1= miny + j*y_width;
 				double y2= y1 + y_width;
 				RetailZone rz = new RetailZone (id, x1, y1, x2, y2);
-				for (PersonImpl p : persons ) {
+				for (Person p : persons ) {
 					Coord c = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacility().getCoord();
 					if (c.getX()< x2 && c.getX()>=x1 && c.getY()<y2 && c.getY()>=y1) { 
 						rz.addPersonToQuadTree(c,p);

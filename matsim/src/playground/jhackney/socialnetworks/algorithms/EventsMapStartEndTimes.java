@@ -4,22 +4,22 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
 import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 
 public class EventsMapStartEndTimes implements DeprecatedActivityStartEventHandler, DeprecatedActivityEndEventHandler {
 
-	public LinkedHashMap<PersonImpl, ArrayList<ActivityStartEventImpl>> startMap = new LinkedHashMap<PersonImpl,ArrayList<ActivityStartEventImpl>>();
-	public LinkedHashMap<PersonImpl, ArrayList<ActivityEndEventImpl>> endMap = new LinkedHashMap<PersonImpl,ArrayList<ActivityEndEventImpl>>();
+	public LinkedHashMap<Person, ArrayList<ActivityStartEventImpl>> startMap = new LinkedHashMap<Person,ArrayList<ActivityStartEventImpl>>();
+	public LinkedHashMap<Person, ArrayList<ActivityEndEventImpl>> endMap = new LinkedHashMap<Person,ArrayList<ActivityEndEventImpl>>();
 	public double maxtime=0;
-	private PopulationImpl plans;
+	private Population plans;
 	static final private Logger log = Logger.getLogger(EventsMapStartEndTimes.class);
 
-	public EventsMapStartEndTimes(PopulationImpl plans) {
+	public EventsMapStartEndTimes(Population plans) {
 		super();
 //		makeTimeWindows();
 		this.plans=plans;
@@ -27,7 +27,7 @@ public class EventsMapStartEndTimes implements DeprecatedActivityStartEventHandl
 	}
 
 	public void handleEvent(ActivityStartEventImpl event) {
-		PersonImpl person = plans.getPersons().get(event.getPersonId());
+		Person person = plans.getPersons().get(event.getPersonId());
 		ArrayList<ActivityStartEventImpl> startList;
 		if((startMap.get(person)==null)){
 			startList=new ArrayList<ActivityStartEventImpl>();
@@ -47,7 +47,7 @@ public class EventsMapStartEndTimes implements DeprecatedActivityStartEventHandl
 	}
 
 	public void handleEvent(ActivityEndEventImpl event) {
-		PersonImpl person = plans.getPersons().get(event.getPersonId());
+		Person person = plans.getPersons().get(event.getPersonId());
 		ArrayList<ActivityEndEventImpl> endList;
 		if((endMap.get(person)== null)){
 			endList=new ArrayList<ActivityEndEventImpl>();

@@ -3,19 +3,19 @@ package org.matsim.core.mobsim.jdeqsim.parallel;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.jdeqsim.Scheduler;
 import org.matsim.core.mobsim.jdeqsim.Vehicle;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 
 
 
 public class PVehicle extends Vehicle {
 
-	public PVehicle(Scheduler scheduler, PersonImpl ownerPerson) {
+	public PVehicle(Scheduler scheduler, Person ownerPerson) {
 		super(scheduler, ownerPerson);
 		
 	}

@@ -53,7 +53,6 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.collections.QuadTree;
@@ -233,7 +232,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 		}
 	}
 	
-	public OTFQuery query(QueueNetwork net, PopulationImpl plans, EventsManager events, OTFServerQuad quad) {
+	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad quad) {
 		this.drivenLinks = new HashMap<Link,Integer> ();
 //		QueueLink link = net.getQueueLink(this.linkId);
 //		String start = link.getLink().getFromNode().getId().toString();

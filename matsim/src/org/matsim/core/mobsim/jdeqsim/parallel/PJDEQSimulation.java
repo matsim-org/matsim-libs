@@ -6,7 +6,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
@@ -15,8 +17,6 @@ import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /*
@@ -65,7 +65,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 
 	private int numOfThreads;
 
-	public PJDEQSimulation(NetworkLayer network, PopulationImpl population,
+	public PJDEQSimulation(NetworkLayer network, Population population,
 			EventsManagerImpl events, int numOfThreads) {
 		super(network, population, events);
 		this.numOfThreads = numOfThreads; // TODO: use this number really...
@@ -101,7 +101,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 		// find out networkXMedian
 		int numberOfLinks = 0;
 		double sumXCoord = 0;
-		for (PersonImpl person : this.population.getPersons().values()) {
+		for (Person person : this.population.getPersons().values()) {
 			// estimate, where to cut the map
 
 			// System.out.println(((Activity)
@@ -198,7 +198,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 		// initialize vehicles
 		PVehicle vehicle = null;
 		// the vehicle has registered itself to the scheduler
-		for (PersonImpl person : this.population.getPersons().values()) {
+		for (Person person : this.population.getPersons().values()) {
 			vehicle = new PVehicle(scheduler, person);
 		}
 

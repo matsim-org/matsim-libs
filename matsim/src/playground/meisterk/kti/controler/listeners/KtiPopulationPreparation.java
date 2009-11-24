@@ -20,10 +20,10 @@
 
 package playground.meisterk.kti.controler.listeners;
 
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 
@@ -41,7 +41,7 @@ public class KtiPopulationPreparation implements StartupListener {
 
 	public void notifyStartup(StartupEvent event) {
 
-		PopulationImpl pop = event.getControler().getPopulation();
+		Population pop = event.getControler().getPopulation();
 		Config config = event.getControler().getConfig();
 		
 		/*

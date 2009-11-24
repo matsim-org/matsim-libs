@@ -21,7 +21,6 @@
 package playground.christoph.events;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -432,7 +431,7 @@ public class EventControler extends Controler {
 		actEndReplanningCounter = 0;
 		leaveLinkReplanningCounter = 0;
 
-		for (PersonImpl person : this.getPopulation().getPersons().values()) {
+		for (Person person : this.getPopulation().getPersons().values()) {
 			// get Person's Custom Attributes
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 
@@ -533,10 +532,7 @@ public class EventControler extends Controler {
 	 * are assigned based on probabilities from config files.
 	 */
 	protected void setReplanners() {
-		Iterator<PersonImpl> PersonIterator = this.getPopulation().getPersons().values().iterator();
-		while (PersonIterator.hasNext()) {
-			PersonImpl p = PersonIterator.next();
-
+		for (Person p : this.getPopulation().getPersons().values()) {
 			Map<String, Object> customAttributes = p.getCustomAttributes();
 			// customAttributes.put("Replanner", replanners.get(0)); // A*
 			// customAttributes.put("Replanner", replanners.get(1)); // Random
@@ -563,11 +559,7 @@ public class EventControler extends Controler {
 	 */
 	protected void setNodeSelectors() {
 		// Create NodeSelectorContainer
-		Iterator<PersonImpl> PersonIterator = this.getPopulation().getPersons()
-				.values().iterator();
-		while (PersonIterator.hasNext()) {
-			PersonImpl p = PersonIterator.next();
-
+		for (Person p : this.getPopulation().getPersons().values()) {
 			Map<String, Object> customAttributes = p.getCustomAttributes();
 
 			ArrayList<SelectNodes> personNodeSelectors = new ArrayList<SelectNodes>();
@@ -577,11 +569,8 @@ public class EventControler extends Controler {
 
 		// Assign NodeSelectors
 		int counter = 0;
-		PersonIterator = this.getPopulation().getPersons().values().iterator();
-		while (PersonIterator.hasNext()) {
+		for (Person p : this.getPopulation().getPersons().values()) {
 			counter++;
-			PersonImpl p = PersonIterator.next();
-
 			Map<String, Object> customAttributes = p.getCustomAttributes();
 
 			ArrayList<SelectNodes> personNodeSelectors = (ArrayList<SelectNodes>) customAttributes.get("NodeSelectors");
@@ -667,7 +656,7 @@ public class EventControler extends Controler {
 	}
 
 	protected void setSubNetworks() {
-		for (PersonImpl person : this.getPopulation().getPersons().values()) {
+		for (Person person : this.getPopulation().getPersons().values()) {
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 
 			customAttributes.put("SubNetwork", new SubNetwork(this.network));
@@ -714,9 +703,9 @@ public class EventControler extends Controler {
 	} // setNodes()
 
 	protected void doInitialReplanning() {
-		ArrayList<PersonImpl> personsToReplan = new ArrayList<PersonImpl>();
+		ArrayList<Person> personsToReplan = new ArrayList<Person>();
 
-		for (PersonImpl person : this.getPopulation().getPersons().values()) {
+		for (Person person : this.getPopulation().getPersons().values()) {
 			boolean replanning = (Boolean) person.getCustomAttributes().get("initialReplanning");
 
 			if (replanning) {
@@ -752,8 +741,8 @@ public class EventControler extends Controler {
 
 	// removes all plans, that are currently not selectedS
 	protected void clearPlans() {
-		for (PersonImpl person : this.getPopulation().getPersons().values()) {
-			person.removeUnselectedPlans();
+		for (Person person : this.getPopulation().getPersons().values()) {
+			((PersonImpl) person).removeUnselectedPlans();
 		}
 	}
 

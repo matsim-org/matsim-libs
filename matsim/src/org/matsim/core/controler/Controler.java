@@ -46,6 +46,7 @@ import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
@@ -155,7 +156,7 @@ public class Controler {
 
 	protected EventsManagerImpl events = null;
 	protected NetworkLayer network = null;
-	protected PopulationImpl population = null;
+	protected Population population = null;
 	private Counts counts = null;
 	private final NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(this.network);
 
@@ -1057,7 +1058,7 @@ public class Controler {
 		return this.network;
 	}
 
-	public final PopulationImpl getPopulation() {
+	public final Population getPopulation() {
 		return this.population;
 	}
 

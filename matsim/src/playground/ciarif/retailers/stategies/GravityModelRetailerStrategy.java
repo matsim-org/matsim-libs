@@ -7,12 +7,12 @@ import java.util.TreeMap;
 import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 import playground.ciarif.retailers.RetailerGA.RunRetailerGA;
@@ -146,9 +146,9 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 				//zone_count++;
 				double counter = 0;
 				double prob = 0;
-				ArrayList<PersonImpl> persons = rz.getPersons();
+				ArrayList<Person> persons = rz.getPersons();
 				
-				for (PersonImpl p:persons) {
+				for (Person p:persons) {
 					boolean first_shop = true;
 					for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
 						

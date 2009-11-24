@@ -24,10 +24,10 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis;
 import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution;
@@ -57,7 +57,7 @@ public class LegDistanceDistributionWriter implements IterationEndsListener {
 		if (event.getIteration() % 10 == 0) {
 
 			Controler c = event.getControler();
-			PopulationImpl pop = c.getPopulation();
+			Population pop = c.getPopulation();
 			
 			PrintStream out = null;
 			try {

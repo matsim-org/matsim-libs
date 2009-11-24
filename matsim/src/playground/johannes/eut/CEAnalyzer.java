@@ -31,14 +31,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -51,34 +51,34 @@ public class CEAnalyzer implements IterationEndsListener, ShutdownListener {
 	
 	private TripAndScoreStats stats;
 	
-	private List<PersonImpl> persons;
+	private List<Person> persons;
 	
 	private String personsFile;
 	
-	private PopulationImpl plans;
+	private Population plans;
 	
-	private Map<PersonImpl, List<Double>> samples;
+	private Map<Person, List<Double>> samples;
 	
-	public CEAnalyzer(String personsFile, PopulationImpl plans, TripAndScoreStats stats, ArrowPrattRiskAversionI utilFunc) {
+	public CEAnalyzer(String personsFile, Population plans, TripAndScoreStats stats, ArrowPrattRiskAversionI utilFunc) {
 		this.personsFile = personsFile;
 		this.plans = plans;
 		this.stats = stats;
 		this.utilFunc = utilFunc;
-		samples = new HashMap<PersonImpl, List<Double>>();
+		samples = new HashMap<Person, List<Double>>();
 	}
 	
-	public CEAnalyzer(List<PersonImpl> persons, TripAndScoreStats stats, ArrowPrattRiskAversionI utilFunc) {
+	public CEAnalyzer(List<Person> persons, TripAndScoreStats stats, ArrowPrattRiskAversionI utilFunc) {
 		this.persons = persons;
 		this.stats = stats;
 		this.utilFunc = utilFunc;
-		samples = new HashMap<PersonImpl, List<Double>>();
+		samples = new HashMap<Person, List<Double>>();
 	}
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if(persons == null && personsFile != null) {
 			readPersons(personsFile, plans);
 		}
-		for (PersonImpl p : persons) {
+		for (Person p : persons) {
 			Double tripDur = stats.getTripDurations().get(p.getId());
 			if (tripDur != null) { // F***ing withinday bug!
 				List<Double> personSamples = samples.get(p);
@@ -91,13 +91,13 @@ public class CEAnalyzer implements IterationEndsListener, ShutdownListener {
 		}
 	}
 
-	private void readPersons(String file, PopulationImpl plans) {
-		persons = new LinkedList<PersonImpl>();
+	private void readPersons(String file, Population plans) {
+		persons = new LinkedList<Person>();
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(file);
 			String personId;
 			while ((personId = reader.readLine()) != null) {
-				PersonImpl p = plans.getPersons().get(new IdImpl(personId));
+				Person p = plans.getPersons().get(new IdImpl(personId));
 				if (p != null)
 					persons.add(p);
 			}
@@ -111,7 +111,7 @@ public class CEAnalyzer implements IterationEndsListener, ShutdownListener {
 			BufferedWriter writer = IOUtils.getBufferedWriter(Controler
 					.getOutputFilename("ceValues.txt"));
 
-			for (PersonImpl p : persons) {
+			for (Person p : persons) {
 				List<Double> personSamples = samples.get(p);
 				double utilsum = 0;
 				for (Double d : personSamples)

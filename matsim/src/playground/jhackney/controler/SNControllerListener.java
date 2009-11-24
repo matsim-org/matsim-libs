@@ -22,14 +22,14 @@ package playground.jhackney.controler;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
@@ -43,8 +43,6 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
@@ -263,7 +261,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 //				Write out the KML for the EgoNet of a chosen agent
 				this.log.info(" Writing out KMZ activity spaces and day plans for agent's egoNet");
-				PersonImpl testP=this.controler.getPopulation().getPersons().get(new IdImpl("21924270"));//1pct
+				Person testP=this.controler.getPopulation().getPersons().get(new IdImpl("21924270"));//1pct
 //				Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
 				EgoNetPlansItersMakeKML.loadData(testP,event.getIteration(), this.knowledges);
 				this.log.info(" ... done");
@@ -334,10 +332,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 
 			this.log.info(" Forgetting excess activities (locations) OR SHOULD THIS HAPPEN EACH TIME AN ACTIVITY IS LEARNED ...");
 			this.log.info("  Should be an algorithm");
-			Collection<PersonImpl> personList = this.controler.getPopulation().getPersons().values();
-			Iterator<PersonImpl> iperson = personList.iterator();
-			while (iperson.hasNext()) {
-				PersonImpl p = iperson.next();
+			for (Person p : this.controler.getPopulation().getPersons().values()) {
 //				Remember a number of activities equal to at least the number of
 //				acts per plan times the number of plans in memory
 				int max_memory = (int) (p.getSelectedPlan().getPlanElements().size()/2*p.getPlans().size()*1.5);
@@ -356,7 +351,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	 * private methods
 	 * =================================================================== */
 
-	void initializeKnowledge(final PopulationImpl plans, ActivityFacilitiesImpl facilities, Knowledges knowledges ) {
+	void initializeKnowledge(final Population plans, ActivityFacilitiesImpl facilities, Knowledges knowledges ) {
 
 		// Knowledge is already initialized in some plans files
 		// Map agents' knowledge (Activities) to their experience in the plans (Acts)
@@ -371,10 +366,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 		aar.openFile(fileName);
 		System.out.println(" ... done");
 
-		Iterator<PersonImpl> p_it = plans.getPersons().values().iterator();
-		while (p_it.hasNext()) {
-			PersonImpl person=p_it.next();
-
+		for (Person person : plans.getPersons().values()) {
 			KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 			if(k ==null){
 				k =  this.knowledges.getFactory().createKnowledge(person.getId(), "created by " + this.getClass().getName());

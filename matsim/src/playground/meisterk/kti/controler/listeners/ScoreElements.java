@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -32,7 +33,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -80,7 +80,7 @@ public class ScoreElements implements StartupListener, ScoringListener, Shutdown
 		Controler c = event.getControler();
 		EventsToScore eventsToScore = c.getPlansScoring().getPlanScorer();
 		
-		for (PersonImpl p : c.getPopulation().getPersons().values()) {
+		for (Person p : c.getPopulation().getPersons().values()) {
 			
 			ScoringFunction sf = eventsToScore.getScoringFunctionForAgent(p.getId());
 			if (sf instanceof ScoringFunctionAccumulator) {

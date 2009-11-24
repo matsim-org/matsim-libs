@@ -8,13 +8,13 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
+
 import playground.ciarif.retailers.data.FacilityRetailersImpl;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.utils.Utils;
@@ -44,10 +44,10 @@ public class CatchmentAreaRetailerStrategy implements RetailerStrategy {
 				
 				log.info("allowed links are = " + allowedLinks );
 				// example of the use of a bad code style, but works anyway....
-				QuadTree<PersonImpl> personQuadTree = Utils.getPersonQuadTree();
+				QuadTree<Person> personQuadTree = Utils.getPersonQuadTree();
 				if (personQuadTree == null) { throw new RuntimeException("QuadTree not set!"); }
-				Collection<PersonImpl> persons = personQuadTree.get(f.getCoord().getX(),f.getCoord().getY(),200);
-				log.info(" Persons living around the facility " + f.getId() + " are: " + persons.toArray().length);
+				Collection<? extends Person> persons = personQuadTree.get(f.getCoord().getX(),f.getCoord().getY(),200);
+				log.info(" Persons living around the facility " + f.getId() + " are: " + persons.size());
 				Object[] links = controler.getNetwork().getLinks().values().toArray();
 				controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
 					double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId());

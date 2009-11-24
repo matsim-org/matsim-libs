@@ -27,10 +27,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimFileWriter;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
@@ -46,7 +46,7 @@ public class SelectionWriter extends MatsimXmlWriter implements MatsimFileWriter
 	//private int numDigits = 3;
 	
 	private SelectionWriterHandler handler = null;
-	private final PopulationImpl population;
+	private final Population population;
 	private KnowledgeTools knowledgeTools;
 	
 	private final static Logger log = Logger.getLogger(SelectionWriter.class);
@@ -60,7 +60,7 @@ public class SelectionWriter extends MatsimXmlWriter implements MatsimFileWriter
 	 * @param filename the filename where to write the data
 	 * @param version specifies the file-format
 	 */
-	public SelectionWriter(final PopulationImpl population, final String dtdFile, final String version, final String description)
+	public SelectionWriter(final Population population, final String dtdFile, final String version, final String description)
 	{
 		super();
 		
@@ -106,7 +106,7 @@ public class SelectionWriter extends MatsimXmlWriter implements MatsimFileWriter
 		}
 	}
 
-	public final void writePerson(final PersonImpl p) 
+	public final void writePerson(final Person p) 
 	{
 		try 
 		{
@@ -155,11 +155,7 @@ public class SelectionWriter extends MatsimXmlWriter implements MatsimFileWriter
 
 	public final void writePersons()
 	{
-		Iterator<PersonImpl> p_it = this.population.getPersons().values().iterator();
-		
-		while (p_it.hasNext()) 
-		{
-			PersonImpl p = p_it.next();
+		for (Person p : this.population.getPersons().values()) {
 			writePerson(p);
 		}
 	}
@@ -234,7 +230,7 @@ public class SelectionWriter extends MatsimXmlWriter implements MatsimFileWriter
 		// set how many places you want to the left of the decimal.
 		nf.setMinimumIntegerDigits(this.numDigits);
 */				
-		Iterator<PersonImpl> p_it = this.population.getPersons().values().iterator();
+		Iterator<? extends Person> p_it = this.population.getPersons().values().iterator();
 		
 		while (p_it.hasNext()) 
 		{
@@ -245,7 +241,7 @@ public class SelectionWriter extends MatsimXmlWriter implements MatsimFileWriter
 				log.info(this.outfile);
 				this.writeStartSelection(description);
 			}
-			PersonImpl p = p_it.next();
+			Person p = p_it.next();
 			writePerson(p);
 			
 			if ( ((i + 1) % n == 0) || !p_it.hasNext())

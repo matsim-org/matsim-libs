@@ -22,13 +22,13 @@ package playground.jhackney.controler;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -230,10 +230,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 //			forget knowledge
 			//TODO  Should be an algorithm
 			this.log.info("Forgetting knowledge");
-			Collection<PersonImpl> personList = this.controler.getPopulation().getPersons().values();
-			Iterator<PersonImpl> iperson = personList.iterator();
-			while (iperson.hasNext()) {
-				PersonImpl p = iperson.next();
+			for (Person p : this.controler.getPopulation().getPersons().values()) {
 //				Remember a number of activities equal to at least the number of
 //				acts per plan times the number of plans in memory
 				int max_memory = (int) (p.getSelectedPlan().getPlanElements().size()/2*p.getPlans().size()*1.5);

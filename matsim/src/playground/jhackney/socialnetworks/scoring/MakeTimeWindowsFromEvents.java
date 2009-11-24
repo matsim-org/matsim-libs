@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.ActivityEndEventImpl;
@@ -47,8 +48,8 @@ public class MakeTimeWindowsFromEvents {
 	public MakeTimeWindowsFromEvents(){
 	}
 	public void makeTimeWindows(EventsMapStartEndTimes epp){
-		LinkedHashMap<PersonImpl, ArrayList<ActivityStartEventImpl>> startMap = epp.startMap;
-		LinkedHashMap<PersonImpl, ArrayList<ActivityEndEventImpl>> endMap = epp.endMap;
+		LinkedHashMap<Person, ArrayList<ActivityStartEventImpl>> startMap = epp.startMap;
+		LinkedHashMap<Person, ArrayList<ActivityEndEventImpl>> endMap = epp.endMap;
 		Object[] persons = startMap.keySet().toArray();
 		for (int i=0;i<persons.length;i++){
 			//for each startEvent and endEvent

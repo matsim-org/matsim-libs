@@ -4,11 +4,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.world.MappedLocation;
 
 import playground.jhackney.socialnetworks.socialnet.SocialNetEdge;
@@ -30,14 +29,14 @@ public class GeoStatistics {
 	 * @author jhackney
 	 */
 	Graph gg;
-	PopulationImpl plans;
+	Population plans;
 	SocialNetwork snet;
 	LinkedHashMap<MappedLocation, Vertex> locVertex = new LinkedHashMap<MappedLocation, Vertex>();
 	LinkedHashMap<Vertex, MappedLocation> vertexLoc = new LinkedHashMap<Vertex,MappedLocation>();
 	LinkedHashMap<Edge, Double> edgeStrength = new LinkedHashMap<Edge,Double>();
 //	Collection<Location> locations;
 
-	public GeoStatistics(PopulationImpl plans, SocialNetwork snet) {
+	public GeoStatistics(Population plans, SocialNetwork snet) {
 
 		this.plans=plans;
 		this.snet=snet;
@@ -48,10 +47,8 @@ public class GeoStatistics {
 	public Graph makeJungGraph() {
 		// TODO fix
 		Graph g = new UndirectedSparseGraph();
-		Iterator<PersonImpl> iperson = this.plans.getPersons().values().iterator();
-		while (iperson.hasNext()) {
+		for (Person aPerson : this.plans.getPersons().values()) {
 			Vertex v;
-			PersonImpl aPerson = iperson.next();
 //			Choose the first location in the plan and assume it's where the person lives
 
 			ActivityFacility aHome = ((PlanImpl) aPerson.getSelectedPlan()).getFirstActivity().getFacility();

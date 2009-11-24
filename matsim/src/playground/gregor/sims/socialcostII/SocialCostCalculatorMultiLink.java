@@ -9,7 +9,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -24,9 +26,7 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -41,7 +41,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 	private final NetworkLayer network;
 	private final int binSize;
 	private final TravelTimeCalculator travelTimeCalculator;
-	private final PopulationImpl population;
+	private final Population population;
 	
 	private Integer maxK;
 	private final int minK;
@@ -55,7 +55,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 
 	private final static int MSA_OFFSET = 0;
 	
-	public SocialCostCalculatorMultiLink(NetworkLayer network, int binSize, TravelTimeCalculator travelTimeCalculator, PopulationImpl population) {
+	public SocialCostCalculatorMultiLink(NetworkLayer network, int binSize, TravelTimeCalculator travelTimeCalculator, Population population) {
 		this.network = network;
 		this.binSize = binSize;
 		this.minK = (int)(3 * 3600 / (double)binSize); //just a HACK needs to be fixed
@@ -90,7 +90,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 	}
 
 	private void recalculateSocialCosts() {
-		for (PersonImpl pers : this.population.getPersons().values()) {
+		for (Person pers : this.population.getPersons().values()) {
 			if ( this.stuckedAgents.contains(pers.getId())) {
 				continue;
 			}
@@ -164,7 +164,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 	}
 
 	private void scorePlans() {
-		for (PersonImpl pers : this.population.getPersons().values()) {
+		for (Person pers : this.population.getPersons().values()) {
 			if ( this.stuckedAgents.contains(pers.getId())) {
 				continue;
 			}

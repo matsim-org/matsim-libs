@@ -32,13 +32,13 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -49,7 +49,7 @@ public class Wardrop {
 	
 	//protected NetworkLayer network;
 	protected NetworkLayer network;
-	protected PopulationImpl population;
+	protected Population population;
 	
 	protected WardropZones wardropZones;
 	protected ActTimesCollector actTimesCollector;
@@ -67,7 +67,7 @@ public class Wardrop {
 	double endTime = 3600*36; // [sec]
 	double minCellDistance = 30000.0; // [m]
 	
-	public Wardrop(NetworkLayer network, PopulationImpl population)
+	public Wardrop(NetworkLayer network, Population population)
 	{
 		this.network = network;
 		this.population = population;
@@ -145,7 +145,7 @@ public class Wardrop {
 	
 	public void fillMatrixFromPlans()
 	{		
-		for (PersonImpl person : population.getPersons().values()) 
+		for (Person person : population.getPersons().values()) 
 		{
 			Plan plan = person.getSelectedPlan();
 			
@@ -232,7 +232,7 @@ public class Wardrop {
 		
 		if (actTimesCollector != null)
 		{
-			for(PersonImpl person:this.population.getPersons().values())
+			for(Person person:this.population.getPersons().values())
 			{
 				Id id = person.getId();
 				ArrayList<Double> startTimes = (ArrayList<Double>) actTimesCollector.getStartTimes(id);
@@ -545,7 +545,7 @@ public class Wardrop {
 		int legCounter = 0;
 		int PersonCounter = 0;
 		
-		for (PersonImpl person : population.getPersons().values()) 
+		for (Person person : population.getPersons().values()) 
 		{
 			Plan plan = person.getSelectedPlan();
 						

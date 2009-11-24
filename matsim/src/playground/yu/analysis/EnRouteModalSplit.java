@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentEvent;
@@ -81,7 +82,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 	protected double[] othersDep = null, othersArr = null, othersStuck = null,
 			othersEnRoute = null;
 
-	protected final PopulationImpl plans;
+	protected final Population plans;
 
 	protected RoadPricingScheme toll = null;
 
@@ -95,7 +96,7 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 	 *            The number of time bins for this analysis.
 	 */
 	public EnRouteModalSplit(String scenario, final int binSize,
-			final int nofBins, PopulationImpl plans) {
+			final int nofBins, Population plans) {
 		super();
 		this.scenario = scenario;
 		this.binSize = binSize;
@@ -139,15 +140,15 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 	 *            The size of a time bin in seconds.
 	 */
 	public EnRouteModalSplit(String scenario, final int binSize,
-			PopulationImpl plans) {
+			Population plans) {
 		this(scenario, binSize, 30 * 3600 / binSize + 1, plans);
 	}
 
-	public EnRouteModalSplit(String scenario, PopulationImpl plans) {
+	public EnRouteModalSplit(String scenario, Population plans) {
 		this(scenario, 300, plans);
 	}
 
-	public EnRouteModalSplit(String scenario, PopulationImpl ppl,
+	public EnRouteModalSplit(String scenario, Population ppl,
 			RoadPricingScheme toll) {
 		this(scenario, ppl);
 		this.toll = toll;

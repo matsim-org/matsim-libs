@@ -26,15 +26,15 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -42,7 +42,7 @@ public class ItsumoSim extends ExternalMobsim {
 
 	protected static final String CONFIG_MODULE = "itsumo";
 
-	public ItsumoSim(final PopulationImpl population, final EventsManagerImpl events) {
+	public ItsumoSim(final Population population, final EventsManagerImpl events) {
 		super(population, events);
 		System.out.println("\n##################################################################################################\n" +
 				"#   REMINDER - Header in writeItsumoConfig has to be changed\n" +
@@ -94,7 +94,7 @@ public class ItsumoSim extends ExternalMobsim {
 
 			out.write(" <drivers>"); out.newLine();
 
-			for (PersonImpl person : this.population.getPersons().values()) {
+			for (Person person : this.population.getPersons().values()) {
 
 				out.write("  <driver>"); out.newLine();
 

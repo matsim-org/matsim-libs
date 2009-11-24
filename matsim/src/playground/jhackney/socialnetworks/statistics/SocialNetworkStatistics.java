@@ -36,6 +36,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -160,7 +161,7 @@ public class SocialNetworkStatistics {
 		}
 	}
 
-	public void calculate(int iteration, SocialNetwork snet, PopulationImpl plans, Knowledges knowledges) {
+	public void calculate(int iteration, SocialNetwork snet, Population plans, Knowledges knowledges) {
 		// First instantiate the JUNG-compatible graph structure
 		if (snet.isUNDIRECTED()) {
 			this.g = new UndirectedSparseGraph();
@@ -347,7 +348,7 @@ public class SocialNetworkStatistics {
 		return 2. * g.numEdges() / g.numVertices();
 	}
 
-	private void runPersonStatistics(int iter, PopulationImpl plans, SocialNetwork snet, Knowledges knowledges) {
+	private void runPersonStatistics(int iter, Population plans, SocialNetwork snet, Knowledges knowledges) {
 
 		double clusteringRatio = 0.;
 		double clusterCoef = 0.;
@@ -367,7 +368,7 @@ public class SocialNetworkStatistics {
 		while (ivert.hasNext()) {
 
 			Vertex myVert = ivert.next();
-			PersonImpl myPerson = plans.getPersons().get((Id) myVert.getUserDatum("personId"));
+			Person myPerson = plans.getPersons().get((Id) myVert.getUserDatum("personId"));
 			int id = Integer.parseInt(myVert.getUserDatum("personId").toString());
 			// Agent's Home Location ID
 			ActivityImpl myAct = (ActivityImpl) myPerson.getSelectedPlan().getPlanElements().get(0);
@@ -497,10 +498,10 @@ public class SocialNetworkStatistics {
 	 * @param snet
 	 * @param plans
 	 */
-	void fillGraph(Graph g, SocialNetwork snet, PopulationImpl plans) {
+	void fillGraph(Graph g, SocialNetwork snet, Population plans) {
 		Vertex v;
 		Edge e;
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person p : plans.getPersons().values()) {
 			if (snet.isUNDIRECTED()) {
 				v = new UndirectedSparseVertex();
 			}

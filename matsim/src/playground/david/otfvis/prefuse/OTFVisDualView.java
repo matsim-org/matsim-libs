@@ -1,38 +1,15 @@
 package playground.david.otfvis.prefuse;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.Point2D.Double;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.rmi.RemoteException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
@@ -44,11 +21,9 @@ import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
-import org.matsim.vis.otfvis.opengl.layer.ColoredStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
@@ -120,7 +95,7 @@ public class OTFVisDualView extends OnTheFlyClientFileQuad{
 	                			Object ref = parent.get("ref");
 	                    		if(ref == null){
 		                        	int id = Integer.parseInt(ids);
-	        						PersonImpl p = tree.getPop().getPerson(id);
+	        						Person p = tree.getPop().getPerson(id);
 	        						parent.set("ref", p);
 	        						ref = p;
 	                    		}

@@ -27,6 +27,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
@@ -47,7 +48,7 @@ public class ExternalMobsim {
 	private static final String CONFIG_MODULE = "simulation";
 
 	protected EventsManagerImpl events;
-	protected PopulationImpl population;
+	protected Population population;
 
 	protected String plansFileName = null;
 	protected String eventsFileName = null;
@@ -57,7 +58,7 @@ public class ExternalMobsim {
 
 	private static final Logger log = Logger.getLogger(ExternalMobsim.class);
 
-	public ExternalMobsim(final PopulationImpl population, final EventsManagerImpl events) {
+	public ExternalMobsim(final Population population, final EventsManagerImpl events) {
 		this.population = population;
 		this.events = events;
 		init();

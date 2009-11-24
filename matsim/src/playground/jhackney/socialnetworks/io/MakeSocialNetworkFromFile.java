@@ -4,10 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 
 import org.apache.log4j.Logger;
-
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
 import playground.jhackney.socialnetworks.socialnet.SocialNetEdge;
@@ -18,11 +17,11 @@ import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 
 public class MakeSocialNetworkFromFile {
 
-	private PopulationImpl plans;
+	private Population plans;
 	private SocialNetwork snet;
 	private final Logger log = Logger.getLogger(MakeSocialNetworkFromFile.class);
 
-	public MakeSocialNetworkFromFile(SocialNetwork snet, PopulationImpl plans){
+	public MakeSocialNetworkFromFile(SocialNetwork snet, Population plans){
 		// initialize a new SocialNetwork -- uses config params
 		this.plans=plans;
 		this.snet=snet;
@@ -65,8 +64,8 @@ public class MakeSocialNetworkFromFile {
 
 					if(iterToLoad == iter){
 						//fill the social network
-						PersonImpl person1 = plans.getPersons().get(new IdImpl(egoId));
-						PersonImpl person2 = plans.getPersons().get(new IdImpl(alterId));
+						Person person1 = plans.getPersons().get(new IdImpl(egoId));
+						Person person2 = plans.getPersons().get(new IdImpl(alterId));
 						snet.makeSocialContact(person1, person2, 0, purpose);
 						SocialNetEdge thisEdge = ((EgoNet)person1.getCustomAttributes().get(EgoNet.NAME)).getEgoLink(person2);
 						thisEdge.setNumberOfTimesMet(timesmet);

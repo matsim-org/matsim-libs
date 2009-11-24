@@ -36,6 +36,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
@@ -48,7 +49,6 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -211,7 +211,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 			int iter = controler.getIteration();
 			this.rs.write(this.retailers);
 			
-			for (PersonImpl p : controler.getPopulation().getPersons().values()) {
+			for (Person p : controler.getPopulation().getPersons().values()) {
 				pst.run(p,iter);
 				//for (Plan plan : p.getPlans()) {
 				Plan plan = p.getSelectedPlan();
@@ -244,7 +244,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		}
 	}	
 	
-	private final QuadTree<PersonImpl> createPersonQuadTree(Controler controler) {
+	private final QuadTree<Person> createPersonQuadTree(Controler controler) {
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -259,8 +259,8 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 
 		log.info("minx = " + minx + "; miny = " + miny + "; maxx = " + maxx + "; maxy =" + maxy );
-		QuadTree<PersonImpl> personQuadTree = new QuadTree<PersonImpl>(minx, miny, maxx, maxy);
-		for (PersonImpl p : controler.getPopulation().getPersons().values()) {
+		QuadTree<Person> personQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
+		for (Person p : controler.getPopulation().getPersons().values()) {
 			Coord c = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getFacility().getCoord();
 			personQuadTree.put(c.getX(),c.getY(),p);
 		}

@@ -65,7 +65,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -193,7 +192,7 @@ public class Controller extends Controler {
 			links.add(network.getLink("5"));
 			route.setLinks(route.getStartLink(), links, route.getEndLink());
 			
-			for(PersonImpl p : event.getControler().getPopulation().getPersons().values()) {
+			for(Person p : event.getControler().getPopulation().getPersons().values()) {
 				if(random.nextDouble() <= proba) {
 					Plan plan = p.getSelectedPlan();
 					((LegImpl)plan.getPlanElements().get(1)).setRoute(route);
