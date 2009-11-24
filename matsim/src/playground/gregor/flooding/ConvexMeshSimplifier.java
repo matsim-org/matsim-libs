@@ -587,7 +587,7 @@ public class ConvexMeshSimplifier {
 	}
 
 
-	private static class Edge {
+	public static class Edge {
 		int from;
 		int to;
 		int hash;

@@ -26,6 +26,7 @@ import org.matsim.evacuation.otfvis.readerwriter.InundationData.Triangle;
 
 import playground.gregor.MY_STATIC_STUFF;
 import playground.gregor.flooding.ConvexMeshSimplifier;
+import playground.gregor.flooding.TriangularMeshSimplifier;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -92,7 +93,7 @@ public class InundationDataFromNetcdfReaderII {
 	}
 
 	private void init() {
-		this.inundationData.powerLookUp = new double[4];
+		this.inundationData.powerLookUp = new double[3];
 
 		double z = 1;
 		for (int i = 0; i < this.inundationData.powerLookUp.length; i++) {
@@ -105,10 +106,11 @@ public class InundationDataFromNetcdfReaderII {
 
 
 		this.inundationData.floodingData.put(this.inundationData.powerLookUp[0], triangles);
+//		this.inundationData.floodingData.put(this.inundationData.powerLookUp[1], triangles);
 		for (int i = 1; i < this.inundationData.powerLookUp.length; i++) {
 			//			QuadTree<InundationGeometry> tmp = scaleTriangles(triangles,mapping);
 			QuadTree<InundationGeometry> tmp =  scaleGeometries(triangles,mapping);
-			tmp =  scaleGeometries(tmp,mapping);
+//			tmp =  scaleGeometries(tmp,mapping);
 			//			tmp =  scaleTriangles(tmp,mapping);
 			//			tmp =  scaleTriangles(tmp,mapping);
 			double zoom = this.inundationData.powerLookUp[i];
@@ -185,8 +187,9 @@ public class InundationDataFromNetcdfReaderII {
 		for (int i = 0; i < MY_STATIC_STUFF.SWW_COUNT; i++) {
 			String file = MY_STATIC_STUFF.SWW_ROOT + "/" + MY_STATIC_STUFF.SWW_PREFIX + i + MY_STATIC_STUFF.SWW_SUFFIX;
 //			BasicInundationGeometryLoader reader = new BasicInundationGeometryLoader(file);
-			ConvexMeshSimplifier reader = new ConvexMeshSimplifier(file);//,aoi);
-			ArrayList<List<FloodingInfo>> fgis = reader.getInundationGeometries();
+//			ConvexMeshSimplifier reader = new ConvexMeshSimplifier(file);//,aoi);
+			TriangularMeshSimplifier reader = new TriangularMeshSimplifier(file);
+			List<List<FloodingInfo>> fgis = reader.getInundationGeometries();
 			reader = null;
 
 			Queue<List<FloodingInfo>> queue = new ConcurrentLinkedQueue<List<FloodingInfo>>();
@@ -403,7 +406,7 @@ public class InundationDataFromNetcdfReaderII {
 		for (d = 0.05; d < 0.5; d += 0.01) {
 			double w1 = 1- (0.5 - d) / 0.45;
 			double w2 = 1 - w1;
-			colorTree.put(d, new float [] {(float) (clow[0] * w1 + cvlow[0]* w2),(float) (clow[1] * w1 + cvlow[1]* w2),(float) (clow[2] * w1 + cvlow[2]* w2),(float) w1});
+			colorTree.put(d, new float [] {(float) (clow[0] * w1 + cvlow[0]* w2),(float) (clow[1] * w1 + cvlow[1]* w2),(float) (clow[2] * w1 + cvlow[2]* w2),(float) (d+0.5)});
 		}
 		for (d = 0.5; d < 4; d += .05) {
 			double w1 = (d - 0.2) / 3.8;
