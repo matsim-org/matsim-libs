@@ -14,6 +14,7 @@ import playground.meisterk.kti.controler.listeners.LegDistanceDistributionWriter
 import playground.meisterk.kti.controler.listeners.ScoreElements;
 import playground.meisterk.kti.router.KtiNodeNetworkRouteFactory;
 import playground.meisterk.kti.router.KtiPtRouteFactory;
+import playground.meisterk.kti.router.KtiTravelCostCalculatorFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
@@ -60,6 +61,9 @@ public class KTIControler extends Controler {
 				this.getFacilityPenalties());
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
+		KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
+		this.setTravelCostCalculatorFactory(costCalculatorFactory);
+		
 		super.setUp();
 	}
 
