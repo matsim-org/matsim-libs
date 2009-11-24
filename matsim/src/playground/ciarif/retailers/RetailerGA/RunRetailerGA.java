@@ -27,10 +27,11 @@ public class RunRetailerGA
 		initialSolution.add(i);
 	}
     int genomeLength = initialSolution.size();
-    int populationSize = 10;
-    int numberOfGenerations = 10;
+    int populationSize = 20;
+    int numberOfGenerations = 40;
     double elites = 0.1;
-    double mutants = 0.05;
+    //default: double mutants = 0.05;
+    double mutants = 0.1;
 
     int crossoverType = 3;
     ArrayList<ArrayList<Double>> solutionProgress = new ArrayList<ArrayList<Double>>(numberOfGenerations);
