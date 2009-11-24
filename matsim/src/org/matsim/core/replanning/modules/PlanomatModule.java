@@ -20,9 +20,9 @@
 
 package org.matsim.core.replanning.modules;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelCost;
@@ -52,7 +52,7 @@ public class PlanomatModule extends AbstractMultithreadedModule {
 
 	public PlanomatModule(
 			Controler controler, 
-			EventsManagerImpl events, 
+			EventsManager events, 
 			NetworkLayer network,
 			ScoringFunctionFactory scoringFunctionFactory,
 			TravelCost travelCost, 

@@ -22,8 +22,8 @@ package playground.kai.usecases.mentalmodule;
  * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
  */
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -40,7 +40,7 @@ public class MyStrategy extends PlanStrategy {
 		
 		addStrategyModule(mod) ;
 		
-		EventsManagerImpl events = controler.getEvents() ;
+		EventsManager events = controler.getEvents() ;
 		events.addHandler( mod ) ;
 		
 	}

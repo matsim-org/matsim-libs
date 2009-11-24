@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
@@ -92,7 +93,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 * @param time the current time the generated events are associated with
 	 * @param events the {@link EventsManagerImpl} collection, the generated events are sent to for processing
 	 */
-	public void sendUtilityEvents(final double time, final EventsManagerImpl events) {
+	public void sendUtilityEvents(final double time, final EventsManager events) {
 		for (Map.Entry<Id, AgentInfo> entries : this.agents.entrySet()) {
 			events.processEvent(new AgentMoneyEventImpl(time, entries.getKey(), -entries.getValue().toll));
 		}

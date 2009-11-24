@@ -1,7 +1,7 @@
 package playground.wrashid.PHEV.Utility;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 
@@ -23,7 +23,7 @@ class DESController extends Controler {
 		t.startTimer();
 		final DESController controler = new DESController(args);
 		controler.setOverwriteFiles(true);
-		EventsManagerImpl events=controler.getEvents();
+		EventsManager events=controler.getEvents();
 		
 		
 		ElectricCostHandler ecHandler=new ElectricCostHandler(controler,getEnergyConsumptionSamples(),events,"0");

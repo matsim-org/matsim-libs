@@ -28,6 +28,7 @@ import java.util.UUID;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
@@ -146,7 +147,7 @@ QueueSimulationAfterSimStepListener {
 	private QueueNetwork queueNetwork;
 	protected OnTheFlyServer myOTFServer;
 	private Population population;
-	private EventsManagerImpl events;
+	private EventsManager events;
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Controler cont = event.getControler();

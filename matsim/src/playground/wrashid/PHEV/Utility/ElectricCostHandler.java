@@ -8,16 +8,16 @@ import java.util.HashMap;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.PersonEvent;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.LinkImpl;
 
 //TODO: write tests for this class
@@ -33,7 +33,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 	private final double penaltyForRunningOutOfElectricEnergy = -100000000;
 	private MobSimController controler = null;
 	private EnergyConsumptionSamples energyConsumptionSamples = null;
-	private EventsManagerImpl events = null;
+	private EventsManager events = null;
 
 	// application specific
 	private double averageTimeSpentAtWork = 0;
@@ -75,7 +75,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 
 	// observedVehicleId: if not null, the SOC of this vehicle is recorded
 	public ElectricCostHandler(MobSimController controler,
-			EnergyConsumptionSamples energyConsumptionSamples, EventsManagerImpl events,
+			EnergyConsumptionSamples energyConsumptionSamples, EventsManager events,
 			String observedVehicleId) {
 		this.controler = controler;
 		this.energyConsumptionSamples = energyConsumptionSamples;
@@ -88,7 +88,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 	}
 
 	public ElectricCostHandler(DESController controler2,
-			EnergyConsumptionSamples energyConsumptionSamples2, EventsManagerImpl events2,
+			EnergyConsumptionSamples energyConsumptionSamples2, EventsManager events2,
 			String observedVehicleId) {
 		this.controler2 = controler2;
 		this.energyConsumptionSamples = energyConsumptionSamples2;
