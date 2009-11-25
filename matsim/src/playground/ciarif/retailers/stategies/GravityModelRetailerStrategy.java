@@ -9,13 +9,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.ciarif.retailers.RetailerGA.RunRetailerGA;
 import playground.ciarif.retailers.data.Consumer;
@@ -28,16 +26,14 @@ import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
 public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO check the arguments that are passed from this class to 
-	//the GravityModel class, in particular if it is really necessary to pass the controler. 
-
-	//TODO have a look to variables here, it shouldn't happen that fields here are the same as in the GravityModel class
+	//the GravityModel class, in particular if it is really necessary to pass the controler. Have also a look to variables here, it shouldn't happen that fields here are the same as in the GravityModel class
 	public static final String NAME = "gravityModelRetailerStrategy";
 	private final static Logger log = Logger.getLogger(GravityModelRetailerStrategy.class);
 	private Controler controler;
-	private Map<Id,ActivityFacility> shops;
+	private Map<Id,ActivityFacilityImpl> shops;
 	private RetailZones retailZones;
-	private Map<Id, ActivityFacility> retailerFacilities;
-	private Map<Id, ActivityFacility> movedFacilities = new TreeMap<Id, ActivityFacility>();
+	private Map<Id, ActivityFacilityImpl> retailerFacilities;
+	private Map<Id, ActivityFacilityImpl> movedFacilities = new TreeMap<Id, ActivityFacilityImpl>();
 
 	public GravityModelRetailerStrategy(Controler controler) { //TODO think better if it is necessary to give to all strategies the controler
 		
@@ -48,9 +44,9 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		
 		TreeMap<Integer,String> locations = new TreeMap<Integer,String> ();
 		int intCount=0;
-		for (ActivityFacility af:retailerFacilities.values()){
+		for (ActivityFacilityImpl af:retailerFacilities.values()){
 			
-			locations.put(intCount,af.getLinkId().toString());
+			locations.put(intCount,af.getLink().getId().toString());
 			intCount = intCount+1;
 			//log.info("The facility with Id: " + integer + " has been added");
 		}
@@ -84,10 +80,10 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		for (Consumer c:consumers) {
 			int consumer_index = Integer.parseInt(c.getId().toString());
 	    	int zone_index = Integer.parseInt(c.getRzId().toString());
-	    	ActivityFacility af = c.getShoppingFacility();
+	    	ActivityFacilityImpl af = (ActivityFacilityImpl)c.getShoppingFacility();
     		double prob= prob_zone_shop.get(zone_index,shops_keys.get(af.getId()));
     		regressand_matrix.set(consumer_index, Math.log(prob/prob_zone_shop.viewRow(zone_index).zSum()));
-    		double dist1 = (af.getActivityOptions().get("shop").getFacility().calcDistance(((PlanImpl) c.getPerson().getSelectedPlan()).getFirstActivity().getCoord()));
+    		double dist1 = (af.calcDistance(((PlanImpl) c.getPerson().getSelectedPlan()).getFirstActivity().getCoord()));
 	        if (dist1 == 0.0D) {
 	          dist1 = 10.0D;
 	          cases = cases+1;
@@ -96,8 +92,8 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 	        double sumDim = 0;
 	        double dist2 = 0;
 	        double dim = 0;
-    		for (ActivityFacility aaff:this.shops.values()) {
-    			dist2 = CoordUtils.calcDistance(aaff.getCoord(), ((PlanImpl) c.getPerson().getSelectedPlan()).getFirstActivity().getCoord());
+    		for (ActivityFacilityImpl aaff:this.shops.values()) {
+    			dist2 = aaff.calcDistance(((PlanImpl) c.getPerson().getSelectedPlan()).getFirstActivity().getCoord());
     			sumDist = sumDist + dist2;
     			dim = aaff.getActivityOptions().get("shop").getCapacity().doubleValue();
     			sumDim = sumDim + dim;
@@ -120,14 +116,15 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 	    return b;
 	  }
 
-	public Map<Id, ActivityFacility> getMovedFacilities() {
+	public Map<Id, ActivityFacilityImpl> getMovedFacilities() {
 		log.info("moved Facilities are: " + movedFacilities);
 		return this.movedFacilities;		
 	}
 
-	
-	public Map<Id, ActivityFacility> moveFacilities(Map<Id, ActivityFacility> retailerFacilities, Map<Id,LinkRetailersImpl> freeLinks) {
-		
+	public Map<Id, ActivityFacilityImpl> moveFacilities(
+			Map<Id, ActivityFacilityImpl> retailerFacilities,
+			TreeMap<Id, LinkRetailersImpl> freeLinks) {
+		// TODO Auto-generated method stub
 		this.retailerFacilities = retailerFacilities;
 		GravityModel gm = new GravityModel(this.controler, retailerFacilities); 
 		gm.init();
@@ -139,7 +136,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		int consumer_count=0;
 		int j=0;
 		log.info("This scenario has " + shops.size() +" shops");
-		for (ActivityFacility f:this.shops.values()) { 
+		for (ActivityFacilityImpl f:this.shops.values()) { 
 			shops_keys.put(f.getId(),j);
 			
 			// gets the average probability of a person from a given zone going to a given shop 
@@ -186,28 +183,32 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		ArrayList<Integer> solution = rrGA.runGA(first.size(),gm);		
 		log.info("The optimized solution is: " + solution);
 		int count=0;
-		for (ActivityFacility af : this.retailerFacilities.values()) {
-			if (first.get(solution.get(count)) != (af.getLinkId().toString())) {
-				Utils.moveFacility((ActivityFacilityImpl) af,controler.getNetwork().getLink(first.get(solution.get(count))),this.controler.getWorld());
+		for (ActivityFacilityImpl af:this.retailerFacilities.values()) {
+			if (first.get(solution.get(count)) != (af.getLink().getId().toString())) {
+				Utils.moveFacility(af,controler.getNetwork().getLink(first.get(solution.get(count))),this.controler.getWorld());
 				log.info("The facility " + af.getId() + " has been moved");
 				this.movedFacilities.put(af.getId(), af);
-				log.info("Link Id after = "+ af.getLinkId());
+				log.info("Link Id after = "+ af.getLink().getId());
 				count=count+1;
 				log.info("Count= " + count);
 			}
 		}
 		return movedFacilities;
 	}
+	
+	
 
-	private TreeMap<Id,LinkRetailersImpl> mergeLinks(Map<Id,LinkRetailersImpl> freeLinks) {
+	private TreeMap<Id,LinkRetailersImpl> mergeLinks(TreeMap<Id,LinkRetailersImpl> freeLinks) {
 		
 		TreeMap<Id,LinkRetailersImpl> availableLinks = new TreeMap<Id,LinkRetailersImpl>();
-		for (ActivityFacility af: this.retailerFacilities.values()){
-			Id id = af.getLinkId();
+		for (ActivityFacilityImpl af: this.retailerFacilities.values()){
+			Id id = af.getLink().getId();
 			LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLink(id),controler.getNetwork());
 			availableLinks.put(link.getId(),link);
 		}
 		availableLinks.putAll(freeLinks);
 		return availableLinks;
 	}
+
+	
 }
