@@ -22,15 +22,16 @@ public class EmptyCarLegTest extends TestHandlerDetailedEventChecker {
 	}
 	
 	public void checkAssertions(final PopulationImpl population) {
+		boolean wasInLoop=false;
+		
 		for (LinkedList<PersonEvent> list : events.values()) {
+			wasInLoop=true;
 			assertTrue(list.get(0) instanceof ActivityEndEventImpl);
-			
 			assertTrue(list.get(1) instanceof AgentDepartureEventImpl);
-			
 			assertTrue(list.get(2) instanceof AgentArrivalEventImpl);
-			
 			assertTrue(list.get(3) instanceof ActivityStartEventImpl);
 		}
+		assertTrue(wasInLoop);
 	}
 	
 }

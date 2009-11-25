@@ -32,6 +32,7 @@ public class AllTests {
 		
 		suite.addTestSuite(EmptyCarLegTest.class);
 		suite.addTestSuite(NonCarLegTest.class);
+		suite.addTestSuite(EquilPlans1Test.class);
 		
 		
 		suite.addTestSuite(TestDESStarter_EquilPopulationPlans1Modified1.class);
