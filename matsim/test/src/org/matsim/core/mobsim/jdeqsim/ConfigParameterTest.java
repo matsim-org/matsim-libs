@@ -7,6 +7,8 @@ import org.matsim.testcases.MatsimTestCase;
 public class ConfigParameterTest extends MatsimTestCase {
 
 	public void testParametersSetCorrectly() {
+		
+		
 		Config config = super.loadConfig(this.getPackageInputDirectory() + "config.xml");
 //		config.controler().setLastIteration(-1); // we don't really want to run the simulation
 		Controler controler = new Controler(config);

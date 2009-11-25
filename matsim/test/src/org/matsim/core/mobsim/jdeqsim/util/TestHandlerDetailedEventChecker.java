@@ -76,14 +76,18 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					act = (ActivityImpl) pe;
-					
+
 					if (leg != null) {
 						// each leg ends with enter on act link
-						assertTrue(list.get(index) instanceof LinkEnterEventImpl);
-						assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-								((LinkEnterEventImpl) list.get(index)).getLinkId().toString()));
-						index++;
-						
+						// => only for non empty car legs and non-cars legs this
+						// statement is true
+						if (leg.getMode().equals(TransportMode.car) && ((NetworkRouteWRefs) leg.getRoute()).getLinks().size() > 0) {
+							assertTrue(list.get(index) instanceof LinkEnterEventImpl);
+							assertTrue(act.getLinkId().toString().equalsIgnoreCase(
+									((LinkEnterEventImpl) list.get(index)).getLinkId().toString()));
+							index++;
+						}
+
 						// each leg ends with arrival on act link
 						assertTrue(list.get(index) instanceof AgentArrivalEventImpl);
 						assertTrue(act.getLinkId().toString().equalsIgnoreCase(
@@ -102,45 +106,45 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 					assertTrue(list.get(index) instanceof ActivityEndEventImpl);
 					assertEquals(act.getLinkId(), ((ActivityEndEventImpl) list.get(index)).getLinkId());
 					index++;
-					
+
 					// each leg starts with departure on act link
 					assertTrue(list.get(index) instanceof AgentDepartureEventImpl);
 					assertTrue(act.getLinkId().toString().equalsIgnoreCase(
 							((AgentDepartureEventImpl) list.get(index)).getLinkId().toString()));
 					index++;
-					
+
 					// each CAR leg must enter/leave act link
 					if (leg.getMode().equals(TransportMode.car)) {
 
-						
-						// if car leg contains empty route, then this check is not applicable
+						// if car leg contains empty route, then this check is
+						// not applicable
 						if (((NetworkRouteWRefs) leg.getRoute()).getLinks().size() > 0) {
-						// the first LinkEnterEvent is a AgentWait2LinkEvent
-						assertTrue(list.get(index) instanceof AgentWait2LinkEventImpl);
-						assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-								((AgentWait2LinkEventImpl) list.get(index)).getLinkId().toString()));
-						index++;
-						
-						assertTrue(list.get(index) instanceof LinkLeaveEventImpl);
-						assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-								((LinkLeaveEventImpl) list.get(index)).getLinkId().toString()));
-						index++;
+							// the first LinkEnterEvent is a AgentWait2LinkEvent
+							assertTrue(list.get(index) instanceof AgentWait2LinkEventImpl);
+							assertTrue(act.getLinkId().toString().equalsIgnoreCase(
+									((AgentWait2LinkEventImpl) list.get(index)).getLinkId().toString()));
+							index++;
+
+							assertTrue(list.get(index) instanceof LinkLeaveEventImpl);
+							assertTrue(act.getLinkId().toString().equalsIgnoreCase(
+									((LinkLeaveEventImpl) list.get(index)).getLinkId().toString()));
+							index++;
 						}
-						
+
 						for (Link link : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
 							// enter link and leave each link on route
 							assertTrue(list.get(index) instanceof LinkEnterEventImpl);
 							assertTrue(link.getId().toString().equalsIgnoreCase(
 									((LinkEnterEventImpl) list.get(index)).getLinkId().toString()));
 							index++;
-							
+
 							assertTrue(list.get(index) instanceof LinkLeaveEventImpl);
 							assertTrue(link.getId().toString().equalsIgnoreCase(
 									((LinkLeaveEventImpl) list.get(index)).getLinkId().toString()));
 							index++;
 						}
 					}
-					
+
 				}
 			}
 		}

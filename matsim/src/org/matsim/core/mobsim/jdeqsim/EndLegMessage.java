@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.List;
 
+import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.ActivityStartEventImpl;
@@ -102,10 +103,12 @@ public class EndLegMessage extends EventMessage {
 		EventImpl event = null;
 
 		// schedule enter link event
-		event = new LinkEnterEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson(), vehicle.getCurrentLink());
+		// only, if car leg and is not empty
+		if (vehicle.getCurrentLeg().getMode().equals(TransportMode.car) && (vehicle.getCurrentLinkRoute()!=null && vehicle.getCurrentLinkRoute().length!=0)){
+			event = new LinkEnterEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson(), vehicle.getCurrentLink());
 
-		SimulationParameters.getProcessEventThread().processEvent(event);
-		
+			SimulationParameters.getProcessEventThread().processEvent(event);
+		}
 		
 		// schedule AgentArrivalEvent
 		event = new AgentArrivalEventImpl(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson(), this.vehicle.getCurrentLink(), this.vehicle.getCurrentLeg());
