@@ -83,8 +83,9 @@ public class BasicTests extends MatsimTestCase {
 		assertEquals(2, chargingTimesOfAgentOne.getChargingTimes().size());
 		
 		// check, if charging events are written out
-		File outputChargingLog= new File(ParametersPSF.getMainChargingTimesOutputFilePath());
-		assertTrue("output charging log does not exist. expected at " + outputChargingLog.getPath(), outputChargingLog.exists());
+		// the charging log output is not performed anymore during the tests.
+		//File outputChargingLog= new File(ParametersPSF.getMainChargingTimesOutputFilePath());
+		//assertTrue("output charging log does not exist. expected at " + outputChargingLog.getPath(), outputChargingLog.exists());
 	}
 	 
 	
@@ -124,7 +125,7 @@ public class BasicTests extends MatsimTestCase {
 		// allow small delta of one second (because the output time in the log
 		// file is truncated
 		// check the time of the entrance of the last link
-		assertEquals(61459, energyConsumption.getTempEnteranceTimeOfLastLink(),  1);
+		assertEquals(61389, energyConsumption.getTempEnteranceTimeOfLastLink(),  1);
 		LinkEnergyConsumptionLog energyLog = energyConsumption.getLinkEnergyConsumption().get(0);
 		assertEquals(21670, energyLog.getEnterTime(),  1);
 		assertEquals(22029,  energyLog.getLeaveTime(),1);
