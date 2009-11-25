@@ -27,8 +27,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -63,7 +63,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 
 	private final HashMap<PersonImpl, DriverAgent> agents = new HashMap<PersonImpl, DriverAgent>(100);
 
-	public TransitQueueSimulation(final ScenarioImpl scenario, final EventsManagerImpl events) {
+	public TransitQueueSimulation(final ScenarioImpl scenario, final EventsManager events) {
 		super(scenario, events);
 
 		this.schedule = scenario.getTransitSchedule();

@@ -58,8 +58,7 @@ import playground.david.otfvis.prefuse.OTFVisDualView;
 public class ExeViaListener {
 	public static class SimCanceledException extends RuntimeException{
 		
-	};
-	
+	}
 
 	public static class ResetableMobsimControler extends Controler{
 		protected boolean useResetable = true;

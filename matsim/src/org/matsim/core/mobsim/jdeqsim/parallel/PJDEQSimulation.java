@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.jdeqsim.Road;
@@ -45,14 +45,14 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /*
  * Some first performance experiments:
- * (100% Z�rich, on home compi)
+ * (100% Zürich, on home compi)
  * - parallel JDEQSim (optimal division - manual): 147.7sec / 130.5sec.
  * - JDEQSim: 181.4sec.
  * - parallel JDEQSim (without optimal devision): 153.2 sec./ 136.3 sec. (not yet optimal, as not fifty fifty devision of events).
  * - parallel JDEQSim (optimal division - manual), maxTimeDelta=600: 126.2sec / 109sec. 
  * - parallel JDEQSim (optimal division - manual), maxTimeDelta=100000: 121sec / 104sec.
  * 
- * (10% Z�rich, on home compi)
+ * (10% Zürich, on home compi)
  * - parallel JDEQSim (optimal division - manual): 19.4 sec. / 17.1 sec.
  * - JDEQSim: 25sec.
  * - parallel JDEQSim (without optimal devision): 21.9 sec. / 19.490 sec.
@@ -66,7 +66,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 	private int numOfThreads;
 
 	public PJDEQSimulation(NetworkLayer network, Population population,
-			EventsManagerImpl events, int numOfThreads) {
+			EventsManager events, int numOfThreads) {
 		super(network, population, events);
 		this.numOfThreads = numOfThreads; // TODO: use this number really...
 		log = Logger.getLogger(JDEQSimulation.class);

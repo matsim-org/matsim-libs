@@ -26,6 +26,7 @@ import java.io.IOException;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -34,10 +35,10 @@ import org.matsim.core.utils.misc.StringUtils;
 public class EventsReaderTXTv1 implements MatsimSomeReader {
 
 	private BufferedReader infile = null;
-	protected EventsManagerImpl events;
+	private final EventsManager events;
 	private EventsFactory builder;
 
-	public EventsReaderTXTv1(final EventsManagerImpl events) {
+	public EventsReaderTXTv1(final EventsManager events) {
 		super();
 		this.events = events;
 		this.builder = events.getFactory();
@@ -64,8 +65,8 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 
 	}
 
-	 public Event createEvent(final EventsManagerImpl events, final double time, final Id agentId,
-			final Id linkId, final int flag, final String desc, final String acttype) {
+	 public Event createEvent(final double time, final Id agentId, final Id linkId,
+			final int flag, final String desc, final String acttype) {
 		 Event data = null;
 
 		switch (flag) {
@@ -115,12 +116,12 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 	protected void parseLine(final String line) {
 		String[] result = StringUtils.explode(line, '\t', 7);
 		if (result.length == 7) {
-			Event data = createEvent(this.events, Double.parseDouble(result[0]),	// time
-					new IdImpl(result[1]),		// vehID
-					new IdImpl(result[3]),		// linkID
+			Event data = createEvent(Double.parseDouble(result[0]), new IdImpl(result[1]),	// time
+					new IdImpl(result[3]),		// vehID
 					//Integer.parseInt(result[4]),		// nodeID
-					Integer.parseInt(result[5]),		// flag
-					result[6], "");		// description
+					Integer.parseInt(result[5]),		// linkID
+					result[6],		// flag
+					"");		// description
 			events.processEvent(data);
 		}
 	}

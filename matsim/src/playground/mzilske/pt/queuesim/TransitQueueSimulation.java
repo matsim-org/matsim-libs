@@ -3,7 +3,7 @@ package playground.mzilske.pt.queuesim;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.Simulation;
@@ -17,7 +17,7 @@ import org.matsim.vehicles.BasicVehicles;
 
 public class TransitQueueSimulation extends org.matsim.pt.queuesim.TransitQueueSimulation {
 
-	public TransitQueueSimulation(ScenarioImpl scenario, EventsManagerImpl events) {
+	public TransitQueueSimulation(ScenarioImpl scenario, EventsManager events) {
 		super(scenario, events);
 	}
 

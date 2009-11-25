@@ -24,6 +24,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -45,7 +46,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	
 	protected KnowledgeDBStorageHandler knowledgeDBStorageHandler;
 		
-	public ReplanningQueueSimulation(final NetworkLayer network, final Population population, final EventsManagerImpl events)
+	public ReplanningQueueSimulation(final NetworkLayer network, final Population population, final EventsManager events)
 	{
 		super(network, population, events);
 		

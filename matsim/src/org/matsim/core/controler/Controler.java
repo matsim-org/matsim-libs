@@ -47,6 +47,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -1063,7 +1064,7 @@ public class Controler {
 		return this.population;
 	}
 
-	public final EventsManagerImpl getEvents() {
+	public final EventsManager getEvents() {
 		return this.events;
 	}
 

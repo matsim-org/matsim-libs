@@ -23,11 +23,11 @@ package org.matsim.core.controler.corelisteners;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.EventsManagerImpl;
 
 /**
  * Integrates the {@link org.matsim.analysis.LegHistogram} into the
@@ -38,13 +38,13 @@ import org.matsim.core.events.EventsManagerImpl;
  */
 public class LegHistogramListener implements IterationEndsListener, IterationStartsListener {
 
-	private final EventsManagerImpl events;
+	private final EventsManager events;
 	private final LegHistogram histogram;
 	private final boolean outputGraph;
 
 	static private final Logger log = Logger.getLogger(LegHistogramListener.class);
 
-	public LegHistogramListener(final EventsManagerImpl events, final boolean outputGraph) {
+	public LegHistogramListener(final EventsManager events, final boolean outputGraph) {
 		this.events = events;
 		this.histogram = new LegHistogram(300);
 		this.outputGraph = outputGraph;

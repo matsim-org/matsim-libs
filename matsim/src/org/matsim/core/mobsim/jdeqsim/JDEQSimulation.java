@@ -25,7 +25,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.network.LinkImpl;
@@ -45,7 +45,7 @@ public class JDEQSimulation {
 	protected NetworkLayer network;
 	
 
-	public JDEQSimulation(final NetworkLayer network, final Population population, final EventsManagerImpl events) {
+	public JDEQSimulation(final NetworkLayer network, final Population population, final EventsManager events) {
 		// constructor
 		
 		log = Logger.getLogger(JDEQSimulation.class);

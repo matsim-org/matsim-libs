@@ -11,5 +11,7 @@ public interface EventsManager extends MatsimToplevelContainer {
 	public void processEvent(final Event event);
 
 	public void addHandler(final EventHandler handler);
+	
+	public void removeHandler(final EventHandler handler);
 
 }

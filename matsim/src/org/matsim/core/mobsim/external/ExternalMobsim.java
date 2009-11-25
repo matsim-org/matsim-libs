@@ -28,11 +28,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -47,7 +47,7 @@ public class ExternalMobsim {
 
 	private static final String CONFIG_MODULE = "simulation";
 
-	protected EventsManagerImpl events;
+	protected EventsManager events;
 	protected Population population;
 
 	protected String plansFileName = null;
@@ -58,7 +58,7 @@ public class ExternalMobsim {
 
 	private static final Logger log = Logger.getLogger(ExternalMobsim.class);
 
-	public ExternalMobsim(final Population population, final EventsManagerImpl events) {
+	public ExternalMobsim(final Population population, final EventsManager events) {
 		this.population = population;
 		this.events = events;
 		init();

@@ -34,10 +34,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.population.ActivityImpl;
@@ -65,7 +65,7 @@ public class DEQSim extends ExternalMobsim {
 
 	private IterationStopWatch stopwatch = null;
 
-	public DEQSim(final Population population, final EventsManagerImpl events) {
+	public DEQSim(final Population population, final EventsManager events) {
 		super(population, events);
 	}
 

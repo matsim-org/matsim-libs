@@ -32,22 +32,22 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.EventImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 
 public class EventsReaderDEQv1 {
 
-	private final EventsManagerImpl events;
+	private final EventsManager events;
 
 	/*package*/ final static Logger log = Logger.getLogger(EventsReaderDEQv1.class);
 
-	public EventsReaderDEQv1(final EventsManagerImpl events) {
+	public EventsReaderDEQv1(final EventsManager events) {
 		this.events = events;
 	}
 
@@ -65,7 +65,6 @@ public class EventsReaderDEQv1 {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.events.printEventsCount();
 	}
 
 	private void readEventsSingleCPU(final String iterationEventsFile) throws FileNotFoundException, IOException {
