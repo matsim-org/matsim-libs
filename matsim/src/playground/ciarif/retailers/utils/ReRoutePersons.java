@@ -19,7 +19,7 @@ public class ReRoutePersons {
 	private final static Logger log = Logger.getLogger(ReRoutePersons.class);
 	//private Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
 	
-	public void run (Map<Id,ActivityFacility> movedFacilities, NetworkLayer network, Map<Id,? extends Person> persons,PlansCalcRoute pcrl){ 
+	public void run (Map<Id,ActivityFacilityImpl> movedFacilities, NetworkLayer network, Map<Id,? extends Person> persons,PlansCalcRoute pcrl){ 
 		
 		int counter = 0;
 		for (Person p : persons.values()) {

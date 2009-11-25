@@ -33,18 +33,18 @@ public class GravityModel
   public final static String CONFIG_SAMPLE_PERSONS = "samplingRatePersons";
   private double[] betas;
   private Controler controler;
-  private Map<Id,ActivityFacility> shops = new TreeMap<Id,ActivityFacility>();
+  private Map<Id,ActivityFacilityImpl> shops = new TreeMap<Id,ActivityFacilityImpl>();
   private Collection<? extends ActivityFacility> controlerFacilities;
   private Map<Id, PersonRetailersImpl> retailersPersons = new TreeMap<Id, PersonRetailersImpl>();
   private RetailZones retailZones = new RetailZones();
-  private Map<Id, ActivityFacility> retailersFacilities;
+  private Map<Id, ActivityFacilityImpl> retailersFacilities;
   private TreeMap<Integer,String> first;
   private Map<Id, ? extends Person> persons;
   private int counter=0;
   private int nextCounterMsg =1;
   
  
-  public GravityModel(Controler controler, Map<Id, ActivityFacility> retailerFacilities)
+  public GravityModel(Controler controler, Map<Id, ActivityFacilityImpl> retailerFacilities)
   {
     this.controler = controler;
     this.retailersFacilities = retailerFacilities;
@@ -145,12 +145,12 @@ public double computePotential(ArrayList<Integer> solution){
     return global_likelihood;
   }
   
-  private Map<Id,ActivityFacility> findScenarioShops (Collection<? extends ActivityFacility> controlerFacilities) {
+  private Map<Id,ActivityFacilityImpl> findScenarioShops (Collection<? extends ActivityFacility> controlerFacilities) {
 	  
-		Map<Id,ActivityFacility> shops = new TreeMap<Id,ActivityFacility>();
+		Map<Id,ActivityFacilityImpl> shops = new TreeMap<Id,ActivityFacilityImpl>();
 		for (ActivityFacility f : controlerFacilities) {
 			if (f.getActivityOptions().entrySet().toString().contains("shop")) {
-				shops.put(f.getId(),f);
+				shops.put(f.getId(),(ActivityFacilityImpl)f);
 			}
 		}
 		return shops;
@@ -289,7 +289,7 @@ public double computePotential(ArrayList<Integer> solution){
 		Gbl.printMemoryUsage();
 	}
 
-	  public Map<Id,ActivityFacility> getScenarioShops () {
+	  public Map<Id,ActivityFacilityImpl> getScenarioShops () {
 		  return this.shops;
 	  }
 	  public RetailZones getRetailZones() {

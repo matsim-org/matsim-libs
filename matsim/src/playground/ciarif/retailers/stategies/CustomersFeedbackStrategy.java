@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 
@@ -38,6 +39,13 @@ public class CustomersFeedbackStrategy implements RetailerStrategy {
 	public Map<Id, ActivityFacility> moveFacilities(
 			Map<Id, ActivityFacility> facilities,
 			Map<Id, LinkRetailersImpl> links) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Map<Id, ActivityFacilityImpl> moveFacilities(
+			Map<Id, ActivityFacilityImpl> facilities,
+			TreeMap<Id, LinkRetailersImpl> links) {
 		// TODO Auto-generated method stub
 		return null;
 	}

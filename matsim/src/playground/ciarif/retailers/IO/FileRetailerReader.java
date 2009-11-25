@@ -11,6 +11,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 
 import playground.ciarif.retailers.data.Retailer;
@@ -46,7 +47,7 @@ public class FileRetailerReader {
 					if (controlerFacilities.get(fId) != null) {
 					if (this.retailers.getRetailers().containsKey(rId)) { // retailer exists already
 						
-						ActivityFacility f = controlerFacilities.get(fId);
+						ActivityFacilityImpl f = (ActivityFacilityImpl)controlerFacilities.get(fId);
 						this.retailers.getRetailers().get(rId).addFacility(f);
 						retailersLinks.add(f.getLinkId());
 
@@ -55,7 +56,7 @@ public class FileRetailerReader {
 						
 						Retailer r = new Retailer(rId, null);
 						r.addStrategy(controler, entries[2]);
-						ActivityFacility f = controlerFacilities.get(fId);
+						ActivityFacilityImpl f = (ActivityFacilityImpl)controlerFacilities.get(fId);
 						r.addFacility(f);
 						retailersLinks.add(f.getLinkId());
 						this.retailers.addRetailer(r);

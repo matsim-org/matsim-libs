@@ -127,7 +127,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 					Id rId = new IdImpl(entries[0]);
 					if (this.retailers.getRetailers().containsKey(rId)) { // retailer exists already
 						Id fId = new IdImpl (entries[1]);
-						ActivityFacility f = controler.getFacilities().getFacilities().get(fId);
+						ActivityFacilityImpl f =(ActivityFacilityImpl) controler.getFacilities().getFacilities().get(fId);
 						this.retailersFacilities.put(f.getId(),f);
 						this.retailers.getRetailers().get(rId).addFacility(f);
 					}
@@ -135,7 +135,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 						Retailer r = new Retailer(rId, null);
 						r.addStrategy(controler, entries[2]);
 						Id fId = new IdImpl (entries[1]);
-						ActivityFacility f = controler.getFacilities().getFacilities().get(fId);
+						ActivityFacilityImpl f =(ActivityFacilityImpl) controler.getFacilities().getFacilities().get(fId);
 						r.addFacility(f);
 						this.retailersFacilities.put(f.getId(),f);
 						this.retailers.addRetailer(r);
@@ -191,7 +191,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 //		}	<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		
 		
-			Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
+			Map<Id,ActivityFacilityImpl> movedFacilities = new TreeMap<Id,ActivityFacilityImpl>();
 			
 			// works, but it is not nicely programmed. shouldn't be a global container, should be
 			// controlled by the controler (or actually added to the population)
