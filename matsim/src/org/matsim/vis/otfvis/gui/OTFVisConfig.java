@@ -51,13 +51,13 @@ public class OTFVisConfig extends Module {
 		private static final long serialVersionUID = 1L;
 		
 		public Point3f getZoomstart() {
-			return zoomstart;
+			return this.zoomstart;
 		}
 		public BufferedImage getSnap() {
-			return snap;
+			return this.snap;
 		}
 		public String getName() {
-			return name;
+			return this.name;
 		}
 		
 		Point3f zoomstart;
@@ -76,35 +76,35 @@ public class OTFVisConfig extends Module {
 		}
 
 		private void writeObject( java.io.ObjectOutputStream s ) throws IOException {
-			s.writeUTF(name);
-			s.writeFloat(zoomstart.x);
-			s.writeFloat(zoomstart.y);
-			s.writeFloat(zoomstart.z);
-			ImageIO.write(snap, "jpg", s);
+			s.writeUTF(this.name);
+			s.writeFloat(this.zoomstart.x);
+			s.writeFloat(this.zoomstart.y);
+			s.writeFloat(this.zoomstart.z);
+			ImageIO.write(this.snap, "jpg", s);
 		}
 
 
 		private void readObject( java.io.ObjectInputStream s ) throws IOException {
-			name = s.readUTF();
-			zoomstart = new Point3f(s.readFloat(),s.readFloat(),s.readFloat());
-			snap = ImageIO.read(s);
+			this.name = s.readUTF();
+			this.zoomstart = new Point3f(s.readFloat(),s.readFloat(),s.readFloat());
+			this.snap = ImageIO.read(s);
 		}
 	}
 	
 	public List<ZoomEntry> getZooms() {
-		return zooms;
+		return this.zooms;
 	}
 	public void addZoom(ZoomEntry entry) {
 		setModified();
-		zooms.add(entry);
+		this.zooms.add(entry);
 	}
 	public void deleteZoom(ZoomEntry entry) {
 		setModified();
-		zooms.remove(entry);
+		this.zooms.remove(entry);
 	}
 	public Point3f getZoomValue(String zoomName) {
 		Point3f result = null;
-		for(ZoomEntry entry : zooms) {
+		for(ZoomEntry entry : this.zooms) {
 			if(entry.name.equals(zoomName))result = entry.zoomstart;
 		}
 		return result;
@@ -150,13 +150,13 @@ public class OTFVisConfig extends Module {
 	private boolean cachingAllowed = true;
 	private int delay_ms = 30;
 
-	private boolean drawScaleBar = true;
+	private boolean drawScaleBar = false;
 
 	/**
 	 * @return the delay_ms
 	 */
 	public int getDelay_ms() {
-		return delay_ms;
+		return this.delay_ms;
 	}
 	/**
 	 * @param delay_ms the delay_ms to set
@@ -165,7 +165,7 @@ public class OTFVisConfig extends Module {
 		this.delay_ms = delay_ms;
 	}
 	public boolean isCachingAllowed() {
-		return cachingAllowed;
+		return this.cachingAllowed;
 	}
 	public void setCachingAllowed(boolean cachingAllowed) {
 		this.cachingAllowed = cachingAllowed;
@@ -174,7 +174,7 @@ public class OTFVisConfig extends Module {
 	 * @return the modified
 	 */
 	public boolean isModified() {
-		return modified;
+		return this.modified;
 	}
 	/**
 	 * @param modified the modified to set
@@ -195,11 +195,11 @@ public class OTFVisConfig extends Module {
 		if (AGENT_SIZE.equals(key)) {
 			return Float.toString(getAgentSize());
 		} else if (MIDDLE_MOUSE_FUNC.equals(key)) {
-			return middleMouseFunc;
+			return this.middleMouseFunc;
 		} else if (LEFT_MOUSE_FUNC.equals(key)) {
-			return leftMouseFunc;
+			return this.leftMouseFunc;
 		}  else if (RIGHT_MOUSE_FUNC.equals(key)) {
-			return rightMouseFunc;
+			return this.rightMouseFunc;
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -208,13 +208,13 @@ public class OTFVisConfig extends Module {
 	@Override
 	public void addParam(final String key, final String value) {
 		if (AGENT_SIZE.equals(key)) {
-			agentSize = Float.parseFloat(value);
+			this.agentSize = Float.parseFloat(value);
 		} else if (MIDDLE_MOUSE_FUNC.equals(key)) {
-			middleMouseFunc = value;
+			this.middleMouseFunc = value;
 		} else if (LEFT_MOUSE_FUNC.equals(key)) {
-			leftMouseFunc = value;
+			this.leftMouseFunc = value;
 		}  else if (RIGHT_MOUSE_FUNC.equals(key)) {
-			rightMouseFunc = value;
+			this.rightMouseFunc = value;
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -241,7 +241,7 @@ public class OTFVisConfig extends Module {
 	/* direct access */
 
 	public float getAgentSize() {
-		return agentSize;
+		return this.agentSize;
 	}
 
 	public void setAgentSize(float agentSize) {
@@ -250,7 +250,7 @@ public class OTFVisConfig extends Module {
 	}
 
 	public String getMiddleMouseFunc() {
-		return middleMouseFunc;
+		return this.middleMouseFunc;
 	}
 
 	public void setMiddleMouseFunc(String middleMouseFunc) {
@@ -259,7 +259,7 @@ public class OTFVisConfig extends Module {
 	}
 
 	public String getLeftMouseFunc() {
-		return leftMouseFunc;
+		return this.leftMouseFunc;
 	}
 
 	public void setLeftMouseFunc(String leftMouseFunc) {
@@ -268,7 +268,7 @@ public class OTFVisConfig extends Module {
 	}
 
 	public String getRightMouseFunc() {
-		return rightMouseFunc;
+		return this.rightMouseFunc;
 	}
 
 	public void setRightMouseFunc(String rightMouseFunc) {
@@ -280,7 +280,7 @@ public class OTFVisConfig extends Module {
 	 * @return the fileVersion
 	 */
 	public int getFileVersion() {
-		return fileVersion;
+		return this.fileVersion;
 	}
 
 	/**
@@ -294,7 +294,7 @@ public class OTFVisConfig extends Module {
 	 * @return the fileMinorVersion
 	 */
 	public int getFileMinorVersion() {
-		return fileMinorVersion;
+		return this.fileMinorVersion;
 	}
 
 	/**
@@ -308,7 +308,7 @@ public class OTFVisConfig extends Module {
 	 * @return the bigTimeStep
 	 */
 	public int getBigTimeStep() {
-		return bigTimeStep;
+		return this.bigTimeStep;
 	}
 
 	/**
@@ -323,7 +323,7 @@ public class OTFVisConfig extends Module {
 	 * @return the queryType
 	 */
 	public String getQueryType() {
-		return queryType;
+		return this.queryType;
 	}
 
 	/**
@@ -337,7 +337,7 @@ public class OTFVisConfig extends Module {
 	 * @return the multipleSelect
 	 */
 	public boolean isMultipleSelect() {
-		return multipleSelect;
+		return this.multipleSelect;
 	}
 
 	/**
@@ -378,7 +378,7 @@ public class OTFVisConfig extends Module {
 	 * @return the showParking
 	 */
 	public boolean isShowParking() {
-		return showParking;
+		return this.showParking;
 	}
 
 	/**
@@ -393,7 +393,7 @@ public class OTFVisConfig extends Module {
 	 * @return the drawLinkIds
 	 */
 	public boolean drawLinkIds() {
-		return drawLinkIds;
+		return this.drawLinkIds;
 	}
 
 	/**
@@ -410,7 +410,7 @@ public class OTFVisConfig extends Module {
 	}
 	
 	public boolean drawOverlays() {
-		return drawOverlays;
+		return this.drawOverlays;
 	}
 	public void setDrawTime(boolean draw) {
 		setModified();
@@ -418,16 +418,16 @@ public class OTFVisConfig extends Module {
 	}
 	
 	public boolean drawTime() {
-		return drawTime;
+		return this.drawTime;
 	}
 
 	public boolean setRenderImages(boolean render) {
 		setModified();
-		return renderImages = render;
+		return this.renderImages = render;
 	}
 	
 	public boolean renderImages() {
-		return renderImages;
+		return this.renderImages;
 	}
 	
 	public void setDrawScaleBar(boolean drawScaleBar) {
@@ -436,7 +436,7 @@ public class OTFVisConfig extends Module {
 	}
 	
 	public boolean drawScaleBar() {
-		return drawScaleBar ;
+		return this.drawScaleBar ;
 	}
 	
 
