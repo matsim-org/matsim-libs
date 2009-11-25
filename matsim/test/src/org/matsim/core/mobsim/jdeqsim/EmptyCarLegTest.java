@@ -26,12 +26,14 @@ public class EmptyCarLegTest extends TestHandlerDetailedEventChecker {
 		
 		for (LinkedList<PersonEvent> list : events.values()) {
 			wasInLoop=true;
-			// start and end time of the leg is the same
+			// departure and arrival time is the same
 			// empty car leg or mode!=car
 			assertEquals(21600.0,list.get(0).getTime());
 			assertTrue(list.get(0) instanceof ActivityEndEventImpl);
 			assertTrue(list.get(1) instanceof AgentDepartureEventImpl);
+			assertEquals(21600.0,list.get(1).getTime());
 			assertTrue(list.get(2) instanceof AgentArrivalEventImpl);
+			assertEquals(21600.0,list.get(2).getTime());
 			assertTrue(list.get(3) instanceof ActivityStartEventImpl);
 			assertEquals(21600.0,list.get(3).getTime());
 		}
