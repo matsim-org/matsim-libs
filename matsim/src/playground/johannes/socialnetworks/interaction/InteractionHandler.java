@@ -31,13 +31,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
 import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -53,14 +52,14 @@ DeprecatedActivityEndEventHandler {
 	
 	private Interactor interactor;
 	
-	private Map<ActivityFacilityImpl, PhysicalFacility> pfacilities;
+	private Map<ActivityFacility, PhysicalFacility> pfacilities;
 	
-	public InteractionHandler(InteractionSelector selector, Interactor interactor, ActivityFacilitiesImpl facilities) {
+	public InteractionHandler(InteractionSelector selector, Interactor interactor, ActivityFacilities facilities) {
 		this.selector = selector;
 		this.interactor = interactor;
-		this.pfacilities = new HashMap<ActivityFacilityImpl, PhysicalFacility>();
+		this.pfacilities = new HashMap<ActivityFacility, PhysicalFacility>();
 		
-		for(ActivityFacilityImpl f : facilities.getFacilities().values()) {
+		for(ActivityFacility f : facilities.getFacilities().values()) {
 			this.pfacilities.put(f, new PhysicalFacility());
 		}
 	}
@@ -103,7 +102,7 @@ DeprecatedActivityEndEventHandler {
 		
 		final String TAB = "\t"; 
 		final String WSPACE = " "; 
-		for(ActivityFacilityImpl f : pfacilities.keySet()) {
+		for(ActivityFacility f : pfacilities.keySet()) {
 			PhysicalFacility pf = pfacilities.get(f);
 			writer.write(f.getId().toString());
 			writer.write(TAB);

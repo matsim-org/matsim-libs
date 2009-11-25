@@ -26,6 +26,7 @@ import java.util.List;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -59,9 +60,9 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 	private TravelCost tcost;
 	private TravelTime ttime;
 	private String[] factypes;
-	private ActivityFacilitiesImpl facs;
+	private ActivityFacilities facs;
 
-	public RandomChangeLocationF(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime, ActivityFacilitiesImpl facs) {
+	public RandomChangeLocationF(String[] factypes, NetworkLayer network, TravelCost tcost, TravelTime ttime, ActivityFacilities facs) {
 		weights = Gbl.getConfig().socnetmodule().getSWeights();
 		cum_p_factype = getCumFacWeights(weights);
 		this.network=network;
@@ -136,9 +137,9 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 
 //			List<Activity> actList = k.getActivities(factype);
 
-			if(facs.getFacilitiesForActivityType(newAct.getType()).size()>0){
-				int index=MatsimRandom.getRandom().nextInt(facs.getFacilitiesForActivityType(newAct.getType()).size());
-				ActivityFacilityImpl fFromFacilities=(ActivityFacilityImpl) facs.getFacilitiesForActivityType(newAct.getType()).values().toArray()[index];
+			if(((ActivityFacilitiesImpl) facs).getFacilitiesForActivityType(newAct.getType()).size()>0){
+				int index=MatsimRandom.getRandom().nextInt(((ActivityFacilitiesImpl) facs).getFacilitiesForActivityType(newAct.getType()).size());
+				ActivityFacilityImpl fFromFacilities=(ActivityFacilityImpl) ((ActivityFacilitiesImpl) facs).getFacilitiesForActivityType(newAct.getType()).values().toArray()[index];
 
 //				And replace the activity in the chain with it (only changes the facility)
 
@@ -162,7 +163,7 @@ public class RandomChangeLocationF  implements PlanAlgorithm{
 					newAct.setLink(fFromFacilities.getLink());
 					newAct.setCoord(fFromFacilities.getCoord());
 					newAct.setFacility(fFromFacilities);
-					((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).addActivity(fFromFacilities.getActivityOption(factype));
+					((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).addActivity(fFromFacilities.getActivityOptions().get(factype));
 					changed = true;
 				}
 			}

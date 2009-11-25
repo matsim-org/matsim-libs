@@ -200,7 +200,7 @@ public class MatricesCompleteBasedOnFacilities {
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-			if (f.getActivityOption(WORK) != null) {
+			if (f.getActivityOptions().get(WORK) != null) {
 				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 				if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -214,7 +214,7 @@ public class MatricesCompleteBasedOnFacilities {
 		System.out.println("building quad tree: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.workFacQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-			if (f.getActivityOption(WORK) != null) {
+			if (f.getActivityOptions().get(WORK) != null) {
 				this.workFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
 		}
@@ -230,7 +230,7 @@ public class MatricesCompleteBasedOnFacilities {
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-			if (f.getActivityOption(EDUCATION) != null) {
+			if (f.getActivityOptions().get(EDUCATION) != null) {
 				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 				if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -244,7 +244,7 @@ public class MatricesCompleteBasedOnFacilities {
 		System.out.println("building quad tree: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.educFacQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-			if (f.getActivityOption(EDUCATION) != null) {
+			if (f.getActivityOptions().get(EDUCATION) != null) {
 				this.educFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
 		}
@@ -281,8 +281,8 @@ public class MatricesCompleteBasedOnFacilities {
 				boolean has_educ = false;
 				for (int i=0; i<facs.size(); i++) {
 					ActivityFacilityImpl f = facs.get(i);
-					if (f.getActivityOption(WORK) != null) { has_work = true; }
-					if (f.getActivityOption(EDUCATION) != null) { has_educ = true; }
+					if (f.getActivityOptions().get(WORK) != null) { has_work = true; }
+					if (f.getActivityOptions().get(EDUCATION) != null) { has_educ = true; }
 				}
 				if (!has_work) {
 					System.out.println("      zone id=" + z.getId() + ": removing all WORK entries ending at this zone:");

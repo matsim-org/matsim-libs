@@ -87,7 +87,7 @@ public class WorldFacilityZoneMapping {
 		// add mapping for the remaining facilities (non home facilities)
 		for (ActivityFacilityImpl f : fs.getFacilities().values()) {
 			if (f.getUpMapping().size() == 0) {
-				if (f.getActivityOption(CAtts.ACT_HOME) != null) { Gbl.errorMsg("That should not happen!"); }
+				if (f.getActivityOptions().get(CAtts.ACT_HOME) != null) { Gbl.errorMsg("That should not happen!"); }
 				ArrayList<MappedLocation> locs = new ArrayList<MappedLocation>();
 				MappedLocation nearest_loc = null;
 				double min_dist = Double.MAX_VALUE;

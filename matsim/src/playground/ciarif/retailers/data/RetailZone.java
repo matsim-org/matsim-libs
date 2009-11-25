@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -16,16 +16,16 @@ public class RetailZone {
 	
 	private Id id;
 	private QuadTree<Person> personsQuadTree;   
-	private QuadTree<ActivityFacilityImpl> shopsQuadTree;
+	private QuadTree<ActivityFacility> shopsQuadTree;
 	private ArrayList<Person> persons = new ArrayList<Person>();
-	private ArrayList<ActivityFacilityImpl> shops = new ArrayList<ActivityFacilityImpl>();
+	private ArrayList<ActivityFacility> shops = new ArrayList<ActivityFacility>();
 	private CoordImpl minCoord;
 	private CoordImpl maxCoord;
 	
 	public RetailZone(Id id,final Double minx,final Double miny,final Double maxx,final Double maxy) { 
 		this.id = id;
 		this.personsQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
-		this.shopsQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
+		this.shopsQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
 		this.minCoord = new CoordImpl (minx.toString(),miny.toString());
 		this.maxCoord = new CoordImpl (maxx.toString(), maxy.toString());		
 	}
@@ -40,7 +40,7 @@ public class RetailZone {
 		this.persons.add(person);
 	}
 
-	public void addShopToQuadTree(Coord coord, ActivityFacilityImpl shop) { //TODO look if it is possible to eliminate the QuadTree and use another data structure
+	public void addShopToQuadTree(Coord coord, ActivityFacility shop) { //TODO look if it is possible to eliminate the QuadTree and use another data structure
 		this.shopsQuadTree.put(coord.getX(),coord.getY(),shop);	
 		this.shops.add(shop);
 	}
@@ -53,11 +53,11 @@ public class RetailZone {
 		return this.persons;
 	}
 	
-	public ArrayList<ActivityFacilityImpl> getShops (){
+	public ArrayList<ActivityFacility> getShops (){
 		return this.shops;
 	}
 	
-	public QuadTree<ActivityFacilityImpl> getShopsQuadTree (){
+	public QuadTree<ActivityFacility> getShopsQuadTree (){
 		return this.shopsQuadTree;
 	}
 	public CoordImpl getMaxCoord (){

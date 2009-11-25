@@ -150,7 +150,7 @@ public class CapacityCalculator {
 			ActivityFacilityImpl facility = facility_it.next();	
 			
 			for (int i = 0; i < nogaTypes.length; i++) {						
-				if (facility.getActivityOption(nogaTypes[i]) != null) {
+				if (facility.getActivityOptions().get(nogaTypes[i]) != null) {
 					Iterator<ActivityOptionImpl> options_it = facility.getActivityOptions().values().iterator();
 					while (options_it.hasNext()) {
 						ActivityOptionImpl actOpt = options_it.next();

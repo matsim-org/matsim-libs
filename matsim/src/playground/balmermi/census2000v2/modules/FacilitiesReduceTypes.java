@@ -67,24 +67,24 @@ public class FacilitiesReduceTypes {
 			TreeMap<String,ActivityOptionImpl> t_map = new TreeMap<String, ActivityOptionImpl>();
 			for (String t : f.getActivityOptions().keySet()) {
 				if (t.equals("home")) {
-					h_map.put(t,f.getActivityOption(t));
+					h_map.put(t,f.getActivityOptions().get(t));
 				}
 				if (t.equals("work_sector2") || t.equals("work_sector3")) {
-					w_map.put(t,f.getActivityOption(t));
+					w_map.put(t,f.getActivityOptions().get(t));
 				}
 				if (t.equals("education_higher") || t.equals("education_kindergarten") || t.equals("education_other") ||
 				    t.equals("education_primary") || t.equals("education_secondary")) {
-					e_map.put(t,f.getActivityOption(t));
+					e_map.put(t,f.getActivityOptions().get(t));
 				}
 				if (t.equals("shop_other") || t.equals("shop_retail_get1000sqm") || t.equals("shop_retail_get100sqm") ||
 				    t.equals("shop_retail_get400sqm") || t.equals("shop_retail_gt2500sqm") || t.equals("shop_retail_lt100sqm")) {
-					s_map.put(t,f.getActivityOption(t));
+					s_map.put(t,f.getActivityOptions().get(t));
 				}
 				if (t.equals("leisure_culture") || t.equals("leisure_gastro") || t.equals("leisure_sports")) {
-					l_map.put(t,f.getActivityOption(t));
+					l_map.put(t,f.getActivityOptions().get(t));
 				}
 				if (t.equals("tta")) {
-					t_map.put(t,f.getActivityOption(t));
+					t_map.put(t,f.getActivityOptions().get(t));
 				}
 			}
 			if (h_map.size() > 1) { Gbl.errorMsg("fid="+f.getId()+": more than one home activity!"); }

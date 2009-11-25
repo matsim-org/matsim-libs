@@ -49,12 +49,12 @@ public class FacilitiesCombine {
 		Iterator<ActivityOptionImpl> a_it = f.getActivityOptions().values().iterator();
 		while (a_it.hasNext()) {
 			ActivityOptionImpl a = a_it.next();
-			if (f2.getActivityOption(a.getType()) == null) {
+			if (f2.getActivityOptions().get(a.getType()) == null) {
 				ActivityOptionImpl a2 = f2.createActivityOption(a.getType());
 				a2.setCapacity(a.getCapacity());
 			}
 			else {
-				ActivityOptionImpl a2 = f2.getActivityOption(a.getType());
+				ActivityOptionImpl a2 = f2.getActivityOptions().get(a.getType());
 				double cap2 = a2.getCapacity();
 				double cap = a.getCapacity();
 				if ((cap < Integer.MAX_VALUE) && (cap2 < Integer.MAX_VALUE)) { a2.setCapacity(cap + cap2); }
@@ -66,7 +66,7 @@ public class FacilitiesCombine {
 				Iterator<OpeningTime> o_it = ts.iterator();
 				while (o_it.hasNext()) {
 					OpeningTime o = o_it.next();
-					f2.getActivityOption(a.getType()).addOpeningTime(o);
+					f2.getActivityOptions().get(a.getType()).addOpeningTime(o);
 				}
 			}
 		}

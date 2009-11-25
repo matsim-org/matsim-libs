@@ -29,9 +29,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.core.population.PersonImpl;
@@ -60,8 +60,8 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 	}
 	
 	@Override
-	public void run (final ActivityFacilitiesImpl facilities) {
-		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
+	public void run (final ActivityFacilities facilities) {
+		for (ActivityFacility f : facilities.getFacilities().values()) {
 			run(f);
 		}
 		/* TODO Removing tta activity type but needs clarification! */ 
@@ -69,7 +69,7 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 		else log.info("No tta act type found.");
 		log.info("Searching available activity types done.");
 	}
-	public void run(ActivityFacilityImpl facility){
+	public void run(ActivityFacility facility){
 		Collection<ActivityOptionImpl> facActTypes = facility.getActivityOptions().values();
 		for (Iterator<ActivityOptionImpl> iterator = facActTypes.iterator();iterator.hasNext();){
 			ActivityOptionImpl act = iterator.next();

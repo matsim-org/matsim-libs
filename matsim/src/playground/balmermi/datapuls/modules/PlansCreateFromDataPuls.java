@@ -146,7 +146,7 @@ public class PlansCreateFromDataPuls {
 			double maxx = Double.NEGATIVE_INFINITY;
 			double maxy = Double.NEGATIVE_INFINITY;
 			for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-				if (f.getActivityOption(types[i]) != null) {
+				if (f.getActivityOptions().get(types[i]) != null) {
 					if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 					if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 					if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -157,7 +157,7 @@ public class PlansCreateFromDataPuls {
 			log.info("    => type="+types[i]+": xrange("+minx+","+maxx+"); yrange("+miny+","+maxy+")");
 			QuadTree<ActivityFacilityImpl> qt = new QuadTree<ActivityFacilityImpl>(minx,miny,maxx,maxy);
 			for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-				if (f.getActivityOption(types[i]) != null) { qt.put(f.getCoord().getX(),f.getCoord().getY(),f); }
+				if (f.getActivityOptions().get(types[i]) != null) { qt.put(f.getCoord().getX(),f.getCoord().getY(),f); }
 			}
 			log.info("    => "+qt.size()+" facilities of type="+types[i]+" added.");
 			facilityGroups.put(types[i],qt);
@@ -198,7 +198,7 @@ public class PlansCreateFromDataPuls {
 				ActivityFacilityImpl af = datapulsFacilities.getFacilities().get(fid);
 				if (af == null) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" not found in facilities."); }
 				if (af.getActivityOptions().size() != 1) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" must have only one activity option."); }
-				ActivityOptionImpl a = af.getActivityOption("home");
+				ActivityOptionImpl a = af.getActivityOptions().get("home");
 				if (a == null) { throw new RuntimeException("line "+line_cnt+": fid="+fid+" does not contain 'home'."); }
 				
 				PersonImpl p = (PersonImpl)population.getFactory().createPerson(id);

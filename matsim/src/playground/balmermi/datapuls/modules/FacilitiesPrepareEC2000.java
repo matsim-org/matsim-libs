@@ -85,10 +85,10 @@ public class FacilitiesPrepareEC2000 {
 			for (String t : f.getActivityOptions().keySet()) {
 				if (t.equals("shop_other") || t.equals("shop_retail_get1000sqm") || t.equals("shop_retail_get100sqm") ||
 				    t.equals("shop_retail_get400sqm") || t.equals("shop_retail_gt2500sqm") || t.equals("shop_retail_lt100sqm")) {
-					s_map.put(t,f.getActivityOption(t));
+					s_map.put(t,f.getActivityOptions().get(t));
 				}
 				if (t.equals("leisure_culture") || t.equals("leisure_gastro") || t.equals("leisure_sports")) {
-					l_map.put(t,f.getActivityOption(t));
+					l_map.put(t,f.getActivityOptions().get(t));
 				}
 			}
 			if (s_map.size() > 1) { throw new RuntimeException("fid="+f.getId()+": more than one shopping activity!"); }

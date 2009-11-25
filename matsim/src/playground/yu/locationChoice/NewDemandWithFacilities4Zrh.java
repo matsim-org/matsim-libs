@@ -102,7 +102,7 @@ public class NewDemandWithFacilities4Zrh {
 				afMap.put(coord, af);
 			}
 			act.setFacility(af);
-			ActivityOptionImpl ao = af.getActivityOption(type);
+			ActivityOptionImpl ao = af.getActivityOptions().get(type);
 			if (ao == null)
 				ao = af.createActivityOption(type);
 			// 3 primary type in Zurich scenario

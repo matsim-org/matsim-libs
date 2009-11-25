@@ -41,7 +41,7 @@ import net.opengis.kml._2.TimeSpanType;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -140,7 +140,7 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 
 	}
 
-	public void run(final ActivityFacilityImpl facility) {
+	public void run(final ActivityFacility facility) {
 
 		PlacemarkType aShopOpeningPeriod = null;
 		PointType aPointType = null;
@@ -161,8 +161,8 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 		// have to iterate this over opening times
 		int dayCounter = 0;
 		for (Day day : days) {
-			if (facility.getActivityOption(ACTIVITY_TYPE_SHOP) != null) {
-				Set<OpeningTime> dailyOpentimes = facility.getActivityOption(ACTIVITY_TYPE_SHOP).getOpeningTimes(day.getAbbrevEnglish());
+			if (facility.getActivityOptions().get(ACTIVITY_TYPE_SHOP) != null) {
+				Set<OpeningTime> dailyOpentimes = facility.getActivityOptions().get(ACTIVITY_TYPE_SHOP).getOpeningTimes(day.getAbbrevEnglish());
 				if (dailyOpentimes != null) {
 					for (OpeningTime opentime : dailyOpentimes) {
 

@@ -74,7 +74,7 @@ public class FacilitiesAnalysis {
 		out.write("ID\tX\tY\tCAPACITY\n");
 		out.flush();
 		for (ActivityFacilityImpl f : facilities.getFacilities().values()) {
-			ActivityOptionImpl ao = f.getActivityOption(actOptType);
+			ActivityOptionImpl ao = f.getActivityOptions().get(actOptType);
 			if (ao != null) {
 				out.write(f.getId().toString()+"\t");
 				out.write(f.getCoord().getX()+"\t");

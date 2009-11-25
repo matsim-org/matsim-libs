@@ -72,7 +72,7 @@ public class PersonSetHomeLoc extends AbstractPersonAlgorithm implements PlanAlg
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-			if (f.getActivityOption(HOME) != null) {
+			if (f.getActivityOptions().get(HOME) != null) {
 				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 				if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -86,7 +86,7 @@ public class PersonSetHomeLoc extends AbstractPersonAlgorithm implements PlanAlg
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.homeFacQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-			if (f.getActivityOption(HOME) != null) {
+			if (f.getActivityOptions().get(HOME) != null) {
 				this.homeFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
 		}

@@ -1,14 +1,12 @@
 package playground.ciarif.retailers.data;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-//import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 
 import playground.ciarif.retailers.stategies.CatchmentAreaRetailerStrategy;
 import playground.ciarif.retailers.stategies.CustomersFeedbackStrategy;
@@ -20,10 +18,10 @@ import playground.ciarif.retailers.stategies.RetailerStrategy;
 
 public class Retailer {
 	private final Id id;
-	private final Map<Id,ActivityFacilityImpl> facilities = new LinkedHashMap<Id,ActivityFacilityImpl>();
+	private final Map<Id,ActivityFacility> facilities = new LinkedHashMap<Id,ActivityFacility>();
 	//private final static Logger log = Logger.getLogger(Retailer.class);
 	private RetailerStrategy strategy;
-	private Map<Id,ActivityFacilityImpl> movedFacilities = new TreeMap<Id,ActivityFacilityImpl>();
+	private Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
 		
 	public Retailer(final Id id, RetailerStrategy rs) { 
 		this.id = id;
@@ -34,7 +32,7 @@ public class Retailer {
 		return this.id;
 	}
 
-	public final boolean addFacility(ActivityFacilityImpl f) {
+	public final boolean addFacility(ActivityFacility f) {
 		if (f == null) { return false; }
 		if (this.facilities.containsKey(f.getId())) { return false; }
 		this.facilities.put(f.getId(),f);
@@ -70,19 +68,19 @@ public class Retailer {
 		else { throw new RuntimeException("The strategy has been not added!"); }
 	}
 	
-	public final ActivityFacilityImpl getFacility(final Id facId) {
+	public final ActivityFacility getFacility(final Id facId) {
 		return this.facilities.get(facId);
 	}
 
-	public final Map<Id,ActivityFacilityImpl> getFacilities() {
+	public final Map<Id,ActivityFacility> getFacilities() {
 		return this.facilities;
 	}
 
-	public final void runStrategy(TreeMap<Id,LinkRetailersImpl> links) {
+	public final void runStrategy(Map<Id,LinkRetailersImpl> links) {
 		this.movedFacilities = strategy.moveFacilities(this.facilities, links);
 	}
 	
-	public Map<Id,ActivityFacilityImpl> getMovedFacilities () {
+	public Map<Id,ActivityFacility> getMovedFacilities () {
 		return this.movedFacilities;
 	}
 }

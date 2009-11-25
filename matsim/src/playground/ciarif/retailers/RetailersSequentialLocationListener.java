@@ -37,6 +37,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -77,8 +78,8 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	private String facilityIdFile = null;
 	private ArrayList<LinkRetailersImpl> retailersLinks = null;
 	private RetailZones retailZones = new RetailZones();
-	private Map<Id,ActivityFacilityImpl> controlerFacilities = null;
-	ArrayList<ActivityFacilityImpl> sampledShops = new ArrayList<ActivityFacilityImpl>();
+	private Map<Id,? extends ActivityFacility> controlerFacilities = null;
+	ArrayList<ActivityFacility> sampledShops = new ArrayList<ActivityFacility>();
 
 	private Controler controler;
 	
@@ -150,8 +151,8 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Controler controler = event.getControler();
-		Map<Id,ActivityFacilityImpl> movedFacilities = new TreeMap<Id,ActivityFacilityImpl>();
-		ArrayList<ActivityFacilityImpl> retailersFacilities = new ArrayList<ActivityFacilityImpl>();
+		Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
+		ArrayList<ActivityFacility> retailersFacilities = new ArrayList<ActivityFacility>();
 		// works, but it is not nicely programmed. shouldn't be a global container, should be
 		// controlled by the controler (or actually added to the population)
 		log.info("There is (are) " + retailers.getRetailers().values().size() + " Retailer(s)");
@@ -196,7 +197,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		}	
 	}
 	
-	private void createZonesFromScenario (Collection<? extends Person> persons, ArrayList<ActivityFacilityImpl> shops, int n, double samplingRatePersons, double samplingRateShops) {
+	private void createZonesFromScenario (Collection<? extends Person> persons, ArrayList<ActivityFacility> shops, int n, double samplingRatePersons, double samplingRateShops) {
 		
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
@@ -208,7 +209,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX() > maxx) { maxx = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX(); }
 			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY() > maxy) { maxy = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY(); }
 		}
-		for (ActivityFacilityImpl shop : shops) {
+		for (ActivityFacility shop : shops) {
 			if (shop.getCoord().getX() < minx) { minx = shop.getCoord().getX(); }
 			if (shop.getCoord().getY() < miny) { miny = shop.getCoord().getY(); }
 			if (shop.getCoord().getX() > maxx) { maxx = shop.getCoord().getX(); }
@@ -239,7 +240,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 						rz.addPersonToQuadTree(c,p);
 					}		
 				} 
-				for (ActivityFacilityImpl af : shops) {
+				for (ActivityFacility af : shops) {
 					Coord c = af.getCoord();
 					if (c.getX()< x2 & c.getX()>=x1 & c.getY()<y2 & c.getY()>=y1) {
 						rz.addShopToQuadTree(c,af);
@@ -255,9 +256,9 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		}
 	}
 	
-	private ArrayList<ActivityFacilityImpl> findScenarioShops() {
-		ArrayList<ActivityFacilityImpl> shops = new ArrayList<ActivityFacilityImpl>();
-		for (ActivityFacilityImpl f : this.controlerFacilities.values()) {
+	private ArrayList<ActivityFacility> findScenarioShops() {
+		ArrayList<ActivityFacility> shops = new ArrayList<ActivityFacility>();
+		for (ActivityFacility f : this.controlerFacilities.values()) {
 			if (f.getActivityOptions().entrySet().toString().contains("shop")) {
 				shops.add(f);
 				log.info("The shop " + f.getId() + " has been added to the file 'shops'");

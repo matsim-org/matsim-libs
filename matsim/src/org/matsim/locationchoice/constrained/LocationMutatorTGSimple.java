@@ -29,6 +29,7 @@ import java.util.Vector;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -47,7 +48,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges);
 	
 	public LocationMutatorTGSimple(final NetworkLayer network, Controler controler, Knowledges knowledges,
-			TreeMap<String, QuadTreeRing<ActivityFacilityImpl>> quad_trees,
+			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
 		
 		super(network, controler, knowledges, quad_trees, facilities_of_type);
@@ -124,10 +125,10 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	protected boolean modifyLocation(ActivityImpl act, Coord startCoord, Coord endCoord, double radius) {		
 		double midPointX = (startCoord.getX() + endCoord.getX()) / 2.0;
 		double midPointY = (startCoord.getY() + endCoord.getY()) / 2.0;	
-		ArrayList<ActivityFacilityImpl> facilitySet = 
-			(ArrayList<ActivityFacilityImpl>) this.quadTreesOfType.get(act.getType()).get(midPointX, midPointY, radius);
+		ArrayList<ActivityFacility> facilitySet = 
+			(ArrayList<ActivityFacility>) this.quadTreesOfType.get(act.getType()).get(midPointX, midPointY, radius);
 		
-		ActivityFacilityImpl facility = null;
+		ActivityFacility facility = null;
 		if (facilitySet.size() > 1) {
 			facility = facilitySet.get(MatsimRandom.getRandom().nextInt(facilitySet.size()));
 		}

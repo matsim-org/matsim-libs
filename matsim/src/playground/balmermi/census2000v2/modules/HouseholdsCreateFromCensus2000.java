@@ -106,7 +106,7 @@ public class HouseholdsCreateFromCensus2000 {
 				Id f_id = new IdImpl(entries[CAtts.I_GEBAEUDE_ID]);
 				ActivityFacilityImpl f = this.facilities.getFacilities().get(f_id);
 				if (f == null) { throw new RuntimeException("Line "+line_cnt+": Facility id="+f_id+" does not exist!"); }
-				if (f.getActivityOption(CAtts.ACT_HOME) == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" exists but does not have 'home' activity type assigned!"); }
+				if (f.getActivityOptions().get(CAtts.ACT_HOME) == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" exists but does not have 'home' activity type assigned!"); }
 				
 				// check for existing municipality
 				Municipality muni = this.municipalities.getMunicipality(Integer.parseInt(zone_id.toString()));

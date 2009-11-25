@@ -201,7 +201,7 @@ public class SNPickFacility implements PlanAlgorithm {
 			}
 
 			if(changed){
-				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).addActivity(f.getActivityOption(factype));
+				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).addActivity(f.getActivityOptions().get(factype));
 //				System.out.println(" Activity locatoin changed this many activities:"+k.getActivities().size());
 				//		 loop over all <leg>s, remove route-information
 				List<? extends PlanElement> bestactslegs = newPlan.getPlanElements();

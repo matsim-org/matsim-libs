@@ -39,7 +39,7 @@ public class CreateZHLeisure {
 		Object [] oldFacilitiesArray = this.facilities.getFacilities().values().toArray();
 		for (int i = 0; i < oldFacilitiesArray.length; i++) {		
 			ActivityFacilityImpl facility = (ActivityFacilityImpl)oldFacilitiesArray[i];
-			if (!(facility.getActivityOption("leisure") == null)) {
+			if (!(facility.getActivityOptions().get("leisure") == null)) {
 				this.facilities.getFacilities().remove(facility.getId());
 			}
 		}	
@@ -69,8 +69,8 @@ public class CreateZHLeisure {
 					this.facilities.createFacility(id, coord);				
 					ActivityFacilityImpl facility = this.facilities.getFacilities().get(id);
 					facility.createActivityOption("leisure");
-					facility.getActivityOption("leisure").setCapacity(1.0);
-					facility.getActivityOption("leisure").addOpeningTime(new OpeningTimeImpl(DayType.wk, 9.0 * 3600, 24.0 * 3600));
+					facility.getActivityOptions().get("leisure").setCapacity(1.0);
+					facility.getActivityOptions().get("leisure").addOpeningTime(new OpeningTimeImpl(DayType.wk, 9.0 * 3600, 24.0 * 3600));
 				}
 			}
 		}

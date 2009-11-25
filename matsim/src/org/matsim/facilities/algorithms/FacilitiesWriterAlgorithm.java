@@ -20,6 +20,8 @@
 
 package org.matsim.facilities.algorithms;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -35,14 +37,14 @@ public class FacilitiesWriterAlgorithm extends AbstractFacilityAlgorithm {
 
 	private FacilitiesWriter facilitiesWriter = null;
 
-	public FacilitiesWriterAlgorithm(final ActivityFacilitiesImpl facilities, final String filename) {
+	public FacilitiesWriterAlgorithm(final ActivityFacilities facilities, final String filename) {
 		super();
-		this.facilitiesWriter = new FacilitiesWriter(facilities);
+		this.facilitiesWriter = new FacilitiesWriter((ActivityFacilitiesImpl) facilities);
 		this.facilitiesWriter.writeOpenAndInit(filename);
 	}
 
-	public void run(final ActivityFacilityImpl facility) {
-		this.facilitiesWriter.writeFacility(facility);
+	public void run(final ActivityFacility facility) {
+		this.facilitiesWriter.writeFacility((ActivityFacilityImpl) facility);
 	}
 
 	/**

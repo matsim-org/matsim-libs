@@ -25,13 +25,12 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
 import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 
 /*
@@ -44,17 +43,14 @@ public class EventsToFacilityLoad implements DeprecatedActivityStartEventHandler
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);
 
-	public EventsToFacilityLoad(final ActivityFacilitiesImpl facilities, double scaleNumberOfPersons,
+	public EventsToFacilityLoad(final ActivityFacilities facilities, double scaleNumberOfPersons,
 			TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		super();
 		
 		this.facilityPenalties = facilityPenalties;
 		
 		log.info("facilities size: " + facilities.getFacilities().values().size());
-		Iterator<? extends ActivityFacilityImpl> iter_fac = facilities.getFacilities().values().iterator();
-		while (iter_fac.hasNext()){
-			ActivityFacilityImpl f = iter_fac.next();
-			
+		for (ActivityFacility f : facilities.getFacilities().values()) {
 			double capacity = Double.MAX_VALUE;
 			Iterator<? extends ActivityOptionImpl> iter_act = f.getActivityOptions().values().iterator();
 			while (iter_act.hasNext()){

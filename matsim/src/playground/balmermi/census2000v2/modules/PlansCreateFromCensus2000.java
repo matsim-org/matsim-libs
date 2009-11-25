@@ -100,7 +100,7 @@ public class PlansCreateFromCensus2000 {
 			double maxx = Double.NEGATIVE_INFINITY;
 			double maxy = Double.NEGATIVE_INFINITY;
 			for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-				if (f.getActivityOption(types[i]) != null) {
+				if (f.getActivityOptions().get(types[i]) != null) {
 					if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 					if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 					if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -111,7 +111,7 @@ public class PlansCreateFromCensus2000 {
 			log.info("        type="+types[i]+": xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 			QuadTree<ActivityFacilityImpl> qt = new QuadTree<ActivityFacilityImpl>(minx,miny,maxx,maxy);
 			for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-				if (f.getActivityOption(types[i]) != null) { qt.put(f.getCoord().getX(),f.getCoord().getY(),f); }
+				if (f.getActivityOptions().get(types[i]) != null) { qt.put(f.getCoord().getX(),f.getCoord().getY(),f); }
 			}
 			log.info("        "+qt.size()+" facilities of type="+types[i]+" added.");
 			this.fqts.put(types[i],qt);
@@ -129,7 +129,7 @@ public class PlansCreateFromCensus2000 {
 			QuadTree<ActivityFacilityImpl> qt = this.fqts.get(act_type);
 			ActivityFacilityImpl home_f = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(0).getFacility();
 			ActivityFacilityImpl educ_f = qt.get(home_f.getCoord().getX(),home_f.getCoord().getY());
-			return educ_f.getActivityOption(act_type);
+			return educ_f.getActivityOptions().get(act_type);
 		}
 		else if (act_type.equals(CAtts.ACT_ESECO)) { // search in home zone and expanding
 			List<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>();
@@ -143,7 +143,7 @@ public class PlansCreateFromCensus2000 {
 				qt.get(min.getX(),min.getY(),max.getX(),max.getY(),fs);
 				if (!fs.isEmpty()) {
 					for (ActivityFacilityImpl f : fs) {
-						ActivityOptionImpl a = f.getActivityOption(act_type);
+						ActivityOptionImpl a = f.getActivityOptions().get(act_type);
 						for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 					}
 					ActivityOptionImpl act = acts.get(MatsimRandom.getRandom().nextInt(acts.size()));
@@ -164,7 +164,7 @@ public class PlansCreateFromCensus2000 {
 			qt.get(qt.getMinEasting()-1.0,qt.getMinNorthing()-1.0,qt.getMaxEasting()+1.0,qt.getMaxNorthing()+1.0,fs);
 			List<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>();
 			for (ActivityFacilityImpl f : fs) {
-				ActivityOptionImpl a = f.getActivityOption(act_type);
+				ActivityOptionImpl a = f.getActivityOptions().get(act_type);
 				for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 			}
 			ActivityOptionImpl act = acts.get(MatsimRandom.getRandom().nextInt(acts.size()));
@@ -210,7 +210,7 @@ public class PlansCreateFromCensus2000 {
 		if (zone != null) {
 			List<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>();
 			for (MappedLocation l : zone.getDownMapping().values()) {
-				ActivityOptionImpl a = ((ActivityFacilityImpl)l).getActivityOption(act_type);
+				ActivityOptionImpl a = ((ActivityFacilityImpl)l).getActivityOptions().get(act_type);
 				if (a != null) { acts.add(a); }
 			}
 			if (!acts.isEmpty()) {
@@ -235,7 +235,7 @@ public class PlansCreateFromCensus2000 {
 					qt.get(min.getX(),min.getY(),max.getX(),max.getY(),fs);
 					if (!fs.isEmpty()) {
 						for (ActivityFacilityImpl f : fs) {
-							ActivityOptionImpl a = f.getActivityOption(act_type);
+							ActivityOptionImpl a = f.getActivityOptions().get(act_type);
 							for (int i=0; i<a.getCapacity(); i++) { acts.add(a); }
 						}
 						ActivityOptionImpl act = acts.get(MatsimRandom.getRandom().nextInt(acts.size()));
@@ -380,7 +380,7 @@ public class PlansCreateFromCensus2000 {
 		List<ActivityOptionImpl> acts_weighted = new ArrayList<ActivityOptionImpl>();
 		for (ActivityFacilityImpl f : facs) {
 			for (String a : w_acts) {
-				ActivityOptionImpl act = f.getActivityOption(a);
+				ActivityOptionImpl act = f.getActivityOptions().get(a);
 				if (act != null) { for (int i=0; i<act.getCapacity(); i++) { acts_weighted.add(act); } }
 			}
 		}
@@ -412,21 +412,21 @@ public class PlansCreateFromCensus2000 {
 		if (wkat == 1) {
 			Household hh_w = (Household)p_atts.get(CAtts.HH_W);
 			desc = desc+"("+CAtts.HH_W+":"+hh_w.getId()+")";
-			k.addActivity(hh_w.getFacility().getActivityOption(CAtts.ACT_HOME), false);
+			k.addActivity(hh_w.getFacility().getActivityOptions().get(CAtts.ACT_HOME), false);
 
 			Household hh_z = (Household)p_atts.get(CAtts.HH_Z);
 			desc = desc+"("+CAtts.HH_Z+":"+hh_z.getId()+")";
-			k.addActivity(hh_z.getFacility().getActivityOption(CAtts.ACT_HOME), false);
+			k.addActivity(hh_z.getFacility().getActivityOptions().get(CAtts.ACT_HOME), false);
 		}
 		else if (wkat == 3) {
 			Household hh_w = (Household)p_atts.get(CAtts.HH_W);
 			desc = desc+"("+CAtts.HH_W+":"+hh_w.getId()+")";
-			k.addActivity(hh_w.getFacility().getActivityOption(CAtts.ACT_HOME), false);
+			k.addActivity(hh_w.getFacility().getActivityOptions().get(CAtts.ACT_HOME), false);
 		}
 		else if (wkat == 4) {
 			Household hh_z = (Household)p_atts.get(CAtts.HH_Z);
 			desc = desc+"("+CAtts.HH_Z+":"+hh_z.getId()+")";
-			k.addActivity(hh_z.getFacility().getActivityOption(CAtts.ACT_HOME), false);
+			k.addActivity(hh_z.getFacility().getActivityOptions().get(CAtts.ACT_HOME), false);
 		}
 		else { Gbl.errorMsg("that should not happen!"); }
 		k.setDescription(k.getDescription()+desc);

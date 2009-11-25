@@ -93,7 +93,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-			if (f.getActivityOption(WORK) != null) {
+			if (f.getActivityOptions().get(WORK) != null) {
 				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 				if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -107,7 +107,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.workFacQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-			if (f.getActivityOption(WORK) != null) {
+			if (f.getActivityOptions().get(WORK) != null) {
 				this.workFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
 		}
@@ -123,7 +123,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-			if (f.getActivityOption(EDUCATION) != null) {
+			if (f.getActivityOptions().get(EDUCATION) != null) {
 				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
 				if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
@@ -137,7 +137,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		this.educFacQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
 		for (ActivityFacilityImpl f : this.facilities.getFacilities().values()) {
-			if (f.getActivityOption(EDUCATION) != null) {
+			if (f.getActivityOptions().get(EDUCATION) != null) {
 				this.educFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
 		}
@@ -162,13 +162,13 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			}
 
 			Zone z = zones.get(MatsimRandom.getRandom().nextInt(zones.size()));
-			if (f.getActivityOption(WORK) != null) {
+			if (f.getActivityOptions().get(WORK) != null) {
 				ArrayList<ActivityFacilityImpl> facs = this.zone_work_fac_mapping.get(z.getId());
 				if (facs == null) { facs = new ArrayList<ActivityFacilityImpl>(); }
 				facs.add(f);
 				this.zone_work_fac_mapping.put(z.getId(),facs);
 			}
-			if (f.getActivityOption(EDUCATION) != null) {
+			if (f.getActivityOptions().get(EDUCATION) != null) {
 				ArrayList<ActivityFacilityImpl> facs = this.zone_educ_fac_mapping.get(z.getId());
 				if (facs == null) { facs = new ArrayList<ActivityFacilityImpl>(); }
 				facs.add(f);
@@ -220,17 +220,17 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		if (facs.isEmpty()) { Gbl.errorMsg("facs are empty! This should not happen!"); }
 
 		int[] dist_sum = new int[facs.size()];
-		dist_sum[0] = facs.get(0).getActivityOption(act_type).getCapacity().intValue();
+		dist_sum[0] = facs.get(0).getActivityOptions().get(act_type).getCapacity().intValue();
 		if ((dist_sum[0] <= 0) || (dist_sum[0] == Integer.MAX_VALUE)) {
 			dist_sum[0] = 1;
-			facs.get(0).getActivityOption(act_type).setCapacity(1);
+			facs.get(0).getActivityOptions().get(act_type).setCapacity(1);
 		}
 		int n = facs.size();
 		for (int i=1; i<n; i++) {
-			int val = facs.get(i).getActivityOption(act_type).getCapacity().intValue();
+			int val = facs.get(i).getActivityOptions().get(act_type).getCapacity().intValue();
 			if ((val <= 0) || (val == Integer.MAX_VALUE)) {
 				val = 1;
-				facs.get(i).getActivityOption(act_type).setCapacity(1);
+				facs.get(i).getActivityOptions().get(act_type).setCapacity(1);
 			}
 			dist_sum[i] = dist_sum[i-1] + val;
 		}

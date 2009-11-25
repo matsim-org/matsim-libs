@@ -34,7 +34,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -64,7 +64,7 @@ public class PajekWriter {
 
 	private final static Logger log = Logger.getLogger(PajekWriter.class);
 
-	public PajekWriter(String dir, ActivityFacilitiesImpl facilities, Knowledges knowledges){
+	public PajekWriter(String dir, ActivityFacilities facilities, Knowledges knowledges){
 		this.dir= dir + "/";
 		this.knowledges = knowledges;
 		File pjDir=new File(this.dir+"pajek/");

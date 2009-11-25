@@ -68,7 +68,7 @@ public class ReadKonradFacilities {
 			
 			int i = 0;
 			for (DayType day : DayType.values()) {				
-				SortedSet<OpeningTime>  set = facility.getActivityOption("shop").getOpeningTimes(day);
+				SortedSet<OpeningTime>  set = facility.getActivityOptions().get("shop").getOpeningTimes(day);
 				if (set != null) {
 					if (set.size() == 2) {
 						opentimes[i][2] = set.first().getStartTime();

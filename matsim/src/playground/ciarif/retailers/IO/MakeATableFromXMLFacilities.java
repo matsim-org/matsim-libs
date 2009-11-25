@@ -4,8 +4,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
+
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 
 public class MakeATableFromXMLFacilities {
@@ -56,17 +57,17 @@ public class MakeATableFromXMLFacilities {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void write(Map<Id,ActivityFacilityImpl> facilities) {
+	public void write(Map<Id,? extends ActivityFacility> facilities) {
 		try {
 			//this.facilities = facilities;
 			
-			for (ActivityFacilityImpl f : facilities.values()) {
-				if (f.getActivityOption("shop")!=null){
+			for (ActivityFacility f : facilities.values()) {
+				if (f.getActivityOptions().get("shop")!=null){
 					out.write(f.getId()+ "\t");
 					out.write(f.getCoord().getX()+ "\t");
 					out.write(f.getCoord().getY()+"\t");
-					out.write(f.getLink().getId()+"\t");
-					out.write(f.getActivityOption("shop").getCapacity()+"\n");
+					out.write(f.getLinkId()+"\t");
+					out.write(f.getActivityOptions().get("shop").getCapacity()+"\n");
 					}
 				}
 			out.flush();

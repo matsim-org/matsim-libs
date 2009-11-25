@@ -47,6 +47,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
@@ -418,9 +419,9 @@ public class Controler {
 			// dump config
 			new ConfigWriter(this.config).writeFile(this.getNameForOutputFilename("output_config.xml.gz"));
 			// dump facilities
-			ActivityFacilitiesImpl facilities = this.getFacilities();
+			ActivityFacilities facilities = this.getFacilities();
 			if (facilities != null) {
-				new FacilitiesWriter(facilities).writeFile(this.getNameForOutputFilename("output_facilities.xml.gz"));
+				new FacilitiesWriter((ActivityFacilitiesImpl) facilities).writeFile(this.getNameForOutputFilename("output_facilities.xml.gz"));
 			}
 			if (this.network.getFactory().isTimeVariant()) {
 				new NetworkChangeEventsWriter().write(this.getNameForOutputFilename("output_change_events.xml.gz"), this.network.getNetworkChangeEvents());
@@ -1050,7 +1051,7 @@ public class Controler {
 		return this.scenarioData.getWorld();
 	}
 
-	public final ActivityFacilitiesImpl getFacilities() {
+	public final ActivityFacilities getFacilities() {
 		return this.scenarioData.getActivityFacilities();
 	}
 

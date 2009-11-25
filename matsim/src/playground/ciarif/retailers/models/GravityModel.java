@@ -9,11 +9,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.ciarif.retailers.data.PersonRetailersImpl;
 import playground.ciarif.retailers.data.RetailZone;
@@ -31,18 +33,18 @@ public class GravityModel
   public final static String CONFIG_SAMPLE_PERSONS = "samplingRatePersons";
   private double[] betas;
   private Controler controler;
-  private Map<Id,ActivityFacilityImpl> shops = new TreeMap<Id,ActivityFacilityImpl>();
-  private Collection<ActivityFacilityImpl> controlerFacilities;
+  private Map<Id,ActivityFacility> shops = new TreeMap<Id,ActivityFacility>();
+  private Collection<? extends ActivityFacility> controlerFacilities;
   private Map<Id, PersonRetailersImpl> retailersPersons = new TreeMap<Id, PersonRetailersImpl>();
   private RetailZones retailZones = new RetailZones();
-  private Map<Id, ActivityFacilityImpl> retailersFacilities;
+  private Map<Id, ActivityFacility> retailersFacilities;
   private TreeMap<Integer,String> first;
   private Map<Id, ? extends Person> persons;
   private int counter=0;
   private int nextCounterMsg =1;
   
  
-  public GravityModel(Controler controler, Map<Id, ActivityFacilityImpl> retailerFacilities)
+  public GravityModel(Controler controler, Map<Id, ActivityFacility> retailerFacilities)
   {
     this.controler = controler;
     this.retailersFacilities = retailerFacilities;
@@ -78,7 +80,7 @@ public double computePotential(ArrayList<Integer> solution){
 	double global_likelihood = 0;
     int a = 0;
     
-    for (ActivityFacilityImpl c : this.retailersFacilities.values()) {
+    for (ActivityFacility c : this.retailersFacilities.values()) {
     String linkId = this.first.get(solution.get(a));
     Coord coord = this.controler.getNetwork().getLink(linkId).getCoord();
 	++a;
@@ -95,16 +97,16 @@ public double computePotential(ArrayList<Integer> solution){
         else {
           dist1 = ((ActivityFacilityImpl) ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility()).calcDistance(coord);
         }
-        pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(c.getActivityOption("shop").getCapacity().doubleValue(), this.betas[1]);
+        pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(c.getActivityOptions().get("shop").getCapacity().doubleValue(), this.betas[1]);
         
         if (pr.getGlobalShopsUtility()==0) {
         	this.processPerson();
         	
-        	for (ActivityFacilityImpl s : this.shops.values()) {
+        	for (ActivityFacility s : this.shops.values()) {
 	          double dist = 0.0D;
 	          int count=0;
 	         
-	          for (ActivityFacilityImpl af: this.retailersFacilities.values()){
+	          for (ActivityFacility af: this.retailersFacilities.values()){
 		          
 	        	  if (af.equals(s)){
 		            int index = count;
@@ -116,19 +118,18 @@ public double computePotential(ArrayList<Integer> solution){
 		            else {
 		              dist = ((ActivityFacilityImpl) ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility()).calcDistance(coord1);
 		            }
-		
 		          }
-		          else if (s.calcDistance(((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getCoord()) == 0.0D) {
+		          else if (CoordUtils.calcDistance(s.getCoord(), ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getCoord()) == 0.0D) {
 		        	  dist = 10.0D;
 		          } 
 		          
 		          else {
-		            dist = s.calcDistance(((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getCoord());
+		            dist = CoordUtils.calcDistance(s.getCoord(), ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getCoord());
 		          }
 		          ++count;
 	          } 
 	
-	          double potential = Math.pow(dist, this.betas[0]) + Math.pow(s.getActivityOption("shop").getCapacity().doubleValue(), this.betas[1]);
+	          double potential = Math.pow(dist, this.betas[0]) + Math.pow(s.getActivityOptions().get("shop").getCapacity().doubleValue(), this.betas[1]);
 	          ;
 	          pers_sum_potential += potential;
         	}
@@ -144,14 +145,13 @@ public double computePotential(ArrayList<Integer> solution){
     return global_likelihood;
   }
   
-  private Map<Id,ActivityFacilityImpl> findScenarioShops (Collection<ActivityFacilityImpl> controlerFacilities) {
+  private Map<Id,ActivityFacility> findScenarioShops (Collection<? extends ActivityFacility> controlerFacilities) {
 	  
-		Map<Id,ActivityFacilityImpl> shops = new TreeMap<Id,ActivityFacilityImpl>();
-		for (ActivityFacilityImpl f : controlerFacilities) {
+		Map<Id,ActivityFacility> shops = new TreeMap<Id,ActivityFacility>();
+		for (ActivityFacility f : controlerFacilities) {
 			if (f.getActivityOptions().entrySet().toString().contains("shop")) {
 				shops.put(f.getId(),f);
 			}
-			else {}
 		}
 		return shops;
 	}
@@ -167,7 +167,7 @@ public double computePotential(ArrayList<Integer> solution){
 			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX() > maxx) { maxx = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getX(); }
 			if (((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY() > maxy) { maxy = ((PlanImpl) p.getSelectedPlan()).getFirstActivity().getCoord().getY(); }
 		}
-		for (ActivityFacilityImpl shop : shops.values()) {
+		for (ActivityFacility shop : shops.values()) {
 			if (shop.getCoord().getX() < minx) { minx = shop.getCoord().getX(); }
 			if (shop.getCoord().getY() < miny) { miny = shop.getCoord().getY(); }
 			if (shop.getCoord().getX() > maxx) { maxx = shop.getCoord().getX(); }
@@ -203,7 +203,7 @@ public double computePotential(ArrayList<Integer> solution){
 							rz.addPersonToQuadTree(c,p);
 						}		
 					} 
-					for (ActivityFacilityImpl af : shops.values()) {
+					for (ActivityFacility af : shops.values()) {
 						Coord c = af.getCoord();
 						if (c.getX()< x2 & c.getX()>=x1 & c.getY()<y2 & c.getY()>=y1) {
 							rz.addShopToQuadTree(c,af);
@@ -225,7 +225,7 @@ public double computePotential(ArrayList<Integer> solution){
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		
-		for (ActivityFacilityImpl af : controlerFacilities) {
+		for (ActivityFacility af : controlerFacilities) {
 			if (af.getCoord().getX() < minx) { minx = af.getCoord().getX(); }
 			if (af.getCoord().getY() < miny) { miny = af.getCoord().getY(); }
 			if (af.getCoord().getX() > maxx) { maxx = af.getCoord().getX(); }
@@ -262,7 +262,7 @@ public double computePotential(ArrayList<Integer> solution){
 						rz.addPersonToQuadTree(c,p);
 					}		
 				} 
-				for (ActivityFacilityImpl af : shops.values()) {
+				for (ActivityFacility af : shops.values()) {
 					Coord c = af.getCoord();
 					if (c.getX()< x2 & c.getX()>=x1 & c.getY()<y2 & c.getY()>=y1) {
 						rz.addShopToQuadTree(c,af);
@@ -289,7 +289,7 @@ public double computePotential(ArrayList<Integer> solution){
 		Gbl.printMemoryUsage();
 	}
 
-	  public Map<Id,ActivityFacilityImpl> getScenarioShops () {
+	  public Map<Id,ActivityFacility> getScenarioShops () {
 		  return this.shops;
 	  }
 	  public RetailZones getRetailZones() {

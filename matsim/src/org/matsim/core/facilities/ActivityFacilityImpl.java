@@ -159,10 +159,6 @@ public class ActivityFacilityImpl extends AbstractLocation implements ActivityFa
 		return this.activities;
 	}
 
-	public final ActivityOptionImpl getActivityOption(final String type) {
-		return this.activities.get(type);
-	}
-
 	public final LinkImpl getLink() {
 		if (this.down_mapping.isEmpty()) { return null; }
 		if (this.down_mapping.size() > 1) { Gbl.errorMsg("Something is wrong!!! A facility contains at most one Link (as specified for the moment)!"); }

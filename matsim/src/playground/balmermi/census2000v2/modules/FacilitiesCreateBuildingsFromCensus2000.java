@@ -133,7 +133,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 					}
 
 					// add 1 to capacity
-					ActivityOptionImpl act = f.getActivityOption(CAtts.ACT_HOME);
+					ActivityOptionImpl act = f.getActivityOptions().get(CAtts.ACT_HOME);
 					act.setCapacity(act.getCapacity()+1);
 
 					// store some info

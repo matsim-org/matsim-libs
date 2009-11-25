@@ -289,7 +289,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 
 		this.currfacility = this.facilities.getFacilities().get(new IdImpl(id));
 		if (this.currfacility == null) { Gbl.errorMsg("facility id=" + id + " does not exist!"); }
-		this.curractivity = this.currfacility.getActivityOption(this.curracttype);
+		this.curractivity = this.currfacility.getActivityOptions().get(this.curracttype);
 		if (this.curractivity == null) { Gbl.errorMsg("facility id=" + id + ": Activity of type=" + this.curracttype + " does not exist!"); }
 		this.currknowledge.addActivity(this.curractivity,isPrimary);
 	}

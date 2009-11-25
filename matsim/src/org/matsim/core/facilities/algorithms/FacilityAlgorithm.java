@@ -20,8 +20,8 @@
 
 package org.matsim.core.facilities.algorithms;
 
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 public interface FacilityAlgorithm {
-	public void run(ActivityFacilityImpl facility);
+	public void run(ActivityFacility facility);
 }

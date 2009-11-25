@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -23,7 +24,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 	public final static String CONFIG_N_ALTERNATIVES = "alternatives";
 	private Controler controler;
 	private int alternatives;	
-	private Map<Id,ActivityFacilityImpl> movedFacilities = new TreeMap<Id,ActivityFacilityImpl>();
+	private Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
 	
 	public LogitMaxLinkRetailerStrategy (Controler controler) {
 		this.controler = controler;
@@ -32,21 +33,21 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 		this.alternatives = alternatives;
 	}
 
-	public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> facilities, ArrayList<LinkRetailersImpl> Allowedlinks) {
+	public Map<Id, ActivityFacility> moveFacilities(Map<Id, ActivityFacility> facilities, ArrayList<LinkRetailersImpl> Allowedlinks) {
 		
 		// example to get the facilities (locations) of a link 
 //		controler.getNetwork().getLink("").getUpMapping();
 		
 
-		for (ActivityFacilityImpl f : facilities.values()) { //francesco: TODO check again this loop (or one of the internal one), it seems that too many 
+		for (ActivityFacility f : facilities.values()) { //francesco: TODO check again this loop (or one of the internal one), it seems that too many 
 			// facility relocations are performed, if this might not influence the results it is certainly a waste of memory
 			
 			double[] utils = new double[alternatives];
 			Object[] links = controler.getNetwork().getLinks().values().toArray();
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getTravelTimeCalculator());
-			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLink().getId());
+			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLinkId());
 			ArrayList<Link> newLinks = new ArrayList<Link>(); 
-			newLinks.add(f.getLink());
+			newLinks.add(((ActivityFacilityImpl) f).getLink());
 			double currentlink_volume =0;
 			for (int j=0; j<currentlink_volumes.length;j=j+1) {
 				currentlink_volume = currentlink_volume + currentlink_volumes[j];
@@ -69,7 +70,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 			double [] probs = calcLogitProbability(utils);
 			for (int k=0;k<probs.length;k++) {
 				if (r<=probs [k]) {
-					f.moveTo(newLinks.get(k).getCoord());
+					((ActivityFacilityImpl) f).moveTo(newLinks.get(k).getCoord());
 					this.movedFacilities.put(f.getId(),f);
 				}
 			}
@@ -94,9 +95,9 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 		return null;
 	}
 
-	public Map<Id, ActivityFacilityImpl> moveFacilities(
-			Map<Id, ActivityFacilityImpl> facilities,
-			TreeMap<Id, LinkRetailersImpl> links) {
+	public Map<Id, ActivityFacility> moveFacilities(
+			Map<Id, ActivityFacility> facilities,
+			Map<Id, LinkRetailersImpl> links) {
 		// TODO Auto-generated method stub
 		return null;
 	}

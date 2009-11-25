@@ -325,7 +325,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		// and maintain a list of Facilities per Zone
 		core.J = new double[ core.numZ ];
 		for( ActivityFacilityImpl facility : facilities.getFacilities().values() ){
-			ActivityOptionImpl act = facility.getActivityOption( primaryActivityName );
+			ActivityOptionImpl act = facility.getActivityOptions().get(primaryActivityName);
 			if( act != null ){
 				ArrayList<MappedLocation> list = zoneLayer.getNearestLocations( facility.getCoord(), null);
 				Zone zone = (Zone) list.get(0);

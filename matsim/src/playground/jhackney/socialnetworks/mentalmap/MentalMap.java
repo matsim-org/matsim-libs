@@ -34,7 +34,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
@@ -119,7 +120,7 @@ public class MentalMap {
 					while(myActivity==null){
 						int k = MatsimRandom.getRandom().nextInt(facs.length);
 						ActivityFacilityImpl f = (ActivityFacilityImpl) facs[k];
-						myActivity = f.getActivityOption(myAct.getType());
+						myActivity = f.getActivityOptions().get(myAct.getType());
 						if(myActivity!=null){
 							myAct.setFacility(myActivity.getFacility());
 							//TODO JH add logic to label this activity primary or secondary
@@ -131,7 +132,7 @@ public class MentalMap {
 		}
 	}
 
-	public void initializeActActivityMapFromFile(Plan myPlan, ActivityFacilitiesImpl facilities, ActivityActReader aar){
+	public void initializeActActivityMapFromFile(Plan myPlan, ActivityFacilities facilities, ActivityActReader aar){
 
 
 		if(aar==null) return;
@@ -145,11 +146,11 @@ public class MentalMap {
 //			String myActivityType=nextFac.get(myFacilityId);
 				String myActivityType=myAct.getType();
 				
-				ActivityFacilityImpl fac = facilities.getFacilities().get(myFacilityId);
+				ActivityFacility fac = facilities.getFacilities().get(myFacilityId);
 //			myAct.setFacility(fac);
 //			this.knowledge.addActivity(fac.getActivity(myActivityType));
 				//TODO JH apply some logic to label this a primary or secondary location
-				ActivityOptionImpl myActivity=fac.getActivityOption(myActivityType);
+				ActivityOptionImpl myActivity=fac.getActivityOptions().get(myActivityType);
 				this.knowledge.addActivity(myActivity,false);
 			}
 		}

@@ -4,7 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.ciarif.retailers.data.Retailer;
 import playground.ciarif.retailers.data.Retailers;
@@ -66,14 +66,14 @@ public class RetailersSummaryWriter {
 			
 			out.write("ITERATION N." + iter +"\n");
 			for (Retailer r : this.retailers.getRetailers().values()) {
-				for (ActivityFacilityImpl f : r.getFacilities().values()) {
+				for (ActivityFacility f : r.getFacilities().values()) {
 					System.out.println("fac Id = "+ f.getId());
 					out.write(f.getId()+"\t");
 					out.write(f.getCoord().getX()+ "\t");
 					out.write(f.getCoord().getY()+"\t");
 //					BasicLink l = (BasicLink)f.getDownMapping().values().iterator().next();
 //					out.write(l.getId()+"\t");
-					out.write(f.getLink().getId()+"\t");
+					out.write(f.getLinkId()+"\t");
 					out.write(iter +"\n");
 				}
 			}

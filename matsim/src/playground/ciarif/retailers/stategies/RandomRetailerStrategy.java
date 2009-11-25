@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
@@ -19,17 +20,17 @@ public class RandomRetailerStrategy implements RetailerStrategy {
 	
 	private final World world;
 	public static final String NAME = "randomRetailerStrategy";
-	private Map<Id,ActivityFacilityImpl> movedFacilities = new TreeMap<Id,ActivityFacilityImpl>();
+	private Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
 	
 	public RandomRetailerStrategy (NetworkLayer network, World world) {
 		this.world = world;
 	}
 	
-	final public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> facilities, ArrayList<LinkRetailersImpl> allowedLinks) {
-		for (ActivityFacilityImpl f : facilities.values()) {
+	final public Map<Id, ActivityFacility> moveFacilities(Map<Id, ActivityFacility> facilities, ArrayList<LinkRetailersImpl> allowedLinks) {
+		for (ActivityFacility f : facilities.values()) {
 			int rd = MatsimRandom.getRandom().nextInt(allowedLinks.size());
 			Link link =allowedLinks.get(rd);
-			Utils.moveFacility(f,link,this.world);
+			Utils.moveFacility((ActivityFacilityImpl) f,link,this.world);
 			this.movedFacilities.put(f.getId(),f);
 		}
 		return this.movedFacilities;
@@ -46,9 +47,9 @@ public class RandomRetailerStrategy implements RetailerStrategy {
 		return null;
 	}
 
-	public Map<Id, ActivityFacilityImpl> moveFacilities(
-			Map<Id, ActivityFacilityImpl> facilities,
-			TreeMap<Id, LinkRetailersImpl> links) {
+	public Map<Id, ActivityFacility> moveFacilities(
+			Map<Id, ActivityFacility> facilities,
+			Map<Id, LinkRetailersImpl> links) {
 		// TODO Auto-generated method stub
 		return null;
 	}

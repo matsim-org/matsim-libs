@@ -20,8 +20,8 @@
 
 package org.matsim.core.facilities;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -86,7 +86,7 @@ public class FacilitiesImplTest extends MatsimTestCase {
 	/*package*/ static class MockAlgo1 extends AbstractFacilityAlgorithm {
 		private int counter = 0;
 
-		public void run(final ActivityFacilityImpl facility) {
+		public void run(final ActivityFacility facility) {
 			this.counter++;
 		}
 
@@ -98,7 +98,7 @@ public class FacilitiesImplTest extends MatsimTestCase {
 	/*package*/ static class MockAlgo2 implements FacilityAlgorithm {
 		private int counter = 0;
 
-		public void run(final ActivityFacilityImpl facility) {
+		public void run(final ActivityFacility facility) {
 			this.counter++;
 		}
 

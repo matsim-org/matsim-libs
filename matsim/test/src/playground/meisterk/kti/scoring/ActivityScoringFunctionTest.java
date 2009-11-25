@@ -218,10 +218,10 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		ActivityOptionImpl actOpt = null;
 
-		actOpt = this.facilities.getFacilities().get(new IdImpl("3")).getActivityOption("work_sector3");
+		actOpt = this.facilities.getFacilities().get(new IdImpl("3")).getActivityOptions().get("work_sector3");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("18:00:00")));
 
-		actOpt = this.facilities.getFacilities().get(new IdImpl("5")).getActivityOption("leisure");
+		actOpt = this.facilities.getFacilities().get(new IdImpl("5")).getActivityOptions().get("leisure");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("16:00:00")));
 
 		// []{end home, work_sector3, leisure, work_Sector3, home, shop, start home, finish, reset}
@@ -245,11 +245,11 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		ActivityOptionImpl actOpt = null;
 
-		actOpt = this.facilities.getFacilities().get(new IdImpl("3")).getActivityOption("work_sector3");
+		actOpt = this.facilities.getFacilities().get(new IdImpl("3")).getActivityOptions().get("work_sector3");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("14:00:00")));
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("15:15:00"), Time.parseTime("20:00:00")));
 
-		actOpt = this.facilities.getFacilities().get(new IdImpl("5")).getActivityOption("leisure");
+		actOpt = this.facilities.getFacilities().get(new IdImpl("5")).getActivityOptions().get("leisure");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
 
 		// []{end home, work_sector3, leisure, work_Sector3, home, shop, start home, finish, reset}
@@ -273,15 +273,15 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		ActivityOptionImpl actOpt = null;
 
-		actOpt = this.facilities.getFacilities().get(new IdImpl("3")).getActivityOption("work_sector3");
+		actOpt = this.facilities.getFacilities().get(new IdImpl("3")).getActivityOptions().get("work_sector3");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("07:00:00"), Time.parseTime("10:00:00")));
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("10:30:00"), Time.parseTime("14:00:00")));
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("15:15:00"), Time.parseTime("20:00:00")));
 
-		actOpt = this.facilities.getFacilities().get(new IdImpl("5")).getActivityOption("leisure");
+		actOpt = this.facilities.getFacilities().get(new IdImpl("5")).getActivityOptions().get("leisure");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("11:00:00"), Time.parseTime("14:00:00")));
 
-		actOpt = this.facilities.getFacilities().get(new IdImpl("7")).getActivityOption("shop");
+		actOpt = this.facilities.getFacilities().get(new IdImpl("7")).getActivityOptions().get("shop");
 		actOpt.addOpeningTime(new OpeningTimeImpl(DayType.wed, Time.parseTime("12:00:00"), Time.parseTime("27:00:00")));
 
 		// []{end home, work_sector3, leisure, work_Sector3, home, shop, start home, finish, reset}

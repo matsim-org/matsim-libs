@@ -4,14 +4,17 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
+
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.data.Retailer;
 import playground.ciarif.retailers.data.Retailers;
@@ -115,8 +118,8 @@ public class LinksRetailerReader {
 	private void detectRetailersActualLinks(){
 		TreeMap<Id,LinkRetailersImpl> links =  new TreeMap<Id,LinkRetailersImpl>();
 		for (Retailer r:retailers.getRetailers().values()) {
-			for (ActivityFacilityImpl af: r.getFacilities().values()){
-				LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)af.getLink(), controler.getNetwork());
+			for (ActivityFacility af: r.getFacilities().values()){
+				LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)((ActivityFacilityImpl) af).getLink(), controler.getNetwork());
 				links.put(link.getId(),link);
 			}
 		}

@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -298,11 +299,11 @@ public class AgentsAssigner implements PlanAlgorithm{
 			if (!primActs.isEmpty()){
 				for (int j=0;j<primActs.size();j++){
 					if (((ActivityImpl)(bestPlan.getPlanElements().get(i))).getType().equals(primActs.get(j).getType())){
-						ActivityFacilityImpl fac = this.controler.getFacilities().getFacilities().get(primActs.get(j).getFacility().getId());
+						ActivityFacility fac = this.controler.getFacilities().getFacilities().get(primActs.get(j).getFacility().getId());
 						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setFacility(fac);
 						// not only update of fac required but also coord and link; data inconsistencies otherwise
 						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setCoord(fac.getCoord());
-						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setLink(fac.getLink());
+						((ActivityImpl)(bestPlan.getPlanElements().get(i))).setLink(((ActivityFacilityImpl) fac).getLink());
 						if (!primActs.get(j).getType().toString().equals("home")) primActs.remove(j);
 						break;
 					}

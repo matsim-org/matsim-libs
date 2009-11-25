@@ -8,9 +8,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 
 import playground.ciarif.retailers.data.Retailer;
@@ -19,12 +19,12 @@ import playground.ciarif.retailers.data.Retailers;
 public class FileRetailerReader {
 
 	private final static Logger log = Logger.getLogger(FileRetailerReader.class);
-	private Map<Id, ActivityFacilityImpl> controlerFacilities;
+	private Map<Id, ? extends ActivityFacility> controlerFacilities;
 	private String facilityIdFile;
 	private Retailers retailers = new Retailers();
 	private ArrayList<Id> retailersLinks = new ArrayList<Id>();
 	
-	public FileRetailerReader(Map<Id, ActivityFacilityImpl> controlerFacilities, String facilityIdFile) {
+	public FileRetailerReader(Map<Id, ? extends ActivityFacility> controlerFacilities, String facilityIdFile) {
 		this.controlerFacilities = controlerFacilities;
 		this.facilityIdFile = facilityIdFile;
 	}
@@ -46,18 +46,18 @@ public class FileRetailerReader {
 					if (controlerFacilities.get(fId) != null) {
 					if (this.retailers.getRetailers().containsKey(rId)) { // retailer exists already
 						
-						ActivityFacilityImpl f = controlerFacilities.get(fId);
+						ActivityFacility f = controlerFacilities.get(fId);
 						this.retailers.getRetailers().get(rId).addFacility(f);
-						retailersLinks.add(f.getLink().getId());
+						retailersLinks.add(f.getLinkId());
 
 					}	
 					else { // retailer does not exists yet
 						
 						Retailer r = new Retailer(rId, null);
 						r.addStrategy(controler, entries[2]);
-						ActivityFacilityImpl f = controlerFacilities.get(fId);
+						ActivityFacility f = controlerFacilities.get(fId);
 						r.addFacility(f);
-						retailersLinks.add(f.getLink().getId());
+						retailersLinks.add(f.getLinkId());
 						this.retailers.addRetailer(r);
 					}
 				}

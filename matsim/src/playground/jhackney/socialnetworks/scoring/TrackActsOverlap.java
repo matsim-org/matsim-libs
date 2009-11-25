@@ -99,7 +99,7 @@ public class TrackActsOverlap {
 			for (PlanElement pe : p1.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act1 = (ActivityImpl) pe;
-					ActivityOptionImpl activity1=((ActivityFacilityImpl) act1.getFacility()).getActivityOption(act1.getType());
+					ActivityOptionImpl activity1=((ActivityFacilityImpl) act1.getFacility()).getActivityOptions().get(act1.getType());
 					ArrayList<PersonImpl> actList=new ArrayList<PersonImpl>();
 					
 					if(!activityMap.keySet().contains(activity1)){
@@ -141,7 +141,7 @@ public class TrackActsOverlap {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
-				ActivityOptionImpl myActivity=((ActivityFacilityImpl) act.getFacility()).getActivityOption(act.getType());
+				ActivityOptionImpl myActivity=((ActivityFacilityImpl) act.getFacility()).getActivityOptions().get(act.getType());
 				ArrayList<PersonImpl> visitors=activityMap.get(myActivity);
 				// Go through the list of Persons and for each one pick one friend randomly
 				// Must be double loop
@@ -171,7 +171,7 @@ public class TrackActsOverlap {
 		for (PlanElement pe1 : plan.getPlanElements()) {
 			if (pe1 instanceof ActivityImpl) {
 				ActivityImpl act1 = (ActivityImpl) pe1;
-				ActivityOptionImpl myActivity=((ActivityFacilityImpl) act1.getFacility()).getActivityOption(act1.getType());
+				ActivityOptionImpl myActivity=((ActivityFacilityImpl) act1.getFacility()).getActivityOptions().get(act1.getType());
 				ArrayList<PersonImpl> visitors=activityMap.get(myActivity);
 				if(!activityMap.keySet().contains(myActivity)){
 					Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
@@ -222,7 +222,7 @@ public class TrackActsOverlap {
 		for (PlanElement pe1 : plan.getPlanElements()) {
 			if (pe1 instanceof ActivityImpl) {
 				ActivityImpl act1 = (ActivityImpl) pe1;
-				ActivityOptionImpl myActivity=((ActivityFacilityImpl) act1.getFacility()).getActivityOption(act1.getType());
+				ActivityOptionImpl myActivity=((ActivityFacilityImpl) act1.getFacility()).getActivityOptions().get(act1.getType());
 				ArrayList<PersonImpl> visitors=activityMap.get(myActivity);
 				if(!activityMap.keySet().contains(myActivity)){
 					Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
@@ -281,7 +281,7 @@ public class TrackActsOverlap {
 				double foe=0.;
 				double totalTimeWithFriends=0;
 				
-				ActivityOptionImpl myActivity=((ActivityFacilityImpl) act1.getFacility()).getActivityOption(act1.getType());
+				ActivityOptionImpl myActivity=((ActivityFacilityImpl) act1.getFacility()).getActivityOptions().get(act1.getType());
 				ArrayList<PersonImpl> visitors=activityMap.get(myActivity);
 				if(!activityMap.keySet().contains(myActivity)){
 					Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
