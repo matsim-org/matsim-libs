@@ -105,7 +105,8 @@
 		<param name="testing.energyConsumptionPerLink" value="100000" /> <!-- in Joule [J] -->
 		<param name="testing.maxEnergyPriceWillingToPay" value="1" /> <!-- in utils per [J]  -->
 		
-		
+		<param name="main.numberOfHubs" value="1" />
+		<param name="main.hubLinkMappingPath" value="&INBASE;/hubLinkMapping3.txt" />
 		<param name="testing.peakHourElectricityPrice" value="0.8" /> <!-- in utils/J peakHour: from 07:00 to 20:00  -->
 		<param name="testing.lowTariffElectrictyPrice" value="0.3" /> <!-- in utils/J lowTariff: from 20:00 to 07:00  -->
 		
