@@ -54,7 +54,7 @@ public class PtIntegrator {
 	//private final static String TRANSIT_SCHEDULE_FILE = "src/playground/mmoyo/demo/X5/transfer_det/blue_green2_TransitSchedule.xml";
 	private final static String VEHICLE_FILE = "src/playground/mmoyo/demo/X5/vehicles.xml";	
 	
-	private final static String ROUTED_PLANS_FILE = "src/playground/mmoyo/demo/X5/simplePlan1/routedPlans.xml";
+	private final static String ROUTED_PLANS_FILE = "src/playground/mmoyo/demo/X5/routedPlans.xml";
 	//private final static String MULTI_MODAL_NETWORK_FILE = "src/playground/mmoyo/demo/X5/simplePlan1/multimodalnetwork.xml";
 	//private final static String TRANSIT_SCHEDULE_WITH_NETWORK_FILE = "src/playground/mmoyo/demo/X5/simplePlan1/Schedule_With_Net_File";
 	
