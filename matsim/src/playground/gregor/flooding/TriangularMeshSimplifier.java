@@ -3,6 +3,8 @@ package playground.gregor.flooding;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.geotools.factory.FactoryRegistryException;
@@ -22,6 +25,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -42,7 +46,10 @@ public class TriangularMeshSimplifier {
 
 	private static final Logger log = Logger.getLogger(TriangularMeshSimplifier.class);
 
-	private static final double MAX_LENGTH = 500;
+	private static final double MAX_LENGTH = 20;
+
+	private static final double TWO_PI = 2 * Math.PI;
+	private static final double PI_HALF =  Math.PI / 2;
 
 	private final List<List<FloodingInfo>> geos = new ArrayList<List<FloodingInfo>>();
 
@@ -59,7 +66,6 @@ public class TriangularMeshSimplifier {
 	private final Map<Edge,Set<Triangle>> edgeTriangleMapping = new HashMap<Edge,Set<Triangle>>();
 	private final Map<Triangle,Set<Edge>> triangleEdgeMapping = new HashMap<Triangle,Set<Edge>>();
 
-	private  Set<Edge> edges;	
 	private List<FloodingInfo> fis;
 
 	private final Set<Edge> removed = new HashSet<Edge>();
@@ -70,16 +76,18 @@ public class TriangularMeshSimplifier {
 
 	private Queue<Edge> queue;
 
-//	private final Set<Triangle> rmTriangles = new HashSet<Triangle>();
-//	private final Set<Triangle> mvTriangles = new HashSet<Triangle>();
-//	private final Set<Triangle> newTriangles = new HashSet<Triangle>();
-	private final Stack<Edge> badEdges = new Stack<Edge>();
 
-	private final boolean run = true;
+	private final Set<Edge> cleanUps = new HashSet<Edge>();
 
-	private final GeometryFactory geofac = new GeometryFactory();
+	private final Map<Triangle,Set<Edge>> saveTriangleEdgeMapping = new HashMap<Triangle,Set<Edge>>();
+	private final Map<Edge,Set<Triangle>> saveEdgeTriangleMapping = new HashMap<Edge,Set<Triangle>>();
+	private final Map<Integer, Set<Edge>> saveNetwork = new HashMap<Integer, Set<Edge>>();
+	private final Set<Triangle> newTriangles = new HashSet<Triangle>();
+	private final Set<Triangle> oldTriangles = new HashSet<Triangle>();
+	private final Set<Edge> newEdges = new HashSet<Edge>();
 
-//	private final Stack<Edge> cleanUps = new Stack<Edge>();
+	private final Set<Edge> touched  = new HashSet<Edge>();
+
 
 	public TriangularMeshSimplifier(String netcdf) {
 		this.netcdf = netcdf;
@@ -92,7 +100,7 @@ public class TriangularMeshSimplifier {
 		if (!this.initialized){
 			init();
 		}
-		
+
 		for (Triangle tri : this.triangleEdgeMapping.keySet()) {
 			List<FloodingInfo> fi = new ArrayList<FloodingInfo>();
 			for (int i = 0; i < 3; i++) {
@@ -100,9 +108,9 @@ public class TriangularMeshSimplifier {
 				fi.add(this.fis.get(idx));
 			}
 			this.geos.add(fi);
-			
+
 		}
-		
+
 		return this.geos;
 
 	}
@@ -122,74 +130,159 @@ public class TriangularMeshSimplifier {
 			edges = loadNetwork();
 		} catch (Exception e1) {
 			e1.printStackTrace();
-//			dumpGeos();
 			throw new RuntimeException(e1);
 		}
-		this.edges = edges;
 		this.queue = new PriorityQueue<Edge>();
 		this.queue.addAll(edges);
 
+		checkEdgeConsistency();
 
-		while (this.queue.size() > 0) {
-			Edge e = this.queue.poll();
-			if (this.removed.contains(e) || this.network.get(e.to) == null || this.network.get(e.from) == null) {
-				continue;
-			}
 
-			if (e.length > MAX_LENGTH) {
-				continue;
-			} //else if (isBorderRegion(e)) {
-			//				border.add(e);
-			//				continue;
-			//}
-
-//			this.rmTriangles.clear();
-//			this.mvTriangles.clear();
-//			this.newTriangles.clear();
-			contractEdge(e);
-			while (!this.badEdges.isEmpty()) {
-				handleBadEdge(this.badEdges.pop());
-			}
-//			while (!this.cleanUps.isEmpty()) {
-////				cleanUpEdge(this.cleanUps.pop());
-//				this.cleanUps.pop();
-//			}
-			//			if (this.rmTriangles.size() > 50 && this.newTriangles.size() > 50) {
-			//				break;
-			//			}
-			if (this.run == false) {
-				break;
-			}
-
+		log.info("start!");
+		for (int i = 0; i < 10; i++) {
+			runIteration();
+			this.queue.addAll(this.edgeTriangleMapping.keySet());
+			this.removed.clear();
 		}
+		
 
-
-//		dumpGeos();
+		dumpGeos();
 
 		this.initialized = true;
 	}
 
 
+	private void runIteration() {
+		int count = 0;
+		while (this.queue.size() > 0) {
+			if (count++ % 10000 == 0) {
+				log.info("count: " + count);
+			}
+			Edge e = this.queue.poll();
+			if (!checkEdgeConsistency(e)){
+				continue;
+			}
+			if (this.removed.contains(e) || this.network.get(e.to) == null || this.network.get(e.from) == null || this.edgeTriangleMapping.get(e).size() < 2) {
+				continue;
+			}
+
+			if (e.length > MAX_LENGTH) {
+				continue;
+			}
+
+			contractEdge(e);
+			deepClean(this.cleanUps);
+			this.cleanUps.clear();
+		}
+
+		
+	}
+
+
+
+	private void deepClean(Collection<Edge> edges) {
+		
+		
+		Stack<Edge> current = new Stack<Edge>();
+		for (int i = 0; i < 20; i++) {
+			current.addAll(edges);
+			Collections.shuffle(current);
+			while (!current.isEmpty()) {
+				cleanUpEdge(current.pop());
+				this.oldTriangles.clear();
+				this.newEdges.clear();
+				this.newTriangles.clear();
+				this.saveEdgeTriangleMapping.clear();
+				this.saveTriangleEdgeMapping.clear();
+				this.saveNetwork.clear();
+				this.oldTriangles.clear();
+			}
+			current.addAll(this.touched);
+			this.touched.clear();
+		}
+		
+	}
+
+
+
+	private void checkEdgeConsistency() {
+		for (Set<Triangle> set : this.edgeTriangleMapping.values()) {
+			if(set.size() > 2) {
+				throw new RuntimeException("At least one edge is associated with more then two triangles!");
+			}
+		}
+
+	}
+
+	private boolean checkEdgesConsistency(Set<Edge> edges) {
+
+		for (Edge edge : edges) {
+			if (!checkEdgeConsistency(edge)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private boolean checkEdgeConsistency(Edge edge) {
+		Set<Triangle> set = this.edgeTriangleMapping.get(edge);
+		if (set == null) {
+			return false;
+		}
+
+		if(set.size() > 2) {
+			return false;
+		}
+		for (Triangle tri : set) {
+			if (!this.triangleEdgeMapping.get(tri).contains(edge)) {
+				throw new RuntimeException("no reverse mapping!");
+			}
+		}
+		
+		Set<Edge> s1 = this.network.get(edge.from);
+		Set<Edge> s2 = this.network.get(edge.to);
+		Set<Integer> nodes = new HashSet<Integer>();
+		for (Edge e1 : s1) {
+			nodes.add(e1.to);
+		}
+		int neighbors = 0;
+		for (Edge e2 : s2) {
+			if (nodes.contains(e2.to)) {
+				neighbors++;
+			}
+		}
+		if (neighbors > 2 || neighbors == 0) {
+			return false;
+		}
+		return true;
+	}
+
 	private void cleanUpEdge(Edge pop) {
+
 		if (this.removed.contains(pop)) {
 			return;
 		}
+		checkEdgeConsistency(pop);
+
 		Set<Triangle> tris = this.edgeTriangleMapping.get(pop);
 		if (tris == null) {
 			return;
 		}
-		
+
 		if (tris.size() != 2) {
 			return;
 		}
-		double norm = 0;
-		for (Triangle tri : tris) {
-			norm += getNormalizedVariance(tri);
-//			System.out.println(norm);
-		}
+
 		List<Triangle> tl = new ArrayList<Triangle>(tris);
 		Triangle tri1 = tl.get(0);
 		Triangle tri2 = tl.get(1);
+		double norm = Double.POSITIVE_INFINITY;
+		for (Triangle tri : tris) {
+			norm = Math.min(norm,getMinAngle(tri.coords));
+		}
+
+
 		int [] touch = new int[2];
 		int countTouch = 0;
 		for (int i = 0; i < 3; i++) {
@@ -219,155 +312,127 @@ public class TriangularMeshSimplifier {
 			}
 		}
 
-		double norm2 = getNormalizedVariance(coords1);
-		norm2 += getNormalizedVariance(coords2);
-		
-		
-//		if (norm2 > norm) {
-//			Edge newEdge = createEdge(coords1[1],coords1[2]);
-//			Edge newEdge2 = createEdge(coords1[2],coords1[1]);
-//			this.network.get(coords1[1]).add(newEdge);
-//			this.network.get(coords1[2]).add(newEdge2);
-//			this.queue.add(newEdge);
-//			this.edges.add(newEdge);
-//			removeEdge(pop);
-//			addEdge(newEdge);
-//		}
-		
-	
-		//TODO
-		// if norm > threshold
-//		removeEdge(...);
-//		addEdge(...);
-	}
-
-	
-
-	private double getNormalizedVariance(int[] coords1) {
-		Edge e0 = createEdge(coords1[0], coords1[1]);
-		Edge e1 = createEdge(coords1[1], coords1[2]);
-		Edge e2 = createEdge(coords1[0], coords1[2]);
-		double avgLength = e0.length + e1.length + e2.length;
-		avgLength /= 3;
-		
-		double norm = Math.pow(e0.length-avgLength, 2) + Math.pow(e1.length-avgLength, 2) + Math.pow(e2.length-avgLength, 2);
-		norm /= 3;
-		norm /= avgLength;
-		
-		return norm;
-	}
-
-
-
-	private double getNormalizedVariance(Triangle tri) {
-		Set<Edge> edges = this.triangleEdgeMapping.get(tri);
-		double avgLength = 0;
-		for (Edge edge : edges) {
-			avgLength += edge.length;
-		}
-		avgLength /= 3;
-		
-		double norm = 0;
-		for (Edge edge : edges) {
-			norm += Math.pow(edge.length-avgLength, 2);
-		}
-		norm /= 3;
-		norm /= avgLength;
-		
-		return norm;
-	}
-
-
-
-	private void handleBadEdge(Edge edge) {
-		Set<Triangle> tmp = this.edgeTriangleMapping.get(edge);
-		if (tmp == null) {
-			log.warn("edge not associated with any triangle!");
-			//			removeEdge(edge);
+		if (!isUnionConvex(coords1,coords2)) {
 			return;
 		}
-		List<Triangle> tris = new ArrayList<Triangle>(tmp);
-		List<Triangle> rms = new ArrayList<Triangle>();
-		for (int i = 0; i < tris.size()-1; i++) {
-			for (int j = i+1; j < tris.size(); j++) {
-				Triangle rm = getOverlappedTriangle(tris.get(i),tris.get(j));
-				if (rm != null) {
-					rms.add(rm);
-//					this.mvTriangles.add(rm);
-				}
+
+		double norm2 = getMinAngle(coords1);
+		norm2 = Math.min(norm2,getMinAngle(coords2));
+
+		if (MatsimRandom.getRandom().nextDouble() < 0.01) {
+			norm2 = Math.PI;
+		}
+		if (norm2 > norm) {
+			saveState(pop);
+			Edge newEdge = createEdge(coords1[1],coords1[2]);
+
+			Edge newEdge2 = createEdge(coords1[2],coords1[1]);
+			this.network.get(coords1[1]).add(newEdge);
+			this.network.get(coords1[2]).add(newEdge2);
+			this.queue.add(newEdge);
+			removeEdge(pop);
+			if (!createTriangles(newEdge)){
+				undoChanges();
+			}else if (!checkEdgeConsistency(newEdge)) {
+				undoChanges();
 			}
 		}
-		if (rms.size() == 0) {
-			//			throw new RuntimeException("There must be at least one removable triangle!!");
-			log.warn("couldn not repair, just removing edge!");
-			//			removeEdge(edge);
-			return;
-		}
-
-		if (rms.size() > 1) {
-			log.warn("not implemented yet!");
-			return;
-		}
-		Set<Edge> affected = new HashSet<Edge>();
-		affected.addAll(this.triangleEdgeMapping.remove(rms.get(0)));
-		for (Edge e : affected) {
-			this.edgeTriangleMapping.get(e).remove(rms.get(0));
-		}
-		affected.remove(edge);
-		for (Edge e : affected) {
-			removeEdge(e);
-		}
 	}
 
 
 
-	private Triangle getOverlappedTriangle(Triangle tri1, Triangle tri2) {
-		Polygon p1 = getTrianglePolygon(tri1);
-		Polygon p2 = getTrianglePolygon(tri2);
-
-		if (p1.contains(p2)) {
-			return tri2;
-		} 
-
-		if (p2.contains(p1)) {
-			return tri1;
+	private boolean isUnionConvex(int[] coords1, int[] coords2) {
+		int [] coords = {coords1[0],coords1[1],coords2[0],coords1[2],coords1[0]};
+		int over = 0;
+		int under = 0;
+		boolean turnRight = true;
+		for (int i= 0; i < 3; i++) {
+			Edge e1 = createEdge(coords[i], coords[i+1]);
+			Edge e2 = createEdge(coords[i+1], coords[i+2]);
+			double alpha = getAngle(e1,e2,turnRight);
+			if (alpha > Math.PI) {
+				over++;
+			} else {
+				under++;
+			}
 		}
-
-		if (p1.covers(p2)) {
-			log.warn("poly covered but not contained!");
-			return tri2;
-		} 
-
-		if (p2.covers(p1)) {
-			log.warn("poly covered but not contained!");
-			return tri1;
+		Edge e1 = createEdge(coords[3], coords[0]);
+		Edge e2 = createEdge(coords[0], coords[1]);
+		double alpha = getAngle(e1,e2,turnRight);
+		if (alpha > Math.PI) {
+			over++;
+		} else {
+			under++;
 		}
+		if (Math.min(over,under) > 0) {
+			return false;
+		}
+		return true;
+	}
 
-		//		if (p1.overlaps(p2)) {
-		//			log.warn("poly only overlaped!");
-		//			if (p1.getArea() > p2.getArea()) {
-		//				return tri1;
-		//			} else {
-		//				return tri2;
-		//			}
-		//		}
+	private double getAngle(Edge e1, Edge e2, boolean turnRight) {
+		Integer idx = this.mapping.get(e1.to);
+		Coordinate zero = this.fis.get(idx).getCoordinate();
+		idx = this.mapping.get(e1.from);
+		Coordinate c0 = this.fis.get(idx).getCoordinate();
+		Coordinate v0 = new Coordinate(c0.x-zero.x,c0.y-zero.y);
+		idx = this.mapping.get(e2.to);
+		Coordinate c1 = this.fis.get(idx).getCoordinate();
+		Coordinate v1 = new Coordinate(c1.x-zero.x,c1.y-zero.y);
+		double alpha = getPhaseAngle(v0);
+		double beta = getPhaseAngle(v1);
+		double gamma = 0;
+		if (turnRight) {gamma = beta - alpha;}
+		else { gamma = alpha - beta; }
+		gamma = gamma < 0 ? gamma + TWO_PI : gamma;
+		return gamma;
+	}
 
-		return null;
+	private double getPhaseAngle(Coordinate v0) {
+		double alpha = 0.0;
+		if (v0.x > 0) {
+			alpha = Math.atan(v0.y/v0.x);
+		} else if (v0.x < 0) {
+			alpha = Math.PI + Math.atan(v0.y/v0.x);
+		} else { // i.e. DX==0
+			if (v0.y > 0) {
+				alpha = PI_HALF;
+			} else {
+				alpha = -PI_HALF;
+			}
+		}
+		if (alpha < 0.0) alpha += TWO_PI;
+		return alpha;
 	}
 
 
 
-	private Polygon getTrianglePolygon(Triangle tri) {
-		Coordinate [] coords = new Coordinate[4];
-		for (int i = 0; i < 3; i++) {
-			Integer idx = this.mapping.get(tri.coords[i]);
-			coords[i] = this.fis.get(idx).getCoordinate();
-		}
-		coords[3] = coords[0];
-		LinearRing lr = this.geofac.createLinearRing(coords);
-		return this.geofac.createPolygon(lr, null);
-	}
 
+
+	private double getMinAngle(int[] coords1) {
+		Edge e0 = createEdge(coords1[0], coords1[1]);
+		Edge e1 = createEdge(coords1[1], coords1[2]);
+		Edge e2 = createEdge(coords1[2], coords1[0]);
+		boolean turnRight = true;
+		double alpha = getAngle(e0, e1, turnRight);
+		if (alpha > Math.PI) {
+			turnRight = false;
+			alpha -= Math.PI;
+		}
+		alpha = Math.min(alpha, getAngle(e1,e2,turnRight));
+		alpha = Math.min(alpha, getAngle(e2,e0,turnRight));
+		
+		return alpha;
+		
+//		double avgLength = e0.length + e1.length + e2.length;
+//		avgLength /= 3;
+//
+//		double norm = Math.pow(e0.length-avgLength, 2) + Math.pow(e1.length-avgLength, 2) + Math.pow(e2.length-avgLength, 2);
+//		norm /= 3;
+//		norm = Math.sqrt(norm) / avgLength;
+//
+//		return norm;
+	}
 
 
 	//DEBUG
@@ -384,137 +449,165 @@ public class TriangularMeshSimplifier {
 
 		}
 		dump(geos,"../../tmp/geometries.shp",true);
-//
-//		geos.clear();
-//		for (Triangle tri : this.rmTriangles) {
-//			List<Integer> geo = new ArrayList<Integer>();
-//			geo.add(tri.coords[0]);
-//			geo.add(tri.coords[1]);
-//			geo.add(tri.coords[2]);
-//			geo.add(tri.coords[0]);
-//			geos.add(geo);
-//
-//		}
-//		dump(geos,"../../tmp/rmTriangles.shp",true);
-//
-//		geos.clear();
-//		for (Triangle tri : this.mvTriangles) {
-//			List<Integer> geo = new ArrayList<Integer>();
-//			geo.add(tri.coords[0]);
-//			geo.add(tri.coords[1]);
-//			geo.add(tri.coords[2]);
-//			geo.add(tri.coords[0]);
-//			geos.add(geo);
-//
-//		}
-//		dump(geos,"../../tmp/mvTriangles.shp",true);
-//		geos.clear();
-//		for (Edge e : this.badEdges) {
-//			List<Integer> geo = new ArrayList<Integer>();
-//			geo.add(e.from);
-//			geo.add(e.to);
-//			geos.add(geo);
-//		}
-//		dump(geos,"../../tmp/badEdges.shp",false);
-//		geos.clear();
-//		for (Triangle tri : this.newTriangles) {
-//			List<Integer> geo = new ArrayList<Integer>();
-//			geo.add(tri.coords[0]);
-//			geo.add(tri.coords[1]);
-//			geo.add(tri.coords[2]);
-//			geo.add(tri.coords[0]);
-//			geos.add(geo);
-//
-//		}
-//		dump(geos,"../../tmp/newTriangles.shp",true);
-//
-//		geos.clear();
-//		this.edges.clear();
-//		for (Set<Edge> node : this.network.values()) {
-//			for (Edge e : node) {
-//				if (!this.removed.contains(e)) {
-//					//					throw new RuntimeException("This will never happen!");
-//
-//					this.edges.add(e);
-//				}
-//			}
-//		}
-//		for (Edge e : this.badEdges) {
-//			List<Integer> geo = new ArrayList<Integer>();
-//			geo.add(e.from);
-//			geo.add(e.to);
-//			geos.add(geo);
-//		}
-//		dump(geos,"../../tmp/badEdges.shp",false);
-//
-//		//		for (Edge e : this.edges) {
-//		//			List<Integer> geo = new ArrayList<Integer>();
-//		//			geo.add(e.from);
-//		//			geo.add(e.to);
-//		//			geos.add(geo);
-//		//		}
-//		//		dump(geos,"../../tmp/edges.shp",false);
 	}
 
 	private void contractEdge(Edge e) {
+
+
 		Set<Edge> fromNode = this.network.get(e.from);
 		Set<Edge> toNode = this.network.get(e.to);
-		//		contractEdge(e,toNode, fromNode,e.from, e.to);
 
-
-		int degFrom = getMinNeighborDegree(fromNode);
-		int degTo = getMinNeighborDegree(toNode);
-		if (degFrom <=4 && degTo <= 4) {
-			return;
-		}
-		if (degFrom <=2 || degTo <= 2) {
+		if (this.edgeTriangleMapping.get(e).size() < 2) {
 			return;
 		}
 		
-		if (degFrom <=3) {
-			contractEdge(e,toNode, fromNode,e.from, e.to);
-		} else if (degTo <= 3) {
-			contractEdge(e,fromNode,toNode,e.to, e.from);
-		} else if (degFrom > degTo) {
-			contractEdge(e,fromNode,toNode,e.to, e.from);	
-		} else {
-			contractEdge(e,toNode, fromNode,e.from, e.to);	
+		int degFrom = getMinNeighborDegree(fromNode);
+		int degTo = getMinNeighborDegree(toNode);
+
+		if (degFrom <=1 && degTo <= 1) {
+			return;
+		}
+		//
+		if (degFrom == 0 || degTo == 0) {
+			return;
 		}
 
-		//		if (getMinNeighborDegree(fromNode) > 2) {
-		//			
-		//		} else  if (getMinNeighborDegree(toNode) > 2) {
-		//			
-		//		}
+		saveState(e);
+		//	
+		boolean ret = false;
+		if (degFrom <=1) {
+			ret = contractEdge(e,toNode, fromNode,e.from, e.to);
+		} else if (degTo <= 1) {
+			ret = contractEdge(e,fromNode,toNode,e.to, e.from);
+		} else if (degFrom > degTo) {
+			ret = contractEdge(e,fromNode,toNode,e.to, e.from);	
+		} else {
+			ret = contractEdge(e,toNode, fromNode,e.from, e.to);	
+		}
+
+		if(!ret) {
+			undoChanges();
+		} else if (!checkEdgesConsistency(this.touched)){
+			log.error("inconsistence!");
+			undoChanges();
+		}
+		this.newEdges.clear();
+		this.newTriangles.clear();
+		this.saveEdgeTriangleMapping.clear();
+		this.saveTriangleEdgeMapping.clear();
+		this.saveNetwork.clear();
+		this.oldTriangles.clear();
+		this.touched.clear();
+	}
+
+
+
+	private void undoChanges() {
+		
+
+		
+		for (Edge edge : this.newEdges) {
+			this.removed.add(edge);
+			this.edgeTriangleMapping.remove(edge);
+			this.network.get(edge.from).remove(edge);
+			this.network.get(edge.to).remove(edge);
+		}
+		for (Triangle tri : this.newTriangles) {
+			Set<Edge> tmp = this.triangleEdgeMapping.remove(tri);
+			for (Edge e : tmp) {
+				if (this.edgeTriangleMapping.get(e) != null) {
+					this.edgeTriangleMapping.remove(tri);
+				}
+			}
+		}
+		
+		for (Entry<Edge,Set<Triangle>> entry : this.saveEdgeTriangleMapping.entrySet()) {
+			this.edgeTriangleMapping.put(entry.getKey(),entry.getValue());
+		}
+		for (Entry<Triangle,Set<Edge>> entry : this.saveTriangleEdgeMapping.entrySet()) {
+			this.triangleEdgeMapping.put(entry.getKey(), entry.getValue());
+		}
+
+		for (Entry<Integer,Set<Edge>> entry : this.saveNetwork.entrySet()) {
+			this.network.put(entry.getKey(), entry.getValue());
+
+		}
+//
+//
+//		for (Edge e: this.saveEdgeTriangleMapping.keySet()) {
+//			checkEdgeConsistency(e);
+//		}
+//		
+		this.cleanUps.clear();
+
+
+
 
 	}
 
 
 
-	private void contractEdge(Edge e, Set<Edge> delete, Set<Edge> keep,int keepId, int rmId) {
-		//		keep.remove(e);
-		//		removeEdge(e);
-//		Integer idx1 = this.mapping.get(keepId);
-//		Coordinate c1 = this.fis.get(idx1).getCoordinate();
-		Set<Edge> genEdges = new HashSet<Edge>();
-		List<Edge> rms = new ArrayList<Edge>();
+	private void saveState(Edge e) {
+		List<Edge> edges = new ArrayList<Edge>();
+
+		edges.addAll(getAllAssociatedEdges(this.network.get(e.from)));
+		edges.addAll(getAllAssociatedEdges(this.network.get(e.to)));
+		for (Edge ee : edges) {
+
+			Set<Edge> s1 = this.network.get(ee.from);
+			Set<Edge> s1n = new HashSet<Edge>();
+			s1n.addAll(s1);
+			this.saveNetwork.put(ee.from, s1n);
+			
+			
+			Set<Triangle> s2 = this.edgeTriangleMapping.get(ee);
+			Set<Triangle> s2n = new HashSet<Triangle>();
+			s2n.addAll(s2);
+			this.saveEdgeTriangleMapping.put(ee, s2n);
+						
+			
+			Set<Triangle> tris  = this.edgeTriangleMapping.get(ee);
+			for (Triangle tri : tris) {
+				Set<Edge> s3 = this.triangleEdgeMapping.get(tri);
+				Set<Edge> s3n = new HashSet<Edge>();
+				s3n.addAll(s3);
+				this.saveTriangleEdgeMapping.put(tri,s3n);
+			}
+		}
+	}
+
+
+
+	private List<Edge> getAllAssociatedEdges(Collection<Edge> set) {
+		List<Edge> ret = new ArrayList<Edge>();
+		for (Edge e : set) {
+			ret.add(e);
+			Set<Edge> s = this.network.get(e.to);
+			for (Edge ee : s) {
+				ret.add(ee);
+			}
+			Set<Edge> s2 = this.network.get(e.from);
+			for (Edge ee : s2) {
+				ret.add(ee);
+			}
+
+		}
+		return ret;
+	}
+
+
+
+	private boolean contractEdge(Edge e, Set<Edge> delete, Set<Edge> keep,int keepId, int rmId) {
+		List<Edge> genEdges = new ArrayList<Edge>();
+		Set<Edge> rms = new HashSet<Edge>();
 		for (Edge del : delete) {
 			rms.add(del);
-
-			int from = del.to;
-			if (from == keepId) {
+			if (del.to == keepId) {
 				continue;
 			}
-//			Integer idx2 = this.mapping.get(from);
-//			Coordinate c2 = this.fis.get(idx2).getCoordinate();
-//			double dist = c2.distance(c1);
-			Edge e1 = createEdge(from, keepId);//new Edge(from,keepId,dist);
-			//			Edge e2 = new Edge(keepId,from,dist);
-			if (!this.edges.contains(e1)) {
-				genEdges.add(e1);
-			}
-
-
+			Edge e1 = createEdge(del.to, keepId);
+			this.newEdges.add(e1);
+			genEdges.add(e1);
 		}
 		for (Edge rm : rms) {
 			removeEdge(rm);
@@ -522,31 +615,64 @@ public class TriangularMeshSimplifier {
 
 		for (Edge edge : genEdges) {
 			this.network.get(edge.from).add(edge);
-			Edge e2 = createEdge(edge.to, edge.from);//new Edge(edge.to,edge.from,edge.length);
+			Edge e2 = createEdge(edge.to, edge.from);
 			this.network.get(e2.from).add(e2);
-			this.edges.add(edge);
 		}
+
+
+		boolean b = true;
 		for (Edge edge : genEdges) {
-			addEdge(edge);
-			this.queue.add(edge);
-//			this.cleanUps.push(edge);
+			if (!testCreateTriangles(edge)){
+				return false;
+			}
+
 		}
 
-		if (keep.size() < 2 ) {
-			System.err.println("this should not happen!");
-		}
+		if (b) {
+			for (Edge edge : genEdges) {
+				if (!createTriangles(edge)){
+					return false;
+				}
 
-		//		if (this.network.remove(rmId) == null){
-		//			throw new RuntimeException("will never happen");
-		//		}
+				this.queue.add(edge);
+				this.cleanUps.add(edge);
+			} 
+		} 
+
+		return true;
+
 	}
 
 
-	private void addEdge(Edge e) {
+	private boolean testCreateTriangles(Edge e) {
 		Set<Edge> s1 = this.network.get(e.from);
 		Set<Edge> s2 = this.network.get(e.to);
 		Set<Integer> tmp = new HashSet<Integer>();
-		List<Integer> nodes = new ArrayList<Integer>();
+		Set<Integer> nodes = new HashSet<Integer>();
+		for (Edge edge : s1) {
+			tmp.add(edge.to);
+		}
+		for (Edge edge : s2) {
+			if (tmp.contains(edge.to)) {
+				nodes.add(edge.to);
+			}
+		}
+		if (nodes.size() == 0) {
+			//			throw new RuntimeException("Trying to add a non connected edge!");
+			return false;
+		} else if (nodes.size() > 2) {
+			return false;
+		}
+		return true;
+	}
+
+
+
+	private boolean createTriangles(Edge e) {
+		Set<Edge> s1 = this.network.get(e.from);
+		Set<Edge> s2 = this.network.get(e.to);
+		Set<Integer> tmp = new HashSet<Integer>();
+		Set<Integer> nodes = new HashSet<Integer>();
 		for (Edge edge : s1) {
 			tmp.add(edge.to);
 		}
@@ -557,19 +683,19 @@ public class TriangularMeshSimplifier {
 		}
 		if (nodes.size() == 0) {
 			log.warn("Trying to add a non connected edge!");
+			return false;
 		} else if (nodes.size() > 2) {
-			//			log.error("Each edge can only be part of two triangles!");
-			//			this.run = false;
-			this.badEdges.push(e);
-			//			this.badEdges.addAll(s1);
-			//			this.badEdges.addAll(s2);
-			//			throw new RuntimeException("Each edge can only be part of two triangles!");
+			return false;
 		}
 
 
+		
 		for (int i : nodes) {
-			addEdgeTriangle(s1,s2,i,e);
+			if(!addEdgeTriangle(s1,s2,i,e)){
+				return false;
+			}
 		}
+		return true;
 
 
 	}
@@ -583,23 +709,23 @@ public class TriangularMeshSimplifier {
 		}
 		Set<Triangle> tris = this.edgeTriangleMapping.get(e); 
 		if (tris == null){
-			log.warn("Edge was not associated with any triangle!");
-			this.edgeTriangleMapping.remove(e);
-			this.removed.add(e);
-
-			if (this.network.get(e.from).size() == 0) {
-				this.network.remove(e.from);
-			}
-			return;
+			throw new RuntimeException("Edge was not associated with any triangle!");
+		}
+		if (tris.size() > 2) {
+			throw new RuntimeException("Edge is associated with more then 2 triangles!");
 		}
 		for (Triangle tri : tris) {
+			this.oldTriangles.add(tri);
 			Set<Edge> edges = this.triangleEdgeMapping.remove(tri);
 			for (Edge edge : edges) {
 				if (edge.equals(e)) {
 					continue;
 				}
-				this.edgeTriangleMapping.get(edge).remove(tri);
-//				this.rmTriangles.add(tri);
+				this.cleanUps.add(edge);
+
+				if (this.edgeTriangleMapping.get(edge) != null) {
+					this.edgeTriangleMapping.get(edge).remove(tri);
+				}
 			}
 		}
 		this.edgeTriangleMapping.remove(e);
@@ -613,7 +739,10 @@ public class TriangularMeshSimplifier {
 		}
 	}
 
-	private void addEdgeTriangle(Set<Edge>s1, Set<Edge> s2, int node,Edge e){
+
+
+
+	private boolean addEdgeTriangle(Set<Edge>s1, Set<Edge> s2, int node,Edge e){
 		Set<Edge> edges = new HashSet<Edge>();
 		for (Edge edge : s1) {
 			if (edge.to == node) {
@@ -633,26 +762,28 @@ public class TriangularMeshSimplifier {
 
 		int [] coords = {e.from, e.to, node};
 		Triangle tri1 = new Triangle(coords);
-
-		//		//DEBUG
-		//		if (this.newTriangles.contains(tri1)) {
-		//			log.error("already there!");
-		//		}
-//		this.newTriangles.add(tri1);
+		this.newTriangles.add(tri1);
 
 		this.triangleEdgeMapping.put(tri1, edges);
 
 		for (Edge edge : edges) {
+
 			Set<Triangle> tris = this.edgeTriangleMapping.get(edge);
 			if (tris == null){
 				tris = new HashSet<Triangle>();
 				this.edgeTriangleMapping.put(edge, tris);
 			}
+			this.touched.add(edge);
 			tris.add(tri1);
+			if(!checkEdgeConsistency(edge)){
+				return false;
+			}
 		}
+		return true;
 	}
 
 	private void addInitialEdgeTriangle(Edge e, Triangle tri) {
+
 		Set<Triangle> tris = this.edgeTriangleMapping.get(e);
 		if (tris == null) {
 			tris = new HashSet<Triangle>();
@@ -676,19 +807,12 @@ public class TriangularMeshSimplifier {
 
 	private int getMinNeighborDegree(Set<Edge> fromNode) {
 
-		if (fromNode.size() <= 2) {
-			return fromNode.size();
-		}
-
-
-		int minDegree = Integer.MAX_VALUE;
 		for (Edge e : fromNode) {
-			Set<Edge> node = this.network.get(e.to);
-			if (node.size() < minDegree) {
-				minDegree = node.size();
+			if (this.edgeTriangleMapping.get(e).size() <= 1){
+				return 1;
 			}
 		}
-		return minDegree;
+		return 2;
 	}
 
 
@@ -697,11 +821,7 @@ public class TriangularMeshSimplifier {
 
 		Set<Edge> ret = new HashSet<Edge>();
 		List<int[]> tris = this.reader.getTriangles();
-		int cccc = 0;
 		for (int [] tri : tris) {
-			//			if (cccc++ > 10000) {
-			//				break;
-			//			}
 			boolean cont = false;
 			for (int i = 0; i < 3; i++) {
 				if (this.mapping.get(tri[i]) == null) {
@@ -729,7 +849,6 @@ public class TriangularMeshSimplifier {
 					continue;
 				}
 
-//				double dist = this.fis.get(idx1).getCoordinate().distance(this.fis.get(idx0).getCoordinate());
 				Set<Edge> node = this.network.get(tri[j]);
 				if (node == null) {
 					node = new HashSet<Edge>();
@@ -738,14 +857,6 @@ public class TriangularMeshSimplifier {
 				Edge e = createEdge(tri[j], tri[i]); //new Edge(,dist);
 				Edge e2 =createEdge(tri[i], tri[j]);
 
-				//				if (ret.containsKey(e2)) {
-				//					Edge e3 = ret.get(e2);
-				//					if (e2.to != e3.to && e2.to != e3.from) {
-				//						int iii = 0;
-				//						iii++;
-				//						e3.hash = 0;
-				//					}
-				//				}
 
 				node.add(e);
 				Set<Edge> node2 = this.network.get(tri[i]);
@@ -769,7 +880,7 @@ public class TriangularMeshSimplifier {
 		int idx2 = this.mapping.get(n2);
 		Coordinate c1 = this.fis.get(idx1).getCoordinate();
 		Coordinate c2 = this.fis.get(idx2).getCoordinate();
-		
+
 		double length = c1.distance(c2); 
 		return new Edge(n1,n2,length);
 	}
@@ -848,7 +959,10 @@ public class TriangularMeshSimplifier {
 			return this.hash;
 		}
 
-
+		@Override
+		public String toString() {
+			return (this.coords[0] + " " + this.coords[1] + " " + this.coords[2]);
+		}
 	}
 
 	public static void main(String [] args) {
