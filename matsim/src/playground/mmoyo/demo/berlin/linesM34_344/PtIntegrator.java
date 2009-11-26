@@ -172,6 +172,7 @@ public class PtIntegrator {
 		//PlansCalcTransitRoute router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
 		router.run(population);	
 		
+		/**write routed plans*/
 		new PopulationWriter(population).write(ROUTED_PLANS_FILE);
 		
 		/**prepare simulation*/
@@ -184,7 +185,7 @@ public class PtIntegrator {
 		events.addHandler(writer);
 		events.addHandler(writertxt);
 
-		//play scenario
+		/**play scenario*/
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
 		final TransitQueueSimulation sim = new TransitQueueSimulation(scenario, (EventsManagerImpl) events);
 		sim.startOTFServer(SERVERNAME);
