@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -68,6 +69,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 	private ActivityFacilitiesImpl facilities;
 	private PopulationImpl population;
 	private Config config;
+	private ScenarioImpl scenario;
 
 	private int numOfThreads = 4;
 	
@@ -113,6 +115,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 	
 	public CreateDijkstraKnowledge4MultiFactors()
 	{			
+		this.scenario = new ScenarioImpl();
 		loadNetwork();
 		if (facilitiesFile != null) loadFacilities();
 		loadPopulation();
@@ -129,7 +132,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 	
 	private void loadNetwork()
 	{
-		network = new NetworkLayer();
+		network = scenario.getNetwork();
 		
 		/*
 		 * Use MyLinkImpl. They can carry some additional Information like their
@@ -154,25 +157,21 @@ public class CreateDijkstraKnowledge4MultiFactors {
 	
 	private void loadFacilities()
 	{
-		facilities = new ActivityFacilitiesImpl();
+		facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(facilitiesFile);
-		
-		Gbl.getWorld().setFacilityLayer((ActivityFacilitiesImpl)facilities);
 		
 		log.info("Loading Facilities ... done");
 	}
 	
 	private void loadPopulation()
 	{
-		population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(populationFile);
+		new MatsimPopulationReader(scenario).readFile(populationFile);
 		log.info("Loading Population ... done");
 	}
 	
 	private void loadConfig()
 	{
-		this.config = new Config();
-		this.config.addCoreModules();
+		this.config = scenario.getConfig();
 		this.config.checkConsistency();
 		try {
 			new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
@@ -180,7 +179,6 @@ public class CreateDijkstraKnowledge4MultiFactors {
 			log.error("Problem loading the configuration file from " + this.configFileName);
 			throw new RuntimeException(e);
 		}
-		Gbl.setConfig(config);
 		log.info("Loading Config ... done");
 	}
 	

@@ -189,16 +189,18 @@ public class MyRuns {
 	
 	public void analyzeModeChainFeasibility(Config config) {
 
+		ScenarioImpl scenario = new ScenarioImpl();
+
 		// initialize scenario with events from a given events file
 		// - network
 		logger.info("Reading network xml file...");
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		logger.info("Reading network xml file...done.");
 		
 		// - facilities
 		logger.info("Reading facilities xml file...");
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		try {
 			new MatsimFacilitiesReader(facilities).parse(config.facilities().getInputFile());
 		} catch (SAXException e) {
@@ -208,7 +210,6 @@ public class MyRuns {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Gbl.getWorld().setFacilityLayer(facilities);
 		logger.info("Reading facilities xml file...");
 		
 		// - population
@@ -216,14 +217,13 @@ public class MyRuns {
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
 		plansAlgos.add(pa);
 
-		PopulationImpl matsimAgentPopulation = new PopulationImpl();
+		PopulationImpl matsimAgentPopulation = scenario.getPopulation();
 		matsimAgentPopulation.setIsStreaming(true);
 		matsimAgentPopulation.addAlgorithm(pa);
-		PopulationReader plansReader = new MatsimPopulationReader(matsimAgentPopulation, network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(config.plans().getInputFile());
 		
 		logger.info("Number of selected plans which are infeasible: " + pa.getNumInfeasiblePlans());
-
 	}
 	
 	private class PersonAnalyzeModeChainFeasibility implements PersonAlgorithm {
@@ -346,21 +346,22 @@ public class MyRuns {
 	 */
 	public static void analyseInitialTimes() {
 
+		ScenarioImpl scenario = new ScenarioImpl(Gbl.getConfig());
 		// initialize scenario with events from a given events file
 		// - network
 		logger.info("Reading network xml file...");
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(network).readFile(scenario.getConfig().network().getInputFile());
 		logger.info("Reading network xml file...done.");
 		// - population
 		PersonAlgorithm pa = new PersonAnalyseTimesByActivityType(TIME_BIN_SIZE);
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
 		plansAlgos.add(pa);
 
-		PopulationImpl matsimAgentPopulation = new PopulationImpl();
+		PopulationImpl matsimAgentPopulation = scenario.getPopulation();
 		matsimAgentPopulation.setIsStreaming(true);
-		PopulationReader plansReader = new MatsimPopulationReader(matsimAgentPopulation, network);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+		plansReader.readFile(scenario.getConfig().plans().getInputFile());
 		matsimAgentPopulation.printPlansCount();
 		int[][] numDeps = ((PersonAnalyseTimesByActivityType) pa).getNumDeps();
 		MyRuns.writeAnArray(numDeps, "output/deptimes.txt");

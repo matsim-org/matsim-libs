@@ -169,7 +169,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		//this is really ugly...
 		this.createFakeNetwork(scenario, network);
 
-		MatsimPopulationReader reader = new  MatsimPopulationReader(population, network);
+		MatsimPopulationReader reader = new  MatsimPopulationReader(scenario);
 		reader.readFile(outfile.getAbsolutePath());
 		checkContent(population);
 	}

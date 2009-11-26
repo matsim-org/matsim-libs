@@ -26,7 +26,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -36,7 +35,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationWriter;
@@ -62,10 +60,12 @@ public class BkIncomeTestScenarioCreator {
 	private Id id6 = new IdImpl(6);
 	private Id id7 = new IdImpl(7);
 
-	private NetworkLayer uselessNetwork;
+	private final NetworkLayer uselessNetwork;
+	private final ScenarioImpl scenario;
 	
-	public BkIncomeTestScenarioCreator(NetworkLayer uselessNetwork) {
-		this.uselessNetwork = uselessNetwork;
+	public BkIncomeTestScenarioCreator(ScenarioImpl scenario) {
+		this.uselessNetwork = scenario.getNetwork();
+		this.scenario = scenario;
 	}
 
 
@@ -74,9 +74,7 @@ public class BkIncomeTestScenarioCreator {
 		double homeEndTime = firstHomeEndTime;
 		log.info("starting plans creation...");
 		
-		Scenario scenario = new ScenarioImpl();
-		
-		Population pop = scenario.getPopulation();
+		Population pop = this.scenario.getPopulation();
 		PopulationFactory builder = pop.getFactory();
 		
 		for (int i = 1; i <= 2000; i++) {
@@ -172,16 +170,13 @@ public class BkIncomeTestScenarioCreator {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
+		ScenarioImpl scenario = new ScenarioImpl();
 		String outfile = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/plans.xml";
 		String networkFile = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/network.xml";
-		NetworkLayer uselessNetwork = new NetworkLayer();
-		MatsimNetworkReader reader = new MatsimNetworkReader(uselessNetwork);
-		reader.readFile(networkFile);
-		Gbl.createWorld();
-		Gbl.getWorld().setNetworkLayer(uselessNetwork);
+		NetworkLayer uselessNetwork = scenario.getNetwork();
+		new MatsimNetworkReader(uselessNetwork).readFile(networkFile);
 		
-		
-		BkIncomeTestScenarioCreator pc = new BkIncomeTestScenarioCreator(uselessNetwork);
+		BkIncomeTestScenarioCreator pc = new BkIncomeTestScenarioCreator(scenario);
 		Population pop = pc.createPlans();
 		new PopulationWriter(pop).writeFile(outfile);
 		log.info("plans written");

@@ -84,7 +84,6 @@ public class ScenarioImpl implements Scenario {
 	public ScenarioImpl(Config config) {
 		this.config = config;
 		initContainers();
-		
 	}
 	
 	private void initContainers(){
@@ -152,17 +151,10 @@ public class ScenarioImpl implements Scenario {
 		return Gbl.getWorld();
 	}
 	
-	
-	/**
-	 * @see org.matsim.api.core.v01.Scenario#getActivityFacilities()
-	 */
 	public ActivityFacilitiesImpl getActivityFacilities() {
 		return this.facilities;
 	}
 
-	/**
-	 * @see org.matsim.api.core.v01.Scenario#getNetwork()
-	 */
 	public NetworkLayer getNetwork() {
 		return this.network;
 	}

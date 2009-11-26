@@ -29,6 +29,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -46,16 +47,16 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.world.World;
 
 import playground.anhorni.locationchoice.preprocess.helper.Bins;
 import playground.anhorni.locationchoice.preprocess.helper.Utils;
 
 public class AnalyzePlans {
 
-	private PopulationImpl plans = new PopulationImpl();
-	private ActivityFacilitiesImpl facilities;
-	private NetworkLayer network;
+	private final ScenarioImpl scenario = new ScenarioImpl();
+	private final PopulationImpl plans = scenario.getPopulation();
+	private final ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+	private final NetworkLayer network = scenario.getNetwork();
 	
 	String plansfilePath;
 		
@@ -90,18 +91,14 @@ public class AnalyzePlans {
 		
 	private void init(String networkfilePath, String facilitiesfilePath, String plansfilePath) {
 		
-		World world = Gbl.getWorld();
-				
 		log.info("reading the facilities ...");
-		this.facilities =(ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 			
 		log.info("reading the network ...");
-		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 		
 		log.info("  reading file " + plansfilePath);
-		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, network);
+		final PopulationReader plansReader = new MatsimPopulationReader(this.scenario);
 		plansReader.readFile(plansfilePath);				
 	}
 	
@@ -503,23 +500,12 @@ public class AnalyzePlans {
 		return plans;
 	}
 
-	public void setPlans(PopulationImpl plans) {
-		this.plans = plans;
-	}
-
 	public ActivityFacilitiesImpl getFacilities() {
 		return facilities;
-	}
-
-	public void setFacilities(ActivityFacilitiesImpl facilities) {
-		this.facilities = facilities;
 	}
 
 	public NetworkLayer getNetwork() {
 		return network;
 	}
 
-	public void setNetwork(NetworkLayer network) {
-		this.network = network;
-	}	
 }

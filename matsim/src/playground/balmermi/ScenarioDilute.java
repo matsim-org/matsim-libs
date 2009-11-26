@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
@@ -78,6 +79,7 @@ public class ScenarioDilute {
 		if (args.length != 1) { printUsage(); return; }
 
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
+		ScenarioImpl sc = sl.getScenario();
 
 		System.out.println("loading facilities...");
 		sl.loadActivityFacilities();
@@ -102,7 +104,7 @@ public class ScenarioDilute {
 		exTxpes.add("4-4130-1"); // ferry
 		exTxpes.add("4-4130-2"); // train
 		exTxpes.add("7-4130-1"); // ferry
-		Gbl.getWorld().complete(exTxpes);
+		sc.getWorld().complete(exTxpes);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
 		

@@ -23,6 +23,7 @@ package playground.balmermi;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -74,6 +75,7 @@ public class ScenarioIO {
 		if (args.length != 1) { printUsage(); return; }
 
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
+		ScenarioImpl sc = sl.getScenario();
 
 		System.out.println("loading facilities...");
 		sl.loadActivityFacilities();
@@ -114,7 +116,7 @@ public class ScenarioIO {
 //		exTxpes.add("94"); exTxpes.add("95"); exTxpes.add("96"); exTxpes.add("97");
 //		exTxpes.add("98"); exTxpes.add("99");
 		
-		Gbl.getWorld().complete(exTxpes);
+		sc.getWorld().complete(exTxpes);
 		Gbl.printMemoryUsage();
 		System.out.println("done. (complete world)");
 		

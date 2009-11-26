@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
@@ -64,6 +65,12 @@ public class TransitDriverTest extends TestCase {
 
 	private static final Logger log = Logger.getLogger(TransitDriverTest.class);
 
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		Gbl.reset(); // reset world
+	}
+	
 	public void testInitializationNetworkRoute() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));

@@ -10,14 +10,15 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.world.Layer;
@@ -59,9 +60,9 @@ public class ModdedConverter {
 		}
 	}
 
-	private PopulationImpl pop;
+	private Population pop;
 
-	public void setPop(final PopulationImpl pop) {
+	public void setPop(final Population pop) {
 		this.pop = pop;
 	}
 
@@ -167,7 +168,7 @@ public class ModdedConverter {
 						// then start the new person
 
 						if (!this.pop.getPersons().isEmpty()) {
-							PersonImpl p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
+							Person p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
 							Plan tmpPl = p.getSelectedPlan();
 
 							LegImpl leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
@@ -236,7 +237,7 @@ public class ModdedConverter {
 				}
 			}
 		}else{
-			PersonImpl p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
+			Person p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
 			PlanImpl tmpPl = (PlanImpl) p.getSelectedPlan();
 
 			LegImpl leg = tmpPl.createAndAddLeg(TransportMode.car);
@@ -282,11 +283,11 @@ public class ModdedConverter {
 		String newPlansFilename = "C:\\Thesis_HJY\\matsim\\output\\ConvertPlan\\plans.xml.gz";
 		String zoneFilename = "C:\\Thesis_HJY\\matsim\\input\\ConvertPlan\\centroids.txt";
 		
+		ScenarioImpl scenario = new ScenarioImpl();
+		
 		ModdedConverter c = new ModdedConverter();
 
-		Gbl.createConfig(null);
-		c.setZones((ZoneLayer) Gbl.getWorld().createLayer(new IdImpl("zones"),
-				"toronto_test"));
+		c.setZones((ZoneLayer) scenario.getWorld().createLayer(new IdImpl("zones"), "toronto_test"));
 
 		c.setZoneXYs(new HashMap<String, ZoneXY>());
 
@@ -326,7 +327,7 @@ public class ModdedConverter {
 		c.createZones();
 
 		//
-		c.setPop(new PopulationImpl());
+		c.setPop(scenario.getPopulation());
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
 			PopulationWriter writer = new PopulationWriter(c.pop);

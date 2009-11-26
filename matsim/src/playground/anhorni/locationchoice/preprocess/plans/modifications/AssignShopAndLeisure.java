@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
@@ -14,12 +15,12 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.world.World;
 
 public class AssignShopAndLeisure {
-	private PopulationImpl plans = new PopulationImpl();
-	private ActivityFacilitiesImpl facilities;
-	private NetworkLayer network;
+	private final ScenarioImpl scenario = new ScenarioImpl();
+	private PopulationImpl plans = scenario.getPopulation();
+	private ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+	private NetworkLayer network = scenario.getNetwork();
 	
 	private String plansfilePath;
 	private String facilitiesfilePath;
@@ -38,7 +39,7 @@ public class AssignShopAndLeisure {
 	public void run(String variant) {
 		this.init();
 		if (variant.equals("0")) {
-			ActivityDifferentiationShop differentiator = new ActivityDifferentiationShop(this.plans);
+			ActivityDifferentiationShop differentiator = new ActivityDifferentiationShop(this.scenario);
 			differentiator.run();
 		}
 		// handle leisure
@@ -69,23 +70,18 @@ public class AssignShopAndLeisure {
 		String pathsFile = "./input/trb/valid/paths.txt";
 		this.readInputFile(pathsFile);
 						
-		World world = Gbl.getWorld();
-				
 		log.info("reading the facilities ...");
-		this.facilities =(ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 			
 		log.info("reading the network ...");
-		this.network = new NetworkLayer();
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 		
 		log.info("  reading file " + plansfilePath);
-		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, network);
+		final PopulationReader plansReader = new MatsimPopulationReader(this.scenario);
 		plansReader.readFile(plansfilePath);				
 	}
 	
 	private void writePlans(String variant) {
-		PopulationWriter writer;
 		if (variant.equals("0")) {
 			new PopulationWriter(this.plans).writeFile(this.outpath + "plans0.xml.gz");
 		}

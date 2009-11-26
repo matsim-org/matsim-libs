@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
@@ -35,16 +36,13 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
 /**
  * counts Agents in network for every timeBin
  * 
  * @author ychen
- * 
  */
 public class TraVolCnter implements LinkEnterEventHandler,
 		LinkLeaveEventHandler {
@@ -111,12 +109,10 @@ public class TraVolCnter implements LinkEnterEventHandler,
 		final String netFilename = "./equil/equil_net.xml";
 		final String plansFilename = "./equil/equil_plans.xml";
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(population,
-				network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFilename);
 
 		EventsManagerImpl events = new EventsManagerImpl();
@@ -124,7 +120,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 		TraVolCnter traVolCounter = new TraVolCnter();
 		events.addHandler(traVolCounter);
 
-		QueueSimulation sim = new QueueSimulation(network, population, events);
+		QueueSimulation sim = new QueueSimulation(scenario, events);
 		sim.run();
 	}
 }

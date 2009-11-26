@@ -20,11 +20,11 @@
 package playground.christoph.population;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -40,6 +40,7 @@ public class PopulationSplitter {
 
 	private final static Logger log = Logger.getLogger(PopulationSplitter.class);
 	
+	private ScenarioImpl scenario;
 	private NetworkLayer network;
 	private ActivityFacilitiesImpl facilities;
 	private PopulationImpl population;
@@ -68,7 +69,8 @@ public class PopulationSplitter {
 	}
 	
 	public PopulationSplitter()
-	{		
+	{
+		this.scenario = new ScenarioImpl();
 		loadNetwork();
 		if (facilitiesFile != null) loadFacilities();
 		loadPopulation();
@@ -98,7 +100,7 @@ public class PopulationSplitter {
 	
 	private void loadNetwork()
 	{
-		network = new NetworkLayer();
+		network = scenario.getNetwork();
 		
 		new MatsimNetworkReader(network).readFile(networkFile);
 				
@@ -107,18 +109,15 @@ public class PopulationSplitter {
 	
 	private void loadFacilities()
 	{
-		facilities = new ActivityFacilitiesImpl();
+		facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(facilitiesFile);
-		
-		Gbl.getWorld().setFacilityLayer((ActivityFacilitiesImpl)facilities);
 		
 		log.info("Loading Facilities ... done");
 	}
 	
 	private void loadPopulation()
 	{
-		population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(populationFile);
+		new MatsimPopulationReader(scenario).readFile(populationFile);
 		log.info("Loading Population ... done");
 	}
 	
