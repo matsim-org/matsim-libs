@@ -26,9 +26,10 @@ package playground.yu.newNetwork;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -48,21 +49,21 @@ public class NetworkCleaner {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		final String inputNetFilename = "input/Toronto/toronto_m.xml";
-		final String outputNetFilename = "output/Toronto/toronto_c.xml.gz";
-		String logFilename = "output/Toronto/netCleaner.log";
+		final String inputNetFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newMultiModalNetBiggerWithoutBusLinkTest.xml.gz";
+		final String outputNetFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newMultiModalNetBiggerWithoutBusLinkCleanedTest.xml.gz";
+		String logFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/clean.log";
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputNetFilename);
-		Set<NodeImpl> nodesToRemove = new TreeSet<NodeImpl>();
-		for (NodeImpl n : network.getNodes().values())
-			if (n.getIncidentLinks().isEmpty())
+		Set<Node> nodesToRemove = new HashSet<Node>();
+		for (Node n : network.getNodes().values())
+			if (((NodeImpl) n).getIncidentLinks().isEmpty())
 				nodesToRemove.add(n);
 		int count = 0;
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(logFilename);
-			writer.write("Id of nodes removed from Toronto network\n");
-			for (NodeImpl n : nodesToRemove) {
+			writer.write("Id of nodes removed from " + inputNetFilename + "\n");
+			for (Node n : nodesToRemove) {
 				network.removeNode(n);
 				writer.write(count++ + n.toString() + "\n");
 			}

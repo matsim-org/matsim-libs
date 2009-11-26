@@ -92,7 +92,7 @@ public class BusLineAllocator {
 		}
 	}
 
-	private NetworkLayer netWithoutBus;
+	private NetworkLayer carNet;
 	private Map<Id, List<Tuple<Link, Tuple<Coord, Coord>>>> coordPairs;// <ptRouteId,<ptLink<fromNodeCoord,toNodeCoord>>>
 	// private Map<Id, List<Tuple<String, Tuple<Coord, Coord>>>>
 	// coordPairs4rtf;//
@@ -101,18 +101,19 @@ public class BusLineAllocator {
 	 * <ptRouteId,List<ptLinkId,Path_Links(shouldn't be pt linkId, but there
 	 * also is exception))>>
 	 */
-	private Map<Id, List<Tuple<Id, List<Id>/* Path.links */>>> paths = new HashMap<Id, List<Tuple<Id, List<Id>/*
-																												 * Path.
-																												 * links
-																												 */>>>();
+	private Map<Id, List<Tuple<Id, List<Id>/* path */>>> paths = new HashMap<Id, List<Tuple<Id, List<Id>/*
+																										 * Path.
+																										 * links
+																										 */>>>();
 	/*
 	 * <ptRouteId,List<ptLinkId:next_ptLinkId,Path(linkIds (shouldn't be pt
 	 * linkIds))>>
 	 */
-	private Map<Id, List<Tuple<String, List<Id>/* Path.links */>>> paths4rtf = new HashMap<Id, List<Tuple<String, List<Id>/*
-																															 * Path.
-																															 * links
-																															 */>>>();
+	// private Map<Id, List<Tuple<String, List<Id>/*path*/>>> paths4rtf
+	// = new HashMap<Id, List<Tuple<String, List<Id>/*
+	// * Path.
+	// * links
+	// */>>>();
 	// 
 	private String outputFile;
 	private Dijkstra dijkstra;
@@ -142,7 +143,7 @@ public class BusLineAllocator {
 	public BusLineAllocator(NetworkLayer netWithoutBus,
 			NetworkLayer multiModalNetwork, TransitSchedule schedule,
 			String outputFile) {
-		this.netWithoutBus = netWithoutBus;
+		this.carNet = netWithoutBus;
 		this.multiModalNetwork = multiModalNetwork;
 		this.schedule = schedule;
 		this.coordPairs = createCoordPairs(schedule);
@@ -158,7 +159,7 @@ public class BusLineAllocator {
 		for (Entry<Id, List<Tuple<Link, Tuple<Coord, Coord>>>> routeLinkCoordPair : coordPairs
 				.entrySet()) {
 			tmpPtRouteId = routeLinkCoordPair.getKey();
-			List<Tuple<Id, List<Id>/* Path.links */>> ptLinkIdPaths = paths
+			List<Tuple<Id, List<Id>/* path */>> ptLinkIdPaths = paths
 					.get(tmpPtRouteId);
 			if (ptLinkIdPaths == null)
 				ptLinkIdPaths = new ArrayList<Tuple<Id, List<Id>/* Path. links */>>();
@@ -166,7 +167,7 @@ public class BusLineAllocator {
 			for (Tuple<Link, Tuple<Coord, Coord>> linkCoordPair : routeLinkCoordPair
 					.getValue()) {
 				tmpPtLink = linkCoordPair.getFirst();
-				List<Id>/* Path.links */pathLinks = allocateRouteLink(linkCoordPair
+				List<Id>/* path */pathLinks = allocateRouteLink(linkCoordPair
 						.getSecond()/* coordPair */);
 				// TODO empty check
 				if (!pathLinks.isEmpty())/*
@@ -175,7 +176,7 @@ public class BusLineAllocator {
 										 * and toNode(carNet)? It's not problem
 										 * more.
 										 */{
-					ptLinkIdPaths.add(new Tuple<Id, List<Id>/* Path.links */>(
+					ptLinkIdPaths.add(new Tuple<Id, List<Id>/* path */>(
 							tmpPtLink.getId(), pathLinks));
 				}
 				/*
@@ -192,28 +193,27 @@ public class BusLineAllocator {
 		for (Link l2a : links2add) {
 			Node ptFrom = l2a.getFromNode();
 			Id ptFromId = ptFrom.getId();
-			Node carFrom = netWithoutBus.getNode(ptFromId);
+			Node carFrom = carNet.getNode(ptFromId);
 			if (carFrom == null)/* this node with this Id dosn't exist. */
-				carFrom = netWithoutBus.createAndAddNode(ptFromId, ptFrom
-						.getCoord());
+				carFrom = carNet.createAndAddNode(ptFromId, ptFrom.getCoord());
 			carFrom.getOutLinks().remove(l2a.getId());
 
 			Node ptTo = l2a.getToNode();
 			Id ptToId = ptTo.getId();
-			Node carTo = netWithoutBus.getNode(ptToId);
+			Node carTo = carNet.getNode(ptToId);
 			if (carTo == null)
-				carTo = netWithoutBus.createAndAddNode(ptToId, ptTo.getCoord());
+				carTo = carNet.createAndAddNode(ptToId, ptTo.getCoord());
 			carTo.getInLinks().remove(l2a.getId());
 
-			Link createdLink = netWithoutBus.createAndAddLink(l2a.getId(),
-					carFrom, carTo, l2a.getLength(), l2a.getFreespeed(0), l2a
+			Link createdLink = carNet.createAndAddLink(l2a.getId(), carFrom,
+					carTo, l2a.getLength(), l2a.getFreespeed(0), l2a
 							.getCapacity(0), l2a.getNumberOfLanes(0));
 			createdLink.setAllowedModes(modes);
 		}
-		netWithoutBus.connect();
+		carNet.connect();
 		/*---------- check in-/outLinks of nodes of links added to netWithoutBus-------*/
 		for (Link l2a : links2add) {
-			Link link = netWithoutBus.getLink(l2a.getId());// get link from-
+			Link link = carNet.getLink(l2a.getId());// get link from-
 			// netWithoutBus with the Id from links2add
 			Node from = link.getFromNode();
 			// from.getInLinks().clear();
@@ -224,7 +224,7 @@ public class BusLineAllocator {
 																		 * InLinks
 																		 */{
 				if (!fromInLinkIds.contains(inLinkId)) {
-					Link inLink = netWithoutBus.getLink(inLinkId);
+					Link inLink = carNet.getLink(inLinkId);
 					if (inLink != null)
 						from.addInLink(inLink);
 				}
@@ -238,7 +238,7 @@ public class BusLineAllocator {
 																		 * OutLinks
 																		 */{
 				if (!fromOutLinkIds.contains(outLinkId)) {
-					Link outLink = netWithoutBus.getLink(outLinkId);
+					Link outLink = carNet.getLink(outLinkId);
 					if (outLink != null)
 						from.addOutLink(outLink);
 				}
@@ -252,7 +252,7 @@ public class BusLineAllocator {
 																	 * toNode-InLinks
 																	 */{
 				if (!toInLinkIds.contains(inLinkId)) {
-					Link inLink = netWithoutBus.getLink(inLinkId);
+					Link inLink = carNet.getLink(inLinkId);
 					if (inLink != null)
 						to.addInLink(inLink);
 				}
@@ -266,96 +266,55 @@ public class BusLineAllocator {
 																		 * OutLinks
 																		 */{
 				if (!toOutLinkIds.contains(outLinkId)) {
-					Link outLink = netWithoutBus.getLink(outLinkId);
+					Link outLink = carNet.getLink(outLinkId);
 					if (outLink != null)
 						to.addOutLink(outLink);
 				}
 			}
 		}
-		netWithoutBus.connect();
-		dijkstra/* new Instance angain */= new Dijkstra(netWithoutBus,
+		carNet.connect();
+		dijkstra/* new Instance angain */= new Dijkstra(carNet,
 				new TravelCostFunctionDistance(), new TravelTimeFunctionFree());
 
 	}
 
 	private void rectifyAllocations() {
-		for (Entry<Id, List<Tuple<Id, List<Id>/* Path.links */>>> ptRouteIdPtLinkIdpaths : paths
+		// Map<Id, List<Tuple<Id, List<Id>>>> tmpPaths = new HashMap<Id,
+		// List<Tuple<Id, List<Id>>>>();
+		// tmpPaths.putAll(paths);
+		for (Entry<Id, List<Tuple<Id, List<Id>/* path */>>> routeId_ptLinkIdpathPairs : paths
 				.entrySet()) {
-
-			Id ptRouteId = ptRouteIdPtLinkIdpaths.getKey();
-			List<Tuple<String/* ptLinkIdpair */, List<Id>/* Path.links */>> ptLinkIdPaths4rtf = paths4rtf
-					.get(ptRouteId);
-			if (ptLinkIdPaths4rtf == null)
-				ptLinkIdPaths4rtf = new ArrayList<Tuple<String, List<Id>/*
-																		 * Path.links
-																		 */>>();
-
-			List<Tuple<Id, List<Id>/* Path.links */>> ptLinkIdPaths = ptRouteIdPtLinkIdpaths
+			List<Tuple<Id, List<Id>/* path */>> ptLinkId_PathPairs = routeId_ptLinkIdpathPairs
 					.getValue();
-			for (int i = 0; i < ptLinkIdPaths.size() - 1; i++) {
-				System.out.println(">>>>>Line 296 BEGINS!!!");
-				Tuple<Id, List<Id>/* Path.links */> ptLinkIdPathA = ptLinkIdPaths
-						.get(i), ptLinkIdPathB = ptLinkIdPaths.get(i + 1);
-				List<Id> pathA = ptLinkIdPathA.getSecond(), pathB = ptLinkIdPathB
+
+			for (int i = 0; i < ptLinkId_PathPairs.size() - 1; i++) {
+				Tuple<Id, List<Id>/* path */> ptLinkId_pathPairA = ptLinkId_PathPairs
+						.get(i), ptLinkId_pathPairB = ptLinkId_PathPairs
+						.get(i + 1);
+				List<Id> pathA = ptLinkId_pathPairA.getSecond(), pathB = ptLinkId_pathPairB
 						.getSecond();
 
-				Node from = netWithoutBus.getLink(pathA.get(0)).getFromNode(), to = netWithoutBus
-						.getLink(pathB.get(pathB.size() - 1)).getToNode();
-
-				Id idA = ptLinkIdPathA.getFirst(), idB = ptLinkIdPathB
-						.getFirst();
-				List<Id> linkIds = new ArrayList<Id>();
-				Link lastALink = netWithoutBus.getLink(pathA
-						.get(pathA.size() - 1)), firstBLink = netWithoutBus
-						.getLink(pathB.get(0));
-				System.out.println(">>>>> before calcShortPath\t" + lastALink
-						+ "\t" + firstBLink);
-				Path path = dijkstra.calcLeastCostPath(from, to, 0);
-				System.out.println(">>>>> after calcShortPath");
-				if (path == null) {
-
-					System.err.println("No connections between the 2 links:\t"
-							+ lastALink + "\t" + firstBLink);
-
-					Node lastANode = lastALink.getToNode(), firstBNode = firstBLink
-							.getFromNode();
-
-					if (lastANode.getId().toString().startsWith("tr_")) {
-						lastALink.setToNode(firstBNode);
-					} else if (!lastANode.getId().toString().startsWith("tr_")
-							&& firstBNode.getId().toString().startsWith("tr_")) {
-						firstBLink.setFromNode(lastANode);
-					} else {
-						Id newLinkId = new IdImpl(lastANode.getId() + "-2-"
-								+ firstBNode.getId());
-						Link newLink = netWithoutBus.getLink(newLinkId);
-						if (newLink == null)
-							newLink = netWithoutBus.createAndAddLink(newLinkId,
-									lastANode, firstBNode, CoordUtils
-											.calcDistance(lastANode.getCoord(),
-													firstBNode.getCoord()),
-									lastALink.getFreespeed(0), lastALink
-											.getCapacity(0), lastALink
-											.getNumberOfLanes(0));
-
-						linkIds.addAll(pathA);
-						linkIds.add(newLink.getId());
-						linkIds.addAll(pathB);
-						System.out.println(">>>>>Line 331 finished!!!");
+				// compare PahtA and pathB
+				int sizeA = pathA.size();
+				compare: for (int j = sizeA - 1; j >= 1; j--) {
+					Id idA = pathA.get(j);
+					for (int k = 0; k < pathB.size(); k++) {
+						Id idB = pathB.get(k);
+						if (idA.equals(idB)) {
+							List<Id> sub = new ArrayList<Id>();
+							sub.addAll(pathA.subList(j, sizeA));
+							pathA.removeAll(sub);
+							sub.clear();
+							sub.addAll(pathB.subList(0, k));
+							pathB.removeAll(sub);
+							break compare;
+						}
 					}
+				}// compare ends!
 
-				} else {
-
-					linkIds = links2Ids(path.links);
-				}
-				ptLinkIdPaths4rtf
-						.add(new Tuple<String, List<Id>/* Path.links */>(idA
-								+ ":" + idB /* idAB */, linkIds/* pathAB */));
-				System.out.println(">>>>>Line 339 finished!!!");
 			}
-			paths4rtf.put(ptRouteId, ptLinkIdPaths4rtf);
-			System.out.println(">>>>>Line 341 finished!!!");
 		}
+		// TODO
 
 	}
 
@@ -367,141 +326,146 @@ public class BusLineAllocator {
 		return ids;
 	}
 
-	private void eliminateRedundancy() {
-		for (Entry<Id, List<Tuple<String, List<Id>/* Path.links */>>> path4rtfEntry : paths4rtf
-				.entrySet()) {
-			Id routeId = path4rtfEntry.getKey();
-			List<Tuple<String, List<Id>/* Path.links */>> ptLinkIdsPaths4rtf = path4rtfEntry
-					.getValue();
-			for (int j = 0; j < ptLinkIdsPaths4rtf.size(); j++) {
-
-				Tuple<String, List<Id>/* Path.links */> ptLinkIdsPath4rtf = ptLinkIdsPaths4rtf
-						.get(j);
-				String[] ptLinkIds4rtf = ptLinkIdsPath4rtf.getFirst()
-						.split(":");
-				List<Id>/* Path.links */pathA = null, pathB = null;
-				List<Tuple<Id, List<Id>>> ptLinkIdPaths = paths.get(routeId);
-
-				Tuple<Id, List<Id>/* Path.links */> ptLinkIdPathA = ptLinkIdPaths
-						.get(j), ptLinkIdPathB = ptLinkIdPaths.get(j + 1);
-				String ptLinkIdStrA = ptLinkIdPathA.getFirst().toString(), ptLinkIdStrB = ptLinkIdPathB
-						.getFirst().toString();
-				if (ptLinkIds4rtf[0].equals(ptLinkIdStrA))
-					pathA = ptLinkIdPathA.getSecond();
-				if (ptLinkIds4rtf[1].equals(ptLinkIdStrB))
-					pathB = ptLinkIdPathB.getSecond();
-				if (pathA == null && pathB == null) {
-					System.err
-							.println(">>>>>lineNo.380\tlinkIds don't match :\t"
-									+ ptLinkIds4rtf + "\t<->\t" + ptLinkIdStrA
-									+ "\t" + ptLinkIdStrB);
-					System.exit(1);
-				}
-
-				List<Id>/* Path.links */rtfPath = ptLinkIdsPath4rtf.getSecond();
-				List<Id>/* Path.links */tmpLinksA = new ArrayList<Id>/*
-																	 * Path.links
-																	 */();
-				List<Id>/* Path.links */tmpLinksB = new ArrayList<Id>/*
-																	 * Path.links
-																	 */();
-				List<Id>/* Path.links */tmpLinksRtf = new ArrayList<Id>/*
-																		 * Path.links
-																		 */();
-				tmpLinksA.addAll(pathA);
-				for (Id linkId : tmpLinksA)
-					if (!rtfPath.contains(linkId)) {
-						pathA.remove(linkId);
-					}
-				tmpLinksB.addAll(pathB);
-				for (Id linkId : tmpLinksB)
-					if (!rtfPath.contains(linkId)) {
-						pathB.remove(linkId);
-					}
-
-				if (!isSubList(pathA, pathB, rtfPath)) {
-					pathA.clear();
-					pathB.clear();
-					pathB.addAll(tmpLinksB);
-					pathA.addAll(tmpLinksA);
-				}
-				/* already reduced ? */
-				Id lastA = pathA.get(pathA.size() - 1), firstB = pathB.get(0);
-				Node lastANode = netWithoutBus.getLink(lastA).getToNode(), firstBNode = netWithoutBus
-						.getLink(firstB).getFromNode();
-				if (!lastANode.equals(firstBNode))/* different nodes */{
-					if (!lastANode.getCoord().equals(firstBNode.getCoord()))/*
-																			 * differen
-																			 * coord
-																			 */{
-						Path path = dijkstra.calcLeastCostPath(lastANode,
-								firstBNode, 0);
-
-						if (path != null) {
-							if (!path.links.isEmpty()) {
-								Coord ptLinkAToCoord = multiModalNetwork
-										.getLink(ptLinkIdStrA).getToNode()
-										.getCoord();
-								double minDist = 10000;
-								Link nearestLink = null;
-								int nearestPos = -1;
-								for (int i = 0; i < path.links.size(); i++) {
-									Link link = path.links.get(i);
-									double tmpDist = CoordUtils.calcDistance(
-											ptLinkAToCoord, link.getCoord());
-									if (tmpDist < minDist) {
-										minDist = tmpDist;
-										nearestLink = link;
-										nearestPos = i;
-									}
-								}
-								if (nearestLink != null)
-									for (int i = 0; i < path.links.size(); i++) {
-										Link link = path.links.get(i);
-										if (i <= nearestPos)
-											pathA.add(link.getId());
-										else
-											pathB.add(i - nearestPos - 1, link
-													.getId());
-									}
-							} else {
-								System.out
-										.println(">>>>>line424\tempty path.links");
-							}
-						} else/* path==null */{
-							Link ptLinkA = multiModalNetwork
-									.getLink(ptLinkIdStrA);
-							Link newLink = netWithoutBus.createAndAddLink(
-									new IdImpl(ptLinkIdStrA + "-"
-											+ ptLinkIdStrB), lastANode,
-									firstBNode, CoordUtils.calcDistance(
-											lastANode.getCoord(), firstBNode
-													.getCoord()), ptLinkA
-											.getFreespeed(0), ptLinkA
-											.getCapacity(0), ptLinkA
-											.getNumberOfLanes(0));
-							pathA.add(newLink.getId());
-						}
-					} else/* same Coord */{
-						Link ptLinkA = multiModalNetwork.getLink(ptLinkIdStrA);
-						Id newLinkId = new IdImpl(ptLinkIdStrA + "-"
-								+ ptLinkIdStrB);
-
-						Link newLink = netWithoutBus.getLink(newLinkId);
-						if (newLink == null)
-							newLink = netWithoutBus.createAndAddLink(newLinkId,
-									lastANode, firstBNode, 0, ptLinkA
-											.getFreespeed(0), ptLinkA
-											.getCapacity(0), ptLinkA
-											.getNumberOfLanes(0));
-						newLink.setAllowedModes(modes);
-						pathA.add(newLink.getId());
-					}
-				}
-			}
-		}
-		netWithoutBus.connect();
-	}
+	// private void eliminateRedundancy() {
+	// for (Entry<Id, List<Tuple<String, List<Id>/*path*/>>>
+	// path4rtfEntry : paths4rtf
+	// .entrySet()) {
+	// Id routeId = path4rtfEntry.getKey();
+	// List<Tuple<String, List<Id>/*path*/>> ptLinkIdsPaths4rtf =
+	// path4rtfEntry
+	// .getValue();
+	// for (int j = 0; j < ptLinkIdsPaths4rtf.size(); j++) {
+	//
+	// Tuple<String, List<Id>/*path*/> ptLinkIdsPath4rtf =
+	// ptLinkIdsPaths4rtf
+	// .get(j);
+	// String[] ptLinkIds4rtf = ptLinkIdsPath4rtf.getFirst()
+	// .split(":");
+	// List<Id>/*path*/pathA = null, pathB = null;
+	// List<Tuple<Id, List<Id>>> ptLinkIdPaths = paths.get(routeId);
+	//
+	// Tuple<Id, List<Id>/*path*/> ptLinkIdPathA = ptLinkIdPaths
+	// .get(j), ptLinkIdPathB = ptLinkIdPaths.get(j + 1);
+	// String ptLinkIdStrA = ptLinkIdPathA.getFirst().toString(),
+	// ptLinkIdStrB = ptLinkIdPathB
+	// .getFirst().toString();
+	// if (ptLinkIds4rtf[0].equals(ptLinkIdStrA))
+	// pathA = ptLinkIdPathA.getSecond();
+	// if (ptLinkIds4rtf[1].equals(ptLinkIdStrB))
+	// pathB = ptLinkIdPathB.getSecond();
+	// if (pathA == null && pathB == null) {
+	// System.err
+	// .println(">>>>>lineNo.380\tlinkIds don't match :\t"
+	// + ptLinkIds4rtf + "\t<->\t" + ptLinkIdStrA
+	// + "\t" + ptLinkIdStrB);
+	// System.exit(1);
+	// }
+	//
+	// List<Id>/*path*/rtfPath = ptLinkIdsPath4rtf.getSecond();
+	// List<Id>/*path*/tmpLinksA = new ArrayList<Id>/*
+	// * Path.links
+	// */();
+	// List<Id>/*path*/tmpLinksB = new ArrayList<Id>/*
+	// * Path.links
+	// */();
+	// List<Id>/*path*/tmpLinksRtf = new ArrayList<Id>/*
+	// * Path.links
+	// */();
+	// tmpLinksA.addAll(pathA);
+	// for (Id linkId : tmpLinksA)
+	// if (!rtfPath.contains(linkId)) {
+	// pathA.remove(linkId);
+	// }
+	// tmpLinksB.addAll(pathB);
+	// for (Id linkId : tmpLinksB)
+	// if (!rtfPath.contains(linkId)) {
+	// pathB.remove(linkId);
+	// }
+	//
+	// if (!isSubList(pathA, pathB, rtfPath)) {
+	// pathA.clear();
+	// pathB.clear();
+	// pathB.addAll(tmpLinksB);
+	// pathA.addAll(tmpLinksA);
+	// }
+	// /* already reduced ? */
+	// Id lastA = pathA.get(pathA.size() - 1), firstB = pathB.get(0);
+	// Node lastANode = netWithoutBus.getLink(lastA).getToNode(), firstBNode
+	// = netWithoutBus
+	// .getLink(firstB).getFromNode();
+	// if (!lastANode.equals(firstBNode))/* different nodes */{
+	// if (!lastANode.getCoord().equals(firstBNode.getCoord()))/*
+	// * differen
+	// * coord
+	// */{
+	// Path path = dijkstra.calcLeastCostPath(lastANode,
+	// firstBNode, 0);
+	//
+	// if (path != null) {
+	// if (!path.links.isEmpty()) {
+	// Coord ptLinkAToCoord = multiModalNetwork
+	// .getLink(ptLinkIdStrA).getToNode()
+	// .getCoord();
+	// double minDist = 10000;
+	// Link nearestLink = null;
+	// int nearestPos = -1;
+	// for (int i = 0; i < path.links.size(); i++) {
+	// Link link = path.links.get(i);
+	// double tmpDist = CoordUtils.calcDistance(
+	// ptLinkAToCoord, link.getCoord());
+	// if (tmpDist < minDist) {
+	// minDist = tmpDist;
+	// nearestLink = link;
+	// nearestPos = i;
+	// }
+	// }
+	// if (nearestLink != null)
+	// for (int i = 0; i < path.links.size(); i++) {
+	// Link link = path.links.get(i);
+	// if (i <= nearestPos)
+	// pathA.add(link.getId());
+	// else
+	// pathB.add(i - nearestPos - 1, link
+	// .getId());
+	// }
+	// } else {
+	// System.out
+	// .println(">>>>>line424\tempty path.links");
+	// }
+	// } else/* path==null */{
+	// Link ptLinkA = multiModalNetwork
+	// .getLink(ptLinkIdStrA);
+	// Link newLink = netWithoutBus.createAndAddLink(
+	// new IdImpl(ptLinkIdStrA + "-"
+	// + ptLinkIdStrB), lastANode,
+	// firstBNode, CoordUtils.calcDistance(
+	// lastANode.getCoord(), firstBNode
+	// .getCoord()), ptLinkA
+	// .getFreespeed(0), ptLinkA
+	// .getCapacity(0), ptLinkA
+	// .getNumberOfLanes(0));
+	// pathA.add(newLink.getId());
+	// }
+	// } else/* same Coord */{
+	// Link ptLinkA = multiModalNetwork.getLink(ptLinkIdStrA);
+	// Id newLinkId = new IdImpl(ptLinkIdStrA + "-"
+	// + ptLinkIdStrB);
+	//
+	// Link newLink = netWithoutBus.getLink(newLinkId);
+	// if (newLink == null)
+	// newLink = netWithoutBus.createAndAddLink(newLinkId,
+	// lastANode, firstBNode, 0, ptLinkA
+	// .getFreespeed(0), ptLinkA
+	// .getCapacity(0), ptLinkA
+	// .getNumberOfLanes(0));
+	// newLink.setAllowedModes(modes);
+	// pathA.add(newLink.getId());
+	// }
+	// }
+	// }
+	// }
+	// netWithoutBus.connect();
+	// }
 
 	/**
 	 * @param pathA
@@ -545,21 +509,20 @@ public class BusLineAllocator {
 						ptLinkCoordPairs = new ArrayList<Tuple<Link, Tuple<Coord, Coord>>>();
 
 					NetworkRouteWRefs route = ptRoute.getRoute();
+
 					hasStartLink = false;
 					// route. startLink
 					Link startLink = route.getStartLink();
 					createCoordPair(startLink, ptLinkCoordPairs);
+
 					// route. links
 					for (Link link : route.getLinks())
 						createCoordPair(link, ptLinkCoordPairs);
+
 					// route. endLink
 					Link endLink = route.getEndLink();
-					if (createCoordPair(endLink, ptLinkCoordPairs))
-						endLinks.add(endLink);
-					else
-						endLinks.add(ptLinkCoordPairs.get(
-								ptLinkCoordPairs.size() - 1).getFirst());
-					hasStartLink = false;
+					createCoordPair(endLink, ptLinkCoordPairs);
+					endLinks.add(endLink);
 
 					coordPairs.put(ptRouteId, ptLinkCoordPairs);
 				}
@@ -568,162 +531,72 @@ public class BusLineAllocator {
 		return coordPairs;
 	}
 
-	private boolean createCoordPair(Link link,
+	private void createCoordPair(Link link,
 			List<Tuple<Link, Tuple<Coord, Coord>>> ptLinkCoordPairs) {
 		Coord fromCoord = link.getFromNode().getCoord(), toCoord = link
 				.getToNode().getCoord();
-		boolean toReturn = true;
-		// link.getLength() > 0 && !fromCoord.equals(toCoord);
-		if (toReturn) {
-			ptLinkCoordPairs.add(new Tuple<Link, Tuple<Coord, Coord>>(link,
-					new Tuple<Coord, Coord>(fromCoord, toCoord)));
-			if (!hasStartLink) {
-				startLinks.add(link);
-				hasStartLink = true;
-			}
+		ptLinkCoordPairs.add(new Tuple<Link, Tuple<Coord, Coord>>(link,
+				new Tuple<Coord, Coord>(fromCoord, toCoord)));
+		if (!hasStartLink) {
+			startLinks.add(link);
+			hasStartLink = true;
 		}
-		return toReturn;
 	}
 
-	private List<Id>/* Path.links */allocateRouteLink(
-			Tuple<Coord, Coord> coordPair) {
+	private List<Id>/* path */allocateRouteLink(Tuple<Coord, Coord> coordPair) {
 		Coord coordA = coordPair.getFirst(), coordB = coordPair.getSecond();
-		Node nodeA = netWithoutBus.getNearestNode(coordA), nodeB = netWithoutBus
+		Node nodeA = carNet.getNearestNode(coordA), nodeB = carNet
 				.getNearestNode(coordB);
-		boolean AInRange = CoordUtils.calcDistance(coordA, nodeA.getCoord()) < 100/*
-																				 * TEST(
-																				 * old
-																				 * value
-																				 * =
-																				 * 50
-																				 * )
-																				 */, BInRange = CoordUtils
-				.calcDistance(coordB, nodeB.getCoord()) < 100;/*
-															 * TEST(old
-															 * value=50)
-															 */// circle with
-		// radius of 50
-		// [m]
-		List<Id>/* Path.links */linkIds = new ArrayList<Id>/* Path.links */();
+		boolean AoutOfRange = CoordUtils.calcDistance(coordA, nodeA.getCoord()) > 100, BoutOfRange = CoordUtils
+				.calcDistance(coordB, nodeB.getCoord()) > 100;
 
-		if (AInRange && BInRange/* both inside */) {
-			if (!nodeA.equals(nodeB)) {
-				Path path = dijkstra.calcLeastCostPath(nodeA, nodeB, 0);
-				if (path != null) {
-					if (!path.links.isEmpty()) {
-						List<Link> links = path.links;
-						linkIds.addAll(links2Ids(links));
-					} else {
-						System.out.println("empty path.links!");
-					}
-				} else {
-					tmpPtLink.setFromNode(nodeA);
+		List<Id> pathLinks = new ArrayList<Id>();
 
-					tmpPtLink.setToNode(nodeB);
-
-					links2add.add(tmpPtLink);
-					linkIds.add(tmpPtLink.getId());
-				}
-			} else/* nodeA==nodeB */{
-				if (startLinks.contains(tmpPtLink)) /*
-													 * this tmpPtLink is a
-													 * startLink or endLink
-													 */
-					startCase(linkIds, nodeB);
-				else if (endLinks.contains(tmpPtLink))
-					endCase(linkIds, nodeA);
-			}
-		} else if (!AInRange && !BInRange/* both outside */) {
-			links2add.add(tmpPtLink);
-			linkIds.add(tmpPtLink.getId());
-		} else/* one outside, one inside */{
-			if (AInRange) {
-				// endCase(linkIds, nodeA);
-				Path path = dijkstra.calcLeastCostPath(nodeA, nodeB, 0);
-				if (path != null) {
-					if (!path.links.isEmpty()) {
-						List<Link> links = path.links;
-						linkIds.addAll(links2Ids(links));
-					} else {
-						tmpPtLink.setFromNode(nodeA);
-						links2add.add(tmpPtLink);
-						linkIds.add(tmpPtLink.getId());
-					}
-
-				} else {
-					tmpPtLink.setFromNode(nodeA);
-					links2add.add(tmpPtLink);
-					linkIds.add(tmpPtLink.getId());
-				}
-
-				if (!nodeA.equals(nodeB)) {
-					Id newLinkId = new IdImpl(tmpPtLink.getId() + ">"
-							+ nodeB.getId());
-					Link newLink = multiModalNetwork.getLink(newLinkId);
-					if (newLink == null) {
-						Id newNodeId = new IdImpl(tmpPtLink.getId() + "-4-"
-								+ nodeB.getId());
-						Node newNode = multiModalNetwork.getNode(newNodeId);
-						if (newNode == null)
-							newNode = multiModalNetwork.createAndAddNode(
-									newNodeId, coordB);
-						newLink = multiModalNetwork.createAndAddLink(newLinkId,
-								nodeB, newNode, CoordUtils.calcDistance(nodeB
-										.getCoord(), coordB), tmpPtLink
-										.getFreespeed(0), tmpPtLink
-										.getCapacity(0), tmpPtLink
-										.getNumberOfLanes(0));
-					}
-					links2add.add(newLink);
-					linkIds.add(newLinkId);
-					System.out.println("path of ptLink:\t" + tmpPtLink.getId()
-							+ "==>\t" + linkIds);
-				}
-			} else {
-				/* BInRange */
-				// startCase(linkIds, nodeB);
-				if (!nodeA.equals(nodeB)) {
-					Id newLinkId = new IdImpl(nodeA.getId() + ">"
-							+ tmpPtLink.getId());
-					Link newLink = multiModalNetwork.getLink(newLinkId);
-					if (newLink == null) {
-						Id newNodeId = new IdImpl(tmpPtLink.getId() + "-4-"
-								+ nodeA.getId());
-						Node newNode = multiModalNetwork.getNode(newNodeId);
-						if (newNode == null)
-							newNode = multiModalNetwork.createAndAddNode(
-									newNodeId, coordA);
-
-						newLink = multiModalNetwork.createAndAddLink(newLinkId,
-								newNode, nodeA, CoordUtils.calcDistance(nodeA
-										.getCoord(), coordA), tmpPtLink
-										.getFreespeed(0), tmpPtLink
-										.getCapacity(0), tmpPtLink
-										.getNumberOfLanes(0));
-					}
-
-					links2add.add(newLink);
-					linkIds.add(newLinkId);
-				}
-
-				Path path = dijkstra.calcLeastCostPath(nodeA, nodeB, 0);
-				if (path != null) {
-					if (!path.links.isEmpty()) {
-						List<Link> links = path.links;
-						linkIds.addAll(links2Ids(links));
-						return linkIds;
-					}
-				}
-				{
-					tmpPtLink.setToNode(nodeB);
-					links2add.add(tmpPtLink);
-					linkIds.add(tmpPtLink.getId());
-				}
-				System.out.println("path of ptLink:\t" + tmpPtLink.getId()
-						+ "==>\t" + linkIds);
+		if (!nodeA.equals(nodeB)) {
+			Path path = dijkstra.calcLeastCostPath(nodeA, nodeB, 0);
+			if (path != null)
+				pathLinks.addAll(links2Ids(path.links));
+			else {
+				tmpPtLink.setFromNode(nodeA);
+				tmpPtLink.setToNode(nodeB);
+				links2add.add(tmpPtLink);
+				pathLinks.add(tmpPtLink.getId());
 			}
 		}
-		return linkIds;
+		// else/* nodeA==nodeB */{}
+
+		if (AoutOfRange) {
+			Id newLinkId = new IdImpl(this.tmpPtLink.getId() + "-2-"
+					+ nodeA.getId());
+			Link newLink = multiModalNetwork.getLink(newLinkId);
+			if (newLink == null) {
+				Node A = tmpPtLink.getFromNode();
+				newLink = multiModalNetwork.createAndAddLink(newLinkId, A,
+						nodeA, CoordUtils
+								.calcDistance(coordA, nodeA.getCoord()),
+						tmpPtLink.getFreespeed(0), tmpPtLink.getCapacity(0),
+						tmpPtLink.getNumberOfLanes(0));
+			}
+			links2add.add(newLink);
+			pathLinks.add(0, newLinkId);// first position
+		}
+
+		if (BoutOfRange) {
+			Id newLinkId = new IdImpl(this.tmpPtLink.getId() + "-from-"
+					+ nodeB.getId());
+			Link newLink = multiModalNetwork.getLink(newLinkId);
+			if (newLink == null) {
+				Node B = tmpPtLink.getToNode();
+				newLink = multiModalNetwork.createAndAddLink(newLinkId, nodeB,
+						B, CoordUtils.calcDistance(coordB, nodeB.getCoord()),
+						tmpPtLink.getFreespeed(0), tmpPtLink.getCapacity(0),
+						tmpPtLink.getNumberOfLanes(0));
+			}
+			links2add.add(newLink);
+			pathLinks.add(newLinkId);// last position
+		}
+
+		return pathLinks;
 	}
 
 	private void startCase(List<Id> linkIds, Node to) {
@@ -741,9 +614,9 @@ public class BusLineAllocator {
 	private void output() {
 		SimpleWriter writer = new SimpleWriter(outputFile);
 		writer.writeln("ptRouteId\t:\tptlinkId\t:\tlinks");
-		for (Entry<Id, List<Tuple<Id, List<Id>/* Path.links */>>> routeLinkPathEntry : paths
+		for (Entry<Id, List<Tuple<Id, List<Id>/* path */>>> routeLinkPathEntry : paths
 				.entrySet()) {
-			for (Tuple<Id, List<Id>/* Path.links */> linkPathPair : routeLinkPathEntry
+			for (Tuple<Id, List<Id>/* path */> linkPathPair : routeLinkPathEntry
 					.getValue()) {
 				StringBuffer line = new StringBuffer(routeLinkPathEntry
 						.getKey()
@@ -755,29 +628,31 @@ public class BusLineAllocator {
 		}
 		writer.writeln("----->>>>>HALFWAY RECTIFICATION RESULTS<<<<<-----");
 
-		for (Entry<Id, List<Tuple<String, List<Id>/* Path.links */>>> routeLinkPathEntry : paths4rtf
-				.entrySet()) {
-			for (Tuple<String, List<Id>/* Path.links */> linkPathPair : routeLinkPathEntry
-					.getValue()) {
-				StringBuffer line = new StringBuffer(routeLinkPathEntry
-						.getKey()
-						+ "\t:\t" + linkPathPair.getFirst() + "\t:\t");
-				for (Id linkId : linkPathPair.getSecond())
-					line.append(linkId + "\t");
-				writer.writeln(line.toString());
-			}
-		}
+		// for (Entry<Id, List<Tuple<String, List<Id>/*path*/>>>
+		// routeLinkPathEntry : paths4rtf
+		// .entrySet()) {
+		// for (Tuple<String, List<Id>/*path*/> linkPathPair :
+		// routeLinkPathEntry
+		// .getValue()) {
+		// StringBuffer line = new StringBuffer(routeLinkPathEntry
+		// .getKey()
+		// + "\t:\t" + linkPathPair.getFirst() + "\t:\t");
+		// for (Id linkId : linkPathPair.getSecond())
+		// line.append(linkId + "\t");
+		// writer.writeln(line.toString());
+		// }
+		// }
 		System.out
 				.println(">>>>> >>>>> output has written HALFWAY RECTIFICATION RESULTS!!!");
 		writer.writeln("----->>>>>RECTIFICATION RESULTS<<<<<-----");
 
-		eliminateRedundancy();/* very important */
+		// eliminateRedundancy();/* very important */
 		System.out.println(">>>>> >>>>> eliminateRedundancy ENDS!!!");
 
 		writer.writeln("ptRouteId\t:\tptlinkId\t:\tlinks");
-		for (Entry<Id, List<Tuple<Id, List<Id>/* Path.links */>>> routeLinkPathEntry : paths
+		for (Entry<Id, List<Tuple<Id, List<Id>/* path */>>> routeLinkPathEntry : paths
 				.entrySet()) {
-			for (Tuple<Id, List<Id>/* Path.links */> linkPathPair : routeLinkPathEntry
+			for (Tuple<Id, List<Id>/* path */> linkPathPair : routeLinkPathEntry
 					.getValue()) {
 				StringBuffer line = new StringBuffer(routeLinkPathEntry
 						.getKey()
@@ -804,16 +679,15 @@ public class BusLineAllocator {
 	}
 
 	private void generateNewSchedule(String newTransitScheduleFilename) {
-		Map<Id, List<Id>/* Path.links */> ptLinkIdPaths = convertResult();
+		Map<Id, List<Id>/* path */> ptLinkIdPaths = convertResult();
 		/*-------------------STOPS---------------------------*/
 		for (TransitStopFacility stop : schedule.getFacilities().values()) {
 			Id stopLinkId = stop.getLinkId();
-			List<Id>/* Path.links */path = ptLinkIdPaths.get(stopLinkId);
+			List<Id>/* path */path = ptLinkIdPaths.get(stopLinkId);
 			if (path != null) {
 				if (path.size() > 0)
 					/*------with carNet-----*/
-					stop.setLink(netWithoutBus.getLink(path
-							.get(path.size() - 1)));
+					stop.setLink(carNet.getLink(path.get(path.size() - 1)));
 				else
 					stop.setLink(null);
 			} else {
@@ -838,14 +712,14 @@ public class BusLineAllocator {
 		}
 	}
 
-	private Map<Id, List<Id>/* Path.links */> convertResult() {
-		Map<Id, List<Id>/* Path.links */> ptLinkIdPathMap = new HashMap<Id, List<Id>/*
-																					 * Path.
-																					 * links
-																					 */>();
-		for (List<Tuple<Id, List<Id>/* Path.links */>> ptLinkIdPathPairs : paths
+	private Map<Id, List<Id>/* path */> convertResult() {
+		Map<Id, List<Id>/* path */> ptLinkIdPathMap = new HashMap<Id, List<Id>/*
+																			 * Path.
+																			 * links
+																			 */>();
+		for (List<Tuple<Id, List<Id>/* path */>> ptLinkIdPathPairs : paths
 				.values())
-			for (Tuple<Id, List<Id>/* Path.links */> idPathPair : ptLinkIdPathPairs) {
+			for (Tuple<Id, List<Id>/* path */> idPathPair : ptLinkIdPathPairs) {
 				Id id = idPathPair.getFirst();
 				List<Id> path = ptLinkIdPathMap.get(id);
 				if (path == null)
@@ -854,10 +728,10 @@ public class BusLineAllocator {
 					path = idPathPair.getSecond();
 
 				for (Id linkId : path) {
-					netWithoutBus.getLink(linkId).setAllowedModes(modes);
+					carNet.getLink(linkId).setAllowedModes(modes);
 				}
 
-				ptLinkIdPathMap.put(id, path /* path.links */);
+				ptLinkIdPathMap.put(id, path /* path */);
 			}
 
 		return ptLinkIdPathMap;
@@ -868,26 +742,25 @@ public class BusLineAllocator {
 	 */
 	private Map<Id, NetworkRouteWRefs> convertResult2() {
 		Map<Id, NetworkRouteWRefs> routes = new HashMap<Id, NetworkRouteWRefs>();
-		for (Entry<Id, List<Tuple<Id, List<Id>/* Path.links */>>> routeId_linkPathPair : paths
+		for (Entry<Id, List<Tuple<Id, List<Id>/* path */>>> routeId_linkPathPair : paths
 				.entrySet()) {
-			List<Tuple<Id, List<Id>/* Path.links */>> linkId_Paths = routeId_linkPathPair
+			List<Tuple<Id, List<Id>/* path */>> linkId_Paths = routeId_linkPathPair
 					.getValue();
 			Link startLink = null, endLink = null;
-			LinkedList<Id>/* Path.links */routeLinks = new LinkedList<Id>/*
-																		 * Path.
-																		 * links
-																		 */();
+			LinkedList<Id>/* path */routeLinks = new LinkedList<Id>/*
+																 * Path. links
+																 */();
 			int size = linkId_Paths.size();
 			for (int i = 0; i < size; i++) {
-				Tuple<Id, List<Id>/* Path.links */> linkId_PathPair = linkId_Paths
+				Tuple<Id, List<Id>/* path */> linkId_PathPair = linkId_Paths
 						.get(i);
-				List<Id>/* Path.links */linkIds = linkId_PathPair.getSecond();
+				List<Id>/* path */linkIds = linkId_PathPair.getSecond();
 				routeLinks.addAll(linkIds);
 
 			}
 			/*-----with carNetwork-----*/
-			endLink = netWithoutBus.getLink(routeLinks.removeLast());
-			startLink = netWithoutBus.getLink(routeLinks.remove(0));
+			endLink = carNet.getLink(routeLinks.removeLast());
+			startLink = carNet.getLink(routeLinks.remove(0));
 			NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink,
 					endLink);
 			route.setLinks(startLink, ids2links(routeLinks), endLink);
@@ -900,13 +773,13 @@ public class BusLineAllocator {
 		List<Link> links = new ArrayList<Link>();
 		for (Id id : ids) {
 			/*-----with carNetwork-----*/
-			links.add(netWithoutBus.getLink(id));
+			links.add(carNet.getLink(id));
 		}
 		return links;
 	}
 
 	private void generateNewPlans(PopulationImpl pop, String newPopFile) {
-		Map<Id, List<Id>/* Path.links */> linkIdPahs = convertResult();
+		Map<Id, List<Id>/* path */> linkIdPahs = convertResult();
 
 		for (Person person : pop.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
@@ -917,11 +790,10 @@ public class BusLineAllocator {
 					Id linkId = act.getLinkId();
 					if (act.getType().equals("pt interaction")
 							&& linkId.toString().startsWith("tr_")) {
-						Link actLink = netWithoutBus.getLink(linkId);
+						Link actLink = carNet.getLink(linkId);
 						if (actLink == null)
-							act.setLink(netWithoutBus
-									.getNearestLink(multiModalNetwork.getLink(
-											linkId).getCoord()));
+							act.setLink(carNet.getNearestLink(multiModalNetwork
+									.getLink(linkId).getCoord()));
 					}
 				}
 			}
@@ -931,7 +803,7 @@ public class BusLineAllocator {
 
 	private void generateNewNetwork(String newNetFilename) {
 		/*-----------carNetwork with only Bus----------*/
-		new NetworkWriter(netWithoutBus).writeFile(newNetFilename);
+		new NetworkWriter(carNet).writeFile(newNetFilename);
 	}
 
 	/**
@@ -942,7 +814,7 @@ public class BusLineAllocator {
 		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.xml";
 		// String transitScheduleFile =
 		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/transitSchedule.networkOevModellBln.xml";
-		// String netWithoutBusFile =
+		// String carNetFile =
 		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.car.mini.xml";
 		// String outputFile =
 		// "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/busLineAllocation2.txt";
@@ -958,11 +830,11 @@ public class BusLineAllocator {
 
 		String multiModalNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/network.multimodal.xml.gz";
 		String transitScheduleFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/transitSchedule.networkOevModellBln.xml.gz";
-		String netWithoutBusFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newMultiModalNetBiggerWithoutBusLinkCleanedTest.xml.gz";
+		String carNetFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newMultiModalNetBiggerWithoutBusLinkCleanedTest.xml.gz";
 		String outputFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/busLineAllocationBigger.txt";
 		String popFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/plan.routedOevModell.xml.gz";
 
-		String newNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newMultiModalNetBiggerTest.xml.gz";
+		String newNetworkFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newNetWithBusBiggerTest.xml.gz";
 		String newTransitScheduleFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newScheduleBigger.xml.gz";
 		String newPopFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newPopBiggerTest.xml.gz";
 
@@ -984,10 +856,10 @@ public class BusLineAllocator {
 			e.printStackTrace();
 		}
 
-		NetworkLayer netWithoutBus = new NetworkLayer();
-		new MatsimNetworkReader(netWithoutBus).readFile(netWithoutBusFile);
+		NetworkLayer carNet = new NetworkLayer();
+		new MatsimNetworkReader(carNet).readFile(carNetFile);
 
-		BusLineAllocator busLineAllocator = new BusLineAllocator(netWithoutBus,
+		BusLineAllocator busLineAllocator = new BusLineAllocator(carNet,
 				multiModalNetwork, schedule, outputFile);
 		busLineAllocator.run();
 		busLineAllocator.generateNewNetwork(newNetworkFile);

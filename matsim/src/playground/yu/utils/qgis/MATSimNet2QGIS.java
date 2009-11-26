@@ -169,12 +169,12 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	public static void main(final String[] args) {
-		String netFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.xml";
+		String netFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newNetWithBusBiggerTest.xml.gz";
 
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
 		mn2q.readNetwork(netFilename);
 		mn2q.setCrs(general);
 		mn2q
-				.writeShapeFile("../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.shp");
+				.writeShapeFile("../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newNetWithBusBiggerTest.shp");
 	}
 }
