@@ -347,7 +347,7 @@ public class PlansVariator implements PlanAlgorithm {
 	
 	private void changeMode (PlanImpl plan){
 		/* Selection of subtour to be changed */
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(controler.getConfig().planomat());
 		planAnalyzeSubtours.run(plan);
 		int subtourIndex = (int)(MatsimRandom.getRandom().nextDouble()*planAnalyzeSubtours.getNumSubtours());
 		

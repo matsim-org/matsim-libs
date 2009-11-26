@@ -34,6 +34,7 @@ import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -203,7 +204,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
 		
 		/* Analysis of subtours */
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(Gbl.getConfig().planomat());
 		planAnalyzeSubtours.run(newPlan);
 		
 		/* Make sure that all subtours with distance = 0 are set to "walk" */
@@ -291,7 +292,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		newPlan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
 		
 		/* Analysis of subtours */
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(Gbl.getConfig().planomat());
 		planAnalyzeSubtours.run(newPlan);
 		
 		/* Make sure that all subtours with distance = 0 are set to "walk" */

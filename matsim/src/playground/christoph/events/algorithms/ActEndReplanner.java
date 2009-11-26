@@ -60,7 +60,7 @@ public class ActEndReplanner {
 	public ActEndReplanner(ActivityImpl fromAct, QueueVehicle vehicle, double time, PlanAlgorithm replanner)
 	{
 		this.fromAct = fromAct;
-		this.person = vehicle.getDriver().getPerson();
+		this.person = (PersonImpl) vehicle.getDriver().getPerson();
 		this.time = time;
 		this.replanner = replanner;
 

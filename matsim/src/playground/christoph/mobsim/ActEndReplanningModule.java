@@ -74,7 +74,7 @@ public class ActEndReplanningModule {
 				boolean replanning = (Boolean)driverAgent.getPerson().getCustomAttributes().get("endActivityReplanning");
 				if(!replanning) continue; 
 				
-				PersonImpl person = driverAgent.getPerson();
+				PersonImpl person = (PersonImpl) driverAgent.getPerson();
 				personsToReplanActEnd.add(person);
 				
 				PersonAgent pa = (PersonAgent) driverAgent;

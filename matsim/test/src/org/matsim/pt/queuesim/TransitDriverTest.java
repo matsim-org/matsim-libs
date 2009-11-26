@@ -89,7 +89,7 @@ public class TransitDriverTest extends TestCase {
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = null;
 		TransitQueueSimulation tqsim = null;
-		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
 
 		assertTrue(driver.getCurrentLeg().getRoute() instanceof NetworkRouteWRefs);
 		NetworkRouteWRefs netRoute = (NetworkRouteWRefs) driver.getCurrentLeg().getRoute();
@@ -121,7 +121,7 @@ public class TransitDriverTest extends TestCase {
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), depTime);
 		TransitStopAgentTracker tracker = null;
 		TransitQueueSimulation tqsim = null;
-		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
 		assertEquals(depTime, driver.getDepartureTime(), MatsimTestCase.EPSILON);
 	}
 
@@ -144,7 +144,7 @@ public class TransitDriverTest extends TestCase {
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 		TransitQueueSimulation tqsim = null;
-		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
 
 		BasicVehicleType vehType = new BasicVehicleTypeImpl(new IdImpl("busType"));
 		BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();
@@ -189,7 +189,7 @@ public class TransitDriverTest extends TestCase {
 		vehType.setCapacity(capacity);
 		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
 
-		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
 		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
 		driver.setVehicle(queueVehicle);
 
@@ -255,7 +255,7 @@ public class TransitDriverTest extends TestCase {
 		vehType.setCapacity(capacity);
 		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
 
-		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
 		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
 		driver.setVehicle(queueVehicle);
 
@@ -306,7 +306,7 @@ public class TransitDriverTest extends TestCase {
 		vehType.setCapacity(capacity);
 		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
 
-		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
 		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
 		driver.setVehicle(queueVehicle);
 
@@ -349,7 +349,7 @@ public class TransitDriverTest extends TestCase {
 		vehType.setCapacity(capacity);
 		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
 
-		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
 		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
 		driver.setVehicle(queueVehicle);
 
@@ -391,7 +391,7 @@ public class TransitDriverTest extends TestCase {
 		vehType.setCapacity(capacity);
 		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(1976), vehType);
 
-		TransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, tqsim);
 		TransitQueueVehicle queueVehicle = new TransitQueueVehicle(vehicle, 3.0);
 		driver.setVehicle(queueVehicle);
 

@@ -232,7 +232,7 @@ public class TimeModeChoicer1 implements org.matsim.population.algorithms.PlanAl
 				this.router);
 		
 		/* Analysis of subtours */
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(config);
 		planAnalyzeSubtours.run(plan);
 		
 		/* Make sure that all subtours with distance = 0 are set to "walk" */

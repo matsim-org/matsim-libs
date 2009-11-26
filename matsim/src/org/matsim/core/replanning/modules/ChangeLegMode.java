@@ -49,11 +49,13 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 
 	/*package*/ final static String CONFIG_MODULE = "changeLegMode";
 	/*package*/ final static String CONFIG_PARAM_MODES = "modes";
-
+	
+	private Config config;
 	private TransportMode[] availableModes = new TransportMode[] { TransportMode.car, TransportMode.pt };
 
 	public ChangeLegMode(final Config config) {
 		super(config.global().getNumberOfThreads());
+		this.config = config;
 		String modes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_MODES);
 		if (modes != null) {
 			String[] parts = StringUtils.explode(modes, ',');
@@ -66,7 +68,7 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new ChooseRandomLegMode(this.availableModes, MatsimRandom.getLocalInstance());
+		return new ChooseRandomLegMode(this.availableModes, MatsimRandom.getLocalInstance(), config.planomat());
 	}
 
 }

@@ -78,7 +78,7 @@ public class LeaveLinkReplanner {
 		this.time = time;
 		this.vehicle = vehicle;
 		this.personAgent = (PersonAgent) vehicle.getDriver();
-		this.person = vehicle.getDriver().getPerson();
+		this.person = (PersonImpl) vehicle.getDriver().getPerson();
 		this.replanner = replanner;
 		
 		init();
@@ -89,7 +89,7 @@ public class LeaveLinkReplanner {
 		this.time = time;
 		this.vehicle = vehicle;
 		this.personAgent = (PersonAgent) vehicle.getDriver();
-		this.person = vehicle.getDriver().getPerson();
+		this.person = (PersonImpl) vehicle.getDriver().getPerson();
 
 		replanner = (PlanAlgorithm)person.getCustomAttributes().get("Replanner");
 		if (replanner == null) log.error("No Replanner found in Person!");

@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -44,29 +44,37 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 
 	public static final int UNDEFINED = Integer.MIN_VALUE;
 	private static final Id INVALID_ID = new IdImpl(PlanAnalyzeSubtours.UNDEFINED);
-
+	
 	private int[] subtourIndexation = null;
-
 	private ArrayList<Id> locationIds = null;
 	private int numSubtours = Integer.MIN_VALUE;
+	private List<List<PlanElement>> subTours;
+	private List<Integer> parentTourIndices;
+	private List<Integer> firstIndexOfSubtours;
+	private List<Integer> lastIndexOfSubtours;
+	private PlanomatConfigGroup planomatConfigGroup;
 
-	public PlanAnalyzeSubtours() {
+	public PlanAnalyzeSubtours(PlanomatConfigGroup planomatConfigGroup) {
 		super();
+		this.planomatConfigGroup = planomatConfigGroup;
 	}
 
 	public void run(final Plan plan) {
 
 		this.locationIds = new ArrayList<Id>();
-
-		PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourAnalysisLocationType = Gbl.getConfig().planomat().getTripStructureAnalysisLayer();
+		this.subTours = new ArrayList<List<PlanElement>>();
+		this.parentTourIndices = new ArrayList<Integer>();
+		this.firstIndexOfSubtours = new ArrayList<Integer>();
+		this.lastIndexOfSubtours = new ArrayList<Integer>();
 
 		Id locationId = null;
-		List<? extends PlanElement> actsLegs = plan.getPlanElements();
+		List<PlanElement> actsLegs = plan.getPlanElements();
 		for (int ii=0; ii < actsLegs.size(); ii++) {
 			if (actsLegs.get(ii) instanceof ActivityImpl) {
-				if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(subtourAnalysisLocationType)) {
+				TripStructureAnalysisLayerOption tripStructureAnalysisLayer = planomatConfigGroup.getTripStructureAnalysisLayer();
+				if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
 					locationId = ((ActivityImpl) actsLegs.get(ii)).getFacilityId();
-				} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(subtourAnalysisLocationType)) {
+				} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
 					locationId = ((ActivityImpl) actsLegs.get(ii)).getLinkId();
 				}
 				this.locationIds.add(locationId);
@@ -84,20 +92,34 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 
 		int ii = 0;
 		while(ii <= this.locationIds.size() - 1) {
-			Id currentLinkId = this.locationIds.get(ii);
-			if (locationEnumerator.contains(currentLinkId)) {
-				int lastLinkIndex = locationEnumerator.lastIndexOf(currentLinkId);
+			Id currentLocationId = this.locationIds.get(ii);
+			if (locationEnumerator.contains(currentLocationId)) {
+				int lastLinkIndex = locationEnumerator
+						.lastIndexOf(currentLocationId);
 				for (int jj = lastLinkIndex; jj < ii; jj++) {
 					if (this.subtourIndexation[jj] == PlanAnalyzeSubtours.UNDEFINED) {
 						this.subtourIndexation[jj] = this.numSubtours;
+					} else {
+						if (this.parentTourIndices
+								.get(this.subtourIndexation[jj]) == null) {
+							this.parentTourIndices.set(
+									this.subtourIndexation[jj], numSubtours);
+						}
 					}
 				}
+				int firstIndexOfSubtour = 2 * lastLinkIndex;
+				int lastIndexOfSubtour = 2 * ii;
+				List<PlanElement> subTour = actsLegs.subList(firstIndexOfSubtour, lastIndexOfSubtour);
+				this.firstIndexOfSubtours.add(firstIndexOfSubtour);
+				this.lastIndexOfSubtours.add(lastIndexOfSubtour);
+				this.parentTourIndices.add(null);
+				this.subTours.add(subTour);
 				this.numSubtours++;
 				for (int removeMe = lastLinkIndex; removeMe < ii; removeMe++) {
 					locationEnumerator.set(removeMe, INVALID_ID);
 				}
 			}
-			locationEnumerator.add(currentLinkId);
+			locationEnumerator.add(currentLocationId);
 			ii++;
 		}
 
@@ -119,6 +141,22 @@ public class PlanAnalyzeSubtours implements PlanAlgorithm {
 	 */
 	public int getNumSubtours() {
 		return this.numSubtours;
+	}
+	
+	public List<List<PlanElement>> getSubtours() {
+		return this.subTours;
+	}
+	
+	public List<Integer> getParentTours() {
+		return this.parentTourIndices;
+	}
+
+	public List<Integer> getFromIndexOfSubtours() {
+		return firstIndexOfSubtours;
+	}
+
+	public List<Integer> getToIndexOfSubtours() {
+		return lastIndexOfSubtours;
 	}
 
 }

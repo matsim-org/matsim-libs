@@ -212,7 +212,7 @@ public class PlanomatTest extends MatsimTestCase {
 		
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
 		if (possibleModes.length > 0) {
-			planAnalyzeSubtours = new PlanAnalyzeSubtours();
+			planAnalyzeSubtours = new PlanAnalyzeSubtours(scenario.getConfig().planomat());
 			planAnalyzeSubtours.run(testPlan);
 		}
 
@@ -247,7 +247,7 @@ public class PlanomatTest extends MatsimTestCase {
 		testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		// init IChromosome (from JGAP)
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(scenario.getConfig().planomat());
 		planAnalyzeSubtours.run(testPlan);
 		int numActs = planAnalyzeSubtours.getSubtourIndexation().length;
 

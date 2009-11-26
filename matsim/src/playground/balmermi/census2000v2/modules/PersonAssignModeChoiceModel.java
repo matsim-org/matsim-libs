@@ -73,7 +73,7 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 	private FileWriter fw = null;
 	private BufferedWriter out = null;
 
-	private final PlanAnalyzeSubtours past = new PlanAnalyzeSubtours();
+	private final PlanAnalyzeSubtours past = new PlanAnalyzeSubtours(Gbl.getConfig().planomat());
 	private final Municipalities municipalities;
 
 	private Knowledges knowledges;
