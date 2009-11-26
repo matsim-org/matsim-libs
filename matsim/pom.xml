@@ -223,7 +223,7 @@
 					<artifactId>maven-pmd-plugin</artifactId>
 					<version>2.4</version>
 					<configuration>
-						<targetJdk>${compileSource}</targetJdk>
+						<targetJdk>1.5</targetJdk>
 					</configuration>
 				</plugin>
 				<plugin>
