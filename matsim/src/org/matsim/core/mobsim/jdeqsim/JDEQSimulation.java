@@ -53,6 +53,9 @@ public class JDEQSimulation {
 		this.population = population;
 		this.network = network;
 
+		// reset simulation parameters
+		SimulationParameters.reset();
+		
 		// initialize the events handler to which the micro simulatation gives the events
 		SimulationParameters.setProcessEventThread(events);
 

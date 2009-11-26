@@ -51,23 +51,35 @@ public class SimulationParameters {
 	public static final int PRIORITY_ENTER_ROAD_MESSAGE = 100;
 
 	// INPUT
-	private static double simulationEndTime = Double.MAX_VALUE; // in s
-	private static double gapTravelSpeed = 15.0; // in m/s
-	private static double flowCapacityFactor = 1.0; // 1.0 is default
-	private static double storageCapacityFactor = 1.0; // 1.0 is default
-	private static double carSize = 7.5; // in meter
+	private static double simulationEndTime; // in s
+	private static double gapTravelSpeed; // in m/s
+	private static double flowCapacityFactor; // 1.0 is default
+	private static double storageCapacityFactor; // 1.0 is default
+	private static double carSize; // in meter
 	// in [vehicles/hour] per lane, can be scaled with flow capacity factor
-	private static double minimumInFlowCapacity = 1800;
+	private static double minimumInFlowCapacity;
 	/**
 	 * stuckTime is used for deadlock prevention. when a car waits for more than
 	 * 'stuckTime' for entering next road, it will enter the next. in seconds
 	 */
-	private static double squeezeTime = 1800;
+	private static double squeezeTime;
 	/**
 	 * this must be initialized before starting the simulation! mapping:
 	 * key=linkId used to find a road corresponding to a link
 	 */
 	private static HashMap<String, Road> allRoads = null;
+	
+	public static void reset(){
+		simulationEndTime = Double.MAX_VALUE; 
+		gapTravelSpeed = 15.0; 
+		flowCapacityFactor = 1.0; 
+		storageCapacityFactor = 1.0; 
+		carSize = 7.5; 
+		minimumInFlowCapacity = 1800;
+		squeezeTime = 1800;
+		allRoads = null;
+	}
+	
 
 	// SETTINGS
 	// should garbage collection of messages be activated
