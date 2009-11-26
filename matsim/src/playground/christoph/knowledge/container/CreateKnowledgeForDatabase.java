@@ -63,10 +63,10 @@ public class CreateKnowledgeForDatabase {
 	
 	private double dijkstraCostFactor = 1.0;
 //	private double[] dijkstraCostFactors = {1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0};
-	private double[] dijkstraCostFactors = {1.025};
+	private double[] dijkstraCostFactors = {1.0125};
 	private TravelCost costCalculator;
 	
-	private int parallelThreads = 4;
+	private int parallelThreads = 8;
 		
 	private final String separator = System.getProperty("file.separator");
 

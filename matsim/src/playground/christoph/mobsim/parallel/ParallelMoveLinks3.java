@@ -33,7 +33,7 @@
 //	
 //	private final static Logger log = Logger.getLogger(ParallelMoveLinks3.class);
 //	
-//	private MoveLinkThread[] moveLinksThreads;
+//	private MoveLinksThread[] moveLinksThreads;
 //	private CyclicBarrier timeStepStartBarrier;
 //	private CyclicBarrier timeStepEndBarrier;
 //	private boolean simulateAllLinks = false;
@@ -61,7 +61,7 @@
 //		try
 //		{
 //			// set current Time
-//			MoveLinkThread.setTime(time);
+//			for (MoveLinksThread moveLinksThread : moveLinksThreads) moveLinksThread.setTime(time);
 //
 //			this.timeStepStartBarrier.await();
 //			
@@ -85,12 +85,12 @@
 //		this.timeStepStartBarrier = new CyclicBarrier(this.numOfThreads + 1);
 //		this.timeStepEndBarrier = new CyclicBarrier(this.numOfThreads + 1);
 //		
-//		moveLinksThreads = new MoveLinkThread[numOfThreads];
+//		moveLinksThreads = new MoveLinksThread[numOfThreads];
 //		
 //		// setup threads
 //		for (int i = 0; i < numOfThreads; i++) 
 //		{
-//			MoveLinkThread moveLinkThread = new MoveLinkThread(simulateAllLinks);
+//			MoveLinksThread moveLinkThread = new MoveLinksThread(simulateAllLinks);
 //			moveLinkThread.setName("MoveLinks" + i);
 //			moveLinkThread.handleLinks(linkLists.get(i));
 //			moveLinkThread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
@@ -124,10 +124,10 @@
 //	/**
 //	 * The thread class that really handles the links.
 //	 */
-//	private static class MoveLinkThread extends Thread
+//	private static class MoveLinksThread extends Thread
 //	{
-//		private static double time = 0.0;
-//		private static boolean simulationRunning = true;
+//		private double time = 0.0;
+//		private boolean simulationRunning = true;
 //		private boolean simulateAllLinks = false;
 //		
 //		private List<QueueLink> links = new ArrayList<QueueLink>();
@@ -135,12 +135,12 @@
 //		private CyclicBarrier timeStepStartBarrier;
 //		private CyclicBarrier timeStepEndBarrier;
 //		
-//		public MoveLinkThread(boolean simulateAllLinks)
+//		public MoveLinksThread(boolean simulateAllLinks)
 //		{
 //			this.simulateAllLinks = simulateAllLinks;
 //		}
 //		
-//		public static void setTime(final double t)
+//		public void setTime(final double t)
 //		{
 //			time = t;
 //		}
@@ -189,11 +189,21 @@
 //					{
 //						link = simLinks.next();
 //						
-//						isActive = link.moveLink(time);
-//						
-//						if (!isActive && !simulateAllLinks)
+//						/*
+//						 * Synchronize on the QueueLink is only some kind of Workaround.
+//						 * It is only needed, if the QueueSimulation teleports Vehicles
+//						 * between different Threads. It would be probably faster, if the
+//						 * QueueSimulation would contain a synchronized method to do the
+//						 * teleportation instead of synchronize on EVERY QueueLink.
+//						 */
+//						synchronized(link)
 //						{
-//							simLinks.remove();
+//							isActive = link.moveLink(time);
+//							
+//							if (!isActive && !simulateAllLinks)
+//							{
+//								simLinks.remove();
+//							}
 //						}
 //					}
 //				}

@@ -1,6 +1,6 @@
 ///* *********************************************************************** *
 // * project: org.matsim.*
-// * ParallelQueueSimEngine2.java
+// * ParallelQueueSimEngine5.java
 // *                                                                         *
 // * *********************************************************************** *
 // *                                                                         *
@@ -23,8 +23,8 @@
 //import java.util.List;
 //import java.util.Random;
 //
-//import org.matsim.core.mobsim.queuesim.QueueLink;
 //import org.matsim.core.mobsim.queuesim.QueueNetwork;
+//import org.matsim.core.mobsim.queuesim.QueueNode;
 //import org.matsim.core.mobsim.queuesim.QueueSimEngine;
 //
 ///**
@@ -33,102 +33,59 @@
 // * multiple Threads. The results of the Simulation stay
 // * deterministic but the order of the LinkEvents within
 // * a single TimeStep does not.
+// * 
+// * A point that has to be checked:
+// * What happens if an Agent is teleported? Could this cause
+// * Race Conditions is the destination link has / has not 
+// * already been processed?
 // */
-//public class ParallelQueueSimEngine2 extends QueueSimEngine{
+//public class ParallelQueueSimEngine5 extends QueueSimEngine{
 //
 //	/** This is the collection of links that have to be moved in the simulation */
-//	private List<List<QueueLink>> parallelSimLinksArray;
+//	private List<List<QueueNode>> parallelSimNodesArray;
 //		
-//	private int numOfThreads = 8;
-//	private ParallelMoveLinks3 parallelMoveLinks;
-//	
-//	private int distributor = 0;
-//	
-//	public ParallelQueueSimEngine2(final QueueNetwork network, final Random random) 
+//	private int numOfThreads = 4;
+//	private ParallelMoveNodes6 parallelMoveNodes;
+//		
+//	public ParallelQueueSimEngine5(final QueueNetwork network, final Random random) 
 //	{
 //		super(network, random);
-//			
-//		parallelSimLinksArray = new ArrayList<List<QueueLink>>();
 //		
-//		createLinkLists();
+//		parallelSimNodesArray = new ArrayList<List<QueueNode>>();
 //		
-//		parallelMoveLinks = new ParallelMoveLinks3(simulateAllLinks);
-//		parallelMoveLinks.init(parallelSimLinksArray);
+//		createNodeLists();
+//		
+//		parallelMoveNodes = new ParallelMoveNodes6(simulateAllNodes);
+//		parallelMoveNodes.init(parallelSimNodesArray);
 //	}
 //
-//	private void createLinkLists()
+//	private void createNodeLists()
 //	{
 //		for (int i = 0; i < numOfThreads; i++)
 //		{
-//			parallelSimLinksArray.add(new ArrayList<QueueLink>());
+//			parallelSimNodesArray.add(new ArrayList<QueueNode>());
 //		}
-//		
-//		/*
-//		 * If we simulate all Links, we have to add them initially to the Lists.
-//		 */
-//		if (simulateAllLinks) 
+//
+//		int i = 0;
+//		for(QueueNode node : this.simNodesArray)
 //		{
-//			int roundRobin = 0;
-//			for(QueueLink link : this.allLinks)
-//			{
-//				parallelSimLinksArray.get(roundRobin % numOfThreads).add(link);
-//				roundRobin++;
-//			}
+//			parallelSimNodesArray.get(i % numOfThreads).add(node);
+//			i++;
 //		}
 //	}
 //	
 //	/*
-//	 * Parallel movement of the Links. The results of the simulation
+//	 * Parallel movement of the Nodes. The results of the simulation
 //	 * are deterministic but the order of the LinkEvents within a
 //	 * single TimeStep are not!
 //	 */
 //	@Override
-//	protected void moveLinks(final double time)
-//	{
-//		reactivateLinks();
-//		
+//	protected void moveNodes(final double time)
+//	{		
 //		/*
 //		 * Now split it up to different threads...
 //		 */
-//		parallelMoveLinks.run(time);
+//		parallelMoveNodes.run(time);
 //	}
 //	
-//	/*
-//	 * We do the load balancing between the threads using some kind
-//	 * of round robin.
-//	 * 
-//	 * Additionally we should check from time to time whether the load
-//	 * is really still balanced. This is not guaranteed due to the fact
-//	 * that some Links get deactivated while other don't. If the number
-//	 * of Links is high enough statistically the difference shouldn't
-//	 * be to significant.
-//	 */
-//	@Override
-//	protected void reactivateLinks() {
-//		if (!simulateAllLinks) {
-//			if (!this.simActivateThis.isEmpty()) {
-//				for(QueueLink link : this.simActivateThis)
-//				{
-//					parallelSimLinksArray.get(distributor % numOfThreads).add(link);
-//					distributor++;
-//				}
-//				this.simActivateThis.clear();
-//			}
-//		}
-//	}
-//
-//	/**
-//	 * @return Returns the simLinksArray.
-//	 */
-//	@Override
-//	protected int getNumberOfSimulatedLinks()
-//	{
-//		int size = 0;
-//		for (int i = 0; i < numOfThreads; i++)
-//		{
-//			size = size + this.parallelSimLinksArray.get(i).size();
-//		}
-//		
-//		return size;
-//	}
 //}

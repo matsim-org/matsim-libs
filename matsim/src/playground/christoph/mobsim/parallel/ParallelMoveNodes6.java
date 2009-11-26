@@ -1,6 +1,6 @@
 ///* *********************************************************************** *
 // * project: org.matsim.*
-// * ParallelMoveNodes4.java
+// * ParallelMoveNodes6.java
 // *                                                                         *
 // * *********************************************************************** *
 // *                                                                         *
@@ -21,29 +21,26 @@
 //
 //import java.util.ArrayList;
 //import java.util.List;
+//import java.util.Random;
 //import java.util.concurrent.BrokenBarrierException;
 //import java.util.concurrent.CyclicBarrier;
 //
 //import org.apache.log4j.Logger;
 //import org.matsim.core.gbl.Gbl;
+//import org.matsim.core.gbl.MatsimRandom;
 //import org.matsim.core.mobsim.queuesim.QueueNode;
 //
-//public class ParallelMoveNodes4 {
+//public class ParallelMoveNodes6 {
 //	
-//	private final static Logger log = Logger.getLogger(ParallelMoveNodes4.class);
+//	private final static Logger log = Logger.getLogger(ParallelMoveNodes6.class);
 //	
 //	private MoveNodesThread[] moveNodesThreads;
-//
-//	private CyclicBarrier iterationBarrier;
 //	private CyclicBarrier timeStepStartBarrier;
 //	private CyclicBarrier timeStepEndBarrier;
-//	
+//	private boolean simulateAllNodes = false;
 //	private int numOfThreads;
-//	private int iterations;
-//	private boolean simulateAllNodes;
-//	private List<QueueNodeDependencies[][]> parallelSimNodesArray;
 //		
-//	public ParallelMoveNodes4(boolean simulateAllNodes)
+//	public ParallelMoveNodes6(boolean simulateAllNodes)
 //	{
 //		this.simulateAllNodes = simulateAllNodes;
 //	}
@@ -79,76 +76,24 @@
 //        }
 //	}
 //	
-//	public void init(List<List<QueueNodeDependencies>> simNodesArray, int numOfThreads)
+//	public void init(List<List<QueueNode>> nodeLists)
 //	{
-//		this.numOfThreads = numOfThreads;
-//		this.iterations = simNodesArray.size();
+//		this.numOfThreads = nodeLists.size();
 //		
 //		this.timeStepStartBarrier = new CyclicBarrier(this.numOfThreads + 1);
 //		this.timeStepEndBarrier = new CyclicBarrier(this.numOfThreads + 1);
-//		this.iterationBarrier = new CyclicBarrier(this.numOfThreads);
-//		
-//		
-//		/*
-//		 * Structure of the parallelSimNodesArray
-//		 * Outer List: one for each Thread
-//		 * Middle Array: one for each Iteration
-//		 * Inner Array: one for each QueueNodeDependencies
-//		 */
-//		parallelSimNodesArray = new ArrayList<QueueNodeDependencies[][]>();
-//		
-//		for (int thread = 0;  thread < this.numOfThreads; thread++)
-//		{
-//			QueueNodeDependencies[][] newList = new QueueNodeDependencies[iterations][];
-//			parallelSimNodesArray.add(newList);
-//		}
-//
-//		/*
-//		 * For each Iteration of independent moveable Nodes.
-//		 */
-//		int iteration = 0;
-//		int distributor = 0;
-//		
-//		// for each iteration
-//		for (List<QueueNodeDependencies> list : simNodesArray)
-//		{
-//			List<List<QueueNodeDependencies>> tempList = new ArrayList<List<QueueNodeDependencies>>();
-//			
-//			for (int i = 0; i < this.numOfThreads; i++)
-//			{
-//				tempList.add(new ArrayList<QueueNodeDependencies>());
-//			}
-//			
-//			// for each node	
-//			for (QueueNodeDependencies qnd : list)
-//			{
-//				tempList.get(distributor % this.numOfThreads).add(qnd);
-//				distributor++;
-//			}
-//			
-//			// Copy the Lists to Arrays
-//			for (int i = 0; i < this.numOfThreads; i++)
-//			{
-//				parallelSimNodesArray.get(i)[iteration] = new QueueNodeDependencies[tempList.get(i).size()];;
-//				tempList.get(i).toArray(parallelSimNodesArray.get(i)[iteration]);
-//			}
-//			
-//			iteration++;
-//		}
-//		
-//		moveNodesThreads = new MoveNodesThread[this.numOfThreads];
+//				
+//		moveNodesThreads = new MoveNodesThread[numOfThreads];
 //		
 //		// setup threads
-//		for (int i = 0; i < this.numOfThreads; i++) 
+//		for (int i = 0; i < numOfThreads; i++) 
 //		{
 //			MoveNodesThread moveNodesThread = new MoveNodesThread(simulateAllNodes);
 //			moveNodesThread.setName("MoveNodes" + i);
-//			moveNodesThread.setDaemon(true);	// make the Threads Daemons so they will terminate automatically
-//			moveNodesThread.setProcessableQueueNodes(parallelSimNodesArray.get(i));
-//			moveNodesThread.setCyclicIterationBarrier(iterationBarrier);
-//			moveNodesThread.setCyclicTimeStepStartBarrier(timeStepStartBarrier);
-//			moveNodesThread.setCyclicTimeStepEndBarrier(timeStepEndBarrier);
-//			
+//			moveNodesThread.handleNodes(nodeLists.get(i));
+//			moveNodesThread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
+//			moveNodesThread.setCyclicTimeStepStartBarrier(this.timeStepStartBarrier);
+//			moveNodesThread.setCyclicTimeStepEndBarrier(this.timeStepEndBarrier);
 //			moveNodesThreads[i] = moveNodesThread;
 //			
 //			moveNodesThread.start();
@@ -182,29 +127,24 @@
 //		private static double time = 0.0;
 //		private static boolean simulationRunning = true;
 //
-//		private QueueNodeDependencies[][] processableQueueNodes;	// [Iteration][Nodes]
-//		private int iteration;
-//		private int iterationCount;
+//		private List<QueueNode> nodes = new ArrayList<QueueNode>();
+//		private QueueNode[] nodesArray;
 //		
-//		private CyclicBarrier iterationBarrier;
 //		private CyclicBarrier timeStepStartBarrier;
 //		private CyclicBarrier timeStepEndBarrier;
 //		private boolean simulateAllNodes = false;
+//		private Random random = MatsimRandom.getRandom();
 //		
 //		public MoveNodesThread(boolean simulateAllNodes)
 //		{
 //			this.simulateAllNodes = simulateAllNodes;
 //		}
 //		
-//		public void setProcessableQueueNodes(QueueNodeDependencies[][] processableQueueNodes)
+//		public void handleNodes(List<QueueNode> nodes)
 //		{
-//			this.processableQueueNodes = processableQueueNodes;
-//			this.iterationCount = processableQueueNodes.length;
-//		}
-//		
-//		public void setCyclicIterationBarrier(CyclicBarrier barrier)
-//		{
-//			this.iterationBarrier = barrier;
+//			this.nodes = nodes;
+//			nodesArray = new QueueNode[nodes.size()];
+//			nodes.toArray(nodesArray);
 //		}
 //
 //		public void setCyclicTimeStepStartBarrier(CyclicBarrier barrier)
@@ -228,7 +168,7 @@
 //			while (simulationRunning)
 //			{
 //				try
-//				{					
+//				{
 //					/*
 //					 * The End of the Node Moving is synchronized with 
 //					 * the TimeStepEndBarrier. If all Threads reach this Barrier
@@ -242,60 +182,26 @@
 //
 //					timeStepStartBarrier.await();
 //					
-////					log.info("Starting..." + time + " " + this.getName());
-//					
-//					for (QueueNodeDependencies[] qnds : processableQueueNodes)
+//					for (QueueNode node : nodesArray)
 //					{
-//						/*
-//						 * As long as we get new QueueNodes to move...
-//						 */
-//						for(QueueNodeDependencies qnd : qnds)
-//						{				
-//							QueueNode node = qnd.getQueueNode();
-//							if (node.isActive() || node.isSignalized() || simulateAllNodes)
-//							{
-//								qnd.getQueueNode().moveNode(time, qnd.getRandom());
-//							}
+//						if (node.isActive() || node.isSignalized() || simulateAllNodes)
+//						{
+//							node.moveNode(time, random);
 //						}
-//						
-////						for (QueueNodeDependencies qnd : processableQueueNodes.get(iteration))
-////						{
-////							qnd.setMoved(true);
-////							for (QueueNodeDependencies qnd2 : qnd.getOutNodes())
-////							{
-////								qnd2.incNodeProcessed();
-////							}
-////						}
-//						
-////						for (QueueNodeDependencies qnd : processableQueueNodes.get(iteration))
-////						{
-////							if (qnd.isMoveable())
-////							{
-////								qnd.setMoved(true);
-////								for (QueueNodeDependencies qnd2 : qnd.getOutNodes())
-////								{
-////									qnd2.incNodeProcessed();
-////								}
-////							}
-////							else
-////							{
-////								log.info(processableQueueNodes.get(iteration - 1).get(0).hasBeenMoved());
-////								log.error("Node is not moveable?!" + iteration);
-////							}						
-////						}
-//						
-////						// in the next loop the next iteration will be processed
-////						iteration++;
+//					}
+//					
+////					ListIterator<QueueNode> simNodes = this.nodes.listIterator();
+////					QueueNode node;
+////
+////					while (simNodes.hasNext()) 
+////					{
+////						node = simNodes.next();
 ////						
-////						if (iteration != iterationCount)
+////						if (node.isActive() || node.isSignalized() || simulateAllNodes)
 ////						{
-////							iterationBarrier.await();		
+////							node.moveNode(time, random);
 ////						}
-////						// It is the last Iteration - reset Counter 
-////						else iteration = 0;
-//
-//					}	// for all Iterations
-////					log.info("... done" + time + " " + this.getName());
+////					}
 //
 //				}
 //				catch (InterruptedException ie)

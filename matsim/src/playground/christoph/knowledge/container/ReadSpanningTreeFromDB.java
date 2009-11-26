@@ -1,18 +1,38 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ReadSpanningTreeFromDB.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.christoph.knowledge.container;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
 import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
-import playground.christoph.tools.ByteArrayConverter;
 import playground.christoph.tools.Zipper;
 
+/*
+ * Reads the Spanning Trees that are created by using
+ * the Dijsktra Node Selection Tool from a DataBase.
+ * 
+ * The DataBase configuration has to be set in the DBConnectionTool.
+ */
 public class ReadSpanningTreeFromDB {
 
 	/*
@@ -31,6 +51,16 @@ public class ReadSpanningTreeFromDB {
 
 	}
 	
+	public DBConnectionTool getDBConnectionTool()
+	{
+		return this.dbConnectionTool;
+	}
+	
+	public void setDBConnectionTool(DBConnectionTool tool)
+	{
+		this.dbConnectionTool = tool;
+	}
+	
 	public byte[] readFromDB(Node node, String tableName)
 	{	
 		ResultSet rs;
@@ -43,10 +73,6 @@ public class ReadSpanningTreeFromDB {
 		{	
 			while (rs.next())
 			{					
-//				// if using getBlob causes Problems, maybe 
-//				Blob blob = rs.getBlob("SpanningTree");
-//				byte[] bytes =  blob.getBytes((long) 1, (int) blob.length());
-				
 				byte[] bytes = rs.getBytes("SpanningTree");
 				
 				if (this.useCompression)

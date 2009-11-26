@@ -33,7 +33,7 @@
 // * Every QueueNodeDependencies Objects gets its own
 // * Random Object. I don't like this, but at the moment
 // * its the only way i can think of that guarantees 
-// * deterministic behaviour... 
+// * deterministic behavior... 
 // */
 //public class QueueNodeDependencies {
 //	private QueueNode queueNode;

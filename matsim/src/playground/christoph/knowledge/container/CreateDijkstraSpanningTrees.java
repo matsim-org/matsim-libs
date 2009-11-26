@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CreateDijkstraMap.java
+ * CreateDijkstraSpanningTrees.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -53,7 +53,7 @@ public class CreateDijkstraSpanningTrees {
 	
 	private NetworkLayer network;
 
-	private int numOfThreads = 2;
+	private int numOfThreads = 8;
 
 	/*
 	 * Should the byte Arrays be compressed? Will save about 10% memory but
@@ -92,7 +92,7 @@ public class CreateDijkstraSpanningTrees {
 				
 		log.info("Loading Network ... done");
 		
-//		new CreateDijkstraMap(network);
+//		new CreateDijkstraSpanningTrees(network);
 	}
 	
 	public CreateDijkstraSpanningTrees(NetworkLayer network)
