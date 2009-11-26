@@ -20,7 +20,8 @@ public class NonCarLegTest extends TestHandlerDetailedEventChecker {
 	}
 	
 	public void checkAssertions(final PopulationImpl population) {
-		// super.checkAssertions: intentionally not executed, because this is checked in detail here
+		// super.checkAssertions: intentionally not executed, because of -infinity time step
+		// problem in that method (and not required).
 		boolean wasInLoop=false;
 		
 		for (LinkedList<PersonEvent> list : events.values()) {

@@ -22,7 +22,8 @@ public class EquilPlans1Test extends TestHandlerDetailedEventChecker {
 	}
 
 	public void checkAssertions(final PopulationImpl population) {
-		// super.checkAssertions: intentionally not executed, because this is checked in detail here
+		// the super.checkAssertions is not required, but it is a consistency check between tests
+		super.checkAssertions(population);
 		boolean wasInLoop = false;
 		int index = 0;
 		for (LinkedList<PersonEvent> list : events.values()) {
