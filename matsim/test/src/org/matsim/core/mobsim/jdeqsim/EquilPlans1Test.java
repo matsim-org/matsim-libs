@@ -1,6 +1,5 @@
 package org.matsim.core.mobsim.jdeqsim;
 
-
 import java.util.LinkedList;
 
 import org.matsim.core.api.experimental.events.PersonEvent;
@@ -19,18 +18,18 @@ public class EquilPlans1Test extends TestHandlerDetailedEventChecker {
 
 	public void test_EmptyCarRoute() {
 		Gbl.reset();
-		
-		EquilPlans1Test equilPlans1Test = new EquilPlans1Test();
-		equilPlans1Test.startTestDES("test/scenarios/equil/config_plans1.xml", false, null, null);
+		this.startTestDES("test/scenarios/equil/config_plans1.xml", false, null, null);
 	}
-	
+
 	public void checkAssertions(final PopulationImpl population) {
-		boolean wasInLoop=false;
-		int index=0;
+		// intentionally not executed, because this is checked in detail here
+		// super.checkAssertions(population);
+		boolean wasInLoop = false;
+		int index = 0;
 		for (LinkedList<PersonEvent> list : events.values()) {
-			wasInLoop=true;
+			wasInLoop = true;
 			// checking the time of the first event
-			assertEquals(21600,list.get(index).getTime(),0.9);
+			assertEquals(21600, list.get(index).getTime(), 0.9);
 			assertTrue(list.get(index++) instanceof ActivityEndEventImpl);
 			assertTrue(list.get(index++) instanceof AgentDepartureEventImpl);
 			assertTrue(list.get(index++) instanceof AgentWait2LinkEventImpl);
@@ -42,7 +41,7 @@ public class EquilPlans1Test extends TestHandlerDetailedEventChecker {
 			assertTrue(list.get(index++) instanceof LinkEnterEventImpl);
 			assertTrue(list.get(index++) instanceof AgentArrivalEventImpl);
 			assertTrue(list.get(index++) instanceof ActivityStartEventImpl);
-			assertTrue(list.get(index++) instanceof ActivityEndEventImpl);			
+			assertTrue(list.get(index++) instanceof ActivityEndEventImpl);
 			assertTrue(list.get(index++) instanceof AgentDepartureEventImpl);
 			assertTrue(list.get(index++) instanceof AgentArrivalEventImpl);
 			assertTrue(list.get(index++) instanceof ActivityStartEventImpl);
@@ -60,10 +59,10 @@ public class EquilPlans1Test extends TestHandlerDetailedEventChecker {
 			assertTrue(list.get(index++) instanceof AgentArrivalEventImpl);
 			assertTrue(list.get(index) instanceof ActivityStartEventImpl);
 			// checking the time of the last event
-			assertEquals(38039,list.get(index).getTime(),0.9);
+			assertEquals(38039, list.get(index).getTime(), 0.9);
 		}
-		
+
 		assertTrue(wasInLoop);
 	}
-	
+
 }
