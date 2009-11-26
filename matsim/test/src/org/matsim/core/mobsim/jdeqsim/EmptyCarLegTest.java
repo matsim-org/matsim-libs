@@ -19,8 +19,7 @@ public class EmptyCarLegTest extends TestHandlerDetailedEventChecker {
 	}
 
 	public void checkAssertions(final PopulationImpl population) {
-		// intentionally not executed, because this is checked in detail here
-		// super.checkAssertions(population);
+		// super.checkAssertions: intentionally not executed, because this is checked in detail here
 		boolean wasInLoop = false;
 
 		for (LinkedList<PersonEvent> list : events.values()) {
