@@ -21,6 +21,7 @@
 package org.matsim.core.router;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -106,28 +107,30 @@ public class RoutingTest extends MatsimTestCase {
 	private void doTest(final RouterProvider provider) {
 		Config config = loadConfig("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
 		String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(inPlansName);
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(inPlansName);
 		long referenceChecksum = CRCChecksum.getCRCFromFile(inPlansName);
 		log.info("Reference checksum = " + referenceChecksum + " file: " + inPlansName);
 
 		String outPlansName = getOutputDirectory() + provider.getName() + ".plans.xml.gz";
 
-		calcRoute(provider, network, population);
+		calcRoute(provider, network, population, config);
 		new PopulationWriter(population).writeFile(outPlansName);
 		final long routerChecksum = CRCChecksum.getCRCFromFile(outPlansName);
 		log.info("routerChecksum = " + routerChecksum + " file: " + outPlansName);
 		assertEquals("different plans files.", referenceChecksum, routerChecksum);
 	}
 
-	private void calcRoute(final RouterProvider provider, final NetworkLayer network, final PopulationImpl population) {
+	private void calcRoute(final RouterProvider provider, final NetworkLayer network, final PopulationImpl population, final Config config) {
 		log.info("### calcRoute with router " + provider.getName());
 
-		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost();
+		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		LeastCostPathCalculator routingAlgo = provider.getRouter(network, calculator, calculator);
 
 		PlansCalcRoute router = null;

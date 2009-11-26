@@ -90,7 +90,7 @@ public class ScenarioImpl implements Scenario {
 		this.network = new NetworkLayer();
 		this.getWorld().setNetworkLayer((NetworkLayer) this.network);
 		this.getWorld().complete();
-		this.population = new PopulationImpl();
+		this.population = new PopulationImpl(this);
 		this.facilities = new ActivityFacilitiesImpl();
 		this.getWorld().setFacilityLayer((ActivityFacilitiesImpl) this.facilities);
 	

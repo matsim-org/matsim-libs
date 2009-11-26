@@ -26,8 +26,11 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
@@ -51,8 +54,8 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	private final static String PLANS_V4 = "plans_v4.dtd";
 	
 	private final Population plans;
-	private final NetworkLayer network;
-	private final ActivityFacilitiesImpl facilities;
+	private final Network network;
+	private final ActivityFacilities facilities;
 	private MatsimXmlParser delegate = null;
 	private Knowledges knowledges;
 
@@ -73,11 +76,16 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 		this.knowledges = new KnowledgesImpl();
 	}
 	
-	public MatsimPopulationReader(final ScenarioImpl scenario) {
+	public MatsimPopulationReader(final Scenario scenario) {
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
-		this.facilities = scenario.getActivityFacilities();
-		this.knowledges = scenario.getKnowledges();
+		if (scenario instanceof ScenarioImpl) {
+		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+		this.knowledges = ((ScenarioImpl) scenario).getKnowledges();
+		} else {
+			this.facilities = null;
+			this.knowledges = null;
+		}
 	}
 
 	@Override

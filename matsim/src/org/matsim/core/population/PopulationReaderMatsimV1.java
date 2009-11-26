@@ -28,11 +28,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -58,7 +59,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	private final static String ROUTE = "route";
 
 	private final Population plans;
-	private final NetworkLayer network;
+	private final Network network;
 
 	private PersonImpl currperson = null;
 
@@ -71,7 +72,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 
 	private ActivityImpl prevAct = null;
 
-	public PopulationReaderMatsimV1(final Population plans, final NetworkLayer network) {
+	public PopulationReaderMatsimV1(final Population plans, final Network network) {
 		this.plans = plans;
 		this.network = network;
 	}
@@ -184,7 +185,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startAct(final Attributes atts) {
-		LinkImpl link = null;
+		Link link = null;
 		Coord coord = null;
 		ActivityImpl act = null;
 		if (atts.getValue("link") != null) {
@@ -220,7 +221,7 @@ public class PopulationReaderMatsimV1 extends MatsimXmlParser implements
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currroute = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, this.prevAct.getLink(), this.prevAct.getLink());
+		this.currroute = (NetworkRouteWRefs) ((NetworkFactoryImpl) this.network.getFactory()).createRoute(TransportMode.car, this.prevAct.getLink(), this.prevAct.getLink());
 		this.currleg.setRoute(this.currroute);
 		if (atts.getValue("dist") != null) {
 			this.currroute.setDistance(Double.parseDouble(atts.getValue("dist")));

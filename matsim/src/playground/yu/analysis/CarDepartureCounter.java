@@ -27,6 +27,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -36,7 +37,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -71,15 +71,14 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		final String eventsFilename = "../runs/run628/it.500/500.events.txt.gz";
 		final String outputFilename = "../runs/run628/it.500/500.carDeparture.txt";
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
-		PopulationImpl ppl = new PopulationImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
 
 		System.out.println("->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(ppl, network).readFile(plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		EventsManagerImpl events = new EventsManagerImpl();
-		CarDepartureCounter cdc = new CarDepartureCounter(ppl);
+		CarDepartureCounter cdc = new CarDepartureCounter(scenario.getPopulation());
 		events.addHandler(cdc);
 		System.out.println("-> reading eventsfile: " + eventsFilename);
 		new MatsimEventsReader(events).readFile(eventsFilename);

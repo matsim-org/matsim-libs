@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -72,7 +73,7 @@ public class NetworkUtils {
 	 * @return list containing the specified nodes.
 	 * @throws IllegalArgumentException if a specified node is not found in the network
 	 */
-	public static List<Node> getNodes(final NetworkLayer network, final String nodes) {
+	public static List<Node> getNodes(final Network network, final String nodes) {
 		if (nodes == null) {
 			return new ArrayList<Node>(0);
 		}
@@ -84,7 +85,7 @@ public class NetworkUtils {
 		final List<Node> nodesList = new ArrayList<Node>(parts.length);
 
 		for (String id : parts) {
-			Node node = network.getNode(new IdImpl(id));
+			Node node = network.getNodes().get(new IdImpl(id));
 			if (node == null) {
 				throw new IllegalArgumentException("no node with id " + id);
 			}

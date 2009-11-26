@@ -28,13 +28,13 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.analysis.CalcAverageTripLength;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -91,14 +91,15 @@ public class AnalysisTest {
 		}
 		String tollFilename = (withToll) ? args[args.length - 3] : null;
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		ScenarioImpl scenario2 = new ScenarioImpl();
+		Network network = scenario2.getNetwork();
+		new MatsimNetworkReader(scenario2.getNetwork()).readFile(netFilename);
 
 		// toll
 		RoadPricingScheme toll = null;
 		if (withToll) {
 			RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
-					network);
+					scenario2.getNetwork());
 			try {
 				tollReader.parse(tollFilename);
 			} catch (SAXException e) {
@@ -122,7 +123,7 @@ public class AnalysisTest {
 		LegDistance ld = null;
 		// only PersonAlgorithm begins.
 		if (plansFilename != null) {
-			PopulationImpl population = new PopulationImpl();
+			PopulationImpl population = scenario2.getPopulation();
 
 			catl = new CalcAverageTripLength();
 			ms = new ModeSplit(toll);
@@ -130,11 +131,10 @@ public class AnalysisTest {
 			lttms = new LegTravelTimeModalSplit(population, toll);
 			dd = new DailyDistance(toll);
 			dert = new DailyEnRouteTime(toll);
-			ld = new LegDistance(network, toll, population);
+			ld = new LegDistance(scenario2.getNetwork(), toll, population);
 			// in future, add some PersonAlgorithm and EventsHandler
 
-			new MatsimPopulationReader(population, network)
-					.readFile(plansFilename);
+			new MatsimPopulationReader(scenario2).readFile(plansFilename);
 
 			catl.run(population);
 			dd.run(population);

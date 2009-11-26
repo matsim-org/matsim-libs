@@ -34,13 +34,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -62,7 +62,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	 *            - a SpeedCounter object
 	 */
 	private final HashMap<String, SpeedCounter> speedCounters = new HashMap<String, SpeedCounter>();
-	private Set<LinkImpl> interestLinks = null;
+	private Set<Link> interestLinks = null;
 	private final int binSize, nofBins;
 	private final double[] speeds;
 	private final int[] speedsCount;
@@ -75,7 +75,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	 * @param nofBins
 	 *            - number of bins
 	 */
-	public CalcLinksAvgSpeed(final NetworkLayer network, final int binSize,
+	public CalcLinksAvgSpeed(final Network network, final int binSize,
 			final int nofBins) {
 		super(network);
 		this.binSize = binSize;
@@ -84,11 +84,11 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		speedsCount = new int[nofBins - 1];
 	}
 
-	public CalcLinksAvgSpeed(final NetworkLayer network, final int binSize) {
+	public CalcLinksAvgSpeed(final Network network, final int binSize) {
 		this(network, binSize, 30 * 3600 / binSize + 1);
 	}
 
-	public CalcLinksAvgSpeed(final NetworkLayer network) {
+	public CalcLinksAvgSpeed(final Network network) {
 		this(network, 300);
 	}
 
@@ -103,26 +103,26 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	 * @param radius
 	 *            -radius of the circle
 	 */
-	public CalcLinksAvgSpeed(final NetworkLayer network, final double x,
+	public CalcLinksAvgSpeed(final Network network, final double x,
 			final double y, final double radius) {
 		this(network);
 		interestLinks = new NetworkLinksInCircle(network)
 				.getLinks(x, y, radius);
 	}
 
-	public CalcLinksAvgSpeed(final NetworkLayer network, int binSize,
+	public CalcLinksAvgSpeed(final Network network, int binSize,
 			final double x, final double y, final double radius) {
 		this(network, binSize);
 		interestLinks = new NetworkLinksInCircle(network)
 				.getLinks(x, y, radius);
 	}
 
-	public CalcLinksAvgSpeed(final NetworkLayer network,
+	public CalcLinksAvgSpeed(final Network network,
 			final RoadPricingScheme toll) {
 		this(network);
 		this.toll = toll;
 		if (toll != null)
-			interestLinks = new HashSet<LinkImpl>(toll.getLinks());
+			interestLinks = new HashSet<Link>(toll.getLinks());
 	}
 
 	public static class SpeedCounter {

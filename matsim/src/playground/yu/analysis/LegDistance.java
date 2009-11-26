@@ -28,6 +28,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -38,11 +41,9 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -58,12 +59,12 @@ import playground.yu.utils.TollTools;
  */
 public class LegDistance implements LinkEnterEventHandler,
 		AgentArrivalEventHandler, AgentStuckEventHandler {
-	private final NetworkLayer network;
+	private final Network network;
 	private int binSize;
 	private double[] legDistances;
 	private int[] legCount;
 	private RoadPricingScheme toll = null;
-	private PopulationImpl ppl = null;
+	private Population ppl = null;
 	/**
 	 * @param arg0
 	 *            - String agentId;
@@ -98,31 +99,30 @@ public class LegDistance implements LinkEnterEventHandler,
 	 *            - the network, in which the simulation is located.
 	 */
 	public LegDistance(final int binSize, final int nofBins,
-			NetworkLayer network) {
+			Network network) {
 		this.network = network;
 		this.binSize = binSize;
 		this.legDistances = new double[nofBins + 1];
 		this.legCount = new int[nofBins + 1];
 	}
 
-	public LegDistance(final int binSize, NetworkLayer network) {
+	public LegDistance(final int binSize, Network network) {
 		this(binSize, 30 * 3600 / binSize + 1, network);
 	}
 
-	public LegDistance(NetworkLayer network) {
+	public LegDistance(Network network) {
 		this(300, network);
 	}
 
-	public LegDistance(NetworkLayer network, RoadPricingScheme toll,
-			PopulationImpl ppl) {
+	public LegDistance(Network network, RoadPricingScheme toll,
+			Population ppl) {
 		this(network);
 		this.toll = toll;
 		this.ppl = ppl;
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		String linkId = event.getLinkId().toString();
-		LinkImpl l = this.network.getLink(linkId);
+		Link l = this.network.getLinks().get(event.getLinkId());
 		String agentId = event.getPersonId().toString();
 		Double distance = this.distances.get(agentId);
 		if (distance == null) {
@@ -131,7 +131,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		if (l != null) {
 			distance += l.getLength();
 		} else {
-			System.err.println("link with ID: \"" + linkId
+			System.err.println("link with ID: \"" + event.getLinkId().toString()
 					+ "\" doesn't exist in this network!");
 		}
 		if (toll == null)

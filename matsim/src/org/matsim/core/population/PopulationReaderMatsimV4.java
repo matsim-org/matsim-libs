@@ -30,14 +30,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
@@ -79,8 +80,8 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private final static String ROUTE = "route";
 
 	private final Population plans;
-	private final NetworkLayer network;
-	private final ActivityFacilitiesImpl facilities;
+	private final Network network;
+	private final ActivityFacilities facilities;
 	private Knowledges knowledges;
 
 	private PersonImpl currperson = null;
@@ -88,7 +89,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private KnowledgeImpl currknowledge = null;
 	private ActivitySpace curractspace = null;
 	private String curracttype = null;
-	private ActivityFacilityImpl currfacility = null;
+	private ActivityFacility currfacility = null;
 	private ActivityOptionImpl curractivity = null;
 	private PlanImpl currplan = null;
 	private ActivityImpl curract = null;
@@ -109,7 +110,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	 * @deprecated use PoopulationReaderMatsimV4(Scenario)
 	 */
 	@Deprecated
-	public PopulationReaderMatsimV4(final Population pop, final NetworkLayer network, final ActivityFacilitiesImpl facilities, final Knowledges knowledges) {
+	public PopulationReaderMatsimV4(final Population pop, final Network network, final ActivityFacilities facilities, final Knowledges knowledges) {
 		this.plans = pop;
 		this.network = network;
 		this.facilities = facilities;
@@ -353,7 +354,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startAct(final Attributes atts) {
-		LinkImpl link = null;
+		Link link = null;
 		Coord coord = null;
 		if (atts.getValue("link") != null) {
 			link = this.network.getLinks().get(new IdImpl(atts.getValue("link")));
@@ -376,7 +377,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		this.curract.setEndTime(Time.parseTime(atts.getValue("end_time")));
 		String fId = atts.getValue("facility");
 		if (fId != null) {
-			ActivityFacilityImpl f = this.facilities.getFacilities().get(new IdImpl(fId));
+			ActivityFacility f = this.facilities.getFacilities().get(new IdImpl(fId));
 			if (f == null) {
 				Gbl.errorMsg("facility id=" + fId + " does not exist!");
 			}
@@ -407,7 +408,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currRoute = this.network.getFactory().createRoute(this.currleg.getMode(), this.prevAct.getLink(), this.prevAct.getLink());
+		this.currRoute = ((NetworkFactoryImpl) this.network.getFactory()).createRoute(this.currleg.getMode(), this.prevAct.getLink(), this.prevAct.getLink());
 		this.currleg.setRoute(this.currRoute);
 		if (atts.getValue("dist") != null) {
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("dist")));

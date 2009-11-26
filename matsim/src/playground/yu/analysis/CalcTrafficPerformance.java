@@ -21,9 +21,9 @@
 package playground.yu.analysis;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.yu.utils.TollTools;
@@ -37,20 +37,20 @@ import playground.yu.utils.TollTools;
  */
 public class CalcTrafficPerformance implements LinkEnterEventHandler {
 	private double lengthSum = 0;
-	private NetworkLayer network = null;
+	private Network network = null;
 	private RoadPricingScheme toll = null;
 
-	public CalcTrafficPerformance(final NetworkLayer network) {
+	public CalcTrafficPerformance(final Network network) {
 		this.network = network;
 	}
 
-	public CalcTrafficPerformance(NetworkLayer network, RoadPricingScheme toll) {
+	public CalcTrafficPerformance(Network network, RoadPricingScheme toll) {
 		this(network);
 		this.toll = toll;
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		Link l = this.network.getLink(event.getLinkId().toString());
+		Link l = this.network.getLinks().get(event.getLinkId());
 		if (l != null) {
 			if (toll == null)
 				this.lengthSum += l.getLength() / 1000.0;

@@ -156,7 +156,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
 	private void startLink(final Attributes atts) {
 		//TODO dg refactor network to support factory/builder and remove cast
-		Link l = ((NetworkLayer)this.network).createAndAddLink(new IdImpl(atts.getValue("id")), this.network.getNode(new IdImpl(atts.getValue("from"))), this.network.getNode(new IdImpl(atts.getValue("to"))),
+		Link l = this.network.createAndAddLink(new IdImpl(atts.getValue("id")), this.network.getNodes().get(new IdImpl(atts.getValue("from"))), this.network.getNodes().get(new IdImpl(atts.getValue("to"))),
 				Double.parseDouble(atts.getValue("length")), Double.parseDouble(atts.getValue("freespeed")), Double.parseDouble(atts.getValue("capacity")),
 				Double.parseDouble(atts.getValue("permlanes")));
 		((LinkImpl) l).setOrigId(atts.getValue("origid"));

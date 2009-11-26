@@ -9,12 +9,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -74,19 +74,17 @@ public class ActOrderChecker extends AbstractPersonAlgorithm implements
 
 //		Gbl.createConfig(null);
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		ScenarioImpl scenario = new ScenarioImpl();
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
 
-		PopulationImpl populationA = new PopulationImpl();
+		PopulationImpl populationA = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilenameA);
 		ActOrderChecker aocA = new ActOrderChecker();
-		new MatsimPopulationReader(populationA, network)
-				.readFile(plansFilenameA);
 		aocA.run(populationA);
 
 		PopulationImpl populationB = new PopulationImpl();
 		ActOrderChecker aocB = new ActOrderChecker();
-		new MatsimPopulationReader(populationB, network)
-				.readFile(plansFilenameB);
+		new MatsimPopulationReader(populationB, scenario.getNetwork()).readFile(plansFilenameB);
 		aocB.run(populationB);
 
 		SimpleWriter writer = new SimpleWriter(outputFilename);

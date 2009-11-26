@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
@@ -162,7 +161,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 		//this is really ugly...
 		this.createFakeNetwork(scenario, network);
 
-		MatsimPopulationReader reader = new  MatsimPopulationReader(population, (NetworkLayer) network);
+		MatsimPopulationReader reader = new  MatsimPopulationReader(scenario);
 		reader.readFile(outfile.getAbsolutePath());
 		checkContent(population);
 	}
