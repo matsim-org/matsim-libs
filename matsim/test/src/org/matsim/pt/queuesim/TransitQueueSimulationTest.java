@@ -54,6 +54,7 @@ import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.Simulation;
@@ -93,6 +94,12 @@ import org.matsim.vehicles.VehiclesFactory;
  */
 public class TransitQueueSimulationTest extends TestCase {
 
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		Gbl.reset();
+	}
+	
 	/**
 	 * Ensure that for each departure an agent is created and departs
 	 */
