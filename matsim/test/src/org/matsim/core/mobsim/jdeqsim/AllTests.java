@@ -29,6 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
 		
+		suite.addTestSuite(ConfigParameterTest.class);
 		
 		suite.addTestSuite(EmptyCarLegTest.class);
 		suite.addTestSuite(NonCarLegTest.class);
@@ -43,10 +44,6 @@ public class AllTests {
 		suite.addTestSuite(TestMessageFactory.class);
 		suite.addTestSuite(TestMessageQueue.class);
 		suite.addTestSuite(TestScheduler.class);
-		
-		// need to put this test at the end, because somehow this effects the outcome of the controler
-		// tests
-		suite.addTestSuite(ConfigParameterTest.class);
 		
 		suite.addTest(org.matsim.core.mobsim.jdeqsim.util.AllTests.suite());
 		//$JUnit-END$
