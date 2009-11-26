@@ -183,11 +183,35 @@ public class ParametersPSF {
 	private static double testingPeakPriceStartTime = 25200;
 	private static double testingPeakPriceEndTime = 72000;
 
+	private static void reset(){
+		defaultMaxBatteryCapacity=0.0;
+		defaultChargingPowerAtParking=0.0;
+		facilityChargingPowerMapper=null;
+		mainChargingPriceScalingFactor=-1.0;
+		numberOfHubs=0;
+		events=null;
+		averageEnergyConsumptionBins=null;
+		hubPriceInfo=null;
+		mainChargingPriceBlurFactor = -1.0;
+		testingModeOn = false;
+		mainChargingTimesOutputFilePath = null;
+		mainEnergyUsageStatistics = null;
+		mainBaseLoad = null;
+		mainHubPriceGraphFileName = null;
+		mainBaseLoadOutputGraphFileName = null;
+		hubLinkMapping=null;
+		testingPeakPriceStartTime = 25200;
+		testingPeakPriceEndTime = 72000;
+	}
+	
 	public static String getChargingMode() {
 		return mainChargingMode;
 	}
 
 	public static void readConfigParamters(Controler controler) {
+		// reset simulation parameters
+		reset();
+		
 		String tempStringValue;
 
 		tempStringValue = controler.getConfig().findParam(PSFModule, default_maxBatteryCapacity);
