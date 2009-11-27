@@ -27,10 +27,11 @@ import playground.marcel.pt.config.TransitConfigGroup;
 import playground.marcel.pt.router.PlansCalcTransitRoute;
 import playground.mmoyo.TransitSimulation.MMoyoPlansCalcTransitRoute;
 
+/**read a config file, routes the transit plans and plays OFTDemo*/ 
 public class PlanRouter {
 
 	private static final String SERVERNAME = "ScenarioPlayer";
-	private boolean useMoyoRouter  = false;     //true= Mmoyo   false= Rieser
+	private boolean useMoyoRouter  = true;     //true= PtRouter(MMoyo)   false= transitRouter
 	
 	public PlanRouter(ScenarioImpl scenario) {
 		PlansCalcRoute router;
@@ -88,7 +89,5 @@ public class PlanRouter {
 		new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork()).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
 		//new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getVehicles()).run();
 		new PlanRouter(scenario);
-		
-
 	}
 }
