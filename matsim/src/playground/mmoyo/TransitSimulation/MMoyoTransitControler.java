@@ -27,7 +27,7 @@ import org.matsim.pt.queuesim.TransitQueueSimulation;
 
 import playground.marcel.pt.config.TransitConfigGroup;
 import playground.marcel.pt.controler.TransitControler;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
+//import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
 //import org.matsim.run.OTFVis;
 import playground.marcel.OTFDemo;
 
@@ -45,10 +45,7 @@ public class MMoyoTransitControler extends TransitControler {
 	
 	@Override
 	protected void runMobSim() {
-		//new TransitQueueSimulation(this.scenarioData, this.events).run();
-		 
 		if (launchOTFDemo){
-			/**  OTFDemo suggested by Andreas*/
 			TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
 			sim.startOTFServer("livesim");
 			OTFDemo.ptConnect("livesim");
