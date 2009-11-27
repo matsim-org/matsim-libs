@@ -33,9 +33,9 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.run.OTFVis;
 
+import playground.dgrether.linkanalysis.InOutGraphWriter;
 import playground.dgrether.linkanalysis.TTGraphWriter;
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
-import playground.dgrether.linkanalysis.TTInOutflowGraphWriter;
 import playground.dgrether.utils.MatsimIo;
 
 
@@ -152,16 +152,7 @@ public class CMCFRunnerNoReroute {
 		
 		OTFVis.main(args);
 	}
-	
 
-	
-
-	
-	private void writeGraphs(TTInOutflowEventHandler handler, String basePath) {
-		TTInOutflowGraphWriter.writeTTChart(handler, basePath);
-		TTInOutflowGraphWriter.writeInOutFlowChart(handler, basePath);
-	}
-	
 	/**
 	 * @param args
 	 */

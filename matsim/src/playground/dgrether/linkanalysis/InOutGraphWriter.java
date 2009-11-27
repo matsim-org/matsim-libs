@@ -16,14 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.cmcf;
+package playground.dgrether.linkanalysis;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.utils.charts.XYLineChart;
 
-import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
 
 
 /**

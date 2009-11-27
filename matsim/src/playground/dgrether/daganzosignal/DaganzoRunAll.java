@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * DaganzoRunAll
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,38 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether;
+package playground.dgrether.daganzosignal;
 
 
 /**
  * @author dgrether
  *
  */
-public interface DgPaths {
-	
-	final String DATA = "/media/data/";
-	
-	final String WORKBASE = DATA + "work/";
+public class DaganzoRunAll {
 
-	final String SCMWORKSPACE = WORKBASE + "repos/";
-	
-	final String WSBASE = WORKBASE + "svnWorkspace/";
-	
-	final String VSPCVSBASE = WORKBASE + "cvsRep/vsp-cvs/";
-	
-	final String SHAREDSVN = SCMWORKSPACE + "shared-svn/";
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		try {
+			new DaganzoScenarioGenerator().createScenario();
+			new DaganzoRunner().runScenario();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
 
-
-  
-  final String RUNBASE = SCMWORKSPACE + "runs-svn/";
-
-  final String IVTCHNET = SHAREDSVN + "studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
-  
-  final String IVTCHROADPRICING = SHAREDSVN + "studies/schweiz-ivtch/baseCase/roadpricing/zurichCityArea/zurichCityAreaWithoutHighwaysPricingScheme.xml";
-  
-  final String IVTCHCOUNTS = SHAREDSVN + "studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml";
-
-	final String IVTCHBASE = SHAREDSVN + "studies/schweiz-ivtch/";
-
-	final String STUDIESDG = SHAREDSVN + "studies/dgrether/";
 }

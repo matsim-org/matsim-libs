@@ -37,12 +37,14 @@ public class VisLastIteration {
 		DaganzoScenarioGenerator scenarioGenerator = new DaganzoScenarioGenerator();
 		Config config = null;
 		config = new Config();
+		config.addCoreModules();
 		MatsimConfigReader reader = new MatsimConfigReader(config);
 		reader.readFile(scenarioGenerator.configOut);
-		
-		String[] args = {config.controler().getOutputDirectory() + 
-				"/ITERS/it." + config.controler().getLastIteration() + 
-				"/" + config.controler().getLastIteration() + ".otfvis.mvi"};
+		String mvi = config.controler().getOutputDirectory() + 
+		"/ITERS/it." + config.controler().getLastIteration() + 
+		"/" + config.controler().getLastIteration() + ".otfvis.mvi";
+		System.out.println(mvi);
+		String[] args = {mvi};
 		OTFVis.main(args);
 		
 	}

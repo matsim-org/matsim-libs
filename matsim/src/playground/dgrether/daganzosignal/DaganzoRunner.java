@@ -24,11 +24,21 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
+import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
+import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
+import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
 import org.matsim.run.OTFVis;
 
+import playground.dgrether.analysis.charts.utils.DgChartWriter;
+import playground.dgrether.linkanalysis.DgCountPerIterationGraph;
+import playground.dgrether.linkanalysis.InOutGraphWriter;
 import playground.dgrether.linkanalysis.TTGraphWriter;
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
 
@@ -47,22 +57,44 @@ public class DaganzoRunner {
 
 	public void runScenario(){
 		DaganzoScenarioGenerator scenarioGenerator = new DaganzoScenarioGenerator();
-		Controler controler = new Controler(scenarioGenerator.configOut);
+		String c = scenarioGenerator.configOut;
+//		String c = DgPaths.STUDIESDG + "daganzo/daganzoConfig2Agents.xml"; 
+		Controler controler = new Controler(c);
 		controler.setOverwriteFiles(true);
 		Config config = controler.getConfig();
 		
 		this.addListener(controler);
-		
+		this.addQueueSimListener(controler);
 		controler.run();
 //		this.startVisualizer(config);
 	}
 	
+	private void addQueueSimListener(final Controler controler) {
+		controler.getQueueSimulationListener().add(new QueueSimulationInitializedListener() {
+			public void notifySimulationInitialized(QueueSimulationInitializedEvent e) {
+				QueueSimulation qs = e.getQueueSimulation();
+				AdaptiveController adaptiveController = (AdaptiveController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+				controler.getEvents().addHandler(adaptiveController);
+			}
+		});
+		
+		controler.getQueueSimulationListener().add(new QueueSimulationBeforeCleanupListener() {
+			public void notifySimulationBeforeCleanup(QueueSimulationBeforeCleanupEvent e) {
+				QueueSimulation qs = e.getQueueSimulation();
+				AdaptiveController adaptiveController = (AdaptiveController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+				controler.getEvents().removeHandler(adaptiveController);
+			}
+		});
+		
+		
+	}
+
 	private void addListener(Controler c) {
-//		handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));
+		handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));
 		handler4 = new TTInOutflowEventHandler(new IdImpl("4"));
 		c.addControlerListener(new StartupListener() {
 			public void notifyStartup(StartupEvent e) {
-//				e.getControler().getEvents().addHandler(handler3);
+				e.getControler().getEvents().addHandler(handler3);
 				e.getControler().getEvents().addHandler(handler4);
 			}});
 
@@ -70,14 +102,23 @@ public class DaganzoRunner {
 		c.addControlerListener(new IterationEndsListener() {
 			public void notifyIterationEnds(IterationEndsEvent e) {
 				TTGraphWriter ttWriter = new TTGraphWriter();
-//				ttWriter.addTTEventHandler(handler3);
+				ttWriter.addTTEventHandler(handler3);
 				ttWriter.addTTEventHandler(handler4);
 				ttWriter.writeTTChart(e.getControler().getIterationPath(e.getIteration()), e.getIteration());
 				
-//				InOutGraphWriter inoutWriter = new InOutGraphWriter();
-//				inoutWriter.addInOutEventHandler(handler3);
-//				inoutWriter.addInOutEventHandler(handler4);
-//				inoutWriter.writeInOutChart(e.getControler().getIterationPath(event.getIteration()), event.getIteration());
+				InOutGraphWriter inoutWriter = new InOutGraphWriter();
+				inoutWriter.addInOutEventHandler(handler3);
+				inoutWriter.addInOutEventHandler(handler4);
+				inoutWriter.writeInOutChart(e.getControler().getIterationPath(e.getIteration()), e.getIteration());
+			}
+		});
+		
+		c.addControlerListener(new ShutdownListener() {
+			public void notifyShutdown(ShutdownEvent event) {
+				DgCountPerIterationGraph chart = new DgCountPerIterationGraph();
+				chart.addCountEventHandler(handler3);
+				chart.addCountEventHandler(handler4);
+				DgChartWriter.writeChart(event.getControler().getNameForOutputFilename("countPerIteration"), chart.createChart());
 			}
 		});
 	}

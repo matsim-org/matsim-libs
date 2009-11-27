@@ -73,7 +73,8 @@ public class DaganzoScenarioGenerator {
 	public static final String DAGANZONETWORKFILE = DAGANZOBASEDIR
 			+ "daganzoNetwork.xml";
 
-	public static final String NETWORKFILE =  DAGANZOBASEDIR + "daganzoNetworkNoLanes.xml";//DAGANZONETWORKFILE;
+//	public static final String NETWORKFILE =  DAGANZOBASEDIR + "daganzoNetworkNoLanes.xml";//DAGANZONETWORKFILE;
+	public static final String NETWORKFILE =  DAGANZONETWORKFILE;
 
 	private static final String PLANS1OUT = DAGANZOBASEDIR
 			+ "daganzoPlansNormalRoute.xml";
@@ -105,14 +106,13 @@ public class DaganzoScenarioGenerator {
 	
 	public String configOut, plansOut, outputDirectory;
 
-	private static final boolean isAlternativeRouteEnabled = false;
+	private static final boolean isAlternativeRouteEnabled = true;
 	
-	private static final boolean isUseLanes = false;
+	private static final boolean isUseLanes = true;
 	
-	private static final boolean isUseSignalSystems = false;
+	private static final boolean isUseSignalSystems = true;
 
-	private static final int iterations = 0;
-
+	private static final int iterations = 1000;
 	private static final int iterations2 = 0;
 
 	private static final String controllerClass = AdaptiveController.class.getCanonicalName();
@@ -168,7 +168,7 @@ public class DaganzoScenarioGenerator {
 		}
 		if (isUseSignalSystems) {
 			//enable lanes and signal system feature in config
-//			config.scenario().setUseSignalSystems(true);
+			config.scenario().setUseSignalSystems(true);
 			config.signalSystems().setSignalSystemFile(SIGNALSYSTEMSOUTPUTFILE);
 			config.signalSystems().setSignalSystemConfigFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
 			//create the signal systems and write them
@@ -221,7 +221,7 @@ public class DaganzoScenarioGenerator {
 				route.setLinks(l1, NetworkUtils.getLinks(network, "2 3 5 6"), l7);
 			}
 			else {
-				route.setLinks(l1, NetworkUtils.getLinks(network, "2 4 41 6"), l7);
+				route.setLinks(l1, NetworkUtils.getLinks(network, "2 4 6"), l7);
 			}
 			leg.setRoute(route);
 
@@ -286,11 +286,13 @@ public class DaganzoScenarioGenerator {
 		BasicLanesToLinkAssignment lanesForLink4 = builder.createLanesToLinkAssignment(id4);
 		BasicLane link4lane1 = builder.createLane(id1);
 		link4lane1.addToLinkId(id6);
+		link4lane1.setNumberOfRepresentedLanes(3);
 		lanesForLink4.addLane(link4lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink4);
 		//lanes for link 5
 		BasicLanesToLinkAssignment lanesForLink5 = builder.createLanesToLinkAssignment(id5);
 		BasicLane link5lane1 = builder.createLane(id1);
+		link5lane1.setNumberOfRepresentedLanes(3);
 		link5lane1.addToLinkId(id6);
 		lanesForLink5.addLane(link5lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink5);

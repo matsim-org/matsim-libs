@@ -20,10 +20,15 @@
 package playground.dgrether.daganzosignal;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.LaneEnterEvent;
+import org.matsim.core.events.LaneLeaveEvent;
+import org.matsim.core.events.handler.LaneEnterEventHandler;
+import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;
 import org.matsim.signalsystems.control.AdaptiveSignalSystemControlerImpl;
-import org.matsim.signalsystems.control.SignalGroupState;
 
 
 /**
@@ -31,29 +36,47 @@ import org.matsim.signalsystems.control.SignalGroupState;
  *
  */
 public class AdaptiveController extends
-		AdaptiveSignalSystemControlerImpl {
+		AdaptiveSignalSystemControlerImpl implements LaneEnterEventHandler, LaneLeaveEventHandler{
 	
 	private static final Logger log = Logger.getLogger(AdaptiveController.class);
 
-	/**
-	 * @param controlInfo
-	 */
+	private final Id id1 = new IdImpl("1");
+	private final Id id4 = new IdImpl("4");
+	private final Id id5 = new IdImpl("5");
+	private int vehOnLink5Lane1 = 0;
+	
 	public AdaptiveController(BasicAdaptiveSignalSystemControlInfo controlInfo) {
 		super(controlInfo);
 	}
 
-	/**
-	 * @see org.matsim.signalsystems.control.SignalSystemController#givenSignalGroupIsGreen(org.matsim.signalsystems.basic.BasicSignalGroupDefinition)
-	 */
 	public boolean givenSignalGroupIsGreen(double time, BasicSignalGroupDefinition signalGroup) {
-//		log.info("isGreen?");
-		
+		if (signalGroup.getLinkRefId().equals(id5)){
+			if (vehOnLink5Lane1 > 0) {
+				return true;
+			}
+			return false;
+		}
+		if (signalGroup.getLinkRefId().equals(id4)){
+			if (vehOnLink5Lane1 > 0){
+				return false;
+			}
+			return true;
+		}
 		return true;
 	}
 
-	public SignalGroupState getSignalGroupState(double time, BasicSignalGroupDefinition signalGroup) {
-		// TODO Auto-generated method stub
-		return null;
+	public void handleEvent(LaneEnterEvent e) {
+		if (e.getLinkId().equals(id5) && e.getLaneId().equals(id1)) {
+			this.vehOnLink5Lane1++;
+		}
+	}
+	public void handleEvent(LaneLeaveEvent e) {
+		if (e.getLinkId().equals(id5) && e.getLaneId().equals(id1)) {
+			this.vehOnLink5Lane1--;
+		}
+	}
+
+	public void reset(int iteration) {
 	}
 
 }
