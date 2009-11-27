@@ -2,6 +2,7 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
@@ -10,23 +11,23 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.jdeqsim.util.TestHandlerDetailedEventChecker;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
-public class EquilPlans1Test extends TestHandlerDetailedEventChecker {
+public class EquilPlans1Test extends AbstractJDEQSimTest {
 
 	public void test_EmptyCarRoute() {
-		Gbl.reset();
-		this.startTestDES("test/scenarios/equil/config_plans1.xml", false, null, null);
-	}
-
-	public void checkAssertions(final PopulationImpl population) {
-		// the super.checkAssertions is not required, but it is a consistency check between tests
-		super.checkAssertions(population);
+		ScenarioImpl scenario = new ScenarioLoaderImpl("test/scenarios/equil/config_plans1.xml").loadScenario();
+		this.runJDEQSim(scenario);
+		
+		assertEquals(1, eventsByPerson.size());
+		
+		super.checkAscendingTimeStamps();
+		super.checkEventsCorrespondToPlans(scenario.getPopulation());
+		
+		// custom checks:
 		boolean wasInLoop = false;
 		int index = 0;
-		for (LinkedList<PersonEvent> list : events.values()) {
+		for (LinkedList<PersonEvent> list : super.eventsByPerson.values()) {
 			wasInLoop = true;
 			// checking the time of the first event
 			assertEquals(21600, list.get(index).getTime(), 0.9);

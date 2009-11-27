@@ -1,16 +1,18 @@
 package org.matsim.core.mobsim.jdeqsim;
 
 
-import org.matsim.core.mobsim.jdeqsim.util.TestHandlerDetailedEventChecker;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 
-public class TestDESStarter_equilPlans100 extends MatsimTestCase {
+public class TestDESStarter_equilPlans100 extends AbstractJDEQSimTest {
 	
 	public void test_equilPlans100_TestHandlerDetailedEventChecker() {
-		TestHandlerDetailedEventChecker detailedChecker = new TestHandlerDetailedEventChecker();
-		detailedChecker.startTestDES("test/scenarios/equil/config.xml", false,
-				"test/scenarios/equil/plans100.xml",
-				null);
+		ScenarioImpl scenario = new ScenarioLoaderImpl("test/scenarios/equil/config.xml").loadScenario();
+		this.runJDEQSim(scenario);
+		
+		assertEquals(scenario.getPopulation().getPersons().size(), super.eventsByPerson.size());
+		super.checkAscendingTimeStamps();
+		super.checkEventsCorrespondToPlans(scenario.getPopulation());
 	}
 	
 	/* 

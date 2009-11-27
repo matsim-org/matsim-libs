@@ -110,7 +110,7 @@ public class CppEventFileParser {
 		return rows;
 	}
 
-	/*
+	/**
 	 * Compares events produced by java and by C++ simulation
 	 */
 	public static boolean equals(final PersonEvent personEvent, final EventLog deqSimEvent) {

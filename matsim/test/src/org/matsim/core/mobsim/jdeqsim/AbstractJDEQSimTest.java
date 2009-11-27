@@ -1,7 +1,10 @@
-package org.matsim.core.mobsim.jdeqsim.util;
+package org.matsim.core.mobsim.jdeqsim;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
@@ -10,9 +13,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
-import org.matsim.core.config.Config;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
@@ -22,31 +25,49 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.parallelEventsHandler.ParallelEvents;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
+import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestCase;
 
-public class TestHandlerDetailedEventChecker extends MatsimTestCase implements PersonEventHandler {
+public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 
-	protected HashMap<Id, LinkedList<PersonEvent>> events = new HashMap<Id, LinkedList<PersonEvent>>();
+	protected HashMap<Id, LinkedList<PersonEvent>> eventsByPerson = new HashMap<Id, LinkedList<PersonEvent>>();
 	public LinkedList<PersonEvent> allEvents = new LinkedList<PersonEvent>();
-	// private HashMap<Id, ExpectedNumberOfEvents> expectedNumberOfMessages =
-	// new HashMap<Id, ExpectedNumberOfEvents>();
-	protected boolean printEvent = true;
 
-	public void checkAssertions(final PopulationImpl population) {
 
-		// at least one event
-		assertTrue(events.size() > 0);
-
+	// if populationModifier == null, then the DummyPopulationModifier is used
+	// if planFilePath == null, then the plan specified in the config file is
+	// used
+	public void runJDEQSim(ScenarioImpl scenario) {
+/*
+		Config config = loadConfig(configFilePath);
+		if (planFilePath != null) {
+			config.plans().setInputFile(planFilePath);
+		}
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
+		loader.loadScenario();
+		ScenarioImpl scenario = loader.getScenario();
+		NetworkLayer network = scenario.getNetwork();
+		PopulationImpl population = scenario.getPopulation();
+		if (populationModifier != null) {
+			population = populationModifier.modifyPopulation(population);
+		}
+	*/
+		EventsManagerImpl events = new ParallelEvents(1);
+		events.addHandler(new PersonEventCollector(this.eventsByPerson, this.allEvents));
+		events.initProcessing();
+		new JDEQSimulation(scenario.getNetwork(), scenario.getPopulation(), events).run();
+		events.finishProcessing();
+	}
+	
+	
+	protected void checkAscendingTimeStamps() {
 		// all events of one agent must have ascending time stamps
 		double lastTimeStamp;
-		for (LinkedList<PersonEvent> list : events.values()) {
+		for (LinkedList<PersonEvent> list : eventsByPerson.values()) {
 			lastTimeStamp = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < list.size(); i++) {
 				if (lastTimeStamp > list.get(i).getTime()) {
@@ -62,10 +83,14 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 				lastTimeStamp = list.get(i).getTime();
 			}
 		}
-
-		// compare plan and events for each agent
-		// compare: type of events, linkId
-		for (LinkedList<PersonEvent> list : events.values()) {
+	}
+	
+	/** 
+	 * Compares plan and events for each agent.
+	 * Checks the type of the event and the linkId. 
+	 */
+	protected void checkEventsCorrespondToPlans(final Population population) {
+		for (LinkedList<PersonEvent> list : eventsByPerson.values()) {
 			Person p = population.getPersons().get(list.get(0).getPersonId());
 			// printEvents(list.get(0).agentId);
 			Plan plan = p.getSelectedPlan();
@@ -149,46 +174,69 @@ public class TestHandlerDetailedEventChecker extends MatsimTestCase implements P
 			}
 		}
 	}
-
-	public void handleEvent(PersonEvent event) {
-		if (!events.containsKey(event.getPersonId())) {
-			events.put(event.getPersonId(), new LinkedList<PersonEvent>());
+	
+	/**
+	 * Compare events to deq event file. The order of events must also be the
+	 * same. (this test will only succeed for simple tests with one car
+	 * often!!!) => reason: at junctions the order of cars can change + stuck
+	 * vehicles are dealt with in different ways
+	 */
+	protected void compareToDEQSimEvents(final String deqsimEventsFile) {
+ 		LinkedList<PersonEvent> copyEventList=new LinkedList<PersonEvent>();
+ 		
+ 		// remove ActStartEvent and ActEndEvent, because this does not exist in
+		// c++ DEQSim
+ 		for (int i=0;i<allEvents.size();i++){
+	 		if (!(allEvents.get(i) instanceof ActivityStartEventImpl || allEvents.get(i) instanceof ActivityEndEventImpl)){
+				copyEventList.add(allEvents.get(i));
+			}
+ 		}
+ 		
+		ArrayList<EventLog> deqSimLog=CppEventFileParser.parseFile(deqsimEventsFile);
+		for (int i=0;i<copyEventList.size();i++){
+			assertTrue("events not equal.", CppEventFileParser.equals(copyEventList.get(i), deqSimLog.get(i)));
 		}
-		events.get(event.getPersonId()).add(event);
-		if (printEvent) {
-			System.out.println(event.toString());
-		}
-		allEvents.add(event);
 	}
 
-	public void reset(int iteration) {
+	/**
+	 * Compares the sum of all travel times with the sum of all travel times generated by the C++DEQSim.
+	 * As {@link #compareToDEQSimEvents(String)} does not function for most comparisons of the JavaDEQSim and C++DEQSim model,
+	 * we need to compare the time each car was on the road and take its average. This figure should with in a small interval
+	 * for both simulations.
+	 * Attention: Still when vehicles are stuck, this comparison can be off by larger number, because unstucking the vehicles is
+	 * done in different ways by the two simulations 
+	 */
+	protected void compareToDEQSimTravelTimes(final String deqsimEventsFile, final double tolerancePercentValue) {
+		ArrayList<EventLog> deqSimLog = CppEventFileParser.parseFile(deqsimEventsFile);
+		
+		double deqSimTravelSum=EventLog.getSumTravelTime(deqSimLog);
+		double javaSimTravelSum=EventLibrary.getSumTravelTime(allEvents);
+		assertTrue ((Math.abs(deqSimTravelSum - javaSimTravelSum)/deqSimTravelSum) < tolerancePercentValue);
 	}
 
-	// if populationModifier == null, then the DummyPopulationModifier is used
-	// if planFilePath == null, then the plan specified in the config file is
-	// used
-	public void startTestDES(String configFilePath, boolean printEvent, String planFilePath, PopulationModifier populationModifier) {
-		Config config = loadConfig(configFilePath);
-		if (planFilePath != null) {
-			config.plans().setInputFile(planFilePath);
-		}
-		this.printEvent = printEvent;
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
-		loader.loadScenario();
-		ScenarioImpl data = loader.getScenario();
-		NetworkLayer network = (NetworkLayer) data.getNetwork();
-		PopulationImpl population = data.getPopulation();
-		if (populationModifier != null) {
-			population = populationModifier.modifyPopulation(population);
-		}
-		EventsManagerImpl events = new ParallelEvents(1);
-		events.addHandler(this);
-		events.initProcessing();
-		new JDEQSimulation(network, population, events).run();
-		events.finishProcessing();
+	
+	private static class PersonEventCollector implements PersonEventHandler {
 
-		// this.calculateExpectedNumberOfEvents(population); // this method
-		// doesn't do anything useful/stateful
-		this.checkAssertions(population);
+		private final Map<Id, LinkedList<PersonEvent>> eventsByPerson;
+		private final List<PersonEvent> allEvents;
+		
+		/*package*/ PersonEventCollector(Map<Id, LinkedList<PersonEvent>> eventsByPerson, List<PersonEvent> allEvents) {
+			this.eventsByPerson = eventsByPerson;
+			this.allEvents = allEvents;
+		}
+		
+		public void handleEvent(PersonEvent event) {
+			if (!eventsByPerson.containsKey(event.getPersonId())) {
+				eventsByPerson.put(event.getPersonId(), new LinkedList<PersonEvent>());
+			}
+			eventsByPerson.get(event.getPersonId()).add(event);
+			allEvents.add(event);
+		}
+
+		public void reset(int iteration) {
+		}
 	}
+	
+	
+	
 }
