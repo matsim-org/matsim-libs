@@ -46,10 +46,12 @@ public class TriangularMeshSimplifier {
 
 	private static final Logger log = Logger.getLogger(TriangularMeshSimplifier.class);
 
-	private static final double MAX_LENGTH = 20;
+	private static final double MAX_LENGTH = 500;
 
 	private static final double TWO_PI = 2 * Math.PI;
 	private static final double PI_HALF =  Math.PI / 2;
+
+	private static final double MIN_LENGTH = 2;
 
 	private final List<List<FloodingInfo>> geos = new ArrayList<List<FloodingInfo>>();
 
@@ -144,7 +146,7 @@ public class TriangularMeshSimplifier {
 			this.queue.addAll(this.edgeTriangleMapping.keySet());
 			this.removed.clear();
 		}
-		
+
 
 		dumpGeos();
 
@@ -162,11 +164,17 @@ public class TriangularMeshSimplifier {
 			if (!checkEdgeConsistency(e)){
 				continue;
 			}
-			if (this.removed.contains(e) || this.network.get(e.to) == null || this.network.get(e.from) == null || this.edgeTriangleMapping.get(e).size() < 2) {
+			if (this.removed.contains(e) || this.network.get(e.to) == null || this.network.get(e.from) == null ) {
 				continue;
 			}
+			
+			int depth = calcDepth(e);
+			double maxLength = MIN_LENGTH * Math.pow(2, depth);
 
-			if (e.length > MAX_LENGTH) {
+			
+			
+
+			if (e.length > maxLength) {
 				continue;
 			}
 
@@ -175,20 +183,70 @@ public class TriangularMeshSimplifier {
 			this.cleanUps.clear();
 		}
 
+
+	}
+
+
+
+	private int calcDepth(Edge e) {
+		if(this.edgeTriangleMapping.get(e).size() < 2) {
+			return 1;
+		} 
+
 		
+		Set<Edge> s1 = new HashSet<Edge>();
+		s1.add(e);
+		s1.addAll(this.network.get(e.from));
+		s1.addAll(this.network.get(e.to));
+		List<Integer> fib = new ArrayList<Integer>();
+//		fib.add(1);
+		fib.add(2);
+		fib.add(3);
+		fib.add(5);
+		fib.add(8);
+		fib.add(13);
+		
+		for (int i : fib) {
+			if (getMinNeighbors(s1) == 1){
+				return i;			
+			}
+			Set<Edge> ss1 = new HashSet<Edge>();
+			for (Edge ee : s1) {
+				ss1.addAll(this.network.get(ee.to));
+				
+			}
+			s1.addAll(ss1);
+		}
+		return 21;
+	}
+
+
+
+	private int getMinNeighbors(Set<Edge> s1) {
+		for (Edge e : s1) {
+			for (Edge ee : this.network.get(e.to)) {
+				if (s1.contains(ee)) {
+					continue;
+				}
+				if (this.edgeTriangleMapping.get(ee).size() < 2) {
+					return 1;
+				}
+			}
+		}
+		return 2;
 	}
 
 
 
 	private void deepClean(Collection<Edge> edges) {
-		
-		
+
+
 		Stack<Edge> current = new Stack<Edge>();
-		for (int i = 0; i < 20; i++) {
+		for (int i = 1; i <= 50; i++) {
 			current.addAll(edges);
 			Collections.shuffle(current);
 			while (!current.isEmpty()) {
-				cleanUpEdge(current.pop());
+				cleanUpEdge(current.pop(), 1./(10.*i));
 				this.oldTriangles.clear();
 				this.newEdges.clear();
 				this.newTriangles.clear();
@@ -200,7 +258,7 @@ public class TriangularMeshSimplifier {
 			current.addAll(this.touched);
 			this.touched.clear();
 		}
-		
+
 	}
 
 
@@ -239,7 +297,7 @@ public class TriangularMeshSimplifier {
 				throw new RuntimeException("no reverse mapping!");
 			}
 		}
-		
+
 		Set<Edge> s1 = this.network.get(edge.from);
 		Set<Edge> s2 = this.network.get(edge.to);
 		Set<Integer> nodes = new HashSet<Integer>();
@@ -258,7 +316,7 @@ public class TriangularMeshSimplifier {
 		return true;
 	}
 
-	private void cleanUpEdge(Edge pop) {
+	private void cleanUpEdge(Edge pop, double crit) {
 
 		if (this.removed.contains(pop)) {
 			return;
@@ -319,10 +377,14 @@ public class TriangularMeshSimplifier {
 		double norm2 = getMinAngle(coords1);
 		norm2 = Math.min(norm2,getMinAngle(coords2));
 
-		if (MatsimRandom.getRandom().nextDouble() < 0.01) {
-			norm2 = Math.PI;
+		if (MatsimRandom.getRandom().nextDouble() < crit) {
+			if (MatsimRandom.getRandom().nextBoolean()){
+				norm = 0;
+			} else {
+				norm2 = 0;
+			}
 		}
-		if (norm2 > norm) {
+		if (norm2 > norm ) {
 			saveState(pop);
 			Edge newEdge = createEdge(coords1[1],coords1[2]);
 
@@ -421,17 +483,17 @@ public class TriangularMeshSimplifier {
 		}
 		alpha = Math.min(alpha, getAngle(e1,e2,turnRight));
 		alpha = Math.min(alpha, getAngle(e2,e0,turnRight));
-		
+
 		return alpha;
-		
-//		double avgLength = e0.length + e1.length + e2.length;
-//		avgLength /= 3;
-//
-//		double norm = Math.pow(e0.length-avgLength, 2) + Math.pow(e1.length-avgLength, 2) + Math.pow(e2.length-avgLength, 2);
-//		norm /= 3;
-//		norm = Math.sqrt(norm) / avgLength;
-//
-//		return norm;
+
+		//		double avgLength = e0.length + e1.length + e2.length;
+		//		avgLength /= 3;
+		//
+		//		double norm = Math.pow(e0.length-avgLength, 2) + Math.pow(e1.length-avgLength, 2) + Math.pow(e2.length-avgLength, 2);
+		//		norm /= 3;
+		//		norm = Math.sqrt(norm) / avgLength;
+		//
+		//		return norm;
 	}
 
 
@@ -460,17 +522,17 @@ public class TriangularMeshSimplifier {
 		if (this.edgeTriangleMapping.get(e).size() < 2) {
 			return;
 		}
-		
+
 		int degFrom = getMinNeighborDegree(fromNode);
 		int degTo = getMinNeighborDegree(toNode);
 
-		if (degFrom <=1 && degTo <= 1) {
-			return;
-		}
-		//
-		if (degFrom == 0 || degTo == 0) {
-			return;
-		}
+//		if (degFrom <=1 && degTo <= 1) {
+//			return;
+//		}
+//		//
+//		if (degFrom == 0 || degTo == 0) {
+//			return;
+//		}
 
 		saveState(e);
 		//	
@@ -503,9 +565,9 @@ public class TriangularMeshSimplifier {
 
 
 	private void undoChanges() {
-		
 
-		
+
+
 		for (Edge edge : this.newEdges) {
 			this.removed.add(edge);
 			this.edgeTriangleMapping.remove(edge);
@@ -520,7 +582,7 @@ public class TriangularMeshSimplifier {
 				}
 			}
 		}
-		
+
 		for (Entry<Edge,Set<Triangle>> entry : this.saveEdgeTriangleMapping.entrySet()) {
 			this.edgeTriangleMapping.put(entry.getKey(),entry.getValue());
 		}
@@ -532,12 +594,12 @@ public class TriangularMeshSimplifier {
 			this.network.put(entry.getKey(), entry.getValue());
 
 		}
-//
-//
-//		for (Edge e: this.saveEdgeTriangleMapping.keySet()) {
-//			checkEdgeConsistency(e);
-//		}
-//		
+		//
+		//
+		//		for (Edge e: this.saveEdgeTriangleMapping.keySet()) {
+		//			checkEdgeConsistency(e);
+		//		}
+		//		
 		this.cleanUps.clear();
 
 
@@ -558,14 +620,14 @@ public class TriangularMeshSimplifier {
 			Set<Edge> s1n = new HashSet<Edge>();
 			s1n.addAll(s1);
 			this.saveNetwork.put(ee.from, s1n);
-			
-			
+
+
 			Set<Triangle> s2 = this.edgeTriangleMapping.get(ee);
 			Set<Triangle> s2n = new HashSet<Triangle>();
 			s2n.addAll(s2);
 			this.saveEdgeTriangleMapping.put(ee, s2n);
-						
-			
+
+
 			Set<Triangle> tris  = this.edgeTriangleMapping.get(ee);
 			for (Triangle tri : tris) {
 				Set<Edge> s3 = this.triangleEdgeMapping.get(tri);
@@ -689,7 +751,7 @@ public class TriangularMeshSimplifier {
 		}
 
 
-		
+
 		for (int i : nodes) {
 			if(!addEdgeTriangle(s1,s2,i,e)){
 				return false;
