@@ -20,7 +20,6 @@ import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.xml.sax.SAXException;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.PlansCalcRoute;
 
 import playground.marcel.OTFDemo;

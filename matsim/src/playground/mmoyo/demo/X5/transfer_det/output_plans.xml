@@ -18,7 +18,7 @@
 			</leg>
 			<act type="transitInteraction" end_time="00:00:00" link="23" />
 			<leg mode="car">
-				<route trav_time="00:01:00>
+				<route trav_time="00:01:00">
 					20 21
 				</route>
 			</leg>
