@@ -70,26 +70,12 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	private static final Logger log = Logger.getLogger(OnTheFlyServer.class);
 	
-	static class QuadStorage {
-		public String id;
-		public OTFServerQuad quad;
-		public QuadTree.Rect rect;
-		public byte [] buffer;
-		public QuadStorage(String id, OTFServerQuad quad, Rect rect, byte[] buffer) {
-			this.id = id;
-			this.quad = quad;
-			this.rect = rect;
-			this.buffer = buffer;
-		}
-	}
-
 	public static final int UNCONNECTED = 0;
 	public static final int PAUSE = 1;
 	public static final int PLAY = 2;
 	public static final int STEP = 3;
 	private static Registry registry = null;
 
-	private String userReadableName;
 	private int status = UNCONNECTED;
 
 	protected final Object paused = new Object();
@@ -102,6 +88,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	protected final HashMap<OTFQuery,OTFQuery> queryThis = new HashMap<OTFQuery,OTFQuery>();
 	private final List<OTFDataWriter> additionalElements= new LinkedList<OTFDataWriter>();
 
+	protected int controllerStatus = OTFVisController.NOCONTROL;
+	protected int controllerIteration = 0;
+	protected int stepToIteration = 0;
+	protected int requestStatus = 0;
 
 //	private final OTFNetHandler handler = null;
 	private transient Population pop = null;
@@ -118,8 +108,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		super(0);
 	}
 	
-	private void init(String ReadableName, QueueNetwork network, Population population, EventsManager events){
-		this.userReadableName = ReadableName;
+	private void init(QueueNetwork network, Population population, EventsManager events){
 		this.network = network;
 		this.out = new ByteArrayOutputStream(20000000);
 		this.pop = population;
@@ -163,7 +152,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			} else {
 				result  = new OnTheFlyServer();
 			}
-      result.init(ReadableName, network, population, events);
+      result.init(network, population, events);
 			// Bind this object instance to the name ReadableName
 			registry.bind(ReadableName, result);
 
@@ -411,10 +400,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		return false;
 	}
 
-	protected int controllerStatus = OTFVisController.NOCONTROL;
-	protected int controllerIteration = 0;
-	protected int stepToIteration = 0;
-	protected int requestStatus = 0;
 
 	public boolean requestControllerStatus(int status) throws RemoteException {
 		stepToIteration = status & 0xffffff;
@@ -427,8 +412,9 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 
 	public int getControllerStatus() {
-		if ((controllerStatus == OTFVisController.RUNNING) && (status == PAUSE)) return  OTFVisController.RUNNING + OTFVisController.PAUSED;
-		else return controllerStatus;
+		if ((controllerStatus == OTFVisController.RUNNING) && (status == PAUSE)) 
+			return  OTFVisController.RUNNING + OTFVisController.PAUSED;
+		return controllerStatus;
 	}
 
 	public int getRequestStatus() {
@@ -465,5 +451,18 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 	}
 
+	private static class QuadStorage {
+		public String id;
+		public OTFServerQuad quad;
+		public QuadTree.Rect rect;
+		public byte [] buffer;
+		public QuadStorage(String id, OTFServerQuad quad, Rect rect, byte[] buffer) {
+			this.id = id;
+			this.quad = quad;
+			this.rect = rect;
+			this.buffer = buffer;
+		}
+	}
+	
 	
 }
