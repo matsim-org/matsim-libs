@@ -26,6 +26,8 @@ import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.RMIClientSocketFactory;
+import java.rmi.server.RMIServerSocketFactory;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Collection;
 import java.util.HashMap;
@@ -87,7 +89,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public static final int STEP = 3;
 	private static Registry registry = null;
 
-	private final String userReadableName;
+	private String userReadableName;
 	private int status = UNCONNECTED;
 
 	protected final Object paused = new Object();
@@ -107,32 +109,26 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public transient QueueNetwork network = null;
 	public transient EventsManager events;
 
-	protected OnTheFlyServer(String ReadableName, QueueNetwork network, Population population, EventsManager events) throws RemoteException {
+	protected OnTheFlyServer(RMIClientSocketFactory clientSocketFactory, RMIServerSocketFactory serverSocketFactory) throws RemoteException {
 		super(0, new SslRMIClientSocketFactory(),	new SslRMIServerSocketFactory());
-		this.userReadableName = ReadableName;
-		this.network = network;
-		this.out = new ByteArrayOutputStream(20000000);
-		this.pop = population;
-		this.events = events;
 		OTFDataWriter.setServer(this);
 	}
 
-	protected OnTheFlyServer(String ReadableName, QueueNetwork network, Population population, EventsManager events, boolean noSSL) throws RemoteException {
+	protected OnTheFlyServer() throws RemoteException {
 		super(0);
+	}
+	
+	private void init(String ReadableName, QueueNetwork network, Population population, EventsManager events){
 		this.userReadableName = ReadableName;
 		this.network = network;
 		this.out = new ByteArrayOutputStream(20000000);
 		this.pop = population;
 		this.events = events;
 	}
-
-//	public static boolean useSSL = true;
+	
 	
 	public static OnTheFlyServer createInstance(String ReadableName, QueueNetwork network, Population population, EventsManager events, boolean useSSL) {
 		OnTheFlyServer result = null;
-		
-//		OnTheFlyServer.useSSL = useSSL;
-		
 		if (useSSL) {
 			System.setProperty("javax.net.ssl.keyStore", "input/keystore");
 			System.setProperty("javax.net.ssl.keyStorePassword", "vspVSP");
@@ -163,11 +159,11 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		try {
 			// Create SSL-based registry
 			if (useSSL) {
-				result = new OnTheFlyServer(ReadableName, network, population,events);
+				result = new OnTheFlyServer(new SslRMIClientSocketFactory(),	new SslRMIServerSocketFactory());
 			} else {
-				result  = new OnTheFlyServer(ReadableName, network, population, events, true);
+				result  = new OnTheFlyServer();
 			}
-
+      result.init(ReadableName, network, population, events);
 			// Bind this object instance to the name ReadableName
 			registry.bind(ReadableName, result);
 
@@ -194,9 +190,8 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}else 		synchronized (stepDone) {
 			stepDone.notifyAll();
 		};
-
-
 	}
+	
 	public void cleanup() {
 		try {
 			//Naming.unbind("DSOTFServer_" + UserReadableName);
@@ -208,9 +203,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		}
 	}
 
-//	private double lastTime = -1.0;
 	public void updateOut(double time) {
-		
 		for(String id : updateThis) {
 			buf.position(0);
 			QuadStorage act = quads.get(id);
@@ -220,15 +213,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			buf.get(act.buffer);
 		}
 		updateThis.clear();
-
 		OTFServerQuad quad = quads.values().iterator().next().quad;
-		
 		for(OTFQuery query : queryThis.keySet()) {
 			queryThis.put(query, query.query(network, pop, events, quad));
 		}
-		//queryThis.clear();
-		
-//		lastTime = time;
 	}
 
 
