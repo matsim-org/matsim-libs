@@ -136,46 +136,46 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		int consumer_count=0;
 		int j=0;
 		log.info("This scenario has " + shops.size() +" shops");
-//		for (ActivityFacilityImpl f:this.shops.values()) { 
-//			shops_keys.put(f.getId(),j);
-//			
-//			// gets the average probability of a person from a given zone going to a given shop 
-//			//(it is the same for all persons of a given zone)
-//			for (RetailZone rz : this.retailZones.getRetailZones().values()) {
-//				//zone_count++;
-//				double counter = 0;
-//				double prob = 0;
-//				ArrayList<Person> persons = rz.getPersons();
-//				
-//				for (Person p:persons) {
-//					boolean first_shop = true;
-//					for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
-//						
-//						if (pe2 instanceof ActivityImpl) {
-//							ActivityImpl act = (ActivityImpl) pe2;
-//							
-//							if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
-//								if (first_shop && this.retailerFacilities.containsKey(f.getId())) {
-//									Consumer consumer = new Consumer (consumer_count, p, rz.getId());
-//									consumer.setShoppingFacility(f);
-//									consumers.add(consumer);
-//									consumer_count++;
-//								}
-//								counter++;
-//								int i =Integer.parseInt(rz.getId().toString());
-//								prob = counter/persons.size();
-//								prob_i_j.set(i,j,prob);
-//								first_shop=false;
-//							}
-//						}
-//					}
-//				}
-//			}
-//			j=j+1;
-//		}	
+		for (ActivityFacilityImpl f:this.shops.values()) { 
+			shops_keys.put(f.getId(),j);
+			
+			// gets the average probability of a person from a given zone going to a given shop 
+			//(it is the same for all persons of a given zone)
+			for (RetailZone rz : this.retailZones.getRetailZones().values()) {
+				//zone_count++;
+				double counter = 0;
+				double prob = 0;
+				ArrayList<Person> persons = rz.getPersons();
+				
+				for (Person p:persons) {
+					boolean first_shop = true;
+					for (PlanElement pe2 : p.getSelectedPlan().getPlanElements()) {
+						
+						if (pe2 instanceof ActivityImpl) {
+							ActivityImpl act = (ActivityImpl) pe2;
+							
+							if (act.getType().equals("shop") && act.getFacility().getId().equals(f.getId())) {
+								if (first_shop && this.retailerFacilities.containsKey(f.getId())) {
+									Consumer consumer = new Consumer (consumer_count, p, rz.getId());
+									consumer.setShoppingFacility(f);
+									consumers.add(consumer);
+									consumer_count++;
+								}
+								counter++;
+								int i =Integer.parseInt(rz.getId().toString());
+								prob = counter/persons.size();
+								prob_i_j.set(i,j,prob);
+								first_shop=false;
+							}
+						}
+					}
+				}
+			}
+			j=j+1;
+		}	
 
-		//double [] b= this.computeParameters (prob_i_j, consumers, shops_keys);
-		double[] b = {-1, 1};
+		double [] b= this.computeParameters (prob_i_j, consumers, shops_keys);
+		//double[] b = {-1, 1};
 		gm.setBetas(b);
 		RunRetailerGA rrGA = new RunRetailerGA();
 		TreeMap<Integer, String> first = this.createInitialLocationsForGA(this.mergeLinks(freeLinks));
