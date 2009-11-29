@@ -21,12 +21,14 @@
 package playground.balmermi;
 
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkAdaptLength;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.MatsimCountsReader;
@@ -55,6 +57,18 @@ public class CleanNetwork {
 		new NetworkCleaner().run(network);
 
 		new NetworkShiftFreespeed().run(network);
+		
+		for (LinkImpl l : network.getLinks().values()) {
+			if (l.getType().startsWith("2-") || l.getType().startsWith("3-")) {
+				if (l.getNumberOfLanes(Time.UNDEFINED_TIME) == 2) {
+					l.setNumberOfLanes(1);
+					l.setCapacity(2000);
+				}
+				if (l.getNumberOfLanes(Time.UNDEFINED_TIME) > 1) {
+					System.out.println(l.toString());
+				}
+			}
+		}
 		
 		NetworkWriteAsTable nwat = new NetworkWriteAsTable("../../output/");
 		nwat.run(network);

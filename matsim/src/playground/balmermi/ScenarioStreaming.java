@@ -36,7 +36,6 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
-import playground.balmermi.modules.FacilitiesRandomizeHectareCoordinates;
 import playground.balmermi.modules.PersonResetCoordAndLink;
 import playground.balmermi.modules.PersonStupidDeleteKnowledgeForStreamingModule;
 
@@ -78,7 +77,7 @@ public class ScenarioStreaming {
 
 		System.out.println("loading facilities...");
 		sl.loadActivityFacilities();
-		new FacilitiesRandomizeHectareCoordinates().run(sl.getScenario().getActivityFacilities());
+//		new FacilitiesRandomizeHectareCoordinates().run(sl.getScenario().getActivityFacilities());
 		Gbl.printMemoryUsage();
 		System.out.println("done. (loading facilities)");
 
