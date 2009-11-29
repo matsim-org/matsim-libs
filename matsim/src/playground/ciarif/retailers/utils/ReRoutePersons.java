@@ -23,23 +23,25 @@ public class ReRoutePersons {
 		
 		int counter = 0;
 		for (Person p : persons.values()) {
-			
-			Plan plan = p.getSelectedPlan(); 
-			boolean routeIt = false;
-			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) pe;
-					if (movedFacilities.containsKey(act.getFacilityId())) { 
-						act.setLink(((ActivityFacilityImpl) act.getFacility()).getLink());
-						routeIt = true;
+			for (Plan plan:p.getPlans()) {
+				 
+				boolean routeIt = false;
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof ActivityImpl) {
+						ActivityImpl act = (ActivityImpl) pe;
+						if (movedFacilities.containsKey(act.getFacilityId())) { 
+							act.setLink(((ActivityFacilityImpl) act.getFacility()).getLink());
+							routeIt = true;
+						}
 					}
+				}
+				
+				if (routeIt) {
+					pcrl.run(plan);
+					counter = counter+1;
 				}
 			}
 			
-			if (routeIt) {
-				pcrl.run(plan);
-				counter = counter+1;
-			}
 		}
 		log.info("The program re-routed " +  counter + " persons who were shopping in moved facilities");
 	}

@@ -79,7 +79,8 @@ public class RetailersLocationListener implements StartupListener, IterationEnds
 			gravityModelIter = Integer.parseInt (modelIterParam);
 		}
 		// The model is run only every "n" iterations
-		if (controler.getIteration()%gravityModelIter ==0 && controler.getIteration()>0){//TODO should come from the confing file
+		//if (controler.getIteration()%gravityModelIter ==0 && controler.getIteration()>0){
+		if (controler.getIteration()==gravityModelIter){
 			// TODO maybe need to add if sequential statement
 			for (Retailer r : this.retailers.getRetailers().values()) {
 				r.runStrategy(lrr.getFreeLinks());
