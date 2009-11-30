@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.events.AgentReplanEventImpl;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
@@ -76,7 +77,7 @@ public class WithindayAgent extends PersonAgent {
 
 	private final List<AgentPercepts> percepts;
 
-	public WithindayAgent(final PersonImpl person, final QueueSimulation simulation, final int sightDistance, final WithindayAgentLogicFactory factory) {
+	public WithindayAgent(final Person person, final QueueSimulation simulation, final int sightDistance, final WithindayAgentLogicFactory factory) {
 		super(person, simulation);
 //		this.person = person;
 //		this.vehicle = v;
@@ -150,7 +151,7 @@ public class WithindayAgent extends PersonAgent {
 		Link destinationLink = nextAct.getLink();
 		NetworkRouteWRefs alternativeRoute = this.desireGenerationFunction.requestRoute(currentLink, destinationLink, SimulationTimer.getTime());
 		Plan oldPlan = this.getPerson().getSelectedPlan();
-		LegImpl currentLeg = this.getCurrentLeg();
+		LegImpl currentLeg = (LegImpl) this.getCurrentLeg();
 		RouteWRefs oldRoute = currentLeg.getRoute();
 
 		//create Route of already passed Nodes
@@ -209,7 +210,7 @@ public class WithindayAgent extends PersonAgent {
 				}
 	    	log.trace("  new route: " + newRoute + " nodes: " + buffer.toString());
     	}
-    	this.getPerson().exchangeSelectedPlan(newPlan, false);
+    	((PersonImpl)this.getPerson()).exchangeSelectedPlan(newPlan, false);
     	this.exchangeCurrentLeg(newLeg);
 
     	QueueSimulation.getEvents().processEvent(new AgentReplanEventImpl(SimulationTimer.getTime(), this.getPerson().getId(), alternativeRoute));

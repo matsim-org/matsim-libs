@@ -56,7 +56,7 @@ import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitScheduleReader;
 import org.matsim.transitSchedule.api.TransitStopFacility;
-import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
+import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
 import org.xml.sax.SAXException;
 
 
@@ -208,7 +208,7 @@ public class VisualizeTransitPlans {
 
 	private void visualize() {
 		EventsManagerImpl events = new EventsManagerImpl();
-		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(this.visScenario, events);
+		OTFVisQueueSim client = new OTFVisQueueSim(this.visScenario, events);
 		client.run();
 	}
 

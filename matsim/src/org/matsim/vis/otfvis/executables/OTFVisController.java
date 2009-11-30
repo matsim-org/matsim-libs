@@ -25,10 +25,8 @@ import java.util.UUID;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
-import org.matsim.vis.otfvis.gui.PreferencesDialog;
+import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
-import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
-import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 /**
@@ -51,6 +49,8 @@ public class OTFVisController extends Controler {
 	public static final int CANCEL = 0x08000000;
 	public static final int ALL_FLAGS = 0xff000000;
 
+	private boolean doVisualizeTeleportedVehicles = false;
+	
 	public static int getStatus(int flags) {
 		return flags & ALL_FLAGS;
 	}
@@ -78,17 +78,19 @@ public class OTFVisController extends Controler {
 		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.queueNetwork, this.population, getEvents(), false);
 		myOTFServer.setControllerStatus(STARTUP);
 		// FOR TESTING ONLY!
-		PreferencesDialog.preDialogClass = PreferencesDialog2.class;
 		OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString());
 		client.start();
 	}
 
 	@Override
 	protected void runMobSim() {
-		OnTheFlyQueueSimQuad sim = new OnTheFlyQueueSimQuad(this.scenarioData, this.events);
+		OTFVisQueueSim sim = new OTFVisQueueSim(this.scenarioData, this.events);
 		// overwrite network
 		sim.setQueueNetwork(this.queueNetwork);
 		sim.setServer(myOTFServer);
+		if (this.doVisualizeTeleportedVehicles){
+			sim.activateVisualizeTeleportedVehicles();
+		}
 		for (QueueSimulationListener l : this.getQueueSimulationListener()) {
 			sim.addQueueSimulationListeners(l);
 		}

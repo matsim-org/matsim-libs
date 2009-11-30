@@ -22,7 +22,7 @@ package playground.dgrether.signalVis;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
+import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
 
 
 public class FourWaysVis {
@@ -64,7 +64,7 @@ public class FourWaysVis {
 		
 		EventsManagerImpl events = new EventsManagerImpl();
 		
-		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(scenario, events);
+		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
 		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
 		client.setLaneDefinitions(scenario.getLaneDefinitions());
 		client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());

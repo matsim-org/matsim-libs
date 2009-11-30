@@ -67,12 +67,6 @@ abstract class ActivityEventImpl extends PersonEventImpl implements ActivityEven
 		return this.acttype;
 	}
 
-	/** @deprecated use getLinkId() */
-	@Deprecated
-	public Link getLink() {
-		return this.link;
-	}
-
 	public Id getLinkId() {
 		return this.linkId;
 	}

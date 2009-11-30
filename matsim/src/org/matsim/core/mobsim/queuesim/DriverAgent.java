@@ -21,22 +21,9 @@
 package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.LegImpl;
 
-public interface DriverAgent {
+public interface DriverAgent extends PersonAgentI {
 
-	/**
-	 * The time the agent wants to depart from an Activity. If the agent is currently driving,
-	 * the return value cannot be interpreted (e.g. it is not defined if it is the departure time
-	 * from the previous activity, or from the next one).
-	 *
-	 * @return the time when the agent wants to depart from an activity.
-	 */
-	public double getDepartureTime();
-	/* there is no corresponding setter, as the implementation should set the the corresponding time
-	 * internally, e.g. in legEnds().
-	 */
 	
 	public Link getDestinationLink();
 	
@@ -47,31 +34,11 @@ public interface DriverAgent {
 	 */
 	public Link chooseNextLink();
 
-	/**
-	 * Informs the agent that it arrived at the destination of the current leg.
-	 * The agent can then decide if he wants to start an activity, or continue
-	 * on another leg.
-	 *
-	 * @param now the current time in the simulation
-	 */
-	public void legEnds(final double now);
-	
-	/**
-	 * Informs the agent that the currently executed activity is ended / is
-	 * no longer performed.
-	 * 
-	 * @param now
-	 */
-	public void activityEnds(final double now);
-	
 	public void teleportToLink(final Link link);
 
 	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
 
 	public void moveOverNode();
 
-	public LegImpl getCurrentLeg();
-
-	public Person getPerson();
 
 }

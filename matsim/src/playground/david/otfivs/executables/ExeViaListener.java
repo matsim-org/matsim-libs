@@ -48,9 +48,7 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListe
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
 import org.matsim.vis.otfvis.executables.OTFVisController;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
-import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
-import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 import playground.david.otfvis.prefuse.OTFVisDualView;
@@ -204,7 +202,6 @@ QueueSimulationAfterSimStepListener {
 	}
 
 	protected void startupClient(String url) {
-		PreferencesDialog.preDialogClass = PreferencesDialog2.class;
 		OnTheFlyClientFileQuad client = new OnTheFlyClientFileQuad(url);
 		client.setFilename( Gbl.getConfig().network().getInputFile());
 		client.start();
@@ -225,7 +222,6 @@ QueueSimulationAfterSimStepListener {
 		if (Gbl.getConfig() == null) Gbl.createConfig(null);
 		Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, visconf);
 
-		PreferencesDialog.preDialogClass = PreferencesDialog2.class;
 		OnTheFlyClientFileQuad client = new OTFVisDualView(url, null, false);
 		client.setFilename( Gbl.getConfig().network().getInputFile());
 		client.start();

@@ -30,7 +30,7 @@ import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
+import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
 
 import playground.dgrether.DgPaths;
 
@@ -78,7 +78,7 @@ public class ZurichSignalVis {
 		BasicSignalSystemConfigurations signalConfigs = scenario.getSignalSystemConfigurations();
 		new MatsimSignalSystemConfigurationsReader(signalConfigs).readFile(signalConfigsFile);
 		
-		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(scenario, events);
+		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
 		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
 		client.setLaneDefinitions(laneDefs);
 		client.setSignalSystems(signalDefs, signalConfigs);

@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
@@ -61,7 +62,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 	private TransitSchedule schedule = null;
 	protected final TransitStopAgentTracker agentTracker;
 
-	private final HashMap<PersonImpl, DriverAgent> agents = new HashMap<PersonImpl, DriverAgent>(100);
+	private final HashMap<Person, DriverAgent> agents = new HashMap<Person, DriverAgent>(100);
 
 	public TransitQueueSimulation(final ScenarioImpl scenario, final EventsManager events) {
 		super(scenario, events);
@@ -72,7 +73,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 	}
 
 	public void startOTFServer(final String serverName) {
-		this.otfServer = OnTheFlyServer.createInstance(serverName, this.network, this.plans, getEvents(), false);
+		this.otfServer = OnTheFlyServer.createInstance(serverName, this.network, this.population, getEvents(), false);
 		this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(this.schedule, this.agentTracker));
 		try {
 			this.otfServer.pause();
@@ -138,7 +139,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 
 	@Override
 	public void agentDeparts(final DriverAgent agent, final Link link) {
-		LegImpl leg = agent.getCurrentLeg();
+		LegImpl leg = (LegImpl) agent.getCurrentLeg();
 		if (leg.getMode() == TransportMode.pt) {
 			if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 				log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + agent.getPerson().getId().toString());

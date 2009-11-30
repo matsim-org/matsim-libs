@@ -42,7 +42,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -95,8 +94,8 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 		replannedPersons.add(person);
 	}
 
-	public void addGuidedPerson(PersonImpl person) {
-		guidedPersons.add(person);
+	public void addGuidedPerson(Person person2) {
+		guidedPersons.add(person2);
 	}
 	
 	public Collection<Person> getGuidedPersons() {

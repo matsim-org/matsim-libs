@@ -43,7 +43,7 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
-import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
+import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
 
 /**
  * A generic starter for the OnTheFly Visualizer that supports
@@ -183,7 +183,7 @@ public class OTFVis {
 		ScenarioImpl scenario = loader.getScenario();
 		EventsManagerImpl events = new EventsManagerImpl();
 
-		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(scenario, events);
+		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
 		client.run();
 	}
 	
@@ -194,7 +194,7 @@ public class OTFVis {
 		PopulationImpl population = scenario.getPopulation();
 		EventsManagerImpl events = new EventsManagerImpl();
 		
-		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(scenario, events);
+		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
 		client.run();
 	}
 

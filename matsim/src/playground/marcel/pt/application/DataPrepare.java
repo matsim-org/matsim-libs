@@ -44,7 +44,7 @@ import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
+import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.config.TransitConfigGroup;
@@ -205,7 +205,7 @@ public class DataPrepare {
 
 		log.info("start visualizer");
 		EventsManagerImpl events = new EventsManagerImpl();
-		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(visScenario, events);
+		OTFVisQueueSim client = new OTFVisQueueSim(visScenario, events);
 		client.run();
 	}
 

@@ -21,7 +21,7 @@ package playground.dgrether.signalVis;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
+import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
 
 /**
  * This is actually a more or less direct copy of OnTheFlyQueueSimQuad, because
@@ -32,7 +32,7 @@ import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
  * @author dgrether
  * 
  */
-public class DgOnTheFlyQueueSimQuad extends OnTheFlyQueueSimQuad {
+public class DgOnTheFlyQueueSimQuad extends OTFVisQueueSim {
 
 //	protected OnTheFlyServer myOTFServer = null;
 

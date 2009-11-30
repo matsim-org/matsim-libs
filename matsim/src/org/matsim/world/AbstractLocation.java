@@ -190,7 +190,7 @@ public abstract class AbstractLocation implements MappedLocation {
 	/* (non-Javadoc)
 	 * @see org.matsim.world.Location#getLayer()
 	 */
-	public final Layer getLayer() {
+	public Layer getLayer() {
 		return this.layer;
 	}
 

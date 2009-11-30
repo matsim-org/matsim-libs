@@ -71,9 +71,9 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 
 	public void useKnowledgeStorageHandler(boolean value)
 	{
-		if (value && knowledgeDBStorageHandler == null)
+		if (value && (knowledgeDBStorageHandler == null))
 		{
-			this.knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(this.plans);
+			this.knowledgeDBStorageHandler = new KnowledgeDBStorageHandler(this.population);
 			this.knowledgeDBStorageHandler.start();
 			((EventsManagerImpl)getEvents()).addHandler(knowledgeDBStorageHandler);
 			this.addQueueSimulationListeners(this.knowledgeDBStorageHandler);

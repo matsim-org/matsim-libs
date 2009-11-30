@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.world.AbstractLocation;
+import org.matsim.world.Layer;
 
 public class LinkImpl extends AbstractLocation implements Link {
 
@@ -297,5 +298,9 @@ public class LinkImpl extends AbstractLocation implements Link {
 		"[type=" + this.type + "]";
 	}
 
-
+	@Override
+	public Layer getLayer() {
+		return super.getLayer();
+	}
+	
 }

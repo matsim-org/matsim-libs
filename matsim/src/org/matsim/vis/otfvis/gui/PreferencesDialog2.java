@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.otfvis.opengl.gui;
+package org.matsim.vis.otfvis.gui;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -30,9 +30,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.vis.otfvis.gui.OTFHostControlBar;
-import org.matsim.vis.otfvis.gui.OTFVisConfig;
-import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.opengl.queries.QueryToggleShowParking;
 
 

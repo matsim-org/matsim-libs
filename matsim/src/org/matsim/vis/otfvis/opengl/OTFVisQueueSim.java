@@ -30,8 +30,6 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimEngine;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.gui.PreferencesDialog;
-import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 
@@ -39,10 +37,10 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
  * This class starts OTFVis in live mode, i.e. with a running QueueSimulation.
  * @author DS
  */
-public class OnTheFlyQueueSimQuad extends QueueSimulation{
+public class OTFVisQueueSim extends QueueSimulation{
 	protected OnTheFlyServer myOTFServer = null;
 	private boolean ownServer = true;
-
+	private boolean doVisualizeTeleportedVehicles = false;
 	private OTFConnectionManager connectionManager = null;
 	
 	public void setServer(OnTheFlyServer server) {
@@ -55,10 +53,8 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 
 		if(ownServer) {
 			UUID idOne = UUID.randomUUID();
-			this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.network, this.plans, getEvents(), false);
+			this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.network, this.population, getEvents(), false);
 
-			// FOR TESTING ONLY!
-			PreferencesDialog.preDialogClass = PreferencesDialog2.class;
 			OnTheFlyClientQuad client = null;
 			if (connectionManager == null) {
 				client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString());
@@ -71,7 +67,6 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 			try {
 				this.myOTFServer.pause();
 			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -92,11 +87,19 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 	protected void afterSimStep(final double time) {
 		super.afterSimStep(time);
 		this.myOTFServer.updateStatus(time);
+		if (doVisualizeTeleportedVehicles) {
+			this.visualizeTeleportedAgents();
+		}
 	}
 
-	public OnTheFlyQueueSimQuad(final Scenario scenario, final EventsManager events) {
+	private void visualizeTeleportedAgents() {
+		while (this.teleportationList.peek() != null ) {
+		  
+		}
+	}
+	public OTFVisQueueSim(final Scenario scenario, final EventsManager events) {
 		super(scenario, events);
-
+		
 		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
 		if (isMac) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -114,6 +117,10 @@ public class OnTheFlyQueueSimQuad extends QueueSimulation{
 	
 	public void setConnectionManager(OTFConnectionManager connectionManager) {
 		this.connectionManager = connectionManager;
+	}
+	public void activateVisualizeTeleportedVehicles() {
+		this.doVisualizeTeleportedVehicles = true;
+//TODO dg		this.myOTFServer add stuff
 	}
 
 }

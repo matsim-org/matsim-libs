@@ -102,7 +102,7 @@ public class LeaveLinkReplanner {
 	{
 		Plan plan = person.getSelectedPlan();
 
-		leg = personAgent.getCurrentLeg();
+		leg = (LegImpl) personAgent.getCurrentLeg();
 
 		nextAct = (ActivityImpl)((PlanImpl) plan).getNextActivity(leg);	
 		

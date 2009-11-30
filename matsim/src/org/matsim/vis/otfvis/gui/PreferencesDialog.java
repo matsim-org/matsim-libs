@@ -23,8 +23,6 @@ package org.matsim.vis.otfvis.gui;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -49,7 +47,6 @@ import javax.swing.event.ChangeListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
 import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
-import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
 
 /**
  * The class responsible for drawing the PreferencesDialog.
@@ -59,8 +56,6 @@ import org.matsim.vis.otfvis.opengl.gui.PreferencesDialog2;
  *
  */
 public class PreferencesDialog extends javax.swing.JDialog implements ChangeListener, ActionListener {
-
-	public static Class preDialogClass = PreferencesDialog2.class;
 
 	protected transient OTFVisConfig cfg;
 	private JComboBox rightMFunc;
@@ -72,20 +67,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	private JSlider linkWidthSlider;
 	private JSlider delaySlider = null;
 
-	/**
-	 * Auto-generated main method to display this JDialog
-	 */
-	public static void main(final String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				JFrame frame = new JFrame();
-				PreferencesDialog inst = new PreferencesDialog(frame, new OTFVisConfig(), null);
-				inst.setVisible(true);
-			}
-		});
-	}
-
-	public PreferencesDialog(final JFrame frame, final OTFVisConfig config, final OTFHostControlBar mother) {
+	protected PreferencesDialog(final JFrame frame, final OTFVisConfig config, final OTFHostControlBar mother) {
 		super(frame);
 		this.cfg = config;
 		this.host = mother;
@@ -261,39 +243,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	}
 
 	public static PreferencesDialog buildMenu(final JFrame frame, final OTFVisConfig config, final OTFHostControlBar host, final OTFSettingsSaver save) {
-		PreferencesDialog preferencesDialog = new PreferencesDialog(frame, config, host);
-		Class partypes[] = new Class[3];
-		partypes[0] = JFrame.class;
-		partypes[1] = OTFVisConfig.class;
-		partypes[2] = OTFHostControlBar.class;
-		try {
-			Constructor ct = preDialogClass.getConstructor(partypes);
-			Object arglist[] = new Object[3];
-			arglist[0] = frame;
-			arglist[1] = config;
-			arglist[2] = host;
-			preferencesDialog = (PreferencesDialog) ct.newInstance(arglist);
-
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		PreferencesDialog preferencesDialog = new PreferencesDialog2(frame, config, host);
 		preferencesDialog.buildMenu(frame, preferencesDialog, save);
 		return preferencesDialog;
 	}

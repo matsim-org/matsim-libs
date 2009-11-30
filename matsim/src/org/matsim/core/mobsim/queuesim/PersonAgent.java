@@ -25,12 +25,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
@@ -42,7 +43,7 @@ public class PersonAgent implements DriverAgent {
 
 	private static final Logger log = Logger.getLogger(PersonAgent.class);
 
-	private final PersonImpl person;
+	private final Person person;
 	private QueueVehicle vehicle;
 	protected Link cachedNextLink = null;
 
@@ -67,12 +68,12 @@ public class PersonAgent implements DriverAgent {
 
 	private int currentNodeIndex;
 
-	public PersonAgent(final PersonImpl p, final QueueSimulation simulation) {
+	public PersonAgent(final Person p, final QueueSimulation simulation) {
 		this.person = p;
 		this.simulation = simulation;
 	}
 
-	public PersonImpl getPerson() {
+	public Person getPerson() {
 		return this.person;
 	}
 
@@ -104,7 +105,7 @@ public class PersonAgent implements DriverAgent {
 		return this.currentLink;
 	}
 
-	public LegImpl getCurrentLeg() {
+	public Leg getCurrentLeg() {
 		return this.currentLeg;
 	}
 
@@ -132,6 +133,7 @@ public class PersonAgent implements DriverAgent {
 		this.currentPlanElementIndex = 0;
 		ActivityImpl firstAct = (ActivityImpl) planElements.get(0);
 		double departureTime = firstAct.getEndTime();
+		
 		this.currentLink = firstAct.getLink();
 		if ((departureTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
 			setDepartureTime(departureTime);
@@ -171,7 +173,7 @@ public class PersonAgent implements DriverAgent {
 	 */
 	public void activityEnds(final double now) {
 		ActivityImpl act = (ActivityImpl) this.getPlanElements().get(this.currentPlanElementIndex);
-		QueueSimulation.getEvents().processEvent(new ActivityEndEventImpl(now, this.getPerson(), this.currentLink, act));
+		QueueSimulation.getEvents().processEvent(new ActivityEndEventImpl(now, this.getPerson(), act.getLink(), act));
 		advancePlanElement(now);
 	}
 

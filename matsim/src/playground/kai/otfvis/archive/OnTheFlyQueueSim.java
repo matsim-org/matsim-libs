@@ -55,7 +55,7 @@ public class OnTheFlyQueueSim extends QueueSimulation{
 
 	@Override
 	protected void prepareSim() {
-		this.myOTFServer = OnTheFlyServer.createInstance("AName1", this.network, this.plans, getEvents(), false);
+		this.myOTFServer = OnTheFlyServer.createInstance("AName1", this.network, this.population, getEvents(), false);
 
 		super.prepareSim();
 

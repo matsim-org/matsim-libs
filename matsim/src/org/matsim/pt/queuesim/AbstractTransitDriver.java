@@ -18,6 +18,7 @@ import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.TransitDriverAgent;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -179,7 +180,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	}
 
 	public void activityEnds(final double now) {
-		this.sim.agentDeparts(this, this.getCurrentLeg().getRoute().getStartLink());
+		this.sim.agentDeparts(this, ((LegImpl)this.getCurrentLeg()).getRoute().getStartLink());
 	}
 
 	public Person getPerson() {

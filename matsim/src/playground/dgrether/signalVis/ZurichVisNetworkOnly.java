@@ -25,7 +25,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.vis.otfvis.opengl.OnTheFlyQueueSimQuad;
+import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
 
 import playground.dgrether.DgPaths;
 
@@ -61,7 +61,7 @@ public class ZurichVisNetworkOnly {
 		MatsimLaneDefinitionsReader lanesReader = new MatsimLaneDefinitionsReader(laneDefs);
 		lanesReader.readFile(lanesFile);
 		
-		OnTheFlyQueueSimQuad client = new OnTheFlyQueueSimQuad(scenario, events);
+		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
 		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
 		client.setLaneDefinitions(laneDefs);
 		client.run();

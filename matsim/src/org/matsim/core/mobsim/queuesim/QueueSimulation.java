@@ -37,6 +37,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -52,7 +53,6 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.collections.Tuple;
@@ -91,7 +91,7 @@ public class QueueSimulation {
 	private double infoTime = 0;
 
 	private final Config config;
-	protected final PopulationImpl plans;
+	protected final PopulationImpl population;
 	protected QueueNetwork network;
 	protected Network networkLayer;
 
@@ -108,7 +108,7 @@ public class QueueSimulation {
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
-	private final PriorityQueue<Tuple<Double, DriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, DriverAgent>>(30, new TeleportationArrivalTimeComparator());
+	protected final PriorityQueue<Tuple<Double, DriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, DriverAgent>>(30, new TeleportationArrivalTimeComparator());
 
 	private final Date starttime = new Date();
 
@@ -134,6 +134,8 @@ public class QueueSimulation {
 
 	private QueueSimSignalEngine signalEngine = null;
 
+//	private final Set<TransportMode> notTeleportedModes;
+	
 	/**
 	 * Initialize the QueueSimulation without signal systems
 	 * @param network
@@ -147,7 +149,7 @@ public class QueueSimulation {
 		this.config = Gbl.getConfig();
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
 		setEvents(events);
-		this.plans = (PopulationImpl) plans;
+		this.population = (PopulationImpl) plans;
 
 		this.networkLayer = network;
 		this.network = new QueueNetwork(this.networkLayer);
@@ -216,14 +218,14 @@ public class QueueSimulation {
 	}
 
 	protected void createAgents() {
-		if (this.plans == null) {
+		if (this.population == null) {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
 		BasicVehicleType defaultVehicleType = new BasicVehicleTypeImpl(new IdImpl("defaultVehicleType"));
 
-		for (PersonImpl p : this.plans.getPersons().values()) {
+		for (Person p : this.population.getPersons().values()) {
 			PersonAgent agent = this.agentFactory.createPersonAgent(p);
-
+			
 			QueueVehicle veh = new QueueVehicleImpl(new BasicVehicleImpl(agent.getPerson().getId(), defaultVehicleType));
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
@@ -236,9 +238,6 @@ public class QueueSimulation {
 		}
 	}
 
-//	protected void prepareNetwork() {
-//		this.network.beforeSim();
-//	}
 
 	public void openNetStateWriter(final String snapshotFilename, final String networkFilename, final int snapshotPeriod) {
 		/* TODO [MR] I don't really like it that we change the configuration on the fly here.
@@ -553,8 +552,8 @@ public class QueueSimulation {
 	protected void agentDeparts(final DriverAgent agent, final Link link) {
 		double now = SimulationTimer.getTime();
 
-		LegImpl leg = agent.getCurrentLeg();
-
+		LegImpl leg = (LegImpl) agent.getCurrentLeg();
+		
 		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson(), link, leg));
 
 		if (leg.getMode().equals(TransportMode.car)) {
