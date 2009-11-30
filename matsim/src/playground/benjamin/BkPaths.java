@@ -26,29 +26,29 @@ package playground.benjamin;
 public interface BkPaths {
 	
 	
-//	final String DATA = "/media/data/";
+	final String DATA = "/media/data/";
 	
-//	final String WORKBASE = DATA + "work/";
+	final String WORKBASE = DATA + "2_Eclipse/";
 
-	final String WORKSPACE = "../";
+	final String SCMWORKSPACE = WORKBASE + "Workspace_Repos/";
 	
-//	final String WSBASE = DATA + "work/svnWorkspace/";
+//	final String WSBASE = WORKBASE + "svnWorkspace/";
 	
-//	final String VSPCVSBASE = DATA + "work/cvsRep/vsp-cvs/";
+//	final String VSPCVSBASE = WORKBASE + "cvsRep/vsp-cvs/";
 	
-//	final String SHAREDSVN = SCMWORKSPACE + "shared-svn/";
-
-
+	final String SHAREDSVN = SCMWORKSPACE + "shared-svn/";
   
-  final String RUNBASE = WORKSPACE; // + "runs-svn/";
+	final String RUNBASE = SCMWORKSPACE + "runs-svn/";
+	
+	
 
-//  final String IVTCHNET = SHAREDSVN + "studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
+	final String IVTCHNET = SHAREDSVN + "studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
   
-//  final String IVTCHROADPRICING = SHAREDSVN + "studies/schweiz-ivtch/baseCase/roadpricing/zurichCityArea/zurichCityAreaWithoutHighwaysPricingScheme.xml";
+	final String IVTCHROADPRICING = SHAREDSVN + "studies/schweiz-ivtch/baseCase/roadpricing/zurichCityArea/zurichCityAreaWithoutHighwaysPricingScheme.xml";
   
-//  final String IVTCHCOUNTS = SHAREDSVN + "studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml";
+	final String IVTCHCOUNTS = SHAREDSVN + "studies/schweiz-ivtch/baseCase/counts/countsIVTCH.xml";
 
-//	final String IVTCHBASE = SHAREDSVN + "studies/schweiz-ivtch/";
+	final String IVTCHBASE = SHAREDSVN + "studies/schweiz-ivtch/";
 
-//	final String STUDIESDG = SHAREDSVN + "studies/dgrether/";
+	final String STUDIESDG = SHAREDSVN + "studies/dgrether/";
 }
