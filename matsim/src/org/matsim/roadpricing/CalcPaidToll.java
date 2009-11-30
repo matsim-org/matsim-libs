@@ -32,7 +32,6 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
@@ -91,7 +90,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 * may be added twice to the agents' score!
 	 *
 	 * @param time the current time the generated events are associated with
-	 * @param events the {@link EventsManagerImpl} collection, the generated events are sent to for processing
+	 * @param events the {@link EventsManager} collection, the generated events are sent to for processing
 	 */
 	public void sendUtilityEvents(final double time, final EventsManager events) {
 		for (Map.Entry<Id, AgentInfo> entries : this.agents.entrySet()) {

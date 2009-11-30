@@ -50,7 +50,7 @@ public interface OTFQuery extends Serializable{
 	 * 
 	 * @param Id A String representation of Id
 	 */
-	public enum Type {AGENT,LINK,OTHER, CLIENT};
+	public enum Type {AGENT,LINK,OTHER, CLIENT}
 
 	/**
 	 * Sets Id as String.

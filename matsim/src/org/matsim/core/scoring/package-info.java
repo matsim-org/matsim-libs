@@ -31,7 +31,7 @@
  * {@link org.matsim.core.controler.Controler#setScoringFunctionFactory(org.matsim.core.scoring.ScoringFunctionFactory)}.
  * If you do not use the Controler, you can can use
  * {@link org.matsim.core.scoring.EventsToScore} as events handler with your
- * {@link org.matsim.core.events.EventsManagerImpl}-object to calculate the scores. Do not
+ * {@link org.matsim.core.events.EventsManager}-object to calculate the scores. Do not
  * forget to call {@link org.matsim.core.scoring.EventsToScore#finish()} after
  * processing all events.
  *

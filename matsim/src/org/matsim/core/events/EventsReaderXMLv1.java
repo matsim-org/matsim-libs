@@ -23,6 +23,7 @@ package org.matsim.core.events;
 import java.util.Stack;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -32,10 +33,10 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 	static public final String EVENT = "event";
 	static public final String EVENTS = "events";
 
-	private final EventsManagerImpl events;
+	private final EventsManager events;
 	private EventsFactoryImpl builder;
 
-	public EventsReaderXMLv1(final EventsManagerImpl events) {
+	public EventsReaderXMLv1(final EventsManager events) {
 		this.events = events;
 		this.builder = (EventsFactoryImpl) events.getFactory();
 		this.setValidating(false);// events-files have no DTD, thus they cannot validate

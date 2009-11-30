@@ -25,13 +25,12 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.EventsManagerImpl;
 
 /**
  * @author dgrether
@@ -52,7 +51,7 @@ public class LinkTravelTimeCounter implements LinkEnterEventHandler, LinkLeaveEv
 
 	public static void init(final EventsManager events, final int numberOfLinks) {
 		instance = new LinkTravelTimeCounter(numberOfLinks);
-		((EventsManagerImpl)events).addHandler(instance);
+		events.addHandler(instance);
 	}
 
 	public void handleEvent(final LinkEnterEvent event) {

@@ -58,10 +58,9 @@ public class MatsimEventsReader implements MatsimSomeReader {
 	 */
 	public void readFile(final String filename) {
 		if (filename.endsWith(".txt") || filename.endsWith(".txt.gz")) {
-			new EventsReaderTXTv1((EventsManagerImpl) this.events).readFile(filename);
-			((EventsManagerImpl) this.events).printEventsCount();
+			new EventsReaderTXTv1(this.events).readFile(filename);
 		} else if (filename.endsWith(".xml") || filename.endsWith(".xml.gz")) {
-			new XmlEventsReader((EventsManagerImpl) this.events).readFile(filename);
+			new XmlEventsReader(this.events).readFile(filename);
 		} else {
 			throw new IllegalArgumentException("Cannot recognize the format of the events-file " + filename);
 		}
@@ -69,11 +68,11 @@ public class MatsimEventsReader implements MatsimSomeReader {
 
 	private static class XmlEventsReader extends MatsimXmlParser {
 
-		final EventsManagerImpl events;
+		final EventsManager events;
 		private final static String EVENTS_V1 = "events_v1.dtd";
 		private MatsimXmlParser delegate = null;
 
-		public XmlEventsReader(final EventsManagerImpl events) {
+		public XmlEventsReader(final EventsManager events) {
 			this.events = events;
 			this.setValidating(false); // events-files have no DTD, thus they cannot validate
 			setDoctype("events_v1.dtd"); // manually set a doctype, otherwise delegate would not be initialized
