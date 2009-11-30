@@ -148,12 +148,12 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		double midPointX = (startCoord.getX() + endCoord.getX()) / 2.0;
 		double midPointY = (startCoord.getY() + endCoord.getY()) / 2.0;	
 		
-		ArrayList<ActivityFacilityImpl> facilitySet = 
-			(ArrayList<ActivityFacilityImpl>) this.quadTreesOfType.get(act.getType()).get(midPointX, midPointY, radius);
+		ArrayList<ActivityFacility> facilitySet = 
+			(ArrayList<ActivityFacility>) this.quadTreesOfType.get(act.getType()).get(midPointX, midPointY, radius);
 		
 		ActivityFacilityImpl facility = null;
 		if (facilitySet.size() > 1) {
-			facility = facilitySet.get(MatsimRandom.getRandom().nextInt(facilitySet.size()));
+			facility = (ActivityFacilityImpl)facilitySet.get(MatsimRandom.getRandom().nextInt(facilitySet.size()));
 		}
 		else {
 			return false;
