@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.matsim</groupId>
+	<artifactId>playgrounds</artifactId>
+	<packaging>pom</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>MATSim-Playgrounds</name>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<modules>
+		<module>andreas</module>
+    	<module>anhorni</module>
+    	<module>balmermi</module>
+    	<module>benjamin</module>
+    	<module>cgray</module>
+    	<module>christoph</module>
+    	<module>ciarif</module>
+    	<module>cottbus</module>
+    	<module>david</module>
+    	<module>dgrether</module>
+    	<module>dressler</module>
+    	<module>dsantani</module>
+    	<module>duncan</module>
+    	<module>fabrice</module>
+    	<module>florian</module>
+    	<module>gregor</module>
+    	<module>jhackney</module>
+    	<module>jjoubert</module>
+    	<module>johannes</module>
+    	<module>kai</module>
+    	<module>meisterk</module>
+    	<module>mfeil</module>
+    	<module>mmoyo</module>
+    	<module>mohit</module>
+    	<module>mrieser</module>
+    	<module>msieg</module>
+    	<module>mzilske</module>
+    	<module>pedro</module>
+    	<module>pieter</module>
+    	<module>rost</module>
+    	<module>run</module>
+    	<module>scnadine</module>
+    	<module>toronto</module>
+    	<module>wisinee</module>
+    	<module>wrashid</module>
+    	<module>yalcin</module>
+    	<module>yu</module>
+	</modules>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.7</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>hudson</id>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.codehaus.mojo</groupId>
+							<artifactId>cobertura-maven-plugin</artifactId>
+							<configuration>
+								<formats>
+									<format>xml</format>
+								</formats>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+			<reporting>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-pmd-plugin</artifactId>
+						<version>2.4</version>
+						<configuration>
+							<targetJdk>1.5</targetJdk>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>javancss-maven-plugin</artifactId>
+						<version>2.0</version>
+					</plugin>
+				</plugins>
+			</reporting>
+		</profile>
+	</profiles>
+
+
+</project>
