@@ -4,9 +4,7 @@ import java.util.HashMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.PSF.ParametersPSFMutator;

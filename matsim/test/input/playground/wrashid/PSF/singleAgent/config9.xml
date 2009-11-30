@@ -26,7 +26,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="./output/PSF/singleAgentS1" />
+		<param name="outputDirectory" value="./test/output/playground/wrashid/PSF/singleAgent/ScoringTst/testScoring1" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 		<param name= "writeEventsInterval" value="4" />

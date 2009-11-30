@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -12,7 +13,6 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
-import playground.mmoyo.demo.ScenarioDemo;
 import playground.mmoyo.demo.equil.MMoyoEquilnetDemo;
 
 public class EquilIterTest extends MatsimTestCase {
@@ -23,7 +23,7 @@ public class EquilIterTest extends MatsimTestCase {
 		
 		//test\input\playground\mmoyo\EquilIterTest\testEquil\output_plans.xml.gz
 		String inputDirectory = getInputDirectory(); 
-		String outputDirectory = "output/transitEquil2";
+		String outputDirectory = getOutputDirectory() + "transitEquil2";
 		String expectedFile =  inputDirectory + OUT_PLANS_FILE;
 		String outputFile = outputDirectory + "/" + OUT_PLANS_FILE;
 		

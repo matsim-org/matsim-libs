@@ -1,27 +1,31 @@
 package playground.wrashid.PSF.converter.addingParkings;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.testcases.MatsimTestCase;
-
-import playground.wrashid.lib.GeneralLib;
 
 public class AddParkingsToPlansTest extends MatsimTestCase {
 
 	public void testGeneratePlanWithParkingActs(){
-		String basePathOfTestData="test/input/playground/wrashid/PSF/converter/addParkings/";
+		String basePathOfTestData=getPackageInputDirectory();
 		String networkFile = "test/scenarios/berlin/network.xml.gz";
 		
+		ScenarioImpl scenario = new ScenarioImpl();
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
+		new MatsimPopulationReader(scenario).readFile(basePathOfTestData + "plans5.xml");
+		
 		// generate parking facilities
-		GenerateParkingFacilities.generateParkingFacilties(basePathOfTestData + "plans5.xml",networkFile,"output/facilities.xml");
-		
-		
+		GenerateParkingFacilities.generateParkingFacilties(scenario);
+
 		// generate plans with parking
-		AddParkingsToPlans.generatePlanWithParkingActs(basePathOfTestData + "plans5.xml", networkFile, "output/plans.xml","output/facilities.xml");
+		AddParkingsToPlans.generatePlanWithParkingActs(scenario);
 		
-		Population population=GeneralLib.readPopulation("output/plans.xml", networkFile, "output/facilities.xml");
+		Population population = scenario.getPopulation();
 		
 		// check, the population size 
 		assertEquals(3, population.getPersons().size());
@@ -49,7 +53,6 @@ public class AddParkingsToPlansTest extends MatsimTestCase {
 		// check, that the agent with walk legs did not convert them to additional legs with parkings...
 		person=population.getPersons().get(new IdImpl("1"));
 		assertEquals(9, person.getSelectedPlan().getPlanElements().size());
-		
 		
 	} 
 	

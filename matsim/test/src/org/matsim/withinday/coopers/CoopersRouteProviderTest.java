@@ -24,16 +24,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.coopers.routeprovider.CoopersRouteProvider;
 import org.matsim.withinday.routeprovider.AStarLandmarksRouteProvider;
 import org.matsim.withinday.trafficmanagement.EmptyControlInputImpl;
@@ -44,7 +42,7 @@ import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControle
 /**
  * @author dgrether
  */
-public class CoopersRouteProviderTest extends TestCase {
+public class CoopersRouteProviderTest extends MatsimTestCase {
 
 	private static final String networkFile = "./test/input/org/matsim/withinday/network.xml";
 
@@ -57,6 +55,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
+		super.loadConfig(null);
 		this.network = this.loadNetwork(networkFile);
 	}
 
@@ -69,9 +68,7 @@ public class CoopersRouteProviderTest extends TestCase {
 	}
 
 	private NetworkLayer loadNetwork(final String filename) {
-		Gbl.reset();
 		NetworkLayer network = new NetworkLayer();
-		Gbl.createConfig(null);
 		MatsimNetworkReader parser = new MatsimNetworkReader(network);
 		parser.readFile(filename);
 		return network;

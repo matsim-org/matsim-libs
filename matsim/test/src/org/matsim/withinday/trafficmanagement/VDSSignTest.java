@@ -23,18 +23,15 @@ package org.matsim.withinday.trafficmanagement;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.BangBangControler;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControler;
 
@@ -43,7 +40,7 @@ import org.matsim.withinday.trafficmanagement.feedbackcontroler.ConstantControle
  * @author dgrether
  *
  */
-public class VDSSignTest extends TestCase {
+public class VDSSignTest extends MatsimTestCase {
 
 	private static final String networkFile = "./test/input/org/matsim/withinday/network.xml";
 
@@ -55,21 +52,18 @@ public class VDSSignTest extends TestCase {
 	private EmptyControlInputImpl controlInput;
 
 	private int systemTime;
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
+		super.loadConfig(null);
 		this.network = this.loadNetwork(networkFile);
 		SimulationTimer.reset();
 		this.systemTime = (int) SimulationTimer.getTime();
 	}
 
 	private NetworkLayer loadNetwork(final String filename) {
-		Gbl.reset();
 		NetworkLayer network = new NetworkLayer();
-		Gbl.createConfig(null);
 		MatsimNetworkReader parser = new MatsimNetworkReader(network);
 		parser.readFile(filename);
 		return network;

@@ -4,44 +4,40 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 
-import playground.wrashid.lib.GeneralLib;
-
-/*
+/**
  * add parking to plans (leg + activities)
  */
 public class AddParkingsToPlans {
 	
 	/**
-	 * As input this method receives a plan file, without parking acts (and
+	 * As input this method receives a population, without parking acts (and
 	 * related lets) and adds these.
 	 */
-	public static void generatePlanWithParkingActs(String inputPlansFile,
-			String networkFile, String outputPlansFile, String facilitiesFile) {
-		Population inPop = GeneralLib.readPopulation(inputPlansFile,
-				networkFile);
+	public static void generatePlanWithParkingActs(ScenarioImpl scenario) {
 		// modify population and write it out again
-		GeneralLib.writePopulation(addParkings(inPop, facilitiesFile), outputPlansFile);
+		addParkings(scenario);
+//		GeneralLib.writePopulation(scenario.getPopulation(), outputPlansFile);
 	}
 
-	/*
+	/**
 	 * Returns the same population object, but added with parking act/legs. 
 	 * The facility is also added to the existing acts.
 	 */
-	private static Population addParkings(Population population, String facilitiesFile) {
-		ActivityFacilitiesImpl facilities=GeneralLib.readActivityFacilities(facilitiesFile);
+	private static void addParkings(ScenarioImpl scenario) {
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		
-		for (Person person : population.getPersons().values()) {
+		for (Person person : scenario.getPopulation().getPersons().values()) {
 			List<PlanElement> planElements = person.getSelectedPlan()
 					.getPlanElements();
 			List<PlanElement> newPlanElements = new LinkedList<PlanElement>();
@@ -91,7 +87,6 @@ public class AddParkingsToPlans {
 			planElements.addAll(newPlanElements);
 		}
 
-		return population;
 	}
 
 	// the leg for going to parking or back

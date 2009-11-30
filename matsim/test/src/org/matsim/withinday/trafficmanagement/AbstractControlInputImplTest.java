@@ -23,7 +23,6 @@ package org.matsim.withinday.trafficmanagement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -36,13 +35,8 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class AbstractControlInputImplTest extends MatsimTestCase {
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		Gbl.createConfig(null);
-	}
-
 	public void testAbstractControlInputImpl() {
+		super.loadConfig(null);
 		NetworkLayer network = new NetworkLayer();
 		MatsimNetworkReader parser = new MatsimNetworkReader(network);
 		parser.readFile(getInputDirectory() + "network.xml");

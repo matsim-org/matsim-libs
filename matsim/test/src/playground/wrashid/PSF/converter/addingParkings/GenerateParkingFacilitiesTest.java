@@ -1,24 +1,28 @@
 package playground.wrashid.PSF.converter.addingParkings;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.testcases.MatsimTestCase;
-
-import playground.wrashid.lib.GeneralLib;
 
 public class GenerateParkingFacilitiesTest extends MatsimTestCase {
 
-	/*
+	/**
 	 * test, that the number of created facilities corresponds to what is expected.
 	 */
 	public void testGenerateParkingFacilities(){
 		
-		String inputPlansFile = "test/input/playground/wrashid/PSF/converter/addParkings/plans2.xml";
+		String inputPlansFile = getPackageInputDirectory() + "plans2.xml";
 		String networkFile = "test/scenarios/berlin/network.xml.gz";
-		String outputFacilitiesFile = "output/facilities2.xml";
 
-		GenerateParkingFacilities.generateParkingFacilties(inputPlansFile,networkFile,outputFacilitiesFile);
+		ScenarioImpl scenario = new ScenarioImpl();
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
+		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
 		
-		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(outputFacilitiesFile);
+		GenerateParkingFacilities.generateParkingFacilties(scenario);
+		
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		
 		assertEquals(4, facilities.getFacilities().size());
 	}

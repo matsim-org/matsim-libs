@@ -1,5 +1,9 @@
 package playground.wrashid.PSF.converter.scenario;
 
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
+
 import playground.wrashid.PSF.converter.addingParkings.AddParkingsToPlans;
 import playground.wrashid.PSF.converter.addingParkings.GenerateParkingFacilities;
 
@@ -13,15 +17,20 @@ public class Berlin {
 		String basePathOfData="test/scenarios/berlin/";
 		String networkFile = basePathOfData+  "network.xml.gz";
 		
+		ScenarioImpl scenario = new ScenarioImpl();
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
+		new MatsimPopulationReader(scenario).readFile(basePathOfData + "plans_hwh_1pct.xml.gz");
+
 		// generate parking facilities
-		GenerateParkingFacilities.generateParkingFacilties(basePathOfData + "plans_hwh_1pct.xml.gz", networkFile, "output/facilities.xml.gz");		
+		GenerateParkingFacilities.generateParkingFacilties(scenario);		
 		
 		// generate plans with parking
-		AddParkingsToPlans.generatePlanWithParkingActs(basePathOfData + "plans_hwh_1pct.xml.gz", networkFile, "output/plans.xml.gz", "output/facilities.xml.gz");
+		AddParkingsToPlans.generatePlanWithParkingActs(scenario);
 		
 		// start simulation run
 		//String configFilePath="test/input/playground/wrashid/PSF/converter/addParkings/config4.xml";
-		//new GeneralTestOptimizedCharger(configFilePath).optimizedChargerTest();
+		//Controler controler = new Controler(scenario);
+		//new GeneralTestOptimizedCharger(controler).optimizedChargerTest();
 	}
 	
 }

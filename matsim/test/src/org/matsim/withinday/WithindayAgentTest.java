@@ -68,8 +68,8 @@ public class WithindayAgentTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
+		super.loadConfig(null);
 		this.network = new NetworkLayer();
-		Gbl.createConfig(null);
 		MatsimNetworkReader parser = new MatsimNetworkReader(this.network);
 		parser.readFile(networkFile);
 		this.createRoutes();
