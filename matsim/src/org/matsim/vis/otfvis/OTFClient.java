@@ -37,16 +37,10 @@ import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFQueryControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
-import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
-import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
@@ -66,29 +60,11 @@ public class OTFClient extends Thread {
 		if (isMac) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 		}
-		/*
-		 * If I got it right: The next four entries to the connection manager are really needed to 
-		 * get otfvis running with the current matsim version. The other entries added
-		 * below are needed in terms of backward compatibility to older versions only. (dg, nov 09)
-		 */
+
 		connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		/*
-		 * Only needed for backward compatibility, see comment above (dg, nov 09)
-		 */
-		connect.add(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
-		connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-		connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-		connect.add(OTFLinkAgentsHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		connect.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
-		connect.add(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
-		connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
-		connect.add(OTFAgentsListHandler.class,  AgentPointDrawer.class);
 	}
 
 	public OTFClient(String filename2, OTFConnectionManager connect) {

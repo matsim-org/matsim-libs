@@ -76,7 +76,18 @@ public class OTFClientFile extends Thread {
 	public OTFClientFile( String filename) {
 		super();
 		this.filename = filename;
+		/*
+		 * If I got it right: The next four entries to the connection manager are really needed to 
+		 * get otfvis running with the current matsim version. The other entries added
+		 * below are needed in terms of backward compatibility to older versions only. (dg, nov 09)
+		 */
 
+		this.connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		/*
+		 * Only needed for backward compatibility, see comment above (dg, nov 09)
+		 */
 		this.connect.add(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
 		this.connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
@@ -84,9 +95,6 @@ public class OTFClientFile extends Thread {
 		this.connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		this.connect.add(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
 		this.connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
-		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		this.connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
-		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
 		splitLayout = false;
 	}
 
