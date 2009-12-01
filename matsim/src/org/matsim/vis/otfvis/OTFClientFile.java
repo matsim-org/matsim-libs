@@ -157,12 +157,7 @@ public class OTFClientFile extends Thread {
 		System.setProperty("javax.net.ssl.trustStore", "input/truststore");
 		System.setProperty("javax.net.ssl.trustStorePassword", "vspVSP");
 		
-		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
-		if (isMac) {
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-		}
-
-		OTFFrame frame = new OTFFrame("MATSim OTFVis", isMac);
+		OTFFrame frame = new OTFFrame("MATSim OTFVis");
 		this.pane = frame.getSplitPane();
 
 		if (Gbl.getConfig() == null) {

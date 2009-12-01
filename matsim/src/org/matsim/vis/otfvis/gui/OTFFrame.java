@@ -41,15 +41,13 @@ public class OTFFrame extends JFrame {
 
 	private JSplitPane pane;
 
-	public OTFFrame(String title, boolean isMac) {
+	public OTFFrame(String title) {
 		super(title);
-		if (isMac) {
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-		}
-		
 		this.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ); 		
 		JFrame.setDefaultLookAndFeelDecorated(true);
+		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
 		if (isMac){
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
 			this.getRootPane().putClientProperty("apple.awt.brushMetalLook", Boolean.TRUE);
 		}
 		JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);

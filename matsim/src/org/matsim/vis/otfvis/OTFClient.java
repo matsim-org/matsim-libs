@@ -51,17 +51,10 @@ public class OTFClient extends Thread {
 
 	private OTFConnectionManager connect = new OTFConnectionManager();
 
-	private final boolean isMac;
-
 	public static OTFHostControlBar hostControl2;
 
 	public OTFClient(String url) {
 		this.url = url;
-
-		isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
-//		if (isMac) {
-//			System.setProperty("apple.laf.useScreenMenuBar", "true");
-//		}
 		connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
@@ -77,7 +70,7 @@ public class OTFClient extends Thread {
 	public void run() {
 		String id1 = "test1";
 		OTFVisConfig visconf = Gbl.getConfig().otfVis();
-		OTFFrame frame = new OTFFrame("MATSIM OTFVis", isMac);
+		OTFFrame frame = new OTFFrame("MATSIM OTFVis");
 		JSplitPane pane = frame.getSplitPane();
 		try {
 

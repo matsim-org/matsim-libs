@@ -86,7 +86,7 @@ public class OnTheFlyClientQuadSwing{
 		OTFHostControlBar hostControl;
 		try {
 			hostControl = new OTFHostControlBar(arg0);
-			OTFFrame frame = new OTFFrame("MATSIM OTFVis", false);
+			OTFFrame frame = new OTFFrame("MATSIM OTFVis");
 
 			frame.getContentPane().add(hostControl, BorderLayout.NORTH);
 			JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);

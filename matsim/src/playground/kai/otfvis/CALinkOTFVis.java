@@ -541,8 +541,7 @@ public class CALinkOTFVis extends Thread {
 		MyControlBar hostControl;
 		try {
 			hostControl = new MyControlBar("");
-			boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
-			OTFFrame frame = new OTFFrame("MATSim OTFVis", isMac);
+			OTFFrame frame = new OTFFrame("MATSim OTFVis");
 			hostControl.frame = frame;
 
 			frame.getContentPane().add(hostControl, BorderLayout.NORTH);
