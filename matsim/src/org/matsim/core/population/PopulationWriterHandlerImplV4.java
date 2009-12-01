@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -211,36 +210,6 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 
 	public void endSecondaryLocation(final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t</location>\n");
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// <capacity ... />
-	//////////////////////////////////////////////////////////////////////
-
-	public void startCapacity(final ActivityOptionImpl activtiy, final BufferedWriter out) throws IOException {
-		if (activtiy.getCapacity() != Integer.MAX_VALUE) {
-			out.write("\t\t\t\t\t<capacity");
-			out.write(" value=\"" + activtiy.getCapacity() + "\"");
-			out.write(" />\n");
-		}
-	}
-
-	public void endCapacity(final BufferedWriter out) throws IOException {
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// <opentime ... />
-	//////////////////////////////////////////////////////////////////////
-
-	public void startOpentime(final OpeningTimeImpl opentime, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t\t\t<opentime");
-		out.write(" day=\"" + opentime.getDay() + "\"");
-		out.write(" start_time=\"" + Time.writeTime(opentime.getStartTime()) + "\"");
-		out.write(" end_time=\"" + Time.writeTime(opentime.getEndTime()) + "\"");
-		out.write(" />\n");
-	}
-
-	public void endOpentime(final BufferedWriter out) throws IOException {
 	}
 
 	//////////////////////////////////////////////////////////////////////

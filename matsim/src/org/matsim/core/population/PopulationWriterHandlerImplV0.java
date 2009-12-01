@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -142,26 +141,6 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	}
 
 	public void endSecondaryLocation(final BufferedWriter out) throws IOException {
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// <capacity ... />
-	//////////////////////////////////////////////////////////////////////
-
-	public void startCapacity(final ActivityOptionImpl activtiy, final BufferedWriter out) throws IOException {
-	}
-
-	public void endCapacity(final BufferedWriter out) throws IOException {
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// <opentime ... />
-	//////////////////////////////////////////////////////////////////////
-
-	public void startOpentime(final OpeningTimeImpl opentime, final BufferedWriter out) throws IOException {
-	}
-
-	public void endOpentime(final BufferedWriter out) throws IOException {
 	}
 
 	//////////////////////////////////////////////////////////////////////

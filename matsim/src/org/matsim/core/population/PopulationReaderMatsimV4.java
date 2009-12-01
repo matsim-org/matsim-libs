@@ -141,15 +141,15 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		} else if (KNOWLEDGE.equals(name)) {
 			startKnowledge(atts);
 		} else if (ACTIVITYSPACE.equals(name)) {
-			log.error(ACTIVITYSPACE + " is no longer supported! The data will not be read in.");
+			log.warn("<activityspace> will be ignored.");
 		} else if (ACTIVITY.equals(name)) {
 			startActivityFacility(atts);
 		} else if (LOCATION.equals(name)) {
 			startLocation(atts);
 		} else if (CAPACITY.equals(name)) {
-			startCapacity();
+			log.warn("<capacity> will be ignored!");
 		} else if (OPENTIME.equals(name)) {
-			startOpenTime();
+			log.warn("<opentime> will be ignored!");
 		} else if (PLAN.equals(name)) {
 			startPlan(atts);
 		} else if (ACT.equals(name)) {
@@ -274,14 +274,6 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		this.curractivity = this.currfacility.getActivityOptions().get(this.curracttype);
 		if (this.curractivity == null) { Gbl.errorMsg("facility id=" + id + ": Activity of type=" + this.curracttype + " does not exist!"); }
 		this.currknowledge.addActivity(this.curractivity,isPrimary);
-	}
-
-	private void startCapacity() {
-		log.warn("<capcity> will be ignored!");
-	}
-
-	private void startOpenTime() {
-		log.warn("<opentime> will be ignored!");
 	}
 
 	private void startPlan(final Attributes atts) {

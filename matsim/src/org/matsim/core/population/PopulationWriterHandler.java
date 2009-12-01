@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.utils.io.WriterHandler;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.population.Desires;
@@ -108,22 +107,6 @@ public interface PopulationWriterHandler extends WriterHandler {
 	public void startSecondaryLocation(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException;
 
 	public void endSecondaryLocation(final BufferedWriter out) throws IOException;
-
-	//////////////////////////////////////////////////////////////////////
-	// <capacity ... />
-	//////////////////////////////////////////////////////////////////////
-
-	public void startCapacity(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException;
-
-	public void endCapacity(final BufferedWriter out) throws IOException;
-
-	//////////////////////////////////////////////////////////////////////
-	// <opentime ... />
-	//////////////////////////////////////////////////////////////////////
-
-	public void startOpentime(final OpeningTimeImpl opentime, final BufferedWriter out) throws IOException;
-
-	public void endOpentime(final BufferedWriter out) throws IOException;
 
 	//////////////////////////////////////////////////////////////////////
 	// <plan ... > ... </plan>
