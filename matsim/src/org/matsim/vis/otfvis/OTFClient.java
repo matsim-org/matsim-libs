@@ -40,6 +40,7 @@ import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
@@ -55,10 +56,18 @@ public class OTFClient extends Thread {
 
 	public OTFClient(String url) {
 		this.url = url;
+  	// data source to writer
 		connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		//writer -> reader
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
+		//reader -> drawer
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		//drawer -> layer
+		connect.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		
+		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
+		//drawer -> layer
+		connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
 	}
 
 	public OTFClient(String filename2, OTFConnectionManager connect) {
