@@ -41,6 +41,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
@@ -241,7 +242,9 @@ public class OTFQuadFileHandler {
 	}
 
 	public static class Reader implements OTFServerRemote {
-
+		
+		private static final Logger log = Logger.getLogger(OTFQuadFileHandler.Reader.class);
+		
 		private final String fileName;
 
 		public Reader(final String fname) {
@@ -316,9 +319,14 @@ public class OTFQuadFileHandler {
 		}
 
 		private void openAndReadInfo() {
+			this.sourceZipFile = new File(this.fileName);
+			if (!this.sourceZipFile.exists()){
+				String message = "The file: " + this.fileName + " cannot be found!";
+				log.error(message);
+				throw new RuntimeException(message);
+			}
 			// open file
 			try {
-				this.sourceZipFile = new File(this.fileName);
 				// Open Zip file for reading
 				ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
 				ZipEntry infoEntry = zipFile.getEntry("info.bin");
