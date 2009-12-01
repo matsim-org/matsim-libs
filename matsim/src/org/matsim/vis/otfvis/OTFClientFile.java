@@ -81,10 +81,13 @@ public class OTFClientFile extends Thread {
 		 * get otfvis running with the current matsim version. The other entries added
 		 * below are needed in terms of backward compatibility to older versions only. (dg, nov 09)
 		 */
-
-		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
 		this.connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		this.connect.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		this.connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
+		this.connect.add(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
+		this.connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		/*
 		 * Only needed for backward compatibility, see comment above (dg, nov 09)
 		 */
@@ -92,9 +95,7 @@ public class OTFClientFile extends Thread {
 		this.connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-		this.connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		this.connect.add(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
-		this.connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
+		
 		splitLayout = false;
 	}
 
