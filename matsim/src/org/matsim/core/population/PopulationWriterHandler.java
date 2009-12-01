@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.utils.io.WriterHandler;
-import org.matsim.knowledges.ActivitySpace;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.population.Desires;
 
@@ -85,22 +84,6 @@ public interface PopulationWriterHandler extends WriterHandler {
 	public void startKnowledge(final KnowledgeImpl knowledge, final BufferedWriter out) throws IOException;
 
 	public void endKnowledge(final BufferedWriter out) throws IOException;
-
-	//////////////////////////////////////////////////////////////////////
-	// <activityspace ... > ... </activityspace>
-	//////////////////////////////////////////////////////////////////////
-
-	public void startActivitySpace(final ActivitySpace as, final BufferedWriter out) throws IOException;
-
-	public void endActivitySpace(final BufferedWriter out) throws IOException;
-
-	//////////////////////////////////////////////////////////////////////
-	// <param ... />
-	//////////////////////////////////////////////////////////////////////
-
-	public void startParam(final String name, final String value, final BufferedWriter out) throws IOException;
-
-	public void endParam(final BufferedWriter out) throws IOException;
 
 	//////////////////////////////////////////////////////////////////////
 	// <activity ... > ... </activity>

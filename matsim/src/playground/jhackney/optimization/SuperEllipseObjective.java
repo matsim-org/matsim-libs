@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BeanObjective.java
+ * SuperEllipseObjective.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.optimization;
+package playground.jhackney.optimization;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -29,55 +29,59 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.gbl.Gbl;
 
 /**
- * Objective Function based on a Bean Curve. The Bean Curve is defined as
- * <ul><li>cartesian:       x^4+(x^2)*(y^2)+y^4=x*(x^2+y^2)</li>
- *     <li>parametrically:  X = a*cos(t), Y = b*sin(t)</li>
- *     <li>area:            A = 1.058049*a*b</li></ul>
- * In space, a Bean curve is described by the following 5 parameters:
- * <ul><li>x, y: the Coordinates of the center of the bean</li>
+ * Objective Function based on a SuperEllipse. The superellipse is defined as
+ * <ul><li>cartesian:       |x/a|^r + |y/b|^r = 1</li>
+ *     <li>parametrically:  X = a*[(cos(t))^(2/r)], Y = b*[(sin(t))^(2/r)]</li>
+ *     <li>area:            A = {4^(1-1/r)*a*b*(??)*?(1+1/r)}/{(1/2+1/r)}
+ * In space, a superellipse is described by the following 6 parameters:
+ * <ul><li>x, y: the Coordinates of the center of the ellipse</li>
  *     <li>a, b: the length of the two orthogonal axes</li>
+ *     <li>r:exponent</li>
  *     <li>theta: the rotation of the main axis a</li></ul>
- * In our case, we use a 4-dimensional parameter space with the following
- * 4 axes and their ranges:
+ * In our case, we use a 5-dimensional parameter space with the following
+ * 5 axes and their ranges:
  * <ul><li>x : ]-INF .. +INF[</li>
  *     <li>y : ]-INF .. +INF[</li>
- *     <li>theta : ]-pi/2 .. pi/2]</li>
+ *     <li>theta : ]-pi/2 .. +pi/2[</li>
+ *     <li>r:]1..+INF[</li>
  *     <li>ratio : ]0 .. +INF[</li></ul>
- * The effective size of the bean curve is given implicitely by a minimum
- * cover-percentage. The bean curve will be enlarged until it contains at
+ * The effective size of the superellipse is given implicitely by a minimum
+ * cover-percentage. The superellipse will be enlarged until it contains at
  * least the specified percentage of all points.
  */
-public class BeanObjective implements Objective {
+public class SuperEllipseObjective implements Objective {
 
 	//////////////////////////////////////////////////////////////////////
 	// member constants
 	//////////////////////////////////////////////////////////////////////
 
-	public static final String OBJECTIVE_NAME = "bean";
+	public static final String OBJECTIVE_NAME = "superellipse";
 
 	public static final double EPSILON = 100.0;		// TODO, test what value is best for this param
 
-	public static final int DIMENSION = 3;
+	public static final int DIMENSION = 4;
 
 	public static final int X_idx = 0;
 	public static final int Y_idx = 1;
 	public static final int RATIO_idx = 2;
+    public static final int R_idx = 3;
 
 	public static final String X_name = "x";
 	public static final String Y_name = "y";
 
 	public static final String THETA_name = "theta";
+	public static final String R_name = "r";
 	public static final String A_name = "a";
 	public static final String B_name = "b";
 	public static final String COVER_name = "cover";
 
-	private final static Logger log = Logger.getLogger(BeanObjective.class);
+	private final static Logger log = Logger.getLogger(SuperEllipseObjective.class);
 	
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final Collection<Coord> coords;	// list of points which the calculated bean curve region should cover
+	private final Collection<Coord> coords;	// list of points which the calculated superelliptic region should cover
 	private final double minCover;
 
 	private double theta;
@@ -88,7 +92,7 @@ public class BeanObjective implements Objective {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public BeanObjective(Collection<Coord> coords, double minCover, double theta) {
+	public SuperEllipseObjective(Collection<Coord> coords, double minCover, double theta) {
 		this.coords = coords;
 		this.minCover = minCover;
 		this.theta = theta;
@@ -106,19 +110,21 @@ public class BeanObjective implements Objective {
 			return Double.MAX_VALUE;
 		}
 		double a = getBestA(p);
-		return (1.058049*a*a*p.getValue(RATIO_idx)); // area = 1.058049*a*b
+
+		return a * a * p.getValue(RATIO_idx)*Math.sqrt(Math.PI)*(Math.pow(4.0,(1.0-(1/(p.getValue(R_idx)))))*dgamma(1.0+(1/(p.getValue(R_idx))))/dgamma((1.0/2.0)+(1/(p.getValue(R_idx)))));
+
 	}
 
 	/**
-	 * returns the value for the bean curve-parameter a that best fulfills the cover-percentage
+	 * returns the value for the superellipse-parameter a that best fulfills the cover-percentage
 	 * @param p a parameter point for which a is calculated
-	 * @return smallest bean-axis parameter a so that the bean covers at least a predefined percentage of points
+	 * @return smallest superellipse-axis parameter a so that the ellipse covers at least a predefined percentage of points
 	 */
 	private final double getBestA(ParamPoint p) {
 
 		double cover = 0;
 		double addFactor = 1;
-		double a = 1;	// the ''real'' size of a
+		double a = 1;	// the ``real'' size of a
 
 		double bestA = Double.MAX_VALUE; // if we include everything, we sure ...
 		double bestCover = 1.0; // ... get all points
@@ -147,10 +153,40 @@ public class BeanObjective implements Objective {
 		return bestA;
 	}
 
+
+//	This routine calculates the value of Gamma function which is a prerequesite for area of superellipse.
+	double dgamma(double x)
+	{
+	    int k, n;
+	    double w, y;
+	    n = x < 1.5 ? -((int) (2.5 - x)) : (int) (x - 1.5);
+	    w = x - (n + 2);
+	    y = (((((((((((((-1.99542863674e-7 * w + 1.337767384067e-6) * w -
+	        2.591225267689e-6) * w - 1.7545539395205e-5) * w +
+	        1.45596568617526e-4) * w - 3.60837876648255e-4) * w -
+	        8.04329819255744e-4) * w + 0.008023273027855346) * w -
+	        0.017645244547851414) * w - 0.024552490005641278) * w +
+	        0.19109110138763841) * w - 0.233093736421782878) * w -
+	        0.422784335098466784) * w + 0.99999999999999999);
+	    if (n > 0) {
+	        w = x - 1;
+	        for (k = 2; k <= n; k++) {
+	            w *= x - k;
+	        }
+	    } else {
+	        w = 1;
+	        for (k = 0; k > n; k--) {
+	            y *= x - k;
+	        }
+	    }
+//	    System.out.println(w/y);
+	    return w / y;
+	}
+
 	/**
-	 * calculates the percentage of covered points with the bean defined by p and a.
+	 * calculates the percentage of covered points with the ellipse defined by p and a.
 	 *
-	 * @return percentage of the points covered by the bean
+	 * @return percentage of the points covered by the ellipse
 	 */
 	private final double getCover(ParamPoint p, double a) {
 		int cntTotal = 0;
@@ -172,34 +208,17 @@ public class BeanObjective implements Objective {
 
 		double x0 = p.getValue(X_idx);
 		double y0 = p.getValue(Y_idx);
+		double r = p.getValue(R_idx);
 		double b = p.getValue(RATIO_idx) * a;
 
 		double x = coord.getX();
 		double y = coord.getY();
-//		double x1;
-//		double y1;
-		double x_;
-		double y_;
-		double x1_;
-		double y1_;
-//		x1 = (Math.cos( theta)*(x)- Math.sin( theta)*(y))/a;
-//		y1 = (Math.sin( theta)*(x)+ Math.cos( theta)*(y))/b;
-		x1_ = ( Math.cos(this.theta) * (x0) + Math.sin(this.theta) * (y0) ) - a/2.0;
-		y1_ = ( -Math.sin(this.theta) * (x0) + Math.cos(this.theta) * (y0) );
-//		x1 = ( Math.cos(theta) * (x1_) - Math.sin(theta) * (y1_) );
-//		y1 = ( Math.sin(theta) * (x1_) + Math.cos(theta) * (y1_) );
-		x_ = ( Math.cos(this.theta) * (x) + Math.sin(this.theta) * (y) ) - x1_;
-		y_ = ( - Math.sin(this.theta) * (x) + Math.cos(this.theta) * (y) ) - y1_;
 
-//		System.out.println(a + " " + b + " " + x0 + " " + y0 + " " + x + " " + y + " " + p.getValue(RATIO_idx) + " " + x1_ + " " + y1_ + " " + x1 + " " + y1 + " " + x_ + " " + y_);
+		double term1 = (Math.cos(this.theta)*(x-x0) + Math.sin(this.theta)*(y-y0))/a;
+		double term2 = (-Math.sin(this.theta)*(x-x0) + Math.cos(this.theta)*(y-y0))/b;
 
-//		double dist =  b*( Math.sqrt( (x_/a) * ( (1-(x_/a)) + Math.sqrt(1+(2-3*(x_/a))*(x_/a)) ) ) )/(Math.sqrt(2.00));
-//      double dist = Math.pow(x1,4)+ Math.pow(y1,4)+ Math.pow(x1,2)* Math.pow(y1,2)- x * (Math.pow(x1,2)+ Math.pow(y1,2));
-		double dist = Math.pow(y_,4)-Math.pow(y_,2)*b*b*(x_/a)*(1-(x_/a))+Math.pow((x_/a),4)*Math.pow(b,4)-Math.pow(b,4)*Math.pow((x_/a),3);
-//		System.out.println(">>> dist: " + dist + "<<<");
-//		System.out.println(">>> theta: " + theta + "<<<");
-
-		return (dist<= 0.0);
+		double dist = Math.sqrt(Math.pow(Math.abs(term1),r) +Math.pow(Math.abs( term2),r));
+		return (dist<= 1);
 	}
 
 	public final void setInitParamPoint(ParamPoint p, int i) {
@@ -215,7 +234,7 @@ public class BeanObjective implements Objective {
 
 	public final ParamPoint getInitialParamPoint(final int index) {
 		if (index > DIMENSION) {
-			log.warn("Initial paramPoint " + index + " was requested, but we only have 4 Dimensions. Returning Initial paramPoint 0.");
+			log.warn("Initial paramPoint " + index + " was requested, but we only have 4 Dimensions. Returning initial paramPoint 0.");
 			return this.initPPoints[0];
 	  }
 		return this.initPPoints[index];
@@ -225,19 +244,21 @@ public class BeanObjective implements Objective {
 		// do not validate x and y, as they have no real limitation
 //		double theta = p.getValue(THETA_idx);
 		double ratio = p.getValue(RATIO_idx);
+		double r = p.getValue(R_idx);
 		// when the ratio can be anything larger than 0, a and b can switch their meaning.
-		// so the bean can be transformed over to itself by switching the ratio and rotating it by 90 degrees = pi/2
+		// so the ellipse can be transformed over to itself by switching the ratio and rotating it by 90 degrees = pi/2
 		// thus check that ratio > 0 and theta in a range of pi/2
-//		return ( (theta > -(Math.PI)) && (theta <= +(Math.PI))
+//		return ( (theta > -(Math.PI/4)) && (theta <= +(Math.PI/4))
 //				&& (ratio > 0) );
-		return ratio > 0;
+		return ((ratio > 0) && (r >= 0.1) && (r <= 0.9));
 	}
 
 	public final TreeMap<String, Double> getParamMap(ParamPoint p) {
 		TreeMap<String, Double> map = new TreeMap<String, Double>();
 		map.put(X_name, p.getValue(X_idx));
 		map.put(Y_name, p.getValue(Y_idx));
-		map.put(THETA_name, this.theta); // p.getValue(THETA_idx));
+		map.put(THETA_name, this.theta);
+		map.put(R_name,p.getValue(R_idx));
 		double a = getBestA(p);
 		map.put(A_name, a);
 		map.put(B_name, p.getValue(RATIO_idx) * a);
@@ -245,3 +266,5 @@ public class BeanObjective implements Objective {
 		return map;
 	}
 }
+
+

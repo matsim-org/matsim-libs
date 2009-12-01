@@ -29,14 +29,16 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.knowledges.ActivitySpace;
-import org.matsim.knowledges.ActivitySpaceBean;
-import org.matsim.knowledges.ActivitySpaceCassini;
-import org.matsim.knowledges.ActivitySpaceEllipse;
-import org.matsim.knowledges.ActivitySpaceSuperEllipse;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+
+import playground.jhackney.activitySpaces.ActivitySpace;
+import playground.jhackney.activitySpaces.ActivitySpaceBean;
+import playground.jhackney.activitySpaces.ActivitySpaceCassini;
+import playground.jhackney.activitySpaces.ActivitySpaceEllipse;
+import playground.jhackney.activitySpaces.ActivitySpaceSuperEllipse;
+import playground.jhackney.activitySpaces.ActivitySpaces;
 
 public class PersonDrawActivitySpace extends AbstractPersonAlgorithm {
 
@@ -142,9 +144,9 @@ public class PersonDrawActivitySpace extends AbstractPersonAlgorithm {
 				}
 			}
 
-			int nof_as = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivitySpaces().size();
+			int nof_as = ActivitySpaces.getActivitySpaces(person).size();
 			int cnt = 0;
-			Iterator<ActivitySpace> as_it = this.knowledges.getKnowledgesByPersonId().get(person.getId()).getActivitySpaces().iterator();
+			Iterator<ActivitySpace> as_it = ActivitySpaces.getActivitySpaces(person).iterator();
 			while (as_it.hasNext()) {
 				cnt++;
 				ActivitySpace as = as_it.next();

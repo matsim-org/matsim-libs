@@ -32,16 +32,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.knowledges.ActivitySpace;
-import org.matsim.knowledges.ActivitySpaceBean;
-import org.matsim.knowledges.ActivitySpaceCassini;
-import org.matsim.knowledges.ActivitySpaceEllipse;
-import org.matsim.knowledges.ActivitySpaceSuperEllipse;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.population.Desires;
 
@@ -167,48 +161,6 @@ public class PopulationWriterHandlerImplV4 implements PopulationWriterHandler {
 
 	public void endKnowledge(final BufferedWriter out) throws IOException {
 		out.write("\t\t</knowledge>\n\n");
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// <activityspace ... > ... </activityspace>
-	//////////////////////////////////////////////////////////////////////
-
-	public void startActivitySpace(final ActivitySpace as, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t<activityspace");
-		if (as instanceof ActivitySpaceEllipse) {
-			out.write(" type=\"" + "ellipse" + "\"");
-		} else if (as instanceof ActivitySpaceCassini) {
-			out.write(" type=\"" + "cassini" + "\"");
-
-		}else if (as instanceof ActivitySpaceSuperEllipse) {
-			out.write(" type=\"" + "superellipse" + "\"");
-
-		}else if (as instanceof ActivitySpaceBean) {
-			out.write(" type=\"" + "bean" + "\"");
-
-		} else {
-			Gbl.errorMsg("[something is completely wrong!]");
-		}
-		out.write(" activity_type=\"" + as.getActType() + "\"");
-		out.write(">\n");
-	}
-
-	public void endActivitySpace(final BufferedWriter out) throws IOException {
-		out.write("\t\t\t</activityspace>\n\n");
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// <param ... />
-	//////////////////////////////////////////////////////////////////////
-
-	public void startParam(final String name, final String value, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t\t<param");
-		out.write(" name=\"" + name + "\"");
-		out.write(" value=\"" + value + "\"");
-		out.write(" />\n");
-	}
-
-	public void endParam(final BufferedWriter out) throws IOException {
 	}
 
 	//////////////////////////////////////////////////////////////////////

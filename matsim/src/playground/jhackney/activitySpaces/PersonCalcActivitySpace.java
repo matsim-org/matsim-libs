@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package playground.jhackney.activitySpaces;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,16 +28,18 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.knowledges.ActivitySpace;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.utils.optimization.BeanObjective;
-import org.matsim.utils.optimization.CassiniObjective;
-import org.matsim.utils.optimization.EllipseObjective;
-import org.matsim.utils.optimization.Objective;
-import org.matsim.utils.optimization.ParamPoint;
-import org.matsim.utils.optimization.SimplexOptimization;
-import org.matsim.utils.optimization.SuperEllipseObjective;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+
+import playground.jhackney.optimization.BeanObjective;
+import playground.jhackney.optimization.CassiniObjective;
+import playground.jhackney.optimization.EllipseObjective;
+import playground.jhackney.optimization.Objective;
+import playground.jhackney.optimization.ParamPoint;
+import playground.jhackney.optimization.SimplexOptimization;
+import playground.jhackney.optimization.SuperEllipseObjective;
+
 
 public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 
@@ -348,7 +350,7 @@ public class PersonCalcActivitySpace extends AbstractPersonAlgorithm {
 
 				// Add the results to the data Structure
 				
-				ActivitySpace act_space = know.createActivitySpace(activity_shape,activity_type);
+				ActivitySpace act_space = ActivitySpaces.createActivitySpace(activity_shape,activity_type, person);
 				act_space.addParams(objFunc.getParamMap(best_param_point));
 				
 				Gbl.printElapsedTime();

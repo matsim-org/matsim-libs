@@ -18,30 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package playground.jhackney.activitySpaces;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.knowledges.ActivitySpace;
-import org.matsim.knowledges.ActivitySpaceBean;
-import org.matsim.knowledges.ActivitySpaceCassini;
-import org.matsim.knowledges.ActivitySpaceEllipse;
-import org.matsim.knowledges.ActivitySpaceSuperEllipse;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.utils.optimization.BeanObjective;
-import org.matsim.utils.optimization.CassiniObjective;
-import org.matsim.utils.optimization.EllipseObjective;
-import org.matsim.utils.optimization.SuperEllipseObjective;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+
+import playground.jhackney.optimization.BeanObjective;
+import playground.jhackney.optimization.CassiniObjective;
+import playground.jhackney.optimization.EllipseObjective;
+import playground.jhackney.optimization.SuperEllipseObjective;
+
 
 public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 
@@ -159,7 +157,7 @@ public class PersonWriteActivitySpaceTable extends AbstractPersonAlgorithm {
 
 		try {
 			Id pid = person.getId();
-			ArrayList<ActivitySpace> act_spaces = know.getActivitySpaces();
+			List<ActivitySpace> act_spaces = ActivitySpaces.getActivitySpaces(person);
 			for (int i=0; i<act_spaces.size(); i++) {
 				ActivitySpace as = act_spaces.get(i);
 				String act_type = as.getActType();

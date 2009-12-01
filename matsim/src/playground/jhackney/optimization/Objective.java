@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.optimization;
+package playground.jhackney.optimization;
 
 import java.util.TreeMap;
 

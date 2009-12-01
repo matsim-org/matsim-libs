@@ -48,6 +48,7 @@ import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
+import playground.jhackney.activitySpaces.ActivitySpaces;
 import playground.jhackney.algorithms.InitializeKnowledge;
 import playground.jhackney.kml.EgoNetPlansItersMakeKML;
 import playground.jhackney.socialnetworks.algorithms.CompareTimeWindows;
@@ -365,7 +366,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).initializeActActivityMapRandom(plan);
 				((MentalMap)person.getCustomAttributes().get(MentalMap.NAME)).initializeActActivityMapFromFile(plan,facilities,aar);
 //				Reset activity spaces because they are not read or written correctly
-				k.resetActivitySpaces();
+				ActivitySpaces.resetActivitySpaces(person);
 			}
 		}
 		aar.close();//close the file with the input act-activity map

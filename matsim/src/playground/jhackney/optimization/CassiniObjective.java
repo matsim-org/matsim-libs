@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EllipseObjective.java
+ * CassiniObjective.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.optimization;
+package playground.jhackney.optimization;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -29,33 +29,33 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.gbl.Gbl;
 
 /**
- * Objective Function based on a Ellipse. The ellipse is defined as
- * <ul><li>cartesian:       (x/a)^2 + (y/b)^2 = 1</li>
- *     <li>parametrically:  X = a*cos(t), Y = b*sin(t)</li>
- *     <li>area:            A = pi * a * b</li></ul>
- * In space, an ellipse is described by the following 5 parameters:
- * <ul><li>x, y: the Coordinates of the center of the ellipse</li>
+ * Objective Function based on a Cassini Oval. The Cassini Oval is defined as
+ * <ul><li>cartesian:       [(x-a)^2 + y^2][(x+a)^2 + y^2] = b^4</li>
+ *     <li>polar equation:  (r^4)+(a^4)-2(a^2)*(r^2)*cos(2@) = b^4</li>
+ *     <li>area:            A = 1/2*(r)^2*d@ = a^2+b^2*E[(a^2)/(b^2)]   (where E(x)is the complete elliptic integral of the second kind)</li></ul>
+ * In space, a Cassini Oval is described by the following 5 parameters:
+ * <ul><li>x, y: the Coordinates of the center of the Cassini</li>
  *     <li>a, b: the length of the two orthogonal axes</li>
  *     <li>theta: the rotation of the main axis a</li></ul>
  * In our case, we use a 4-dimensional parameter space with the following
  * 4 axes and their ranges:
  * <ul><li>x : ]-INF .. +INF[</li>
  *     <li>y : ]-INF .. +INF[</li>
- *     <li>theta : ]-pi/4 .. +pi/4]</li>
+ *     <li>theta : ]-pi/2 .. +pi/2]</li>
  *     <li>ratio : ]0 .. +INF[</li></ul>
- * The effective size of the ellipse is given implicitely by a minimum
- * cover-percentage. The ellipse will be enlarged until it contains at
+ * The effective size of the Cassini is given implicitely by a minimum
+ * cover-percentage. The Cassini will be enlarged until it contains at
  * least the specified percentage of all points.
  */
-public class EllipseObjective implements Objective {
+public class CassiniObjective implements Objective {
 
 	//////////////////////////////////////////////////////////////////////
 	// member constants
 	//////////////////////////////////////////////////////////////////////
 
-	public static final String OBJECTIVE_NAME = "ellipse";
+	public static final String OBJECTIVE_NAME = "cassini";
 
-	public static final double EPSILON =100.0;		// TODO, test what value is best for this param
+	public static final double EPSILON = 100.0;		// TODO, test what value is best for this param
 
 	public static final int DIMENSION = 3;
 
@@ -82,13 +82,13 @@ public class EllipseObjective implements Objective {
 
 	private ParamPoint[] initPPoints;
 
-	private final static Logger log = Logger.getLogger(EllipseObjective.class);
+	private final static Logger log = Logger.getLogger(CassiniObjective.class);
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public EllipseObjective(Collection<Coord> coords, double minCover, double theta) {
+	public CassiniObjective(Collection<Coord> coords, double minCover, double theta) {
 		this.coords = coords;
 		this.minCover = minCover;
 		this.theta = theta;
@@ -97,7 +97,7 @@ public class EllipseObjective implements Objective {
 
 	public ParamPoint getNewParamPoint() {
 		ParamPoint p = new ParamPoint(DIMENSION);
-		p.setValue(RATIO_idx, 0.1);
+		p.setValue(RATIO_idx,0.1);
 		return p;
 	}
 
@@ -106,15 +106,34 @@ public class EllipseObjective implements Objective {
 			return Double.MAX_VALUE;
 		}
 		double a = getBestA(p);
-		return Math.PI * a * a * p.getValue(RATIO_idx); // area = pi*a*b = pi*a*b*(a/a) = pi*a*a*(b/a) = pi*a^2*ratio
+		double baratio = p.getValue(RATIO_idx);
+		if(baratio < 1) {
+			throw new RuntimeException("Ratio b/a is smaller than 1");
+		}
+
+		double b = baratio*a;
+		/* Area Integral */
+		double stepSize = (Math.PI/2.0)/25; /* Denominator decides accuracy level */
+		double angle=-1*Math.PI/4.0;
+		double sumArea =0;
+		while(angle < Math.PI/4.0){
+			sumArea +=((rSquare(a, b, angle) + rSquare(a, b, angle + stepSize))*stepSize)/2.0;
+			angle += stepSize;
+		}
+		return sumArea;
+	}
+
+	public static double rSquare(double aa, double bb, double ang)
+	{
+		return aa*aa*(Math.cos(2*ang)+Math.sqrt(Math.pow((bb/aa),4)-Math.pow(Math.sin(2*ang),2)));
 	}
 
 	/**
-	 * returns the value for the ellipse-parameter a that best fulfills the cover-percentage
+	 * returns the value for the cassini oval-parameter a that best fulfills the cover-percentage
 	 * @param p a parameter point for which a is calculated
-	 * @return smallest ellipse-axis parameter a so that the ellipse covers at least a predefined percentage of points
+	 * @return smallest cassini oval-axis parameter a so that the cassini oval covers at least a predefined percentage of points
 	 */
-	public final double getBestA(ParamPoint p) {
+	private final double getBestA(ParamPoint p) {
 
 		double cover = 0;
 		double addFactor = 1;
@@ -148,9 +167,9 @@ public class EllipseObjective implements Objective {
 	}
 
 	/**
-	 * calculates the percentage of covered points with the ellipse defined by p and a.
+	 * calculates the percentage of covered points with the Cassini Oval defined by p and a.
 	 *
-	 * @return percentage of the points covered by the ellipse
+	 * @return percentage of the points covered by the Cassini Oval
 	 */
 	private final double getCover(ParamPoint p, double a) {
 		int cntTotal = 0;
@@ -163,7 +182,7 @@ public class EllipseObjective implements Objective {
 				cntInside++;
 			}
 		}
-		if (cntTotal == 0) return 1;
+		if (cntTotal == 0) return 0;
 		return (1.0 * cntInside / (1.0 * cntTotal));
 	}
 
@@ -177,13 +196,28 @@ public class EllipseObjective implements Objective {
 		double x = coord.getX();
 		double y = coord.getY();
 
-		double term1 = (Math.cos(this.theta)*(x-x0) + Math.sin(this.theta)*(y-y0))/a;
-		double term2 = (-Math.sin(this.theta)*(x-x0) + Math.cos(this.theta)*(y-y0))/b;
+		double x1_ = (Math.cos(this.theta)*(x0)+Math.sin(this.theta)*(y0))-a;
+		double y1_ = (-Math.sin(this.theta)*(x0)+Math.cos(this.theta)*(y0));
+		double x2_ = (Math.cos(this.theta)*(x0)+Math.sin(this.theta)*(y0))+a;
+		double y2_ = (-Math.sin(this.theta)*(x0)+Math.cos(this.theta)*(y0));
+		double x1 = (Math.cos(this.theta)*(x1_)-Math.sin(this.theta)*(y1_));
+		double y1 = (Math.sin(this.theta)*(x1_)+Math.cos(this.theta)*(y1_));
+		double x2 = (Math.cos(this.theta)*(x2_)-Math.sin(this.theta)*(y2_));
+		double y2 = (Math.sin(this.theta)*(x2_)+Math.cos(this.theta)*(y2_));
 
-		double dist = term1*term1 + term2*term2; // Math.sqrt(term1*term1 + term2*term2)
+		double term1 = ((x-x1)*(x-x1));
+		double term2 = ((y-y1)*(y-y1));
+		double term3 = ((x-x2)*(x-x2));
+		double term4 = ((y-y2)*(y-y2));
+		double term5 =(term1+term2);
+		double term6 =(term3+term4);
+		double dist  =(term5*term6);
+//		double dist1 = Math.sqrt( Math.pow((x - x1),2.00) + Math.pow ((y - y1), 2.00 ) );
+//		double dist2 = Math.sqrt( Math.pow((x - x2),2.00) + Math.pow ((y - y2), 2.00 ) );
+//		double dist = dist1 * dist2;
 		// we do not sqrt() that expression, as it would not change anything on the comparison to 1
 
-		return (dist <= 1);
+		return (dist <=(Math.pow(b,4)));
 	}
 
 	public final void setInitParamPoint(ParamPoint p, int i) {
@@ -202,19 +236,20 @@ public class EllipseObjective implements Objective {
 			log.warn("Initial paramPoint " + index + " was requested, but we only have 4 Dimensions. Returning initial paramPoint 0.");
 			return this.initPPoints[0];
 		}
+
 		return this.initPPoints[index];
 	}
 
 	public final boolean isValidParamPoint(ParamPoint p) {
 		// do not validate x and y, as they have no real limitation
-//		double theta = p.getValue(THETA_idx);
+		//		double theta = p.getValue(THETA_idx);
 		double ratio = p.getValue(RATIO_idx);
 		// when the ratio can be anything larger than 0, a and b can switch their meaning.
-		// so the ellipse can be transformed over to itself by switching the ratio and rotating it by 90 degrees = pi/2
-		// thus check that ratio > 0 and theta in a range of pi/2
-//		return ( (theta > -(Math.PI/4)) && (theta <= +(Math.PI/4))
-//				&& (ratio > 0) );
-		return ratio > 0;
+		// so the Cassini can be transformed over to itself by switching the ratio and rotating it by 90 degrees = pi/2
+		// thus check that ratio > 1 and theta in a range of pi/2
+		//		return ( (theta > -(Math.PI/4)) && (theta <= +(Math.PI/4))
+		//				&& (ratio > 1) );
+		return ratio > 1;
 	}
 
 	public final TreeMap<String, Double> getParamMap(ParamPoint p) {

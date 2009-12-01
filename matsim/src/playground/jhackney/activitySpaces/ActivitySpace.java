@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.knowledges;
+package playground.jhackney.activitySpaces;
 
 import java.util.Iterator;
 import java.util.Map;

@@ -36,7 +36,6 @@ import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.knowledges.ActivitySpace;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.population.Desires;
 
@@ -117,26 +116,6 @@ public class PopulationWriterHandlerImplV0 implements PopulationWriterHandler {
 	}
 
 	public void endKnowledge(final BufferedWriter out) throws IOException {
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// <activityspace ... > ... </activityspace>
-	//////////////////////////////////////////////////////////////////////
-
-	public void startActivitySpace(final ActivitySpace as, final BufferedWriter out) throws IOException {
-	}
-
-	public void endActivitySpace(final BufferedWriter out) throws IOException {
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// <param ... />
-	//////////////////////////////////////////////////////////////////////
-
-	public void startParam(final String name, final String value, final BufferedWriter out) throws IOException {
-	}
-
-	public void endParam(final BufferedWriter out) throws IOException {
 	}
 
 	//////////////////////////////////////////////////////////////////////

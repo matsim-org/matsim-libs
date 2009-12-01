@@ -36,7 +36,6 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.knowledges.ActivitySpace;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.Desires;
@@ -161,26 +160,6 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimFileWrite
 				if ((this.knowledges != null) && (this.knowledges.getKnowledgesByPersonId().get(p.getId()) != null)) {
 					KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(p.getId());
 					this.handler.startKnowledge(k, this.writer);
-					// activity spaces
-					if (k.getActivitySpaces() != null) {
-						Iterator<ActivitySpace> as_it = k.getActivitySpaces().iterator();
-						while (as_it.hasNext()) {
-							ActivitySpace as = as_it.next();
-							if (!as.isComplete()) {
-								Gbl.errorMsg("[person_id="+p.getId()+" holds an incomplete act-space.]");
-							}
-							this.handler.startActivitySpace(as, this.writer);
-							// params
-							Iterator<String> name_it = as.getParams().keySet().iterator();
-							while (name_it.hasNext()) {
-								String name = name_it.next();
-								Double val = as.getParams().get(name);
-								this.handler.startParam(name, val.toString(), this.writer);
-								this.handler.endParam(this.writer);
-							}
-							this.handler.endActivitySpace(this.writer);
-						}
-					}
 					// activities
 					Iterator<String> at_it = k.getActivityTypes().iterator();
 					while (at_it.hasNext()) {

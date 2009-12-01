@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivitySpaceSuperEllipse.java
+ * ActivitySpaceBean.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,11 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.knowledges;
+package playground.jhackney.activitySpaces;
 
 import org.matsim.core.gbl.Gbl;
 
-public class ActivitySpaceSuperEllipse extends ActivitySpace {
+public class ActivitySpaceBean extends ActivitySpace {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -32,14 +32,13 @@ public class ActivitySpaceSuperEllipse extends ActivitySpace {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public ActivitySpaceSuperEllipse(final String act_type) {
+	public ActivitySpaceBean(final String act_type) {
 		this.act_type = act_type;
 		this.params.put("x", null); // pre-defined params
 		this.params.put("y", null);
 		this.params.put("theta", null);
 		this.params.put("a", null);
 		this.params.put("b", null);
-		this.params.put("r", null);
 		this.params.put("cover", null);
 	}
 
@@ -54,8 +53,8 @@ public class ActivitySpaceSuperEllipse extends ActivitySpace {
 			Gbl.errorMsg("[name="+name+" is not allowed]");
 		}
 		if (name.equals("theta")) {
-			if ((v <= -Math.PI/4.0) || (v > Math.PI/4.0)) {
-				Gbl.errorMsg("[name="+name+",value="+value+" is not element of ]-pi,pi].]");
+			if ((v <= -Math.PI/2.0) || (v > Math.PI/2.0)) {
+				Gbl.errorMsg("[name="+name+",value="+v+" is not element of ]-pi,pi].]");
 			}
 		}
 		if (name.equals("cover")) {

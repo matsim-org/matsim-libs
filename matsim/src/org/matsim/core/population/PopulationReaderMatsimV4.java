@@ -46,7 +46,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.knowledges.ActivitySpace;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
@@ -69,7 +68,6 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private final static String ACTDUR = "actDur";
 	private final static String KNOWLEDGE = "knowledge";
 	private final static String ACTIVITYSPACE = "activityspace";
-	private final static String PARAM = "param";
 	private final static String ACTIVITY = "activity";
 	private final static String LOCATION = "location";
 	private final static String CAPACITY = "capacity";
@@ -87,7 +85,6 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private PersonImpl currperson = null;
 	private Desires currdesires = null;
 	private KnowledgeImpl currknowledge = null;
-	private ActivitySpace curractspace = null;
 	private String curracttype = null;
 	private ActivityFacility currfacility = null;
 	private ActivityOptionImpl curractivity = null;
@@ -144,10 +141,7 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		} else if (KNOWLEDGE.equals(name)) {
 			startKnowledge(atts);
 		} else if (ACTIVITYSPACE.equals(name)) {
-			startActivitySpace(atts);
-			this.curractspace = this.currknowledge.createActivitySpace(atts.getValue("type"), atts.getValue("activity_type"));
-		} else if (PARAM.equals(name)) {
-			startParam(atts);
+			log.error(ACTIVITYSPACE + " is no longer supported! The data will not be read in.");
 		} else if (ACTIVITY.equals(name)) {
 			startActivityFacility(atts);
 		} else if (LOCATION.equals(name)) {
@@ -183,11 +177,6 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 		} else if (KNOWLEDGE.equals(name)) {
 
 				this.currknowledge = null;
-		} else if (ACTIVITYSPACE.equals(name)) {
-			if (!this.curractspace.isComplete()) {
-				Gbl.errorMsg("[person_id="+this.currperson.getId()+" holds an incomplete act-space!]");
-			}
-			this.curractspace = null;
 		} else if (ACTIVITY.equals(name)) {
 			this.curracttype = null;
 		} else if (LOCATION.equals(name)) {
@@ -259,14 +248,6 @@ public class PopulationReaderMatsimV4 extends MatsimXmlParser implements Populat
 	private void startKnowledge(final Attributes atts) {
 		this.currknowledge = this.knowledges.getFactory().createKnowledge(this.currperson.getId(), atts.getValue("desc"));
 		this.knowledges.getKnowledgesByPersonId().put(this.currperson.getId(), this.currknowledge);
-	}
-
-	private void startActivitySpace(final Attributes atts) {
-		this.curractspace = this.currknowledge.createActivitySpace(atts.getValue("type"), atts.getValue("activity_type"));
-	}
-
-	private void startParam(final Attributes atts) {
-		this.curractspace.addParam(atts.getValue("name"), atts.getValue("value"));
 	}
 
 	private void startActivityFacility(final Attributes atts) {

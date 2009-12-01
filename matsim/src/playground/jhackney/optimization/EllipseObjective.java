@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SuperEllipseObjective.java
+ * EllipseObjective.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.optimization;
+package playground.jhackney.optimization;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -29,70 +29,66 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.gbl.Gbl;
 
 /**
- * Objective Function based on a SuperEllipse. The superellipse is defined as
- * <ul><li>cartesian:       |x/a|^r + |y/b|^r = 1</li>
- *     <li>parametrically:  X = a*[(cos(t))^(2/r)], Y = b*[(sin(t))^(2/r)]</li>
- *     <li>area:            A = {4^(1-1/r)*a*b*(??)*?(1+1/r)}/{(1/2+1/r)}
- * In space, a superellipse is described by the following 6 parameters:
+ * Objective Function based on a Ellipse. The ellipse is defined as
+ * <ul><li>cartesian:       (x/a)^2 + (y/b)^2 = 1</li>
+ *     <li>parametrically:  X = a*cos(t), Y = b*sin(t)</li>
+ *     <li>area:            A = pi * a * b</li></ul>
+ * In space, an ellipse is described by the following 5 parameters:
  * <ul><li>x, y: the Coordinates of the center of the ellipse</li>
  *     <li>a, b: the length of the two orthogonal axes</li>
- *     <li>r:exponent</li>
  *     <li>theta: the rotation of the main axis a</li></ul>
- * In our case, we use a 5-dimensional parameter space with the following
- * 5 axes and their ranges:
+ * In our case, we use a 4-dimensional parameter space with the following
+ * 4 axes and their ranges:
  * <ul><li>x : ]-INF .. +INF[</li>
  *     <li>y : ]-INF .. +INF[</li>
- *     <li>theta : ]-pi/2 .. +pi/2[</li>
- *     <li>r:]1..+INF[</li>
+ *     <li>theta : ]-pi/4 .. +pi/4]</li>
  *     <li>ratio : ]0 .. +INF[</li></ul>
- * The effective size of the superellipse is given implicitely by a minimum
- * cover-percentage. The superellipse will be enlarged until it contains at
+ * The effective size of the ellipse is given implicitely by a minimum
+ * cover-percentage. The ellipse will be enlarged until it contains at
  * least the specified percentage of all points.
  */
-public class SuperEllipseObjective implements Objective {
+public class EllipseObjective implements Objective {
 
 	//////////////////////////////////////////////////////////////////////
 	// member constants
 	//////////////////////////////////////////////////////////////////////
 
-	public static final String OBJECTIVE_NAME = "superellipse";
+	public static final String OBJECTIVE_NAME = "ellipse";
 
-	public static final double EPSILON = 100.0;		// TODO, test what value is best for this param
+	public static final double EPSILON =100.0;		// TODO, test what value is best for this param
 
-	public static final int DIMENSION = 4;
+	public static final int DIMENSION = 3;
 
 	public static final int X_idx = 0;
 	public static final int Y_idx = 1;
 	public static final int RATIO_idx = 2;
-    public static final int R_idx = 3;
 
 	public static final String X_name = "x";
 	public static final String Y_name = "y";
 
 	public static final String THETA_name = "theta";
-	public static final String R_name = "r";
 	public static final String A_name = "a";
 	public static final String B_name = "b";
 	public static final String COVER_name = "cover";
 
-	private final static Logger log = Logger.getLogger(SuperEllipseObjective.class);
-	
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final Collection<Coord> coords;	// list of points which the calculated superelliptic region should cover
-	private final double minCover;
+	private final Collection<Coord> coords;	// list of points which the calculated elliptic region should cover
+	private final double minCover;	//
 
 	private double theta;
 
 	private ParamPoint[] initPPoints;
 
+	private final static Logger log = Logger.getLogger(EllipseObjective.class);
+	
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public SuperEllipseObjective(Collection<Coord> coords, double minCover, double theta) {
+	public EllipseObjective(Collection<Coord> coords, double minCover, double theta) {
 		this.coords = coords;
 		this.minCover = minCover;
 		this.theta = theta;
@@ -110,17 +106,15 @@ public class SuperEllipseObjective implements Objective {
 			return Double.MAX_VALUE;
 		}
 		double a = getBestA(p);
-
-		return a * a * p.getValue(RATIO_idx)*Math.sqrt(Math.PI)*(Math.pow(4.0,(1.0-(1/(p.getValue(R_idx)))))*dgamma(1.0+(1/(p.getValue(R_idx))))/dgamma((1.0/2.0)+(1/(p.getValue(R_idx)))));
-
+		return Math.PI * a * a * p.getValue(RATIO_idx); // area = pi*a*b = pi*a*b*(a/a) = pi*a*a*(b/a) = pi*a^2*ratio
 	}
 
 	/**
-	 * returns the value for the superellipse-parameter a that best fulfills the cover-percentage
+	 * returns the value for the ellipse-parameter a that best fulfills the cover-percentage
 	 * @param p a parameter point for which a is calculated
-	 * @return smallest superellipse-axis parameter a so that the ellipse covers at least a predefined percentage of points
+	 * @return smallest ellipse-axis parameter a so that the ellipse covers at least a predefined percentage of points
 	 */
-	private final double getBestA(ParamPoint p) {
+	public final double getBestA(ParamPoint p) {
 
 		double cover = 0;
 		double addFactor = 1;
@@ -153,36 +147,6 @@ public class SuperEllipseObjective implements Objective {
 		return bestA;
 	}
 
-
-//	This routine calculates the value of Gamma function which is a prerequesite for area of superellipse.
-	double dgamma(double x)
-	{
-	    int k, n;
-	    double w, y;
-	    n = x < 1.5 ? -((int) (2.5 - x)) : (int) (x - 1.5);
-	    w = x - (n + 2);
-	    y = (((((((((((((-1.99542863674e-7 * w + 1.337767384067e-6) * w -
-	        2.591225267689e-6) * w - 1.7545539395205e-5) * w +
-	        1.45596568617526e-4) * w - 3.60837876648255e-4) * w -
-	        8.04329819255744e-4) * w + 0.008023273027855346) * w -
-	        0.017645244547851414) * w - 0.024552490005641278) * w +
-	        0.19109110138763841) * w - 0.233093736421782878) * w -
-	        0.422784335098466784) * w + 0.99999999999999999);
-	    if (n > 0) {
-	        w = x - 1;
-	        for (k = 2; k <= n; k++) {
-	            w *= x - k;
-	        }
-	    } else {
-	        w = 1;
-	        for (k = 0; k > n; k--) {
-	            y *= x - k;
-	        }
-	    }
-//	    System.out.println(w/y);
-	    return w / y;
-	}
-
 	/**
 	 * calculates the percentage of covered points with the ellipse defined by p and a.
 	 *
@@ -199,7 +163,7 @@ public class SuperEllipseObjective implements Objective {
 				cntInside++;
 			}
 		}
-		if (cntTotal == 0) return 0;
+		if (cntTotal == 0) return 1;
 		return (1.0 * cntInside / (1.0 * cntTotal));
 	}
 
@@ -208,7 +172,6 @@ public class SuperEllipseObjective implements Objective {
 
 		double x0 = p.getValue(X_idx);
 		double y0 = p.getValue(Y_idx);
-		double r = p.getValue(R_idx);
 		double b = p.getValue(RATIO_idx) * a;
 
 		double x = coord.getX();
@@ -217,8 +180,10 @@ public class SuperEllipseObjective implements Objective {
 		double term1 = (Math.cos(this.theta)*(x-x0) + Math.sin(this.theta)*(y-y0))/a;
 		double term2 = (-Math.sin(this.theta)*(x-x0) + Math.cos(this.theta)*(y-y0))/b;
 
-		double dist = Math.sqrt(Math.pow(Math.abs(term1),r) +Math.pow(Math.abs( term2),r));
-		return (dist<= 1);
+		double dist = term1*term1 + term2*term2; // Math.sqrt(term1*term1 + term2*term2)
+		// we do not sqrt() that expression, as it would not change anything on the comparison to 1
+
+		return (dist <= 1);
 	}
 
 	public final void setInitParamPoint(ParamPoint p, int i) {
@@ -236,7 +201,7 @@ public class SuperEllipseObjective implements Objective {
 		if (index > DIMENSION) {
 			log.warn("Initial paramPoint " + index + " was requested, but we only have 4 Dimensions. Returning initial paramPoint 0.");
 			return this.initPPoints[0];
-	  }
+		}
 		return this.initPPoints[index];
 	}
 
@@ -244,21 +209,19 @@ public class SuperEllipseObjective implements Objective {
 		// do not validate x and y, as they have no real limitation
 //		double theta = p.getValue(THETA_idx);
 		double ratio = p.getValue(RATIO_idx);
-		double r = p.getValue(R_idx);
 		// when the ratio can be anything larger than 0, a and b can switch their meaning.
 		// so the ellipse can be transformed over to itself by switching the ratio and rotating it by 90 degrees = pi/2
 		// thus check that ratio > 0 and theta in a range of pi/2
 //		return ( (theta > -(Math.PI/4)) && (theta <= +(Math.PI/4))
 //				&& (ratio > 0) );
-		return ((ratio > 0) && (r >= 0.1) && (r <= 0.9));
+		return ratio > 0;
 	}
 
 	public final TreeMap<String, Double> getParamMap(ParamPoint p) {
 		TreeMap<String, Double> map = new TreeMap<String, Double>();
 		map.put(X_name, p.getValue(X_idx));
 		map.put(Y_name, p.getValue(Y_idx));
-		map.put(THETA_name, this.theta);
-		map.put(R_name,p.getValue(R_idx));
+		map.put(THETA_name, this.theta); // p.getValue(THETA_idx));
 		double a = getBestA(p);
 		map.put(A_name, a);
 		map.put(B_name, p.getValue(RATIO_idx) * a);
@@ -266,5 +229,3 @@ public class SuperEllipseObjective implements Objective {
 		return map;
 	}
 }
-
-

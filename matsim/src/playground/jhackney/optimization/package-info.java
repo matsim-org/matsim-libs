@@ -7,4 +7,4 @@
  *   <li>Michael Balmer</li>
  * </ul>
  */
-package org.matsim.utils.optimization;
+package playground.jhackney.optimization;

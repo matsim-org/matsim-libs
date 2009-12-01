@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivitySpaceCassini.java
+ * ActivitySpaceEllipse.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,19 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.knowledges;
+package playground.jhackney.activitySpaces;
 
 import org.matsim.core.gbl.Gbl;
 
-/**
- *
- * @todo hm... that's weird... the cassini has exactly the same description as
- *   the ellipse. the only difference is the function itself and with it, the
- *   area and so on...
- *   so i leave it as it is, because there must be more than what its
- *   implemented and then we need different classes... balmermi
- */
-public class ActivitySpaceCassini extends ActivitySpace {
+public class ActivitySpaceEllipse extends ActivitySpace {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -40,8 +32,8 @@ public class ActivitySpaceCassini extends ActivitySpace {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public ActivitySpaceCassini(final String act_type) {
-		this.act_type = act_type;
+	public ActivitySpaceEllipse(final String act_type) {
+		this.act_type = act_type.intern();
 		this.params.put("x", null); // pre-defined params
 		this.params.put("y", null);
 		this.params.put("theta", null);
@@ -61,8 +53,8 @@ public class ActivitySpaceCassini extends ActivitySpace {
 			Gbl.errorMsg("[name="+name+" is not allowed]");
 		}
 		if (name.equals("theta")) {
-			if ((v <= -Math.PI/2.0) || (v > Math.PI/2.0)) {
-				Gbl.errorMsg("[name="+name+",value="+value+" is not element of ]-pi,pi].]");
+			if ((v <= -Math.PI/4.0) || (v > Math.PI/4.0)) {
+				Gbl.errorMsg("[name="+name+",value="+v+" is not element of ]-pi,pi].]");
 			}
 		}
 		if (name.equals("cover")) {

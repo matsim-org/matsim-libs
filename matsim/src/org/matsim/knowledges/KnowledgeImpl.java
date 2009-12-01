@@ -29,8 +29,6 @@ import java.util.TreeSet;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 
 public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
@@ -47,7 +45,6 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 	 * one time, independent of its {@code isPrimary} flag.
 	 */
 	private Set<KActivity> activities = null;
-	private ArrayList<ActivitySpace> activitySpaces = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -93,26 +90,6 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 	//////////////////////////////////////////////////////////////////////
 	// create methods
 	//////////////////////////////////////////////////////////////////////
-
-	public final ActivitySpace createActivitySpace(final String type, final String act_type) {
-		ActivitySpace asp = null;
-		if (type.equals("ellipse")) {
-			asp = new ActivitySpaceEllipse(act_type);
-		} else if (type.equals("cassini")) {
-			asp = new ActivitySpaceCassini(act_type);
-		}else if (type.equals("superellipse")) {
-			asp = new ActivitySpaceSuperEllipse(act_type);
-		}else if (type.equals("bean")) {
-			asp = new ActivitySpaceBean(act_type);
-		} else {
-			Gbl.errorMsg("[type="+type+" not allowed]");
-		}
-		if (this.activitySpaces == null) {
-			this.activitySpaces = new ArrayList<ActivitySpace>(1);
-		}
-		this.activitySpaces.add(asp);
-		return asp;
-	}
 
 	//////////////////////////////////////////////////////////////////////
 	// add methods
@@ -384,24 +361,24 @@ public class KnowledgeImpl implements Knowledge<ActivityOptionImpl> {
 		return this.desc;
 	}
 
-	/**
-	 * @return List, may be null
-	 */
-	public final ArrayList<ActivitySpace> getActivitySpaces() {
-		return this.activitySpaces;
-	}
+//	/**
+//	 * @return List, may be null
+//	 */
+//	public final ArrayList<ActivitySpace> getActivitySpaces() {
+//		return this.activitySpaces;
+//	}
 
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Sets the activitySpaces to null
-	 */
-	public final void resetActivitySpaces(){
-		this.activitySpaces = null;
-	}
-	
+//	/**
+//	 * Sets the activitySpaces to null
+//	 */
+//	public final void resetActivitySpaces(){
+//		this.activitySpaces = null;
+//	}
+//	
 	/**
 	 * Sets the {@code isPrimary} flag for the given {@link ActivityOptionImpl}
 	 * @param activity the {@link ActivityOptionImpl} to set the flag

@@ -29,12 +29,12 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.population.algorithms.PersonCalcActivitySpace;
-import org.matsim.population.algorithms.PersonWriteActivitySpaceTable;
 import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.Scenario;
+import playground.jhackney.activitySpaces.PersonCalcActivitySpace;
+import playground.jhackney.activitySpaces.PersonWriteActivitySpaceTable;
 import playground.jhackney.socialnetworks.socialnet.SocialNetwork;
 
 public class EgoNetMakeActivitySpaces {

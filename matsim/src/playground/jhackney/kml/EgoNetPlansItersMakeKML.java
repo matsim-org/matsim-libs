@@ -63,13 +63,14 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.knowledges.ActivitySpace;
-import org.matsim.knowledges.ActivitySpaceEllipse;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.population.algorithms.PersonCalcActivitySpace;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 
+import playground.jhackney.activitySpaces.ActivitySpace;
+import playground.jhackney.activitySpaces.ActivitySpaceEllipse;
+import playground.jhackney.activitySpaces.ActivitySpaces;
+import playground.jhackney.activitySpaces.PersonCalcActivitySpace;
 import playground.jhackney.algorithms.PersonCalcEgoSpace;
 import playground.jhackney.socialnetworks.socialnet.EgoNet;
 
@@ -515,8 +516,8 @@ public class EgoNetPlansItersMakeKML {
 
 		// add the points of the activity space to the polygon
 		// if PersonCalcEgoSpace() failed to give an activity space, ...
-		if((knowledges.getKnowledgesByPersonId().get(ego.getId()).getActivitySpaces().size()>1)){
-			ActivitySpace space = knowledges.getKnowledgesByPersonId().get(ego.getId()).getActivitySpaces().get(1);
+		if((ActivitySpaces.getActivitySpaces(ego).size()>1)){
+			ActivitySpace space = ActivitySpaces.getActivitySpaces(ego).get(1);
 			if (space instanceof ActivitySpaceEllipse) {
 
 //				calculate the circumference points (boundary)
@@ -668,13 +669,13 @@ public class EgoNetPlansItersMakeKML {
 		// For the KMZ animations you can overwrite (erase, replace) the activity space
 		// each iteration.
 
-		if(!(knowledges.getKnowledgesByPersonId().get(myPerson.getId()).getActivitySpaces()==null)){
-			knowledges.getKnowledgesByPersonId().get(myPerson.getId()).getActivitySpaces().clear();
+		if(!(ActivitySpaces.getActivitySpaces(myPerson)==null)){
+			ActivitySpaces.getActivitySpaces(myPerson).clear();
 		}
 		new PersonCalcActivitySpace("all", knowledges).run(myPerson);
 //		new PersonDrawActivitySpace().run(myPerson);
 		// add the points of the activity space to the polygon
-		ActivitySpace space = knowledges.getKnowledgesByPersonId().get(myPerson.getId()).getActivitySpaces().get(0);
+		ActivitySpace space = ActivitySpaces.getActivitySpaces(myPerson).get(0);
 
 		if (space instanceof ActivitySpaceEllipse) {
 
