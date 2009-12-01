@@ -12,11 +12,11 @@
 	</module>
 
 	<module name="facilities">
-		<param name="inputFacilitiesFile" value="test/input/playground/wrashid/PSF/converter/addParkings/facilities3.xml" />
+		<param name="inputFacilitiesFile" value="test/input/playground/wrashid/PSF/converter/addingParkings/facilities3.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/input/playground/wrashid/PSF/converter/addParkings/plans3.xml" />
+		<param name="inputPlansFile" value="test/input/playground/wrashid/PSF/converter/addingParkings/plans3.xml" />
 	</module>
 
 	<module name="controler">
