@@ -25,8 +25,6 @@ import java.awt.GraphicsDevice;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-import javax.swing.JFrame;
-import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 
 import org.apache.log4j.Logger;
@@ -34,6 +32,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFQueryControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
@@ -51,8 +50,8 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
-public class OnTheFlyClientQuad extends Thread {
-	private static final Logger log = Logger.getLogger(OnTheFlyClientQuad.class);
+public class OTFClient extends Thread {
+	private static final Logger log = Logger.getLogger(OTFClient.class);
 	
 	private final String url;
 	private OTFConnectionManager connect = new OTFConnectionManager();
@@ -60,7 +59,7 @@ public class OnTheFlyClientQuad extends Thread {
 	protected String id1 = "test1";
 	public static OTFHostControlBar hostControl2;
 	
-	public OnTheFlyClientQuad(String url) {
+	public OTFClient(String url) {
 		this.url = url;
 		
 		isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
@@ -92,7 +91,7 @@ public class OnTheFlyClientQuad extends Thread {
 		connect.add(OTFAgentsListHandler.class,  AgentPointDrawer.class);
 	}
 
-	public OnTheFlyClientQuad(String filename2, OTFConnectionManager connect) {
+	public OTFClient(String filename2, OTFConnectionManager connect) {
 		this(filename2);
 		this.connect = connect;
 	}
@@ -107,12 +106,7 @@ public class OnTheFlyClientQuad extends Thread {
 		
 		OTFVisConfig visconf = Gbl.getConfig().otfVis() ;
 		
-		JFrame frame = new JFrame("MATSIM OTFVis");
-		if (isMac) {
-			frame.getRootPane().putClientProperty("apple.awt.brushMetalLook", Boolean.TRUE);
-		}
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		JFrame.setDefaultLookAndFeelDecorated(true);
+		OTFFrame frame = new OTFFrame("MATSIM OTFVis", isMac);
 		
 		if (fullscreen) {
 			GraphicsDevice gd = frame.getGraphicsConfiguration().getDevice();
@@ -120,14 +114,9 @@ public class OnTheFlyClientQuad extends Thread {
 			gd.setFullScreenWindow(frame);
 		}
 
-		JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		pane.setContinuousLayout(true);
-		pane.setOneTouchExpandable(true);
-		frame.add(pane);
+		JSplitPane pane = frame.getSplitPane();
 
 		try {
-			//Make sure menus appear above JOGL Layer
-			JPopupMenu.setDefaultLightWeightPopupEnabled(false); 
 			
 			OTFHostControlBar hostControl = new OTFHostControlBar(url);
 			hostControl.frame = frame;
@@ -183,7 +172,7 @@ public class OnTheFlyClientQuad extends Thread {
 
 	public static void main(String[] args) {
 		if(args.length==0) {args = new String[] {"rmi:127.0.0.1:4019"};};
-		OnTheFlyClientQuad client = new OnTheFlyClientQuad(args[0]);
+		OTFClient client = new OTFClient(args[0]);
 		client.start();
 	}
 

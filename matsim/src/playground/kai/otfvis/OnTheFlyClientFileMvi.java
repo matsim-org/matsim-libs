@@ -1,6 +1,6 @@
 package playground.kai.otfvis;
 
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
+import org.matsim.vis.otfvis.opengl.OTFClientFile;
 
 public class OnTheFlyClientFileMvi {
 	public static void main(String[] args) {
@@ -19,6 +19,6 @@ public class OnTheFlyClientFileMvi {
 //		 String mviFile = "/home/nagel/eclipse/matsim-trunk/psrc-parcel-output/ITERS/it.100/100.otfvis.mvi" ;
 //		String mviFile = "/home/nagel/eclipse/opus/opus_matsim/runs/25nov08-w-viaduct/ITERS/it.200/200.otfvis.mvi" ;
 
-		new OnTheFlyClientFileQuad(mviFile).run();
+		new OTFClientFile(mviFile).run();
 	}
 }

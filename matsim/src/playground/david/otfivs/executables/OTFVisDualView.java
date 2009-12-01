@@ -16,8 +16,8 @@ import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
+import org.matsim.vis.otfvis.opengl.OTFClientFile;
+import org.matsim.vis.otfvis.opengl.OTFClient;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
@@ -29,7 +29,7 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentArrayDrawer;
 
 
 
-public class OTFVisDualView extends OnTheFlyClientFileQuad{
+public class OTFVisDualView extends OTFClientFile{
 	
 	private static OTFOGLDrawer.FastColorizer colorizerBlue = new OTFOGLDrawer.FastColorizer(
 			new double[] { 0.0, 50.}, new Color[] {	Color.BLUE, Color.YELLOW});
@@ -73,7 +73,7 @@ public class OTFVisDualView extends OnTheFlyClientFileQuad{
 		String localDtdBase = "../matsimJ/dtd/";
 		Gbl.getConfig().global().setLocalDtdBase(localDtdBase);
 		
-		OnTheFlyClientQuad client = new OnTheFlyClientQuad("tveh:"+vehFileName + "@" + netFileName, connect1);
+		OTFClient client = new OTFClient("tveh:"+vehFileName + "@" + netFileName, connect1);
 		client.run();
 	}
 
@@ -163,7 +163,7 @@ public class OTFVisDualView extends OnTheFlyClientFileQuad{
 		
 //		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(10); 
 //		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50));
-		OnTheFlyClientFileQuad client = new OTFVisDualView(filename, null, true);
+		OTFClientFile client = new OTFVisDualView(filename, null, true);
 		
 //		new OnTheFlyClientFilePadang()
 		client.run();

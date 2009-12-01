@@ -18,8 +18,8 @@ import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
+import org.matsim.vis.otfvis.opengl.OTFClientFile;
+import org.matsim.vis.otfvis.opengl.OTFClient;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundFeatureDrawer;
@@ -29,7 +29,7 @@ import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
 
 
-public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
+public class OnTheFlyClientFilePadang extends OTFClientFile{
 	
 	private static final String CVSROOT = "../vsp-cvs";
 	private static final String BG_IMG_ROOT = CVSROOT + "/studies/padang/imagery/sliced/blabla";
@@ -58,7 +58,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		final String localDtdBase = "../matsimJ/dtd/";
 		Gbl.getConfig().global().setLocalDtdBase(localDtdBase);
 		
-		final OnTheFlyClientQuad client = new OnTheFlyClientQuad("tveh:"+vehFileName + "@" + netFileName, connect1);
+		final OTFClient client = new OTFClient("tveh:"+vehFileName + "@" + netFileName, connect1);
 		client.run();
 	}
 
@@ -172,7 +172,7 @@ public class OnTheFlyClientFilePadang extends OnTheFlyClientFileQuad{
 		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(0); 
 		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50));
 		
-		final OnTheFlyClientFileQuad client = new OnTheFlyClientFilePadang(filename, null, false);
+		final OTFClientFile client = new OnTheFlyClientFilePadang(filename, null, false);
 		
 //		new OnTheFlyClientFilePadang()
 		client.run();

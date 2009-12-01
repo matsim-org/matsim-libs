@@ -46,7 +46,7 @@ import javax.swing.event.ChangeListener;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
+import org.matsim.vis.otfvis.opengl.OTFClientFile;
 
 /**
  * The class responsible for drawing the PreferencesDialog.
@@ -307,7 +307,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 		Action exitAction = new AbstractAction("Quit") {
 			public void actionPerformed(ActionEvent e) {
-				OnTheFlyClientFileQuad.endProgram(0);
+				OTFClientFile.endProgram(0);
 			}
 		};
 		fileMenu.add(exitAction);

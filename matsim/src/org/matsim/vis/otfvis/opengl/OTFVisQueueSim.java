@@ -55,12 +55,12 @@ public class OTFVisQueueSim extends QueueSimulation{
 			UUID idOne = UUID.randomUUID();
 			this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.network, this.population, getEvents(), false);
 
-			OnTheFlyClientQuad client = null;
+			OTFClient client = null;
 			if (connectionManager == null) {
-				client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString());
+				client = new OTFClient("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString());
 			}
 			else {
-				client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
+				client = new OTFClient("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
 			}
 			client.start();
 
@@ -120,7 +120,7 @@ public class OTFVisQueueSim extends QueueSimulation{
 	}
 	public void activateVisualizeTeleportedVehicles() {
 		this.doVisualizeTeleportedVehicles = true;
-//TODO dg		this.myOTFServer add stuff
+//TODO dg		this.myOTFServer add stuff && add trac entry
 	}
 
 }

@@ -17,7 +17,7 @@ import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
+import org.matsim.vis.otfvis.opengl.OTFClientFile;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
@@ -37,7 +37,7 @@ import prefuse.visual.VisualItem;
 
 import playground.david.otfvis.prefuse.TreeView.MTree;
 
-public class OTFVisDualView extends OnTheFlyClientFileQuad{
+public class OTFVisDualView extends OTFClientFile{
 	
 	private static final String BG_IMG_ROOT = "../vsp-cvs/studies/padang/imagery/sliced/";
 	protected String url;
@@ -185,7 +185,7 @@ public class OTFVisDualView extends OnTheFlyClientFileQuad{
 		
 //		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setLinkWidth(10); 
 //		((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).setNetworkColor(new Color(50,50,50));
-		OnTheFlyClientFileQuad client = new OTFVisDualView(filename, null, false);
+		OTFClientFile client = new OTFVisDualView(filename, null, false);
 //		new OnTheFlyClientFilePadang()
 		client.run();
 		

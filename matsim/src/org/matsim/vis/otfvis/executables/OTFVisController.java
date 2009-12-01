@@ -26,7 +26,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
+import org.matsim.vis.otfvis.opengl.OTFClient;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 /**
@@ -78,7 +78,7 @@ public class OTFVisController extends Controler {
 		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.queueNetwork, this.population, getEvents(), false);
 		myOTFServer.setControllerStatus(STARTUP);
 		// FOR TESTING ONLY!
-		OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString());
+		OTFClient client = new OTFClient("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString());
 		client.start();
 	}
 

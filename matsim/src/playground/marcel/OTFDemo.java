@@ -29,7 +29,7 @@ import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
+import org.matsim.vis.otfvis.opengl.OTFClient;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
@@ -108,7 +108,7 @@ public class OTFDemo {
 		connect.add(FacilityDrawer.DataReader_v1_0.class, FacilityDrawer.DataDrawer.class);
 		
 //		new OnTheFlyClientQuad("rmi:127.0.0.1:4019:OTFServer_Transit", connect).start();
-		new OnTheFlyClientQuad("rmi:127.0.0.1:4019:" + servername, connect).start();
+		new OTFClient("rmi:127.0.0.1:4019:" + servername, connect).start();
 //		new OnTheFlyClientQuad("rmi:127.0.0.1:4019", connect).start();
 		
 	

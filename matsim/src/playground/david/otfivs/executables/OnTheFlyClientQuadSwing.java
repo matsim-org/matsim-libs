@@ -11,7 +11,7 @@ import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
+import org.matsim.vis.otfvis.opengl.OTFClientFile;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
@@ -21,7 +21,7 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 
 
-public class OnTheFlyClientQuadSwing extends OnTheFlyClientFileQuad{
+public class OnTheFlyClientQuadSwing extends OTFClientFile{
 	public OnTheFlyClientQuadSwing(String filename2, OTFConnectionManager connect, boolean split) {
 		super(filename2, connect, split);
 		// TODO Auto-generated constructor stub
@@ -66,7 +66,7 @@ public class OnTheFlyClientQuadSwing extends OnTheFlyClientFileQuad{
 	
 		//main2(args);
 		
-		OnTheFlyClientFileQuad client = new OnTheFlyClientQuadSwing(filename, null, true);
+		OTFClientFile client = new OnTheFlyClientQuadSwing(filename, null, true);
 		client.run();
 	}
 

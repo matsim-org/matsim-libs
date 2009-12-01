@@ -28,12 +28,12 @@ import org.matsim.vis.otfvis.data.*;
 import org.matsim.vis.otfvis.gui.OTFSlaveHost;
 import org.matsim.vis.otfvis.handler.*;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
+import org.matsim.vis.otfvis.opengl.OTFClientFile;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.layer.*;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
-public class OTFDoubleMVI extends OnTheFlyClientFileQuad {
+public class OTFDoubleMVI extends OTFClientFile {
 	protected String filename2;
 	
 	public OTFDoubleMVI(String filename, String filename2) {

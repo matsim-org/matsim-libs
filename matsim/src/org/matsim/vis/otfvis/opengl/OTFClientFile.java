@@ -33,13 +33,13 @@ import java.rmi.RemoteException;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFQueryControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
@@ -59,28 +59,25 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
-class OTFFrame extends JFrame {
-	   public OTFFrame(String string) {
-		super(string);
-	}
-
-	@Override
-	protected void processWindowEvent(WindowEvent e) {
-
-	        if (e.getID() == WindowEvent.WINDOW_CLOSING) {
-	        	OnTheFlyClientFileQuad.endProgram(0);
-	        } else {
-		        super.processWindowEvent(e);
-	        }
-	    }
-}
-
 /**
  * This file starts OTFVis using a .mvi file.
  * @author dstrippgen
  */
-public class OnTheFlyClientFileQuad extends Thread {
+public class OTFClientFile extends Thread {
+	
 	private OTFQueryControlBar queryControl = null;
+
+	protected OTFHostControlBar hostControl = null;
+
+	protected String filename;
+
+	private boolean splitLayout = true;
+
+	protected JSplitPane pane = null;
+	protected OTFDrawer leftComp = null;
+	protected OTFDrawer rightComp = null;
+
+	protected OTFConnectionManager connect = new OTFConnectionManager();
 
 	
 	public static void endProgram(int code) {
@@ -126,15 +123,11 @@ public class OnTheFlyClientFileQuad extends Thread {
 		System.exit(code);
 	}
 	
-	protected OTFHostControlBar hostControl = null;
-
-	protected String filename;
 	
 	public void setFilename(String filename) {
 		this.filename = filename;
 	}
 
-	private boolean splitLayout = true;
 	public OTFQueryControlBar getQueryControl() {
 		return queryControl;
 	}
@@ -158,14 +151,6 @@ public class OnTheFlyClientFileQuad extends Thread {
 	public OTFDrawer getRightComp() {
 		return rightComp;
 	}
-
-	protected JSplitPane pane = null;
-	protected OTFDrawer leftComp = null;
-	protected OTFDrawer rightComp = null;
-
-	protected OTFConnectionManager connect = new OTFConnectionManager();
-
-	//NetworkLayer network = new NetworkLayer();
 
 
 	public OTFDrawer getLeftDrawerComponent(JFrame frame) throws RemoteException {
@@ -220,22 +205,12 @@ public class OnTheFlyClientFileQuad extends Thread {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 		}
 
-		JFrame frame = new OTFFrame("MATSim OTFVis");
-	    frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ); 
+		OTFFrame frame = new OTFFrame("MATSim OTFVis", isMac);
+		this.pane = frame.getSplitPane();
 
-		if (isMac) {
-			frame.getRootPane().putClientProperty("apple.awt.brushMetalLook", Boolean.TRUE);
+		if (Gbl.getConfig() == null) {
+			Gbl.createConfig(null);
 		}
-		JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		pane.setContinuousLayout(true);
-		pane.setOneTouchExpandable(true);
-		frame.getContentPane().add(pane);
-		this.pane = pane;
-
-		//Make sure menus appear above JOGL Layer
-		JPopupMenu.setDefaultLightWeightPopupEnabled(false); 
-		
-		if (Gbl.getConfig() == null) Gbl.createConfig(null);
 		OTFFileSettingsSaver saver = getFileSaver();
 		
 		OTFVisConfig visconf = (OTFVisConfig) Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
@@ -310,27 +285,8 @@ public class OnTheFlyClientFileQuad extends Thread {
 		hostControl.finishedInitialisition();
 	}
 
-	public static void main( String[] args) {
 
-		String filename;
-
-		if (args.length == 1) {
-			filename = args[0];
-		} else {
-//			filename = "../MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi.gz";
-			filename = "output/OTFQuadfile10p.mvi";
-//			filename = "../../tmp/1000.events.mvi";
-//			filename = "/TU Berlin/workspace/MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi";
-//			filename = "/TU Berlin/workspace/MatsimJ/otfvisSwitzerland10p.mvi";
-			filename = "testCUDA10p.mvi";
-		}
-
-		
-		OnTheFlyClientFileQuad client = new OnTheFlyClientFileQuad(filename);
-		client.run();
-	}
-
-	public OnTheFlyClientFileQuad( String filename) {
+	public OTFClientFile( String filename) {
 		super();
 		this.filename = filename;
 
@@ -347,35 +303,22 @@ public class OnTheFlyClientFileQuad extends Thread {
 		splitLayout = false;
 	}
 
-	public OnTheFlyClientFileQuad( String filename2,  OTFConnectionManager connect) {
+	public OTFClientFile( String filename2,  OTFConnectionManager connect) {
 		this(filename2);
 		this.connect = connect;
 	}
 
-	public OnTheFlyClientFileQuad( String filename2,  OTFConnectionManager connect,  boolean split) {
+	public OTFClientFile( String filename2,  OTFConnectionManager connect,  boolean split) {
 		this(filename2);
 		this.connect = connect;
 		this.splitLayout = split;
 	}
 
 
-	public OnTheFlyClientFileQuad( String filename2,  boolean split) {
+	public OTFClientFile( String filename2,  boolean split) {
 		this(filename2);
 		this.splitLayout = split;
 	}
 
 
-
-//	private static DisplayableNetI prepareNet() {
-//	String fileName = "E:\\Development\\tmp\\studies\\berlin-wip\\network\\wip_net.xml";
-//	NetReaderI netReader = new MatsimNetReader_PLAIN();
-//	NetBuffer buffer = new NetBuffer();
-//	netReader.readNetwork(buffer, fileName);
-
-//	DisplayNet network = new DisplayNet();
-//	NetComposerI netComposer = new TrafficNetComposer();
-//	netComposer.compose(network, buffer);
-//	return network;
-
-//	}
 }

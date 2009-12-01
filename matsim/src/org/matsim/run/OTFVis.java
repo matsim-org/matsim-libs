@@ -41,8 +41,8 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientFileQuad;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
+import org.matsim.vis.otfvis.opengl.OTFClientFile;
+import org.matsim.vis.otfvis.opengl.OTFClient;
 import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
 
 /**
@@ -149,7 +149,7 @@ public class OTFVis {
 	}
 
 	public static final void playMVI(final String[] args) {
-		new OnTheFlyClientFileQuad(args[0]).run();
+		new OTFClientFile(args[0]).run();
 	}
 
 	public static final void playVEH(final String[] args) {
@@ -162,7 +162,7 @@ public class OTFVis {
 		if (args[1].toLowerCase().endsWith(".xml") || args[1].toLowerCase().endsWith(".xml.gz")) {
 			String netFileName = args[1];
 			if (Gbl.getConfig() == null) Gbl.createConfig(null); // is this really required?
-			new OnTheFlyClientQuad("tveh:"+vehFileName + "@" + netFileName).run();
+			new OTFClient("tveh:"+vehFileName + "@" + netFileName).run();
 		}
 	}
 	

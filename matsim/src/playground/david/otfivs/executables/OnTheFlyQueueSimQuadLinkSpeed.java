@@ -20,7 +20,7 @@ import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkTravelTimesHandler;
-import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
+import org.matsim.vis.otfvis.opengl.OTFClient;
 import org.matsim.vis.otfvis.opengl.layer.ColoredStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
@@ -54,7 +54,7 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 		connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		connect.add(OTFAgentsListHandler.class,  AgentPointDrawer.class);
 
-		OnTheFlyClientQuad client = new OnTheFlyClientQuad("rmi:127.0.0.1:4019:AName1", connect);
+		OTFClient client = new OTFClient("rmi:127.0.0.1:4019:AName1", connect);
 		client.start();
 		try {
 			this.myOTFServer.pause();
