@@ -111,7 +111,7 @@ ActivityEndEventHandler
 			Person person = pb.createPerson(id) ;
 			pop.addPerson(person);
 			
-			Plan newPlan = pb.createPlan(person) ; 
+			Plan newPlan = pb.createPlan() ; 
 			person.addPlan(newPlan ) ;
 			
 			// FIXME: This creational method has the side effect of also adding the created Object.  In my view:

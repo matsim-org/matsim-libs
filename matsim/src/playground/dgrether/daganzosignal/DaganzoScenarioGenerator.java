@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -34,7 +35,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -201,7 +201,7 @@ public class DaganzoScenarioGenerator {
 		for (int i = 1; i <= 1000; i++) {
 			PersonImpl p = (PersonImpl) builder.createPerson(scenario.createId(Integer
 					.toString(i)));
-			PlanImpl plan = (PlanImpl) builder.createPlan(p);
+			Plan plan = builder.createPlan();
 			p.addPlan(plan);
 			// home
 			// homeEndTime = homeEndTime + ((i - 1) % 3);

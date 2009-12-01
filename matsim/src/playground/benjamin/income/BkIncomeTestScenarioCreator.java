@@ -81,9 +81,9 @@ public class BkIncomeTestScenarioCreator {
 			Person p = builder.createPerson(scenario.createId(Integer.toString(i)));	
 
 			//adding carPlan to person
-			Plan plan = builder.createPlan(p);
-			plan.setSelected(true);
+			Plan plan = builder.createPlan();
 			p.addPlan(plan);
+			plan.setSelected(true);
 			
 			Activity act1 = builder.createActivityFromLinkId("h", id1);			
 			act1.setEndTime(homeEndTime);
@@ -132,7 +132,7 @@ public class BkIncomeTestScenarioCreator {
 			plan.addActivity(act3);
 			
 			//adding ptPlan to person
-			plan = builder.createPlan(p);
+			plan = builder.createPlan();
 			p.addPlan(plan);
 			//plan.setSelected(true);
 			

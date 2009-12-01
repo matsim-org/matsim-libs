@@ -101,7 +101,7 @@ public class MyControler2 {
 				Person person = pb.createPerson(id); 
 				population.addPerson(person);
 				
-				Plan plan = pb.createPlan(person) ;
+				Plan plan = pb.createPlan() ;
 				person.addPlan(plan) ;
 				
 				plan.setSelected(true) ; // will also work without

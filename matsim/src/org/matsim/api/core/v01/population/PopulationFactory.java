@@ -41,15 +41,7 @@ public interface PopulationFactory extends Serializable, MatsimFactory {
 //	public BasicRoute createRoute(Id startLinkId, Id endLinkId, final List<Id> currentRouteLinkIds);
 	// disabled until everything else is figured out
 	
-	
-	
 	Person createPerson(Id id);
-	/**
-	 * @deprecated use createPlan() instead. the reference to the Person
-	 * is set when calling Person.addPlan(Plan p).
-	 */
-	@Deprecated
-	Plan createPlan(Person person);
 
 	Plan createPlan();
 	

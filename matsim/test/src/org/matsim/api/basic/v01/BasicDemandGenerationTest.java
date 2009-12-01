@@ -102,11 +102,12 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 			pop.addPerson(person);
 			assertEquals(i+1, pop.getPersons().size());
 			//create the plan and add it to the person
-			plan = builder.createPlan(person);
+			plan = builder.createPlan();
 			assertNotNull(plan);
-			assertEquals(plan.getPerson(), person);
+			assertNull(plan.getPerson());
 			assertEquals(0, person.getPlans().size());
 			person.addPlan(plan);
+			assertEquals(plan.getPerson(), person);
 			assertEquals(1, person.getPlans().size());
 			//create the plan elements
 			activity = builder.createActivityFromLinkId("h", ids.get(0));

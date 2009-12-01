@@ -283,7 +283,7 @@ public class GraphBuilder {
 	
 	private Person createPerson(Id id, Coord coord) {
 		Person person = population.getFactory().createPerson(id);
-		Plan plan = population.getFactory().createPlan(person);
+		Plan plan = population.getFactory().createPlan();
 		Activity activity = population.getFactory().createActivityFromCoord("home", coord);
 		plan.addActivity(activity);
 		person.addPlan(plan);
