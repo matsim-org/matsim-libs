@@ -21,7 +21,6 @@
 package org.matsim.vis.otfvis;
 
 import java.awt.BorderLayout;
-import java.awt.GraphicsDevice;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
@@ -45,25 +44,27 @@ import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 public class OTFClient extends Thread {
+
 	private static final Logger log = Logger.getLogger(OTFClient.class);
-	
+
 	private final String url;
+
 	private OTFConnectionManager connect = new OTFConnectionManager();
+
 	private final boolean isMac;
-	protected String id1 = "test1";
+
 	public static OTFHostControlBar hostControl2;
-	
+
 	public OTFClient(String url) {
 		this.url = url;
-		
+
 		isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
 		if (isMac) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 		}
-
 		connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		connect.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
+		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
 	}
 
@@ -71,85 +72,50 @@ public class OTFClient extends Thread {
 		this(filename2);
 		this.connect = connect;
 	}
-	
+
 	@Override
 	public void run() {
-		boolean fullscreen = false;
-
-//		OTFVisConfig visconf = new OTFVisConfig();
-//		if (Gbl.getConfig() == null) Gbl.createConfig(null);
-//		Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, visconf);
-		
-		OTFVisConfig visconf = Gbl.getConfig().otfVis() ;
-		
+		String id1 = "test1";
+		OTFVisConfig visconf = Gbl.getConfig().otfVis();
 		OTFFrame frame = new OTFFrame("MATSIM OTFVis", isMac);
-		
-		if (fullscreen) {
-			GraphicsDevice gd = frame.getGraphicsConfiguration().getDevice();
-			frame.setUndecorated(true);
-			gd.setFullScreenWindow(frame);
-		}
-
 		JSplitPane pane = frame.getSplitPane();
-
 		try {
-			
+
 			OTFHostControlBar hostControl = new OTFHostControlBar(url);
 			hostControl.frame = frame;
 			if (hostControl.isLiveHost()) {
 				visconf.setCachingAllowed(false); // no use to cache in live mode
 			}
 			frame.getContentPane().add(hostControl, BorderLayout.NORTH);
-			String netName= Gbl.getConfig().network().getInputFile();
+			String netName = Gbl.getConfig().network().getInputFile();
 			OTFFileSettingsSaver saver = new OTFFileSettingsSaver(netName);
 			saver.readDefaultSettings();
-			
+
 			PreferencesDialog.buildMenu(frame, visconf, hostControl, saver);
 
 			OTFClientQuad clientQ = hostControl.createNewView(id1, connect);
 
 			OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);
-
-			
 			pane.setLeftComponent(drawer.getComponent());
-
-//			pane.getContentPane().add(drawer.getComponent());
 			pane.validate();
-			if(hostControl.isLiveHost()) {
+			if (hostControl.isLiveHost()) {
 				OTFQueryControlBar queryControl = new OTFQueryControlBar("test", hostControl, visconf);
 				frame.getContentPane().add(queryControl, BorderLayout.SOUTH);
-				((OTFOGLDrawer)drawer).setQueryHandler(queryControl);
+				((OTFOGLDrawer) drawer).setQueryHandler(queryControl);
 			}
-			
-			if (!fullscreen) {
-				// only set custom frame size if not in fullscreen mode
-				frame.setSize(1024, 600);
-			}
-//			hostControl2 = hostControl;
-//			Gbl.startMeasurement();
-//			hostControl2.countto(3600);
-//			Gbl.printElapsedTime();
-			//new Thread(){public void run(){ hostControl2.countto(7200);};}.start();
+			frame.setSize(1024, 600);
 			frame.setVisible(true);
-			drawer.invalidate((int)hostControl.getTime());
+			drawer.invalidate((int) hostControl.getTime());
 			hostControl.addHandler(id1, drawer);
 
 		} catch (RemoteException e) {
-			// TODO DS Handle with grace!
 			e.printStackTrace();
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (NotBoundException e) {
 			e.printStackTrace();
 		}
 
-	}
-
-	public static void main(String[] args) {
-		if(args.length==0) {args = new String[] {"rmi:127.0.0.1:4019"};};
-		OTFClient client = new OTFClient(args[0]);
-		client.start();
 	}
 
 }

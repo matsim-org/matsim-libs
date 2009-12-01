@@ -81,35 +81,21 @@ public class OTFDoubleMVI extends OTFClientFile {
 			hostControl.finishedInitialisition();
 			
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NotBoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	public static void main( String[] args) {
-
-		String filename;
-		String filename2;
-		
+		String filename = null;
+		String filename2 = null;
 		if (args.length == 2) {
 			filename = args[0];
 			filename2 = args[1];
-		} else {
-//			filename = "../MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi.gz";
-			filename2 = "output/testrun301.mvi";
-			filename = "output/testrun301_2.mvi";
-//			filename = "../../tmp/1000.events.mvi";
-//			filename = "/TU Berlin/workspace/MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi";
-//			filename = "/TU Berlin/workspace/MatsimJ/otfvisSwitzerland10p.mvi";
-//			filename = "testCUDA10p.mvi";
-		}
-
+		} 
 		
 		OTFDoubleMVI client = new OTFDoubleMVI(filename, filename2);
 		client.run();

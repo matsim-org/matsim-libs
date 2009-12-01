@@ -82,9 +82,9 @@ public class OTFClientFile extends Thread {
 		 * below are needed in terms of backward compatibility to older versions only. (dg, nov 09)
 		 */
 
+		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
 		this.connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
 		/*
 		 * Only needed for backward compatibility, see comment above (dg, nov 09)
 		 */

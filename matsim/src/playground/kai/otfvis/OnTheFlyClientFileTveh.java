@@ -1,7 +1,7 @@
 package playground.kai.otfvis;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.vis.otfvis.OTFClient;
+import org.matsim.run.OTFVis;
 
 public class OnTheFlyClientFileTveh {
 
@@ -37,8 +37,10 @@ public class OnTheFlyClientFileTveh {
 //		String localDtdBase = "../matsim-trunk/dtd/";
 //		Gbl.getConfig().global().setLocalDtdBase(localDtdBase);
 		
-		OTFClient client = new OTFClient("tveh:"+vehFileName + "@" + netFileName);
-		client.run();
+		String[] a = {vehFileName, netFileName};
+		
+		OTFVis.main(a);
+		
 	}
 
  

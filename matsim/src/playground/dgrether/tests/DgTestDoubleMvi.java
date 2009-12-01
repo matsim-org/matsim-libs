@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFDoubleMVI.java
+ * DgTestDoubleMvi
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.dgrether.tests;
 
-package playground.kai.otfvis;
+import org.matsim.vis.otfvis.OTFDoubleMVI;
+
+import playground.dgrether.DgPaths;
 
 
-public class OTFDoubleMVI {
+/**
+ * @author dgrether
+ *
+ */
+public class DgTestDoubleMvi {
 
-	public static void main( String[] args) {
-
-		String filename;
-		String filename2;
-		
-		if (args.length == 2) {
-			filename = args[0];
-			filename2 = args[1];
-		} else {
-			
-			// use myDoubleOTFVis instead !!!!
-			
-			
-//			filename = "../MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi.gz";
-			filename2 = "output/OTFQuadfile10p.mvi";
-			filename = "testCUDA10p.mvi";
-//			filename = "../../tmp/1000.events.mvi";
-//			filename = "/TU Berlin/workspace/MatsimJ/output/OTFQuadfileNoParking10p_wip.mvi";
-//			filename = "/TU Berlin/workspace/MatsimJ/otfvisSwitzerland10p.mvi";
-//			filename = "testCUDA10p.mvi";
-		}
-
-		String[] a = {filename, filename2};
-		org.matsim.vis.otfvis.OTFDoubleMVI.main(a);
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		String file1 = DgPaths.RUNBASE + "run749/it.100/749.100.Zurich.otfvis.mvi";
+		String file2 = DgPaths.RUNBASE + "run749/it.2000/749.2000.Zurich.otfvis.mvi";
+		String[] a = {file1, file2};
+		OTFDoubleMVI.main(a);
 	}
 
 }
-

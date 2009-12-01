@@ -232,7 +232,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	public OTFClientQuad createNewView(String id, OTFConnectionManager connect) throws RemoteException {
 		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 
-		if(config.getFileVersion() < OTFQuadFileHandler.VERSION || config.getFileMinorVersion() < OTFQuadFileHandler.MINORVERSION) {
+		if((config.getFileVersion() < OTFQuadFileHandler.VERSION) || (config.getFileMinorVersion() < OTFQuadFileHandler.MINORVERSION)) {
 			// go through every reader class and look for the appropriate Reader Version for this fileformat
 			connect.adoptFileFormat(OTFDataReader.getVersionString(config.getFileVersion(), config.getFileMinorVersion()));
 		}
@@ -417,7 +417,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			timeField.setText(OTFVisController.getIteration(controllerStatus) +"#Preparing...#");
 			break;
 		case (OTFVisController.RUNNING + OTFVisController.PAUSED):
-			if(movieTimer != null && !synchronizedPlay) stopMovie();
+			if((movieTimer != null) && !synchronizedPlay) stopMovie();
 		case OTFVisController.RUNNING:
 			timeField.setText(OTFVisController.getIteration(controllerStatus) +"#" +Time.writeTime(simTime));
 			break;
@@ -579,7 +579,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		String newTime = ((JFormattedTextField)event.getSource()).getText();
 		int index = newTime.indexOf("#");
 		String tmOfDay = newTime.substring(index+1);
-		if(index != -1 && controllerStatus != OTFVisController.NOCONTROL) {
+		if((index != -1) && (controllerStatus != OTFVisController.NOCONTROL)) {
 			gotoIter = Integer.parseInt(newTime.substring(0, index));
 		}
 		int newTime_s = (int)Time.parseTime(tmOfDay);
@@ -741,7 +741,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 					sleep(delay);
 					synchronized(blockReading) {
 						if (isActive && synchronizedPlay &&
-							(simTime >= loopEnd || !host.requestNewTime(simTime+1, OTFServerRemote.TimePreference.LATER))) {
+							((simTime >= loopEnd) || !host.requestNewTime(simTime+1, OTFServerRemote.TimePreference.LATER))) {
 								host.requestNewTime(loopStart, OTFServerRemote.TimePreference.LATER);
 						}
 
