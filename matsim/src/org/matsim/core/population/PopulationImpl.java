@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
@@ -105,7 +104,7 @@ public class PopulationImpl implements Population {
 
 			// run algos
 			for (PersonAlgorithm algo : this.personAlgos) {
-				algo.run( (PersonImpl) p);
+				algo.run(p);
 			}
 
 			// remove again as we are streaming
@@ -136,7 +135,7 @@ public class PopulationImpl implements Population {
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// clear methods
+	// algorithms
 	//////////////////////////////////////////////////////////////////////
 
 	public final void clearAlgorithms() {
@@ -146,11 +145,6 @@ public class PopulationImpl implements Population {
 	public boolean removeAlgorithm(final PersonAlgorithm algo) {
 		return this.personAlgos.remove(algo);
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// set/add methods
-	//////////////////////////////////////////////////////////////////////
-
 
 	public final void addAlgorithm(final PersonAlgorithm algo) {
 		this.personAlgos.add(algo);
@@ -191,10 +185,6 @@ public class PopulationImpl implements Population {
 
 	public PopulationFactory getFactory() {
 		return this.pb;
-	}
-	
-	public PopulationFactory getPopulationBuilder() {
-		return this.getFactory();
 	}
 	
 	private String name ;
