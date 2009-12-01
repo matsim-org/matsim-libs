@@ -43,6 +43,10 @@ public class OTFVisQueueSim extends QueueSimulation{
 	private boolean doVisualizeTeleportedVehicles = false;
 	private OTFConnectionManager connectionManager = null;
 	
+	public OTFVisQueueSim(final Scenario scenario, final EventsManager events) {
+		super(scenario, events);
+	}
+	
 	public void setServer(OnTheFlyServer server) {
 		this.myOTFServer = server;
 		ownServer = false;
@@ -95,14 +99,6 @@ public class OTFVisQueueSim extends QueueSimulation{
 	private void visualizeTeleportedAgents() {
 		while (this.teleportationList.peek() != null ) {
 		  
-		}
-	}
-	public OTFVisQueueSim(final Scenario scenario, final EventsManager events) {
-		super(scenario, events);
-		
-		boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
-		if (isMac) {
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
 		}
 	}
 
