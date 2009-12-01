@@ -26,16 +26,13 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
-
 import playground.david.otfvis.prefuse.PopProviderFile;
 import playground.david.otfvis.prefuse.TreeView;
-
+import playground.david.otfvis.prefuse.TreeView.MTree;
 import prefuse.controls.ControlAdapter;
 import prefuse.data.Node;
 import prefuse.data.Tree;
 import prefuse.visual.VisualItem;
-
-import playground.david.otfvis.prefuse.TreeView.MTree;
 
 public class OTFVisDualView extends OTFClientFile{
 	
@@ -159,10 +156,6 @@ public class OTFVisDualView extends OTFClientFile{
 		return super.getFileSaver();
 	}
 
-	@Override
-	protected String getURL() {
-		return url;
-	}
 
  	public static void main(String[] args) {
 //		String filename = "../MatsimJ/output/OTFQuadfileSCHWEIZ2.3.mvi.gz";

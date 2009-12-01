@@ -73,37 +73,41 @@ public class OTFClientFile extends Thread {
 
 	protected OTFConnectionManager connect = new OTFConnectionManager();
 
-	
-	public void setFilename(String filename) {
+	public OTFClientFile( String filename) {
+		super();
 		this.filename = filename;
+
+		this.connect.add(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
+		this.connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
+		this.connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
+		this.connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
+		this.connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
+		this.connect.add(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
+		this.connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
+		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		this.connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		splitLayout = false;
 	}
 
-	public OTFQueryControlBar getQueryControl() {
-		return queryControl;
+	public OTFClientFile( String filename2,  OTFConnectionManager connect) {
+		this(filename2);
+		this.connect = connect;
 	}
 
-	public OTFHostControlBar getHostControl() {
-		return hostControl;
-	}
-
-	public boolean isSplitLayout() {
-		return splitLayout;
-	}
-
-	public JSplitPane getPane() {
-		return pane;
-	}
-
-	public OTFDrawer getLeftComp() {
-		return leftComp;
-	}
-
-	public OTFDrawer getRightComp() {
-		return rightComp;
+	public OTFClientFile( String filename2,  OTFConnectionManager connect,  boolean split) {
+		this(filename2);
+		this.connect = connect;
+		this.splitLayout = split;
 	}
 
 
-	public OTFDrawer getLeftDrawerComponent(JFrame frame) throws RemoteException {
+	public OTFClientFile( String filename2,  boolean split) {
+		this(filename2);
+		this.splitLayout = split;
+	}
+
+	protected OTFDrawer getLeftDrawerComponent(JFrame frame) throws RemoteException {
 		OTFConnectionManager connectL = this.connect.clone();
 		connectL.remove(OTFLinkAgentsHandler.class);
 
@@ -116,7 +120,7 @@ public class OTFClientFile extends Thread {
 		return drawer;
 	}
 
-	public OTFDrawer getRightDrawerComponent(JFrame frame) throws RemoteException {
+	protected OTFDrawer getRightDrawerComponent(JFrame frame) throws RemoteException {
 		OTFConnectionManager connectR = this.connect.clone();
 		connectR.remove(OTFLinkAgentsHandler.class);
 
@@ -134,11 +138,6 @@ public class OTFClientFile extends Thread {
 		return drawer2;
 	}
 
-	protected String getURL() {
-		System.out.println("Loading file " + this.filename + " ....");
-		return "file:" + this.filename;
-	}
-	
 	protected OTFFileSettingsSaver getFileSaver() {
 		return new OTFFileSettingsSaver(this.filename);
 	}
@@ -172,8 +171,7 @@ public class OTFClientFile extends Thread {
 
 		try {
 
-			
-			this.hostControl = new OTFHostControlBar(getURL());
+			this.hostControl = new OTFHostControlBar("file:" + this.filename);
 			hostControl.frame = frame;
 
 			frame.getContentPane().add(this.hostControl, BorderLayout.NORTH);
@@ -212,10 +210,6 @@ public class OTFClientFile extends Thread {
 			frame.setSize(screenSize.width/2,screenSize.height/2);
 			frame.setVisible(true);
 
-			//InfoText.showText("Loaded...");
-
-
-
 		}catch (RemoteException e) {
 			e.printStackTrace();
 			throw new RuntimeException();
@@ -234,41 +228,33 @@ public class OTFClientFile extends Thread {
 		prepareRun();
 		hostControl.finishedInitialisition();
 	}
-
-
-	public OTFClientFile( String filename) {
-		super();
+	
+	public void setFilename(String filename) {
 		this.filename = filename;
-
-		this.connect.add(OTFDefaultLinkHandler.Writer.class, OTFDefaultLinkHandler.class);
-		this.connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-		this.connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
-		this.connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
-		this.connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		this.connect.add(OTFAgentsListHandler.class,  OGLAgentPointLayer.AgentPointDrawer.class);
-		this.connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
-		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		this.connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
-		this.connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		splitLayout = false;
 	}
 
-	public OTFClientFile( String filename2,  OTFConnectionManager connect) {
-		this(filename2);
-		this.connect = connect;
+	public OTFQueryControlBar getQueryControl() {
+		return queryControl;
 	}
 
-	public OTFClientFile( String filename2,  OTFConnectionManager connect,  boolean split) {
-		this(filename2);
-		this.connect = connect;
-		this.splitLayout = split;
+	public OTFHostControlBar getHostControl() {
+		return hostControl;
 	}
 
-
-	public OTFClientFile( String filename2,  boolean split) {
-		this(filename2);
-		this.splitLayout = split;
+	public boolean isSplitLayout() {
+		return splitLayout;
 	}
 
+	public JSplitPane getPane() {
+		return pane;
+	}
+
+	public OTFDrawer getLeftComp() {
+		return leftComp;
+	}
+
+	public OTFDrawer getRightComp() {
+		return rightComp;
+	}
 
 }

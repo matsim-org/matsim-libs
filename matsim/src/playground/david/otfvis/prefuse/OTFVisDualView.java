@@ -184,11 +184,6 @@ public class OTFVisDualView extends OTFClientFile{
 		return super.getFileSaver();
 	}
 
-	@Override
-	protected String getURL() {
-		return url;
-	}
-
  	public static void main(String[] args) {
 //		String filename = "../MatsimJ/output/OTFQuadfileSCHWEIZ2.3.mvi.gz";
 //		String filename = "../MatsimJ/output/testSWI2.mvi.gz";
