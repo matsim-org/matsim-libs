@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.otfvis.opengl;
+package org.matsim.vis.otfvis;
 
 import java.rmi.RemoteException;
 import java.util.UUID;

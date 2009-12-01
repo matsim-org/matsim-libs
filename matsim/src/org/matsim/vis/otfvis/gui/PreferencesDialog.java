@@ -45,8 +45,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.matsim.core.gbl.Gbl;
+import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
-import org.matsim.vis.otfvis.opengl.OTFClientFile;
 
 /**
  * The class responsible for drawing the PreferencesDialog.

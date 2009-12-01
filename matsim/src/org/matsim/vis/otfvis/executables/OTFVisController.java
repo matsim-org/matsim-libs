@@ -25,8 +25,8 @@ import java.util.UUID;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
-import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
-import org.matsim.vis.otfvis.opengl.OTFClient;
+import org.matsim.vis.otfvis.OTFClient;
+import org.matsim.vis.otfvis.OTFVisQueueSim;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 /**

@@ -34,7 +34,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vis.otfvis.opengl.OTFClient;
+import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 

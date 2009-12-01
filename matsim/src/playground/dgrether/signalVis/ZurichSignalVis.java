@@ -30,7 +30,7 @@ import org.matsim.signalsystems.MatsimSignalSystemConfigurationsReader;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.basic.BasicSignalSystems;
 import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
-import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
+import org.matsim.vis.otfvis.OTFVisQueueSim;
 
 import playground.dgrether.DgPaths;
 

@@ -40,10 +40,10 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
+import org.matsim.vis.otfvis.OTFClient;
+import org.matsim.vis.otfvis.OTFClientFile;
+import org.matsim.vis.otfvis.OTFVisQueueSim;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
-import org.matsim.vis.otfvis.opengl.OTFClientFile;
-import org.matsim.vis.otfvis.opengl.OTFClient;
-import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
 
 /**
  * A generic starter for the OnTheFly Visualizer that supports

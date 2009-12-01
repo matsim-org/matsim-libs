@@ -44,7 +44,7 @@ import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
+import org.matsim.vis.otfvis.OTFVisQueueSim;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.config.TransitConfigGroup;

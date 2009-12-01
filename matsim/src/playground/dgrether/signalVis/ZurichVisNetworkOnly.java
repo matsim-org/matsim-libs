@@ -25,7 +25,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
-import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
+import org.matsim.vis.otfvis.OTFVisQueueSim;
 
 import playground.dgrether.DgPaths;
 

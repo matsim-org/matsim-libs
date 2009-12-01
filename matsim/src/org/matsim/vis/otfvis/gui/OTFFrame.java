@@ -25,7 +25,7 @@ import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 
-import org.matsim.vis.otfvis.opengl.OTFClientFile;
+import org.matsim.vis.otfvis.OTFClientFile;
 
 
 /**

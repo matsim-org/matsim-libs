@@ -53,7 +53,7 @@ import org.matsim.vehicles.BasicVehicleCapacityImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.VehiclesFactory;
-import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
+import org.matsim.vis.otfvis.OTFVisQueueSim;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.config.TransitConfigGroup;
@@ -211,7 +211,7 @@ public class DataPrepare {
 
 		log.info("start visualizer");
 		EventsManagerImpl events = new EventsManagerImpl();
-		OTFVisQueueSim client = new OTFVisQueueSim(visScenario, events);
+		OTFVisQueueSim client = new org.matsim.vis.otfvis.OTFVisQueueSim(visScenario, events);
 		client.run();
 	}
 	

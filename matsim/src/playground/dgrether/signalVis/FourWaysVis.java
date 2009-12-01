@@ -22,7 +22,7 @@ package playground.dgrether.signalVis;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.vis.otfvis.opengl.OTFVisQueueSim;
+import org.matsim.vis.otfvis.OTFVisQueueSim;
 
 
 public class FourWaysVis {

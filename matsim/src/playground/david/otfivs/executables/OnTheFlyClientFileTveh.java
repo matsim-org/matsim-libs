@@ -1,7 +1,7 @@
 package playground.david.otfivs.executables;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.vis.otfvis.opengl.OTFClient;
+import org.matsim.vis.otfvis.OTFClient;
 
 
 
