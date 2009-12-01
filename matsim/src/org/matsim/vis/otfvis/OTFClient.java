@@ -59,9 +59,9 @@ public class OTFClient extends Thread {
 		this.url = url;
 
 		isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
-		if (isMac) {
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-		}
+//		if (isMac) {
+//			System.setProperty("apple.laf.useScreenMenuBar", "true");
+//		}
 		connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);

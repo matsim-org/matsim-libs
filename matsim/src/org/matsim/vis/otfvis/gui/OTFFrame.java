@@ -43,6 +43,10 @@ public class OTFFrame extends JFrame {
 
 	public OTFFrame(String title, boolean isMac) {
 		super(title);
+		if (isMac) {
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+		}
+		
 		this.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ); 		
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		if (isMac){
