@@ -1,4 +1,4 @@
-package playground.mohit.converter;
+package playground.marcel.pt.converter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,8 +27,8 @@ import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
-import playground.mohit.converter.VisumNetwork.VehicleCombination;
-import playground.mohit.converter.VisumNetwork.VehicleUnit;
+import playground.marcel.pt.converter.VisumNetwork.VehicleCombination;
+import playground.marcel.pt.converter.VisumNetwork.VehicleUnit;
 
 
 public class Visum2TransitSchedule {
