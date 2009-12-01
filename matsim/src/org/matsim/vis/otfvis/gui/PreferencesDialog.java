@@ -23,6 +23,8 @@ package org.matsim.vis.otfvis.gui;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -32,9 +34,9 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -45,8 +47,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
+import org.matsim.vis.otfvis.opengl.queries.QueryToggleShowParking;
 
 /**
  * The class responsible for drawing the PreferencesDialog.
@@ -55,8 +57,10 @@ import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
  * @author dstrippgen
  *
  */
-public class PreferencesDialog extends javax.swing.JDialog implements ChangeListener, ActionListener {
+public class PreferencesDialog extends javax.swing.JDialog implements ChangeListener, ActionListener, ItemListener {
 
+	private static final long serialVersionUID = 5778562849300898138L;
+	
 	protected transient OTFVisConfig cfg;
 	private JComboBox rightMFunc;
 	private JComboBox middleMFunc;
@@ -66,9 +70,11 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 	private JSlider linkWidthSlider;
 	private JSlider delaySlider = null;
+	private OTFFrame frame;
 
-	protected PreferencesDialog(final JFrame frame, final OTFVisConfig config, final OTFHostControlBar mother) {
+	protected PreferencesDialog(final OTFFrame frame, final OTFVisConfig config, final OTFHostControlBar mother) {
 		super(frame);
+		this.frame = frame;
 		this.cfg = config;
 		this.host = mother;
 		initGUI();
@@ -126,9 +132,81 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 				this.rightMFunc.setModel(jComboBox2Model);
 				this.rightMFunc.setBounds(70, 80, 120, 27);
 				this.rightMFunc.addActionListener(this);
-			}
+			}		
 		}
+		{
+			JPanel panel = new JPanel(null);
+			getContentPane().add(panel);
+			panel.setBorder(BorderFactory.createTitledBorder("Switches"));
+			panel.setBounds(250, 130, 220, 160);
 
+			JCheckBox SynchBox; 
+			if(host.isLiveHost()) {
+				SynchBox = new JCheckBox("show parked vehicles");
+//				SynchBox.setMnemonic(KeyEvent.VK_M);
+				SynchBox.setSelected(cfg.isShowParking());
+				SynchBox.addItemListener(this);
+				SynchBox.setBounds(10, 20, 200, 31);
+				SynchBox.setVisible(true);
+				//SynchBox.setMaximumSize(new Dimension(250,60));
+				panel.add(SynchBox);
+			}
+			if((host.isLiveHost())||((cfg.getFileVersion()>=1) &&(cfg.getFileMinorVersion()>=4))) {
+				SynchBox = new JCheckBox("show link Ids");
+//				SynchBox.setMnemonic(KeyEvent.VK_M);
+				SynchBox.setSelected(cfg.drawLinkIds());
+				SynchBox.addItemListener(this);
+				SynchBox.setBounds(10, 40, 200, 31);
+				SynchBox.setVisible(true);
+				//SynchBox.setMaximumSize(new Dimension(250,60));
+				panel.add(SynchBox);
+			}
+
+			SynchBox = new JCheckBox("show overlays");
+//			SynchBox.setMnemonic(KeyEvent.VK_M);3
+			SynchBox.setSelected(cfg.drawOverlays());
+			SynchBox.addItemListener(this);
+			SynchBox.setBounds(10, 60, 200, 31);
+			SynchBox.setVisible(true);
+			//SynchBox.setMaximumSize(new Dimension(250,60));
+			panel.add(SynchBox);
+
+			SynchBox = new JCheckBox("show time GL");
+//			SynchBox.setMnemonic(KeyEvent.VK_M);
+			SynchBox.setSelected(cfg.drawTime());
+			SynchBox.addItemListener(this);
+			SynchBox.setBounds(10, 80, 200, 31);
+			//SynchBox.setVisible(true);
+			//SynchBox.setMaximumSize(new Dimension(250,60));
+			panel.add(SynchBox);
+
+			SynchBox = new JCheckBox("save jpg frames");
+//			SynchBox.setMnemonic(KeyEvent.VK_M);
+			SynchBox.setSelected(cfg.renderImages());
+			SynchBox.addItemListener(this);
+			SynchBox.setBounds(10, 100, 200, 31);
+			//SynchBox.setVisible(true);
+			//SynchBox.setMaximumSize(new Dimension(250,60));
+			panel.add(SynchBox);
+			SynchBox = new JCheckBox("allow caching");
+//			SynchBox.setMnemonic(KeyEvent.VK_M);
+			SynchBox.setSelected(cfg.isCachingAllowed());
+			SynchBox.addItemListener(this);
+			SynchBox.setBounds(10, 120, 200, 31);
+			//SynchBox.setVisible(true);
+			//SynchBox.setMaximumSize(new Dimension(250,60));
+			panel.add(SynchBox);
+			SynchBox = new JCheckBox("show scale bar");
+//			SynchBox.setMnemonic(KeyEvent.VK_M);
+			SynchBox.setSelected(cfg.drawScaleBar());
+			SynchBox.addItemListener(this);
+			SynchBox.setBounds(10, 140, 200, 31);
+			SynchBox.setVisible(true);
+			//SynchBox.setMaximumSize(new Dimension(250,60));
+			panel.add(SynchBox);
+		}
+		
+		
 		// Colors
 		{
 			JPanel panel = new JPanel(null);
@@ -242,13 +320,13 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		return this.middleMFunc;
 	}
 
-	public static PreferencesDialog buildMenu(final JFrame frame, final OTFVisConfig config, final OTFHostControlBar host, final OTFSettingsSaver save) {
-		PreferencesDialog preferencesDialog = new PreferencesDialog2(frame, config, host);
+	public static PreferencesDialog buildMenu(final OTFFrame frame, final OTFVisConfig config, final OTFHostControlBar host, final OTFSettingsSaver save) {
+		PreferencesDialog preferencesDialog = new PreferencesDialog(frame, config, host);
 		preferencesDialog.buildMenu(frame, preferencesDialog, save);
 		return preferencesDialog;
 	}
 
-	public void buildMenu(final JFrame frame, final PreferencesDialog preferencesDialog, final OTFSettingsSaver save) {
+	public void buildMenu(final OTFFrame frame, final PreferencesDialog preferencesDialog, final OTFSettingsSaver save) {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
@@ -307,7 +385,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 		Action exitAction = new AbstractAction("Quit") {
 			public void actionPerformed(ActionEvent e) {
-				OTFClientFile.endProgram(0);
+				frame.endProgram(0);
 			}
 		};
 		fileMenu.add(exitAction);
@@ -352,4 +430,36 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		}
 	}
 
+	public void itemStateChanged(ItemEvent e) {
+		this.cfg = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis"));
+		JCheckBox source = (JCheckBox)e.getItemSelectable();
+		if (source.getText().equals("show parked vehicles")) {
+			cfg.setShowParking(e.getStateChange() != ItemEvent.DESELECTED);
+			cfg.setShowParking(!cfg.isShowParking());
+			if (host != null) {
+				host.doQuery(new QueryToggleShowParking());
+				host.clearCaches();
+				host.redrawHandlers();
+			}
+		} else if (source.getText().equals("show link Ids")) {
+			// toggle draw link Ids
+			cfg.setDrawLinkIds(!cfg.drawLinkIds());
+		} else if (source.getText().equals("show overlays")) {
+			// toggle draw Overlays
+			cfg.setDrawOverlays(!cfg.drawOverlays());
+		} else if (source.getText().equals("save jpg frames")) {
+			// toggle save jpgs
+			cfg.setRenderImages(!cfg.renderImages());
+		} else if (source.getText().equals("show time GL")) {
+			// toggle draw time in GL
+			cfg.setDrawTime(!cfg.drawTime());
+		} else if (source.getText().equals("allow caching")) {
+			// toggle caching allowed
+			cfg.setCachingAllowed(!cfg.isCachingAllowed());
+		} else if (source.getText().equals("show scale bar")) {
+			// toggle draw Overlays
+			cfg.setDrawScaleBar(!cfg.drawScaleBar());
+		} 
+		}
+	
 }

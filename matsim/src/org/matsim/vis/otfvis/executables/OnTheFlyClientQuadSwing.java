@@ -26,7 +26,6 @@ import java.awt.Toolkit;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
 import org.matsim.core.gbl.Gbl;
@@ -34,6 +33,7 @@ import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.NetJComponent;
+import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
@@ -86,7 +86,7 @@ public class OnTheFlyClientQuadSwing{
 		OTFHostControlBar hostControl;
 		try {
 			hostControl = new OTFHostControlBar(arg0);
-			JFrame frame = new JFrame("MATSIM OTFVis");
+			OTFFrame frame = new OTFFrame("MATSIM OTFVis", false);
 
 			frame.getContentPane().add(hostControl, BorderLayout.NORTH);
 			JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);

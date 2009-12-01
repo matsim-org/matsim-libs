@@ -11,7 +11,6 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
 import org.matsim.api.core.v01.network.Link;
@@ -30,6 +29,7 @@ import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.executables.OTFVisController;
+import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
@@ -454,7 +454,7 @@ public class CALinkOTFVis extends Thread {
 		@Override
 		protected void openAddress(String address) throws RemoteException, InterruptedException, NotBoundException {
 			this.host = new CALiveServer();
-			if (host != null && host.isLive()) liveHost = (OTFLiveServerRemote)host;
+			if ((host != null) && host.isLive()) liveHost = (OTFLiveServerRemote)host;
 		}
 
 		private static final long serialVersionUID = 1L;
@@ -486,20 +486,13 @@ public class CALinkOTFVis extends Thread {
 		MyControlBar hostControl;
 		try {
 			hostControl = new MyControlBar("");
-			JFrame frame = new JFrame("MATSim OTFVis");
-
 			boolean isMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
-			if (isMac) {
-				frame.getRootPane().putClientProperty("apple.awt.brushMetalLook", Boolean.TRUE);
-			}
+			OTFFrame frame = new OTFFrame("MATSim OTFVis", isMac);
 
 			hostControl.frame = frame;
 
 			frame.getContentPane().add(hostControl, BorderLayout.NORTH);
-			JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-			pane.setContinuousLayout(true);
-			pane.setOneTouchExpandable(true);
-			frame.getContentPane().add(pane);
+			JSplitPane pane = frame.getSplitPane();
 			PreferencesDialog.buildMenu(frame, visconf, hostControl, null);
 
 			OTFConnectionManager connectR = new OTFConnectionManager();

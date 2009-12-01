@@ -19,13 +19,18 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.gui;
 
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 
-import org.matsim.vis.otfvis.OTFClientFile;
+import org.matsim.core.gbl.Gbl;
 
 
 /**
@@ -61,11 +66,55 @@ public class OTFFrame extends JFrame {
 	protected void processWindowEvent(WindowEvent e) {
 
 	        if (e.getID() == WindowEvent.WINDOW_CLOSING) {
-	        	OTFClientFile.endProgram(0);
+	        	this.endProgram(0);
 	        } else {
 		        super.processWindowEvent(e);
 	        }
 	    }
 
+	void endProgram(int code) {
+		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+		if(config.isModified()) {
+			final JDialog dialog = new JDialog((JFrame)null, "Preferences are unsaved and modified...", true);
+			final JOptionPane optionPane = new JOptionPane(
+				    "There are potenially unsaved changes in Preferences.\nQuit anyway?",
+				    JOptionPane.QUESTION_MESSAGE,
+				    JOptionPane.YES_NO_OPTION);
+			dialog.setContentPane(optionPane);
+			dialog.setDefaultCloseOperation(
+				    JDialog.DO_NOTHING_ON_CLOSE);
+				dialog.addWindowListener(new WindowAdapter() {
+				    @Override
+						public void windowClosing(WindowEvent we) {
+				        
+				    }
+				});
+				optionPane.addPropertyChangeListener(
+				    new PropertyChangeListener() {
+				        public void propertyChange(PropertyChangeEvent e) {
+				            String prop = e.getPropertyName();
+
+				            if (dialog.isVisible() 
+				             && (e.getSource() == optionPane)
+				             && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
+				                //If you were going to check something
+				                //before closing the window, you'd do
+				                //it here.
+				                dialog.setVisible(false);
+				            }
+				        }
+				    });
+			dialog.pack();
+			dialog.setVisible(true);
+			int value = ((Integer)optionPane.getValue()).intValue();
+			if (value == JOptionPane.NO_OPTION) {
+				return; // do not quit
+			}
+
+		}
+		System.exit(code);
+	}
+
+	
 	
 }
