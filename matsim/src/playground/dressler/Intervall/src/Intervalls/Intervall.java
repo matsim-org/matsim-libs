@@ -69,6 +69,14 @@ implements Comparable<Intervall>
 	}
 	
 	/**
+	 * copy constructor
+	 * @param old Intervall to make a copy of
+	 */
+	public Intervall(final Intervall old){
+		this(old._l,old._r);
+	}
+	
+	/**
 	 * Constructs an Intervall  given containing all piont between l and r.
 	 * Only accepts l <= r.
 	 * @param l lowbound of the Intervall

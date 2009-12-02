@@ -50,6 +50,14 @@ public class EdgeIntervall extends Intervall
 	public EdgeIntervall() {
 		super();
 	}
+	/**
+	 * copy constructor
+	 * @param old EdgeIntervall to make a copy of
+	 */
+	public EdgeIntervall(final EdgeIntervall old){
+		super(old);
+		this._flow =old._flow;
+	}
 
 	/**
 	 * creating an EdgeIntervall (l,r)
@@ -119,7 +127,8 @@ public class EdgeIntervall extends Intervall
 	}
 	
 	/**
-	 * sets the flow to f and throws an Exception if the new flow would succeed u or is negative
+	 * sets the flow to f and throws an Exception if the new flow would succeed 
+	 * u or is negative
 	 * @param f new flow value
 	 * @param u  nonnegative capacity
 	 */
@@ -134,7 +143,8 @@ public class EdgeIntervall extends Intervall
 	}
 	
 	/**
-	 * changes the flow by f and throws an Exception if the new flow would succeed u or get negative
+	 * changes the flow by f and throws an Exception if the new flow would succeed 
+	 * u or get negative
 	 * @param f amount of flow to augment
 	 * @param u  nonnegative capacity
 	 */
@@ -147,7 +157,8 @@ public class EdgeIntervall extends Intervall
 	/**
 	 * splits the referenced EdgeIntervall at t contained in (lowbound, higbound)
 	 * by changing !! the referenced Intervall to (lowbound,t) 
-	 * and creating a new EdgeInterval (t,highbound) with same flow value as the referenced
+	 * and creating a new EdgeInterval (t,highbound) with same
+	 * flow value as the referenced
 	 *@param t point to split at
 	 *@return new Interval 
 	 */
@@ -192,17 +203,19 @@ public class EdgeIntervall extends Intervall
 	 * @param other EdgeIntervall
 	 * @return
 	 */
-	public boolean sameIntervall(final EdgeIntervall other){
+	public boolean onSameIntervall(final EdgeIntervall other){
 		return super.equals(other);
 	}
 
 //----------------------- SHIFTING ------------------------------------------------//
 	
 	/**
-	 * Method to shift a EdgeIntervall within the positive numbers and same flow value.
+	 * Method to shift a EdgeIntervall within the positive numbers
+	 *  and same flow value.
 	 * The EdgeIntervall might get cut off.
 	 * @param tau value to be shifted by
-	 * @return EdgeIntervall in the positive integers null if the shift does not intersect the positive integers
+	 * @return EdgeIntervall in the positive integers null if the shift
+	 *  does not intersect the positive integers
 	 */
 	@Override
 	public EdgeIntervall shiftPositive(final int tau){
@@ -222,7 +235,8 @@ public class EdgeIntervall extends Intervall
 	@Override
 	public String toString()
 	{
-		return "[" + this.getLowBound() + "," + this.getHighBound() + ") f: " + this.getFlow(); 
+		return "[" + this.getLowBound() + "," + 
+			this.getHighBound() + ") f: " + this.getFlow(); 
 	}
 
 }

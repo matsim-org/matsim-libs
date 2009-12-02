@@ -46,9 +46,11 @@ public class VertexIntervall extends Intervall {
 	/**
 	 * predecessor in a shortest path
 	 */
-	//TODO predecessor
 	private Link _predecessor=null;
 	
+	/**
+	 * travel time to predecessor
+	 */
 	private int travelTimeToPredecessor;
 	
 	//VERY IMPORTANT DEFAULT SETTING.
@@ -64,15 +66,8 @@ public class VertexIntervall extends Intervall {
 //**************************************************************//
 	
 
-	public int getTravelTimeToPredecessor() {
-		return travelTimeToPredecessor;
-	}
 
-	public void setTravelTimeToPredecessor(int travelTimeToPredecessor) {
-		this.travelTimeToPredecessor = travelTimeToPredecessor;
-	}
-
-	//--------------------------CONSTUCTORS-------------------------//
+//--------------------------CONSTUCTORS-------------------------//
 	/**
 	 * Default costructor creates an (0,1) Intervall 
 	 * with Integer.MAX_VALUE as initial distance to the sink
@@ -83,44 +78,21 @@ public class VertexIntervall extends Intervall {
 	}
 
 	/**
-	 * Creates in interval from l to r
+	 * Creates in VertexIntervall from l to r
 	 * @param l lowbound
 	 * @param r highbound
 	 */
-	public VertexIntervall(int l, int r) {
+	public VertexIntervall(final int l,final int r) {
 		super(l, r);
-		
 	}
 	
 	/**
-	 * * Default costructor creates an (0,1) Intervall 
-	 * with d as initial distance to the sink
-	 * no predesessor is specified
+	 * construct an VertexIntervall from l to r wit he settings of other
 	 * @param l lowbound
 	 * @param r highbound
-	 * @param d distance
+	 * @param other Intervall to copy settings from
 	 */
-	public VertexIntervall(int l, int r, boolean d) {
-		super(l, r);
-		this.setReachable(d);
-	}
-	
-	/**
-	 * * Default costructor creates an (0,1) Intervall 
-	 * with d as initial distance to the sink
-	 * predesessor will be pred
-	 * @param l lowbound
-	 * @param r highbound
-	 * @param d distance
-	 * @param pred Predecessor in a shortest path
-	 */
-	public VertexIntervall(int l, int r, boolean d, Link pred) {
-		super(l, r);
-		this.setReachable(d);
-		this.setPredecessor(pred);
-	}
-	
-	public VertexIntervall(int l, int r, VertexIntervall other)
+	public VertexIntervall(final int l,final int r,final VertexIntervall other)
 	{
 		super(l,r);
 		this.setLastDepartureAtFromNode(other.lastDepartureAtFromNode);
@@ -136,17 +108,17 @@ public class VertexIntervall extends Intervall {
 	 * Predecessor is set to null and dist to Integer.MAX_VALUE
 	 * @param j Intervall to copy
 	 */
-	public VertexIntervall(Intervall j) {
+	public VertexIntervall(final Intervall j) {
 		super(j.getLowBound(),j.getHighBound());
 		
 	}
 
-//------------------------DISTANCE----------------------//
+//------------------------Getter Setter----------------------//
 	/**
 	 * Setter for the min distance to the sink at time lowbound
 	 * @param d min distance to sink
 	 */
-	public void setReachable(boolean d){
+	public void setReachable(final boolean d){
 		this.reachable=d;
 	}
 	
@@ -159,14 +131,11 @@ public class VertexIntervall extends Intervall {
 	}
 	
 	
-	
-//----------------------------PREDECESSOR------------------------//
-	
 	/**
 	 * Setter for the predecessor in a shortest path
 	 * @param pred predesessor vertex
 	 */
-	public void setPredecessor(Link pred){
+	public void setPredecessor(final Link pred){
 		this._predecessor=pred;
 	}
 	
@@ -176,6 +145,69 @@ public class VertexIntervall extends Intervall {
 	 */
 	public Link getPredecessor(){
 		return this._predecessor;
+	}
+	
+	/**
+	 * getter for travelTimeToPredecessor
+	 * @return travelTimeToPredecessor
+	 */
+	public int getTravelTimeToPredecessor() {
+		return travelTimeToPredecessor;
+	}
+
+	/**
+	 * setter for travelTimeToPredecessor
+	 * @param travelTimeToPredecessor
+	 */
+	public void setTravelTimeToPredecessor(final int travelTimeToPredecessor) {
+		this.travelTimeToPredecessor = travelTimeToPredecessor;
+	}
+	
+	/**
+	 * getter for scanned
+	 * @return scanned
+	 */
+	public boolean isScanned() {
+		return scanned;
+	}
+
+	/**
+	 * setter for scanned
+	 * @param scanned
+	 */
+	public void setScanned(final boolean scanned) {
+		this.scanned = scanned;
+	}
+	/**
+	 * getter for lastDepartureAtFromNode
+	 * @return lastDepartureAtFromNode
+	 */
+	public int getLastDepartureAtFromNode() {
+		return lastDepartureAtFromNode;
+	}
+
+	/**
+	 * setter for lastDepartureAtFromNode
+	 * @param lastArrivalAtThisNode
+	 */
+	public void setLastDepartureAtFromNode(final int lastArrivalAtThisNode) {
+		this.lastDepartureAtFromNode = lastArrivalAtThisNode;
+	}
+
+	/**
+	 * getter for overridable
+	 * @return overridable
+	 */
+	public boolean isOverridable() {
+		return overridable;
+	}
+
+	/**
+	 * setter for overridable
+	 * @param overridable
+	 */
+	public void setOverridable(final boolean overridable) {
+		this.overridable = overridable;
 	}
 	
 //----------------------------SPLITTING----------------------------//
@@ -188,7 +220,6 @@ public class VertexIntervall extends Intervall {
 	 *@param t point to split at
 	 *@return new Interval 
 	 */
-	@Override
 	public VertexIntervall splitAt(int t){
 		boolean newdist = this.getReachable();
 		Intervall j =super.splitAt(t);
@@ -202,7 +233,12 @@ public class VertexIntervall extends Intervall {
 		return k;
 	}
 	
-	@Override
+	/**
+	 * gives a string representation of tje VertexIntervall of the form with optional predecessor
+	 * [x,y): reachable: true scanned: false pred: 
+	 * @return string representation 
+	 */
+	 
 	public String toString()
 	{
 		if(this._predecessor != null)
@@ -210,33 +246,4 @@ public class VertexIntervall extends Intervall {
 		else
 			return super.toString() + "; reachable: " + this.reachable + "; scanned: " + this.scanned;
 	}
-	
-	public boolean isScanned() {
-		return scanned;
-	}
-
-	public void setScanned(boolean scanned) {
-		this.scanned = scanned;
-	}
-
-	public int getLastDepartureAtFromNode() {
-		return lastDepartureAtFromNode;
-	}
-
-	public void setLastDepartureAtFromNode(int lastArrivalAtThisNode) {
-		this.lastDepartureAtFromNode = lastArrivalAtThisNode;
-	}
-
-	public boolean isOverridable() {
-		return overridable;
-	}
-
-	public void setOverridable(boolean overridable) {
-		this.overridable = overridable;
-	}
-	
-//----------------------------MAIN METHOD--------------------------//
-	
-	
-
 }

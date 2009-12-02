@@ -1,6 +1,6 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * VertexIntervalls.java
+ * project: org.matsim.*												   *
+ * VertexIntervalls.java												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,9 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+//playground imports
 package playground.dressler.Intervall.src.Intervalls;
 
 //java imports
@@ -28,8 +26,6 @@ import java.util.ArrayList;
 
 //mastim imports
 import org.matsim.api.core.v01.network.Link;
-
-//import playground.rost.eaflow.ea_flow.BellmanFordIntervallBased.IntervallNode;
 
 /**
  * class representing the flow of an edge in a Time Expanded Network
@@ -41,20 +37,23 @@ public class VertexIntervalls {
 //------------------------FIELDS----------------------------------//
 	
 	/**
-	 * internal binary search tree holding distinkt Intervalls
+	 * internal binary search tree holding distinct VertexIntervall instances
 	 */
 	private AVLTree _tree;
 	
 	/**
-	 * reference to the last Intervall
+	 * reference to the last VertexIntervall
 	 */
 	private VertexIntervall _last; 
 	
 	/**
 	 * flag for debug mode
 	 */
+	@SuppressWarnings("unused")
 	private static boolean _debug = false;
-	
+	/**
+	 * total number of removed VertexIntervall in cleanup
+	 */
 	public static int rem;
 	
 	
@@ -76,7 +75,6 @@ public class VertexIntervalls {
 		_last = intervall;
 	}
 	
-
 //------------------------SPLITTING--------------------------------//	
 	
 	/**
@@ -87,10 +85,8 @@ public class VertexIntervalls {
 	 * @return the new EdgeIntervall for further modification
  	 */
 	public VertexIntervall splitAt(int t){
-		
 		boolean found = false;
 		VertexIntervall j = null;
-		
 		VertexIntervall i = getIntervallAt(t);
 			if (i != null){
 				found = true;
@@ -112,7 +108,7 @@ public class VertexIntervalls {
 //------------------------------FLOW-------------------------//	
 	
 	/**
-	 * Gives the predesessing Link on the Vertex at time t
+	 * Gives the predecessor Link on the Vertex at time t
 	 * @param t time
 	 * @return flow at t
 	 */
@@ -124,7 +120,6 @@ public class VertexIntervalls {
 //------------------------------GETTER-----------------------//
 	
 	
-
 	/**
 	 * Finds the VertexIntervall containing t in the collection
 	 * @param t time
@@ -139,9 +134,8 @@ public class VertexIntervalls {
 		return i;
 	}
 	
-	
 	/**
-	 * Geves a String representation of all stored Intervalls linewise
+	 * Gives a String representation of all stored VertexIntervall Instances line by line
 	 * @return String representation
 	 */
 	@Override
@@ -175,18 +169,15 @@ public class VertexIntervalls {
 			if(i.getPredecessor() != null){
 				str.append(l+i.getLowBound()+";"+i.getHighBound()+r+" d:"+i.getReachable()+ " scanned: " + i.isScanned() + " pred:"+i.getPredecessor().getId().toString() +"\n");
 			}else{
-				
 				str.append(l+i.getLowBound()+";"+i.getHighBound()+r+" d:"+i.getReachable()+ " scanned: " + i.isScanned() + " pred: null"+"\n");
 			}
 		}
-			
 		return str.toString();
-		
 	}
 	
 	
 	/**
-	 * gives the last Stored VertexIntervall
+	 * Gives the last stored VertexIntervall
 	 * @return VertexIntervall with maximal lowbound
 	 */
 	public VertexIntervall getLast(){
@@ -195,7 +186,7 @@ public class VertexIntervalls {
 	
 	
 	/**
-	 * checks weather last is referenced right
+	 * checks whether last is referenced right
 	 * @return true iff everything is OK
 	 */
 	public boolean checkLast(){
@@ -203,7 +194,7 @@ public class VertexIntervalls {
 	}
 	
 	/**
-	 * Checks weather the given VertexIntervall is the last
+	 * Checks whether the given VertexIntervall is the last
 	 * @param o EgeIntervall which it test for 
 	 * @return true if getLast.equals(o)
 	 */
@@ -220,13 +211,12 @@ public class VertexIntervalls {
 	}
 	
 	/**
-	 * gives the next VertexIntervall with respect ot the order contained 
-	 * @param o schould be contained
+	 * gives the next VertexIntervall with respect to the order contained 
+	 * @param o should be contained
 	 * @return next VertexIntervall iff o is not last and contained
 	 */
 	public VertexIntervall getNext(VertexIntervall o){
 		_tree.goToNodeAt(o.getLowBound());
-		
 			VertexIntervall j = (VertexIntervall) _tree._curr.obj;
 			if(j.equals(o)){
 				_tree.increment();
@@ -237,14 +227,12 @@ public class VertexIntervalls {
 				}else 	throw new IllegalArgumentException("Intervall was already last");
 			}
 			else throw new IllegalArgumentException("Intervall was not contained");
-		
-		
 	}
 	
 	/**
-	 * finds the first intervall within which
+	 * finds the first VertexIntervall within which
 	 *  the node is reachable from the source
-	 * @return specified Intervall or null if none exist
+	 * @return specified VertexIntervall or null if none exist
 	 */
 	public VertexIntervall getFirstPossible(){
 		VertexIntervall result = this.getIntervallAt(0);
@@ -253,7 +241,6 @@ public class VertexIntervalls {
 				return result;
 			}else{
 				result=this.getNext(result);
-				//TODO more effcient
 			}
 		}
 		if (result.getReachable()){
@@ -263,8 +250,8 @@ public class VertexIntervalls {
 	}
 	
 	/**
-	 * calculates the where it is reachable 
-	 * @return min time or Integer.MAX_VALUE if it is not reachable at all
+	 * calculates the first time where it is reachable 
+	 * @return minimal time or Integer.MAX_VALUE if it is not reachable at all
 	 */
 	public int firstPossibleTime(){
 		VertexIntervall test =this.getFirstPossible();
@@ -273,22 +260,20 @@ public class VertexIntervalls {
 		}else{
 			return Integer.MAX_VALUE;
 		}
-		
 	}
 	
 	/**
 	 * Sets arrival true for all time steps in arrive and sets predecessor to link for each time t
 	 * where it was null beforehand
-	 * @param arrive Intervalls at which node is reachable
+	 * @param arrive VertexIntervalls at which node is reachable
 	 * @return true iff anything was changed
 	 */
 	public boolean setTrue(ArrayList<VertexIntervall> arrive,Link link) {
 		boolean changed = false;
 		ArrayList<VertexIntervall> arrivecondensed = new ArrayList<VertexIntervall>();
 		if(!arrive.isEmpty()){
-			//TODO ROST review whether "condensing" the intervall is usefull (the intervalls are not ordered
+			//ROST review whether "condensing" the intervall is usefull (the intervalls are not ordered
 			//when using bow edges)
-			
 //			VertexIntervall last= arrive.get(0);
 //			for(int j=1; j< arrive.size(); j++){
 //				VertexIntervall present = arrive.get(j);
@@ -306,7 +291,6 @@ public class VertexIntervalls {
 //			}
 			//arrivecondensed=arrive;
 			rem+=arrive.size()-arrivecondensed.size();
-			
 			for(int i=0; i< arrive.size(); i++){
 				boolean temp= setTrue(arrive.get(i),link);
 				if(temp){
@@ -347,7 +331,6 @@ public class VertexIntervalls {
 					else if(ourIntervall.contains(arrive))
 					{
 						//if arrive is contained..
-						
 						//we adapt our intervall, so that our lowbound equals
 						//the low bound of the arrive intervall..
 						if(ourIntervall.getLowBound() < arrive.getLowBound())
@@ -369,7 +352,6 @@ public class VertexIntervalls {
 					{
 						//ourIntervall intersects arrive, but is neither contained nor does it contain
 						//arrive. thus they overlap somewhere
-
 						//if the lowerBound of arrive, is greater than our lower bound
 						//we set our lower bound to the bound of arrive
 						if(arrive.getLowBound() > ourIntervall.getLowBound() && arrive.getLowBound() < ourIntervall.getHighBound())
@@ -398,7 +380,13 @@ public class VertexIntervalls {
 		return changed;
 	}
 	
-	protected void setArrivalAttributes(VertexIntervall ourIntervall, VertexIntervall arrive, Link link)
+	/**
+	 * set the fields of the VertexIntervall reachable true overridable false and scanned false if OurIntervall is not overidable
+	 * @param ourIntervall VertexIntervall upon which the attributes are set
+	 * @param arrive VertexIntervall from which we get getLastDepartureAtFromNode and getTravelTimeToPredecessor
+	 * @param link which is set as predecessor
+	 */
+	protected void setArrivalAttributes (VertexIntervall ourIntervall, final VertexIntervall arrive,final Link link)
 	{
 		//we might have already scanned this intervall
 		if(!ourIntervall.isOverridable())
@@ -412,34 +400,11 @@ public class VertexIntervalls {
 		ourIntervall.setTravelTimeToPredecessor(arrive.getTravelTimeToPredecessor());
 	}
 	
+//------------------------Clean Up--------------------------------//
 
-	
-	/**
-	 * finds the next VertexIntervall that has flow less than u after time t
-	 * @param t time
-	 * @param u capacity
-	 * @return
-	 */
-	/**
-	public VertexIntervall minPossible(int t,int u){
-		if (t<0){
-			throw new IllegalArgumentException("time shold not be negative");
-		}
-		if (u<=0){
-			throw new IllegalArgumentException("capacity shold be positive");
-		}
-		for(_tree.goToNodeAt(t);_tree.isAtEnd() ;_tree.increment()){
-			if(((VertexIntervall)_tree._curr.obj).getFlow()<u){
-				return (VertexIntervall)_tree._curr.obj;
-			}
-		}
-		return null;
-	}
-	**/
-	
-	//------------------------Clean Up--------------------------------//
 	/**
 	 * unifies adjacent intervalls, call only when you feel it is safe to do
+	 * @return number of unified VertexIntervalls
 	 */
 	public int cleanup() {
 		int gain = 0;
@@ -456,8 +421,6 @@ public class VertexIntervalls {
 				  && (i.getTravelTimeToPredecessor() == j.getTravelTimeToPredecessor())
 				  && (i.getLastDepartureAtFromNode() == j.getLastDepartureAtFromNode())
 				  && (i.isOverridable() == j.isOverridable())) {
-			 
-			  //TODO ROST dont remove both intervalls, no new insert needed MORE EFFICIENT!
 			  _tree.remove(i);
 			  _tree.remove(j);
 			  VertexIntervall vI = new VertexIntervall(i.getLowBound(), j.getHighBound());
@@ -475,10 +438,13 @@ public class VertexIntervalls {
 		  }		 		 
 		}
 		_last = (VertexIntervall) _tree._getLast().obj;
-		
 		return gain;
 	}
 	
+	/**
+	 * Gives the first reachable but unscanned VertexIntervall 
+	 * @return the VertexIntervall or null if it does not exist
+	 */
 	public VertexIntervall getFirstUnscannedIntervall()
 	{
 		int lowBound = 0;
@@ -492,6 +458,10 @@ public class VertexIntervalls {
 		return null;
 	}
 	
+	/**
+	 * Returns the lowbound of the first unscanned but reachable VertexIntervall
+	 * @return the Value of the lowbound or null if it does not exist
+	 */
 	public Integer getFirstTimePointWithDistTrue()
 	{
 		VertexIntervall vIntervall = this.getFirstUnscannedIntervall();
@@ -500,10 +470,4 @@ public class VertexIntervalls {
 		else
 			return vIntervall.getLowBound();
 	}
-	
-	
-//------------------------MAIN METHOD--------------------------------//
-	
-	
-
 }
