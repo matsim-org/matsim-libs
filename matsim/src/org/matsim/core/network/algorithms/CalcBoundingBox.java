@@ -20,8 +20,8 @@
 
 package org.matsim.core.network.algorithms;
 
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 
 /**
  * Calculates the bounding box (=maximal extent) of a network.
@@ -35,12 +35,12 @@ public class CalcBoundingBox {
 	private double maxX = Double.NEGATIVE_INFINITY;
 	private double maxY = Double.NEGATIVE_INFINITY;
 
-	public void run(final NetworkLayer network) {
+	public void run(final Network network) {
 		this.minX = Double.POSITIVE_INFINITY;
 		this.minY = Double.POSITIVE_INFINITY;
 		this.maxX = Double.NEGATIVE_INFINITY;
 		this.maxY = Double.NEGATIVE_INFINITY;
-		for (NodeImpl n : network.getNodes().values()) {
+		for (Node n : network.getNodes().values()) {
 			if (n.getCoord().getX() < this.minX) { this.minX = n.getCoord().getX(); }
 			if (n.getCoord().getY() < this.minY) { this.minY = n.getCoord().getY(); }
 			if (n.getCoord().getX() > this.maxX) { this.maxX = n.getCoord().getX(); }

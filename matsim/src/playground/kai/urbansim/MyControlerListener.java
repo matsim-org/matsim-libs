@@ -11,7 +11,7 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -42,7 +42,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc));
 		
-		NetworkLayer network = controler.getNetwork() ;
+		NetworkImpl network = controler.getNetwork() ;
 		double dpTime = 8.*3600 ;
 		st.setDepartureTime(dpTime);
 

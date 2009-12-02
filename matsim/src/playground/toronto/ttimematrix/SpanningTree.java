@@ -28,6 +28,7 @@ import java.util.PriorityQueue;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
@@ -160,7 +161,7 @@ public class SpanningTree {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final NetworkLayer network) {
+	public void run(final Network network) {
 //		log.info("running " + this.getClass().getName() + " module...");
 
 		nodeData = new HashMap<Id,NodeData>((int)(network.getNodes().size()*1.1),0.95f);

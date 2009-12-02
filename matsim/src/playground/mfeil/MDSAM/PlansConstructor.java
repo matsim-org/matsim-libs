@@ -33,7 +33,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -44,7 +43,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -78,7 +77,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected String inputFile, outputFile, outputFileBiogeme, attributesInputFile, outputFileMod, outputFileSims;
 	protected PopulationImpl population;
 	protected ArrayList<List<PlanElement>> actChains;
-	protected NetworkLayer network;
+	protected NetworkImpl network;
 	protected PlansCalcRoute router;
 	protected LocationMutatorwChoiceSet locator;
 	protected MDSAM mdsam;
@@ -107,7 +106,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.network = controler.getNetwork();
 		this.init(network);	
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
-		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
+		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, controler.getScenarioData().getKnowledges());
 		this.linker = new XY2Links (this.controler.getNetwork());
 		this.beta				= "no";
 		this.gamma				= "no";
@@ -144,13 +143,13 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.costPtGA			= 0.08;	// CHF/km
 	}
 	
-	private void init(final NetworkLayer network) {
+	private void init(final NetworkImpl network) {
 		this.network.connect();
 	}
 	
 	public void prepareReplanning() {
 		// Read the external plans file.
-		new MatsimPopulationReader(this.population, this.controler.getNetwork()).readFile(this.inputFile);		
+		new MatsimPopulationReader(this.controler.getScenarioData()).readFile(this.inputFile);		
 		log.info("Reading population done.");
 	}
 

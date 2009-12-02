@@ -40,6 +40,7 @@ import java.util.Set;
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -63,7 +64,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.population.LegImpl;
@@ -341,7 +342,7 @@ public class Homework2 extends Controler {
 
 		private TIntObjectHashMap<List<NetworkChangeEvent>> changeEvents;
 		
-		public IncidentGenerator(String filename, NetworkLayer network) {
+		public IncidentGenerator(String filename, Network network) {
 			try {
 				changeEvents = new TIntObjectHashMap<List<NetworkChangeEvent>>();
 				
@@ -351,7 +352,7 @@ public class Homework2 extends Controler {
 					String[] tokens = line.split("\t");
 					
 					NetworkChangeEvent badEvent = new NetworkChangeEvent(0);
-					badEvent.addLink(network.getLink(new IdImpl(tokens[1])));
+					badEvent.addLink(network.getLinks().get(new IdImpl(tokens[1])));
 					badEvent.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, Double.parseDouble(tokens[2])));
 //					
 					int it = Integer.parseInt(tokens[0]);
@@ -374,9 +375,9 @@ public class Homework2 extends Controler {
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 			List<NetworkChangeEvent> events = changeEvents.get(event.getIteration());
 			if(events != null) {
-				event.getControler().getNetwork().setNetworkChangeEvents(events);
+				((NetworkImpl) event.getControler().getNetwork()).setNetworkChangeEvents(events);
 			} else
-				event.getControler().getNetwork().setNetworkChangeEvents(new LinkedList<NetworkChangeEvent>());
+				((NetworkImpl) event.getControler().getNetwork()).setNetworkChangeEvents(new LinkedList<NetworkChangeEvent>());
 		}
 		
 	}

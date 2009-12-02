@@ -14,6 +14,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.data.Retailer;
@@ -94,7 +95,7 @@ public class LinksRetailerReader {
 				// header: l_id  max_fac
 				// index:   0       1 
 				Id lId = new IdImpl (entries[0]);
-				LinkRetailersImpl l = new LinkRetailersImpl(controler.getNetwork().getLinks().get(lId),controler.getNetwork());
+				LinkRetailersImpl l = new LinkRetailersImpl(controler.getNetwork().getLinks().get(lId),(NetworkLayer) controler.getNetwork());
 				// ciarif: if facilities are already on this link the number of already 
 				// existing facilities is compared with the max from the file. The larger is taken.
 				//TODO verify if it is still actual
@@ -119,7 +120,7 @@ public class LinksRetailerReader {
 		TreeMap<Id,LinkRetailersImpl> links =  new TreeMap<Id,LinkRetailersImpl>();
 		for (Retailer r:retailers.getRetailers().values()) {
 			for (ActivityFacility af: r.getFacilities().values()){
-				LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)((ActivityFacilityImpl) af).getLink(), controler.getNetwork());
+				LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)((ActivityFacilityImpl) af).getLink(), (NetworkLayer) controler.getNetwork());
 				links.put(link.getId(),link);
 			}
 		}
@@ -136,7 +137,7 @@ public class LinksRetailerReader {
 		
 		while (this.freeLinks.size()<(newLinksMax)) {
 			int rd = MatsimRandom.getRandom().nextInt(controler.getNetwork().getLinks().values().size());
-			LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLinks().values().toArray()[rd],controler.getNetwork());
+			LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLinks().values().toArray()[rd],(NetworkLayer) controler.getNetwork());
 			if (currentLinks.containsKey(link.getId())) {}
 			else {	
 				if ((freeLinks.containsKey(link.getId())))	{log.info("The link " + link.getId() + " is already in the list");}

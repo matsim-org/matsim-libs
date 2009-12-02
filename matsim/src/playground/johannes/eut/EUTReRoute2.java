@@ -23,8 +23,8 @@
  */
 package playground.johannes.eut;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -41,12 +41,12 @@ public class EUTReRoute2 extends AbstractMultithreadedModule {
 	
 	private EUTRouterAnalyzer analyzer;
 	
-	private NetworkLayer network;
+	private Network network;
 	
 	private TwoStateTTKnowledge provider;
 	
 	
-	public EUTReRoute2(NetworkLayer network, TwoStateTTKnowledge provider, double rho) {
+	public EUTReRoute2(Network network, TwoStateTTKnowledge provider, double rho) {
 		super(1);
 		utilFunction = new CARAFunction(rho);
 		this.network = network;

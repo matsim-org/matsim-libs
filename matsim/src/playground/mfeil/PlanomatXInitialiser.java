@@ -21,10 +21,8 @@ package playground.mfeil;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -41,7 +39,7 @@ import playground.mfeil.MDSAM.ActivityTypeFinder;
 public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 	
 	
-	private final NetworkLayer 							network;
+	private final NetworkImpl 							network;
 	private final Controler								controler;
 	private final LocationMutatorwChoiceSet 			locator;
 	private /*final*/ DepartureDelayAverageCalculator 	tDepDelayCalc;
@@ -70,7 +68,7 @@ public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 		this.finder = finder;
 	}
 	
-	private void init(final NetworkLayer network) {
+	private void init(final NetworkImpl network) {
 		this.network.connect();
 	}
 

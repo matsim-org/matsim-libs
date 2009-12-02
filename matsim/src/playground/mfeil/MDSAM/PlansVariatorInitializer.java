@@ -23,7 +23,7 @@ package playground.mfeil.MDSAM;
 import java.util.List;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
@@ -41,7 +41,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class PlansVariatorInitializer extends AbstractMultithreadedModule{
 	
 	private final Controler controler;
-	private final NetworkLayer 						network;
+	private final NetworkImpl 						network;
 	private final DepartureDelayAverageCalculator 	tDepDelayCalc;
 	private final LocationMutatorwChoiceSet locator;
 	private final PlansCalcRoute router;
@@ -60,7 +60,7 @@ public class PlansVariatorInitializer extends AbstractMultithreadedModule{
 		this.actTypes = finder.getActTypes();
 	}
 	
-	private void init(final NetworkLayer network) {
+	private void init(final NetworkImpl network) {
 		this.network.connect();
 	}
 

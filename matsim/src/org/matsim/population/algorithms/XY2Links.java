@@ -25,7 +25,7 @@ import java.util.List;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 
 /**
@@ -36,9 +36,9 @@ import org.matsim.core.population.ActivityImpl;
  */
 public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 
-	public XY2Links(final NetworkLayer network) {
+	public XY2Links(final NetworkImpl network) {
 		super();
 		this.network = network;
 	}

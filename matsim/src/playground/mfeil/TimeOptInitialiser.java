@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package playground.mfeil;
 
+import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.replanning.modules.*;
 
 
 /**
@@ -35,7 +35,7 @@ public class TimeOptInitialiser extends AbstractMultithreadedModule{
 	
 	private final Controler							controler;
 	private final DepartureDelayAverageCalculator 	tDepDelayCalc;
-	private final NetworkLayer 						network;
+	private final NetworkImpl 						network;
 
 	
 	public TimeOptInitialiser (Controler controler) {
@@ -46,7 +46,7 @@ public class TimeOptInitialiser extends AbstractMultithreadedModule{
 		this.controler.getEvents().addHandler(tDepDelayCalc);
 	}
 	
-	private void init(final NetworkLayer network) {
+	private void init(final NetworkImpl network) {
 		this.network.connect();
 	}
 

@@ -7,7 +7,7 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -32,7 +32,7 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 			
 	protected void computeChoiceSet(Controler controler) {
 			
-		NetworkLayer network = controler.getNetwork();
+		NetworkImpl network = controler.getNetwork();
 		
 		LinkImpl link0 = network.getNearestLink(new CoordImpl(681753.6875, 251900.64844999998));
 		ActivityImpl fromAct = new ActivityImpl("home", link0);

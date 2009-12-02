@@ -27,11 +27,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
@@ -60,7 +62,7 @@ public class IncidentGenerator implements StartupListener, BeforeMobsimListener 
 	
 	public void notifyStartup(StartupEvent event) {
 		badEvent = new NetworkChangeEvent(0);
-		badEvent.addLink(event.getControler().getNetwork().getLink("2"));
+		badEvent.addLink(event.getControler().getNetwork().getLinks().get(new IdImpl("2")));
 		badEvent.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacityFactor));
 //		badEvent.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 0.3));
 		badEvents = new LinkedList<NetworkChangeEvent>();
@@ -71,11 +73,11 @@ public class IncidentGenerator implements StartupListener, BeforeMobsimListener 
 		if(event.getIteration() > -1) {
 //			if(event.getIteration() % 2 == 0)
 			if(random.nextDouble() <= 0.5) {
-				event.getControler().getNetwork().setNetworkChangeEvents(badEvents);
+				((NetworkImpl) event.getControler().getNetwork()).setNetworkChangeEvents(badEvents);
 				isBadDay = true;
 			} else {
 				isBadDay = false;
-				event.getControler().getNetwork().setNetworkChangeEvents(emptyEvents);
+				((NetworkImpl) event.getControler().getNetwork()).setNetworkChangeEvents(emptyEvents);
 			}
 		}
 	}	

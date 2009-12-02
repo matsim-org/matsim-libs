@@ -31,7 +31,7 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -90,7 +90,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	 */
 	
 	private void handleFacility(ZHFacility facility, ChoiceSet choiceSet, Controler controler, int tt) {
-		NetworkLayer network = controler.getNetwork();
+		NetworkImpl network = controler.getNetwork();
 		
 		Id linkId = facility.getLinkId();
 		

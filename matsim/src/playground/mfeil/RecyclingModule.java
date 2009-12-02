@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scoring.PlanScorer;
@@ -63,7 +63,7 @@ public class RecyclingModule implements PlanStrategyModule{
 	private OptimizedAgents 						agents;
 	private LinkedList<String>						nonassignedAgents;
 	private final DepartureDelayAverageCalculator 	tDepDelayCalc;
-	private final NetworkLayer 						network;
+	private final NetworkImpl 						network;
 	public static PrintStream 						assignment;
 	private final Knowledges 						knowledges;
 	private final ActivityTypeFinder 				finder;
@@ -126,7 +126,7 @@ public class RecyclingModule implements PlanStrategyModule{
 		RecyclingModule.assignment.println("Agent\tScore\tPlan\n");
 	}
 	
-	private void init(final NetworkLayer network) {
+	private void init(final NetworkImpl network) {
 		this.network.connect();
 	}
 	

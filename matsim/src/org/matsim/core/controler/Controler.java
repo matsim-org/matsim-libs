@@ -84,6 +84,7 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
@@ -1056,7 +1057,7 @@ public class Controler {
 		return this.scenarioData.getActivityFacilities();
 	}
 
-	public final NetworkLayer getNetwork() {
+	public final NetworkImpl getNetwork() {
 		return this.network;
 	}
 
@@ -1068,11 +1069,7 @@ public class Controler {
 		return this.events;
 	}
 
-	/**
-	 * This is here for testing purposes only. Kai, mar08
-	 */
-	@Deprecated
-	public final ScenarioImpl getScenarioData() {
+	public final ScenarioImpl getScenarioData() { // TODO [MR] rename to getScenario 
 		return this.scenarioData;
 	}
 

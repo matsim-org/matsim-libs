@@ -67,6 +67,7 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -424,9 +425,9 @@ public class Controller extends WithindayControler {
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 			List<NetworkChangeEvent> events = changeEvents.get(event.getIteration());
 			if(events != null) {
-				event.getControler().getNetwork().setNetworkChangeEvents(events);
+				((NetworkImpl) event.getControler().getNetwork()).setNetworkChangeEvents(events);
 			} else
-				event.getControler().getNetwork().setNetworkChangeEvents(new LinkedList<NetworkChangeEvent>());
+				((NetworkImpl) event.getControler().getNetwork()).setNetworkChangeEvents(new LinkedList<NetworkChangeEvent>());
 		}
 		
 	}

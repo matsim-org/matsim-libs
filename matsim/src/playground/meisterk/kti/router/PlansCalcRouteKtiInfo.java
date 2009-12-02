@@ -6,7 +6,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
@@ -30,7 +30,7 @@ public class PlansCalcRouteKtiInfo {
 		this.ktiConfigGroup = ktiConfigGroup;
 	}
 
-	public void prepare(final NetworkLayer network) {
+	public void prepare(final Network network) {
 		
 		if (!ktiConfigGroup.isUsePlansCalcRouteKti()) {
 			log.error("The kti module is missing.");

@@ -3,9 +3,8 @@ package playground.andreas.intersection.dijkstra;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -24,15 +23,15 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
  */
 public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 	
-	NetworkLayer wrappedNetwork;
-	NetworkLayer originalNetwork;
+	Network wrappedNetwork;
+	Network originalNetwork;
 
-	public PlansCalcRouteDijkstra(final NetworkLayer originalNetwork, final NetworkLayer wrappedNetwork, final TravelCost costCalculator, final TravelTime timeCalculator) {
+	public PlansCalcRouteDijkstra(final Network originalNetwork, final Network wrappedNetwork, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(originalNetwork, wrappedNetwork, costCalculator, timeCalculator, new FreespeedTravelTimeCost());
 	}
 
 	@SuppressWarnings("deprecation")
-	private PlansCalcRouteDijkstra(final NetworkLayer originalNetwork, final NetworkLayer wrappedNetwork, final TravelCost costCalculator, final TravelTime timeCalculator,
+	private PlansCalcRouteDijkstra(final Network originalNetwork, final Network wrappedNetwork, final TravelCost costCalculator, final TravelTime timeCalculator,
 			final FreespeedTravelTimeCost freespeedTimeCost) {
 		super(wrappedNetwork, new Dijkstra(wrappedNetwork, costCalculator, timeCalculator),
 				new Dijkstra(wrappedNetwork, freespeedTimeCost, freespeedTimeCost));
@@ -57,8 +56,8 @@ public class PlansCalcRouteDijkstra extends PlansCalcRoute {
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
 		if (toLink == null) throw new RuntimeException("toLink missing.");
 
-		NodeImpl startNode = this.wrappedNetwork.getNode(fromLink.getId().toString());	// start at the end of the "current" link
-		NodeImpl endNode = this.wrappedNetwork.getNode(toLink.getId().toString()); // the target is the start of the link
+		Node startNode = this.wrappedNetwork.getNodes().get(fromLink.getId());	// start at the end of the "current" link
+		Node endNode = this.wrappedNetwork.getNodes().get(toLink.getId()); // the target is the start of the link
 
 		Path path = null;
 		if (toLink != fromLink) {

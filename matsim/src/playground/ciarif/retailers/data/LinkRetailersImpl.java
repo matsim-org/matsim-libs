@@ -1,5 +1,6 @@
 package playground.ciarif.retailers.data;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -17,7 +18,7 @@ public class LinkRetailersImpl extends LinkImpl  { //AbstractLocation implements
 	protected double capacity = Double.NaN;
 	protected double nofLanes = Double.NaN;
 
-	public LinkRetailersImpl(LinkImpl link, NetworkLayer network) {
+	public LinkRetailersImpl(Link link, NetworkLayer network) {
 		super(link.getId(),link.getFromNode(),link.getToNode(),network,link.getLength(),link.getFreespeed(Time.UNDEFINED_TIME),link.getCapacity(Time.UNDEFINED_TIME),link.getNumberOfLanes(Time.UNDEFINED_TIME));
 	}
 

@@ -146,11 +146,11 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * @deprecated use one of the other constructors of this class
 	 */
 	@Deprecated
-	public PlansCalcRoute(final NetworkLayer network, final LeastCostPathCalculator router, final LeastCostPathCalculator routerFreeflow) {
+	public PlansCalcRoute(final Network network, final LeastCostPathCalculator router, final LeastCostPathCalculator routerFreeflow) {
 		super();
 		this.routeAlgo = router;
 		this.routeAlgoPtFreeflow = routerFreeflow;
-		this.routeFactory = network.getFactory();
+		this.routeFactory = (NetworkFactoryImpl) network.getFactory();
 		log.warn(NO_CONFIGGROUP_SET_WARNING);
 	}
 	

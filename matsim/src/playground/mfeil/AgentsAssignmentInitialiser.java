@@ -19,8 +19,10 @@
  * *********************************************************************** */
 package playground.mfeil;
 
+import java.util.LinkedList;
+
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scoring.PlanScorer;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
@@ -28,8 +30,6 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.mfeil.MDSAM.ActivityTypeFinder;
-
-import java.util.LinkedList;
 
 
 
@@ -40,7 +40,7 @@ import java.util.LinkedList;
 
 public class AgentsAssignmentInitialiser extends AbstractMultithreadedModule {
 	
-	protected final NetworkLayer 						network;
+	protected final NetworkImpl 						network;
 	protected final Controler							controler;
 	protected final LocationMutatorwChoiceSet 			locator;
 	protected final PlanScorer 							scorer;
@@ -74,7 +74,7 @@ public class AgentsAssignmentInitialiser extends AbstractMultithreadedModule {
 		this.distanceCoefficients = distanceCoefficients;
 	}
 	
-	private void init(final NetworkLayer network) {
+	private void init(final NetworkImpl network) {
 		this.network.connect();
 	}
 

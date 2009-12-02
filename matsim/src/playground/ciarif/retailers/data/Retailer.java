@@ -1,12 +1,10 @@
 package playground.ciarif.retailers.data;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 
@@ -45,7 +43,7 @@ public class Retailer {
 	public final boolean addStrategy (Controler controler, String strategyName) {
 		
 		if (strategyName.contains(RandomRetailerStrategy.NAME)) {
-			this.strategy = new RandomRetailerStrategy(controler.getNetwork(), controler.getWorld());
+			this.strategy = new RandomRetailerStrategy(controler.getWorld());
 			return true;
 		}
 		else if (strategyName.contains(MaxLinkRetailerStrategy.NAME)) {

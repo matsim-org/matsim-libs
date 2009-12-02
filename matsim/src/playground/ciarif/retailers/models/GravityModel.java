@@ -110,7 +110,7 @@ public double computePotential(ArrayList<Integer> solution){
 		          
 	        	  if (af.equals(s)){
 		            int index = count;
-		            Coord coord1 = this.controler.getNetwork().getLink(this.first.get(solution.get(index))).getCoord();
+		            Coord coord1 = this.controler.getNetwork().getLinks().get(new IdImpl(this.first.get(solution.get(index)))).getCoord();
 		            
 		            if (((ActivityFacilityImpl) ((PlanImpl) pr.getSelectedPlan()).getFirstActivity().getFacility()).calcDistance(coord1) == 0.0D) {
 		            	dist = 10.0D;

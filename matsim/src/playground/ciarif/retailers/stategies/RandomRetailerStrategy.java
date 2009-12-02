@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.world.World;
 
 import playground.ciarif.retailers.data.FacilityRetailersImpl;
@@ -22,7 +21,7 @@ public class RandomRetailerStrategy implements RetailerStrategy {
 	public static final String NAME = "randomRetailerStrategy";
 	private Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
 	
-	public RandomRetailerStrategy (NetworkLayer network, World world) {
+	public RandomRetailerStrategy (World world) {
 		this.world = world;
 	}
 	
