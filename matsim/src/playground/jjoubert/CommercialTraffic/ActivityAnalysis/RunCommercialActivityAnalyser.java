@@ -57,10 +57,10 @@ public class RunCommercialActivityAnalyser {
 	 * 		- numberOfSamples: the number of samples to run.						|
 	 * 		- sampleSize: the number of vehicles sampled within each run.			| 
 	 *=============================================================================*/
-	private static float clusterRadius = 10;
-	private static int clusterCount = 20;
-	private static int numberOfSamples = 10;
-	private static int sampleSize = 3000;
+	private static float clusterRadius = 15;
+	private static int clusterCount = 30;
+	private static int numberOfSamples = 1;
+	private static int sampleSize = 32000;
 
 	 /*=============================================================================
 	 * Double array with all the minor/major thresholds that should be considered. 	|
