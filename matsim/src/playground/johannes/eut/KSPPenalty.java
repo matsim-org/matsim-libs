@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
@@ -62,7 +62,7 @@ public class KSPPenalty {
     // constructors
     // ===========================================================================
 
-	public KSPPenalty(NetworkLayer network) {
+	public KSPPenalty(Network network) {
 //		decoratedNet = new NetworkDecorator(network);
 		this.penaltyLinkcost = new PenaltyLinkcost();
 		this.algorithm = newAlgorithm(network, this.penaltyLinkcost);
@@ -93,7 +93,7 @@ public class KSPPenalty {
 	 * @param network The network on which the best path search is done.
 	 * @return a new best path algorithm object.
 	 */
-	protected LeastCostPathCalculator newAlgorithm(NetworkLayer network, PenaltyLinkcost pLinkcost) {
+	protected LeastCostPathCalculator newAlgorithm(Network network, PenaltyLinkcost pLinkcost) {
 		return new Dijkstra(network, pLinkcost, pLinkcost);
 	}
 

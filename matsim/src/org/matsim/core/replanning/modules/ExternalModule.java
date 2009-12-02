@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -76,13 +77,13 @@ public class ExternalModule implements PlanStrategyModule {
 	protected PopulationWriter plansWriter = null;
 	private PopulationWriterHandler handler = null;
 	private BufferedWriter writer = null;
-	private final NetworkLayer network;
+	private final Network network;
 	protected Config extConfig;
 	protected String exePath = "";
 	protected String moduleId = "";
 	protected String outFileRoot = "";
 
-	public ExternalModule(final String exePath, final String moduleId, final NetworkLayer network) {
+	public ExternalModule(final String exePath, final String moduleId, final Network network) {
 		this.exePath = exePath;
 		this.moduleId = moduleId + "_";
 		this.outFileRoot = Controler.getTempPath() + "/";
@@ -195,7 +196,7 @@ public class ExternalModule implements PlanStrategyModule {
 	}
 
 	protected PopulationReader getPlansReader(final PopulationImpl plans) {
-		PopulationReader plansReader = new MatsimPopulationReader(plans, this.network);
+		PopulationReader plansReader = new MatsimPopulationReader(plans, (NetworkLayer) this.network);
 		return plansReader;
 	}
 

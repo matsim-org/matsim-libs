@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -33,8 +34,8 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 
 public class JamTest extends Controler {
 
@@ -50,7 +51,7 @@ public class JamTest extends Controler {
 
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			c = event.getControler();
-			NetworkLayer n = c.getNetwork();
+			Network n = c.getNetwork();
 			try {
 				for (Id linkId : va.getLinkIds()) {
 					int[] v = va.getVolumesForLink(linkId);
@@ -58,14 +59,8 @@ public class JamTest extends Controler {
 					for (int i = 6; i < 10; i++) {
 						sb.append("\t" + v[i]);
 					}
-					out
-							.write(linkId
-									+ "\t"
-									+ n
-											.getLink(linkId)
-											.getCapacity(
-													org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
-									/ 100.0 + sb + "\n");
+					out.write(linkId + "\t" + 
+							n.getLinks().get(linkId).getCapacity(Time.UNDEFINED_TIME) / 100.0 + sb + "\n");
 					out.flush();
 				}
 			} catch (IOException e) {

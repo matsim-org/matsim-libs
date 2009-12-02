@@ -47,9 +47,9 @@ import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimResource;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
@@ -142,65 +142,26 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * constant for the file name of the CountsSimRealPerHourGraphs
 	 */
 	private static final String SIMREALGRAPHNAME = "countsSimRealPerHour_";
-	/**
-	 * the network
-	 */
-	private final NetworkLayer network;
-	/**
-	 * the srs transformation used
-	 */
+	
+	private final Network network;
 	private CoordinateTransformation coordTransform = null;
-	/**
-	 * The object factory for KML types.
-	 */
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	/**
 	 * main kml, doc and folder
 	 */
 	private KmlType mainKml = null;
-	/**
-	 * the kml main document
-	 */
+	
 	private DocumentType mainDoc = null;
-	/**
-	 * The kml main folder
-	 */
 	private FolderType mainFolder = null;
-	/**
-	 * the kmz writer
-	 */
 	private KMZWriter writer = null;
-	/**
-	 * style for one of the icons
-	 */
+	
 	private StyleType redCrossStyle;
-	/**
-	 * style for one of the icons
-	 */
 	private StyleType redMinusStyle;
-	/**
-	 * style for one of the icons
-	 */
 	private StyleType yellowCrossStyle;
-	/**
-	 * style for one of the icons
-	 */
 	private StyleType yellowMinusStyle;
-	/**
-	 * style for one of the icons
-	 */
 	private StyleType greenMinusStyle;
-	/**
-	 * style for one of the icons
-	 */
 	private StyleType greenCrossStyle;
-	/**
-	 * style for one of the icons
-	 */
 	private StyleType greyCrossStyle;
-	/**
-	 * style for one of the icons
-	 */
 	private StyleType greyMinusStyle;
 	/**
 	 * maps linkids to filenames in the kmz
@@ -216,7 +177,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param network
 	 * @param coordTransform
 	 */
-	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final NetworkLayer network, final CoordinateTransformation coordTransform) {
+	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final Network network, final CoordinateTransformation coordTransform) {
 		super(countSimCompList);
 		this.network = network;
 		this.coordTransform = coordTransform;
@@ -445,14 +406,14 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 */
 	private void writeLinkData(final List<CountSimComparison> countSimComparisonList, final FolderType folder) {
 		Id linkid;
-		LinkImpl link;
+		Link link;
 		PlacemarkType placemark;
 		double relativeError;
 		Coord coord;
 		PointType point;
 		for (CountSimComparison csc : countSimComparisonList) {
 			linkid = csc.getId();
-			link = this.network.getLink(linkid);
+			link = this.network.getLinks().get(linkid);
 
 			coord = this.coordTransform.transform(calculatePlacemarkPosition(link));
 			relativeError = csc.calculateRelativeError();
@@ -493,7 +454,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param l
 	 * @return the CoordI instance
 	 */
-	private Coord calculatePlacemarkPosition(final LinkImpl l) {
+	private Coord calculatePlacemarkPosition(final Link l) {
 		Coord coordFrom = l.getFromNode().getCoord();
 		Coord coordTo = l.getToNode().getCoord();
 		double xDiff = coordTo.getX() - coordFrom.getX();

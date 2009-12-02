@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 
 /**
  * Contains several helper methods for working with {@link NetworkLayer networks}. 
@@ -42,14 +41,14 @@ public class NetworkUtils {
 	 * @param nodes
 	 * @return The bounding box of all the given nodes as <code>double[] = {minX, minY, maxX, maxY}</code>
 	 */
-	public static double[] getBoundingBox(final Collection<? extends NodeImpl> nodes) {
+	public static double[] getBoundingBox(final Collection<? extends Node> nodes) {
 		double[] bBox = new double[4];
 		bBox[0] = Double.MIN_VALUE;
 		bBox[1] = Double.MAX_VALUE;
 		bBox[2] = Double.MIN_VALUE;
 		bBox[3] = Double.MAX_VALUE;
 
-		for (NodeImpl n : nodes) {
+		for (Node n : nodes) {
 			if (n.getCoord().getX() > bBox[0]) {
 				bBox[0] = n.getCoord().getX();
 			}

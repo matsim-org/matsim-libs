@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,7 +35,6 @@ import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
@@ -46,7 +46,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public abstract class LocationMutator extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
-	protected NetworkLayer network = null;
+	protected Network network = null;
 	protected Controler controler = null;	
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType;
 	
@@ -61,7 +61,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	private static final Logger log = Logger.getLogger(LocationMutator.class);
 	// ----------------------------------------------------------
 
-	public LocationMutator(final NetworkLayer network, final Controler controler, final Knowledges kn) {
+	public LocationMutator(final Network network, final Controler controler, final Knowledges kn) {
 		this.knowledges = kn;
 		this.defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges);
 		this.quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
@@ -71,7 +71,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	}
 	
 	
-	public LocationMutator(final NetworkLayer network, final Controler controler, final Knowledges kn,
+	public LocationMutator(final Network network, final Controler controler, final Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
 		this.knowledges = kn;
@@ -86,7 +86,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		}
 	}
 	
-	private void initLocal(final NetworkLayer network, Controler controler) {	
+	private void initLocal(final Network network, Controler controler) {	
 		
 		if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
 			locationChoiceBasedOnKnowledge = false;

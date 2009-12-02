@@ -26,6 +26,7 @@ package playground.johannes.itsc08;
 import java.util.Set;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -102,8 +103,8 @@ public class Controler extends WithindayControler {
 		m.addStrategy(new PlanStrategy(new ExpBetaPlanChanger()), 0.98);
 //		m.addStrategy(new PlanStrategy(new SelectWorstPlan()), 0.01);
 //		m.addStrategy(new PlanStrategy(new RandomPlanSelector()), 0.05);
-		m.addStrategy(new PlanStrategy(new ForceSelectPlan(getNetwork().getLink("4"))), 0.01);
-		m.addStrategy(new PlanStrategy(new ForceSelectPlan(getNetwork().getLink("5"))), 0.01);
+		m.addStrategy(new PlanStrategy(new ForceSelectPlan(new IdImpl("4"))), 0.01);
+		m.addStrategy(new PlanStrategy(new ForceSelectPlan(new IdImpl("5"))), 0.01);
 		return m;
 	}
 	

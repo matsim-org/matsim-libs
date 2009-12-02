@@ -12,7 +12,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -46,7 +46,7 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 				defaultFeatureTypeFactory.addType(attrTypes.get(i));
 			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 
-			for (LinkImpl link : toll.getLinks()) {
+			for (Link link : toll.getLinks()) {
 				// if (link != null) {
 				LinearRing lr = getLinearRing(link);
 				Polygon p = new Polygon(lr, null, this.geofac);
@@ -62,7 +62,7 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 				o[5] = link
 						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 						/ network.getCapacityPeriod() * 3600.0;
-				o[6] = (link.getType() != null) ? Integer.parseInt(link
+				o[6] = (((LinkImpl) link).getType() != null) ? Integer.parseInt(((LinkImpl) link)
 						.getType()) : 0;
 				o[7] = link.getFreespeed(0);
 				for (int i = 0; i < parameters.size(); i++) {

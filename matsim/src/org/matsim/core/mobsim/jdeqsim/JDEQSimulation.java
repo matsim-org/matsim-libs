@@ -23,13 +23,14 @@ package org.matsim.core.mobsim.jdeqsim;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 
 
@@ -42,10 +43,10 @@ public class JDEQSimulation {
 
 	protected static Logger log = null;
 	protected Population population;
-	protected NetworkLayer network;
+	protected Network network;
 	
 
-	public JDEQSimulation(final NetworkLayer network, final Population population, final EventsManager events) {
+	public JDEQSimulation(final Network network, final Population population, final EventsManager events) {
 		// constructor
 		
 		log = Logger.getLogger(JDEQSimulation.class);
@@ -70,13 +71,14 @@ public class JDEQSimulation {
 		final String GAP_TRAVEL_SPEED = "gapTravelSpeed";
 		final String END_TIME = "endTime";
 
-		String squeezeTime = Gbl.getConfig().findParam(JDEQ_SIM, SQUEEZE_TIME);
-		String flowCapacityFactor = Gbl.getConfig().findParam(JDEQ_SIM, FLOW_CAPACITY_FACTOR);
-		String storageCapacityFactor = Gbl.getConfig().findParam(JDEQ_SIM, STORAGE_CAPACITY_FACTOR);
-		String minimumInFlowCapacity = Gbl.getConfig().findParam(JDEQ_SIM, MINIMUM_INFLOW_CAPACITY);
-		String carSize = Gbl.getConfig().findParam(JDEQ_SIM, CAR_SIZE);
-		String gapTravelSpeed = Gbl.getConfig().findParam(JDEQ_SIM, GAP_TRAVEL_SPEED);
-		String endTime = Gbl.getConfig().findParam(JDEQ_SIM, END_TIME);
+		Config config = Gbl.getConfig();
+		String squeezeTime = config.findParam(JDEQ_SIM, SQUEEZE_TIME);
+		String flowCapacityFactor = config.findParam(JDEQ_SIM, FLOW_CAPACITY_FACTOR);
+		String storageCapacityFactor = config.findParam(JDEQ_SIM, STORAGE_CAPACITY_FACTOR);
+		String minimumInFlowCapacity = config.findParam(JDEQ_SIM, MINIMUM_INFLOW_CAPACITY);
+		String carSize = config.findParam(JDEQ_SIM, CAR_SIZE);
+		String gapTravelSpeed = config.findParam(JDEQ_SIM, GAP_TRAVEL_SPEED);
+		String endTime = config.findParam(JDEQ_SIM, END_TIME);
 
 		if (squeezeTime != null) {
 			SimulationParameters.setSqueezeTime(Double.parseDouble(squeezeTime));
@@ -140,7 +142,7 @@ public class JDEQSimulation {
 
 		// initialize network
 		Road road = null;
-		for (LinkImpl link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			road = new Road(scheduler, link);
 			SimulationParameters.getAllRoads().put(link.getId().toString(), road);
 		}

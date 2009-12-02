@@ -26,11 +26,13 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.knowledges.Knowledges;
@@ -43,7 +45,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class LocationChoice extends AbstractMultithreadedModule {
 
-	private NetworkLayer network=null;
+	private Network network=null;
 	private Controler controler = null;
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
@@ -59,7 +61,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	}
 
 	public LocationChoice(
-			final NetworkLayer network,
+			final Network network,
 			Controler controler, Knowledges kn) {
 		// TODO: why does this module need the control(l)er as argument?  Gets a bit awkward
 		// when you use it in demandmodelling where you don't really need a control(l)er.
@@ -86,7 +88,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 
 
 	private void initLocal(
-			final NetworkLayer network,
+			final Network network,
 			final Controler controler) {
 						
 		if (Gbl.getConfig().locationchoice().getMode().equals("true")) {
@@ -98,7 +100,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		}
 		this.controler = controler;
 		this.network = network;
-		this.network.connect();
+		((NetworkImpl) this.network).connect();
 		this.initTrees(controler.getFacilities());
 	}
 			
@@ -164,7 +166,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	}
 
 	// for test cases:
-	public NetworkLayer getNetwork() {
+	/*package*/ Network getNetwork() {
 		return network;
 	}
 

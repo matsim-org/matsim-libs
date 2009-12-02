@@ -43,6 +43,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -111,12 +112,12 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 	}
 
 	public static List<Map<Id, Double>> createSpeedLevels(
-			Collection<LinkImpl> links, CalcLinksAvgSpeed clas) {
+			Collection<? extends Link> links, CalcLinksAvgSpeed clas) {
 		List<Map<Id, Double>> speeds = new ArrayList<Map<Id, Double>>(24);
 		for (int i = 0; i < 24; i++)
 			speeds.add(i, null);
 
-		for (LinkImpl link : links) {
+		for (Link link : links) {
 			Id linkId = link.getId();
 
 			for (int i = 0; i < 24; i++) {
@@ -125,8 +126,8 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 					m = new HashMap<Id, Double>();
 					speeds.add(i, m);
 				}
-				double speed = clas.getAvgSpeed(linkId, (double) (i * 3600))
-						/ 3.6 / link.getFreespeed(((double) i) * 3600.0);
+				double speed = clas.getAvgSpeed(linkId, (i * 3600))
+						/ 3.6 / link.getFreespeed(i * 3600.0);
 				m.put(linkId, speed);
 			}
 		}
@@ -171,7 +172,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		}
 		RoadPricingScheme rps = tollReader.getScheme();
 
-		Collection<LinkImpl> links = (rps != null) ? rps.getLinks() : net
+		Collection<? extends Link> links = (rps != null) ? rps.getLinks() : net
 				.getLinks().values();
 		List<Map<Id, Double>> sls = createSpeedLevels(links, clas);
 

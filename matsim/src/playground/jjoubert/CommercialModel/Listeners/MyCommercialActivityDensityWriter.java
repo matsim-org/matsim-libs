@@ -23,17 +23,17 @@ package playground.jjoubert.CommercialModel.Listeners;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 
 public class MyCommercialActivityDensityWriter implements ActivityStartEventHandler{
 	
 	private BufferedWriter outputGapDensity;
-	private NetworkLayer network;
+	private Network network;
 	
-	public MyCommercialActivityDensityWriter(BufferedWriter output, NetworkLayer nw) {
+	public MyCommercialActivityDensityWriter(BufferedWriter output, Network nw) {
 		this.outputGapDensity = output;
 		this.network = nw;
 	}
@@ -48,7 +48,7 @@ public class MyCommercialActivityDensityWriter implements ActivityStartEventHand
 			double timeSeconds = event.getTime();
 			int hour = (int) Math.floor((timeSeconds) / 3600);
 
-			LinkImpl link = this.network.getLink( event.getLinkId() );
+			Link link = this.network.getLinks().get( event.getLinkId() );
 			try {
 				this.outputGapDensity.write(String.valueOf(link.getCoord().getX()));
 				this.outputGapDensity.write(",");

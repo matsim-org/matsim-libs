@@ -359,7 +359,7 @@ public class Controler {
 		ParallelPersonAlgorithmRunner.run(this.getPopulation(), this.config.global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(getRoutingAlgorithm(), getNetwork());
+				return new PersonPrepareForSim(getRoutingAlgorithm(), Controler.this.network);
 			}
 		});
 		
@@ -1047,6 +1047,7 @@ public class Controler {
 		return this.config;
 	}
 
+	@Deprecated
 	public final World getWorld() {
 		return this.scenarioData.getWorld();
 	}

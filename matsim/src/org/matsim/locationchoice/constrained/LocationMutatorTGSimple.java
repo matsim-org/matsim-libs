@@ -28,12 +28,13 @@ import java.util.Vector;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -47,7 +48,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	protected int unsuccessfullLC = 0;
 	DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges);
 	
-	public LocationMutatorTGSimple(final NetworkLayer network, Controler controler, Knowledges knowledges,
+	public LocationMutatorTGSimple(final Network network, Controler controler, Knowledges knowledges,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
 		
@@ -136,7 +137,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			return false;
 		}
 		act.setFacility(facility);
-   		act.setLink(this.network.getNearestLink(facility.getCoord()));
+   		act.setLink(((NetworkImpl) this.network).getNearestLink(facility.getCoord()));
    		act.setCoord(facility.getCoord());
    		
    		return true;

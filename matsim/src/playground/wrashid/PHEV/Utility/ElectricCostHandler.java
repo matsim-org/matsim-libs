@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
@@ -18,7 +19,6 @@ import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.network.LinkImpl;
 
 //TODO: write tests for this class
 
@@ -108,7 +108,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 	public void handleEvent(LinkLeaveEvent event) {
 		// for some strange reason, the links, person are not set using the DES
 		// controller
-		LinkImpl link = controler2.getNetwork().getLinks().get(event.getLinkId());
+		Link link = controler2.getNetwork().getLinks().get(event.getLinkId());
 //		if (controler == null) {
 //			event.setLink(controler2.getNetwork().getLink(event.getLinkId().toString()));
 ////			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
@@ -144,7 +144,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		recordSOCOfVehicle(event);
 	}
 
-	private double getEnergyConsumption(LinkImpl link) {
+	private double getEnergyConsumption(Link link) {
 		double freeSpeed = 0;
 		if (controler == null) {
 			freeSpeed = link.getFreespeed(controler2.getNetwork()

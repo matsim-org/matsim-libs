@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -16,7 +17,6 @@ import org.matsim.core.mobsim.jdeqsim.Road;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 /*
@@ -65,7 +65,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 
 	private int numOfThreads;
 
-	public PJDEQSimulation(NetworkLayer network, Population population,
+	public PJDEQSimulation(Network network, Population population,
 			EventsManager events, int numOfThreads) {
 		super(network, population, events);
 		this.numOfThreads = numOfThreads; // TODO: use this number really...
@@ -164,7 +164,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 
 		// initialize network
 		ExtendedRoad road = null;
-		for (LinkImpl link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			road = new ExtendedRoad(scheduler, link);
 
 			if (link.getCoord().getX() < networkXMedian) {
@@ -180,7 +180,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 		// define border roads
 		// just one layer long
 		ExtendedRoad tempRoad = null;
-		for (LinkImpl link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			road = (ExtendedRoad) Road.getRoad(link.getId().toString());
 			
 			// mark roads, which go away from border roads

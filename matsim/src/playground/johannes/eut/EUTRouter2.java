@@ -26,8 +26,8 @@ package playground.johannes.eut;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
@@ -49,7 +49,7 @@ public class EUTRouter2 implements LeastCostPathCalculator {
 
 	private ArrowPrattRiskAversionI utilFunc;
 
-	public EUTRouter2(NetworkLayer network, TwoStateTTKnowledge ttKnowledge,
+	public EUTRouter2(Network network, TwoStateTTKnowledge ttKnowledge,
 			ArrowPrattRiskAversionI utilFunc) {
 		this.ttKnowledge = ttKnowledge;
 		this.utilFunc = utilFunc;

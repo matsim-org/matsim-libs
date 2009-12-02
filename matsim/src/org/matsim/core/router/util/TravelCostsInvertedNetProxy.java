@@ -20,8 +20,7 @@
 package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.api.core.v01.network.Network;
 
 /**
  * Proxy for a TravelCost instance to make it work with the 
@@ -32,10 +31,10 @@ import org.matsim.core.network.NetworkLayer;
  */
 public class TravelCostsInvertedNetProxy implements TravelCost {
 
-	private NetworkLayer originalNetwork;
+	private Network originalNetwork;
 	private TravelCost travelCosts;
 
-	public TravelCostsInvertedNetProxy(NetworkLayer originalNetwork,
+	public TravelCostsInvertedNetProxy(Network originalNetwork,
 			TravelCost travelCosts) {
 		this.originalNetwork = originalNetwork;
 		this.travelCosts = travelCosts;
@@ -44,7 +43,7 @@ public class TravelCostsInvertedNetProxy implements TravelCost {
 	public double getLinkTravelCost(Link link, double time) {
 		//as we have no turning move travel costs defined
 		//the fromLink is sufficient to calculate travelCosts
-		LinkImpl fromLink = this.originalNetwork.getLink(link.getFromNode().getId());
+		Link fromLink = this.originalNetwork.getLinks().get(link.getFromNode().getId());
 		return this.travelCosts.getLinkTravelCost(fromLink, time);
 	}
 

@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -60,7 +61,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @param factory
 	 * @param scheme
 	 */
-	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator,
+	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final Network network, final TravelCost costCalculator, final TravelTime timeCalculator,
 			LeastCostPathCalculatorFactory factory, final RoadPricingScheme scheme) {
 		super(configGroup, network, costCalculator, timeCalculator, factory);
 		this.scheme = scheme;

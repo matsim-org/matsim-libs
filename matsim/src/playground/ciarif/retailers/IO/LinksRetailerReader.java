@@ -94,7 +94,7 @@ public class LinksRetailerReader {
 				// header: l_id  max_fac
 				// index:   0       1 
 				Id lId = new IdImpl (entries[0]);
-				LinkRetailersImpl l = new LinkRetailersImpl(controler.getNetwork().getLink(lId),controler.getNetwork());
+				LinkRetailersImpl l = new LinkRetailersImpl(controler.getNetwork().getLinks().get(lId),controler.getNetwork());
 				// ciarif: if facilities are already on this link the number of already 
 				// existing facilities is compared with the max from the file. The larger is taken.
 				//TODO verify if it is still actual

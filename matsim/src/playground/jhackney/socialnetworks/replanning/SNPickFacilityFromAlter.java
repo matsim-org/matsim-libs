@@ -1,6 +1,7 @@
 package playground.jhackney.socialnetworks.replanning;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.TravelCost;
@@ -12,12 +13,12 @@ public class SNPickFacilityFromAlter extends AbstractMultithreadedModule {
 	
 	private final static Logger log = Logger.getLogger(SNPickFacilityFromAlter.class);
 	private String[] factypes={"home","work","shop","education","leisure"};
-	private NetworkLayer network=null;
+	private Network network=null;
 	private TravelCost tcost=null;
 	private TravelTime ttime=null;
 	private Knowledges knowledges;
 	
-	public SNPickFacilityFromAlter(NetworkLayer network, TravelCost tcost, TravelTime ttime, Knowledges kn) {
+	public SNPickFacilityFromAlter(Network network, TravelCost tcost, TravelTime ttime, Knowledges kn) {
 		log.info("initializing SNPickFacility");
     	this.network=network;
     	this.tcost = tcost;
@@ -28,6 +29,6 @@ public class SNPickFacilityFromAlter extends AbstractMultithreadedModule {
     @Override
 		public PlanAlgorithm getPlanAlgoInstance() {
 
-    	return new SNPickFacility(factypes, network, tcost, ttime, this.knowledges);
+    	return new SNPickFacility(factypes, (NetworkLayer) network, tcost, ttime, this.knowledges);
     }
 }

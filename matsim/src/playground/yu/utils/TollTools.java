@@ -6,7 +6,6 @@ package playground.yu.utils;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 /**
@@ -34,7 +33,7 @@ public class TollTools {
 	 *         containing all the <code>Link</code>s in the difference area
 	 *         between biggerToll and surroundedToll
 	 */
-	public static Collection<LinkImpl> getDifferenceToll(
+	public static Collection<Link> getDifferenceToll(
 			RoadPricingScheme biggerToll, RoadPricingScheme surroundedToll) {
 		biggerToll.getLinks().removeAll(surroundedToll.getLinks());
 		return biggerToll.getLinks();

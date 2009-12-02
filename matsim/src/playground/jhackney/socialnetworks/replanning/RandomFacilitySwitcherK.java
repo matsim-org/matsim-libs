@@ -21,7 +21,7 @@
 package playground.jhackney.socialnetworks.replanning;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -39,7 +39,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class RandomFacilitySwitcherK extends AbstractMultithreadedModule {
 	private final static Logger log = Logger.getLogger(RandomFacilitySwitcherK.class);
-	private NetworkLayer network=null;
+	private Network network=null;
 	private TravelCost tcost=null;
 	private TravelTime ttime=null;
 	/** 
@@ -50,7 +50,7 @@ public class RandomFacilitySwitcherK extends AbstractMultithreadedModule {
 	private String[] factypes={"home","work","shop","education","leisure"};
 	private Knowledges knowledges;
 	
-    public RandomFacilitySwitcherK(NetworkLayer network, TravelCost tcost, TravelTime ttime, Knowledges kn) {
+    public RandomFacilitySwitcherK(Network network, TravelCost tcost, TravelTime ttime, Knowledges kn) {
 
 		log.info("initializing SNRandomFacilitySwitcher");
     	this.network=network;

@@ -1,7 +1,7 @@
 package playground.christoph.replanning.modules;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.ReRouteDijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -19,11 +19,11 @@ public class MyReRouteDijkstra extends ReRouteDijkstra {
 
 	TravelCost costCalculator = null;
 	TravelTime timeCalculator = null;
-	NetworkLayer network = null;
+	Network network = null;
 	
 	private PlansCalcRouteConfigGroup configGroup = null;
 	
-	public MyReRouteDijkstra(PlansCalcRouteConfigGroup configGroup, final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+	public MyReRouteDijkstra(PlansCalcRouteConfigGroup configGroup, final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		super(configGroup, network, costCalculator, timeCalculator);
 		this.network = network;
 		this.costCalculator = costCalculator;

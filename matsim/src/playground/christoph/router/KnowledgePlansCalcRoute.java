@@ -23,11 +23,11 @@ package playground.christoph.router;
 import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -39,7 +39,7 @@ import playground.christoph.router.util.PersonLeastCostPathCalculator;
 public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable{
 	
 	protected Person person;
-	protected NetworkLayer network;
+	protected Network network;
 	protected PlansCalcRouteConfigGroup configGroup;
 	protected TravelCost costCalculator;
 	protected TravelTime timeCalculator;
@@ -47,7 +47,7 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 		
 	private final static Logger log = Logger.getLogger(KnowledgePlansCalcRoute.class);
 				
-	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, final TravelCost costCalculator,
+	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		super(group, network, costCalculator, timeCalculator, factory);
 		
@@ -62,7 +62,7 @@ public class KnowledgePlansCalcRoute extends PlansCalcRoute implements Cloneable
 	 * If no LeastCostPathCalculatorFactory is given use by Default
 	 * a DijkstraFactory.
 	 */
-	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+	public KnowledgePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(group, network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
 	

@@ -26,11 +26,12 @@ package playground.johannes.eut;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.mobsim.WithindayQueueSimulation;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
@@ -63,7 +64,7 @@ public class EUTController2 extends WithindayControler {
 	
 	private double capReduction;
 	
-	private List<LinkImpl> riskyLinks;
+	private List<Link> riskyLinks;
 
 	//==============================================================================
 	// 
@@ -108,9 +109,9 @@ public class EUTController2 extends WithindayControler {
 		 * Get the "risky" links...
 		 */
 		String linkIds = getConfig().findParam(CONFIG_MODULE_NAME, "links");
-		riskyLinks = new LinkedList<LinkImpl>();
+		riskyLinks = new LinkedList<Link>();
 		for(String id : linkIds.split(" ")) {
-			LinkImpl link = getNetwork().getLink(id);
+			Link link = getNetwork().getLinks().get(new IdImpl(id));
 			riskyLinks.add(link);
 			
 		}
@@ -152,7 +153,7 @@ public class EUTController2 extends WithindayControler {
 		 */
 		RandomIncidentSimulator simulator = new RandomIncidentSimulator(network, incidentProba);
 		simulator.setCapReduction(capReduction);
-		for(LinkImpl link : riskyLinks)
+		for(Link link : riskyLinks)
 			simulator.addLink(link);
 		
 		addControlerListener(simulator);
@@ -195,10 +196,10 @@ public class EUTController2 extends WithindayControler {
 	}
 
 	private double string2Double(String str) {
-		if(str.endsWith("%"))
+		if(str.endsWith("%")) {
 			return Integer.parseInt(str.substring(0, str.length()-1))/100.0;
-		else
-			return Double.parseDouble(str);
+		}
+		return Double.parseDouble(str);
 
 	}
 }

@@ -29,9 +29,8 @@ import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 
 /**
  * Pre-processes a given network, gathering information which can be used by
@@ -48,7 +47,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 
 	private final int landmarkCount;
 
-	private NodeImpl[] landmarks;
+	private Node[] landmarks;
 
 	private static final Logger log = Logger.getLogger(PreProcessLandmarks.class);
 
@@ -90,7 +89,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	}
 
 	@Override
-	public void run(final NetworkLayer network) {
+	public void run(final Network network) {
 		super.run(network);
 
 		log.info("Putting landmarks on network...");
@@ -108,12 +107,12 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 			expandLandmark(this.landmarks[i], i);
 		}
 
-		for (NodeImpl node : network.getNodes().values()) {
+		for (Node node : network.getNodes().values()) {
 			LandmarksData r = (LandmarksData) getNodeData(node);
 			r.updateMinMaxTravelTimes();
 		}
 
-		for (NodeImpl node : network.getNodes().values()) {
+		for (Node node : network.getNodes().values()) {
 			LandmarksData r = (LandmarksData) getNodeData(node);
 			for (int i = 0; i < this.landmarks.length; i++) {
 				if (r.getMinLandmarkTravelTime(i) > r.getMaxLandmarkTravelTime(i)) {
@@ -170,7 +169,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		}
 	}
 
-	public NodeImpl[] getLandmarks() {
+	public Node[] getLandmarks() {
 		return this.landmarks.clone();
 	}
 

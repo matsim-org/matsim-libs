@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
@@ -81,7 +80,7 @@ public class RecyclingModule implements PlanStrategyModule{
 	public RecyclingModule (ControlerMFeil controler, ActivityTypeFinder finder) {
 		
 		this.controler=controler;
-		this.knowledges 			= ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
+		this.knowledges 			= controler.getScenarioData().getKnowledges();
 		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler, this.knowledges);
 		this.scorer 				= new PlanScorer (controler.getScoringFunctionFactory());
 		this.network 				= controler.getNetwork();

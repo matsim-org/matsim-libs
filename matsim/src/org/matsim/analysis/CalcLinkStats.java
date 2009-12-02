@@ -28,9 +28,8 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
@@ -58,21 +57,21 @@ public class CalcLinkStats {
 	private int count = 0;
 	private final Map<Id, LinkData> linkData;
 	private final int nofHours;
-	private final NetworkLayer network;
+	private final Network network;
 
 	private static final int MIN = 0;
 	private static final int MAX = 1;
 	private static final int SUM = 2;
 	private static final int NOF_STATS = 3;
 
-	public CalcLinkStats(final NetworkLayer network) {
+	public CalcLinkStats(final Network network) {
 		this.network = network;
 		this.linkData = new TreeMap<Id, LinkData>();
 		this.nofHours = 24;
 		reset();
 	}
 
-	public CalcLinkStats(final NetworkLayer network, double vol_scale_factor) {
+	public CalcLinkStats(final Network network, double vol_scale_factor) {
 		this(network);
 		this.volScaleFactor = vol_scale_factor;
 	}
@@ -81,7 +80,7 @@ public class CalcLinkStats {
 		this.count++;
 		// TODO verify analyzer and ttimes have hourly timeBin-Settings
 		for (Id linkId : this.linkData.keySet()) {
-			LinkImpl link = this.network.getLinks().get(linkId);
+			Link link = this.network.getLinks().get(linkId);
 			int[] volumes = analyzer.getVolumesForLink(linkId);
 			LinkData data = this.linkData.get(linkId);
 			int sum = 0; // daily (0-24) sum
@@ -170,14 +169,10 @@ public class CalcLinkStats {
 			for (Map.Entry<Id, LinkData> entry : this.linkData.entrySet()) {
 				Id linkId = entry.getKey();
 				LinkData data = entry.getValue();
-				LinkImpl link = this.network.getLinks().get(linkId);
+				Link link = this.network.getLinks().get(linkId);
 
 				out.write(linkId.toString());
-				if (link.getOrigId() == null) {
-					out.write("\t");
-				} else {
-					out.write("\t" + link.getOrigId());
-				}
+				out.write("\t"); // origId, no longer supported
 				out.write("\t" + link.getFromNode().getId().toString());
 				out.write("\t" + link.getToNode().getId().toString());
 				out.write("\t" + Double.toString(link.getLength()));

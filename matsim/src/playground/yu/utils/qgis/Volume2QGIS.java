@@ -35,8 +35,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -49,12 +49,12 @@ import org.xml.sax.SAXException;
  */
 public class Volume2QGIS extends MATSimNet2QGIS {
 
-	public static List<Map<Id, Integer>> createVolumes(Collection<LinkImpl> links,
+	public static List<Map<Id, Integer>> createVolumes(Collection<? extends Link> links,
 			final VolumesAnalyzer va) {
 		List<Map<Id, Integer>> volumes = new ArrayList<Map<Id, Integer>>(24);
 		for (int i = 0; i < 24; i++)
 			volumes.add(i, null);
-		for (LinkImpl link : links) {
+		for (Link link : links) {
 			Id linkId = link.getId();
 			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
@@ -116,7 +116,7 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		}
 		RoadPricingScheme rps = tollReader.getScheme();
 
-		Collection<LinkImpl> links = (rps != null) ? rps.getLinks() : net
+		Collection<? extends Link> links = (rps != null) ? rps.getLinks() : net
 				.getLinks().values();
 		List<Map<Id, Integer>> vols = createVolumes(links, va);
 		List<Map<Id, Double>> sls = SaturationLevel2QGIS

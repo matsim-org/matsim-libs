@@ -23,12 +23,12 @@ package org.matsim.analysis;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 
@@ -43,12 +43,12 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Agent
 	private double sumLength = 0.0;
 	private int cntTrips = 0;
 	private RoadPricingScheme scheme = null;
-	private NetworkLayer network = null;
+	private Network network = null;
 	private TreeMap<Id, Double> agentDistance = null;
 	
 	private static Double zero = Double.valueOf(0.0);
 
-	public CalcAverageTolledTripLength(final NetworkLayer network, final RoadPricingScheme scheme) {
+	public CalcAverageTolledTripLength(final Network network, final RoadPricingScheme scheme) {
 		this.scheme = scheme;
 		this.network = network;
 		this.agentDistance = new TreeMap<Id, Double>();
@@ -57,7 +57,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Agent
 	public void handleEvent(final LinkEnterEvent event) {
 		Cost cost = this.scheme.getLinkCost(event.getLinkId(), event.getTime());
 		if (cost != null) {
-			LinkImpl link = this.network.getLink(event.getLinkId());
+			Link link = this.network.getLinks().get(event.getLinkId());
 			if (link != null) {
 				Double length = this.agentDistance.get(event.getPersonId());
 				if (length == null) {

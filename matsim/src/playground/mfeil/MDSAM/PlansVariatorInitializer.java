@@ -20,15 +20,15 @@
 
 package playground.mfeil.MDSAM;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import java.util.List;
+
+import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.controler.Controler;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import java.util.List;
 
 
 
@@ -53,7 +53,7 @@ public class PlansVariatorInitializer extends AbstractMultithreadedModule{
 		this.init(network);	
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network, controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
-		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
+		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, controler.getScenarioData().getKnowledges());
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
 		ActivityTypeFinder finder = new ActivityTypeFinder (this.controler);
 		finder.run(controler.getFacilities());

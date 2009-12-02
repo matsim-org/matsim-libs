@@ -1,8 +1,8 @@
 package org.matsim.core.mobsim.jdeqsim.parallel;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.jdeqsim.Road;
 import org.matsim.core.mobsim.jdeqsim.Scheduler;
-import org.matsim.core.network.LinkImpl;
 
 public class ExtendedRoad extends Road {
 
@@ -12,9 +12,8 @@ public class ExtendedRoad extends Road {
 	
 	private boolean borderZone=false;
 	
-	public ExtendedRoad(Scheduler scheduler, LinkImpl link) {
+	public ExtendedRoad(Scheduler scheduler, Link link) {
 		super(scheduler, link);
-		// TODO Auto-generated constructor stub
 	}
 
 	public int getThreadZoneId() {

@@ -26,11 +26,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
@@ -59,17 +59,17 @@ public class CountsComparisonAlgorithm {
 	 */
 	private final List<CountSimComparison> countSimComp;
 
-	private NodeImpl distanceFilterNode = null;
+	private Node distanceFilterNode = null;
 
 	private Double distanceFilter = null;
 
-	private final NetworkLayer network;
+	private final Network network;
 
 	private double countsScaleFactor;
 
 	private final static Logger log = Logger.getLogger(CountsComparisonAlgorithm.class);
 
-	public CountsComparisonAlgorithm(final CalcLinkStats linkStats, final Counts counts, final NetworkLayer network) {
+	public CountsComparisonAlgorithm(final CalcLinkStats linkStats, final Counts counts, final Network network) {
 		this.linkStats = linkStats;
 		this.counts = counts;
 		this.countSimComp = new ArrayList<CountSimComparison>();
@@ -123,7 +123,7 @@ public class CountsComparisonAlgorithm {
 		if ((this.distanceFilterNode == null) || (this.distanceFilter == null)) {
 			return true;
 		}
-		LinkImpl l = this.network.getLink(linkid);
+		Link l = this.network.getLinks().get(linkid);
 		if (l == null) {
 			log.warn("Cannot find requested link: " + linkid.toString());
 			return false;
@@ -152,7 +152,7 @@ public class CountsComparisonAlgorithm {
 	 */
 	public void setDistanceFilter(final Double distance, final String nodeId) {
 		this.distanceFilter = distance;
-	  this.distanceFilterNode = this.network.getNode(new IdImpl(nodeId));
+	  this.distanceFilterNode = this.network.getNodes().get(new IdImpl(nodeId));
 	}
 
 	public void setCountsScaleFactor(final double countsScaleFactor) {

@@ -21,6 +21,7 @@
 package playground.marcel.modules.template;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -28,7 +29,6 @@ import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -54,7 +54,7 @@ public class Template implements MatsimModule {
 		// *** RoutingAlgorithm *********************
 		
 		LeastCostPathCalculatorFactory routerAlgoFactory = new LeastCostPathCalculatorFactory() {
-			public LeastCostPathCalculator createPathCalculator(NetworkLayer network, TravelCost travelCosts, TravelTime travelTimes) {
+			public LeastCostPathCalculator createPathCalculator(Network network, TravelCost travelCosts, TravelTime travelTimes) {
 				return null;
 			}
 		};

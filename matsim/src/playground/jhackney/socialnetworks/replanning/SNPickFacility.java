@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -65,7 +66,7 @@ public class SNPickFacility implements PlanAlgorithm {
 
 	private final String weights;
 	private double[] cum_p_factype;
-	private NetworkLayer network;
+	private Network network;
 	private TravelCost tcost;
 	private TravelTime ttime;
 	private String[] factypes;
@@ -212,7 +213,7 @@ public class SNPickFacility implements PlanAlgorithm {
 //				Reset the score.
 //				newPlan.setScore(null);
 
-				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), network).run(newPlan.getPerson());
+				new PersonPrepareForSim(new PlansCalcRoute(network, tcost, ttime), (NetworkLayer) network).run(newPlan.getPerson());
 //				new PlansCalcRoute(network, tcost, ttime).run(newPlan);
 
 //				Not needed with new change to Act --> Facility JH 7.2008

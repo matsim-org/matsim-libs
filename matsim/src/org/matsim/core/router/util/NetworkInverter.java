@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
@@ -24,15 +25,15 @@ public class NetworkInverter {
 
 	final private static Logger log = Logger.getLogger(NetworkInverter.class);
 	
-	private NetworkLayer originalNetwork;
+	private Network originalNetwork;
 	
 	private NetworkLayer invertedNetwork = null;
 
-	public NetworkInverter(NetworkLayer originalNet) {
+	public NetworkInverter(Network originalNet) {
 		this.originalNetwork = originalNet;
 	}
 
-	public NetworkLayer getInvertedNetwork() {
+	public Network getInvertedNetwork() {
 		if (this.invertedNetwork == null){
 			invertNetwork();
 		}
@@ -44,7 +45,7 @@ public class NetworkInverter {
 		int numberOfNodesGenerated = 0;
 		int numberOfLinksGenerated = 0;
 
-		for (LinkImpl link : this.originalNetwork.getLinks().values()) {
+		for (Link link : this.originalNetwork.getLinks().values()) {
 			this.invertedNetwork.createAndAddNode(link.getId(), link.getToNode().getCoord());
 			numberOfNodesGenerated++;
 		}
@@ -76,7 +77,7 @@ public class NetworkInverter {
 	public List<Node> convertInvertedLinksToNodes(List<Link> links) {
 		List<Node> ret = new ArrayList<Node>(links.size());
 		for (Link l : links){
-			ret.add(this.originalNetwork.getNode(l.getId()));
+			ret.add(this.originalNetwork.getNodes().get(l.getId()));
 		}
 		return ret;
 	}
@@ -84,7 +85,7 @@ public class NetworkInverter {
 	public List<Link> convertInvertedNodesToLinks(List<Node> nodes) {
 		List<Link> ret = new ArrayList<Link>(nodes.size());
 		for (Node n : nodes){
-			ret.add(this.originalNetwork.getLink(n.getId()));
+			ret.add(this.originalNetwork.getLinks().get(n.getId()));
 		}
 		return ret;
 	}

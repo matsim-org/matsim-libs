@@ -203,7 +203,7 @@ public class GravityModelRetailerStrategy implements RetailerStrategy { //TODO c
 		TreeMap<Id,LinkRetailersImpl> availableLinks = new TreeMap<Id,LinkRetailersImpl>();
 		for (ActivityFacilityImpl af: this.retailerFacilities.values()){
 			Id id = af.getLink().getId();
-			LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLink(id),controler.getNetwork());
+			LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)controler.getNetwork().getLinks().get(id),controler.getNetwork());
 			availableLinks.put(link.getId(),link);
 		}
 		availableLinks.putAll(freeLinks);

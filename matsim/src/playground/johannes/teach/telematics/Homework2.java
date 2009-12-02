@@ -39,6 +39,7 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -321,16 +322,19 @@ public class Homework2 extends Controler {
 			avr_route2TTs = StatUtils.mean(route2TTs.toNativeArray());
 			
 			if(Double.isNaN(avr_route1TTs)) {
-				avr_route1TTs = event.getControler().getNetwork().getLink("2").getFreespeedTravelTime(Time.UNDEFINED_TIME);
-				avr_route1TTs += event.getControler().getNetwork().getLink("4").getFreespeedTravelTime(Time.UNDEFINED_TIME);
-				avr_route1TTs += event.getControler().getNetwork().getLink("6").getFreespeedTravelTime(Time.UNDEFINED_TIME);
+				avr_route1TTs = getFreespeedTravelTime(event.getControler().getNetwork().getLinks().get(new IdImpl("2")));
+				avr_route1TTs += getFreespeedTravelTime(event.getControler().getNetwork().getLinks().get(new IdImpl("4")));
+				avr_route1TTs += getFreespeedTravelTime(event.getControler().getNetwork().getLinks().get(new IdImpl("6")));
 			} if(Double.isNaN(avr_route2TTs)) {
-				avr_route2TTs = event.getControler().getNetwork().getLink("3").getFreespeedTravelTime(Time.UNDEFINED_TIME);
-				avr_route2TTs += event.getControler().getNetwork().getLink("5").getFreespeedTravelTime(Time.UNDEFINED_TIME);
-				avr_route2TTs += event.getControler().getNetwork().getLink("6").getFreespeedTravelTime(Time.UNDEFINED_TIME);
+				avr_route2TTs = getFreespeedTravelTime(event.getControler().getNetwork().getLinks().get(new IdImpl("3")));
+				avr_route2TTs += getFreespeedTravelTime(event.getControler().getNetwork().getLinks().get(new IdImpl("5")));
+				avr_route2TTs += getFreespeedTravelTime(event.getControler().getNetwork().getLinks().get(new IdImpl("6")));
 			}
 		}
 		
+		private double getFreespeedTravelTime(final Link link) {
+			return link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
+		}
 	}
 	
 	private class IncidentGenerator implements BeforeMobsimListener {

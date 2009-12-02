@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
@@ -32,7 +33,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public class Road extends SimUnit {
 
-	protected LinkImpl link;
+	protected Link link;
 
 	// see method enterRequest for a detailed description of variable 'gap'
 	private LinkedList<Double> gap;
@@ -79,7 +80,7 @@ public class Road extends SimUnit {
 	 */
 	private LinkedList<DeadlockPreventionMessage> deadlockPreventionMessages = new LinkedList<DeadlockPreventionMessage>();
 
-	public Road(Scheduler scheduler, LinkImpl link) {
+	public Road(Scheduler scheduler, Link link) {
 		super(scheduler);
 		this.link = link;
 
@@ -102,7 +103,7 @@ public class Road extends SimUnit {
 		double maxInverseInFlowCapacity = 3600 / (SimulationParameters.getMinimumInFlowCapacity()
 				* SimulationParameters.getFlowCapacityFactor() * NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 
-		inverseOutFlowCapacity = 1 / (link.getFlowCapacity(Time.UNDEFINED_TIME) * SimulationParameters.getFlowCapacityFactor());
+		inverseOutFlowCapacity = 1 / (((LinkImpl) link).getFlowCapacity(Time.UNDEFINED_TIME) * SimulationParameters.getFlowCapacityFactor());
 
 		if (inverseOutFlowCapacity > maxInverseInFlowCapacity) {
 			inverseInFlowCapacity = maxInverseInFlowCapacity;
@@ -294,7 +295,7 @@ public class Road extends SimUnit {
 		noOfCarsPromisedToEnterRoad++;
 	}
 
-	public LinkImpl getLink() {
+	public Link getLink() {
 		return link;
 	}
 

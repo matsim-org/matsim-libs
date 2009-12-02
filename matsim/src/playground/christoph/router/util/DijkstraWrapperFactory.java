@@ -4,7 +4,6 @@ import java.lang.reflect.Constructor;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -36,7 +35,7 @@ public class DijkstraWrapperFactory extends DijkstraFactory {
 	}
 	
 	@Override
-	public LeastCostPathCalculator createPathCalculator(final NetworkLayer network, final TravelCost travelCosts, final TravelTime travelTimes) {
+	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelCost travelCosts, final TravelTime travelTimes) {
 		
 		Dijkstra dijkstra = null;
 		DijkstraWrapper dijkstraWrapper = null;

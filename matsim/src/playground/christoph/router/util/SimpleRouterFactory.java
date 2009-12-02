@@ -3,8 +3,8 @@ package playground.christoph.router.util;
 import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelCost;
@@ -29,7 +29,7 @@ public class SimpleRouterFactory implements LeastCostPathCalculatorFactory{
 		this.calculator = calculator;
 	}
 	
-	public LeastCostPathCalculator createPathCalculator(NetworkLayer network, TravelCost travelCosts, TravelTime travelTimes)
+	public LeastCostPathCalculator createPathCalculator(Network network, TravelCost travelCosts, TravelTime travelTimes)
 	{
 		LeastCostPathCalculator calculatorClone = null;
 		if (calculator instanceof Cloneable)

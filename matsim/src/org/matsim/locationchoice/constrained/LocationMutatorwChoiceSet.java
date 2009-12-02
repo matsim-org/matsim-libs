@@ -27,12 +27,13 @@ import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -48,7 +49,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	private double recursionTravelSpeed = 30.0;
 	protected int maxRecursions = 10;
 	
-	public LocationMutatorwChoiceSet(final NetworkLayer network, Controler controler, Knowledges kn,
+	public LocationMutatorwChoiceSet(final Network network, Controler controler, Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
 		super(network, controler, kn, quad_trees, facilities_of_type);
@@ -57,7 +58,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
 	}
 	
-	public LocationMutatorwChoiceSet(final NetworkLayer network, Controler controler, Knowledges kn) {
+	public LocationMutatorwChoiceSet(final Network network, Controler controler, Knowledges kn) {
 		super(network, controler, kn);
 		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
 		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
@@ -167,7 +168,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 			final ActivityFacility facility = choiceSet.get(MatsimRandom.getRandom().nextInt(choiceSet.size()));
 			
 			act.setFacility(facility);
-       		act.setLink(this.network.getNearestLink(facility.getCoord()));
+       		act.setLink(((NetworkImpl) this.network).getNearestLink(facility.getCoord()));
        		act.setCoord(facility.getCoord());
        		return true;
 		}

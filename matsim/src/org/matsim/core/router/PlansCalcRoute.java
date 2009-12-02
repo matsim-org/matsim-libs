@@ -23,6 +23,7 @@ package org.matsim.core.router;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -91,7 +92,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * @deprecated use the constructor with the config group as argument
 	 */
 	@Deprecated
-	public PlansCalcRoute(final NetworkLayer network, final TravelCost costCalculator,
+	public PlansCalcRoute(final Network network, final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		this(null, network, costCalculator, timeCalculator, factory);
 	}
@@ -101,7 +102,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * @deprecated use the constructor with the config group as argument
 	 */
 	@Deprecated
-	public PlansCalcRoute(final NetworkLayer network, final TravelCost costCalculator, final TravelTime timeCalculator) {
+	public PlansCalcRoute(final Network network, final TravelCost costCalculator, final TravelTime timeCalculator) {
 		this(null, network, costCalculator, timeCalculator, new DijkstraFactory());
 	}
 	
@@ -112,14 +113,14 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * </ul>
 	 * [[old javadoc: Uses the speed factors from the config group and the rerouting of the factory]] 
 	 */
-	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final NetworkLayer network, 
+	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, 
 			final TravelCost costCalculator,
 			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
 		this.routeAlgo = factory.createPathCalculator(network, costCalculator, timeCalculator);
 		FreespeedTravelTimeCost ptTimeCostCalc = new FreespeedTravelTimeCost(-1.0, 0.0, 0.0);
 		this.routeAlgoPtFreeflow = factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
 
-		this.routeFactory = network.getFactory();
+		this.routeFactory = (NetworkFactoryImpl) network.getFactory();
 		if (group != null) {
 			this.configGroup = group;
 		}

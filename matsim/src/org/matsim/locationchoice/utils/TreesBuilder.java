@@ -7,6 +7,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
@@ -14,13 +16,11 @@ import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class TreesBuilder {
 	
-	private NetworkLayer network = null;
+	private Network network = null;
 	private static final Logger log = Logger.getLogger(TreesBuilder.class);
 	private HashSet<String> flexibleTypes = new HashSet<String>();
 	
@@ -28,12 +28,12 @@ public class TreesBuilder {
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	
 	
-	public TreesBuilder(HashSet<String> flexibleTypes, NetworkLayer network) {
+	public TreesBuilder(HashSet<String> flexibleTypes, Network network) {
 		this.flexibleTypes = flexibleTypes;
 		this.network = network;
 	}
 	
-	public TreesBuilder(NetworkLayer network) {
+	public TreesBuilder(Network network) {
 		this.initFlexibleTypes();
 		this.network = network;
 	}
@@ -61,13 +61,13 @@ public class TreesBuilder {
 		
 		boolean regionalScenario = false;
 		double radius = 0.0;
-		NodeImpl centerNode = null;
+		Node centerNode = null;
 		LocationChoiceConfigGroup config = Gbl.getConfig().locationchoice();
 		
 		if (!config.getCenterNode().equals("null") &&
 				!config.getRadius().equals("null")) {
 			regionalScenario = true;
-			centerNode = this.network.getNode(new IdImpl(config.getCenterNode()));
+			centerNode = this.network.getNodes().get(new IdImpl(config.getCenterNode()));
 			radius = Double.parseDouble(config.getRadius());
 			log.info("Building trees regional scenario");
 		}

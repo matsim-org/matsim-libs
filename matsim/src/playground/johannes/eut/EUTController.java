@@ -26,13 +26,14 @@ package playground.johannes.eut;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
@@ -79,7 +80,7 @@ public class EUTController extends WithindayControler {
 	
 	private double capReduction;
 	
-	private List<LinkImpl> riskyLinks;
+	private List<Link> riskyLinks;
 	
 
 	/**
@@ -168,9 +169,9 @@ public class EUTController extends WithindayControler {
 		 */
 		String linkIds = getConfig().findParam(CONFIG_MODULE_NAME, "links");
 		capReduction = string2Double(getConfig().findParam(CONFIG_MODULE_NAME, "capReduction"));
-		riskyLinks = new LinkedList<LinkImpl>();
+		riskyLinks = new LinkedList<Link>();
 		for(String id : linkIds.split(" ")) {
-			LinkImpl link = getNetwork().getLink(id);
+			Link link = getNetwork().getLinks().get(new IdImpl(id));
 			riskyLinks.add(link);
 			
 		}
@@ -220,7 +221,7 @@ public class EUTController extends WithindayControler {
 		
 		RandomIncidentSimulator simulator = new RandomIncidentSimulator(network, incidentProba);
 		simulator.setCapReduction(capReduction);
-		for(LinkImpl link : riskyLinks)
+		for(Link link : riskyLinks)
 //			simulator.addLink(sim.getQueueNetworkLayer().getQueueLink(link.getId()));
 			simulator.addLink(null); //FIXME
 		simulator.notifyIterationStarts(EUTController.getIteration());

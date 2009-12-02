@@ -47,6 +47,7 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -131,7 +132,7 @@ public class Analyzer implements StartupListener, IterationEndsListener, AgentDe
 
 		riskyPlans = new HashSet<Plan>();
 		safePlans = new HashSet<Plan>();
-		Id id = event.getControler().getNetwork().getLink("4").getId();
+		Id id = event.getControler().getNetwork().getLinks().get(new IdImpl("4")).getId();
 		for(Person p : event.getControler().getPopulation().getPersons().values()) {
 			for(Plan plan : p.getPlans()) {
 				LegImpl leg = (LegImpl) plan.getPlanElements().get(1);

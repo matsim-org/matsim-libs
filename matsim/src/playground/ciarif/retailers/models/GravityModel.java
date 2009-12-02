@@ -82,7 +82,7 @@ public double computePotential(ArrayList<Integer> solution){
     
     for (ActivityFacility c : this.retailersFacilities.values()) {
     String linkId = this.first.get(solution.get(a));
-    Coord coord = this.controler.getNetwork().getLink(linkId).getCoord();
+    Coord coord = this.controler.getNetwork().getLinks().get(new IdImpl(linkId)).getCoord();
 	++a;
 	double loc_likelihood = 0.0D;
 	

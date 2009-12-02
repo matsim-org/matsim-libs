@@ -20,8 +20,8 @@
 package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
 
 
 /**
@@ -34,7 +34,7 @@ import org.matsim.core.network.NetworkLayer;
 public class LeastCostPathCalculatorInvertedNetProxy implements
 		LeastCostPathCalculator {
 
-	private NetworkLayer invertedNetwork;
+	private Network invertedNetwork;
 	private NetworkInverter netInverter;
 	private LeastCostPathCalculator leastCostPathCalculator;
 	
@@ -49,10 +49,10 @@ public class LeastCostPathCalculatorInvertedNetProxy implements
 	 */
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime) {
 		//we start at the toNode of the link representing the fromNode of the original network
-		Link startLink = this.invertedNetwork.getLink(fromNode.getId());
+		Link startLink = this.invertedNetwork.getLinks().get(fromNode.getId());
 		Node startNode = startLink.getToNode();
 		//we stop at the
-		Link endLink = this.invertedNetwork.getLink(toNode.getId());
+		Link endLink = this.invertedNetwork.getLinks().get(toNode.getId());
 		Node endNode = endLink.getToNode();
 		
 		Path invertedPath = this.leastCostPathCalculator.calcLeastCostPath(startNode, endNode, starttime);
@@ -61,7 +61,5 @@ public class LeastCostPathCalculatorInvertedNetProxy implements
 				this.netInverter.convertInvertedNodesToLinks(invertedPath.nodes), invertedPath.travelTime, invertedPath.travelCost);
 		return path;
 	}
-
-	
 
 }

@@ -3,8 +3,8 @@ package playground.christoph.router.util;
 import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -26,7 +26,7 @@ public class MyDijkstraFactory extends DijkstraFactory {
 	private static final Logger log = Logger.getLogger(MyDijkstraFactory.class);
 	
 	@Override
-	public LeastCostPathCalculator createPathCalculator(final NetworkLayer network, final TravelCost travelCosts, final TravelTime travelTimes)
+	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelCost travelCosts, final TravelTime travelTimes)
 	{
 		/*
 		 *  Return only a clone (if possible)

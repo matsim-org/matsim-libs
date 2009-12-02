@@ -29,8 +29,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
 
 /**
  * Pre-processes a given network, gathering information which
@@ -49,7 +49,7 @@ public class PreProcessDijkstra {
 
 	protected Map<Node, DeadEndData> nodeData = null;
 	
-	public void run(final NetworkLayer network) {
+	public void run(final Network network) {
 		markDeadEnds(network);
 		this.containsData = true;
 	}
@@ -58,7 +58,7 @@ public class PreProcessDijkstra {
 	 * Marks nodes that are in dead ends (i.e. nodes that are connected through a single node to the rest of the network), starting at all nodes with degree 2.
 	 * @param network The network on which to process.
 	 */
-	private void markDeadEnds(final NetworkLayer network) {
+	private void markDeadEnds(final Network network) {
 		long now = System.currentTimeMillis();
 
 		this.nodeData = new HashMap<Node, DeadEndData>(network.getNodes().size());

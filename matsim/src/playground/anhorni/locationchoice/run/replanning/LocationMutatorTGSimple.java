@@ -29,15 +29,16 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -159,7 +160,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			return false;
 		}
 		act.setFacility(facility);
-   		act.setLink(this.network.getNearestLink(facility.getCoord()));
+   		act.setLink(((NetworkImpl) this.network).getNearestLink(facility.getCoord()));
    		act.setCoord(facility.getCoord());
    		
    		return true;
@@ -213,7 +214,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 		}
 		if (facility != null) {
 			act.setFacility(facility);
-	   		act.setLink(this.network.getNearestLink(facility.getCoord()));
+	   		act.setLink(((NetworkImpl) this.network).getNearestLink(facility.getCoord()));
 	   		act.setCoord(facility.getCoord());	   		
 	   		return true;
 		}

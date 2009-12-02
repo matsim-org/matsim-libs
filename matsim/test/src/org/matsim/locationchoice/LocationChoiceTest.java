@@ -4,9 +4,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -29,9 +29,10 @@ public class LocationChoiceTest  extends MatsimTestCase {
 	
 	@Override
 	protected void tearDown() throws Exception {
-         super.tearDown();
-         Gbl.reset();
-    }
+		this.locationchoice = null;
+		this.initializer = null;
+		super.tearDown();
+	}
 	
 	private void initialize() {		
 		this.locationchoice = new LocationChoice(this.initializer.getControler().getNetwork(), 
@@ -55,7 +56,7 @@ public class LocationChoiceTest  extends MatsimTestCase {
 		Gbl.getConfig().locationchoice();
 		
         Method method = null;
-		method = this.locationchoice.getClass().getDeclaredMethod("initLocal", new Class[]{NetworkLayer.class, Controler.class});
+		method = this.locationchoice.getClass().getDeclaredMethod("initLocal", new Class[]{Network.class, Controler.class});
 		method.setAccessible(true);
 		method.invoke(this.locationchoice, new Object[]{this.initializer.getControler().getNetwork(),
 				this.initializer.getControler()});

@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.analysis.CalcAverageTripLength;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -38,7 +39,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
@@ -95,7 +95,7 @@ public class PtcheckControlerTest extends Controler {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			NetworkLayer network = ctl.getNetwork();
+			Network network = ctl.getNetwork();
 			this.cas = new CalcNetAvgSpeed(network);
 			this.ctpf = new CalcTrafficPerformance(network);
 			EventsManager events = ctl.getEvents();
@@ -176,7 +176,7 @@ public class PtcheckControlerTest extends Controler {
 		public void notifyIterationStarts(final IterationStartsEvent event) {
 			Controler c = event.getControler();
 			EventsManager es = c.getEvents();
-			NetworkLayer nl = c.getNetwork();
+			Network nl = c.getNetwork();
 			Population ps = c.getPopulation();
 			if (event.getIteration() == c.getLastIteration()) {
 				this.orms = new EnRouteModalSplit("Zurich", 300,
