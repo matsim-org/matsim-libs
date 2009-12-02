@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -110,7 +111,7 @@ public class TestSubNetwork {
 	
 	private void setKnowledgeStorageHandler()
 	{
-		for(PersonImpl person : population.getPersons().values())
+		for(Person person : population.getPersons().values())
 		{
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 
@@ -152,7 +153,7 @@ public class TestSubNetwork {
 		KnowledgeTools kt = new KnowledgeTools();
 		
 		int i = 0;
-		for(PersonImpl person : population.getPersons().values())
+		for(Person person : population.getPersons().values())
 		{
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 
@@ -196,7 +197,7 @@ public class TestSubNetwork {
 		return true;
 	}
 	
-	private void replanRoute(PersonImpl person)
+	private void replanRoute(Person person)
 	{	
 		dijkstraRouter.run(person.getSelectedPlan());
 	}

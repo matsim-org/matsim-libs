@@ -26,10 +26,11 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -45,6 +46,8 @@ import org.matsim.knowledges.Knowledges;
  */
 public class ASPTimingsModes extends ASPActivityChains {
 
+	private final static Logger log = Logger.getLogger(ASPTimingsModes.class);
+	
 	public ASPTimingsModes(final PopulationImpl population, final Knowledges knowledges, final String outputDir) {
 		super (population, knowledges, outputDir);
 	}

@@ -28,17 +28,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -102,8 +101,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 	}
 
 	public void handleEvent(final AgentDepartureEvent event) {
-		PersonImpl p = this.ppl.getPersons().get(
-				new IdImpl(event.getPersonId().toString()));
+		Person p = this.ppl.getPersons().get(event.getPersonId());
 		if (PlanModeJudger.useCar(p.getSelectedPlan()))
 			this.cdc++;
 	}
@@ -118,8 +116,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 	}
 
 	public void handleEvent(final AgentArrivalEvent event) {
-		PersonImpl p = this.ppl.getPersons().get(
-				new IdImpl(event.getPersonId().toString()));
+		Person p = this.ppl.getPersons().get(event.getPersonId());
 		if (PlanModeJudger.useCar(p.getSelectedPlan()))
 			this.cac++;
 

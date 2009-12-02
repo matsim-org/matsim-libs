@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -201,7 +202,7 @@ public class ReadFromUrbansimParcelModel {
 				// at this point, we have a full "new" person.  Now check against pre-existing population ...
 
 				while ( true ) { // loop from which we can "break":
-					PersonImpl oldPerson ;
+					Person oldPerson ;
 					if ( oldPop==null ) { // no pre-existing population.  Accept:
 						newPop.addPerson(newPerson) ;
 						break ;
@@ -209,7 +210,7 @@ public class ReadFromUrbansimParcelModel {
 						backupPop.addPerson( newPerson) ;
 						notFoundCnt++ ;
 						break ;
-					} else if ( oldPerson.isEmployed() != newPerson.isEmployed() ) { // employment status changed.  Accept new person:
+					} else if ( ((PersonImpl) oldPerson).isEmployed() != newPerson.isEmployed() ) { // employment status changed.  Accept new person:
 						newPop.addPerson(newPerson) ;
 						break ;
 					}
@@ -252,9 +253,9 @@ public class ReadFromUrbansimParcelModel {
 				+ " bakPopSize: " + backupPop.getPersons().size() + " NUrbansimPersons: " + NUrbansimPersons ) ;
 		log.warn("why is bakPopSize not approx as large as samplingRate*NUrbansimPersons?" ) ;
 
-		List<PersonImpl> bakPersons = new ArrayList<PersonImpl>( backupPop.getPersons().values() ) ; // Population data structure not needed!
+		List<Person> bakPersons = new ArrayList<Person>( backupPop.getPersons().values() ) ; // Population data structure not needed!
 		Collections.shuffle( bakPersons ) ;
-		for ( PersonImpl person : bakPersons ) {
+		for ( Person person : bakPersons ) {
 			if ( newPop.getPersons().size() >= samplingRate*NUrbansimPersons ) {
 				break ;
 			}

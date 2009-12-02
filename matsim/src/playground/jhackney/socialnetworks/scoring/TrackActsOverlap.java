@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
@@ -43,7 +44,7 @@ public class TrackActsOverlap {
 
 	SocialNetwork net;
 
-	LinkedHashMap<ActivityOptionImpl,ArrayList<PersonImpl>> activityMap;
+	LinkedHashMap<ActivityOptionImpl,ArrayList<Person>> activityMap;
 	static final private Logger log = Logger.getLogger(TrackActsOverlap.class);
 
 	/**
@@ -73,7 +74,7 @@ public class TrackActsOverlap {
 
 		log.info(" Looking through plans and mapping social interactions for scoring "+iteration);
 
-		activityMap = new LinkedHashMap<ActivityOptionImpl,ArrayList<PersonImpl>>(); 
+		activityMap = new LinkedHashMap<ActivityOptionImpl,ArrayList<Person>>(); 
 		activityMap= makeActivityMap(plans);
 
 		log.info("...finished");
@@ -92,22 +93,22 @@ public class TrackActsOverlap {
 	 * @param plans
 	 * @return activityMap
 	 */
-	private LinkedHashMap<ActivityOptionImpl,ArrayList<PersonImpl>> makeActivityMap(PopulationImpl plans){
+	private LinkedHashMap<ActivityOptionImpl,ArrayList<Person>> makeActivityMap(Population plans){
 		log.info("Making a new activity map for spatial scores");
 //		LinkedHashMap<Activity,ArrayList<Person>> activityMap=new LinkedHashMap<Activity,ArrayList<Person>>();
-		for (PersonImpl p1 : plans.getPersons().values()) {
+		for (Person p1 : plans.getPersons().values()) {
 			for (PlanElement pe : p1.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act1 = (ActivityImpl) pe;
 					ActivityOptionImpl activity1=((ActivityFacilityImpl) act1.getFacility()).getActivityOptions().get(act1.getType());
-					ArrayList<PersonImpl> actList=new ArrayList<PersonImpl>();
+					ArrayList<Person> actList=new ArrayList<Person>();
 					
 					if(!activityMap.keySet().contains(activity1)){
 						actList.add(p1);
 						activityMap.put(activity1,actList);	
 					}
 					if(activityMap.keySet().contains(activity1)){
-						ArrayList<PersonImpl> myList=activityMap.get(activity1);
+						ArrayList<Person> myList=activityMap.get(activity1);
 						myList.add(p1);
 					}	
 				}
@@ -142,7 +143,7 @@ public class TrackActsOverlap {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
 				ActivityOptionImpl myActivity=((ActivityFacilityImpl) act.getFacility()).getActivityOptions().get(act.getType());
-				ArrayList<PersonImpl> visitors=activityMap.get(myActivity);
+				ArrayList<Person> visitors=activityMap.get(myActivity);
 				// Go through the list of Persons and for each one pick one friend randomly
 				// Must be double loop
 //				for (Person p2 : visitors) {
@@ -172,7 +173,7 @@ public class TrackActsOverlap {
 			if (pe1 instanceof ActivityImpl) {
 				ActivityImpl act1 = (ActivityImpl) pe1;
 				ActivityOptionImpl myActivity=((ActivityFacilityImpl) act1.getFacility()).getActivityOptions().get(act1.getType());
-				ArrayList<PersonImpl> visitors=activityMap.get(myActivity);
+				ArrayList<Person> visitors=activityMap.get(myActivity);
 				if(!activityMap.keySet().contains(myActivity)){
 					Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
 				}
@@ -180,7 +181,7 @@ public class TrackActsOverlap {
 					Gbl.errorMsg(this.getClass()+" number of visitors not >0");
 				}
 				// Go through the list of Persons and for each one pick one friend randomly
-				for (PersonImpl p2 : visitors) {
+				for (Person p2 : visitors) {
 					for (PlanElement pe2 : p2.getSelectedPlan().getPlanElements()) {
 						if (pe2 instanceof ActivityImpl) {
 							ActivityImpl act2 = (ActivityImpl) pe2;
@@ -223,7 +224,7 @@ public class TrackActsOverlap {
 			if (pe1 instanceof ActivityImpl) {
 				ActivityImpl act1 = (ActivityImpl) pe1;
 				ActivityOptionImpl myActivity=((ActivityFacilityImpl) act1.getFacility()).getActivityOptions().get(act1.getType());
-				ArrayList<PersonImpl> visitors=activityMap.get(myActivity);
+				ArrayList<Person> visitors=activityMap.get(myActivity);
 				if(!activityMap.keySet().contains(myActivity)){
 					Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
 				}
@@ -231,7 +232,7 @@ public class TrackActsOverlap {
 					Gbl.errorMsg(this.getClass()+" number of visitors not >0");
 				}
 				// Go through the list of Persons
-				for (PersonImpl p2 : visitors) {
+				for (Person p2 : visitors) {
 					for (PlanElement pe2 : p2.getSelectedPlan().getPlanElements()) {
 						if (pe2 instanceof ActivityImpl) {
 							ActivityImpl act2 = (ActivityImpl) pe2;
@@ -282,7 +283,7 @@ public class TrackActsOverlap {
 				double totalTimeWithFriends=0;
 				
 				ActivityOptionImpl myActivity=((ActivityFacilityImpl) act1.getFacility()).getActivityOptions().get(act1.getType());
-				ArrayList<PersonImpl> visitors=activityMap.get(myActivity);
+				ArrayList<Person> visitors=activityMap.get(myActivity);
 				if(!activityMap.keySet().contains(myActivity)){
 					Gbl.errorMsg(this.getClass()+" activityMap does not contain myActivity");
 				}
@@ -290,7 +291,7 @@ public class TrackActsOverlap {
 					Gbl.errorMsg(this.getClass()+" number of visitors not >0");
 				}
 				// Go through the list of Persons
-				for (PersonImpl p2 : visitors) {
+				for (Person p2 : visitors) {
 					for (PlanElement pe2 : p2.getSelectedPlan().getPlanElements()) {
 						if (pe2 instanceof ActivityImpl) {
 							ActivityImpl act2 = (ActivityImpl) pe2;

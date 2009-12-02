@@ -64,7 +64,7 @@ public class ParallelPersonAlgorithmRunnerTest extends MatsimTestCase {
 		PopulationImpl population = new PopulationImpl();
 		for (int i = 0; i < 100; i++) {
 			PersonImpl person = new PersonImpl(new IdImpl(i));
-			population.getPersons().put(person.getId(), person);
+			population.addPerson(person);
 		}
 		final PersonAlgorithmTester tester = new PersonAlgorithmTester();
 		ParallelPersonAlgorithmRunner.run(population, 2, tester);

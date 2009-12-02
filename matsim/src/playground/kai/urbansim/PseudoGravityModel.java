@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -101,7 +102,7 @@ public class PseudoGravityModel {
 		// NOTE: For the time being, I need this model only for U_CELL, not for U_PARCEL.  So it does not need to be general.
 		
 		// compute the extent of the coordinates for persons:
-		for ( PersonImpl person : population.getPersons().values() ) {
+		for ( Person person : population.getPersons().values() ) {
 			Plan plan = person.getSelectedPlan() ;
 			ActivityImpl act = ((PlanImpl) plan).getFirstActivity();
 			Coord homeCoord = act.getCoord() ;
@@ -133,8 +134,8 @@ public class PseudoGravityModel {
 		}
 		
 		// for every worker, add it to the pseudoCell
-		for ( PersonImpl pp : population.getPersons().values() ) {
-			if ( pp.getEmployed().equals("yes") ) {
+		for ( Person pp : population.getPersons().values() ) {
+			if ( ((PersonImpl) pp).getEmployed().equals("yes") ) {
 				Coord cc = ((PlanImpl) pp.getSelectedPlan()).getFirstActivity().getCoord(); // awkward
 				int bin = binFromXY( cc.getX(), cc.getY() ) ;
 				PseudoCell pc = pseudoCells.get(bin) ;
@@ -200,7 +201,7 @@ public class PseudoGravityModel {
 		log.info("done with IPF") ;
 		printArray( zone2zone ) ;
 		
-		for ( PersonImpl pp : population.getPersons().values() ) {
+		for ( Person pp : population.getPersons().values() ) {
 			// pull plan:
 			Plan plan = pp.getSelectedPlan();
 

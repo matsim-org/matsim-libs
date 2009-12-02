@@ -26,6 +26,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
@@ -33,7 +34,6 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -88,7 +88,7 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 				out = IOUtils.getBufferedWriter(outdir+"/linkAnalysis_car_"+(currentBin*timeBinSize)+"-"+((currentBin+1)*timeBinSize)+".txt.gz");
 				out.write("lid\tpid\tfromActType\tfromActFid\ttoActType\ttoActFid\n");
 			}
-			PersonImpl p = population.getPersons().get(event.getPersonId());
+			Person p = population.getPersons().get(event.getPersonId());
 			ActivityImpl fromAct = fromActs.get(p.getId());
 			LegImpl leg = ((PlanImpl) p.getSelectedPlan()).getNextLeg(fromAct);
 			ActivityImpl toAct = ((PlanImpl) p.getSelectedPlan()).getNextActivity(leg);
@@ -100,7 +100,7 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 	}
 
 	public void handleEvent(ActivityEndEvent event) {
-		PersonImpl p = population.getPersons().get(event.getPersonId());
+		Person p = population.getPersons().get(event.getPersonId());
 		if (!fromActs.containsKey(p.getId())) {
 			fromActs.put(p.getId(),((PlanImpl) p.getSelectedPlan()).getFirstActivity());
 		}

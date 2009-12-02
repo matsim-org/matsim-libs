@@ -57,7 +57,7 @@ public class PersonImplTest extends MatsimTestCase {
 		plans[8] = person.createAndAddPlan(false);
 		plans[8].setScore(-10.0);
 		plans[9] = person.createAndAddPlan(false);
-		population.getPersons().put(person.getId(), person);
+		population.addPerson(person);
 
 		// now test if we all for plans without score are returned
 		Plan plan = person.getRandomUnscoredPlan();

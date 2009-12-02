@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
 
@@ -64,9 +63,7 @@ public class AssignLeisureTripDistances {
 		int assignedNumberOf_GroceryActs = 0;
 		int assignedNumberOf_NonGroceryActs = 0;
 		
-		Iterator<PersonImpl> person_it = this.plans.getPersons().values().iterator();
-		while (person_it.hasNext()) {
-			PersonImpl person = person_it.next();
+		for (Person person : this.plans.getPersons().values()) {
 			
 			// intitially only one plan is available
 			if (person.getPlans().size() > 1) {

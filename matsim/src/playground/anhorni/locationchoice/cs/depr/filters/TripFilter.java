@@ -1,14 +1,13 @@
 package playground.anhorni.locationchoice.cs.depr.filters;
 
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.api.core.v01.population.Population;
 
 import playground.anhorni.locationchoice.cs.helper.ChoiceSet;
 
@@ -17,10 +16,8 @@ public abstract class TripFilter {
 	protected List<ChoiceSet> choiceSets = new Vector<ChoiceSet>();
 	private final static Logger log = Logger.getLogger(TripFilter.class);
 		
-	public List<ChoiceSet> apply(PopulationImpl population, String mode) {	
-		Iterator<PersonImpl> person_it = population.getPersons().values().iterator();
-		while (person_it.hasNext()) {
-			PersonImpl person = person_it.next();		
+	public List<ChoiceSet> apply(Population population, String mode) {
+		for (Person person : population.getPersons().values()) {
 			// Person only has one plan at this stage
 			Plan plan = person.getSelectedPlan();		
 			filterPlan(plan, mode);

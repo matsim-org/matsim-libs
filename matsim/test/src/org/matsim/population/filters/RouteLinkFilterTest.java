@@ -76,7 +76,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 7 12"), link20);
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", link20);
-		population.getPersons().put(person.getId(), person);
+		population.addPerson(person);
 
 		person = new PersonImpl(new IdImpl("2"));
 		plan = person.createAndAddPlan(true);
@@ -87,7 +87,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 7 12"), link20);
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", link20);
-		population.getPersons().put(person.getId(), person);
+		population.addPerson(person);
 
 		person = new PersonImpl(new IdImpl("3"));
 		plan = person.createAndAddPlan(true);
@@ -98,7 +98,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		route.setNodes(link1, NetworkUtils.getNodes(network, "2 6 12"), link20);
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", link20);
-		population.getPersons().put(person.getId(), person);
+		population.addPerson(person);
 
 		return population;
 	}

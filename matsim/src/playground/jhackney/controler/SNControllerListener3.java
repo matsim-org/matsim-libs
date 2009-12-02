@@ -22,7 +22,6 @@ package playground.jhackney.controler;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
@@ -41,7 +40,6 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.knowledges.KnowledgeImpl;
@@ -347,9 +345,7 @@ public class SNControllerListener3 implements StartupListener, BeforeMobsimListe
 		aar.openFile(fileName);
 		System.out.println(" ... done");
 
-		Iterator<PersonImpl> p_it = plans.getPersons().values().iterator();
-		while (p_it.hasNext()) {
-			PersonImpl person=p_it.next();
+		for (Person person : plans.getPersons().values()) {
 
 			KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
 			if(k ==null){

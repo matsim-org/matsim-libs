@@ -21,15 +21,13 @@
 package playground.mfeil.analysis;
 
 
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
 
@@ -50,8 +48,7 @@ public class AssignFacs {
 		this.outputDir = outputDir;
 		PersonSetNearestFacCoord f = new PersonSetNearestFacCoord(facs);
 		
-		for (Iterator<PersonImpl> i = population.getPersons().values().iterator(); i.hasNext();){
-			PersonImpl person = i.next();
+		for (Person person : population.getPersons().values()) {
 			f.run(person);
 		}
 	}

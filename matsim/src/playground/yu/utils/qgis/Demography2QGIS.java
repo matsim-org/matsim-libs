@@ -103,7 +103,7 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 
 				// method person.toString() not appropriate
 				out.write(person_id.toString() + ";");
-				PersonImpl person = this.plans.getPersons().get(person_id);
+				PersonImpl person = (PersonImpl) this.plans.getPersons().get(person_id);
 				out.write(person.getSex() + ";");
 				out.write(person.getAge() + ";");
 				out.write(person.getLicense() + ";");

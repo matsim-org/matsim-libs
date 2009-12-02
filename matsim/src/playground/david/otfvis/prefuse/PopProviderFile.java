@@ -32,10 +32,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 
@@ -48,7 +47,6 @@ public class PopProviderFile implements PopulationProvider {
 	
 	public PopProviderFile(String filename) {
 		this.filename = filename;
-		BufferedInputStream fin;
 		try {
 			File sourceZipFile = new File(filename);
 			// Open Zip file for reading
@@ -72,19 +70,17 @@ public class PopProviderFile implements PopulationProvider {
 	}
 
 	public SortedSet<Integer> getIdSet() {
-		int max = population.getPersons().size();
 		Set<Id> ids = population.getPersons().keySet();
 		SortedSet<Integer> idSet = new TreeSet<Integer>();
 		for(Id id : ids){
 			int i = Integer.parseInt(id.toString());
 			idSet.add(i);
 		}
-		max = idSet.last();
 		return idSet;
 	}
 
-	public PersonImpl getPerson(int id) {
-		PersonImpl p = population.getPersons().get(new IdImpl(id));
+	public Person getPerson(int id) {
+		Person p = population.getPersons().get(new IdImpl(id));
 		return p;
 	}
 

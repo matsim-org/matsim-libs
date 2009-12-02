@@ -23,11 +23,11 @@ package org.matsim.population.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
@@ -60,9 +60,7 @@ public class PlansDefineKnowledge {
 		}
 
 		// set exactly one home and four other activities for each person
-		Iterator<PersonImpl> p_it = plans.getPersons().values().iterator();
-		while (p_it.hasNext()) {
-			PersonImpl p = p_it.next();
+		for (Person p : plans.getPersons().values()) {
 			KnowledgeImpl k = this.knowledges.getFactory().createKnowledge(p.getId(), "created by " + this.getClass().getName());
 			int index = MatsimRandom.getRandom().nextInt(home_acts.size());
 			k.addActivity(home_acts.get(index),true);

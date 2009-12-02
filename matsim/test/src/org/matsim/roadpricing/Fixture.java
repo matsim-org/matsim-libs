@@ -162,7 +162,7 @@ import org.matsim.core.utils.misc.Time;
 	}
 	
 	private static void addPersonToPopulation(final PersonImpl person, final PopulationImpl population) {
-		population.getPersons().put(person.getId(), person);
+		population.addPerson(person);
 	}
 
 	/**

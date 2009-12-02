@@ -76,7 +76,7 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm implemen
 			has_educ = true;
 		}
 
-		PersonImpl mz_p = microcensus.getRandomWeightedMZPerson(person.getAge(),person.getSex(),person.getLicense(), has_work, has_educ);
+		Person mz_p = microcensus.getRandomWeightedMZPerson(person.getAge(),person.getSex(),person.getLicense(), has_work, has_educ);
 		if (mz_p == null) {
 			log.warn("pid="+person.getId()+": Person does not belong to a micro census group!");
 			mz_p = microcensus.getRandomWeightedMZPerson(person.getAge(),"f",person.getLicense(), has_work, has_educ);

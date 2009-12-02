@@ -20,6 +20,8 @@
 
 package playground.david;
 
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -31,8 +33,8 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.NetVis;
 
@@ -42,26 +44,23 @@ public class IteratePopSimTest {
 		String popFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\30.plans.xml";
 		String netFileName = "..\\..\\tmp\\studies\\berlin-wip\\network\\wip_net.xml";
 
-		final Config config = Gbl.createConfig(args);
-		String s1 = new String("Hello World !");
-		String s2 = s1;
-		if (s1 == s2) {
-			System.out.println("true");
-		}
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
+		ScenarioImpl scenario = sl.getScenario();
+		final Config config = scenario.getConfig();
 
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 				// Read network file with special Reader Implementation
 		new MatsimNetworkReader(network).readFile(netFileName);
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 		// Read plans file with special Reader Implementation
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(popFileName);
 
 		Gbl.startMeasurement();
 		long sum = 0;
 		long count = 0;
-		for (PersonImpl person : population.getPersons().values()) {
-			sum += person.getAge();
+		for (Person person : population.getPersons().values()) {
+			sum += ((PersonImpl) person).getAge();
 			count++;
 		}
 		System.out.println("persons: " + count);

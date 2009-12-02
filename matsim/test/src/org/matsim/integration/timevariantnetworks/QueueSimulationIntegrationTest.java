@@ -76,8 +76,8 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		PopulationImpl plans = new PopulationImpl();
 		PersonImpl person1 = createPersons(7*3600, link1, link3, network, 1).get(0);
 		PersonImpl person2 = createPersons(9*3600, link1, link3, network, 1).get(0);
-		plans.getPersons().put(person1.getId(), person1);
-		plans.getPersons().put(person2.getId(), person2);
+		plans.addPerson(person1);
+		plans.addPerson(person2);
 
 		// run the simulation with the timevariant network and the two persons
 		EventsManagerImpl events = new EventsManagerImpl();
@@ -127,13 +127,13 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		PopulationImpl plans = new PopulationImpl();
 		List<PersonImpl> persons1 = createPersons(0, link1, link3, network, personsPerWave);
 		for(PersonImpl p : persons1) {
-			plans.getPersons().put(p.getId(), p);
+			plans.addPerson(p);
 		}
 		PersonImpl person1 = persons1.get(personsPerWave - 1);
 
 		List<PersonImpl> persons2 = createPersons(3600, link1, link3, network, personsPerWave);
 		for(PersonImpl p : persons2) {
-			plans.getPersons().put(p.getId(), p);
+			plans.addPerson(p);
 		}
 		PersonImpl person2 = persons2.get(personsPerWave - 1);
 		/*

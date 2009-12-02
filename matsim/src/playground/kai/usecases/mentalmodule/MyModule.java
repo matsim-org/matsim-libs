@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -83,7 +84,8 @@ ActivityStartEventHandler
 		}
 		
 		// go through population and copy to my personal population:
-		for ( PersonImpl person : pop.getPersons().values() ) {
+		for ( Person pp : pop.getPersons().values() ) {
+			PersonImpl person = (PersonImpl) pp;
 			
 			Id id = person.getId();
 			

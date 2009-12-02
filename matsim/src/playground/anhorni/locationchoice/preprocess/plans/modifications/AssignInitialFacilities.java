@@ -20,14 +20,12 @@
 
 package playground.anhorni.locationchoice.preprocess.plans.modifications;
 
-import java.util.Iterator;
 import org.apache.log4j.Logger;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 
@@ -47,9 +45,7 @@ public class AssignInitialFacilities {
 		log.info("Assigning inital " + type + "facilities ...");
 		Counter counter = new Counter("Person :");
 		
-		Iterator<PersonImpl> person_it = plans.getPersons().values().iterator();
-		while (person_it.hasNext()) {
-			Person person = person_it.next();
+		for (Person person : plans.getPersons().values()) {
 			counter.incCounter();
 		
 			if (person.getPlans().size() != 1) {

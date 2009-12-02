@@ -25,10 +25,11 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
 public class PlansActChainReduction {
@@ -47,13 +48,11 @@ public class PlansActChainReduction {
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final TreeMap<String, ArrayList<PersonImpl>> calcChainFrequencies(final PopulationImpl plans) {
+	private final TreeMap<String, ArrayList<Person>> calcChainFrequencies(final Population plans) {
 		// TreeMap(String chain, ArrayList(Person person))
-		TreeMap<String, ArrayList<PersonImpl>> chains = new TreeMap<String, ArrayList<PersonImpl>>();
+		TreeMap<String, ArrayList<Person>> chains = new TreeMap<String, ArrayList<Person>>();
 		// fill up the chains TreeMap
-		Iterator<PersonImpl> p_it = plans.getPersons().values().iterator();
-		while (p_it.hasNext()) {
-			PersonImpl p = p_it.next();
+		for (Person p : plans.getPersons().values()) {
 			if (p.getPlans().size() != 1) {
 				Gbl.errorMsg("[person_id=" + p.getId() + " does not have exactly one plan. not allowed.]");
 			}
@@ -64,9 +63,9 @@ public class PlansActChainReduction {
 				chain = chain.concat(act.getType());
 			}
 			if (!chains.containsKey(chain)) {
-				chains.put(chain, new ArrayList<PersonImpl>());
+				chains.put(chain, new ArrayList<Person>());
 			}
-			ArrayList<PersonImpl> persons = chains.get(chain);
+			ArrayList<Person> persons = chains.get(chain);
 			persons.add(p);
 		}
 		return chains;
@@ -74,21 +73,21 @@ public class PlansActChainReduction {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final TreeMap<Double, ArrayList<String>> calcFractionTreeMap(final TreeMap<String, ArrayList<PersonImpl>> chains) {
+	private final TreeMap<Double, ArrayList<String>> calcFractionTreeMap(final TreeMap<String, ArrayList<Person>> chains) {
 		// calculate the sum of all chain occurrences
 		int sum = 0;
-		Iterator<ArrayList<PersonImpl>> al_it = chains.values().iterator();
+		Iterator<ArrayList<Person>> al_it = chains.values().iterator();
 		while (al_it.hasNext()) {
-			ArrayList<PersonImpl> al = al_it.next();
+			ArrayList<Person> al = al_it.next();
 			sum += al.size();
 		}
 		// TreeMap(Double fraction, ArrayList(String chains))
 		TreeMap<Double, ArrayList<String>> fractions = new TreeMap<Double, ArrayList<String>>();
 		// create the fractions TreeMap
 		System.out.println("        chain\tfreq\tpercentage");
-		for (java.util.Map.Entry<String, ArrayList<PersonImpl>> entry : chains.entrySet()) {
+		for (java.util.Map.Entry<String, ArrayList<Person>> entry : chains.entrySet()) {
 			String c = entry.getKey();
-			ArrayList<PersonImpl> persons = entry.getValue();
+			ArrayList<Person> persons = entry.getValue();
 			Double frac = Double.valueOf(((double)persons.size())/((double)sum));
 			if (!fractions.containsKey(frac)) {
 				fractions.put(frac, new ArrayList<String>());
@@ -107,7 +106,7 @@ public class PlansActChainReduction {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
 		// TreeMap(String chain, ArrayList(Person person))
-		TreeMap<String, ArrayList<PersonImpl>> chains = this.calcChainFrequencies(plans);
+		TreeMap<String, ArrayList<Person>> chains = this.calcChainFrequencies(plans);
 
 		// TreeMap(Double fraction, ArrayList(String chains))
 		System.out.println("      chain distribution before cut:");
@@ -124,7 +123,7 @@ public class PlansActChainReduction {
 			// plans data structure
 			for (int i=0; i<cs.size(); i++) {
 				String chain = cs.get(i);
-				ArrayList<PersonImpl> persons = chains.get(chain);
+				ArrayList<Person> persons = chains.get(chain);
 
 				for (int j=0, n=persons.size(); j<n; j++) {
 					Id pid = (persons.get(j)).getId();

@@ -44,7 +44,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.Dijkstra;
@@ -183,7 +182,7 @@ public class TravelTimeHistogram {
 		int count = 0;
 		for(Ego ego : egos.values()) {
 			TDoubleDoubleHashMap hist = new TDoubleDoubleHashMap();
-			for(PersonImpl p2 : population.getPersons().values()) {
+			for(Person p2 : population.getPersons().values()) {
 				Coord c1 = ego.homeloc;
 				Coord c2 = ((PlanImpl) p2.getSelectedPlan()).getFirstActivity().getCoord();
 				double d = CoordUtils.calcDistance(c1, c2);

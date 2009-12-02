@@ -41,7 +41,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 	public void testAddMoney() {
 		PopulationImpl population = new PopulationImpl();
 		PersonImpl person = new PersonImpl(new IdImpl(1));
-		population.getPersons().put(person.getId(), person);
+		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
 		EventsToScore e2s = new EventsToScore(population, sfFactory, 1.0);
 		EventsManagerImpl events = new EventsManagerImpl();

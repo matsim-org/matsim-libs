@@ -30,6 +30,7 @@ import org.jgap.impl.IntegerGene;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
@@ -79,13 +80,13 @@ public class PlanomatTest extends MatsimTestCase {
 		loader.loadScenario();
 		this.scenario = loader.getScenario();
 		//store the only existing person
-		PersonImpl p = scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+//		Person p = scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		//read the events once to create a complete test population
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(new ScenarioCreatePersonEventHandler(this.scenario));
 		new MatsimEventsReader(events).readFile(this.getClassInputDirectory() + "equil-times-only-1000.events.txt.gz");
 		//now overwrite the testee person in the scenario
-		scenario.getPopulation().getPersons().put(TEST_PERSON_ID, p);
+//		scenario.getPopulation().addPerson(p);// not necessary, as the reference stayed the same!
 		
 	}
 
@@ -119,15 +120,15 @@ public class PlanomatTest extends MatsimTestCase {
 
 	public void testCarAvailabilityAlways() {
 		this.scenario.getConfig().planomat().setPossibleModes("car,pt");
-		PersonImpl p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
-		p.setCarAvail("always");
+		Person p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+		((PersonImpl) p).setCarAvail("always");
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
 	}
 	
 	public void testCarAvailabilityNever() {
 		this.scenario.getConfig().planomat().setPossibleModes("car,pt");
-		PersonImpl p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
-		p.setCarAvail("never");
+		Person p = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+		((PersonImpl) p).setCarAvail("never");
 		this.runATestRun(PlanomatTestRun.NOEVENTS_CAR_PT);
 	}
 	
@@ -172,7 +173,7 @@ public class PlanomatTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+		Person testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
@@ -181,7 +182,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 		// write out the test person and the modified plan into a file
 		PopulationImpl outputPopulation = new PopulationImpl();
-		outputPopulation.getPersons().put(testPerson.getId(), testPerson);
+		outputPopulation.addPerson(testPerson);
 
 		log.info("Writing plans file...");
 		new PopulationWriter(outputPopulation).writeFile(this.getOutputDirectory() + "output_plans.xml.gz");
@@ -201,7 +202,7 @@ public class PlanomatTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+		Person testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
 		Plan testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
@@ -242,7 +243,7 @@ public class PlanomatTest extends MatsimTestCase {
 		final int TEST_PLAN_NR = 0;
 
 		// first person
-		PersonImpl testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
+		Person testPerson = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
 		// only plan of that person
 		testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
@@ -307,7 +308,7 @@ public class PlanomatTest extends MatsimTestCase {
 		
 		// write out the test person and the modified plan into a file
 		PopulationImpl outputPopulation = new PopulationImpl();
-		outputPopulation.getPersons().put(testPerson.getId(), testPerson);
+		outputPopulation.addPerson(testPerson);
 
 		System.out.println("Writing plans file...");
 		new PopulationWriter(outputPopulation).writeFile(this.getOutputDirectory() + "output_plans.xml.gz");

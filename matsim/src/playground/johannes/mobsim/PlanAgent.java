@@ -26,6 +26,7 @@ package playground.johannes.mobsim;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -46,7 +47,7 @@ public class PlanAgent implements MobsimAgent {
 	// private fields
 	// =======================================================
 
-	private final PersonImpl person;
+	private final Person person;
 
 	private int currentPlanIndex;
 
@@ -67,7 +68,7 @@ public class PlanAgent implements MobsimAgent {
 	 *            the underlying data source. <tt>person</tt> must have a
 	 *            selected plan!
 	 */
-	public PlanAgent(PersonImpl person) {
+	public PlanAgent(Person person) {
 		this.person = person;
 	}
 
@@ -284,7 +285,7 @@ public class PlanAgent implements MobsimAgent {
 	/**
 	 * @return the underlying person.
 	 */
-	public PersonImpl getPerson() {
+	public Person getPerson() {
 		return person;
 	}
 

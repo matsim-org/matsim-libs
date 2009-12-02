@@ -170,7 +170,7 @@ public class AccessEgressDemo {
 				leg.setRoute(new ExperimentalTransitRoute(stop, tLine, tRoute, lastStop));
 				ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[nOfLinks - 1]);
 
-				population.getPersons().put(person.getId(), person);
+				population.addPerson(person);
 				person.addPlan(plan);
 				person.setSelectedPlan(plan);
 				plan.addActivity(act1);

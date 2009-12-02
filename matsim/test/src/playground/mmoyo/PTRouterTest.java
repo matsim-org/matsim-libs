@@ -9,6 +9,7 @@ import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
@@ -16,7 +17,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -85,7 +85,7 @@ public class PTRouterTest extends MatsimTestCase {
 		PopulationImpl population = new PopulationImpl();
 		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, plainNetwork);
 		plansReader.readFile(PLANFILE);
-		PersonImpl person = population.getPersons().get(new IdImpl("1")); 
+		Person person = population.getPersons().get(new IdImpl("1")); 
 		Plan plan = person.getPlans().get(0);
 
 		ActivityImpl act1 = (ActivityImpl)plan.getPlanElements().get(0);

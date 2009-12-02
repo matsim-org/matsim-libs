@@ -22,6 +22,7 @@ package playground.rost.eaflow.util;
 
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -32,7 +33,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -75,7 +75,7 @@ public class DDcontroller {
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		if (testplans) {
-			for (PersonImpl person : population.getPersons().values()) {
+			for (Person person : population.getPersons().values()) {
 				Plan plan = person.getSelectedPlan();
 				if (plan == null) {
 					System.out.println("Person " + person.getId() + " has no plan.");

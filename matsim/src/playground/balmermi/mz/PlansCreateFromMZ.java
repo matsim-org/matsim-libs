@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
@@ -196,7 +197,7 @@ public class PlansCreateFromMZ {
 				person_string_new = person_string_new + str;
 
 				// creating/getting the matsim person
-				PersonImpl person = plans.getPersons().get(pid);
+				PersonImpl person = (PersonImpl) plans.getPersons().get(pid);
 				if (person == null) {
 					person = new PersonImpl(pid);
 					plans.addPerson(person);
@@ -266,7 +267,7 @@ public class PlansCreateFromMZ {
 
 	private final void removePlans(final PopulationImpl plans, final Map<Id,String> person_strings, final Set<Id> ids) {
 		for (Id id : ids) {
-			PersonImpl p = plans.getPersons().remove(id);
+			Person p = plans.getPersons().remove(id);
 			if (p == null) { Gbl.errorMsg("pid="+id+": id not found in the plans DB!"); }
 			String p_str = person_strings.remove(id);
 			if (p_str == null) { Gbl.errorMsg("pid="+id+": id not found in the person_strings DB!"); }
@@ -276,7 +277,7 @@ public class PlansCreateFromMZ {
 	//////////////////////////////////////////////////////////////////////
 
 	private final void setHomeLocations(final PopulationImpl plans, final Map<Id,String> person_strings) {
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			ActivityImpl home = ((PlanImpl) plan).getFirstActivity();
 			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
@@ -295,7 +296,7 @@ public class PlansCreateFromMZ {
 
 	private final Set<Id> identifyNonHomeBasedPlans(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			ActivityImpl last = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 			if (!last.getType().equals(HOME)) { ids.add(p.getId()); }
@@ -307,7 +308,7 @@ public class PlansCreateFromMZ {
 
 	private final Set<Id> identifyPlansWithTypeOther(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
@@ -323,7 +324,7 @@ public class PlansCreateFromMZ {
 
 	private final Set<Id> identifyPlansModeTypeUndef(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
@@ -339,7 +340,7 @@ public class PlansCreateFromMZ {
 
 	private final Set<Id> identifyPlansWithRoundTrips(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			ActivityImpl prevAct = null;
 			for (PlanElement pe : plan.getPlanElements()) {
@@ -363,7 +364,7 @@ public class PlansCreateFromMZ {
 		int cnt_sametypes = 0;
 		int cnt_difftypes = 0;
 		int cnt_p = 0;
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person p : plans.getPersons().values()) {
 			boolean has_changed = false;
 			Plan plan = p.getSelectedPlan();
 			PlanImpl plan2 = new org.matsim.core.population.PlanImpl(p);
@@ -415,7 +416,7 @@ public class PlansCreateFromMZ {
 			if (has_changed) { cnt_p++; }
 			p.getPlans().clear();
 			p.addPlan(plan2);
-			p.setSelectedPlan(plan2);
+			((PersonImpl) p).setSelectedPlan(plan2);
 
 			// complete the last act with time info
 			if (p.getSelectedPlan().getPlanElements().size() == 1) {
@@ -432,7 +433,7 @@ public class PlansCreateFromMZ {
 
 	private final Set<Id> identifyPlansNegDistance(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
@@ -448,7 +449,7 @@ public class PlansCreateFromMZ {
 
 	private final Set<Id> identifyPlansWithNegCoords(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof ActivityImpl) {
@@ -464,7 +465,7 @@ public class PlansCreateFromMZ {
 
 	private final Set<Id> identifyPlansWithTooLongWalkTrips(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof LegImpl) {
@@ -480,7 +481,7 @@ public class PlansCreateFromMZ {
 
 	private final Set<Id> identifyPlansInconsistentTimes(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			for (int i=0; i<plan.getPlanElements().size()-2; i=i+2) {
 				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
@@ -494,7 +495,7 @@ public class PlansCreateFromMZ {
 
 	private final Set<Id> identifySingleActPlans(final PopulationImpl plans, final Map<Id,String> person_strings) {
 		Set<Id> ids = new HashSet<Id>();
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			if (plan.getPlanElements().size() <= 1) { ids.add(p.getId()); }
 		}

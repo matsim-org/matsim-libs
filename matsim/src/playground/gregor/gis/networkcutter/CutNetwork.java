@@ -47,7 +47,6 @@ import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -87,7 +86,7 @@ public class CutNetwork {
 		max_y = 9894785.;
 		
 		ConcurrentLinkedQueue<Plan> q = new ConcurrentLinkedQueue<Plan>();
-		for (PersonImpl pers : pop.getPersons().values()) {
+		for (Person pers : pop.getPersons().values()) {
 			Plan p = pers.getSelectedPlan();
 			CoordImpl c = (CoordImpl) ((PlanImpl) p).getFirstActivity().getCoord();
 			if (!isWithin(c)) {
@@ -135,9 +134,9 @@ public class CutNetwork {
 		}
 		new NetworkCleaner().run(net);
 		
-		Iterator<PersonImpl> it = pop.getPersons().values().iterator();
+		Iterator<? extends Person> it = pop.getPersons().values().iterator();
 		while (it.hasNext()) {
-			PersonImpl pers = it.next();
+			Person pers = it.next();
 
 			Id id = ((ActivityImpl)pers.getPlans().get(0).getPlanElements().get(0)).getLink().getId();
 

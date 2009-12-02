@@ -93,14 +93,14 @@ public class PopulationImpl implements Population {
 
 		if (!this.isStreaming) {
 			// streaming is off, just add the person to our list
-			this.getPersons().put(p.getId(), (PersonImpl) p);
+			this.persons.put(p.getId(), (PersonImpl) p);
 		} else {
 			// streaming is on, run algorithm on the person and write it to file.
 
 			/* Add Person to map, for algorithms might reference to the person
 			 * with "agent = population.getPersons().get(personId);"
 			 * remove it after running the algorithms! */
-			this.getPersons().put(p.getId(), (PersonImpl) p);
+			this.persons.put(p.getId(), (PersonImpl) p);
 
 			// run algos
 			for (PersonAlgorithm algo : this.personAlgos) {
@@ -122,7 +122,7 @@ public class PopulationImpl implements Population {
 				PersonAlgorithm algo = this.personAlgos.get(i);
 				log.info("running algorithm " + algo.getClass().getName());
 				Counter cntr = new Counter(" person # ");
-				for (PersonImpl person : this.getPersons().values()) {
+				for (Person person : this.getPersons().values()) {
 					cntr.incCounter();
 					algo.run(person);
 				}
@@ -155,7 +155,7 @@ public class PopulationImpl implements Population {
 	//////////////////////////////////////////////////////////////////////
 
 
-	public final Map<Id, PersonImpl> getPersons() {
+	public final Map<Id, ? extends Person> getPersons() {
 		return persons ;
 	}
 

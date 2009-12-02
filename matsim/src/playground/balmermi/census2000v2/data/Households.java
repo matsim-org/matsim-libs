@@ -29,11 +29,11 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
 import playground.balmermi.census2000.data.Municipalities;
@@ -125,7 +125,7 @@ public class Households {
 				entries = p_w_list.split(";",-1);
 				for (int i=0; i<entries.length-1; i++) {
 					Id pid = new IdImpl(entries[i]);
-					PersonImpl p = plans.getPersons().get(pid);
+					Person p = plans.getPersons().get(pid);
 					if (p == null) { Gbl.errorMsg("that should not happen!"); }
 					if (hh.getPersonsW().put(p.getId(),p) !=  null) { Gbl.errorMsg("that should not happen!"); }
 					if (p.getCustomAttributes().put(CAtts.HH_W,hh) != null) {
@@ -135,7 +135,7 @@ public class Households {
 				entries = p_z_list.split(";",-1);
 				for (int i=0; i<entries.length-1; i++) {
 					Id pid = new IdImpl(entries[i]);
-					PersonImpl p = plans.getPersons().get(pid);
+					Person p = plans.getPersons().get(pid);
 					if (p == null) { Gbl.errorMsg("that should not happen!"); }
 					if (hh.getPersonsZ().put(p.getId(),p) != null) { Gbl.errorMsg("that should not happen!"); }
 					if (p.getCustomAttributes().put(CAtts.HH_Z,hh) != null) {

@@ -44,7 +44,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -150,7 +149,7 @@ public class Getagentcoords {
 
 			Integer foundpeople = 0;
 			Integer notfoundpeople = 0;
-			for (PersonImpl p : population.getPersons().values()) {
+			for (Person p : population.getPersons().values()) {
 				Plan plan = p.getSelectedPlan();
 				// p.setVisualizerData(visualizerData)
 				if (plan == null) {notfoundpeople++; continue;}

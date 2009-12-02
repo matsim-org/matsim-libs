@@ -24,10 +24,10 @@ import java.io.IOException;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
@@ -88,7 +88,7 @@ public class BKickHouseholdsCreator {
 
     IncomeCalculatorKantonZurich incomeCalculator = new IncomeCalculatorKantonZurich();
     
-    for (PersonImpl p : pop.getPersons().values()){
+    for (Person p : pop.getPersons().values()){
     	Household hh = b.createHousehold(p.getId());
       hh.setIncome(b.createIncome(incomeCalculator.calculateIncome(46300), Income.IncomePeriod.year));
       hh.getMemberIds().add(p.getId());

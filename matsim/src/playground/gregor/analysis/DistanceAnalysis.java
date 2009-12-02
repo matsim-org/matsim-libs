@@ -42,6 +42,7 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -50,7 +51,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -108,7 +108,7 @@ public class DistanceAnalysis {
 
 	private final PopulationImpl population;
 	private Envelope envelope = null;
-	private QuadTree<PersonImpl> personTree;
+	private QuadTree<Person> personTree;
 	private final NetworkLayer network;
 	private final PlansCalcRoute router;
 	private FeatureType ftDistrictShape;
@@ -186,7 +186,7 @@ public class DistanceAnalysis {
 		for (Polygon polygon : this.polygons) {
 			int num_pers = 0;
 
-			Collection<PersonImpl> persons = this.personTree.get(polygon.getCentroid().getX(), polygon.getCentroid().getY(),400);
+			Collection<Person> persons = this.personTree.get(polygon.getCentroid().getX(), polygon.getCentroid().getY(),400);
 
 			persons = rmAliens(persons,polygon);
 
@@ -215,7 +215,7 @@ public class DistanceAnalysis {
 
 	}
 
-	private double[] handlePersons(final Collection<PersonImpl> persons) {
+	private double[] handlePersons(final Collection<Person> persons) {
 
 		double [] dist = {0., 0.,0., 0., 0.};
 		double diff = 0;
@@ -224,7 +224,7 @@ public class DistanceAnalysis {
 		int [] dests = new int [100];
 
 
-		for (PersonImpl person : persons) {
+		for (Person person : persons) {
 			LegImpl leg = ((PlanImpl) person.getSelectedPlan()).getNextLeg(((PlanImpl) person.getSelectedPlan()).getFirstActivity());
 			double l1 = leg.getRoute().getDistance();
 			List<Link> ls = ((NetworkRouteWRefs) leg.getRoute()).getLinks();
@@ -274,10 +274,10 @@ public class DistanceAnalysis {
 		return dist;
 
 	}
-	private Collection<PersonImpl>  rmAliens(final Collection<PersonImpl> persons, final Polygon polygon) {
+	private Collection<Person>  rmAliens(final Collection<Person> persons, final Polygon polygon) {
 
-		ArrayList<PersonImpl> ret = new ArrayList<PersonImpl>();
-		for (PersonImpl person : persons) {
+		ArrayList<Person> ret = new ArrayList<Person>();
+		for (Person person : persons) {
 			Point p = MGC.coord2Point(((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord());
 			if (polygon.contains(p)) {
 				ret.add(person);
@@ -287,8 +287,8 @@ public class DistanceAnalysis {
 	}
 	private void handlePlans() {
 
-		this.personTree = new QuadTree<PersonImpl>(0,0,3*this.envelope.getMaxX(),3*this.envelope.getMaxY());
-		for (PersonImpl person : this.population.getPersons().values()){
+		this.personTree = new QuadTree<Person>(0,0,3*this.envelope.getMaxX(),3*this.envelope.getMaxY());
+		for (Person person : this.population.getPersons().values()){
 			Coord c = ((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord();
 			this.personTree.put(c.getX(), c.getY(), person);
 		}

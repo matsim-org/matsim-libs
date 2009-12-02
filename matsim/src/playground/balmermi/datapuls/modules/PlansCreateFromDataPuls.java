@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
@@ -32,8 +33,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -59,7 +62,7 @@ public class PlansCreateFromDataPuls {
 	private final String infile;
 	private final Random random = MatsimRandom.getRandom();
 	private final PopulationImpl censusPopulation;
-	private final ArrayList<QuadTree<PersonImpl>> censusPersonGroups;
+	private final ArrayList<QuadTree<Person>> censusPersonGroups;
 	private final Knowledges censusKnowledges;
 	private final ActivityFacilitiesImpl datapulsFacilities;
 	private final Map<String,QuadTree<ActivityFacilityImpl>> datapulsFacilityGroups;
@@ -84,14 +87,14 @@ public class PlansCreateFromDataPuls {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private ArrayList<QuadTree<PersonImpl>> buildPersonGroups(PopulationImpl population) {
+	private ArrayList<QuadTree<Person>> buildPersonGroups(Population population) {
 		log.info("  building a quadtree for each person group...");
 		log.info("    calc spatial extent...");
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (PersonImpl p : population.getPersons().values()) {
+		for (Person p : population.getPersons().values()) {
 			Coord c = ((PlanImpl) p.getPlans().get(0)).getFirstActivity().getFacility().getCoord();
 			if (c.getX() < minx) { minx = c.getX(); }
 			if (c.getY() < miny) { miny = c.getY(); }
@@ -102,11 +105,12 @@ public class PlansCreateFromDataPuls {
 		log.info("    => xrange("+ minx+","+maxx+"); yrange("+miny+","+maxy+")");
 		log.info("    done.");
 		
-		ArrayList<QuadTree<PersonImpl>> qts = new ArrayList<QuadTree<PersonImpl>>(10);
-		for (int i=0; i<10; i++) { qts.add(new QuadTree<PersonImpl>(minx,miny,maxx,maxy)); }
+		ArrayList<QuadTree<Person>> qts = new ArrayList<QuadTree<Person>>(10);
+		for (int i=0; i<10; i++) { qts.add(new QuadTree<Person>(minx,miny,maxx,maxy)); }
 
 		log.info("    assinging persons to their group...");
-		for (PersonImpl p : population.getPersons().values()) {
+		for (Person pp : population.getPersons().values()) {
+			PersonImpl p = (PersonImpl) pp;
 			Coord c = ((PlanImpl) p.getPlans().get(0)).getFirstActivity().getFacility().getCoord();
 			if (p.getSex().equals("m")) {
 				if (p.getAge()<7) { qts.get(0).put(c.getX(),c.getY(),p); }
@@ -223,9 +227,10 @@ public class PlansCreateFromDataPuls {
 	private final void assignCensus2datapuls(PopulationImpl population, Knowledges kn) {
 		log.info("  assing Census demand to datapuls population...");
 		double maxDistance = 0;
-		for (PersonImpl p : population.getPersons().values()) {
+		for (Person pp : population.getPersons().values()) {
+			PersonImpl p = (PersonImpl) pp;
 			Coord c = kn.getKnowledgesByPersonId().get(p.getId()).getActivities("home").get(0).getFacility().getCoord();
-			QuadTree<PersonImpl> personGroup = null;
+			QuadTree<Person> personGroup = null;
 			if (p.getSex().equals("m")) {
 				if (p.getAge()<7) { personGroup = censusPersonGroups.get(0); }
 				else if (p.getAge()<15) { personGroup = censusPersonGroups.get(1); }
@@ -241,15 +246,16 @@ public class PlansCreateFromDataPuls {
 				else { personGroup = censusPersonGroups.get(9); }
 			}
 			double distance = 100;
-			ArrayList<PersonImpl> censusPersons = (ArrayList<PersonImpl>)personGroup.get(c.getX(),c.getY(),distance);
+			List<Person> censusPersons = (List<Person>)personGroup.get(c.getX(),c.getY(),distance);
 			while (censusPersons.isEmpty()) {
-				distance = 2*distance; censusPersons = (ArrayList<PersonImpl>)personGroup.get(c.getX(),c.getY(),distance);
+				distance = 2*distance;
+				censusPersons = (ArrayList<Person>)personGroup.get(c.getX(),c.getY(),distance);
 			}
 			// some logging info
 			if (maxDistance < distance) { maxDistance = distance; log.info("    pid="+p.getId()+": censusHome2datapulsHome distance="+distance); }
 			
-			PersonImpl censusPerson = censusPersons.get(random.nextInt(censusPersons.size()));
-			mapDemand(p,kn.getKnowledgesByPersonId().get(p.getId()),censusPerson,this.censusKnowledges.getKnowledgesByPersonId().get(censusPerson.getId()));
+			Person censusPerson = censusPersons.get(random.nextInt(censusPersons.size()));
+			mapDemand(p,kn.getKnowledgesByPersonId().get(p.getId()),(PersonImpl) censusPerson,this.censusKnowledges.getKnowledgesByPersonId().get(censusPerson.getId()));
 		}
 		log.info("  done.");
 	}

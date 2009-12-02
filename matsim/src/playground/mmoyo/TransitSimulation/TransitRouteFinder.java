@@ -6,19 +6,19 @@ import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.transitSchedule.api.TransitSchedule;
 
-import playground.mmoyo.PTRouter.PTRouter;
-import playground.mmoyo.PTRouter.LogicIntoPlainTranslator;
 import playground.mmoyo.PTRouter.LogicFactory;
+import playground.mmoyo.PTRouter.LogicIntoPlainTranslator;
+import playground.mmoyo.PTRouter.PTRouter;
 
 /**
  * Receives two acts and returns a list of PT legs connecting their coordinates 
@@ -34,7 +34,7 @@ public class TransitRouteFinder {
 	}
 	
 	/**returns a list of legs that represent a PT connection between two activities locations*/ 
-	public List<Leg> calculateRoute (final ActivityImpl fromAct, final ActivityImpl toAct, final PersonImpl person ){
+	public List<Leg> calculateRoute (final ActivityImpl fromAct, final ActivityImpl toAct, final Person person ){
 		List<Leg> legList = new ArrayList<Leg>();
 		Path path = ptRouter.findPTPath(fromAct.getCoord(), toAct.getCoord(), fromAct.getEndTime());
 

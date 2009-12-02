@@ -24,14 +24,15 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -56,7 +57,7 @@ public class RouterTest extends MatsimTestCase {
 		new TransitScheduleReaderV1(schedule, network).readFile("test/input/playground/marcel/pt/router/transitSchedule.xml");
 		PopulationImpl population = new PopulationImpl();
 		new MatsimPopulationReader(population, network).readFile("test/input/playground/marcel/pt/plans.xml");
-		PersonImpl person = population.getPersons().get(new IdImpl(1));
+		Person person = population.getPersons().get(new IdImpl(1));
 		ActivityImpl fromAct = (ActivityImpl) person.getPlans().get(0).getPlanElements().get(0);
 		ActivityImpl toAct = (ActivityImpl) person.getPlans().get(0).getPlanElements().get(2);
 		

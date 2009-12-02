@@ -42,6 +42,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -174,7 +175,7 @@ public class EgressAnalysis {
 
 	private void handlePlans() {
 			log.info("handle plans");
-			for (PersonImpl person : this.population.getPersons().values()) {
+			for (Person person : this.population.getPersons().values()) {
 				LegImpl leg = ((PlanImpl) person.getSelectedPlan()).getNextLeg(((PlanImpl) person.getSelectedPlan()).getFirstActivity());
 				List<Node> route = ((NetworkRouteWRefs) leg.getRoute()).getNodes();
 				Node node = route.get(route.size()-2);

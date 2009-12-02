@@ -23,6 +23,7 @@ package org.matsim.analysis;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
@@ -54,7 +55,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		
 		this.population = new PopulationImpl();
 		PersonImpl person = new PersonImpl(DEFAULT_PERSON_ID);
-		this.population.getPersons().put(person.getId(), person);
+		this.population.addPerson(person);
 		PlanImpl plan = person.createAndAddPlan(true);
 		plan.createAndAddActivity("act1", new CoordImpl(100.0, 100.0));
 		plan.createAndAddLeg(TransportMode.undefined);
@@ -97,7 +98,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(testee);
 
-		PersonImpl defaultPerson = this.population.getPersons().get(DEFAULT_PERSON_ID);
+		Person defaultPerson = this.population.getPersons().get(DEFAULT_PERSON_ID);
 		LinkImpl defaultLink = this.network.getLinks().get(DEFAULT_LINK_ID);
 
 		LegImpl leg = new LegImpl(TransportMode.car);

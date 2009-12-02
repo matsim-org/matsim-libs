@@ -9,6 +9,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
@@ -73,7 +74,7 @@ public class PTActWriter {
 		
 		SimplifyPtLegs SimplifyPtLegs = new SimplifyPtLegs();
 		
-		for (PersonImpl person: population.getPersons().values()) {
+		for (Person person: population.getPersons().values()) {
 			//if (true){ Person person = population.getPersons().get(new IdImpl("3937204"));
 			System.out.println(person.getId());
 			SimplifyPtLegs.run(person.getPlans().get(0));
@@ -90,7 +91,7 @@ public class PTActWriter {
 	public void printPTLegs(final TransitSchedule transitSchedule){
 		TransitRouteFinder transitRouteFinder= new TransitRouteFinder (transitSchedule);
 		
-		for (PersonImpl person: this.population.getPersons().values()) {
+		for (Person person: this.population.getPersons().values()) {
 		//if (true){	
 			//PersonImpl person = population.getPersons().get(new IdImpl("2180188"));   //2180188
 	
@@ -123,7 +124,7 @@ public class PTActWriter {
 		
 		List<Double> durations = new ArrayList<Double>();  
 		
-		for (PersonImpl person: this.population.getPersons().values()) {
+		for (Person person: this.population.getPersons().values()) {
 			//if ( true ) {
 			//PersonImpl person = population.getPersons().get(new IdImpl("905449")); // 5228308   5636428  2949483 
  			System.out.println(numPlans + " id:" + person.getId());
@@ -184,8 +185,8 @@ public class PTActWriter {
 			}
 
 			if (addPerson){
-				person.exchangeSelectedPlan(newPlan, true);
-				person.removeUnselectedPlans();
+				((PersonImpl) person).exchangeSelectedPlan(newPlan, true);
+				((PersonImpl) person).removeUnselectedPlans();
 				newPopulation.addPerson(person);
 			}
 			numPlans++;

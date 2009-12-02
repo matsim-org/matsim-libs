@@ -44,7 +44,6 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -112,8 +111,8 @@ public class ScenarioCut {
 					}
 				}
 			}
-			if (((ScenarioImpl)scenario).getKnowledges().getKnowledgesByPersonId().get(p.getId()) != null) {
-				for (ActivityOptionImpl ao : ((ScenarioImpl)scenario).getKnowledges().getKnowledgesByPersonId().get(p.getId()).getActivities()) {
+			if (scenario.getKnowledges().getKnowledgesByPersonId().get(p.getId()) != null) {
+				for (ActivityOptionImpl ao : scenario.getKnowledges().getKnowledgesByPersonId().get(p.getId()).getActivities()) {
 					ActivityFacilityImpl f = ao.getFacility();
 					if (f.getCoord().getX() < min.getX()) { min.setX(f.getCoord().getX()); }
 					if (f.getCoord().getY() < min.getY()) { min.setY(f.getCoord().getY()); }
@@ -226,7 +225,7 @@ public class ScenarioCut {
 		Set<Id> linkIds = scenario.getNetwork().getLinks().keySet();
 		Set<Id> facIds = scenario.getActivityFacilities().getFacilities().keySet();
 		Set<Id> toRemove = new HashSet<Id>();
-		for (PersonImpl p : scenario.getPopulation().getPersons().values()) {
+		for (Person p : scenario.getPopulation().getPersons().values()) {
 			boolean removeIt = false;
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement e : plan.getPlanElements()) {
@@ -241,8 +240,8 @@ public class ScenarioCut {
 					}
 				}
 			}
-			if (((ScenarioImpl)scenario).getKnowledges().getKnowledgesByPersonId().get(p.getId()) != null) {
-				for (ActivityOptionImpl ao : ((ScenarioImpl)scenario).getKnowledges().getKnowledgesByPersonId().get(p.getId()).getActivities()) {
+			if (scenario.getKnowledges().getKnowledgesByPersonId().get(p.getId()) != null) {
+				for (ActivityOptionImpl ao : scenario.getKnowledges().getKnowledgesByPersonId().get(p.getId()).getActivities()) {
 					if (!facIds.contains(ao.getFacility().getId())) { removeIt = true; }
 				}
 			}

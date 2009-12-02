@@ -6,13 +6,13 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -83,7 +83,7 @@ public class Counter {
 		
 		PopulationResult populationResult= new PopulationResult(ptRouter.getTimeCoeficient(), ptRouter.getDistanceCoeficient(), ptRouter.getTransferPenalty());
 		
-		for (PersonImpl person: population.getPersons().values()) {
+		for (Person person: population.getPersons().values()) {
 			//if ( true ) {
 			//PersonImpl person = population.getPersons().get(new IdImpl("905449")); // 5228308   5636428  2949483 
  			System.out.println(timeCoefficient + " " + (numPlans++) + " id:" + person.getId());

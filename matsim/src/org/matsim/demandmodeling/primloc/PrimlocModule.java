@@ -69,7 +69,6 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.knowledges.KnowledgeImpl;
@@ -294,7 +293,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		
 		core.P = new double[ core.numZ ];
 		// Determine how many employed persons live in each zone
-		for (PersonImpl guy : population.getPersons().values()) 
+		for (Person guy : population.getPersons().values()) 
 			if( agentHasPrimaryActivityInPlan( guy ) ){
 				ActivityFacilityImpl homeOfGuy = this.knowledges.getKnowledgesByPersonId().get(guy.getId()).getActivities("home").get(0).getFacility();
 				ArrayList<MappedLocation> list = zoneLayer.getNearestLocations(homeOfGuy.getCoord(), null);

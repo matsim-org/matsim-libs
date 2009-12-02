@@ -36,7 +36,6 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.pt.queuesim.TransitQueueSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -109,7 +108,7 @@ public class PseudoNetworkDemo {
 
 		PopulationImpl population = scenario.getPopulation();
 		Person person = population.getFactory().createPerson(new IdImpl(1));
-		population.getPersons().put(person.getId(), (PersonImpl) person);
+		population.addPerson(person);
 		Plan plan = population.getFactory().createPlan();
 		person.addPlan(plan);
 		Activity act = population.getFactory().createActivityFromLinkId("home", link1.getId());

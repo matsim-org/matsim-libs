@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -150,7 +151,7 @@ public class KnowledgeDBStorageHandler extends Thread implements ActivityStartEv
 
 	public synchronized void handleEvent(ActivityStartEvent event)
 	{
-		PersonImpl person = population.getPersons().get(event.getPersonId());
+		Person person = population.getPersons().get(event.getPersonId());
 		NodeKnowledge nodeKnowledge = knowledgeTools.getNodeKnowledge(person);
 		
 		subNetworkTools.resetSubNetwork(person);

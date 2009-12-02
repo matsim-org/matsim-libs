@@ -250,7 +250,7 @@ public class TwoLinesDemo {
 			plan.addActivity(act3);
 			person.addPlan(plan);
 			person.setSelectedPlan(plan);
-			population.getPersons().put(person.getId(), person);
+			population.addPerson(person);
 		}
 
 		{ // person 2
@@ -273,7 +273,7 @@ public class TwoLinesDemo {
 			plan.addActivity(act3);
 			person.addPlan(plan);
 			person.setSelectedPlan(plan);
-			population.getPersons().put(person.getId(), person);
+			population.addPerson(person);
 		}
 
 		{ // person 3
@@ -296,7 +296,7 @@ public class TwoLinesDemo {
 			plan.addActivity(act3);
 			person.addPlan(plan);
 			person.setSelectedPlan(plan);
-			population.getPersons().put(person.getId(), person);
+			population.addPerson(person);
 		}
 	}
 

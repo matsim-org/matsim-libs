@@ -25,9 +25,9 @@ import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
 /**
@@ -59,7 +59,7 @@ public class PlansFilterArea {
 		Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
 		while (pid_it.hasNext()) {
 			Id personId = pid_it.next();
-			PersonImpl person = plans.getPersons().get(personId);
+			Person person = plans.getPersons().get(personId);
 
 			run(person);	// handle the person; in this step plans may get removed from a person
 			if (person.getPlans().isEmpty()) {
@@ -79,7 +79,7 @@ public class PlansFilterArea {
 		System.out.println("Number of persons removed: " + pid_set.size());
 	}
 
-	private void run(final PersonImpl person) {
+	private void run(final Person person) {
 		for (int i=person.getPlans().size()-1; i>=0; i--) {
 			int cntActs = 0;
 			int cntOutside = 0;

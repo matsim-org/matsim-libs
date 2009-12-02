@@ -25,6 +25,7 @@ import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -74,7 +75,7 @@ public class PlansFilterByLegMode {
 		Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
 		while (pid_it.hasNext()) {
 			Id personId = pid_it.next();
-			PersonImpl person = plans.getPersons().get(personId);
+			Person person = plans.getPersons().get(personId);
 
 			for (int i=person.getPlans().size()-1; i>=0; i--) {
 				Plan plan = person.getPlans().get(i);
@@ -89,7 +90,7 @@ public class PlansFilterByLegMode {
 						hasOtherLegMode = true;
 					}
 				}
-				if (this.legModeIsCar && never.equals(person.getCarAvail())) {
+				if (this.legModeIsCar && never.equals(((PersonImpl) person).getCarAvail())) {
 					// person cannot drive car if she has no car. this means, the person was given a lift by someone else
 					// --> do not include this person, as we're only interested in the driver
 					hasSearchedLegMode = false;

@@ -21,10 +21,9 @@
 package playground.marcel.kti.test;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -65,17 +64,17 @@ public class KtiPtTester {
 		ktiConfigGroup.setWorldInputFilename(this.config.world().getInputFile());
 		
 		PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(ktiConfigGroup);
-		plansCalcRouteKtiInfo.prepare((NetworkLayer) this.data.getNetwork());
+		plansCalcRouteKtiInfo.prepare(this.data.getNetwork());
 
 		Gbl.printRoundTime();
 
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new AStarLandmarksFactory(
-				(NetworkLayer) this.data.getNetwork(), 
+				this.data.getNetwork(), 
 				new FreespeedTravelTimeCost(this.config.charyparNagelScoring()));
 		
 		PlansCalcRouteKti calcPtLeg = new PlansCalcRouteKti(
 				this.config.plansCalcRoute(), 
-				(NetworkLayer) this.data.getNetwork(), 
+				this.data.getNetwork(), 
 				fttc, 
 				fttc, 
 				leastCostPathCalculatorFactory, 
@@ -84,7 +83,7 @@ public class KtiPtTester {
 		Gbl.printRoundTime();
 
 		Counter counter = new Counter("handle person #");
-		for (PersonImpl person : population.getPersons().values()) {
+		for (Person person : population.getPersons().values()) {
 			counter.incCounter();
 			calcPtLeg.run(person.getSelectedPlan());
 		}

@@ -27,7 +27,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
@@ -65,7 +64,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
 		commonRouterData.run(network);
 
-		PersonImpl person1 = population.getPersons().get(new IdImpl("1"));
+		Person person1 = population.getPersons().get(new IdImpl("1"));
 		LegImpl leg = ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1)));
 
 		// 1st case: without toll, agent chooses shortest path
@@ -114,7 +113,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
 
-		PersonImpl person1 = population.getPersons().get(new IdImpl("1"));
+		Person person1 = population.getPersons().get(new IdImpl("1"));
 		LegImpl leg = ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1)));
 
 		// 1st case: without toll, agent chooses shortest path

@@ -205,7 +205,7 @@ public class BlockingStopDemo {
 			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(this.ids[i-1]), tLine1, tRoute1, schedule.getFacilities().get(this.ids[nOfStops-1])));
 			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[nOfLinks-1]);
 
-			population.getPersons().put(person.getId(), person);
+			population.addPerson(person);
 			person.addPlan(plan);
 			person.setSelectedPlan(plan);
 			plan.addActivity(act1);
@@ -223,7 +223,7 @@ public class BlockingStopDemo {
 			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(this.ids[nOfStops+i-1]), tLine2, tRoute2, schedule.getFacilities().get(this.ids[2*nOfStops-1])));
 			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[2*nOfLinks-1]);
 
-			population.getPersons().put(person.getId(), person);
+			population.addPerson(person);
 			person.addPlan(plan);
 			person.setSelectedPlan(plan);
 			plan.addActivity(act1);
@@ -252,7 +252,7 @@ public class BlockingStopDemo {
 			leg1.setRoute(carRoute1);
 			ActivityImpl act1b = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[4]);
 
-			population.getPersons().put(person.getId(), person);
+			population.addPerson(person);
 			person.addPlan(plan);
 			person.setSelectedPlan(plan);
 			plan.addActivity(act1a);
@@ -267,7 +267,7 @@ public class BlockingStopDemo {
 			leg2.setRoute(carRoute2);
 			ActivityImpl act2b = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[nOfLinks-1]);
 
-			population.getPersons().put(person2.getId(), person2);
+			population.addPerson(person2);
 			person2.addPlan(plan2);
 			person2.setSelectedPlan(plan2);
 			plan2.addActivity(act2a);

@@ -6,6 +6,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -42,7 +43,8 @@ public class PopulationAnalysis {
 		int[] stats = new int[112];
 		int count = 0;
 		for (int i=0; i<stats.length; i++) { stats[i] = 0; }
-		for (PersonImpl p : population.getPersons().values()) {
+		for (Person pp : population.getPersons().values()) {
+			PersonImpl p = (PersonImpl) pp;
 			boolean analyse = true;
 			List<PlanElement> e = p.getSelectedPlan().getPlanElements();
 			for (int i=0; i<e.size(); i++) {
@@ -102,7 +104,7 @@ public class PopulationAnalysis {
 				count[i][j] = 0;
 			}
 		}
-		for (PersonImpl p : population.getPersons().values()) {
+		for (Person p : population.getPersons().values()) {
 			List<PlanElement> e = p.getSelectedPlan().getPlanElements();
 			for (int i=2; i<e.size(); i=i+2) {
 				ActivityImpl a = (ActivityImpl)e.get(i);

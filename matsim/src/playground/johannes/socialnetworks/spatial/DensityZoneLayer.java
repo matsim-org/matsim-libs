@@ -28,7 +28,7 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -59,7 +59,7 @@ public class DensityZoneLayer {
 		logger.info("Counting persons...");
 		int n = 0;
 		int total = population.getPersons().size();
-		for(PersonImpl person : population.getPersons().values()) {
+		for(Person person : population.getPersons().values()) {
 			Coord homeLoc = ((PlanImpl) person.getSelectedPlan()).getFirstActivity().getCoord();
 			
 			Zone zone = zoneLayerDouble.getZone(homeLoc);

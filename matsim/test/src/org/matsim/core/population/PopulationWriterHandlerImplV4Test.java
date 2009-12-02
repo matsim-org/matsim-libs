@@ -21,6 +21,7 @@
 package org.matsim.core.population;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
@@ -56,14 +57,14 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		plan.addLeg(leg);
 		plan.addActivity(pb.createActivityFromLinkId("h", new IdImpl(1)));
 		person.addPlan(plan);
-		pop.getPersons().put(person.getId(), person);
+		pop.addPerson(person);
 		
 		String filename = getOutputDirectory() + "population.xml";
 		new PopulationWriter(pop).writeV4(filename);
 		
 		PopulationImpl pop2 = new PopulationImpl();
 		new MatsimPopulationReader(pop2, network).readFile(filename);
-		PersonImpl person2 = pop2.getPersons().get(new IdImpl(1));
+		Person person2 = pop2.getPersons().get(new IdImpl(1));
 		LegImpl leg2 = (LegImpl) person2.getPlans().get(0).getPlanElements().get(1);
 		RouteWRefs route2 = leg2.getRoute();
 		assertEquals(123, route2.getTravelTime(), EPSILON); // if this succeeds, we know that writing/reading the data works

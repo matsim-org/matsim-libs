@@ -9,6 +9,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -59,7 +60,8 @@ public class PopulationWriteTable {
 			for (String type : actOptTypes) { out.write("\t"+type+"Fid"); }
 			out.write("\n");
 			out.flush();
-			for (PersonImpl p : population.getPersons().values()) {
+			for (Person pp : population.getPersons().values()) {
+				PersonImpl p = (PersonImpl) pp;
 				out.write(p.getId().toString()+"\t");
 				if (p.hasLicense()) { out.write("yes\t"); } else { out.write("no\t"); }
 				out.write(p.getCarAvail()+"\t");

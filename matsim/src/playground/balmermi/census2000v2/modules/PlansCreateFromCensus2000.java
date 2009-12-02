@@ -32,13 +32,13 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -504,37 +504,37 @@ public class PlansCreateFromCensus2000 {
 				// 3     id    id      2/person   person is part of w and z. current line reflects w
 				// 4     id    id      2/person   person is part of w and z. current line reflects z
 				if ((wkat == 1) && (gem2 == -9) && (partnr == -9)) {
-					PersonImpl p = plans.getPersons().get(pid);
+					Person p = plans.getPersons().get(pid);
 					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
 					p = new PersonImpl(pid);
 					Map<String,Object> p_atts = p.getCustomAttributes();
 					p_atts.put(CAtts.HH_W,hh); hh.getPersonsW().put(p.getId(),p);
 					p_atts.put(CAtts.HH_Z,hh); hh.getPersonsZ().put(p.getId(),p);
 					plans.addPerson(p);
-					this.addDemographics(p,entries,wkat,municipalityLayer);
+					this.addDemographics((PersonImpl) p,entries,wkat,municipalityLayer);
 				}
 				else if ((wkat == 3) && (gem2 == -7) && (partnr == -7)) {
-					PersonImpl p = plans.getPersons().get(pid);
+					Person p = plans.getPersons().get(pid);
 					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
 					p = new PersonImpl(pid);
 					Map<String,Object> p_atts = p.getCustomAttributes();
 					p_atts.put(CAtts.HH_W,hh); hh.getPersonsW().put(p.getId(),p);
 					p_atts.put(CAtts.HH_Z,null);
 					plans.addPerson(p);
-					this.addDemographics(p,entries,wkat,municipalityLayer);
+					this.addDemographics((PersonImpl) p,entries,wkat,municipalityLayer);
 				}
 				else if ((wkat == 4) && (gem2 == -7) && (partnr == -7)) {
-					PersonImpl p = plans.getPersons().get(pid);
+					Person p = plans.getPersons().get(pid);
 					if (p != null) { Gbl.errorMsg(e_head+"person alread exists!"); }
 					p = new PersonImpl(pid);
 					Map<String,Object> p_atts = p.getCustomAttributes();
 					p_atts.put(CAtts.HH_W,null);
 					p_atts.put(CAtts.HH_Z,hh); hh.getPersonsZ().put(p.getId(),p);
 					plans.addPerson(p);
-					this.addDemographics(p,entries,wkat,municipalityLayer);
+					this.addDemographics((PersonImpl) p,entries,wkat,municipalityLayer);
 				}
 				else if ((wkat == 3) && ((1 <= gem2)&&(gem2 <= 7011)) && ((1 <= partnr)&&(partnr <= 999999999))) {
-					PersonImpl p = plans.getPersons().get(new IdImpl(partnr));
+					Person p = plans.getPersons().get(new IdImpl(partnr));
 					if (p == null) {
 						if (!pids.add(pid)) { Gbl.errorMsg(e_head+"partner person not found, but pid found in the set!"); }
 						p = new PersonImpl(pid);
@@ -542,18 +542,18 @@ public class PlansCreateFromCensus2000 {
 						p_atts.put(CAtts.HH_W,hh); hh.getPersonsW().put(p.getId(),p);
 						p_atts.put(CAtts.HH_Z,null);
 						plans.addPerson(p);
-						this.addDemographics(p,entries,wkat,municipalityLayer);
+						this.addDemographics((PersonImpl) p,entries,wkat,municipalityLayer);
 					}
 					else {
 						if (!pids.remove(new IdImpl(partnr))) { Gbl.errorMsg(e_head+"partner person found, but not found in the set!"); }
 						Map<String,Object> p_atts = p.getCustomAttributes();
 						if (!((p_atts.get(CAtts.HH_W) == null) && (p_atts.get(CAtts.HH_Z) != null))) { Gbl.errorMsg(e_head+"something is wrong!"); }
 						p_atts.put(CAtts.HH_W,hh); hh.getPersonsW().put(p.getId(),p);
-						this.addDemographics(p,entries,wkat,municipalityLayer);
+						this.addDemographics((PersonImpl) p,entries,wkat,municipalityLayer);
 					}
 				}
 				else if ((wkat == 4) && ((1 <= gem2)&&(gem2 <= 7011)) && ((1 <= partnr)&&(partnr <= 999999999))) {
-					PersonImpl p = plans.getPersons().get(new IdImpl(partnr));
+					Person p = plans.getPersons().get(new IdImpl(partnr));
 					if (p == null) {
 						if (!pids.add(pid)) { Gbl.errorMsg(e_head+"partner person not found, but pid found in the set!"); }
 						p = new PersonImpl(pid);
@@ -561,14 +561,14 @@ public class PlansCreateFromCensus2000 {
 						p_atts.put(CAtts.HH_W,null);
 						p_atts.put(CAtts.HH_Z,hh); hh.getPersonsZ().put(p.getId(),p);
 						plans.addPerson(p);
-						this.addDemographics(p,entries,wkat,municipalityLayer);
+						this.addDemographics((PersonImpl) p,entries,wkat,municipalityLayer);
 					}
 					else {
 						if (!pids.remove(new IdImpl(partnr))) { Gbl.errorMsg(e_head+"partner person found, but not found in the set!"); }
 						Map<String,Object> p_atts = p.getCustomAttributes();
 						if (!((p_atts.get(CAtts.HH_W) != null) && (p_atts.get(CAtts.HH_Z) == null))) { Gbl.errorMsg(e_head+"something is wrong!"); }
 						p_atts.put(CAtts.HH_Z,hh); hh.getPersonsZ().put(p.getId(),p);
-						this.addDemographics(p,entries,wkat,municipalityLayer);
+						this.addDemographics((PersonImpl) p,entries,wkat,municipalityLayer);
 					}
 				}
 				else { Gbl.errorMsg(e_head+"not allowed!"); }
@@ -585,7 +585,7 @@ public class PlansCreateFromCensus2000 {
 			// some info
 			log.info("    "+plans.getPersons().size()+" persons created! (#pids="+pids.size()+")");
 			int same_cnt = 0; int diff_cnt = 0; int wonly_cnt = 0; int zonly_cnt = 0; int diff_f_cnt = 0;
-			for (PersonImpl p : plans.getPersons().values()) {
+			for (Person p : plans.getPersons().values()) {
 				Map<String,Object> p_atts = p.getCustomAttributes();
 				if ((p_atts.get(CAtts.HH_W)==null)&&(p_atts.get(CAtts.HH_Z)==null)) { Gbl.errorMsg("WAHHH!"); }
 				else if ((p_atts.get(CAtts.HH_W)==null)&&(p_atts.get(CAtts.HH_Z)!=null)) { zonly_cnt++; }

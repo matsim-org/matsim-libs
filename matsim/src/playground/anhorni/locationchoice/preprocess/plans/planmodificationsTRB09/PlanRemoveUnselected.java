@@ -1,11 +1,10 @@
 package playground.anhorni.locationchoice.preprocess.plans.planmodificationsTRB09;
 
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -52,12 +51,10 @@ public class PlanRemoveUnselected {
 
 	private void runModifications() {
 
-		Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
 		Counter counter = new Counter(" person # ");
-		while (person_iter.hasNext()) {
-			PersonImpl person = person_iter.next();
-				counter.incCounter();
-				person.removeUnselectedPlans();
+		for (Person person : this.plans.getPersons().values()) {
+			counter.incCounter();
+			((PersonImpl) person).removeUnselectedPlans();
 		}
 		log.info("runModifications done.");
 
@@ -70,23 +67,18 @@ public class PlanRemoveUnselected {
 	private void init(final String plansfilePath, final String networkfilePath,
 			final String facilitiesfilePath, final String worldfilePath) {
 
+		ScenarioImpl scenario = new ScenarioImpl();
 
-		System.out.println("  create world ... ");
-		World world = Gbl.createWorld();
-		//final MatsimWorldReader worldReader = new MatsimWorldReader(this.world);
-		//worldReader.readFile(worldfilePath);
-		System.out.println("  done.");
-
-
-		this.network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		this.network = scenario.getNetwork();
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 		log.info("network reading done");
 
 		//this.facilities=new Facilities();
-		this.facilities=(ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		this.facilities = scenario.getActivityFacilities();
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 		log.info("facilities reading done");
 
+		World world = scenario.getWorld();
 		world.complete();
 		new WorldCheck().run(world);
 		new WorldConnectLocations().run(world);

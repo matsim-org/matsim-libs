@@ -1,11 +1,10 @@
 package playground.jhackney.algorithms;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
 public class PersonsRandomizeId {
@@ -21,11 +20,9 @@ public class PersonsRandomizeId {
 		numPers=plans.getPersons().values().size();
 		maxId=minId+numPers;
 		ArrayList<Integer> newIds=makeNewIds(numPers, minId, maxId);
-		Iterator<PersonImpl> pIt=plans.getPersons().values().iterator();
-		
 		int j=0;
-		while(pIt.hasNext()){
-			PersonImpl p=pIt.next();
+		for (Person p : plans.getPersons().values()) {
+		
 //			int id=Integer.valueOf(p.getId().toString()).intValue();
 //			if(minId>id){
 //				minId=id;

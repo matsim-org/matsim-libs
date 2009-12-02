@@ -23,16 +23,15 @@ package playground.mfeil.MDSAM;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.PlanScorer;
 
@@ -72,7 +71,7 @@ public class EstimationValidation {
 		
 		// First row
 		stream.print("Id\tChoice\tChosenUtility\tMaxUtility\tRank\t");
-		PersonImpl p = this.population.getPersons().values().iterator().next();
+		Person p = this.population.getPersons().values().iterator().next();
 	
 		for (int i = 0;i<p.getPlans().size();i++){
 			stream.print("alt"+(i+1)+"\t");
@@ -83,8 +82,7 @@ public class EstimationValidation {
 		int counterCorrectChoice = -1;
 		int counterOut = -1;
 		double distance = 0;
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
+		for (Person person : this.population.getPersons().values()) {
 			counterOut++;
 			
 			//Id
@@ -107,8 +105,7 @@ public class EstimationValidation {
 			double maxScore = -100000;
 			int rank = 1;
 			int counterIn = -1;
-			for (Iterator<Plan> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				Plan plan = iterator2.next();
+			for (Plan plan : person.getPlans()) {
 				counterIn++;
 				if (plan.getScore() == null || plan.getScore()!=-100000){
 					plan.setScore(this.scorer.getScore(plan)+sims.get(counterOut).get(counterIn)*(-0.621));
@@ -121,8 +118,7 @@ public class EstimationValidation {
 			stream.print(maxScore+"\t"+rank+"\t");
 			
 			// Utilities
-			for (Iterator<Plan> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				Plan plan = iterator2.next();
+			for (Plan plan : person.getPlans()) {
 				if (plan.getScore()!=-100000) {
 					stream.print((plan.getScore())+"\t");					
 				}

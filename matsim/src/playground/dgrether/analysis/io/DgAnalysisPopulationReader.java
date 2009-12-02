@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -142,7 +143,7 @@ public class DgAnalysisPopulationReader {
 			if ( whichPlan.equals( "selected" ) ) {
 				plan = population.getPersons().get(id).getSelectedPlan();
 			} else if ( whichPlan.equals( "best" ) ) {
-				plan = population.getPersons().get(id).getBestPlan();
+				plan = ((PersonImpl) population.getPersons().get(id)).getBestPlan();
 			} else {
 				log.error( " whichPlan not recognized; aborting ... " ) ;
 				System.exit( -1 ) ;

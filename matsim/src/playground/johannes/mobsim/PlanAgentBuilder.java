@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
@@ -77,7 +78,7 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 	public List<PlanAgent> buildAgents() {
 		List<PlanAgent> agents = new ArrayList<PlanAgent>(population.getPersons().size());
 		int countInvalid = 0;
-		for(PersonImpl p : population.getPersons().values()) {
+		for(Person p : population.getPersons().values()) {
 			if(validatePerson(p)) {
 				agents.add(buildAgent(p));
 			} else
@@ -104,7 +105,7 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 	 *            the person which will act as underlying data source.
 	 * @return a new {@link PlanAgent} instance.
 	 */
-	protected PlanAgent buildAgent(PersonImpl p) {
+	protected PlanAgent buildAgent(Person p) {
 		return new PlanAgent(p);
 	}
 
@@ -117,7 +118,7 @@ public class PlanAgentBuilder implements MobsimAgentBuilder {
 	 * @return <tt>true</tt> if the person is valid, <tt>false</tt>
 	 *         otherwise.
 	 */
-	protected boolean validatePerson(PersonImpl p) {
+	protected boolean validatePerson(Person p) {
 		Plan plan = p.getSelectedPlan();
 		if(plan == null) {
 			return false;

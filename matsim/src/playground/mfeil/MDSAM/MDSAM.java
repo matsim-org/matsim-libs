@@ -24,14 +24,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
 
@@ -83,9 +82,7 @@ public class MDSAM {
 		this.sims = new ArrayList<List<Double>>();
 		
 		int counter=0;
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
-			
+		for (Person person : this.population.getPersons().values()) {
 			counter++;
 			if (counter>20) this.printing=false;
 			

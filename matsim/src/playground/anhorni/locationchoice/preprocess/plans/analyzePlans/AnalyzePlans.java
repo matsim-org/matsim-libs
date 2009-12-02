@@ -186,9 +186,7 @@ public class AnalyzePlans {
 			int numberOfEducationTrips = 0;
 			int numberOfReturningTrips = 0;
 			
-			Iterator<PersonImpl> person_it = this.plans.getPersons().values().iterator();
-			while (person_it.hasNext()) {
-				PersonImpl person = person_it.next();
+			for (Person person : this.plans.getPersons().values()) {
 				Plan selectedPlan = person.getSelectedPlan();
 								
 				final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
@@ -243,9 +241,7 @@ public class AnalyzePlans {
 			out.newLine();
 			int numberOfPersonsDoingType = 0;
 
-			Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
-			while (person_iter.hasNext()) {
-				PersonImpl person = person_iter.next();
+			for (Person person : this.plans.getPersons().values()) {
 				boolean personSet = false;
 
 				Plan selectedPlan = person.getSelectedPlan();
@@ -256,7 +252,7 @@ public class AnalyzePlans {
 					if (act.getType().startsWith(type)) {
 						out.write(person.getId().toString() + "\t" +
 								String.valueOf(act.getDuration()) + "\t" +
-								person.getDesires().getActivityDuration(type));
+								((PersonImpl) person).getDesires().getActivityDuration(type));
 						out.newLine();
 
 						if (!personSet) {
@@ -286,9 +282,7 @@ public class AnalyzePlans {
 			out.write(header);
 			out.newLine();
 
-			Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
-			while (person_iter.hasNext()) {
-				PersonImpl person = person_iter.next();
+			for (Person person : this.plans.getPersons().values()) {
 				Plan selectedPlan = person.getSelectedPlan();
 				final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 
@@ -320,9 +314,7 @@ public class AnalyzePlans {
 		int numberOfPersonsDoingSL = 0;
 		int numberOfTrips = 0;
 
-		Iterator<PersonImpl> person_iter = this.plans.getPersons().values().iterator();
-		while (person_iter.hasNext()) {
-			PersonImpl person = person_iter.next();
+		for (Person person : this.plans.getPersons().values()) {
 			boolean personSet = false;
 
 			Plan selectedPlan = person.getSelectedPlan();

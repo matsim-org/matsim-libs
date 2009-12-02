@@ -78,7 +78,7 @@ public class ControlerTest extends MatsimTestCase {
 		nodes.add(f.node3);
 		route1.setNodes(f.link1, nodes, f.link3);
 		plan1.createAndAddActivity("h", f.link3);
-		population.getPersons().put(person1.getId(), person1);
+		population.addPerson(person1);
 
 		PersonImpl person2 = new PersonImpl(new IdImpl(2));
 		PlanImpl plan2 = person2.createAndAddPlan(true);
@@ -89,7 +89,7 @@ public class ControlerTest extends MatsimTestCase {
 		leg2.setRoute(route2);
 		route2.setNodes(f.link1, nodes, f.link3);
 		plan2.createAndAddActivity("h", f.link3);
-		population.getPersons().put(person2.getId(), person2);
+		population.addPerson(person2);
 
 		// Complete the configuration for our test case
 		// - set scoring parameters
@@ -192,7 +192,7 @@ public class ControlerTest extends MatsimTestCase {
 		leg2 = plan2.createAndAddLeg(TransportMode.car);
 		// DO NOT CREATE A ROUTE FOR THE LEG!!!
 		plan2.createAndAddActivity("h", f.link3);
-		population.getPersons().put(person1.getId(), person1);
+		population.addPerson(person1);
 
 		// Complete the configuration for our test case
 		// - set scoring parameters

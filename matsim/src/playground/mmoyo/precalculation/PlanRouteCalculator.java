@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkLayer;
@@ -48,7 +49,7 @@ public class PlanRouteCalculator {
 	
 		long startTime = System.currentTimeMillis();
 		int found=0;
-		for (PersonImpl person: population.getPersons().values()) {
+		for (Person person: population.getPersons().values()) {
 			Plan plan = person.getPlans().get(0);
 
 			int foundConns=0;
@@ -86,7 +87,7 @@ public class PlanRouteCalculator {
 	public void findRoutes(){
 		PopulationImpl newPopulation = new PopulationImpl();
 		
-		for (PersonImpl person: population.getPersons().values()) {
+		for (Person person: population.getPersons().values()) {
 				//if ( true ) {
 				//PersonImpl person = population.getPersons().get(new IdImpl("35420")); // 5636428  2949483 
 			PlanImpl newPlan = new PlanImpl(person);
@@ -116,8 +117,8 @@ public class PlanRouteCalculator {
 			}
 			
 	
-			person.exchangeSelectedPlan(newPlan, true);
-			person.removeUnselectedPlans();
+			((PersonImpl) person).exchangeSelectedPlan(newPlan, true);
+			((PersonImpl) person).removeUnselectedPlans();
 			newPopulation.addPerson(person);
 
 			System.out.println("writing output plan file...");

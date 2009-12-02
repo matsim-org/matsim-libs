@@ -1,11 +1,10 @@
 package playground.anhorni.locationchoice.preprocess.plans.modifications;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -13,9 +12,9 @@ import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 import org.matsim.world.World;
 
@@ -56,9 +55,7 @@ public class ActivityDifferentiationShop {
 	private int getNumberOfShopActs() {
 		int numberOfShopActs = 0;
 		
-		Iterator<PersonImpl> person_it = this.plans.getPersons().values().iterator();
-		while (person_it.hasNext()) {
-			PersonImpl person = person_it.next();
+		for (Person person : this.plans.getPersons().values()) {
 			
 			// intitially only one plan is available
 			if (person.getPlans().size() > 1) {
@@ -82,9 +79,7 @@ public class ActivityDifferentiationShop {
 		int assignedNumberOf_GroceryActs = 0;
 		int assignedNumberOf_NonGroceryActs = 0;
 		
-		Iterator<PersonImpl> person_it = this.plans.getPersons().values().iterator();
-		while (person_it.hasNext()) {
-			PersonImpl person = person_it.next();
+		for (Person person : this.plans.getPersons().values()) {
 			
 			// intitially only one plan is available
 			if (person.getPlans().size() > 1) {

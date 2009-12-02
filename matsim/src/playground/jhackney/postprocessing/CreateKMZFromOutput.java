@@ -19,11 +19,11 @@ package playground.jhackney.postprocessing;
  *                                                                         *
  * *********************************************************************** */
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
@@ -137,7 +137,7 @@ public class CreateKMZFromOutput {
 
 
 //			System.out.println(" Writing out KMZ activity spaces and day plans for agent's egoNet");
-			PersonImpl testP=plans.getPersons().get(new IdImpl("21924270"));//1pct
+			Person testP=plans.getPersons().get(new IdImpl("21924270"));//1pct
 //			Person testP=this.controler.getPopulation().getPerson("21462061");//10pct
 			EgoNetPlansItersMakeKML.loadData(testP,i, Scenario.getKnowledges());
 			System.out.println(" ... done");

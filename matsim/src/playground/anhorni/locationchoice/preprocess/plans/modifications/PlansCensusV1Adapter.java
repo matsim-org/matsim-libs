@@ -1,17 +1,17 @@
 package playground.anhorni.locationchoice.preprocess.plans.modifications;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 
 import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeBuilder;
@@ -27,28 +27,28 @@ public class PlansCensusV1Adapter {
 	private void init(ActivityFacilitiesImpl facilities) {
 		FacilityQuadTreeBuilder builder = new FacilityQuadTreeBuilder();
 		leisureTree = builder.builFacQuadTree(
-				"leisure", (TreeMap<Id, ActivityFacilityImpl>) facilities.getFacilitiesForActivityType("leisure"));
+				"leisure", facilities.getFacilitiesForActivityType("leisure"));
 		
 		shopTree = builder.builFacQuadTree(
-				"shop", (TreeMap<Id, ActivityFacilityImpl>) facilities.getFacilitiesForActivityType("shop"));
+				"shop", facilities.getFacilitiesForActivityType("shop"));
 		
 		homeTree = builder.builFacQuadTree(
-				"home", (TreeMap<Id, ActivityFacilityImpl>) facilities.getFacilitiesForActivityType("home"));
+				"home", facilities.getFacilitiesForActivityType("home"));
 		
 		
 		TreeMap<Id, ActivityFacilityImpl> educationTreeMap = 
-			(TreeMap<Id, ActivityFacilityImpl>)facilities.getFacilitiesForActivityType("education_kindergarten");
+			facilities.getFacilitiesForActivityType("education_kindergarten");
 		educationTreeMap.putAll(facilities.getFacilitiesForActivityType("education_primary"));
 		educationTreeMap.putAll(facilities.getFacilitiesForActivityType("education_secondary"));
 		educationTreeMap.putAll(facilities.getFacilitiesForActivityType("education_higher"));
 		educationTreeMap.putAll(facilities.getFacilitiesForActivityType("education_other"));
 		educationTreeMap.putAll(facilities.getFacilitiesForActivityType("education"));
 		educationTree = builder.builFacQuadTree(
-				"education", (TreeMap<Id, ActivityFacilityImpl>) educationTreeMap);
+				"education", educationTreeMap);
 		
 		
 		TreeMap<Id, ActivityFacilityImpl> workTreeMap = 
-			(TreeMap<Id, ActivityFacilityImpl>)facilities.getFacilitiesForActivityType("work_sector2");
+			facilities.getFacilitiesForActivityType("work_sector2");
 		workTreeMap.putAll(facilities.getFacilitiesForActivityType("work_sector3"));
 		workTreeMap.putAll(facilities.getFacilitiesForActivityType("work"));
 	
@@ -61,12 +61,10 @@ public class PlansCensusV1Adapter {
 		
 		this.init(facilities);
 				
-		Iterator<PersonImpl> person_it = plans.getPersons().values().iterator();
-		while (person_it.hasNext()) {
-			PersonImpl person = person_it.next();
+		for (Person person : plans.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			
-			person.createDesires("adapted desire");
+			((PersonImpl) person).createDesires("adapted desire");
 			
 			List<? extends PlanElement> actslegs = plan.getPlanElements();			
 			for (int j = 0; j < actslegs.size(); j=j+2) {			
@@ -76,7 +74,7 @@ public class PlansCensusV1Adapter {
 		}
 	}
 	
-	private void adaptActivity(ActivityImpl act, PersonImpl person) {
+	private void adaptActivity(ActivityImpl act, Person person) {
 		
 		double desiredDuration = 0.0;
 		if (act.getType().equals("tta")) {
@@ -107,8 +105,8 @@ public class PlansCensusV1Adapter {
 			fullType = "work";
 			act.setFacility(this.workTree.get(act.getCoord().getX(), act.getCoord().getY()));
 		}
-		if (person.getDesires().getActivityDuration(fullType) <= 0.0) {
-			person.getDesires().putActivityDuration(fullType, desiredDuration);
+		if (((PersonImpl) person).getDesires().getActivityDuration(fullType) <= 0.0) {
+			((PersonImpl) person).getDesires().putActivityDuration(fullType, desiredDuration);
 		}
 		act.setType(fullType);
 	}

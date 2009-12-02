@@ -60,7 +60,7 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		new PopulationReaderMatsimV4(scenario).parse(getInputDirectory() + "plans2.xml");
 
 		assertEquals("population size.", 2, population.getPersons().size());
-		PersonImpl person1 = population.getPersons().get(new IdImpl("1"));
+		Person person1 = population.getPersons().get(new IdImpl("1"));
 		Plan plan1 = person1.getPlans().get(0);
 		LegImpl leg1a = (LegImpl) plan1.getPlanElements().get(1);
 		RouteWRefs route1a = leg1a.getRoute();
@@ -75,7 +75,7 @@ public class PopulationReaderMatsimV4Test extends MatsimTestCase {
 		assertEquals("different startLink for third leg.", network.getLink(new IdImpl("20")), route1c.getStartLink());
 		assertEquals("different endLink for third leg.", network.getLink(new IdImpl("1")), route1c.getEndLink());
 
-		PersonImpl person2 = population.getPersons().get(new IdImpl("2"));
+		Person person2 = population.getPersons().get(new IdImpl("2"));
 		Plan plan2 = person2.getPlans().get(0);
 		LegImpl leg2a = (LegImpl) plan2.getPlanElements().get(1);
 		RouteWRefs route2a = leg2a.getRoute();

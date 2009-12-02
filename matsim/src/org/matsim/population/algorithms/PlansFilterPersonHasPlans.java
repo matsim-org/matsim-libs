@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PopulationImpl;
 
 /**
@@ -47,7 +47,7 @@ public class PlansFilterPersonHasPlans {
 		Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
 		while (pid_it.hasNext()) {
 			Id personId = pid_it.next();
-			PersonImpl person = plans.getPersons().get(personId);
+			Person person = plans.getPersons().get(personId);
 
 			if (person.getPlans().isEmpty()) {
 				// the person has no plans left. remove the person afterwards (so we do not disrupt the Iterator)

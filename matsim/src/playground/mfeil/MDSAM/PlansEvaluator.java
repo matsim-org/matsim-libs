@@ -22,9 +22,8 @@ package playground.mfeil.MDSAM;
 
 
 
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
@@ -33,7 +32,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.FixedRouteLegTravelTimeEstimator;
@@ -41,16 +39,11 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 
 
-
-
-
 /**
  * @author Matthias Feil
  * Class that reads a file of plans (with or without varied plans) and evaluates them.
  */
-
-
-public class PlansEvaluator extends PlansConstructor implements PlanStrategyModule{
+public class PlansEvaluator extends PlansConstructor implements PlanStrategyModule {
 		
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private static final Logger log = Logger.getLogger(PlansEvaluator.class);	
@@ -98,15 +91,13 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 	private void evaluatePlans (){
 		log.info("Evaluating plans...");
 		int counter=0;
-		for (Iterator<PersonImpl> iterator1 = this.population.getPersons().values().iterator(); iterator1.hasNext();){
-			PersonImpl person = iterator1.next();
+		for (Person person : this.population.getPersons().values()) {
 			counter++;
 			if (counter%10==0) {
 				log.info("Handled "+counter+" persons");
 				Gbl.printMemoryUsage();
-			}			
-			for (Iterator<Plan> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				Plan plan = iterator2.next();
+			}
+			for (Plan plan : person.getPlans()) {
 				
 				LegTravelTimeEstimator estimator = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
 						plan,

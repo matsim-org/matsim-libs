@@ -21,6 +21,7 @@ package org.matsim.demandmodeling;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -49,14 +50,14 @@ public class PopulationAsciiFileReaderTest extends MatsimTestCase {
 		PopulationImpl plans = p.readFile(f);
 		assertNotNull(plans);
 		assertEquals(2, plans.getPersons().size());
-		PersonImpl p1 = plans.getPersons().get(new IdImpl("1"));
-		PersonImpl p2 = plans.getPersons().get(new IdImpl("2"));
+		Person p1 = plans.getPersons().get(new IdImpl("1"));
+		Person p2 = plans.getPersons().get(new IdImpl("2"));
 		assertNotNull(p1);
 		assertNotNull(p2);
-		assertEquals(1, p1.getAge());
-		assertEquals(99, p2.getAge());
-		assertEquals("m", p1.getSex());
-		assertEquals("f", p2.getSex());
+		assertEquals(1, ((PersonImpl) p1).getAge());
+		assertEquals(99, ((PersonImpl) p2).getAge());
+		assertEquals("m", ((PersonImpl) p1).getSex());
+		assertEquals("f", ((PersonImpl) p2).getSex());
 		Plan plan1 = p1.getSelectedPlan();
 		Plan plan2 = p2.getSelectedPlan();
 		assertNotNull(plan1);

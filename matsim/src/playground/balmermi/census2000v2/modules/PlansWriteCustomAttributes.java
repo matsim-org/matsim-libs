@@ -27,9 +27,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 
 public class PlansWriteCustomAttributes {
 
@@ -60,12 +59,12 @@ public class PlansWriteCustomAttributes {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final PopulationImpl plans) {
+	public void run(final Population plans) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		
 		Set<String> keys = new HashSet<String>();
 		
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person p : plans.getPersons().values()) {
 			if (p.getCustomAttributes().size() > keys.size()) { keys = p.getCustomAttributes().keySet(); }
 		}
 		
@@ -76,7 +75,7 @@ public class PlansWriteCustomAttributes {
 			for (String key : keys) { out.write("\t"+key); }
 			out.write("\n");
 			out.flush();
-			for (PersonImpl p : plans.getPersons().values()) {
+			for (Person p : plans.getPersons().values()) {
 				out.write(p.getId().toString());
 				for (String key : keys) { out.write("\t"+p.getCustomAttributes().get(key)); }
 				out.write("\n");

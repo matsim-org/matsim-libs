@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
@@ -32,7 +33,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 
@@ -104,7 +104,7 @@ public class ActivityDurationAnalyser {
 			plansParser.readFile(file);
 			ActivityDurationCounter adc = new ActivityDurationCounter();
 			System.out.println("Handling plans: " + file);
-			for (PersonImpl person : plans.getPersons().values()) {
+			for (Person person : plans.getPersons().values()) {
 //				if (!RoadPricingUtilities.hasActInTollArea(person.getSelectedPlan(), this.roadPricingScheme)){
 //					continue;
 //				}

@@ -23,17 +23,16 @@ package playground.mfeil.MDSAM;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
 
@@ -79,7 +78,7 @@ public class TravelTimeComparer {
 		// First row
 		int counter=0;
 		stream.print("Id\tChoice\t");
-		PersonImpl p = this.populationNew.getPersons().values().iterator().next();
+		Person p = this.populationNew.getPersons().values().iterator().next();
 		for (int i = 0;i<p.getPlans().size();i++){
 			for (int j =1;j<java.lang.Math.max(p.getPlans().get(i).getPlanElements().size()-1,1);j+=2){
 				if (((LegImpl)(p.getPlans().get(i).getPlanElements().get(j))).getMode().equals(TransportMode.car)){
@@ -98,12 +97,10 @@ public class TravelTimeComparer {
 		double valueSelected=0;
 		double diffSelected=0;
 		int numberSelected=0;
-		for (Iterator<PersonImpl> iterator = this.populationOrig.getPersons().values().iterator(); iterator.hasNext();){
-			
+		for (Person personOrig : this.populationOrig.getPersons().values()) {
 			int counterIn=0;
 			
-			PersonImpl personOrig = iterator.next();
-			PersonImpl personNew = this.populationNew.getPersons().get(personOrig.getId());
+			Person personNew = this.populationNew.getPersons().get(personOrig.getId());
 			
 			stream.print(personOrig.getId()+"\t");
 			int position = -1;
@@ -214,8 +211,8 @@ public class TravelTimeComparer {
 		
 		// get maximum number of legs
 		int size = 0;
-		for (Iterator<PersonImpl> iterator = this.populationNew.getPersons().values().iterator(); iterator.hasNext();){
-			int sizeIn = iterator.next().getSelectedPlan().getPlanElements().size()/2;
+		for (Person person : this.populationNew.getPersons().values()) {
+			int sizeIn = person.getSelectedPlan().getPlanElements().size()/2;
 			if (sizeIn>size) size= sizeIn;
 		}		
 		stream.print("PersonI\t");
@@ -248,8 +245,7 @@ public class TravelTimeComparer {
 		double valueBike=0;
 		
 		// compare populations
-		for (Iterator<PersonImpl> iterator = this.populationNew.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
+		for (Person person : this.populationNew.getPersons().values()) {
 			Plan planNew = person.getSelectedPlan();
 			Plan planOrig = this.populationOrig.getPersons().get(person.getId()).getSelectedPlan();
 			

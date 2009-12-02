@@ -25,11 +25,10 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -37,7 +36,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.knowledges.Knowledges;
 
@@ -52,7 +50,7 @@ import playground.mfeil.ActChainEqualityCheck;
  */
 public class ASPActivityChainsModes extends ASPActivityChains{
 
-	protected static final Logger log = Logger.getLogger(ASPActivityChainsModes.class);
+	private static final Logger log = Logger.getLogger(ASPActivityChainsModes.class);
 	
 
 
@@ -77,8 +75,7 @@ public class ASPActivityChainsModes extends ASPActivityChains{
 		this.activityChains = new ArrayList<List<PlanElement>>();
 		this.plans = new ArrayList<ArrayList<Plan>>();
 		ActChainEqualityCheck ac = new ActChainEqualityCheck();
-		Map<Id,PersonImpl> agents = this.population.getPersons();
-		for (PersonImpl person:agents.values()){
+		for (Person person : this.population.getPersons().values()) {
 			boolean alreadyIn = false;
 			for (int i=0;i<this.activityChains.size();i++){
 				if (ac.checkEqualActChainsModes(person.getSelectedPlan().getPlanElements(), this.activityChains.get(i))){

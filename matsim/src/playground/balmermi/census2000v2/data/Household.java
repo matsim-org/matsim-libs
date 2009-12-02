@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.PersonImpl;
 
@@ -41,8 +42,8 @@ public class Household {
 	private final Id id;
 	private final Municipality municipality;
 	private final ActivityFacilityImpl facility;
-	private final Map<Id,PersonImpl> persons_w = new HashMap<Id,PersonImpl>();
-	private final Map<Id,PersonImpl> persons_z = new HashMap<Id,PersonImpl>();
+	private final Map<Id,Person> persons_w = new HashMap<Id,Person>();
+	private final Map<Id,Person> persons_z = new HashMap<Id,Person>();
 	private int hhtpz = Integer.MIN_VALUE;
 	private int hhtpw = Integer.MIN_VALUE;
 	
@@ -80,11 +81,11 @@ public class Household {
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final PersonImpl removePersonW(Id pid) {
+	public final Person removePersonW(Id pid) {
 		return this.persons_w.remove(pid);
 	}
 	
-	public final PersonImpl removePersonZ(Id pid) {
+	public final Person removePersonZ(Id pid) {
 		return this.persons_z.remove(pid);
 	}
 	
@@ -104,34 +105,34 @@ public class Household {
 		return this.facility;
 	}
 	
-	public final Map<Id,PersonImpl> getPersonsW() {
+	public final Map<Id,Person> getPersonsW() {
 		return this.persons_w;
 	}
 	
-	public final Map<Id,PersonImpl> getPersonsZ() {
+	public final Map<Id,Person> getPersonsZ() {
 		return this.persons_z;
 	}
 	
-	public final Map<Id,PersonImpl> getPersons() {
-		Map<Id,PersonImpl> map = new HashMap<Id, PersonImpl>(this.persons_w);
+	public final Map<Id,Person> getPersons() {
+		Map<Id,Person> map = new HashMap<Id, Person>(this.persons_w);
 		map.putAll(this.persons_z);
 		return map;
 	}
 	
-	public final Map<Id,PersonImpl> getKidsW() {
-		Map<Id,PersonImpl> map = new HashMap<Id, PersonImpl>();
-		for (PersonImpl p : this.persons_w.values()) { if (p.getAge() < 15) { map.put(p.getId(),p); } }
+	public final Map<Id,Person> getKidsW() {
+		Map<Id,Person> map = new HashMap<Id, Person>();
+		for (Person p : this.persons_w.values()) { if (((PersonImpl) p).getAge() < 15) { map.put(p.getId(),p); } }
 		return map;
 	}
 	
-	public final Map<Id,PersonImpl> getKidsZ() {
-		Map<Id,PersonImpl> map = new HashMap<Id, PersonImpl>();
-		for (PersonImpl p : this.persons_z.values()) { if (p.getAge() < 15) { map.put(p.getId(),p); } }
+	public final Map<Id,Person> getKidsZ() {
+		Map<Id,Person> map = new HashMap<Id, Person>();
+		for (Person p : this.persons_z.values()) { if (((PersonImpl) p).getAge() < 15) { map.put(p.getId(),p); } }
 		return map;
 	}
 
-	public final Map<Id,PersonImpl> getKids() {
-		Map<Id,PersonImpl> map = new HashMap<Id, PersonImpl>(this.getKidsW());
+	public final Map<Id,Person> getKids() {
+		Map<Id,Person> map = new HashMap<Id, Person>(this.getKidsW());
 		map.putAll(this.getKidsZ());
 		return map;
 	}

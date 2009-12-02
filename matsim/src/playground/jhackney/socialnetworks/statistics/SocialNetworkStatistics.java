@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -259,9 +258,9 @@ public class SocialNetworkStatistics {
 			// Average distance separating acquaintances
 			smDD.accumulate(dyadDist);
 			// Need persons to get Id's
-			Vector<PersonImpl> dyad = getEdgePersons(myEdge, plans);
-			PersonImpl pFrom = dyad.elementAt(0);
-			PersonImpl pTo = dyad.elementAt(1);
+			Vector<Person> dyad = getEdgePersons(myEdge, plans);
+			Person pFrom = dyad.elementAt(0);
+			Person pTo = dyad.elementAt(1);
 			// Average duration of a social link
 			double x1 = (iter - Integer.parseInt(myEdge.getUserDatum("timeLastUsed")
 					.toString()));
@@ -292,12 +291,12 @@ public class SocialNetworkStatistics {
 		}
 	}
 
-	private Vector<PersonImpl> getEdgePersons(Edge e, PopulationImpl plans) {
-		Vector<PersonImpl> persons = new Vector<PersonImpl>(2);
+	private Vector<Person> getEdgePersons(Edge e, PopulationImpl plans) {
+		Vector<Person> persons = new Vector<Person>(2);
 		Vertex v1 = (Vertex) e.getEndpoints().getFirst();
-		PersonImpl p1 = plans.getPersons().get((Id) v1.getUserDatum("personId"));
+		Person p1 = plans.getPersons().get((Id) v1.getUserDatum("personId"));
 		Vertex v2 = (Vertex) e.getEndpoints().getSecond();
-		PersonImpl p2 = plans.getPersons().get((Id) v2.getUserDatum("personId"));
+		Person p2 = plans.getPersons().get((Id) v2.getUserDatum("personId"));
 		persons.add(p1);
 		persons.add(p2);
 		return persons;
@@ -317,11 +316,11 @@ public class SocialNetworkStatistics {
 	private double getDyadDistance(Edge myEdge, PopulationImpl plans) {
 		double dist = 0.;
 		Vertex vFrom = (Vertex) myEdge.getEndpoints().getFirst();
-		PersonImpl pFrom = plans.getPersons().get((Id) vFrom.getUserDatum("personId"));
+		Person pFrom = plans.getPersons().get((Id) vFrom.getUserDatum("personId"));
 		Coord fromCoord = ((ActivityImpl) pFrom.getSelectedPlan().getPlanElements().get(
 				0)).getCoord();
 		Vertex vTo = (Vertex) myEdge.getEndpoints().getSecond();
-		PersonImpl pTo = plans.getPersons().get((Id) vTo.getUserDatum("personId"));
+		Person pTo = plans.getPersons().get((Id) vTo.getUserDatum("personId"));
 		Coord toCoord = ((ActivityImpl) pTo.getSelectedPlan().getPlanElements().get(0))
 		.getCoord();
 		dist = CoordUtils.calcDistance(fromCoord, toCoord);

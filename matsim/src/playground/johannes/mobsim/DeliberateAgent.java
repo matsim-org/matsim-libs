@@ -24,8 +24,8 @@
 package playground.johannes.mobsim;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 /**
@@ -151,7 +151,7 @@ public class DeliberateAgent extends MobsimAgentDecorator<PlanAgent> {
 					 * new plan and leave the old plan untouched. Needs further
 					 * investigation...
 					 */
-					agent.getPerson().exchangeSelectedPlan(newPlan, false);
+					((PersonImpl) agent.getPerson()).exchangeSelectedPlan(newPlan, false);
 				} else {
 					log.warn(String.format(
 								"Re-planning failed! The plan size is incorrect (size=%1$s, index=%2$s).",

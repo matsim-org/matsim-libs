@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -207,8 +208,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	
 	protected void rectifyActTypes (){
 		log.info("Rectifying act types...");
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
+		for (Person person : this.population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			for (int i=0;i<plan.getPlanElements().size();i+=2){
 				ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(i);
@@ -227,8 +227,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	
 	private void linkRouteOrigPlans (){
 		log.info("Adding links and routes to original plans...");
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
+		for (Person person : this.population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			this.linker.run(plan);
 			for (int j=1;j<plan.getPlanElements().size();j++){
@@ -406,8 +405,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		log.info("Adding alternative plans...");
 		int counter=0;
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
+		for (Person person : this.population.getPersons().values()) {
 			counter++;
 			if (counter%10==0) {
 				log.info("Handled "+counter+" persons");
@@ -474,7 +472,7 @@ public class PlansConstructor implements PlanStrategyModule{
 					if (plan.getLastActivity().getStartTime()-86400>plan.getFirstActivity().getEndTime()){
 						plan.setScore(-100000.0);
 					}
-					person.getPlans().add(i, plan);
+					person.addPlan(plan);
 				}
 			}
 		}
@@ -487,8 +485,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		int counter=0;
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
 		
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
+		for (Person person : this.population.getPersons().values()) {
 			counter++;
 			if (counter%10==0) {
 				log.info("Handling person "+counter);
@@ -575,7 +572,7 @@ public class PlansConstructor implements PlanStrategyModule{
 						isValidPlan = false;
 					}
 				} while (!isValidPlan);
-				person.getPlans().add(plan);
+				person.addPlan(plan);
 				
 			}
 		}
@@ -651,7 +648,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		
 		// First row
 		stream.print("Id\tChoice\t");
-		PersonImpl p = this.population.getPersons().values().iterator().next();
+		Person p = this.population.getPersons().values().iterator().next();
 		for (int i = 0;i<p.getPlans().size();i++){
 			int j=0;
 			for (j =0;j<java.lang.Math.max(p.getPlans().get(i).getPlanElements().size()-1,1);j++){
@@ -668,8 +665,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		int counterPerson = -1;
 		boolean firstPersonFound = true;
 		Id firstPersonId = new IdImpl (1);
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
+		for (Person person : this.population.getPersons().values()){
 			if (firstPersonFound){
 				firstPersonId = person.getId();
 				firstPersonFound = false;
@@ -685,8 +681,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			}
 			stream.print(position+"\t");
 			int counterPlan = -1;
-			for (Iterator<Plan> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				Plan plan = iterator2.next();
+			for (Plan plan : person.getPlans()){
 				counterPlan++;
 				Plan planFirstPerson = this.population.getPersons().get(firstPersonId).getPlans().get(counterPlan);
 				
@@ -732,8 +727,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				// Similarity attribute
 				stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
 			}
-			for (Iterator<Plan> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				Plan plan = iterator2.next();
+			for (Plan plan : person.getPlans()){
 				
 				// Plan not executable, drop from choice set
 				if (plan.getScore()!=null && plan.getScore()==-100000.0)	stream.print(0+"\t");
@@ -1146,8 +1140,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			
 			// Calculate average income
 			int counterIncome=0;
-			for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-				PersonImpl person = iterator.next();
+			for (Person person : this.population.getPersons().values()) {
 				if (!aaa.getIncome().containsKey(person.getId())){
 					continue;
 				}
@@ -1264,8 +1257,8 @@ public class PlansConstructor implements PlanStrategyModule{
 		int counter=0;
 		int valid=0;
 		int invalid=0;
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
+		for (Person p : this.population.getPersons().values()) {
+			PersonImpl person = (PersonImpl) p;
 			counter++;
 			if (counter%1000==0) {
 				log.info("Handling person "+counter);
@@ -1516,7 +1509,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		
 		// First row
 		stream.print("Id\tChoice\t");
-		PersonImpl p = this.population.getPersons().values().iterator().next();
+		Person p = this.population.getPersons().values().iterator().next();
 		for (int i = 0;i<p.getPlans().size();i++){
 			int j=0;
 			for (j =0;j<java.lang.Math.max(p.getPlans().get(i).getPlanElements().size()-1,1);j++){//act/mode attributes
@@ -1534,8 +1527,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		int counterPerson = -1;
 		boolean firstPersonFound = true;
 		Id firstPersonId = new IdImpl (1);
-		for (Iterator<PersonImpl> iterator = this.population.getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = iterator.next();
+		for (Person person : this.population.getPersons().values()) {
 			if (firstPersonFound){
 				firstPersonId = person.getId();
 				firstPersonFound = false;
@@ -1551,8 +1543,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			}
 			stream.print(position+"\t");
 			int counterPlan = -1;
-			for (Iterator<Plan> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				Plan plan = iterator2.next();
+			for (Plan plan : person.getPlans()) {
 				counterPlan++;
 				Plan planFirstPerson = this.population.getPersons().get(firstPersonId).getPlans().get(counterPlan);
 				
@@ -1603,8 +1594,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				// Similarity attribute
 				stream.print(this.sims.get(counterPerson).get(counterPlan)+"\t");
 			}
-			for (Iterator<Plan> iterator2 = person.getPlans().iterator(); iterator2.hasNext();){
-				Plan plan = iterator2.next();
+			for (Plan plan : person.getPlans()) {
 				
 				// Plan not executable, drop from choice set
 				if (plan.getScore()!=null && plan.getScore()==-100000.0)	stream.print(0+"\t");

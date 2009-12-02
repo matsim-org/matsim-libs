@@ -95,7 +95,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		this.population = new PopulationImpl();
 //		Id personId = new IdImpl("123");
 		PersonImpl person = new PersonImpl(TEST_PERSON_ID);
-		this.population.getPersons().put(person.getId(), person);
+		this.population.addPerson(person);
 
 		// generate facilities
 		this.facilities = new ActivityFacilitiesImpl();
@@ -427,7 +427,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		double duration, zeroUtilityDuration, typicalDuration;
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
 			if (asf.getAccumulatedDurations().containsKey(actType)) {
-				typicalDuration = this.population.getPersons().get(TEST_PERSON_ID).getDesires().getActivityDuration(actType);
+				typicalDuration = ((PersonImpl) this.population.getPersons().get(TEST_PERSON_ID)).getDesires().getActivityDuration(actType);
 				duration = Time.parseTime(expectedAccumulatedActivityDurations.get(actType)[7]);
 				zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0) / ActivityScoringFunction.DEFAULT_PRIORITY);
 				double utilPerf = factory.getParams().marginalUtilityOfPerforming * typicalDuration * Math.log((duration / 3600.0) / zeroUtilityDuration);

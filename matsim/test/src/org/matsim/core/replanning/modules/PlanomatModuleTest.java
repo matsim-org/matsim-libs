@@ -21,15 +21,14 @@
 package org.matsim.core.replanning.modules;
 
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -54,7 +53,7 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		
 		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(config.facilities().getInputFile());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
-		new MatsimPopulationReader(scenario.getPopulation(), scenario.getNetwork()).readFile(config.plans().getInputFile());
+		new MatsimPopulationReader(scenario).readFile(config.plans().getInputFile());
 	}
 
 	public void testGenerateRandomDemand() {
@@ -81,13 +80,13 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		PlanomatModule testee = new PlanomatModule(
 				dummyControler, 
 				emptyEvents, 
-				(NetworkLayer) this.scenario.getNetwork(), 
+				this.scenario.getNetwork(), 
 				scoringFunctionFactory, 
 				travelCostEstimator, 
 				tTravelEstimator);
 		
 		testee.prepareReplanning();
-		for (PersonImpl person : this.scenario.getPopulation().getPersons().values()) {
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 
 			Plan plan = person.getPlans().get(TEST_PLAN_NR);
 			testee.handlePlan(plan);

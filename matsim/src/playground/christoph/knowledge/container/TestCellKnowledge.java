@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
@@ -18,7 +19,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
 import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
@@ -32,7 +32,7 @@ public class TestCellKnowledge {
 	private NetworkLayer network;
 	private PopulationImpl population;
 	private Config config;
-	private PersonImpl person;
+	private Person person;
 	private SelectNodesDijkstra selectNodesDijkstra;
 	private Map<Id, Node> nodesMap;
 	private CellKnowledge cellKnowledge;

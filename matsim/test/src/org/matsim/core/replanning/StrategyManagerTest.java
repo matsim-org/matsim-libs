@@ -45,7 +45,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		PopulationImpl population = new PopulationImpl();
 		for (int i = 0; i < 1000; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i));
-			population.getPersons().put(p.getId(), p);
+			population.addPerson(p);
 		}
 
 		// setup StrategyManager
@@ -125,7 +125,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		PopulationImpl population = new PopulationImpl();
 		for (int i = 0; i < 100; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i));
-			population.getPersons().put(p.getId(), p);
+			population.addPerson(p);
 		}
 
 		// setup StrategyManager
@@ -200,7 +200,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 		plans[8] = person.createAndAddPlan(false);
 		plans[8].setScore(Double.valueOf(-10.0));
 		plans[9] = person.createAndAddPlan(false);
-		population.getPersons().put(person.getId(), person);
+		population.addPerson(person);
 
 		StrategyManager manager = new StrategyManager();
 		PlanStrategy strategy = new PlanStrategy(new TestPlanSelector());
@@ -239,7 +239,7 @@ public class StrategyManagerTest extends MatsimTestCase {
 			plans[i].setScore(Double.valueOf(i*10));
 		}
 		PopulationImpl pop = new PopulationImpl();
-		pop.getPersons().put(p.getId(), p);
+		pop.addPerson(p);
 		
 		// run with default settings
 		manager.setMaxPlansPerAgent(plans.length - 2);

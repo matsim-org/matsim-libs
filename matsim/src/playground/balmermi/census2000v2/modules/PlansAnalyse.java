@@ -22,6 +22,7 @@ package playground.balmermi.census2000v2.modules;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
@@ -87,7 +88,8 @@ public class PlansAnalyse {
 		double[] trip_dist = new double[30];
 		for (int i=0; i<trip_dist.length; i++) { trip_dist[i]=0; }
 		
-		for (PersonImpl p : plans.getPersons().values()) {
+		for (Person pp : plans.getPersons().values()) {
+			PersonImpl p = (PersonImpl) pp;
 			// license
 			if (p.hasLicense()) { lic_cnt[0]++; } else { lic_cnt[1]++; }
 			// mob tools

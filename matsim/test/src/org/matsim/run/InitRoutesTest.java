@@ -23,6 +23,7 @@ package org.matsim.run;
 import java.io.File;
 
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -63,7 +64,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		// create one person with missing link in act
 		PopulationImpl population = new PopulationImpl();
 		PersonImpl person = new PersonImpl(new IdImpl("1"));
-		population.getPersons().put(person.getId(), person);
+		population.addPerson(person);
 		PlanImpl plan = person.createAndAddPlan(true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", network.getLink(new IdImpl("1")));
 		a1.setEndTime(3600);
@@ -91,7 +92,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		PopulationImpl population2 = new PopulationImpl();
 		new MatsimPopulationReader(population2, network).parse(PLANS_FILE_TESTOUTPUT);
 		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
-		PersonImpl person2 = population2.getPersons().get(new IdImpl("1"));
+		Person person2 = population2.getPersons().get(new IdImpl("1"));
 		assertNotNull("person 1 missing", person2);
 		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
 		Plan plan2 = person2.getPlans().get(0);
