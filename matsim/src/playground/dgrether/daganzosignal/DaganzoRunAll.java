@@ -32,7 +32,7 @@ public class DaganzoRunAll {
 	public static void main(String[] args) {
 		try {
 			new DaganzoScenarioGenerator().createScenario();
-			new DaganzoRunner().runScenario();
+			new DaganzoRunner().runScenario(null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

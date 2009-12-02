@@ -55,11 +55,17 @@ public class DaganzoRunner {
 	
 	public DaganzoRunner(){}
 
-	public void runScenario(){
-		DaganzoScenarioGenerator scenarioGenerator = new DaganzoScenarioGenerator();
-		String c = scenarioGenerator.configOut;
+	public void runScenario(final String configFile){
+		String conf = null;
+		if (configFile == null) {
+			DaganzoScenarioGenerator scenarioGenerator = new DaganzoScenarioGenerator();
+			conf = scenarioGenerator.configOut;
+		}
+		else {
+			conf = configFile;
+		}
 //		String c = DgPaths.STUDIESDG + "daganzo/daganzoConfig2Agents.xml"; 
-		Controler controler = new Controler(c);
+		Controler controler = new Controler(conf);
 		controler.setOverwriteFiles(true);
 		Config config = controler.getConfig();
 		
@@ -136,7 +142,12 @@ public class DaganzoRunner {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new DaganzoRunner().runScenario();
+		if (args.length == 0){
+			new DaganzoRunner().runScenario(null);
+		}
+		else {
+			new DaganzoRunner().runScenario(args[0]);
+		}
 	}
 
 }
