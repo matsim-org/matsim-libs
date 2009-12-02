@@ -90,7 +90,7 @@ public class TransitControler extends Controler {
 		params.setTypicalDuration(120.0);
 		this.config.charyparNagelScoring().addActivityParams(params);
 
-		this.getNetworkFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
 		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
 		addControlerListener(cl);

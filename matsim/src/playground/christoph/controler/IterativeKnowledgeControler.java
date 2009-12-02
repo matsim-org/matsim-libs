@@ -42,7 +42,7 @@ public class IterativeKnowledgeControler extends Controler{
 	{
 		// Use MyLinkImpl. They can carry some additional Information like their
 		// TravelTime or VehicleCount.
-		this.getNetworkFactory().setLinkFactory(new MyLinkFactoryImpl());
+		this.getNetwork().getFactory().setLinkFactory(new MyLinkFactoryImpl());
 	}
 	
 	private void setScoringFunction()

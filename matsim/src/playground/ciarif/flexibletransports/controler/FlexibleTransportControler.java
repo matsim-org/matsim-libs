@@ -38,9 +38,9 @@ public class FlexibleTransportControler extends Controler {
 		this.ftConfigGroup = new FtConfigGroup();
 		super.config.addModule(FtConfigGroup.GROUP_NAME, this.ftConfigGroup);
 
-		this.getNetworkFactory().setRouteFactory(TransportMode.car, new KtiNodeNetworkRouteFactory(super.getConfig().planomat()));
-		this.getNetworkFactory().setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
-		this.getNetworkFactory().setRouteFactory(TransportMode.ride, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo)); 
+		this.getNetwork().getFactory().setRouteFactory(TransportMode.car, new KtiNodeNetworkRouteFactory(super.getConfig().planomat()));
+		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
+		this.getNetwork().getFactory().setRouteFactory(TransportMode.ride, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo)); 
 		//TODO modify the line here over when a specific router for ride is available, now it is not used 
 	}
 	

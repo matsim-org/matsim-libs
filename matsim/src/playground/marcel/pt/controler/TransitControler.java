@@ -26,8 +26,6 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.xml.sax.SAXException;
-
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Module;
@@ -45,6 +43,7 @@ import org.matsim.pt.queuesim.TransitQueueSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.BasicVehicleReaderV1;
+import org.xml.sax.SAXException;
 
 import playground.marcel.pt.config.TransitConfigGroup;
 import playground.marcel.pt.replanning.TransitStrategyManagerConfigLoader;
@@ -90,7 +89,7 @@ public class TransitControler extends Controler {
 		params.setTypicalDuration(120.0);
 		this.config.charyparNagelScoring().addActivityParams(params);
 
-		this.getNetworkFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
 		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
 		addControlerListener(cl);

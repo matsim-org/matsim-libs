@@ -83,7 +83,6 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
@@ -160,7 +159,6 @@ public class Controler {
 	protected NetworkLayer network = null;
 	protected Population population = null;
 	private Counts counts = null;
-	private final NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(this.network);
 
 	protected TravelTimeCalculator travelTimeCalculator = null;
 	protected TravelCost travelCostCalculator = null;
@@ -590,7 +588,6 @@ public class Controler {
 	 */
 	private void loadData() {
 		if (!this.scenarioLoaded) {
-			this.scenarioData.getNetwork().setFactory(this.getNetworkFactory());
 			this.loader = new ScenarioLoaderImpl(this.scenarioData);
 			this.loader.loadScenario();
 			this.network = loadNetwork();
@@ -1079,10 +1076,6 @@ public class Controler {
 	 */
 	public final Counts getCounts() {
 		return this.counts;
-	}
-
-	protected NetworkFactoryImpl getNetworkFactory() {
-		return this.networkFactory;
 	}
 
 	public final CalcLinkStats getLinkStats() {

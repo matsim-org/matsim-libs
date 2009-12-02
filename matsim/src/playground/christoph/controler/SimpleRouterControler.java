@@ -136,7 +136,7 @@ public class SimpleRouterControler extends Controler {
 		 * TravelTime or VehicleCount.
 		 * This is needed to be able to use a LinkVehiclesCounter.
 		 */
-		this.getNetworkFactory().setLinkFactory(new MyLinkFactoryImpl());
+		this.getNetwork().getFactory().setLinkFactory(new MyLinkFactoryImpl());
 
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());

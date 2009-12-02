@@ -160,7 +160,7 @@ public class EventControler extends Controler {
 	{
 		// Use MyLinkImpl. They can carry some additional Information like their
 		// TravelTime or VehicleCount.
-		this.getNetworkFactory().setLinkFactory(new MyLinkFactoryImpl());
+		this.getNetwork().getFactory().setLinkFactory(new MyLinkFactoryImpl());
 
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
