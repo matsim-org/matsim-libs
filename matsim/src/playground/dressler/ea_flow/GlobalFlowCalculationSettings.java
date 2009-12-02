@@ -24,10 +24,6 @@ package playground.dressler.ea_flow;
 //matsim imports
 import org.matsim.api.core.v01.network.Link;
 
-//playground imports
-import playground.dressler.ea_flow.BowTravelTimeCost;
-import playground.dressler.ea_flow.SimpleEdgeTravelTimeCost;
-import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
 
 public class GlobalFlowCalculationSettings {
@@ -49,7 +45,7 @@ public class GlobalFlowCalculationSettings {
 		MultiSourceEAF.debug(true);
 		BellmanFordVertexIntervalls.debug(3);
 		VertexIntervalls.debug(true);
-		EdgeIntervalls.debug(true);
+//		EdgeIntervalls.debug(true);
 		Flow.debug(3);
 	}
 	
@@ -58,7 +54,7 @@ public class GlobalFlowCalculationSettings {
 		MultiSourceEAF.debug(false);
 		BellmanFordVertexIntervalls.debug(0);
 		VertexIntervalls.debug(false);
-		EdgeIntervalls.debug(false);
+//		EdgeIntervalls.debug(false);
 		Flow.debug(0);
 	}
 	
