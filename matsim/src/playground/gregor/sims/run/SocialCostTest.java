@@ -7,12 +7,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.evacuation.socialcost.MarginalTravelCostCalculatorII;
 import org.matsim.evacuation.socialcost.SocialCostCalculatorSingleLink;
@@ -25,7 +25,6 @@ public class SocialCostTest extends Controler {
 	public SocialCostTest(String[] args) {
 		super(args);
 		this.setOverwriteFiles(true);
-		
 	}
 	
 	@Override
@@ -54,7 +53,7 @@ public class SocialCostTest extends Controler {
 	@Override
 	protected NetworkLayer loadNetwork() {
 		
-		NetworkLayer net = new NetworkLayer();
+		NetworkLayer net = this.scenarioData.getNetwork();
 		net.setCapacityPeriod(1);
 		net.setEffectiveCellSize(0.26);
 		net.setEffectiveLaneWidth(0.71);
@@ -83,9 +82,9 @@ public class SocialCostTest extends Controler {
 		net.createAndAddLink(new IdImpl(6+100000), nt1, nt0, 1 , 1, 4, 1);
 		
 		
-		this.scenarioData.setNetwork(net);
-		this.getWorld().setNetworkLayer(net);
-		this.getWorld().complete();
+//		this.scenarioData.setNetwork(net);
+//		this.getWorld().setNetworkLayer(net);
+//		this.getWorld().complete();
 //		this.shelterLinks = this.esnl.getShelterLinks();
 
 		
@@ -93,10 +92,9 @@ public class SocialCostTest extends Controler {
 	}
 	
 	@Override
-	protected PopulationImpl loadPopulation() {
+	protected Population loadPopulation() {
 
-
-		PopulationImpl pop = this.scenarioData.getPopulation();
+		Population pop = this.scenarioData.getPopulation();
 		
 		PopulationFactory pb = new PopulationFactoryImpl(this.scenarioData);
 		int id = 0;

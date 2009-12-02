@@ -86,7 +86,6 @@ import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
@@ -636,7 +635,7 @@ public class Controler {
 	 * @return The population to be used for the simulation.
 	 */
 	@Deprecated
-	protected PopulationImpl loadPopulation() {
+	protected Population loadPopulation() {
 		return this.scenarioData.getPopulation();
 	}
 

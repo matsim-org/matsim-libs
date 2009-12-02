@@ -24,6 +24,7 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -31,9 +32,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -52,13 +51,13 @@ public class PlansGeneratorControler extends Controler {
 
 	/** Should be overwritten in case of artificial population */
 	@Override
-	protected PopulationImpl loadPopulation() {
+	protected Population loadPopulation() {
 
 //		return generate4wPersons();
 		return generateSimplePlans();
 	}
 
-	private PopulationImpl generate4wPersons(){
+	private Population generate4wPersons(){
 
 		int numberOfPlans = 1;
 		PopulationImpl pop = new PopulationImpl();
@@ -121,7 +120,7 @@ public class PlansGeneratorControler extends Controler {
 		return pop;
 	}
 
-	private PopulationImpl generateSimplePlans(){
+	private Population generateSimplePlans(){
 		final int agentsPerDest = 1;
 		int numberOfPlans = 1;
 

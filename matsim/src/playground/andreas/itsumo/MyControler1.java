@@ -24,6 +24,7 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -104,7 +105,7 @@ public class MyControler1 extends Controler {
 	}
 
 	@Override
-	protected PopulationImpl loadPopulation() {
+	protected Population loadPopulation() {
 
 
 		PopulationImpl population = new PopulationImpl();

@@ -3,9 +3,9 @@ package playground.gregor.sims.run;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.BuildingsShapeReader;
 import org.matsim.evacuation.base.EvacuationNetGenerator;
@@ -61,7 +61,7 @@ public class ConfluentCostController extends Controler {
 	}
 
 	@Override
-	protected PopulationImpl loadPopulation() {
+	protected Population loadPopulation() {
 		if (this.buildings == null) {
 			this.buildings = BuildingsShapeReader.readDataFile(this.config.evacuation().getBuildingsFile(),this.config.evacuation().getSampleSize());
 		}

@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.benjamin;
 
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.population.algorithms.PlanCalcType;
 
 
@@ -44,8 +44,8 @@ public class BKickControler extends Controler {
 	}
 
 	@Override
-	protected PopulationImpl loadPopulation() {
-		PopulationImpl pop = super.loadPopulation();
+	protected Population loadPopulation() {
+		Population pop = super.loadPopulation();
 		new PlanCalcType().run(pop);
 		return pop;
 	}
