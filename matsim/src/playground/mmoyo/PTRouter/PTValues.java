@@ -12,7 +12,7 @@ public class PTValues {
 	public final static byte EGRESS 	= 5;
 	
 	public final double AV_WALKING_SPEED = 1/1.34;  //1.34 [Weidmann93], [Antonini2004].  0.836 by [Al-Azzawi 07]  
-	public final double DETTRANSFER_RANGE = 300;	//distance to search station to build det transfer links
+	public final double DETTRANSFER_RANGE = 100;	//300 original distance to search station to build det transfer links
 	public final double FIRST_WALKRANGE = 600;  	//initial distance for station search 
 	public final double WALKRANGE_EXT = 300;   		//progressive extension distance of the station search
 	

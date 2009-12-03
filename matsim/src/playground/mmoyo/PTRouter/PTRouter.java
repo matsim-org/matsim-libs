@@ -33,10 +33,9 @@ public class PTRouter{
 	private NetworkLayer logicNet;
 	private LeastCostPathCalculator myDijkstra;
 	private TravelCost ptTravelCost;
-	public PTTravelTime ptTravelTime;   //> make private 
-	private TransitSchedule transitSchedule;
-	NodeImpl originNode;
-	NodeImpl destinationNode;
+	private NodeImpl originNode;
+	private NodeImpl destinationNode;
+	public PTTravelTime ptTravelTime;   //> make private
 	PTValues ptValues = new PTValues();
 
 	public PTRouter(final NetworkLayer logicNet) {
@@ -44,29 +43,28 @@ public class PTRouter{
 	}
 	
 	public PTRouter(final TransitSchedule schedule, final TransitRouterConfig config){
-		LogicFactory logicFactory = new LogicFactory(schedule);
-		 //this.logicToPlainTranslator = logicFactory.getLogicToPlainTranslator();
-		init(logicFactory.getLogicNet());
+		init(new LogicFactory(schedule).getLogicNet());
 	}
 	
 	private final void init(final NetworkLayer logicNet){
 		this.logicNet = logicNet;
 		this.ptTravelTime =new PTTravelTime();
 		this.ptTravelCost = new PTTravelCost(ptTravelTime);
-		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);	
+		this.myDijkstra = new MyDijkstra(this.logicNet, ptTravelCost, ptTravelTime);	
 		
-		Coord iniCoord = logicNet.getNodes().values().iterator().next().getCoord();
-		this.originNode=  new PTNode(new IdImpl("W1"), iniCoord);		//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
-		this.destinationNode=  new PTNode(new IdImpl("W2"), iniCoord);	//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
+		Coord firstCoord = logicNet.getNodes().values().iterator().next().getCoord();
+		this.originNode=  new Station(new IdImpl("W1"), firstCoord);		//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
+		this.destinationNode=  new Station(new IdImpl("W2"), firstCoord);	//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
 		this.logicNet.addNode(originNode);
 		this.logicNet.addNode(destinationNode);	
 	}
 	
 	/**invokes findPTpath and returns a set of legs of it*/
 	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime) {
+		List<Leg> legList = null;
 		Path path = findPTPath(fromCoord, toCoord, departureTime);
-		List<Leg> legList = new ArrayList<Leg>();
 		if (path!= null){
+			legList = new ArrayList<Leg>();
 			List <PTLink> linkList = new ArrayList<PTLink>();
 			double depTime=departureTime;
 			double time = departureTime;
@@ -79,24 +77,20 @@ public class PTRouter{
 					if (ptLink.getAliasType() != lastLinkType){
 						//if (!lastLinkType.equals("Transfer")){    //transfers will not be described in legs ??<-
 						TransportMode mode;	
-						if (lastLinkType==2){mode= TransportMode.pt;}else{mode= TransportMode.walk;}		   	
-						
-						LegImpl newLeg = createLeg(mode, linkList, depTime, time);  
-							legList.add(newLeg);
+						if (lastLinkType==2){mode= TransportMode.pt;}else{mode= TransportMode.walk;} // must be undefined		   	
+							legList.add(createLeg(mode, linkList, depTime, time));
 						//}
 						depTime=time;
 						linkList = new ArrayList<PTLink>();
 					}
 					//add the egress link
 					if (i == path.links.size()){
-						time = time + ptLink.getWalkTime();
+						time += ptLink.getWalkTime();
 						linkList.add(ptLink);
-						LegImpl newLeg = createLeg(TransportMode.walk, linkList, depTime, time);
-						legList.add(newLeg);
+						legList.add(createLeg(TransportMode.walk, linkList, depTime, time));
 					}
-					
 				}
-				time = time + ptTravelTime.getLinkTravelTime(link, time);;
+				time += ptTravelTime.getLinkTravelTime(link, time);;
 				linkList.add(ptLink);
 				lastLinkType = ptLink.getAliasType();
 				i++;
@@ -108,14 +102,17 @@ public class PTRouter{
 	}	
 	
 	public Path findPTPath(final Coord coord1, final Coord coord2, final double time){
+		//double startTime = System.currentTimeMillis();
 		originNode.setCoord(coord1);
 		destinationNode.setCoord(coord2);
 		
 		Collection <NodeImpl> nearOriginStops = findnStations (originNode);
 		Collection <NodeImpl> nearDestinationStops = findnStations (destinationNode);
 		
-		nearOriginStops.remove(destinationNode);
-		nearDestinationStops.remove(originNode);
+		//maka a test here if destinationNode and originNode st 
+		
+		nearOriginStops.remove(destinationNode); // were they not previously removed?
+		nearDestinationStops.remove(originNode); //
 		
 		List <LinkImpl> walkLinksFromOrigin = createWalkingLinks(originNode, nearOriginStops, true);
 		List <LinkImpl> walkLinksToDestination = createWalkingLinks(destinationNode, nearDestinationStops, false);
@@ -130,6 +127,7 @@ public class PTRouter{
 		}
 		//logicNet.removeNode(origin);
 		//logicNet.removeNode(destination);
+		//System.out.println("route search duration: " + (System.currentTimeMillis()-startTime));
 		return path;
 	}
 
@@ -137,9 +135,8 @@ public class PTRouter{
 	private Collection <NodeImpl> findnStations(final NodeImpl node){
 		Collection <NodeImpl> nearStations;
 		double walkRange = ptValues.FIRST_WALKRANGE;
-		Coord coord = node.getCoord();
 		do{
-			nearStations = logicNet.getNearestNodes(coord, walkRange);  //walkRange
+			nearStations = logicNet.getNearestNodes(node.getCoord(), walkRange);  //walkRange
 			walkRange += 300;
 		} while (nearStations.size()<ptValues.INI_STATIONS_NUM);
 		nearStations.remove(node);
@@ -147,36 +144,23 @@ public class PTRouter{
 	}
 
 	/**Creates a temporary origin or destination node avoids the method net.createNode because it is not necessary to rebuild the quadtree	 */
-	public NodeImpl createWalkingNode(Id id, Coord coord) {
+	/*
+	public NodeImpl createWalkingNode999(Id id, Coord coord) {
 		NodeImpl node = new PTNode(id, coord);
 		//logicNet.getNodes().put(id, node);
 		logicNet.addNode(node);
 		return node;
-	}
+	}*/
 	
 	public List <LinkImpl> createWalkingLinks(NodeImpl walkNode, Collection <NodeImpl> nearNodes, boolean to){
 		List<LinkImpl> newWalkLinks = new ArrayList<LinkImpl>();
-		Id idLink;
-		NodeImpl fromNode;
-		NodeImpl toNode;
 		int x=0;
-		String type;
 		for (NodeImpl node : nearNodes){
 			if (to){
-				fromNode= walkNode;
-				toNode= node;
-				idLink = new IdImpl("WLO" + x++);
-				type = "Access";
+				newWalkLinks.add(new PTLink(new IdImpl("WLO" + x++), walkNode, node, logicNet, "Access"));
 			}else{
-				fromNode= node;
-				toNode=  walkNode;
-				idLink = new IdImpl("WLD" + x++);
-				type = "Egress";
+				newWalkLinks.add(new PTLink(new IdImpl("WLD" + x++), node, walkNode, logicNet, "Egress"));
 			}
-			
-			PTLink link = new PTLink(idLink, fromNode, toNode, logicNet, type, ptValues.AV_WALKING_SPEED); 
-			//PTLink link= logicNet.createAndAddLink(idLink, fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()) , 1, 1, 1, "0", type);
-			newWalkLinks.add(link);
 		}
 		return newWalkLinks;
 	}
@@ -190,32 +174,35 @@ public class PTRouter{
 	
 	private LegImpl createLeg(TransportMode mode, final List<PTLink> routeLinks, final double depTime, final double arrivTime){
 		PTLink firstLink = routeLinks.get(0);
-		double travTime= arrivTime - depTime;
-		double distance=0;
-		List<Node> routeNodeList = new ArrayList<Node>();
-		if (routeLinks.size()>0) routeNodeList.add(routeLinks.get(0).getFromNode());
+		//double travTime= arrivTime - depTime;
+		double travTime= 0;
+		//double distance=0;
+		//List<Node> routeNodeList = new ArrayList<Node>();
+		//if (routeLinks.size()>0) routeNodeList.add(routeLinks.get(0).getFromNode());
 
-		for(Link link : routeLinks) {
-			distance += link.getLength();
-			routeNodeList.add(link.getToNode());
+		for(PTLink ptLink : routeLinks) {
+			//distance += ptLink.getLength();
+			travTime+= (ptLink.getTravelTime()*60);
+			//routeNodeList.add(link.getToNode());
 		} 
 		LegImpl leg = new LegImpl(mode);
 		
 		if (firstLink.getAliasType() ==2){ //Standard link
 			TransitLine line = firstLink.getTransitLine();
 			TransitRoute route = firstLink.getTransitRoute();
-			TransitStopFacility accessStop = ((PTNode)firstLink.getFromNode()).getTransitStopFacility();
-			TransitStopFacility egressStop = ((PTNode)routeLinks.get(routeLinks.size()-1).getToNode()).getTransitStopFacility();
+			TransitStopFacility accessStop = ((Station)firstLink.getFromNode()).getTransitStopFacility();
+			TransitStopFacility egressStop = ((Station)routeLinks.get(routeLinks.size()-1).getToNode()).getTransitStopFacility();
 			ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 			leg.setRoute(ptRoute);
-			ptRoute.setDistance(distance);
-			ptRoute.setTravelTime(travTime);
+			leg.setTravelTime(travTime);
+			//ptRoute.setDistance(distance);
+			//ptRoute.setTravelTime(travTime);
 		}else{        						//walking links : access, transfer, detTransfer, egress
 			leg = new LegImpl(TransportMode.walk);
 			leg.setTravelTime(firstLink.getWalkTime());
 			
 			if (firstLink.getAliasType() ==3 || firstLink.getAliasType() ==4){  //transfers
-				GenericRouteImpl walkRoute = new GenericRouteImpl(((PTNode)firstLink.getFromNode()).getTransitStopFacility().getLink(), ((PTNode)firstLink.getToNode()).getTransitStopFacility().getLink());
+				GenericRouteImpl walkRoute = new GenericRouteImpl(((Station)firstLink.getFromNode()).getTransitStopFacility().getLink(), ((Station)firstLink.getToNode()).getTransitStopFacility().getLink());
 				leg.setRoute(walkRoute);
 			}
 		}
@@ -227,12 +214,43 @@ public class PTRouter{
 		return leg;
 	}
 
+	private LegImpl createLeg2(boolean isStandardLeg, TransportMode mode, TransitLine line, TransitRoute route, TransitStopFacility accessStop , TransitStopFacility egressStop,  final List<PTLink> routeLinks){
+		double distance=0;
+		double travelTime=0;
+	
+		LegImpl leg= null;
+		if (isStandardLeg){ //Standard link
+			for(PTLink ptLink : routeLinks) {
+				distance += ptLink.getLength();
+				travelTime += ptLink.getTravelTime();
+			} 
+			ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
+			ptRoute.setDistance(distance);
+			ptRoute.setTravelTime(travelTime);
+			ptRoute.getDistance();
+			leg = new LegImpl(mode);
+			leg.setRoute(ptRoute);
+			
+		}else{        						//walking links : access, transfer, detTransfer, egress
+			PTLink firstLink = routeLinks.get(0);
+			leg = new LegImpl(TransportMode.walk);
+			leg.setTravelTime(firstLink.getWalkTime());
+			
+			if (firstLink.getAliasType() ==3 || firstLink.getAliasType() ==4){  //transfers
+				leg.setRoute(new GenericRouteImpl(((Station)firstLink.getFromNode()).getTransitStopFacility().getLink(), ((Station)firstLink.getToNode()).getTransitStopFacility().getLink()));
+			}
+		}
+		//leg.setDepartureTime(depTime);??
+		//leg.setArrivalTime(arrivTime);??
+		return leg;
+	}
+	
 	public void printRoute(Path path){
 		if (path!=null){
 			System.out.print("\nLinks: ");
 			Id transitRouteId = new IdImpl("");
 			for (Node node : path.nodes){
-				PTNode ptNode= (PTNode)node;
+				Station ptNode= (Station)node;
 				if(ptNode.getTransitRoute().getId()==transitRouteId){
 					System.out.print(ptNode.getId().toString() + " ");
 				}else{
@@ -261,8 +279,11 @@ public class PTRouter{
 		this.distanceCoeficient = distanceCoeficient; 
 		this.transferPenalty = transferPenalty;
 		this.myDijkstra = new MyDijkstra(logicNet, ptTravelCost, ptTravelTime);	
-		originNode= createWalkingNode(new IdImpl("W1"), null);   //this is faster than network.createNode but uses PTNode
-		destinationNode= createWalkingNode(new IdImpl("W2"), null);
+		this.originNode=  new Station(new IdImpl("W1"), null);		//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
+		this.destinationNode=  new Station(new IdImpl("W2"), null);	//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
+		this.logicNet.addNode(originNode);
+		this.logicNet.addNode(destinationNode);	
+	
 	}
 	
 	public double getTimeCoeficient(){

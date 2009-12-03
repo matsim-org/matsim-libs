@@ -73,7 +73,7 @@ public class Main {
 		/*******************************************************/
 	
 		LogicFactory logicFactory = new LogicFactory(transitSchedule); // Creates logic elements: logicNetwork, logicTransitSchedule, logicToPlanConverter
-		NetworkLayer plainNetwork=logicFactory.getPlainNet();
+		//03 dic noPlain Net NetworkLayer plainNetwork=logicFactory.getPlainNet();
 		
 		int option =10;
 		switch (option){
@@ -82,7 +82,7 @@ public class Main {
 				break;
 			
 			case 2:  //searches and shows a PT path between two coordinates or nodes */  
-				plainNetwork=logicFactory.getPlainNet();
+				//03 dic no Plain net plainNetwork=logicFactory.getPlainNet();
 				PTRouter ptRouter = new PTRouter(logicFactory.getLogicNet());
 				Coord coord1 = new CoordImpl(686897, 250590);
 				Coord coord2 = new CoordImpl(684854, 254079);
@@ -109,15 +109,6 @@ public class Main {
 				ptActWriter.printPTLegs(transitSchedule);
 				break;
 
-			case 5:
-				plainNetwork=logicFactory.getPlainNet();
-				NodeImpl node1 = plainNetwork.getNode("299598");
-				NodeImpl node2 = plainNetwork.getNode("8503006");
-				double distance = CoordUtils.calcDistance(node1.getCoord(), node2.getCoord());
-				System.out.println(distance);
-				//-->check if their nodes are joined by detTransfer links 
-				break;
-				
 			case 6:  //simplifies a plan
 				String planToSimplify = "output_plan.xml";
 				String simplifiedPlan = "simplfied_plan.xml";
@@ -166,7 +157,7 @@ public class Main {
 				System.out.println("Transferlinks: " +  transfers);
 				System.out.println("Standard: " +  standard);
 				System.out.println("num of logic nodes:" + logicNetwork.getNodes().size());
-				System.out.println("num of plain nodes:" + plainNetwork.getNodes().size());
+				//03 dic no plainNet System.out.println("num of plain nodes:" + plainNetwork.getNodes().size());
 				
 				break;
 			
@@ -175,7 +166,7 @@ public class Main {
 				Counter counter= new Counter(PLANFILE, logicFactory);
 				break;
 			case 11:
-				TransitRouteValidator transitRouteValidator = new TransitRouteValidator(logicFactory);
+				new TransitRouteValidator(transitSchedule);
 				break;
 				
 				/**Try the transitRouter class on equilnet*/

@@ -50,7 +50,7 @@ public class LogicIntoPlainTranslator {
 	public List<Node> convertNodesToPlain(List<Node> logicNodes){
 		List<Node> plainNodes  = new ArrayList<Node>();
 		for (Node logicNode: logicNodes){
-			plainNodes.add(((PTNode)logicNode).getPlainNode());
+			plainNodes.add(((Station)logicNode).getPlainNode());
 		}
 		return plainNodes;
 	}	

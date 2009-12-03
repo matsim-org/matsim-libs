@@ -15,20 +15,12 @@ public class PTLink extends LinkImpl{
 	private double travelTime;
 	private double walkTime = Double.NaN;
 	private byte aliasType ;   //1= access, 2= standard, 3= transfer 4= detTransfer 5= Egress
-
-	public PTLink(final Id id, final Node from, final Node to, final NetworkLayer network, final String type, double avWalkSpeed) {
+	double avWalkSpeed = 1/1.34;//new PTValues().AV_WALKING_SPEED;    //use static variable
+	
+	public PTLink(final Id id, final Node from, final Node to, final NetworkLayer network, final String type) {
 		super(id, from, to, network, 0, 10, 9999 , 1);
 		this.setType(type);
-
-		if 		(type.equals("Access")) 	{aliasType=1;} 
-		else if (type.equals("Standard")) 	{aliasType=2;}
-		else if (type.equals("Transfer")) 	{aliasType=3;}
-		else if (type.equals("DetTransfer")){aliasType=4;}
-		else if (type.equals("Egress")) 	{aliasType=5;}
-		else 				{aliasType=0;}
-		
 		this.setLength(this.getEuklideanDistance());
-		if (aliasType!=2){ this.walkTime = this.getLength() * avWalkSpeed;}
 		network.addLink(this);
 	}
 
@@ -41,6 +33,13 @@ public class PTLink extends LinkImpl{
 	}
 
 	public byte getAliasType() {
+		if 		(type.equals("Access")) 	{aliasType=1;} 
+		else if (type.equals("Standard")) 	{aliasType=2;}
+		else if (type.equals("Transfer")) 	{aliasType=3;}
+		else if (type.equals("DetTransfer")){aliasType=4;}
+		else if (type.equals("Egress")) 	{aliasType=5;}
+		else 				{aliasType=0;}
+		
 		return this.aliasType;
 	}
 
@@ -49,6 +48,7 @@ public class PTLink extends LinkImpl{
 	}
 
 	public double getWalkTime(){
+		if (aliasType!=2){ this.walkTime = this.getLength() * avWalkSpeed;}
 		return this.walkTime;
 	}
 

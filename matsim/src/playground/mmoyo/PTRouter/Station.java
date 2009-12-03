@@ -10,19 +10,20 @@ import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 /**
- * Node with necessary data for the PT simulation
+ * Node with necessary data for the routing network
  * These nodes are installed in a different layer in independent paths according to each route
- *
  */
-public class PTNode extends NodeImpl {
+public class Station extends NodeImpl {
 	private TransitRoute transitRoute ;
 	private TransitLine transitLine;
 	private TransitRouteStop transitRouteStop;
 	private double[]arrDep;  
 	private Link inStandardLink;
 	private Node plainNode;
+	private boolean isFirstStation;
+	private boolean isLastStation; 
 	
-	public PTNode(final Id id, final Coord coord) {
+	public Station(final Id id, final Coord coord) {
 		super(id, coord, null);
 	}
 
@@ -59,7 +60,6 @@ public class PTNode extends NodeImpl {
 	}
 
 	public TransitStopFacility getTransitStopFacility(){
-		System.out.println ("id:" + this.getId());
 		return this.transitRouteStop.getStopFacility();
 	}
 
@@ -70,38 +70,29 @@ public class PTNode extends NodeImpl {
 	public void setArrDep(double[] arrDep) {
 		this.arrDep = arrDep;
 	}
-		
-	/*
-	 * This is an attempt to speed up the calculation of waiting time in a transfer
-	 * It must be determined if it is faster to do it here or at timetable class
-	 */
-	/*
-	public double getTransferTime (final double time){//,
-		int length = arrDep.length;
-		int index =  Arrays.binarySearch(arrDep, time);
-		if (index<0){
-			index = -index;
-			if (index <= length)index--; else index=0;	
-		}else{
-			if (index < (length-1))index++; else index=0;	
-		}
-		double nextDeparture = arrDep[index];
-		
-		double transTime = nextDeparture-time;
-		if (transTime<0){//wait till next day first departure
-			transTime= 86400-time+ nextDeparture;
-		}
-		
-		return transTime;
-	}
-	*/
-	
+			
 	public TransitLine getTransitLine() {
 		return transitLine;
 	}
 
 	public void setTransitLine(TransitLine transitLine) {
 		this.transitLine = transitLine;
+	}
+
+	public boolean isFirstStation() {
+		return isFirstStation;
+	}
+
+	public void setFirstStation(boolean isFirstStation) {
+		this.isFirstStation = isFirstStation;
+	}
+
+	public boolean isLastStation() {
+		return isLastStation;
+	}
+
+	public void setLastStation(boolean isLastStation) {
+		this.isLastStation = isLastStation;
 	}
 		
 }

@@ -57,7 +57,7 @@ public class PTActWriter {
 		this.outputFile= outputFile;
 		this.ptValues= ptValues;
 		this.logicNet= logicFactory.getLogicNet();
-		this.plainNet= logicFactory.getPlainNet();
+		//03dic no Plain net this.plainNet= logicFactory.getPlainNet();
 		this.ptRouter = new PTRouter(logicNet);
 		this.logicToPlainConverter = logicFactory.getLogicToPlainTranslator();
 		this.firstWalkRange = ptValues.FIRST_WALKRANGE;
@@ -391,28 +391,25 @@ public class PTActWriter {
 	}
 	
 	private void createWlinks(final Coord coord1, final Path path, final Coord coord2){
-		//-> move and use it in Link factory
 		originNode= createWalkingNode(new IdImpl("W1"), coord1);
 		destinationNode= createWalkingNode(new IdImpl("W2"), coord2);
 		path.nodes.add(0, originNode);
 		path.nodes.add(destinationNode);
-		accessLink = createPTLink("Access", originNode , path.nodes.get(1), "Access");
-		egressLink = createPTLink("Egress", path.nodes.get(path.nodes.size()-2) , destinationNode, "Egress");
+		accessLink = logicNet.createAndAddLink( new IdImpl("Access"), originNode, path.nodes.get(1), CoordUtils.calcDistance(originNode.getCoord(), path.nodes.get(1).getCoord()), 3600, 1, 1, "0", "Access"); 
+		egressLink = logicNet.createAndAddLink( new IdImpl("Egress"), path.nodes.get(path.nodes.size()-2), destinationNode, CoordUtils.calcDistance(path.nodes.get(path.nodes.size()-2).getCoord(), destinationNode.getCoord()), 3600, 1, 1, "0", "Egress");
 	}
 	
 	/**
 	 * Creates a temporary origin or destination node
 	 * avoids the method net.createNode because it is not necessary to rebuild the Quadtree*/
 	public NodeImpl createWalkingNode(final Id id, final Coord coord){
-		NodeImpl node = new PTNode(id, coord);
+		NodeImpl node = new Station(id, coord);
 		logicNet.getNodes().put(id, node);
 		return node;
 	}
 	
-	public LinkImpl createPTLink(final String strIdLink, final Node fromNode, final Node toNode, final String type){
-		//->use link factory
-		double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
-		return logicNet.createAndAddLink( new IdImpl(strIdLink), (NodeImpl) fromNode, (NodeImpl) toNode, length, 1, 1, 1, "0", type); 
+	public LinkImpl createPTLink999(final String strIdLink, final Node fromNode, final Node toNode, final String type){
+		return logicNet.createAndAddLink( new IdImpl(strIdLink), (NodeImpl) fromNode, (NodeImpl) toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()), 3600, 1, 1, "0", type); 
 	}
 	
 	private void removeWlinks(){

@@ -22,22 +22,22 @@ import org.matsim.api.core.v01.network.Node;
 public class TransitRouteValidator {
 
 	private NetworkLayer logicNetwork;		
-	private TransitSchedule logicTransitSchedule;
+	private TransitSchedule transitSchedule;
 	
-	public TransitRouteValidator(final LogicFactory logicFactory){
-		this.logicNetwork=logicFactory.getLogicNet();		
-		this.logicTransitSchedule = logicFactory.getLogicTransitSchedule();
+	public TransitRouteValidator(TransitSchedule transitSchedule){
+		this.logicNetwork =	new LogicFactory(transitSchedule).getLogicNet();
 		getIsolatedPTLines();
 	}
 	
 	public void getIsolatedPTLines(){
+		
 		int isolated=0;
 		int comparisons=0;
 		PseudoTimeCost pseudoTimeCost = new PseudoTimeCost();
 		LeastCostPathCalculator expressDijkstra = new MyDijkstra(logicNetwork, pseudoTimeCost, pseudoTimeCost);
 		
 		List<Id[]> ptLineIdList = new ArrayList<Id[]>();
-		for (TransitLine transitLine : logicTransitSchedule.getTransitLines().values()){
+		for (TransitLine transitLine : transitSchedule.getTransitLines().values()){
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
 				for (TransitRoute transitRoute2 : transitLine.getRoutes().values()){
 					if(!transitRoute.equals(transitRoute2)){
