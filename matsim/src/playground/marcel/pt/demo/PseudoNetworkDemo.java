@@ -55,16 +55,16 @@ public class PseudoNetworkDemo {
 		String networkFile = null;
 		String transitScheduleFile = null;
 		if (args.length == 1) {
-			transitScheduleFile = args[0]	;
+			transitScheduleFile = args[0];
 		} else {
-//			networkFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/network.xml";
-			networkFile = "../thesis-data/application/network.oevModellZH.xml";
-//			transitScheduleFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml";
+			networkFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/network.xml";
+//			networkFile = "../thesis-data/application/network.oevModellZH.xml";
+			transitScheduleFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitSchedule.xml";
 //			transitScheduleFile = "test/input/org/matsim/transitSchedule/TransitScheduleReaderTest/transitScheduleNoLinks.xml";
 //			transitScheduleFile = "../thesis-data/examples/berta/schedule.xml";
 //			transitScheduleFile = "/Users/cello/Desktop/Mohit/berlinSchedule.xml";
 //			transitScheduleFile = "../thesis-data/application/zuerichSchedule.xml";
-			transitScheduleFile = "../thesis-data/application/transitSchedule.oevModellZH.xml";
+//			transitScheduleFile = "../thesis-data/application/transitSchedule.oevModellZH.xml";
 		}
 
 		ScenarioImpl scenario = new ScenarioImpl();

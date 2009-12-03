@@ -146,7 +146,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 			assertNotNull("stopFacility not found: " + stopE.getId().toString(), stopA);
 			assertEquals("different x coordinates.", stopE.getCoord().getX(), stopA.getCoord().getX(), EPSILON);
 			assertEquals("different y coordinates.", stopE.getCoord().getY(), stopA.getCoord().getY(), EPSILON);
-			assertEquals("different link information.", stopE.getLink(), stopA.getLink());
+			assertEquals("different link information.", stopE.getLinkId(), stopA.getLinkId());
 			assertEquals("different isBlocking.", stopE.getIsBlockingLane(), stopA.getIsBlockingLane());
 			assertEquals("different names.", stopE.getName(), stopA.getName());
 		}

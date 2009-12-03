@@ -34,7 +34,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
@@ -358,7 +357,7 @@ public class QueueLane {
 				// are handled via a separate data structure ("transitVehicleStopQueue") --???  kai, nov'09
 				TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
 				TransitStopFacility stop = driver.getNextTransitStop();
-				if ((stop != null) && (stop.getLink() == this.queueLink.getLink())) {
+				if ((stop != null) && (stop.getLinkId() == this.queueLink.getLink().getId())) {
 				/* ignore delay from handleTransitStop, obviously, the transit
 				 * vehicle was parked here, so everybody should have border by now */
 					// yyyy It probably means "boarded" instead of "border".  But I still don't understand, since
@@ -426,7 +425,7 @@ public class QueueLane {
 			if (driver instanceof TransitDriverAgent) {
 				TransitDriverAgent transitDriver = (TransitDriverAgent) veh.getDriver();
 				TransitStopFacility stop = transitDriver.getNextTransitStop();
-				if ((stop != null) && (stop.getLink() == this.queueLink.getLink())) {
+				if ((stop != null) && (stop.getLinkId() == this.queueLink.getLink().getId())) {
 					double delay = transitDriver.handleTransitStop(stop, now);
 					if (delay > 0.0) {
 						veh.setEarliestLinkExitTime(now + delay);

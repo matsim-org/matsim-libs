@@ -76,7 +76,6 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertNotNull(stop);
 		assertEquals(79.0, stop.getCoord().getX(), MatsimTestCase.EPSILON);
 		assertEquals(80.0, stop.getCoord().getY(), MatsimTestCase.EPSILON);
-		assertNull(stop.getLink());
 		assertNull(stop.getLinkId());
 		assertNull(stop.getName());
 		assertFalse(stop.getIsBlockingLane());
@@ -108,7 +107,6 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		assertNotNull(stop);
 		assertEquals(79.0, stop.getCoord().getX(), MatsimTestCase.EPSILON);
 		assertEquals(80.0, stop.getCoord().getY(), MatsimTestCase.EPSILON);
-		assertEquals(link3, stop.getLink());
 		assertEquals(link3.getId(), stop.getLinkId());
 	}
 

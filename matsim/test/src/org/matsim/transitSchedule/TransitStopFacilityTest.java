@@ -70,14 +70,11 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 		Id id = new IdImpl(2491);
 		Coord coord = new CoordImpl(30, 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
-		assertNull(stop.getLink());
 		assertNull(stop.getLinkId());
 		Link link = new FakeLink(new IdImpl(99), null, null);
 		stop.setLink(link);
-		assertEquals(link, stop.getLink());
 		assertEquals(link.getId(), stop.getLinkId());
 		stop.setLink(null);
-		assertNull(stop.getLink());
 		assertNull(stop.getLinkId());
 	}
 	

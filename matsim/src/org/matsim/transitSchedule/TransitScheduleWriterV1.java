@@ -75,7 +75,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 			attributes.add(this.createTuple(Constants.ID, stop.getId().toString()));
 			attributes.add(this.createTuple("x", stop.getCoord().getX()));
 			attributes.add(this.createTuple("y", stop.getCoord().getY()));
-			if (stop.getLink() != null) {
+			if (stop.getLinkId() != null) {
 				attributes.add(this.createTuple("linkRefId", stop.getLinkId().toString()));
 			}
 			if (stop.getName() != null) {

@@ -186,7 +186,8 @@ public class VisualizeTransitPlans {
 		TransitStopFacility accessStop = this.realScenario.getTransitSchedule().getFacilities().get(route.getAccessStopId());
 		TransitStopFacility egressStop = this.realScenario.getTransitSchedule().getFacilities().get(route.getEgressStopId());
 
-		NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(accessStop.getLink(), egressStop.getLink());
+		NetworkRouteWRefs netRoute = new LinkNetworkRouteImpl(this.realScenario.getNetwork().getLinks().get(accessStop.getLinkId()), 
+				this.realScenario.getNetwork().getLinks().get(egressStop.getLinkId()));
 		List<Link> links = new ArrayList<Link>();
 		boolean include = false;
 		TransitStopFacility prevStop = null;
@@ -202,7 +203,8 @@ public class VisualizeTransitPlans {
 			}
 			prevStop = stop.getStopFacility();
 		}
-		netRoute.setLinks(accessStop.getLink(), links, egressStop.getLink());
+		netRoute.setLinks(this.realScenario.getNetwork().getLinks().get(accessStop.getLinkId()),
+				links, this.realScenario.getNetwork().getLinks().get(egressStop.getLinkId()));
 		return netRoute;
 	}
 
