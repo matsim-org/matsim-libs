@@ -35,7 +35,7 @@ import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
+import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.world.MappedLocation;
 
 import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
@@ -48,7 +48,7 @@ import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
  */
 public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
-	private final ActivityFacilitiesImpl shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
+	private final ActivityFacilitiesImpl shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005");
 
 	private final String shopsOf2005Filename = "/home/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/facilities_shopsOf2005.xml";
 

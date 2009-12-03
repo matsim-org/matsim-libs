@@ -29,8 +29,6 @@ public class AllTests {
 
 		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
 		//$JUnit-BEGIN$
-		suite.addTest(org.matsim.core.facilities.algorithms.AllTests.suite());
-		suite.addTestSuite(FacilitiesImplTest.class);
 		suite.addTestSuite(FacilitiesParserWriterTest.class);
 		suite.addTestSuite(FacilityMoveTest.class);
 		//$JUnit-END$

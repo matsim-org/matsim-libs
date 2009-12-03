@@ -86,7 +86,6 @@ public class FacilitiesProductionKTI {
 		addOpentimes.init();
 		addOpentimes.run(facilities);
 //		new FacilitiesRandomizeHectareCoordinates().run(facilities);
-		facilities.runAlgorithms();
 		log.info("Adding and running facilities algorithms...done.");
 
 		System.out.println("  writing facilities file... ");

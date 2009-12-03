@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilityAlgorithm.java
+ * AllTests.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,17 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities.algorithms;
+package org.matsim.facilities;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-public abstract class AbstractFacilityAlgorithm implements FacilityAlgorithm {
+public class AllTests {
 
-	public void run(final ActivityFacilities facilities) {
-		for (ActivityFacility f : facilities.getFacilities().values()) {
-			run(f);
-		}
+	public static Test suite() {
+
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
+		//$JUnit-BEGIN$
+		suite.addTest(org.matsim.facilities.algorithms.AllTests.suite());
+		//$JUnit-END$
+		return suite;
 	}
 
 }

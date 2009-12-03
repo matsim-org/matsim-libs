@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities.algorithms;
+package org.matsim.facilities.algorithms;
 
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 

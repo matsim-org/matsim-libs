@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * FacilityAlgorithm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,20 +18,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities.algorithms;
+package org.matsim.facilities.algorithms;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
-public class AllTests {
+public abstract class AbstractFacilityAlgorithm implements FacilityAlgorithm {
 
-	public static Test suite() {
-
-		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
-		//$JUnit-BEGIN$
-		suite.addTestSuite(AbstractFacilityAlgorithmTest.class);
-		//$JUnit-END$
-		return suite;
+	public void run(final ActivityFacilities facilities) {
+		for (ActivityFacility f : facilities.getFacilities().values()) {
+			run(f);
+		}
 	}
 
 }

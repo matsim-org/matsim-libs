@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilityAlgorithmTest.java
+ * AllTests.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities.algorithms;
+package org.matsim.facilities.algorithms;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.testcases.MatsimTestCase;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-public class AbstractFacilityAlgorithmTest extends MatsimTestCase {
+public class AllTests {
 
-	public void testRunAlgorithms() {
-		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		// create 2 facilities
-		facilities.createFacility(new IdImpl(1), new CoordImpl(1.0, 1.0));
-		facilities.createFacility(new IdImpl(2), new CoordImpl(2.0, 2.0));
-		// create an algo and let it run over the facilities
-		MockAlgo1 algo1 = new MockAlgo1();
-		algo1.run(facilities);
-		assertEquals("TestAlgo should have handled 2 facilities.", 2, algo1.getCounter());
+	public static Test suite() {
+
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
+		//$JUnit-BEGIN$
+		suite.addTestSuite(AbstractFacilityAlgorithmTest.class);
+		//$JUnit-END$
+		return suite;
 	}
 
-	/*package*/ static class MockAlgo1 extends AbstractFacilityAlgorithm {
-		private int counter = 0;
-
-		public void run(final ActivityFacility facility) {
-			this.counter++;
-		}
-
-		public int getCounter() {
-			return this.counter;
-		}
-	}
 }

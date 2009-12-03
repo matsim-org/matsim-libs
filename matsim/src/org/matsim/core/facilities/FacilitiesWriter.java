@@ -63,7 +63,7 @@ public class FacilitiesWriter extends MatsimXmlWriter implements MatsimFileWrite
 		this.writeFinish();
 	}
 
-	public final void writeOpenAndInit(final String filename) {
+	private final void writeOpenAndInit(final String filename) {
 		try {
 			openFile(filename);
 			this.writeXmlHead();
@@ -77,7 +77,7 @@ public class FacilitiesWriter extends MatsimXmlWriter implements MatsimFileWrite
 		}
 	}
 
-	public final void writeFacility(final ActivityFacilityImpl f) {
+	private final void writeFacility(final ActivityFacilityImpl f) {
 		try {
 			this.handler.startFacility(f, this.writer);
 			Iterator<ActivityOptionImpl> a_it = f.getActivityOptions().values().iterator();
@@ -106,7 +106,7 @@ public class FacilitiesWriter extends MatsimXmlWriter implements MatsimFileWrite
 		}
 	}
 
-	public final void writeFinish() {
+	private final void writeFinish() {
 		try {
 			this.handler.endFacilities(this.writer);
 			this.writer.flush();
@@ -116,12 +116,4 @@ public class FacilitiesWriter extends MatsimXmlWriter implements MatsimFileWrite
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
-	public final String toString() {
-		return super.toString();
-	}
 }

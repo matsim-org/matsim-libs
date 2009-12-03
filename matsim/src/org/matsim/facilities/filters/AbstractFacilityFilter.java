@@ -21,7 +21,7 @@
 package org.matsim.facilities.filters;
 
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
+import org.matsim.facilities.algorithms.FacilityAlgorithm;
 
 public abstract class AbstractFacilityFilter implements FacilityAlgorithm, FacilityFilter {
 

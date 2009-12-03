@@ -28,7 +28,7 @@ public class Shp2Facilities {
 	private static Collection<Feature> getPolygons(final FeatureSource n) {
 		final Collection<Feature> polygons = new ArrayList<Feature>(); // not needed
 
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("workplaces",false) ;
+		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("workplaces");
 		long cnt = 0 ;
 		
 		FeatureIterator it = null;

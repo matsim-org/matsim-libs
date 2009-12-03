@@ -26,7 +26,7 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
+import org.matsim.facilities.algorithms.FacilityAlgorithm;
 
 /**
  * Keeps all facilities if they contain one OR more of the specified activities.

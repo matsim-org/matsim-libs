@@ -97,7 +97,6 @@ public class FacilitiesProductionKTI {
 		new FacilitiesAllActivitiesFTE(ktiYear).run(facilities);
 //		new FacilitiesOpentimesKTIYear1().run(facilities);
 //		new FacilitiesRandomizeHectareCoordinates().run(facilities);
-		facilities.runAlgorithms();
 		log.info("Adding and running facilities algorithms...done.");
 
 		System.out.println("  writing facilities file... ");

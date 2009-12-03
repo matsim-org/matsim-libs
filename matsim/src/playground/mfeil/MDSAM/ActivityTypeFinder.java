@@ -33,8 +33,8 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 
 import playground.mfeil.config.PlanomatXConfigGroup;
 

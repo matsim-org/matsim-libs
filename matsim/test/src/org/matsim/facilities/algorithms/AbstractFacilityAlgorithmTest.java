@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilitiesWriterAlgorithm.java
+ * FacilityAlgorithmTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,39 +20,35 @@
 
 package org.matsim.facilities.algorithms;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.algorithms.AbstractFacilityAlgorithm;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
+import org.matsim.testcases.MatsimTestCase;
 
-/**
- * Use this facilities writer when streaming facilities.
- *
- * @author meisterk
- *
- */
-public class FacilitiesWriterAlgorithm extends AbstractFacilityAlgorithm {
+public class AbstractFacilityAlgorithmTest extends MatsimTestCase {
 
-	private FacilitiesWriter facilitiesWriter = null;
-
-	public FacilitiesWriterAlgorithm(final ActivityFacilities facilities, final String filename) {
-		super();
-		this.facilitiesWriter = new FacilitiesWriter((ActivityFacilitiesImpl) facilities);
-		this.facilitiesWriter.writeOpenAndInit(filename);
+	public void testRunAlgorithms() {
+		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
+		// create 2 facilities
+		facilities.createFacility(new IdImpl(1), new CoordImpl(1.0, 1.0));
+		facilities.createFacility(new IdImpl(2), new CoordImpl(2.0, 2.0));
+		// create an algo and let it run over the facilities
+		MockAlgo1 algo1 = new MockAlgo1();
+		algo1.run(facilities);
+		assertEquals("TestAlgo should have handled 2 facilities.", 2, algo1.getCounter());
 	}
 
-	public void run(final ActivityFacility facility) {
-		this.facilitiesWriter.writeFacility((ActivityFacilityImpl) facility);
-	}
+	/*package*/ static class MockAlgo1 extends AbstractFacilityAlgorithm {
+		private int counter = 0;
 
-	/**
-	 * Calls the facilities writer to close the out stream.
-	 * Don't forget to call this method after streaming all facilities.
-	 */
-	public void finish() {
-		this.facilitiesWriter.writeFinish();
-	}
+		public void run(final ActivityFacility facility) {
+			this.counter++;
+		}
 
+		public int getCounter() {
+			return this.counter;
+		}
+	}
 }

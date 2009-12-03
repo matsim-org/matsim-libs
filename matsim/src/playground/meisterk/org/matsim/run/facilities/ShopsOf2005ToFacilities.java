@@ -67,14 +67,12 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.facilities.algorithms.FacilityAlgorithm;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.algorithms.FacilitiesWriterAlgorithm;
 import org.matsim.vis.kml.KMZWriter;
 
 import playground.meisterk.org.matsim.facilities.ShopId;
@@ -227,7 +225,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void transformGeocodedKMLToFacilities(Config config) {
 
-		ActivityFacilitiesImpl shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
+		ActivityFacilitiesImpl shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005");
 
 		JAXBElement<KmlType> kmlElement = null;
 
@@ -1447,7 +1445,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void shopsToTXT() {
 
-		ActivityFacilitiesImpl shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
+		ActivityFacilitiesImpl shopsOf2005 = new ActivityFacilitiesImpl("shopsOf2005");
 		ArrayList<String> txtLines = new ArrayList<String>();
 		ShopId shopId = null;
 		String aShopLine = null;
@@ -1605,7 +1603,7 @@ public class ShopsOf2005ToFacilities {
 
 		ActivityFacilitiesImpl facilities = null;
 		for (int dataSetIndex : new int[]{SHOPS_OF_2005/*, SHOPS_FROM_ENTERPRISE_CENSUS*/}) {
-			facilities = new ActivityFacilitiesImpl(shopsNames.get(new Integer(dataSetIndex)), ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
+			facilities = new ActivityFacilitiesImpl(shopsNames.get(new Integer(dataSetIndex)));
 
 			System.out.println("Reading facilities xml file... ");
 			FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilities);
@@ -1709,27 +1707,21 @@ public class ShopsOf2005ToFacilities {
 
 	private static void applyOpentimesToEnterpriseCensus(Config config) {
 
-		ActivityFacilitiesImpl facilities_input = new ActivityFacilitiesImpl("Switzerland based on Enterprise census 2000.", ActivityFacilitiesImpl.FACILITIES_USE_STREAMING);
-
-		ActivityFacilitiesImpl facilities_output = new ActivityFacilitiesImpl("Facilities KTI Year 2", ActivityFacilitiesImpl.FACILITIES_NO_STREAMING);
+		ActivityFacilitiesImpl facilities_input = new ActivityFacilitiesImpl("Switzerland based on Enterprise census 2000.");
 
 		// init algorithms
 		FacilitiesOpentimesKTIYear2 facilitiesOpentimesKTIYear2 = new FacilitiesOpentimesKTIYear2();
 		facilitiesOpentimesKTIYear2.init();
 
-		FacilitiesWriterAlgorithm writerAlgo = new FacilitiesWriterAlgorithm(facilities_output, config.facilities().getOutputFile());
-
-		for (FacilityAlgorithm facilitiesAlgorithm : new FacilityAlgorithm[]{facilitiesOpentimesKTIYear2, writerAlgo}) {
-			facilities_input.addAlgorithm(facilitiesAlgorithm);
-		}
-
-		System.out.println("Streaming Facilities KTI Year 2 file... ");
+		System.out.println("Reading Facilities KTI Year 2 file...");
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilities_input);
 		facilities_reader.setValidating(false);
-		facilities_reader.readFile(Gbl.getConfig().facilities().getInputFile());
-		System.out.println("Streaming Facilities KTI Year 2 file...done.");
+		facilities_reader.readFile(config.facilities().getInputFile());
+		System.out.println("Processing Facilities KTI Year 2 file...");
+		facilitiesOpentimesKTIYear2.run(facilities_input);
 
-		writerAlgo.finish();
+		System.out.println("Writing Facilities KTI Year 2 file...");
+		new FacilitiesWriter(facilities_input).writeFile(config.facilities().getOutputFile());
 
 	}
 
