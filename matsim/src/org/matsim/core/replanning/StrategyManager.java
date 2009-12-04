@@ -143,7 +143,7 @@ public class StrategyManager {
 		}
 	}
 	
-	private void removePlans(final PersonImpl person, final int maxNumberOfPlans) {
+	protected void removePlans(final PersonImpl person, final int maxNumberOfPlans) {
 		while (person.getPlans().size() > maxNumberOfPlans) {
 			Plan plan = this.removalPlanSelector.selectPlan(person);
 			person.getPlans().remove(plan);
