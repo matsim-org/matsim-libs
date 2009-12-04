@@ -29,13 +29,10 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.Simulation;
-import org.matsim.core.mobsim.queuesim.SimulationTimer;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRoute;
@@ -70,6 +67,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 		this.schedule = scenario.getTransitSchedule();
 		this.setAgentFactory(new TransitAgentFactory(this, this.agents));
 		this.agentTracker = new TransitStopAgentTracker();
+		this.getNotTeleportedModes().add(TransportMode.pt);
 	}
 
 	public void startOTFServer(final String serverName) {
@@ -136,9 +134,22 @@ public class TransitQueueSimulation extends QueueSimulation {
 			}
 		}
 	}
+	
+	/**
+	 * Only overwritten to change visibility.
+	 */
+	@Override
+	protected void handleAgentArrival(final double now, DriverAgent agent){
+		super.handleAgentArrival(now, agent);
+	}
 
 	@Override
-	public void agentDeparts(final DriverAgent agent, final Link link) {
+	protected void agentDeparts(double now, final DriverAgent agent, final Link link){
+		super.agentDeparts(now, agent, link);
+	}
+	
+	@Override
+	public void handleKnownLegModeDeparture(double now, final DriverAgent agent, final Link link, TransportMode mode) {
 		LegImpl leg = (LegImpl) agent.getCurrentLeg();
 		if (leg.getMode() == TransportMode.pt) {
 			if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
@@ -159,12 +170,11 @@ public class TransitQueueSimulation extends QueueSimulation {
 								+ ". The agent is removed from the simulation.");
 				return;
 			}
-			getEvents().processEvent(new AgentDepartureEventImpl(SimulationTimer.getTime(), agent.getPerson(), (LinkImpl) link, leg));
-
 			TransitStopFacility stop = this.schedule.getFacilities().get(route.getAccessStopId());
 			this.agentTracker.addAgentToStop((PassengerAgent) agent, stop);
-		} else {
-			super.agentDeparts(agent, link);
+		} 
+		else {
+			super.handleKnownLegModeDeparture(now, agent, link, mode);
 		}
 	}
 

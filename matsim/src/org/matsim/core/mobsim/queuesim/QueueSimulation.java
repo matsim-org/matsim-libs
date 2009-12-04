@@ -27,8 +27,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
@@ -37,6 +39,7 @@ import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -52,7 +55,6 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.collections.Tuple;
@@ -134,7 +136,7 @@ public class QueueSimulation {
 
 	private QueueSimSignalEngine signalEngine = null;
 
-//	private final Set<TransportMode> notTeleportedModes;
+	private final Set<TransportMode> notTeleportedModes = new HashSet<TransportMode>();
 	
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -155,6 +157,8 @@ public class QueueSimulation {
 		this.network = new QueueNetwork(this.networkLayer);
 		this.agentFactory = new AgentFactory(this);
 
+		this.notTeleportedModes.add(TransportMode.car);
+		
 		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
 	}
 
@@ -488,12 +492,12 @@ public class QueueSimulation {
 		QueueSimulation.events = events;
 	}
 
-	private final void handleUnknownLegMode(final DriverAgent agent) {
+	protected void handleUnknownLegMode(double now, final DriverAgent agent) {
 		double arrivalTime = SimulationTimer.getTime() + agent.getCurrentLeg().getTravelTime();
 		this.teleportationList.add(new Tuple<Double, DriverAgent>(arrivalTime, agent));
 	}
 
-	private final void moveVehiclesWithUnknownLegMode(final double now) {
+	protected void moveVehiclesWithUnknownLegMode(final double now) {
 		while (this.teleportationList.peek() != null ) {
 			Tuple<Double, DriverAgent> entry = this.teleportationList.peek();
 			if (entry.getFirst().doubleValue() <= now) {
@@ -501,12 +505,23 @@ public class QueueSimulation {
 				DriverAgent driver = entry.getSecond();
 				Link destinationLink = driver.getDestinationLink();
 				driver.teleportToLink(destinationLink);
-
-				getEvents().processEvent(new AgentArrivalEventImpl(now, driver.getPerson(),
-						destinationLink, driver.getCurrentLeg()));
 				driver.legEnds(now);
+//				this.handleAgentArrival(now, driver);
+//				getEvents().processEvent(new AgentArrivalEventImpl(now, driver.getPerson(),
+//						destinationLink, driver.getCurrentLeg()));
+//				driver.legEnds(now);
 			} else break;
 		}
+	}
+	
+	/**
+	 * Should be a PersonAgentI as argument, but is needed because the old events form is still used also for tests
+	 * @param now
+	 * @param agent
+	 */
+	protected void handleAgentArrival(final double now, DriverAgent agent){
+		getEvents().processEvent(new AgentArrivalEventImpl(now, agent.getPerson(),
+				agent.getDestinationLink(), agent.getCurrentLeg()));
 	}
 
 	private void handleNetworkChangeEvents(final double time) {
@@ -545,18 +560,26 @@ public class QueueSimulation {
 	/**
 	 * Informs the simulation that the specified agent wants to depart from its current activity.
 	 * The simulation can then put the agent onto its vehicle on a link or teleport it to its destination.
+	 * @param now 
 	 *
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
-	protected void agentDeparts(final DriverAgent agent, final Link link) {
-		double now = SimulationTimer.getTime();
-
-		LegImpl leg = (LegImpl) agent.getCurrentLeg();
-		
+	protected void agentDeparts(double now, final DriverAgent agent, final Link link) {
+		Leg leg = agent.getCurrentLeg();
+		TransportMode mode = leg.getMode();
 		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson(), link, leg));
+		if (this.notTeleportedModes.contains(mode)){
+			this.handleKnownLegModeDeparture(now, agent, link, mode);
+		}
+		else {
+			this.handleUnknownLegMode(now, agent);
+		}
+	}
 
-		if (leg.getMode().equals(TransportMode.car)) {
+	protected void handleKnownLegModeDeparture(double now, DriverAgent agent, Link link, TransportMode mode) {
+		Leg leg = agent.getCurrentLeg();
+		if (mode.equals(TransportMode.car)) {
 			NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
 			Id vehicleId = route.getVehicleId();
 			if (vehicleId == null) {
@@ -588,13 +611,11 @@ public class QueueSimulation {
 			}
 			vehicle.setDriver(agent);
 			if ((route.getEndLink() == link) && (agent.chooseNextLink() == null)) {
+				agent.legEnds(now);
 				qlink.processVehicleArrival(now, vehicle);
 			} else {
 				qlink.addDepartingVehicle(vehicle);
 			}
-		} else {
-			// unknown leg mode
-			this.handleUnknownLegMode(agent);
 		}
 	}
 
@@ -658,4 +679,9 @@ public class QueueSimulation {
 		return this.signalEngine;
 	}
 
+	public Set<TransportMode> getNotTeleportedModes() {
+		return notTeleportedModes;
+	}
+
+	
 }

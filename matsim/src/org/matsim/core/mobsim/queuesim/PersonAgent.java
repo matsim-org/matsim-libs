@@ -145,7 +145,7 @@ public class PersonAgent implements DriverAgent {
 		return false; // the agent has no leg, so nothing more to do
 	}
 
-	private void initNextLeg(final LegImpl leg) {
+	private void initNextLeg(double now, final LegImpl leg) {
 		RouteWRefs route = leg.getRoute();
 		if (route == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
@@ -162,7 +162,7 @@ public class PersonAgent implements DriverAgent {
 		this.cachedNextLink = null;
 		this.nextActivity += 2;
 
-		this.simulation.agentDeparts(this, this.currentLink);
+		this.simulation.agentDeparts(now, this, this.currentLink);
 	}
 
 	/**
@@ -178,6 +178,7 @@ public class PersonAgent implements DriverAgent {
 	}
 
 	public void legEnds(final double now) {
+		this.simulation.handleAgentArrival(now, this);
 		if (this.currentLink != this.destinationLink) {
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.destinationLink.getId()
 					+ ", but arrived on link " + this.currentLink.getId() + ". Removing the agent from the simulation.");
@@ -208,7 +209,7 @@ public class PersonAgent implements DriverAgent {
 			}
 
 		} else if (pe instanceof LegImpl) {
-			initNextLeg((LegImpl) pe);
+			initNextLeg(now, (LegImpl) pe);
 		} else {
 			throw new RuntimeException("Unknown PlanElement of type " + pe.getClass().getName());
 		}

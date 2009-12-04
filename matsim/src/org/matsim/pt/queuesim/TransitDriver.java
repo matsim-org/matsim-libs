@@ -58,6 +58,7 @@ public class TransitDriver extends AbstractTransitDriver {
 
 	@Override
 	public void legEnds(final double now) {
+		this.getSimulation().handleAgentArrival(now, this);
 		Simulation.decLiving();
 	}
 
@@ -76,6 +77,7 @@ public class TransitDriver extends AbstractTransitDriver {
 		return transitRoute;
 	}
 
+	@Override
 	public double getDepartureTime() {
 		return departureTime;
 	}

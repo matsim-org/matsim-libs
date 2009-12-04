@@ -32,7 +32,6 @@ import java.util.SortedMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueLane.AgentOnLink;
@@ -89,7 +88,7 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  * ----------------
  * </pre>
  * 
- *
+ *agent
  * Queue Model Link implementation with the following properties:
  * <ul>
  *   <li>The queue behavior itself is simulated by one or more instances of QueueLane</li>
@@ -351,11 +350,11 @@ public class QueueLink {
 	}
 
 	/*package*/ void processVehicleArrival(final double now, final QueueVehicle veh) {
-		QueueSimulation.getEvents().processEvent(
-				new AgentArrivalEventImpl(now, veh.getDriver().getPerson(),
-						this.getLink(), veh.getDriver().getCurrentLeg()));
+//		QueueSimulation.getEvents().processEvent(
+//				new AgentArrivalEventImpl(now, veh.getDriver().getPerson(),
+//						this.getLink(), veh.getDriver().getCurrentLeg()));
 		// Need to inform the veh that it now reached its destination.
-		veh.getDriver().legEnds(now);
+//		veh.getDriver().legEnds(now);
 		addParkedVehicle(veh);
 	}
 
