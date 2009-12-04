@@ -5,14 +5,14 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
-
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 
 public abstract class WardropZonesImpl implements WardropZones{
 
-	protected NetworkLayer network;
+	protected Network network;
 		
 	protected double xMin;
 	protected double xMax;
@@ -22,7 +22,7 @@ public abstract class WardropZonesImpl implements WardropZones{
 	protected Map<Id, List<Integer>> nodeMapping;
 	protected Map<Id, List<Integer>> linkMapping;
 	
-	public WardropZonesImpl(NetworkLayer network)
+	public WardropZonesImpl(Network network)
 	{
 		this.network = network;
 		getNetworkRange();
@@ -32,7 +32,7 @@ public abstract class WardropZonesImpl implements WardropZones{
 	{
 		if (network != null)
 		{
-			for(NodeImpl node : network.getNodes().values())
+			for(Node node : network.getNodes().values())
 			{
 				Coord coord = node.getCoord();
 				double xcoord = coord.getX();

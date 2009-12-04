@@ -22,6 +22,7 @@ package org.matsim.withinday.routeprovider;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.AStarLandmarks;
@@ -44,11 +45,11 @@ public class AStarLandmarksRouteProvider extends AbstractRouteProvider {
 	 * Constructor for a RouteProvider with a default priority of 0.
 	 * @param network
 	 */
-	public AStarLandmarksRouteProvider(final NetworkLayer network) {
+	public AStarLandmarksRouteProvider(final Network network) {
 		this(network, 0);
 	}
 
-	public AStarLandmarksRouteProvider(final NetworkLayer network, final int priority) {
+	public AStarLandmarksRouteProvider(final Network network, final int priority) {
 		this.freespeedTravelCost = new FreespeedTravelTimeCost();
 		PreProcessLandmarks preProcess = new PreProcessLandmarks(
 				this.freespeedTravelCost);

@@ -23,7 +23,7 @@ package org.matsim.run;
 import java.util.Iterator;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -98,7 +98,7 @@ public class XY2Links {
 		parseArguments(args);
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(this.configfile);
 		sl.loadNetwork();
-		NetworkLayer network = sl.getScenario().getNetwork();
+		NetworkImpl network = sl.getScenario().getNetwork();
 		this.config = sl.getScenario().getConfig();
 
 		final PopulationImpl plans = sl.getScenario().getPopulation();		plans.setIsStreaming(true);

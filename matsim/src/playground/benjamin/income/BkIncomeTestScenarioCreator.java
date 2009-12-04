@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 
@@ -60,7 +60,7 @@ public class BkIncomeTestScenarioCreator {
 	private Id id6 = new IdImpl(6);
 	private Id id7 = new IdImpl(7);
 
-	private final NetworkLayer uselessNetwork;
+	private final NetworkImpl uselessNetwork;
 	private final ScenarioImpl scenario;
 	
 	public BkIncomeTestScenarioCreator(ScenarioImpl scenario) {
@@ -173,7 +173,7 @@ public class BkIncomeTestScenarioCreator {
 		ScenarioImpl scenario = new ScenarioImpl();
 		String outfile = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/plans.xml";
 		String networkFile = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/network.xml";
-		NetworkLayer uselessNetwork = scenario.getNetwork();
+		NetworkImpl uselessNetwork = scenario.getNetwork();
 		new MatsimNetworkReader(uselessNetwork).readFile(networkFile);
 		
 		BkIncomeTestScenarioCreator pc = new BkIncomeTestScenarioCreator(scenario);

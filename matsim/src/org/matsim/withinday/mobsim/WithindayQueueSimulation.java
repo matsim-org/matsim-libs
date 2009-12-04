@@ -20,10 +20,10 @@
 
 package org.matsim.withinday.mobsim;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.withinday.WithindayAgentFactory;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
@@ -40,7 +40,7 @@ public class WithindayQueueSimulation extends QueueSimulation {
 
 	private TrafficManagement trafficManagement;
 
-	public WithindayQueueSimulation(final NetworkLayer net,
+	public WithindayQueueSimulation(final Network net,
 			final Population plans, final EventsManager events, final WithindayControler controler) {
 		super(net, plans, events);
 		this.controler = controler;

@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -25,7 +26,6 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.util.TravelCost;
@@ -38,7 +38,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 
 	private static final Logger  log = Logger.getLogger(SocialCostCalculatorMultiLink.class);
 	
-	private final NetworkLayer network;
+	private final Network network;
 	private final int binSize;
 	private final TravelTimeCalculator travelTimeCalculator;
 	private final Population population;
@@ -55,7 +55,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 
 	private final static int MSA_OFFSET = 0;
 	
-	public SocialCostCalculatorMultiLink(NetworkLayer network, int binSize, TravelTimeCalculator travelTimeCalculator, Population population) {
+	public SocialCostCalculatorMultiLink(Network network, int binSize, TravelTimeCalculator travelTimeCalculator, Population population) {
 		this.network = network;
 		this.binSize = binSize;
 		this.minK = (int)(3 * 3600 / (double)binSize); //just a HACK needs to be fixed
@@ -177,7 +177,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 				if (enterTime == null) {
 					return;
 				}
-				cost += getLinkTravelCost(this.network.getLink(id), li.getAgentEnterTime(pers.getId()));
+				cost += getLinkTravelCost(this.network.getLinks().get(id), li.getAgentEnterTime(pers.getId()));
 			}
 			AgentMoneyEventImpl e = new AgentMoneyEventImpl(this.maxK * this.binSize,pers.getId(),cost/-600);
 			QueueSimulation.getEvents().processEvent(e);
@@ -186,7 +186,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 	}
 
 	private void calcLinkTimeCosts() {
-		for (LinkImpl link : this.network.getLinks().values()) {
+		for (Link link : this.network.getLinks().values()) {
 			LinkInfo li = this.linkInfos.get(link.getId());
 			if (li == null) { //Link has never been used by anny agent
 				continue;
@@ -197,7 +197,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 				
 				
 				double tauAk = this.travelTimeCalculator.getLinkTravelTime(link, k*this.binSize);
-				double tauAFree = Math.ceil(link.getFreespeedTravelTime(k*this.binSize));
+				double tauAFree = Math.ceil(((LinkImpl) link).getFreespeedTravelTime(k*this.binSize));
 				if (tauAk <= tauAFree) {
 					kE = k;
 					continue;
@@ -227,7 +227,7 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 		double agentDelay = 0;
 		for (int i = links.size()-1; i >= 0; i--) {
 			Id linkId = links.get(i);
-			LinkImpl link = this.network.getLink(linkId);
+			Link link = this.network.getLinks().get(linkId);
 			LinkInfo li = this.linkInfos.get(linkId); //Direct access
 			Double enterTime = li.getAgentEnterTime(agentId);
 			if (enterTime == null) {
@@ -237,8 +237,8 @@ public class SocialCostCalculatorMultiLink implements TravelCost,BeforeMobsimLis
 			Integer timeBin = getTimeBin(enterTime);
 			LinkTimeCostInfo ltc = li.getLinkTimeCostInfo(timeBin);
 			ltc.linkDelay += agentDelay;
-			double tau = this.travelTimeCalculator.getLinkTravelTime(this.network.getLink(linkId),enterTime);
-			double tauAFree = Math.ceil(link.getFreespeedTravelTime(enterTime));
+			double tau = this.travelTimeCalculator.getLinkTravelTime(this.network.getLinks().get(linkId),enterTime);
+			double tauAFree = Math.ceil(((LinkImpl) link).getFreespeedTravelTime(enterTime));
 			
 			if (tau > tauAFree){			
 				Integer timeBin2 = getTimeBin(this.binSize*timeBin + tau);

@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -184,7 +185,7 @@ public class DgAnalysisPopulationReader {
    *          the path to the filename
    * @return the Plans object containing the population
    */
-	protected PopulationImpl loadPopulationFile(final String filename, NetworkLayer network) {
+	protected PopulationImpl loadPopulationFile(final String filename, Network network) {
 		PopulationImpl plans = new PopulationImpl();
 
 		log.info("  reading plans xml file... ");

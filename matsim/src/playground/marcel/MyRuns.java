@@ -49,14 +49,14 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcLanes;
 import org.matsim.core.network.algorithms.NetworkFalsifier;
@@ -130,7 +130,7 @@ public class MyRuns {
 
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
-		NetworkLayer network = sl.getScenario().getNetwork();
+		NetworkImpl network = sl.getScenario().getNetwork();
 
 		System.out.println("  extracting aoi... at " + (new Date()));
 		for (Link link : network.getLinks().values()) {
@@ -291,7 +291,7 @@ public class MyRuns {
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 
-		NetworkLayer network = sl.getScenario().getNetwork();
+		NetworkImpl network = sl.getScenario().getNetwork();
 
 		System.out.println("  calculating number of lanes... ");
 		new NetworkCalcLanes().run(network);
@@ -318,7 +318,7 @@ public class MyRuns {
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 
-		NetworkLayer network = sl.getScenario().getNetwork();
+		NetworkImpl network = sl.getScenario().getNetwork();
 
 //		System.out.println("  reading population... " + (new Date()));
 //		final Plans population = new Plans(Plans.NO_STREAMING);
@@ -359,10 +359,10 @@ public class MyRuns {
 		sl.loadNetwork();
 		ScenarioImpl scenario = sl.getScenario();
 
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 
 		System.out.println("  falsifying the network...");
-		(new NetworkFalsifier(50)).run(network);
+		new NetworkFalsifier(50).run(network);
 
 		System.out.println("  writing the falsified network...");
 		final NetworkWriter network_writer = new NetworkWriter(network);
@@ -393,17 +393,17 @@ public class MyRuns {
 	// buildKML2
 	//////////////////////////////////////////////////////////////////////
 
-	private static MultiGeometryType getNetworkAsKml(final NetworkLayer network, final CoordinateTransformation coordTransform) {
+	private static MultiGeometryType getNetworkAsKml(final Network network, final CoordinateTransformation coordTransform) {
 		return getNetworkAsKml(network, new TreeMap<Id, Integer>(), coordTransform);
 	}
 
-	private static MultiGeometryType getNetworkAsKml(final NetworkLayer network, final TreeMap<Id, Integer> linkVolumes, final CoordinateTransformation coordTransform) {
+	private static MultiGeometryType getNetworkAsKml(final Network network, final TreeMap<Id, Integer> linkVolumes, final CoordinateTransformation coordTransform) {
 
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
 
 		final MultiGeometryType networkGeom = kmlObjectFactory.createMultiGeometryType();
 
-		for (LinkImpl link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			Integer volume = linkVolumes.get(link.getId());
 			if (volume == null) volume = 0;
 			final Coord fromCoord = coordTransform.transform(link.getFromNode().getCoord());
@@ -426,7 +426,7 @@ public class MyRuns {
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		sl.loadNetwork();
 		Config config = sl.getScenario().getConfig();
-		NetworkLayer network = sl.getScenario().getNetwork();
+		Network network = sl.getScenario().getNetwork();
 
 		if (useVolumes) {
 			System.out.println("  reading plans...");

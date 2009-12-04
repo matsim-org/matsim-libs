@@ -28,12 +28,12 @@ import java.util.List;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -74,7 +74,7 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 	 * <li> It remembers <tt>transitConfig</tt>.
 	 * </ul>
 	 */
-	public PlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final NetworkLayer network,
+	public PlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
 			final TravelCost costCalculator, final TravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
 			final TransitConfigGroup transitConfig) {

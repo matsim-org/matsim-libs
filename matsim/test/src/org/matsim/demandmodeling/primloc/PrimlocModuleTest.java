@@ -27,7 +27,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -100,12 +99,8 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		new MatsimWorldReader(world).readFile(config.world().getInputFile());
 		System.out.println("  done.");
 
-		System.out.println("  creating network layer... ");
-		NetworkLayer network = scenario.getNetwork();
-		System.out.println("  done.");
-
 		System.out.println("  reading network xml file... ");
-		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
@@ -146,7 +141,7 @@ public class PrimlocModuleTest extends MatsimTestCase{
 		System.out.println("  done.");
 
 		System.out.println("  writing network xml file... ");
-		NetworkWriter network_writer = new NetworkWriter(network);
+		NetworkWriter network_writer = new NetworkWriter(scenario.getNetwork());
 		network_writer.writeFile(config.network().getOutputFile());
 		System.out.println("  done.");
 

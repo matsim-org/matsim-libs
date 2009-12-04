@@ -16,7 +16,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -65,8 +64,7 @@ public class AsciiToPlan {
 		
 		//ffnen des Szenarios
 		ScenarioImpl sc = new ScenarioImpl();
-		NetworkLayer net = sc.getNetwork();
-		new MatsimNetworkReader(net).readFile(NET_FILE);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(NET_FILE);
 		org.matsim.core.population.PopulationImpl pop = sc.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		

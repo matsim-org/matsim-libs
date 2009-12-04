@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -13,11 +14,10 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 public class UmlaufInterpolator {
-	
 
-	private NetworkLayer network;
+	private Network network;
 
-	public UmlaufInterpolator(NetworkLayer network) {
+	public UmlaufInterpolator(Network network) {
 		super();
 		this.network = network;
 	}
@@ -51,7 +51,7 @@ public class UmlaufInterpolator {
 			throw new RuntimeException("No route found from node "
 					+ startNode.getId() + " to node " + endNode.getId() + ".");
 		}
-		NetworkRouteWRefs route = (NetworkRouteWRefs) this.network.getFactory()
+		NetworkRouteWRefs route = (NetworkRouteWRefs) ((NetworkFactoryImpl) this.network.getFactory())
 				.createRoute(TransportMode.car, fromLink, toLink);
 		route.setNodes(fromLink, wendenPath.nodes, toLink);
 		umlauf.getUmlaufStuecke().add(new Wenden(route));

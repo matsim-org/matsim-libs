@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 
@@ -47,7 +47,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
 
-	public PersonPrepareForSim(final PlanAlgorithm router, final NetworkLayer network) {
+	public PersonPrepareForSim(final PlanAlgorithm router, final NetworkImpl network) {
 		super();
 		this.router = router;
 		this.xy2links = new XY2Links(network);

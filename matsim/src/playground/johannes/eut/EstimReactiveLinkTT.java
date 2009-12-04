@@ -30,6 +30,7 @@ import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -40,7 +41,6 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -66,9 +66,9 @@ public class EstimReactiveLinkTT implements
 
 	private double lastTravelTime;
 	
-	private final NetworkLayer network;
+	private final Network network;
 
-	public EstimReactiveLinkTT(double scenarioScale, NetworkLayer network) {
+	public EstimReactiveLinkTT(double scenarioScale, Network network) {
 		capacityFactor = scenarioScale;
 		this.network = network;
 	}
@@ -130,7 +130,7 @@ public class EstimReactiveLinkTT implements
 
 	private class LinkTTCalculator {
 
-		private final LinkImpl link;
+		private final Link link;
 
 //		private final double freeFlowTravTime;
 
@@ -149,7 +149,7 @@ public class EstimReactiveLinkTT implements
 
 		private SortedSet<Sample> samples;
 
-		public LinkTTCalculator(LinkImpl link) {
+		public LinkTTCalculator(Link link) {
 //			this.qLink = queueNetwork.getQueueLink(link.getId());
 			this.link = link;
 			this.samples = new TreeSet<Sample>();
@@ -160,7 +160,7 @@ public class EstimReactiveLinkTT implements
 		}
 
 		public void enterLink(Id personId, int time) {
-			this.samples.add(new Sample(personId, (int) Math.ceil(time + link.getFreespeedTravelTime(time))));
+			this.samples.add(new Sample(personId, (int) Math.ceil(time + ((LinkImpl) link).getFreespeedTravelTime(time))));
 		}
 
 		public void leaveLink(Id personId, int time) {
@@ -188,10 +188,10 @@ public class EstimReactiveLinkTT implements
 				this.outCount = 0;
 
 				if(this.samples.isEmpty())
-					this.feasibleOutFlow = this.link.getFlowCapacity(time) * capacityFactor;
+					this.feasibleOutFlow = ((LinkImpl) this.link).getFlowCapacity(time) * capacityFactor;
 //				else if(this.samples.first().linkLeaveTime > time)
 				else if(sample.linkLeaveTime >= time)
-					this.feasibleOutFlow = this.link.getFlowCapacity(time) * capacityFactor;
+					this.feasibleOutFlow = ((LinkImpl) this.link).getFlowCapacity(time) * capacityFactor;
 				else
 					this.feasibleOutFlow = this.outCount/(double)deltaT;
 			}
@@ -207,11 +207,11 @@ public class EstimReactiveLinkTT implements
 //				else {
 				double tt = Double.NaN;
 				if(Double.isNaN(feasibleOutFlow)) {
-					tt = samples.size() / link.getFlowCapacity(time) * capacityFactor;
+					tt = samples.size() / ((LinkImpl) link).getFlowCapacity(time) * capacityFactor;
 				} else {
 					tt = this.samples.size() / this.feasibleOutFlow;
 				}
-				traveltime = Math.max(link.getFreespeedTravelTime(time), tt);
+				traveltime = Math.max(((LinkImpl) link).getFreespeedTravelTime(time), tt);
 //				}
 				currentTravelTime = traveltime;
 			}

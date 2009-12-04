@@ -27,6 +27,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
@@ -34,8 +36,6 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 
 public class ActTimesCollector implements ActivityStartEventHandler, ActivityEndEventHandler {
 
@@ -44,7 +44,7 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 	// <Person's Id, Person's EventData>
 	protected TreeMap<Id, EventData> data = new TreeMap<Id, EventData>();
 	//protected NetworkLayer network;
-	protected NetworkLayer network;
+	protected Network network;
 	protected Population population;
 	
 	protected double startTime = 0.0;
@@ -99,7 +99,7 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 		}
 		else if (network != null)
 		{
-			LinkImpl link = network.getLink(linkId);
+			Link link = network.getLinks().get(linkId);
 			//eventData.addStartActivityEvent(event.getTime(), link.getCenter());
 			eventData.addStartActivityEvent(event.getTime(), link.getCoord());
 		}
@@ -152,7 +152,7 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 		}
 		else if (network != null)
 		{
-			LinkImpl link = network.getLink(linkId);
+			Link link = network.getLinks().get(linkId);
 			eventData.addEndActivityEvent(event.getTime(), link.getCoord());
 			//eventData.addEndActivityEvent(event.time, link.getCenter());
 		}
@@ -263,14 +263,12 @@ public class ActTimesCollector implements ActivityStartEventHandler, ActivityEnd
 		}
 	}
 	
-	//public void setNetwork(NetworkLayer nw)
-	public void setNetwork(NetworkLayer nw)
+	public void setNetwork(Network nw)
 	{
 		network = nw;
 	}
 	
-	//public NetworkLayer getNetwork()
-	public NetworkLayer getNetwork()
+	public Network getNetwork()
 	{
 		return network;
 	}

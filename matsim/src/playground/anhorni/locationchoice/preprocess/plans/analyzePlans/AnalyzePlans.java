@@ -37,7 +37,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -56,7 +56,7 @@ public class AnalyzePlans {
 	private final ScenarioImpl scenario = new ScenarioImpl();
 	private final PopulationImpl plans = scenario.getPopulation();
 	private final ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-	private final NetworkLayer network = scenario.getNetwork();
+	private final NetworkImpl network = scenario.getNetwork();
 	
 	String plansfilePath;
 		
@@ -496,7 +496,7 @@ public class AnalyzePlans {
 		return facilities;
 	}
 
-	public NetworkLayer getNetwork() {
+	public NetworkImpl getNetwork() {
 		return network;
 	}
 

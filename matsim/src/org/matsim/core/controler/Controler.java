@@ -84,7 +84,6 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.StrategyManager;
@@ -156,7 +155,7 @@ public class Controler {
 	private final String dtdFileName;
 
 	protected EventsManagerImpl events = null;
-	protected NetworkLayer network = null;
+	protected NetworkImpl network = null;
 	protected Population population = null;
 	private Counts counts = null;
 
@@ -617,7 +616,7 @@ public class Controler {
 	 * @return The network to be used for the simulation.
 	 */
 	@Deprecated
-	protected NetworkLayer loadNetwork() {
+	protected NetworkImpl loadNetwork() {
 		return this.scenarioData.getNetwork();
 	}
 

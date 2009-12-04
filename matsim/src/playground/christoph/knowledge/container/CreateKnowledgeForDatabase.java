@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.util.TravelCost;
@@ -57,7 +57,7 @@ public class CreateKnowledgeForDatabase {
 	private final static Logger log = Logger.getLogger(CreateKnowledgeForDatabase.class);
 	
 	private ScenarioImpl scenario;
-	private NetworkLayer network;
+	private NetworkImpl network;
 	private PopulationImpl population;
 	private ActivityFacilitiesImpl facilities;
 	private ArrayList<SelectNodes> nodeSelectors;

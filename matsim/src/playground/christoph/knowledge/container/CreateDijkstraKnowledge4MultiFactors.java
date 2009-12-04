@@ -43,7 +43,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -65,7 +65,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 
 	private final static Logger log = Logger.getLogger(CreateDijkstraKnowledge4MultiFactors.class);
 	
-	private NetworkLayer network;
+	private NetworkImpl network;
 	private ActivityFacilitiesImpl facilities;
 	private PopulationImpl population;
 	private Config config;

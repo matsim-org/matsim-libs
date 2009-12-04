@@ -27,11 +27,11 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 
 import playground.christoph.knowledge.container.MapKnowledge;
 import playground.christoph.knowledge.container.MapKnowledgeDB;
@@ -57,7 +57,7 @@ public class ParallelCreateKnownNodesMap {
 	 * @param nodeSelectors
 	 * @param numberOfThreads
 	 */
-	public static void run(final Population population, final NetworkLayer network, final ArrayList<SelectNodes> nodeSelectors, final int numberOfThreads)
+	public static void run(final Population population, final Network network, final ArrayList<SelectNodes> nodeSelectors, final int numberOfThreads)
 	{
 		int numOfThreads = Math.max(numberOfThreads, 1); // it should be at least 1 here; we allow 0 in other places for "no threads"
 		
@@ -140,12 +140,12 @@ public class ParallelCreateKnownNodesMap {
 	private static class SelectNodesThread implements Runnable 
 	{
 		public final int threadId;
-		private final NetworkLayer network;
+		private final Network network;
 		private final ArrayList<SelectNodes> nodeSelectors;
 		private final SelectNodes[][] nodeSelectorArray;
 		private final List<Person> persons = new LinkedList<Person>();
 		
-		public SelectNodesThread(final int i, NetworkLayer network, final SelectNodes nodeSelectorArray[][], final ArrayList<SelectNodes> nodeSelectors)
+		public SelectNodesThread(final int i, Network network, final SelectNodes nodeSelectorArray[][], final ArrayList<SelectNodes> nodeSelectors)
 		{
 			this.threadId = i;
 			this.network = network;

@@ -44,6 +44,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -64,7 +65,7 @@ public class KMLPersonWriter {
 	protected PersonImpl person;
 	protected ArrayList<Link> activityLinks;
 	protected ArrayList<Node> routeNodes;
-	protected NetworkLayer network;
+	protected NetworkImpl network;
 	protected Map<Id, Node> nodes;
 	protected NetworkRouteWRefs route;
 	
@@ -80,7 +81,7 @@ public class KMLPersonWriter {
 	private StyleType networkNodeStyle;
 	private CoordinateTransformation coordinateTransform = new IdentityTransformation();
 	
-	public KMLPersonWriter(NetworkLayer network, PersonImpl person)
+	public KMLPersonWriter(NetworkImpl network, PersonImpl person)
 	{
 //		kmzFileName = "D:/Master_Thesis_HLI/Workspace/TestNetz/test.kmz";
 		setNetwork(network);
@@ -394,7 +395,7 @@ public class KMLPersonWriter {
 		this.writeNetwork = value;
 	}
 	
-	public void setNetwork(NetworkLayer network)
+	public void setNetwork(NetworkImpl network)
 	{
 		this.network = network;
 	}

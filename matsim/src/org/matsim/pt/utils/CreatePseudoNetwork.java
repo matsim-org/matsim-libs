@@ -31,9 +31,9 @@ import java.util.Set;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.collections.Tuple;
@@ -56,7 +56,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 public class CreatePseudoNetwork {
 
 	private final TransitSchedule schedule;
-	private final NetworkLayer network;
+	private final Network network;
 	private final String prefix;
 
 	private final Map<Tuple<Node, Node>, Link> links = new HashMap<Tuple<Node, Node>, Link>();
@@ -70,7 +70,7 @@ public class CreatePseudoNetwork {
 
 	private final Set<TransportMode> transitModes = EnumSet.of(TransportMode.pt);
 
-	public CreatePseudoNetwork(final TransitSchedule schedule, final NetworkLayer network, final String networkIdPrefix) {
+	public CreatePseudoNetwork(final TransitSchedule schedule, final Network network, final String networkIdPrefix) {
 		this.schedule = schedule;
 		this.network = network;
 		this.prefix = networkIdPrefix;
@@ -118,7 +118,8 @@ public class CreatePseudoNetwork {
 			fromNode = this.startNodes.get(toFacility);
 			if (fromNode == null) {
 				Coord coord = new CoordImpl(toFacility.getCoord().getX() + 50, toFacility.getCoord().getY() + 50);
-				fromNode = this.network.createAndAddNode(new IdImpl("startnode_" + toFacility.getId()), coord);
+				fromNode = this.network.getFactory().createNode(new IdImpl("startnode_" + toFacility.getId()), coord);
+				this.network.addNode(fromNode);
 				++nodeIdCounter;
 				this.startNodes.put(toFacility, fromNode);
 			}
@@ -132,7 +133,8 @@ public class CreatePseudoNetwork {
 		fromNode.toString();
 		Node toNode = this.nodes.get(toFacility);
 		if (toNode == null) {
-			toNode = this.network.createAndAddNode(new IdImpl(this.prefix + toFacility.getId()), toFacility.getCoord());
+			toNode = this.network.getFactory().createNode(new IdImpl(this.prefix + toFacility.getId()), toFacility.getCoord());
+			this.network.addNode(toNode);
 			++nodeIdCounter;
 			this.nodes.put(toFacility, toNode);
 		}
@@ -173,7 +175,12 @@ public class CreatePseudoNetwork {
 	private Link createAndAddLink(Node fromNode, Node toNode,
 			Tuple<Node, Node> connection) {
 		Link link;
-		link = this.network.createAndAddLink(new IdImpl(this.prefix + this.linkIdCounter++), fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()), 30.0 / 3.6, 500, 1);
+		link = this.network.getFactory().createLink(new IdImpl(this.prefix + this.linkIdCounter++), fromNode.getId(), toNode.getId());
+		link.setLength(CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()));
+		link.setFreespeed(30.0 / 3.6);
+		link.setCapacity(500);
+		link.setNumberOfLanes(1);
+		this.network.addLink(link);
 		link.setAllowedModes(this.transitModes);
 		this.links.put(connection, link);
 		return link;

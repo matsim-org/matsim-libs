@@ -7,10 +7,10 @@ import java.util.Set;
 
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.evacuation.otfvis.drawer.OTFBackgroundTexturesDrawer;
 
@@ -21,15 +21,15 @@ public class ConfluenceArrowsFromEvents implements LinkEnterEventHandler{
 	protected static final double TWO_PI = 2 * Math.PI;
 	protected final Map<Node, NodeInfo> infos = new HashMap<Node, NodeInfo>();
 	protected final OTFBackgroundTexturesDrawer sbg;
-	private final NetworkLayer network;
+	private final Network network;
 	
-	public ConfluenceArrowsFromEvents(OTFBackgroundTexturesDrawer sbg, NetworkLayer network) {
+	public ConfluenceArrowsFromEvents(OTFBackgroundTexturesDrawer sbg, Network network) {
 		this.sbg = sbg;
 		this.network = network;
 	}
 	
 	public void handleEvent(LinkEnterEvent event) {
-		Link l = this.network.getLink(event.getLinkId());
+		Link l = this.network.getLinks().get(event.getLinkId());
 		NodeInfo ni = this.infos.get(l.getFromNode());
 		if (ni == null) {
 			ni = new NodeInfo();

@@ -34,7 +34,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -91,16 +91,28 @@ public class BlockingStopDemo {
 	}
 
 	private void createNetwork() {
-		NetworkLayer network = this.scenario.getNetwork();
+		NetworkImpl network = this.scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		Node[] nodes = new Node[nOfLinks * 2 + 2];
 		for (int i = 0; i <= nOfLinks; i++) {
-			nodes[i           ] = network.createAndAddNode(this.ids[i           ], this.scenario.createCoord(i * 500, 0));
-			nodes[i+nOfLinks+1] = network.createAndAddNode(this.ids[i+nOfLinks+1], this.scenario.createCoord(i * 500, 500));
+			nodes[i] = network.getFactory().createNode(this.ids[i], this.scenario.createCoord(i * 500, 0));
+			network.addNode(nodes[i]);
+			nodes[i+nOfLinks+1] = network.getFactory().createNode(this.ids[i+nOfLinks+1], this.scenario.createCoord(i * 500, 500));
+			network.addNode(nodes[i+nOfLinks+1]);
 		}
 		for (int i = 0; i < nOfLinks; i++) {
-			network.createAndAddLink(this.ids[i         ], nodes[i           ], nodes[i+1], 500.0, 10.0, 1000.0, 1);
-			network.createAndAddLink(this.ids[i+nOfLinks], nodes[i+nOfLinks+1], nodes[i+nOfLinks+2], 500.0, 10.0, 1000.0, 1);
+			Link link = network.getFactory().createLink(this.ids[i], nodes[i].getId(), nodes[i+1].getId());
+			link.setLength(500.0);
+			link.setFreespeed(10.0);
+			link.setCapacity(1000.0);
+			link.setNumberOfLanes(1);
+			network.addLink(link);
+			link = network.getFactory().createLink(this.ids[i+nOfLinks], nodes[i+nOfLinks+1].getId(), nodes[i+nOfLinks+2].getId());
+			link.setLength(500.0);
+			link.setFreespeed(10.0);
+			link.setCapacity(1000.0);
+			link.setNumberOfLanes(1);
+			network.addLink(link);
 		}
 	}
 
@@ -232,7 +244,7 @@ public class BlockingStopDemo {
 		}
 
 		// car-drivers
-		NetworkLayer network = this.scenario.getNetwork();
+		NetworkImpl network = this.scenario.getNetwork();
 		NetworkRouteWRefs carRoute1 = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, network.getLinks().get(this.ids[0]), network.getLinks().get(this.ids[nOfLinks-1]));
 		NetworkRouteWRefs carRoute2 = (NetworkRouteWRefs) network.getFactory().createRoute(TransportMode.car, network.getLinks().get(this.ids[nOfLinks]), network.getLinks().get(this.ids[2*nOfLinks-1]));
 		List<Link> links1 = new ArrayList<Link>(nOfLinks-2);

@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -38,7 +39,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -48,7 +48,7 @@ public class Wardrop {
 	private static final Logger log = Logger.getLogger(Wardrop.class);
 	
 	//protected NetworkLayer network;
-	protected NetworkLayer network;
+	protected Network network;
 	protected Population population;
 	
 	protected WardropZones wardropZones;
@@ -67,7 +67,7 @@ public class Wardrop {
 	double endTime = 3600*36; // [sec]
 	double minCellDistance = 30000.0; // [m]
 	
-	public Wardrop(NetworkLayer network, Population population)
+	public Wardrop(Network network, Population population)
 	{
 		this.network = network;
 		this.population = population;

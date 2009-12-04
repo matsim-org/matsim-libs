@@ -8,12 +8,10 @@ import java.util.Iterator;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -25,7 +23,6 @@ import playground.gregor.snapshots.postprocessors.DestinationDependentColorizer;
 import playground.gregor.snapshots.postprocessors.EvacuationLinksTeleporter;
 import playground.gregor.snapshots.postprocessors.SheltersColorizer;
 import playground.gregor.snapshots.postprocessors.TimeDependentColorizer;
-import playground.gregor.snapshots.postprocessors.WrongDirectionArrowsFromEvents;
 import playground.gregor.snapshots.writers.LineStringTree;
 import playground.gregor.snapshots.writers.MVISnapshotWriter;
 import playground.gregor.snapshots.writers.PositionInfo;
@@ -108,8 +105,8 @@ public class OTFSnapshotGenerator {
 		
 		PositionInfo.lsTree = new LineStringTree(getFeatures(),this.scenario.getNetwork());
 		
-		
-		this.scenario.getNetwork().createAndAddNode(new IdImpl("minXY"), new CoordImpl(643000,9870000));//HACK to get the bounding box big enough; 
+		this.scenario.getNetwork().addNode(
+				this.scenario.getNetwork().getFactory().createNode(new IdImpl("minXY"), new CoordImpl(643000,9870000)));//HACK to get the bounding box big enough; 
 		//otherwise we could get negative openGL coords since we calculating offsetEast, offsetNorth based on this bounding box
 		
 		MVISnapshotWriter writer = new MVISnapshotWriter(this.scenario);

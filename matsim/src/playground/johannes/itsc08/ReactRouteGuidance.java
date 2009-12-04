@@ -24,7 +24,7 @@
 package playground.johannes.itsc08;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.router.Dijkstra;
@@ -46,7 +46,7 @@ public class ReactRouteGuidance implements RouteProvider {
 
 	private RoutableLinkCost linkcost;
 
-	public ReactRouteGuidance(NetworkLayer network, TravelTime traveltimes) {
+	public ReactRouteGuidance(Network network, TravelTime traveltimes) {
 		this.linkcost = new RoutableLinkCost();
 		this.linkcost.traveltimes = traveltimes;
 		this.algorithm = new Dijkstra(network, this.linkcost, this.linkcost);

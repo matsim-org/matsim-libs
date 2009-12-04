@@ -32,9 +32,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -58,13 +58,13 @@ import org.xml.sax.SAXException;
 public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
 	private final TransitSchedule schedule;
-	private final NetworkLayer network;
+	private final Network network;
 
 	private TransitLine currentTransitLine = null;
 	private TempTransitRoute currentTransitRoute = null;
 	private TempRoute currentRouteProfile = null;
 
-	public TransitScheduleReaderV1(final TransitSchedule schedule, final NetworkLayer network) {
+	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network) {
 		this.schedule = schedule;
 		this.network = network;
 	}
@@ -80,7 +80,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 			TransitStopFacility stop = new TransitStopFacilityImpl(
 					new IdImpl(atts.getValue(Constants.ID)), new CoordImpl(atts.getValue("x"), atts.getValue("y")), isBlocking);
 			if (atts.getValue(Constants.LINK_REF_ID) != null) {
-				LinkImpl link = this.network.getLinks().get(new IdImpl(atts.getValue(Constants.LINK_REF_ID)));
+				Link link = this.network.getLinks().get(new IdImpl(atts.getValue(Constants.LINK_REF_ID)));
 				if (link == null) {
 					throw new RuntimeException("no link with id " + atts.getValue(Constants.LINK_REF_ID));
 				}
@@ -110,16 +110,14 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 		} else if (Constants.LINK.equals(name)) {
 			String linkStr = atts.getValue(Constants.REF_ID);
 			if (!linkStr.contains(" ")) {
-				LinkImpl link = this.network.getLinks()
-						.get(new IdImpl(linkStr));
+				Link link = this.network.getLinks().get(new IdImpl(linkStr));
 				if (link == null)
 					throw new RuntimeException("no link with id " + linkStr);
 				this.currentRouteProfile.addLink(link);
 			} else {
 				String[] links = linkStr.split(" ");
 				for (int i = 0; i < links.length; i++) {
-					LinkImpl link = this.network.getLinks().get(
-							new IdImpl(links[i]));
+					Link link = this.network.getLinks().get(new IdImpl(links[i]));
 					if (link == null)
 						throw new RuntimeException("no link with id "
 								+ links[i]);
@@ -165,7 +163,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 				if (this.currentRouteProfile.lastLink == null) {
 					this.currentRouteProfile.lastLink = this.currentRouteProfile.firstLink;
 				}
-				route = (NetworkRouteWRefs) this.network.getFactory().createRoute(TransportMode.car, this.currentRouteProfile.firstLink, this.currentRouteProfile.lastLink);
+				route = (NetworkRouteWRefs) ((NetworkFactoryImpl) this.network.getFactory()).createRoute(TransportMode.car, this.currentRouteProfile.firstLink, this.currentRouteProfile.lastLink);
 				route.setLinks(this.currentRouteProfile.firstLink, this.currentRouteProfile.links, this.currentRouteProfile.lastLink);
 			}
 			TransitRoute transitRoute = new TransitRouteImpl(this.currentTransitRoute.id, route, stops, this.currentTransitRoute.mode);

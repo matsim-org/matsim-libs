@@ -190,14 +190,18 @@ public class DataPrepare {
 
 		log.info("create vis network");
 		ScenarioImpl visScenario = new ScenarioImpl();
-		NetworkLayer visNet = visScenario.getNetwork();
+		Network visNet = visScenario.getNetwork();
 
 		for (Node node : routerNet.getNodes().values()) {
-			visNet.createAndAddNode(node.getId(), node.getCoord());
+			visNet.getFactory().createNode(node.getId(), node.getCoord());
+			visNet.addNode(node);
 		}
 		for (Link link : routerNet.getLinks().values()) {
-			visNet.createAndAddLink(link.getId(), visNet.getNodes().get(link.getFromNode().getId()), visNet.getNodes().get(link.getToNode().getId()),
-					link.getLength(), link.getFreespeed(Time.UNDEFINED_TIME), link.getCapacity(Time.UNDEFINED_TIME), link.getNumberOfLanes(Time.UNDEFINED_TIME));
+			Link l = visNet.getFactory().createLink(link.getId(), link.getFromNode().getId(), link.getToNode().getId());
+			l.setLength(link.getLength());
+			l.setFreespeed(link.getFreespeed(Time.UNDEFINED_TIME));
+			l.setCapacity(link.getCapacity(Time.UNDEFINED_TIME));
+			l.setNumberOfLanes(link.getNumberOfLanes(Time.UNDEFINED_TIME));
 		}
 
 		log.info("write routerNet.xml");

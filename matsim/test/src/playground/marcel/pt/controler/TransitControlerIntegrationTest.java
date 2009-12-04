@@ -27,6 +27,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,7 +40,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -65,7 +65,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		Id id3 = scenario.createId("3");
 
 		// build network
-		NetworkLayer network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		NetworkFactory nBuilder = network.getFactory();
 		Node node1 = nBuilder.createNode(id1, scenario.createCoord(0, 0));
 		Node node2 = nBuilder.createNode(id2, scenario.createCoord(1000, 0));

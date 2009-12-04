@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -33,7 +33,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	private UmlaufInterpolator umlaufInterpolator;
 	
 	
-	public ReconstructingUmlaufBuilder(NetworkLayer network, Collection<TransitLine> transitLines,
+	public ReconstructingUmlaufBuilder(Network network, Collection<TransitLine> transitLines,
 			BasicVehicles basicVehicles) {
 		super();
 		this.umlaufInterpolator = new UmlaufInterpolator(network);

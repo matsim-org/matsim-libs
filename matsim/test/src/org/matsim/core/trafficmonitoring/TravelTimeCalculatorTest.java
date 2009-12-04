@@ -40,6 +40,7 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -94,7 +95,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		String networkFile = getClassInputDirectory() + "link10_network.xml";
 		String eventsFile = getClassInputDirectory() + "link10_events.txt";
 
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFile);
 
 		EventsManagerImpl events = new EventsManagerImpl();

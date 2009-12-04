@@ -8,9 +8,9 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -24,7 +24,7 @@ public class CircularWardropZones extends WardropZonesImpl{
 	protected Map<Integer, Coord> zoneCentres;
 	protected boolean validMapping = false;
 	
-	public CircularWardropZones(NetworkLayer network) 
+	public CircularWardropZones(Network network) 
 	{
 		super(network);
 		createMapping();

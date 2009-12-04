@@ -27,9 +27,9 @@ import java.util.List;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
@@ -76,7 +76,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 
 	/*package*/ final ScenarioImpl scenario;
 	/*package*/ final Config config;
-	/*package*/ final NetworkLayer network;
+	/*package*/ final Network network;
 	/*package*/ final TransitScheduleFactory builder;
 	/*package*/ final TransitSchedule schedule;
 	/*package*/ TransitLine redLine = null;
@@ -104,49 +104,66 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 	}
 
 	protected void buildNetwork() {
-		this.nodes[0]  = this.network.createAndAddNode(this.scenario.createId("0"),  this.scenario.createCoord(   0, 5000));
-		this.nodes[1]  = this.network.createAndAddNode(this.scenario.createId("1"),  this.scenario.createCoord( 4000, 5000));
-		this.nodes[2]  = this.network.createAndAddNode(this.scenario.createId("2"),  this.scenario.createCoord( 8000, 5000));
-		this.nodes[3]  = this.network.createAndAddNode(this.scenario.createId("3"),  this.scenario.createCoord(12000, 5000));
-		this.nodes[4]  = this.network.createAndAddNode(this.scenario.createId("4"),  this.scenario.createCoord(16000, 5000));
-		this.nodes[5]  = this.network.createAndAddNode(this.scenario.createId("5"),  this.scenario.createCoord(20000, 5000));
-		this.nodes[6]  = this.network.createAndAddNode(this.scenario.createId("6"),  this.scenario.createCoord(24000, 5000));
-		this.nodes[7]  = this.network.createAndAddNode(this.scenario.createId("7"),  this.scenario.createCoord(28000, 5000));
-		this.nodes[8]  = this.network.createAndAddNode(this.scenario.createId("8"),  this.scenario.createCoord(32000, 5000));
-		this.nodes[9]  = this.network.createAndAddNode(this.scenario.createId("9"),  this.scenario.createCoord(36000, 5000));
-		this.nodes[10] = this.network.createAndAddNode(this.scenario.createId("10"), this.scenario.createCoord(40000, 5000));
-		this.nodes[11] = this.network.createAndAddNode(this.scenario.createId("11"), this.scenario.createCoord(12000, 5000));
-		this.nodes[12] = this.network.createAndAddNode(this.scenario.createId("12"), this.scenario.createCoord(16000, 10000));
-		this.nodes[13] = this.network.createAndAddNode(this.scenario.createId("13"), this.scenario.createCoord(24000, 10000));
-		this.nodes[14] = this.network.createAndAddNode(this.scenario.createId("14"), this.scenario.createCoord(28000, 5000));
-		this.nodes[15] = this.network.createAndAddNode(this.scenario.createId("15"), this.scenario.createCoord(24000, 0));
-		this.nodes[16] = this.network.createAndAddNode(this.scenario.createId("16"), this.scenario.createCoord(16000, 0));
-		this.links[0]  = this.network.createAndAddLink(this.scenario.createId( "0"), this.nodes[ 0], this.nodes[ 1], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[1]  = this.network.createAndAddLink(this.scenario.createId( "1"), this.nodes[ 1], this.nodes[ 2], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[2]  = this.network.createAndAddLink(this.scenario.createId( "2"), this.nodes[ 2], this.nodes[ 3], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[3]  = this.network.createAndAddLink(this.scenario.createId( "3"), this.nodes[ 3], this.nodes[ 4], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[4]  = this.network.createAndAddLink(this.scenario.createId( "4"), this.nodes[ 4], this.nodes[ 5], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[5]  = this.network.createAndAddLink(this.scenario.createId( "5"), this.nodes[ 5], this.nodes[ 6], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[6]  = this.network.createAndAddLink(this.scenario.createId( "6"), this.nodes[ 6], this.nodes[ 7], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[7]  = this.network.createAndAddLink(this.scenario.createId( "7"), this.nodes[ 7], this.nodes[ 8], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[8]  = this.network.createAndAddLink(this.scenario.createId( "8"), this.nodes[ 8], this.nodes[ 9], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[9]  = this.network.createAndAddLink(this.scenario.createId( "9"), this.nodes[10], this.nodes[ 9], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[10] = this.network.createAndAddLink(this.scenario.createId("10"), this.nodes[ 9], this.nodes[ 8], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[11] = this.network.createAndAddLink(this.scenario.createId("11"), this.nodes[ 8], this.nodes[ 7], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[12] = this.network.createAndAddLink(this.scenario.createId("12"), this.nodes[ 7], this.nodes[ 6], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[13] = this.network.createAndAddLink(this.scenario.createId("13"), this.nodes[ 6], this.nodes[ 5], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[14] = this.network.createAndAddLink(this.scenario.createId("14"), this.nodes[ 5], this.nodes[ 4], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[15] = this.network.createAndAddLink(this.scenario.createId("15"), this.nodes[ 4], this.nodes[ 3], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[16] = this.network.createAndAddLink(this.scenario.createId("16"), this.nodes[ 3], this.nodes[ 2], 5000.0, 44.44, 2000.0, 1.0);
-		this.links[17] = this.network.createAndAddLink(this.scenario.createId("17"), this.nodes[ 2], this.nodes[ 1], 5000.0, 44.44, 2000.0, 1.0);
+		this.nodes[0]  = this.network.getFactory().createNode(this.scenario.createId("0"),  this.scenario.createCoord(   0, 5000));
+		this.nodes[1]  = this.network.getFactory().createNode(this.scenario.createId("1"),  this.scenario.createCoord( 4000, 5000));
+		this.nodes[2]  = this.network.getFactory().createNode(this.scenario.createId("2"),  this.scenario.createCoord( 8000, 5000));
+		this.nodes[3]  = this.network.getFactory().createNode(this.scenario.createId("3"),  this.scenario.createCoord(12000, 5000));
+		this.nodes[4]  = this.network.getFactory().createNode(this.scenario.createId("4"),  this.scenario.createCoord(16000, 5000));
+		this.nodes[5]  = this.network.getFactory().createNode(this.scenario.createId("5"),  this.scenario.createCoord(20000, 5000));
+		this.nodes[6]  = this.network.getFactory().createNode(this.scenario.createId("6"),  this.scenario.createCoord(24000, 5000));
+		this.nodes[7]  = this.network.getFactory().createNode(this.scenario.createId("7"),  this.scenario.createCoord(28000, 5000));
+		this.nodes[8]  = this.network.getFactory().createNode(this.scenario.createId("8"),  this.scenario.createCoord(32000, 5000));
+		this.nodes[9]  = this.network.getFactory().createNode(this.scenario.createId("9"),  this.scenario.createCoord(36000, 5000));
+		this.nodes[10] = this.network.getFactory().createNode(this.scenario.createId("10"), this.scenario.createCoord(40000, 5000));
+		this.nodes[11] = this.network.getFactory().createNode(this.scenario.createId("11"), this.scenario.createCoord(12000, 5000));
+		this.nodes[12] = this.network.getFactory().createNode(this.scenario.createId("12"), this.scenario.createCoord(16000, 10000));
+		this.nodes[13] = this.network.getFactory().createNode(this.scenario.createId("13"), this.scenario.createCoord(24000, 10000));
+		this.nodes[14] = this.network.getFactory().createNode(this.scenario.createId("14"), this.scenario.createCoord(28000, 5000));
+		this.nodes[15] = this.network.getFactory().createNode(this.scenario.createId("15"), this.scenario.createCoord(24000, 0));
+		this.nodes[16] = this.network.getFactory().createNode(this.scenario.createId("16"), this.scenario.createCoord(16000, 0));
+		for (int i = 0; i < 17; i++) {
+			this.network.addNode(this.nodes[i]);
+		}
+		this.links[0]  = this.network.getFactory().createLink(this.scenario.createId( "0"), this.nodes[ 0].getId(), this.nodes[ 1].getId());
+		this.links[1]  = this.network.getFactory().createLink(this.scenario.createId( "1"), this.nodes[ 1].getId(), this.nodes[ 2].getId());
+		this.links[2]  = this.network.getFactory().createLink(this.scenario.createId( "2"), this.nodes[ 2].getId(), this.nodes[ 3].getId());
+		this.links[3]  = this.network.getFactory().createLink(this.scenario.createId( "3"), this.nodes[ 3].getId(), this.nodes[ 4].getId());
+		this.links[4]  = this.network.getFactory().createLink(this.scenario.createId( "4"), this.nodes[ 4].getId(), this.nodes[ 5].getId());
+		this.links[5]  = this.network.getFactory().createLink(this.scenario.createId( "5"), this.nodes[ 5].getId(), this.nodes[ 6].getId());
+		this.links[6]  = this.network.getFactory().createLink(this.scenario.createId( "6"), this.nodes[ 6].getId(), this.nodes[ 7].getId());
+		this.links[7]  = this.network.getFactory().createLink(this.scenario.createId( "7"), this.nodes[ 7].getId(), this.nodes[ 8].getId());
+		this.links[8]  = this.network.getFactory().createLink(this.scenario.createId( "8"), this.nodes[ 8].getId(), this.nodes[ 9].getId());
+		this.links[9]  = this.network.getFactory().createLink(this.scenario.createId( "9"), this.nodes[10].getId(), this.nodes[ 9].getId());
+		this.links[10] = this.network.getFactory().createLink(this.scenario.createId("10"), this.nodes[ 9].getId(), this.nodes[ 8].getId());
+		this.links[11] = this.network.getFactory().createLink(this.scenario.createId("11"), this.nodes[ 8].getId(), this.nodes[ 7].getId());
+		this.links[12] = this.network.getFactory().createLink(this.scenario.createId("12"), this.nodes[ 7].getId(), this.nodes[ 6].getId());
+		this.links[13] = this.network.getFactory().createLink(this.scenario.createId("13"), this.nodes[ 6].getId(), this.nodes[ 5].getId());
+		this.links[14] = this.network.getFactory().createLink(this.scenario.createId("14"), this.nodes[ 5].getId(), this.nodes[ 4].getId());
+		this.links[15] = this.network.getFactory().createLink(this.scenario.createId("15"), this.nodes[ 4].getId(), this.nodes[ 3].getId());
+		this.links[16] = this.network.getFactory().createLink(this.scenario.createId("16"), this.nodes[ 3].getId(), this.nodes[ 2].getId());
+		this.links[17] = this.network.getFactory().createLink(this.scenario.createId("17"), this.nodes[ 2].getId(), this.nodes[ 1].getId());
+		for (int i = 0; i < 18; i++) {
+			this.links[i].setLength(5000.0);
+			this.links[i].setFreespeed(44.44);
+			this.links[i].setCapacity(2000.0);
+			this.links[i].setNumberOfLanes(1.0);
+			this.network.addLink(this.links[i]);
+		}
 		this.links[18] = null;
 		this.links[19] = null;
-		this.links[20] = this.network.createAndAddLink(this.scenario.createId("20"), this.nodes[11], this.nodes[12], 10000.0, 20.0, 2000.0, 1.0);
-		this.links[21] = this.network.createAndAddLink(this.scenario.createId("21"), this.nodes[12], this.nodes[13], 10000.0, 20.0, 2000.0, 1.0);
-		this.links[22] = this.network.createAndAddLink(this.scenario.createId("22"), this.nodes[13], this.nodes[14], 10000.0, 20.0, 2000.0, 1.0);
-		this.links[23] = this.network.createAndAddLink(this.scenario.createId("23"), this.nodes[14], this.nodes[15], 10000.0, 20.0, 2000.0, 1.0);
-		this.links[24] = this.network.createAndAddLink(this.scenario.createId("24"), this.nodes[15], this.nodes[16], 10000.0, 20.0, 2000.0, 1.0);
-		this.links[25] = this.network.createAndAddLink(this.scenario.createId("25"), this.nodes[16], this.nodes[11], 10000.0, 20.0, 2000.0, 1.0);
+		this.links[20] = this.network.getFactory().createLink(this.scenario.createId("20"), this.nodes[11].getId(), this.nodes[12].getId());
+		this.links[21] = this.network.getFactory().createLink(this.scenario.createId("21"), this.nodes[12].getId(), this.nodes[13].getId());
+		this.links[22] = this.network.getFactory().createLink(this.scenario.createId("22"), this.nodes[13].getId(), this.nodes[14].getId());
+		this.links[23] = this.network.getFactory().createLink(this.scenario.createId("23"), this.nodes[14].getId(), this.nodes[15].getId());
+		this.links[24] = this.network.getFactory().createLink(this.scenario.createId("24"), this.nodes[15].getId(), this.nodes[16].getId());
+		this.links[25] = this.network.getFactory().createLink(this.scenario.createId("25"), this.nodes[16].getId(), this.nodes[11].getId());
+		for (int i = 20; i < 26; i++) {
+			this.links[i].setLength(10000.0);
+			this.links[i].setFreespeed(20.0);
+			this.links[i].setCapacity(2000.0);
+			this.links[i].setNumberOfLanes(1.0);
+			this.network.addLink(this.links[i]);
+		}
 	}
 
 	protected void buildStops() {

@@ -37,7 +37,7 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
@@ -68,7 +68,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 	// User parameters:
 
-	private final NetworkLayer network;
+	private final NetworkImpl network;
 	
 	private int numberofeventsdetection = 10;
 
@@ -112,7 +112,7 @@ public class ControlInputMB extends AbstractControlInputImpl {
 
 	private final SimulationConfigGroup simulationConfig;
 
-	public ControlInputMB(final SimulationConfigGroup simulationConfigGroup, final NetworkLayer network) {
+	public ControlInputMB(final SimulationConfigGroup simulationConfigGroup, final NetworkImpl network) {
 		this.simulationConfig = simulationConfigGroup;
 		this.network = network;
 	}

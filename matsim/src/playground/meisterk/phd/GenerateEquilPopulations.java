@@ -22,6 +22,7 @@ package playground.meisterk.phd;
 
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -33,7 +34,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.PlanomatModule;
 import org.matsim.core.replanning.modules.ReRouteDijkstra;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
@@ -62,7 +62,7 @@ public class GenerateEquilPopulations {
 		Population pop = scenario.getPopulation();
 		PopulationFactory popFactory = pop.getFactory();
 
-		NetworkLayer network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		
 		Activity act = null;
 		Leg leg = null;
@@ -75,15 +75,15 @@ public class GenerateEquilPopulations {
 			person.addPlan(plan);
 			plan.setSelected(true);
 			
-			act = popFactory.createActivityFromLinkId("h", network.getLink(new IdImpl(1)).getId());
+			act = popFactory.createActivityFromLinkId("h", network.getLinks().get(new IdImpl(1)).getId());
 			plan.addActivity(act);
 			leg = popFactory.createLeg(TransportMode.undefined);
 			plan.addLeg(leg);
-			act = popFactory.createActivityFromLinkId("w", network.getLink(new IdImpl(20)).getId());
+			act = popFactory.createActivityFromLinkId("w", network.getLinks().get(new IdImpl(20)).getId());
 			plan.addActivity(act);
 			leg = popFactory.createLeg(TransportMode.undefined);
 			plan.addLeg(leg);
-			act = popFactory.createActivityFromLinkId("h", network.getLink(new IdImpl(1)).getId());
+			act = popFactory.createActivityFromLinkId("h", network.getLinks().get(new IdImpl(1)).getId());
 			plan.addActivity(act);
 		}
 		
@@ -122,7 +122,7 @@ public class GenerateEquilPopulations {
 		Population pop = scenario.getPopulation();
 		PopulationFactory popFactory = pop.getFactory();
 
-		NetworkLayer network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		
 		Activity act = null;
 		Leg leg = null;
@@ -135,19 +135,19 @@ public class GenerateEquilPopulations {
 			person.addPlan(plan);
 			plan.setSelected(true);
 			
-			act = popFactory.createActivityFromLinkId("h", network.getLink(new IdImpl(1)).getId());
+			act = popFactory.createActivityFromLinkId("h", network.getLinks().get(new IdImpl(1)).getId());
 			act.setEndTime(Time.parseTime("06:00:00"));
 			plan.addActivity(act);
 			leg = popFactory.createLeg(TransportMode.car);
 			leg.setDepartureTime(Time.parseTime("06:00:00"));
 			plan.addLeg(leg);
-			act = popFactory.createActivityFromLinkId("w", network.getLink(new IdImpl(20)).getId());
+			act = popFactory.createActivityFromLinkId("w", network.getLinks().get(new IdImpl(20)).getId());
 			act.setEndTime(Time.parseTime("14:00:00"));
 			plan.addActivity(act);
 			leg = popFactory.createLeg(TransportMode.car);
 			leg.setDepartureTime(Time.parseTime("14:00:00"));
 			plan.addLeg(leg);
-			act = popFactory.createActivityFromLinkId("h", network.getLink(new IdImpl(1)).getId());
+			act = popFactory.createActivityFromLinkId("h", network.getLinks().get(new IdImpl(1)).getId());
 			plan.addActivity(act);
 			
 		}

@@ -27,9 +27,9 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.WithindayAgent;
 import org.matsim.withinday.WithindayAgentLogicFactory;
@@ -67,7 +67,7 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory {// implement
 	 * @param network
 	 * @param scoringConfig
 	 */
-	public GuidedAgentFactory(NetworkLayer network,
+	public GuidedAgentFactory(Network network,
 			CharyparNagelScoringConfigGroup scoringConfig, TravelTime reactTTs, double fraction, long randomSeed) {
 		super(network, scoringConfig);
 		router = new ReactRouteGuidance(network, reactTTs);

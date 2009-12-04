@@ -32,10 +32,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -153,16 +151,14 @@ public class ActivityTypeDetector extends AbstractPersonAlgorithm implements
 	public static void main(String[] args) {
 		ScenarioImpl s = new ScenarioImpl();
 
-		NetworkLayer net = s.getNetwork();
-		new MatsimNetworkReader(net)
+		new MatsimNetworkReader(s.getNetwork())
 				.readFile("D:/fromNB04/wm/Toronto/toronto/networks/changedNetworkWithManeuvers/network.xml");
 
-		PopulationImpl pop = s.getPopulation();
-		new MatsimPopulationReader(pop, net)
+		new MatsimPopulationReader(s)
 				.readFile("D:/fromNB04/wm/Toronto/toronto/plans/xy/plans.xml.gz");
 
 		ActivityTypeDetector atd = new ActivityTypeDetector();
-		atd.run(pop);
+		atd.run(s.getPopulation());
 		atd.output();
 	}
 }

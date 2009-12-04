@@ -25,10 +25,10 @@ import java.util.Stack;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.withinday.trafficmanagement.controlinput.ControlInputImpl1;
@@ -120,7 +120,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 
 	private ArrayList<Node> currentRouteNodes;
 
-	private NetworkLayer network;
+	private NetworkImpl network;
 
 	private ControlInput controlInput;
 
@@ -131,7 +131,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 	private SimulationConfigGroup simulationConfig;
 
 
-	public TrafficManagementConfigParser(final NetworkLayer network,
+	public TrafficManagementConfigParser(final NetworkImpl network,
 			final EventsManager events, SimulationConfigGroup simulationConfigGroup) {
 		this.network = network;
 		this.events = events;
@@ -151,7 +151,7 @@ public class TrafficManagementConfigParser extends MatsimXmlParser {
 		}
 		else if (name.equalsIgnoreCase(NODE)) {
 			String id = atts.getValue(ID);
-			NodeImpl node = this.network.getNode(id);
+			Node node = this.network.getNodes().get(new IdImpl(id));
 			if (node != null) {
 				this.currentRouteNodes.add(node);
 			}

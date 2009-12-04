@@ -189,8 +189,7 @@ public class OTFVis {
 	
 	public static final void playNetwork(final String[] args) {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = scenario.getNetwork();
-		new MatsimNetworkReader(network).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		PopulationImpl population = scenario.getPopulation();
 		EventsManagerImpl events = new EventsManagerImpl();
 		

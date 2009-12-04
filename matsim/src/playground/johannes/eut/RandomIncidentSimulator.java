@@ -35,7 +35,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
@@ -45,7 +45,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
  */
 public class RandomIncidentSimulator implements IterationStartsListener {
 
-	private NetworkLayer network;
+	private NetworkImpl network;
 	
 	private final double incidentProba;
 
@@ -59,7 +59,7 @@ public class RandomIncidentSimulator implements IterationStartsListener {
 
 	private BufferedWriter writer;
 
-	public RandomIncidentSimulator(NetworkLayer network, double proba) {
+	public RandomIncidentSimulator(NetworkImpl network, double proba) {
 		this.network = network;
 		this.incidentProba = proba;
 

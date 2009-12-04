@@ -3,6 +3,7 @@ package playground.andreas.bln.pop;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -107,12 +108,12 @@ public class DeriveSmallScenarioFromBigOne {
 		
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(config);
 		sl.loadNetwork();
-		NetworkLayer network = sl.getScenario().getNetwork();
+		Network network = sl.getScenario().getNetwork();
 		config = sl.getScenario().getConfig();
 
 		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
+		final PopulationReader plansReader = new MatsimPopulationReader(sl.getScenario());
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plansWriter.startStreaming(config.plans().getOutputFile());
 		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links((NetworkLayer) network));

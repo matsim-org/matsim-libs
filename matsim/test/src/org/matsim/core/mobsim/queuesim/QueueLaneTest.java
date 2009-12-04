@@ -22,9 +22,10 @@ package org.matsim.core.mobsim.queuesim;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.lanes.basic.BasicLane;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
@@ -44,7 +45,7 @@ public class QueueLaneTest extends MatsimTestCase {
   private final Id id2 = new IdImpl("2");	
   private final Id id3 = new IdImpl("3");	
 	
-  private NetworkLayer initNetwork(NetworkLayer network) {
+  private Network initNetwork(NetworkImpl network) {
 		network.setCapacityPeriod(3600.0);
 		Node node1 = network.getFactory().createNode(id1, new CoordImpl(0, 0));
 		Node node2 = network.getFactory().createNode(id2, new CoordImpl(1, 0));
@@ -107,7 +108,7 @@ public class QueueLaneTest extends MatsimTestCase {
   
 	public void testCapacityWoLanes() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = this.initNetwork(scenario.getNetwork());
+		Network network = this.initNetwork(scenario.getNetwork());
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);
 		QueueNetwork queueNetwork = queueSim.getQueueNetwork();
@@ -119,7 +120,7 @@ public class QueueLaneTest extends MatsimTestCase {
 	
 	public void testCapacityWithOneLaneOneLane() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = this.initNetwork(scenario.getNetwork());
+		Network network = this.initNetwork(scenario.getNetwork());
 		BasicLaneDefinitions lanes = this.createOneLane(scenario, 1);
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);
@@ -150,7 +151,7 @@ public class QueueLaneTest extends MatsimTestCase {
 
 	public void testCapacityWithOneLaneOneLaneTwoLanes() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = this.initNetwork(scenario.getNetwork());
+		Network network = this.initNetwork(scenario.getNetwork());
 		BasicLaneDefinitions lanes = this.createOneLane(scenario, 2);
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);
@@ -183,7 +184,7 @@ public class QueueLaneTest extends MatsimTestCase {
 	
 	public void testCapacityWithLanes() {
 		ScenarioImpl scenario = new ScenarioImpl();
-		NetworkLayer network = this.initNetwork(scenario.getNetwork());
+		Network network = this.initNetwork(scenario.getNetwork());
 		BasicLaneDefinitions lanes = this.createLanes(scenario);
 		
 		QueueSimulation queueSim = new QueueSimulation(network, null, null);

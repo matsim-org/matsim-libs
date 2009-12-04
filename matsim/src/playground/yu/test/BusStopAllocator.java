@@ -152,7 +152,7 @@ public class BusStopAllocator {
 		ScenarioImpl scenario = new ScenarioImpl();
 		scenario.getConfig().scenario().setUseTransit(true);
 
-		NetworkLayer multiModalNetwork = scenario.getNetwork();
+		NetworkImpl multiModalNetwork = scenario.getNetwork();
 		new MatsimNetworkReader(multiModalNetwork)
 				.readFile(multiModalNetworkFile);
 

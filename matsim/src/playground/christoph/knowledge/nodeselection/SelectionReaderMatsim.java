@@ -31,12 +31,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.knowledges.KnowledgeImpl;
@@ -66,10 +66,10 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 	public static boolean writeNodesList = false;
 	
 	protected Population population;
-	protected NetworkLayer network;
+	protected Network network;
 	protected Person person;
 	protected KnowledgeImpl currentKnowledge;
-	protected Map<Id, NodeImpl> currentNodes;
+	protected Map<Id, Node> currentNodes;
 	protected Map<Id, LinkImpl> currentLinks;
 	protected List<String> currentNodesList;
 	protected List<String> currentLinksList;
@@ -82,7 +82,7 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 
 	private Knowledges knowledges;
 			
-	public SelectionReaderMatsim(NetworkLayer network, Population population, Knowledges knowledges)
+	public SelectionReaderMatsim(Network network, Population population, Knowledges knowledges)
 	{
 		this.network = network;
 		this.population = population;
@@ -193,13 +193,13 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 					{
 						if (customAttributes.containsKey("Nodes"))
 						{
-							currentNodes = (Map<Id, NodeImpl>)customAttributes.get("Nodes");
+							currentNodes = (Map<Id, Node>)customAttributes.get("Nodes");
 							
 							if(overwriteExistingSelection) currentNodes.clear();
 						}
 						else
 						{
-							currentNodes = new TreeMap<Id, NodeImpl>();
+							currentNodes = new TreeMap<Id, Node>();
 							customAttributes.put("Nodes", currentNodes);
 						}
 					}
@@ -245,7 +245,7 @@ public class SelectionReaderMatsim extends MatsimXmlParser implements SelectionR
 			
 			if (nodeId != null)
 			{
-				NodeImpl node = network.getNode(nodeId);
+				Node node = network.getNodes().get(nodeId);
 				
 				if (node != null)
 				{

@@ -10,7 +10,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -20,7 +20,7 @@ public class AssignShopAndLeisure {
 	private final ScenarioImpl scenario = new ScenarioImpl();
 	private PopulationImpl plans = scenario.getPopulation();
 	private ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-	private NetworkLayer network = scenario.getNetwork();
+	private NetworkImpl network = scenario.getNetwork();
 	
 	private String plansfilePath;
 	private String facilitiesfilePath;

@@ -43,6 +43,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -194,7 +195,7 @@ public class MyRuns {
 		// initialize scenario with events from a given events file
 		// - network
 		logger.info("Reading network xml file...");
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		logger.info("Reading network xml file...done.");
 		
@@ -350,7 +351,7 @@ public class MyRuns {
 		// initialize scenario with events from a given events file
 		// - network
 		logger.info("Reading network xml file...");
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(scenario.getConfig().network().getInputFile());
 		logger.info("Reading network xml file...done.");
 		// - population

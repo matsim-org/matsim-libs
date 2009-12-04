@@ -27,9 +27,9 @@ import java.util.Map;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationImpl;
@@ -58,7 +58,7 @@ public class PlanFilter {
 
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		ScenarioImpl sc = sl.loadScenario();
-		final NetworkLayer network = sc.getNetwork();
+		final Network network = sc.getNetwork();
 		final PopulationImpl population = sc.getPopulation();
 
 		System.out.println("  finding sub-networks... " + (new Date()));
@@ -117,7 +117,7 @@ public class PlanFilter {
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
 		ScenarioImpl sc = sl.loadScenario();
 		final Config config = sc.getConfig();
-		final NetworkLayer network = sc.getNetwork();
+		final Network network = sc.getNetwork();
 		final PopulationImpl population = sc.getPopulation();
 
 		System.out.println("  finding AOI links");
@@ -137,7 +137,7 @@ public class PlanFilter {
 		NetworkLayer subnet = new NetworkLayer();
 		subnet.setName("based on " + config.network().getInputFile());
 		subnet.setCapacityPeriod(network.getCapacityPeriod());
-		for (LinkImpl link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			final Node from = link.getFromNode();
 			final Node to = link.getToNode();
 			if ((CoordUtils.calcDistance(from.getCoord(), center) <= bigRadius) || (CoordUtils.calcDistance(to.getCoord(), center) <= bigRadius)) {

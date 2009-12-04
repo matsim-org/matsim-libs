@@ -23,8 +23,8 @@ package org.matsim.withinday;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
@@ -45,11 +45,11 @@ import org.matsim.withinday.routeprovider.RouteProvider;
  */
 public class WithindayAgentLogicFactory {
 
-	protected NetworkLayer network;
+	protected Network network;
 	private CharyparNagelScoringConfigGroup scoringConfig;
 	protected AStarLandmarksRouteProvider aStarRouteProvider;
 	
-	public WithindayAgentLogicFactory(final NetworkLayer network, final CharyparNagelScoringConfigGroup scoringConfig) {
+	public WithindayAgentLogicFactory(final Network network, final CharyparNagelScoringConfigGroup scoringConfig) {
 		this.network = network;
 		this.scoringConfig = scoringConfig;
 		this.aStarRouteProvider = new AStarLandmarksRouteProvider(this.network);

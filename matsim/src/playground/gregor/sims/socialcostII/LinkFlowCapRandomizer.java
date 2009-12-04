@@ -8,8 +8,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.TimeVariantLinkImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.misc.Time;
@@ -19,10 +18,10 @@ public class LinkFlowCapRandomizer implements BeforeMobsimListener{
 
 
 	private double C;
-	private NetworkLayer network;
+	private NetworkImpl network;
 	private final double increment;
 
-	public LinkFlowCapRandomizer(NetworkLayer network, double c, double increment) {
+	public LinkFlowCapRandomizer(NetworkImpl network, double c, double increment) {
 		this.network = network;
 		this.C = c;
 		this.increment = increment;
@@ -34,10 +33,7 @@ public class LinkFlowCapRandomizer implements BeforeMobsimListener{
 		double startTime = 0 * 3600;
 		double endTime = 2 * 3600;
 
-
-		
 		for (LinkImpl link : this.network.getLinks().values()) {
-			TimeVariantLinkImpl ll;
 			double detFlow = link.getFlowCapacity(Time.UNDEFINED_TIME);
 			for (double time = startTime; time < endTime; time += 120) {
 				NetworkChangeEvent e = new NetworkChangeEvent(time);

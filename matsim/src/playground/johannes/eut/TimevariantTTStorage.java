@@ -24,10 +24,8 @@
 package playground.johannes.eut;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
@@ -45,12 +43,12 @@ public class TimevariantTTStorage extends TimevariantValueStorage implements Tra
 	 * @param endTime
 	 * @param binSize
 	 */
-	public TimevariantTTStorage(NetworkLayer network, int startTime, int endTime, int binSize) {
+	public TimevariantTTStorage(Network network, int startTime, int endTime, int binSize) {
 		super(startTime, endTime, binSize);
 		/*
 		 * Initialize all bins with free flow travel time.
 		 */
-		for (LinkImpl link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			double freeTT = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
 			for (int i = 0; i < getBinCnt(); i++) {
 				setBinValue(link, i, freeTT);
@@ -69,7 +67,7 @@ public class TimevariantTTStorage extends TimevariantValueStorage implements Tra
 		}
 	}
 
-	public void setLinkTravelTime(LinkImpl link, double time, double value) {
+	public void setLinkTravelTime(Link link, double time, double value) {
 		if(value <= 0)
 			throw new IllegalArgumentException("Travel time values must be greater than zero!");
 

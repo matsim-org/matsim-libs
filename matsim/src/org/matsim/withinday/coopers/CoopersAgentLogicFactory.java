@@ -23,8 +23,8 @@ package org.matsim.withinday.coopers;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.withinday.WithindayAgent;
 import org.matsim.withinday.WithindayAgentLogicFactory;
@@ -45,7 +45,7 @@ public class CoopersAgentLogicFactory extends WithindayAgentLogicFactory {
 
 	private List<VDSSign> signs;
 	
-	public CoopersAgentLogicFactory(final NetworkLayer network,
+	public CoopersAgentLogicFactory(final Network network,
 			final CharyparNagelScoringConfigGroup scoringConfig, final List<VDSSign> signs) {
 		super(network, scoringConfig);
 		this.signs = signs;

@@ -32,9 +32,6 @@ import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
 
 import org.matsim.core.gbl.MatsimResource;
-import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vis.kml.KMZWriter;
@@ -99,7 +96,7 @@ public class KmlNetworkWriterTest extends MatsimTestCase {
 		assertEquals("uncompressed size of icon is wrong.", linkIconEntry.getSize(), iconFileSize);
 		assertEquals("uncompressed size of icon is wrong.", nodeIconEntry.getSize(), iconFileSize);
 		assertEquals("uncompressed size of doc.kml is wrong.", 303, docKmlEntry.getSize());
-		assertEquals("uncompressed size of main.kml is wrong.", 45428, mainKmlEntry.getSize());
+		assertEquals("uncompressed size of main.kml is wrong.", 45408, mainKmlEntry.getSize());
 	}
 	
 }

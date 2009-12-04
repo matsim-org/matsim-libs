@@ -22,10 +22,11 @@ package org.matsim.core.router;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -45,7 +46,7 @@ public class RoutingTest extends MatsimTestCase {
 
 	private interface RouterProvider {
 		public String getName();
-		public LeastCostPathCalculator getRouter(NetworkLayer network, TravelMinCost costCalc, TravelTime timeCalc);
+		public LeastCostPathCalculator getRouter(Network network, TravelMinCost costCalc, TravelTime timeCalc);
 	}
 
 	public void testDijkstra() {
@@ -53,7 +54,7 @@ public class RoutingTest extends MatsimTestCase {
 			public String getName() {
 				return "Dijkstra";
 			}
-			public LeastCostPathCalculator getRouter(final NetworkLayer network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+			public LeastCostPathCalculator getRouter(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				return new Dijkstra(network, costCalc, timeCalc, null);
 			}
 		});
@@ -64,7 +65,7 @@ public class RoutingTest extends MatsimTestCase {
 			public String getName() {
 				return "DijkstraPruneDeadends";
 			}
-			public LeastCostPathCalculator getRouter(final NetworkLayer network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+			public LeastCostPathCalculator getRouter(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
 				long now = System.currentTimeMillis();
 				preProcessData.run(network);
@@ -79,7 +80,7 @@ public class RoutingTest extends MatsimTestCase {
 			public String getName() {
 				return "AStarEuclidean";
 			}
-			public LeastCostPathCalculator getRouter(final NetworkLayer network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+			public LeastCostPathCalculator getRouter(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				PreProcessEuclidean preProcessData = new PreProcessEuclidean(costCalc);
 				long now = System.currentTimeMillis();
 				preProcessData.run(network);
@@ -94,7 +95,7 @@ public class RoutingTest extends MatsimTestCase {
 			public String getName() {
 				return "AStarLandmarks";
 			}
-			public LeastCostPathCalculator getRouter(final NetworkLayer network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+			public LeastCostPathCalculator getRouter(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				PreProcessLandmarks preProcessData = new PreProcessLandmarks(costCalc);
 				long now = System.currentTimeMillis();
 				preProcessData.run(network);
@@ -109,7 +110,7 @@ public class RoutingTest extends MatsimTestCase {
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		
-		NetworkLayer network = scenario.getNetwork();
+		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 
 		String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
@@ -127,7 +128,7 @@ public class RoutingTest extends MatsimTestCase {
 		assertEquals("different plans files.", referenceChecksum, routerChecksum);
 	}
 
-	private void calcRoute(final RouterProvider provider, final NetworkLayer network, final PopulationImpl population, final Config config) {
+	private void calcRoute(final RouterProvider provider, final NetworkImpl  network, final PopulationImpl population, final Config config) {
 		log.info("### calcRoute with router " + provider.getName());
 
 		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(config.charyparNagelScoring());

@@ -99,7 +99,7 @@ public class NetworkUtils {
 	 * @return list containing the specified links.
 	 * @throws IllegalArgumentException if a specified node is not found in the network
 	 */
-	public static List<Link> getLinks(final NetworkLayer network, final String links) {
+	public static List<Link> getLinks(final Network network, final String links) {
 		if (links == null) {
 			return new ArrayList<Link>(0);
 		}
@@ -111,7 +111,7 @@ public class NetworkUtils {
 		final List<Link> linksList = new ArrayList<Link>(parts.length);
 		
 		for (String id : parts) {
-			Link link = network.getLink(new IdImpl(id));
+			Link link = network.getLinks().get(new IdImpl(id));
 			if (link == null) {
 				throw new IllegalArgumentException("no node with id " + id);
 			}

@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
@@ -69,7 +68,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	 * @deprecated use {@link #MatsimPopulationReader(ScenarioImpl)}
 	 */
 	@Deprecated // use MatsimPopulationReader(Scenario)
-	public MatsimPopulationReader(final Population plans, final NetworkLayer network) {
+	public MatsimPopulationReader(final Population plans, final Network network) {
 		this.plans = plans;
 		this.network = network;
 		this.facilities = (ActivityFacilitiesImpl) Gbl.getWorld().getLayer(ActivityFacilitiesImpl.LAYER_TYPE);

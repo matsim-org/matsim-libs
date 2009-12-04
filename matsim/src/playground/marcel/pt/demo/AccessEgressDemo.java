@@ -32,7 +32,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -90,14 +90,19 @@ public class AccessEgressDemo {
 	}
 
 	private void createNetwork() {
-		NetworkLayer network = this.scenario.getNetwork();
+		NetworkImpl network = this.scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		Node[] nodes = new Node[nOfLinks + 1];
 		for (int i = 0; i <= nOfLinks; i++) {
-			nodes[i] = network.createAndAddNode(this.ids[i], this.scenario.createCoord(i * 500, 0));
+			nodes[i] = network.getFactory().createNode(this.ids[i], this.scenario.createCoord(i * 500, 0));
+			network.addNode(nodes[i]);
 		}
 		for (int i = 0; i < nOfLinks; i++) {
-			network.createAndAddLink(this.ids[i], nodes[i], nodes[i+1], 500.0, 10.0, 1000.0, 1);
+			Link l = network.getFactory().createLink(this.ids[i], nodes[i].getId(), nodes[i+1].getId());
+			l.setLength(500.0);
+			l.setFreespeed(10.0);
+			l.setCapacity(1000.0);
+			l.setNumberOfLanes(1);
 		}
 	}
 

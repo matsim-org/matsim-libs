@@ -27,6 +27,7 @@ import java.util.EnumSet;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -37,7 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -152,10 +153,16 @@ public class ControlerTest extends MatsimTestCase {
 
 		ScenarioImpl scenario = new ScenarioImpl(config);
 		// create a very simple network with one link only and an empty population
-		NetworkLayer network = scenario.getNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(100, 0));
-		network.createAndAddLink(new IdImpl(1), node1, node2, 100, 1, 3600, 1);
+		Network network = scenario.getNetwork();
+		Node node1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
+		Node node2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(100, 0));
+		network.addNode(node1);
+		network.addNode(node2);
+		Link link = network.getFactory().createLink(new IdImpl(1), node1.getId(), node2.getId());
+		link.setLength(100);
+		link.setFreespeed(1);
+		link.setCapacity(3600.0);
+		link.setNumberOfLanes(1);
 
 		final Controler controler = new Controler(scenario);
 		controler.setCreateGraphs(false);
@@ -452,7 +459,7 @@ public class ControlerTest extends MatsimTestCase {
 	 */
 	private static class Fixture {
 		final ScenarioImpl scenario;
-		final NetworkLayer network;
+		final NetworkImpl network;
 		Node node1 = null;
 		Node node2 = null;
 		Node node3 = null;
@@ -477,13 +484,32 @@ public class ControlerTest extends MatsimTestCase {
 			 * (one having 100secs, the other having 200secs to cross the link).
 			 */
 			this.network.setCapacityPeriod(Time.parseTime("01:00:00"));
-			this.node1 = this.network.createAndAddNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
-			this.node2 = this.network.createAndAddNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
-			this.node3 = this.network.createAndAddNode(new IdImpl(3), new CoordImpl(1000.0, 0.0));
-			this.node4 = this.network.createAndAddNode(new IdImpl(4), new CoordImpl(1100.0, 0.0));
-			this.link1 = this.network.createAndAddLink(new IdImpl(1), this.node1, this.node2, 100, 10, 7200, 1);
-			this.link2 = this.network.createAndAddLink(new IdImpl(2), this.node2, this.node3, 1000, 10, 36, 1);
-			this.link3 = this.network.createAndAddLink(new IdImpl(3), this.node3, this.node4, 100, 10, 7200, 1);
+			this.node1 = this.network.getFactory().createNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
+			this.node2 = this.network.getFactory().createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
+			this.node3 = this.network.getFactory().createNode(new IdImpl(3), new CoordImpl(1000.0, 0.0));
+			this.node4 = this.network.getFactory().createNode(new IdImpl(4), new CoordImpl(1100.0, 0.0));
+			this.network.addNode(this.node1);
+			this.network.addNode(this.node2);
+			this.network.addNode(this.node3);
+			this.network.addNode(this.node4);
+			this.link1 = this.network.getFactory().createLink(new IdImpl(1), this.node1.getId(), this.node2.getId());
+			link1.setLength(100);
+			link1.setFreespeed(10);
+			link1.setCapacity(7200);
+			link1.setNumberOfLanes(1);
+			this.network.addLink(link1);
+			this.link2 = this.network.getFactory().createLink(new IdImpl(2), this.node2.getId(), this.node3.getId());
+			link2.setLength(1000);
+			link2.setFreespeed(10);
+			link2.setCapacity(36);
+			link2.setNumberOfLanes(1);
+			this.network.addLink(link2);
+			this.link3 = this.network.getFactory().createLink(new IdImpl(3), this.node3.getId(), this.node4.getId());
+			link3.setLength(100);
+			link3.setFreespeed(10);
+			link3.setCapacity(7200);
+			link3.setNumberOfLanes(1);
+			this.network.addLink(link3);
 		}
 	}
 

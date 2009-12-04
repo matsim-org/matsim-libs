@@ -25,6 +25,9 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -35,10 +38,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -157,7 +157,6 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		
 		//write created population
 		PopulationWriter writer = new PopulationWriter(pop);
-		Config config = Gbl.getConfig();
 		writer.write(this.getOutputDirectory() + populationFile);
 		File outfile = new File(this.getOutputDirectory() + populationFile);
 		assertTrue(outfile.exists());
@@ -166,7 +165,7 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		//read population again, now the code gets really ugly, dirty and worth to refactor...
 		ScenarioImpl scenario = new ScenarioImpl();
 		PopulationImpl population  = scenario.getPopulation();
-		NetworkLayer network = (NetworkLayer)scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		//this is really ugly...
 		this.createFakeNetwork(scenario, network);
 
@@ -175,14 +174,14 @@ public class BasicDemandGenerationTest extends MatsimTestCase {
 		checkContent(population);
 	}
 	
-	private void createFakeNetwork(Scenario scenario, NetworkLayer network){
-		NodeImpl n1 = network.getFactory().createNode(ids.get(0), scenario.createCoord(0.0, 0.0), null);
-		network.getNodes().put(n1.getId(), n1);
-		NodeImpl n2 = network.getFactory().createNode(ids.get(1), scenario.createCoord(0.0, 0.0), null);
-		network.getNodes().put(n2.getId(), n2);
+	private void createFakeNetwork(Scenario scenario, Network network){
+		Node n1 = network.getFactory().createNode(ids.get(0), scenario.createCoord(0.0, 0.0));
+		network.addNode(n1);
+		Node n2 = network.getFactory().createNode(ids.get(1), scenario.createCoord(0.0, 0.0));
+		network.addNode(n2);
 		for (Id id : ids){
-			LinkImpl l = network.getFactory().createLink(id, n1, n2, network, 23.0, 23.0, 23.0, 1.0);
-			network.getLinks().put(l.getId(), l);
+			Link l = network.getFactory().createLink(id, n1.getId(), n2.getId());
+			network.addLink(l);
 		}
 	}
 	

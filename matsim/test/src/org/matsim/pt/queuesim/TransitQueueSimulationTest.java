@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -61,7 +62,6 @@ import org.matsim.core.mobsim.queuesim.Simulation;
 import org.matsim.core.mobsim.queuesim.TransitDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -111,12 +111,19 @@ public class TransitQueueSimulationTest extends TestCase {
 		scenario.getConfig().simulation().setEndTime(8.0*3600);
 
 		// setup: network
-		NetworkLayer network = scenario.getNetwork();
-		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(   0, 0));
-		Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(1000, 0));
-		Node node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(2000, 0));
-		Link link1 = network.createAndAddLink(scenario.createId("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
-		Link link2 = network.createAndAddLink(scenario.createId("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
+		Network network = scenario.getNetwork();
+		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
+		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000, 0));
+		Node node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000, 0));
+		network.addNode(node1);
+		network.addNode(node2);
+		network.addNode(node3);
+		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		setDefaultLinkAttributes(link1);
+		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		setDefaultLinkAttributes(link2);
+		network.addLink(link1);
+		network.addLink(link2);
 
 		// setup: vehicles
 		BasicVehicles vehicles = scenario.getVehicles();
@@ -231,10 +238,14 @@ public class TransitQueueSimulationTest extends TestCase {
 		scenario.getConfig().scenario().setUseTransit(true);
 
 		// setup: network
-		NetworkLayer network = scenario.getNetwork();
-		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(   0, 0));
-		Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(1000, 0));
-		network.createAndAddLink(scenario.createId("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
+		Network network = scenario.getNetwork();
+		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
+		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000, 0));
+		network.addNode(node1);
+		network.addNode(node2);
+		Link link = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		setDefaultLinkAttributes(link);
+		network.addLink(link);
 
 		// setup: transit schedule
 		TransitSchedule schedule = scenario.getTransitSchedule();
@@ -288,18 +299,34 @@ public class TransitQueueSimulationTest extends TestCase {
 		scenario.getConfig().simulation().setEndTime(8.0*3600);
 
 		// setup: network
-		NetworkLayer network = scenario.getNetwork();
-		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(   0, 0));
-		Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(1000, 0));
-		Node node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(2000, 0));
-		Node node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord(3000, 0));
-		Node node5 = network.createAndAddNode(scenario.createId("5"), scenario.createCoord(4000, 0));
-		Node node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord(5000, 0));
-		Link link1 = network.createAndAddLink(scenario.createId("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
-		Link link2 = network.createAndAddLink(scenario.createId("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
-		Link link3 = network.createAndAddLink(scenario.createId("3"), node3, node4, 1000.0, 10.0, 3600.0, 1);
-		Link link4 = network.createAndAddLink(scenario.createId("4"), node4, node5, 1000.0, 10.0, 3600.0, 1);
-		Link link5 = network.createAndAddLink(scenario.createId("5"), node5, node6, 1000.0, 10.0, 3600.0, 1);
+		Network network = scenario.getNetwork();
+		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
+		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000, 0));
+		Node node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000, 0));
+		Node node4 = network.getFactory().createNode(scenario.createId("4"), scenario.createCoord(3000, 0));
+		Node node5 = network.getFactory().createNode(scenario.createId("5"), scenario.createCoord(4000, 0));
+		Node node6 = network.getFactory().createNode(scenario.createId("6"), scenario.createCoord(5000, 0));
+		network.addNode(node1);
+		network.addNode(node2);
+		network.addNode(node3);
+		network.addNode(node4);
+		network.addNode(node5);
+		network.addNode(node6);
+		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		Link link3 = network.getFactory().createLink(scenario.createId("3"), node3.getId(), node4.getId());
+		Link link4 = network.getFactory().createLink(scenario.createId("4"), node4.getId(), node5.getId());
+		Link link5 = network.getFactory().createLink(scenario.createId("5"), node5.getId(), node6.getId());
+		setDefaultLinkAttributes(link1);
+		setDefaultLinkAttributes(link2);
+		setDefaultLinkAttributes(link3);
+		setDefaultLinkAttributes(link4);
+		setDefaultLinkAttributes(link5);
+		network.addLink(link1);
+		network.addLink(link2);
+		network.addLink(link3);
+		network.addLink(link4);
+		network.addLink(link5);
 
 		// setup: transit schedule
 		TransitSchedule schedule = scenario.getTransitSchedule();
@@ -409,6 +436,13 @@ public class TransitQueueSimulationTest extends TestCase {
 		assertEquals(stop4, data.stopFacility);
 		assertEquals(0.0, data.returnedDelay, MatsimTestCase.EPSILON);
 		assertEquals(lastTime + lastDelay, data.time, MatsimTestCase.EPSILON);
+	}
+	
+	private void setDefaultLinkAttributes(final Link link) {
+		link.setLength(1000.0);
+		link.setFreespeed(10.0);
+		link.setCapacity(3600.0);
+		link.setNumberOfLanes(1);
 	}
 
 	protected static class TestHandleStopSimulation extends TransitQueueSimulation {

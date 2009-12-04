@@ -21,11 +21,11 @@
 package org.matsim.core.network.algorithms;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -43,15 +43,15 @@ public class NetworkFalsifier implements NetworkRunnable {
 		this.distance = distance;
 	}
 
-	public void run(NetworkLayer network) {
+	public void run(Network network) {
 		double maxDistance = this.distance * 2.0;
-		for (NodeImpl node : network.getNodes().values()) {
+		for (Node node : network.getNodes().values()) {
 			Coord coord = node.getCoord();
 			coord.setXY(coord.getX() + (MatsimRandom.getRandom().nextDouble() - 0.5) *  maxDistance,
 					coord.getY() + (MatsimRandom.getRandom().nextDouble() - 0.5) * maxDistance);
 		}
 
-		for (LinkImpl link : network.getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 			Coord fromCoord = link.getFromNode().getCoord();
 			Coord toCoord = link.getToNode().getCoord();
 			link.setLength(CoordUtils.calcDistance(fromCoord, toCoord));

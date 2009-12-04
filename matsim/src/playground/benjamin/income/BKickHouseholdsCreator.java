@@ -26,7 +26,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.households.Household;
@@ -74,12 +74,12 @@ public class BKickHouseholdsCreator {
 		String networkFile =outdir + "../oneRouteNoModeTest/network.xml";
 		
 		ScenarioImpl sc = new ScenarioImpl();
-		NetworkLayer network = sc.getNetwork();
+		NetworkImpl network = sc.getNetwork();
 		MatsimNetworkReader netreader = new MatsimNetworkReader(network);
 		netreader.readFile(networkFile);
 		
     PopulationImpl pop = sc.getPopulation();
-    MatsimPopulationReader popReader = new MatsimPopulationReader(pop, network);
+    MatsimPopulationReader popReader = new MatsimPopulationReader(sc);
     popReader.readFile(plansFile);
     
     sc.getConfig().scenario().setUseHouseholds(true);

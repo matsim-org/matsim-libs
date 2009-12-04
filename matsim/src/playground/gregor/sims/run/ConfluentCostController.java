@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.evacuation.base.Building;
 import org.matsim.evacuation.base.BuildingsShapeReader;
 import org.matsim.evacuation.base.EvacuationNetGenerator;
@@ -54,8 +54,8 @@ public class ConfluentCostController extends Controler {
 
 
 	@Override
-	protected NetworkLayer loadNetwork() {
-		NetworkLayer net =  super.loadNetwork();
+	protected NetworkImpl loadNetwork() {
+		NetworkImpl net =  super.loadNetwork();
 		new EvacuationNetGenerator(net,this.config).run();
 		return net;
 	}

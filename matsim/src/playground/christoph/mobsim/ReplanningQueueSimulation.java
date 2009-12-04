@@ -23,12 +23,12 @@ package playground.christoph.mobsim;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.network.NetworkLayer;
 
 import playground.christoph.knowledge.container.dbtools.KnowledgeDBStorageHandler;
 
@@ -46,7 +46,7 @@ public class ReplanningQueueSimulation extends QueueSimulation{
 	
 	protected KnowledgeDBStorageHandler knowledgeDBStorageHandler;
 		
-	public ReplanningQueueSimulation(final NetworkLayer network, final Population population, final EventsManager events)
+	public ReplanningQueueSimulation(final Network network, final Population population, final EventsManager events)
 	{
 		super(network, population, events);
 		

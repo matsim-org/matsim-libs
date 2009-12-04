@@ -9,6 +9,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
@@ -34,9 +35,9 @@ public class NetworkToCarNetwork {
 		
 		HashSet<String> excludes = getExludes();
 		
-		//�ffnen des Szenarios
+		//oeffnen des Szenarios
 		ScenarioImpl sc = new ScenarioImpl();
-		NetworkLayer net = sc.getNetwork();
+		NetworkImpl net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(NET_FILE);
 //		Network net2 = sc.getNetwork();
 //		net2.setCapacityPeriod(3600);
@@ -45,7 +46,7 @@ public class NetworkToCarNetwork {
 		net3.setEffectiveLaneWidth(3.5);
 		net3.setEffectiveCellSize(7.5);
 		
-		// �bertragen der Nodes
+		// uebertragen der Nodes
 		Map<Id,NodeImpl> nodes = net.getNodes();
 		int j = 0;
 		for (Iterator<Id> it = nodes.keySet().iterator(); it.hasNext();){
