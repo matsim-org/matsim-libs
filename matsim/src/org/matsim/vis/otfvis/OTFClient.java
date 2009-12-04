@@ -28,7 +28,6 @@ import javax.swing.JSplitPane;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFFrame;
@@ -36,13 +35,9 @@ import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFQueryControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
-import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
-import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 public class OTFClient extends Thread {
 
@@ -54,24 +49,8 @@ public class OTFClient extends Thread {
 
 	public static OTFHostControlBar hostControl2;
 
-	public OTFClient(String url) {
+	public OTFClient(String url, OTFConnectionManager connect) {
 		this.url = url;
-  	// data source to writer
-		connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
-		//writer -> reader
-		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
-		//reader -> drawer
-		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
-		//drawer -> layer
-		connect.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
-		
-		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
-		//drawer -> layer
-		connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
-	}
-
-	public OTFClient(String filename2, OTFConnectionManager connect) {
-		this(filename2);
 		this.connect = connect;
 	}
 

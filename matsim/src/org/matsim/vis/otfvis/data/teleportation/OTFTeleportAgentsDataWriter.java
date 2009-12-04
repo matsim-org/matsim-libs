@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgOnTheFlyQueueSimQuad
+ * OTFTeleportAgentsDataWriter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalVis;
+package org.matsim.vis.otfvis.data.teleportation;
 
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.vis.otfvis.OTFVisQueueSim;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
+import org.matsim.core.utils.misc.ByteBufferUtils;
+import org.matsim.vis.otfvis.data.OTFDataWriter;
+
 
 /**
- * This is actually a more or less direct copy of OnTheFlyQueueSimQuad, because
- * the important command, i.e. new OnTheFlyClientQuad(..., MyConncetionManager)
- * is not accessible even in case of an overwritten prepareSim() that has to
- * call QueueSimulation.prepareSim() in any case;-).
- * 
  * @author dgrether
- * 
+ *
  */
-public class DgOnTheFlyQueueSimQuad extends OTFVisQueueSim {
+public class OTFTeleportAgentsDataWriter extends OTFDataWriter<Map<Id, TeleportationVisData>> {
+  
+	private static final Logger log = Logger.getLogger(OTFTeleportAgentsDataWriter.class);
+	
+	private double time;
 
-	/**
-	 * @param net
-	 * @param plans
-	 * @param events
-	 * @param laneDefsvoid
-	 */
-	public DgOnTheFlyQueueSimQuad(ScenarioImpl scenario, EventsManagerImpl events) {
-		super(scenario, events);
-		this.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
+	public OTFTeleportAgentsDataWriter() {
 	}
+
+	@Override
+	public void writeConstData(ByteBuffer out) throws IOException {
+	}
+
+	@Override
+	public void writeDynData(ByteBuffer out) throws IOException {
+//		log.error("writing agent data");
+		if (this.src != null) {
+			out.putInt(this.src.size());
+			for (TeleportationVisData d : this.src.values()){
+				ByteBufferUtils.putString(out, d.getId().toString());
+				d.calculatePosition(this.time);
+//				log.error("id: " + d.getId() + " x: " + d.getX() + " y: " + d.getY());
+				out.putDouble(d.getX());
+				out.putDouble(d.getY());
+			}
+		}
+		else {
+			out.putInt(0);
+		}
+	}
+
+	public void setTime(double time) {
+		this.time = time;
+	}
+
 }

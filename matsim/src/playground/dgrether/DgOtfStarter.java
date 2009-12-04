@@ -50,6 +50,7 @@ public class DgOtfStarter {
 		//bkickscoring
 		file = "881/it.3000/881.3000.Zurich.otfvis.mvi";
 		file = "749/it.2000/749.2000.Zurich.otfvis.mvi";
+//		file = "662/it.500/500.events.mvi";
 		file = "328/output/movie.mvi";
 		
 		//toll case ersa

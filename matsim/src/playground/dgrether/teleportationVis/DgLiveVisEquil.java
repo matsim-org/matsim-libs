@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.dgrether.teleportationVis;
 
+import java.util.Random;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -43,7 +46,9 @@ import playground.dgrether.utils.LogOutputEventHandler;
  *
  */
 public class DgLiveVisEquil {
-
+  
+	private static final Logger log = Logger.getLogger(DgLiveVisEquil.class);
+	
 	public DgLiveVisEquil(){
 		Scenario scenario = new ScenarioImpl();
 		scenario.getConfig().network().setInputFile("./examples/equil/network.xml");
@@ -53,25 +58,32 @@ public class DgLiveVisEquil {
 		EventsManager events = new EventsManagerImpl();
 		events.addHandler(new LogOutputEventHandler());
 		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
+		client.setVisualizeTeleportedAgents(true);
 		client.run();
 	}
 	
 	
 	private void createPopulation(Scenario sc) {
-		for (int i = 0; i < 4; i ++){
+		Random r = new Random(234231);
+		for (int i = 0; i < 20; i ++){
+			int id1 = r.nextInt(23);
+			int id2 = r.nextInt(23);
+			id1++;
+			id2++;
+			log.error("Id1: " + id1 + " Id2: " + id2);
 			Population pop = sc.getPopulation();
 			PopulationFactory fac = pop.getFactory();
 			Person pers = fac.createPerson(sc.createId(Integer.toString(i)));
 			pop.addPerson(pers);
 			Activity act1 = fac.createActivityFromCoord("h", sc.createCoord(0, 0));
-			Link link1 = sc.getNetwork().getLinks().get(sc.createId("1"));
+			Link link1 = sc.getNetwork().getLinks().get(sc.createId(Integer.toString(id1)));
 			((ActivityImpl)act1).setLink(link1);
 			act1.setEndTime(3600.0);
 			Activity act2 = fac.createActivityFromCoord("h", sc.createCoord(5000, 0));
-			Link link6 = sc.getNetwork().getLinks().get(sc.createId("6"));
+			Link link6 = sc.getNetwork().getLinks().get(sc.createId(Integer.toString(id2)));
 			((ActivityImpl)act2).setLink(link6);
 			Leg leg = fac.createLeg(TransportMode.walk); 
-			leg.setTravelTime(600.0);
+			leg.setTravelTime(600.0 - id1);
      
 			leg.setRoute(new LinkNetworkRouteImpl(link1, link6));
 			Plan plan = fac.createPlan();

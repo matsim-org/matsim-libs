@@ -27,6 +27,7 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.OTFVisQueueSim;
+import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 /**
@@ -49,7 +50,7 @@ public class OTFVisController extends Controler {
 	public static final int CANCEL = 0x08000000;
 	public static final int ALL_FLAGS = 0xff000000;
 
-	private boolean doVisualizeTeleportedVehicles = false;
+	private boolean doVisualizeTeleportedAgents = false;
 	
 	public static int getStatus(int flags) {
 		return flags & ALL_FLAGS;
@@ -60,16 +61,6 @@ public class OTFVisController extends Controler {
 		return res;
 	}
 	
-//	@Override
-//	protected void loadControlerListeners() {
-//		super.loadControlerListeners();
-//	}
-//
-//	@Override
-//	protected void loadCoreListeners() {
-//		super.loadCoreListeners();
-//	}
-//
 	@Override
 	protected void setUp() {
 		super.setUp();
@@ -77,8 +68,7 @@ public class OTFVisController extends Controler {
 		this.queueNetwork = new QueueNetwork(this.network);
 		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.queueNetwork, this.population, getEvents(), false);
 		myOTFServer.setControllerStatus(STARTUP);
-		// FOR TESTING ONLY!
-		OTFClient client = new OTFClient("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString());
+		OTFClient client = new OTFClient("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), new DefaultConnectionManagerFactory().createConnectionManager());
 		client.start();
 	}
 
@@ -88,9 +78,7 @@ public class OTFVisController extends Controler {
 		// overwrite network
 		sim.setQueueNetwork(this.queueNetwork);
 		sim.setServer(myOTFServer);
-		if (this.doVisualizeTeleportedVehicles){
-			sim.activateVisualizeTeleportedVehicles();
-		}
+		sim.setVisualizeTeleportedAgents(this.doVisualizeTeleportedAgents);
 		for (QueueSimulationListener l : this.getQueueSimulationListener()) {
 			sim.addQueueSimulationListeners(l);
 		}
@@ -112,17 +100,5 @@ public class OTFVisController extends Controler {
 	public OTFVisController(String configFileName) {
 		super(configFileName);
 	}
-
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String config = "../../tmp/studies/ivtch/Diss/config1p.xml";
-		OTFVisController controller = new OTFVisController(config);
-		controller.setOverwriteFiles(true);
-		controller.run();
-	}
-
 }
 

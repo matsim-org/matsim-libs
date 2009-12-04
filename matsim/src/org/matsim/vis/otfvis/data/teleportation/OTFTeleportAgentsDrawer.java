@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgOnTheFlyQueueSimQuad
+ * OTFTeleportAgentsDrawer
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalVis;
+package org.matsim.vis.otfvis.data.teleportation;
 
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.vis.otfvis.OTFVisQueueSim;
+import java.awt.geom.Point2D;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.media.opengl.GL;
+
+import org.apache.log4j.Logger;
+import org.matsim.vis.otfvis.caching.SceneGraph;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
+
+
 
 /**
- * This is actually a more or less direct copy of OnTheFlyQueueSimQuad, because
- * the important command, i.e. new OnTheFlyClientQuad(..., MyConncetionManager)
- * is not accessible even in case of an overwritten prepareSim() that has to
- * call QueueSimulation.prepareSim() in any case;-).
- * 
  * @author dgrether
- * 
+ *
  */
-public class DgOnTheFlyQueueSimQuad extends OTFVisQueueSim {
+public class OTFTeleportAgentsDrawer extends OTFGLDrawableImpl{
+	
+	private static final Logger log = Logger.getLogger(OTFTeleportAgentsDrawer.class);
+	
+  private Map<String, Point2D.Double> positions = new HashMap<String, Point2D.Double>();
 
-	/**
-	 * @param net
-	 * @param plans
-	 * @param events
-	 * @param laneDefsvoid
-	 */
-	public DgOnTheFlyQueueSimQuad(ScenarioImpl scenario, EventsManagerImpl events) {
-		super(scenario, events);
-		this.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
+	public void onDraw(GL gl) {
+//		log.error("starting to draw agents...");
+		gl.glColor3d(0.0, 0.0, 1.0);
+		double zCoord = 1.0;
+		double offset = 100.0;
+		for (Point2D.Double p : positions.values()){
+//			log.error("drawing agent at : " + p.x + " " + p.y + " offsetN: " + OTFServerQuad.offsetNorth + " offsetE: " + OTFServerQuad.offsetEast);
+			gl.glBegin(GL.GL_QUADS);
+				gl.glVertex3d(p.x - offset, p.y - offset, zCoord);
+				gl.glVertex3d(p.x - offset, p.y + offset, zCoord);
+				gl.glVertex3d(p.x + offset, p.y + offset, zCoord);
+				gl.glVertex3d(p.x + offset, p.y - offset, zCoord);
+			gl.glEnd();
+		}
 	}
+	
+	public Map<String, Point2D.Double> getPositions(){
+		return this.positions;
+	}
+
+	@Override
+	public void invalidate(SceneGraph graph) {
+		super.invalidate(graph);
+	}
+
+	
+	
 }

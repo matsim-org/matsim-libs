@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgOnTheFlyQueueSimQuad
+ * DefaultConnectionManagerFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalVis;
+package org.matsim.vis.otfvis.data;
 
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.vis.otfvis.OTFVisQueueSim;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
+import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
+
 
 /**
- * This is actually a more or less direct copy of OnTheFlyQueueSimQuad, because
- * the important command, i.e. new OnTheFlyClientQuad(..., MyConncetionManager)
- * is not accessible even in case of an overwritten prepareSim() that has to
- * call QueueSimulation.prepareSim() in any case;-).
  * 
+ * Creates the default OTFVis ConnectionManager
  * @author dgrether
- * 
+ *
  */
-public class DgOnTheFlyQueueSimQuad extends OTFVisQueueSim {
-
-	/**
-	 * @param net
-	 * @param plans
-	 * @param events
-	 * @param laneDefsvoid
-	 */
-	public DgOnTheFlyQueueSimQuad(ScenarioImpl scenario, EventsManagerImpl events) {
-		super(scenario, events);
-		this.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
+public class DefaultConnectionManagerFactory {
+	
+	public OTFConnectionManager createConnectionManager(){
+		OTFConnectionManager connect = new OTFConnectionManager();
+	// data source to writer
+		connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		//writer -> reader
+		connect.add(OTFLinkLanesAgentsNoParkingHandler.Writer.class, OTFLinkLanesAgentsNoParkingHandler.class);
+		//reader -> drawer
+		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, SimpleStaticNetLayer.SimpleQuadDrawer.class);
+		//drawer -> layer
+		connect.add(SimpleStaticNetLayer.SimpleQuadDrawer.class, SimpleStaticNetLayer.class);
+		//reader -> drawer
+		connect.add(OTFLinkLanesAgentsNoParkingHandler.class, AgentPointDrawer.class);
+		//drawer -> layer
+		connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
+		return connect;
 	}
 }

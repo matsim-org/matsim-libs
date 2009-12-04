@@ -711,7 +711,7 @@ public class TransitQueueSimulationTest extends TestCase {
 			System.out.println(event.toString());
 		}
 
-//		assertEquals(23, allEvents.size());
+		assertEquals(23, allEvents.size());
 		
 		assertTrue(allEvents.get(0) instanceof ActivityEndEventImpl);
 		assertEquals("h", ((ActivityEndEventImpl) allEvents.get(0)).getActType());

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgOnTheFlyQueueSimQuad
+ * OTFTeleportAgentsLayer
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalVis;
+package org.matsim.vis.otfvis.data.teleportation;
 
-import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.vis.otfvis.OTFVisQueueSim;
+import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
+
 
 /**
- * This is actually a more or less direct copy of OnTheFlyQueueSimQuad, because
- * the important command, i.e. new OnTheFlyClientQuad(..., MyConncetionManager)
- * is not accessible even in case of an overwritten prepareSim() that has to
- * call QueueSimulation.prepareSim() in any case;-).
- * 
  * @author dgrether
- * 
+ *
  */
-public class DgOnTheFlyQueueSimQuad extends OTFVisQueueSim {
-
-	/**
-	 * @param net
-	 * @param plans
-	 * @param events
-	 * @param laneDefsvoid
-	 */
-	public DgOnTheFlyQueueSimQuad(ScenarioImpl scenario, EventsManagerImpl events) {
-		super(scenario, events);
-		this.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
+public class OTFTeleportAgentsLayer extends SimpleSceneLayer {
+	
+	@Override
+	public int getDrawOrder() {
+		return 100;
 	}
 }

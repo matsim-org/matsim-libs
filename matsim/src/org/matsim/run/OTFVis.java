@@ -43,6 +43,7 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.OTFVisQueueSim;
+import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
 
 /**
@@ -162,7 +163,7 @@ public class OTFVis {
 		if (args[1].toLowerCase().endsWith(".xml") || args[1].toLowerCase().endsWith(".xml.gz")) {
 			String netFileName = args[1];
 			if (Gbl.getConfig() == null) Gbl.createConfig(null); // is this really required?
-			new OTFClient("tveh:"+vehFileName + "@" + netFileName).run();
+			new OTFClient("tveh:"+vehFileName + "@" + netFileName, new DefaultConnectionManagerFactory().createConnectionManager()).run();
 		}
 	}
 	

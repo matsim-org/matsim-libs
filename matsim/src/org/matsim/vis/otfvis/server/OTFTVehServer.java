@@ -95,44 +95,6 @@ public class OTFTVehServer implements OTFServerRemote {
 		readOneStep();
 	}
 
-//	private List<Double>  buildTimesList() {
-//		Gbl.startMeasurement();
-//		System.out.println("Scanning timesteps:");
-//
-//		// Get time Structure
-//		List<Double> times = new ArrayList<Double>();
-//		open();
-//		String line = null;
-//		boolean lineFound = false;
-//		String lasttime = "-1";
-//
-//		try {
-//			line = this.reader.readLine();
-//			while ( !lineFound && (line != null)) {
-//				line = line.substring(line.indexOf('\t')+1);
-//				String tt = line.substring(0, line.indexOf('\t'));
-//				if(!tt.equals(lasttime)) {
-//					times.add(Double.valueOf(tt));
-//					lasttime = tt;
-//					System.out.print(tt);
-//					System.out.print(", ");
-//				}
-//				line = this.reader.readLine();
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		System.out.println();
-//		System.out.println("Nr of timesteps: " + times.size());
-//		try {
-//			reader.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		Gbl.printElapsedTime();
-//		return times;
-//	}
-
 	public boolean readOneLine(){
 		String line = null;
 		boolean lineFound = false;
@@ -229,20 +191,9 @@ public class OTFTVehServer implements OTFServerRemote {
 		}
 	}
 
-//	private void finish() {
-//	try {
-//		this.reader.close();
-//	} catch (IOException e) {
-//		e.printStackTrace();
-//	}
-//	Gbl.printElapsedTime();
-//	}
-//
-
 	public int getLocalTime() throws RemoteException {
 		return (int)this.nextTime;
 	}
-
 
 	public OTFServerQuad getQuad(String id, OTFConnectionManager connect)
 			throws RemoteException {
