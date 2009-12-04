@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.phd;
+package playground.meisterk.phd.controler;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -28,9 +28,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for playground.meisterk.phd");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(GenerateEquilPopulationsTest.class);
-		
-		suite.addTest(playground.meisterk.phd.controler.AllTests.suite());
+		suite.addTestSuite(PhDControlerTest.class);
 		//$JUnit-END$
 		return suite;
 	}

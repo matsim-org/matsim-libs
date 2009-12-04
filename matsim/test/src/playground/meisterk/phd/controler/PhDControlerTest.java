@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * RunEquilRuns.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,21 +18,62 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.phd;
+package playground.meisterk.phd.controler;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.core.controler.Controler;
+import org.matsim.testcases.MatsimTestCase;
 
-public class AllTests {
+public class PhDControlerTest extends MatsimTestCase {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.meisterk.phd");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(GenerateEquilPopulationsTest.class);
-		
-		suite.addTest(playground.meisterk.phd.controler.AllTests.suite());
-		//$JUnit-END$
-		return suite;
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		Controler testee = new PhDControler(new String[]{this.getInputDirectory() + "config.xml"});
+		testee.getConfig().controler().setOutputDirectory(this.getOutputDirectory());
+
+		testee.setCreateGraphs(false);
+		testee.setWriteEventsInterval(0);
+		testee.run();
 	}
 
+	public void testTAMRouter() {
+		fail("Not yet implemented.");
+	}
+	
+	public void testPlanomatOnly() {
+		fail("Not yet implemented.");
+	}
+	
+	public void testPlanomatRouter() {
+		fail("Not yet implemented.");
+	}
+	
+	public void testPlanomatRouterCarPt() {
+		fail("Not yet implemented.");
+	}
+	
+	public void xtestImprovePtTravelTime() {
+		fail("Not yet implemented.");
+	}
+	
+	public void xtestUpgradeRouteToHighway() {
+		fail("Not yet implemented.");
+	}
+	
+	public void xtestIntroduceTollOnHighway() {
+		fail("Not yet implemented.");
+	}
+	
+	public void xtestRealWorldFeatures() {
+		fail("Not yet implemented.");
+	}
+	
+	public void xtestVaryLeisureOpeningTimes() {
+		fail("Not yet implemented.");
+	}
+	
+	public void xtestIntroduceMobilityTools() {
+		fail("Not yet implemented.");
+	}
+	
 }
