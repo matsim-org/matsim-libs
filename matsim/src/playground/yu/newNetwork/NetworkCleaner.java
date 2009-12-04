@@ -49,9 +49,9 @@ public class NetworkCleaner {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		final String inputNetFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newMultiModalNetBiggerWithoutBusLinkTest.xml.gz";
-		final String outputNetFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newMultiModalNetBiggerWithoutBusLinkCleanedTest.xml.gz";
-		String logFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/clean.log";
+		final String inputNetFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/network_original.xml";
+		final String outputNetFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/net.xml";
+		String logFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/net.log";
 
 		NetworkLayer network = new NetworkLayer();
 		new MatsimNetworkReader(network).readFile(inputNetFilename);

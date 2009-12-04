@@ -40,6 +40,7 @@ import org.matsim.core.population.PopulationReader;
 public class DoublePlan extends NewPopulation {
 	// private String newPersonId;
 	private Person tmpPerson = null;
+	private int n = 0;
 
 	/**
 	 * Construcktor
@@ -56,13 +57,21 @@ public class DoublePlan extends NewPopulation {
 	 */
 	@Override
 	public void run(Person person) {
+
 		pw.writePerson(person);
+		n++;
 		tmpPerson = person;
-		String oldId = person.getId().toString();
+		// String oldId = person.getId().toString();
 		// int oldId = Integer.parseInt(person.getId().toString());
 		// produce new Person with new Id
-		for (int i = 1; i < 100; i++)
-			createNewPerson(oldId + i);
+		if (n == 1) {
+			for (int i = 2; i <= 100; i++)
+				createNewPerson("passenger" + (2 * i - 1));
+		} else if (n == 2) {
+			for (int i = 2; i <= 100; i++)
+				createNewPerson("passenger" + 2 * i);
+		}
+
 		// createNewPerson(oldId + "A");
 		// createNewPerson(oldId + "B");
 		// createNewPerson(oldId + "C");
@@ -77,9 +86,9 @@ public class DoublePlan extends NewPopulation {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		String networkFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/network.multimodal.mini.xml";
-		String plansFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/test.xml";
-		String outputPlansFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/testCarPop.xml";
+		String networkFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/net.xml";
+		String plansFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/pop.xml";
+		String outputPlansFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/pop200.xml";
 
 		ScenarioImpl s = new ScenarioImpl();
 

@@ -17,8 +17,13 @@ import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.utils.charts.XYLineChart;
+import org.matsim.core.utils.misc.Time;
+
+import playground.yu.utils.io.SimpleWriter;
 
 /**
+ * shows the ocuppancy situations of pt vehicles.
+ * 
  * @author yu
  * 
  */
@@ -26,12 +31,6 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 		PersonLeavesVehicleEventHandler {
 	private Map<Id, Integer> occups = new HashMap<Id, Integer>();
 	private Map<Id, Map<Double, Integer>> timeOccups = new HashMap<Id, Map<Double, Integer>>();
-
-	/**
-	 * 
-	 */
-	public PtOccupancy() {
-	}
 
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		Id vehId = event.getVehicleId();
@@ -75,10 +74,12 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 		// occups.remove(vehId);
 	}
 
-	public void write(String chartFilename) {
+	public void write(String outputFilenameBase) {
 
 		XYLineChart avgSpeedChart = new XYLineChart("vehicle(bus) occupancies",
 				"time", "agents in bus [per.]");
+		SimpleWriter writer = new SimpleWriter(outputFilenameBase + "txt");
+
 		for (Entry<Id, Map<Double, Integer>> vto : timeOccups.entrySet()) {
 			Map<Double, Integer> tos = vto.getValue();
 			int size = tos.size();
@@ -91,10 +92,19 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 				ys[i + 1] = to.getValue();
 				i += 2;
 			}
-			avgSpeedChart.addSeries("vehId\t" + vto.getKey(), xs, ys);
+			Id vehId = vto.getKey();
+
+			avgSpeedChart.addSeries("vehId\t" + vehId, xs, ys);
+
+			writer.writeln("vehId:\t" + vehId
+					+ "\ntime\tthe number of passengers");
+			for (int j = 0; j < size * 2; j++)
+				writer.writeln(Time.writeTime(xs[j] * 3600.0) + "\t" + ys[j]);
+			writer.writeln("----------");
 		}
 
-		avgSpeedChart.saveAsPng(chartFilename, 1024, 768);
+		writer.close();
+		avgSpeedChart.saveAsPng(outputFilenameBase + "png", 1024, 768);
 	}
 
 	/**
@@ -111,6 +121,6 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 		new MatsimEventsReader(em).readFile(eventsFilename);
 
 		po
-				.write("../berlin-bvg09/pt/nullfall_M44_344/test/output200/ITERS/it.100/100.occupancies.png");
+				.write("../berlin-bvg09/pt/nullfall_M44_344/test/output200/ITERS/it.100/100.occupancies.");
 	}
 }
