@@ -298,6 +298,8 @@ public class Controler {
 				this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 			}
 			this.scenarioData = new ScenarioImpl(this.config);
+			this.network = this.scenarioData.getNetwork();
+			this.population = this.scenarioData.getPopulation();
 		}
 
 		Gbl.setConfig(this.config);

@@ -52,6 +52,15 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class ControlerTest extends MatsimTestCase {
 
+	public void testConstructor() {
+		Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+		assertNotNull(controler.getNetwork()); // is required, e.g. for changing the factories
+		assertNotNull(controler.getPopulation());
+		assertEquals(0, controler.getNetwork().getLinks().size());
+		assertEquals(0, controler.getNetwork().getNodes().size());
+		assertEquals(0, controler.getPopulation().getPersons().size());
+	}
+	
 	/**
 	 * Tests that the travel times are correctly calculated during the simulation.
 	 *
