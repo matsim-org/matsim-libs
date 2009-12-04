@@ -35,4 +35,10 @@
 		<param name="activityClosingTime_1"     value="24:00:00" />
 	</module>
 
+	<module name="planomat">
+		<param name="populationSize" value="1" />
+		<param name="jgapMaxGenerations" value="0" />
+		<param name="tripStructureAnalysisLayer" value="link" />
+	</module>
+
 </config>
