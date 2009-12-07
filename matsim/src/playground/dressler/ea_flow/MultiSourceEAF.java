@@ -45,6 +45,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
+import playground.dressler.Intervall.src.Intervalls.EdgeIntervalls;
 import playground.dressler.Intervall.src.Intervalls.VertexIntervalls;
 import playground.dressler.ea_flow.GlobalFlowCalculationSettings.EdgeTypeEnum;
 import playground.dressler.ea_flow.TimeExpandedPath.PathEdge;
@@ -383,7 +384,7 @@ public class MultiSourceEAF {
 		BellmanFordVertexIntervalls.debug(0);
 		VertexIntervalls.debug(false);
 		//VertexIntervall.debug(false);
-//		EdgeIntervalls.debug(false);
+		EdgeIntervalls.debug(0);
 		//EdgeIntervall.debug(false);
 		Flow.debug(0);
 		//BellmanFordVertexIntervalls.warmstart(3);

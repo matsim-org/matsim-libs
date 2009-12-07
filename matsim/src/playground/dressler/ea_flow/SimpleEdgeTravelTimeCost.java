@@ -29,11 +29,16 @@ public class SimpleEdgeTravelTimeCost implements FlowEdgeTraversalCalculator {
 	protected final int capacity;	
 	protected final int traveltime;
 	
-	public SimpleEdgeTravelTimeCost(Link link)
-	{
-		this.link = link;
-		capacity = (int)link.getCapacity(1.);
-		traveltime = (int)((double)link.getLength() / (double)link.getFreespeed(1.));
+	public SimpleEdgeTravelTimeCost(Link link){
+		if(link ==null){
+			this.link=null;
+			capacity= 1;
+			traveltime=1;
+		}else{
+			this.link = link;
+			capacity = (int)link.getCapacity(1.);
+			traveltime = (int)((double)link.getLength() / (double)link.getFreespeed(1.));
+		}	
 	}
 	
 	
