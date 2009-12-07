@@ -52,7 +52,7 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
  * @author DS
  */
 public class OTFVisQueueSim extends QueueSimulation{
-	protected OnTheFlyServer myOTFServer = null;
+	protected OnTheFlyServer otfServer = null;
 	private boolean ownServer = true;
 	private boolean doVisualizeTeleportedAgents = false;
 	private OTFConnectionManager connectionManager = new DefaultConnectionManagerFactory().createConnectionManager();
@@ -64,7 +64,7 @@ public class OTFVisQueueSim extends QueueSimulation{
 	}
 	
 	public void setServer(OnTheFlyServer server) {
-		this.myOTFServer = server;
+		this.otfServer = server;
 		ownServer = false;
 	}
 	@Override
@@ -73,12 +73,12 @@ public class OTFVisQueueSim extends QueueSimulation{
 
 		if(ownServer) {
 			UUID idOne = UUID.randomUUID();
-			this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.network, this.population, getEvents(), false);
+			this.otfServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.network, this.population, getEvents(), false);
 
 			if (this.doVisualizeTeleportedAgents){
 				this.teleportationWriter = new OTFTeleportAgentsDataWriter();
 				this.visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
-				this.myOTFServer.addAdditionalElement(this.teleportationWriter);
+				this.otfServer.addAdditionalElement(this.teleportationWriter);
 				this.connectionManager.add(OTFTeleportAgentsDataWriter.class, OTFTeleportAgentsDataReader.class);
 				this.connectionManager.add(OTFTeleportAgentsDataReader.class, OTFTeleportAgentsDrawer.class);
 				this.connectionManager.add(OTFTeleportAgentsDrawer.class, OTFTeleportAgentsLayer.class);
@@ -88,7 +88,7 @@ public class OTFVisQueueSim extends QueueSimulation{
 			client.start();
 
 			try {
-				this.myOTFServer.pause();
+				this.otfServer.pause();
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
@@ -98,9 +98,9 @@ public class OTFVisQueueSim extends QueueSimulation{
 	@Override
 	protected void cleanupSim() {
 		if(ownServer) {
-			this.myOTFServer.cleanup();
+			this.otfServer.cleanup();
 		}
-		this.myOTFServer = null;
+		this.otfServer = null;
 		super.cleanupSim();
 	}
 	
@@ -108,7 +108,6 @@ public class OTFVisQueueSim extends QueueSimulation{
 	protected void handleAgentArrival(final double now, DriverAgent agent){
 		if (this.doVisualizeTeleportedAgents){
 			this.visTeleportationData.remove(agent.getPerson().getId());
-			
 		}
 		super.handleAgentArrival(now, agent);
 	}
@@ -116,9 +115,6 @@ public class OTFVisQueueSim extends QueueSimulation{
 	@Override
 	protected void beforeSimStep(final double time) {
 		super.beforeSimStep(time);
-//		if (doVisualizeTeleportedAgents) {
-//			this.visualizeTeleportedAgents(time);
-//		}
 	}
 
 	@Override
@@ -127,7 +123,7 @@ public class OTFVisQueueSim extends QueueSimulation{
 		if (doVisualizeTeleportedAgents) {
 			this.visualizeTeleportedAgents(time);
 		}
-		this.myOTFServer.updateStatus(time);
+		this.otfServer.updateStatus(time);
 	}
 	
 	@Override
