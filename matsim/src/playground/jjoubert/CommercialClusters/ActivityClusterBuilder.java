@@ -94,8 +94,17 @@ public class ActivityClusterBuilder {
 		djc.clusterInput();
 	}
 
-	
-	public void executeSna(String vehicleFoldername, String vehicleFilename){
+	/**
+	 * 
+	 * @param vehicleFoldername
+	 * @param vehicleFilename
+	 * @param silent a logical variable indicating whether log messages should be 
+	 * 		displayed for the individual vehicle chains. If <code>true</code> then 
+	 * 		messages will be suppressed and only a vehicle counter will be logged.
+	 * 		If <code>false</code> then each individual vehicle chain's progress 
+	 * 		will be logged and displayed.
+	 */
+	public void executeSna(String vehicleFoldername, String vehicleFilename, boolean silent){
 		// Ensure the cluster list contains clusters.
 		if(djc.getClusterList().size() > 0){
 			MyAdjancencyMatrixBuilder mamb = new MyAdjancencyMatrixBuilder(djc.getClusterList());
@@ -105,19 +114,35 @@ public class ActivityClusterBuilder {
 				File folder = new File(vehicleFoldername);
 				if(folder.exists() && folder.isDirectory()){
 					File[] fileList = folder.listFiles();
+					if(silent){
+						log.info("Approximate number of vehicle files to process: " + fileList.length);
+					}
+					int vehicleCounter = 0;
+					int vehicleMultiplier = 1;
 					for (File file : fileList) {
 						if(file.getName().length() > 4){
 							String extention = file.getName().substring(file.getName().length()-4);
 							if(extention.equalsIgnoreCase(".xml")){
 								List<Chain> chains = readVehicleChain(file.getAbsolutePath());
-								mamb.buildAdjacency(chains);
+								mamb.buildAdjacency(chains, silent);
 							}
 						}
+						
+						// Report progress
+						if(silent){
+							if(++vehicleCounter == vehicleMultiplier){
+								log.info("   Vehicles processed: " + vehicleCounter);
+								vehicleMultiplier = vehicleMultiplier*2;
+							}
+						}
+					}
+					if(silent){
+						log.info("   Vehicles processed: " + vehicleCounter + " (Done)");
 					}
 				}
 			} else if(vehicleFilename != null){
 				List<Chain> chains = readVehicleChain(vehicleFilename);
-				mamb.buildAdjacency(chains);
+				mamb.buildAdjacency(chains, silent);
 			} else{
 				throw new RuntimeException("No vehicle file or folder specified.");
 			}

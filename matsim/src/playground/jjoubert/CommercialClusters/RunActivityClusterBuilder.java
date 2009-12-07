@@ -107,6 +107,7 @@ public class RunActivityClusterBuilder {
 	private static boolean writeClusters;
 	private static boolean writeClusterListToXml;
 	private static boolean performSNA;
+	private static boolean snaSilence;
 
 	/**
 	 * @param args
@@ -153,7 +154,7 @@ public class RunActivityClusterBuilder {
 						}
 						
 						if(performSNA){
-							acb.executeSna(sb.getVehicleFoldername(), null);
+							acb.executeSna(sb.getVehicleFoldername(), null, snaSilence);
 						}						
 					}
 				}
@@ -168,6 +169,7 @@ public class RunActivityClusterBuilder {
 		writeClusters = false;
 		writeClusterListToXml = false;
 		performSNA = false;
+		snaSilence = false;
 		switch (scenario) {
 		case 1: // City Deep (with output)
 			visualizeClusters = true;
@@ -191,12 +193,14 @@ public class RunActivityClusterBuilder {
 
 		case 5: // Study area (no output; with ALL vehicles SNA)
 			performSNA = true;
+			snaSilence = true;
 			break;
 			
 		case 6: // Study area (output and ALL vehicle SNA)
 			visualizeClusters = true;
 			writeClusters = true;
 			performSNA = true;
+			snaSilence = true;
 			break;
 
 		default:

@@ -127,9 +127,11 @@ public class MyAdjancencyMatrixBuilder {
 	}
 
 
-	public void buildAdjacency(List<Chain> chains){
+	public void buildAdjacency(List<Chain> chains, boolean silent){
 		GeometryFactory gf = new GeometryFactory();
-		log.info("Building adjacency for " + chains.size() + " chains.");
+		if(!silent){
+			log.info("Building adjacency for " + chains.size() + " chains.");
+		}
 		int chainCounter = 0;
 		int chainMultiplier = 1;
 		
@@ -159,14 +161,18 @@ public class MyAdjancencyMatrixBuilder {
 				log.warn("Found a chain with only two activities: Vehicle " + chain.getActivities().get(0).getLocation().getVehID());
 			}
 				
-			chainCounter++;
-			// Report progress
-			if(chainCounter == chainMultiplier){
-				log.info("   Chains: " + chainCounter);
-				chainMultiplier *= 2;
+			if(!silent){
+				chainCounter++;
+				// Report progress
+				if(chainCounter == chainMultiplier){
+					log.info("   Chains: " + chainCounter);
+					chainMultiplier *= 2;
+				}
 			}
 		}
-		log.info("   Chains: " + chainCounter + " (Done)");
+		if(!silent){
+			log.info("   Chains: " + chainCounter + " (Done)");
+		}
 	}
 
 
