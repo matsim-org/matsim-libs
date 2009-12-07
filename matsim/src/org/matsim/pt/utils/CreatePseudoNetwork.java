@@ -91,11 +91,7 @@ public class CreatePseudoNetwork {
 				}
 
 				if (routeLinks.size() > 0) {
-					Link startLink = routeLinks.get(0);
-					List<Link> linksBetween = (routeLinks.size() > 2) ? routeLinks.subList(1, routeLinks.size() - 1) : new ArrayList<Link>(0);
-					Link endLink = routeLinks.get(routeLinks.size() - 1);
-					NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink, endLink);
-					route.setLinks(startLink, linksBetween, endLink);
+					NetworkRouteWRefs route = LinkNetworkRouteImpl.create(routeLinks);
 					tRoute.setRoute(route);
 				} else {
 					System.err.println("Line " + tLine.getId() + " route " + tRoute.getId() + " has less than two stops. Removing this route from schedule.");
@@ -126,11 +122,7 @@ public class CreatePseudoNetwork {
 		} else {
 			fromNode = this.nodes.get(fromFacility);
 		}
-//		if (fromNode == null) {
-//			fromNode = this.network.createAndAddNode(new IdImpl(this.prefix + this.nodeIdCounter++), fromFacility.getCoord());
-//			this.nodes.put(fromFacility, fromNode);
-//		}
-		fromNode.toString();
+		
 		Node toNode = this.nodes.get(toFacility);
 		if (toNode == null) {
 			toNode = this.network.getFactory().createNode(new IdImpl(this.prefix + toFacility.getId()), toFacility.getCoord());

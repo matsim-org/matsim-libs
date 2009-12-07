@@ -54,11 +54,11 @@ import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFVisQueueSim;
+import org.matsim.visum.VisumNetwork;
+import org.matsim.visum.VisumNetworkReader;
 import org.xml.sax.SAXException;
 
 import playground.marcel.pt.config.TransitConfigGroup;
-import playground.marcel.pt.converter.VisumNetwork;
-import playground.marcel.pt.converter.VisumNetworkReader;
 import playground.marcel.pt.router.PlansCalcTransitRoute;
 import playground.marcel.pt.router.TransitRouter;
 import playground.marcel.pt.utils.MergeNetworks;

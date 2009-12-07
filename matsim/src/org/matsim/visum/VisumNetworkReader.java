@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.converter;
+package org.matsim.visum;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -33,6 +33,8 @@ import org.matsim.core.utils.misc.StringUtils;
 
 public class VisumNetworkReader {
 
+	private static final String ATTRIBUTE_UNKNOWN = "%%%KEINE_AHNUNG%%%";
+
 	private final VisumNetwork network;
 
 	private final Logger log = Logger.getLogger(VisumNetworkReader.class);
@@ -41,6 +43,8 @@ public class VisumNetworkReader {
 	private int language = 0;
 
 	/* collection of localized strings: [0] english, [1] german */
+	private final String[] TABLE_NODE = {ATTRIBUTE_UNKNOWN, "$KNOTEN:"};
+	private final String[] TABLE_EDGE = {ATTRIBUTE_UNKNOWN, "$STRECKE:"};
 	private final String[] TABLE_STOP = {"$STOP:", "$HALTESTELLE:"};
 	private final String[] TABLE_STOPAREA = {"$STOPAREA:", "$HALTESTELLENBEREICH:"};
 	private final String[] TABLE_STOPPOINT = {"$STOPPOINT:", "$HALTEPUNKT:"};
@@ -54,6 +58,16 @@ public class VisumNetworkReader {
 	private final String[] TABLE_VEHCOMB = {"$VEHCOMB:", "$FZGKOMB:"};
 	private final String[] TABLE_VEHUNITTOVEHCOMB = {"$VEHUNITTOVEHCOMB:", "$FZGEINHEITZUFZGKOMB:"};
 
+	private final String[] ATTRIBUTE_NODE_NO = {ATTRIBUTE_UNKNOWN, "NR"};
+	private final String[] ATTRIBUTE_NODE_NAME = {ATTRIBUTE_UNKNOWN, "NAME"};
+	private final String[] ATTRIBUTE_NODE_XCOORD = {ATTRIBUTE_UNKNOWN, "XKOORD"};
+	private final String[] ATTRIBUTE_NODE_YCOORD = {ATTRIBUTE_UNKNOWN, "YKOORD"};
+	
+	private final String[] ATTRIBUTE_EDGE_NO = {ATTRIBUTE_UNKNOWN, "NR"};
+	private final String[] ATTRIBUTE_EDGE_FROM_NODE = {ATTRIBUTE_UNKNOWN, "VONKNOTNR"};
+	private final String[] ATTRIBUTE_EDGE_TO_NODE = {ATTRIBUTE_UNKNOWN, "NACHKNOTNR"};
+	private final String[] ATTRIBUTE_EDGE_LENGTH = {ATTRIBUTE_UNKNOWN, "LAENGE"};
+	
 	private final String[] ATTRIBUTE_STOP_NO = {"NO", "NR"};
 	private final String[] ATTRIBUTE_STOP_NAME = {"NAME", "NAME"};
 	private final String[] ATTRIBUTE_STOP_XCOORD = {"XCOORD", "XKOORD"};
@@ -70,15 +84,17 @@ public class VisumNetworkReader {
 	private final String[] ATTRIBUTE_LR_NAME = {"NAME", "NAME"};
 	private final String[] ATTRIBUTE_LR_LINENAME = {"LINENAME", "LINNAME"};
 	private final String[] ATTRIBUTE_LR_DCODE = {"DIRECTIONCODE", "RICHTUNGCODE"};
+	private final String[] ATTRIBUTE_LR_TAKT = {ATTRIBUTE_UNKNOWN, "TAKT_TAG_HVZ"};
 
 	private final String[] ATTRIBUTE_L_NAME = {"NAME", "NAME"};
 	private final String[] ATTRIBUTE_L_TCODE = {"TSYSCODE", "VSYSCODE"};
 	private final String[] ATTRIBUTE_L_VEHCOMBNO = {"VEHCOMBNO", "FZGKOMBNR"};
 
 	private final String[] ATTRIBUTE_LRI_LRNAME = {"LINEROUTENAME", "LINROUTENAME"};
-	private final String[] ATTRIBUTE_LRI_LNAME ={"LINENAME", "LINNAME"};
-	private final String[] ATTRIBUTE_LRI_ID ={"INDEX", "INDEX"};
-	private final String[] ATTRIBUTE_LRI_DCODE ={"DIRECTIONCODE", "RICHTUNGCODE"};
+	private final String[] ATTRIBUTE_LRI_LNAME = {"LINENAME", "LINNAME"};
+	private final String[] ATTRIBUTE_LRI_ID = {"INDEX", "INDEX"};
+	private final String[] ATTRIBUTE_LRI_DCODE = {"DIRECTIONCODE", "RICHTUNGCODE"};
+	private final String[] ATTRIBUTE_LRI_NODEID = {ATTRIBUTE_UNKNOWN, "KNOTNR"};
 	private final String[] ATTRIBUTE_LRI_SPNO = {"STOPPOINTNO", "HPUNKTNR"};
 
 	private final String[] ATTRIBUTE_TP_LNAME ={"LINENAME", "LINNAME"};
@@ -143,6 +159,10 @@ public class VisumNetworkReader {
 					readVersion(line, reader);
 				} else if (line.startsWith(this.TABLE_STOP[this.language])) {
 					readStops(line, reader);
+				} else if (line.startsWith(this.TABLE_NODE[this.language])) {
+					readNodes(line, reader);
+				} else if (line.startsWith(this.TABLE_EDGE[this.language])) {
+					readEdges(line, reader);
 				} else if (line.startsWith(this.TABLE_STOPAREA[this.language])) {
 					readStopAreas(line, reader);
 				} else if (line.startsWith(this.TABLE_STOPPOINT[this.language])) {
@@ -210,6 +230,54 @@ public class VisumNetworkReader {
 		line = reader.readLine();
 	}
 
+	private void readNodes(final String tableAttributes, final BufferedReader reader) throws IOException {
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_NODE[this.language].length()), ';');
+		final int idxNo = getAttributeIndex(this.ATTRIBUTE_NODE_NO[this.language], attributes);
+		final int idxName = getAttributeIndex(this.ATTRIBUTE_NODE_NAME[this.language], attributes);
+		final int idxXcoord = getAttributeIndex(this.ATTRIBUTE_NODE_XCOORD[this.language], attributes);
+		final int idxYcoord = getAttributeIndex(this.ATTRIBUTE_NODE_YCOORD[this.language], attributes);
+
+		String line = reader.readLine();
+		while (line.length() > 0) {
+			final String[] parts = StringUtils.explode(line, ';');
+			VisumNetwork.Node node = new VisumNetwork.Node(new IdImpl(parts[idxNo]), parts[idxName],
+					new CoordImpl(Double.parseDouble(parts[idxXcoord].replace(',', '.')), Double.parseDouble(parts[idxYcoord].replace(',', '.'))));
+			this.network.addNode(node);
+			// proceed to next line
+			line = reader.readLine();
+		}
+	}
+	
+	private void readEdges(String tableAttributes, BufferedReader reader) throws IOException {
+		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_EDGE[this.language].length()), ';');
+		final int idxNo = getAttributeIndex(this.ATTRIBUTE_EDGE_NO[this.language], attributes);
+		final int idxFromNode = getAttributeIndex(this.ATTRIBUTE_EDGE_FROM_NODE[this.language], attributes);
+		final int idxToNode = getAttributeIndex(this.ATTRIBUTE_EDGE_TO_NODE[this.language], attributes);
+		final int idxLength = getAttributeIndex(this.ATTRIBUTE_EDGE_LENGTH[this.language], attributes);
+		
+		String line = reader.readLine();
+		while (line.length() > 0) {
+			final String[] parts = StringUtils.explode(line, ';');
+			IdImpl id = new IdImpl(parts[idxNo]);
+			IdImpl fromNodeId = new IdImpl(parts[idxFromNode]);
+			IdImpl toNodeId = new IdImpl(parts[idxToNode]);
+			VisumNetwork.Edge lastEdge = this.network.edges.get(id);
+			if (lastEdge != null) {
+				if (lastEdge.fromNode.equals(toNodeId) && lastEdge.toNode.equals(fromNodeId)) {
+					id = new IdImpl(parts[idxNo] + 'R');
+				} else {
+					throw new RuntimeException("Duplicate edge.");
+				}
+			}
+			double length = Double.parseDouble(parts[idxLength].replace(',', '.'));
+			VisumNetwork.Edge edge = new VisumNetwork.Edge(id, 
+					fromNodeId, toNodeId, length);
+			this.network.addEdge(edge);
+			// proceed to next line
+			line = reader.readLine();
+		}
+	}
+
 	private void readStops(final String tableAttributes, final BufferedReader reader) throws IOException {
 		final String[] attributes = StringUtils.explode(tableAttributes.substring(this.TABLE_STOP[this.language].length()), ';');
 		final int idxNo = getAttributeIndex(this.ATTRIBUTE_STOP_NO[this.language], attributes);
@@ -263,11 +331,15 @@ public class VisumNetworkReader {
 		final int idxName = getAttributeIndex(this.ATTRIBUTE_LR_NAME[this.language], attributes);
 		final int idxLineName = getAttributeIndex(this.ATTRIBUTE_LR_LINENAME[this.language], attributes);
 		final int idxDCode = getAttributeIndex(this.ATTRIBUTE_LR_DCODE[this.language], attributes);
+		final int idxTakt = getAttributeIndex(this.ATTRIBUTE_LR_TAKT[this.language], attributes);
 
 		String line = reader.readLine();
 		while (line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 			VisumNetwork.TransitLineRoute lr1 = new VisumNetwork.TransitLineRoute(new IdImpl(parts[idxName]), new IdImpl(parts[idxLineName]),new IdImpl(parts[idxDCode]));
+			if (idxTakt != -1) {
+				lr1.takt = parts[idxTakt];
+			}
 			this.network.addLineRoute(lr1);
 			// proceed to next line
 			line = reader.readLine();
@@ -294,14 +366,22 @@ public class VisumNetworkReader {
 		final int idxLineName = getAttributeIndex(this.ATTRIBUTE_LRI_LNAME[this.language], attributes);
 		final int idxIndex = getAttributeIndex(this.ATTRIBUTE_LRI_ID[this.language], attributes);
 		final int idxDCode = getAttributeIndex(this.ATTRIBUTE_LRI_DCODE[this.language], attributes);
+		final int idxNodeId = getAttributeIndex(this.ATTRIBUTE_LRI_NODEID[this.language], attributes);
 		final int idxStopPointNo = getAttributeIndex(this.ATTRIBUTE_LRI_SPNO[this.language], attributes);
 
 
 		String line = reader.readLine();
 		while (line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
-
-			VisumNetwork.LineRouteItem lri1 = new VisumNetwork.LineRouteItem(parts[idxLineName],parts[idxLineRouteName],parts[idxIndex],parts[idxDCode],new IdImpl(parts[idxStopPointNo]));
+			IdImpl nodeId = new IdImpl(parts[idxNodeId]);
+			String stopPointNoString = parts[idxStopPointNo];
+			IdImpl stopPointNo;
+			if (stopPointNoString.isEmpty()) {
+				stopPointNo = null;
+			} else {
+				stopPointNo = new IdImpl(stopPointNoString);
+			}
+			VisumNetwork.LineRouteItem lri1 = new VisumNetwork.LineRouteItem(parts[idxLineName],parts[idxLineRouteName],parts[idxIndex],parts[idxDCode],nodeId,stopPointNo);
 			this.network.addLineRouteItem(lri1);
 			// proceed to next line
 			line = reader.readLine();

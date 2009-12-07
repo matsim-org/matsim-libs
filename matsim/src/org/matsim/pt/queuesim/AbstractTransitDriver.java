@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
@@ -38,6 +39,12 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	private TransitStopFacility lastHandledStop = null;
 	private Iterator<TransitRouteStop> stopIterator;
 
+	public abstract void legEnds(final double now);
+	public abstract NetworkRouteWRefs getCarRoute();
+	public abstract TransitLine getTransitLine();
+	public abstract TransitRoute getTransitRoute();
+	public abstract double getDepartureTime();
+
 	public AbstractTransitDriver(Person personImpl, TransitQueueSimulation sim, TransitStopAgentTracker agentTracker2) {
 		super();
 		this.dummyPerson = personImpl;
@@ -53,20 +60,6 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 			this.nextStop = null;
 		}
 		this.nextLinkIndex = 0;
-	}
-
-	public abstract void legEnds(final double now);
-	public abstract NetworkRouteWRefs getCarRoute();
-	public abstract TransitLine getTransitLine();
-	public abstract TransitRoute getTransitRoute();
-	public abstract double getDepartureTime();
-	
-	public void setVehicle(final TransitVehicle vehicle) {
-		this.vehicle = vehicle;
-	}
-	
-	public TransitVehicle getVehicle() {
-		return this.vehicle;
 	}
 	
 	public Link chooseNextLink() {
@@ -91,26 +84,137 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	}
 
 	public double handleTransitStop(final TransitStopFacility stop, final double now) {
-		if (stop != this.nextStop.getStopFacility()) {
-			throw new RuntimeException("Expected different stop.");
+		assertExpectedStop(stop);
+		processEventVehicleArrives(stop, now);
+		ArrayList<PassengerAgent> passengersLeaving = findPassengersLeaving(stop);	
+		int freeCapacity = this.vehicle.getPassengerCapacity() - this.vehicle.getPassengers().size() + passengersLeaving.size();
+		ArrayList<PassengerAgent> passengersEntering = findPassengersEntering(stop, freeCapacity);
+		double stopTime = handlePassengersAndCalculateStopTime(stop, now, passengersLeaving, passengersEntering);
+		stopTime = longerStopTimeIfWeAreAheadOfSchedule(now, stopTime);
+		if (stopTime == 0.0) {
+			depart(now);
 		}
+		return stopTime;
+	}
+
+	public void activityEnds(final double now) {
+		this.sim.agentDeparts(now, this, ((LegImpl) this.getCurrentLeg()).getRoute().getStartLink());
+	}
 	
+	public void teleportToLink(final Link link) {
+	}
+	
+	TransitQueueSimulation getSimulation(){
+		return this.sim;
+	}
+	
+	public Person getPerson() {
+		return this.dummyPerson;
+	}
+	
+	public TransitVehicle getVehicle() {
+		return this.vehicle;
+	}
+	
+	public void setVehicle(final TransitVehicle vehicle) {
+		this.vehicle = vehicle;
+	}
+	
+	private void processEventVehicleArrives(final TransitStopFacility stop,
+			final double now) {
 		EventsManager events = TransitQueueSimulation.getEvents();
 		if (this.lastHandledStop != stop) {
 			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
 		}
-	
-		int freeCapacity = this.vehicle.getPassengerCapacity() - this.vehicle.getPassengers().size();
-		// find out who wants to get out
-		ArrayList<PassengerAgent> passengersLeaving = new ArrayList<PassengerAgent>();
-		for (PassengerAgent passenger : this.vehicle.getPassengers()) {
-			if (passenger.getExitAtStop(stop)) {
-				passengersLeaving.add(passenger);
+	}
+
+	private void assertExpectedStop(final TransitStopFacility stop) {
+		if (stop != this.nextStop.getStopFacility()) {
+			throw new RuntimeException("Expected different stop.");
+		}
+	}
+
+	private double longerStopTimeIfWeAreAheadOfSchedule(final double now,
+			double stopTime) {
+		if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset() != Time.UNDEFINED_TIME)) {
+			double earliestDepTime = getDepartureTime() + this.nextStop.getDepartureOffset();
+			if (now + stopTime < earliestDepTime) {
+				stopTime = earliestDepTime - now;
 			}
 		}
-		freeCapacity += passengersLeaving.size();
-		// find out who wants to get in
+		return stopTime;
+	}
+
+	private void depart(final double now) {
+		EventsManager events = TransitQueueSimulation.getEvents();
+		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), this.lastHandledStop.getId()));
+		this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);
+		if(this.nextStop == null) {
+			assertVehicleIsEmpty();
+		}
+	}
+
+	private void assertVehicleIsEmpty() {
+		if (this.vehicle.getPassengers().size() > 0) {
+			RuntimeException e = new RuntimeException("Transit vehicle is at last stop but still contains passengers that did not leave the vehicle!");
+			log.error("Transit vehicle must be empty after last stop! vehicle-id = " + this.vehicle.getBasicVehicle().getId(), e);
+			for (PassengerAgent agent : this.vehicle.getPassengers()) {
+				if (agent instanceof PersonAgent) {
+				log.error("Agent is still in transit vehicle: agent-id = " + ((PersonAgent) agent).getPerson().getId());
+				}
+			}
+			throw e;
+		}
+	}
+
+	private double handlePassengersAndCalculateStopTime(
+			final TransitStopFacility stop, final double now,
+			ArrayList<PassengerAgent> passengersLeaving,
+			ArrayList<PassengerAgent> passengersEntering) {
+		double stopTime = 0.0;
+		int cntEgress = passengersLeaving.size();
+		int cntAccess = passengersEntering.size();
+		if ((cntAccess > 0) || (cntEgress > 0)) {
+			stopTime = cntAccess * 4 + cntEgress * 2;
+			if (this.lastHandledStop != stop) {
+				stopTime += 15.0; // add fixed amount of time for door-operations and similar stuff
+			}
+			handlePassengersLeaving(stop, now, passengersLeaving);
+			handlePassengersEntering(stop, now, passengersEntering);
+		}
+		this.lastHandledStop = stop;
+		return stopTime;
+	}
+
+	private void handlePassengersEntering(final TransitStopFacility stop,
+			final double now, ArrayList<PassengerAgent> passengersEntering) {
+		EventsManager events = TransitQueueSimulation.getEvents();
+		for (PassengerAgent passenger : passengersEntering) {
+			this.agentTracker.removeAgentFromStop(passenger, stop);
+			this.vehicle.addPassenger(passenger);
+			DriverAgent agent = (DriverAgent) passenger;
+			events.processEvent(new PersonEntersVehicleEventImpl(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
+		}
+	}
+
+	private void handlePassengersLeaving(final TransitStopFacility stop,
+			final double now, ArrayList<PassengerAgent> passengersLeaving) {
+		EventsManager events = TransitQueueSimulation.getEvents();
+		for (PassengerAgent passenger : passengersLeaving) {
+			this.vehicle.removePassenger(passenger);
+			DriverAgent agent = (DriverAgent) passenger;
+			events.processEvent(new PersonLeavesVehicleEventImpl(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
+			agent.teleportToLink(stop.getLink());
+			events.processEvent(new AgentArrivalEventImpl(now, agent.getPerson(),
+					stop.getLink(), agent.getCurrentLeg()));
+			agent.legEnds(now);
+		}
+	}
+
+	private ArrayList<PassengerAgent> findPassengersEntering(
+			final TransitStopFacility stop, int freeCapacity) {
 		ArrayList<PassengerAgent> passengersEntering = new ArrayList<PassengerAgent>();
+		
 		for (PassengerAgent agent : this.agentTracker.getAgentsAtStop(stop)) {
 			if (freeCapacity == 0) {
 				break;
@@ -121,69 +225,18 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 				freeCapacity--;
 			}
 		}
-	
-		// do the handling
-		double stopTime = 0.0;
-		int cntEgress = passengersLeaving.size();
-		int cntAccess = passengersEntering.size();
-		if ((cntAccess > 0) || (cntEgress > 0)) {
-			stopTime = cntAccess * 4 + cntEgress * 2;
-			if (this.lastHandledStop != stop) {
-				stopTime += 15.0; // add fixed amount of time for door-operations and similar stuff
-			}
-	
-			for (PassengerAgent passenger : passengersLeaving) {
-				this.vehicle.removePassenger(passenger);
-				DriverAgent agent = (DriverAgent) passenger;
-				events.processEvent(new PersonLeavesVehicleEventImpl(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
-				agent.teleportToLink(stop.getLink());
-//				events.processEvent(new AgentArrivalEventImpl(now, agent.getPerson(),
-//						stop.getLink(), agent.getCurrentLeg()));
-				agent.legEnds(now);
-			}
-	
-			for (PassengerAgent passenger : passengersEntering) {
-				this.agentTracker.removeAgentFromStop(passenger, stop);
-				this.vehicle.addPassenger(passenger);
-				DriverAgent agent = (DriverAgent) passenger;
-				events.processEvent(new PersonEntersVehicleEventImpl(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
-			}
-	
-		}
-		this.lastHandledStop = stop;
-	
-		if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset() != Time.UNDEFINED_TIME)) {
-			double earliestDepTime = getDepartureTime() + this.nextStop.getDepartureOffset();
-			if (now + stopTime < earliestDepTime) {
-				stopTime = earliestDepTime - now;
-			}
-		}
-	
-		if (stopTime == 0.0) {
-			events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
-			this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);
-			if(this.nextStop == null) {
-				if (this.vehicle.getPassengers().size() > 0) {
-					RuntimeException e = new RuntimeException("Transit vehicle is at last stop but still contains passengers that did not leave the vehicle!");
-					log.error("Transit vehicle must be empty after last stop! vehicle-id = " + this.vehicle.getBasicVehicle().getId(), e);
-					for (PassengerAgent agent : this.vehicle.getPassengers()) {
-						if (agent instanceof PersonAgent) {
-						log.error("Agent is still in transit vehicle: agent-id = " + ((PersonAgent) agent).getPerson().getId());
-						}
-					}
-					throw e;
-				}
-			}
-		}
-		return stopTime;
+		return passengersEntering;
 	}
 
-	public void activityEnds(final double now) {
-		this.sim.agentDeparts(now, this, ((LegImpl)this.getCurrentLeg()).getRoute().getStartLink());
-	}
-
-	public Person getPerson() {
-		return this.dummyPerson;
+	private ArrayList<PassengerAgent> findPassengersLeaving(
+			final TransitStopFacility stop) {
+		ArrayList<PassengerAgent> passengersLeaving = new ArrayList<PassengerAgent>();
+		for (PassengerAgent passenger : this.vehicle.getPassengers()) {
+			if (passenger.getExitAtStop(stop)) {
+				passengersLeaving.add(passenger);
+			}
+		}
+		return passengersLeaving;
 	}
 
 	protected NetworkRouteWrapper getWrappedCarRoute() {
@@ -300,13 +353,6 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 				throw new AssertionError(e);
 			}
 		}
-	}
-	
-	public void teleportToLink(final Link link) {
-	}
-	
-	TransitQueueSimulation getSimulation(){
-		return this.sim;
 	}
 	
 

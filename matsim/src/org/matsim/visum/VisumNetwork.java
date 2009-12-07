@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.marcel.pt.converter;
+package org.matsim.visum;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -34,18 +34,34 @@ import org.matsim.api.basic.v01.Id;
  */
 public class VisumNetwork {
 
+	public final Map<Id, Node> nodes = new HashMap<Id, Node>();
+	public final Map<Id, Edge> edges = new HashMap<Id, Edge>();
 	public final Map<Id, Stop> stops = new TreeMap<Id, Stop>();
 	public final Map<Id, StopArea> stopAreas = new TreeMap<Id, StopArea>();
 	public final Map<String, StopPoint> stopPoints = new TreeMap<String, StopPoint>();
 	public final Map<Id, TransitLine> lines = new TreeMap<Id, TransitLine>();
 	public final Map<String, TransitLineRoute> lineRoutes = new TreeMap<String, TransitLineRoute>();
-	public final Map<String , LineRouteItem> lineRouteItems = new TreeMap<String, LineRouteItem>();
-	public final Map<String , TimeProfile> timeProfiles = new TreeMap<String, TimeProfile>();
-	public final Map<String , TimeProfileItem> timeProfileItems = new LinkedHashMap<String, TimeProfileItem>();
-	public final Map<String , Departure> departures = new TreeMap<String, Departure>();
+	public final Map<String, LineRouteItem> lineRouteItems = new TreeMap<String, LineRouteItem>();
+	public final Map<String, TimeProfile> timeProfiles = new TreeMap<String, TimeProfile>();
+	public final Map<String, TimeProfileItem> timeProfileItems = new LinkedHashMap<String, TimeProfileItem>();
+	public final Map<String, Departure> departures = new TreeMap<String, Departure>();
 	public final Map<String, VehicleUnit> vehicleUnits = new HashMap<String, VehicleUnit>();
 	public final Map<String, VehicleCombination> vehicleCombinations = new HashMap<String, VehicleCombination>();
-
+	
+	public void addNode(final Node node) {
+		Node oldNode = nodes.put(node.id, node);
+		if (oldNode != null) {
+			throw new IllegalArgumentException("Duplicate node.");
+		}
+	}
+	
+	public void addEdge(final Edge edge) {
+		Edge oldEdge = edges.put(edge.id, edge);
+		if (oldEdge != null) {
+			throw new IllegalArgumentException("Duplicate edge.");
+		}
+	}
+	
 	public void addStop(final Stop stop) {
 		Stop oldStop = this.stops.put(stop.id, stop);
 		if (oldStop != null) {
@@ -56,6 +72,7 @@ public class VisumNetwork {
 		}
 
 	}
+	
 	public void addStopArea(final StopArea stopAr) {
 		StopArea oldStopAr = this.stopAreas.put(stopAr.id, stopAr);
 		if (oldStopAr != null) {
@@ -157,6 +174,30 @@ public class VisumNetwork {
 		}
 	}
 
+	public static class Node {
+		public final Id id;
+		public final String name;
+		public final Coord coord;
+		public Node(Id id, String name, Coord coord) {
+			this.id = id;
+			this.name = name;
+			this.coord = coord;
+		}		
+	}
+	
+	public static class Edge {
+		public final Id id;
+		public final Id fromNode;
+		public final Id toNode;
+		public final double length;
+		public Edge(Id id, Id fromEdge, Id toEdge, double length) {
+			super();
+			this.id = id;
+			this.fromNode = fromEdge;
+			this.toNode = toEdge;
+			this.length = length;
+		}
+	}
 
 	public static class Stop {
 		public final Id id;
@@ -173,11 +214,9 @@ public class VisumNetwork {
 		public final Id id;
 		public final Id StopId;
 
-
 		public StopArea(final Id id, final Id StopId) {
 			this.id = id;
 			this.StopId = StopId;
-
 		}
 	}
 	public static class StopPoint {
@@ -198,6 +237,7 @@ public class VisumNetwork {
 		public final Id id;
 		public final Id lineName;
 		public final Id DCode;
+		public String takt;
 
 		public TransitLineRoute(final Id id,final Id lineName,final Id DCode) {
 			this.id = id;
@@ -224,14 +264,14 @@ public class VisumNetwork {
 		public final String lineRouteName;
 		public final String index;
 		public final String DCode;
+		public final Id nodeId;
 		public final Id stopPointNo;
 
-
-
-		public LineRouteItem(final String lineName, final String lineRouteName, final String index,final String DCode, final Id stopPointNo) {
+		public LineRouteItem(final String lineName, final String lineRouteName, final String index,final String DCode, final Id nodeId, final Id stopPointNo) {
 			this.lineName = lineName;
 			this.lineRouteName = lineRouteName;
 			this.index = index;
+			this.nodeId = nodeId;
 			this.stopPointNo = stopPointNo;
 			this.DCode = DCode;
 		}

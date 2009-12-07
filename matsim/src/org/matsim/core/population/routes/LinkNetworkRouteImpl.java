@@ -36,12 +36,22 @@ import org.matsim.api.core.v01.population.LinkNetworkRoute;
  */
 public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteWRefs, LinkNetworkRoute, Cloneable {
 
+	private static final long serialVersionUID = 1L;
 	private ArrayList<Link> route = new ArrayList<Link>();
 	private double travelCost = Double.NaN;
 	private Id vehicleId = null;
 
 	public LinkNetworkRouteImpl(final Link startLink, final Link endLink){
 		super(startLink, endLink);
+	}
+
+	public static NetworkRouteWRefs create(List<Link> routeLinks) {
+		Link startLink = routeLinks.get(0);
+		List<Link> linksBetween = (routeLinks.size() > 2) ? routeLinks.subList(1, routeLinks.size() - 1) : new ArrayList<Link>(0);
+		Link endLink = routeLinks.get(routeLinks.size() - 1);
+		NetworkRouteWRefs route = new LinkNetworkRouteImpl(startLink, endLink);
+		route.setLinks(startLink, linksBetween, endLink);
+		return route;
 	}
 
 	@Override
@@ -190,17 +200,27 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRouteW
 		Node prevNode = null;
 		for (Node node : srcRoute) {
 			if (prevNode != null) {
-				// find link from prevNode to node
-				for (Link link : prevNode.getOutLinks().values()) {
-					if (link.getToNode().equals(node)) {
-						this.route.add(link);
-						break;
-					}
-				}
+				findAndAddLink(prevNode, node);
 			}
 			prevNode = node;
 		}
 		this.route.trimToSize();
+	}
+
+	private void findAndAddLink(Node prevNode, Node node) {
+		Link foundLink = findLink(prevNode, node);
+		if (foundLink != null) {
+			this.route.add(foundLink);
+		}
+	}
+
+	private Link findLink(Node prevNode, Node node) {
+		for (Link link : prevNode.getOutLinks().values()) {
+			if (link.getToNode().equals(node)) {
+				return link;
+			}
+		}
+		return null;
 	}
 
 	public Id getVehicleId() {

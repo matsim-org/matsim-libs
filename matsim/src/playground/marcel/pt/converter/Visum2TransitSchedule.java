@@ -26,9 +26,10 @@ import org.matsim.vehicles.BasicVehicleCapacity;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.visum.VisumNetwork;
+import org.matsim.visum.VisumNetwork.VehicleCombination;
+import org.matsim.visum.VisumNetwork.VehicleUnit;
 
-import playground.marcel.pt.converter.VisumNetwork.VehicleCombination;
-import playground.marcel.pt.converter.VisumNetwork.VehicleUnit;
 
 
 public class Visum2TransitSchedule {

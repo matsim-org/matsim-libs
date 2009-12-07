@@ -22,9 +22,9 @@ package org.matsim.transitSchedule;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
@@ -46,8 +46,10 @@ public class TransitRouteImpl implements TransitRoute {
 	private NetworkRouteWRefs route;
 	private final List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 	private String description = null;
-	private final Map<Id, Departure> departures = new HashMap<Id, Departure>();
+	private final Map<Id, Departure> departures = new TreeMap<Id, Departure>();
 	private TransportMode transportMode;
+	private String lineRouteName;
+	private String direction;
 
 	protected TransitRouteImpl(final Id id, final NetworkRouteWRefs route, final List<TransitRouteStop> stops, final TransportMode mode) {
 		this.routeId = id;
@@ -117,6 +119,22 @@ public class TransitRouteImpl implements TransitRoute {
 			}
 		}
 		return null;
+	}
+
+	public String getLineRouteName() {
+		return lineRouteName;
+	}
+
+	public String getDirection() {
+		return direction;
+	}
+
+	public void setLineRouteName(String lineRouteName) {
+		this.lineRouteName = lineRouteName;
+	}
+
+	public void setDirection(String direction) {
+		this.direction = direction;
 	}
 
 }
