@@ -20,26 +20,19 @@
 
 package org.matsim.vis.otfvis.executables;
 
-import java.util.UUID;
-
+import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
-import org.matsim.vis.otfvis.OTFClient;
-import org.matsim.vis.otfvis.OTFVisQueueSim;
-import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
-import org.matsim.vis.otfvis.server.OnTheFlyServer;
+import org.matsim.vis.otfvis.OTFVisControlerListener;
 
 /**
  * This class shows how the controller is overloaded to run a "live" simulation.
- * 
+ * Now the live simulation is run via an listener as an first step to get this more modular.
  * @author dstrippgen
  *
  */
 public class OTFVisController extends Controler {
 
-	private OnTheFlyServer myOTFServer;
-	private QueueNetwork queueNetwork;
+  private static final Logger log = Logger.getLogger(OTFVisController.class);
 
 	public static final int NOCONTROL = 0x00000000;
 	
@@ -50,53 +43,47 @@ public class OTFVisController extends Controler {
 	public static final int CANCEL = 0x08000000;
 	public static final int ALL_FLAGS = 0xff000000;
 
+	private static OTFVisControlerListener listener;
+	
+	static {
+		listener = new OTFVisControlerListener();
+	}
+	
 	public static int getStatus(int flags) {
-		return flags & ALL_FLAGS;
+		return listener.getStatus(flags);
 	}
 	
 	public static int getIteration(int flags) {
-		int res = flags & 0xffffff;
-		return res;
+		return listener.getIteration(flags);
 	}
 	
-	@Override
-	protected void setUp() {
-		super.setUp();
-		UUID idOne = UUID.randomUUID();
-		this.queueNetwork = new QueueNetwork(this.network);
-		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.queueNetwork, this.population, getEvents(), false);
-		myOTFServer.setControllerStatus(STARTUP);
-		OTFClient client = new OTFClient("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), new DefaultConnectionManagerFactory().createConnectionManager());
-		client.start();
-	}
-
-	@Override
-	protected void runMobSim() {
-		OTFVisQueueSim sim = new OTFVisQueueSim(this.scenarioData, this.events);
-		// overwrite network
-		sim.setQueueNetwork(this.queueNetwork);
-		sim.setServer(myOTFServer);
-		sim.setVisualizeTeleportedAgents(this.config.otfVis().isShowTeleportedAgents());
-		for (QueueSimulationListener l : this.getQueueSimulationListener()) {
-			sim.addQueueSimulationListeners(l);
-		}
-		myOTFServer.setControllerStatus(RUNNING + getIteration());
-		sim.run();
-		myOTFServer.setControllerStatus(REPLANNING + getIteration()+1);
-	}
-
-	@Override
-	protected void shutdown(boolean unexpected) {
-		super.shutdown(unexpected);
-		this.myOTFServer.cleanup();
-	}
-
 	public OTFVisController(String[] args) {
 		super(args);
+		this.addControlerListener(listener);
 	}
 
 	public OTFVisController(String configFileName) {
 		super(configFileName);
+		this.addControlerListener(listener);
+	}
+	
+	/**
+	 * Do nothing as the listener is doing all the work
+	 */
+	@Override
+	protected void runMobSim() {
+	}
+
+
+	
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		log.info("running OTFVisController...");
+		OTFVisController controller = new OTFVisController(args);
+		controller.setOverwriteFiles(true);
+		controller.run();
 	}
 }
 
