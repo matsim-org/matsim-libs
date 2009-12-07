@@ -123,7 +123,7 @@ public class ActivityClusterBuilder {
 						if(file.getName().length() > 4){
 							String extention = file.getName().substring(file.getName().length()-4);
 							if(extention.equalsIgnoreCase(".xml")){
-								List<Chain> chains = readVehicleChain(file.getAbsolutePath());
+								List<Chain> chains = readVehicleChain(file.getAbsolutePath(), silent);
 								mamb.buildAdjacency(chains, silent);
 							}
 						}
@@ -141,7 +141,7 @@ public class ActivityClusterBuilder {
 					}
 				}
 			} else if(vehicleFilename != null){
-				List<Chain> chains = readVehicleChain(vehicleFilename);
+				List<Chain> chains = readVehicleChain(vehicleFilename, silent);
 				mamb.buildAdjacency(chains, silent);
 			} else{
 				throw new RuntimeException("No vehicle file or folder specified.");
@@ -154,9 +154,9 @@ public class ActivityClusterBuilder {
 		}
 	}
 	
-	private List<Chain> readVehicleChain(String filename){
+	private List<Chain> readVehicleChain(String filename, boolean silent){
 		List<Chain> result = null;
-		MyXmlConverter mxc = new MyXmlConverter();
+		MyXmlConverter mxc = new MyXmlConverter(silent);
 		Object o = mxc.readObjectFromFile(filename);
 		if(o instanceof CommercialVehicle){
 			result = ((CommercialVehicle) o).getChains();
