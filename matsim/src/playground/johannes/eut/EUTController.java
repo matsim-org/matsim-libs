@@ -224,7 +224,7 @@ public class EUTController extends WithindayControler {
 		for(Link link : riskyLinks)
 //			simulator.addLink(sim.getQueueNetworkLayer().getQueueLink(link.getId()));
 			simulator.addLink(null); //FIXME
-		simulator.notifyIterationStarts(EUTController.getIteration());
+		simulator.notifyIterationStarts(this.getIteration());
 		
 		sim.run();
 		

@@ -104,7 +104,7 @@ public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener
 			}
 			countswriter.close();
 			
-			writer.write(String.valueOf(EUTController.getIteration()));
+			writer.write(String.valueOf(event.getIteration()));
 			writer.write("\t");
 			writer.write(String.valueOf(count));
 			writer.newLine();
@@ -117,7 +117,7 @@ public class LinkCounter implements LinkEnterEventHandler, IterationEndsListener
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		try {
 			countswriter = IOUtils.getBufferedWriter(EUTController
-					.getOutputFilename(EUTController.getIteration()
+					.getOutputFilename(event.getIteration()
 							+ ".1100.linkcounts.txt"));
 			countswriter.write("time\tcounts");
 			countswriter.newLine();
