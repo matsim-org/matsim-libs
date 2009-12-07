@@ -376,7 +376,7 @@ public class VisumNetworkReader {
 			IdImpl nodeId = new IdImpl(parts[idxNodeId]);
 			String stopPointNoString = parts[idxStopPointNo];
 			IdImpl stopPointNo;
-			if (stopPointNoString.isEmpty()) {
+			if (stopPointNoString.length() == 0) {
 				stopPointNo = null;
 			} else {
 				stopPointNo = new IdImpl(stopPointNoString);
