@@ -50,8 +50,6 @@ public class OTFVisController extends Controler {
 	public static final int CANCEL = 0x08000000;
 	public static final int ALL_FLAGS = 0xff000000;
 
-	private boolean doVisualizeTeleportedAgents = false;
-	
 	public static int getStatus(int flags) {
 		return flags & ALL_FLAGS;
 	}
@@ -78,7 +76,7 @@ public class OTFVisController extends Controler {
 		// overwrite network
 		sim.setQueueNetwork(this.queueNetwork);
 		sim.setServer(myOTFServer);
-		sim.setVisualizeTeleportedAgents(this.doVisualizeTeleportedAgents);
+		sim.setVisualizeTeleportedAgents(this.config.otfVis().isShowTeleportedAgents());
 		for (QueueSimulationListener l : this.getQueueSimulationListener()) {
 			sim.addQueueSimulationListeners(l);
 		}

@@ -125,6 +125,7 @@ public class OTFVisConfig extends Module {
 	public static final String FILE_MINOR_VERSION = "fileMinorVersion";
 
 	public static final String BIG_TIME_STEP = "bigTimeStep";
+	public static final String SHOW_TELEPORTATION = "showTeleportation";
 //	public static final String TIME_STEP = "timeStep";
 
 	private  float agentSize = 120.f;
@@ -151,6 +152,7 @@ public class OTFVisConfig extends Module {
 	private int delay_ms = 30;
 
 	private boolean drawScaleBar = false;
+	private boolean showTeleportedAgents = false;
 
 	/**
 	 * @return the delay_ms
@@ -200,7 +202,11 @@ public class OTFVisConfig extends Module {
 			return this.leftMouseFunc;
 		}  else if (RIGHT_MOUSE_FUNC.equals(key)) {
 			return this.rightMouseFunc;
-		} else {
+		} 
+		else if (SHOW_TELEPORTATION.equalsIgnoreCase(key)){
+			return Boolean.toString(this.showTeleportedAgents);
+		}
+		else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -215,7 +221,11 @@ public class OTFVisConfig extends Module {
 			this.leftMouseFunc = value;
 		}  else if (RIGHT_MOUSE_FUNC.equals(key)) {
 			this.rightMouseFunc = value;
-		} else {
+		} 
+		else if (SHOW_TELEPORTATION.equalsIgnoreCase(key)){
+			this.showTeleportedAgents = Boolean.parseBoolean(value);
+		}
+		else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -227,6 +237,7 @@ public class OTFVisConfig extends Module {
 		map.put(LEFT_MOUSE_FUNC, getValue(LEFT_MOUSE_FUNC));
 		map.put(MIDDLE_MOUSE_FUNC, getValue(MIDDLE_MOUSE_FUNC));
 		map.put(RIGHT_MOUSE_FUNC, getValue(RIGHT_MOUSE_FUNC));
+		map.put(SHOW_TELEPORTATION, getValue(SHOW_TELEPORTATION));
 		return map;
 	}
 	
@@ -437,6 +448,13 @@ public class OTFVisConfig extends Module {
 	
 	public boolean drawScaleBar() {
 		return this.drawScaleBar ;
+	}
+	public boolean isShowTeleportedAgents() {
+		return this.showTeleportedAgents ;
+	}
+	
+	public void setShowTeleportedAgents(boolean showTeleportation){
+		this.showTeleportedAgents = showTeleportation;
 	}
 	
 
