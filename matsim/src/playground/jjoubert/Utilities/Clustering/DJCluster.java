@@ -218,9 +218,10 @@ public class DJCluster {
 		 * the clusterId field as 'row' and 'column' reference in the 2D matrices
 		 * when determining adjacency in Social Network Analysis.
 		 */
-		log.info("Building the cluster list.");
+		log.info("Building the cluster list (2 steps)");
 		Map<Cluster, List<ClusterPoint>> clusterMap = new TreeMap<Cluster, List<ClusterPoint>>();
 		
+		log.info("Step 1 of 2:");
 		log.info("Number of ClusterPoints to process: " + ul.size());
 		int cpCounter = 0;
 		int cpMultiplier = 1;
@@ -243,6 +244,7 @@ public class DJCluster {
 		}
 		log.info("   ClusterPoints processed: " + cpCounter + " (Done)");
 		
+		log.info("Step 2 of 2:");
 		log.info("Number of clusters to process: " + clusterMap.keySet().size());
 		int clusterCounter = 0;
 		int clusterMultiplier = 1;
