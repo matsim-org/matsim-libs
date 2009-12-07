@@ -155,6 +155,9 @@ public class TransitQueueSimulation extends QueueSimulation {
 	 */
 	@Override
 	protected void handleAgentArrival(final double now, DriverAgent agent){
+		if (this.otfServer != null) {
+			this.visTeleportationData.remove(agent.getPerson().getId());
+		}
 		super.handleAgentArrival(now, agent);
 	}
 
