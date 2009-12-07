@@ -22,8 +22,10 @@ package org.matsim.pt.queuesim;
 
 import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
@@ -44,6 +46,8 @@ import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDataWriter;
+import org.matsim.vis.otfvis.data.teleportation.TeleportationVisData;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 
@@ -61,6 +65,10 @@ public class TransitQueueSimulation extends QueueSimulation {
 
 	private final HashMap<Person, DriverAgent> agents = new HashMap<Person, DriverAgent>(100);
 
+	private OTFTeleportAgentsDataWriter teleportationWriter;
+
+	private LinkedHashMap<Id, TeleportationVisData> visTeleportationData;
+
 	public TransitQueueSimulation(final ScenarioImpl scenario, final EventsManager events) {
 		super(scenario, events);
 
@@ -73,6 +81,10 @@ public class TransitQueueSimulation extends QueueSimulation {
 	public void startOTFServer(final String serverName) {
 		this.otfServer = OnTheFlyServer.createInstance(serverName, this.network, this.population, getEvents(), false);
 		this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(this.schedule, this.agentTracker));
+		this.teleportationWriter = new OTFTeleportAgentsDataWriter();
+		this.visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
+		this.otfServer.addAdditionalElement(this.teleportationWriter);
+
 		try {
 			this.otfServer.pause();
 		} catch (RemoteException e) {
@@ -92,6 +104,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 	protected void afterSimStep(final double time) {
 		super.afterSimStep(time);
 		if (this.otfServer != null) {
+			this.visualizeTeleportedAgents(time);
 			this.otfServer.updateStatus(time);
 		}
 	}
@@ -146,6 +159,9 @@ public class TransitQueueSimulation extends QueueSimulation {
 	@Override
 	protected void agentDeparts(double now, final DriverAgent agent, final Link link){
 		super.agentDeparts(now, agent, link);
+		if (this.otfServer != null) {
+			this.visAndHandleUnknownLegMode(now, agent, link);
+		}
 	}
 	
 	@Override
@@ -178,4 +194,14 @@ public class TransitQueueSimulation extends QueueSimulation {
 		}
 	}
 
+	private void visualizeTeleportedAgents(double time) {
+		this.teleportationWriter.setSrc(this.visTeleportationData);
+		this.teleportationWriter.setTime(time);
+	}
+
+	protected void visAndHandleUnknownLegMode(double now, final DriverAgent agent, Link link){
+		this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link));
+		super.handleUnknownLegMode(now, agent);
+	}
+	
 }
