@@ -29,8 +29,10 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -158,9 +160,17 @@ public class TransitQueueSimulation extends QueueSimulation {
 
 	@Override
 	protected void agentDeparts(double now, final DriverAgent agent, final Link link){
-		super.agentDeparts(now, agent, link);
-		if (this.otfServer != null) {
+		Leg leg = agent.getCurrentLeg();
+		TransportMode mode = leg.getMode();
+		getEvents().processEvent(new AgentDepartureEventImpl(now, agent.getPerson(), link, leg));
+		if (this.getNotTeleportedModes().contains(mode)){
+			this.handleKnownLegModeDeparture(now, agent, link, mode);
+		}
+		else if (this.otfServer != null){
 			this.visAndHandleUnknownLegMode(now, agent, link);
+		}
+		else {
+			this.handleUnknownLegMode(now, agent);
 		}
 	}
 	
