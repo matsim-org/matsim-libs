@@ -55,7 +55,7 @@ import org.matsim.vis.otfvis.interfaces.OTFQuery;
 
 /**
  * OnTheFlyServer is the live server of the OTFVis.
- * it is injected into a running QueueSimulation by either oveloading the 
+ * it is injected into a running QueueSimulation by either overloading the 
  * simulation's afterSimStep() method or via the external trigger events.
  * The simulation should call on every tick the method updateStatus().
  * Then the server can stop the simulation run whenever wanted.
