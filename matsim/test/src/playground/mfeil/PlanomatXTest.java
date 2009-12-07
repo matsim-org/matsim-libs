@@ -26,33 +26,11 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
-import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.planomat.costestimators.*;
-import org.matsim.population.algorithms.PlanAnalyzeSubtours;
-import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.population.routes.NodeNetworkRouteImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.PlanElement;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.api.basic.v01.TransportMode;
-
 import playground.mfeil.MDSAM.ActivityTypeFinder;
 import playground.mfeil.FilesForTests.Initializer;
 
