@@ -220,6 +220,10 @@ public class DJCluster {
 		 */
 		log.info("Building the cluster list.");
 		Map<Cluster, List<ClusterPoint>> clusterMap = new TreeMap<Cluster, List<ClusterPoint>>();
+		
+		log.info("Number of ClusterPoints to process: " + ul.size());
+		int cpCounter = 0;
+		int cpMultiplier = 1;
 		for (ClusterPoint cp : ul) {
 			Cluster theCluster = cp.getCluster();
 			if(theCluster != null){
@@ -232,7 +236,16 @@ public class DJCluster {
 				}
 				clusterMap.get(theCluster).add(cp);
 			}
+			if(++cpCounter == cpMultiplier){
+				log.info("   ClusterPoints processed: " + cpCounter + " (" + String.format("%3.2f", ((double)cpCounter/(double)ul.size())*100) + "%)");
+				cpMultiplier = cpMultiplier*2;
+			}
 		}
+		log.info("   ClusterPoints processed: " + cpCounter + " (Done)");
+		
+		log.info("Number of clusters to process: " + clusterMap.keySet().size());
+		int clusterCounter = 0;
+		int clusterMultiplier = 1;
 		int clusterNumber = 0;
 		for (Cluster cluster : clusterMap.keySet()) {
 			List<ClusterPoint> listOfClusterPoints = clusterMap.get(cluster);
@@ -242,7 +255,13 @@ public class DJCluster {
 				cluster.setCenterOfGravity();
 				clusterList.add(cluster);
 			}
+			
+			if(++clusterCounter == clusterMultiplier){
+				log.info("   Clusters processed: " + clusterCounter + " (" + String.format("%3.2f",	((double)clusterCounter / (double)clusterMap.keySet().size())*100) + "%)");
+				clusterMultiplier = clusterMultiplier*2;
+			}
 		}
+		log.info("   Clusters processed: " + clusterCounter + " (Done)");
 		log.info("Cluster list built.");
 	}
 	
