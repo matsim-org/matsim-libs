@@ -36,6 +36,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.locationchoice.LocationChoice;
+
 import playground.mfeil.MDSAM.*;
 
 
@@ -141,7 +142,8 @@ public class ControlerMFeil extends Controler {
 	@Override
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
 		//return new PlanomatXScoringFunctionFactory(this.getConfig().charyparNagelScoring());
-		return new JohScoringFunctionFactory();
+		//return new JohScoringFunctionFactory();
+		return new JohScoringFunctionEstimationFactory();
 	}
 	
 }
