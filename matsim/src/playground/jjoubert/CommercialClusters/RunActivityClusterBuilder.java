@@ -73,7 +73,7 @@ public class RunActivityClusterBuilder {
 	 /*=============================================================================
 	 * String value indicating the version to run									|
 	 *=============================================================================*/
-	private static String version = "20091202132951";
+	private static String version = "20091202131951";
 	
 	 /*=============================================================================
 	 * String array with all the minor/major thresholds that should be considered. 	|
