@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
@@ -59,13 +61,13 @@ import org.xml.sax.SAXException;
 import playground.mzilske.pt.queuesim.GreedyUmlaufBuilderImpl;
 import playground.mzilske.pt.queuesim.Umlauf;
 import playground.mzilske.pt.queuesim.UmlaufInterpolator;
+import playground.mzilske.pt.queuesim.UmlaufStueckI;
 
 public class NullFallFacilityRollout {
 
 	private static final Logger log = Logger.getLogger(NullFallFacilityRollout.class);
 
 	private static String InNetworkFile = "../berlin-bvg09/pt/nullfall_M44_344/intermediateNetwork.xml";
-	private static String InVehicleFile = "../berlin-bvg09/pt/nullfall_M44_344/intermediateVehicles.xml";;
 	private static String InTransitScheduleFile = "../berlin-bvg09/pt/nullfall_M44_344/intermediateTransitSchedule.xml";
 	private static String OutNetworkFile = "../berlin-bvg09/pt/nullfall_M44_344/network.xml";
 	private static String OutTransitScheduleFile = "../berlin-bvg09/pt/nullfall_M44_344/transitSchedule.xml";
@@ -75,6 +77,8 @@ public class NullFallFacilityRollout {
 	private final ScenarioImpl outScenario;
 	private final Config outConfig;
 	private Map<TransitStopFacility, Map<Link, TransitStopFacility>> transitStopInLinks = new HashMap<TransitStopFacility, Map<Link, TransitStopFacility>>();
+
+	private Collection<Umlauf> umlaeufe;
 
 	
 
@@ -97,6 +101,7 @@ public class NullFallFacilityRollout {
 		app.enterFacilities();
 		app.emptyVehicles();
 		app.buildUmlaeufe();
+		app.removeUnusedNetworkParts();
 		try {
 			app.writeNetworkAndScheduleAndVehicles();
 		} catch (FileNotFoundException e) {
@@ -234,10 +239,14 @@ public class NullFallFacilityRollout {
 		}
 	}
 	
+	private void emptyVehicles() {
+		outScenario.getVehicles().getVehicles().clear();
+	}
+
 	private void buildUmlaeufe() {
 		Collection<TransitLine> transitLines = outScenario.getTransitSchedule().getTransitLines().values();
 		GreedyUmlaufBuilderImpl greedyUmlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(outScenario.getNetwork()), transitLines);
-		Collection<Umlauf> umlaeufe = greedyUmlaufBuilder.build();
+		umlaeufe = greedyUmlaufBuilder.build();
 		
 		VehiclesFactory vb = outScenario.getVehicles().getFactory();
 		BasicVehicleType vehicleType = vb.createVehicleType(new IdImpl(
@@ -257,8 +266,22 @@ public class NullFallFacilityRollout {
 		}
 	}
 
-	private void emptyVehicles() {
-		outScenario.getVehicles().getVehicles().clear();
+	private void removeUnusedNetworkParts() {
+		Collection<Node> usedNodes = new HashSet<Node>();
+		for (Umlauf umlauf : umlaeufe) {
+			for (UmlaufStueckI umlaufstueck : umlauf.getUmlaufStuecke()) {
+				NetworkRouteWRefs route = umlaufstueck.getCarRoute();
+				for (Node node : route.getNodes()) {
+					usedNodes.add(node);
+				}
+			}
+		}
+		Collection<Node> allNodes = new ArrayList<Node>(outScenario.getNetwork().getNodes().values());
+		for (Node node : allNodes) {
+			if (!usedNodes.contains(node)) {
+				outScenario.getNetwork().removeNode(node);
+			}
+		}
 	}
 
 }

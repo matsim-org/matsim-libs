@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 /**
  * Contains several helper methods for working with {@link NetworkLayer networks}. 
@@ -125,6 +126,15 @@ public class NetworkUtils {
 	 */
 	public static int getNumberOfLanesAsInt(final double time, final Link link) {
 		return Math.round((float)Math.max(link.getNumberOfLanes(time), 1.0d));
+	}
+
+	public static LinkNetworkRouteImpl createLinkNetworkRoute(List<Link> routeLinks) {
+		Link startLink = routeLinks.get(0);
+		List<Link> linksBetween = (routeLinks.size() > 2) ? routeLinks.subList(1, routeLinks.size() - 1) : new ArrayList<Link>(0);
+		Link endLink = routeLinks.get(routeLinks.size() - 1);
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLink, endLink);
+		route.setLinks(startLink, linksBetween, endLink);
+		return route;
 	}
 	
 }

@@ -43,8 +43,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.transitSchedule.TransitRouteImpl;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.Departure;
@@ -138,7 +138,7 @@ public class NullFallDataPrepare {
 					links.add(link);
 					previousLineRouteItem = nextLineRouteItem;
 				}
-				NetworkRouteWRefs linkNetworkRoute = LinkNetworkRouteImpl.create(links);
+				NetworkRouteWRefs linkNetworkRoute = NetworkUtils.createLinkNetworkRoute(links);
 				transitRouteI.setRoute(linkNetworkRoute);
 				if (transitLineRoute.takt != null) {
 					int taktInSeconds = parseTaktToSeconds(transitLineRoute.takt);
