@@ -3367,9 +3367,6 @@
 			<activity type="work">
 				<location id="8" isPrimary="yes"/>
 			</activity>
-			<activity type="shop">
-				<location id="1" isPrimary="yes"/>
-			</activity>
 			<activity type="leisure">
 				<location id="43" isPrimary="no"/>
 			</activity>
