@@ -119,7 +119,7 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 		this.out.close();
 	}
 
-	private int getRank(Person person) {
+	int getRank(Person person) {
 		
 		int rank = 0;
 		
