@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import playground.balmermi.census2000.data.Municipality;
 import playground.balmermi.census2000.data.Municipalities;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 
 /**
@@ -56,7 +57,7 @@ public class IncomeAttacher {
 		final String worldFilename = "/home/baug/mfeil/data/Zurich10/world.xml";
 		final String worldAddFilename = "/home/baug/mfeil/data/Zurich10/gg25_2001_infos.txt";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-		final String populationFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans_mz05.xml";
+		final String populationFilename = "/home/baug/mfeil/data/Zurich10/plans.xml";
 		final String outputFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans0930.dat";
 		
 		/*
@@ -80,7 +81,7 @@ public class IncomeAttacher {
 	}
 	
 	private static final Logger log = Logger.getLogger(IncomeAttacher.class);
-	private HashMap<Id,Integer> income;
+	private HashMap<Id,Double> income;
 	private ScenarioImpl scenario;
 
 	
@@ -97,7 +98,10 @@ public class IncomeAttacher {
 		municipalities.parse(municipalityLayer);
 		System.out.println("  done.");
 		
-		ArrayList<ArrayList<Id>> listings = new ArrayList<ArrayList<Id>>();
+		this.income = new HashMap<Id,Double>();
+		HashMap<Id,Id> listings = new HashMap<Id,Id>();
+		int doubleListings = 0;
+		int noListing =0;
 		
 		for (Iterator<? extends Person> iterator = this.scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = (PersonImpl) iterator.next();
@@ -119,15 +123,29 @@ public class IncomeAttacher {
 					munAtts.add(muni.getId());
 				}
 			}
-			listings.add(munAtts);
-			//income.put(person.getId(), value);
-		}
-		
-		for (int i = 0;i<listings.size();i++){
-			if (listings.get(i).size()==0 || listings.get(i).size()>1){
-				System.out.println("Size of "+i+". listings element is "+listings.get(i).size());
+			if (munAtts.size()>1){
+				doubleListings++;
+				System.out.println("Size of element is "+munAtts.size());
+				
+				double distance = Double.MAX_VALUE;
+				int position = -1;
+				for (int j=0;j<munAtts.size();j++){
+					double dis = CoordUtils.calcDistance(((ActivityImpl)(person.getSelectedPlan().getPlanElements().get(0))).getCoord(), municipalities.getMunicipality(munAtts.get(j)).getZone().getCoord());
+					if (distance>dis){
+						distance = dis;
+						position = j;
+					}
+				}
+				listings.put(person.getId(), munAtts.get(position));
+				this.income.put(person.getId(), municipalities.getMunicipality(munAtts.get(position)).getIncome());
+				
+			}
+			if (munAtts.size()== 0){
+				noListing++;
+				System.out.println("Size of element is "+munAtts.size());
 			}
 		}
+		System.out.println("There are "+doubleListings+" double-listings and "+noListing+" no-listings.");
 	}
 }
 
