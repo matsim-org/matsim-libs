@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IncomeAdder.java
+ * AgentsAttributesAdder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -38,7 +38,7 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 public class AgentsAttributesAdder {
 
-	private static final Logger log = Logger.getLogger(AgentsAttributesAdder.class);
+	private static final Logger log = Logger.getLogger(AgentsHighestEducationAdder.class);
 	private Map<Id, Integer> income;
 	private Map<Id, Integer> carAvail;
 	private Map<Id, Integer> seasonTicket;	
