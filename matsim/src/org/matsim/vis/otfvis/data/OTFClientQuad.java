@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.caching.SceneGraph;
@@ -55,6 +56,9 @@ import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
  *
  */
 public class OTFClientQuad extends QuadTree<OTFDataReader> {
+	
+	private static final Logger log = Logger.getLogger(OTFClientQuad.class);
+	
 	private final double minEasting;
 	private final double maxEasting;
 	private final double minNorthing;
@@ -164,7 +168,10 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 				new CreateReceiverExecutor(connect, graph));
 		for(OTFDataReader element : this.additionalElements) {
 			Collection<OTFDataReceiver> drawers = connect.getReceivers(element.getClass(), graph);
-			for (OTFDataReceiver drawer : drawers) element.connect(drawer);
+			for (OTFDataReceiver drawer : drawers) {
+				element.connect(drawer);
+				log.info("Connected " + element.getClass().getName() + " to " + drawer.getClass().getName());
+			}
 		}
 	}
 
@@ -243,7 +250,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		SceneGraph cachedResult = this.cachedTimes.get(time);
 		if(cachedResult != null) {
 			Rect cachedRect = cachedResult.getRect();
-			if(cachedRect == null || cachedRect.containsOrEquals(rect)) return cachedResult;
+			if((cachedRect == null) || cachedRect.containsOrEquals(rect)) return cachedResult;
 
 			Rect intersec = rect.intersection(cachedRect);
 			if(intersec == null) {
@@ -298,7 +305,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	}
 
 	public synchronized SceneGraph getSceneGraph(final int time, final Rect rect, final OTFDrawer drawer) throws RemoteException {
-		if (time == -1 && this.lastGraph != null) return this.lastGraph;
+		if ((time == -1) && (this.lastGraph != null)) return this.lastGraph;
 		this.lastGraph = getSceneGraphNoCache(time, rect, drawer);
 		return this.lastGraph;
 	}
