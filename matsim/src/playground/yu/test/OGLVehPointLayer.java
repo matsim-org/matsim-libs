@@ -23,73 +23,65 @@
  */
 package playground.yu.test;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import javax.media.opengl.GL;
+import java.awt.Color;
 
 import org.matsim.core.gbl.MatsimResource;
-import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentArrayDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 
 /**
  * @author yu
  * 
  */
-public class VehOTFVis {
-	public static class VehDrawer extends AgentArrayDrawer {
+public class OGLVehPointLayer extends OGLAgentPointLayer {
 
-		public VehDrawer(String filename) {
-			this.texture = OTFOGLDrawer.createTexture(MatsimResource
-					.getAsInputStream(filename));
+	public class VehDrawer extends AgentPointDrawer {
+		public final AgentArrayDrawer carDrawer = new AgentArrayDrawer() {
+			@Override
+			protected void setTexture() {
+				this.texture = OTFOGLDrawer.createTexture(MatsimResource
+						.getAsInputStream("car.png"));
+			}
+		};
+		public final AgentArrayDrawer busDrawer = new AgentArrayDrawer() {
+			@Override
+			protected void setTexture() {
+				this.texture = OTFOGLDrawer.createTexture(MatsimResource
+						.getAsInputStream("bus.png"));
+			}
+		};
+
+		public void setAgent(char[] id, float startX, float startY, int state,
+				int user, float color) {
+			if (id[0] == 'p' && id[1] == 't')
+				busDrawer.addAgent(id, startX, startY, colorizer
+						.getColor(color), true);
+			else
+				carDrawer.addAgent(id, startX, startY, colorizer
+						.getColor(color), true);
 		}
 
-		public void onDraw(GL gl) {
-
+		public void drawAll() {
+			this.carDrawer.draw();
+			this.busDrawer.draw();
 		}
-
 	}
 
-	public static class VehReader extends OTFDataReader {
+	private final VehDrawer vehdrawer = new VehDrawer();
 
-		@Override
-		public void connect(OTFDataReceiver receiver) {
-		}
+	private static OTFOGLDrawer.FastColorizer colorizer = new OTFOGLDrawer.FastColorizer(
+			new double[] { 0.0, 30., 50. }, new Color[] { Color.RED,
+					Color.YELLOW, Color.GREEN });
 
-		@Override
-		public void invalidate(SceneGraph graph) {
-
-		}
-
-		@Override
-		public void readConstData(ByteBuffer in) throws IOException {
-
-		}
-
-		@Override
-		public void readDynData(ByteBuffer in, SceneGraph graph)
-				throws IOException {
-			VehDrawer cars = new VehDrawer("");
-			VehDrawer buses=new VehDrawer("");
-		}
-
+	@Override
+	public Object newInstance(Class clazz) throws InstantiationException,
+			IllegalAccessException {
+		return vehdrawer;
 	}
 
-	public static class VehWriter extends OTFDataWriter {
-
-		@Override
-		public void writeConstData(ByteBuffer out) throws IOException {
-
-		}
-
-		@Override
-		public void writeDynData(ByteBuffer out) throws IOException {
-
-		}
-
+	@Override
+	public void draw() {
+		super.draw();
+		vehdrawer.drawAll();
 	}
 }
