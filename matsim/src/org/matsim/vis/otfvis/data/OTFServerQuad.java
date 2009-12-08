@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueNode;
@@ -45,7 +46,9 @@ import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
  *
  */
 public class OTFServerQuad extends QuadTree<OTFDataWriter> {
-
+  
+	private static final Logger log = Logger.getLogger(OTFServerQuad.class);
+	
 	private final List<OTFDataWriter> additionalElements= new LinkedList<OTFDataWriter>();
 
 	private static class ConvertToClientExecutor implements Executor<OTFDataWriter> {
@@ -187,19 +190,24 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 			}
 			
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 //		System.out.println("server bounds: " +  " coords 0,0-" + easting + "," + northing );
 
     	if(!nodeWriterFractoryObjects.isEmpty()) {
+    		boolean first = true;
     		for (QueueNode node : this.net.getNodes().values()) {
     			for (OTFWriterFactory<QueueNode> fac : nodeWriterFractoryObjects) {
     				OTFDataWriter<QueueNode> writer = fac.getWriter();
-    				if (writer != null) writer.setSrc(node);
+    				if (writer != null) {
+    					writer.setSrc(node);
+    					if (first){
+    						log.info("Connecting Source QueueNode with " + writer.getClass().getName());
+    						first = false;
+    					}
+    				}
     				put(node.getNode().getCoord().getX() - this.minEasting, node.getNode().getCoord().getY() - this.minNorthing, writer);
     			}
     		}
@@ -207,6 +215,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 //		System.out.print("server links/nodes count: " + (net.getLinks().values().size()+net.getNodes().values().size()) );
 
     	if(!linkWriterFactoriyObjects.isEmpty()) {
+    		boolean first = true;
     		for (QueueLink link : this.net.getLinks().values()) {
     			double middleEast = (link.getLink().getToNode().getCoord().getX() + link.getLink().getFromNode().getCoord().getX())*0.5 - this.minEasting;
     			double middleNorth = (link.getLink().getToNode().getCoord().getY() + link.getLink().getFromNode().getCoord().getY())*0.5 - this.minNorthing;
@@ -214,7 +223,13 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
     			for (OTFWriterFactory<QueueLink> fac : linkWriterFactoriyObjects) {
     				OTFDataWriter<QueueLink> writer = fac.getWriter();
     				// null means take the default handler
-    				if (writer != null) writer.setSrc(link);
+    				if (writer != null) {
+    					writer.setSrc(link);
+    					if (first) {
+    						log.info("Connecting Source QueueLink with " + writer.getClass().getName());
+    						first = false;
+    					}
+    				}
     				put(middleEast, middleNorth, writer);
 //      		System.out.println("server link: " + link.getId().toString() + " coords " + middleEast + "," + middleNorth );
     			}
@@ -243,6 +258,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 				try {
 					Object reader = readerClass.newInstance();
 					client.addAdditionalElement((OTFDataReader)reader);
+					log.info("Connected additional element writer " + element.getClass().getName() + "(" + element + ")  to " + reader.getClass().getName() + " (" + reader + ")");
 				} catch (Exception e) {
 					e.printStackTrace();
 					throw new RuntimeException();
