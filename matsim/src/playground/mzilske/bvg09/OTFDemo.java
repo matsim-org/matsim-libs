@@ -2,6 +2,7 @@
 package playground.mzilske.bvg09;
 
 import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDataReader;
@@ -40,6 +41,9 @@ public class OTFDemo {
 		connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
 		connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		connect.add(OTFAgentsListHandler.class,  AgentPointDrawer.class);
+		connect.add(FacilityDrawer.DataWriter_v1_0.class, FacilityDrawer.DataReader_v1_0.class);
+	  connect.add(FacilityDrawer.DataReader_v1_0.class, FacilityDrawer.DataDrawer.class);
+		
 		connect.add(OTFTeleportAgentsDataWriter.class, OTFTeleportAgentsDataReader.class);
 		connect.add(OTFTeleportAgentsDataReader.class, OTFTeleportAgentsDrawer.class);
 		connect.add(OTFTeleportAgentsDrawer.class, OTFTeleportAgentsLayer.class);
