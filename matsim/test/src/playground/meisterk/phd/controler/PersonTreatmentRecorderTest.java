@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * PersonTreatmentRecorderTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,18 +20,56 @@
 
 package playground.meisterk.phd.controler;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.framework.TestCase;
 
-public class AllTests {
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.basic.v01.IdImpl;
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Tests for playground.meisterk.phd");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(PhDControlerTest.class);
-		suite.addTestSuite(PersonTreatmentRecorderTest.class);
-		//$JUnit-END$
-		return suite;
+public class PersonTreatmentRecorderTest extends TestCase {
+
+	protected void setUp() throws Exception {
+		super.setUp();
 	}
 
+	public void testGetRank() {
+		
+		Scenario sc = new ScenarioImpl() ;
+		Population pop = sc.getPopulation() ;
+		PopulationFactory pf = pop.getFactory() ;
+		Person person = pf.createPerson(new IdImpl(1));
+		for (double d : new double[]{180.0, 180.1, 180.5, 169.9}) {
+			Plan plan = pf.createPlan();
+			plan.setScore(d);
+			person.addPlan(plan);
+		}
+
+		PersonTreatmentRecorder testee = new PersonTreatmentRecorder();
+		
+		for (int i=0; i<3; i++) {
+			Plan plan = person.getPlans().get(i);
+			plan.setSelected(true);
+			int rank = testee.getRank(person);
+			switch(i) {
+			case 0:
+				assertEquals("Wrong rank.", 2, rank);
+				break;
+			case 1:
+				assertEquals("Wrong rank.", 1, rank);
+				break;
+			case 2:
+				assertEquals("Wrong rank.", 0, rank);
+				break;
+			case 3:
+				assertEquals("Wrong rank.", 3, rank);
+				break;
+			}
+		}
+		
+	}
+	
 }
