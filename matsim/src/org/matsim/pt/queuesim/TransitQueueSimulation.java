@@ -208,6 +208,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 	}
 
 	private void visualizeTeleportedAgents(double time) {
+//		log.error("setting src: " + this.visTeleportationData.size());
 		this.teleportationWriter.setSrc(this.visTeleportationData);
 		this.teleportationWriter.setTime(time);
 	}
