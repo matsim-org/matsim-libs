@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
@@ -205,8 +204,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 			DriverAgent agent = (DriverAgent) passenger;
 			events.processEvent(new PersonLeavesVehicleEventImpl(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
 			agent.teleportToLink(stop.getLink());
-			events.processEvent(new AgentArrivalEventImpl(now, agent.getPerson(),
-					stop.getLink(), agent.getCurrentLeg()));
+//			events.processEvent(new AgentArrivalEventImpl(now, agent.getPerson(),
+//					stop.getLink(), agent.getCurrentLeg()));
 			agent.legEnds(now);
 		}
 	}
