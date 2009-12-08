@@ -320,7 +320,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 		quad.fillQuadTree(connect);
 		
-		for(OTFDataWriter writer : additionalElements) quad.addAdditionalElement(writer);
+		for(OTFDataWriter writer : additionalElements) {
+			log.info("Adding additional element: " + writer.getClass().getName());
+			quad.addAdditionalElement(writer);
+		}
 		
 		return quad;
 	}
