@@ -63,7 +63,8 @@ public class MyDijkstra extends Dijkstra{
 		List<Node> newNodes = new ArrayList<Node>();
 		for(Node node : path.nodes)
 		{
-			newNodes.add(((SubNode)node).getParentNode());
+			if (node instanceof SubNode) newNodes.add(((SubNode)node).getParentNode());
+			else newNodes.add(node);
 		}
 		path.nodes.clear();
 		path.nodes.addAll(newNodes);
@@ -71,7 +72,8 @@ public class MyDijkstra extends Dijkstra{
 		List<Link> newLinks = new ArrayList<Link>();
 		for(Link link : path.links)
 		{
-			newLinks.add(((SubLink)link).getParentLink());
+			if (link instanceof SubLink) newLinks.add(((SubLink)link).getParentLink());
+			else newLinks.add(link);
 		}
 		path.links.clear();
 		path.links.addAll(newLinks);

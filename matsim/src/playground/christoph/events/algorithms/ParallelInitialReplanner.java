@@ -36,7 +36,7 @@ public class ParallelInitialReplanner extends ParallelReplanner {
 	
 	private final static Logger log = Logger.getLogger(ParallelInitialReplanner.class);
 	
-	protected static boolean removeKnowledge = false;
+	protected boolean removeKnowledge = false;
 	
 	@Override
 	public void init()

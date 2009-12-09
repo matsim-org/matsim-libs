@@ -24,12 +24,15 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.events.algorithms.ParallelInitialReplanner;
@@ -37,14 +40,15 @@ import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.knowledge.nodeselection.SelectNodes;
 import playground.christoph.mobsim.ReplanningManager;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
-import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
 import playground.christoph.router.CompassRoute;
 import playground.christoph.router.KnowledgePlansCalcRoute;
 import playground.christoph.router.RandomCompassRoute;
+import playground.christoph.router.RandomDijkstraRoute;
 import playground.christoph.router.RandomRoute;
 import playground.christoph.router.TabuRoute;
-import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
+import playground.christoph.router.costcalculators.OnlyDistanceDependentTravelCostCalculator;
+import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import playground.christoph.router.util.SimpleRouterFactory;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 
@@ -81,10 +85,11 @@ public class SimpleRouterControler extends Controler {
 	 * than 1.0 (100%). If its lower, all remaining agents
 	 * will do no Replanning.
 	 */
-	protected double pRandomRouter = 0.5;
-	protected double pTabuRouter = 0.5;
+	protected double pRandomRouter = 0.0;
+	protected double pTabuRouter = 0.0;
 	protected double pCompassRouter = 0.0;
 	protected double pRandomCompassRouter = 0.0;
+	protected double pRandomDijkstraRouter = 1.0;
 	
 	protected int noReplanningCounter = 0;
 	protected int initialReplanningCounter = 0;
@@ -93,7 +98,15 @@ public class SimpleRouterControler extends Controler {
 	protected int tabuRouterCounter = 0;
 	protected int compassRouterCounter = 0;
 	protected int randomCompassRouterCounter = 0;
-		
+	protected int randomDijkstraRouterCounter = 0;
+	
+	/*
+	 * TravelTime and TravelCost for the Dijkstra Router
+	 */
+	protected TravelTime dijkstraTravelTime = new FreeSpeedTravelTime();
+//	protected TravelCost dijkstraTravelCost = new OnlyTimeDependentTravelCostCalculator(dijkstraTravelTime);
+	protected TravelCost dijkstraTravelCost = new OnlyDistanceDependentTravelCostCalculator();
+	
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 * The results should stay deterministic as long as the same
@@ -101,15 +114,14 @@ public class SimpleRouterControler extends Controler {
 	 * gets his own Random Number Generator so the results will
 	 * change if the number of Threads is changed. 
 	 */
-	protected int numReplanningThreads = 2;
+	protected int numReplanningThreads = 4;
 	
 	/*
 	 * Should the Agents use their Knowledge? If not, they use
 	 * the entire Network.
 	 */
-	protected boolean useKnowledge = true;
+	protected boolean useKnowledge = false;
 	
-	protected KnowledgeTravelTimeCalculator knowledgeTravelTime;
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ReplanningManager replanningManager;
 	protected ReplanningQueueSimulation sim;
@@ -136,7 +148,7 @@ public class SimpleRouterControler extends Controler {
 		 * TravelTime or VehicleCount.
 		 * This is needed to be able to use a LinkVehiclesCounter.
 		 */
-		this.getNetwork().getFactory().setLinkFactory(new MyLinkFactoryImpl());
+//		this.getNetwork().getFactory().setLinkFactory(new MyLinkFactoryImpl());
 
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
@@ -162,6 +174,9 @@ public class SimpleRouterControler extends Controler {
 
 		KnowledgePlansCalcRoute randomCompassRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomCompassRoute(this.network)));
 		replanners.add(randomCompassRouter);
+		
+		KnowledgePlansCalcRoute randomDijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomDijkstraRoute(this.network, dijkstraTravelCost, dijkstraTravelTime)));
+		replanners.add(randomDijkstraRouter);
 	}
 
 	/*
@@ -174,6 +189,7 @@ public class SimpleRouterControler extends Controler {
 		this.parallelInitialReplanner.setReplannerArrayList(replanners);
 		this.parallelInitialReplanner.createReplannerArray();
 		this.parallelInitialReplanner.init();
+		this.parallelInitialReplanner.setRemoveKnowledge(true);
 	}
 	
 	@Override
@@ -224,6 +240,9 @@ public class SimpleRouterControler extends Controler {
 			double pCompassRouterHigh = pRandomRouter + pTabuRouter + pCompassRouter;
 			double pRandomCompassRouterLow = pRandomRouter + pTabuRouter + pCompassRouter;
 			double pRandomCompassRouterHigh = pRandomRouter + pTabuRouter + pCompassRouter + pRandomCompassRouter;
+			double pRandomDijkstraRouterLow = pRandomRouter + pTabuRouter + pCompassRouter + pRandomCompassRouter;
+			double pRandomDijkstraRouterHigh = pRandomRouter + pTabuRouter + pCompassRouter + pRandomCompassRouter + pRandomDijkstraRouter;
+
 			
 			// Random Router
 			if (pRandomRouterLow <= probability && probability < pRandomRouterHigh)
@@ -257,6 +276,14 @@ public class SimpleRouterControler extends Controler {
 				initialReplanningCounter++;
 				randomCompassRouterCounter++;
 			}
+			// Random Dijkstra Router
+			else if (pRandomDijkstraRouterLow <= probability && probability < pRandomDijkstraRouterHigh)
+			{
+				customAttributes.put("Replanner", replanners.get(4)); // RandomDijkstra
+				customAttributes.put("initialReplanning", new Boolean(true));
+				initialReplanningCounter++;
+				randomDijkstraRouterCounter++;
+			}
 			// No Router
 			else
 			{
@@ -269,12 +296,14 @@ public class SimpleRouterControler extends Controler {
 		log.info("Tabu Routing Probability: " + pTabuRouter);
 		log.info("Compass Routing Probability: " + pCompassRouter);
 		log.info("Random Compass Routing Probability: " + pRandomCompassRouter);
+		log.info("Random Dijkstra Routing Probability: " + pRandomDijkstraRouter);
 
 		double numPersons = this.population.getPersons().size();
 		log.info(randomRouterCounter + " persons use a Random Router (" + randomRouterCounter / numPersons * 100.0 + "%)");
 		log.info(tabuRouterCounter + " persons use a Tabu Router (" + tabuRouterCounter / numPersons * 100.0 + "%)");
 		log.info(compassRouterCounter + " persons use a Compass Router (" + compassRouterCounter / numPersons * 100.0 + "%)");
-		log.info(randomCompassRouterCounter + " persons use a Random Compass Router (" + randomCompassRouterCounter / numPersons * 100.0 + "%)");			
+		log.info(randomCompassRouterCounter + " persons use a Random Compass Router (" + randomCompassRouterCounter / numPersons * 100.0 + "%)");
+		log.info(randomDijkstraRouterCounter + " persons use a Random Dijkstra Router (" + randomDijkstraRouterCounter / numPersons * 100.0 + "%)");
 		
 		log.info(noReplanningCounter + " persons don't replan their Plans ("+ noReplanningCounter / numPersons * 100.0 + "%)");
 		log.info(initialReplanningCounter + " persons replan their plans initially (" + initialReplanningCounter / numPersons * 100.0 + "%)");
@@ -349,4 +378,17 @@ public class SimpleRouterControler extends Controler {
 		System.exit(0);
 	}
 
+	public static class FreeSpeedTravelTime implements TravelTime, Cloneable
+	{
+
+		public double getLinkTravelTime(Link link, double time)
+		{
+			return link.getFreespeed(time);
+		}
+		
+		public FreeSpeedTravelTime clone()
+		{
+			return new FreeSpeedTravelTime();
+		}
+	}
 }
