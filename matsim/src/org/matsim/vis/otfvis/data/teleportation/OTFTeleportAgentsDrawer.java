@@ -26,7 +26,9 @@ import java.util.Map;
 import javax.media.opengl.GL;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
+import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 
 
@@ -43,9 +45,10 @@ public class OTFTeleportAgentsDrawer extends OTFGLDrawableImpl{
 
 	public void onDraw(GL gl) {
 //		log.error("starting to draw agents...");
+		float agentSize = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getAgentSize();
 		gl.glColor3d(0.0, 0.0, 1.0);
 		double zCoord = 1.0;
-		double offset = 100.0;
+		double offset = agentSize/2;
 		for (Point2D.Double p : positions.values()){
 //			log.error("drawing agent at : " + p.x + " " + p.y + " offsetN: " + OTFServerQuad.offsetNorth + " offsetE: " + OTFServerQuad.offsetEast);
 			gl.glBegin(GL.GL_QUADS);
