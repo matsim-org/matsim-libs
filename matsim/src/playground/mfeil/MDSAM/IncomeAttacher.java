@@ -23,6 +23,9 @@ package playground.mfeil.MDSAM;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -56,9 +59,10 @@ public class IncomeAttacher {
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 		final String worldFilename = "/home/baug/mfeil/data/Zurich10/world.xml";
 		final String worldAddFilename = "/home/baug/mfeil/data/Zurich10/gg25_2001_infos.txt";
+		final String highestEducationFilename = "/home/baug/mfeil/data/Zurich10/highestEducCensus2000.txt";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 		final String populationFilename = "/home/baug/mfeil/data/Zurich10/plans.xml";
-		final String outputFilename = "/home/baug/mfeil/data/choiceSet/it0/output_plans0930.dat";
+		final String outputFilename = "/home/baug/mfeil/data/Zurich10/income.xls";
 		
 		/*
 		final String populationFilename = "./plans/output_plans.xml";
@@ -76,7 +80,7 @@ public class IncomeAttacher {
 		new MatsimWorldReader(scenario.getWorld()).readFile(worldFilename);
 
 		IncomeAttacher att = new IncomeAttacher(scenario);
-		att.run(worldAddFilename);
+		att.run(worldAddFilename, outputFilename);
 		log.info("Process finished.");
 	}
 	
@@ -90,13 +94,24 @@ public class IncomeAttacher {
 	}
 	
 	
-	private void run (String inputFile){
+	private void run (String inputFile, String outputFile){
 		
-		System.out.println("  parsing additional municipality information... ");
+		log.info("  parsing additional municipality information... ");
 		Municipalities municipalities = new Municipalities(inputFile);
 		Layer municipalityLayer = scenario.getWorld().getLayer(new IdImpl(Municipalities.MUNICIPALITY));
 		municipalities.parse(municipalityLayer);
-		System.out.println("  done.");
+		log.info("  done.");
+		
+		
+		String outputfile = outputFile;
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputfile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		stream.println("AgentID\tMunicipalityID\tAverageIncome\tIndividualIncome");		
 		
 		this.income = new HashMap<Id,Double>();
 		HashMap<Id,Id> listings = new HashMap<Id,Id>();
@@ -125,7 +140,7 @@ public class IncomeAttacher {
 			}
 			if (munAtts.size()>1){
 				doubleListings++;
-				System.out.println("Size of element is "+munAtts.size());
+				log.info("Agent "+person.getId()+" with "+munAtts.size()+" potential home zones. Finding best one...");
 				
 				double distance = Double.MAX_VALUE;
 				int position = -1;
@@ -140,12 +155,20 @@ public class IncomeAttacher {
 				this.income.put(person.getId(), municipalities.getMunicipality(munAtts.get(position)).getIncome());
 				
 			}
-			if (munAtts.size()== 0){
+			else if (munAtts.size()== 0){
 				noListing++;
-				System.out.println("Size of element is "+munAtts.size());
+				log.warn("Agent "+person.getId()+" without valid home zone. This may never happen!");
+				listings.put(person.getId(), new IdImpl (-1));
+				this.income.put(person.getId(), -1.0);
 			}
+			else {
+				listings.put(person.getId(), munAtts.get(0));
+				this.income.put(person.getId(), municipalities.getMunicipality(munAtts.get(0)).getIncome());
+			}
+			
+			stream.println(person.getId()+"\t"+listings.get(person.getId())+"\t"+income.get(person.getId()));
 		}
-		System.out.println("There are "+doubleListings+" double-listings and "+noListing+" no-listings.");
+		log.info(listings.size()+" agents in the scenario. Thereof "+doubleListings+" with double-listings and "+noListing+" with no-listings.");
 	}
 }
 
