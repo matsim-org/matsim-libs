@@ -46,11 +46,11 @@ public class TeleportationVisData {
 	public TeleportationVisData(double now, DriverAgent agent, Link link) {
 		this.starttime = now;
 		this.id = agent.getPerson().getId();
-		this.startX = link.getCoord().getX();
-		this.startY = link.getCoord().getY();
+		this.startX = link.getToNode().getCoord().getX();
+		this.startY = link.getToNode().getCoord().getY();
 		double traveltime = agent.getCurrentLeg().getTravelTime();
-		double endX = agent.getDestinationLink().getCoord().getX();
-		double endY = agent.getDestinationLink().getCoord().getY();
+		double endX = agent.getDestinationLink().getToNode().getCoord().getX();
+		double endY = agent.getDestinationLink().getToNode().getCoord().getY();
 		double dX = endX - startX;
 		double dY = endY - startY;
 		double length = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
