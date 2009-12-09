@@ -141,7 +141,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			panel.setBounds(250, 130, 220, 160);
 
 			JCheckBox SynchBox; 
-			if(host.isLiveHost()) {
+			if(host.getOTFHostControl().isLiveHost()) {
 				SynchBox = new JCheckBox("show parked vehicles");
 //				SynchBox.setMnemonic(KeyEvent.VK_M);
 				SynchBox.setSelected(cfg.isShowParking());
@@ -151,7 +151,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 				//SynchBox.setMaximumSize(new Dimension(250,60));
 				panel.add(SynchBox);
 			}
-			if((host.isLiveHost())||((cfg.getFileVersion()>=1) &&(cfg.getFileMinorVersion()>=4))) {
+			if((host.getOTFHostControl().isLiveHost())||((cfg.getFileVersion()>=1) &&(cfg.getFileMinorVersion()>=4))) {
 				SynchBox = new JCheckBox("show link Ids");
 //				SynchBox.setMnemonic(KeyEvent.VK_M);
 				SynchBox.setSelected(cfg.drawLinkIds());
@@ -341,7 +341,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			}
 		};
 		fileMenu.add(prefAction);
-		if (!preferencesDialog.host.isLiveHost()) {
+		if (!preferencesDialog.host.getOTFHostControl().isLiveHost()) {
 			Action saveAction = new AbstractAction() {
 				{
 					putValue(Action.NAME, "Save Settings to mvi");

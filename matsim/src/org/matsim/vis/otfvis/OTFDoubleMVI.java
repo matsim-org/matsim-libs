@@ -56,6 +56,7 @@ public class OTFDoubleMVI extends OTFClientFile {
 
 		OTFSlaveHost hostControl2;
 		try {
+			
 			hostControl2 = new OTFSlaveHost("file:" + this.filename2);
 			hostControl2.frame = frame;
 			this.hostControl.addSlave(hostControl2);
@@ -70,7 +71,7 @@ public class OTFDoubleMVI extends OTFClientFile {
 
 			OTFClientQuad clientQ2 = hostControl2.createNewView(null, connectR);
 			OTFOGLDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
-			drawer2.invalidate((int)hostControl.getTime());
+			drawer2.invalidate((int)hostControl.getOTFHostControl().getTime());
 			drawer2.replaceMouseHandler(((OTFOGLDrawer)rightComp).getMouseHandler());
 			hostControl.addHandler("test", drawer2);
 			this.pane.setLeftComponent(drawer2.getComponent());

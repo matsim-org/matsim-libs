@@ -64,7 +64,7 @@ public class OTFClient extends Thread {
 
 			OTFHostControlBar hostControl = new OTFHostControlBar(url);
 			hostControl.frame = frame;
-			if (hostControl.isLiveHost()) {
+			if (hostControl.getOTFHostControl().isLiveHost()) {
 				visconf.setCachingAllowed(false); // no use to cache in live mode
 			}
 			frame.getContentPane().add(hostControl, BorderLayout.NORTH);
@@ -79,14 +79,14 @@ public class OTFClient extends Thread {
 			OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);
 			pane.setLeftComponent(drawer.getComponent());
 			pane.validate();
-			if (hostControl.isLiveHost()) {
+			if (hostControl.getOTFHostControl().isLiveHost()) {
 				OTFQueryControlBar queryControl = new OTFQueryControlBar("test", hostControl, visconf);
 				frame.getContentPane().add(queryControl, BorderLayout.SOUTH);
 				((OTFOGLDrawer) drawer).setQueryHandler(queryControl);
 			}
 			frame.setSize(1024, 600);
 			frame.setVisible(true);
-			drawer.invalidate((int) hostControl.getTime());
+			drawer.invalidate((int) hostControl.getOTFHostControl().getTime());
 			hostControl.addHandler(id1, drawer);
 
 		} catch (RemoteException e) {

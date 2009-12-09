@@ -139,10 +139,10 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 	public void addSlider() {
 
 		//Create the slider.
-		Collection<Double> steps = hostControl.getTimeSteps();
+		Collection<Double> steps = hostControl.getOTFHostControl().getTimeSteps();
 		Double[] dsteps = steps.toArray(new Double[steps.size()]);
 
-		times = new MyJSlider(JSlider.HORIZONTAL,  dsteps[0].intValue(), dsteps[dsteps.length-1].intValue(), (int)hostControl.getTime());
+		times = new MyJSlider(JSlider.HORIZONTAL,  dsteps[0].intValue(), dsteps[dsteps.length-1].intValue(), (int)hostControl.getOTFHostControl().getTime());
 
 		times.addChangeListener(this);
 		times.setMajorTickSpacing((dsteps[0].intValue()-dsteps[dsteps.length-1].intValue())/10);

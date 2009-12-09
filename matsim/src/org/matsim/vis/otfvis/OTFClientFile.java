@@ -182,7 +182,7 @@ public class OTFClientFile extends Thread {
 			PreferencesDialog.buildMenu(frame, visconf, this.hostControl, saver);
 			
 			
-			if(!hostControl.isLiveHost()) {
+			if(!hostControl.getOTFHostControl().isLiveHost()) {
 				frame.getContentPane().add(new OTFTimeLine("time", hostControl), BorderLayout.SOUTH);
 			} else  {
 				queryControl = new OTFQueryControlBar("test", hostControl, visconf);
@@ -195,7 +195,7 @@ public class OTFClientFile extends Thread {
 			if (this.splitLayout) {
 				OTFDrawer drawer = getLeftDrawerComponent(frame);
 				this.leftComp = drawer;
-				drawer.invalidate((int)hostControl.getTime());
+				drawer.invalidate((int)hostControl.getOTFHostControl().getTime());
 				this.hostControl.addHandler("test", drawer);
 				pane.setLeftComponent(drawer.getComponent());
 				if(queryControl != null) ((OTFOGLDrawer)drawer).setQueryHandler(queryControl);
@@ -205,7 +205,7 @@ public class OTFClientFile extends Thread {
 			this.rightComp = drawer2;
 			pane.setRightComponent(drawer2.getComponent());
 			this.hostControl.addHandler("test2", drawer2);
-			drawer2.invalidate((int)hostControl.getTime());
+			drawer2.invalidate((int)hostControl.getOTFHostControl().getTime());
 			if(queryControl != null) ((OTFOGLDrawer)drawer2).setQueryHandler(queryControl);
 
 			System.out.println("Finished init");
