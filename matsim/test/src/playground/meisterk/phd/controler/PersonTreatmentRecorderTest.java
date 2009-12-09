@@ -29,31 +29,41 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.testcases.MatsimTestCase;
 
 public class PersonTreatmentRecorderTest extends TestCase {
 
+	private Person person = null;
+	
 	protected void setUp() throws Exception {
 		super.setUp();
-	}
 
-	public void testGetRank() {
-		
 		Scenario sc = new ScenarioImpl() ;
 		Population pop = sc.getPopulation() ;
 		PopulationFactory pf = pop.getFactory() ;
-		Person person = pf.createPerson(new IdImpl(1));
+		this.person = pf.createPerson(new IdImpl(1));
 		for (double d : new double[]{180.0, 180.1, 180.5, 169.9}) {
 			Plan plan = pf.createPlan();
 			plan.setScore(d);
 			person.addPlan(plan);
 		}
 
+	}
+	
+	@Override
+	protected void tearDown() throws Exception {
+		this.person = null;
+		super.tearDown();
+	}
+
+	public void testGetRankOfSelectedPlan() {
+		
 		PersonTreatmentRecorder testee = new PersonTreatmentRecorder();
 		
 		for (int i=0; i<3; i++) {
 			Plan plan = person.getPlans().get(i);
 			plan.setSelected(true);
-			int rank = testee.getRank(person);
+			int rank = testee.getRankOfSelectedPlan(person);
 			switch(i) {
 			case 0:
 				assertEquals("Wrong rank.", 2, rank);
@@ -70,6 +80,30 @@ public class PersonTreatmentRecorderTest extends TestCase {
 			}
 		}
 		
+	}
+	
+	public void testGetScoreDifference() {
+		PersonTreatmentRecorder testee = new PersonTreatmentRecorder();
+		
+		for (int i=0; i<3; i++) {
+			Plan plan = person.getPlans().get(i);
+			plan.setSelected(true);
+			Double scoreDifference = testee.getAbsoluteScoreDifference(person);
+			switch(i) {
+			case 0:
+				assertEquals("Wrong rank.", 10.1, scoreDifference, MatsimTestCase.EPSILON);
+				break;
+			case 1:
+				assertEquals("Wrong rank.", 0.1, scoreDifference, MatsimTestCase.EPSILON);
+				break;
+			case 2:
+				assertEquals("Wrong rank.", 0.4, scoreDifference, MatsimTestCase.EPSILON);
+				break;
+			case 3:
+				assertEquals("Wrong rank.", null, scoreDifference);
+				break;
+			}
+		}
 	}
 	
 }

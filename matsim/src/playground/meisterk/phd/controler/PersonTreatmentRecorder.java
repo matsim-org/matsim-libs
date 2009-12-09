@@ -94,7 +94,7 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 		for (PlanStrategy strategy : personTreatment.keySet()) {
 			Set<Person> persons = personTreatment.get(strategy);
 			for (Person person : persons) {
-				int rank = this.getRank(person);
+				int rank = this.getRankOfSelectedPlan(person);
 				String columnName = this.getColumnName(strategy, rank);
 				if (!counts.containsKey(columnName)) {
 					counts.put(columnName, 0);
@@ -119,10 +119,10 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 		this.out.close();
 	}
 
-	int getRank(Person person) {
+	int getRankOfSelectedPlan(Person person) {
 		
 		int rank = 0;
-		
+
 		Double newScore = person.getSelectedPlan().getScore();
 		for (Plan plan : person.getPlans()) {
 			if (!plan.isSelected()) {
@@ -138,6 +138,33 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 		return rank;
 	}
 
+	/**
+	 * @param person
+	 * @return the difference of the score of the selected plan to the score of the next worse plan
+	 */
+	Double getAbsoluteScoreDifference(Person person) {
+	
+		Double selectedScore = person.getSelectedPlan().getScore();
+		Double nextWorseScore = null;
+		for (Plan plan : person.getPlans()) {
+			if (!plan.isSelected()) {
+				Double otherScore = plan.getScore();
+				if (otherScore < selectedScore) {
+					if (nextWorseScore == null) {
+						nextWorseScore = otherScore;
+					} else {
+						if (otherScore > nextWorseScore) {
+							nextWorseScore = otherScore;
+						}
+					}
+				}
+			}
+		}
+		
+		return (selectedScore - nextWorseScore);
+		
+	}
+	
 	private String getColumnName(PlanStrategy strategy, int rank) {
 		return strategy.toString() + "_" + Integer.toString(rank);
 	}
