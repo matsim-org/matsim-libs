@@ -122,7 +122,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	// -------------------- CONSTRUCTION --------------------
 
 	public OTFHostControlBar(String address, boolean makeButtons) throws RemoteException, InterruptedException, NotBoundException {
-		this.hostControl = new OTFHostControl(address, this);
+		this.hostControl = new OTFHostControl(address);
 		if(makeButtons) addButtons();
 	}
 	public OTFHostControlBar(String address) throws RemoteException, InterruptedException, NotBoundException {

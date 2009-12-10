@@ -23,17 +23,11 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.vis.otfvis.data.OTFClientQuad;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
@@ -54,14 +48,9 @@ public class OTFHostControl {
 	protected int controllerStatus = 0;
 
 	
-	private final Map <String,OTFDrawer> handlers = new HashMap<String,OTFDrawer>();
-	private final Map <String,OTFClientQuad> quads = new HashMap<String,OTFClientQuad>();
-	private final List <OTFSlaveHost> slaves = new ArrayList<OTFSlaveHost>();
-	private OTFHostControlBar controlBar;
 
-	public OTFHostControl(String url, OTFHostControlBar controlBar) throws RemoteException, InterruptedException, NotBoundException{
+	public OTFHostControl(String url) throws RemoteException, InterruptedException, NotBoundException{
 		this.openAddress(url);
-		this.controlBar = controlBar;
 	}
 	
 	public OTFServerRemote getOTFServer(){

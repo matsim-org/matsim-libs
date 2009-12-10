@@ -83,8 +83,8 @@ public class OTFVisQueueSim extends QueueSimulation{
 				this.connectionManager.add(OTFTeleportAgentsDataReader.class, OTFTeleportAgentsDrawer.class);
 				this.connectionManager.add(OTFTeleportAgentsDrawer.class, OTFTeleportAgentsLayer.class);
 			}
-			OTFClient client = null;
-			client = new OTFClient("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
+			OTFClientLive client = null;
+			client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
 			client.start();
 
 			try {

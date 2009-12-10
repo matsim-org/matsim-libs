@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OnTheFlyClientQuad.java
+ * OTFClient
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,78 +17,77 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.vis.otfvis;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import javax.swing.JSplitPane;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.vis.otfvis.data.OTFClientQuad;
-import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
-import org.matsim.vis.otfvis.gui.OTFQueryControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
 
-public class OTFClient extends Thread {
 
-	private static final Logger log = Logger.getLogger(OTFClient.class);
+/**
+ * @author dgrether
+ *
+ */
+public abstract class OTFClient extends Thread {
 
-	private final String url;
+	protected OTFVisConfig visconf;
 
-	private OTFConnectionManager connect = new OTFConnectionManager();
+	protected String url;
+	
+	protected OTFFrame frame;
+	
+	protected JSplitPane pane = null;
 
-	public static OTFHostControlBar hostControl2;
+	protected OTFHostControlBar hostControl = null;
+	
+	protected OTFFileSettingsSaver saver;
 
-	public OTFClient(String url, OTFConnectionManager connect) {
+	protected OTFDrawer mainDrawer;
+	
+	public OTFClient(String url) {
 		this.url = url;
-		this.connect = connect;
 	}
 
 	@Override
 	public void run() {
-		String id1 = "test1";
-		OTFVisConfig visconf = Gbl.getConfig().otfVis();
-		OTFFrame frame = new OTFFrame("MATSIM OTFVis");
-		JSplitPane pane = frame.getSplitPane();
+		getOTFVisConfig();
+		createMainFrame();
+		createHostControlBar();
+		createDrawer();
+		addDrawerToSplitPane();
+		this.hostControl.addHandler(this.url, mainDrawer);
 		try {
+			mainDrawer.invalidate((int)hostControl.getOTFHostControl().getTime());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		frame.setVisible(true);
+		System.out.println("Finished init");
+	}
 
-			OTFHostControlBar hostControl = new OTFHostControlBar(url);
+	private void addDrawerToSplitPane() {
+		pane.setRightComponent(mainDrawer.getComponent());
+		pane.validate();
+
+	}
+
+	protected void createHostControlBar() {
+		try {
+			this.hostControl = new OTFHostControlBar(this.url);
 			hostControl.frame = frame;
-			if (hostControl.getOTFHostControl().isLiveHost()) {
-				visconf.setCachingAllowed(false); // no use to cache in live mode
-			}
-			frame.getContentPane().add(hostControl, BorderLayout.NORTH);
-			String netName = Gbl.getConfig().network().getInputFile();
-			OTFFileSettingsSaver saver = new OTFFileSettingsSaver(netName);
-			saver.readDefaultSettings();
-
+			frame.getContentPane().add(this.hostControl, BorderLayout.NORTH);
 			PreferencesDialog.buildMenu(frame, visconf, hostControl, saver);
-
-			OTFClientQuad clientQ = hostControl.createNewView(id1, connect);
-
-			OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);
-			pane.setLeftComponent(drawer.getComponent());
-			pane.validate();
-			if (hostControl.getOTFHostControl().isLiveHost()) {
-				OTFQueryControlBar queryControl = new OTFQueryControlBar("test", hostControl, visconf);
-				frame.getContentPane().add(queryControl, BorderLayout.SOUTH);
-				((OTFOGLDrawer) drawer).setQueryHandler(queryControl);
-			}
-			frame.setSize(1024, 600);
-			frame.setVisible(true);
-			drawer.invalidate((int) hostControl.getOTFHostControl().getTime());
-			hostControl.addHandler(id1, drawer);
-
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -96,7 +95,18 @@ public class OTFClient extends Thread {
 		} catch (NotBoundException e) {
 			e.printStackTrace();
 		}
-
 	}
+
+	protected void createMainFrame(){
+		this.frame = new OTFFrame("MATSim OTFVis");
+		this.pane = frame.getSplitPane();
+		this.pane.setDividerLocation(0.5);
+    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		this.frame.setSize(screenSize.width/2,screenSize.height/2);
+	}
+
+	protected abstract void createDrawer();
+
+	protected abstract void getOTFVisConfig();
 
 }

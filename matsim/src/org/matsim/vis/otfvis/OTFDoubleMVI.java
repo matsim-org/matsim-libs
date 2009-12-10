@@ -23,14 +23,14 @@ package org.matsim.vis.otfvis;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-import javax.swing.JFrame;
-
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFSlaveHost;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
+import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+import org.matsim.vis.otfvis.opengl.layer.ColoredStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
@@ -43,20 +43,34 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
  */
 public class OTFDoubleMVI extends OTFClientFile {
 	protected String filename2;
-	
+	protected OTFDrawer leftComp = null;
 	public OTFDoubleMVI(String filename, String filename2) {
-		super(filename, false);
+		super(filename);
 		this.filename2 = filename2;
 	}
 
+	protected OTFClientQuad getLeftDrawerComponent() throws RemoteException {
+		OTFConnectionManager connectL = this.connect.clone();
+		connectL.remove(OTFLinkAgentsHandler.class);
+
+		connectL.add(OTFLinkAgentsHandler.class, ColoredStaticNetLayer.QuadDrawer.class);
+		connectL.add(ColoredStaticNetLayer.QuadDrawer.class, ColoredStaticNetLayer.class);
+		OTFClientQuad clientQ = this.hostControl.createNewView(null, connectL);
+		return clientQ;
+	}
 
 	@Override
-	public void run() {
-		JFrame frame = prepareRun();
-
-		OTFSlaveHost hostControl2;
+	protected void createDrawer() {
+		super.createDrawer();
+		OTFDrawer drawer;
 		try {
+			drawer = new OTFOGLDrawer(frame, this.getLeftDrawerComponent());
+			this.leftComp = drawer;
 			
+			drawer.invalidate((int)hostControl.getOTFHostControl().getTime());
+			this.hostControl.addHandler("test", drawer);
+			pane.setLeftComponent(drawer.getComponent());
+			OTFSlaveHost hostControl2;
 			hostControl2 = new OTFSlaveHost("file:" + this.filename2);
 			hostControl2.frame = frame;
 			this.hostControl.addSlave(hostControl2);
@@ -72,15 +86,11 @@ public class OTFDoubleMVI extends OTFClientFile {
 			OTFClientQuad clientQ2 = hostControl2.createNewView(null, connectR);
 			OTFOGLDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
 			drawer2.invalidate((int)hostControl.getOTFHostControl().getTime());
-			drawer2.replaceMouseHandler(((OTFOGLDrawer)rightComp).getMouseHandler());
+			drawer2.replaceMouseHandler(((OTFOGLDrawer) this.mainDrawer).getMouseHandler());
 			hostControl.addHandler("test", drawer2);
 			this.pane.setLeftComponent(drawer2.getComponent());
-			pane.setDividerLocation(0.5);
 			pane.setResizeWeight(0.5);
-			//do not call for slave hosts!
-			
-			hostControl.finishedInitialisition();
-			
+
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -99,7 +109,7 @@ public class OTFDoubleMVI extends OTFClientFile {
 		} 
 		
 		OTFDoubleMVI client = new OTFDoubleMVI(filename, filename2);
-		client.run();
+		client.start();
 	}
 
 }
