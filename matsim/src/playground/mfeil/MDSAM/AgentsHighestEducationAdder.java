@@ -48,7 +48,7 @@ public class AgentsHighestEducationAdder {
 	
 	public void run (final String inputFile){
 		
-		log.info("Reading input file...");
+		log.info("Reading input file "+inputFile+"...");
 		
 		try {
 
@@ -74,12 +74,12 @@ public class AgentsHighestEducationAdder {
 				line = br.readLine();
 			}		
 		} catch (Exception ex) {
-			System.out.println(ex);
+			log.warn(ex);
 		}
 		log.info("done...");
 	}	
 	
-	public Map<Id, Integer> getIncome (){
+	public Map<Id, Integer> getEducation (){
 		return this.education;
 	}
 }

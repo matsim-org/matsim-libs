@@ -193,76 +193,84 @@ public class IncomeAttacher {
 		// create objective function
 		double[] coefficients = new double [this.income.size()];
 		for (int i=0; i<coefficients.length;i++) coefficients[i]=1;
-		LinearObjectiveFunction f = new LinearObjectiveFunction (coefficients, 0);
+		LinearObjectiveFunction f = new LinearObjectiveFunction (coefficients, 100);
 		
 		// writing constraints
 		ArrayList<double[]> table = new ArrayList<double[]>();
+		HashMap <Id, Integer> munTableMatch = new HashMap <Id, Integer>(); 
 		int[] rowTotal = new int[this.municipalities.getMunicipalities().size()];
-		for (int i=0;i<this.municipalities.getMunicipalities().size();i++){
+		int count = 0;
+		for (Iterator<Municipality> iterator = this.municipalities.getMunicipalities().values().iterator(); iterator.hasNext();){
+			Municipality mun = iterator.next(); 		
 			table.add(new double[]{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}); // 12 education types x + 1 variable y
-			rowTotal[i]=0; // Number of persons per municipality
+			munTableMatch.put(mun.getId(), count);
+			rowTotal[count]=0; // Number of persons per municipality
+			count++;
 		}
 		for (Iterator<Id> iterator = this.education.keySet().iterator(); iterator.hasNext();){
 			Id id = iterator.next(); // count through the number of education types and inhabitants per municipality
 			if (this.education.get(id).equals(11)) {
-				table.get(Integer.parseInt(this.listings.get(id).toString())-1)[0]++; // Obligatorische Schule
+				table.get(munTableMatch.get(this.listings.get(id)))[0]++; // Obligatorische Schule
 				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
 			}
 			else if (this.education.get(id).equals(12)) {
-				table.get(Integer.parseInt(this.listings.get(id).toString())-1)[1]++; // Diplommittelschule
+				table.get(munTableMatch.get(this.listings.get(id)))[1]++; // Diplommittelschule
 				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
 			}
 			else if (this.education.get(id).equals(21)) {
-				table.get(Integer.parseInt(this.listings.get(id).toString())-1)[2]++; // Berufslehre
+				table.get(munTableMatch.get(this.listings.get(id)))[2]++; // Berufslehre
 				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
 			}
 			else if (this.education.get(id).equals(22)) {
-				table.get(Integer.parseInt(this.listings.get(id).toString())-1)[3]++; // Maturitätsschule
+				table.get(munTableMatch.get(this.listings.get(id)))[3]++; // Maturitätsschule
 				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
 				}
 			else if (this.education.get(id).equals(23)) {
-				table.get(Integer.parseInt(this.listings.get(id).toString())-1)[4]++; // Lehrerseminar
+				table.get(munTableMatch.get(this.listings.get(id)))[4]++; // Lehrerseminar
 				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
 			}
 			else if (this.education.get(id).equals(31)) {
-				table.get(Integer.parseInt(this.listings.get(id).toString())-1)[5]++; // Höhere Fach- und Berufsausbildung
+				table.get(munTableMatch.get(this.listings.get(id)))[5]++; // Höhere Fach- und Berufsausbildung
 				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
 			}
 			else if (this.education.get(id).equals(32)) {
-				table.get(Integer.parseInt(this.listings.get(id).toString())-1)[6]++; // Höhere Fachschule
+				table.get(munTableMatch.get(this.listings.get(id)))[6]++; // Höhere Fachschule
 				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
 			}
 			else if (this.education.get(id).equals(33)) {
-				table.get(Integer.parseInt(this.listings.get(id).toString())-1)[7]++; // FH
+				table.get(munTableMatch.get(this.listings.get(id)))[7]++; // FH
 				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
 			}
 			else if (this.education.get(id).equals(34)) {
-				table.get(Integer.parseInt(this.listings.get(id).toString())-1)[8]++; // Universität
+				table.get(munTableMatch.get(this.listings.get(id)))[8]++; // Universität
 				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
 			}
 			else if (this.education.get(id).equals(-7)) {
-				table.get(Integer.parseInt(this.listings.get(id).toString())-1)[9]++; // Ohne Angabe
+				table.get(munTableMatch.get(this.listings.get(id)))[9]++; // Ohne Angabe
 				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
 			}
 			else if (this.education.get(id).equals(-8)) {
-				table.get(Integer.parseInt(this.listings.get(id).toString())-1)[10]++; // Keine Ausbildung
+				table.get(munTableMatch.get(this.listings.get(id)))[10]++; // Keine Ausbildung
 				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
 			}
 			else if (this.education.get(id).equals(-9)) {
-				table.get(Integer.parseInt(this.listings.get(id).toString())-1)[11]++; // Noch nicht schulpflichtig
+				table.get(munTableMatch.get(this.listings.get(id)))[11]++; // Noch nicht schulpflichtig
 				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
 			}
 		}
 		ArrayList<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
-		for (int i=0;i<table.size();i++){
-			constraints.add(new LinearConstraint(table.get(i), Relationship.EQ, this.municipalities.getMunicipality(i+1).getIncome()*rowTotal[i])); // 12 education types x + 1 variable y
+		for (Iterator<Municipality> iterator = this.municipalities.getMunicipalities().values().iterator(); iterator.hasNext();){
+			Municipality mun = iterator.next(); 
+			constraints.add(new LinearConstraint(table.get(munTableMatch.get(mun.getId())), Relationship.EQ, mun.getIncome()*rowTotal[munTableMatch.get(mun.getId())])); // 12 education types x + 1 variable y
 		}
 		
 		// Goal type
 		GoalType goalType = GoalType.MINIMIZE;
+		
+		// Running the simplex
 		RealPointValuePair result = new RealPointValuePair(new double[]{0.0},0.0); // Dummy initialization
 		try{
-			result = new SimplexSolver().optimize(f, constraints, goalType, false) ;
+			result = new SimplexSolver().optimize(f, constraints, goalType, true) ;
 		}
 		catch (OptimizationException e)	{
 			log.warn("Error in optimization: "+e);	
