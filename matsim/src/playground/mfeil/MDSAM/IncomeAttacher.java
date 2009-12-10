@@ -68,7 +68,7 @@ public class IncomeAttacher {
 		final String highestEducationFilename = "/home/baug/mfeil/data/Zurich10/highestEducCensus2000.txt";
 		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
 		final String populationFilename = "/home/baug/mfeil/data/Zurich10/plans.xml";
-		final String outputFilename = "/home/baug/mfeil/data/Zurich10/income.xls";
+		final String outputFilename = "/home/baug/mfeil/data/Zurich10/table.xls";
 		
 		/*
 		final String populationFilename = "./plans/output_plans.xml";
@@ -126,7 +126,7 @@ public class IncomeAttacher {
 			e.printStackTrace();
 			return;
 		}
-		stream.println("AgentID\tEducation\tMunicipalityID\tAverageIncome\tIndividualIncome");		
+		//stream.println("AgentID\tEducation\tMunicipalityID\tAverageIncome\tIndividualIncome");		
 		
 		this.income = new HashMap<Id,Double>();
 		this.listings = new HashMap<Id,Id>();
@@ -181,7 +181,7 @@ public class IncomeAttacher {
 				this.income.put(person.getId(), this.municipalities.getMunicipality(munAtts.get(0)).getIncome());
 			}
 			
-			stream.println(person.getId()+"\t"+this.education.get(person.getId())+"\t"+listings.get(person.getId())+"\t"+income.get(person.getId()));
+			//stream.println(person.getId()+"\t"+this.education.get(person.getId())+"\t"+listings.get(person.getId())+"\t"+income.get(person.getId()));
 		}
 		log.info(listings.size()+" agents in the scenario. Thereof "+doubleListings+" with double-listings and "+noListing+" with no-listings.");
 		this.runSimplex();
@@ -190,20 +190,34 @@ public class IncomeAttacher {
 	private void runSimplex (){
 		log.info("  running simplex... ");
 		
-		// writing constraints
+		// length of table
+		int noOfMun = this.municipalities.getMunicipalities().size(); 
+		int[] rowTotal = new int[noOfMun];
+		
+		// breadth of table
+		int noOfCoefficients = noOfMun + 12; // 12 education types x + 1 variable y per row 
+		double[] coefficients = new double[noOfCoefficients];
+		for (int i=0;i<12;i++) coefficients[i]=0;
+		
+		// initialize table
 		ArrayList<double[]> table = new ArrayList<double[]>();
+		double[] consCoeff = new double[noOfCoefficients];
+		for (int i=0;i<consCoeff.length;i++) consCoeff[i]=0; 
+		
+		
 		HashMap <Id, Integer> munTableMatch = new HashMap <Id, Integer>(); 
-		int[] rowTotal = new int[this.municipalities.getMunicipalities().size()];
 		int count = 0;
-		for (Iterator<Municipality> iterator = this.municipalities.getMunicipalities().values().iterator(); iterator.hasNext();){
+		for (Iterator<Municipality> iterator = this.municipalities.getMunicipalities().values().iterator(); iterator.hasNext();){ // = length of table
 			Municipality mun = iterator.next(); 		
-			table.add(new double[]{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}); // 12 education types x + 1 variable y
+			table.add(consCoeff); 
 			munTableMatch.put(mun.getId(), count);
 			rowTotal[count]=0; // Number of persons per municipality
 			count++;
 		}
+		
+		// count through the number of education types and inhabitants per municipality
 		for (Iterator<Id> iterator = this.education.keySet().iterator(); iterator.hasNext();){
-			Id id = iterator.next(); // count through the number of education types and inhabitants per municipality
+			Id id = iterator.next(); 
 			if (this.education.get(id).equals(11)) {
 				table.get(munTableMatch.get(this.listings.get(id)))[0]++; // Obligatorische Schule
 				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
@@ -253,6 +267,11 @@ public class IncomeAttacher {
 				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
 			}
 		}
+		for (int i=0;i<table.size();i++){
+			table.get(i)[i+12]=rowTotal[i]; // y variable = rowTotal
+		}
+		
+		// now translate into Collection<LinearConstraint> language
 		ArrayList<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
 		for (Iterator<Municipality> iterator = this.municipalities.getMunicipalities().values().iterator(); iterator.hasNext();){
 			Municipality mun = iterator.next(); 
@@ -263,10 +282,15 @@ public class IncomeAttacher {
 		// Goal type
 		GoalType goalType = GoalType.MINIMIZE;
 		
-		// create objective function
-		double[] coefficients = new double [this.income.size()];
-		for (int i=0; i<coefficients.length;i++) coefficients[i]=1;
+		// finalize objective function
+		for (Iterator<Municipality> iterator = this.municipalities.getMunicipalities().values().iterator(); iterator.hasNext();){
+			Municipality mun = iterator.next(); 
+			coefficients[munTableMatch.get(mun.getId())+12] = mun.getIncome(); 
+		}
 		LinearObjectiveFunction f = new LinearObjectiveFunction (coefficients, 0);
+		
+		// write output coefficients and table
+		//for (int i=0;i<coefficients.length;i++) stream.print
 		
 		// Running the simplex
 		RealPointValuePair result = new RealPointValuePair(new double[]{0.0},0.0); // Dummy initialization
