@@ -75,12 +75,14 @@ public class EventsFactoryImpl implements EventsFactory {
 		return new LinkLeaveEventImpl(time, agentId, linkId);
 	}
 	
-	public PersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
-		return new PersonEntersVehicleEventImpl(time, personId, vehicleId);
+	public PersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId, final Id transitRouteId) {
+		PersonEntersVehicleEventImpl e = new PersonEntersVehicleEventImpl(time, personId, vehicleId, transitRouteId);
+		return e;
 	}
-	
-	public PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
-		return new PersonLeavesVehicleEventImpl(time, personId, vehicleId);
+
+	public PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId, final Id transitRouteId) {
+		PersonLeavesVehicleEventImpl e = new PersonLeavesVehicleEventImpl(time, personId, vehicleId, transitRouteId);
+		return e;
 	}
 	
 	public VehicleArrivesAtFacilityEvent createVehicleArrivesAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId) {
@@ -90,4 +92,6 @@ public class EventsFactoryImpl implements EventsFactory {
 	public VehicleDepartsAtFacilityEvent createVehicleDepartsAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId) {
 		return new VehicleDepartsAtFacilityEventImpl(time, vehicleId, facilityId);
 	}
+
+	
 }

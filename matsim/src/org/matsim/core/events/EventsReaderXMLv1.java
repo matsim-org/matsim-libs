@@ -108,14 +108,34 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 					new IdImpl(atts.getValue(AgentMoneyEventImpl.ATTRIBUTE_PERSON)),
 					Double.parseDouble(atts.getValue(AgentMoneyEventImpl.ATTRIBUTE_AMOUNT))));
 		} else if (PersonEntersVehicleEventImpl.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(this.builder.createPersonEntersVehicleEvent(time,
-					new IdImpl(atts.getValue(PersonEntersVehicleEventImpl.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(PersonEntersVehicleEventImpl.ATTRIBUTE_VEHICLE))));			
+			String personString = atts.getValue(PersonEntersVehicleEventImpl.ATTRIBUTE_PERSON);
+			String vehicleString = atts.getValue(PersonEntersVehicleEventImpl.ATTRIBUTE_VEHICLE);
+			String transitRouteString = atts.getValue(PersonEntersVehicleEventImpl.TRANSIT_ROUTE_ID);
+			if (transitRouteString != null) {
+				this.events.processEvent(this.builder.createPersonEntersVehicleEvent(time,
+						new IdImpl(personString),
+						new IdImpl(vehicleString),
+						new IdImpl(transitRouteString)));			
+			}
+			else {
+				this.events.processEvent(this.builder.createPersonEntersVehicleEvent(time,
+						new IdImpl(personString),
+						new IdImpl(vehicleString), null));			
+			}
 		} else if (PersonLeavesVehicleEventImpl.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(this.builder.createPersonLeavesVehicleEvent(time,
-					new IdImpl(atts.getValue(PersonLeavesVehicleEventImpl.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(PersonLeavesVehicleEventImpl.ATTRIBUTE_VEHICLE))));
-		} else if (VehicleArrivesAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
+			IdImpl pId = new IdImpl(atts.getValue(PersonLeavesVehicleEventImpl.ATTRIBUTE_PERSON));
+			IdImpl vId = new IdImpl(atts.getValue(PersonLeavesVehicleEventImpl.ATTRIBUTE_VEHICLE));
+			String transitRouteString = atts.getValue(PersonEntersVehicleEventImpl.TRANSIT_ROUTE_ID);
+			if (transitRouteString != null) {
+				this.events.processEvent(this.builder.createPersonLeavesVehicleEvent(time, pId, vId,
+						new IdImpl(transitRouteString)));			
+			}
+			else {
+				this.events.processEvent(this.builder.createPersonEntersVehicleEvent(time,
+						pId, vId, null));			
+			}
+		}
+		else if (VehicleArrivesAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.createVehicleArrivesAtFacilityEvent(time,
 					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE)),
 					new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY))));			

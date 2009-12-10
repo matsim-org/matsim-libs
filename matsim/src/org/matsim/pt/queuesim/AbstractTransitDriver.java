@@ -192,7 +192,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 			this.agentTracker.removeAgentFromStop(passenger, stop);
 			this.vehicle.addPassenger(passenger);
 			DriverAgent agent = (DriverAgent) passenger;
-			events.processEvent(new PersonEntersVehicleEventImpl(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
+			events.processEvent(new PersonEntersVehicleEventImpl(now, agent.getPerson(), this.vehicle.getBasicVehicle(), this.getTransitRoute().getId()));
 		}
 	}
 
@@ -202,7 +202,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 		for (PassengerAgent passenger : passengersLeaving) {
 			this.vehicle.removePassenger(passenger);
 			DriverAgent agent = (DriverAgent) passenger;
-			events.processEvent(new PersonLeavesVehicleEventImpl(now, agent.getPerson(), this.vehicle.getBasicVehicle()));
+			events.processEvent(new PersonLeavesVehicleEventImpl(now, agent.getPerson(), this.vehicle.getBasicVehicle(), this.getTransitRoute().getId()));
 			agent.teleportToLink(stop.getLink());
 //			events.processEvent(new AgentArrivalEventImpl(now, agent.getPerson(),
 //					stop.getLink(), agent.getCurrentLeg()));

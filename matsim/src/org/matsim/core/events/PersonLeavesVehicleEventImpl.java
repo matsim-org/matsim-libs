@@ -36,21 +36,27 @@ public class PersonLeavesVehicleEventImpl extends PersonEventImpl implements Per
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
 	private final Id vehicleId;
+	private Id transitRouteId = null;
 
-	public PersonLeavesVehicleEventImpl(final double time, final Person person, final BasicVehicle vehicle) {
+	public PersonLeavesVehicleEventImpl(final double time, final Person person, final BasicVehicle vehicle, final Id transitRouteId) {
 		super(time, person);
 		this.vehicleId = vehicle.getId();
+		this.transitRouteId = transitRouteId;
 	}
 	
-	public PersonLeavesVehicleEventImpl(final double time, final Id personId, final Id vehicleId) {
+	public PersonLeavesVehicleEventImpl(final double time, final Id personId, final Id vehicleId, final Id transitRouteId) {
 		super(time, personId);
 		this.vehicleId = vehicleId;
+		this.transitRouteId = transitRouteId;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attrs = super.getAttributes();
 		attrs.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+		if (this.transitRouteId != null){
+			attrs.put(PersonEntersVehicleEventImpl.TRANSIT_ROUTE_ID, this.transitRouteId.toString());
+		}
 		return attrs;
 	}
 
@@ -62,5 +68,10 @@ public class PersonLeavesVehicleEventImpl extends PersonEventImpl implements Per
 	public Id getVehicleId() {
 		return this.vehicleId;
 	}
+	
+	public Id getTransitRouteId() {
+		return transitRouteId;
+	}
+	
 
 }
