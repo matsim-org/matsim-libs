@@ -43,7 +43,7 @@ public class RandomDijkstraRoute extends SimpleRouter implements Cloneable{
 	protected static int errorCounter = 0;
 	
 	protected boolean removeLoops = false;
-	protected double dijkstraProbability = 0.0;
+	protected double dijkstraWeightFactor = 0.5;
 	protected LeastCostPathCalculator leastCostPathCalculator;
 	protected TravelCost travelCost;
 	protected TravelTime travelTime;
@@ -58,10 +58,15 @@ public class RandomDijkstraRoute extends SimpleRouter implements Cloneable{
 		this.travelTime = travelTime;
 		this.leastCostPathCalculator = new MyDijkstraFactory().createPathCalculator((NetworkLayer)network, travelCost, travelTime);
 	}
-		
+	
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime)
 	{
 		return findRoute(fromNode, toNode);
+	}
+	
+	public void setDijsktraWeightFactor(double weightFactor)
+	{
+		this.dijkstraWeightFactor = weightFactor;
 	}
 	
 	private Path findRoute(Node fromNode, Node toNode)
@@ -84,7 +89,12 @@ public class RandomDijkstraRoute extends SimpleRouter implements Cloneable{
 			 * Replace the CurrentNode with its child in the SubNetwork
 			 */
 			currentNode = subNetwork.getNodes().get(currentNode.getId());
-						
+			
+			if (currentNode == null)
+			{
+				log.error("null!");
+			}
+			
 			useKnowledge = true;
 			
 			if (this.leastCostPathCalculator instanceof PersonLeastCostPathCalculator)
@@ -122,48 +132,121 @@ public class RandomDijkstraRoute extends SimpleRouter implements Cloneable{
 				log.error("Looks like Node is a dead end. Routing could not be finished!");
 				break;
 			}
+							
+			/*
+			 * Dijkstra
+			 */
+			double[] dijkstraProbabilities = new double[linksArray.length];
+						
+			Path path = this.leastCostPathCalculator.calcLeastCostPath(currentNode, toNode, Time.UNDEFINED_TIME);
 			
-			Link nextLink = null;
+			Link dijskstraNextLink = null;
+			if (path.links.size() > 0) dijskstraNextLink = path.links.get(0);
+			
+			// Replace the dijskstraNextLink with its child in the SubNetwork
+			if (useKnowledge)
+			{
+				SubNetwork subNetwork = (SubNetwork) nw;
+				dijskstraNextLink = subNetwork.getLinks().get(dijskstraNextLink.getId());
+			}
+
+			// set Probabilities
+			for(int i = 0; i < dijkstraProbabilities.length; i++)
+			{
+				Link link = linksArray[i];
+				if(link.equals(dijskstraNextLink)) dijkstraProbabilities[i] = 1.0;
+				else dijkstraProbabilities[i] = 0.0;
+			}
 			
 			/*
-			 * Choose next Link randomly or dijkstra based?
-			 *
-			 * Select random number, if the random number is bigger than the dijkstraProbabilty.
-			 * If that's not the case, nothing has to be done - the current nextLink is selected by
-			 * the Dijkstra Algorithm.
+			 * Random
 			 */
-			double randomDouble = random.nextDouble();
-
-			// get the Link with the random Algorithm
-			if (randomDouble > dijkstraProbability) nextLink = linksArray[random.nextInt(linksArray.length)];
+			double[] randomProbabilities = new double[linksArray.length];
+			for(int i = 0; i < randomProbabilities.length; i++) randomProbabilities[i] = 1.0 / randomProbabilities.length;
 			
-			// get the Link with the Dijkstra Algorithm
-			else
-			{			
-				Path path = this.leastCostPathCalculator.calcLeastCostPath(currentNode, toNode, Time.UNDEFINED_TIME);
-				
-				if (path.links.size() > 0) nextLink = path.links.get(0);
-				
-				/*
-				 * Replace the nextLink with its child in the SubNetwork
-				 */
-				if (useKnowledge)
-				{
-					SubNetwork subNetwork = (SubNetwork) nw;
-					
-					if (nextLink == null)
-					{
-						log.error("Link not found!");
-					}
-					
-					nextLink = subNetwork.getLinks().get(nextLink.getId());
-					if (nextLink == null)
-					{
-						log.error("Link not found!");
-					}
-				}
+			/*
+			 * Merge Dijkstra and Random based on the dijkstraProbability.
+			 * The higher the probability the more likely the next Link is
+			 * chosen based on the results from the Dijkstra Algorithm.
+			 * (p = 1.0 means that a Dijsktra Route will be returned) 
+			 */
+			for(int i = 0; i < dijkstraProbabilities.length; i++) dijkstraProbabilities[i] = dijkstraProbabilities[i] * dijkstraWeightFactor;
+			for(int i = 0; i < randomProbabilities.length; i++) randomProbabilities[i] = randomProbabilities[i] * (1.0 - dijkstraWeightFactor);
+			
+			double[] sumProbabilities = new double[linksArray.length];
+			for (int i = 0; i < sumProbabilities.length; i++)
+			{
+				sumProbabilities[i] = dijkstraProbabilities[i] + randomProbabilities[i];
 			}
-						
+			
+			/*
+			 * Select next Link based on the summarized Probabilities.
+			 */
+			Link nextLink = null;
+			double randomDouble = random.nextDouble();
+			
+			double sumProb = 0.0;
+			for (int i = 0; i < sumProbabilities.length; i++)
+			{
+				/*
+				 *  If randomDouble is exactly 0.0 select the first Link.
+				 *  The next if statement wouldn't do it.
+				 */
+				if (randomDouble == 0.0)
+				{
+					nextLink = linksArray[0];
+					break;
+				}
+
+				if(randomDouble > sumProb && randomDouble <= sumProb + sumProbabilities[i])
+				{
+					nextLink = linksArray[i];
+					break;
+				}
+							
+				sumProb = sumProb + sumProbabilities[i];
+			}
+			
+//			Replace the nextLink with its child in the SubNetwork
+			if (useKnowledge)
+			{
+				SubNetwork subNetwork = (SubNetwork) nw;
+				
+				nextLink = subNetwork.getLinks().get(nextLink.getId());
+			}
+//-------------------------------------------------------------
+//			/*
+//			 * Choose next Link randomly or dijkstra based?
+//			 *
+//			 * Select random number, if the random number is bigger than the dijkstraProbabilty.
+//			 * If that's not the case, nothing has to be done - the current nextLink is selected by
+//			 * the Dijkstra Algorithm.
+//			 */
+//			Link nextLink = null;
+//			double randomDouble = random.nextDouble();
+//
+//			// get the Link with the random Algorithm
+//			if (randomDouble > dijkstraProbability) nextLink = linksArray[random.nextInt(linksArray.length)];
+//			
+//			// get the Link with the Dijkstra Algorithm
+//			else
+//			{			
+//				Path path = this.leastCostPathCalculator.calcLeastCostPath(currentNode, toNode, Time.UNDEFINED_TIME);
+//				
+//				if (path.links.size() > 0) nextLink = path.links.get(0);
+//				
+//				/*
+//				 * Replace the nextLink with its child in the SubNetwork
+//				 */
+//				if (useKnowledge)
+//				{
+//					SubNetwork subNetwork = (SubNetwork) nw;
+//					
+//					nextLink = subNetwork.getLinks().get(nextLink.getId());
+//				}
+//			}
+//-------------------------------------------------------------
+			
 			// make the chosen link to the current link
 			if(nextLink != null)
 			{
@@ -216,7 +299,7 @@ public class RandomDijkstraRoute extends SimpleRouter implements Cloneable{
 	public RandomDijkstraRoute clone()
 	{		
 		RandomDijkstraRoute clone = new RandomDijkstraRoute(this.network, this.travelCost, this.travelTime);
-		clone.dijkstraProbability = this.dijkstraProbability;
+		clone.dijkstraWeightFactor = this.dijkstraWeightFactor;
 		clone.maxLinks = this.maxLinks;
 		clone.removeLoops = this.removeLoops;
 		

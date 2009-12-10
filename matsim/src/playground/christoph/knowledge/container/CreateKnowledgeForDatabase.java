@@ -64,7 +64,7 @@ public class CreateKnowledgeForDatabase {
 	
 	private double dijkstraCostFactor = 1.0;
 //	private double[] dijkstraCostFactors = {1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0};
-	private double[] dijkstraCostFactors = {1.0125};
+	private double[] dijkstraCostFactors = {1.0};
 	private TravelCost costCalculator;
 	
 	private int parallelThreads = 8;
@@ -74,8 +74,8 @@ public class CreateKnowledgeForDatabase {
 	// Default
 	// Berlin Scenario - contained in MATSim
 	private String configFileName = "test/scenarios/berlin/config.xml";
-	private String networkFile = "test/scenarios/berlin/network.xml";
-	private String populationFile = "test/scenarios/berlin/plans_hwh_1pct.xml";
+	private String networkFile = "test/scenarios/berlin/network.xml.gz";
+	private String populationFile = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 	private String facilitiesFile = null;
 
 /*
@@ -302,6 +302,7 @@ public class CreateKnowledgeForDatabase {
 	private void loadPopulation()
 	{
 		new MatsimPopulationReader(scenario).readFile(populationFile);
+		this.population = this.scenario.getPopulation();
 		log.info("Loading Population ... done");
 	}
 

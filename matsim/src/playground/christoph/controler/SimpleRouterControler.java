@@ -74,7 +74,7 @@ public class SimpleRouterControler extends Controler {
 	 * Select which size the known Areas should have in the Simulation.
 	 * The needed Parameter is the Name of the Table in the MYSQL Database.
 	 */
-	protected String tableName = "BatchTable1_5";
+	protected String tableName = "BatchTable1_0";
 	
 	protected ArrayList<PlanAlgorithm> replanners;
 	protected ArrayList<SelectNodes> nodeSelectors;
@@ -91,6 +91,13 @@ public class SimpleRouterControler extends Controler {
 	protected double pRandomCompassRouter = 0.0;
 	protected double pRandomDijkstraRouter = 1.0;
 	
+	/*
+	 * Weight Factor for the RandomDijkstraRouter.
+	 * 0.0 means that the Route is totally Random based
+	 * 1.0 means that the Route is totally Dijkstra based  
+	 */
+	protected double randomDijsktraWeightFactor = 0.5;
+	
 	protected int noReplanningCounter = 0;
 	protected int initialReplanningCounter = 0;
 	
@@ -104,8 +111,8 @@ public class SimpleRouterControler extends Controler {
 	 * TravelTime and TravelCost for the Dijkstra Router
 	 */
 	protected TravelTime dijkstraTravelTime = new FreeSpeedTravelTime();
-//	protected TravelCost dijkstraTravelCost = new OnlyTimeDependentTravelCostCalculator(dijkstraTravelTime);
-	protected TravelCost dijkstraTravelCost = new OnlyDistanceDependentTravelCostCalculator();
+	protected TravelCost dijkstraTravelCost = new OnlyTimeDependentTravelCostCalculator(dijkstraTravelTime);
+//	protected TravelCost dijkstraTravelCost = new OnlyDistanceDependentTravelCostCalculator();
 	
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -120,7 +127,7 @@ public class SimpleRouterControler extends Controler {
 	 * Should the Agents use their Knowledge? If not, they use
 	 * the entire Network.
 	 */
-	protected boolean useKnowledge = false;
+	protected boolean useKnowledge = true;
 	
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ReplanningManager replanningManager;
@@ -174,8 +181,10 @@ public class SimpleRouterControler extends Controler {
 
 		KnowledgePlansCalcRoute randomCompassRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomCompassRoute(this.network)));
 		replanners.add(randomCompassRouter);
-		
-		KnowledgePlansCalcRoute randomDijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(new RandomDijkstraRoute(this.network, dijkstraTravelCost, dijkstraTravelTime)));
+
+		RandomDijkstraRoute randomDijkstraRoute = new RandomDijkstraRoute(this.network, dijkstraTravelCost, dijkstraTravelTime);
+		randomDijkstraRoute.setDijsktraWeightFactor(randomDijsktraWeightFactor);
+		KnowledgePlansCalcRoute randomDijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, null, null, new SimpleRouterFactory(randomDijkstraRoute));
 		replanners.add(randomDijkstraRouter);
 	}
 
@@ -277,7 +286,7 @@ public class SimpleRouterControler extends Controler {
 				randomCompassRouterCounter++;
 			}
 			// Random Dijkstra Router
-			else if (pRandomDijkstraRouterLow <= probability && probability < pRandomDijkstraRouterHigh)
+			else if (pRandomDijkstraRouterLow <= probability && probability <= pRandomDijkstraRouterHigh)
 			{
 				customAttributes.put("Replanner", replanners.get(4)); // RandomDijkstra
 				customAttributes.put("initialReplanning", new Boolean(true));

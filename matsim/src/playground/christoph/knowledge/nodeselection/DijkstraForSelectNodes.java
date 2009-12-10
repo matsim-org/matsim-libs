@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -171,7 +172,7 @@ public class DijkstraForSelectNodes {
 	        if (node.getNode().equals(endNode.getNode())) break;
 	            
 	        node.setVisited(true);
-	           
+	        
 	        relaxOutgoingNode(node);
 	    }
 	}
@@ -219,7 +220,7 @@ public class DijkstraForSelectNodes {
 	
 	// Search shortest Fowardpaths to all nodes within the network.
 	public void executeForwardNetwork(Node start)
-	{		
+	{	
 		DijkstraNode startNode = dijkstraNodeMap.get(start);
 		init(startNode);
 		
@@ -272,17 +273,24 @@ public class DijkstraForSelectNodes {
 			dijkstraNode.setMinDistBackward(Double.MAX_VALUE);
 		}
 		
+		executeBackwardNetwork(end);
+	    for (DijkstraNode dijkstraNode : dijkstraNodeMap.values())
+	    {
+	    	dijkstraNode.setMinDistBackward(dijkstraNode.getMinDist());
+	    }
+		
+	    // We execute this after the BackwardNetwork so we can call getForwardRoute aferwards!
 		executeForwardNetwork(start);
 	    for (DijkstraNode dijkstraNode : dijkstraNodeMap.values())
 	    {
 	    	dijkstraNode.setMinDistForward(dijkstraNode.getMinDist());
 	    }
 		
-		executeBackwardNetwork(end);
-	    for (DijkstraNode dijkstraNode : dijkstraNodeMap.values())
-	    {
-	    	dijkstraNode.setMinDistBackward(dijkstraNode.getMinDist());
-	    }
+//		executeBackwardNetwork(end);
+//	    for (DijkstraNode dijkstraNode : dijkstraNodeMap.values())
+//	    {
+//	    	dijkstraNode.setMinDistBackward(dijkstraNode.getMinDist());
+//	    }
 	}
 	
 	/*
@@ -305,6 +313,27 @@ public class DijkstraForSelectNodes {
 		}
 		
 		return minDistances;
+	}
+	
+	/*
+	 * Based on the Dijkstra Data returns the ForwardRoute
+	 * from Start to End.
+	 */
+	public List<Node> getForwardRoute(Node start, Node end)
+	{
+	    LinkedList<Node> forwardRoute = new LinkedList<Node>();
+		DijkstraNode startNode = dijkstraNodeMap.get(start);
+		DijkstraNode endNode = dijkstraNodeMap.get(end);
+		DijkstraNode node = endNode.getPrevNode();
+		while (node != startNode)
+		{
+			forwardRoute.addFirst(node.getNode());
+			node = node.getPrevNode();
+		}
+		forwardRoute.addFirst(startNode.getNode());
+		forwardRoute.addLast(endNode.getNode());
+		
+		return forwardRoute;
 	}
 	
 	/*

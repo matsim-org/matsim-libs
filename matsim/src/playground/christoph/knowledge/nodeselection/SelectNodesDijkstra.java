@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.utils.misc.Time;
 
-
 /**
  * Selects Nodes by using a Dijkstra Algorithm. Nodes are included, if
  * they lie on routes that an agent can use to get from the start node to 
@@ -176,6 +175,20 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 			}
 		}
 		
+		/*
+		 * If the costFactor is exactly 1.0 we may loose due to some rounding errors
+		 * some of the Nodes on the only possible Route. To avoid that we add the entire
+		 * Route to the map again (the map SHOULD contain all of the already!).
+		 */
+		if (costFactor == 1.0)
+		{
+			List<Node> nodes = dijkstra.getForwardRoute(startNode, endNode);
+			for (Node node : nodes)
+			{
+				nodesMap.put(node.getId(), node);
+			}
+		}
+			
 		totalNodes.clear();
 		
 /*		
@@ -291,6 +304,21 @@ public class SelectNodesDijkstra extends BasicSelectNodesImpl{
 				{
 					knowledge.put(node.getId(), node);
 					iter.remove();
+				}
+			}
+			
+			/*
+			 * If the costFactor is exactly 1.0 we may loose due to some rounding errors
+			 * some of the Nodes on the only possible Route. To avoid that we add the entire
+			 * Route to the map again (the map SHOULD contain all of the already!).
+			 */
+			if (costFactor == 1.0)
+			{
+				List<Node> nodes = dijkstra.getForwardRoute(startNode, endNode);
+				for (Node node : nodes)
+				{
+					knowledge.put(node.getId(), node);
+					totalNodes.remove(node);
 				}
 			}
 			

@@ -71,7 +71,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 	private Config config;
 	private ScenarioImpl scenario;
 
-	private int numOfThreads = 4;
+	private int numOfThreads = 8;
 	
 	private double[] dijkstraCostFactors = {1.0, 1.25, 1.5, 1.75, 2.0};
 	private List<Double> costFactorsList;
@@ -87,7 +87,13 @@ public class CreateDijkstraKnowledge4MultiFactors {
 	 * How to call the Table in the Database. Additionally the used size
 	 * factor will be added to the String.
 	 */
-	private static final String baseTableName = "KnowledgeFactor";
+	private static final String baseTableName = "BatchTable";
+
+	private final String configFileName = "test/scenarios/berlin/config.xml";
+	private final String dtdFileName = null;
+	private final String networkFile = "test/scenarios/berlin/network.xml.gz";
+	private final String populationFile = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
+	private final String facilitiesFile = null;
 	
 //	private final String configFileName = "mysimulations/kt-zurich/config.xml";
 //	private final String dtdFileName = null;
@@ -95,12 +101,12 @@ public class CreateDijkstraKnowledge4MultiFactors {
 //	private final String populationFile = "mysimulations/kt-zurich/input/plans.xml";
 //	private final String facilitiesFile = null;
 		
-	private final String configFileName = "mysimulations/switzerland/config.xml";
-	private final String dtdFileName = null;
-	private final String networkFile = "mysimulations/switzerland/input/network.xml";
-//	private final String populationFile = "mysimulations/switzerland/input/plans.xml.gz";
-	private final String populationFile = "mysimulations/switzerland/input/plans_split_1.xml.gz";
-	private final String facilitiesFile = "mysimulations/switzerland/input/facilities.xml.gz";
+//	private final String configFileName = "mysimulations/switzerland/config.xml";
+//	private final String dtdFileName = null;
+//	private final String networkFile = "mysimulations/switzerland/input/network.xml";
+////	private final String populationFile = "mysimulations/switzerland/input/plans.xml.gz";
+//	private final String populationFile = "mysimulations/switzerland/input/plans_split_1.xml.gz";
+//	private final String facilitiesFile = "mysimulations/switzerland/input/facilities.xml.gz";
 	
 //	private final String configFileName = "mysimulations/kt-zurich-cut/config_10.xml";
 //	private final String dtdFileName = null;
@@ -166,6 +172,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 	private void loadPopulation()
 	{
 		new MatsimPopulationReader(scenario).readFile(populationFile);
+		this.population = this.scenario.getPopulation();
 		log.info("Loading Population ... done");
 	}
 	
