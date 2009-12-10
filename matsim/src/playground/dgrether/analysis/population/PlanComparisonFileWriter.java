@@ -32,10 +32,7 @@ public class PlanComparisonFileWriter {
 
 	private BufferedWriter writer;
 	private DgAnalysisPopulation pop;
-	/**
-	 * 
-	 * @param filename
-	 */
+
 	public PlanComparisonFileWriter(DgAnalysisPopulation pop) {
 		this.pop = pop;
 	}
