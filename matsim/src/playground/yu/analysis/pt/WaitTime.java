@@ -25,6 +25,8 @@ import org.matsim.core.utils.misc.Time;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
+ * waittime plots from events.xml
+ * 
  * @author yu
  * 
  */
@@ -41,9 +43,9 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 	 * saves the results to output, format: personId, [departureTime,
 	 * enterVehTime][departureTime, enterVehTime]...
 	 */
-	private Map<Id, List<Double>> results1 = new HashMap<Id, List<Double>>(),
+	private Map<Id, List<Double>> results1 = new HashMap<Id, List<Double>>();
 	/** saves the waitTimes of agents/persons */
-	waitTimes = new HashMap<Id, List<Double>>();
+	private Map<Id, List<Double>> waitTimes = new HashMap<Id, List<Double>>();
 
 	// public WaitTime() {}
 
@@ -133,8 +135,17 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 				"enRouteTime<->waitTimeAtBusStop", "enRouteTime [s]",
 				"waitTimeAtBusStop [s]");
 
+		XYScatterChart chartC = new XYScatterChart(
+				"firstDepartureTime<->enRouteTime,sumOfWaitTimeAtBusStop",
+				"firstDepartureTime", "time [s]");
+
+		XYScatterChart chartD = new XYScatterChart(
+				"firstDepartureTime<->waitTimeAtBusStop", "firstDepartureTime",
+				"waitTimeAtBusStop [s]");
+
 		int arraySizeA = arrivals.size();
-		double[] xAs = new double[arraySizeA];
+		double[] xAs = new double[arraySizeA], xCs = new double[arraySizeA], ySumOfWaitTimes = new double[arraySizeA];
+
 		int waitTimesSize = waitTimes.values().iterator().next().size();
 		List<double[]> yAss = new ArrayList<double[]>();
 		for (int i = 0; i < waitTimesSize; i++) {
@@ -148,9 +159,10 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 			Id perId = waitTimeEntry.getKey();
 			List<Double> waitTimeList = waitTimeEntry.getValue();
 
-			double enRouteTime = arrivals.get(perId)
-					- firstDepartures.get(perId);
+			double firstDpTime = firstDepartures.get(perId);
+			double enRouteTime = arrivals.get(perId) - firstDpTime;
 			xAs[j] = enRouteTime;
+			xCs[j] = firstDpTime / 3600.0;
 
 			writer.write(perId + "\t" + Time.writeTime(enRouteTime) + "\t");
 			StringBuffer sb = new StringBuffer("[");
@@ -164,20 +176,30 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 			}
 			writer.writeln(Time.writeTime(waitTimeSum) + "\t" + waitTimeSum
 					/ enRouteTime + "\t" + sb);
+			ySumOfWaitTimes[j] = waitTimeSum;
+
 			j++;
 		}
 		writer.close();
-		for (int i = 0; i < waitTimesSize; i++)
+		chartC.addSeries("enRouteTime", xCs, xAs);
+		chartC.addSeries("sumOfWaitTime", xCs, ySumOfWaitTimes);
+
+		chartC.saveAsPng(outputFilenameBase + "C.png", 1024, 768);
+
+		for (int i = 0; i < waitTimesSize; i++) {
 			chartA.addSeries((i + 1) + ". waitTimeAtBusStop", xAs, yAss.get(i));
+			chartD.addSeries((i + 1) + ". waitTimeAtBusStop", xCs, yAss.get(i));
+		}
 
 		chartA.saveAsPng(outputFilenameBase + "A.png", 1024, 768);
+		chartD.saveAsPng(outputFilenameBase + "D.png", 1024, 768);
 	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String eventsFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/output200/ITERS/it.100/100.events.xml.gz";
+		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/outputTest180/ITERS/it.100/100.events.xml.gz";
 
 		EventsManager em = new EventsManagerImpl();
 		WaitTime wt = new WaitTime();
@@ -186,6 +208,6 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 		new MatsimEventsReader(em).readFile(eventsFilename);
 
 		wt
-				.write("../berlin-bvg09/pt/nullfall_M44_344/test/output200/ITERS/it.100/100.waitTimes.");
+				.write("../berlin-bvg09/pt/m2_schedule_delay/outputTest180/ITERS/it.100/100.waitTimes.");
 	}
 }

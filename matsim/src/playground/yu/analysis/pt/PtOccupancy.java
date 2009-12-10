@@ -3,12 +3,17 @@
  */
 package playground.yu.analysis.pt;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -16,8 +21,16 @@ import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.transitSchedule.api.Departure;
+import org.matsim.transitSchedule.api.TransitLine;
+import org.matsim.transitSchedule.api.TransitRoute;
+import org.matsim.transitSchedule.api.TransitSchedule;
+import org.matsim.transitSchedule.api.TransitScheduleReader;
+import org.xml.sax.SAXException;
 
 import playground.yu.utils.io.SimpleWriter;
 
@@ -29,27 +42,62 @@ import playground.yu.utils.io.SimpleWriter;
  */
 public class PtOccupancy implements PersonEntersVehicleEventHandler,
 		PersonLeavesVehicleEventHandler {
-	private Map<Id, Integer> occups = new HashMap<Id, Integer>();
-	private Map<Id, Map<Double, Integer>> timeOccups = new HashMap<Id, Map<Double, Integer>>();
+	/* Map<vehId,No.ofInstantaneousOccupancies> */
+	private Map<Id, Integer> occups = new HashMap<Id, Integer>(), routeOccups;
+	/* Map<vehId,Map<time,NO.ofOccupancies */
+	private Map<Id, Map<Double, Integer>> timeOccups = new HashMap<Id, Map<Double, Integer>>(),
+			routeTimeOccups;
+	private TransitSchedule schedule = null;
+	/* Map<vehId,routeId> */
+	private Map<Id, Id> vehRouteIds;
+
+	public PtOccupancy(TransitSchedule schedule) {
+		this.schedule = schedule;
+		if (schedule != null) {
+			/* Map<routeId,No.ofInstantaneousOccupancies> */
+			routeOccups = new HashMap<Id, Integer>();
+			/* Map<routeId,Map<time,NO.ofOccupancies */
+			routeTimeOccups = new HashMap<Id, Map<Double, Integer>>();
+
+			vehRouteIds = new HashMap<Id, Id>();
+			for (TransitLine tl : schedule.getTransitLines().values())
+				for (TransitRoute tr : tl.getRoutes().values()) {
+					Id trId = tr.getId();
+					for (Departure dp : tr.getDepartures().values())
+						vehRouteIds.put(dp.getVehicleId(), trId);
+				}
+		}
+	}
 
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		Id vehId = event.getVehicleId();
-		double time = event.getTime() / 3600.0;
+		double time = event.getTime();
 
 		Integer occup = occups.get(vehId);
 		if (occup == null)
 			occup = 0;
 		occups.put(vehId, ++occup);
 
-		// System.out.println(">>>>> veh:\t" + vehId + "\toccup:\t"
-		// + occups.get(vehId));
-
 		Map<Double, Integer> timeOccup = timeOccups.get(vehId);
 		if (timeOccup == null)
 			timeOccup = new TreeMap<Double, Integer>();
-
 		timeOccup.put(time, occups.get(vehId));
 		timeOccups.put(vehId, timeOccup);
+
+		if (schedule != null) {
+			Id routeId = vehRouteIds.get(vehId);
+
+			Integer ro = routeOccups.get(routeId);
+			if (ro == null)
+				ro = 0;
+			routeOccups.put(routeId, ++ro);
+
+			Map<Double, Integer> rto = routeTimeOccups.get(routeId);
+			if (rto == null)
+				rto = new TreeMap<Double, Integer>();
+			rto.put(time, routeOccups.get(routeId));
+			routeTimeOccups.put(routeId, rto);
+		}
 	}
 
 	public void reset(int iteration) {
@@ -57,44 +105,49 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		Id vehId = event.getVehicleId();
-		double time = event.getTime() / 3600.0;
+		double time = event.getTime();
 
 		Integer occup = occups.get(vehId);
 		occups.put(vehId, --occup);
 
-		// System.out.println(">>>>> veh:\t" + vehId + "\toccup:\t"
-		// + occups.get(vehId));
-
 		Map<Double, Integer> timeOccup = timeOccups.get(vehId);
-
 		timeOccup.put(time, occups.get(vehId));
 		timeOccups.put(vehId, timeOccup);
 
-		// if (occups.get(vehId) == 0)
-		// occups.remove(vehId);
+		if (schedule != null) {
+			Id routeId = vehRouteIds.get(vehId);
+
+			Integer ro = routeOccups.get(routeId);
+			routeOccups.put(routeId, --ro);
+
+			Map<Double, Integer> rto = routeTimeOccups.get(routeId);
+			rto.put(time, routeOccups.get(routeId));
+			routeTimeOccups.put(routeId, rto);
+		}
 	}
 
 	public void write(String outputFilenameBase) {
-
-		XYLineChart avgSpeedChart = new XYLineChart("vehicle(bus) occupancies",
-				"time", "agents in bus [per.]");
 		SimpleWriter writer = new SimpleWriter(outputFilenameBase + "txt");
 
-		for (Entry<Id, Map<Double, Integer>> vto : timeOccups.entrySet()) {
-			Map<Double, Integer> tos = vto.getValue();
+		// -------------------------veh occupancies-----------------------------
+		XYLineChart chart = new XYLineChart("vehicle(bus) occupancies", "time",
+				"agents in bus [per.]");
+
+		for (Entry<Id, Map<Double, Integer>> toEntry : timeOccups.entrySet()) {
+			Map<Double, Integer> tos = toEntry.getValue();
 			int size = tos.size();
 			double[] xs = new double[size * 2], ys = new double[size * 2];
 			int i = 0;
 			for (Entry<Double, Integer> to : tos.entrySet()) {
-				xs[i] = to.getKey() - 1.0 / 3600.0;
+				xs[i] = (to.getKey() - 1.0) / 3600.0;
 				ys[i] = (i > 0) ? ys[i - 1] : 0;
-				xs[i + 1] = to.getKey();
+				xs[i + 1] = to.getKey() / 3600.0;
 				ys[i + 1] = to.getValue();
 				i += 2;
 			}
-			Id vehId = vto.getKey();
+			Id vehId = toEntry.getKey();
 
-			avgSpeedChart.addSeries("vehId\t" + vehId, xs, ys);
+			chart.addSeries("veh:\t" + vehId, xs, ys);
 
 			writer.writeln("vehId:\t" + vehId
 					+ "\ntime\tthe number of passengers");
@@ -103,24 +156,73 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 			writer.writeln("----------");
 		}
 
+		chart.saveAsPng(outputFilenameBase + "png", 1024, 768);
+		// -----------------------route occupancies-----------------------------
+		XYLineChart chartR = new XYLineChart("TransitRoute occupancies",
+				"time", "agents in bus(route) [per.]");
+
+		for (Entry<Id, Map<Double, Integer>> rtoEntry : routeTimeOccups
+				.entrySet()) {
+			Map<Double, Integer> tos = rtoEntry.getValue();
+			int size = tos.size();
+			double[] xs = new double[size * 2], ys = new double[size * 2];
+			int i = 0;
+			for (Entry<Double, Integer> to : tos.entrySet()) {
+				xs[i] = (to.getKey()/* time */- 1.0) / 3600.0;
+				ys[i] = (i > 0) ? ys[i - 1] : 0;
+				xs[i + 1] = to.getKey() / 3600.0;
+				ys[i + 1] = to.getValue()/* occupancies */;
+				i += 2;
+			}
+			Id routeId = rtoEntry.getKey();
+
+			chartR.addSeries("route:\t" + routeId, xs, ys);
+
+			writer.writeln("routeId:\t" + routeId
+					+ "\ntime\tthe number of passengers");
+			for (int j = 0; j < size * 2; j++)
+				writer.writeln(Time.writeTime(xs[j] * 3600.0) + "\t" + ys[j]);
+			writer.writeln("----------");
+		}
+		chartR.saveAsPng(outputFilenameBase + "route.png", 1024, 768);
+
 		writer.close();
-		avgSpeedChart.saveAsPng(outputFilenameBase + "png", 1024, 768);
+
 	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String eventsFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/output200/ITERS/it.100/100.events.xml.gz";
+		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/outputTest180/ITERS/it.100/100.events.xml.gz";
+		String scheduleFilename = "../berlin-bvg09/pt/m2_schedule_delay/transitSchedule.xml";
+		String netFilename = "../berlin-bvg09/pt/m2_schedule_delay/net.xml";
+
+		ScenarioImpl s = new ScenarioImpl();
+		s.getConfig().scenario().setUseTransit(true);
+
+		Network net = s.getNetwork();
+		new MatsimNetworkReader((NetworkImpl) net).readFile(netFilename);
+
+		TransitSchedule schedule = s.getTransitSchedule();
+		try {
+			new TransitScheduleReader(s).readFile(scheduleFilename);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
 
 		EventsManager em = new EventsManagerImpl();
 
-		PtOccupancy po = new PtOccupancy();
+		PtOccupancy po = new PtOccupancy(schedule);
 		em.addHandler(po);
 
 		new MatsimEventsReader(em).readFile(eventsFilename);
 
 		po
-				.write("../berlin-bvg09/pt/nullfall_M44_344/test/output200/ITERS/it.100/100.occupancies.");
+				.write("../berlin-bvg09/pt/m2_schedule_delay/outputTest180/ITERS/it.100/100.occupancies.");
 	}
 }

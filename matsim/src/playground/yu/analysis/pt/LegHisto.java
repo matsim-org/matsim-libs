@@ -111,9 +111,9 @@ public class LegHisto implements AgentDepartureEventHandler,
 
 	public void handleEvent(AgentArrivalEvent event) {
 		int index = getBinIndex(event.getTime());
-		if (event.getPersonId().toString().startsWith("ptDrvr")) {
+		if (event.getPersonId().toString().startsWith("pt"))
 			this.drvrModesData.countsArr[index]++;
-		} else if (event.getLegMode() != null) {
+		else if (event.getLegMode() != null) {
 			ModeData modeData = getDataForMode(event.getLegMode());
 			modeData.countsArr[index]++;
 		}
@@ -121,9 +121,9 @@ public class LegHisto implements AgentDepartureEventHandler,
 
 	public void handleEvent(AgentDepartureEvent event) {
 		int index = getBinIndex(event.getTime());
-		if (event.getPersonId().toString().startsWith("ptDrvr")) {
+		if (event.getPersonId().toString().startsWith("pt"))
 			this.drvrModesData.countsDep[index]++;
-		} else if (event.getLegMode() != null) {
+		else if (event.getLegMode() != null) {
 			ModeData modeData = getDataForMode(event.getLegMode());
 			modeData.countsDep[index]++;
 		}
@@ -131,9 +131,9 @@ public class LegHisto implements AgentDepartureEventHandler,
 
 	public void handleEvent(AgentStuckEvent event) {
 		int index = getBinIndex(event.getTime());
-		if (event.getPersonId().toString().startsWith("ptDrvr")) {
+		if (event.getPersonId().toString().startsWith("pt"))
 			this.drvrModesData.countsStuck[index]++;
-		} else if (event.getLegMode() != null) {
+		else if (event.getLegMode() != null) {
 			ModeData modeData = getDataForMode(event.getLegMode());
 			modeData.countsStuck[index]++;
 		}
@@ -157,22 +157,23 @@ public class LegHisto implements AgentDepartureEventHandler,
 		XYLineChart chartS = new XYLineChart("leg Histogram - stucks",
 				"time (h)", "stucks");
 
+		chartA.addSeries("ptDriver", xs, drvrModesData.countsArr);
+		chartD.addSeries("ptDriver", xs, drvrModesData.countsDep);
+		chartS.addSeries("ptDriver", xs, drvrModesData.countsStuck);
+		chartE.addSeries("ptDriver", xs, getEnRoutes(drvrModesData));
+
 		List<TransportMode> modes = new ArrayList<TransportMode>();
 		modes.addAll(data.keySet());
 		Collections.sort(modes);
 
 		for (TransportMode mode : modes) {
-			String modeStr = mode.toString();
+			String modeName = mode.toString();
 			ModeData modeData = data.get(mode);
-			chartA.addSeries(modeStr, xs, modeData.countsArr);
-			chartD.addSeries(modeStr, xs, modeData.countsDep);
-			chartS.addSeries(modeStr, xs, modeData.countsStuck);
-			chartE.addSeries(modeStr, xs, getEnRoutes(modeData));
+			chartA.addSeries(modeName, xs, modeData.countsArr);
+			chartD.addSeries(modeName, xs, modeData.countsDep);
+			chartS.addSeries(modeName, xs, modeData.countsStuck);
+			chartE.addSeries(modeName, xs, getEnRoutes(modeData));
 		}
-		chartA.addSeries("ptDriver", xs, drvrModesData.countsArr);
-		chartD.addSeries("ptDriver", xs, drvrModesData.countsDep);
-		chartS.addSeries("ptDriver", xs, drvrModesData.countsStuck);
-		chartE.addSeries("ptDriver", xs, getEnRoutes(drvrModesData));
 
 		chartA.saveAsPng(outputFilenameBase + "Arr.png", 1024, 768);
 		chartD.saveAsPng(outputFilenameBase + "Dep.png", 1024, 768);
@@ -181,7 +182,7 @@ public class LegHisto implements AgentDepartureEventHandler,
 	}
 
 	public static void main(String[] args) {
-		String eventsFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/output0/ITERS/it.100/100.events.xml.gz";
+		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/outputTest180/ITERS/it.100/100.events.xml.gz";
 
 		EventsManager em = new EventsManagerImpl();
 
@@ -191,6 +192,6 @@ public class LegHisto implements AgentDepartureEventHandler,
 		new MatsimEventsReader(em).readFile(eventsFilename);
 
 		lh
-				.write("../berlin-bvg09/pt/nullfall_M44_344/test/output0/ITERS/it.100/100.legHisto.");
+				.write("../berlin-bvg09/pt/m2_schedule_delay/outputTest180/ITERS/it.100/100.legHisto.");
 	}
 }
