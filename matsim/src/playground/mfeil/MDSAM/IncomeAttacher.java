@@ -189,11 +189,6 @@ public class IncomeAttacher {
 	
 	private void runSimplex (){
 		log.info("  running simplex... ");
-
-		// create objective function
-		double[] coefficients = new double [this.income.size()];
-		for (int i=0; i<coefficients.length;i++) coefficients[i]=1;
-		LinearObjectiveFunction f = new LinearObjectiveFunction (coefficients, 100);
 		
 		// writing constraints
 		ArrayList<double[]> table = new ArrayList<double[]>();
@@ -263,14 +258,20 @@ public class IncomeAttacher {
 			Municipality mun = iterator.next(); 
 			constraints.add(new LinearConstraint(table.get(munTableMatch.get(mun.getId())), Relationship.EQ, mun.getIncome()*rowTotal[munTableMatch.get(mun.getId())])); // 12 education types x + 1 variable y
 		}
+		log.info("Finished constraints...");
 		
 		// Goal type
 		GoalType goalType = GoalType.MINIMIZE;
 		
+		// create objective function
+		double[] coefficients = new double [this.income.size()];
+		for (int i=0; i<coefficients.length;i++) coefficients[i]=1;
+		LinearObjectiveFunction f = new LinearObjectiveFunction (coefficients, 0);
+		
 		// Running the simplex
 		RealPointValuePair result = new RealPointValuePair(new double[]{0.0},0.0); // Dummy initialization
 		try{
-			result = new SimplexSolver().optimize(f, constraints, goalType, true) ;
+			result = new SimplexSolver().optimize(f, constraints, goalType, false) ;
 		}
 		catch (OptimizationException e)	{
 			log.warn("Error in optimization: "+e);	
