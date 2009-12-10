@@ -42,7 +42,7 @@ public class TransitQueueVehicle extends QueueVehicleImpl implements TransitVehi
 			throw new NullPointerException("No capacity set in vehicle type.");
 		}
 		this.passengerCapacity = capacity.getSeats().intValue() +
-				(capacity.getStandingRoom() == null ? 0 : capacity.getStandingRoom().intValue());
+				(capacity.getStandingRoom() == null ? 0 : capacity.getStandingRoom().intValue() )- 1; //the driver takes also the seat
 	}
 
 	public boolean addPassenger(final PassengerAgent passenger) {
