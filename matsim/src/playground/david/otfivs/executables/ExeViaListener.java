@@ -51,7 +51,6 @@ import org.matsim.vis.otfvis.executables.OTFVisController;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
-import playground.david.otfvis.prefuse.OTFVisDualView;
 
 public class ExeViaListener {
 	public static class SimCanceledException extends RuntimeException{
@@ -203,7 +202,7 @@ QueueSimulationAfterSimStepListener {
 
 	protected void startupClient(String url) {
 		OTFClientFile client = new OTFClientFile(url);
-		client.setFilename( Gbl.getConfig().network().getInputFile());
+//		client.setFilename( Gbl.getConfig().network().getInputFile());
 		client.start();
 
 	}
@@ -221,17 +220,17 @@ QueueSimulationAfterSimStepListener {
 		OTFVisConfig visconf = new OTFVisConfig();
 		if (Gbl.getConfig() == null) Gbl.createConfig(null);
 		Gbl.getConfig().addModule(OTFVisConfig.GROUP_NAME, visconf);
-
-		OTFClientFile client = new OTFVisDualView(url, null, false);
-		client.setFilename( Gbl.getConfig().network().getInputFile());
-		client.start();
-		while(client.getQueryControl() == null) try {Thread.sleep(500);}catch(Exception e){};
-		if(
-				(client.getQueryControl() != null) && 
-				(controlListener instanceof OTFPopShowListener)
-		) {
-			client.getQueryControl().addQueryEntry("Show plan", "Shows the agent's plan on the left side", playground.david.otfvis.prefuse.QueryAgentPlanSyncView.class);
-		}
+// commented as not really needed dg dec 09
+//		OTFClientFile client = new OTFVisDualView(url, null, false);
+//		client.setFilename( Gbl.getConfig().network().getInputFile());
+//		client.start();
+//		while(client.getQueryControl() == null) try {Thread.sleep(500);}catch(Exception e){};
+//		if(
+//				(client.getQueryControl() != null) && 
+//				(controlListener instanceof OTFPopShowListener)
+//		) {
+//			client.getQueryControl().addQueryEntry("Show plan", "Shows the agent's plan on the left side", playground.david.otfvis.prefuse.QueryAgentPlanSyncView.class);
+//		}
 	}
 	
 }

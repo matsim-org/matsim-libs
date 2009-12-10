@@ -16,7 +16,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.netvis.streaming.SimStateWriterI;
-import org.matsim.vis.otfvis.OTFClient;
+import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
@@ -54,7 +54,7 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 		connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
 		connect.add(OTFAgentsListHandler.class,  AgentPointDrawer.class);
 
-		OTFClient client = new OTFClient("rmi:127.0.0.1:4019:AName1", connect);
+		OTFClientLive client = new OTFClientLive("rmi:127.0.0.1:4019:AName1", connect);
 		client.start();
 		try {
 			this.myOTFServer.pause();
