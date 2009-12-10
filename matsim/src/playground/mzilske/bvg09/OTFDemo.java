@@ -3,7 +3,7 @@ package playground.mzilske.bvg09;
 
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.pt.otfvis.FacilityDrawer;
-import org.matsim.vis.otfvis.OTFClient;
+import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDataReader;
 import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDataWriter;
@@ -49,7 +49,7 @@ public class OTFDemo {
 		connect.add(OTFTeleportAgentsDrawer.class, OTFTeleportAgentsLayer.class);
 
 
-		new OTFClient("rmi:127.0.0.1:4019:" + servername, connect).start();
+		new OTFClientLive("rmi:127.0.0.1:4019:" + servername, connect).start();
 
 	}
 
