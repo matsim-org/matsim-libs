@@ -183,7 +183,7 @@ public class Controler {
 
 	public final IterationStopWatch stopwatch = new IterationStopWatch();
 	final protected ScenarioImpl scenarioData;
-	private boolean scenarioLoaded = false;
+	protected boolean scenarioLoaded = false;
 	private PlansScoring plansScoring = null;
 	private RoadPricing roadPricing = null;
 	private ScoreStats scoreStats = null;
@@ -215,7 +215,7 @@ public class Controler {
 			shutdown(true);
 		}
 	};
-	private ScenarioLoaderImpl loader;
+	protected ScenarioLoaderImpl loader;
 	
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 
@@ -587,7 +587,7 @@ public class Controler {
 	 * {@link #loadNetwork()} and {@link #loadPopulation()}, if this data was
 	 * not given in the Constructor.
 	 */
-	private void loadData() {
+	protected void loadData() {
 		if (!this.scenarioLoaded) {
 			this.loader = new ScenarioLoaderImpl(this.scenarioData);
 			this.loader.loadScenario();

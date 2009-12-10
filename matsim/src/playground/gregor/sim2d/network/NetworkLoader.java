@@ -13,6 +13,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
@@ -32,6 +33,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -58,6 +60,8 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class NetworkLoader {
 
+	private static final Logger log = Logger.getLogger(NetworkLoader.class);
+	
 	private static final double RANGE = 0.25;
 
 	private static final double OVER_LENGTH = 2.;
@@ -93,9 +97,33 @@ public class NetworkLoader {
 
 	private Dijkstra router;
 
-	
+
 	public NetworkLoader(NetworkLayer net) {
 		this.network = net;
+	}
+
+	public Map<MultiPolygon,List<Link>> getFloors() {
+		if (!this.initialized) {
+			loadNetwork();
+		}
+		Map<MultiPolygon,List<Link>> mps = new HashMap<MultiPolygon,List<Link>>();
+		
+		for (Geometry geo : this.geos) {
+			MultiPolygon mp = null;
+			if (geo instanceof MultiPolygon) {
+				mp = (MultiPolygon) geo;
+			} else if (geo instanceof Polygon) {
+				mp = this.geofac.createMultiPolygon(new Polygon[]{(Polygon) geo});
+			} else {
+				throw new RuntimeException("Could not create Geometry of:" + geo);
+			}
+			
+			//TODO needs to be changed as soon as we have several floors (multi polygon)
+			log.warn("needs to be changed as soon as we have several floors (multi polygon)");
+			List<Link> links = new ArrayList<Link>(this.network.getLinks().values());
+			mps.put(mp,links);
+		}
+		return mps;
 	}
 	
 	public Network loadNetwork() {
@@ -112,17 +140,19 @@ public class NetworkLoader {
 
 		this.network.setEffectiveCellSize(0.26);
 		this.network.setEffectiveLaneWidth(0.71);
-		new NetworkWriter(this.network).writeFile("test.xml");
+		new NetworkCleaner().run(this.network);
 
-		ScenarioImpl scenario = new ScenarioImpl();
-		scenario.getConfig().global().setCoordinateSystem("WGS84_UTM33N");
-		//		CoordinateReferenceSystem crs = MGC.getCRS("WGS84_UTM33N");
-		FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(this.network);
-		//		builder.setCoordinateReferenceSystem(crs);
-		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
-		builder.setWidthCoefficient(0.5);
-		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);		
-		new Links2ESRIShape(this.network,"../../tmp/simplifiedNetwork.shp", builder).write();
+		if (DEBUG) {
+			ScenarioImpl scenario = new ScenarioImpl();
+			scenario.getConfig().global().setCoordinateSystem("WGS84_UTM33N");
+			//		CoordinateReferenceSystem crs = MGC.getCRS("WGS84_UTM33N");
+			FeatureGeneratorBuilder builder = new FeatureGeneratorBuilder(this.network);
+			//		builder.setCoordinateReferenceSystem(crs);
+			builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
+			builder.setWidthCoefficient(0.5);
+			builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);		
+			new Links2ESRIShape(this.network,"../../tmp/simplifiedNetwork.shp", builder).write();
+		}
 
 		return ret;
 	}
@@ -133,7 +163,7 @@ public class NetworkLoader {
 		this.router = new Dijkstra(this.network, this.cost, this.cost);
 
 		LinkComp comp = new LinkComp();
-		
+
 		boolean simplified = true;
 		int iter = 0;
 		while(simplified) {
@@ -145,7 +175,7 @@ public class NetworkLoader {
 				queue.addAll(node.getOutLinks().values());
 				while (queue.size() > 0) {
 					Link link = queue.poll();
-					
+
 					removeLink(link);
 					if (!isRemovalValid(node)) {
 						addLink(link);
@@ -154,8 +184,8 @@ public class NetworkLoader {
 						break;
 					}
 				}
-				
-				
+
+
 
 			}
 
@@ -224,8 +254,8 @@ public class NetworkLoader {
 				}
 				if (visible) {
 					this.visibilityGraph.add(ls);
-					Link l1 = this.network.createAndAddLink(new IdImpl(id++), n1, n2, ls.getLength(), 1.66, 1., 1.);
-					Link l2 = this.network.createAndAddLink(new IdImpl(id++), n2, n1, ls.getLength(), 1.66, 1., 1.);
+					Link l1 = this.network.createAndAddLink(new IdImpl(id), n1, n2, ls.getLength(), 1.66, 3600., 1.);
+					Link l2 = this.network.createAndAddLink(new IdImpl(100000 + id++), n2, n1, ls.getLength(), 1.66, 3600., 1.);
 					this.linkLinkMapping.put(l1, l2);
 					this.linkLinkMapping.put(l2, l1);
 				}
@@ -259,7 +289,8 @@ public class NetworkLoader {
 					other = null;
 					continue;
 				}
-				if (geo.intersects(other)){
+				//HACK for now we want only one big MultiPolygon
+				if (geo.intersects(other) || true){
 					break;
 				}
 				if (it.hasNext() == false) {
@@ -455,11 +486,16 @@ public class NetworkLoader {
 	private void dumpPolygons(Collection<Geometry> elements, String string) {
 		Collection<Feature> fts = new ArrayList<Feature>();
 		for (Geometry geo : elements) {
+			MultiPolygon mp = null;
 			if (geo instanceof MultiPolygon) {
-				geo = geo.getGeometryN(0);
+				mp = (MultiPolygon) geo;
+			} else if (geo instanceof Polygon) {
+				mp = this.geofac.createMultiPolygon(new Polygon[]{(Polygon) geo});
+			} else {
+				throw new RuntimeException("Could not create Geometry of:" + geo);
 			}
 			try {
-				fts.add(this.ft.create(new Object [] {geo,0,0}));
+				fts.add(this.ft.create(new Object [] {mp,0,0}));
 			} catch (IllegalAttributeException e) {
 				e.printStackTrace();
 			}
@@ -492,7 +528,7 @@ public class NetworkLoader {
 	private void initFeatures() {
 		CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
 		AttributeType p = DefaultAttributeTypeFactory.newAttributeType(
-				"Polygon", Polygon.class, true, null, null, targetCRS);
+				"MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
 		AttributeType l = DefaultAttributeTypeFactory.newAttributeType(
 				"LineString", LineString.class, true, null, null, targetCRS);
 		AttributeType po = DefaultAttributeTypeFactory.newAttributeType(

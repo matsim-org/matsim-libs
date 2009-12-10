@@ -55,7 +55,7 @@ public class SimpleBackgroundDrawer extends AbstractBackgroundDrawer {
         final float ty2 = tc.bottom();
 
 
-        final float z = 1.1f;
+        final float z = 0.0f;
         this.picture.enable();
         this.picture.bind();
 
