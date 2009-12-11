@@ -23,7 +23,7 @@ package org.matsim.withinday.mobsim;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.withinday.WithindayAgentFactory;
 import org.matsim.withinday.WithindayControler;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;

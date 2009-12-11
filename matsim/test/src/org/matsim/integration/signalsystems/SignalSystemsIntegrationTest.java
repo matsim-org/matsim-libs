@@ -20,8 +20,8 @@
 package org.matsim.integration.signalsystems;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.ptproject.controller.PtController;
 import org.matsim.testcases.MatsimTestCase;
 
 
@@ -36,7 +36,7 @@ public class SignalSystemsIntegrationTest extends MatsimTestCase {
 	public void testSignalSystems() {
 		Config config = this.loadConfig(this.getClassInputDirectory() + CONFIG_FILE_NAME);
 		config.controler().setOutputDirectory(this.getOutputDirectory());
-		Controler c = new Controler(config);
+		PtController c = new PtController(config);
 		c.setCreateGraphs(false);
 		c.run();
 		

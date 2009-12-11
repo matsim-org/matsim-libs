@@ -31,7 +31,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -40,6 +39,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.trafficmonitoring.LinkTravelTimeCounter;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.ptproject.controller.PtController;
 import org.matsim.withinday.mobsim.WithindayQueueSimulation;
 import org.matsim.withinday.trafficmanagement.TrafficManagement;
 import org.matsim.withinday.trafficmanagement.TrafficManagementConfigParser;
@@ -49,7 +49,7 @@ import org.xml.sax.SAXException;
 /**
  * @author dgrether
  */
-public class WithindayControler extends Controler {
+public class WithindayControler extends PtController {
 
 	private static final Logger log = Logger.getLogger(WithindayControler.class);
 

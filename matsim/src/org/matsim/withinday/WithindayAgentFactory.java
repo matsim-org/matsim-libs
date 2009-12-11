@@ -21,9 +21,9 @@ package org.matsim.withinday;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.WithindayConfigGroup;
-import org.matsim.core.mobsim.queuesim.AgentFactory;
-import org.matsim.core.mobsim.queuesim.PersonAgent;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.ptproject.qsim.AgentFactory;
+import org.matsim.ptproject.qsim.PersonAgent;
+import org.matsim.ptproject.qsim.QueueSimulation;
 
 /**
  * Factory for withinday replanning agents
