@@ -56,10 +56,6 @@ import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.AbstractSimulation;
-import org.matsim.core.mobsim.queuesim.TransitDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
@@ -71,6 +67,10 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
+import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.Simulation;
+import org.matsim.ptproject.qsim.TransitDriverAgent;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.transitSchedule.api.Departure;
@@ -482,7 +482,7 @@ public class TransitQueueSimulationTest extends TestCase {
 			qlink.addParkedVehicle(veh);
 
 			this.scheduleActivityEnd(this.driver);
-			AbstractSimulation.incLiving();
+			Simulation.incLiving();
 		}
 	}
 

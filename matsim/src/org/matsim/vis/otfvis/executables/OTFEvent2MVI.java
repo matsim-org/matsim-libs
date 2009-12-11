@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
+import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;

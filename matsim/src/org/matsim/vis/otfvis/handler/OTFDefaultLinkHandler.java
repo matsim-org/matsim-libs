@@ -25,7 +25,7 @@ import java.awt.geom.Point2D.Double;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataQuadReceiver;

@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.core.mobsim.queuesim.QueueVehicleImpl;
+import org.matsim.ptproject.qsim.QueueVehicleImpl;
 import org.matsim.vehicles.BasicVehicle;
 import org.matsim.vehicles.BasicVehicleCapacity;
 

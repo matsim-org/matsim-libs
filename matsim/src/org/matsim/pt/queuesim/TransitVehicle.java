@@ -22,7 +22,7 @@ package org.matsim.pt.queuesim;
 
 import java.util.Collection;
 
-import org.matsim.core.mobsim.queuesim.DriverAgent;
+import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.vehicles.BasicVehicle;
 
 

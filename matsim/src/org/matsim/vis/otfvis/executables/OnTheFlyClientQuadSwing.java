@@ -29,7 +29,7 @@ import java.rmi.RemoteException;
 import javax.swing.JSplitPane;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.NetJComponent;

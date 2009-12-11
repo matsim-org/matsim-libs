@@ -29,7 +29,6 @@ import org.geotools.data.FeatureSource;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -49,22 +48,20 @@ import org.matsim.evacuation.otfvis.readerwriter.TextureDataWriter;
 import org.matsim.evacuation.otfvis.readerwriter.TextutreDataReader;
 import org.matsim.evacuation.otfvis.readerwriter.TileDrawerDataReader;
 import org.matsim.evacuation.otfvis.readerwriter.TileDrawerDataWriter;
+import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
-import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 
 import playground.gregor.otf.readerwriter.InundationDataFromBinaryFileReader;
-import playground.gregor.otf.readerwriter.InundationDataFromNetcdfReaderII;
 
 
 public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{

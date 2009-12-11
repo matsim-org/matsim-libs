@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.data;
 
-import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;

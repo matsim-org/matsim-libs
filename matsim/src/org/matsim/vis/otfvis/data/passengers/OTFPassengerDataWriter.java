@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.mobsim.queuesim.DriverAgent;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueVehicle;
+import org.matsim.ptproject.qsim.DriverAgent;
+import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QueueVehicle;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.pt.queuesim.PassengerAgent;
 import org.matsim.pt.queuesim.TransitVehicle;

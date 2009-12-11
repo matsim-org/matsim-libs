@@ -43,9 +43,9 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.mobsim.queuesim.QueueNode;
+import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.ptproject.qsim.QueueNode;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vis.netvis.streaming.SimStateWriterI;

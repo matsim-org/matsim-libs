@@ -24,7 +24,7 @@ import java.awt.BorderLayout;
 import java.rmi.RemoteException;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;

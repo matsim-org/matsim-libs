@@ -22,7 +22,7 @@ package org.matsim.vis.otfvis.handler;
 
 import java.nio.ByteBuffer;
 
-import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo.VehicleState;
