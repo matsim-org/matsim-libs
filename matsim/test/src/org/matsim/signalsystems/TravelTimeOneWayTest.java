@@ -27,7 +27,7 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.lanes.basic.BasicLaneDefinitions;
 import org.matsim.signalsystems.basic.BasicSignalSystems;

@@ -43,7 +43,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.lanes.basic.BasicLane;
