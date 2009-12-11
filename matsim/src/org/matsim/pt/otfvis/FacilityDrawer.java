@@ -32,13 +32,13 @@ import org.matsim.pt.queuesim.TransitStopAgentTracker;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.otfvis.caching.SceneGraph;
+import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
-import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
+import org.matsim.vis.otfvis.opengl.queries.QueryDrawingUtils;
 
 
 public class FacilityDrawer {
@@ -122,7 +122,7 @@ public class FacilityDrawer {
 		
 		public void onDraw(GL gl) {
 			for (VisBusStop stop : this.stops) {
-				QueryAgentPlan.drawCircle(gl, (float) stop.x, (float) stop.y, 50.0f);
+				QueryDrawingUtils.drawCircle(gl, (float) stop.x, (float) stop.y, 50.0f);
 				InfoText.showTextOnce(stop.id + ": " + stop.nOfPeople, (float) stop.x - 100.0f, (float) stop.y + 50.0f, 2.0f);
 			}
 		}

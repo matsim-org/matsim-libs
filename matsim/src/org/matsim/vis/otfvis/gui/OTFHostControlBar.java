@@ -670,7 +670,6 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	// apparently queries are not dependent on a certain view right now, so it should be host.doQuery
 
 	public OTFQuery doQuery(OTFQuery query) {
-		OTFQuery result = null;
 		OTFClientQuad quad = this.quads.values().iterator().next();
 		return quad.doQuery(query);
 	}

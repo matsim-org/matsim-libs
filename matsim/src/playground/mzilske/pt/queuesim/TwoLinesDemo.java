@@ -54,9 +54,9 @@ import org.matsim.vehicles.BasicVehicleCapacityImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 
-import playground.marcel.OTFDemo;
 import playground.marcel.pt.analysis.RouteOccupancy;
 import playground.marcel.pt.analysis.VehicleTracker;
+import playground.mzilske.bvg09.OTFDemo;
 
 public class TwoLinesDemo {
 

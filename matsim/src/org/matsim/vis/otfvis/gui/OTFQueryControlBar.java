@@ -55,6 +55,7 @@ import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
+import org.matsim.vis.otfvis.interfaces.OTFQuery.Type;
 import org.matsim.vis.otfvis.opengl.queries.OTFReplaceQuery;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentEvents;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentId;
@@ -233,14 +234,12 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		queryType.setModel(leftMFuncModel);
 		queryType.invalidate();
 	}
+	
 	synchronized public void handleIdQuery(String id, String queryName) {
-		OTFQuery marked = null;
-		marked = createQuery(queryName);
-		if (marked != null) {
-			marked.setId(id);
-			marked = handler.doQuery(marked);
-			this.queryItems.add(marked);
-		}
+		OTFQuery query = createQuery(queryName);
+		query.setId(id);
+		query = handler.doQuery(query);
+		this.queryItems.add(query);
 	}
 	
 	public void handleIdQuery(Collection<String> list, String queryName) {
@@ -275,18 +274,16 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	}
 
 	private OTFQuery createQuery(String className) {
-		OTFQuery query = null;
 		try {
 			Class classDefinition = Class.forName(className);
-			query = (OTFQuery)classDefinition.newInstance();
+			return (OTFQuery) classDefinition.newInstance();
 		} catch (InstantiationException e) {
-			System.out.println(e);
+			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {
-			System.out.println(e);
+			throw new RuntimeException(e);
 		} catch (ClassNotFoundException e) {
-			System.out.println(e);
+			throw new RuntimeException(e);
 		}
-		return query;
 	}
 
 	public void handleClick(String viewId, Rectangle2D.Double origRect, int mouseButton) {
@@ -297,9 +294,9 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 			OTFVisConfig conf = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 
 			String queryName = conf.getQueryType();
-			OTFQuery query = createQuery(queryName);
+			Type typeOfQuery = getTypeOfQuery(queryName);
 			
-			if (query.getType() == OTFQuery.Type.AGENT) {
+			if (typeOfQuery == OTFQuery.Type.AGENT) {
 				List<String> agentIds = agentIdResolver.resolveId(origRect);
 				if ((agentIds != null) && (agentIds.size() != 0)) {
 					System.out.println("AgentId = " + agentIds);
@@ -307,7 +304,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 				} else {
 					System.out.println("No AgentId found!");
 				}
-			} else if (query.getType() == OTFQuery.Type.LINK) {
+			} else if (typeOfQuery == OTFQuery.Type.LINK) {
 				QueryLinkId linkIdQuery = (QueryLinkId)handler.doQuery(new QueryLinkId(origRect));
 				if ((linkIdQuery != null) && (linkIdQuery.linkIds.size() != 0)) {
 					System.out.println("LinkId = " + linkIdQuery.linkIds);
@@ -317,6 +314,12 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 				}
 			}
 		}
+	}
+
+	private Type getTypeOfQuery(String queryName) {
+		OTFQuery query = createQuery(queryName);
+		Type typeOfQuery = query.getType();
+		return typeOfQuery;
 	}
 	
 	synchronized public void addQuery(OTFQuery query) {

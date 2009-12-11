@@ -22,14 +22,17 @@ package org.matsim.vis.otfvis.opengl.queries;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.List;
+import java.util.Map;
 
 import javax.media.opengl.GL;
 
 import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -43,6 +46,7 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.vis.otfvis.caching.ClientDataBase;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -61,12 +65,7 @@ import com.sun.opengl.util.BufferUtil;
  *
  */
 public class QueryAgentPlan implements OTFQuery {
-	public interface AgentCoordProvider {
-		public Point2D.Double getAgentCoords(char [] id) ;
-	}
 
-	public static AgentCoordProvider coordProvider = null;
-	
 	private static final long serialVersionUID = -8415337571576184768L;
 
 	private static class MyInfoText implements Serializable{
@@ -103,7 +102,6 @@ public class QueryAgentPlan implements OTFQuery {
 				count++;
 			} else if (o instanceof LegImpl) {
 				LegImpl leg = (LegImpl)o;
-
 				if (leg.getMode().equals(TransportMode.car)) {
 					List<Link> route = ((NetworkRouteWRefs) leg.getRoute()).getLinks();
 					count += route.size();
@@ -129,11 +127,11 @@ public class QueryAgentPlan implements OTFQuery {
 
 	public void buildRoute(Plan plan) {
 		int count = countLines(plan);
-		if(count == 0) return;
+		if (count == 0) return;
 
 		int pos = 0;
 		this.vertex = new float[count*2];
-		this.colors = new byte[count*4]; //BufferUtil.newByteBuffer(count*4);
+		this.colors = new byte[count*4];
 
 		Color carColor = Color.ORANGE;
 		Color actColor = Color.BLUE;
@@ -147,8 +145,7 @@ public class QueryAgentPlan implements OTFQuery {
 				if (coord == null) coord = act.getLink().getCoord();
 				setCoord(pos++, coord, col);
 			} else if (o instanceof LegImpl) {
-				LegImpl leg = (LegImpl)o;
-
+				LegImpl leg = (LegImpl) o;
 				if (leg.getMode().equals(TransportMode.car)) {
 					Node last = null;
 					for (Link driven : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
@@ -166,55 +163,121 @@ public class QueryAgentPlan implements OTFQuery {
 
 	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad quad) {
 		Person person = plans.getPersons().get(new IdImpl(this.agentId));
-		if (person == null) return this;
-
-		Plan plan = person.getSelectedPlan();
-
-		this.acts = new Object [plan.getPlanElements().size()/2];
-
-		for (int i=0;i< this.acts.length; i++) {
-			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i*2);
-			Coord coord = act.getCoord();
-			if (coord == null) coord = act.getLink().getCoord();
-			this.acts[i] = new MyInfoText( (float)coord.getX(), (float)coord.getY(), act.getType());
+		if (person == null) {
+			// Can't do anything.
+		} else {
+			Plan plan = person.getSelectedPlan();
+			this.acts = new Object[plan.getPlanElements().size() / 2];
+			for (int i = 0; i < this.acts.length; i++) {
+				ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(i * 2);
+				Coord coord = act.getCoord();
+				if (coord == null) {
+					coord = act.getLink().getCoord();
+				}
+				this.acts[i] = new MyInfoText((float) coord.getX(), (float) coord.getY(), act.getType());
+			}
+			buildRoute(plan);
 		}
-
-		buildRoute(plan);
 		return this;
 	}
 
 	public void draw(OTFDrawer drawer) {
 		if(drawer instanceof OTFOGLDrawer) {
-			draw((OTFOGLDrawer)drawer);
+			drawWithGLDrawer((OTFOGLDrawer)drawer);
 		}
 	}
 
-	public static void drawCircle(GL gl, float x, float y, float size) {
-		float w = 40;
-
-		gl.glLineWidth(2);
-		gl.glEnable(GL.GL_LINE_SMOOTH);
-		gl.glBegin(GL.GL_LINE_STRIP);
-		for (float f = 0; f < w;) {
-			gl.glVertex3d(Math.cos(f)*size + x, Math.sin(f)*size + y,0);
-			f += (2*Math.PI/w);
+	public void drawWithGLDrawer(OTFOGLDrawer drawer) {
+		if (this.vertex != null) {
+			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
+			Point2D.Double pos = tryToFindAgentPosition(layer);
+			calcOffsetIfNecessary(drawer, pos);
+			rewindGLBuffers();
+			GL gl = drawer.getGL();
+			prepare(gl);
+			if (pos != null) {
+				// We know where the agent is, so we draw stuff around them.
+				drawArrowFromAgentToTextLabel(pos, gl);
+				drawCircleAroundAgent(pos, gl);
+				updateAgentTextPosition(pos);
+				resetAnyOldProgressbars();
+			} else {
+				// We don't know where the agent is, so we ask the server if
+				// they are still active.
+				queryAgentActivityStatus(drawer);
+			}
+			unPrepare(gl);
 		}
-		gl.glEnd();
+	}
+
+	private void prepare(GL gl) {
+		Color color = Color.ORANGE;
+		gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.5);
+		gl.glEnable(GL.GL_BLEND);
+		gl.glEnable(GL.GL_LINE_SMOOTH);
+		gl.glEnableClientState (GL.GL_COLOR_ARRAY);
+		gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
+		gl.glLineWidth(1.f * getLineWidth());
+		gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, cols);
+		gl.glVertexPointer (2, GL.GL_FLOAT, 0, this.vert);
+		gl.glDrawArrays (GL.GL_LINE_STRIP, 0, this.vertex.length/2);
+		gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
+		gl.glDisableClientState (GL.GL_COLOR_ARRAY);
 		gl.glDisable(GL.GL_LINE_SMOOTH);
 	}
 
-	public void draw(OTFOGLDrawer drawer) {
-		if(this.vertex == null) return;
+	private void unPrepare(GL gl) {
+		gl.glDisable(GL.GL_BLEND);
+	}
 
-		Point2D.Double pos;
-		if(coordProvider != null) {
-			pos = coordProvider.getAgentCoords(this.agentId.toCharArray());
-		} else {
-			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
-			pos = layer.getAgentCoords(this.agentId.toCharArray());
+	private void rewindGLBuffers() {
+		vert.position(0);
+		cols.position(0);
+	}
+
+	private float getLineWidth() {
+		return ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
+	}
+
+	private void drawArrowFromAgentToTextLabel(Point2D.Double pos, GL gl) {
+		gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
+		gl.glLineWidth(2);
+		gl.glBegin(GL.GL_LINE_STRIP);
+		gl.glVertex3d((float)pos.x + 50, (float)pos.y + 50,0);
+		gl.glVertex3d((float)pos.x +250, (float)pos.y +250,0);
+		gl.glEnd();
+	}
+
+	private void drawCircleAroundAgent(Point2D.Double pos, GL gl) {
+		QueryDrawingUtils.drawCircle(gl, (float)pos.x, (float)pos.y, 200.f);
+	}
+
+	private void resetAnyOldProgressbars() {
+		if (this.lastActivity >= 0) ((InfoText)this.acts[this.lastActivity]).fill = 0.0f;
+	}
+
+	private void updateAgentTextPosition(Point2D.Double pos) {
+		if(this.agentText != null) {
+			this.agentText.x = (float)pos.x+ 250;
+			this.agentText.y = (float)pos.y + 250;
 		}
+	}
 
-		if( this.calcOffset == true) {
+	private void queryAgentActivityStatus(OTFOGLDrawer drawer) {
+		QueryAgentActivityStatus query = new QueryAgentActivityStatus();
+		query.setId(this.agentId);
+		query.setNow(drawer.getActGraph().getTime());
+		query = (QueryAgentActivityStatus) drawer.getQuad().doQuery(query);
+		if ((query != null) && (query.activityNr != -1) && (query.activityNr < this.acts.length)) {
+			InfoText posT = ((InfoText)this.acts[query.activityNr]);
+			posT.color = new Color(255,50,50,180);
+			posT.fill = (float)query.finished;
+			this.lastActivity = query.activityNr;
+		}
+	}
+
+	private void calcOffsetIfNecessary(OTFOGLDrawer drawer, Point2D.Double pos) {
+		if (this.calcOffset == true) {
 			float east = (float)drawer.getQuad().offsetEast;
 			float north = (float)drawer.getQuad().offsetNorth;
 
@@ -235,65 +298,34 @@ public class QueryAgentPlan implements OTFQuery {
 				this.agentText = InfoText.showTextPermanent(this.agentId, (float)pos.x, (float)pos.y, -0.0005f );
 				this.agentText.setAlpha(0.7f);
 			}
-			//InfoText.showText("Agent selected...");
 			onEndInit();
 		}
+	}
 
-		GL gl = drawer.getGL();
-		Color color = Color.ORANGE;
-		gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.5);
-
-		gl.glEnable(GL.GL_BLEND);
-		gl.glEnable(GL.GL_LINE_SMOOTH);
-		gl.glEnableClientState (GL.GL_COLOR_ARRAY);
-		gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
-		vert.position(0);
-		cols.position(0);
-		gl.glLineWidth(1.f*((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth());
-		gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, cols);
-		gl.glVertexPointer (2, GL.GL_FLOAT, 0, this.vert);
-		gl.glDrawArrays (GL.GL_LINE_STRIP, 0, this.vertex.length/2);
-		gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
-		gl.glDisableClientState (GL.GL_COLOR_ARRAY);
-		gl.glDisable(GL.GL_LINE_SMOOTH);
-		if (pos != null) {
-			//System.out.println("POS: " + pos.x + ", " + pos.y);
-			gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
-			gl.glLineWidth(2);
-			gl.glBegin(GL.GL_LINE_STRIP);
-			gl.glVertex3d((float)pos.x + 50, (float)pos.y + 50,0);
-			gl.glVertex3d((float)pos.x +250, (float)pos.y +250,0);
-			gl.glEnd();
-			drawCircle(gl, (float)pos.x, (float)pos.y, 200.f);
-			if(this.agentText != null) {
-				this.agentText.x = (float)pos.x+ 250;
-				this.agentText.y = (float)pos.y + 250;
+	private Point2D.Double tryToFindAgentPosition(OGLAgentPointLayer layer) {
+		ClientDataBase clientDataBase = ClientDataBase.getInstance();
+		Map<Id, Id> piggyBackingMap = clientDataBase.getPiggyBackingMap();
+		Point2D.Double pos = getAgentPositionFromPointLayer(this.agentId, layer);
+		if (pos == null) {
+			// The agent visualizer doesn't know where the agent is. Presumably
+			// they are in a transit vehicle.
+			Id piggyBackingAgentId = piggyBackingMap.get(new IdImpl(this.agentId));
+			if (piggyBackingAgentId != null) {
+				pos = getAgentPositionFromPointLayer(piggyBackingAgentId.toString(), layer);
 			}
-			// reset any old progressbars
-			if (this.lastActivity >= 0) ((InfoText)this.acts[this.lastActivity]).fill = 0.0f;
 		} else {
-			QueryAgentActivityStatus query = new QueryAgentActivityStatus();
-			query.setId(this.agentId);
-			query.setNow(drawer.getActGraph().getTime());
-			query = (QueryAgentActivityStatus) drawer.getQuad().doQuery(query);
-			if ((query != null) && (query.activityNr != -1) && (query.activityNr < this.acts.length)) {
-				InfoText posT = ((InfoText)this.acts[query.activityNr]);
-				posT.color = new Color(255,50,50,180);
-				// draw progressline underneath
-				posT.fill = (float)query.finished;
-				this.lastActivity = query.activityNr;
-			}
+			// The agent visualizer DOES know where the agent is, so we give the
+			// piggy-backing database a hint that the agent is not with someone else anymore.
+			// Ugly, but OK for now.
+			piggyBackingMap.put(new IdImpl(this.agentId), null);
 		}
-
-		gl.glDisable(GL.GL_BLEND);
-
+		return pos;
 	}
 
-	protected void onEndInit() {
-		// for derived classes
+	private Double getAgentPositionFromPointLayer(String agentIdString, OGLAgentPointLayer layer) {
+		return layer.getAgentCoords(agentIdString.toCharArray());
+	}
 		
-	}
-
 	public void remove() {
 		// Check if we have already generated InfoText Objects, otherwise drop deleting
 		if (this.calcOffset == true) return;
@@ -312,6 +344,10 @@ public class QueryAgentPlan implements OTFQuery {
 
 	public Type getType() {
 		return OTFQuery.Type.AGENT;
+	}
+
+	protected void onEndInit() {
+		// for derived classes
 	}
 
 }

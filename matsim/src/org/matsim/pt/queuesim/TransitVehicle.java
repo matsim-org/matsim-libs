@@ -22,6 +22,7 @@ package org.matsim.pt.queuesim;
 
 import java.util.Collection;
 
+import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.vehicles.BasicVehicle;
 
 
@@ -57,5 +58,7 @@ public interface TransitVehicle {
 	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
 	 */
 	public BasicVehicle getBasicVehicle();
+
+	public DriverAgent getDriver();
 
 }

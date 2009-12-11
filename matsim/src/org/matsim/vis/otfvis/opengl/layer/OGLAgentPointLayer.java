@@ -32,8 +32,6 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
-
-import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.caching.DefaultSceneLayer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
@@ -67,10 +65,12 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	@Deprecated 
 	// for Padang time-based agents
 	/*package*/ final static RandomColorizer colorizer2 = new RandomColorizer(257);
+	
 	//for backward compatibility only
 	@Deprecated 
 	/*package*/ final static OTFOGLDrawer.FastColorizer colorizer3 = new OTFOGLDrawer.FastColorizer(
 			new double[] { 0.0, 30., 120., 255. ,256.}, new Color[] {	Color.GREEN, Color.YELLOW, Color.RED, Color.RED, Color.BLUE});
+	
 	//for backward compatibility only
 	@Deprecated 
 	/*package*/ final static OTFOGLDrawer.FastColorizer colorizer4 = new OTFOGLDrawer.FastColorizer(
@@ -102,7 +102,6 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		
 		protected void setAgentSize() {
 			float agentSize = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getAgentSize();
-
 			if (gl.isFunctionAvailable("glPointParameterf")) {
 				// Query for the max point size supported by the hardware
 				float [] maxSize = {0.0f};
@@ -213,7 +212,6 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			}
 			this.vertexIN.put(startX);
 			this.vertexIN.put(startY);
-			//vertexIN.put(0.f);
 			if (saveId) this.id2coord.put(Arrays.hashCode(id),this.count);
 			
 			this.colorsIN.put( (byte)mycolor.getRed());
@@ -275,26 +273,19 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	//for backward compatibility only
 	@Deprecated 
 	public class AgentPadangDrawer  extends AgentPointDrawer {
-		
-		
-		
+
 		public final AgentArrayDrawer drawerWave = new AgentArrayDrawer(){
 			@Override
 			protected void setAgentSize(){gl.glPointSize(10);}
 			@Override
 			protected void setTexture(){this.texture = null;}
 		};
+		
 		public final AgentArrayDrawer drawerEvacuees = new AgentArrayDrawer(){
 			@Override
 			protected void setTexture(){this.texture = AgentDrawer.pedpng;}
 		};		
-		
-		
-//		public AgentPadangDrawer() {
-//			super();
-//			Logger.getLogger(AgentPadangDrawer.class).warn("This class is deprecated and will be removed in further versions!");	
-//		}
-		
+
 		public void drawAll() {
 			this.drawerWave.draw();
 			this.drawerEvacuees.draw();
@@ -307,8 +298,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 
 		public void onDraw(GL gl) {
-			// TODO Auto-generated method stub
-			
+
 		}
 	}
 
@@ -322,6 +312,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			else this.drawerWave.addAgent(id, startX, startY,colorizer4.getColor(state),false);
 		}
 	}
+	
 	//for backward compatibility only
 	@Deprecated 
 	public class AgentPadangTimeDrawer extends AgentPadangDrawer {
@@ -358,7 +349,6 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 
 	@Override
 	public Object newInstance(Class clazz) throws InstantiationException, IllegalAccessException {
-//		AgentPointDrawer drawer = (AgentPointDrawer)clazz.newInstance(this);
 		if (clazz == AgentPadangTimeDrawer.class) return this.timedrawer;
 		else if (clazz == AgentPadangRegionDrawer.class) return this.regiondrawer;
 		else if (clazz == AgentPointDrawerByID.class) return this.pointIDdrawer;
@@ -366,7 +356,6 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 	}
 
 	public int getDrawOrder() {
-		// TODO Auto-generated method stub
 		return 100;
 	}
 
@@ -387,4 +376,5 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		return null;
 		
 	}
+	
 }

@@ -5,6 +5,10 @@ import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.data.passengers.OTFPassengerDataReader;
+import org.matsim.vis.otfvis.data.passengers.OTFPassengerDataReceiver;
+import org.matsim.vis.otfvis.data.passengers.OTFPassengerDataWriter;
+import org.matsim.vis.otfvis.data.passengers.OTFPassengerDataWriterFactory;
 import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDataReader;
 import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDataWriter;
 import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDrawer;
@@ -47,7 +51,10 @@ public class OTFDemo {
 		connect.add(OTFTeleportAgentsDataWriter.class, OTFTeleportAgentsDataReader.class);
 		connect.add(OTFTeleportAgentsDataReader.class, OTFTeleportAgentsDrawer.class);
 		connect.add(OTFTeleportAgentsDrawer.class, OTFTeleportAgentsLayer.class);
-
+		
+		connect.add(QueueLink.class, OTFPassengerDataWriterFactory.class);
+		connect.add(OTFPassengerDataWriter.class, OTFPassengerDataReader.class);
+		connect.add(OTFPassengerDataReader.class, OTFPassengerDataReceiver.class);
 
 		new OTFClientLive("rmi:127.0.0.1:4019:" + servername, connect).start();
 

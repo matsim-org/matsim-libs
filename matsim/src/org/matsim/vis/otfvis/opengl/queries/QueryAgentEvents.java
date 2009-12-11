@@ -129,38 +129,14 @@ public class QueryAgentEvents extends QueryAgentPlan {
 
 		return result;
 	}
-	@Override
-	public void draw(OTFDrawer drawer) {
-		if(drawer instanceof OTFOGLDrawer) {
-			draw((OTFOGLDrawer)drawer);
-		}
-	}
-
-	public static void drawCircle(GL gl, float x, float y, float size) {
-		float w = 40;
-
-		gl.glLineWidth(2);
-		gl.glEnable(GL.GL_LINE_SMOOTH);
-		gl.glBegin(GL.GL_LINE_STRIP);
-		for (float f = 0; f < w;) {
-			gl.glVertex3d(Math.cos(f)*size + x, Math.sin(f)*size + y,0);
-			f += (2*Math.PI/w);
-		}
-		gl.glEnd();
-		gl.glDisable(GL.GL_LINE_SMOOTH);
-	}
 
 	@Override
-	public void draw(OTFOGLDrawer drawer) {
+	public void drawWithGLDrawer(OTFOGLDrawer drawer) {
 		if(this.vertex == null) return;
 
 		Point2D.Double pos;
-		if(coordProvider != null) {
-			pos = coordProvider.getAgentCoords(this.agentId.toCharArray());
-		} else {
-			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
-			pos = layer.getAgentCoords(this.agentId.toCharArray());
-		}
+		OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
+		pos = layer.getAgentCoords(this.agentId.toCharArray());
 
 		if( this.calcOffset == true) {
 			float east = (float)drawer.getQuad().offsetEast;
@@ -201,7 +177,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 			gl.glVertex3d((float)pos.x + 50, (float)pos.y + 50,0);
 			gl.glVertex3d((float)pos.x +250, (float)pos.y +250,0);
 			gl.glEnd();
-			drawCircle(gl, (float)pos.x, (float)pos.y, 200.f);
+			QueryDrawingUtils.drawCircle(gl, (float)pos.x, (float)pos.y, 200.f);
 			if(this.agentText != null) {
 				this.agentText.x = (float)pos.x+ 250;
 				this.agentText.y = (float)pos.y + 250;

@@ -347,16 +347,15 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	}
 
 	public OTFQuery doQuery(final OTFQuery query) {
-		OTFQuery result = null;
 		try {
 			if(this.host.isLive()) {
-				result = ((OTFLiveServerRemote)this.host).answerQuery(query);
+				return ((OTFLiveServerRemote)this.host).answerQuery(query);
+			} else {
+				return null;
 			}
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		return result;
 	}
 	
 	public boolean doChangeDrawer(Point2D.Double point, OTFDrawer drawer) {

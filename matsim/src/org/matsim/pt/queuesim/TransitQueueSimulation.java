@@ -48,6 +48,7 @@ import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.BasicVehicles;
+import org.matsim.vis.otfvis.data.passengers.OTFPassengerDataWriter;
 import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDataWriter;
 import org.matsim.vis.otfvis.data.teleportation.TeleportationVisData;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
@@ -68,6 +69,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 	private final HashMap<Person, DriverAgent> agents = new HashMap<Person, DriverAgent>(100);
 
 	private OTFTeleportAgentsDataWriter teleportationWriter;
+	// private OTFPassengerDataWriter passengerWriter;
 
 	private LinkedHashMap<Id, TeleportationVisData> visTeleportationData;
 
@@ -84,9 +86,11 @@ public class TransitQueueSimulation extends QueueSimulation {
 		this.otfServer = OnTheFlyServer.createInstance(serverName, this.network, this.population, getEvents(), false);
 		this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(this.schedule, this.agentTracker));
 		this.teleportationWriter = new OTFTeleportAgentsDataWriter();
+		// this.passengerWriter = new OTFPassengerDataWriter();
 		this.visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
 		this.otfServer.addAdditionalElement(this.teleportationWriter);
-
+		// this.otfServer.addAdditionalElement(this.passengerWriter);
+		
 		try {
 			this.otfServer.pause();
 		} catch (RemoteException e) {
