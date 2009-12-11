@@ -1,0 +1,46 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ParallelQueueSimulation.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.ptproject.qsim;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.MatsimRandom;
+
+public class ParallelQueueSimulation extends QueueSimulation{
+
+	/*
+	 * We just use a ParallelQueueSimEngine.
+	 */
+	public ParallelQueueSimulation(final Network network, final Population population, final EventsManager eventsManager)
+	{
+		super(network, population, eventsManager);
+		
+		// use the ParallelQueueSimEngine
+		this.simEngine = new ParallelQueueSimEngine(this.network, MatsimRandom.getRandom());
+	}
+	
+	public ParallelQueueSimulation(final Scenario scenario, final EventsManager eventsManager)
+	{
+		this(scenario.getNetwork(), scenario.getPopulation(), eventsManager);
+	}
+}

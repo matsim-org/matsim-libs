@@ -45,16 +45,16 @@ public class QueueSimEngine {
 	 * the links are processed influences the order of events within one time step. Thus, just comparing the event-files will not
 	 * work, but first sorting the two event-files by time and agent-id and then comparing them, will work.
 	 */
-	private static boolean simulateAllLinks = false;
-	private static boolean simulateAllNodes = false;
+	/*package*/ static boolean simulateAllLinks = false;
+	/*package*/ static boolean simulateAllNodes = false;
 
-	private final List<QueueLink> allLinks;
+	/*package*/ final List<QueueLink> allLinks;
 	/** This is the collection of links that have to be moved in the simulation */
-	private final List<QueueLink> simLinksArray = new ArrayList<QueueLink>();
+	/*package*/ final List<QueueLink> simLinksArray = new ArrayList<QueueLink>();
 	/** This is the collection of nodes that have to be moved in the simulation */
-	private final QueueNode[] simNodesArray;
+	/*package*/ final QueueNode[] simNodesArray;
 	/** This is the collection of links that have to be activated in the current time step */
-	private final ArrayList<QueueLink> simActivateThis = new ArrayList<QueueLink>();
+	/*package*/ final ArrayList<QueueLink> simActivateThis = new ArrayList<QueueLink>();
 	
 	private final Random random;
 	

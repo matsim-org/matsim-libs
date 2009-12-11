@@ -20,20 +20,34 @@
 
 package org.matsim.ptproject.qsim;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.matsim.core.gbl.Gbl;
 
 public abstract class Simulation {
 
+	/*
+	 * @cdobler
+	 * Use AtomicIntegers as counting variables. Doing this avoids
+	 * problems with race conditions in the ParallelQueueSimulation.
+	 * 
+	 * TODO
+	 * We should discuss if there is a possibility to assign a 
+	 * Simulation Objects to each thread. Using the AtomicIntegers
+	 * solves the problems with the race conditions but it is still
+	 * a bottleneck...
+	 */
+	
 	/**
 	 * Number of agents that have not yet reached their final activity location
 	 */
-	private static int living = 0;
+	private static AtomicInteger living = new AtomicInteger(0);
 
 	/**
 	 * Number of agents that got stuck in a traffic jam and where removed from the simulation to solve a possible deadlock
 	 */
-	private static int lost = 0;
-
+	private static AtomicInteger lost = new AtomicInteger(0);
+	
 	private static double stuckTime = Double.MAX_VALUE;
 
 	public static void reset() {
@@ -45,16 +59,51 @@ public abstract class Simulation {
 	public static final double getStuckTime() {return stuckTime;	}
 	private static final void setStuckTime(final double stuckTime) { Simulation.stuckTime = stuckTime; }
 
-	public static final int getLiving() {return living;	}
-	public static final void setLiving(final int count) {living = count;}
-	public static final boolean isLiving() {return living > 0;	}
-	public static final int getLost() {return lost;	}
-	public static final void incLost() {lost++;}
-	public static final void incLost(final int count) {lost += count;}
-	private static final void resetLost() { lost = 0; }
+	public static final int getLiving() {return living.get();	}
+	public static final void setLiving(final int count) {living.set(count);}
+	public static final boolean isLiving() {return living.get() > 0;	}
+	public static final int getLost() {return lost.get();	}
+	public static final void incLost() {lost.incrementAndGet(); }
+	public static final void incLost(final int count) {lost.addAndGet(count);}
+	private static final void resetLost() { lost.set(0); }
 
-	public static final void incLiving() {living++;}
-	public static final void incLiving(final int count) {living += count;}
-	public static final void decLiving() {living--;}
-	public static final void decLiving(final int count) {living -= count;}
+	public static final void incLiving() {living.incrementAndGet();}
+	public static final void incLiving(final int count) {living.addAndGet(count);}
+	public static final void decLiving() {living.decrementAndGet();}
+	public static final void decLiving(final int count) {living.decrementAndGet();}
+	
+	
+//	/**
+//	 * Number of agents that have not yet reached their final activity location
+//	 */
+//	private static int living = 0;
+//
+//	/**
+//	 * Number of agents that got stuck in a traffic jam and where removed from the simulation to solve a possible deadlock
+//	 */
+//	private static int lost = 0;
+//
+//	private static double stuckTime = Double.MAX_VALUE;
+//
+//	public static void reset() {
+//		setLiving(0);
+//		resetLost();
+//		setStuckTime(Gbl.getConfig().simulation().getStuckTime());
+//	}
+//
+//	public static final double getStuckTime() {return stuckTime;	}
+//	private static final void setStuckTime(final double stuckTime) { Simulation.stuckTime = stuckTime; }
+//
+//	public static final int getLiving() {return living;	}
+//	public static final void setLiving(final int count) {living = count;}
+//	public static final boolean isLiving() {return living > 0;	}
+//	public static final int getLost() {return lost;	}
+//	public static final void incLost() {lost++;}
+//	public static final void incLost(final int count) {lost += count;}
+//	private static final void resetLost() { lost = 0; }
+//
+//	public static final void incLiving() {living++;}
+//	public static final void incLiving(final int count) {living += count;}
+//	public static final void decLiving() {living--;}
+//	public static final void decLiving(final int count) {living -= count;}
 }
