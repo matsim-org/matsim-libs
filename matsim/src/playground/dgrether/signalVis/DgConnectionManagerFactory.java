@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.signalVis;
 
-import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;

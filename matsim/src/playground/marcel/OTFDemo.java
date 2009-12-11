@@ -20,8 +20,8 @@
 
 package playground.marcel;
 
-import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.pt.otfvis.FacilityDrawer;
+import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;

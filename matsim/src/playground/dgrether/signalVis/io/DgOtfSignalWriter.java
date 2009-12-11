@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.mobsim.queuesim.QueueLane;
-import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.utils.misc.ByteBufferUtils;
+import org.matsim.ptproject.qsim.QueueLane;
+import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 
 
