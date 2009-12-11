@@ -21,10 +21,10 @@
 package playground.meisterk.phd.replanning;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -38,7 +38,7 @@ public class PhDStrategyManager extends StrategyManager {
 	/**
 	 * Records which person is selected for what plan strategy.
 	 */
-	private HashMap<PlanStrategy, Set<Person>> personTreatment = new HashMap<PlanStrategy, Set<Person>>();
+	private TreeMap<String, Set<Person>> personTreatment = new TreeMap<String, Set<Person>>();
 
 	@Override
 	public void run(Population population, int iteration) {
@@ -65,11 +65,11 @@ public class PhDStrategyManager extends StrategyManager {
 			PlanStrategy strategy = this.chooseStrategy();
 			
 			Set<Person> personIdSet = null;
-			if (this.personTreatment.containsKey(strategy)) {
-				personIdSet = this.personTreatment.get(strategy);
+			if (this.personTreatment.containsKey(strategy.toString())) {
+				personIdSet = this.personTreatment.get(strategy.toString());
 			} else {
 				personIdSet = new HashSet<Person>();
-				this.personTreatment.put(strategy, personIdSet);
+				this.personTreatment.put(strategy.toString(), personIdSet);
 			}
 			personIdSet.add(person);
 			
@@ -85,7 +85,7 @@ public class PhDStrategyManager extends StrategyManager {
 		}
 	}
 
-	public Map<PlanStrategy, Set<Person>> getPersonTreatment() {
+	public Map<String, Set<Person>> getPersonTreatment() {
 		return Collections.unmodifiableMap(this.personTreatment);
 	}
 
