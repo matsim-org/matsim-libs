@@ -70,7 +70,6 @@ import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.matsim.vis.netvis.VisConfig;
 import org.matsim.vis.netvis.streaming.SimStateWriterI;
-import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -121,7 +120,7 @@ public class QueueSimulation implements Simulation{
 
 	private AgentFactory agentFactory;
 
-	private QueueSimListenerManager listenerManager;
+	private QueueSimListenerManager<QueueSimulation> listenerManager;
 
 	protected final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
 
@@ -302,23 +301,7 @@ public class QueueSimulation implements Simulation{
 				this.netStateWriter.open();
 			}
 			if (snapshotFormat.contains("otfvis")) {
-				String snapshotFile = Controler.getIterationFilename("otfvis.mvi");
-				OTFQuadFileHandler.Writer writer = null;
-				writer = new OTFQuadFileHandler.Writer(this.snapshotPeriod, this.network, snapshotFile);
-//				if (this.config.scenario().isUseLanes() && ! this.config.scenario().isUseSignalSystems()) {
-//					OTFConnectionManager connect = writer.getConnectionManager();
-//					// data source to writer
-//					connect.add(QueueLink.class, DgOtfLaneWriter.class);
-//					// writer -> reader: from server to client
-//					connect
-//					.add(DgOtfLaneWriter.class, DgOtfLaneReader.class);
-//					// reader to drawer (or provider to receiver)
-//					connect.add(DgOtfLaneReader.class, DgLaneSignalDrawer.class);
-//					// drawer -> layer
-//					connect.add(DgLaneSignalDrawer.class, DgOtfLaneLayer.class);
-//
-//				}
-				this.snapshotWriters.add(writer);
+				log.error("QueueSimulation no longer supports snapshot format otfvis!");
 			}
 		} else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
 	}
