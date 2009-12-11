@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickControler
+ * AllTests.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin;
 
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
-import org.matsim.population.algorithms.PlanCalcType;
-import org.matsim.ptproject.controller.PtController;
+package org.matsim.ptproject.qsim;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-/**
- * @author dgrether
- *
- */
-public class BKickControler extends PtController {
+public class AllTests {
 
-	public BKickControler(String configFileName) {
-		super(configFileName);
-	}
-	
-	public BKickControler(Config conf){
-		super(conf);
-	}
-
-	public BKickControler(String[] args) {
-		super(args);
+	public static Test suite() {
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
+		//$JUnit-BEGIN$
+		suite.addTestSuite(QueueLinkTest.class);
+		suite.addTestSuite(QueueLaneTest.class);
+		suite.addTestSuite(QueueSimulationTest.class);
+		suite.addTestSuite(TravelTimeTest.class);
+		
+		suite.addTest(org.matsim.core.mobsim.queuesim.listener.AllTests.suite());
+		//$JUnit-END$
+		return suite;
 	}
 
-	@Override
-	protected Population loadPopulation() {
-		Population pop = super.loadPopulation();
-		new PlanCalcType().run(pop);
-		return pop;
-	}
 }

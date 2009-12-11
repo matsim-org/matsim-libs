@@ -24,7 +24,7 @@ package playground.cottbus;
  * [based on tutorial.example7]
  */
 
-import org.matsim.run.Controler;
+import org.matsim.ptproject.controller.PtController;
 import org.matsim.vis.netvis.NetVis;
 
 public class CottbusController {
@@ -33,7 +33,7 @@ public class CottbusController {
 		String config = "./input/denver/config.xml";
 		// configuration that describes current scenario
 		
-		Controler controler = new Controler(config);
+		PtController controler = new PtController(config);
 		controler.setOverwriteFiles(true);
 		// effects output-folder
 		controler.run();

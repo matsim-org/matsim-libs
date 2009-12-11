@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BKickControler
+ * AllTests
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,36 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin;
+package org.matsim.ptproject;
 
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
-import org.matsim.population.algorithms.PlanCalcType;
-import org.matsim.ptproject.controller.PtController;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 
 
 /**
  * @author dgrether
  *
  */
-public class BKickControler extends PtController {
+public class AllTests  {
 
-	public BKickControler(String configFileName) {
-		super(configFileName);
+	public static Test suite() {
+		TestSuite suite = new TestSuite("Tests for " + AllTests.class.getPackage().getName());
+		//$JUnit-BEGIN$
+		suite.addTest(org.matsim.ptproject.qsim.AllTests.suite());
+		//$JUnit-END$
+		return suite;
 	}
 	
-	public BKickControler(Config conf){
-		super(conf);
-	}
-
-	public BKickControler(String[] args) {
-		super(args);
-	}
-
-	@Override
-	protected Population loadPopulation() {
-		Population pop = super.loadPopulation();
-		new PlanCalcType().run(pop);
-		return pop;
-	}
 }
