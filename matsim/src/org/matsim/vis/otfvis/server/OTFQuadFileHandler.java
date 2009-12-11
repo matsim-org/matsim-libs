@@ -69,14 +69,13 @@ import org.matsim.vis.snapshots.writers.SnapshotWriter;
  */
 public class OTFQuadFileHandler {
 
-	private static final int BUFFERSIZE = 300000000;
-
 	// the version number should be increased to imply a compatibility break
 	public static final int VERSION = 1;
 	// minor version increase does not break compatibility
 	public static final int MINORVERSION = 6;
 
 	public static class Writer implements SimStateWriterI, SnapshotWriter {
+		private static final int BUFFERSIZE = 300000000;
 		protected final QueueNetwork net;
 		protected OTFServerQuad quad = null;
 		private final String fileName;

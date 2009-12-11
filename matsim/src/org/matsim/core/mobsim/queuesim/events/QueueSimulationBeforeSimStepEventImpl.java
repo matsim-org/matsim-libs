@@ -19,18 +19,18 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.queuesim.events;
 
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.Simulation;
 
 
 /**
  * @author dgrether
  */
-public class QueueSimulationBeforeSimStepEventImpl extends AbstractQueueSimulationEvent  
-	implements QueueSimulationBeforeSimStepEvent {
+public class QueueSimulationBeforeSimStepEventImpl<T extends Simulation> extends AbstractQueueSimulationEvent<T>  
+	implements QueueSimulationBeforeSimStepEvent<T> {
 
 	private double time;
 
-	public QueueSimulationBeforeSimStepEventImpl(QueueSimulation queuesim, double time) {
+	public QueueSimulationBeforeSimStepEventImpl(T queuesim, double time) {
 		super(queuesim);
 		this.time = time;
 	}

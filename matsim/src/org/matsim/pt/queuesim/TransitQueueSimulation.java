@@ -36,7 +36,7 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.mobsim.queuesim.Simulation;
+import org.matsim.core.mobsim.queuesim.AbstractSimulation;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRoute;
@@ -144,7 +144,7 @@ public class TransitQueueSimulation extends QueueSimulation {
 					qlink.addParkedVehicle(veh);
 
 					this.scheduleActivityEnd(driver);
-					Simulation.incLiving();
+					AbstractSimulation.incLiving();
 				}
 			}
 		}
@@ -184,15 +184,15 @@ public class TransitQueueSimulation extends QueueSimulation {
 			if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 				log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + agent.getPerson().getId().toString());
 				log.info("route: " + leg.getRoute().getClass().getCanonicalName() + " " + (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
-				Simulation.decLiving();
-				Simulation.incLost();
+				AbstractSimulation.decLiving();
+				AbstractSimulation.incLost();
 				return;
 			}
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
 			if (route.getAccessStopId() == null) {
 				// looks like this agent has a bad transit route, likely no route could be calculated for it
-				Simulation.decLiving();
-				Simulation.incLost();
+				AbstractSimulation.decLiving();
+				AbstractSimulation.incLost();
 				log.error(
 						"Agent has bad transit route! agentId=" + agent.getPerson().getId()
 								+ " route=" + route.getRouteDescription()

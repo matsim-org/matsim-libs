@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeSimStepListener
+ * SimVehicle.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.listener;
 
-import org.matsim.core.mobsim.Simulation;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
+package org.matsim.ptproject.qsim;
 
+import org.matsim.api.basic.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.BasicVehicle;
 
-/**
- *  Listeners of QueueSimulation should implement this if they want to be 
- *  notified after QueueSimulation.beforeSimStep() was invoked.
- * @author dgrether
- *
- */
-public interface QueueSimulationBeforeSimStepListener<T extends Simulation> extends QueueSimulationListener<T> {
+public interface QueueVehicle extends Identifiable {
 
-	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent<T> e);
+	public DriverAgent getDriver();
+
+	public void setDriver(final DriverAgent driver);
 	
+	public Link getCurrentLink();
+	
+	public void setCurrentLink(final Link link);
+	
+	public double getSizeInEquivalents();
+	
+	public double getLinkEnterTime();
+	
+	public void setLinkEnterTime(final double time);
+
+	public double getEarliestLinkExitTime();
+
+	public void setEarliestLinkExitTime(final double time);
+
+	/**
+	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
+	 */
+	public BasicVehicle getBasicVehicle();
+
 }

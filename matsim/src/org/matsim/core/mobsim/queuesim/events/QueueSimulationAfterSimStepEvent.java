@@ -19,13 +19,16 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.queuesim.events;
 
+import org.matsim.core.mobsim.Simulation;
+
 
 /**
  * A simple interface for QueueSimulationEvents that are fired for every time step.
  * 
  * @author mrieser
  */
-public interface QueueSimulationAfterSimStepEvent extends QueueSimulationEvent {
+public interface QueueSimulationAfterSimStepEvent<T extends Simulation> 
+	extends QueueSimulationEvent<T>{
 
 	public double getSimulationTime();
 

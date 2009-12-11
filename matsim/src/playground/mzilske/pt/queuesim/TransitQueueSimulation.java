@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.queuesim.DriverAgent;
 import org.matsim.core.mobsim.queuesim.QueueLink;
-import org.matsim.core.mobsim.queuesim.Simulation;
+import org.matsim.core.mobsim.queuesim.AbstractSimulation;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.pt.queuesim.TransitQueueVehicle;
 import org.matsim.pt.queuesim.TransitStopAgentTracker;
@@ -49,7 +49,7 @@ public class TransitQueueSimulation extends org.matsim.pt.queuesim.TransitQueueS
 		qlink.addParkedVehicle(veh);
 
 		this.scheduleActivityEnd(driver);
-		Simulation.incLiving();
+		AbstractSimulation.incLiving();
 	}
 
 	@Override

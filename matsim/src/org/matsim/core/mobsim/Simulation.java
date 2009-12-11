@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeSimStepListener
+ * Simulation
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.listener;
-
-import org.matsim.core.mobsim.Simulation;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
+package org.matsim.core.mobsim;
 
 
 /**
- *  Listeners of QueueSimulation should implement this if they want to be 
- *  notified after QueueSimulation.beforeSimStep() was invoked.
+ * Marker interface to make a simulation work together with
+ * simulation events and a Control(l)er
  * @author dgrether
  *
  */
-public interface QueueSimulationBeforeSimStepListener<T extends Simulation> extends QueueSimulationListener<T> {
+public interface Simulation {
 
-	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent<T> e);
-	
 }

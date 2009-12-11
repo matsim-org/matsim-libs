@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.queuesim.events;
 
+import org.matsim.core.mobsim.Simulation;
+
 
 /**
  * Just a tagging interface for QueueSimulationEvents that are fired
@@ -26,6 +28,6 @@ package org.matsim.core.mobsim.queuesim.events;
  * @author dgrether
  *
  */
-public interface QueueSimulationInitializedEvent extends QueueSimulationEvent {
-
+public interface QueueSimulationInitializedEvent<T extends Simulation> 
+extends QueueSimulationEvent<T>{
 }

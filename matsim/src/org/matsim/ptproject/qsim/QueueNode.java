@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.ptproject.qsim;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -130,15 +130,15 @@ public class QueueNode {
 
 			// check if veh is stuck!
 
-			if ((now - currentLane.bufferLastMovedTime) > AbstractSimulation.getStuckTime()) {
+			if ((now - currentLane.bufferLastMovedTime) > Simulation.getStuckTime()) {
 				/* We just push the vehicle further after stucktime is over, regardless
 				 * of if there is space on the next link or not.. optionally we let them
 				 * die here, we have a config setting for that!
 				 */
 				if (Gbl.getConfig().simulation().isRemoveStuckVehicles()) {
 					currentLane.popFirstFromBuffer();
-					AbstractSimulation.decLiving();
-					AbstractSimulation.incLost();
+					Simulation.decLiving();
+					Simulation.incLost();
 					QueueSimulation.getEvents().processEvent(
 							new AgentStuckEventImpl(now, veh.getDriver().getPerson(), (LinkImpl)currentLink, veh.getDriver().getCurrentLeg()));
 				} else {
@@ -153,8 +153,8 @@ public class QueueNode {
 
 		// --> nextLink == null
 		currentLane.popFirstFromBuffer();
-		AbstractSimulation.decLiving();
-		AbstractSimulation.incLost();
+		Simulation.decLiving();
+		Simulation.incLost();
 		log.error(
 				"Agent has no or wrong route! agentId=" + veh.getDriver().getPerson().getId()
 						+ " currentLink=" + currentLink.getId().toString()

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.queuesim.events;
 
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.Simulation;
 
 
 /**
@@ -28,12 +28,12 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
  * @author dgrether
  *
  */
-public interface QueueSimulationEvent {
+public interface QueueSimulationEvent<T extends Simulation> {
 	/**
 	 * 
 	 * @return the QueueSimulaiton instance by which the event
 	 * is fired.
 	 */
-	public QueueSimulation getQueueSimulation();
+	public T getQueueSimulation();
 	
 }

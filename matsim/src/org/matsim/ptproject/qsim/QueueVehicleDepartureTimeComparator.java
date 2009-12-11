@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeSimStepListener
+ * VehicleDepartureTimeComparator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.listener;
 
-import org.matsim.core.mobsim.Simulation;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
+package org.matsim.ptproject.qsim;
 
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
- *  Listeners of QueueSimulation should implement this if they want to be 
- *  notified after QueueSimulation.beforeSimStep() was invoked.
- * @author dgrether
+ * @author dstrippgen
  *
+ * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
+ * according to their departure time
  */
-public interface QueueSimulationBeforeSimStepListener<T extends Simulation> extends QueueSimulationListener<T> {
+public class QueueVehicleDepartureTimeComparator implements Comparator<QueueVehicle>,
+		Serializable {
 
-	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent<T> e);
-	
+	private static final long serialVersionUID = 1L;
+
+	public int compare(final QueueVehicle veh1, final QueueVehicle veh2) {
+		if (veh1.getDriver().getDepartureTime() > veh2.getDriver().getDepartureTime())
+			return 1;
+		if (veh1.getDriver().getDepartureTime() < veh2.getDriver().getDepartureTime())
+			return -1;
+
+		// Both depart at the same time -> let the one with the larger id be first
+		return veh2.getId().compareTo(veh1.getId());
+	}
 }

@@ -20,6 +20,7 @@
 
 package org.matsim.core.mobsim.queuesim.listener;
 
+import org.matsim.core.mobsim.Simulation;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
 
 /**
@@ -28,9 +29,9 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
  *
  * @author mrieser
  */
-public interface QueueSimulationAfterSimStepListener extends
-		QueueSimulationListener {
+public interface QueueSimulationAfterSimStepListener<T extends Simulation> extends
+		QueueSimulationListener<T> {
 
-	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e);
+	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent<T> e);
 	
 }

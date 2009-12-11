@@ -18,9 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.ptproject.qsim;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.Simulation;
+import org.matsim.core.mobsim.queuesim.SignalEngine;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -68,9 +67,8 @@ import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
-import org.matsim.vis.netvis.VisConfig;
 import org.matsim.vis.netvis.streaming.SimStateWriterI;
-import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
+import org.matsim.vis.otfvis.mobsim.QSimOTFFileWriter;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -85,7 +83,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
  * @author mrieser
  * @author dgrether
  */
-public class QueueSimulation implements Simulation{
+public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 
 	private int snapshotPeriod = 0;
 	private double snapshotTime = 0.0;
@@ -121,7 +119,7 @@ public class QueueSimulation implements Simulation{
 
 	private AgentFactory agentFactory;
 
-	private QueueSimListenerManager listenerManager;
+	private QueueSimListenerManager<QueueSimulation> listenerManager;
 
 	protected final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
 
@@ -147,8 +145,8 @@ public class QueueSimulation implements Simulation{
 	 */
 	public QueueSimulation(final Network network, final Population plans, final EventsManager events) {
 		// In my opinion, this should be marked as deprecated in favor of the constructor with Scenario. marcel/16july2009
-		this.listenerManager = new QueueSimListenerManager(this);
-		AbstractSimulation.reset();
+		this.listenerManager = new QueueSimListenerManager<QueueSimulation>(this);
+		Simulation.reset();
 		this.config = Gbl.getConfig();
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
 		setEvents(events);
@@ -276,35 +274,12 @@ public class QueueSimulation implements Simulation{
 						TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84)));
 			}
 			if (snapshotFormat.contains("netvis")) {
-				String snapshotFile;
-
-				if (Controler.getIteration() == -1 ) snapshotFile = this.config.simulation().getSnapshotFile();
-				else snapshotFile = Controler.getIterationPath() + "/Snapshot";
-
-				File networkFile = new File(this.config.network().getInputFile());
-				VisConfig myvisconf = VisConfig.newDefaultConfig();
-				String[] params = {VisConfig.LOGO, VisConfig.DELAY, VisConfig.LINK_WIDTH_FACTOR, VisConfig.SHOW_NODE_LABELS, VisConfig.SHOW_LINK_LABELS};
-				for (String param : params) {
-					String value = this.config.findParam("vis", param);
-					if (value != null) {
-						myvisconf.set(param, value);
-					}
-				}
-				// OR do it like this: buffers = Integer.parseInt(Config.getSingleton().getParam("temporal", "buffersize"));
-				// Automatic reasoning about buffersize, so that the file will be about 5MB big...
-				int buffers = this.network.getLinks().size();
-				String buffString = this.config.findParam("vis", "buffersize");
-				if (buffString == null) {
-					buffers = Math.max(5, Math.min(500000/buffers, 100));
-				} else buffers = Integer.parseInt(buffString);
-
-				this.netStateWriter = new QueueNetStateWriter(this.network, this.network.getNetworkLayer(), networkFile.getAbsolutePath(), myvisconf, snapshotFile, this.snapshotPeriod, buffers);
-				this.netStateWriter.open();
+				throw new IllegalStateException("netvis is no longer supported by this simulation");
 			}
 			if (snapshotFormat.contains("otfvis")) {
 				String snapshotFile = Controler.getIterationFilename("otfvis.mvi");
-				OTFQuadFileHandler.Writer writer = null;
-				writer = new OTFQuadFileHandler.Writer(this.snapshotPeriod, this.network, snapshotFile);
+				QSimOTFFileWriter writer = null;
+				writer = new QSimOTFFileWriter(this.snapshotPeriod, this.network, snapshotFile);
 //				if (this.config.scenario().isUseLanes() && ! this.config.scenario().isUseSignalSystems()) {
 //					OTFConnectionManager connect = writer.getConnectionManager();
 //					// data source to writer
@@ -449,12 +424,12 @@ public class QueueSimulation implements Simulation{
 			long diffreal = (endtime.getTime() - this.starttime.getTime())/1000;
 			double diffsim  = time - SimulationTimer.getSimStartTime();
 			int nofActiveLinks = this.simEngine.getNumberOfSimulatedLinks();
-			log.info("SIMULATION AT " + Time.writeTime(time) + ": #Veh=" + AbstractSimulation.getLiving() + " lost=" + AbstractSimulation.getLost() + " #links=" + nofActiveLinks
+			log.info("SIMULATION AT " + Time.writeTime(time) + ": #Veh=" + Simulation.getLiving() + " lost=" + Simulation.getLost() + " #links=" + nofActiveLinks
 					+ " simT=" + diffsim + "s realT=" + (diffreal) + "s; (s/r): " + (diffsim/(diffreal + Double.MIN_VALUE)));
 			Gbl.printMemoryUsage();
 		}
 
-		return (AbstractSimulation.isLiving() && (this.stopTime > time));
+		return (Simulation.isLiving() && (this.stopTime > time));
 	}
 
 	protected void afterSimStep(final double time) {

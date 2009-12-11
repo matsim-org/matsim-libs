@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.queuesim.events;
 
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.Simulation;
 
 
 /**
@@ -28,19 +28,19 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
  * @author dgrether
  *
  */
-public abstract class AbstractQueueSimulationEvent implements
-		QueueSimulationEvent {
+public abstract class AbstractQueueSimulationEvent<T extends Simulation> implements
+		QueueSimulationEvent<T> {
 	
-	private QueueSimulation queuesim;
+	private T queuesim;
 
-	public AbstractQueueSimulationEvent(QueueSimulation queuesim){
+	public AbstractQueueSimulationEvent(T queuesim){
 		this.queuesim = queuesim;
 	}
 	
 	/**
 	 * @see org.matsim.core.mobsim.queuesim.events.QueueSimulationEvent#getQueueSimulation()
 	 */
-	public QueueSimulation getQueueSimulation() {
+	public T getQueueSimulation() {
 		return this.queuesim;
 	}
 

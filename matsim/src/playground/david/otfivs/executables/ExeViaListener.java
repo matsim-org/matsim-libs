@@ -137,8 +137,8 @@ public static class OTFControlerListener implements
 StartupListener,
 BeforeMobsimListener, 
 AfterMobsimListener, 
-QueueSimulationInitializedListener,
-QueueSimulationAfterSimStepListener {
+QueueSimulationInitializedListener<QueueSimulation>,
+QueueSimulationAfterSimStepListener<QueueSimulation> {
 
 	private QueueNetwork queueNetwork;
 	protected OnTheFlyServer myOTFServer;
@@ -155,7 +155,7 @@ QueueSimulationAfterSimStepListener {
 		myOTFServer.setControllerStatus(OTFVisController.REPLANNING + cont.getIteration()+1);
 	}
 
-	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent e) {
+	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent<QueueSimulation> e) {
 		int status = myOTFServer.updateStatus(e.getSimulationTime());
 		if(myOTFServer.getRequestStatus() == OTFVisController.CANCEL) {
 //			try {
@@ -171,7 +171,7 @@ QueueSimulationAfterSimStepListener {
 		}
 	}
 
-	public void notifySimulationInitialized(QueueSimulationInitializedEvent e) {
+	public void notifySimulationInitialized(QueueSimulationInitializedEvent<QueueSimulation> e) {
 		QueueSimulation q = e.getQueueSimulation();
 		myOTFServer.events = QueueSimulation.getEvents();
 		myOTFServer.replaceQueueNetwork(q.getQueueNetwork());
@@ -213,8 +213,8 @@ public static class OTFPopShowListener extends OTFControlerListener implements
 StartupListener,
 BeforeMobsimListener, 
 AfterMobsimListener, 
-QueueSimulationInitializedListener,
-QueueSimulationAfterSimStepListener {
+QueueSimulationInitializedListener<QueueSimulation>,
+QueueSimulationAfterSimStepListener<QueueSimulation> {
 	@Override
 	protected void startupClient(String url)  {
 		OTFVisConfig visconf = new OTFVisConfig();

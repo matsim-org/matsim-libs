@@ -22,7 +22,7 @@ package org.matsim.core.mobsim.queuesim.listener;
 
 import javax.swing.event.EventListenerList;
 
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.Simulation;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEventImpl;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
@@ -38,13 +38,13 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEventImp
  *
  * @author dgrether
  */
-public class QueueSimListenerManager {
+public class QueueSimListenerManager<T extends Simulation> {
 	
-	private final QueueSimulation queuesim;
+	private final T queuesim;
 
 	private final EventListenerList listenerList = new EventListenerList();
 
-	public QueueSimListenerManager(QueueSimulation qsim){
+	public QueueSimListenerManager(T qsim){
 		this.queuesim = qsim;
 	}
 	

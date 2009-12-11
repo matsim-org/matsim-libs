@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeSimStepListener
+ * TransitDriverAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.listener;
 
-import org.matsim.core.mobsim.Simulation;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
+package org.matsim.ptproject.qsim;
 
+import org.matsim.transitSchedule.api.TransitStopFacility;
 
 /**
- *  Listeners of QueueSimulation should implement this if they want to be 
- *  notified after QueueSimulation.beforeSimStep() was invoked.
- * @author dgrether
+ * Additional methods for drivers of public transport vehicles.
  *
+ * @author mrieser
  */
-public interface QueueSimulationBeforeSimStepListener<T extends Simulation> extends QueueSimulationListener<T> {
+public interface TransitDriverAgent extends DriverAgent {
 
-	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent<T> e);
+	public TransitStopFacility getNextTransitStop();
 	
+	public double handleTransitStop(final TransitStopFacility stop, final double now);
 }

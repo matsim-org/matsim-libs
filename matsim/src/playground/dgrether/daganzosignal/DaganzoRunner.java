@@ -29,11 +29,11 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
+import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.run.OTFVis;
 
 import playground.dgrether.analysis.charts.utils.DgChartWriter;
@@ -76,16 +76,16 @@ public class DaganzoRunner {
 	}
 	
 	private void addQueueSimListener(final Controler controler) {
-		controler.getQueueSimulationListener().add(new QueueSimulationInitializedListener() {
-			public void notifySimulationInitialized(QueueSimulationInitializedEvent e) {
+		controler.getQueueSimulationListener().add(new QueueSimulationInitializedListener<QueueSimulation>() {
+			public void notifySimulationInitialized(QueueSimulationInitializedEvent<QueueSimulation> e) {
 				QueueSimulation qs = e.getQueueSimulation();
 				AdaptiveController adaptiveController = (AdaptiveController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 				controler.getEvents().addHandler(adaptiveController);
 			}
 		});
 		
-		controler.getQueueSimulationListener().add(new QueueSimulationBeforeCleanupListener() {
-			public void notifySimulationBeforeCleanup(QueueSimulationBeforeCleanupEvent e) {
+		controler.getQueueSimulationListener().add(new QueueSimulationBeforeCleanupListener<QueueSimulation>() {
+			public void notifySimulationBeforeCleanup(QueueSimulationBeforeCleanupEvent<QueueSimulation> e) {
 				QueueSimulation qs = e.getQueueSimulation();
 				AdaptiveController adaptiveController = (AdaptiveController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 				controler.getEvents().removeHandler(adaptiveController);

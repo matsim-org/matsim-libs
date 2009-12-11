@@ -19,12 +19,14 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.queuesim.events;
 
+import org.matsim.core.mobsim.Simulation;
+
 
 /**
  * Is thrown by QueueSimulation after QueueSimulation.beforeSimStep() was invoked.
  * @author dgrether
  */
-public interface QueueSimulationBeforeSimStepEvent extends QueueSimulationEvent {
+public interface QueueSimulationBeforeSimStepEvent<T extends Simulation> extends QueueSimulationEvent<T> {
 
 	public double getSimulationTime();
 

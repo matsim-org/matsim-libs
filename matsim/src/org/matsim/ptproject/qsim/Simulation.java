@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.ptproject.qsim;
 
 import org.matsim.core.gbl.Gbl;
 

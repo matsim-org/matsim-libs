@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeSimStepListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +16,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.listener;
 
-import org.matsim.core.mobsim.Simulation;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
+package org.matsim.ptproject.qsim;
 
+import org.matsim.api.core.v01.population.Person;
 
 /**
- *  Listeners of QueueSimulation should implement this if they want to be 
- *  notified after QueueSimulation.beforeSimStep() was invoked.
  * @author dgrether
- *
  */
-public interface QueueSimulationBeforeSimStepListener<T extends Simulation> extends QueueSimulationListener<T> {
+public class AgentFactory {
 
-	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent<T> e);
-	
+	protected final QueueSimulation simulation;
+
+	public AgentFactory(final QueueSimulation simulation) {
+		this.simulation = simulation;
+	}
+
+	public PersonAgent createPersonAgent(final Person p) {
+		PersonAgent agent = new PersonAgent(p, this.simulation);
+		return agent;
+	}
+
 }

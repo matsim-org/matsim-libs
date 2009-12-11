@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeSimStepListener
+ * DriverAgentDepartureTimeComparator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.listener;
 
-import org.matsim.core.mobsim.Simulation;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
+package org.matsim.ptproject.qsim;
 
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
- *  Listeners of QueueSimulation should implement this if they want to be 
- *  notified after QueueSimulation.beforeSimStep() was invoked.
- * @author dgrether
+ * Compares two {@link DriverAgent}s according to their (planned) departure time. If the 
+ * departure times are the same, the agent with the higher id is considered smaller.
  *
+ * @author mrieser
+ * 
+ * @see DriverAgent#getDepartureTime()
  */
-public interface QueueSimulationBeforeSimStepListener<T extends Simulation> extends QueueSimulationListener<T> {
+/*package*/ class DriverAgentDepartureTimeComparator implements Comparator<DriverAgent>, Serializable {
 
-	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent<T> e);
-	
+	private static final long serialVersionUID = 1L;
+
+	public int compare(DriverAgent agent1, DriverAgent agent2) {
+		int cmp = Double.compare(agent1.getDepartureTime(), agent2.getDepartureTime());
+		if (cmp == 0) {
+			// Both depart at the same time -> let the one with the larger id be first (=smaller)
+			return agent2.getPerson().getId().compareTo(agent1.getPerson().getId());
+		}
+		return cmp;
+	}
+
 }

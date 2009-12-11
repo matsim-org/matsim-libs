@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.queuesim.events;
 
+import org.matsim.core.mobsim.Simulation;
+
 
 /**
  * A simple tagging interface to mark all QueueSimulationEvents that are fired
@@ -27,6 +29,8 @@ package org.matsim.core.mobsim.queuesim.events;
  * @author dgrether
  *
  */
-public interface QueueSimulationBeforeCleanupEvent extends QueueSimulationEvent {
+public interface QueueSimulationBeforeCleanupEvent
+<T extends Simulation> extends QueueSimulationEvent<T>
+{
 
 }

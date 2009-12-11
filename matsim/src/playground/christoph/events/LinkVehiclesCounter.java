@@ -24,7 +24,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.mobsim.queuesim.Simulation;
+import org.matsim.core.mobsim.queuesim.AbstractSimulation;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
@@ -309,10 +309,10 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 //				vehQueueMap.put(id, myVehQueueCount - diff);
 //			}
 	 
-			if (Simulation.getLost() != lostVehicles)
+			if (AbstractSimulation.getLost() != lostVehicles)
 			{ 
 				log.error("Wrong LostCount");
-				log.error("Expected: " + Simulation.getLost() + ", Found: " + lostVehicles);
+				log.error("Expected: " + AbstractSimulation.getLost() + ", Found: " + lostVehicles);
 			} 
 //			
 //			if (queueLink.parkingCount() != parkingMap.get(id))

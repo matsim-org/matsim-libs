@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.ptproject.qsim;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -674,24 +674,24 @@ public class QueueLane {
 			QueueSimulation.getEvents().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
 		}
-		AbstractSimulation.decLiving(this.waitingList.size());
-		AbstractSimulation.incLost(this.waitingList.size());
+		Simulation.decLiving(this.waitingList.size());
+		Simulation.incLost(this.waitingList.size());
 		this.waitingList.clear();
 
 		for (QueueVehicle veh : this.vehQueue) {
 			QueueSimulation.getEvents().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
 		}
-		AbstractSimulation.decLiving(this.vehQueue.size());
-		AbstractSimulation.incLost(this.vehQueue.size());
+		Simulation.decLiving(this.vehQueue.size());
+		Simulation.incLost(this.vehQueue.size());
 		this.vehQueue.clear();
 
 		for (QueueVehicle veh : this.buffer) {
 			QueueSimulation.getEvents().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getPerson(), veh.getCurrentLink(), veh.getDriver().getCurrentLeg()));
 		}
-		AbstractSimulation.decLiving(this.buffer.size());
-		AbstractSimulation.incLost(this.buffer.size());
+		Simulation.decLiving(this.buffer.size());
+		Simulation.incLost(this.buffer.size());
 		this.buffer.clear();
 	}
 

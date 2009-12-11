@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeSimStepListener
+ * DriverAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.queuesim.listener;
 
-import org.matsim.core.mobsim.Simulation;
-import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeSimStepEvent;
+package org.matsim.ptproject.qsim;
 
+import org.matsim.api.core.v01.network.Link;
 
-/**
- *  Listeners of QueueSimulation should implement this if they want to be 
- *  notified after QueueSimulation.beforeSimStep() was invoked.
- * @author dgrether
- *
- */
-public interface QueueSimulationBeforeSimStepListener<T extends Simulation> extends QueueSimulationListener<T> {
+public interface DriverAgent extends PersonAgentI {
 
-	public void notifySimulationBeforeSimStep(QueueSimulationBeforeSimStepEvent<T> e);
 	
+	public Link getDestinationLink();
+	
+	/**
+	 * Returns the next link the vehicle will drive along.
+	 *
+	 * @return The next link the vehicle will drive on, or null if an error has happened.
+	 */
+	public Link chooseNextLink();
+
+	public void teleportToLink(final Link link);
+
+	// the methods below are yet unclear how useful they are in the interface, or if they should be moved to a Vehicle interface.
+
+	public void moveOverNode();
+
+
 }

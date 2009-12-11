@@ -19,17 +19,17 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.queuesim.events;
 
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.Simulation;
 
 
 /**
  * @author dgrether
  * @see QueueSimulationBeforeCleanupEvent
  */
-public class QueueSimulationBeforeCleanupEventImpl extends
-		AbstractQueueSimulationEvent implements QueueSimulationBeforeCleanupEvent {
+public class QueueSimulationBeforeCleanupEventImpl<T extends Simulation> extends
+		AbstractQueueSimulationEvent<T> implements QueueSimulationBeforeCleanupEvent<T> {
 
-	public QueueSimulationBeforeCleanupEventImpl(QueueSimulation queuesim) {
+	public QueueSimulationBeforeCleanupEventImpl(T queuesim) {
 		super(queuesim);
 	}
 

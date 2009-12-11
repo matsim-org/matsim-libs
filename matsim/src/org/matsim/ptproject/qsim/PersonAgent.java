@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.ptproject.qsim;
 
 import java.util.List;
 
@@ -139,7 +139,7 @@ public class PersonAgent implements DriverAgent {
 			setDepartureTime(departureTime);
 //			SimulationTimer.updateSimStartTime(departureTime);
 			this.simulation.scheduleActivityEnd(this);
-			AbstractSimulation.incLiving();
+			Simulation.incLiving();
 			return true;
 		}
 		return false; // the agent has no leg, so nothing more to do
@@ -149,8 +149,8 @@ public class PersonAgent implements DriverAgent {
 		RouteWRefs route = leg.getRoute();
 		if (route == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
-			AbstractSimulation.decLiving();
-			AbstractSimulation.incLost();
+			Simulation.decLiving();
+			Simulation.incLost();
 			return;
 		}
 		this.destinationLink = route.getEndLink();
@@ -182,8 +182,8 @@ public class PersonAgent implements DriverAgent {
 		if (this.currentLink != this.destinationLink) {
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.destinationLink.getId()
 					+ ", but arrived on link " + this.currentLink.getId() + ". Removing the agent from the simulation.");
-			AbstractSimulation.decLiving();
-			AbstractSimulation.incLost();
+			Simulation.decLiving();
+			Simulation.incLost();
 			return;
 		}
 		advancePlanElement(now);
@@ -205,7 +205,7 @@ public class PersonAgent implements DriverAgent {
 				this.simulation.scheduleActivityEnd(this);
 			} else {
 				// this is the last activity
-				AbstractSimulation.decLiving();
+				Simulation.decLiving();
 			}
 
 		} else if (pe instanceof LegImpl) {

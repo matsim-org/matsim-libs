@@ -5,7 +5,7 @@ import java.util.Iterator;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.queuesim.Simulation;
+import org.matsim.core.mobsim.queuesim.AbstractSimulation;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -92,7 +92,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 			}
 			this.sim.scheduleActivityEnd(this);
 		} else {
-			Simulation.decLiving();	
+			AbstractSimulation.decLiving();	
 		}
 	}
 

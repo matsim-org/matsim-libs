@@ -23,7 +23,7 @@ package org.matsim.pt.queuesim;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.queuesim.Simulation;
+import org.matsim.core.mobsim.queuesim.AbstractSimulation;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
@@ -59,7 +59,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	@Override
 	public void legEnds(final double now) {
 		this.getSimulation().handleAgentArrival(now, this);
-		Simulation.decLiving();
+		AbstractSimulation.decLiving();
 	}
 
 	@Override
