@@ -33,8 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
- * QueueNetwork is responsible for creating the QueueLinks/Nodes and for
- * implementing doSim
+ * QueueNetwork is responsible for creating the QueueLinks and QueueNodes.
  *
  * @author david
  * @author mrieser

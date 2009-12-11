@@ -876,18 +876,41 @@ public class QueueLane {
 		 */
 		private void getVehiclePositionsQueue(final Collection<PositionInfo> positions) {
 			double now = SimulationTimer.getTime();
-			double queueEnd = QueueLane.this.queueLink.getLink().getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
 			Link link = QueueLane.this.queueLink.getLink();
-			if ((QueueLane.this.signalGroups != null) ){ 
-				queueEnd -= 35.0;
-			}
+			double queueEnd = getInitialQueueEnd();
 			double storageCapFactor = Gbl.getConfig().simulation().getStorageCapFactor();
 			double cellSize = ((NetworkImpl)QueueLane.this.queueLink.getQueueNetwork().getNetworkLayer()).getEffectiveCellSize();
+			double vehLen = calculateVehicleLength(link, storageCapFactor, cellSize);
+			
+			queueEnd = positionVehiclesFromBuffer(positions, now, queueEnd, link, vehLen);
+			positionOtherDrivingVehicles(positions, now, queueEnd, link, vehLen);
+			
+			int lane = positionVehiclesFromWaitingList(positions, link, cellSize);
+			positionVehiclesFromTransitStop(positions, cellSize, lane);
+		}
+
+		private double calculateVehicleLength(Link link,
+				double storageCapFactor, double cellSize) {
 			double vehLen = Math.min( // the length of a vehicle in visualization
 					link.getLength() / (QueueLane.this.storageCapacity + QueueLane.this.bufferStorageCapacity), // all vehicles must have place on the link
 					cellSize / storageCapFactor); // a vehicle should not be larger than it's actual size
+			return vehLen;
+		}
 
-			// put all cars in the buffer one after the other
+		private double getInitialQueueEnd() {
+			double queueEnd = QueueLane.this.queueLink.getLink().getLength(); // the position of the start of the queue jammed vehicles build at the end of the link
+			if ((QueueLane.this.signalGroups != null) ){ 
+				queueEnd -= 35.0;
+			}
+			return queueEnd;
+		}
+
+		/**
+		 *  put all cars in the buffer one after the other
+		 */
+		private double positionVehiclesFromBuffer(
+				final Collection<PositionInfo> positions, double now,
+				double queueEnd, Link link, double vehLen) {
 			for (QueueVehicle veh : QueueLane.this.buffer) {
 
 				int lane = 1 + (veh.getId().hashCode() % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, QueueLane.this.queueLink.getLink()));
@@ -900,14 +923,19 @@ public class QueueLane {
 				positions.add(position);
 				queueEnd -= vehLen;
 			}
+			return queueEnd;
+		}
 
-			/*
-			 * place other driving cars according the following rule:
-			 * - calculate the time how long the vehicle is on the link already
-			 * - calculate the position where the vehicle should be if it could drive with freespeed
-			 * - if the position is already within the congestion queue, add it to the queue with slow speed
-			 * - if the position is not within the queue, just place the car 	with free speed at that place
-			 */
+		/**
+		 * place other driving cars according the following rule:
+		 * - calculate the time how long the vehicle is on the link already
+		 * - calculate the position where the vehicle should be if it could drive with freespeed
+		 * - if the position is already within the congestion queue, add it to the queue with slow speed
+		 * - if the position is not within the queue, just place the car 	with free speed at that place
+		 */
+		private void positionOtherDrivingVehicles(
+				final Collection<PositionInfo> positions, double now,
+				double queueEnd, Link link, double vehLen) {
 			double lastDistance = Integer.MAX_VALUE;
 			double ttfs = link.getLength() / link.getFreespeed(now);
 			for (QueueVehicle veh : QueueLane.this.vehQueue) {
@@ -946,22 +974,31 @@ public class QueueLane {
 				positions.add(position);
 				lastDistance = distanceOnLink;
 			}
+		}
 
-			/*
-			 * Put the vehicles from the waiting list in positions. Their actual
-			 * position doesn't matter, so they are just placed to the coordinates of
-			 * the from node
-			 */
+		/**
+		 * Put the vehicles from the waiting list in positions. Their actual
+		 * position doesn't matter, so they are just placed to the coordinates of
+		 * the from node
+		 */
+		private int positionVehiclesFromWaitingList(
+				final Collection<PositionInfo> positions, Link link,
+				double cellSize) {
 			int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
 			for (QueueVehicle veh : QueueLane.this.waitingList) {
 				PositionInfo position = new PositionInfo(linkScale, veh.getDriver().getPerson().getId(), QueueLane.this.queueLink.getLink(),
 						/*positionOnLink*/cellSize, lane, 0.0, PositionInfo.VehicleState.Parking, null);
 				positions.add(position);
 			}
+			return lane;
+		}
 
-			/*
-			 * Put the transit vehicles from the transit stop list in positions.
-			 */
+		/**
+		 * Put the transit vehicles from the transit stop list in positions.
+		 */
+		private void positionVehiclesFromTransitStop(
+				final Collection<PositionInfo> positions, double cellSize,
+				int lane) {
 			if (QueueLane.this.transitVehicleStopQueue.size() > 0) {
 				lane++; // place them one lane further away
 				double vehPosition = QueueLane.this.queueLink.getLink().getLength();
@@ -972,7 +1009,6 @@ public class QueueLane {
 					vehPosition -= veh.getSizeInEquivalents() * cellSize;
 				}
 			}
-
 		}
 
 	}
