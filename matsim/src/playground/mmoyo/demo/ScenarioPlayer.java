@@ -40,7 +40,8 @@ import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
-import playground.mzilske.bvg09.OTFDemo;
+import playground.marcel.OTFDemo;
+
 
 
 /**
