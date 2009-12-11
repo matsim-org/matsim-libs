@@ -21,7 +21,9 @@
 package org.matsim.core.replanning;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -232,4 +234,9 @@ public class StrategyManager {
 		this.removalPlanSelector = planSelector;
 	}
 
+	public List<PlanStrategy> getStrategies() {
+		return Collections.unmodifiableList(this.strategies);
+	}
+
+	
 }
