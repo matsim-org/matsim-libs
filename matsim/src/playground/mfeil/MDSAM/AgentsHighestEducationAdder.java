@@ -24,10 +24,16 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.world.Location;
+import org.matsim.world.Zone;
+
+import playground.balmermi.census2000.data.Municipality;
 
 
 
@@ -49,8 +55,8 @@ public class AgentsHighestEducationAdder {
 	public void run (final String inputFile){
 		
 		log.info("Reading input file "+inputFile+"...");
-		
-		try {
+		int counter =0;
+		/*try {
 
 			FileReader fr = new FileReader(inputFile);
 			BufferedReader br = new BufferedReader(fr);
@@ -61,25 +67,50 @@ public class AgentsHighestEducationAdder {
 			line = br.readLine();
 			String tokenId = null;
 			String token = null;
+
 			while (line != null) {		
-				
 				tokenizer = new StringTokenizer(line);
 				
 				tokenId = tokenizer.nextToken();
 				
 				// Watch out that the order is equal to the order in the file!
 				token = tokenizer.nextToken();				
-				education.put(new IdImpl(tokenId), (int)(Double.parseDouble(token)));
+				education.put(new IdImpl(tokenId), (Integer.parseInt(token)));
 				
 				line = br.readLine();
+				if (counter%100==0) log.info("Having read line "+counter+1);
+				counter++;
 			}		
 		} catch (Exception ex) {
-			log.warn(ex);
+			log.warn(ex +"at line"+ counter);
+		}*/
+		try {
+			FileReader file_reader = new FileReader(inputFile);
+			BufferedReader buffered_reader = new BufferedReader(file_reader);
+
+			// Skip header
+			String curr_line = buffered_reader.readLine(); 
+			while ((curr_line = buffered_reader.readLine()) != null) {
+				String[] entries = curr_line.split(" ", -1);
+
+				// Agent_Id	Education_level	
+				// 0        1       
+
+				int id = Integer.parseInt(entries[0].trim());
+				int edu = Integer.parseInt(entries[1].trim());
+				education.put(new IdImpl(id), edu);
+				if (counter%100==0) log.info("Having read line "+counter+1);
+				counter++;
+			}
+			buffered_reader.close();
+		} catch (Exception ex) {
+			log.warn(ex +"at line"+ counter);
 		}
 		log.info("done...");
 	}	
 	
 	public Map<Id, Integer> getEducation (){
+		log.info("Length of education map is = "+this.education.size());
 		return this.education;
 	}
 }

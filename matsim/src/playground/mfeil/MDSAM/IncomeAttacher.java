@@ -184,11 +184,20 @@ public class IncomeAttacher {
 			//stream.println(person.getId()+"\t"+this.education.get(person.getId())+"\t"+listings.get(person.getId())+"\t"+income.get(person.getId()));
 		}
 		log.info(listings.size()+" agents in the scenario. Thereof "+doubleListings+" with double-listings and "+noListing+" with no-listings.");
-		this.runSimplex();
+		this.runSimplex(outputFile);
 	}
 	
-	private void runSimplex (){
+	private void runSimplex (String tableFile){
 		log.info("  running simplex... ");
+		
+		String outputfile = tableFile;
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputfile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
 		
 		// length of table
 		int noOfMun = this.municipalities.getMunicipalities().size(); 
@@ -200,15 +209,13 @@ public class IncomeAttacher {
 		for (int i=0;i<12;i++) coefficients[i]=0;
 		
 		// initialize table
-		ArrayList<double[]> table = new ArrayList<double[]>();
-		double[] consCoeff = new double[noOfCoefficients];
-		for (int i=0;i<consCoeff.length;i++) consCoeff[i]=0; 
-		
-		
+		ArrayList<double[]> table = new ArrayList<double[]>();		
 		HashMap <Id, Integer> munTableMatch = new HashMap <Id, Integer>(); 
 		int count = 0;
 		for (Iterator<Municipality> iterator = this.municipalities.getMunicipalities().values().iterator(); iterator.hasNext();){ // = length of table
-			Municipality mun = iterator.next(); 		
+			Municipality mun = iterator.next(); 	
+			double[] consCoeff = new double[noOfCoefficients];
+			for (int i=0;i<consCoeff.length;i++) consCoeff[i]=0; 
 			table.add(consCoeff); 
 			munTableMatch.put(mun.getId(), count);
 			rowTotal[count]=0; // Number of persons per municipality
@@ -218,54 +225,55 @@ public class IncomeAttacher {
 		// count through the number of education types and inhabitants per municipality
 		for (Iterator<Id> iterator = this.education.keySet().iterator(); iterator.hasNext();){
 			Id id = iterator.next(); 
-			if (this.education.get(id).equals(11)) {
-				table.get(munTableMatch.get(this.listings.get(id)))[0]++; // Obligatorische Schule
-				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
+			if (this.education.get(id).toString().equals("11")) {
+				table.get(munTableMatch.get(this.listings.get(id)))[0]+=1.0; // Obligatorische Schule
+				rowTotal[munTableMatch.get(this.listings.get(id))]++;
 			}
-			else if (this.education.get(id).equals(12)) {
-				table.get(munTableMatch.get(this.listings.get(id)))[1]++; // Diplommittelschule
-				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
+			else if (this.education.get(id).toString().equals("12")) {
+				table.get(munTableMatch.get(this.listings.get(id)))[1]+=1.0; // Diplommittelschule
+				rowTotal[munTableMatch.get(this.listings.get(id))]++;
 			}
-			else if (this.education.get(id).equals(21)) {
-				table.get(munTableMatch.get(this.listings.get(id)))[2]++; // Berufslehre
-				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
+			else if (this.education.get(id).toString().equals("21")) {
+				table.get(munTableMatch.get(this.listings.get(id)))[2]+=1.0; // Berufslehre
+				rowTotal[munTableMatch.get(this.listings.get(id))]++;
 			}
-			else if (this.education.get(id).equals(22)) {
-				table.get(munTableMatch.get(this.listings.get(id)))[3]++; // Maturitätsschule
-				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
+			else if (this.education.get(id).toString().equals("22")) {
+				table.get(munTableMatch.get(this.listings.get(id)))[3]+=1.0; // Maturitätsschule
+				rowTotal[munTableMatch.get(this.listings.get(id))]++;
 				}
-			else if (this.education.get(id).equals(23)) {
-				table.get(munTableMatch.get(this.listings.get(id)))[4]++; // Lehrerseminar
-				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
+			else if (this.education.get(id).toString().equals("23")) {
+				table.get(munTableMatch.get(this.listings.get(id)))[4]+=1.0; // Lehrerseminar
+				rowTotal[munTableMatch.get(this.listings.get(id))]++;
 			}
-			else if (this.education.get(id).equals(31)) {
-				table.get(munTableMatch.get(this.listings.get(id)))[5]++; // Höhere Fach- und Berufsausbildung
-				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
+			else if (this.education.get(id).toString().equals("31")) {
+				table.get(munTableMatch.get(this.listings.get(id)))[5]+=1.0; // Höhere Fach- und Berufsausbildung
+				rowTotal[munTableMatch.get(this.listings.get(id))]++;
 			}
-			else if (this.education.get(id).equals(32)) {
-				table.get(munTableMatch.get(this.listings.get(id)))[6]++; // Höhere Fachschule
-				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
+			else if (this.education.get(id).toString().equals("32")) {
+				table.get(munTableMatch.get(this.listings.get(id)))[6]+=1.0; // Höhere Fachschule
+				rowTotal[munTableMatch.get(this.listings.get(id))]++;
 			}
-			else if (this.education.get(id).equals(33)) {
-				table.get(munTableMatch.get(this.listings.get(id)))[7]++; // FH
-				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
+			else if (this.education.get(id).toString().equals("33")) {
+				table.get(munTableMatch.get(this.listings.get(id)))[7]+=1.0; // FH
+				rowTotal[munTableMatch.get(this.listings.get(id))]++;
 			}
-			else if (this.education.get(id).equals(34)) {
-				table.get(munTableMatch.get(this.listings.get(id)))[8]++; // Universität
-				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
+			else if (this.education.get(id).toString().equals("34")) {
+				table.get(munTableMatch.get(this.listings.get(id)))[8]+=1.0; // Universität
+				rowTotal[munTableMatch.get(this.listings.get(id))]++;
 			}
-			else if (this.education.get(id).equals(-7)) {
-				table.get(munTableMatch.get(this.listings.get(id)))[9]++; // Ohne Angabe
-				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
+			else if (this.education.get(id).toString().equals("-7")) {
+				table.get(munTableMatch.get(this.listings.get(id)))[9]+=1.0; // Ohne Angabe
+				rowTotal[munTableMatch.get(this.listings.get(id))]++;
 			}
-			else if (this.education.get(id).equals(-8)) {
-				table.get(munTableMatch.get(this.listings.get(id)))[10]++; // Keine Ausbildung
-				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
+			else if (this.education.get(id).toString().equals("-8")) {
+				table.get(munTableMatch.get(this.listings.get(id)))[10]+=1.0; // Keine Ausbildung
+				rowTotal[munTableMatch.get(this.listings.get(id))]++;
 			}
-			else if (this.education.get(id).equals(-9)) {
-				table.get(munTableMatch.get(this.listings.get(id)))[11]++; // Noch nicht schulpflichtig
-				rowTotal[Integer.parseInt(this.listings.get(id).toString())-1]++;
+			else if (this.education.get(id).toString().equals("-9")) {
+				table.get(munTableMatch.get(this.listings.get(id)))[11]+=1.0; // Noch nicht schulpflichtig
+				rowTotal[munTableMatch.get(this.listings.get(id))]++;
 			}
+			else log.warn("No education information found for agent "+id);
 		}
 		for (int i=0;i<table.size();i++){
 			table.get(i)[i+12]=rowTotal[i]; // y variable = rowTotal
@@ -290,12 +298,26 @@ public class IncomeAttacher {
 		LinearObjectiveFunction f = new LinearObjectiveFunction (coefficients, 0);
 		
 		// write output coefficients and table
-		//for (int i=0;i<coefficients.length;i++) stream.print
+		stream.println("Municipality\t11\t12\t21\t22\t23\t31\t32\t33\t34\t-7\t-8\t-9\tIncome\tCoefficient\tRowTotal");
+		for (Iterator<Municipality> iterator = this.municipalities.getMunicipalities().values().iterator(); iterator.hasNext();){
+			Municipality mun = iterator.next(); 
+			stream.print(mun.getId()+"\t");
+			stream.print(table.get(munTableMatch.get(mun.getId()))[0]+"\t"+table.get(munTableMatch.get(mun.getId()))[1]+"\t"+
+					table.get(munTableMatch.get(mun.getId()))[2]+"\t"+table.get(munTableMatch.get(mun.getId()))[3]+"\t"+
+					table.get(munTableMatch.get(mun.getId()))[4]+"\t"+table.get(munTableMatch.get(mun.getId()))[5]+"\t"+
+					table.get(munTableMatch.get(mun.getId()))[6]+"\t"+table.get(munTableMatch.get(mun.getId()))[7]+"\t"+
+					table.get(munTableMatch.get(mun.getId()))[8]+"\t"+table.get(munTableMatch.get(mun.getId()))[9]+"\t"+
+					table.get(munTableMatch.get(mun.getId()))[10]+"\t"+table.get(munTableMatch.get(mun.getId()))[11]+"\t");
+			stream.print(mun.getIncome()+"\t");
+			stream.print(coefficients[munTableMatch.get(mun.getId())+12]+"\t");
+			stream.println(rowTotal[munTableMatch.get(mun.getId())]);
+		}
+		
 		
 		// Running the simplex
 		RealPointValuePair result = new RealPointValuePair(new double[]{0.0},0.0); // Dummy initialization
 		try{
-			result = new SimplexSolver().optimize(f, constraints, goalType, false) ;
+			result = new SimplexSolver().optimize(f, constraints, goalType, true) ;
 		}
 		catch (OptimizationException e)	{
 			log.warn("Error in optimization: "+e);	
