@@ -96,12 +96,6 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 
 	}
 
-	/**
-	 * 
-	 */
-	/**
-	 * 
-	 */
 	public void testIsSelectedPlanTheBestPlan() {
 
 		String javaVersion = System.getProperty("java.version");
