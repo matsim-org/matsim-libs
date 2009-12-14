@@ -18,8 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim;
+package org.matsim.pt.queuesim;
 
+import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
 /**

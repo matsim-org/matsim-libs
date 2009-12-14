@@ -65,12 +65,16 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.queuesim.TransitDriver;
+import org.matsim.pt.queuesim.TransitDriverAgent;
+import org.matsim.pt.queuesim.TransitQueueSimulation;
+import org.matsim.pt.queuesim.TransitQueueVehicle;
+import org.matsim.pt.queuesim.TransitStopAgentTracker;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.ptproject.qsim.Simulation;
-import org.matsim.ptproject.qsim.TransitDriverAgent;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.transitSchedule.api.Departure;
@@ -283,7 +287,7 @@ public class TransitQueueSimulationTest extends TestCase {
 		simulation.run();
 
 		// check everything
-		assertEquals(1, simulation.agentTracker.getAgentsAtStop(stop1).size());
+		assertEquals(1, simulation.getAgentTracker().getAgentsAtStop(stop1).size());
 	}
 
 	/**
@@ -466,7 +470,7 @@ public class TransitQueueSimulationTest extends TestCase {
 		protected void createAgents() {
 			super.createAgents();
 
-			this.driver = new SpyDriver(this.line, this.route, this.departure, this.agentTracker, this);
+			this.driver = new SpyDriver(this.line, this.route, this.departure, this.getAgentTracker(), this);
 
 			BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("transitVehicleType"));
 			BasicVehicleCapacity capacity = new BasicVehicleCapacityImpl();

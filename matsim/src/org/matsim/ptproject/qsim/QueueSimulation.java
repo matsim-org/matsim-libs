@@ -33,7 +33,6 @@ import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -56,7 +55,6 @@ import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
@@ -87,55 +85,38 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 
 	private int snapshotPeriod = 0;
 	private double snapshotTime = 0.0;
-
 	protected static final int INFO_PERIOD = 3600;
 	private double infoTime = 0;
-
 	private final Config config;
 	protected final PopulationImpl population;
 	protected QueueNetwork network;
 	protected Network networkLayer;
-
 	private static EventsManager events = null;
 	protected  SimStateWriterI netStateWriter = null;
-
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
-
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
-
 	protected QueueSimEngine simEngine = null;
+	private CarDepartureHandler carDepartureHandler;
 
 	/**
 	 * Includes all agents that have transportation modes unknown to
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
  	 */
 	protected final PriorityQueue<Tuple<Double, DriverAgent>> teleportationList = new PriorityQueue<Tuple<Double, DriverAgent>>(30, new TeleportationArrivalTimeComparator());
-
 	private final Date starttime = new Date();
-
 	private double stopTime = 100*3600;
-
 	final private static Logger log = Logger.getLogger(QueueSimulation.class);
-
 	private AgentFactory agentFactory;
-
 	private QueueSimListenerManager<QueueSimulation> listenerManager;
-
 	protected final PriorityBlockingQueue<DriverAgent> activityEndsList = new PriorityBlockingQueue<DriverAgent>(500, new DriverAgentDepartureTimeComparator());
-
 	protected Scenario scenario = null;
-
 	private BasicLaneDefinitions laneDefintions;
-
-	/** @see #setTeleportVehicles(boolean) */
-	private boolean teleportVehicles = true;
-	private int cntTeleportVehicle = 0;
-
 	private boolean useActivityDurations = true;
-
 	private QueueSimSignalEngine signalEngine = null;
-
 	private final Set<TransportMode> notTeleportedModes = new HashSet<TransportMode>();
+	
+	private List<QueueSimulationFeature> queueSimulationFeatures = new ArrayList<QueueSimulationFeature>();
+	private List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
 	
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -151,14 +132,12 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
 		setEvents(events);
 		this.population = (PopulationImpl) plans;
-
 		this.networkLayer = network;
 		this.network = new QueueNetwork(this.networkLayer);
 		this.agentFactory = new AgentFactory(this);
-
-		this.notTeleportedModes.add(TransportMode.car);
-		
+		this.notTeleportedModes.add(TransportMode.car);	
 		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
+		installCarDepartureHandler();
 	}
 
 	/**
@@ -171,13 +150,23 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 		this.scenario = scenario;
 	}
 
+	private void installCarDepartureHandler() {
+		this.carDepartureHandler = new CarDepartureHandler(this);
+		addDepartureHandler(this.carDepartureHandler);
+	}
+
+	public void addDepartureHandler(DepartureHandler departureHandler) {
+		departureHandlers.add(departureHandler);
+	}
+
+	
 	/**
 	 * Adds the QueueSimulationListener instance  given as parameters as
 	 * listener to this QueueSimulation instance.
 	 * @param listeners
 	 */
 	public void addQueueSimulationListeners(final QueueSimulationListener listener){
-				this.listenerManager.addQueueSimulationListener(listener);
+		this.listenerManager.addQueueSimulationListener(listener);
 	}
 
 	/**
@@ -238,6 +227,10 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 				QueueLink qlink = this.network.getQueueLink(agent.getCurrentLink().getId());
 				qlink.addParkedVehicle(veh);
 			}
+		}
+		
+		for (QueueSimulationFeature queueSimulationFeature : queueSimulationFeatures) {
+			queueSimulationFeature.afterCreateAgents();
 		}
 	}
 
@@ -351,6 +344,10 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 		createSnapshotwriter();
 
 		prepareNetworkChangeEventsQueue();
+		
+		for (QueueSimulationFeature queueSimulationFeature : queueSimulationFeatures) {
+			queueSimulationFeature.afterPrepareSim();
+		}
 	}
 
 	protected void prepareLanes(){
@@ -372,6 +369,10 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 	 * Close any files, etc.
 	 */
 	protected void cleanupSim() {
+		for (QueueSimulationFeature queueSimulationFeature : queueSimulationFeatures) {
+			queueSimulationFeature.beforeCleanupSim();
+		}
+		
 		this.simEngine.afterSim();
 		double now = SimulationTimer.getTime();
 		for (Tuple<Double, DriverAgent> entry : this.teleportationList) {
@@ -437,6 +438,9 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 			this.snapshotTime += this.snapshotPeriod;
 			doSnapshot(time);
 		}
+		for (QueueSimulationFeature queueSimulationFeature : queueSimulationFeatures) {
+			queueSimulationFeature.afterAfterSimStep(time);
+		}
 	}
 
 	private void doSnapshot(final double time) {
@@ -468,7 +472,10 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 		QueueSimulation.events = events;
 	}
 
-	protected void handleUnknownLegMode(double now, final DriverAgent agent) {
+	protected void handleUnknownLegMode(double now, final DriverAgent agent, Link link) {
+		for (QueueSimulationFeature queueSimulationFeature : queueSimulationFeatures) {
+			queueSimulationFeature.beforeHandleUnknownLegMode(now, agent, link);
+		}
 		double arrivalTime = SimulationTimer.getTime() + agent.getCurrentLeg().getTravelTime();
 		this.teleportationList.add(new Tuple<Double, DriverAgent>(arrivalTime, agent));
 	}
@@ -495,7 +502,10 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 	 * @param now
 	 * @param agent
 	 */
-	protected void handleAgentArrival(final double now, DriverAgent agent){
+	public void handleAgentArrival(final double now, DriverAgent agent) {
+		for (QueueSimulationFeature queueSimulationFeature : queueSimulationFeatures) {
+			queueSimulationFeature.beforeHandleAgentArrival(agent);
+		}
 		getEvents().processEvent(new AgentArrivalEventImpl(now, agent.getPerson(),
 				agent.getDestinationLink(), agent.getCurrentLeg()));
 	}
@@ -517,7 +527,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 	 *
 	 * @see DriverAgent#getDepartureTime()
 	 */
-	protected void scheduleActivityEnd(final DriverAgent agent) {
+	public void scheduleActivityEnd(final DriverAgent agent) {
 		this.activityEndsList.add(agent);
 	}
 
@@ -541,57 +551,24 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
-	protected void agentDeparts(double now, final DriverAgent agent, final Link link) {
+	public void agentDeparts(double now, final DriverAgent agent, final Link link) {
 		Leg leg = agent.getCurrentLeg();
 		TransportMode mode = leg.getMode();
 		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson(), link, leg));
 		if (this.notTeleportedModes.contains(mode)){
-			this.handleKnownLegModeDeparture(now, agent, link, mode);
-		}
-		else {
-			this.handleUnknownLegMode(now, agent);
+			this.handleKnownLegModeDeparture(now, agent, link, leg);
+		} else {
+			visAndHandleUnknownLegMode(now, agent, link);
 		}
 	}
 
-	protected void handleKnownLegModeDeparture(double now, DriverAgent agent, Link link, TransportMode mode) {
-		Leg leg = agent.getCurrentLeg();
-		if (mode.equals(TransportMode.car)) {
-			NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
-			Id vehicleId = route.getVehicleId();
-			if (vehicleId == null) {
-				vehicleId = agent.getPerson().getId(); // backwards-compatibility
-			}
-			QueueLink qlink = this.network.getQueueLink(link.getId());
-			QueueVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
-			if (vehicle == null) {
-				// try to fix it somehow
-				if (this.teleportVehicles) {
-					if (agent instanceof PersonAgent) {
-						vehicle = ((PersonAgent) agent).getVehicle();
-						if (vehicle.getCurrentLink() != null) {
-							if (this.cntTeleportVehicle < 9) {
-								this.cntTeleportVehicle++;
-								log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + link.getId());
-								if (this.cntTeleportVehicle == 9) {
-									log.info("No more occurrences of teleported vehicles will be reported.");
-								}
-							}
-							QueueLink qlinkOld = this.network.getQueueLink(vehicle.getCurrentLink().getId());
-							qlinkOld.removeParkedVehicle(vehicle.getId());
-						}
-					}
-				}
-			}
-			if (vehicle == null) {
-				throw new RuntimeException("vehicle not available for agent " + agent.getPerson().getId() + " on link " + link.getId());
-			}
-			vehicle.setDriver(agent);
-			if ((route.getEndLink() == link) && (agent.chooseNextLink() == null)) {
-				agent.legEnds(now);
-				qlink.processVehicleArrival(now, vehicle);
-			} else {
-				qlink.addDepartingVehicle(vehicle);
-			}
+	protected void visAndHandleUnknownLegMode(double now, DriverAgent agent, Link link) {
+		this.handleUnknownLegMode(now, agent, link);
+	}
+
+	private void handleKnownLegModeDeparture(double now, DriverAgent agent, Link link, Leg leg) {
+		for (DepartureHandler departureHandler : departureHandlers) {
+			departureHandler.handleDeparture(now, agent, link, leg);
 		}
 	}
 
@@ -619,7 +596,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 	 * @param teleportVehicles
 	 */
 	public void setTeleportVehicles(final boolean teleportVehicles) {
-		this.teleportVehicles = teleportVehicles;
+		this.carDepartureHandler.setTeleportVehicles(teleportVehicles);
 	}
 
 	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, DriverAgent>>, Serializable {
@@ -657,6 +634,23 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 
 	public Set<TransportMode> getNotTeleportedModes() {
 		return notTeleportedModes;
+	}
+	
+	public void setQueueNetwork(QueueNetwork net) {
+		this.network = net;
+		this.simEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom());
+	}
+
+	public PopulationImpl getPopulation() {
+		return population;
+	}
+
+	public QueueNetwork getNetwork() {
+		return network;
+	}
+
+	public void addFeature(QueueSimulationFeature queueSimulationFeature) {
+		queueSimulationFeatures.add(queueSimulationFeature);
 	}
 
 	

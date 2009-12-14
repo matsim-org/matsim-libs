@@ -19,7 +19,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.PersonAgent;
-import org.matsim.ptproject.qsim.TransitDriverAgent;
+import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
@@ -33,7 +33,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	private int nextLinkIndex = 0;
 	private final TransitStopAgentTracker agentTracker;
 	private final Person dummyPerson;
-	private final TransitQueueSimulation sim;
+	private final QueueSimulation sim;
 	private TransitRouteStop nextStop;
 	private TransitStopFacility lastHandledStop = null;
 	private Iterator<TransitRouteStop> stopIterator;
@@ -44,7 +44,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	public abstract TransitRoute getTransitRoute();
 	public abstract double getDepartureTime();
 
-	public AbstractTransitDriver(Person personImpl, TransitQueueSimulation sim, TransitStopAgentTracker agentTracker2) {
+	public AbstractTransitDriver(Person personImpl, QueueSimulation sim, TransitStopAgentTracker agentTracker2) {
 		super();
 		this.dummyPerson = personImpl;
 		this.sim = sim;
@@ -103,7 +103,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	public void teleportToLink(final Link link) {
 	}
 	
-	TransitQueueSimulation getSimulation(){
+	QueueSimulation getSimulation(){
 		return this.sim;
 	}
 	
@@ -121,7 +121,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	
 	private void processEventVehicleArrives(final TransitStopFacility stop,
 			final double now) {
-		EventsManager events = TransitQueueSimulation.getEvents();
+		EventsManager events = QueueSimulation.getEvents();
 		if (this.lastHandledStop != stop) {
 			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), stop.getId()));
 		}
@@ -145,7 +145,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	}
 
 	private void depart(final double now) {
-		EventsManager events = TransitQueueSimulation.getEvents();
+		EventsManager events = QueueSimulation.getEvents();
 		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getBasicVehicle().getId(), this.lastHandledStop.getId()));
 		this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);
 		if(this.nextStop == null) {
@@ -187,7 +187,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 
 	private void handlePassengersEntering(final TransitStopFacility stop,
 			final double now, ArrayList<PassengerAgent> passengersEntering) {
-		EventsManager events = TransitQueueSimulation.getEvents();
+		EventsManager events = QueueSimulation.getEvents();
 		for (PassengerAgent passenger : passengersEntering) {
 			this.agentTracker.removeAgentFromStop(passenger, stop);
 			this.vehicle.addPassenger(passenger);
@@ -198,7 +198,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 
 	private void handlePassengersLeaving(final TransitStopFacility stop,
 			final double now, ArrayList<PassengerAgent> passengersLeaving) {
-		EventsManager events = TransitQueueSimulation.getEvents();
+		EventsManager events = QueueSimulation.getEvents();
 		for (PassengerAgent passenger : passengersLeaving) {
 			this.vehicle.removePassenger(passenger);
 			DriverAgent agent = (DriverAgent) passenger;

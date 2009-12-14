@@ -1,4 +1,4 @@
-package playground.mzilske.pt.queuesim;
+package org.matsim.pt.queuesim;
 
 import java.util.Iterator;
 
@@ -9,11 +9,13 @@ import org.matsim.core.mobsim.queuesim.AbstractSimulation;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.pt.queuesim.AbstractTransitDriver;
-import org.matsim.pt.queuesim.TransitStopAgentTracker;
+import org.matsim.pt.Umlauf;
+import org.matsim.pt.UmlaufStueckI;
+import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
+
 
 
 public class UmlaufDriver extends AbstractTransitDriver {
@@ -22,14 +24,14 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	private Iterator<UmlaufStueckI> iUmlaufStueck;
 	private NetworkRouteWRefs carRoute;
 	private double departureTime;
-	private final TransitQueueSimulation sim;
+	private final QueueSimulation sim;
 	private final LegImpl currentLeg = new LegImpl(TransportMode.car);
 	private TransitLine transitLine;
 	private TransitRoute transitRoute;
 
 	public UmlaufDriver(Umlauf umlauf,
 			TransitStopAgentTracker thisAgentTracker,
-			TransitQueueSimulation transitQueueSimulation) {
+			QueueSimulation transitQueueSimulation) {
 		super(createDummyPerson(umlauf), transitQueueSimulation, thisAgentTracker);
 		this.umlauf = umlauf;
 		this.sim = transitQueueSimulation;

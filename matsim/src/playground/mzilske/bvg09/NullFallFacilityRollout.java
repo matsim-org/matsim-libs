@@ -42,6 +42,9 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.pt.Umlauf;
+import org.matsim.pt.UmlaufInterpolator;
+import org.matsim.pt.UmlaufStueckI;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.transitSchedule.api.TransitLine;
@@ -59,9 +62,6 @@ import org.matsim.vehicles.VehiclesFactory;
 import org.xml.sax.SAXException;
 
 import playground.mzilske.pt.queuesim.GreedyUmlaufBuilderImpl;
-import playground.mzilske.pt.queuesim.Umlauf;
-import playground.mzilske.pt.queuesim.UmlaufInterpolator;
-import playground.mzilske.pt.queuesim.UmlaufStueckI;
 
 public class NullFallFacilityRollout {
 

@@ -39,7 +39,9 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.queuesim.TransitQueueSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
+import org.matsim.ptproject.qsim.ReconstructingUmlaufBuilder;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.BasicVehicleReaderV1;
 import org.xml.sax.SAXException;
@@ -47,8 +49,6 @@ import org.xml.sax.SAXException;
 import playground.marcel.pt.config.TransitConfigGroup;
 import playground.marcel.pt.replanning.TransitStrategyManagerConfigLoader;
 import playground.marcel.pt.router.PlansCalcTransitRoute;
-import playground.mzilske.pt.queuesim.ReconstructingUmlaufBuilder;
-import playground.mzilske.pt.queuesim.TransitQueueSimulation;
 
 /**
  * @author mrieser
@@ -106,6 +106,7 @@ public class TransitControler extends Controler {
 	@Override
 	protected void runMobSim() {
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
+		sim.setUseUmlaeufe(true);
 		sim.startOTFServer("livesim");
 		OTFDemo.ptConnect("livesim");
 		sim.run();

@@ -41,6 +41,9 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.Umlauf;
+import org.matsim.pt.UmlaufInterpolator;
+import org.matsim.pt.queuesim.TransitQueueSimulation;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
@@ -377,8 +380,8 @@ public class TwoLinesDemo {
 		TransitRoute route2 = this.scenario.getTransitSchedule().getTransitLines().get(this.ids[2]).getRoutes().get(this.ids[1]);
 		RouteOccupancy analysis2 = new RouteOccupancy(route2, vehTracker);
 		events.addHandler(analysis2);
-
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario, events);
+		sim.setUseUmlaeufe(true);
 		sim.startOTFServer("two_lines_demo");
 		OTFDemo.ptConnect("two_lines_demo");
 

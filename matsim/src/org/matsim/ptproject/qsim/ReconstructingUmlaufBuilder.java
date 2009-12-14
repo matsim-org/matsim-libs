@@ -1,4 +1,4 @@
-package playground.mzilske.pt.queuesim;
+package org.matsim.ptproject.qsim;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,11 +9,17 @@ import java.util.Map;
 
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.pt.Umlauf;
+import org.matsim.pt.UmlaufBuilder;
+import org.matsim.pt.UmlaufImpl;
+import org.matsim.pt.UmlaufInterpolator;
+import org.matsim.pt.UmlaufStueck;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.BasicVehicle;
 import org.matsim.vehicles.BasicVehicles;
+
 
 public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 

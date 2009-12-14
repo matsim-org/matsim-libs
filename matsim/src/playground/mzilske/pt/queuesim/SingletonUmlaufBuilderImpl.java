@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.pt.Umlauf;
+import org.matsim.pt.UmlaufBuilder;
+import org.matsim.pt.UmlaufImpl;
+import org.matsim.pt.UmlaufStueck;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;

@@ -48,6 +48,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.basic.BasicLane;
+import org.matsim.pt.queuesim.TransitDriverAgent;
 import org.matsim.signalsystems.basic.BasicSignalGroupDefinition;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.netvis.DrawableAgentI;

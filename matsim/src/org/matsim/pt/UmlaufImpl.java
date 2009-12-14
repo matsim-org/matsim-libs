@@ -1,4 +1,4 @@
-package playground.mzilske.pt.queuesim;
+package org.matsim.pt;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -21,204 +21,257 @@
 package org.matsim.pt.queuesim;
 
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.pt.Umlauf;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.ptproject.qsim.DepartureHandler;
 import org.matsim.ptproject.qsim.DriverAgent;
 import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.ptproject.qsim.QueueSimulationFeature;
+import org.matsim.ptproject.qsim.ReconstructingUmlaufBuilder;
 import org.matsim.ptproject.qsim.Simulation;
 import org.matsim.transitSchedule.api.Departure;
 import org.matsim.transitSchedule.api.TransitLine;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.BasicVehicle;
 import org.matsim.vehicles.BasicVehicles;
 import org.matsim.vis.otfvis.data.teleportation.OTFTeleportAgentsDataWriter;
 import org.matsim.vis.otfvis.data.teleportation.TeleportationVisData;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 
 
-/**
- * @author mrieser
- */
+
 public class TransitQueueSimulation extends QueueSimulation {
 
 	private static final Logger log = Logger.getLogger(TransitQueueSimulation.class);
+	
+	private TransitQueueSimulationFeature queueSimulationFeature;
 
-	private OnTheFlyServer otfServer = null;
+	public TransitQueueSimulation(Network network, Population plans,
+			EventsManager events) {
+		super(network, plans, events);
+		installFeature();
+	}
 
-	private TransitSchedule schedule = null;
-	protected final TransitStopAgentTracker agentTracker;
-
-	private final HashMap<Person, DriverAgent> agents = new HashMap<Person, DriverAgent>(100);
-
-	private OTFTeleportAgentsDataWriter teleportationWriter;
-	// private OTFPassengerDataWriter passengerWriter;
-
-	private LinkedHashMap<Id, TeleportationVisData> visTeleportationData;
-
-	public TransitQueueSimulation(final ScenarioImpl scenario, final EventsManager events) {
+	public TransitQueueSimulation(Scenario scenario, EventsManager events) {
 		super(scenario, events);
-
-		this.schedule = scenario.getTransitSchedule();
-		this.setAgentFactory(new TransitAgentFactory(this, this.agents));
-		this.agentTracker = new TransitStopAgentTracker();
-		this.getNotTeleportedModes().add(TransportMode.pt);
+		installFeature();
 	}
 
-	public void startOTFServer(final String serverName) {
-		this.otfServer = OnTheFlyServer.createInstance(serverName, this.network, this.population, getEvents(), false);
-		this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(this.schedule, this.agentTracker));
-		this.teleportationWriter = new OTFTeleportAgentsDataWriter();
-		// this.passengerWriter = new OTFPassengerDataWriter();
-		this.visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
-		this.otfServer.addAdditionalElement(this.teleportationWriter);
-		// this.otfServer.addAdditionalElement(this.passengerWriter);
-		
-		try {
-			this.otfServer.pause();
-		} catch (RemoteException e) {
-			e.printStackTrace();
+	private void installFeature() {
+		queueSimulationFeature = new TransitQueueSimulationFeature(this);
+		super.addFeature(queueSimulationFeature);
+		super.addDepartureHandler(queueSimulationFeature);
+	}
+
+	public void startOTFServer(String serverName) {
+		queueSimulationFeature.startOTFServer(serverName);
+	}
+
+	public TransitStopAgentTracker getAgentTracker() {
+		return queueSimulationFeature.getAgentTracker();
+	}
+	
+	public void setUseUmlaeufe(boolean useUmlaeufe) {
+		queueSimulationFeature.setUseUmlaeufe(useUmlaeufe);
+	}
+
+	/**
+	 * @author mrieser
+	 */
+	public class TransitQueueSimulationFeature implements QueueSimulationFeature, DepartureHandler {
+	
+		private OnTheFlyServer otfServer = null;
+		private QueueSimulation queueSimulation;
+		private TransitSchedule schedule = null;
+		protected final TransitStopAgentTracker agentTracker;
+	
+		private final HashMap<Person, DriverAgent> agents = new HashMap<Person, DriverAgent>(100);
+	
+		private OTFTeleportAgentsDataWriter teleportationWriter;
+		private LinkedHashMap<Id, TeleportationVisData> visTeleportationData;
+		private boolean useUmlaeufe = false;
+	
+		public TransitQueueSimulationFeature(QueueSimulation queueSimulation) {
+			this.queueSimulation = queueSimulation;
+			this.schedule = ((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule();
+			this.agentTracker = new TransitStopAgentTracker();
+			afterConstruct();
 		}
-	}
-
-	@Override
-	protected void cleanupSim() {
-		if (this.otfServer != null) {
-			this.otfServer.cleanup();
+	
+		private void afterConstruct() {
+			queueSimulation.setAgentFactory(new TransitAgentFactory(queueSimulation, this.agents));
+			queueSimulation.getNotTeleportedModes().add(TransportMode.pt);
 		}
-		super.cleanupSim();
-	}
-
-	@Override
-	protected void afterSimStep(final double time) {
-		super.afterSimStep(time);
-		if (this.otfServer != null) {
-			this.visualizeTeleportedAgents(time);
-			this.otfServer.updateStatus(time);
+	
+		public void startOTFServer(final String serverName) {
+			this.otfServer = OnTheFlyServer.createInstance(serverName, queueSimulation.getNetwork(), queueSimulation.getPopulation(), queueSimulation.getEvents(), false);
+			this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(this.schedule, this.agentTracker));
+			this.teleportationWriter = new OTFTeleportAgentsDataWriter();
+			this.visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
+			this.otfServer.addAdditionalElement(this.teleportationWriter);
+			try {
+				this.otfServer.pause();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
 		}
-	}
-
-	public Object getAgent(final PersonImpl p) {
-		return this.agents.get(p);
-	}
-
-	@Override
-	protected void createAgents() {
-		super.createAgents();
-
-		TransitSchedule schedule = this.schedule;
-		TransitStopAgentTracker agentTracker = this.agentTracker;
-		if (schedule != null) {
-			createVehiclesAndDrivers(schedule, agentTracker);
+	
+		public void beforeCleanupSim() {
+			if (this.otfServer != null) {
+				this.otfServer.cleanup();
+			}
 		}
-	}
+	
+		public void afterAfterSimStep(final double time) {
+			if (this.otfServer != null) {
+				this.visualizeTeleportedAgents(time);
+				this.otfServer.updateStatus(time);
+			}
+		}
+	
+		public void afterCreateAgents() {
+			TransitSchedule schedule = this.schedule;
+			TransitStopAgentTracker agentTracker = this.agentTracker;
+			if (useUmlaeufe ) {
+				createVehiclesAndDriversWithUmlaeufe(schedule, agentTracker);
+			} else {
+				createVehiclesAndDriversWithoutUmlaeufe(schedule, agentTracker);
+			}
+		}
+	
+		private void createVehiclesAndDriversWithUmlaeufe(TransitSchedule thisSchedule,
+				TransitStopAgentTracker thisAgentTracker) {
+			BasicVehicles vehicles = ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles();
+			ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder((NetworkLayer) scenario.getNetwork(),((ScenarioImpl) this.queueSimulation.getScenario()).getTransitSchedule().getTransitLines().values(), ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles());
+			Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
+			for (Umlauf umlauf : umlaeufe) {
+				BasicVehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
+				createAndScheduleVehicleAndDriver(umlauf, basicVehicle,
+						thisAgentTracker);
+			}
+		}
 
-	protected void createVehiclesAndDrivers(TransitSchedule schedule,
-			TransitStopAgentTracker agentTracker) {
-		BasicVehicles vehicles = ((ScenarioImpl) this.scenario).getVehicles();
+		private void createAndScheduleVehicleAndDriver(Umlauf umlauf,
+				BasicVehicle vehicle, TransitStopAgentTracker thisAgentTracker) {
+			UmlaufDriver driver = new UmlaufDriver(umlauf, thisAgentTracker, this.queueSimulation);
+			TransitQueueVehicle veh = new TransitQueueVehicle(vehicle, 5);
+			veh.setDriver(driver);
+			driver.setVehicle(veh);
+			QueueLink qlink = this.queueSimulation.getNetwork().getQueueLink(driver
+					.getCurrentLeg().getRoute().getStartLinkId());
+			qlink.addParkedVehicle(veh);
 
-		for (TransitLine line : schedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				for (Departure departure : route.getDepartures().values()) {
-					TransitDriver driver = new TransitDriver(line, route, departure, agentTracker, this);
-					if (departure.getVehicleId() == null) {
-						throw new NullPointerException("no vehicle id set for departure " + departure.getId() + " in route " + route.getId() + " from line " + line.getId());
+			this.queueSimulation.scheduleActivityEnd(driver);
+			Simulation.incLiving();
+		}
+	
+		private void createVehiclesAndDriversWithoutUmlaeufe(TransitSchedule schedule,
+				TransitStopAgentTracker agentTracker) {
+			BasicVehicles vehicles = ((ScenarioImpl) this.queueSimulation.getScenario()).getVehicles();
+
+			for (TransitLine line : schedule.getTransitLines().values()) {
+				for (TransitRoute route : line.getRoutes().values()) {
+					for (Departure departure : route.getDepartures().values()) {
+						TransitDriver driver = new TransitDriver(line, route, departure, agentTracker, this.queueSimulation);
+						if (departure.getVehicleId() == null) {
+							throw new NullPointerException("no vehicle id set for departure " + departure.getId() + " in route " + route.getId() + " from line " + line.getId());
+						}
+						TransitQueueVehicle veh = new TransitQueueVehicle(vehicles.getVehicles().get(departure.getVehicleId()), 5);
+						veh.setDriver(driver);
+						driver.setVehicle(veh);
+						QueueLink qlink = this.queueSimulation.getNetwork().getQueueLink(driver.getCurrentLeg().getRoute().getStartLinkId());
+						qlink.addParkedVehicle(veh);
+
+						this.queueSimulation.scheduleActivityEnd(driver);
+						Simulation.incLiving();
 					}
-					TransitQueueVehicle veh = new TransitQueueVehicle(vehicles.getVehicles().get(departure.getVehicleId()), 5);
-					veh.setDriver(driver);
-					driver.setVehicle(veh);
-					QueueLink qlink = this.network.getQueueLink(driver.getCurrentLeg().getRoute().getStartLinkId());
-					qlink.addParkedVehicle(veh);
-
-					this.scheduleActivityEnd(driver);
-					Simulation.incLiving();
 				}
 			}
 		}
-	}
+		
+		public void beforeHandleAgentArrival(DriverAgent agent) {
+			if (this.otfServer != null) {
+				this.visTeleportationData.remove(agent.getPerson().getId());
+			}
+		}
 	
-	/**
-	 * Only overwritten to change visibility.
-	 */
-	@Override
-	protected void handleAgentArrival(final double now, DriverAgent agent){
-		if (this.otfServer != null) {
-			this.visTeleportationData.remove(agent.getPerson().getId());
-		}
-		super.handleAgentArrival(now, agent);
-	}
-
-	@Override
-	protected void agentDeparts(double now, final DriverAgent agent, final Link link){
-		Leg leg = agent.getCurrentLeg();
-		TransportMode mode = leg.getMode();
-		getEvents().processEvent(new AgentDepartureEventImpl(now, agent.getPerson(), link, leg));
-		if (this.getNotTeleportedModes().contains(mode)){
-			this.handleKnownLegModeDeparture(now, agent, link, mode);
-		}
-		else if (this.otfServer != null){
-			this.visAndHandleUnknownLegMode(now, agent, link);
-		}
-		else {
-			this.handleUnknownLegMode(now, agent);
-		}
-	}
-	
-	@Override
-	public void handleKnownLegModeDeparture(double now, final DriverAgent agent, final Link link, TransportMode mode) {
-		LegImpl leg = (LegImpl) agent.getCurrentLeg();
-		if (leg.getMode() == TransportMode.pt) {
+		private void handlePTDeparture(final DriverAgent agent, Leg leg) {
 			if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 				log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + agent.getPerson().getId().toString());
-				log.info("route: " + leg.getRoute().getClass().getCanonicalName() + " " + (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
+				log.info("route: "
+								+ leg.getRoute().getClass().getCanonicalName()
+								+ " "
+								+ (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
 				Simulation.decLiving();
 				Simulation.incLost();
-				return;
+			} else {
+				ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+				if (route.getAccessStopId() == null) {
+					// looks like this agent has a bad transit route, likely no
+					// route could be calculated for it
+					Simulation.decLiving();
+					Simulation.incLost();
+					log.error("Agent has bad transit route! agentId="
+							+ agent.getPerson().getId() + " route="
+							+ route.getRouteDescription()
+							+ ". The agent is removed from the simulation.");
+				} else {
+					TransitStopFacility stop = this.schedule.getFacilities().get(route.getAccessStopId());
+					this.agentTracker.addAgentToStop((PassengerAgent) agent, stop);
+				}
 			}
-			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
-			if (route.getAccessStopId() == null) {
-				// looks like this agent has a bad transit route, likely no route could be calculated for it
-				Simulation.decLiving();
-				Simulation.incLost();
-				log.error(
-						"Agent has bad transit route! agentId=" + agent.getPerson().getId()
-								+ " route=" + route.getRouteDescription()
-								+ ". The agent is removed from the simulation.");
-				return;
-			}
-			TransitStopFacility stop = this.schedule.getFacilities().get(route.getAccessStopId());
-			this.agentTracker.addAgentToStop((PassengerAgent) agent, stop);
-		} 
-		else {
-			super.handleKnownLegModeDeparture(now, agent, link, mode);
 		}
-	}
+	
+		private void visualizeTeleportedAgents(double time) {
+			this.teleportationWriter.setSrc(this.visTeleportationData);
+			this.teleportationWriter.setTime(time);
+		}
+	
+		public void beforeHandleUnknownLegMode(double now, final DriverAgent agent, Link link) {
+			if (this.otfServer != null) {
+				this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link));
+			}
+		}
+	
+		public void afterPrepareSim() {
+		
+		}
+	
+		public void handleDeparture(double now, DriverAgent agent, Link link, Leg leg) {
+			if (leg.getMode() == TransportMode.pt) {
+				handlePTDeparture(agent, leg);
+			} 
+		}
 
-	private void visualizeTeleportedAgents(double time) {
-//		log.error("setting src: " + this.visTeleportationData.size());
-		this.teleportationWriter.setSrc(this.visTeleportationData);
-		this.teleportationWriter.setTime(time);
-	}
-
-	protected void visAndHandleUnknownLegMode(double now, final DriverAgent agent, Link link){
-		this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link));
-		super.handleUnknownLegMode(now, agent);
+		public TransitStopAgentTracker getAgentTracker() {
+			return agentTracker;
+		}
+		
+		public void setUseUmlaeufe(boolean useUmlaeufe) {
+			this.useUmlaeufe = useUmlaeufe;
+		}
+		
 	}
 	
 }

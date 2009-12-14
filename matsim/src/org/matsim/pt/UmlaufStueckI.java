@@ -1,4 +1,4 @@
-package playground.mzilske.pt.queuesim;
+package org.matsim.pt;
 
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.transitSchedule.api.Departure;
