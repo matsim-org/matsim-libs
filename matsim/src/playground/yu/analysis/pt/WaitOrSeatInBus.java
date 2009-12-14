@@ -124,7 +124,7 @@ public class WaitOrSeatInBus implements PersonEntersVehicleEventHandler,
 		Id vehId = event.getVehicleId();
 		double time = event.getTime();
 
-		List<Double> enterVehTimeList = enterVehTimes.get(vehId);
+		List<Double> enterVehTimeList = enterVehTimes.remove(vehId);
 		if (enterVehTimeList != null) {
 			int size = enterVehTimeList.size();
 			double sumOfWaitInBus = size * time - getSum(enterVehTimeList);
@@ -173,7 +173,7 @@ public class WaitOrSeatInBus implements PersonEntersVehicleEventHandler,
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/m2_out_2a/m2_out_2a/ITERS/it.1000/1000.events.xml.gz";
+		String eventsFilename = "../m2_schedule_delay/m2_out_100a_opt/it.1000/m2_out_100a_opt/ITERS/it.1000/1000.events.xml.gz";
 
 		EventsManager em = new EventsManagerImpl();
 		WaitOrSeatInBus wosib = new WaitOrSeatInBus(300);
@@ -182,6 +182,6 @@ public class WaitOrSeatInBus implements PersonEntersVehicleEventHandler,
 		new MatsimEventsReader(em).readFile(eventsFilename);
 
 		wosib
-				.write("../berlin-bvg09/pt/m2_schedule_delay/m2_out_2a/m2_out_2a/ITERS/it.1000/1000.wosib.txt");
+				.write("../m2_schedule_delay/m2_out_100a_opt/it.1000/m2_out_100a_opt/ITERS/it.1000/1000.wosib.txt");
 	}
 }
