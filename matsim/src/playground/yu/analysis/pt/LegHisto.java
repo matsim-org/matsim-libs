@@ -182,7 +182,7 @@ public class LegHisto implements AgentDepartureEventHandler,
 	}
 
 	public static void main(String[] args) {
-		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/outputTest180/ITERS/it.100/100.events.xml.gz";
+		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/160p600sWaiting-6_4plansWoPerform/ITERS/it.1000/1000.events.xml.gz";
 
 		EventsManager em = new EventsManagerImpl();
 
@@ -192,6 +192,6 @@ public class LegHisto implements AgentDepartureEventHandler,
 		new MatsimEventsReader(em).readFile(eventsFilename);
 
 		lh
-				.write("../berlin-bvg09/pt/m2_schedule_delay/outputTest180/ITERS/it.100/100.legHisto.");
+				.write("../berlin-bvg09/pt/m2_schedule_delay/160p600sWaiting-6_4plansWoPerform/ITERS/it.1000/1000.legHisto.");
 	}
 }

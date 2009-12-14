@@ -19,9 +19,9 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.misc.Time;
 
+import playground.yu.utils.charts.TimeScatterChart;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -92,7 +92,7 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 		/* writes the first Result */
 		writer
 				.writeln("personId\t[departureTime, enterVehTime]\t[departureTime, enterVehTime]");
-		XYScatterChart chartB = new XYScatterChart(
+		TimeScatterChart chartB = new TimeScatterChart(
 				"arrivalTimeAtBusStop<->enterVehTime", "arrivalTimeAtBusStop",
 				"enterVehTime");
 		int arraySizeB = results1.size();
@@ -111,7 +111,7 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 			for (int i = 0; i < times.size(); i += 2) {
 				double departureTime = times.get(i), enterVehTime = times
 						.get(i + 1);
-				xBss.get(i / 2)[k] = departureTime / 3600.0;
+				xBss.get(i / 2)[k] = departureTime;
 				yBss.get(i / 2)[k] = enterVehTime / 3600.0;
 				writer.write("[" + Time.writeTime(departureTime) + ", "
 						+ Time.writeTime(enterVehTime) + "]\t");
@@ -131,15 +131,15 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 		writer
 				.writeln("-----------------\npersonId\tenRouteTime\tenRouteWaitTime\twaitTimeFraction\t[waitTime,waitTime...]");
 		// TODO to write result2 in graphic
-		XYScatterChart chartA = new XYScatterChart(
-				"enRouteTime<->waitTimeAtBusStop", "enRouteTime [s]",
+		TimeScatterChart chartA = new TimeScatterChart(
+				"enRouteTime<->waitTimeAtBusStop", "enRouteTime",
 				"waitTimeAtBusStop [s]");
 
-		XYScatterChart chartC = new XYScatterChart(
+		TimeScatterChart chartC = new TimeScatterChart(
 				"firstDepartureTime<->enRouteTime,sumOfWaitTimeAtBusStop",
 				"firstDepartureTime", "time [s]");
 
-		XYScatterChart chartD = new XYScatterChart(
+		TimeScatterChart chartD = new TimeScatterChart(
 				"firstDepartureTime<->waitTimeAtBusStop", "firstDepartureTime",
 				"waitTimeAtBusStop [s]");
 
@@ -162,7 +162,7 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 			double firstDpTime = firstDepartures.get(perId);
 			double enRouteTime = arrivals.get(perId) - firstDpTime;
 			xAs[j] = enRouteTime;
-			xCs[j] = firstDpTime / 3600.0;
+			xCs[j] = firstDpTime;
 
 			writer.write(perId + "\t" + Time.writeTime(enRouteTime) + "\t");
 			StringBuffer sb = new StringBuffer("[");
@@ -199,7 +199,7 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/outputTest180/ITERS/it.100/100.events.xml.gz";
+		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/160p600sWaiting-6_4plansWoPerform/ITERS/it.1000/1000.events.xml.gz";
 
 		EventsManager em = new EventsManagerImpl();
 		WaitTime wt = new WaitTime();
@@ -208,6 +208,6 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 		new MatsimEventsReader(em).readFile(eventsFilename);
 
 		wt
-				.write("../berlin-bvg09/pt/m2_schedule_delay/outputTest180/ITERS/it.100/100.waitTimes.");
+				.write("../berlin-bvg09/pt/m2_schedule_delay/160p600sWaiting-6_4plansWoPerform/ITERS/it.1000/1000.waitTimes.");
 	}
 }
