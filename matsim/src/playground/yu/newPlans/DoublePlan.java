@@ -59,18 +59,18 @@ public class DoublePlan extends NewPopulation {
 	public void run(Person person) {
 
 		pw.writePerson(person);
-		n++;
+		// n++;
 		tmpPerson = person;
-		// String oldId = person.getId().toString();
+		String oldId = person.getId().toString();
 		// int oldId = Integer.parseInt(person.getId().toString());
 		// produce new Person with new Id
-		if (n == 1) {
-			for (int i = 2; i <= 100; i++)
-				createNewPerson("passenger" + (2 * i - 1));
-		} else if (n == 2) {
-			for (int i = 2; i <= 100; i++)
-				createNewPerson("passenger" + 2 * i);
-		}
+		// if (n == 1) {
+		for (int i = 1; i <= 89; i++)
+			createNewPerson(oldId + i);
+		// } else if (n == 2) {
+		// for (int i = 1; i <= 89; i++)
+		// createNewPerson(oldId+i);
+		// }
 
 		// createNewPerson(oldId + "A");
 		// createNewPerson(oldId + "B");
@@ -86,9 +86,9 @@ public class DoublePlan extends NewPopulation {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		String networkFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/net.xml";
-		String plansFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/pop.xml";
-		String outputPlansFilename = "../berlin-bvg09/pt/nullfall_M44_344/test/pop200.xml";
+		String networkFilename = "../berlin-bvg09/pt/m2_schedule_delay/net.xml";
+		String plansFilename = "../berlin-bvg09/pt/m2_schedule_delay/pop.xml";
+		String outputPlansFilename = "../berlin-bvg09/pt/m2_schedule_delay/pop180.xml";
 
 		ScenarioImpl s = new ScenarioImpl();
 

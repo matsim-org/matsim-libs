@@ -199,7 +199,7 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/160p600sWaiting-6_4plansWoPerform/ITERS/it.1000/1000.events.xml.gz";
+		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/m2_out_2a/m2_out_2a/ITERS/it.1000/1000.events.xml.gz";
 
 		EventsManager em = new EventsManagerImpl();
 		WaitTime wt = new WaitTime();
@@ -208,6 +208,6 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 		new MatsimEventsReader(em).readFile(eventsFilename);
 
 		wt
-				.write("../berlin-bvg09/pt/m2_schedule_delay/160p600sWaiting-6_4plansWoPerform/ITERS/it.1000/1000.waitTimes.");
+				.write("../berlin-bvg09/pt/m2_schedule_delay/m2_out_2a/m2_out_2a/ITERS/it.1000/1000.waitTime.");
 	}
 }
