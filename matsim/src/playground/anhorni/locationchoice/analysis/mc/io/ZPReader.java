@@ -1,4 +1,4 @@
-package playground.anhorni.locationchoice.analysis.mc;
+package playground.anhorni.locationchoice.analysis.mc.io;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,6 +8,8 @@ import java.util.Vector;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+
+import playground.anhorni.locationchoice.analysis.mc.DateFilter;
 
 public class ZPReader {
 	

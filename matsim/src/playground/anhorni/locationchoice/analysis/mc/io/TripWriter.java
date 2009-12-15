@@ -1,4 +1,4 @@
-package playground.anhorni.locationchoice.analysis.mc;
+package playground.anhorni.locationchoice.analysis.mc.io;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -7,6 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+
+import playground.anhorni.locationchoice.analysis.mc.MZ;
+import playground.anhorni.locationchoice.analysis.mc.MZTrip;
+import playground.anhorni.locationchoice.analysis.mc.TripMeasureDistribution;
 
 public class TripWriter {
 	

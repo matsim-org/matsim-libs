@@ -1,4 +1,4 @@
-package playground.anhorni.locationchoice.analysis.mc;
+package playground.anhorni.locationchoice.analysis.mc.io;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,6 +9,8 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
+
+import playground.anhorni.locationchoice.analysis.mc.MZTrip;
 
 public class MZReader {
 	private List<MZTrip> mzTrips = new Vector<MZTrip>();
