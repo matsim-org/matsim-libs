@@ -42,9 +42,13 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LaneLeaveEvent;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 import org.matsim.core.utils.misc.Time;
 
@@ -59,7 +63,7 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	AgentMoneyEventHandler, AgentStuckEventHandler, 
 	PersonEventHandler, AgentWait2LinkEventHandler,
 	LaneEnterEventHandler, LaneLeaveEventHandler,
-	SignalGroupStateChangedEventHandler{
+	SignalGroupStateChangedEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 
 	private static final Logger log = Logger.getLogger(LogOutputEventHandler.class);
 
@@ -118,6 +122,14 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 				+	" SignalSystem id " + event.getSignalSystemId() 
 				+ " SignalGroup id " + event.getSignalGroupId() 
 				+ " SignalGroupState " + event.getNewState());
+	}
+
+	public void handleEvent(PersonEntersVehicleEvent e) {
+		log.info("PersonEntersVehicleEvent at " + Time.writeTime(e.getTime()) + " person id " + e.getPersonId() + " vehicle id " + e.getVehicleId());
+	}
+
+	public void handleEvent(PersonLeavesVehicleEvent e) {
+		log.info("PersonLeavesVehicleEvent at " + Time.writeTime(e.getTime()) + " person id " + e.getPersonId() + " vehicle id " + e.getVehicleId());		
 	}
 
 
