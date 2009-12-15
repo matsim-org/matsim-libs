@@ -14,7 +14,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 
-import playground.anhorni.locationchoice.preprocess.helper.Bins;
+import playground.anhorni.locationchoice.preprocess.helper.BinsOld;
 import playground.anhorni.locationchoice.preprocess.plans.modifications.helper.DesiredDurationPerson;
 
 public class DistanceBinsAssigner {
@@ -24,10 +24,10 @@ public class DistanceBinsAssigner {
 	private String mode;
 	private Population plans;
 	private DistanceBins distanceBins;
-	private Bins durationDistanceBins;
+	private BinsOld durationDistanceBins;
 	
 	public DistanceBinsAssigner(double linearLimitDuration, String mode, Population plans, 
-			DistanceBins distanceBins, Bins durationDistanceBins) {
+			DistanceBins distanceBins, BinsOld durationDistanceBins) {
 		this.linearLimitDuration = linearLimitDuration;
 		this.mode = mode;
 		this.plans = plans;

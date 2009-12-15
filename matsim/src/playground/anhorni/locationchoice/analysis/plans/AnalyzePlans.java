@@ -48,7 +48,7 @@ import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.anhorni.locationchoice.preprocess.helper.Bins;
+import playground.anhorni.locationchoice.preprocess.helper.BinsOld;
 import playground.anhorni.locationchoice.preprocess.helper.Utils;
 
 public class AnalyzePlans {
@@ -421,11 +421,11 @@ public class AnalyzePlans {
 		int bikeMaxDistance = 50 * 1000;
 		int walkMaxDistance = 20 * 1000;
 		
-		TreeMap<String, Bins> distanceBins = new TreeMap<String, Bins>();
-		distanceBins.put("car", new Bins((int)(carDistanceUnit), carMaxDistance));			
-		distanceBins.put("pt", new Bins((int)(ptDistanceUnit), ptMaxDistance));
-		distanceBins.put("bike", new Bins((int)(bikeDistanceUnit), bikeMaxDistance));
-		distanceBins.put("walk", new Bins((int)(walkDistanceUnit), walkMaxDistance));
+		TreeMap<String, BinsOld> distanceBins = new TreeMap<String, BinsOld>();
+		distanceBins.put("car", new BinsOld((int)(carDistanceUnit), carMaxDistance));			
+		distanceBins.put("pt", new BinsOld((int)(ptDistanceUnit), ptMaxDistance));
+		distanceBins.put("bike", new BinsOld((int)(bikeDistanceUnit), bikeMaxDistance));
+		distanceBins.put("walk", new BinsOld((int)(walkDistanceUnit), walkMaxDistance));
 								
 		Iterator<? extends Person> person_iter = this.plans.getPersons().values().iterator();
 		while (person_iter.hasNext()) {

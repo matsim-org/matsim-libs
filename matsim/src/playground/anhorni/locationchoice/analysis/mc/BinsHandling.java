@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.anhorni.locationchoice.preprocess.helper.Bins;
+import playground.anhorni.locationchoice.preprocess.helper.BinsOld;
 import playground.anhorni.locationchoice.preprocess.helper.Utils;
 
 public class BinsHandling {
@@ -28,21 +28,21 @@ public class BinsHandling {
 	private int walkMaxDistance = 20 * 1000;
 	
 	
-	private TreeMap<String, Bins> createDurationBins() {
-		TreeMap<String, Bins> durationBins = new TreeMap<String, Bins>();
-		durationBins.put("car", new Bins(durationBinUnit, durationBinUnit * 24 ));			
-		durationBins.put("pt", new Bins(durationBinUnit, durationBinUnit * 24));
-		durationBins.put("walk", new Bins(durationBinUnit, durationBinUnit * 24));
-		durationBins.put("bike", new Bins(durationBinUnit, durationBinUnit * 24));
+	private TreeMap<String, BinsOld> createDurationBins() {
+		TreeMap<String, BinsOld> durationBins = new TreeMap<String, BinsOld>();
+		durationBins.put("car", new BinsOld(durationBinUnit, durationBinUnit * 24 ));			
+		durationBins.put("pt", new BinsOld(durationBinUnit, durationBinUnit * 24));
+		durationBins.put("walk", new BinsOld(durationBinUnit, durationBinUnit * 24));
+		durationBins.put("bike", new BinsOld(durationBinUnit, durationBinUnit * 24));
 		return durationBins;
 	}
 	
-	private TreeMap<String, Bins> createDistanceBins(double binUnitFactor) {
-		TreeMap<String, Bins> distanceBins = new TreeMap<String, Bins>();
-		distanceBins.put("car", new Bins((int)(binUnitFactor * carDistanceUnit), carMaxDistance));			
-		distanceBins.put("pt", new Bins((int)(binUnitFactor * ptDistanceUnit), ptMaxDistance));
-		distanceBins.put("bike", new Bins((int)(binUnitFactor * bikeDistanceUnit), bikeMaxDistance));
-		distanceBins.put("walk", new Bins((int)(binUnitFactor * walkDistanceUnit), walkMaxDistance));
+	private TreeMap<String, BinsOld> createDistanceBins(double binUnitFactor) {
+		TreeMap<String, BinsOld> distanceBins = new TreeMap<String, BinsOld>();
+		distanceBins.put("car", new BinsOld((int)(binUnitFactor * carDistanceUnit), carMaxDistance));			
+		distanceBins.put("pt", new BinsOld((int)(binUnitFactor * ptDistanceUnit), ptMaxDistance));
+		distanceBins.put("bike", new BinsOld((int)(binUnitFactor * bikeDistanceUnit), bikeMaxDistance));
+		distanceBins.put("walk", new BinsOld((int)(binUnitFactor * walkDistanceUnit), walkMaxDistance));
 		return distanceBins;
 	}
 		
@@ -59,8 +59,8 @@ public class BinsHandling {
 	private void createDistanceOutput(MZ mz, String region, double binUnitFactor) {
 		
 		Persons persons = mz.getPersons();
-		TreeMap<String, Bins> distanceBinsLeisure = this.createDistanceBins(binUnitFactor);
-		TreeMap<String, Bins> distanceBinsShop = this.createDistanceBins(binUnitFactor);
+		TreeMap<String, BinsOld> distanceBinsLeisure = this.createDistanceBins(binUnitFactor);
+		TreeMap<String, BinsOld> distanceBinsShop = this.createDistanceBins(binUnitFactor);
 		
 		//filter zh region			
 		Iterator<PersonTripActs> personActTrips_it = persons.getPersons().values().iterator();
@@ -159,7 +159,7 @@ public class BinsHandling {
 	
 	private void createDurationOutput(MZ mz) {
 		
-		TreeMap<String, Bins> durationBinsLeisure = this.createDurationBins();
+		TreeMap<String, BinsOld> durationBinsLeisure = this.createDurationBins();
 		
 		Persons persons = mz.getPersons();
 		
@@ -223,7 +223,7 @@ public class BinsHandling {
 	}
 	
 	private void createOutOfHomeBinOutput(MZ mz) {
-		TreeMap<String, Bins> durationBinsOutOfHome = this.createDurationBins();
+		TreeMap<String, BinsOld> durationBinsOutOfHome = this.createDurationBins();
 		
 		Persons persons = mz.getPersons();	
 		
