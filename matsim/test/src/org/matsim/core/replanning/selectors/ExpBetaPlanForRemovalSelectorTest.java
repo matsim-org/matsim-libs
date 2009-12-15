@@ -44,8 +44,14 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 	}
 
 	@Override
+	protected void tearDown() throws Exception {
+		this.config = null;
+		super.tearDown();
+	}
+
+	@Override
 	protected PlanSelector getPlanSelector() {
-		return new ExpBetaPlanForRemovalSelector();
+		return new ExpBetaPlanForRemovalSelector(this.config.charyparNagelScoring());
 	}
 
 	/**
@@ -67,7 +73,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 		PlanImpl plan5 = person.createAndAddPlan(false);// weight: 22026.465
 		plan5.setScore(100.0);
 		
-		PlanSelector selector = new ExpBetaPlanForRemovalSelector();
+		PlanSelector selector = new ExpBetaPlanForRemovalSelector(this.config.charyparNagelScoring());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;
@@ -125,7 +131,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 		PlanImpl plan5 = person.createAndAddPlan(false);
 		plan5.setScore(100.0);
 		
-		PlanSelector selector = new ExpBetaPlanForRemovalSelector();
+		PlanSelector selector = new ExpBetaPlanForRemovalSelector(this.config.charyparNagelScoring());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;

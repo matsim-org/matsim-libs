@@ -140,7 +140,7 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 			} else if (classname.equals("BestScore")) {
 				strategy = new PlanStrategy(new BestPlanSelector());
 			} else if (classname.equals("SelectExpBeta")) {
-				strategy = new PlanStrategy(new ExpBetaPlanSelector());
+				strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
 			} else if (classname.equals("ChangeExpBeta")) {
 				strategy = new PlanStrategy(new ExpBetaPlanChanger());
 			} else if (classname.equals("SelectRandom")) {
@@ -166,7 +166,7 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 				strategy.addStrategyModule(socialNetStrategyModule);
 				// JH
 			} else if (classname.equals("LocationChoice")) {
-	    	strategy = new PlanStrategy(new ExpBetaPlanSelector());
+	    	strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
 	    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges()));
 	    	strategy.addStrategyModule(new ReRoute(controler));
 				strategy.addStrategyModule(new TimeAllocationMutator());

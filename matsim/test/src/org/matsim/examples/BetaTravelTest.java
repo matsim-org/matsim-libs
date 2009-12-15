@@ -273,7 +273,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			StrategyManager manager = new StrategyManager();
 			manager.setMaxPlansPerAgent(5);
 
-			PlanStrategy strategy1 = new PlanStrategy(new ExpBetaPlanSelector());
+			PlanStrategy strategy1 = new PlanStrategy(new ExpBetaPlanSelector(this.config.charyparNagelScoring()));
 			manager.addStrategy(strategy1, 0.80);
 
 			PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());

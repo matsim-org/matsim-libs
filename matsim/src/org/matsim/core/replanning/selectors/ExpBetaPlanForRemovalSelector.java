@@ -21,6 +21,7 @@
 package org.matsim.core.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 
 /**
  * Selects one of the existing plans of the person based on the
@@ -37,6 +38,12 @@ import org.matsim.api.core.v01.population.Plan;
  */
 public class ExpBetaPlanForRemovalSelector extends ExpBetaPlanSelector {
 	
+	public ExpBetaPlanForRemovalSelector(
+			CharyparNagelScoringConfigGroup charyparNagelScoringConfigGroup) {
+		super(charyparNagelScoringConfigGroup);
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	protected double calcPlanWeight(final Plan plan, final double maxScore) {
 		

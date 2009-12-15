@@ -32,12 +32,15 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.locationchoice.LocationChoice;
 
-import playground.mfeil.MDSAM.*;
+import playground.mfeil.MDSAM.ActivityTypeFinder;
+import playground.mfeil.MDSAM.PlansConstructor;
+import playground.mfeil.MDSAM.PlansEvaluator;
+import playground.mfeil.MDSAM.PlansVariatorInitializer;
 
 
 /**
@@ -111,7 +114,7 @@ public class ControlerMFeil extends Controler {
 				strategy.addStrategyModule(module);
 			}
 			else if (classname.equals("LocationChoice")) {
-	    	strategy = new PlanStrategy(new ExpBetaPlanSelector());
+	    	strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
 	    	strategy.addStrategyModule(new LocationChoice(this.getNetwork(), this, ((ScenarioImpl)this.getScenarioData()).getKnowledges()));
 	    	strategy.addStrategyModule(new ReRoute(this));
 				strategy.addStrategyModule(new TimeAllocationMutator());

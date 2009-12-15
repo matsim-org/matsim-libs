@@ -124,7 +124,7 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 			for (int j = 0; j < 100000; j++) {
 				Plan plan = person.getPlans().get(2);
 				plan.setSelected(true);
-				if (testee.isSelectedPlanTheBestPlan(person)) {
+				if (testee.isSelectedPlanTheBestPlan(person, this.sc.getConfig().charyparNagelScoring())) {
 					cntBest++;
 				}
 			}
@@ -256,7 +256,7 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 		}
 
 		PersonTreatmentRecorder testee = new PersonTreatmentRecorder();
-		String actualString = testee.getExpBetaSelectorString(personTreatment);
+		String actualString = testee.getExpBetaSelectorString(personTreatment, this.sc.getConfig().charyparNagelScoring());
 		assertEquals("\t1\t0.5", actualString);
 
 	}

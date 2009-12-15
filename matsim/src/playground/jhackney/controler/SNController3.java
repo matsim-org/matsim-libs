@@ -64,7 +64,7 @@ public class SNController3 extends Controler {
 		this.log.info("  added strategy ReRouteLandmarks with probability 0.15");
 
 		// Tend to re-use best plan
-		PlanStrategy strategy3 = new PlanStrategy(new ExpBetaPlanSelector());
+		PlanStrategy strategy3 = new PlanStrategy(new ExpBetaPlanSelector(this.config.charyparNagelScoring()));
 		manager.addStrategy(strategy3, 0.7);
 		this.log.info("  added strategy ExpBetaPlan with probability 0.7");
 

@@ -33,6 +33,7 @@ import org.apache.commons.math.util.ResizableDoubleArray;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -123,7 +124,7 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 		out.print(event.getIteration());
 		out.print(this.getCountsString(personTreatment, memorySize));
 		out.print(this.getScoreDifferencesString(personTreatment));
-		out.print(this.getExpBetaSelectorString(personTreatment));
+		out.print(this.getExpBetaSelectorString(personTreatment, c.getConfig().charyparNagelScoring()));
 		out.println();
 		
 		log.info("Writing results...done.");
@@ -131,7 +132,7 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 	}
 
 	String getExpBetaSelectorString(
-			Map<String, Set<Person>> personTreatment) {
+			Map<String, Set<Person>> personTreatment, CharyparNagelScoringConfigGroup charyparNagelScoringConfigGroup) {
 
 		String str = new String();
 		
@@ -140,7 +141,7 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 			
 			Set<Person> persons = personTreatment.get(strategyName);
 			for (Person person : persons) {
-				boolean isBest = this.isSelectedPlanTheBestPlan(person);
+				boolean isBest = this.isSelectedPlanTheBestPlan(person, charyparNagelScoringConfigGroup);
 				freq.addValue(isBest ? 1 : 0);
 			}
 
@@ -230,9 +231,9 @@ public class PersonTreatmentRecorder implements StartupListener, IterationEndsLi
 		return rank;
 	}
 
-	boolean isSelectedPlanTheBestPlan(Person person) {
+	boolean isSelectedPlanTheBestPlan(Person person, CharyparNagelScoringConfigGroup charyparNagelScoringConfigGroup) {
 		
-		ExpBetaPlanSelector expBetaPlanSelector = new ExpBetaPlanSelector();
+		ExpBetaPlanSelector expBetaPlanSelector = new ExpBetaPlanSelector(charyparNagelScoringConfigGroup);
 		
 		Plan thePlanItWouldSelect = expBetaPlanSelector.selectPlan(person);
 		return (thePlanItWouldSelect == person.getSelectedPlan());

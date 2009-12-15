@@ -100,7 +100,7 @@ public class MyStrategyManagerConfigLoader {
 			} else if (classname.equals("BestScore")) {
 				strategy = new PlanStrategy(new BestPlanSelector());
 			} else if (classname.equals("SelectExpBeta")) {
-				strategy = new PlanStrategy(new ExpBetaPlanSelector());
+				strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
 			} else if (classname.equals("ChangeExpBeta")) {
 				strategy = new PlanStrategy(new ExpBetaPlanChanger());
 			} else if (classname.equals("SelectRandom")) {
@@ -129,7 +129,7 @@ public class MyStrategyManagerConfigLoader {
 				log.warn("jhackney: No replanning module available in the core for keywords KSecLoc, FSecLoc,SSecloc. The modules have moved to the playground.");
 //				// JH
 			} else if (classname.equals("LocationChoice")) {
-				strategy = new PlanStrategy(new ExpBetaPlanSelector());
+				strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
 				strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, (controler.getScenarioData()).getKnowledges()));
 				strategy.addStrategyModule(new ReRoute(controler));
 				strategy.addStrategyModule(new TimeAllocationMutator());

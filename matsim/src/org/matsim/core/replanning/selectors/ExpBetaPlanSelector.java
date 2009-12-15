@@ -22,7 +22,7 @@ package org.matsim.core.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 
 /**
@@ -36,8 +36,9 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	protected static final double MIN_WEIGHT = Double.MIN_VALUE;
 	protected final double beta;
 
-	public ExpBetaPlanSelector() {
-		this.beta = Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "BrainExpBeta"));
+	public ExpBetaPlanSelector(CharyparNagelScoringConfigGroup charyparNagelScoringConfigGroup) {
+		this.beta = charyparNagelScoringConfigGroup.getBrainExpBeta();
+//		this.beta = Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "BrainExpBeta"));
 	}
 
 	/**

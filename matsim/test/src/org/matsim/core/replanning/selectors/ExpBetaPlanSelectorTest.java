@@ -44,8 +44,14 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	}
 
 	@Override
+	protected void tearDown() throws Exception {
+		this.config = null;
+		super.tearDown();
+	}
+
+	@Override
 	protected PlanSelector getPlanSelector() {
-		return new ExpBetaPlanSelector();
+		return new ExpBetaPlanSelector(this.config.charyparNagelScoring());
 	}
 
 	/**
@@ -66,7 +72,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		PlanImpl plan5 = person.createAndAddPlan(false);// weight: 1
 		plan5.setScore(100.0);
 		
-		ExpBetaPlanSelector selector = new ExpBetaPlanSelector();
+		ExpBetaPlanSelector selector = new ExpBetaPlanSelector(this.config.charyparNagelScoring());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;
@@ -125,7 +131,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 
 		
 		
-		ExpBetaPlanSelector selector = new ExpBetaPlanSelector();
+		ExpBetaPlanSelector selector = new ExpBetaPlanSelector(this.config.charyparNagelScoring());
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;
