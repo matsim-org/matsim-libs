@@ -215,7 +215,7 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/160p600sWaiting-6_4plansWoPerform/ITERS/it.1000/1000.events.xml.gz";
+		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/m2_out_100a/m2_out_100a/ITERS/it.1000/1000.events.xml.gz";
 		String scheduleFilename = "../berlin-bvg09/pt/m2_schedule_delay/transitSchedule.xml";
 		String netFilename = "../berlin-bvg09/pt/m2_schedule_delay/net.xml";
 
@@ -244,6 +244,6 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 		new MatsimEventsReader(em).readFile(eventsFilename);
 
 		po
-				.write("../berlin-bvg09/pt/m2_schedule_delay/160p600sWaiting-6_4plansWoPerform/ITERS/it.1000/1000.occupancies.");
+				.write("../berlin-bvg09/pt/m2_schedule_delay/m2_out_100a/m2_out_100a/ITERS/it.1000/1000.occupancies.");
 	}
 }
