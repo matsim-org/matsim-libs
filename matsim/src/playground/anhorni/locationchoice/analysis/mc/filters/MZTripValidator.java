@@ -1,4 +1,4 @@
-package playground.anhorni.locationchoice.analysis.mc;
+package playground.anhorni.locationchoice.analysis.mc.filters;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 
+import playground.anhorni.locationchoice.analysis.mc.MZTrip;
 import playground.anhorni.locationchoice.analysis.mc.io.ZPReader;
 
 public class MZTripValidator {

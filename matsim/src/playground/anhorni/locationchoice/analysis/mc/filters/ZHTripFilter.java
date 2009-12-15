@@ -1,4 +1,4 @@
-package playground.anhorni.locationchoice.analysis.mc;
+package playground.anhorni.locationchoice.analysis.mc.filters;
 
 import java.util.Iterator;
 import java.util.List;
@@ -6,6 +6,8 @@ import java.util.Vector;
 
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.world.WorldUtils;
+
+import playground.anhorni.locationchoice.analysis.mc.MZTrip;
 
 public class ZHTripFilter {
 	

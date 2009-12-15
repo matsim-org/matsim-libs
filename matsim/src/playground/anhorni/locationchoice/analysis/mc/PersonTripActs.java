@@ -6,6 +6,8 @@ import java.util.TreeMap;
 import java.util.Vector;
 //import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+
+import playground.anhorni.locationchoice.analysis.mc.filters.ZHTripFilter;
 import playground.anhorni.locationchoice.preprocess.helper.Utils;
 
 

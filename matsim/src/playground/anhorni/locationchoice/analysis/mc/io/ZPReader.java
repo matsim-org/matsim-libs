@@ -9,7 +9,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 
-import playground.anhorni.locationchoice.analysis.mc.DateFilter;
+import playground.anhorni.locationchoice.analysis.mc.filters.DateFilter;
 
 public class ZPReader {
 	

@@ -1,4 +1,4 @@
-package playground.anhorni.locationchoice.analysis.mc;
+package playground.anhorni.locationchoice.analysis.mc.filters;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.core.utils.io.IOUtils;
+
+import playground.anhorni.locationchoice.analysis.mc.MZTrip;
 
 
 public class GroceryFilter {

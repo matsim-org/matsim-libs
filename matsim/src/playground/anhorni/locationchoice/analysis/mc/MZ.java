@@ -8,6 +8,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 
+import playground.anhorni.locationchoice.analysis.mc.filters.MZTripValidator;
 import playground.anhorni.locationchoice.analysis.mc.io.MZReader;
 
 public class MZ {

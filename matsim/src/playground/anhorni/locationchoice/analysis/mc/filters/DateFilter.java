@@ -1,4 +1,4 @@
-package playground.anhorni.locationchoice.analysis.mc;
+package playground.anhorni.locationchoice.analysis.mc.filters;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
