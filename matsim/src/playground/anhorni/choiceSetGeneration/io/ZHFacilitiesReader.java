@@ -1,16 +1,17 @@
-package playground.anhorni.locationchoice.preprocess.facilities.assembleFacilitiesVariousSources;
+package playground.anhorni.choiceSetGeneration.io;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
-import java.util.Vector;
-
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.anhorni.choiceSetGeneration.helper.ZHFacilities;
 import playground.anhorni.choiceSetGeneration.helper.ZHFacility;
 
 
@@ -28,14 +29,20 @@ import playground.anhorni.choiceSetGeneration.helper.ZHFacility;
 
 
 public class ZHFacilitiesReader {
-			
-	public ZHFacilitiesReader() {
+	
+	private NetworkLayer network = null;
+	private final static Logger log = Logger.getLogger(ZHFacilitiesReader.class);
+		
+	public ZHFacilitiesReader(NetworkLayer network) {
+		this.network = network;
 	}
 	
-	public List<ZHFacility> readFile(final String file)  {
+	public void readFile(final String file, ZHFacilities facilities)  {
 		
-		List<ZHFacility> facilities = new Vector<ZHFacility>();
-		
+		if (file == null) {
+			log.error("file is null");
+			return;
+		}
 		try {
 			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -47,22 +54,26 @@ public class ZHFacilitiesReader {
 				String shopID = entries[0].trim();
 				String retailerID =  entries[1].trim();
 				int size_descr = Integer.parseInt(entries[2].trim());
+				double dHalt = Double.parseDouble(entries[3].trim());
 				double xCH = Double.parseDouble(entries[4].trim());
-				double yCH = Double.parseDouble(entries[5].trim());		
-				Coord exactPosition = new CoordImpl(xCH, yCH);
+				double yCH = Double.parseDouble(entries[5].trim());
+				double hrs_week = Double.parseDouble(entries[6].trim());
 				
 				String name = entries[6].trim();
 				
-				facilities.add(new ZHFacility(
+				Coord exactPosition = new CoordImpl(xCH, yCH);
+				LinkImpl closestLink = network.getNearestLink(exactPosition);
+				
+				facilities.addFacilityByLink(closestLink.getId(), new ZHFacility(
 									new IdImpl(shopID),
 									name,
-									new CoordImpl(0.0, 0.0),
+									closestLink.getCoord(),
 									exactPosition, 
-									new IdImpl("0"),
+									closestLink.getId(),
 									new IdImpl(retailerID),
 									size_descr,
-									0.0,
-									0.0));	
+									dHalt,
+									hrs_week));	
 			}
 			bufferedReader.close();
 			fileReader.close();
@@ -70,7 +81,6 @@ public class ZHFacilitiesReader {
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}	
-		return facilities;
 	}
 
 

@@ -6,7 +6,8 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 
-import playground.anhorni.locationchoice.cs.depr.filters.AreaReader;
+import playground.anhorni.choiceSetGeneration.filters.AreaReader;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;

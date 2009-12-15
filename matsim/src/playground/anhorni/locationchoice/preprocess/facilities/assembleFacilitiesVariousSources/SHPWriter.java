@@ -22,7 +22,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.anhorni.locationchoice.cs.helper.ZHFacility;
+import playground.anhorni.choiceSetGeneration.helper.ZHFacility;
 
 import com.vividsolutions.jts.geom.Point;
 

@@ -7,7 +7,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
-import playground.anhorni.locationchoice.cs.helper.ZHFacility;
+import playground.anhorni.choiceSetGeneration.helper.ZHFacility;
 
 public class CreateShops {
 	private final static Logger log = Logger.getLogger(CreateShops.class);

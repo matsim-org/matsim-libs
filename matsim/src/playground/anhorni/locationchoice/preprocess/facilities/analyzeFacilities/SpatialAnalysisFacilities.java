@@ -12,7 +12,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 
-import playground.anhorni.locationchoice.cs.depr.filters.AreaReader;
+import playground.anhorni.choiceSetGeneration.filters.AreaReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
