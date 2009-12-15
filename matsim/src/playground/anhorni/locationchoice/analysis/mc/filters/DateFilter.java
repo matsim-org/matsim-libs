@@ -15,7 +15,9 @@ public class DateFilter {
 			int month = Integer.parseInt(m);
 			int day = Integer.parseInt(d);
 		
-			if (this.isMOFRI(year, month, day) && !this.inSummerHolidays(year, month, day) && !this.isPublicHoliday(year, month, day)) {
+			// removing additional filters for comparison with plan-based MC
+			// if (this.isMOFRI(year, month, day) && !this.inSummerHolidays(year, month, day) && !this.isPublicHoliday(year, month, day)) {
+			if (this.isMOFRI(year, month, day)) {
 				return true;	
 			}
 			return false;
