@@ -48,6 +48,7 @@ public class PlansVariatorInitializer extends AbstractMultithreadedModule{
 	private final List<String> actTypes;
 	
 	public PlansVariatorInitializer (Controler controler) {
+		super(controler.getConfig().global());
 		this.controler = controler;
 		this.network = controler.getNetwork();
 		this.init(network);	

@@ -22,6 +22,7 @@ package org.matsim.core.replanning.modules;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -51,7 +52,8 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 	 * or the default value of 1800 (seconds) if there is no value specified in
 	 * the configuration.
 	 */
-	public TimeAllocationMutator() {
+	public TimeAllocationMutator(Config config) {
+		super(config.global());
 		String range = Gbl.getConfig().findParam(CONFIG_GROUP, CONFIG_MUTATION_RANGE);
 		if (range == null) {
 			log.info("No mutation range defined in the config file. Using default of " + mutationRange + " sec.");
@@ -66,7 +68,8 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 	 *
 	 * @param mutationRange
 	 */
-	public TimeAllocationMutator(final int mutationRange) {
+	public TimeAllocationMutator(Config config, final int mutationRange) {
+		super(config.global());
 		this.mutationRange = mutationRange;
 	}
 

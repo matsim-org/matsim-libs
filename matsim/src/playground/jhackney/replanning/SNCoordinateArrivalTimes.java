@@ -34,7 +34,7 @@ public class SNCoordinateArrivalTimes extends AbstractMultithreadedModule {
 	private playground.jhackney.controler.SNController3 controler;
 
 	public SNCoordinateArrivalTimes(playground.jhackney.controler.SNController3 controler) {
-
+		super(controler.getConfig().global());
     	this.controler=controler;
     }
 

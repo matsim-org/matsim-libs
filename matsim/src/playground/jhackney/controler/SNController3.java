@@ -59,7 +59,7 @@ public class SNController3 extends Controler {
 		PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost());
 		preProcessRoutingData.run(this.getNetwork());
 		PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
-		strategy2.addStrategyModule(new ReRouteLandmarks(this.getNetwork(), this.getTravelCostCalculator(), this.getTravelTimeCalculator(), preProcessRoutingData));
+		strategy2.addStrategyModule(new ReRouteLandmarks(this.getConfig(), this.getNetwork(), this.getTravelCostCalculator(), this.getTravelTimeCalculator(), preProcessRoutingData));
 		manager.addStrategy(strategy2,0.15);
 		this.log.info("  added strategy ReRouteLandmarks with probability 0.15");
 

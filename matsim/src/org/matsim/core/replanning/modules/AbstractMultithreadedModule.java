@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -60,8 +61,8 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 
 	abstract public PlanAlgorithm getPlanAlgoInstance();
 
-	public AbstractMultithreadedModule() {
-		this.numOfThreads = Gbl.getConfig().global().getNumberOfThreads();
+	public AbstractMultithreadedModule(GlobalConfigGroup globalConfigGroup) {
+		this.numOfThreads = globalConfigGroup.getNumberOfThreads();
 	}
 
 	public AbstractMultithreadedModule(final int numOfThreads) {
@@ -142,6 +143,10 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 			this.nextCounter *= 2;
 			Gbl.printMemoryUsage();
 		}
+	}
+
+	int getNumOfThreads() {
+		return numOfThreads;
 	}
 
 	private class PlanAlgoThread implements Runnable {

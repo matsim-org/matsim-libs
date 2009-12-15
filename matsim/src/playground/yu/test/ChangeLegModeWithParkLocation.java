@@ -57,19 +57,23 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 	private TransportMode[] availableModes = new TransportMode[] {
 			TransportMode.car, TransportMode.pt };
 
-	public ChangeLegModeWithParkLocation() {
-	}
+	/**
+	 * @deprecated this constructor is used nowhere
+	 */
+//	public ChangeLegModeWithParkLocation() {
+//	}
 
 	/**
 	 * @param availableModes
 	 *            an array for TransportMode
 	 */
-	public ChangeLegModeWithParkLocation(final TransportMode[] availableModes) {
-		super();
+	public ChangeLegModeWithParkLocation(final Config config, final TransportMode[] availableModes) {
+		super(config.global());
 		this.availableModes = availableModes.clone();
 	}
 
 	public ChangeLegModeWithParkLocation(final Config config) {
+		super(config.global());
 		String modes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_MODES);
 		if (modes != null) {
 			String[] parts = StringUtils.explode(modes, ',');
@@ -640,7 +644,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 
 			// TimeAllocationMutator
 			PlanStrategy strategy4 = new PlanStrategy(new RandomPlanSelector());
-			strategy4.addStrategyModule(new TimeAllocationMutator());
+			strategy4.addStrategyModule(new TimeAllocationMutator(this.config));
 			manager.addStrategy(strategy4, 0.1);
 
 			return manager;

@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -57,12 +58,17 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private Knowledges knowledges;
 	
 	
-	public LocationChoice() {
+	/**
+	 * @deprecated seems like this constructor is used nowhere
+	 */
+	public LocationChoice(Config config) {
+		super(config.global());
 	}
 
 	public LocationChoice(
 			final Network network,
 			Controler controler, Knowledges kn) {
+		super(controler.getConfig().global());
 		// TODO: why does this module need the control(l)er as argument?  Gets a bit awkward
 		// when you use it in demandmodelling where you don't really need a control(l)er.
 		// kai, jan09

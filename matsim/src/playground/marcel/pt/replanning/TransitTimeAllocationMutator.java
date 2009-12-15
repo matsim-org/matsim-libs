@@ -21,6 +21,7 @@
 package playground.marcel.pt.replanning;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -48,7 +49,8 @@ public class TransitTimeAllocationMutator extends AbstractMultithreadedModule {
 	 * or the default value of 1800 (seconds) if there is no value specified in
 	 * the configuration.
 	 */
-	public TransitTimeAllocationMutator() {
+	public TransitTimeAllocationMutator(Config config) {
+		super(config.global());
 		String range = Gbl.getConfig().findParam(CONFIG_GROUP, CONFIG_MUTATION_RANGE);
 		if (range == null) {
 			log.info("No mutation range defined in the config file. Using default of " + this.mutationRange + " sec.");
@@ -63,7 +65,8 @@ public class TransitTimeAllocationMutator extends AbstractMultithreadedModule {
 	 *
 	 * @param mutationRange
 	 */
-	public TransitTimeAllocationMutator(final int mutationRange) {
+	public TransitTimeAllocationMutator(Config config, final int mutationRange) {
+		super(config.global());
 		this.mutationRange = mutationRange;
 	}
 

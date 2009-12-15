@@ -60,7 +60,7 @@ public class AgentsAssignmentInitialiser extends AbstractMultithreadedModule {
 			final RecyclingModule module, 
 			final DistanceCoefficients distanceCoefficients,
 			LinkedList<String> nonassignedAgents) {
-		
+		super(controler.getConfig().global());
 		this.network = controler.getNetwork();
 		this.controler = controler;
 		this.init(network);	

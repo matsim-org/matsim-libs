@@ -33,7 +33,7 @@ public class SignalSystemRoutePlanStrategy extends PlanStrategy {
 
 	public SignalSystemRoutePlanStrategy(Controler controler) {
 		super(new RandomPlanSelector());
-		this.addStrategyModule(new ReRouteDijkstraTurningMoves(controler.getNetwork(),
+		this.addStrategyModule(new ReRouteDijkstraTurningMoves(controler.getConfig(), controler.getNetwork(),
 				controler.getTravelCostCalculator(), controler.getTravelTimeCalculator()));
 	}
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReRoute.java
+ * AbstractMultithreadedModuleTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,27 +20,31 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.testcases.MatsimTestCase;
 
-/**
- * Uses the routing algorithm provided by the {@linkplain Controler} for 
- * calculating the routes of plans during Replanning.
- *
- * @author mrieser
- */
-public class ReRoute extends AbstractMultithreadedModule {
+public class AbstractMultithreadedModuleTest extends MatsimTestCase {
 
-	private final Controler controler;
-	
-	public ReRoute(final Controler controler) {
-		super(controler.getConfig().global());
-		this.controler = controler;
+	public void testGetNumOfThreads() {
+		Config config = super.loadConfig(null);
+		config.global().setNumberOfThreads(3);
+		DummyAbstractMultithreadedModule testee = new DummyAbstractMultithreadedModule(config.global());
+		assertEquals(3, testee.getNumOfThreads());
 	}
 
-	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-		return this.controler.getRoutingAlgorithm();
+	private class DummyAbstractMultithreadedModule extends AbstractMultithreadedModule { 
+
+		public DummyAbstractMultithreadedModule(
+				GlobalConfigGroup globalConfigGroup) {
+			super(globalConfigGroup);
+		}
+		@Override
+		public PlanAlgorithm getPlanAlgoInstance() {
+			return null;
+		}
+
 	}
 
 }

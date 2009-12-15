@@ -41,7 +41,7 @@ public class BlurPlanTimes {
 		new MatsimNetworkReader(network).readFile(inputNetworkFile);
 		PopulationImpl population = new PopulationImpl();
 		population.setIsStreaming(true);
-		PersonBlurTimes pbt = new PersonBlurTimes(mutationRange);
+		PersonBlurTimes pbt = new PersonBlurTimes(Gbl.getConfig(), mutationRange);
 		population.addAlgorithm(pbt);
 		PopulationWriter pw = new PopulationWriter(population);
 		pw.startStreaming(outputPlansFile);

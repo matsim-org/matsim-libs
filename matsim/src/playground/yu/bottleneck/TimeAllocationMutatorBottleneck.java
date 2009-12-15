@@ -20,10 +20,16 @@
 
 package playground.yu.bottleneck;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class TimeAllocationMutatorBottleneck extends AbstractMultithreadedModule {
+	
+	public TimeAllocationMutatorBottleneck(Config config) {
+		super(config.global());
+	}
+
 	// -----------------------------MEMBER
 	// VARIABLE------------------------------
 	private static final int mutationRange = 1800;

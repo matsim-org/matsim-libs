@@ -258,7 +258,7 @@ public class ScenarioCut {
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
 		PreProcessLandmarks preProcessLandmarks = new PreProcessLandmarks(timeCostCalc);
 		preProcessLandmarks.run(scenario.getNetwork());
-		ReRouteLandmarks router = new ReRouteLandmarks(scenario.getNetwork(),timeCostCalc,timeCostCalc,preProcessLandmarks);
+		ReRouteLandmarks router = new ReRouteLandmarks(scenario.getConfig(), scenario.getNetwork(),timeCostCalc,timeCostCalc,preProcessLandmarks);
 		router.prepareReplanning();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {

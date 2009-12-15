@@ -22,6 +22,7 @@ package playground.toronto.timeblur;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -38,9 +39,9 @@ public class PersonBlurTimes extends AbstractPersonAlgorithm implements PlanAlgo
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonBlurTimes(int mutationRange) {
+	public PersonBlurTimes(Config config, int mutationRange) {
 		System.out.println("    init " + this.getClass().getName() + " module...");
-		TimeAllocationMutator tam = new TimeAllocationMutator(mutationRange);
+		TimeAllocationMutator tam = new TimeAllocationMutator(config, mutationRange);
 		tam.prepareReplanning();
 		pa = tam.getPlanAlgoInstance();
 		System.out.println("    done.");

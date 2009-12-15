@@ -31,6 +31,7 @@ public class AllTests {
 		suite.addTestSuite(ChangeLegModeTest.class);
 		suite.addTestSuite(TimeAllocationMutatorTest.class);
 		suite.addTestSuite(PlanomatModuleTest.class);
+		suite.addTestSuite(AbstractMultithreadedModuleTest.class);
 		//$JUnit-END$
 		return suite;
 	}

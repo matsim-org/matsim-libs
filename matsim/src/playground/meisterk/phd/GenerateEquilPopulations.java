@@ -163,7 +163,7 @@ public class GenerateEquilPopulations {
 				scenario.getConfig().charyparNagelScoring());
 		
 		ReRouteDijkstra router = new ReRouteDijkstra(
-				scenario.getConfig().plansCalcRoute(), 
+				scenario.getConfig(), 
 				network, 
 				travelCostCalculator, 
 				travelTimeCalculator);

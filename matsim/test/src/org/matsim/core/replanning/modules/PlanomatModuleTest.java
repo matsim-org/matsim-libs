@@ -50,14 +50,16 @@ public class PlanomatModuleTest extends MatsimTestCase {
 		Config config = super.loadConfig(this.getClassInputDirectory() + "config.xml");
 
 		this.scenario = new ScenarioImpl(config);
-		
+	}
+	
+	public void testGenerateRandomDemand() {
+
+		Config config = scenario.getConfig();
+
 		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(config.facilities().getInputFile());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(config.plans().getInputFile());
-	}
 
-	public void testGenerateRandomDemand() {
-		Config config = scenario.getConfig();
 		final int TEST_PLAN_NR = 0;
 
 		// the planomat can be used to generate random demand with respect to the dimensions that are optimized by it

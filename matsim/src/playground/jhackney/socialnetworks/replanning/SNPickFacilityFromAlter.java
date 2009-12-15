@@ -2,6 +2,7 @@ package playground.jhackney.socialnetworks.replanning;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.TravelCost;
@@ -18,7 +19,8 @@ public class SNPickFacilityFromAlter extends AbstractMultithreadedModule {
 	private TravelTime ttime=null;
 	private Knowledges knowledges;
 	
-	public SNPickFacilityFromAlter(Network network, TravelCost tcost, TravelTime ttime, Knowledges kn) {
+	public SNPickFacilityFromAlter(Config config, Network network, TravelCost tcost, TravelTime ttime, Knowledges kn) {
+		super(config.global());
 		log.info("initializing SNPickFacility");
     	this.network=network;
     	this.tcost = tcost;

@@ -20,12 +20,17 @@
 
 package playground.marcel.pt.replanning;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.marcel.pt.router.TransitActsRemover;
 
 public class TransitActsRemoverStrategy extends AbstractMultithreadedModule {
+
+	public TransitActsRemoverStrategy(Config config) {
+		super(config.global());
+	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {

@@ -57,7 +57,7 @@ public class PlanomatModule extends AbstractMultithreadedModule {
 			ScoringFunctionFactory scoringFunctionFactory,
 			TravelCost travelCost, 
 			TravelTime travelTime) {
-		super();
+		super(controler.getConfig().global());
 		this.controler = controler;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.travelCost = travelCost;

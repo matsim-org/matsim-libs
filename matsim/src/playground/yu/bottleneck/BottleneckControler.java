@@ -48,7 +48,7 @@ public class BottleneckControler extends Controler {
 		manager.addStrategy(strategy1, 0.95);
 
 		PlanStrategy strategy2 = new PlanStrategy(new RandomPlanSelector());
-		strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck());
+		strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(this.config));
 		manager.addStrategy(strategy2, 0.05);
 		return manager;
 	}

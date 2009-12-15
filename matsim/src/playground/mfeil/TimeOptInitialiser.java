@@ -39,6 +39,7 @@ public class TimeOptInitialiser extends AbstractMultithreadedModule{
 
 	
 	public TimeOptInitialiser (Controler controler) {
+		super(controler.getConfig().global());
 		this.network = controler.getNetwork();
 		this.init(network);
 		this.controler = controler;

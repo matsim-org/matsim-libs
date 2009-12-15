@@ -47,7 +47,7 @@ public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 	
 	
 	public PlanomatXInitialiser (final ControlerMFeil controler, ActivityTypeFinder finder) {
-		
+		super(controler.getConfig().global());
 		this.network = controler.getNetwork();
 		this.controler = controler;
 		this.init(network);	
@@ -60,7 +60,7 @@ public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 	
 	public PlanomatXInitialiser (final ControlerMFeil controler, 
 			final LocationMutatorwChoiceSet locator, ActivityTypeFinder finder) {
-		
+		super(controler.getConfig().global());
 		this.network = controler.getNetwork();
 		this.controler = controler;
 		this.init(network);

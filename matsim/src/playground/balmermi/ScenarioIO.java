@@ -141,7 +141,7 @@ public class ScenarioIO {
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
 		PreProcessLandmarks preProcessLandmarks = new PreProcessLandmarks(timeCostCalc);
 		preProcessLandmarks.run(network);
-		ReRouteLandmarks router = new ReRouteLandmarks(network,timeCostCalc,timeCostCalc,preProcessLandmarks);
+		ReRouteLandmarks router = new ReRouteLandmarks(config, network,timeCostCalc,timeCostCalc,preProcessLandmarks);
 		router.prepareReplanning();
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {

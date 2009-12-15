@@ -58,7 +58,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		config.global().setNumberOfThreads(4); // just use any number > 1
 
 		PlanStrategy strategy = new PlanStrategy(new RandomPlanSelector());
-		strategy.addStrategyModule(new TimeAllocationMutator());
+		strategy.addStrategyModule(new TimeAllocationMutator(config));
 		StrategyManager strategyManager = new StrategyManager();
 		strategyManager.addStrategy(strategy, 1.0);
 

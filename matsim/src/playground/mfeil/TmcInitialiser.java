@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.mfeil;
 
+import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.modules.*;
 
 
 /**
@@ -37,6 +37,7 @@ public class TmcInitialiser extends AbstractMultithreadedModule{
 
 	
 	public TmcInitialiser (Controler controler) {
+		super(controler.getConfig().global());
 		this.controler = controler;		
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(
 				controler.getNetwork(),

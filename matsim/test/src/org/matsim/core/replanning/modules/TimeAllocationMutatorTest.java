@@ -50,7 +50,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 	public void testMutationRangeDefault() {
 		Config config = loadConfig(null);
 		config.global().setNumberOfThreads(0);
-		runMutationRangeTest(new TimeAllocationMutator(), 1800);
+		runMutationRangeTest(new TimeAllocationMutator(config), 1800);
 	}
 
 	/**
@@ -64,11 +64,11 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 
 		// test smaller value than default
 		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "900");
-		runMutationRangeTest(new TimeAllocationMutator(), 900);
+		runMutationRangeTest(new TimeAllocationMutator(config), 900);
 
 		// test bigger value than default
 		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "2700");
-		runMutationRangeTest(new TimeAllocationMutator(), 2700);
+		runMutationRangeTest(new TimeAllocationMutator(config), 2700);
 	}
 
 	/**
@@ -81,11 +81,11 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		config.global().setNumberOfThreads(0);
 
 		// test smaller value than default
-		runMutationRangeTest(new TimeAllocationMutator(750), 750);
+		runMutationRangeTest(new TimeAllocationMutator(config, 750), 750);
 
 		// test bigger value than default
 		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "2700");
-		runMutationRangeTest(new TimeAllocationMutator(7200), 7200);
+		runMutationRangeTest(new TimeAllocationMutator(config, 7200), 7200);
 	}
 
 	/**

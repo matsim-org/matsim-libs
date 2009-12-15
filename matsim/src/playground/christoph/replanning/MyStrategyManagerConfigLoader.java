@@ -66,23 +66,23 @@ public class MyStrategyManagerConfigLoader {
 				strategy.addStrategyModule(new ReRoute(controler));
 			} else if (classname.equals("ReRoute_Dijkstra")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				strategy.addStrategyModule(new MyReRouteDijkstra(config.plansCalcRoute(), network, travelCostCalc, travelTimeCalc));
+				strategy.addStrategyModule(new MyReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc));
 			} else if (classname.equals("ReRoute_Landmarks")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost(config.charyparNagelScoring()));
 				preProcessRoutingData.run(network);
-				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
+				strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
 			} else if (classname.equals("TimeAllocationMutator") || classname.equals("threaded.TimeAllocationMutator")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				TimeAllocationMutator tam = new TimeAllocationMutator();
+				TimeAllocationMutator tam = new TimeAllocationMutator(config);
 				tam.setUseActivityDurations(config.vspExperimental().isUseActivityDurations());
 				strategy.addStrategyModule(tam);
 			} else if (classname.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				strategy.addStrategyModule(new TimeAllocationMutator(7200));
+				strategy.addStrategyModule(new TimeAllocationMutator(config, 7200));
 				PreProcessLandmarks preProcessRoutingData = new PreProcessLandmarks(new FreespeedTravelTimeCost(config.charyparNagelScoring()));
 				preProcessRoutingData.run(network);
-				strategy.addStrategyModule(new ReRouteLandmarks(network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
+				strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, preProcessRoutingData));
 			} else if (classname.equals("ExternalModule")) {
 				externalCounter++;
 				strategy = new PlanStrategy(new RandomPlanSelector());
@@ -132,7 +132,7 @@ public class MyStrategyManagerConfigLoader {
 				strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
 				strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, (controler.getScenarioData()).getKnowledges()));
 				strategy.addStrategyModule(new ReRoute(controler));
-				strategy.addStrategyModule(new TimeAllocationMutator());
+				strategy.addStrategyModule(new TimeAllocationMutator(config));
 				/* not really happy about the following line. Imagine what happens if everybody does
 				 * this, that one doesn't know at the end which removal-strategy is really used.
 				 * The removal strategy must not be tight to a replanning-strategy, but is a general
