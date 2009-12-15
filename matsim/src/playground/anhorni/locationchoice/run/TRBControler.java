@@ -8,11 +8,11 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.anhorni.locationchoice.analysis.CalculatePlanTravelStats;
 import playground.anhorni.locationchoice.analysis.PrintShopAndLeisureLocations;
 import playground.anhorni.locationchoice.analysis.TravelDistanceDistribution;
 import playground.anhorni.locationchoice.analysis.events.CalcLegDistancesListenerDetailed;
 import playground.anhorni.locationchoice.analysis.events.CalcLegTimesListenerDetailed;
+import playground.anhorni.locationchoice.analysis.plans.CalculatePlanTravelStats;
 import playground.anhorni.locationchoice.run.scoring.ScoreElements;
 import playground.anhorni.locationchoice.run.scoring.TRBScoringFunctionFactory;
 

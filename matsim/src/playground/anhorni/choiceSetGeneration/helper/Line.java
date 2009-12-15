@@ -7,7 +7,7 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.anhorni.locationchoice.preprocess.analyzeMZ.MZTrip;
+import playground.anhorni.locationchoice.analysis.mc.MZTrip;
 
 public class Line {
 	

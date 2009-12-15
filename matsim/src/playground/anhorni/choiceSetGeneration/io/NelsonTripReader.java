@@ -17,7 +17,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
 import playground.anhorni.choiceSetGeneration.helper.Line;
 import playground.anhorni.choiceSetGeneration.helper.ZHFacilities;
-import playground.anhorni.locationchoice.preprocess.analyzeMZ.MZTrip;
+import playground.anhorni.locationchoice.analysis.mc.MZTrip;
 
 /*	  0			1		2			3			4			5		6		7			8				9
  * ---------------------------------------------------------------------------------------------------------		
