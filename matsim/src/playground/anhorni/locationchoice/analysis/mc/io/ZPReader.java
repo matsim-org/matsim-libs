@@ -32,8 +32,8 @@ public class ZPReader {
 				Id personId = new IdImpl(HHNR+ZIELPNR);
 				
 				String[] date = entries[2].trim().split("/", -1);
-				String day = date[0].trim();
-				String month = date[1].trim();
+				String day = date[1].trim();
+				String month = date[0].trim();
 				String year = "2005";
 				
 				if (this.filter.passedFilter(year, month, day)) {
