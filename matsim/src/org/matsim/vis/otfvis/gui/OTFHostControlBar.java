@@ -47,6 +47,7 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.border.Border;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.misc.Time;
@@ -73,7 +74,9 @@ import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
  *
  */
 public class OTFHostControlBar extends JToolBar implements ActionListener, ItemListener {
-
+	
+	private static final Logger log = Logger.getLogger(OTFHostControlBar.class);
+	
 //	private static final String CONNECT = "connect";
 	private static final String TO_START = "to_start";
 	private static final String PAUSE = "pause";
@@ -262,7 +265,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
     pauseIcon = new ImageIcon(MatsimResource.getAsImage("otfvis/buttonPause.png"), "Pause");
 
 		add(createButton("Restart", TO_START, "buttonRestart", "restart the server/simulation"));
-		if (this.hostControl.getOTFServer().isLive()) {
+		if (!this.hostControl.getOTFServer().isLive()) {
 			add(createButton("<<", STEP_BB, "buttonStepBB", "go several timesteps backwards"));
 			add(createButton("<", STEP_B, "buttonStepB", "go one timestep backwards"));
 		}
