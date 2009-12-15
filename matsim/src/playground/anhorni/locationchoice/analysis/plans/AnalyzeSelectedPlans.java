@@ -130,7 +130,9 @@ public class AnalyzeSelectedPlans {
 				}
 				
 				double distance = 0.0;
-				if (leg.getRoute().getStartLink() != null) {
+				// we do only have crowfly data for validation
+				if (leg.getRoute().getStartLink() != null && true == false) {
+				//if (leg.getRoute().getStartLink() != null) {
 					double crowFlyDistance = ((CoordImpl)leg.getRoute().getStartLink().getCoord()).
 					calcDistance(leg.getRoute().getEndLink().getCoord());
 				
