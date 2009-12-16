@@ -23,7 +23,7 @@ import com.sun.opengl.util.texture.TextureCoords;
  * OTFScaleBarDrawer draws a scale bar as an overlay.
  * It depends on the chosen coordinates being in meters.
  * 
- * @author dstrippgen
+ * @author laemmel
  *
  */
 public class OTFScaleBarDrawer extends OTFGLDrawableImpl {
