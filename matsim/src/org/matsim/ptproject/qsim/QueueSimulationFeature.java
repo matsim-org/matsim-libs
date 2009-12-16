@@ -1,7 +1,6 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * OTFClientQuad.java
- *                                                                         *
+ * project: org.matsim																																							 *
+ *                               																			                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2009 by the members listed in the COPYING,        *
