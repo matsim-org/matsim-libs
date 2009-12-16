@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.vis.otfvis.data.fileio;
+package org.matsim.vis.otfvis.data.fileio.qsim;
 
 import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.ptproject.qsim.QueueNode;
@@ -31,7 +31,7 @@ import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
  * @author dgrether
  *
  */
-public class OTFFileWriterConnectionManagerFactory implements OTFConnectionManagerFactory{
+public class OTFFileWriterQSimConnectionManagerFactory implements OTFConnectionManagerFactory{
 
 	public OTFConnectionManager createConnectionManager() {
 		OTFConnectionManager c = new OTFConnectionManager();

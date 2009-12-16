@@ -23,10 +23,12 @@ package org.matsim.vis.otfvis;
 import java.awt.BorderLayout;
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.data.fileio.queuesim.OTFQueueSimLinkAgentsWriter;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
@@ -46,13 +48,15 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
  * @author dstrippgen
  */
 public class OTFClientFile extends OTFClient {
-
+	
+	private static final Logger log = Logger.getLogger(OTFClientFile.class);
+	
 	protected OTFConnectionManager connect = new OTFConnectionManager();
 
 	public OTFClientFile( String filename) {
 		super("file:" + filename);
 		/*
-		 * If I got it right: The next four entries to the connection manager are really needed to 
+		 * If I got it right: The following entries to the connection manager are really needed to 
 		 * get otfvis running with the current matsim version. The other entries added
 		 * below are needed in terms of backward compatibility to older versions only. (dg, nov 09)
 		 */
@@ -70,6 +74,11 @@ public class OTFClientFile extends OTFClient {
 		this.connect.add(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connect.add(OTFLinkAgentsNoParkingHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
+		
+		/*
+		 * This entry is needed to couple the org.matsim.core.queuesim to the visualizer
+		 */
+		this.connect.add(OTFQueueSimLinkAgentsWriter.class, OTFLinkLanesAgentsNoParkingHandler.class);
 		
 	}
 
@@ -111,15 +120,18 @@ public class OTFClientFile extends OTFClient {
 	
 	@Override
 	protected void getOTFVisConfig() {
-		if (Gbl.getConfig() == null) {
+		if (Gbl.getConfig() != null) {
+			visconf = (OTFVisConfig) Gbl.getConfig().otfVis();
+		}
+		else {
 			Gbl.createConfig(null);
 		}
-		saver = new OTFFileSettingsSaver(this.url);
-		visconf = (OTFVisConfig) Gbl.getConfig().otfVis();
+		saver = new OTFFileSettingsSaver(visconf, this.url);
 		if (visconf == null) {
-			visconf = saver.openAndReadConfig();
-		} else {
-			System.out.println("OTFVisConfig already defined, cant read settings from file");
+			visconf = ((OTFFileSettingsSaver)saver).openAndReadConfig();
+		} 
+		else {
+			log.warn("OTFVisConfig already defined, cant read settings from file");
 		}
 	}
 

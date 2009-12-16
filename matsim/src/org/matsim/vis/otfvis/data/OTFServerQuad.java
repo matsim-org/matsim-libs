@@ -58,8 +58,9 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 	public static double offsetEast;
 	public static double offsetNorth;
 
-	public OTFServerQuad(Network n) {
+	public OTFServerQuad(Network network) {
 		super(0,0,0,0);
+		this.updateBoundingBox(network);
 	}
 	
 	/**

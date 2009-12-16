@@ -105,7 +105,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 //	protected OTFServerRemote host = null;
 	protected int controllerStatus = 0;
 	
-	private final Map <String,OTFDrawer> handlers = new HashMap<String,OTFDrawer>();
+	private final Map <String,OTFDrawer> drawer = new HashMap<String,OTFDrawer>();
 	private final Map <String,OTFClientQuad> quads = new HashMap<String,OTFClientQuad>();
 	private final List <OTFSlaveHost> slaves = new ArrayList<OTFSlaveHost>();
 
@@ -148,11 +148,11 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 			connect.adoptFileFormat(OTFDataReader.getVersionString(config.getFileVersion(), config.getFileMinorVersion()));
 		}
 
-		System.out.println("Getting Quad");
+		log.info("Getting Quad id " + id);
 		OTFServerQuad servQ = this.hostControl.getOTFServer().getQuad(id, connect);
-		System.out.println("Converting Quad");
+		log.info("Converting Quad");
 		OTFClientQuad clientQ = servQ.convertToClient(id, this.hostControl.getOTFServer(), connect);
-		System.out.println("Creating receivers");
+		log.info("Creating receivers");
 		clientQ.createReceiver(connect);
 		readConstData(clientQ);
 		this.quads.put(id, clientQ);
@@ -172,7 +172,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	protected boolean preCacheCurrentTime(int time, OTFTimeLine timeLine) throws IOException {
 		boolean result = this.hostControl.getOTFServer().requestNewTime(time, OTFServerRemote.TimePreference.LATER);
 		
-		for(OTFDrawer handler : handlers.values()) {
+		for(OTFDrawer handler : drawer.values()) {
 			if(handler != timeLine) handler.getQuad().getSceneGraphNoCache(this.hostControl.getOTFServer().getLocalTime(), null, handler);
 		}
 		
@@ -187,7 +187,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 		public void preloadCache() {
 			boolean hasNext = true;
-			OTFTimeLine timeLine = (OTFTimeLine)handlers.get("timeline");
+			OTFTimeLine timeLine = (OTFTimeLine)drawer.get("timeline");
 
 			try {
 				int	time = hostControl.getOTFServer().getLocalTime();
@@ -219,16 +219,16 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	public void addHandler(String id, OTFDrawer handler) {
-		handlers.put(id, handler);
+		drawer.put(id, handler);
 	}
 
 	public OTFDrawer getHandler(String id) {
-		return handlers.get(id);
+		return drawer.get(id);
 	}
 
 	public void invalidateHandlers() {
 		try {
-		for (OTFDrawer handler : handlers.values()) {
+		for (OTFDrawer handler : drawer.values()) {
 				handler.invalidate(simTime);
 		}
 		for(OTFSlaveHost slave : slaves) {
@@ -241,7 +241,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	public void redrawHandlers() {
-		for (OTFDrawer handler : handlers.values()) {
+		for (OTFDrawer handler : drawer.values()) {
 			handler.redraw();
 		}
 		for(OTFSlaveHost slave : slaves) {
@@ -250,7 +250,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 	public void clearCaches() {
-		for (OTFDrawer handler : handlers.values()) {
+		for (OTFDrawer handler : drawer.values()) {
 			handler.clearCache();
 		}
 		for(OTFSlaveHost slave : slaves) {

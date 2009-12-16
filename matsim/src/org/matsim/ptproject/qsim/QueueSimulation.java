@@ -67,7 +67,7 @@ import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
 import org.matsim.vis.netvis.streaming.SimStateWriterI;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
-import org.matsim.vis.otfvis.data.fileio.OTFFileWriterConnectionManagerFactory;
+import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.snapshots.writers.KmlSnapshotWriter;
 import org.matsim.vis.snapshots.writers.PlansFileSnapshotWriter;
@@ -274,7 +274,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 			if (snapshotFormat.contains("otfvis")) {
 				String snapshotFile = Controler.getIterationFilename("otfvis.mvi");
 				OTFFileWriter writer = null;
-				writer = new OTFFileWriter(this.snapshotPeriod, new OTFQSimServerQuadBuilder(this.network), snapshotFile, new OTFFileWriterConnectionManagerFactory());
+				writer = new OTFFileWriter(this.snapshotPeriod, new OTFQSimServerQuadBuilder(this.network), snapshotFile, new OTFFileWriterQSimConnectionManagerFactory());
 //				if (this.config.scenario().isUseLanes() && ! this.config.scenario().isUseSignalSystems()) {
 //					OTFConnectionManager connect = writer.getConnectionManager();
 //					// data source to writer

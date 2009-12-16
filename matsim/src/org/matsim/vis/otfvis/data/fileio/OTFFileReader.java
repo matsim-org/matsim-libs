@@ -65,7 +65,6 @@ public class OTFFileReader implements OTFServerRemote {
 
 	private DataInputStream inFile;
 
-	protected OTFServerQuad quad = null;
 	private final String id = null;
 	private byte[] actBuffer = null;
 
@@ -107,8 +106,6 @@ public class OTFFileReader implements OTFServerRemote {
 		System.out.println("");
 		System.out.println("Nr of timesteps: " + this.timesteps.size());
 
-		Gbl.printElapsedTime();
-		Gbl.printMemoryUsage();
 	}
 
 	private byte[] readTimeStep(final double time_s) throws IOException {
@@ -174,13 +171,12 @@ public class OTFFileReader implements OTFServerRemote {
 		@Override
 		protected Class resolveClass(final ObjectStreamClass desc)
 		throws IOException, ClassNotFoundException {
+			String name = desc.getName();
+			log.info("try to resolve " + name);
 			if((version >= 1) && (minorversion >=6)) {
 				return super.resolveClass(desc);
 			}
 			// these remappings only happen with older file versions
-			String name = desc.getName();
-			System.out.println("try to resolve " + name);
-			//org.matsim.core.utils.collections
 			if (name.equals("playground.david.vis.data.OTFServerQuad")) {
 				return OTFServerQuad.class;
 			} else if (name.startsWith("org.matsim.utils.vis.otfvis")) {
@@ -221,7 +217,8 @@ public class OTFFileReader implements OTFServerRemote {
 	}
 
 
-	private void readQuad() {
+	private OTFServerQuad readQuad() {
+		OTFServerQuad quad = null;
 		try {
 			// we do not cache anymore ...readZIPFile();
 			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
@@ -229,7 +226,7 @@ public class OTFFileReader implements OTFServerRemote {
 			BufferedInputStream is = new BufferedInputStream(zipFile
 					.getInputStream(quadEntry));
 			try {
-				this.quad = (OTFServerQuad) new OTFObjectInputStream(is)
+				quad = (OTFServerQuad) new OTFObjectInputStream(is)
 				.readObject();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
@@ -240,6 +237,7 @@ public class OTFFileReader implements OTFServerRemote {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return quad;
 	}
 
 	private void readConnect(OTFConnectionManager connect) {
@@ -303,17 +301,20 @@ public class OTFFileReader implements OTFServerRemote {
 
 	public OTFServerQuad getQuad(final String id,
 			final OTFConnectionManager connect) throws RemoteException {
+		OTFServerQuad quad = null;
 		// if (connect != null) throw new
 		// RemoteException("writers need to be NULL, when reading from file"
 		// );
-		if (this.id == null)
-			readQuad();
+		if (this.id == null) {
+			log.info("reading quad from file...");
+			quad  = readQuad();
+		}
 		readConnect(connect);
 		if ((id != null) && !id.equals(this.id))
 			throw new RemoteException(
 			"id does not match, set id to NULL will match ALL!");
 
-		return this.quad;
+		return quad;
 	}
 
 	public byte[] getQuadConstStateBuffer(final String id)

@@ -29,11 +29,12 @@ import java.nio.ByteBuffer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.matsim.core.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.data.OTFServerQuadBuilder;
+import org.matsim.vis.otfvis.data.OTFConnectionManager.Entry;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.SnapshotWriter;
 /**
@@ -44,7 +45,11 @@ import org.matsim.vis.snapshots.writers.SnapshotWriter;
  * @author dgrether
  */
 public class OTFFileWriter implements SnapshotWriter {
+	
+	private static final Logger log = Logger.getLogger(OTFFileWriter.class);
+
 	private static final int BUFFERSIZE = 300000000;
+	
 	protected OTFServerQuad quad = null;
 	protected final double interval_s;
 	protected double nextTime = -1;
@@ -100,20 +105,15 @@ public class OTFFileWriter implements SnapshotWriter {
 
 	private void writeQuad() throws IOException {
 		this.zos.putNextEntry(new ZipEntry("quad.bin"));
-		Gbl.startMeasurement();
-		System.out.print("build Quad on Server: ");
-		Gbl.printElapsedTime();
-
-		Gbl.startMeasurement();
-
 		onAdditionalQuadData(this.connect);
-
-		Gbl.printElapsedTime();
-		Gbl.startMeasurement();
 		new ObjectOutputStream(this.zos).writeObject(this.quad);
 		this.zos.closeEntry();
 		// this is new, write connect into the mvi as well
 		this.zos.putNextEntry(new ZipEntry("connect.bin"));
+		log.info("writing ConnectionManager to file...");
+		for (Entry e : this.connect.getEntries()){
+			log.info("writing entry: " + e.getFrom().getCanonicalName() + " to " + e.getTo().getName());
+		}
 		new ObjectOutputStream(this.zos).writeObject(this.connect);
 		this.zos.closeEntry();
 	}
@@ -160,8 +160,6 @@ public class OTFFileWriter implements SnapshotWriter {
 			writeInfos();
 			writeQuad();
 			writeConstData();
-			System.out.print("write to file  Quad on Server: ");
-			Gbl.printElapsedTime();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * OTFFileWriterConnectionManagerFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,51 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether;
+package org.matsim.vis.otfvis.data.fileio.queuesim;
 
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.run.OTFVis;
+import org.matsim.core.mobsim.queuesim.QueueLink;
+import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgEquilControler {
+public class OTFFileWriterQueueSimConnectionManagerFactory implements OTFConnectionManagerFactory{
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
-		final String config = "../testData/examples/equil/config.xml";
-		
-//		final int iteration = 0;
-		final int iteration = 0;
-		
-		Controler controler = new Controler(config);
-//		controler = new PtController(config);
-		controler.setOverwriteFiles(true);
-		
-		controler.addControlerListener(new StartupListener(){
-			public void notifyStartup(final StartupEvent event) {
-				event.getControler().getConfig().controler().setLastIteration(iteration);
-			}
-		});
-		
-		controler.run();
-		
-		
-		
-		String filename = controler.getConfig().controler().getOutputDirectory();
-		
-		filename += "/ITERS/it."+iteration+"/" + iteration + ".otfvis.mvi";
-		System.out.println(filename);
-		OTFVis.main(new String[] {filename});
-		
-		
+	public OTFConnectionManager createConnectionManager() {
+		OTFConnectionManager c = new OTFConnectionManager();
+		c.add(QueueLink.class,
+				OTFQueueSimLinkAgentsWriter.class);
+		//not needed yet for current QueueSim functionality thus disabled, reimplement when needed dg dez 09
+		//		c.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
+		return c;
 	}
 
 }

@@ -46,7 +46,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
 import org.matsim.vis.otfvis.opengl.queries.QueryToggleShowParking;
 
@@ -70,17 +69,15 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 	private JSlider linkWidthSlider;
 	private JSlider delaySlider = null;
-	private OTFFrame frame;
 
-	protected PreferencesDialog(final OTFFrame frame, final OTFVisConfig config, final OTFHostControlBar mother) {
+	public PreferencesDialog(final OTFFrame frame, final OTFVisConfig config, final OTFHostControlBar mother) {
 		super(frame);
-		this.frame = frame;
 		this.cfg = config;
 		this.host = mother;
 		initGUI();
 	}
 
-	protected void initGUI() {
+	private void initGUI() {
 		getContentPane().setLayout(null);
 		this.setResizable(false);
 		setSize(480, 340);
@@ -288,7 +285,6 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	}
 
 	public void stateChanged(final ChangeEvent e) {
-		this.cfg = (OTFVisConfig)Gbl.getConfig().getModule("otfvis");
 		if (e.getSource() == this.agentSizeSlider) {
 			this.cfg.setAgentSize(this.agentSizeSlider.getValue());
 			if (this.host != null)
@@ -320,11 +316,6 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		return this.middleMFunc;
 	}
 
-	public static PreferencesDialog buildMenu(final OTFFrame frame, final OTFVisConfig config, final OTFHostControlBar host, final OTFSettingsSaver save) {
-		PreferencesDialog preferencesDialog = new PreferencesDialog(frame, config, host);
-		preferencesDialog.buildMenu(frame, preferencesDialog, save);
-		return preferencesDialog;
-	}
 
 	public void buildMenu(final OTFFrame frame, final PreferencesDialog preferencesDialog, final OTFSettingsSaver save) {
 		JMenuBar menuBar = new JMenuBar();
@@ -376,8 +367,8 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 				save.readSettings();
 				if (frame != null) {
 					frame.getContentPane().invalidate();
-					OTFVisConfig conf = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
-					PreferencesDialog.buildMenu(frame, conf, host, save);
+					PreferencesDialog preferencesDialog = new PreferencesDialog(frame, cfg, host);
+					preferencesDialog.buildMenu(frame, preferencesDialog, save);
 				}
 			}
 		};
@@ -431,7 +422,6 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 	}
 
 	public void itemStateChanged(ItemEvent e) {
-		this.cfg = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis"));
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
 		if (source.getText().equals("show parked vehicles")) {
 			cfg.setShowParking(e.getStateChange() != ItemEvent.DESELECTED);

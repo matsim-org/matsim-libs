@@ -32,7 +32,7 @@ import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
-import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
+import org.matsim.vis.otfvis.opengl.gui.OTFAbstractSettingsSaver;
 
 
 /**
@@ -51,7 +51,7 @@ public abstract class OTFClient extends Thread {
 
 	protected OTFHostControlBar hostControl = null;
 	
-	protected OTFFileSettingsSaver saver;
+	protected OTFAbstractSettingsSaver saver;
 
 	protected OTFDrawer mainDrawer;
 	
@@ -87,7 +87,8 @@ public abstract class OTFClient extends Thread {
 			this.hostControl = new OTFHostControlBar(this.url);
 			hostControl.frame = frame;
 			frame.getContentPane().add(this.hostControl, BorderLayout.NORTH);
-			PreferencesDialog.buildMenu(frame, visconf, hostControl, saver);
+			PreferencesDialog preferencesDialog = new PreferencesDialog(frame, visconf, hostControl);
+			preferencesDialog.buildMenu(frame, preferencesDialog, saver);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {

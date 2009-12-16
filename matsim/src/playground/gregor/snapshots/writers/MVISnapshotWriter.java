@@ -58,7 +58,7 @@ import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
-import org.matsim.vis.otfvis.data.fileio.OTFFileWriterConnectionManagerFactory;
+import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
@@ -97,7 +97,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 	private final String label = "run1006: Nash approach";
 
 	public MVISnapshotWriter(final QueueNetwork net, final String vehFileName, final String outFileName, final double intervall_s) {
-		super(intervall_s, new OTFQSimServerQuadBuilder(net), outFileName, new OTFFileWriterConnectionManagerFactory());
+		super(intervall_s, new OTFQSimServerQuadBuilder(net), outFileName, new OTFFileWriterQSimConnectionManagerFactory());
 		((NetworkLayer) net.getNetworkLayer()).createAndAddNode(new IdImpl("minXY"), new CoordImpl(643000,9880000));//HACK to get the bounding box big enough; 
 		//otherwise we could get negative openGL coords since we calculating offsetEast, offsetNorth based on this bounding box
 //		this.vehFileName = vehFileName;
@@ -106,7 +106,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 
 
 	public MVISnapshotWriter(ScenarioImpl sc) {
-		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QueueNetwork(sc.getNetwork())),"../../outputs/output/movie.mvi", new OTFFileWriterConnectionManagerFactory());
+		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QueueNetwork(sc.getNetwork())),"../../outputs/output/movie.mvi", new OTFFileWriterQSimConnectionManagerFactory());
 	}
 
 

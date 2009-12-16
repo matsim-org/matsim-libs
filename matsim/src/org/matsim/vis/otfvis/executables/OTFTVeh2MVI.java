@@ -32,7 +32,7 @@ import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
-import org.matsim.vis.otfvis.data.fileio.OTFFileWriterConnectionManagerFactory;
+import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
@@ -50,7 +50,7 @@ public class OTFTVeh2MVI extends OTFFileWriter {
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
 
 	public OTFTVeh2MVI(QueueNetwork net, String vehFileName, double interval_s, String outFileName) {
-		super(interval_s, new OTFQSimServerQuadBuilder(net), outFileName, new OTFFileWriterConnectionManagerFactory());
+		super(interval_s, new OTFQSimServerQuadBuilder(net), outFileName, new OTFFileWriterQSimConnectionManagerFactory());
 		this.vehFileName = vehFileName;
 	}
 

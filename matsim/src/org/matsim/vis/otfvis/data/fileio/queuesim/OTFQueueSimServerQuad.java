@@ -39,6 +39,8 @@ import org.matsim.vis.otfvis.data.OTFWriterFactory;
  */
 public class OTFQueueSimServerQuad extends OTFServerQuad {
 
+	private static final long serialVersionUID = 24L;
+	
   private static final Logger log = Logger.getLogger(OTFQueueSimServerQuad.class);
 	
   transient private QueueNetwork net;

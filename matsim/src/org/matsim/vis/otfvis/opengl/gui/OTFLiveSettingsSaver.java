@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * OTFLiveFileSettingsSaver
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,51 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether;
+package org.matsim.vis.otfvis.opengl.gui;
 
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.run.OTFVis;
+import java.io.File;
+
+import org.matsim.vis.otfvis.gui.OTFVisConfig;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgEquilControler {
+public class OTFLiveSettingsSaver extends OTFAbstractSettingsSaver {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
-		final String config = "../testData/examples/equil/config.xml";
-		
-//		final int iteration = 0;
-		final int iteration = 0;
-		
-		Controler controler = new Controler(config);
-//		controler = new PtController(config);
-		controler.setOverwriteFiles(true);
-		
-		controler.addControlerListener(new StartupListener(){
-			public void notifyStartup(final StartupEvent event) {
-				event.getControler().getConfig().controler().setLastIteration(iteration);
-			}
-		});
-		
-		controler.run();
-		
-		
-		
-		String filename = controler.getConfig().controler().getOutputDirectory();
-		
-		filename += "/ITERS/it."+iteration+"/" + iteration + ".otfvis.mvi";
-		System.out.println(filename);
-		OTFVis.main(new String[] {filename});
-		
-		
+	public OTFLiveSettingsSaver(OTFVisConfig visconf, String filename) {
+		super(visconf, filename);
 	}
 
+	
+	public void readDefaultSettings() {
+		File file = new File(fileName + ".vcfg");
+		if(file.exists())openAndReadConfigFromFile(file);
+	}
 }

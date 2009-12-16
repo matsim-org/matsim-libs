@@ -93,8 +93,8 @@ public class OnTheFlyClientQuadSwing{
 			pane.setContinuousLayout(true);
 			pane.setOneTouchExpandable(true);
 			frame.getContentPane().add(pane);
-			PreferencesDialog.buildMenu(frame, visconf, hostControl, null);
-
+			PreferencesDialog preferencesDialog = new PreferencesDialog(frame, visconf, hostControl);
+			preferencesDialog.buildMenu(frame, preferencesDialog, null);
 
 			OTFClientQuad clientQ2 = hostControl.createNewView(null, connect2);
 			OTFDrawer drawer2 = new NetJComponent(frame, clientQ2);

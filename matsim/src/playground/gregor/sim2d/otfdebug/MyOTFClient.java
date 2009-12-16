@@ -37,7 +37,7 @@ import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.gui.OTFFileSettingsSaver;
+import org.matsim.vis.otfvis.opengl.gui.OTFLiveSettingsSaver;
 
 public class MyOTFClient extends Thread {
 
@@ -69,11 +69,11 @@ public class MyOTFClient extends Thread {
 			}
 			frame.getContentPane().add(hostControl, BorderLayout.NORTH);
 			String netName = Gbl.getConfig().network().getInputFile();
-			OTFFileSettingsSaver saver = new OTFFileSettingsSaver(netName);
+			OTFLiveSettingsSaver saver = new OTFLiveSettingsSaver(visconf, netName);
 			saver.readDefaultSettings();
 
-			PreferencesDialog.buildMenu(frame, visconf, hostControl, saver);
-
+			PreferencesDialog preferencesDialog = new PreferencesDialog(frame, visconf, hostControl);
+			preferencesDialog.buildMenu(frame, preferencesDialog, saver);
 			OTFClientQuad clientQ = hostControl.createNewView(id1, connect);
 
 			OTFDrawer drawer = new OTFOGLDrawer(frame, clientQ);

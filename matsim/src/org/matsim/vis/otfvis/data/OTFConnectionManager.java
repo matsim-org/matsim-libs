@@ -79,6 +79,15 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 			return "(" + from.toString() + "," + to.toString() + ") ";
 		}
 
+		public Class getTo(){
+			return this.to;
+		}
+		
+		public Class getFrom(){
+			return this.from;
+		}
+		
+		
 	}
 	
 	private final List<Entry> connections = new LinkedList<Entry>();
@@ -137,6 +146,10 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		}
 	}
 
+	public List<Entry> getEntries(){
+		return this.connections;
+	}
+	
 	public Collection<Class> getToEntries(Class srcClass) {
 		if (!isValidated) validate();
 		
@@ -236,6 +249,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		Iterator<Entry> iter = connect2.connections.iterator();
 		while(iter.hasNext()) {
 			Entry entry = iter.next();
+			log.error("updating entry: " + entry.from.getCanonicalName() + " to " + entry.to.getName());
 			this.add(entry);
 		}
 	}

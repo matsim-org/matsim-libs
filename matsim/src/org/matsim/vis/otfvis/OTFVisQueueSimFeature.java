@@ -57,6 +57,9 @@ public class OTFVisQueueSimFeature implements QueueSimulationFeature {
 			}
 			OTFClientLive client = null;
 			client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
+			if (this.queueSimulation.getScenario() != null) {
+				client.setConfig(this.queueSimulation.getScenario().getConfig().otfVis());
+			}
 			client.start();
 
 			try {
