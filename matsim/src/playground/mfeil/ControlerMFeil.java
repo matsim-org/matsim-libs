@@ -80,7 +80,7 @@ public class ControlerMFeil extends Controler {
 			this.scenarioLoaded = true;
 			
 			// loading income data!
-		//	this.loadIncomeData();
+			this.loadIncomeData();
 			
 			if (this.getWorld() != null) {
 				new WorldCheck().run(this.getWorld());
@@ -90,6 +90,7 @@ public class ControlerMFeil extends Controler {
 	
 	/* Adds income information to all agents of the scenario */	
 	private void loadIncomeData(){
+		log.info("   adding agents income data...");
 		AgentsAttributesAdder adder = new AgentsAttributesAdder();
 		adder.runZurich10("/home/baug/mfeil/data/Zurich10/agents_income.txt");
 		Map<Id, Double> income = adder.getIncome();
@@ -102,6 +103,7 @@ public class ControlerMFeil extends Controler {
 				log.warn("No income information found for agent "+person.getId());
 			}
 		}	
+		log.info("   ... done.");
 	}
 	
 	
