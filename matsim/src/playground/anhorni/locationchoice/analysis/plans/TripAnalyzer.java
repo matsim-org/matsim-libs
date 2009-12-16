@@ -4,21 +4,31 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.Vector;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.anhorni.locationchoice.preprocess.helper.Bins;
 import playground.anhorni.locationchoice.preprocess.helper.Utils;
 
 public class TripAnalyzer {
 	
 	private DecimalFormat formatter = new DecimalFormat("0.0");
 
-	List<Trip> trips = new Vector<Trip>();
+	private List<Trip> trips = new Vector<Trip>();
+	private TreeMap<String, Bins> binnedDistributions = new TreeMap<String, Bins>(); 
 	
 	public void addTrip(Trip trip) {
 		trips.add(trip);
+		
+		// only distance at the moment
+		String key = trip.getPurpose() + trip.getMode();
+		if (binnedDistributions.get(key) == null) {
+			binnedDistributions.put(key, new Bins(5000, 100000, key));
+		}
+		binnedDistributions.get(key).addVal(trip.getDistance());
 	}
 	
 	public void analyze(String outfile) {
@@ -53,7 +63,15 @@ public class TripAnalyzer {
 		}
 		catch (final IOException e) {
 			Gbl.errorMsg(e);
-		}	
+		}
+		
+		for (Bins bins : this.binnedDistributions.values()) {
+			if (bins.getBins().length > 0) {
+				bins.plotBinnedDistribution(outfile + "_", "distance bin", "m");
+			}
+		}
+		
+		
 	}
 		
 	private double[] getAverageDistanceByPurposeAndMode(String purpose, TransportMode mode) {	

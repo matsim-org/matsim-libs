@@ -13,13 +13,15 @@ public class Bins {
 	private int numberOfBins;
 	private int [] bins;
 	private double maxVal;
+	private String desc;
 	
 	private final static Logger log = Logger.getLogger(Bins.class);
 	
-	public Bins(int interval, double maxVal) {
+	public Bins(int interval, double maxVal, String desc) {
 		this.interval = interval;
 		this.maxVal = maxVal;
 		this.numberOfBins = (int)(maxVal / interval);
+		this.desc = desc;
 		
 		bins = new int[numberOfBins];
 		
@@ -30,14 +32,14 @@ public class Bins {
 	
 	public void addVal(double value) {
 		// values > maximum value are assigned to the last bin
-		if (value > maxVal) value = maxVal; 
+		if (value >= maxVal) value = maxVal - 0.00000000001; 
 		
 		// values < 0.0 value are assigned to the first bin
 		if (value < 0.0) {
 			log.error("Value < 0.0 received");
 			value = 0.0;
 		}	
-		int index = (int)Math.floor(Math.min((maxVal / interval), 0.0));
+		int index = (int)Math.floor(value / interval);
 		this.bins[index]++;
 	}
 	
@@ -47,19 +49,19 @@ public class Bins {
 	}
 	
 	
-	public void plotBinnedDistribution(String filename, String path, String title, String xLabel, String xUnit) {	
+	public void plotBinnedDistribution(String path, String xLabel, String xUnit) {	
 		
 		String [] categories  = new String[this.numberOfBins];
 		for (int i = 0; i < this.numberOfBins; i++) {
 			categories[i] = Integer.toString(i);
 		}	
 		BarChart chart = 
-			new BarChart(title, xLabel + " " + xUnit, "#", categories);
+			new BarChart(desc, xLabel + " " + xUnit, "#", categories);
 		chart.addSeries("Bin size", Utils.convert2double(this.bins));
-		chart.saveAsPng(path + filename + ".png", 1600, 800);
+		chart.saveAsPng(path + desc + ".png", 1600, 800);
 		
 		try {			
-			BufferedWriter out = IOUtils.getBufferedWriter(filename + ".txt");
+			BufferedWriter out = IOUtils.getBufferedWriter(desc + ".txt");
 			out.write("Bin [intervall = " + this.interval + " " + xUnit  + "\t" + "#" + "\n");
 			for (int j = 0; j < bins.length;  j++) {
 				out.write(j + "\t" + bins[j] + "\n");
