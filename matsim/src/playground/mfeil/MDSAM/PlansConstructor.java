@@ -1108,7 +1108,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		
 		// Run external classes if required
 		if (incomeConstant.equals("yes") || incomeDivided.equals("yes") || incomeDividedLN.equals("yes") || incomeBoxCox.equals("yes") || carAvail.equals("yes") || seasonTicket.equals("yes") || travelCost.equals("yes")){
-			aaa.run(attributesInputFile);
+			aaa.runMZ(attributesInputFile);
 		}
 		if (similarity.equals("yes")){
 			this.mdsam = new MDSAM(this.population);
