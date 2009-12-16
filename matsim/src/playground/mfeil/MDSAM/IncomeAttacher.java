@@ -73,6 +73,7 @@ public class IncomeAttacher {
 		final String haushalte = "/home/baug/mfeil/data/Zurich10/Haushalte.txt";
 		final String zielpersonen = "/home/baug/mfeil/data/Zurich10/Zielpersonen.txt";
 		final String dataOutput = "/home/baug/mfeil/data/Zurich10/output_income.txt";
+		final String munStatsOutput = "/home/baug/mfeil/data/Zurich10/mun_stats.txt";
 		final String populationOutput = "/home/baug/mfeil/data/Zurich10/output_plans.xml";
 		
 		
@@ -92,7 +93,7 @@ public class IncomeAttacher {
 		new MatsimWorldReader(scenario.getWorld()).readFile(world);
 
 		IncomeAttacher att = new IncomeAttacher(scenario);
-		att.run(municipalityIncome, agentsEducation, dataOutput, haushalte, zielpersonen, populationOutput);
+		att.run(municipalityIncome, agentsEducation, dataOutput, haushalte, zielpersonen, munStatsOutput, populationOutput);
 		log.info("Process finished.");
 	}
 	
@@ -114,6 +115,7 @@ public class IncomeAttacher {
 			String outputFile, 
 			String haushalte, 
 			String zielpersonen, 
+			String munStatsOutput,
 			String populationOutput){
 		
 		log.info("  parsing additional municipality information... ");
@@ -204,6 +206,7 @@ public class IncomeAttacher {
 		//this.runSimplex(outputFile);
 		this.assignIncome(outputFile);
 	//	this.writePop(populationOutput);
+		this.analyzeMunIncomes(munStatsOutput);
 	}
 	
 	
@@ -215,16 +218,16 @@ public class IncomeAttacher {
 	
 	
 	protected void assignIncome (String outputFile){
-		String outputfile = outputFile;
 		PrintStream stream;
 		try {
-			stream = new PrintStream (new File(outputfile));
+			stream = new PrintStream (new File(outputFile));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;
 		}
 		stream.println("Agent_Id\tMunicipality_Id\tMunicipality income\tEducation\tIncome difference\tBase income\tIncome");
 		Random random = new Random();
+		double incomeTotal = 0;
 		for (Iterator<? extends Person> iterator = this.scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = (PersonImpl) iterator.next();
 			double income = -99;			// Final income dummy
@@ -247,9 +250,41 @@ public class IncomeAttacher {
 			
 			// Application of normal distribution
 			income = baseIncome+(random.nextGaussian()*0.5)*baseIncome;
+			if (income<0) income=0; // no negative incomes
+			incomeTotal+=income;
 			stream.println(person.getId()+"\t"+this.agentsMuns.get(person.getId())+"\t"+this.incomePerMunicipality.get(person.getId())+"\t"+this.education.get(person.getId())+"\t"+incomeDifference+"\t"+baseIncome+"\t"+income);
 			person.getCustomAttributes().put("income", income);
 		}
+		log.info("incomeTotal = "+incomeTotal);
+		stream.println("incomeTotal = "+incomeTotal);
+	}
+	
+	protected void analyzeMunIncomes(String outputFile){
+		log.info("  analyzing municipality incomes after income assignment... ");
+		
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputFile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		stream.println("mun_Id\tmun_income\tagents_ave_income\tdifference");
+		
+		for (Iterator<Municipality> iterator = this.municipalities.getMunicipalities().values().iterator(); iterator.hasNext();){ // = length of table
+			Municipality mun = iterator.next(); 	
+			double totalIncome = 0;
+			double count = 0;
+			for (Iterator<? extends Person> iterator2 = this.scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
+				PersonImpl person = (PersonImpl) iterator2.next();
+				if (mun.getId().equals(this.agentsMuns.get(person.getId()))){
+					totalIncome+=Double.parseDouble(person.getCustomAttributes().get("income").toString());
+					count++;
+				}
+			}
+			stream.println(mun.getId()+"\t"+mun.getIncome()+"\t"+(totalIncome/count)+"\t"+((totalIncome/count)-mun.getIncome()));
+		}
+	
 	}
 	
 	protected void runSimplex (String tableFile){
