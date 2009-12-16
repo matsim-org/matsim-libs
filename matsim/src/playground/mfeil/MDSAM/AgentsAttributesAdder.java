@@ -39,18 +39,18 @@ import org.matsim.core.basic.v01.IdImpl;
 public class AgentsAttributesAdder {
 
 	private static final Logger log = Logger.getLogger(AgentsHighestEducationAdder.class);
-	private Map<Id, Integer> income;
+	private Map<Id, Double> income;
 	private Map<Id, Integer> carAvail;
 	private Map<Id, Integer> seasonTicket;	
 
 
 	public AgentsAttributesAdder() {
-		this.income = new TreeMap<Id, Integer>();
+		this.income = new TreeMap<Id, Double>();
 		this.carAvail = new TreeMap<Id, Integer>();
 		this.seasonTicket = new TreeMap<Id, Integer>();
 	}
 	
-	public void run (final String inputFile){
+	public void runMZ (final String inputFile){
 		
 		log.info("Reading input file...");
 		
@@ -73,7 +73,7 @@ public class AgentsAttributesAdder {
 				
 				// Watch out that the order is equal to the order in the file!
 				token = tokenizer.nextToken();				
-				income.put(new IdImpl(tokenId), (int)(Double.parseDouble(token)*1000));
+				income.put(new IdImpl(tokenId), Double.parseDouble(token)*1000);
 				
 				token = tokenizer.nextToken();				
 				carAvail.put(new IdImpl(tokenId), (int)(Double.parseDouble(token)));
@@ -89,7 +89,41 @@ public class AgentsAttributesAdder {
 		log.info("done...");
 	}	
 	
-	public Map<Id, Integer> getIncome (){
+	public void runZurich10 (final String inputFile){
+		
+		log.info("Reading input file...");
+		
+		try {
+
+			FileReader fr = new FileReader(inputFile);
+			BufferedReader br = new BufferedReader(fr);
+			String line = null;
+			StringTokenizer tokenizer = null;
+			line = br.readLine(); // do not parse first line which just
+									// contains column headers
+			line = br.readLine();
+			String tokenId = null;
+			String token = null;
+			while (line != null) {		
+				
+				tokenizer = new StringTokenizer(line);
+				
+				tokenId = tokenizer.nextToken();
+				
+				// Watch out that the order is equal to the order in the file!
+				token = tokenizer.nextToken();		
+				for (int i=0;i<5;i++) tokenizer.nextToken(); // jump over irrelevant information
+				income.put(new IdImpl(tokenId), Double.parseDouble(token));
+				
+				line = br.readLine();
+			}		
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		log.info("done...");
+	}	
+	
+	public Map<Id, Double> getIncome (){
 		return this.income;
 	}
 	

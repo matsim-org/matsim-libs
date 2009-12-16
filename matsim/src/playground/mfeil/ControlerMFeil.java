@@ -20,11 +20,18 @@
 package playground.mfeil;
 
 
+import java.util.Iterator;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.basic.v01.Id;
+import java.util.Map;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.PlanomatModule;
@@ -34,13 +41,12 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.locationchoice.LocationChoice;
+import org.matsim.world.algorithms.WorldCheck;
 
-import playground.mfeil.MDSAM.ActivityTypeFinder;
-import playground.mfeil.MDSAM.PlansConstructor;
-import playground.mfeil.MDSAM.PlansEvaluator;
-import playground.mfeil.MDSAM.PlansVariatorInitializer;
+import playground.mfeil.MDSAM.*;
 
 
 /**
@@ -48,6 +54,8 @@ import playground.mfeil.MDSAM.PlansVariatorInitializer;
  * Adjusting the Controler in order to call the PlanomatX. Replaces also the StrategyManagerConfigLoader.
  */
 public class ControlerMFeil extends Controler {
+	
+	private static final Logger log = Logger.getLogger(Controler.class);
 	
 	public ControlerMFeil (String [] args){
 		super(args);
@@ -57,13 +65,53 @@ public class ControlerMFeil extends Controler {
 		super(config);
 	}
 	
+	/**
+	 * Load all the required data. Currently, this only calls
+	 * {@link #loadNetwork()} and {@link #loadPopulation()}, if this data was
+	 * not given in the Constructor.
+	 */
+	@Override
+	protected void loadData() {
+		if (!this.scenarioLoaded) {
+			this.loader = new ScenarioLoaderImpl(this.scenarioData);
+			this.loader.loadScenario();
+			this.network = loadNetwork();
+			this.population = loadPopulation();
+			this.scenarioLoaded = true;
+			
+			// loading income data!
+		//	this.loadIncomeData();
+			
+			if (this.getWorld() != null) {
+				new WorldCheck().run(this.getWorld());
+			}
+		}
+	}
+	
+	/* Adds income information to all agents of the scenario */	
+	private void loadIncomeData(){
+		AgentsAttributesAdder adder = new AgentsAttributesAdder();
+		adder.runZurich10("/home/baug/mfeil/data/Zurich10/agents_income.txt");
+		Map<Id, Double> income = adder.getIncome();
+		
+		for (Iterator<? extends Person> iterator = this.scenarioData.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = (PersonImpl) iterator.next();
+			try{
+				person.getCustomAttributes().put("income", income.get(person.getId()));
+			} catch (Exception e) {
+				log.warn("No income information found for agent "+person.getId());
+			}
+		}	
+	}
+	
+	
 	
 		/*
 		 * @return A fully initialized StrategyManager for the plans replanning.
 		 */	
 	
 	@Override
-		protected StrategyManager loadStrategyManager() {
+	protected StrategyManager loadStrategyManager() {
 		
 		final StrategyManager manager = new StrategyManager();	
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
