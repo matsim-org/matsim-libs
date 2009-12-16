@@ -33,13 +33,19 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.evacuation.otfvis.drawer.AgentDrawer;
 import org.matsim.evacuation.otfvis.drawer.OTFBackgroundTexturesDrawer;
+import org.matsim.evacuation.otfvis.drawer.OTFLabelDrawer;
 import org.matsim.evacuation.otfvis.drawer.OTFSheltersDrawer;
 import org.matsim.evacuation.otfvis.drawer.TimeDependentTrigger;
+import org.matsim.evacuation.otfvis.layer.AgentLayer;
+import org.matsim.evacuation.otfvis.layer.LabelLayer;
 import org.matsim.evacuation.otfvis.readerwriter.AgentReader;
 import org.matsim.evacuation.otfvis.readerwriter.AgentWriter;
 import org.matsim.evacuation.otfvis.readerwriter.InundationDataReader;
 import org.matsim.evacuation.otfvis.readerwriter.InundationDataWriter;
+import org.matsim.evacuation.otfvis.readerwriter.LabelReader;
+import org.matsim.evacuation.otfvis.readerwriter.LabelWriter;
 import org.matsim.evacuation.otfvis.readerwriter.PolygonDataReader;
 import org.matsim.evacuation.otfvis.readerwriter.PolygonDataWriter;
 import org.matsim.evacuation.otfvis.readerwriter.SheltersReader;
@@ -85,6 +91,8 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 
 	private final AgentWriter writer = new AgentWriter();
 	private final boolean insertWave = true;
+	
+	private final String label = "run1006: Nash approach";
 
 	public MVISnapshotWriter(final QueueNetwork net, final String vehFileName, final String outFileName, final double intervall_s) {
 		super(intervall_s, net, outFileName);
@@ -125,6 +133,14 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 		for (OTFBackgroundTexturesDrawer sbg : this.sbgs){
 			this.quad.addAdditionalElement(new TextureDataWriter(sbg));
 		}
+		
+		if (this.label != null) {
+			this.quad.addAdditionalElement(new LabelWriter(this.label));
+			connect.add(LabelWriter.class,LabelReader.class);
+			connect.add(LabelReader.class,OTFLabelDrawer.class);
+			connect.add(OTFLabelDrawer.class,LabelLayer.class);
+		}
+		
 		connect.add(PolygonDataWriter.class,PolygonDataReader.class);
 		connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
 		connect.add(SimpleBackgroundDrawer.class, OGLSimpleBackgroundLayer.class);
@@ -134,6 +150,8 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 		
 		
 		connect.add(AgentWriter.class,  AgentReader.class);
+		connect.add(AgentReader.class,AgentDrawer.class);
+		connect.add(AgentDrawer.class,AgentLayer.class);
 	
 //		connect.add(AgentReader.class, AgentReceiver.class);
 		

@@ -13,7 +13,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.evacuation.otfvis.drawer.AgentDrawer;
 import org.matsim.evacuation.otfvis.drawer.OTFBackgroundTexturesDrawer;
+import org.matsim.evacuation.otfvis.layer.AgentLayer;
 import org.matsim.evacuation.otfvis.readerwriter.AgentReader;
 import org.matsim.evacuation.otfvis.readerwriter.AgentWriter;
 import org.matsim.evacuation.otfvis.readerwriter.PolygonDataReader;
@@ -76,9 +78,12 @@ public class Controller2D extends Controler {
 			e1.printStackTrace();
 		}
 		
+		
 		this.agentWriter = new AgentWriter();
 		this.myOTFServer.addAdditionalElement(this.agentWriter);
 		this.connectionManager.add(AgentWriter.class,  AgentReader.class);
+		this.connectionManager.add(AgentReader.class,  AgentDrawer.class);
+		this.connectionManager.add( AgentDrawer.class, AgentLayer.class);
 		
 		this.forceArrowWriter = new ForceArrowWriter();
 		this.myOTFServer.addAdditionalElement(this.forceArrowWriter);
