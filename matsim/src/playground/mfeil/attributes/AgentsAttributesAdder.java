@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mfeil.MDSAM;
+package playground.mfeil.attributes;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -28,6 +28,7 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+
 
 
 
@@ -111,8 +112,8 @@ public class AgentsAttributesAdder {
 				tokenId = tokenizer.nextToken();
 				
 				// Watch out that the order is equal to the order in the file!
-				token = tokenizer.nextToken();		
 				for (int i=0;i<5;i++) tokenizer.nextToken(); // jump over irrelevant information
+				token = tokenizer.nextToken();		
 				income.put(new IdImpl(tokenId), Double.parseDouble(token));
 				
 				line = br.readLine();

@@ -47,6 +47,7 @@ import org.matsim.locationchoice.LocationChoice;
 import org.matsim.world.algorithms.WorldCheck;
 
 import playground.mfeil.MDSAM.*;
+import playground.mfeil.attributes.AgentsAttributesAdder;
 
 
 /**

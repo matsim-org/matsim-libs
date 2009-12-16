@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mfeil.MDSAM;
+package playground.mfeil.attributes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +44,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.api.core.v01.population.Person;
 import playground.balmermi.census2000.data.Municipality;
 import playground.balmermi.census2000.data.Municipalities;
+
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.apache.commons.math.optimization.linear.*;
@@ -225,9 +226,56 @@ public class IncomeAttacher {
 			e.printStackTrace();
 			return;
 		}
-		stream.println("Agent_Id\tMunicipality_Id\tMunicipality income\tEducation\tIncome difference\tBase income\tIncome");
+		stream.println("Agent_Id\tMunicipality_Id\tMunicipality_income\tEducation\tMun_factor\tAdjusted_income\tIncome");
 		Random random = new Random();
-		double incomeTotal = 0;
+		
+		Map<Id, double[]> muns = new HashMap<Id, double[]>(); // {count, income, differenceToMove}
+		for (Iterator<? extends Person> iterator = this.scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = (PersonImpl) iterator.next();
+			
+			// Retrieve average income differences. Match between tables is as follows:
+			// 1=-8; 1=-9; 2=11; 2=12; 3=21; 4=21; 5=22; 5=23; 6=31; 7=32; 7=33; 8=34; 9=-7; 10=1
+			if (this.education.get(person.getId())==11 || this.education.get(person.getId())==12) person.getCustomAttributes().put("income", this.incomePerEducation.get(2)[0]);
+			else if (this.education.get(person.getId())==21) person.getCustomAttributes().put("income", (this.incomePerEducation.get(3)[0]+this.incomePerEducation.get(4)[0])/2);
+			else if (this.education.get(person.getId())==22 || this.education.get(person.getId())==23) person.getCustomAttributes().put("income", this.incomePerEducation.get(5)[0]);
+			else if (this.education.get(person.getId())==31) person.getCustomAttributes().put("income", this.incomePerEducation.get(6)[0]);
+			else if (this.education.get(person.getId())==32 || this.education.get(person.getId())==33) person.getCustomAttributes().put("income", this.incomePerEducation.get(7)[0]);
+			else if (this.education.get(person.getId())==34) person.getCustomAttributes().put("income", this.incomePerEducation.get(8)[0]);
+			else if (this.education.get(person.getId())==-7 || this.education.get(person.getId())==1) person.getCustomAttributes().put("income", this.incomePerEducation.get(9)[0]);
+			else if (this.education.get(person.getId())==-8 || this.education.get(person.getId())==-9) person.getCustomAttributes().put("income", this.incomePerEducation.get(1)[0]);
+			else log.warn("No valid education match possible for agent "+person.getId()+" with education "+this.education.get(person.getId()));
+		
+			if (muns.containsKey(this.agentsMuns.get(person.getId()))){
+				muns.get(this.agentsMuns.get(person.getId()))[0]+=1.0;
+				muns.get(this.agentsMuns.get(person.getId()))[1]+=Double.parseDouble(person.getCustomAttributes().get("income").toString());
+			}
+			else {
+				muns.put(this.agentsMuns.get(person.getId()), new double[]{1,Double.parseDouble(person.getCustomAttributes().get("income").toString()),0});
+			}
+		}
+		
+		// Compare average agents income after education with average municipality income and find out difference
+		for (Iterator<Id> iterator = muns.keySet().iterator(); iterator.hasNext();){
+			Id id = iterator.next();
+			muns.get(id)[2]=muns.get(id)[1]/muns.get(id)[0]-this.municipalities.getMunicipality(id).getIncome();
+		}
+		
+		// Adjust agent's income according to the municipality information and apply normal distribution
+		for (Iterator<? extends Person> iterator = this.scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = (PersonImpl) iterator.next();
+			double incomeAdjusted = Double.parseDouble(person.getCustomAttributes().get("income").toString())+muns.get(this.agentsMuns.get(person.getId()))[2];
+			
+			// Application of normal distribution
+			double income = incomeAdjusted+(random.nextGaussian()*0.5)*incomeAdjusted;
+			if (income<0) income=0; // no negative incomes
+			
+			person.getCustomAttributes().clear();
+			person.getCustomAttributes().put("income", income);
+			stream.println(person.getId()+"\t"+this.agentsMuns.get(person.getId())+"\t"+this.incomePerMunicipality.get(person.getId())+"\t"+this.education.get(person.getId())+"\t"+muns.get(this.agentsMuns.get(person.getId()))[2]+"\t"+incomeAdjusted+"\t"+income);
+		}
+		
+		
+		/*
 		for (Iterator<? extends Person> iterator = this.scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = (PersonImpl) iterator.next();
 			double income = -99;			// Final income dummy
@@ -254,9 +302,8 @@ public class IncomeAttacher {
 			incomeTotal+=income;
 			stream.println(person.getId()+"\t"+this.agentsMuns.get(person.getId())+"\t"+this.incomePerMunicipality.get(person.getId())+"\t"+this.education.get(person.getId())+"\t"+incomeDifference+"\t"+baseIncome+"\t"+income);
 			person.getCustomAttributes().put("income", income);
-		}
-		log.info("incomeTotal = "+incomeTotal);
-		stream.println("incomeTotal = "+incomeTotal);
+		}*/
+
 	}
 	
 	protected void analyzeMunIncomes(String outputFile){
@@ -271,18 +318,20 @@ public class IncomeAttacher {
 		}
 		stream.println("mun_Id\tmun_income\tagents_ave_income\tdifference");
 		
-		for (Iterator<Municipality> iterator = this.municipalities.getMunicipalities().values().iterator(); iterator.hasNext();){ // = length of table
-			Municipality mun = iterator.next(); 	
-			double totalIncome = 0;
-			double count = 0;
-			for (Iterator<? extends Person> iterator2 = this.scenario.getPopulation().getPersons().values().iterator(); iterator2.hasNext();){
-				PersonImpl person = (PersonImpl) iterator2.next();
-				if (mun.getId().equals(this.agentsMuns.get(person.getId()))){
-					totalIncome+=Double.parseDouble(person.getCustomAttributes().get("income").toString());
-					count++;
-				}
+		Map<Id, double[]> muns = new HashMap<Id, double[]>();
+		for (Iterator<? extends Person> iterator2 = this.scenario.getPopulation().getPersons().values().iterator(); iterator2.hasNext();){
+			PersonImpl person = (PersonImpl) iterator2.next();
+			if (muns.containsKey(this.agentsMuns.get(person.getId()))){
+				muns.get(this.agentsMuns.get(person.getId()))[0]+=1.0;
+				muns.get(this.agentsMuns.get(person.getId()))[1]+=Double.parseDouble(person.getCustomAttributes().get("income").toString());
 			}
-			stream.println(mun.getId()+"\t"+mun.getIncome()+"\t"+(totalIncome/count)+"\t"+((totalIncome/count)-mun.getIncome()));
+			else {
+				muns.put(this.agentsMuns.get(person.getId()), new double[]{1,Double.parseDouble(person.getCustomAttributes().get("income").toString())});
+			}
+		}
+		for (Iterator<Id> iterator = muns.keySet().iterator(); iterator.hasNext();){
+			Id id = iterator.next();
+			stream.println(id+"\t"+this.municipalities.getMunicipality(id).getIncome()+"\t"+muns.get(id)[1]/muns.get(id)[0]+"\t"+(muns.get(id)[1]/muns.get(id)[0]-this.municipalities.getMunicipality(id).getIncome()));
 		}
 	
 	}

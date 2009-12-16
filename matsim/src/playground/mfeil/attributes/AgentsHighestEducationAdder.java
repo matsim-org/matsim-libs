@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mfeil.MDSAM;
+package playground.mfeil.attributes;
 
 import java.util.Iterator;
 import java.util.Map;
