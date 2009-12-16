@@ -59,18 +59,18 @@ public class MZReader {
 				
 				mzTrip.setHome(coordHome);
 
-				mzTrip.setWmittel(entries[53].trim());
-				mzTrip.setWzweck2(entries[55].trim());
+				mzTrip.setWmittel(entries[52].trim());
+				mzTrip.setWzweck2(entries[54].trim());
 			
-				if (entries[56].trim().equals("4")) {
+				if (entries[55].trim().equals("4")) {
 					mzTrip.setPurposeCode(entries[45].trim());
 					mzTrip.setPurpose("shop");
 				}
-				else if (entries[56].trim().equals("8")) {
+				else if (entries[55].trim().equals("8")) {
 					mzTrip.setPurposeCode(entries[44].trim());
 					mzTrip.setPurpose("leisure");
 				}
-				else if (entries[56].trim().equals("2")) {
+				else if (entries[55].trim().equals("2")) {
 					mzTrip.setPurpose("work");
 					if (mzTrip.getWzweck2().equals("1")) {
 						mzTrip.setPurposeCode("1");
@@ -80,7 +80,7 @@ public class MZReader {
 					}
 				}
 				// education
-				else if (entries[56].trim().equals("3")) {
+				else if (entries[55].trim().equals("3")) {
 					mzTrip.setPurpose("education");
 					if (mzTrip.getWzweck2().equals("1")) {
 						mzTrip.setPurposeCode("1");
@@ -90,7 +90,7 @@ public class MZReader {
 					}
 				}
 				else {
-					mzTrip.setPurposeCode(entries[56].trim());
+					mzTrip.setPurposeCode(entries[55].trim());
 					mzTrip.setPurpose("null");	
 				}
 				this.mzTrips.add(mzTrip);	
