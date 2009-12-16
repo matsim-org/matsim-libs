@@ -62,6 +62,7 @@ import org.matsim.population.algorithms.XY2Links;
 import playground.mfeil.ActChainEqualityCheck;
 import playground.mfeil.analysis.ASPActivityChainsModes;
 import playground.mfeil.analysis.ASPActivityChainsModesAccumulated;
+import playground.mfeil.attributes.AgentsAttributesAdder;
 
 
 
@@ -363,7 +364,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		}
 		java.util.Collections.sort(ranking);
 		for (int i=0;i<ac.size();i++){
-			if (ac.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-40,0))  &&
+			if ((ac.get(i).size()>=ranking.get(java.lang.Math.max(ranking.size()-40,0)))  &&
 				!this.actChains.contains(ac.get(i))	){ 
 				this.actChains.add(ac.get(i));
 				for (Iterator<Plan> iterator = pl.get(i).iterator(); iterator.hasNext();){
@@ -422,7 +423,7 @@ public class PlansConstructor implements PlanStrategyModule{
 							ActivityImpl act = new ActivityImpl((ActivityImpl)this.actChains.get(i).get(j));
 							if (/*j!=0 && */j!=this.actChains.get(i).size()-1) {
 								act.setEndTime(MatsimRandom.getRandom().nextDouble()*act.getDuration()*2+act.getStartTime());
-								if (j!=0 && !act.getType().equalsIgnoreCase("h")) {
+								if ((j!=0) && !act.getType().equalsIgnoreCase("h")) {
 									this.modifyLocationCoord(act);
 								}
 								else if (act.getType().equalsIgnoreCase("h")) {
@@ -729,7 +730,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			for (Plan plan : person.getPlans()){
 				
 				// Plan not executable, drop from choice set
-				if (plan.getScore()!=null && plan.getScore()==-100000.0)	stream.print(0+"\t");
+				if ((plan.getScore()!=null) && (plan.getScore()==-100000.0))	stream.print(0+"\t");
 				
 				// Plan executable
 				else stream.print(1+"\t");
@@ -1100,7 +1101,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.bikeIn=bikeIn;
 		
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
-		AgentsAttributesAdder aaa = new AgentsAttributesAdder ();
+		AgentsAttributesAdder aaa = null;//new AgentsAttributesAdder ();
 		int incomeAverage=0;
 		int noOfGA = 0;
 		int noOfHalbtax = 0;
@@ -1279,7 +1280,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			}			
 			
 			// Check whether the selected plan of the person is valid. Drop the person, otherwise
-			if (person.getSelectedPlan().getScore()!=null && person.getSelectedPlan().getScore()==-100000.0){
+			if ((person.getSelectedPlan().getScore()!=null) && (person.getSelectedPlan().getScore()==-100000.0)){
 				log.warn("Person's "+person.getId()+" selected plan is not valid. Dropping the person.");
 				continue;
 			}
@@ -1291,7 +1292,7 @@ public class PlansConstructor implements PlanStrategyModule{
 					travelCostPt = this.costPtNothing; 
 					noOfNothing++;
 				}
-				else if (aaa.getSeasonTicket().get(person.getId())==2 || aaa.getSeasonTicket().get(person.getId())==3) { // GA
+				else if ((aaa.getSeasonTicket().get(person.getId())==2) || (aaa.getSeasonTicket().get(person.getId())==3)) { // GA
 					travelCostPt = this.costPtGA; 
 					noOfGA++;
 				}
@@ -1464,7 +1465,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				boolean found = false;
 				for (int j=0;j<person.getPlans().size();j++){
 					if (acCheck.checkEqualActChainsModesAccumulated(person.getPlans().get(j).getPlanElements(), this.actChains.get(i))) {
-						if (person.getPlans().get(j).getScore()!=null && person.getPlans().get(j).getScore()==-100000.0) {
+						if ((person.getPlans().get(j).getScore()!=null) && (person.getPlans().get(j).getScore()==-100000.0)) {
 							stream.print(0+"\t");
 							counterRow++;
 							invalid++;
@@ -1513,7 +1514,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			int j=0;
 			for (j =0;j<java.lang.Math.max(p.getPlans().get(i).getPlanElements().size()-1,1);j++){//act/mode attributes
 				stream.print("x"+(i+1)+""+(j+1)+"\t");
-				if (j!=0 && j%2==0)stream.print("x"+(i+1)+""+(j+1)+"_1\t");
+				if ((j!=0) && (j%2==0))stream.print("x"+(i+1)+""+(j+1)+"_1\t");
 			}
 			stream.print("x"+(i+1)+""+(j+1)+"\t");//Sim
 		}
@@ -1596,7 +1597,7 @@ public class PlansConstructor implements PlanStrategyModule{
 			for (Plan plan : person.getPlans()) {
 				
 				// Plan not executable, drop from choice set
-				if (plan.getScore()!=null && plan.getScore()==-100000.0)	stream.print(0+"\t");
+				if ((plan.getScore()!=null) && (plan.getScore()==-100000.0))	stream.print(0+"\t");
 				
 				// Plan executable
 				else stream.print(1+"\t");
@@ -1800,7 +1801,7 @@ public class PlansConstructor implements PlanStrategyModule{
 				counter++;
 				
 			}
-			if (bike>0 && this.bikeIn.equals("yes")){
+			if ((bike>0) && this.bikeIn.equals("yes")){
 				stream.print(bike_time+"\t");
 				counter++;
 				if (this.travelDistance.equals("yes")){
