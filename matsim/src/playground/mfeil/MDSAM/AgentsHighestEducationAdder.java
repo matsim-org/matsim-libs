@@ -57,6 +57,9 @@ public class AgentsHighestEducationAdder {
 
 	public AgentsHighestEducationAdder() {
 		this.education = new TreeMap<Id, Integer>();
+		this.zielperson = new TreeMap<Id, Integer>();
+		this.haushaltseinkommen = new TreeMap<Id, Integer>();
+		this.averageIncome = new TreeMap<Integer, double[]>();
 	}
 	
 	public void runHighestEducation (final String inputFile){
@@ -122,7 +125,7 @@ public class AgentsHighestEducationAdder {
 		log.info("done...");
 	}	
 	
-	public void runIncomePerEducation (final String zielpersonen, String haushalte){
+	public void runIncomePerEducation (final String haushalte, String zielpersonen){
 		
 		log.info("Reading input file "+zielpersonen+"...");
 		int counter =0;
@@ -137,14 +140,13 @@ public class AgentsHighestEducationAdder {
 			line = br.readLine();
 			String tokenId = null;
 			String token = null;
-
+			 
 			while (line != null) {		
-				tokenizer = new StringTokenizer(line);
-				
+				counter++;
+				tokenizer = new StringTokenizer(line);				
 				tokenId = tokenizer.nextToken();
-				for (int i=0;i<14;i++) tokenizer.nextToken();
 				token = tokenizer.nextToken();		
-				log.info("1st tokenId = "+tokenId+" and token = "+token);
+				if (counter<10) log.info("1st tokenId = "+tokenId+" and token = "+token);
 				this.zielperson.put(new IdImpl(tokenId), (Integer.parseInt(token)));
 				
 				line = br.readLine();
@@ -152,6 +154,7 @@ public class AgentsHighestEducationAdder {
 		} catch (Exception ex) {
 			log.warn(ex +" at line "+ counter);
 		}
+		counter = 0;
 		try {
 
 			FileReader fr = new FileReader(haushalte);
@@ -164,13 +167,12 @@ public class AgentsHighestEducationAdder {
 			String tokenId = null;
 			String token = null;
 
-			while (line != null) {		
-				tokenizer = new StringTokenizer(line);
-				
+			while (line != null) {	
+				counter++;
+				tokenizer = new StringTokenizer(line);				
 				tokenId = tokenizer.nextToken();
-				for (int i=0;i<50;i++) tokenizer.nextToken();
 				token = tokenizer.nextToken();		
-				log.info("2nd tokenId = "+tokenId+" and token = "+token);
+				if (counter<10) log.info("2nd tokenId = "+tokenId+" and token = "+token);
 				int index = Integer.parseInt(token);
 				int income = -1;
 				if (index == 1) income = 1000;
@@ -194,25 +196,37 @@ public class AgentsHighestEducationAdder {
 		this.averageIncome = new TreeMap<Integer, double[]>();
 		int countTotal = 0;
 		double inTotal = 0;
+		int countFailure = 0;
 		for (int i=1;i<10;i++){
+			if (i==9){
+				this.averageIncome.put(i, new double[]{0,0}); // {education type's average income, difference with overall's average income}
+				log.info("No income information available for type "+i);
+				continue;
+			}
 			int count=0;
 			double in=0;
 			for (Iterator<Id> iterator = this.zielperson.keySet().iterator(); iterator.hasNext();){
 				Id id = iterator.next();
 				int value = this.zielperson.get(id);
 				if (value==i){
-					count++;
-					countTotal++;
-					in+=this.haushaltseinkommen.get(id);
-					inTotal+=this.haushaltseinkommen.get(id);
+					if (this.haushaltseinkommen.containsKey(id)){
+						count++;
+						countTotal++;
+						in+=this.haushaltseinkommen.get(id);
+						inTotal+=this.haushaltseinkommen.get(id);
+					}
+					else countFailure++;
 				}
 			}
-			this.averageIncome.put(i, new double[]{in/count,-99});
+			this.averageIncome.put(i, new double[]{in/count,-99}); // {education type's average income, difference with overall's average income}
+			log.info("Average income for type "+i+" is "+this.averageIncome.get(i)[0]);
 		}
-		this.averageIncome.put(99, new double[]{inTotal/countTotal,0});
-		for (int i=1;i<10;i++){
+		this.averageIncome.put(99, new double[]{inTotal/countTotal,0}); // {overall's average income, 0}
+		for (int i=1;i<9;i++){
 			this.averageIncome.get(i)[1]=this.averageIncome.get(i)[0]-(inTotal/countTotal);
+			log.info("Income difference for type "+i+" is "+this.averageIncome.get(i)[1]);
 		}
+		log.info(countFailure+" failures to match income and education.");
 		log.info("done...");
 	}	
 	

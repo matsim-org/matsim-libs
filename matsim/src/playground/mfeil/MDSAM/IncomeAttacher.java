@@ -35,6 +35,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.world.Layer;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.api.basic.v01.Id;
@@ -63,15 +64,17 @@ public class IncomeAttacher {
 		log.info("Process started...");
 		
 		
-		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
-		final String worldFilename = "/home/baug/mfeil/data/Zurich10/world.xml";
-		final String worldAddFilename = "/home/baug/mfeil/data/Zurich10/gg25_2001_infos.txt";
-		final String highestEducationFilename = "/home/baug/mfeil/data/Zurich10/highestEducCensus2000.txt";
-		final String networkFilename = "/home/baug/mfeil/data/Zurich10/network.xml";
-		final String populationFilename = "/home/baug/mfeil/data/Zurich10/plans.xml";
-		final String outputFilename = "/home/baug/mfeil/data/Zurich10/table.xls";
-		final String haushalteFilename = "/home/baug/mfeil/data/Zurich10/Haushalte.dat";
-		final String zielpersonenFilename = "/home/baug/mfeil/data/Zurich10/Zielpersonen.dat";
+		final String facilities = "/home/baug/mfeil/data/Zurich10/facilities.xml";
+		final String world = "/home/baug/mfeil/data/Zurich10/world.xml";
+		final String municipalityIncome = "/home/baug/mfeil/data/Zurich10/gg25_2001_infos.txt";
+		final String agentsEducation = "/home/baug/mfeil/data/Zurich10/highestEducCensus2000.txt";
+		final String network = "/home/baug/mfeil/data/Zurich10/network.xml";
+		final String populationInput = "/home/baug/mfeil/data/Zurich10/plans.xml";
+		final String haushalte = "/home/baug/mfeil/data/Zurich10/Haushalte.txt";
+		final String zielpersonen = "/home/baug/mfeil/data/Zurich10/Zielpersonen.txt";
+		final String dataOutput = "/home/baug/mfeil/data/Zurich10/output_income.txt";
+		final String populationOutput = "/home/baug/mfeil/data/Zurich10/output_plans.xml";
+		
 		
 		/*
 		final String populationFilename = "./plans/output_plans.xml";
@@ -83,41 +86,45 @@ public class IncomeAttacher {
 		*/				
 		
 		ScenarioImpl scenario = new ScenarioImpl();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
-		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
-		new MatsimPopulationReader(scenario).readFile(populationFilename);
-		new MatsimWorldReader(scenario.getWorld()).readFile(worldFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(network);
+		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilities);
+		new MatsimPopulationReader(scenario).readFile(populationInput);
+		new MatsimWorldReader(scenario.getWorld()).readFile(world);
 
 		IncomeAttacher att = new IncomeAttacher(scenario);
-		att.run(worldAddFilename, highestEducationFilename, outputFilename, haushalteFilename, zielpersonenFilename);
+		att.run(municipalityIncome, agentsEducation, dataOutput, haushalte, zielpersonen, populationOutput);
 		log.info("Process finished.");
 	}
 	
 	private static final Logger log = Logger.getLogger(IncomeAttacher.class);
-	private HashMap<Id,Double> income;
 	private ScenarioImpl scenario;
 	private Municipalities municipalities;
-	private Map<Id, Integer> education;
-	private Map<Integer, double[]> incomePerEducation;
-	private HashMap<Id,Id> agentsMuns;
-
+	private Map<Id, Integer> education;					// stores an agent's education level
+	private Map<Integer, double[]> incomePerEducation;	// stores the average income and the average income difference from overall's income for the education levels
+	private HashMap<Id,Id> agentsMuns;					// stores an agent's municipality he lives in
+	private HashMap<Id,Double> incomePerMunicipality;	// stores an agent's income according to his municipality income
 	
 	public IncomeAttacher (ScenarioImpl scenario){
 		this.scenario = scenario;
 	}
 	
 	
-	private void run (String worldAddFile, String educationFile, String outputFile, String haushalte, String zielpersonen){
+	private void run (String municipalityIncome, 
+			String agentsEducation, 
+			String outputFile, 
+			String haushalte, 
+			String zielpersonen, 
+			String populationOutput){
 		
 		log.info("  parsing additional municipality information... ");
-		this.municipalities = new Municipalities(worldAddFile);
+		this.municipalities = new Municipalities(municipalityIncome);
 		Layer municipalityLayer = scenario.getWorld().getLayer(new IdImpl(Municipalities.MUNICIPALITY));
 		this.municipalities.parse(municipalityLayer);
 		log.info("  done.");
 		
 		log.info("  parsing education information... ");
 		AgentsHighestEducationAdder adder = new AgentsHighestEducationAdder();
-		adder.runHighestEducation(educationFile);
+		adder.runHighestEducation(agentsEducation);
 		this.education = adder.getEducation();
 		log.info("  done.");
 		
@@ -138,7 +145,7 @@ public class IncomeAttacher {
 		}
 		//stream.println("AgentID\tEducation\tMunicipalityID\tAverageIncome\tIndividualIncome");		
 		
-		this.income = new HashMap<Id,Double>();
+		this.incomePerMunicipality = new HashMap<Id,Double>();
 		this.agentsMuns = new HashMap<Id,Id>();
 		int doubleListings = 0;
 		int noListing =0;
@@ -177,18 +184,18 @@ public class IncomeAttacher {
 					}
 				}
 				this.agentsMuns.put(person.getId(), munAtts.get(position));
-				this.income.put(person.getId(), this.municipalities.getMunicipality(munAtts.get(position)).getIncome());
+				this.incomePerMunicipality.put(person.getId(), this.municipalities.getMunicipality(munAtts.get(position)).getIncome());
 				
 			}
 			else if (munAtts.size()== 0){
 				noListing++;
 				log.warn("Agent "+person.getId()+" without valid home zone. This may never happen!");
 				this.agentsMuns.put(person.getId(), new IdImpl (-1));
-				this.income.put(person.getId(), -1.0);
+				this.incomePerMunicipality.put(person.getId(), -1.0);
 			}
 			else {
 				this.agentsMuns.put(person.getId(), munAtts.get(0));
-				this.income.put(person.getId(), this.municipalities.getMunicipality(munAtts.get(0)).getIncome());
+				this.incomePerMunicipality.put(person.getId(), this.municipalities.getMunicipality(munAtts.get(0)).getIncome());
 			}
 			
 			//stream.println(person.getId()+"\t"+this.education.get(person.getId())+"\t"+listings.get(person.getId())+"\t"+income.get(person.getId()));
@@ -196,7 +203,16 @@ public class IncomeAttacher {
 		log.info(agentsMuns.size()+" agents in the scenario. Thereof "+doubleListings+" with double-listings and "+noListing+" with no-listings.");
 		//this.runSimplex(outputFile);
 		this.assignIncome(outputFile);
+	//	this.writePop(populationOutput);
 	}
+	
+	
+	protected void writePop(String populationOutput){
+		log.info("Writing plans...");
+		new PopulationWriter(this.scenario.getPopulation()).writeFile(populationOutput);
+		log.info("done.");
+	}
+	
 	
 	protected void assignIncome (String outputFile){
 		String outputfile = outputFile;
@@ -207,7 +223,7 @@ public class IncomeAttacher {
 			e.printStackTrace();
 			return;
 		}
-		stream.println("Agent_Id\tMunicipality income\tIncome difference\tBase income\tIncome");
+		stream.println("Agent_Id\tMunicipality_Id\tMunicipality income\tEducation\tIncome difference\tBase income\tIncome");
 		Random random = new Random();
 		for (Iterator<? extends Person> iterator = this.scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = (PersonImpl) iterator.next();
@@ -216,22 +232,23 @@ public class IncomeAttacher {
 			double incomeDifference = -99;	// Education income difference dummy
 			
 			// Retrieve average income differences. Match between tables is as follows:
-			// 2=11; 2=12; 3=21; 4=21; 5=22; 5=23; 6=31; 7=32; 7=33; 8=34; 9=-7; 1=-8; 1=-9
+			// 1=-8; 1=-9; 2=11; 2=12; 3=21; 4=21; 5=22; 5=23; 6=31; 7=32; 7=33; 8=34; 9=-7; 10=1
 			if (this.education.get(person.getId())==11 || this.education.get(person.getId())==12) incomeDifference=this.incomePerEducation.get(2)[1];
 			else if (this.education.get(person.getId())==21) incomeDifference= (this.incomePerEducation.get(3)[1]+this.incomePerEducation.get(4)[1])/2;
 			else if (this.education.get(person.getId())==22 || this.education.get(person.getId())==23) incomeDifference=this.incomePerEducation.get(5)[1];
 			else if (this.education.get(person.getId())==31) incomeDifference= this.incomePerEducation.get(6)[1];
 			else if (this.education.get(person.getId())==32 || this.education.get(person.getId())==33) incomeDifference=this.incomePerEducation.get(7)[1];
 			else if (this.education.get(person.getId())==34) incomeDifference= this.incomePerEducation.get(8)[1];
-			else if (this.education.get(person.getId())==-7) incomeDifference= this.incomePerEducation.get(9)[1];
-			else if (this.education.get(person.getId())==-8 || this.education.get(person.getId())==9) incomeDifference=this.incomePerEducation.get(1)[1];
+			else if (this.education.get(person.getId())==-7 || this.education.get(person.getId())==1) incomeDifference= this.incomePerEducation.get(9)[1];
+			else if (this.education.get(person.getId())==-8 || this.education.get(person.getId())==-9) incomeDifference=this.incomePerEducation.get(1)[1];
 			else log.warn("No valid education match possible for agent "+person.getId()+" with education "+this.education.get(person.getId()));
 			
-			baseIncome = this.income.get(person.getId())+incomeDifference;
+			baseIncome = this.incomePerMunicipality.get(person.getId())+incomeDifference;
 			
 			// Application of normal distribution
-			income = random.nextGaussian()*baseIncome;
-			stream.println(person.getId()+"\t"+this.income.get(person.getId())+"\t"+incomeDifference+"\t"+baseIncome+"\t"+income);
+			income = baseIncome+(random.nextGaussian()*0.5)*baseIncome;
+			stream.println(person.getId()+"\t"+this.agentsMuns.get(person.getId())+"\t"+this.incomePerMunicipality.get(person.getId())+"\t"+this.education.get(person.getId())+"\t"+incomeDifference+"\t"+baseIncome+"\t"+income);
+			person.getCustomAttributes().put("income", income);
 		}
 	}
 	
@@ -249,18 +266,18 @@ public class IncomeAttacher {
 		
 		// length of table
 		ArrayList<int[]> index = new ArrayList<int[]>();
-		int count = 0;
 		for (Iterator<Municipality> iterator = this.municipalities.getMunicipalities().values().iterator(); iterator.hasNext();){ // = length of table
 			Municipality mun = iterator.next(); 	
-			index.add(new int[]{Integer.parseInt(mun.getId().toString()),0,0,0,0,0,0,0,0,0,0,0,0,0,0});
-			count++;
+			index.add(new int[]{Integer.parseInt(mun.getId().toString()),0,0,0,0,0,0,0,0,0,0,0,0,0,0}); // mun_id, row_total, 13 education x
 		}
 		
 		// count through the number of education types and inhabitants per municipality
+		int count = 0;
+		int failures = 0;
 		for (Iterator<Id> iterator = this.agentsMuns.keySet().iterator(); iterator.hasNext();){
 			Id id = iterator.next(); 
 			count=0;
-			while (Integer.parseInt(this.agentsMuns.get(id).toString())!=index.get(count)[0]){
+			while ((Integer.parseInt(this.agentsMuns.get(id).toString()))!=index.get(count)[0]){
 				count++;
 			}
 			if (this.education.get(id)==11) {
@@ -296,15 +313,15 @@ public class IncomeAttacher {
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==34) {
-				index.get(count)[10]+=0; // Universität
+				index.get(count)[10]+=1; // Universität
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==-7) {
-				index.get(count)[11]+=0; // Ohne Angabe
+				index.get(count)[11]+=1; // Ohne Angabe
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==-8) {
-				index.get(count)[12]+=0; // Keine Ausbildung
+				index.get(count)[12]+=1; // Keine Ausbildung
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==-9) {
@@ -317,10 +334,10 @@ public class IncomeAttacher {
 			}
 			else {
 				log.warn("No education information found for agent "+id+" with education = "+this.education.get(id));
-				count++;
+				failures++;
 			}
 		}
-		log.info(count+" unidentified education cases.");
+		log.info(failures+" unidentified education cases.");
 		
 		// remove "0" rows
 		for (int i = index.size()-1;i>=0;i--){
@@ -329,7 +346,7 @@ public class IncomeAttacher {
 			}
 		}
 		
-		// breadth of table
+		// table
 		ArrayList<double[]> table = new ArrayList<double[]>();
 		for (int i=0;i<index.size();i++){
 			double[] consCoef = new double[index.size() + 13];// 13 education types x + 1 variable y per row 
@@ -368,12 +385,9 @@ public class IncomeAttacher {
 		stream.println("Municipality\t11\t12\t21\t22\t23\t31\t32\t33\t34\t-7\t-8\t-9\t1\tIncome\tCoefficient\tRowTotal");
 		for (int i=0;i<index.size();i++){
 			stream.print(index.get(i)[0]+"\t");
-			stream.print(table.get(i)[2]+"\t"+table.get(i)[3]+"\t"+table.get(i)[4]+"\t"+table.get(i)[5]+"\t"+
-					table.get(i)[6]+"\t"+table.get(i)[7]+"\t"+table.get(i)[8]+"\t"+table.get(i)[9]+"\t"+
-					table.get(i)[10]+"\t"+table.get(i)[11]+"\t"+table.get(i)[12]+"\t"+table.get(i)[13]+"\t"+
-					table.get(i)[14]+"\t");
+			for (int j=0;j<13;j++) stream.print(table.get(i)[j]+"\t");
 			stream.print(this.municipalities.getMunicipality(index.get(i)[0]).getIncome()+"\t");
-			stream.print(table.get(i)[i+13]+"\t");
+			stream.print(coefficients[i+13]+"\t");
 			stream.println(index.get(i)[1]);
 		}
 		
@@ -381,7 +395,9 @@ public class IncomeAttacher {
 		// Running the simplex
 		RealPointValuePair result = new RealPointValuePair(new double[]{0.0},0.0); // Dummy initialization
 		try{
-			result = new SimplexSolver().optimize(f, constraints, goalType, true) ;
+			SimplexSolver solver = new SimplexSolver(); 
+			solver.setMaxIterations(1000);
+			result = solver.optimize(f, constraints, goalType, true) ;
 		}
 		catch (OptimizationException e)	{
 			log.warn("Error in optimization: "+e);	
