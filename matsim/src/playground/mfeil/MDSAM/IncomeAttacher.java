@@ -275,7 +275,7 @@ public class IncomeAttacher {
 			Municipality mun = iterator.next(); 	
 			double totalIncome = 0;
 			double count = 0;
-			for (Iterator<? extends Person> iterator2 = this.scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
+			for (Iterator<? extends Person> iterator2 = this.scenario.getPopulation().getPersons().values().iterator(); iterator2.hasNext();){
 				PersonImpl person = (PersonImpl) iterator2.next();
 				if (mun.getId().equals(this.agentsMuns.get(person.getId()))){
 					totalIncome+=Double.parseDouble(person.getCustomAttributes().get("income").toString());
