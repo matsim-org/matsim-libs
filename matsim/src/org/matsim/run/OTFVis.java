@@ -35,7 +35,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
@@ -173,29 +172,24 @@ public class OTFVis {
 
 	public static final void playConfig(final String[] args) {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(args[0]);
-
 		log.info("Complete config dump:");
 		StringWriter writer = new StringWriter();
 		new ConfigWriter(loader.getScenario().getConfig()).writeStream(new PrintWriter(writer));
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
-		
 		loader.loadScenario();
 		ScenarioImpl scenario = loader.getScenario();
 		EventsManagerImpl events = new EventsManagerImpl();
-
-		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
-		client.run();
+		OTFVisQueueSim queueSimulation = new OTFVisQueueSim(scenario, events);
+		queueSimulation.run();
 	}
 	
 	public static final void playNetwork(final String[] args) {
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
-		PopulationImpl population = scenario.getPopulation();
 		EventsManagerImpl events = new EventsManagerImpl();
-		
-		OTFVisQueueSim client = new OTFVisQueueSim(scenario, events);
-		client.run();
+		OTFVisQueueSim queueSimulation = new OTFVisQueueSim(scenario, events);
+		queueSimulation.run();
 	}
 
 	public static final void convert(final String[] args) {
@@ -211,11 +205,10 @@ public class OTFVis {
 		if (args.length == 5) {
 			snapshotPeriod = Integer.parseInt(args[4]);
 		}
-
 		NetworkLayer net = new NetworkLayer();
 		new MatsimNetworkReader(net).readFile(networkFile);
-
 		OTFEvent2MVI converter = new OTFEvent2MVI(new QueueNetwork(net), eventFile, mviFile, snapshotPeriod);
 		converter.convert();
 	}
+	
 }
