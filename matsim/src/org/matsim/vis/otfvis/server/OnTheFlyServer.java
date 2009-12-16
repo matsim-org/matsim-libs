@@ -43,12 +43,13 @@ import javax.rmi.ssl.SslRMIServerSocketFactory;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
+import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuad;
 import org.matsim.vis.otfvis.executables.OTFVisController;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -305,7 +306,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		return true;
 	}
 
-	public void setQuad(String id, OTFServerQuad quad) {
+	public void setQuad(String id, OTFQSimServerQuad quad) {
 		quads.put(id, new QuadStorage(id, quad, null, null));
 	}
 	
@@ -313,17 +314,18 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 		if (quads.containsKey(id)) return quads.get(id).quad;
 
-		OTFServerQuad quad = new OTFServerQuad(network);
-		quads.put(id, new QuadStorage(id, quad, null, null));
-
-		OTFDataWriter.setServer(this);
-
-		quad.fillQuadTree(connect);
-		
+		OTFQSimServerQuad quad = new OTFQSimServerQuad(network);
+		quad.initQuadTree(connect);
 		for(OTFDataWriter writer : additionalElements) {
 			log.info("Adding additional element: " + writer.getClass().getName());
 			quad.addAdditionalElement(writer);
 		}
+		
+		quads.put(id, new QuadStorage(id, quad, null, null));
+
+		OTFDataWriter.setServer(this);
+
+		
 		
 		return quad;
 	}
@@ -456,10 +458,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	private static class QuadStorage {
 		public String id;
-		public OTFServerQuad quad;
+		public OTFQSimServerQuad quad;
 		public QuadTree.Rect rect;
 		public byte [] buffer;
-		public QuadStorage(String id, OTFServerQuad quad, Rect rect, byte[] buffer) {
+		public QuadStorage(String id, OTFQSimServerQuad quad, Rect rect, byte[] buffer) {
 			this.id = id;
 			this.quad = quad;
 			this.rect = rect;

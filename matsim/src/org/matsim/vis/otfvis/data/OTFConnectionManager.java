@@ -99,7 +99,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		
 		for (Entry entry  : connections) {
 			if(OTFDataWriter.class.isAssignableFrom(entry.from)){
-				Collection<Class> readerClasses = this.getEntries(entry.from);
+				Collection<Class> readerClasses = this.getToEntries(entry.from);
 				int count = readerClasses.size();
 				if (count != 1) {
 					// there must be exactly ONE Reader class corresponding to every Writer class
@@ -137,7 +137,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		}
 	}
 
-	public Collection<Class> getEntries(Class srcClass) {
+	public Collection<Class> getToEntries(Class srcClass) {
 		if (!isValidated) validate();
 		
 		List<Class> classList = new LinkedList<Class>();
@@ -147,7 +147,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		return classList;
 	}
 
-	public Class getFirstEntry(Class srcClass) {
+	public Class getFirstToEntry(Class srcClass) {
 		if (!isValidated) validate();
 		
 		for(Entry entry : connections) {
@@ -157,7 +157,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 	}
 
 	public Collection<OTFDataReceiver> getReceivers(Class srcClass, SceneGraph graph) {
-		Collection<Class> classList = getEntries(srcClass);
+		Collection<Class> classList = getToEntries(srcClass);
 		List<OTFDataReceiver> receiverList = new LinkedList<OTFDataReceiver>();
 		
 		for(Class entry : classList) {

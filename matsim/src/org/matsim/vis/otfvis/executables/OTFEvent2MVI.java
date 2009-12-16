@@ -27,8 +27,10 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.run.Events2Snapshot;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
+import org.matsim.vis.otfvis.data.fileio.OTFFileWriterConnectionManagerFactory;
+import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
@@ -38,13 +40,16 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  * @author dstrippgen
  *
  */
-public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
+public class OTFEvent2MVI extends OTFFileWriter {
 	private final String eventFileName;
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
 
+	private QueueNetwork network;
+
 	public OTFEvent2MVI(QueueNetwork net, String eventFileName, String outFileName, double interval_s) {
-		super(interval_s, net, outFileName);
+		super(interval_s, new OTFQSimServerQuadBuilder(net), outFileName, new OTFFileWriterConnectionManagerFactory());
+		this.network = net;
 		this.eventFileName = eventFileName;
 	}
 
@@ -63,7 +68,7 @@ public class OTFEvent2MVI extends OTFQuadFileHandler.Writer {
 		Gbl.getConfig().simulation().setSnapshotPeriod(this.interval_s);
 		Events2Snapshot app = new Events2Snapshot();
 		app.addExternalSnapshotWriter(this);
-		app.run(new File(this.eventFileName), Gbl.getConfig(), this.net.getNetworkLayer());
+		app.run(new File(this.eventFileName), Gbl.getConfig(), this.network.getNetworkLayer());
 
 		close();
 	}

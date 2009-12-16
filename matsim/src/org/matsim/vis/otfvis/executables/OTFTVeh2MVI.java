@@ -25,15 +25,17 @@ import java.io.IOException;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
+import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
+import org.matsim.vis.otfvis.data.fileio.OTFFileWriterConnectionManagerFactory;
+import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
-import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 
 /**
@@ -42,13 +44,13 @@ import org.matsim.vis.snapshots.writers.PositionInfo;
  * @author dstrippgen
  *
  */
-public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer {
+public class OTFTVeh2MVI extends OTFFileWriter {
 	private  String vehFileName = "";
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
 
-	public OTFTVeh2MVI(QueueNetwork net, String vehFileName, String outFileName, double interval_s) {
-		super(interval_s, net, outFileName);
+	public OTFTVeh2MVI(QueueNetwork net, String vehFileName, double interval_s, String outFileName) {
+		super(interval_s, new OTFQSimServerQuadBuilder(net), outFileName, new OTFFileWriterConnectionManagerFactory());
 		this.vehFileName = vehFileName;
 	}
 
@@ -160,7 +162,7 @@ public class OTFTVeh2MVI extends OTFQuadFileHandler.Writer {
 		new MatsimNetworkReader(net).readFile(netFileName);
 		QueueNetwork qnet = new QueueNetwork(net);
 
-		new OTFTVeh2MVI(qnet, vehFileName, outFileName, intervall_s).convert();
+		new OTFTVeh2MVI(qnet, vehFileName, intervall_s, outFileName).convert();
 	}
 
 }

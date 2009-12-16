@@ -54,6 +54,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.executables.OTFVisController;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -62,7 +63,6 @@ import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
-import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 
 
 /**
@@ -143,7 +143,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	public OTFClientQuad createNewView(String id, OTFConnectionManager connect) throws RemoteException {
 		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 
-		if((config.getFileVersion() < OTFQuadFileHandler.VERSION) || (config.getFileMinorVersion() < OTFQuadFileHandler.MINORVERSION)) {
+		if((config.getFileVersion() < OTFFileWriter.VERSION) || (config.getFileMinorVersion() < OTFFileWriter.MINORVERSION)) {
 			// go through every reader class and look for the appropriate Reader Version for this fileformat
 			connect.adoptFileFormat(OTFDataReader.getVersionString(config.getFileVersion(), config.getFileMinorVersion()));
 		}

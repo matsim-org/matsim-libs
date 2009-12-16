@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * OTFFileWriterConnectionManagerFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,50 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether;
+package org.matsim.vis.otfvis.data.fileio;
 
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.ptproject.controller.PtController;
-import org.matsim.run.OTFVis;
+import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QueueNode;
+import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
+import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgEquilControler {
+public class OTFFileWriterConnectionManagerFactory implements OTFConnectionManagerFactory{
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
-		final String config = "../testData/examples/equil/config.xml";
-		
-//		final int iteration = 0;
-		final int iteration = 10;
-		
-		PtController controler = new PtController(config);
-		controler.setOverwriteFiles(true);
-		
-		controler.addControlerListener(new StartupListener(){
-			public void notifyStartup(final StartupEvent event) {
-				event.getControler().getConfig().controler().setLastIteration(iteration);
-			}
-		});
-		
-		controler.run();
-		
-		
-		
-		String filename = controler.getConfig().controler().getOutputDirectory();
-		
-		filename += "/ITERS/it."+iteration+"/" + iteration + ".otfvis.mvi";
-		System.out.println(filename);
-		OTFVis.main(new String[] {filename});
-		
-		
+	public OTFConnectionManager createConnectionManager() {
+		OTFConnectionManager c = new OTFConnectionManager();
+		c.add(QueueLink.class,
+				OTFLinkLanesAgentsNoParkingHandler.Writer.class);
+		c.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
+		return c;
 	}
 
 }

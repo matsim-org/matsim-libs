@@ -43,9 +43,9 @@ import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
 
 import org.matsim.core.gbl.Gbl;
+import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFSettingsSaver;
-import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 
 import de.schlichtherle.io.ArchiveDetector;
 import de.schlichtherle.io.DefaultArchiveDetector;
@@ -166,7 +166,7 @@ public class OTFFileSettingsSaver implements OTFSettingsSaver {
 				ZipEntry infoEntry = zipFile.getEntry("config.bin");
 				if(infoEntry != null) {
 					//load config settings
-					inFile = new OTFQuadFileHandler.Reader.OTFObjectInputStream(zipFile.getInputStream(infoEntry));
+					inFile = new OTFFileReader.OTFObjectInputStream(zipFile.getInputStream(infoEntry));
 					Gbl.getConfig().removeModule(OTFVisConfig.GROUP_NAME);
 					OTFVisConfig cfg = (OTFVisConfig)inFile.readObject();
 					// force this to 30 if zero!

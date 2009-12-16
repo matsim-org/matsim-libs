@@ -57,6 +57,9 @@ import org.matsim.evacuation.otfvis.readerwriter.TileDrawerDataWriter;
 import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
+import org.matsim.vis.otfvis.data.fileio.OTFFileWriterConnectionManagerFactory;
+import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsNoParkingHandler;
@@ -65,12 +68,11 @@ import org.matsim.vis.otfvis.handler.OTFAgentsListHandler.ExtendedPositionInfo;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
-import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 
 import playground.gregor.otf.readerwriter.InundationDataFromBinaryFileReader;
 
 
-public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
+public class MVISnapshotWriter extends OTFFileWriter{
 	//private final   String netFileName = "";
 //	private  String vehFileName = "";
 	//private  String outFileName = "";
@@ -95,7 +97,7 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 	private final String label = "run1006: Nash approach";
 
 	public MVISnapshotWriter(final QueueNetwork net, final String vehFileName, final String outFileName, final double intervall_s) {
-		super(intervall_s, net, outFileName);
+		super(intervall_s, new OTFQSimServerQuadBuilder(net), outFileName, new OTFFileWriterConnectionManagerFactory());
 		((NetworkLayer) net.getNetworkLayer()).createAndAddNode(new IdImpl("minXY"), new CoordImpl(643000,9880000));//HACK to get the bounding box big enough; 
 		//otherwise we could get negative openGL coords since we calculating offsetEast, offsetNorth based on this bounding box
 //		this.vehFileName = vehFileName;
@@ -104,8 +106,7 @@ public class MVISnapshotWriter extends OTFQuadFileHandler.Writer{
 
 
 	public MVISnapshotWriter(ScenarioImpl sc) {
-		super(sc.getConfig().simulation().getSnapshotPeriod(),new QueueNetwork(sc.getNetwork()),"../../outputs/output/movie.mvi");
-		
+		super(sc.getConfig().simulation().getSnapshotPeriod(),new OTFQSimServerQuadBuilder(new QueueNetwork(sc.getNetwork())),"../../outputs/output/movie.mvi", new OTFFileWriterConnectionManagerFactory());
 	}
 
 

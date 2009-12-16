@@ -46,6 +46,7 @@ import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.BasicVehicleReaderV1;
 import org.xml.sax.SAXException;
 
+import playground.dgrether.utils.LogOutputEventHandler;
 import playground.marcel.pt.config.TransitConfigGroup;
 import playground.marcel.pt.replanning.TransitStrategyManagerConfigLoader;
 import playground.marcel.pt.router.PlansCalcTransitRoute;
@@ -105,6 +106,7 @@ public class TransitControler extends Controler {
 
 	@Override
 	protected void runMobSim() {
+		this.events.addHandler(new LogOutputEventHandler());
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
 		sim.setUseUmlaeufe(true);
 		sim.startOTFServer("livesim");

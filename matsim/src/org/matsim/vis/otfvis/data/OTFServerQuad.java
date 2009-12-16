@@ -22,16 +22,12 @@ package org.matsim.vis.otfvis.data;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueNetwork;
-import org.matsim.ptproject.qsim.QueueNode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
@@ -51,192 +47,55 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 	
 	private final List<OTFDataWriter> additionalElements= new LinkedList<OTFDataWriter>();
 
-	private static class ConvertToClientExecutor implements Executor<OTFDataWriter> {
-		final OTFConnectionManager connect;
-		final OTFClientQuad client;
-
-		public ConvertToClientExecutor(OTFConnectionManager connect2, OTFClientQuad client) {
-			this.connect = connect2;
-			this.client = client;
-		}
-		@SuppressWarnings("unchecked")
-		public void execute(double x, double y, OTFDataWriter writer)  {
-			Collection<Class> readerClasses = this.connect.getEntries(writer.getClass());
-			for (Class readerClass : readerClasses) {
-				try {
-					OTFDataReader reader = (OTFDataReader)readerClass.newInstance();
-					reader.setSrc(writer);
-					this.client.put(x, y, reader);
-				} catch (Exception e) {
-					e.printStackTrace();
-					throw new RuntimeException();
-				}
-			}
-		}
-	}
-
-
-	private static class WriteDataExecutor implements Executor<OTFDataWriter> {
-		final ByteBuffer out;
-		boolean writeConst;
-
-		public WriteDataExecutor(ByteBuffer out, boolean writeConst) {
-			this.out = out;
-			this.writeConst = writeConst;
-		}
-		public void execute(double x, double y, OTFDataWriter writer)  {
-			try {
-				if (this.writeConst) writer.writeConstData(this.out);
-				else writer.writeDynData(this.out);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	private static class ReplaceSourceExecutor implements Executor<OTFDataWriter> {
-		public final QueueNetwork q;
-
-		public ReplaceSourceExecutor(QueueNetwork newNet) {
-			q = newNet;
-		}
-
-		public void execute(double x, double y, OTFDataWriter writer)  {
-			Object src = writer.getSrc();
-			if(src instanceof QueueLink) {
-				QueueLink link = q.getLinks().get(((QueueLink) src).getLink().getId());
-				writer.setSrc(link);
-//			} else if(src instanceof QueueNode) {
-//				
-			}
-		}
-	}
-
 	private static final long serialVersionUID = 1L;
 	protected double minEasting;
 	protected double maxEasting;
 	protected double minNorthing;
 	protected double maxNorthing;
-	transient private QueueNetwork net;
+//	
 
 	// Change this, find better way to transport this info into Writers
 	public static double offsetEast;
 	public static double offsetNorth;
 
-	public OTFServerQuad(QueueNetwork net) {
+	public OTFServerQuad(Network n) {
 		super(0,0,0,0);
-		updateBoundingBox(net);
-		// has to be done later, as we do not know the writers yet!
-		// fillQuadTree(net);
 	}
+	
+	/**
+	 * This method should be abstract as it has to be overwritten in subclasses.
+	 * Due to deserialization backwards compatibility this is not possible. dg dez 09
+	 */
+	public void initQuadTree(final OTFConnectionManager connect){
+		throw new java.lang.UnsupportedOperationException("Method should be overwritten in subclasses");
+	};
 
-	public OTFServerQuad(double minX, double minY, double maxX, double maxY) {
-		super(minX, minY, maxX, maxY);
-		// make sure, the bounding box is bigger than the biggest element, otherwise
-		// requests with null == use biggest bounding box will fail on the leftmost elements
-		this.minEasting = minX;
-		this.maxEasting = maxX+1;
-		this.minNorthing = minY;
-		this.maxNorthing = maxY+1;
-	}
-
-	public void updateBoundingBox(QueueNetwork net){
+	
+	protected void updateBoundingBox(Network n){
 		this.minEasting = Double.POSITIVE_INFINITY;
 		this.maxEasting = Double.NEGATIVE_INFINITY;
 		this.minNorthing = Double.POSITIVE_INFINITY;
 		this.maxNorthing = Double.NEGATIVE_INFINITY;
 
-		for (Iterator<? extends QueueNode> it = net.getNodes().values().iterator(); it.hasNext();) {
-			QueueNode node = it.next();
-			this.minEasting = Math.min(this.minEasting, node.getNode().getCoord().getX());
-			this.maxEasting = Math.max(this.maxEasting, node.getNode().getCoord().getX());
-			this.minNorthing = Math.min(this.minNorthing, node.getNode().getCoord().getY());
-			this.maxNorthing = Math.max(this.maxNorthing, node.getNode().getCoord().getY());
+		for (org.matsim.api.core.v01.network.Node node : n.getNodes().values()) {
+			this.minEasting = Math.min(this.minEasting, node.getCoord().getX());
+			this.maxEasting = Math.max(this.maxEasting, node.getCoord().getX());
+			this.minNorthing = Math.min(this.minNorthing, node.getCoord().getY());
+			this.maxNorthing = Math.max(this.maxNorthing, node.getCoord().getY());
 		}
 		// make sure, the bounding box is bigger than the biggest element, otherwise
 		// requests with null == use biggest bounding box will fail on the leftmost elements
 		this.maxEasting +=1;
 		this.maxNorthing +=1;
 
-		this.net = net;
 		offsetEast = this.minEasting;
 		offsetNorth = this.minNorthing;
-	}
-
-	public void fillQuadTree(final OTFConnectionManager connect) {
 		final double easting = this.maxEasting - this.minEasting;
 		final double northing = this.maxNorthing - this.minNorthing;
 		// set top node
 		setTopNode(0, 0, easting, northing);
-		// Get the writer Factories from connect
-		Collection<Class> nodeFactories = connect.getEntries(QueueNode.class);
-		Collection<Class> linkFactories =  connect.getEntries(QueueLink.class);
-		List<OTFWriterFactory<QueueLink>> linkWriterFactoriyObjects = new ArrayList<OTFWriterFactory<QueueLink>>(linkFactories.size());
-		List<OTFWriterFactory<QueueNode>> nodeWriterFractoryObjects = new ArrayList<OTFWriterFactory<QueueNode>>(nodeFactories.size());
-		try {
-			OTFWriterFactory<QueueLink> linkWriterFac = null;			
-			for (Class linkFactory : linkFactories ) {
-				if(linkFactory != Object.class) {
-					linkWriterFac = (OTFWriterFactory<QueueLink>)linkFactory.newInstance();
-					linkWriterFactoriyObjects.add(linkWriterFac);
-				}
-			}
-			OTFWriterFactory<QueueNode> nodeWriterFac = null;
-			for (Class nodeFactory : nodeFactories) {
-				if(nodeFactory != Object.class) {
-					nodeWriterFac = (OTFWriterFactory<QueueNode>)nodeFactory.newInstance();
-					nodeWriterFractoryObjects.add(nodeWriterFac);
-				}
-			}
-			
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-//		System.out.println("server bounds: " +  " coords 0,0-" + easting + "," + northing );
-
-    	if(!nodeWriterFractoryObjects.isEmpty()) {
-    		boolean first = true;
-    		for (QueueNode node : this.net.getNodes().values()) {
-    			for (OTFWriterFactory<QueueNode> fac : nodeWriterFractoryObjects) {
-    				OTFDataWriter<QueueNode> writer = fac.getWriter();
-    				if (writer != null) {
-    					writer.setSrc(node);
-    					if (first){
-    						log.info("Connecting Source QueueNode with " + writer.getClass().getName());
-    						first = false;
-    					}
-    				}
-    				put(node.getNode().getCoord().getX() - this.minEasting, node.getNode().getCoord().getY() - this.minNorthing, writer);
-    			}
-    		}
-    	}
-//		System.out.print("server links/nodes count: " + (net.getLinks().values().size()+net.getNodes().values().size()) );
-
-    	if(!linkWriterFactoriyObjects.isEmpty()) {
-    		boolean first = true;
-    		for (QueueLink link : this.net.getLinks().values()) {
-    			double middleEast = (link.getLink().getToNode().getCoord().getX() + link.getLink().getFromNode().getCoord().getX())*0.5 - this.minEasting;
-    			double middleNorth = (link.getLink().getToNode().getCoord().getY() + link.getLink().getFromNode().getCoord().getY())*0.5 - this.minNorthing;
-
-    			for (OTFWriterFactory<QueueLink> fac : linkWriterFactoriyObjects) {
-    				OTFDataWriter<QueueLink> writer = fac.getWriter();
-    				// null means take the default handler
-    				if (writer != null) {
-    					writer.setSrc(link);
-    					if (first) {
-    						log.info("Connecting Source QueueLink with " + writer.getClass().getName());
-    						first = false;
-    					}
-    				}
-    				put(middleEast, middleNorth, writer);
-//      		System.out.println("server link: " + link.getId().toString() + " coords " + middleEast + "," + middleNorth );
-    			}
-    		}
-    		
-   	}
 	}
+
 
 	public void addAdditionalElement(OTFDataWriter element) {
 		this.additionalElements.add(element);
@@ -253,7 +112,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 //		System.out.print("server executor count: " +colls );
 
 		for(OTFDataWriter element : this.additionalElements) {
-			Collection<Class> readerClasses = connect.getEntries(element.getClass());
+			Collection<Class> readerClasses = connect.getToEntries(element.getClass());
 			for (Class readerClass : readerClasses) {
 				try {
 					Object reader = readerClass.newInstance();
@@ -337,10 +196,51 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 		
 	}
 
-	public void replaceSrc(QueueNetwork newNet) {
-		//int colls = 
-		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
-				new ReplaceSourceExecutor(newNet));
+
+
+	private static class ConvertToClientExecutor implements Executor<OTFDataWriter> {
+		final OTFConnectionManager connect;
+		final OTFClientQuad client;
+
+		public ConvertToClientExecutor(OTFConnectionManager connect2, OTFClientQuad client) {
+			this.connect = connect2;
+			this.client = client;
+		}
+		@SuppressWarnings("unchecked")
+		public void execute(double x, double y, OTFDataWriter writer)  {
+			Collection<Class> readerClasses = this.connect.getToEntries(writer.getClass());
+			for (Class readerClass : readerClasses) {
+				try {
+					OTFDataReader reader = (OTFDataReader)readerClass.newInstance();
+					reader.setSrc(writer);
+					this.client.put(x, y, reader);
+				} catch (Exception e) {
+					e.printStackTrace();
+					throw new RuntimeException();
+				}
+			}
+		}
 	}
 
+
+	private static class WriteDataExecutor implements Executor<OTFDataWriter> {
+		final ByteBuffer out;
+		boolean writeConst;
+
+		public WriteDataExecutor(ByteBuffer out, boolean writeConst) {
+			this.out = out;
+			this.writeConst = writeConst;
+		}
+		public void execute(double x, double y, OTFDataWriter writer)  {
+			try {
+				if (this.writeConst) writer.writeConstData(this.out);
+				else writer.writeDynData(this.out);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+
+	
 }

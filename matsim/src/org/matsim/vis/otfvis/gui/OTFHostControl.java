@@ -28,9 +28,9 @@ import java.util.Collection;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 
 import org.matsim.core.gbl.Gbl;
+import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
-import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 import org.matsim.vis.otfvis.server.OTFTVehServer;
 
 
@@ -144,7 +144,7 @@ public class OTFHostControl {
 	}
 
 	private OTFServerRemote openFile( String fileName) {
-		OTFServerRemote host = new OTFQuadFileHandler.Reader(fileName);
+		OTFServerRemote host = new OTFFileReader(fileName);
 		Gbl.printMemoryUsage();
 		return host;
 	}

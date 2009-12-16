@@ -32,8 +32,8 @@ import java.util.TreeMap;
 import javax.imageio.ImageIO;
 
 import org.matsim.core.config.Module;
+import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
-import org.matsim.vis.otfvis.server.OTFQuadFileHandler;
 
 
 /**
@@ -132,8 +132,8 @@ public class OTFVisConfig extends Module {
 	private  String middleMouseFunc = "Pan";
 	private  String leftMouseFunc = "Zoom";
 	private  String rightMouseFunc = "Select";
-	private int fileVersion = OTFQuadFileHandler.VERSION;
-	private int fileMinorVersion = OTFQuadFileHandler.MINORVERSION;
+	private int fileVersion = OTFFileWriter.VERSION;
+	private int fileMinorVersion = OTFFileWriter.MINORVERSION;
 
 	private int bigTimeStep = 600;
 //	private final int timeStep = 1;

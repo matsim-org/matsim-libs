@@ -32,8 +32,11 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
  * @author dgrether
  *
  */
-public class DefaultConnectionManagerFactory {
+public class DefaultConnectionManagerFactory implements OTFConnectionManagerFactory {
 	
+	/**
+	 * @see org.matsim.vis.otfvis.data.OTFConnectionManagerFactory#createConnectionManager()
+	 */
 	public OTFConnectionManager createConnectionManager(){
 		OTFConnectionManager connect = new OTFConnectionManager();
 	// data source to writer

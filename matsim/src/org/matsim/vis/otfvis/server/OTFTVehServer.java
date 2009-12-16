@@ -29,15 +29,16 @@ import java.util.TreeMap;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueNetwork;
-import org.matsim.ptproject.qsim.QueueNode;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.ptproject.qsim.QueueNode;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuad;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
@@ -84,8 +85,8 @@ public class OTFTVehServer implements OTFServerRemote {
 		connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 		connect.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
 
-		this.quad = new OTFServerQuad(qnet);
-		this.quad.fillQuadTree(connect);
+		this.quad = new OTFQSimServerQuad(qnet);
+		this.quad.initQuadTree(connect);
 		this.quad.addAdditionalElement(this.writer);
 
 //		this.times = buildTimesList(); // Does not work very smoothly, therefore we leave it out until there is demand for this
