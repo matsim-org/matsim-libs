@@ -124,28 +124,5 @@ public class OTFQueueSimServerQuad extends OTFServerQuad {
    	}
 	}
 
-	public void replaceSrc(QueueNetwork newNet) {
-		//int colls = 
-		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
-				new ReplaceSourceExecutor(newNet));
-	}
-	
-	private static class ReplaceSourceExecutor implements Executor<OTFDataWriter> {
-		public final QueueNetwork q;
-
-		public ReplaceSourceExecutor(QueueNetwork newNet) {
-			this.q = newNet;
-		}
-
-		public void execute(double x, double y, OTFDataWriter writer)  {
-			Object src = writer.getSrc();
-			if(src instanceof QueueLink) {
-				QueueLink link = this.q.getLinks().get(((QueueLink) src).getLink().getId());
-				writer.setSrc(link);
-//			} else if(src instanceof QueueNode) {
-//				
-			}
-		}
-	}
 	
 }

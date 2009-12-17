@@ -50,6 +50,7 @@ import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuad;
+import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.otfvis.executables.OTFVisController;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -100,6 +101,8 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public transient QueueNetwork network = null;
 	public transient EventsManager events;
 
+	private OTFQSimServerQuadBuilder quadBuilder;
+	
 	protected OnTheFlyServer(RMIClientSocketFactory clientSocketFactory, RMIServerSocketFactory serverSocketFactory) throws RemoteException {
 		super(0, new SslRMIClientSocketFactory(),	new SslRMIServerSocketFactory());
 		OTFDataWriter.setServer(this);
@@ -110,6 +113,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	}
 	
 	private void init(QueueNetwork network, Population population, EventsManager events){
+		this.quadBuilder = new OTFQSimServerQuadBuilder(network);
 		this.network = network;
 		this.out = new ByteArrayOutputStream(20000000);
 		this.pop = population;
@@ -314,7 +318,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 		if (quads.containsKey(id)) return quads.get(id).quad;
 
-		OTFQSimServerQuad quad = new OTFQSimServerQuad(network);
+		OTFServerQuad quad = this.quadBuilder.createAndInitOTFServerQuad(connect);
 		quad.initQuadTree(connect);
 		for(OTFDataWriter writer : additionalElements) {
 			log.info("Adding additional element: " + writer.getClass().getName());
@@ -393,17 +397,17 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	public boolean replace(String id, double x, double y, int index, Class clazz)
-			throws RemoteException {
-		OTFServerQuad quad = quads.get(id).quad;
-		if(quad != null) {
-			quad.replace(x, y, index, clazz);
-			return true;
-		}
-		// TODO Auto-generated method stub
-		return false;
-	}
+//	@SuppressWarnings("unchecked")
+//	public boolean replace(String id, double x, double y, int index, Class clazz)
+//			throws RemoteException {
+//		OTFServerQuad quad = quads.get(id).quad;
+//		if(quad != null) {
+//			quad.replace(x, y, index, clazz);
+//			return true;
+//		}
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
 
 
 	public boolean requestControllerStatus(int status) throws RemoteException {
@@ -452,16 +456,16 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		this.network = newNet;
 		
 		for(QuadStorage quadS : quads.values()){
-			quadS.quad.replaceSrc(newNet);
+			((OTFQSimServerQuad)quadS.quad).replaceSrc(newNet);
 		}
 	}
 
 	private static class QuadStorage {
 		public String id;
-		public OTFQSimServerQuad quad;
+		public OTFServerQuad quad;
 		public QuadTree.Rect rect;
 		public byte [] buffer;
-		public QuadStorage(String id, OTFQSimServerQuad quad, Rect rect, byte[] buffer) {
+		public QuadStorage(String id, OTFServerQuad quad, Rect rect, byte[] buffer) {
 			this.id = id;
 			this.quad = quad;
 			this.rect = rect;

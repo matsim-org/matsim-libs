@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFHostControl
+ * OTFHostConnectionBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,10 +23,10 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.Collection;
 
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
@@ -38,27 +38,16 @@ import org.matsim.vis.otfvis.server.OTFTVehServer;
  * @author dgrether
  *
  */
-public class OTFHostControl {
+public class OTFHostConnectionBuilder {
 
+	private static final Logger log = Logger.getLogger(OTFHostConnectionBuilder.class);
+	
 	private String address;
 	
-	protected OTFServerRemote host = null;
-	protected OTFLiveServerRemote liveHost = null;
+	private OTFServerRemote host = null;
 
-	protected int controllerStatus = 0;
-
-	
-
-	public OTFHostControl(String url) throws RemoteException, InterruptedException, NotBoundException{
-		this.openAddress(url);
-	}
-	
-	public OTFServerRemote getOTFServer(){
-		return this.host;
-	}
-	
-	
-	protected void openAddress(final String address) throws RemoteException, InterruptedException, NotBoundException {
+	public OTFServerRemote createRemoteServerConnection(final String address) throws RemoteException, InterruptedException, NotBoundException{
+		log.info("trying to open connection to " + address);
 		// try to open/connect to host if given a string of form
 		// connection type (rmi or file or tveh)
 		// rmi:ip  [: port]
@@ -96,14 +85,10 @@ public class OTFHostControl {
 			String [] connparse = connection.split("@");
 			this.host = openTVehFile(connparse[1], connparse[0]);
 
-		} else throw new UnsupportedOperationException("Connctiontype " + type + " not known");
-
-		if (host != null) {
-			if (host.isLive()){
-				liveHost = (OTFLiveServerRemote)host;
-				controllerStatus = liveHost.getControllerStatus();
-			}
+		} else {
+			throw new UnsupportedOperationException("Connctiontype " + type + " not known");
 		}
+		return host;
 	}
 	
 	private OTFServerRemote openSSL(String hostname, int port, String servername) throws InterruptedException, RemoteException, NotBoundException {
@@ -151,35 +136,6 @@ public class OTFHostControl {
 
 	private OTFServerRemote openTVehFile(String netname, String vehname) {
 		return new OTFTVehServer(netname,vehname);
-	}
-
-	/**
-	 * @return the liveHost
-	 */
-	public boolean isLiveHost() {
-		return liveHost != null;
-	}
-
-	public Collection<Double> getTimeSteps() {
-		try {
-			return this.host.getTimeSteps();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public double getTime() {
-		try {
-			return host.getLocalTime();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		return -1;
-	}
-	
-	public String getAddress() {
-		return address;
 	}
 	
 }

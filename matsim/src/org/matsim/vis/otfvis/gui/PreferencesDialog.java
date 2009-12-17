@@ -288,17 +288,17 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 		if (e.getSource() == this.agentSizeSlider) {
 			this.cfg.setAgentSize(this.agentSizeSlider.getValue());
 			if (this.host != null)
-				this.host.invalidateHandlers();
+				this.host.invalidateDrawers();
 			System.out.println("val: " + this.agentSizeSlider.getValue());
 		 } else if (e.getSource() == this.linkWidthSlider) {
 			 this.cfg.setLinkWidth(this.linkWidthSlider.getValue());
 			 if (this.host != null){
-				host.redrawHandlers();
+				host.redrawDrawers();
 			 }
 		 } else if (e.getSource() == this.delaySlider) {
 			 this.cfg.setDelay_ms(this.delaySlider.getValue());
 			 if (this.host != null){
-				host.redrawHandlers();
+				host.redrawDrawers();
 			 }
 			 //System.out.println("val: "+ this.linkWidthSlider.getValue());
 		}
@@ -404,7 +404,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 				if (c != null) {
 					this.cfg.setBackgroundColor(c);
 					if (this.host != null) {
-						this.host.invalidateHandlers();
+						this.host.invalidateDrawers();
 					}
 				}
 			}
@@ -414,7 +414,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 				if (c != null) {
 					this.cfg.setNetworkColor(c);
 					if (this.host != null) {
-						this.host.invalidateHandlers();
+						this.host.invalidateDrawers();
 					}
 				}
 			}
@@ -429,7 +429,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 			if (host != null) {
 				host.doQuery(new QueryToggleShowParking());
 				host.clearCaches();
-				host.redrawHandlers();
+				host.redrawDrawers();
 			}
 		} else if (source.getText().equals("show link Ids")) {
 			// toggle draw link Ids

@@ -125,7 +125,7 @@ class TextRenderHack
 		String osName = System.getProperty("os.name");
 
 		// Only fix it if it's broke :)
-		if (osName != null && osName.toLowerCase().contains("mac"))
+		if ((osName != null) && osName.toLowerCase().contains("mac"))
 		{
 			// Call the TextRenderer's private function getBackingStore to get the backingStore
 			TextureRenderer backingStore = (TextureRenderer) invokePrivateMethod(tr, "getBackingStore",
@@ -649,7 +649,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		Rectangle2D test = new InfoText("0000000").getBounds();
 
 		CoordImpl size  = this.mouseMan.getPixelsize();
-		if(size.getX()*pixelsizeStreet < cellWidth && size.getX()*pixelsizeStreet < cellWidth) {
+		if((size.getX()*pixelsizeStreet < cellWidth) && (size.getX()*pixelsizeStreet < cellWidth)) {
 			Map<CoordImpl, Boolean> xymap = new HashMap<CoordImpl, Boolean>(); // Why is here a Map used, and not a Set?
 			// Query linkIds
 			Rect rect = this.mouseMan.getBounds();
@@ -745,7 +745,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			this.scaleBar.draw();
 		}
 		
-		if(this.config.renderImages() && this.lastShot < this.now){
+		if(this.config.renderImages() && (this.lastShot < this.now)){
 			this.lastShot = this.now;
 			String nr = String.format("%07d", this.now);
 			try {
@@ -894,18 +894,18 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	}
 	
-	void doChangeDrawer(final Point2D.Double point){
-		if(!this.clientQ.doChangeDrawer(point, this)) return;
-		try {
-			//actGraph = this.clientQ.getSceneGraph(this.now, mouseMan.getBounds(), this);
-			invalidate(-1);
-			redraw();
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
+//	void doChangeDrawer(final Point2D.Double point){
+//		if(!this.clientQ.doChangeDrawer(point, this)) return;
+//		try {
+//			//actGraph = this.clientQ.getSceneGraph(this.now, mouseMan.getBounds(), this);
+//			invalidate(-1);
+//			redraw();
+//		} catch (RemoteException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//	}
 
 	public void handleClick(final Point2D.Double point, int mouseButton, MouseEvent e) {
 		if(mouseButton == 4 ){
@@ -946,12 +946,12 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 					}
 				} 
 			} ); 
-			popmen.addSeparator();
-			popmen.add( new AbstractAction("ChangeDrawers...") { 
-				public void actionPerformed( ActionEvent e ) {
-					doChangeDrawer(point);
-				} 
-			} ); 
+//			popmen.addSeparator();
+//			popmen.add( new AbstractAction("ChangeDrawers...") { 
+//				public void actionPerformed( ActionEvent e ) {
+//					doChangeDrawer(point);
+//				} 
+//			} ); 
 			popmen.show(this.getComponent(),e.getX(), e.getY());
 			return;
 		}

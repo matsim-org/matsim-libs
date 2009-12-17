@@ -25,7 +25,7 @@ import java.rmi.RemoteException;
 
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.gui.OTFSlaveHost;
+import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -55,7 +55,7 @@ public class OTFDoubleMVI extends OTFClientFile {
 
 		connectL.add(OTFLinkAgentsHandler.class, ColoredStaticNetLayer.QuadDrawer.class);
 		connectL.add(ColoredStaticNetLayer.QuadDrawer.class, ColoredStaticNetLayer.class);
-		OTFClientQuad clientQ = this.hostControl.createNewView(null, connectL);
+		OTFClientQuad clientQ = createNewView(null, connectL, this.hostControlBar.getOTFHostControl());
 		return clientQ;
 	}
 
@@ -67,13 +67,12 @@ public class OTFDoubleMVI extends OTFClientFile {
 			drawer = new OTFOGLDrawer(frame, this.getLeftDrawerComponent());
 			this.leftComp = drawer;
 			
-			drawer.invalidate((int)hostControl.getOTFHostControl().getTime());
-			this.hostControl.addHandler("test", drawer);
+			drawer.invalidate((int)hostControlBar.getOTFHostControl().getTime());
+			this.hostControlBar.addDrawer("test", drawer);
 			pane.setLeftComponent(drawer.getComponent());
-			OTFSlaveHost hostControl2;
-			hostControl2 = new OTFSlaveHost("file:" + this.filename2);
-			hostControl2.frame = frame;
-			this.hostControl.addSlave(hostControl2);
+			OTFHostConnectionManager hostControl2;
+			hostControl2 = new OTFHostConnectionManager("file:" + this.filename2);
+			this.hostControlBar.addSlave(hostControl2);
 
 			OTFConnectionManager connectR = this.connect.clone();
 			connectR.remove(OTFLinkAgentsHandler.class);
@@ -83,11 +82,11 @@ public class OTFDoubleMVI extends OTFClientFile {
 			connectR.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
 			connectR.add(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
 
-			OTFClientQuad clientQ2 = hostControl2.createNewView(null, connectR);
+			OTFClientQuad clientQ2 = createNewView(null, connectR, hostControl2);
 			OTFOGLDrawer drawer2 = new OTFOGLDrawer(frame, clientQ2);
-			drawer2.invalidate((int)hostControl.getOTFHostControl().getTime());
+			drawer2.invalidate((int)hostControlBar.getOTFHostControl().getTime());
 			drawer2.replaceMouseHandler(((OTFOGLDrawer) this.mainDrawer).getMouseHandler());
-			hostControl.addHandler("test", drawer2);
+			hostControlBar.addDrawer("test", drawer2);
 			this.pane.setLeftComponent(drawer2.getComponent());
 			pane.setResizeWeight(0.5);
 

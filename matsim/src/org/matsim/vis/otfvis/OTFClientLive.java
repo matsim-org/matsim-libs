@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFQueryControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
@@ -39,8 +38,6 @@ public class OTFClientLive extends OTFClient {
 
 	private OTFConnectionManager connect = new OTFConnectionManager();
 
-
-	public static OTFHostControlBar hostControl2;
 
 	public OTFClientLive(String url, OTFConnectionManager connect) {
 		super(url);
@@ -62,12 +59,11 @@ public class OTFClientLive extends OTFClient {
 	@Override
 	protected void createDrawer(){
 		try {		
-
-			OTFClientQuad clientQ = hostControl.createNewView(this.url, connect);
+			OTFClientQuad clientQ = createNewView(this.url, connect, this.hostControlBar.getOTFHostControl());
 			mainDrawer = new OTFOGLDrawer(frame, clientQ);
 			
-			if (hostControl.getOTFHostControl().isLiveHost()) {
-				OTFQueryControlBar queryControl = new OTFQueryControlBar("test", hostControl, visconf);
+			if (hostControlBar.getOTFHostControl().isLiveHost()) {
+				OTFQueryControlBar queryControl = new OTFQueryControlBar("test", hostControlBar, visconf);
 				frame.getContentPane().add(queryControl, BorderLayout.SOUTH);
 				((OTFOGLDrawer) mainDrawer).setQueryHandler(queryControl);
 			}

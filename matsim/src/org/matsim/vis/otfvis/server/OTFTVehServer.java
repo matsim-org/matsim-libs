@@ -38,7 +38,7 @@ import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.ptproject.qsim.QueueNode;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
-import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuad;
+import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkLanesAgentsNoParkingHandler;
@@ -85,7 +85,9 @@ public class OTFTVehServer implements OTFServerRemote {
 		connect.add(QueueLink.class, OTFLinkLanesAgentsNoParkingHandler.Writer.class);
 		connect.add(QueueNode.class, OTFDefaultNodeHandler.Writer.class);
 
-		this.quad = new OTFQSimServerQuad(qnet);
+		 OTFQSimServerQuadBuilder quadBuilder = new OTFQSimServerQuadBuilder(qnet);
+		
+		this.quad =  quadBuilder.createAndInitOTFServerQuad(connect);
 		this.quad.initQuadTree(connect);
 		this.quad.addAdditionalElement(this.writer);
 

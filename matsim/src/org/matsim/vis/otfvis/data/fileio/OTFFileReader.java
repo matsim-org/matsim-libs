@@ -65,7 +65,6 @@ public class OTFFileReader implements OTFServerRemote {
 
 	private DataInputStream inFile;
 
-	private final String id = null;
 	private byte[] actBuffer = null;
 
 	// public ByteArrayOutputStream out = null;
@@ -184,7 +183,7 @@ public class OTFFileReader implements OTFServerRemote {
 				"org.matsim.vis.otfvis");
 				return Class.forName(name);
 			}else if (name.startsWith("playground.david.vis")) {
-				name = name.replaceFirst("playground.david.vis",
+				name = name.replaceFirst("playgrounidd.david.vis",
 				"org.matsim.utils.vis.otfvis");
 				return Class.forName(name);
 			} else if (name.startsWith("org.matsim.utils.vis.otfivs")) {
@@ -305,15 +304,9 @@ public class OTFFileReader implements OTFServerRemote {
 		// if (connect != null) throw new
 		// RemoteException("writers need to be NULL, when reading from file"
 		// );
-		if (this.id == null) {
-			log.info("reading quad from file...");
-			quad  = readQuad();
-		}
+		log.info("reading quad from file...");
+		quad  = readQuad();
 		readConnect(connect);
-		if ((id != null) && !id.equals(this.id))
-			throw new RemoteException(
-			"id does not match, set id to NULL will match ALL!");
-
 		return quad;
 	}
 

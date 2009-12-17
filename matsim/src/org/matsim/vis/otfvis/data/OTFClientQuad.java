@@ -20,7 +20,6 @@
 
 package org.matsim.vis.otfvis.data;
 
-import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
@@ -37,14 +36,11 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PoolFactory;
-import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
-import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
 
 /**
@@ -358,10 +354,10 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		}
 	}
 	
-	public boolean doChangeDrawer(Point2D.Double point, OTFDrawer drawer) {
-		connect.add(OTFDefaultLinkHandler.class, SimpleStaticNetLayer.NoQuadDrawer.class);
-		return replace(drawer, point.x, point.y,OTFLinkAgentsHandler.class,OTFDefaultLinkHandler.class,OTFDefaultLinkHandler.Writer.class);
-	}
+//	public boolean doChangeDrawer(Point2D.Double point, OTFDrawer drawer) {
+//		connect.add(OTFDefaultLinkHandler.class, SimpleStaticNetLayer.NoQuadDrawer.class);
+//		return replace(drawer, point.x, point.y,OTFLinkAgentsHandler.class,OTFDefaultLinkHandler.class,OTFDefaultLinkHandler.Writer.class);
+//	}
 	
 	private static class CollectExecutor implements Executor<OTFDataReader> {
 		private final Class class_old;
@@ -388,52 +384,52 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	}
 
 
-	public boolean replace(OTFDrawer otfdrawer, double x, double y, Class class_old, Class class_new, Class class_src) {
-//		final ArrayList<OTFDataReader> list = new ArrayList<OTFDataReader>();
-//		double xl = x -offsetEast;
-//		double yl = y-offsetNorth;
-		QuadTree.Rect rect = new QuadTree.Rect(x,y,x+200,y+200);
-		CollectExecutor exe = new CollectExecutor(class_old);
-		this.execute(rect, exe);
-		if(exe.list.size()== 0)return false;
-		
-		SceneGraph graph = new SceneGraph(null, -1, connect, otfdrawer);
-
-		for(CollectExecutor.Item item : exe.list) {
-			List<OTFDataReader> leafvalues = getLeafValues(item.x, item.y);
-			if (leafvalues.contains(item.reader)) {
-				int index = leafvalues.indexOf(item.reader);
-				try {
-					OTFDataReader reader = (OTFDataReader) class_new.newInstance();
-					leafvalues.remove(index);
-					leafvalues.add(index, reader);
-					Collection<OTFDataReceiver> drawers = this.connect.getReceivers(reader.getClass(), graph);
-					for (OTFDataReceiver drawer : drawers) reader.connect(drawer);
-					((OTFLiveServerRemote)host).replace(id, item.x, item.y, index, class_src);
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		clearCache();
-		this.lastGraph = null;
-			
-		try {
-			getConstData();
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//invalidateAll(graph);
-
-		return true;
-	}
+//	public boolean replace(OTFDrawer otfdrawer, double x, double y, Class class_old, Class class_new, Class class_src) {
+////		final ArrayList<OTFDataReader> list = new ArrayList<OTFDataReader>();
+////		double xl = x -offsetEast;
+////		double yl = y-offsetNorth;
+//		QuadTree.Rect rect = new QuadTree.Rect(x,y,x+200,y+200);
+//		CollectExecutor exe = new CollectExecutor(class_old);
+//		this.execute(rect, exe);
+//		if(exe.list.size()== 0)return false;
+//		
+//		SceneGraph graph = new SceneGraph(null, -1, connect, otfdrawer);
+//
+//		for(CollectExecutor.Item item : exe.list) {
+//			List<OTFDataReader> leafvalues = getLeafValues(item.x, item.y);
+//			if (leafvalues.contains(item.reader)) {
+//				int index = leafvalues.indexOf(item.reader);
+//				try {
+//					OTFDataReader reader = (OTFDataReader) class_new.newInstance();
+//					leafvalues.remove(index);
+//					leafvalues.add(index, reader);
+//					Collection<OTFDataReceiver> drawers = this.connect.getReceivers(reader.getClass(), graph);
+//					for (OTFDataReceiver drawer : drawers) reader.connect(drawer);
+//					((OTFLiveServerRemote)host).replace(id, item.x, item.y, index, class_src);
+//				} catch (InstantiationException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (IllegalAccessException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (RemoteException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
+//		}
+//		clearCache();
+//		this.lastGraph = null;
+//			
+//		try {
+//			getConstData();
+//		} catch (RemoteException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		//invalidateAll(graph);
+//
+//		return true;
+//	}
 
 }

@@ -53,14 +53,14 @@ public class OTFVisControlerListener implements StartupListener, ShutdownListene
 
 	
 	private QueueNetwork queueNetwork;
-	private OnTheFlyServer myOTFServer;
+	private OnTheFlyServer otfserver;
 
 	public void notifyStartup(StartupEvent e) {
 		UUID idOne = UUID.randomUUID();
 		Scenario sc = e.getControler().getScenarioData();
 		this.queueNetwork = new QueueNetwork(sc.getNetwork());
-		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.queueNetwork, sc.getPopulation(), e.getControler().getEvents(), false);
-		myOTFServer.setControllerStatus(STARTUP);
+		this.otfserver = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.queueNetwork, sc.getPopulation(), e.getControler().getEvents(), false);
+		otfserver.setControllerStatus(STARTUP);
 		OTFClientLive client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), new DefaultConnectionManagerFactory().createConnectionManager());
 		client.setConfig(sc.getConfig().otfVis());
 		client.start();
@@ -71,21 +71,21 @@ public class OTFVisControlerListener implements StartupListener, ShutdownListene
 		OTFVisQueueSim sim = new OTFVisQueueSim(sc, e.getControler().getEvents());
 		// overwrite network
 		sim.setQueueNetwork(this.queueNetwork);
-		sim.setServer(myOTFServer);
+		sim.setServer(otfserver);
 		sim.setVisualizeTeleportedAgents(sc.getConfig().otfVis().isShowTeleportedAgents());
 		for (QueueSimulationListener l : e.getControler().getQueueSimulationListener()) {
 			sim.addQueueSimulationListeners(l);
 		}
-		myOTFServer.setControllerStatus(RUNNING + e.getControler().getIteration());
+		otfserver.setControllerStatus(RUNNING + e.getControler().getIteration());
 		sim.run();
 	}
 
 	public void notifyAfterMobsim(AfterMobsimEvent e) {
-		myOTFServer.setControllerStatus(REPLANNING + e.getControler().getIteration()+1);		
+		otfserver.setControllerStatus(REPLANNING + e.getControler().getIteration()+1);		
 	}
 
 	public void notifyShutdown(ShutdownEvent event) {
-		this.myOTFServer.cleanup();		
+		this.otfserver.cleanup();		
 	}
 
 	public static int getStatus(int flags) {

@@ -33,8 +33,8 @@ import java.rmi.RemoteException;
 public interface OTFLiveServerRemote extends OTFServerRemote {
 	public void pause() throws RemoteException;
 	public void play() throws RemoteException;
-	
-	public boolean replace(String id, double x, double y, int index, Class clazz) throws RemoteException;
+	//is not needed as nothing happens when activated dg dez 09
+//	public boolean replace(String id, double x, double y, int index, Class clazz) throws RemoteException;
 	
 	public OTFQuery answerQuery(OTFQuery query) throws RemoteException;
 	public int getControllerStatus() throws RemoteException;

@@ -27,10 +27,18 @@ import java.rmi.RemoteException;
 
 import javax.swing.JSplitPane;
 
+import org.apache.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.vis.otfvis.data.OTFClientQuad;
+import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.gui.OTFFrame;
+import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
+import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.gui.OTFAbstractSettingsSaver;
 
@@ -41,7 +49,9 @@ import org.matsim.vis.otfvis.opengl.gui.OTFAbstractSettingsSaver;
  */
 public abstract class OTFClient extends Thread {
 
-	protected OTFVisConfig visconf;
+  private static final Logger log = Logger.getLogger(OTFClient.class);
+	
+  protected OTFVisConfig visconf;
 
 	protected String url;
 	
@@ -49,7 +59,7 @@ public abstract class OTFClient extends Thread {
 	
 	protected JSplitPane pane = null;
 
-	protected OTFHostControlBar hostControl = null;
+	protected OTFHostControlBar hostControlBar = null;
 	
 	protected OTFAbstractSettingsSaver saver;
 
@@ -66,9 +76,9 @@ public abstract class OTFClient extends Thread {
 		createHostControlBar();
 		createDrawer();
 		addDrawerToSplitPane();
-		this.hostControl.addHandler(this.url, mainDrawer);
+		this.hostControlBar.addDrawer(this.url, mainDrawer);
 		try {
-			mainDrawer.invalidate((int)hostControl.getOTFHostControl().getTime());
+			mainDrawer.invalidate((int)hostControlBar.getOTFHostControl().getTime());
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -82,12 +92,32 @@ public abstract class OTFClient extends Thread {
 
 	}
 
+	public OTFClientQuad createNewView(String id, OTFConnectionManager connect, OTFHostConnectionManager hostControl) throws RemoteException {
+		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+
+		if((config.getFileVersion() < OTFFileWriter.VERSION) || (config.getFileMinorVersion() < OTFFileWriter.MINORVERSION)) {
+			// go through every reader class and look for the appropriate Reader Version for this fileformat
+			connect.adoptFileFormat(OTFDataReader.getVersionString(config.getFileVersion(), config.getFileMinorVersion()));
+		}
+
+		log.info("Getting Quad id " + id);
+		OTFServerQuad servQ = hostControl.getOTFServer().getQuad(id, connect);
+		log.info("Converting Quad");
+		OTFClientQuad clientQ = servQ.convertToClient(id, hostControl.getOTFServer(), connect);
+		log.info("Creating receivers");
+		clientQ.createReceiver(connect);
+		clientQ.getConstData();
+		this.hostControlBar.updateTimeLabel();
+		hostControl.getQuads().put(id, clientQ);
+		return clientQ;
+	}
+	
 	protected void createHostControlBar() {
 		try {
-			this.hostControl = new OTFHostControlBar(this.url);
-			hostControl.frame = frame;
-			frame.getContentPane().add(this.hostControl, BorderLayout.NORTH);
-			PreferencesDialog preferencesDialog = new PreferencesDialog(frame, visconf, hostControl);
+			this.hostControlBar = new OTFHostControlBar(this.url);
+			hostControlBar.frame = frame;
+			frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
+			PreferencesDialog preferencesDialog = new PreferencesDialog(frame, visconf, hostControlBar);
 			preferencesDialog.buildMenu(frame, preferencesDialog, saver);
 		} catch (RemoteException e) {
 			e.printStackTrace();

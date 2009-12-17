@@ -33,9 +33,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -52,16 +50,11 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
-import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
-import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.executables.OTFVisController;
-import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
-import org.matsim.vis.otfvis.opengl.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer;
 
 
@@ -105,9 +98,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 //	protected OTFServerRemote host = null;
 	protected int controllerStatus = 0;
 	
-	private final Map <String,OTFDrawer> drawer = new HashMap<String,OTFDrawer>();
-	private final Map <String,OTFClientQuad> quads = new HashMap<String,OTFClientQuad>();
-	private final List <OTFSlaveHost> slaves = new ArrayList<OTFSlaveHost>();
+	private final List <OTFHostConnectionManager> hostControls = new ArrayList<OTFHostConnectionManager>();
 
 	private ImageIcon playIcon = null;
 	private ImageIcon pauseIcon = null;
@@ -116,8 +107,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 	private Rectangle windowBounds = null;
 
-	protected Object blockReading = new Object();
-	private final OTFHostControl hostControl;
+	private final OTFHostConnectionManager hostControl;
 	private int gotoTime = 0;
 	private int gotoIter = 0;
 	private transient OTFAbortGoto progressBar = null;
@@ -125,7 +115,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	// -------------------- CONSTRUCTION --------------------
 
 	public OTFHostControlBar(String address, boolean makeButtons) throws RemoteException, InterruptedException, NotBoundException {
-		this.hostControl = new OTFHostControl(address);
+		this.hostControl = new OTFHostConnectionManager(address);
+		this.hostControls.add(this.hostControl);
 		if(makeButtons) addButtons();
 	}
 	public OTFHostControlBar(String address) throws RemoteException, InterruptedException, NotBoundException {
@@ -133,128 +124,42 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	}
 
 
-
-
-	private void buildIndex() {
-		// Read through the whole file to find the indexes for the time steps...
-
-	}
-
-	public OTFClientQuad createNewView(String id, OTFConnectionManager connect) throws RemoteException {
-		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
-
-		if((config.getFileVersion() < OTFFileWriter.VERSION) || (config.getFileMinorVersion() < OTFFileWriter.MINORVERSION)) {
-			// go through every reader class and look for the appropriate Reader Version for this fileformat
-			connect.adoptFileFormat(OTFDataReader.getVersionString(config.getFileVersion(), config.getFileMinorVersion()));
-		}
-
-		log.info("Getting Quad id " + id);
-		OTFServerQuad servQ = this.hostControl.getOTFServer().getQuad(id, connect);
-		log.info("Converting Quad");
-		OTFClientQuad clientQ = servQ.convertToClient(id, this.hostControl.getOTFServer(), connect);
-		log.info("Creating receivers");
-		clientQ.createReceiver(connect);
-		readConstData(clientQ);
-		this.quads.put(id, clientQ);
-		return clientQ;
-	}
-
-	protected void readConstData(OTFClientQuad clientQ) throws RemoteException {
-		clientQ.getConstData();
-		// if this is a recorded session, build random access index
-		if (hostControl.getOTFServer().isLive()) {
-			buildIndex();
-		}
-		simTime = this.hostControl.getOTFServer().getLocalTime();
-		updateTimeLabel();
-
-	}
-	protected boolean preCacheCurrentTime(int time, OTFTimeLine timeLine) throws IOException {
-		boolean result = this.hostControl.getOTFServer().requestNewTime(time, OTFServerRemote.TimePreference.LATER);
-		
-		for(OTFDrawer handler : drawer.values()) {
-			if(handler != timeLine) handler.getQuad().getSceneGraphNoCache(this.hostControl.getOTFServer().getLocalTime(), null, handler);
-		}
-		
-		for(OTFSlaveHost slave : slaves) {
-			slave.preCacheCurrentTime(time, timeLine);
-		}
-
-		return result;
-	}
 	
-	private class PreloadHelper extends Thread {
 
-		public void preloadCache() {
-			boolean hasNext = true;
-			OTFTimeLine timeLine = (OTFTimeLine)drawer.get("timeline");
 
-			try {
-				int	time = hostControl.getOTFServer().getLocalTime();
-
-				while (hasNext && !(timeLine.isCancelCaching)) {
-					synchronized(blockReading) {
-						// remember time the block had before caching next step
-						int	origtime = hostControl.getOTFServer().getLocalTime();
-						time = hostControl.getOTFServer().getLocalTime() + 1;
-						hasNext = preCacheCurrentTime(time,timeLine);
-						time = hostControl.getOTFServer().getLocalTime();
-					}
-					timeLine.setCachedTime(time); // add this to the cached times in the time line drawer
-				}
-				if (timeLine != null) timeLine.setCachedTime(-1);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-//			((OTFQuadFileHandler.Reader)host).closeFile();
-		}
-		@Override
-		public void run() {
-			preloadCache();
-		}
-	}
-
-	public void addHandler(String id, OTFDrawer handler) {
-		drawer.put(id, handler);
+	public void addDrawer(String id, OTFDrawer handler) {
+		this.hostControl.getDrawer().put(id, handler);
 	}
 
 	public OTFDrawer getHandler(String id) {
-		return drawer.get(id);
+		return this.hostControl.getDrawer().get(id);
 	}
 
-	public void invalidateHandlers() {
+	public void invalidateDrawers() {
 		try {
-		for (OTFDrawer handler : drawer.values()) {
+		for(OTFHostConnectionManager slave : hostControls) {
+			for (OTFDrawer handler : slave.getDrawer().values()) {
 				handler.invalidate(simTime);
 		}
-		for(OTFSlaveHost slave : slaves) {
-			slave.invalidateHandlers();
 		}
 		} catch (RemoteException e) {
-			// Possibly lost contact to host DS TODO Handle this!
 			e.printStackTrace();
 		}
 	}
 
-	public void redrawHandlers() {
-		for (OTFDrawer handler : drawer.values()) {
-			handler.redraw();
-		}
-		for(OTFSlaveHost slave : slaves) {
-			slave.redrawHandlers();
-		}
+	public void redrawDrawers() {
+		for(OTFHostConnectionManager slave : hostControls) {
+				for (OTFDrawer handler : slave.getDrawer().values()) {
+					handler.redraw();
+			}
+		}		
 	}
 
 	public void clearCaches() {
-		for (OTFDrawer handler : drawer.values()) {
-			handler.clearCache();
-		}
-		for(OTFSlaveHost slave : slaves) {
-			slave.clearCaches();
+		for(OTFHostConnectionManager slave : hostControls) {
+			for (OTFDrawer handler : slave.getDrawer().values()) {
+				handler.clearCache();
+			}
 		}
 	}
 
@@ -320,7 +225,8 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	  return button;
 	}
 
-	protected void updateTimeLabel() throws RemoteException {
+	public void updateTimeLabel() throws RemoteException {
+		simTime = this.hostControl.getOTFServer().getLocalTime();
 		if(controllerStatus != OTFVisController.NOCONTROL){
 			controllerStatus = ((OTFLiveServerRemote)this.hostControl.getOTFServer()).getControllerStatus();
 		}
@@ -413,17 +319,18 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		float linkWidth = cfg.getLinkWidth();
 		cfg.setLinkWidth(linkWidth + 0.01f);// forces redraw of network, haven't found a better way to do it. marcel/19apr2009
 		SimpleStaticNetLayer.marktex = null;
-		redrawHandlers();
+		redrawDrawers();
 	}
 
 	protected boolean requestTimeStep(int newTime, OTFServerRemote.TimePreference prefTime)  throws IOException {
 		if (hostControl.getOTFServer().requestNewTime(newTime, prefTime)) {
 			simTime = hostControl.getOTFServer().getLocalTime();
 			
-			for(OTFSlaveHost slave : slaves) {
-				 slave.getOTFHostControl().getOTFServer().requestNewTime(newTime, prefTime);
+			for(OTFHostConnectionManager slave : hostControls) {
+				if (!slave.equals(this.hostControl))
+					slave.getOTFServer().requestNewTime(newTime, prefTime);
 			}
-			invalidateHandlers();
+			invalidateDrawers();
 			return true;
 		}
 		if (prefTime == OTFServerRemote.TimePreference.EARLIER) {
@@ -468,7 +375,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 				((OTFLiveServerRemote)hostControl.getOTFServer()).requestControllerStatus(gotoIter);
 			}
 			
-			synchronized(blockReading) {
+			synchronized(hostControl.blockReading) {
 			if(restart)requestTimeStep(gotoTime, OTFServerRemote.TimePreference.RESTART);
 			else if (!requestTimeStep(gotoTime, OTFServerRemote.TimePreference.EARLIER))
 				requestTimeStep(gotoTime, OTFServerRemote.TimePreference.LATER);
@@ -638,7 +545,7 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 					OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 					if(config != null) delay = config.getDelay_ms();
 					sleep(delay);
-					synchronized(blockReading) {
+					synchronized(hostControl.blockReading) {
 						if (isActive && synchronizedPlay &&
 							((simTime >= loopEnd) || !hostControl.getOTFServer().requestNewTime(simTime+1, OTFServerRemote.TimePreference.LATER))) {
 							hostControl.getOTFServer().requestNewTime(loopStart, OTFServerRemote.TimePreference.LATER);
@@ -646,15 +553,16 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 
 						actTime = simTime;
 						simTime = hostControl.getOTFServer().getLocalTime();
-						for(OTFSlaveHost slave : slaves) {
-							slave.getOTFHostControl().getOTFServer().requestNewTime(simTime, OTFServerRemote.TimePreference.LATER);
+						for(OTFHostConnectionManager slave : hostControls) {
+							if (!slave.equals(hostControl))
+								slave.getOTFServer().requestNewTime(simTime, OTFServerRemote.TimePreference.LATER);
 						}
 						
 						updateTimeLabel();
 						if (simTime != actTime) {
 							repaint();
 							if (isActive)  {
-								invalidateHandlers();
+								invalidateDrawers();
 							}
 						}
 					}
@@ -673,39 +581,14 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 	// apparently queries are not dependent on a certain view right now, so it should be host.doQuery
 
 	public OTFQuery doQuery(OTFQuery query) {
-		OTFClientQuad quad = this.quads.values().iterator().next();
+		OTFClientQuad quad = this.getOTFHostControl().getQuads().values().iterator().next();
 		return quad.doQuery(query);
 	}
 
 	public void finishedInitialisition() {
-		OTFVisConfig config = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
-		try {
-			if(!hostControl.getOTFServer().isLive() && config.isCachingAllowed()) {
-				new PreloadHelper().start();
-			}
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		this.hostControl.finishedInitialisition();
 	}
 
-	public void countto(int i) {
-		try {
-			for(int t=0;t<i;t++){
-				int simTime = hostControl.getOTFServer().getLocalTime();
-				hostControl.getOTFServer().requestNewTime(simTime+1, OTFServerRemote.TimePreference.LATER);
-				//updateTimeLabel();
-				//repaint();
-				//invalidateHandlers();
-//				System.out.println(simTime);
-
-			}
-
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-
-		System.out.println("FERTIHHHH");
-	}
 
 	private static class BorderlessButton extends JButton {
 		public BorderlessButton() {
@@ -718,15 +601,14 @@ public class OTFHostControlBar extends JToolBar implements ActionListener, ItemL
 		}
 	}
 
-	public void addSlave(OTFSlaveHost slave) {
-		this.slaves.add(slave);
-		slave.blockReading = this.blockReading;
+	public void addSlave(OTFHostConnectionManager slave) {
+		this.hostControls.add(slave);
 	}
 	
 	/**
 	 * Method should be removed again when we once finish the refactoring
 	 */
-	public OTFHostControl getOTFHostControl(){
+	public OTFHostConnectionManager getOTFHostControl(){
 		return this.hostControl;
 	}
 	

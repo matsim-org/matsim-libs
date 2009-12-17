@@ -249,7 +249,7 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 		Iterator<Entry> iter = connect2.connections.iterator();
 		while(iter.hasNext()) {
 			Entry entry = iter.next();
-			log.error("updating entry: " + entry.from.getCanonicalName() + " to " + entry.to.getName());
+			log.info("updating entry: " + entry.from.getCanonicalName() + " to " + entry.to.getName());
 			this.add(entry);
 		}
 	}

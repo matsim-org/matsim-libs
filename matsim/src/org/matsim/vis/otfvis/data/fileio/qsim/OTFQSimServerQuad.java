@@ -126,7 +126,7 @@ public class OTFQSimServerQuad extends OTFServerQuad {
 
 	public void replaceSrc(QueueNetwork newNet) {
 		//int colls = 
-		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
+		this.execute(0.,0.,this.easting, this.northing,
 				new ReplaceSourceExecutor(newNet));
 	}
 	

@@ -48,7 +48,7 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 	public OTFTimeLine(String string, OTFHostControlBar hostControl) {
 		super(string);
 		this.hostControl = hostControl;
-		hostControl.addHandler("timeline", this);
+		hostControl.addDrawer("timeline", this);
 
 		addSlider();
 
@@ -139,7 +139,7 @@ public class OTFTimeLine extends JToolBar implements OTFDrawer, ActionListener, 
 	public void addSlider() {
 
 		//Create the slider.
-		Collection<Double> steps = hostControl.getOTFHostControl().getTimeSteps();
+		Collection<Double> steps = hostControl.getOTFHostControl().getTimeStepsdrawer();
 		Double[] dsteps = steps.toArray(new Double[steps.size()]);
 
 		times = new MyJSlider(JSlider.HORIZONTAL,  dsteps[0].intValue(), dsteps[dsteps.length-1].intValue(), (int)hostControl.getOTFHostControl().getTime());

@@ -260,7 +260,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		}
 
 		text.setText(infoText.toString());
-		handler.redrawHandlers();
+		handler.redrawDrawers();
 	}
 	
 	public OTFQuery handleQuery(OTFQuery query) {
@@ -289,7 +289,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	public void handleClick(String viewId, Rectangle2D.Double origRect, int mouseButton) {
 		if (mouseButton == 3) {
 			removeQueries();
-			handler.redrawHandlers();
+			handler.redrawDrawers();
 		} else {
 			OTFVisConfig conf = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 
@@ -324,7 +324,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	
 	synchronized public void addQuery(OTFQuery query) {
 		this.queryItems.add(query);
-		handler.redrawHandlers();
+		handler.redrawDrawers();
 	}
 
 	synchronized public void removeQueries(){
@@ -334,7 +334,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		this.queryItems.clear();
 		text.setText("");
 		
-		handler.redrawHandlers();
+		handler.redrawDrawers();
 	}
 
 	synchronized public void drawQueries(OTFDrawer drawer) {

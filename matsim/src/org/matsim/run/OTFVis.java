@@ -149,6 +149,7 @@ public class OTFVis {
 	}
 
 	public static final void playMVI(final String[] args) {
+//		new OTFClientSwing(args[0]).start();
 		new OTFClientFile(args[0]).start();
 	}
 

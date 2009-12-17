@@ -23,6 +23,7 @@ import org.matsim.evacuation.otfvis.readerwriter.PolygonDataWriter;
 import org.matsim.evacuation.otfvis.readerwriter.TextureDataWriter;
 import org.matsim.evacuation.otfvis.readerwriter.TextutreDataReader;
 import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.data.DefaultConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.opengl.drawer.SimpleBackgroundDrawer;
@@ -32,7 +33,6 @@ import org.matsim.world.algorithms.WorldCheck;
 
 import playground.gregor.sim2d.otfdebug.ForceArrowReader;
 import playground.gregor.sim2d.otfdebug.ForceArrowWriter;
-import playground.gregor.sim2d.otfdebug.MyOTFClient;
 import playground.gregor.sim2d.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d.simulation.Sim2D;
 
@@ -89,8 +89,8 @@ public class Controller2D extends Controler {
 		this.myOTFServer.addAdditionalElement(this.forceArrowWriter);
 		this.connectionManager.add(ForceArrowWriter.class,ForceArrowReader.class);
 
-		MyOTFClient client = null;
-		client = new MyOTFClient("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
+		OTFClientLive client = null;
+		client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);
 		client.start();
 
 		try {

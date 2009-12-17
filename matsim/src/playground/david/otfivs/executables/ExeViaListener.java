@@ -141,23 +141,23 @@ QueueSimulationInitializedListener<QueueSimulation>,
 QueueSimulationAfterSimStepListener<QueueSimulation> {
 
 	private QueueNetwork queueNetwork;
-	protected OnTheFlyServer myOTFServer;
+	protected OnTheFlyServer otfserver;
 	private Population population;
 	private EventsManager events;
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Controler cont = event.getControler();
-		myOTFServer.setControllerStatus(OTFVisController.RUNNING + cont.getIteration());
+		otfserver.setControllerStatus(OTFVisController.RUNNING + cont.getIteration());
 	}
 
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		Controler cont = event.getControler();
-		myOTFServer.setControllerStatus(OTFVisController.REPLANNING + cont.getIteration()+1);
+		otfserver.setControllerStatus(OTFVisController.REPLANNING + cont.getIteration()+1);
 	}
 
 	public void notifySimulationAfterSimStep(QueueSimulationAfterSimStepEvent<QueueSimulation> e) {
-		int status = myOTFServer.updateStatus(e.getSimulationTime());
-		if(myOTFServer.getRequestStatus() == OTFVisController.CANCEL) {
+		int status = otfserver.updateStatus(e.getSimulationTime());
+		if(otfserver.getRequestStatus() == OTFVisController.CANCEL) {
 //			try {
 //				myOTFServer.requestControllerStatus(0);
 //				myOTFServer.play();
@@ -166,22 +166,22 @@ QueueSimulationAfterSimStepListener<QueueSimulation> {
 				// TODO Auto-generated catch block
 //				e1.printStackTrace();
 //			} // reset status!
-			myOTFServer.reset();
+			otfserver.reset();
 			throw new SimCanceledException();
 		}
 	}
 
 	public void notifySimulationInitialized(QueueSimulationInitializedEvent<QueueSimulation> e) {
 		QueueSimulation q = e.getQueueSimulation();
-		myOTFServer.events = QueueSimulation.getEvents();
-		myOTFServer.replaceQueueNetwork(q.getQueueNetwork());
+		otfserver.events = QueueSimulation.getEvents();
+		otfserver.replaceQueueNetwork(q.getQueueNetwork());
 	}
 
 	protected void createServer(final UUID idOne, StartupEvent event) {
-		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.queueNetwork, this.population, this.events, false);
-		myOTFServer.setControllerStatus(OTFVisController.STARTUP);
+		this.otfserver = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.queueNetwork, this.population, this.events, false);
+		otfserver.setControllerStatus(OTFVisController.STARTUP);
 		try {
-			myOTFServer.pause();
+			otfserver.pause();
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

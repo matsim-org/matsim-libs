@@ -52,8 +52,9 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 	protected double maxEasting;
 	protected double minNorthing;
 	protected double maxNorthing;
-//	
-
+	protected double easting;
+	protected double northing;
+	
 	// Change this, find better way to transport this info into Writers
 	public static double offsetEast;
 	public static double offsetNorth;
@@ -91,8 +92,8 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 
 		offsetEast = this.minEasting;
 		offsetNorth = this.minNorthing;
-		final double easting = this.maxEasting - this.minEasting;
-		final double northing = this.maxNorthing - this.minNorthing;
+		this.easting = this.maxEasting - this.minEasting;
+		this.northing = this.maxNorthing - this.minNorthing;
 		// set top node
 		setTopNode(0, 0, easting, northing);
 	}
@@ -103,12 +104,12 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 	}
 
 	public OTFClientQuad convertToClient(String id, final OTFServerRemote host, final OTFConnectionManager connect) {
-		final OTFClientQuad client = new OTFClientQuad(id, host, 0.,0.,this.maxEasting - this.minEasting, this.maxNorthing - this.minNorthing);
+		final OTFClientQuad client = new OTFClientQuad(id, host, 0.,0., this.easting, this.northing);
 		client.offsetEast = this.minEasting;
 		client.offsetNorth = this.minNorthing;
 
 		//int colls = 
-		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
+		this.execute(0.,0.,this.easting, this.northing,
 				new ConvertToClientExecutor(connect,client));
 //		System.out.print("server executor count: " +colls );
 
@@ -131,7 +132,7 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 
 	public void writeConstData(ByteBuffer out) {
 		//int colls = 
-		this.execute(0.,0.,this.maxEasting - this.minEasting,this.maxNorthing - this.minNorthing,
+		this.execute(0.,0.,this.easting, this.northing,
 				new WriteDataExecutor(out,true));
 
 		for(OTFDataWriter element : this.additionalElements) {
@@ -178,24 +179,24 @@ public class OTFServerQuad extends QuadTree<OTFDataWriter> {
 		return this.minNorthing;
 	}
 	
-	public void replace(double x, double y, int index, Class clazz) {
-		List<OTFDataWriter> writer = getLeafValues(x,y);
-		OTFDataWriter w = writer.get(index);
-		OTFDataWriter wnew;
-		try {
-			wnew = (OTFDataWriter) clazz.newInstance();
-			wnew.setSrc(w.getSrc());
-			writer.remove(index);
-			writer.add(index, wnew);
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
+//	public void replace(double x, double y, int index, Class clazz) {
+//		List<OTFDataWriter> writer = getLeafValues(x,y);
+//		OTFDataWriter w = writer.get(index);
+//		OTFDataWriter wnew;
+//		try {
+//			wnew = (OTFDataWriter) clazz.newInstance();
+//			wnew.setSrc(w.getSrc());
+//			writer.remove(index);
+//			writer.add(index, wnew);
+//		} catch (InstantiationException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IllegalAccessException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//	}
 
 
 

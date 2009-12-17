@@ -45,7 +45,12 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
 /**
  * This file starts OTFVis using a .mvi file.
+ *
+ * This class is still a bit dirty as it is using tons of code to stay compatible
+ * to older versions of OTFVis. dg dez 09
+ * 
  * @author dstrippgen
+ * @author dgrether
  */
 public class OTFClientFile extends OTFClient {
 	
@@ -97,15 +102,15 @@ public class OTFClientFile extends OTFClient {
 		connectR.add(OTFLinkLanesAgentsNoParkingHandler.class,  AgentPointDrawer.class);
 		connectR.add(OGLAgentPointLayer.AgentPointDrawer.class, OGLAgentPointLayer.class);
 		//end dg dez 09
-		OTFClientQuad clientQ2 = this.hostControl.createNewView(null, connectR);
+		OTFClientQuad clientQ2 = createNewView(null, connectR, this.hostControlBar.getOTFHostControl());
 		return clientQ2;
 	}
 
 	@Override
 	protected void createDrawer(){
 		try {
-			if(!hostControl.getOTFHostControl().isLiveHost()) {
-				frame.getContentPane().add(new OTFTimeLine("time", hostControl), BorderLayout.SOUTH);
+			if(!hostControlBar.getOTFHostControl().isLiveHost()) {
+				frame.getContentPane().add(new OTFTimeLine("time", hostControlBar), BorderLayout.SOUTH);
 			} else  {
 				throw new IllegalStateException("Server in live mode!");
 			}
@@ -115,7 +120,7 @@ public class OTFClientFile extends OTFClient {
 			e.printStackTrace();
 			throw new RuntimeException();
 		}
-		hostControl.finishedInitialisition();
+		hostControlBar.finishedInitialisition();
 	}
 	
 	@Override
