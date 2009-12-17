@@ -26,7 +26,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -37,6 +39,7 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.christoph.events.ExtendedAgentReplanEventImpl;
 import playground.christoph.mobsim.WithinDayPersonAgent;
 
 /*
@@ -190,6 +193,9 @@ public class LeaveLinkReplanner {
 		
 		// finally reset the cached next Link of the PersonAgent - it may have changed!
 		((WithinDayPersonAgent)this.personAgent).ResetCachedNextLink();
+		
+		// create ReplanningEvent
+		QueueSimulation.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), newRoute, route));
 	}
 		
 	/*

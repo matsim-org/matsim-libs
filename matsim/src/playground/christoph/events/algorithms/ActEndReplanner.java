@@ -21,15 +21,21 @@
 package playground.christoph.events.algorithms;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.events.AgentWait2LinkEventImpl;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.christoph.events.ExtendedAgentReplanEventImpl;
 import playground.christoph.network.util.SubNetworkTools;
 
 /*
@@ -201,6 +207,8 @@ public class ActEndReplanner {
 		// Here we are at the moment.
 		newPlan.addActivity(fromAct);
 		
+		Route originalRoute = betweenLeg.getRoute();
+		
 		// Current Route between fromAct and toAct - this Route shall be replanned.
 		newPlan.addLeg(betweenLeg);
 		
@@ -253,6 +261,12 @@ public class ActEndReplanner {
 		// remove previously added new Plan
 		person.removePlan(newPlan);
 //		System.out.println("Do Replanning...");
+		
+		
+		Route alternativeRoute = betweenLeg.getRoute();
+
+		// create ReplanningEvent
+		QueueSimulation.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRouteWRefs)alternativeRoute, (NetworkRouteWRefs)originalRoute));
 		
 
 //		String newRouteString = "PersonId: " + person.getId();

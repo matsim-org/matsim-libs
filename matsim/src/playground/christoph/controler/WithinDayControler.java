@@ -45,6 +45,7 @@ import playground.christoph.mobsim.ReplanningManager;
 import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
+import playground.christoph.replanning.TravelTimeEstimator;
 import playground.christoph.router.KnowledgePlansCalcRoute;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
@@ -86,7 +87,7 @@ public class WithinDayControler extends Controler {
 	/*
 	 * How many parallel Threads shall do the Replanning. 
 	 */
-	protected int numReplanningThreads = 2;
+	protected int numReplanningThreads = 8;
 	
 	protected KnowledgeTravelTimeCalculator knowledgeTravelTime;
 	protected ParallelInitialReplanner parallelInitialReplanner;
@@ -139,6 +140,10 @@ public class WithinDayControler extends Controler {
 		 * the TravelTime to find the LeastCostPath.
 		 */
 		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
+//		TravelTimeEstimator travelTime = new TravelTimeEstimator(population, network, 60, 86400 * 2);
+//		sim.addQueueSimulationListeners(travelTime);
+//		this.events.addHandler(travelTime);
+		
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 		
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);

@@ -26,13 +26,11 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.KnowledgeTools;
 import playground.christoph.router.util.KnowledgeTravelCost;
-import playground.christoph.router.util.KnowledgeTravelTime;
 
 /*
  * Adaption of TravelTimeDistanceCostCalculator

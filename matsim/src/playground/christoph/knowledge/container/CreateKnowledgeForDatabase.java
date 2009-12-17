@@ -63,8 +63,9 @@ public class CreateKnowledgeForDatabase {
 	private ArrayList<SelectNodes> nodeSelectors;
 	
 	private double dijkstraCostFactor = 1.0;
+	private double[] dijkstraCostFactors = {1.05, 1.1, 1.15, 1.2, 1.3, 1.35, 1.4, 1.45};
 //	private double[] dijkstraCostFactors = {1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0};
-	private double[] dijkstraCostFactors = {1.0};
+//	private double[] dijkstraCostFactors = {1.0};
 	private TravelCost costCalculator;
 	
 	private int parallelThreads = 8;
