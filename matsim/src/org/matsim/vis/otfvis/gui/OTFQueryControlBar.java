@@ -50,7 +50,7 @@ import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.matsim.core.gbl.Gbl;
+import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
@@ -72,7 +72,9 @@ import org.matsim.vis.otfvis.opengl.queries.QuerySpinneNOW;
  *
  */
 public class OTFQueryControlBar extends JToolBar implements ActionListener, ItemListener, ChangeListener, OTFQueryHandler {
-
+  
+	private static final Logger log = Logger.getLogger(OTFQueryControlBar.class);
+	
 	public IdResolver agentIdResolver = null;
 
 	private final OTFHostControlBar hostControlBar;
@@ -87,11 +89,14 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 			new QueryEntry("agentPTBus", "highlight all buses of a given line", QueryAgentPTBus.class),
 			new QueryEntry("linkSpinneALL", "show Spinne of ALL traffic", QuerySpinne.class),
 			new QueryEntry("linkSpinneNOW", "show Spinne of all veh on the link NOW", QuerySpinneNOW.class)
-	)); 
+	));
+
+	private OTFVisConfig config; 
 
 
-	public OTFQueryControlBar(String name, OTFHostControlBar handler, final OTFVisConfig config) {
-		super(name);
+	public OTFQueryControlBar(OTFHostControlBar handler, final OTFVisConfig config) {
+		super();
+		this.config = config;
 		if(agentIdResolver == null) agentIdResolver  = new myIdResolver();
 		this.hostControlBar = handler;
 		pane = new JTabbedPane();
@@ -108,7 +113,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		{
 			ComboBoxModel leftMFuncModel =	new DefaultComboBoxModel(queries);
 			leftMFuncModel.setSelectedItem(queries.get(0));
-			config.setQueryType(queries.get(0).clazz.getCanonicalName());
+			this.config.setQueryType(queries.get(0).clazz.getCanonicalName());
 			queryTypeComboBox = new JComboBox();
 			com.add(queryTypeComboBox);
 			queryTypeComboBox.setActionCommand("type_changed");
@@ -153,15 +158,16 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		OTFVisConfig cfg = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
+		OTFVisConfig cfg = this.config;
 		String command = e.getActionCommand();
 		if("id_changed".equals(command)) {
 			String id = ((JTextField)e.getSource()).getText();
-
-			if (!cfg.isMultipleSelect())removeQueries();
-
+			if (!cfg.isMultipleSelect()){
+				removeQueries();
+			}
 			handleIdQuery(id, cfg.getQueryType());
-		} else if ("type_changed".equals(command)) {
+		} 
+		else if ("type_changed".equals(command)) {
 			JComboBox cb = (JComboBox)e.getSource();
 			QueryEntry queryType = (QueryEntry)cb.getSelectedItem();
 			cfg.setQueryType(queryType.clazz.getCanonicalName());
@@ -184,10 +190,9 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	}
 
 	public void itemStateChanged(ItemEvent e) {
-		OTFVisConfig conf = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 		JCheckBox source = (JCheckBox)e.getItemSelectable();
 		if (source.getText().equals("multiple select")) {
-			conf.setMultipleSelect(e.getStateChange() != ItemEvent.DESELECTED);
+			this.config.setMultipleSelect(e.getStateChange() != ItemEvent.DESELECTED);
 		}
 	}
 
@@ -209,9 +214,8 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	}
 
 	public void handleIdQuery(Collection<String> list, String queryName) {
-		OTFVisConfig conf = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
 
-		if (!conf.isMultipleSelect()) {
+		if (!this.config.isMultipleSelect()) {
 			removeQueries();
 		}
 
@@ -256,27 +260,26 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		if (mouseButton == 3) {
 			removeQueries();
 			hostControlBar.redrawDrawers();
-		} else {
-			OTFVisConfig conf = (OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME);
-
-			String queryName = conf.getQueryType();
+		}
+		else {
+			String queryName = this.config.getQueryType();
 			Type typeOfQuery = getTypeOfQuery(queryName);
 
 			if (typeOfQuery == OTFQuery.Type.AGENT) {
 				List<String> agentIds = agentIdResolver.resolveId(origRect);
 				if ((agentIds != null) && (agentIds.size() != 0)) {
-					System.out.println("AgentId = " + agentIds);
+					log.debug("AgentId = " + agentIds);
 					handleIdQuery(agentIds, queryName);
 				} else {
-					System.out.println("No AgentId found!");
+					log.debug("No AgentId found!");
 				}
 			} else if (typeOfQuery == OTFQuery.Type.LINK) {
 				QueryLinkId linkIdQuery = (QueryLinkId)hostControlBar.doQuery(new QueryLinkId(origRect));
 				if ((linkIdQuery != null) && (linkIdQuery.linkIds.size() != 0)) {
-					System.out.println("LinkId = " + linkIdQuery.linkIds);
+					log.debug("LinkId = " + linkIdQuery.linkIds);
 					handleIdQuery(linkIdQuery.linkIds.values(), queryName);
 				} else {
-					System.out.println("No LinkId found!");
+					log.debug("No LinkId found!");
 				}
 			}
 		}
@@ -304,7 +307,9 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	}
 
 	synchronized public void drawQueries(OTFDrawer drawer) {
-		for(OTFQuery query : this.queryItems) query.draw(drawer);
+		for(OTFQuery query : this.queryItems){
+			query.draw(drawer);
+		}
 	}
 
 	synchronized public void updateQueries() {
@@ -342,7 +347,9 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	public class myIdResolver implements IdResolver {
 		public List<String> resolveId(Double origRect) {
 			QueryAgentId agentIdQuery = (QueryAgentId)hostControlBar.doQuery( new QueryAgentId(origRect));
-			if ((agentIdQuery != null) && (agentIdQuery.agentIds.size() != 0)) return agentIdQuery.agentIds; 
+			if ((agentIdQuery != null) && (agentIdQuery.agentIds.size() != 0)) {
+				return agentIdQuery.agentIds; 
+			}
 			return null;
 		}
 	}

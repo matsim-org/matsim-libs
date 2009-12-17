@@ -549,12 +549,12 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		canvas.addGLEventListener(drawer);
 		return canvas;
 	}
-	public OTFOGLDrawer(JFrame frame, OTFClientQuad clientQ) {
+	public OTFOGLDrawer(OTFVisConfig visconf, JFrame frame, OTFClientQuad clientQ) {
 		this.clientQ = clientQ;
 		this.frame = frame;
 		GLCapabilities caps = new GLCapabilities();
-		this.config = (OTFVisConfig) Gbl.getConfig().getModule("otfvis");
-
+		this.config = visconf;
+		
 		this.canvas = createGLCanvas(this, caps, motherContext);
 		
 		this.mouseMan = new VisGUIMouseHandler(this);
@@ -644,7 +644,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	public void displayLinkIds() {
 		// Check for linewidth of street
-		final double cellWidth = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
+		final double cellWidth = this.config.getLinkWidth();
 		final double pixelsizeStreet = 5;
 		Rectangle2D test = new InfoText("0000000").getBounds();
 
@@ -696,10 +696,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	BufferedImage current;
 	synchronized public void display(GLAutoDrawable drawable) {
-		//		Gbl.startMeasurement();
-		// update config
-		this.config = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis"));
-
 		this.gl = drawable.getGL();
 		
 

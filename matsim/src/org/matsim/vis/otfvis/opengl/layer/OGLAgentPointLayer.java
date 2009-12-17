@@ -185,7 +185,7 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 			for(int i = 0; i < this.posBuffers.size(); i++) {
 				vertex = this.posBuffers.get(i);
 				vertex.position(0);
-				while (vertex.hasRemaining() && idx < this.count) {
+				while (vertex.hasRemaining() && (idx < this.count)) {
 					float x = vertex.get();
 					float y = vertex.get();
 					// DS We do not need z value here but need to fetch it from buffer!

@@ -31,6 +31,7 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Coord;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
@@ -42,10 +43,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.caching.ClientDataBase;
 import org.matsim.vis.otfvis.data.OTFServerQuad;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
@@ -66,7 +67,9 @@ import com.sun.opengl.util.BufferUtil;
  */
 public class QueryAgentPlan implements OTFQuery {
 
-	private static final long serialVersionUID = -8415337571576184768L;
+  private static final Logger log = Logger.getLogger(QueryAgentPlan.class);
+	
+  private static final long serialVersionUID = -8415337571576184768L;
 
 	private static class MyInfoText implements Serializable{
 
@@ -163,9 +166,7 @@ public class QueryAgentPlan implements OTFQuery {
 
 	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad quad) {
 		Person person = plans.getPersons().get(new IdImpl(this.agentId));
-		if (person == null) {
-			// Can't do anything.
-		} else {
+		if (person != null) {
 			Plan plan = person.getSelectedPlan();
 			this.acts = new Object[plan.getPlanElements().size() / 2];
 			for (int i = 0; i < this.acts.length; i++) {
@@ -178,6 +179,9 @@ public class QueryAgentPlan implements OTFQuery {
 			}
 			buildRoute(plan);
 		}
+		else {
+			log.error("No person found for id " + this.agentId);
+		}
 		return this;
 	}
 
@@ -187,7 +191,7 @@ public class QueryAgentPlan implements OTFQuery {
 		}
 	}
 
-	public void drawWithGLDrawer(OTFOGLDrawer drawer) {
+	protected void drawWithGLDrawer(OTFOGLDrawer drawer) {
 		if (this.vertex != null) {
 			OGLAgentPointLayer layer = (OGLAgentPointLayer) drawer.getActGraph().getLayer(AgentPointDrawer.class);
 			Point2D.Double pos = tryToFindAgentPosition(layer);
@@ -201,7 +205,8 @@ public class QueryAgentPlan implements OTFQuery {
 				drawCircleAroundAgent(pos, gl);
 				updateAgentTextPosition(pos);
 				resetAnyOldProgressbars();
-			} else {
+			} 
+			else {
 				// We don't know where the agent is, so we ask the server if
 				// they are still active.
 				queryAgentActivityStatus(drawer);

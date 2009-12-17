@@ -33,6 +33,7 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
+import org.matsim.ptproject.controller.PtController;
 import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.run.OTFVis;
 
@@ -65,7 +66,7 @@ public class DaganzoRunner {
 			conf = configFile;
 		}
 //		String c = DgPaths.STUDIESDG + "daganzo/daganzoConfig2Agents.xml"; 
-		Controler controler = new Controler(conf);
+		PtController controler = new PtController(conf);
 		controler.setOverwriteFiles(true);
 		Config config = controler.getConfig();
 		
@@ -77,13 +78,14 @@ public class DaganzoRunner {
 	
 	private void addQueueSimListener(final Controler controler) {
 		controler.getQueueSimulationListener().add(new QueueSimulationInitializedListener<QueueSimulation>() {
+			//add the adaptive controller as events listener
 			public void notifySimulationInitialized(QueueSimulationInitializedEvent<QueueSimulation> e) {
 				QueueSimulation qs = e.getQueueSimulation();
 				AdaptiveController adaptiveController = (AdaptiveController) qs.getQueueSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
 				controler.getEvents().addHandler(adaptiveController);
 			}
 		});
-		
+		//remove the adaptive controller
 		controler.getQueueSimulationListener().add(new QueueSimulationBeforeCleanupListener<QueueSimulation>() {
 			public void notifySimulationBeforeCleanup(QueueSimulationBeforeCleanupEvent<QueueSimulation> e) {
 				QueueSimulation qs = e.getQueueSimulation();
@@ -96,6 +98,7 @@ public class DaganzoRunner {
 	}
 
 	private void addListener(Controler c) {
+		//add some EventHandler to the EventsManager after the controler is started
 		handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));
 		handler4 = new TTInOutflowEventHandler(new IdImpl("4"));
 		c.addControlerListener(new StartupListener() {
@@ -104,7 +107,7 @@ public class DaganzoRunner {
 				e.getControler().getEvents().addHandler(handler4);
 			}});
 
-		
+		//write some output after each iteration
 		c.addControlerListener(new IterationEndsListener() {
 			public void notifyIterationEnds(IterationEndsEvent e) {
 				TTGraphWriter ttWriter = new TTGraphWriter();
@@ -118,7 +121,7 @@ public class DaganzoRunner {
 				inoutWriter.writeInOutChart(e.getControler().getIterationPath(e.getIteration()), e.getIteration());
 			}
 		});
-		
+  	//write some output at shutdown
 		c.addControlerListener(new ShutdownListener() {
 			public void notifyShutdown(ShutdownEvent event) {
 				DgCountPerIterationGraph chart = new DgCountPerIterationGraph();

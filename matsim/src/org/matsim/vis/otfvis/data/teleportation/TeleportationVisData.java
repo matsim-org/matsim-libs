@@ -42,6 +42,8 @@ public class TeleportationVisData {
   private double currentY;
 	private double starttime;
 	private Id id;
+
+	private double length;
 	
 	public TeleportationVisData(double now, DriverAgent agent, Link link) {
 		this.starttime = now;
@@ -53,7 +55,7 @@ public class TeleportationVisData {
 		double endY = agent.getDestinationLink().getToNode().getCoord().getY();
 		double dX = endX - startX;
 		double dY = endY - startY;
-		double length = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
+		length = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
 		this.stepsize = length / traveltime;
 		this.normalX = dX / length;
 		this.normalY = dY / length;
@@ -80,6 +82,10 @@ public class TeleportationVisData {
 
 	public Id getId(){
 		return this.id;
+	}
+	
+	public double getLength(){
+		return this.length;
 	}
 	
 	public void calculatePosition(double time) {

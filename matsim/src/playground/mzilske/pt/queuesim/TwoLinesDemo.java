@@ -383,7 +383,7 @@ public class TwoLinesDemo {
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenario, events);
 		sim.setUseUmlaeufe(true);
 		sim.startOTFServer("two_lines_demo");
-		OTFDemo.ptConnect("two_lines_demo");
+		OTFDemo.ptConnect("two_lines_demo", this.scenario.getConfig());
 
 		sim.run();
 

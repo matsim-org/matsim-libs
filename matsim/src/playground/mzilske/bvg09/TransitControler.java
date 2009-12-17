@@ -110,7 +110,7 @@ public class TransitControler extends Controler {
 		TransitQueueSimulation sim = new TransitQueueSimulation(this.scenarioData, this.events);
 		sim.setUseUmlaeufe(true);
 		sim.startOTFServer("livesim");
-		OTFDemo.ptConnect("livesim");
+		OTFDemo.ptConnect("livesim", this.config);
 		sim.run();
 	}
 
@@ -163,6 +163,7 @@ public class TransitControler extends Controler {
 
 	public static void main(final String[] args) {
 		TransitControler tc = new TransitControler(args);
+		tc.setOverwriteFiles(true);
 		tc.run();
 	}
 

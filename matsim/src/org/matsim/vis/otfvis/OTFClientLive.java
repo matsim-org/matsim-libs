@@ -60,10 +60,10 @@ public class OTFClientLive extends OTFClient {
 	protected void createDrawer(){
 		try {		
 			OTFClientQuad clientQ = createNewView(this.url, connect, this.hostControlBar.getOTFHostControl());
-			mainDrawer = new OTFOGLDrawer(frame, clientQ);
+			mainDrawer = new OTFOGLDrawer(this.visconf, this.frame, clientQ);
 			
 			if (hostControlBar.getOTFHostControl().isLiveHost()) {
-				OTFQueryControlBar queryControl = new OTFQueryControlBar("test", hostControlBar, visconf);
+				OTFQueryControlBar queryControl = new OTFQueryControlBar(hostControlBar, visconf);
 				frame.getContentPane().add(queryControl, BorderLayout.SOUTH);
 				((OTFOGLDrawer) mainDrawer).setQueryHandler(queryControl);
 			}

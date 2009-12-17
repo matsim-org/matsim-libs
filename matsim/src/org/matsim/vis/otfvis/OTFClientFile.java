@@ -114,7 +114,7 @@ public class OTFClientFile extends OTFClient {
 			} else  {
 				throw new IllegalStateException("Server in live mode!");
 			}
-			mainDrawer = 	new OTFOGLDrawer(frame, this.getRightDrawerComponent());
+			mainDrawer = 	new OTFOGLDrawer(this.visconf, frame, this.getRightDrawerComponent());
 
 		}catch (RemoteException e) {
 			e.printStackTrace();

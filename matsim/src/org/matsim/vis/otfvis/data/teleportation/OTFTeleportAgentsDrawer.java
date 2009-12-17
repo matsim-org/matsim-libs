@@ -43,6 +43,10 @@ public class OTFTeleportAgentsDrawer extends OTFGLDrawableImpl{
 	
   private Map<String, Point2D.Double> positions = new HashMap<String, Point2D.Double>();
 
+  public OTFTeleportAgentsDrawer(){
+  	log.info("acitvated OTFTeleportAgentsDrawer...");
+  }
+  
 	public void onDraw(GL gl) {
 //		log.error("starting to draw agents...");
 		float agentSize = ((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).getAgentSize();
