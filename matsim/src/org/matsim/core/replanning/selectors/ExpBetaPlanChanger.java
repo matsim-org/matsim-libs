@@ -39,7 +39,7 @@ public class ExpBetaPlanChanger implements PlanSelector {
 	static boolean betaFlag = true ;
 
 	public ExpBetaPlanChanger() {
-		this.beta = Double.parseDouble(Gbl.getConfig().getParam("planCalcScore", "BrainExpBeta"));
+		this.beta = Gbl.getConfig().charyparNagelScoring().getBrainExpBeta();
 	}
 
 	/**
