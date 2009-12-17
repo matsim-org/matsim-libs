@@ -1101,7 +1101,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.bikeIn=bikeIn;
 		
 		ActChainEqualityCheck acCheck = new ActChainEqualityCheck();
-		AgentsAttributesAdder aaa = null;//new AgentsAttributesAdder ();
+		AgentsAttributesAdder aaa = new AgentsAttributesAdder ();
 		int incomeAverage=0;
 		int noOfGA = 0;
 		int noOfHalbtax = 0;
