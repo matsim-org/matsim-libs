@@ -162,7 +162,8 @@ public class TransitControler extends Controler {
 	}
 
 	public static void main(final String[] args) {
-		new TransitControler(args).run();
+		TransitControler tc = new TransitControler(args);
+		tc.run();
 	}
 
 }
