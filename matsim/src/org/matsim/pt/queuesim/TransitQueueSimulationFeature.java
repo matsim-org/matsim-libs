@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
 import org.matsim.api.basic.v01.TransportMode;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -38,7 +39,9 @@ import org.matsim.vis.otfvis.server.OnTheFlyServer;
  * @author mrieser
  */
 public class TransitQueueSimulationFeature implements QueueSimulationFeature, DepartureHandler {
-
+  
+	private static final Logger log = Logger.getLogger(TransitQueueSimulationFeature.class);
+	
 	private OnTheFlyServer otfServer = null;
 	private QueueSimulation queueSimulation;
 	private TransitSchedule schedule = null;
@@ -188,7 +191,13 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 
 	public void beforeHandleUnknownLegMode(double now, final DriverAgent agent, Link link) {
 		if (this.otfServer != null) {
-			this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link));
+			TeleportationVisData telData = new TeleportationVisData(now, agent, link);
+			if (telData.getLength() != 0.0){
+				this.visTeleportationData.put(agent.getPerson().getId() , new TeleportationVisData(now, agent, link));
+			}
+			else {
+				log.warn("Not able to visualize teleport agent " + agent.getPerson().getId() + " because the teleportation coordinates are equal!");
+			}
 		}
 	}
 
