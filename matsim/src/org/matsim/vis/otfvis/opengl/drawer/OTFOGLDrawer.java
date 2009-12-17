@@ -893,19 +893,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.config.addZoom(new ZoomEntry(image,zoomstore, name));
 
 	}
-	
-//	void doChangeDrawer(final Point2D.Double point){
-//		if(!this.clientQ.doChangeDrawer(point, this)) return;
-//		try {
-//			//actGraph = this.clientQ.getSceneGraph(this.now, mouseMan.getBounds(), this);
-//			invalidate(-1);
-//			redraw();
-//		} catch (RemoteException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-//	}
 
 	public void handleClick(final Point2D.Double point, int mouseButton, MouseEvent e) {
 		if(mouseButton == 4 ){
