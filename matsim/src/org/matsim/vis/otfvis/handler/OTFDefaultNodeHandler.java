@@ -26,7 +26,7 @@ import java.nio.ByteBuffer;
 import org.matsim.ptproject.qsim.QueueNode;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataXYCoordReceiver;
@@ -48,8 +48,8 @@ public class OTFDefaultNodeHandler extends OTFDataReader   {
 
 		@Override
 		public void writeConstData(ByteBuffer out) throws IOException {
-			out.putFloat((float)(this.src.getNode().getCoord().getX() - OTFServerQuad.offsetEast)); //subtract minEasting/Northing somehow!
-			out.putFloat((float)(this.src.getNode().getCoord().getY() - OTFServerQuad.offsetNorth));
+			out.putFloat((float)(this.src.getNode().getCoord().getX() - OTFServerQuad2.offsetEast)); //subtract minEasting/Northing somehow!
+			out.putFloat((float)(this.src.getNode().getCoord().getY() - OTFServerQuad2.offsetNorth));
 		}
 
 		@Override

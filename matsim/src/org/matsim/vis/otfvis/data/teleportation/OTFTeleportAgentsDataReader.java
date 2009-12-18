@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
 
@@ -64,8 +64,8 @@ public class OTFTeleportAgentsDataReader extends OTFDataReader {
 		for (int i = 0; i < numberOfAgents; i++){
 			
 			String id = ByteBufferUtils.getString(in);
-			double x = in.getDouble() - OTFServerQuad.offsetEast;
-			double y = in.getDouble() - OTFServerQuad.offsetNorth;
+			double x = in.getDouble() - OTFServerQuad2.offsetEast;
+			double y = in.getDouble() - OTFServerQuad2.offsetNorth;
 //			log.error("id: " + id + " x: " + x + " y: " + y);
 			drawer.getPositions().put(id, new Point2D.Double(x, y));
 		}

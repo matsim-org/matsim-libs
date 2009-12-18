@@ -48,7 +48,8 @@ import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.data.OTFServerQuadI;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuad;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.otfvis.executables.OTFVisController;
@@ -207,7 +208,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 			buf.get(act.buffer);
 		}
 		updateThis.clear();
-		OTFServerQuad quad = quads.values().iterator().next().quad;
+		OTFServerQuad2 quad = quads.values().iterator().next().quad;
 		for(OTFQuery query : queryThis.keySet()) {
 			queryThis.put(query, query.query(network, pop, events, quad));
 		}
@@ -314,11 +315,11 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 		quads.put(id, new QuadStorage(id, quad, null, null));
 	}
 	
-	public OTFServerQuad getQuad(String id, OTFConnectionManager connect) throws RemoteException {
+	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) throws RemoteException {
 
 		if (quads.containsKey(id)) return quads.get(id).quad;
 
-		OTFServerQuad quad = this.quadBuilder.createAndInitOTFServerQuad(connect);
+		OTFServerQuad2 quad = this.quadBuilder.createAndInitOTFServerQuad(connect);
 		quad.initQuadTree(connect);
 		for(OTFDataWriter writer : additionalElements) {
 			log.info("Adding additional element: " + writer.getClass().getName());
@@ -385,7 +386,7 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	public OTFQuery answerQuery(OTFQuery query) throws RemoteException {
 		OTFQuery result = null;
 		synchronized (updateFinished) {
-			OTFServerQuad quad = quads.values().iterator().next().quad;
+			OTFServerQuad2 quad = quads.values().iterator().next().quad;
 			result = query.query(network, pop, events, quad);
 		}
 
@@ -462,10 +463,10 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 
 	private static class QuadStorage {
 		public String id;
-		public OTFServerQuad quad;
+		public OTFServerQuad2 quad;
 		public QuadTree.Rect rect;
 		public byte [] buffer;
-		public QuadStorage(String id, OTFServerQuad quad, Rect rect, byte[] buffer) {
+		public QuadStorage(String id, OTFServerQuad2 quad, Rect rect, byte[] buffer) {
 			this.id = id;
 			this.quad = quad;
 			this.rect = rect;

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 
 public class ForceArrowWriter  extends OTFDataWriter {
 
@@ -37,8 +37,8 @@ public class ForceArrowWriter  extends OTFDataWriter {
 		}
 		out.putInt(data.size()); 
 		for (double [] force : data) {
-			out.putFloat((float) (force[0]- OTFServerQuad.offsetEast));
-			out.putFloat((float) (force[1] - OTFServerQuad.offsetNorth));
+			out.putFloat((float) (force[0]- OTFServerQuad2.offsetEast));
+			out.putFloat((float) (force[1] - OTFServerQuad2.offsetNorth));
 			out.putFloat((float) force[2]);
 			out.putFloat((float) force[3]);
 			out.putFloat((float) force[4]);

@@ -33,7 +33,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QueueLane;
 import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
@@ -55,11 +55,11 @@ public class DgOtfLaneWriter extends OTFDataWriter<QueueLink> implements OTFWrit
 	public void writeConstData(ByteBuffer out) throws IOException {
 //		String id = this.src.getLink().getId().toString();
 //		ByteBufferUtils.putString(out, id);
-		Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad.offsetEast, 
-				this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad.offsetNorth);
+		Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast, 
+				this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
 		
-		Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad.offsetEast,
-				this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad.offsetNorth);
+		Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
+				this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
 
 		
 		//calculate link width
@@ -145,10 +145,10 @@ public class DgOtfLaneWriter extends OTFDataWriter<QueueLink> implements OTFWrit
 	
 	private Point2D.Double calculateMiddleOfToLink(Link toLink, double cellWidth) {
 		//get coordinates
-		Point2D.Double toLinkStart = new Point2D.Double(toLink.getFromNode().getCoord().getX() - OTFServerQuad.offsetEast, 
-				toLink.getFromNode().getCoord().getY() - OTFServerQuad.offsetNorth);
-		Point2D.Double toLinkEnd = new Point2D.Double(toLink.getToNode().getCoord().getX()  - OTFServerQuad.offsetEast, 
-				toLink.getToNode().getCoord().getY() - OTFServerQuad.offsetNorth);
+		Point2D.Double toLinkStart = new Point2D.Double(toLink.getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast, 
+				toLink.getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
+		Point2D.Double toLinkEnd = new Point2D.Double(toLink.getToNode().getCoord().getX()  - OTFServerQuad2.offsetEast, 
+				toLink.getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
 		//scale
 		Tuple<Double, Double> scaledTuple = VectorUtils.scaleVector(toLinkStart, toLinkEnd, linkScale);
 		toLinkStart = scaledTuple.getFirst();

@@ -32,7 +32,7 @@ import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.ptproject.qsim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 
@@ -54,7 +54,7 @@ public class QueryAgentActivityStatus implements OTFQuery {
 	int activityNr = -1;
 	double finished = 0;
 
-	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad quad) {
+	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad2 quad) {
 		Person person = plans.getPersons().get(this.agentId);
 		if (person == null) return this;
 

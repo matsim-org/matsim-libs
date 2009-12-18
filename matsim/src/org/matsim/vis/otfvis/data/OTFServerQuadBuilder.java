@@ -24,6 +24,6 @@ package org.matsim.vis.otfvis.data;
  */
 public interface OTFServerQuadBuilder {
 
-	public OTFServerQuad createAndInitOTFServerQuad(OTFConnectionManager connect);
+	public OTFServerQuad2 createAndInitOTFServerQuad(OTFConnectionManager connect);
 
 }

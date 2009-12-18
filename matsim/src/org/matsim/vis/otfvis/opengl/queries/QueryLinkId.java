@@ -36,7 +36,7 @@ import org.matsim.core.utils.collections.QuadTree.Executor;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -126,7 +126,7 @@ public class QueryLinkId implements OTFQuery {
 		}
 	}
 	
-	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad quad) {
+	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad2 quad) {
 		
 		// just look in a certain region around the actual point, 
 		double regionWidth = (quad.getMaxEasting()-quad.getMinEasting())*0.1;

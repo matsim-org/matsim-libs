@@ -31,7 +31,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
@@ -92,8 +92,8 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		public void writeAgent(ExtendedPositionInfo pos, ByteBuffer out) {
 			String id = pos.getAgentId().toString();
 			ByteBufferUtils.putString(out, id);
-			out.putFloat((float)(pos.getEasting() - OTFServerQuad.offsetEast));
-			out.putFloat((float)(pos.getNorthing()- OTFServerQuad.offsetNorth));
+			out.putFloat((float)(pos.getEasting() - OTFServerQuad2.offsetEast));
+			out.putFloat((float)(pos.getNorthing()- OTFServerQuad2.offsetNorth));
 			out.putInt(pos.type);
 			out.putInt(pos.user);
 			out.putFloat((float)pos.getSpeed());

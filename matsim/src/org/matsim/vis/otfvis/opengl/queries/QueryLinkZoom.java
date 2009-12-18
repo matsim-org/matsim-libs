@@ -23,7 +23,7 @@ package org.matsim.vis.otfvis.opengl.queries;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.ptproject.qsim.QueueNetwork;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 
@@ -42,7 +42,7 @@ public class QueryLinkZoom implements OTFQuery {
 	}
 
 	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events,
-			OTFServerQuad quad) {
+			OTFServerQuad2 quad) {
 		return this;
 
 	}

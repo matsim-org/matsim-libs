@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuadI;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostConnectionManager;
@@ -101,11 +101,12 @@ public abstract class OTFClient extends Thread {
 		}
 
 		log.info("Getting Quad id " + id);
-		OTFServerQuad servQ = hostControl.getOTFServer().getQuad(id, connect);
+		OTFServerQuadI servQ = hostControl.getOTFServer().getQuad(id, connect);
 		log.info("Converting Quad");
 		OTFClientQuad clientQ = servQ.convertToClient(id, hostControl.getOTFServer(), connect);
-		log.info("Creating receivers");
+		log.info("Creating receivers...");
 		clientQ.createReceiver(connect);
+		log.info("Reading data...");
 		clientQ.getConstData();
 		this.hostControlBar.updateTimeLabel();
 		hostControl.getQuads().put(id, clientQ);

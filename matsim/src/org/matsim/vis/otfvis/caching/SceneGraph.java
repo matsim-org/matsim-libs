@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
@@ -68,6 +69,9 @@ class LayerDrawingOrderComparator implements Comparator<SceneLayer>, Serializabl
  *
  */
 public class SceneGraph {
+	
+	private static final Logger log = Logger.getLogger(SceneGraph.class);
+	
 	private Rect rect;
 	private final Map<Class, SceneLayer> layers = new LinkedHashMap<Class, SceneLayer>();
 	private final List<SceneLayer> drawingLayers = new LinkedList<SceneLayer>();
@@ -91,7 +95,7 @@ public class SceneGraph {
 		layers.put(Object.class, new SimpleSceneLayer());
 		
 		connect.fillLayerMap(layers);
-
+//		log.debug("adding " + layers.size() + " layers to SceneGraph");
 		// do initialising action if necessary
 		for (SceneLayer layer : layers.values()) {
 			layer.init(this, time == -1 ? true : false);

@@ -56,7 +56,7 @@ import org.matsim.evacuation.otfvis.readerwriter.TileDrawerDataReader;
 import org.matsim.evacuation.otfvis.readerwriter.TileDrawerDataWriter;
 import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFFileWriterQSimConnectionManagerFactory;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
@@ -176,7 +176,7 @@ public class MVISnapshotWriter extends OTFFileWriter{
 		if (this.occMap != null) {
 			try {
 				FeatureSource fs = ShapeFileReader.readDataFile(this.BUILDINGS_FILE);
-				OTFSheltersDrawer sd = new OTFSheltersDrawer(fs,this.occMap,OTFServerQuad.offsetNorth,OTFServerQuad.offsetEast);
+				OTFSheltersDrawer sd = new OTFSheltersDrawer(fs,this.occMap,OTFServerQuad2.offsetNorth,OTFServerQuad2.offsetEast);
 				this.quad.addAdditionalElement(new SheltersWriter(sd));
 				connect.add(SheltersWriter.class,SheltersReader.class);
 				connect.add(SheltersReader.class,TimeDependentTrigger.class);

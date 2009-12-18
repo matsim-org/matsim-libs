@@ -21,7 +21,7 @@ package org.matsim.vis.otfvis.data.fileio.queuesim;
 
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFServerQuadBuilder;
 
 
@@ -37,7 +37,7 @@ public class OTFQueueSimServerQuadBuilder implements OTFServerQuadBuilder {
 		this.network = network;
 	}
 	
-	public OTFServerQuad createAndInitOTFServerQuad(OTFConnectionManager connect){
+	public OTFServerQuad2 createAndInitOTFServerQuad(OTFConnectionManager connect){
 		OTFQueueSimServerQuad quad = new OTFQueueSimServerQuad(this.network);
 		quad.initQuadTree(connect);
 		return quad;

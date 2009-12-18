@@ -37,7 +37,7 @@ import org.matsim.ptproject.qsim.QueueLink;
 import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.ptproject.qsim.QueueNode;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.fileio.qsim.OTFQSimServerQuadBuilder;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
@@ -61,7 +61,7 @@ public class OTFTVehServer implements OTFServerRemote {
 	private final TreeMap<Integer, byte[]> timesteps = new TreeMap<Integer, byte[]>();
 
 	private final OTFAgentsListHandler.Writer writer = new OTFAgentsListHandler.Writer();
-	private final OTFServerQuad quad;
+	private final OTFServerQuad2 quad;
 
 	private final ByteBuffer buf = ByteBuffer.allocate(BUFFERSIZE);
 	private OTFAgentsListHandler.ExtendedPositionInfo readVehicle = null;
@@ -198,7 +198,7 @@ public class OTFTVehServer implements OTFServerRemote {
 		return (int)this.nextTime;
 	}
 
-	public OTFServerQuad getQuad(String id, OTFConnectionManager connect)
+	public OTFServerQuad2 getQuad(String id, OTFConnectionManager connect)
 			throws RemoteException {
 		return this.quad;
 	}

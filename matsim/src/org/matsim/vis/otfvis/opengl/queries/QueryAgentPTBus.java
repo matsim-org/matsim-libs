@@ -39,7 +39,7 @@ import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -120,7 +120,7 @@ public class QueryAgentPTBus implements OTFQuery {
 		return vertex;
 	}
 	
-	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad quad) {
+	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad2 quad) {
 		//Person person = plans.getPerson(this.agentID);
 		String prefix = agentId + "-";
 		

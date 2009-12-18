@@ -87,11 +87,6 @@ public class OTFClientFile extends OTFClient {
 		
 	}
 
-	public OTFClientFile( String filename2,  OTFConnectionManager connect) {
-		this(filename2);
-		this.connect = connect;
-	}
-
 	protected OTFClientQuad getRightDrawerComponent() throws RemoteException {
 		OTFConnectionManager connectR = this.connect.clone();
 		//those lines are from my point of view not really needed dg dez 09

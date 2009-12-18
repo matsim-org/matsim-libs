@@ -59,6 +59,7 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	private final double maxEasting;
 	private final double minNorthing;
 	private final double maxNorthing;
+	private SceneGraph lastGraph = null;
 
 	public double offsetEast;
 	public double offsetNorth;
@@ -70,18 +71,30 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 
 	private final List<OTFDataReader> additionalElements= new LinkedList<OTFDataReader>();
 
+	/**
+	 * The big question is why the Receiver creation needs to be done with an 
+	 * "Executor" monster code as it is invoked on the top element of the 
+	 * quad thus on all quad elements and the reader drawer connection
+	 * is not really dependend on spatial things. dg dez 09
+	 *
+	 */
 	static class CreateReceiverExecutor implements Executor<OTFDataReader> {
+
 		final OTFConnectionManager connect;
 		final SceneGraph graph;
 
 		public CreateReceiverExecutor(final OTFConnectionManager connect2, final SceneGraph graph) {
+//			log.error("created CreateReceiverExecuter");
 			this.connect = connect2;
 			this.graph = graph;
 		}
 
 		public void execute(final double x, final double y, final OTFDataReader reader) {
 			Collection<OTFDataReceiver> drawers = this.connect.getReceivers(reader.getClass(), this.graph);
-			for (OTFDataReceiver drawer : drawers) reader.connect(drawer);
+//			log.error("Creating Receivers for reader class: " + reader.getClass());
+			for (OTFDataReceiver drawer : drawers) {
+				reader.connect(drawer);
+			}
 		}
 	}
 
@@ -155,18 +168,21 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		this.additionalElements.add(element);
 	}
 
-	public synchronized void createReceiver(final OTFConnectionManager connect) {
+	public synchronized void createReceiver(final OTFConnectionManager c) {
 
-		this.connect = connect;
+		this.connect = c;
 
+//		DgOTFVisUtils.printConnectionManager(c);
+		
 		SceneGraph graph = new SceneGraph(null, -1, connect, null);
-		this.execute(this.top.getBounds(),
-				new CreateReceiverExecutor(connect, graph));
+		this.execute(this.top.getBounds(), new CreateReceiverExecutor(connect, graph));
+		
+		log.info("Connecting additional elements...");
 		for(OTFDataReader element : this.additionalElements) {
 			Collection<OTFDataReceiver> drawers = connect.getReceivers(element.getClass(), graph);
 			for (OTFDataReceiver drawer : drawers) {
 				element.connect(drawer);
-				log.info("Connected " + element.getClass().getName() + " to " + drawer.getClass().getName());
+				log.info("  Connected " + element.getClass().getName() + " to " + drawer.getClass().getName());
 			}
 		}
 	}
@@ -223,22 +239,6 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		return result;
 	}
 
-
-	/*
-	 * new getScenegraph(time, rect) called from either OGLDrawer or (for caching) from builderThread
-	 * if cahchedversion is in rect and time -> OK
-	 * else
-	 * build scnegraph wth new layers set according to connect
-	 * new scenegraph(rect);
-	 * invalidate quad and additional elements
-	 * in invalidate of elements :
-	 *  scenegraph.add2layer(this);
-	 *
-	 *  store scenegraph according to time
-	 *
-	 */
-
-	private SceneGraph lastGraph = null;
 
 	public synchronized SceneGraph getSceneGraphNoCache(final int time, Rect rect, final OTFDrawer drawer) throws RemoteException {
 		List<Rect> rects = new LinkedList<Rect>();

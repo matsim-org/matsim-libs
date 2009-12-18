@@ -39,7 +39,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
+import org.matsim.vis.otfvis.data.OTFServerQuadI;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 /**
@@ -177,7 +178,7 @@ public class OTFFileReader implements OTFServerRemote {
 			}
 			// these remappings only happen with older file versions
 			if (name.equals("playground.david.vis.data.OTFServerQuad")) {
-				return OTFServerQuad.class;
+				return OTFServerQuad2.class;
 			} else if (name.startsWith("org.matsim.utils.vis.otfvis")) {
 				name = name.replaceFirst("org.matsim.utils.vis.otfvis",
 				"org.matsim.vis.otfvis");
@@ -216,8 +217,8 @@ public class OTFFileReader implements OTFServerRemote {
 	}
 
 
-	private OTFServerQuad readQuad() {
-		OTFServerQuad quad = null;
+	private OTFServerQuadI readQuad() {
+		OTFServerQuadI quad = null;
 		try {
 			// we do not cache anymore ...readZIPFile();
 			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
@@ -225,8 +226,9 @@ public class OTFFileReader implements OTFServerRemote {
 			BufferedInputStream is = new BufferedInputStream(zipFile
 					.getInputStream(quadEntry));
 			try {
-				quad = (OTFServerQuad) new OTFObjectInputStream(is)
+				quad = (OTFServerQuadI) new OTFObjectInputStream(is)
 				.readObject();
+				log.error("Read quad from file, type: " + quad.getClass().getName());
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -298,9 +300,9 @@ public class OTFFileReader implements OTFServerRemote {
 		return false;
 	}
 
-	public OTFServerQuad getQuad(final String id,
+	public OTFServerQuadI getQuad(final String id,
 			final OTFConnectionManager connect) throws RemoteException {
-		OTFServerQuad quad = null;
+		OTFServerQuadI quad = null;
 		// if (connect != null) throw new
 		// RemoteException("writers need to be NULL, when reading from file"
 		// );

@@ -38,7 +38,7 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.data.OTFDataSimpleAgentReceiver;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo.VehicleState;
@@ -74,8 +74,8 @@ public class OTFLinkAgentsHandler extends OTFDefaultLinkHandler {
 		public void writeAgent(PositionInfo pos, ByteBuffer out) {
 			String id = pos.getAgentId().toString();
 			ByteBufferUtils.putString(out, id);
-			out.putFloat((float)(pos.getEasting() - OTFServerQuad.offsetEast));
-			out.putFloat((float)(pos.getNorthing()- OTFServerQuad.offsetNorth));
+			out.putFloat((float)(pos.getEasting() - OTFServerQuad2.offsetEast));
+			out.putFloat((float)(pos.getNorthing()- OTFServerQuad2.offsetNorth));
 			if (pos.getVehicleState()== VehicleState.Parking) {
 				// What is the next legs mode?
 				QueueVehicle veh = src.getVehicle(pos.getAgentId());

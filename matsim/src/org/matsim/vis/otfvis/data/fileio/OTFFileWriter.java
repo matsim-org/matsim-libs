@@ -32,7 +32,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFConnectionManagerFactory;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFServerQuadBuilder;
 import org.matsim.vis.otfvis.data.OTFConnectionManager.Entry;
 import org.matsim.vis.snapshots.writers.PositionInfo;
@@ -50,7 +50,7 @@ public class OTFFileWriter implements SnapshotWriter {
 
 	private static final int BUFFERSIZE = 300000000;
 	
-	protected OTFServerQuad quad = null;
+	protected OTFServerQuad2 quad = null;
 	protected final double interval_s;
 	protected double nextTime = -1;
 

@@ -48,7 +48,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.caching.ClientDataBase;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -164,7 +164,7 @@ public class QueryAgentPlan implements OTFQuery {
 		}
 	}
 
-	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad quad) {
+	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad2 quad) {
 		Person person = plans.getPersons().get(new IdImpl(this.agentId));
 		if (person != null) {
 			Plan plan = person.getSelectedPlan();

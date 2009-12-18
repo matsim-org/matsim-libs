@@ -171,16 +171,18 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 
 	public Collection<OTFDataReceiver> getReceivers(Class srcClass, SceneGraph graph) {
 		Collection<Class> classList = getToEntries(srcClass);
+//		log.error("getting receivers for class " + srcClass.getName());
+//		for (Class c : classList){
+//			log.error("found to entry " + c.getName());
+//		}
 		List<OTFDataReceiver> receiverList = new LinkedList<OTFDataReceiver>();
 		
 		for(Class entry : classList) {
 			try {
 				receiverList.add((OTFDataReceiver)(graph.newInstance(entry)));
 			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -208,13 +210,21 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 			Entry entry = iter.next();
 			// make sure, that the static members have been initialized
 			try {
-				entry.to.newInstance();
 				entry.from.newInstance();
 			} catch (InstantiationException e) {
-				log.warn("For Writer class" + entry.from.getCanonicalName()+ " or " + entry.to.getCanonicalName() + " instance could not be generated");
+				log.warn("FROM For Entry " + entry.from.getCanonicalName()+ " " + entry.to.getCanonicalName() + " the from  instance could not be generated!");
 			} catch (IllegalAccessException e) {
-				log.warn("For Writer class" + entry.from.getCanonicalName()+ " or " + entry.to.getCanonicalName() + " instance could not be accessed");
+				log.warn("FROM For Entry " + entry.from.getCanonicalName()+ " " + entry.to.getCanonicalName() + " the from instance could not be generated!");
 			}
+			
+			try {
+				entry.to.newInstance();
+			} catch (InstantiationException e) {
+				log.warn("TO For Entry " + entry.from.getCanonicalName()+ " " + entry.to.getCanonicalName() + " the to instance could not be generated");
+			} catch (IllegalAccessException e) {
+				log.warn("TO For Entry " + entry.from.getCanonicalName()+ " " + entry.to.getCanonicalName() + " the to instance could not be generated");
+			}
+
 			
 			// check for both classes, if they need to be replaced
 			Class newReader = handleClassAdoption(entry.to, fileFormat);
@@ -223,8 +233,8 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 			newReader = handleClassAdoption(entry.from, fileFormat);
 			if (newReader != null) iter.set(new Entry(newReader, entry.to));
 		}
-		System.out.println(OTFDataReader.previousVersions);
-		System.out.println(connections);
+		log.info(OTFDataReader.previousVersions);
+		log.info(connections);
 
 	}
 
@@ -235,11 +245,11 @@ public class OTFConnectionManager implements Cloneable, Serializable {
 			if (SceneLayer.class.isAssignableFrom(entry.to))
 				try {
 					layers.put(entry.from, (SceneLayer)(entry.to.newInstance()));
+//					log.info("created layer " + entry.to.getName());
+//					log.info("drawer for layer is " + entry.from);
 				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}

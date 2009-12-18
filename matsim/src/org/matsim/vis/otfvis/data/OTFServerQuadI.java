@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFServerRemote.java
+ * OTFServerQuadI
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.vis.otfvis.data;
 
-package org.matsim.vis.otfvis.interfaces;
-
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-import java.util.Collection;
+import java.nio.ByteBuffer;
 
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuadI;
+import org.matsim.vis.otfvis.interfaces.OTFServerRemote;
 
-/**
- * OTFServerRemote is the one most important interface for the 
- * communication between client and server. All methods necessary for data
- * exchange are bundled in this interface.
- * 
- * @author dstrippgen
- *
- */
-public interface OTFServerRemote extends Remote {
-	public enum TimePreference{EARLIER, LATER, RESTART};
-	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException;
-	
-	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) throws RemoteException;
-	public byte[] getQuadConstStateBuffer(String id) throws RemoteException;
-	public byte[] getQuadDynStateBuffer(String id, QuadTree.Rect bounds) throws RemoteException;
+public interface OTFServerQuadI {
 
-	public int getLocalTime() throws RemoteException;
-	public boolean isLive() throws RemoteException;
-	
-	public Collection<Double> getTimeSteps() throws RemoteException;
+	public void initQuadTree(OTFConnectionManager connect);
+
+	public void addAdditionalElement(OTFDataWriter element);
+
+	public OTFClientQuad convertToClient(String id, final OTFServerRemote host, final OTFConnectionManager connect);
+
+	public void writeConstData(ByteBuffer out);
+
+	public void writeDynData(QuadTree.Rect bounds, ByteBuffer out);
+
+	// Internally we hold the coordinates from 0,0 to max -min .. to optimize use of float in visualizer
+	public double getMaxEasting();
+
+	public double getMaxNorthing();
+
+	public double getMinEasting();
+
+	public double getMinNorthing();
+
 }
-

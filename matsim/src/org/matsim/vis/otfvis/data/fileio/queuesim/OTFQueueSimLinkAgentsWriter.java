@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.snapshots.writers.PositionInfo;
 import org.matsim.vis.snapshots.writers.PositionInfo.VehicleState;
@@ -54,8 +54,8 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implem
 	public void writeAgent(PositionInfo pos, ByteBuffer out) {
 		String id = pos.getAgentId().toString();
 		ByteBufferUtils.putString(out, id);
-		out.putFloat((float)(pos.getEasting() - OTFServerQuad.offsetEast));
-		out.putFloat((float)(pos.getNorthing()- OTFServerQuad.offsetNorth));
+		out.putFloat((float)(pos.getEasting() - OTFServerQuad2.offsetEast));
+		out.putFloat((float)(pos.getNorthing()- OTFServerQuad2.offsetNorth));
 		if (pos.getVehicleState()== VehicleState.Parking) {
 			// What is the next legs mode?
 			QueueVehicle veh = src.getVehicle(pos.getAgentId());
@@ -119,10 +119,10 @@ public class OTFQueueSimLinkAgentsWriter extends OTFDataWriter<QueueLink> implem
 			String id = this.src.getLink().getId().toString();
 			ByteBufferUtils.putString(out, id);
 			//subtract minEasting/Northing somehow!
-			Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad.offsetEast, 
-					this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad.offsetNorth);
-			Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad.offsetEast,
-					this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad.offsetNorth);
+			Point2D.Double.Double linkStart = new Point2D.Double.Double(this.src.getLink().getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast, 
+					this.src.getLink().getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
+			Point2D.Double.Double linkEnd = new Point2D.Double.Double(this.src.getLink().getToNode().getCoord().getX() - OTFServerQuad2.offsetEast,
+					this.src.getLink().getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
 			
 			out.putFloat((float) linkStart.x); 
 			out.putFloat((float) linkStart.y);

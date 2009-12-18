@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFServerRemote.java
+ * DgOTFVisUtils
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.dgrether.utils;
 
-package org.matsim.vis.otfvis.interfaces;
-
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-import java.util.Collection;
-
-import org.matsim.core.utils.collections.QuadTree;
+import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFServerQuadI;
+import org.matsim.vis.otfvis.data.OTFConnectionManager.Entry;
+
 
 /**
- * OTFServerRemote is the one most important interface for the 
- * communication between client and server. All methods necessary for data
- * exchange are bundled in this interface.
- * 
- * @author dstrippgen
+ * @author dgrether
  *
  */
-public interface OTFServerRemote extends Remote {
-	public enum TimePreference{EARLIER, LATER, RESTART};
-	public boolean requestNewTime(int time, TimePreference searchDirection) throws RemoteException;
+public class DgOTFVisUtils {
 	
-	public OTFServerQuadI getQuad(String id, OTFConnectionManager connect) throws RemoteException;
-	public byte[] getQuadConstStateBuffer(String id) throws RemoteException;
-	public byte[] getQuadDynStateBuffer(String id, QuadTree.Rect bounds) throws RemoteException;
+	private static final Logger log = Logger.getLogger(DgOTFVisUtils.class);
+	
+	public static void printConnectionManager(OTFConnectionManager c) {
+		for (Entry e : c.getEntries()){
+			log.error("enty from: " + e.getFrom() + " to " + e.getTo());
+		}
+	}
 
-	public int getLocalTime() throws RemoteException;
-	public boolean isLive() throws RemoteException;
-	
-	public Collection<Double> getTimeSteps() throws RemoteException;
 }
-

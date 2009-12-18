@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueNode;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuad;
+import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 
 
@@ -37,7 +37,7 @@ import org.matsim.vis.otfvis.data.OTFWriterFactory;
  * @author dgrether
  *
  */
-public class OTFQueueSimServerQuad extends OTFServerQuad {
+public class OTFQueueSimServerQuad extends OTFServerQuad2 {
 
 	private static final long serialVersionUID = 24L;
 	
