@@ -67,4 +67,34 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 		this.awaitDepartureTime = awaitDepartureTime;
 	}
 
+	/**
+	 * TransitRouteStops are typical Value Objects, so we consider two stops equal if they are equal field-wise.
+	 * 
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof TransitRouteStopImpl)) {
+			return false;
+		}
+		TransitRouteStopImpl other = (TransitRouteStopImpl) obj;
+		if (!stop.equals(other.getStopFacility())) {
+			return false;
+		}
+		if (departureOffset != other.getDepartureOffset()) {
+			return false;
+		} 
+		if (arrivalOffset != other.getArrivalOffset()) {
+			return false;
+		}
+		if (awaitDepartureTime != other.isAwaitDepartureTime()) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return stop.hashCode();
+	}
+
 }

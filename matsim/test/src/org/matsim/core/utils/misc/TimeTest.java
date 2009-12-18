@@ -142,4 +142,10 @@ public class TimeTest extends TestCase {
 		assertEquals(0.0, Time.parseTime("00:00:00"), 0.0);
 		assertEquals(Integer.MIN_VALUE, Time.parseTime("-596523:14:08"), 0.0);
 	}
+	
+	public void testConvertHHMMInteger() {
+		assertEquals( 12*3600.0 + 34*60.0, Time.convertHHMMInteger(Integer.valueOf("1234")), 0.0);
+		assertEquals(  1*3600.0 +  2*60.0, Time.convertHHMMInteger(Integer.valueOf("0102")), 0.0);
+	}
+	
 }

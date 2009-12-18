@@ -186,4 +186,17 @@ public abstract class Time {
 		return seconds;
 	}
 
+	/**
+	 * Converts a number like 1634 to the time value of 16:34:00.
+	 * 
+	 * @param hhmm the time-representing number to convert.
+	 * @return the time as seconds after midnight.
+	 */
+	public static double convertHHMMInteger(int hhmm) {
+		int h = hhmm / 100;
+		int m = hhmm - (h * 100);
+		double seconds = Math.abs(h) * 3600 + m * 60;
+		return seconds;
+	}
+
 }
