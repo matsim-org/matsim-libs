@@ -2,31 +2,38 @@ package playground.anhorni.locationchoice.preprocess.helper;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.List;
+import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.io.IOUtils;
 
-
 public class Bins {
 	
-	private int interval;
-	private int numberOfBins;
-	private int [] bins;
-	private double maxVal;
-	private String desc;
+	protected int interval;
+	protected int numberOfBins;
+	protected int [] bins;
+	protected double maxVal;
+	protected String desc;
+	protected List<Double> values = new Vector<Double>();
 	
 	private final static Logger log = Logger.getLogger(Bins.class);
 	
 	public Bins(int interval, double maxVal, String desc) {
 		this.interval = interval;
 		this.maxVal = maxVal;
-		this.numberOfBins = (int)(maxVal / interval);
+		this.numberOfBins = (int)Math.ceil(maxVal / interval);
 		this.desc = desc;
 		
-		bins = new int[numberOfBins];
-		
+		bins = new int[numberOfBins];		
 		for (int i = 0; i < numberOfBins; i++) {
 			bins[i] = 0;
+		}
+	}
+	
+	public void addValues(double[] values) {
+		for (double value : values) {
+			this.addVal(value);
 		}
 	}
 	
@@ -41,6 +48,8 @@ public class Bins {
 		}	
 		int index = (int)Math.floor(value / interval);
 		this.bins[index]++;
+		
+		this.values.add(value);
 	}
 	
 	
@@ -49,20 +58,20 @@ public class Bins {
 	}
 	
 	
-	public void plotBinnedDistribution(String path, String xLabel, String xUnit) {	
-		
+	public void plotBinnedDistribution(String path, String xLabel, String xUnit) {				
 		String [] categories  = new String[this.numberOfBins];
 		for (int i = 0; i < this.numberOfBins; i++) {
 			categories[i] = Integer.toString(i);
-		}	
+		}		
+			
 		BarChart chart = 
-			new BarChart(desc, xLabel + " " + xUnit, "#", categories);
+			new BarChart(desc, xLabel + " " + "[interval = " + this.interval + xUnit + "]", "#", categories);
 		chart.addSeries("Bin size", Utils.convert2double(this.bins));
 		chart.saveAsPng(path + desc + ".png", 1600, 800);
-		
+				
 		try {			
-			BufferedWriter out = IOUtils.getBufferedWriter(desc + ".txt");
-			out.write("Bin [intervall = " + this.interval + " " + xUnit  + "\t" + "#" + "\n");
+			BufferedWriter out = IOUtils.getBufferedWriter(path + desc + ".txt");
+			out.write("Bin [interval = " + this.interval + " " + xUnit  + "]\t" + "#" + "\n");
 			for (int j = 0; j < bins.length;  j++) {
 				out.write(j + "\t" + bins[j] + "\n");
 			}					

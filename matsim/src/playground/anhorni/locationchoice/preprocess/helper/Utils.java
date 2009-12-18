@@ -39,6 +39,17 @@ public abstract class Utils {
 	    }	
 	}
 	
+	public static double mean(List<Double> values) {
+		double sum = 0.0;
+		int cnt = 0;
+		if (values.size() == 0) return 0.0;	
+		for (Double value : values) {
+			sum += value;
+			cnt++;
+		}
+		return sum / cnt;
+	}
+	
 	// dirty hack in a weak minute. Cast problems.
 	public static double [] divideAndConvert(List<Double> divisorList, List<Double> denominatorList) {
 		
