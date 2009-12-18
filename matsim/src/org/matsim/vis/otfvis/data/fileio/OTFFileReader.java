@@ -228,7 +228,7 @@ public class OTFFileReader implements OTFServerRemote {
 			try {
 				quad = (OTFServerQuadI) new OTFObjectInputStream(is)
 				.readObject();
-				log.error("Read quad from file, type: " + quad.getClass().getName());
+				log.debug("Read OTFServerQuadI from file, type: " + quad.getClass().getName());
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
