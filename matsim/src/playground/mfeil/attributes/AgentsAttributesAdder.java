@@ -22,8 +22,12 @@ package playground.mfeil.attributes;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.ArrayList;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.PrintStream;
 import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
@@ -43,13 +47,120 @@ public class AgentsAttributesAdder {
 	private Map<Id, Double> income;
 	private Map<Id, Integer> carAvail;
 	private Map<Id, Integer> seasonTicket;	
+	private Map<Id, Double> agentsWeight;
+	
 
 
 	public AgentsAttributesAdder() {
 		this.income = new TreeMap<Id, Double>();
 		this.carAvail = new TreeMap<Id, Integer>();
 		this.seasonTicket = new TreeMap<Id, Integer>();
+		this.agentsWeight = new TreeMap<Id, Double> ();
 	}
+	
+	public static void main (String[]args){
+		final String input1 = "D:/Documents and Settings/Matthias Feil/Desktop/workspace/MATSim/plans/MobTSet_1.txt";
+		final String input2 = "D:/Documents and Settings/Matthias Feil/Desktop/workspace/MATSim/plans/plans.dat";
+		final String output = "D:/Documents and Settings/Matthias Feil/Desktop/workspace/MATSim/plans/output.txt";
+		
+		ArrayList<String> ids = new AgentsAttributesAdder().readPlans (input2);
+		new AgentsAttributesAdder().runMZZurich10(input1, output, ids);
+	}
+	
+	// reads the Ids of the Zurich10 agents from a Biogeme estimation data file
+	public ArrayList<String> readPlans (final String input2){
+		log.info("Reading input2 file...");
+		ArrayList<String> ids = new ArrayList<String>();
+		try {
+
+			FileReader fr = new FileReader(input2);
+			BufferedReader br = new BufferedReader(fr);
+			String line = null;
+			StringTokenizer tokenizer = null;
+			line = br.readLine(); // do not parse first line which just
+									// contains column headers
+			line = br.readLine();
+			String tokenId = null;
+			while (line != null) {		
+				
+				tokenizer = new StringTokenizer(line);
+				
+				tokenId = tokenizer.nextToken();
+				ids.add(tokenId);
+				
+				line = br.readLine();
+			}		
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		log.info("done...");
+		return ids;
+	}
+	
+	// reads agent informaton for the selected Ids of the above class from the MobTSet_1 file
+	public void runMZZurich10 (final String inputFile, final String outputFile, final ArrayList<String> ids){
+		
+		log.info("Reading input1 file...");
+		
+		String outputfile = outputFile;
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputfile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		stream.println("Agent_id\tweight\tage\tgender\tlicense\tincome_simulated\tinc_4\tinc_4_8\tincome_8_12\tincome_12_on\tincome_clustered\tcar_avail");					
+		try {
+
+			FileReader fr = new FileReader(inputFile);
+			BufferedReader br = new BufferedReader(fr);
+			String line = null;
+			StringTokenizer tokenizer = null;
+			line = br.readLine(); // do not parse first line which just
+									// contains column headers
+			line = br.readLine();
+			String tokenId = null;
+			String token1 = null;
+			String token2 = null;
+			String token3 = null;
+			String token4 = null;
+			while (line != null) {
+				tokenizer = new StringTokenizer(line);
+				
+				tokenId = tokenizer.nextToken();
+				if (!ids.contains(tokenId)) {
+					line = br.readLine();
+					continue;
+				}
+								
+				// Watch out that the order is equal to the order in the file!
+				stream.print(tokenId+"\t"+tokenizer.nextToken()+"\t"+tokenizer.nextToken()+"\t"+tokenizer.nextToken()+"\t"+tokenizer.nextToken()+"\t");					
+				tokenizer.nextToken();				
+				stream.print(tokenizer.nextToken()+"\t");
+				
+				int income = 0;
+				token1 = tokenizer.nextToken();
+				token2 = tokenizer.nextToken();
+				token3 = tokenizer.nextToken();
+				token4 = tokenizer.nextToken();
+				if (token1.equals("1")) income = 2000;
+				else if (token2.equals("1")) income = 6000;
+				else if (token3.equals("1")) income = 10000;
+				else if (token4.equals("1")) income = 16000;
+				else log.warn("For agent "+tokenId+", no valid income could be detected!");
+				stream.print(token1+"\t"+token2+"\t"+token3+"\t"+token4+"\t"+income+"\t");		
+				
+				for (int i=0;i<3;i++) tokenizer.nextToken();		
+				stream.println(tokenizer.nextToken());
+				
+				line = br.readLine();
+			}		
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		log.info("done...");
+	}	
 	
 	public void runMZ (final String inputFile){
 		
@@ -81,6 +192,9 @@ public class AgentsAttributesAdder {
 				
 				token = tokenizer.nextToken();				
 				seasonTicket.put(new IdImpl(tokenId), (int)(Double.parseDouble(token)));
+				
+				token = tokenizer.nextToken();				
+				this.agentsWeight.put(new IdImpl(tokenId), Double.parseDouble(token));
 				
 				line = br.readLine();
 			}		
