@@ -262,7 +262,7 @@ public class IncomeAttacher {
 		// Compare average agents income after education with average municipality income and find out difference
 		for (Iterator<Id> iterator = muns.keySet().iterator(); iterator.hasNext();){
 			Id id = iterator.next();
-			muns.get(id)[2]=(this.municipalities.getMunicipality(id).getIncome()-muns.get(id)[1]/muns.get(id)[0])*1.0; // Scale up only by 0% to match MZ income data
+			muns.get(id)[2]=(this.municipalities.getMunicipality(id).getIncome()-(muns.get(id)[1]/muns.get(id)[0]))*1.0; // Scale up only by 0% to match MZ income data
 		}
 		
 		// Adjust agent's income according to the municipality information and apply normal distribution
@@ -297,10 +297,10 @@ public class IncomeAttacher {
 			e.printStackTrace();
 			return;
 		}
-		stream.println("mun_Id\tmun_income\tagents_income_after_education\tmun_scaling\tagents_simulated_income\tno_of_agents\tweighted_difference");
+		stream.println("mun_Id\tmun_income\tagents_income_after_education\tmun_scaling\tagents_simulated_income\tno_of_agents\tweighted_surplusof_simulated_income");
 		
 		
-		Map<Id, double[]> agents = new HashMap<Id, double[]>();
+		Map<Id, double[]> agents = new HashMap<Id, double[]>(); // final incomes
 		for (Iterator<? extends Person> iterator2 = this.scenario.getPopulation().getPersons().values().iterator(); iterator2.hasNext();){
 			PersonImpl person = (PersonImpl) iterator2.next();
 			if (agents.containsKey(this.agentsMuns.get(person.getId()))){
@@ -315,7 +315,13 @@ public class IncomeAttacher {
 		for (Iterator<Id> iterator = muns.keySet().iterator(); iterator.hasNext();){
 			Id id = iterator.next();
 			if (this.muns.get(id)[0]!=agents.get(id)[0]) log.warn("Different agents counts for mun id "+id);
-			stream.println(id+"\t"+this.municipalities.getMunicipality(id).getIncome()+"\t"+(this.municipalities.getMunicipality(id).getIncome()-this.muns.get(id)[2])+"\t"+this.muns.get(id)[2]+"\t"+(agents.get(id)[1]/agents.get(id)[1])+"\t"+muns.get(id)[0]+"\t"+(this.municipalities.getMunicipality(id).getIncome()-(agents.get(id)[1]/agents.get(id)[0])*muns.get(id)[0]/172598));
+			stream.println(id+"\t"+
+					this.municipalities.getMunicipality(id).getIncome()+"\t"+
+					(this.municipalities.getMunicipality(id).getIncome()-this.muns.get(id)[2])+"\t"+
+					(this.muns.get(id)[2])+"\t"+
+					(agents.get(id)[1]/agents.get(id)[0])+"\t"+
+					muns.get(id)[0]+"\t"+
+					(this.municipalities.getMunicipality(id).getIncome()-agents.get(id)[1]/agents.get(id)[0])*-1*muns.get(id)[0]/172598);
 		}
 		log.info("  done. ");
 	}
