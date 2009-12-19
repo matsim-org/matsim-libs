@@ -97,7 +97,7 @@ public class AgentsAttributesAdder {
 		return ids;
 	}
 	
-	// reads agent informaton for the selected Ids of the above class from the MobTSet_1 file
+	// reads agent attributes for the selected Ids of the above class from the MobTSet_1 file
 	public void runMZZurich10 (final String inputFile, final String outputFile, final ArrayList<String> ids){
 		
 		log.info("Reading input1 file...");
@@ -162,6 +162,84 @@ public class AgentsAttributesAdder {
 		log.info("done...");
 	}	
 	
+	/** reads some Biogeme-estimation attributes for the selected Ids of the above class from the MobTSet_1 file and writes them
+	 * Biogeme compatible
+	 * @param inputFile
+	 * @param outputFile
+	 * @param ids
+	 */
+	public void runMZZurich10ForBiogeme (final String inputFile, final String outputFile, final ArrayList<String> ids){
+		
+		log.info("Starting Biogeme compilation...");
+		
+		String outputfile = outputFile;
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputfile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		stream.println("Id\tChoice\tAge\tGender\tLicense\tIncome\tCar_always\tCar_sometimes\tav1\tav2\tav3");					
+		try {
+
+			FileReader fr = new FileReader(inputFile);
+			BufferedReader br = new BufferedReader(fr);
+			String line = null;
+			StringTokenizer tokenizer = null;
+			line = br.readLine(); // do not parse first line which just
+									// contains column headers
+			line = br.readLine();
+			String tokenId = null;
+			
+			while (line != null) {
+				tokenizer = new StringTokenizer(line);
+				
+				tokenId = tokenizer.nextToken();
+				if (!ids.contains(tokenId)) {
+					line = br.readLine();
+					continue;
+				}
+								
+				// Id
+				stream.print(tokenId+"\t");
+				tokenizer.nextToken();
+				
+				// Age, gender, license
+				String age = tokenizer.nextToken();
+				String gender = tokenizer.nextToken();
+				String license = tokenizer.nextToken();	
+				tokenizer.nextToken();
+				
+				// Income	
+				String income = tokenizer.nextToken();
+				for (int i=0;i<7;i++) tokenizer.nextToken();
+				
+				// Car Avail	
+				int carAlways = 0;
+				int carSometimes = 0;
+				String carAvail = tokenizer.nextToken();
+				if (carAvail.equals("1")) carAlways = 1;
+				else if (carAvail.equals("2")) carSometimes = 1;
+				for (int i=0;i<11;i++) tokenizer.nextToken();
+				
+				String ticket = tokenizer.nextToken();
+				int choice = 0;
+				if (ticket.equals("2") || ticket.equals("3")) choice = 3;
+				else if (ticket.equals("11")) choice = 1;
+				else choice = 2;
+				
+				stream.println(choice+"\t"+age+"\t"+gender+"\t"+license+"\t"+income+"\t"+carAlways+"\t"+carSometimes+"\t1\t1\t1");		
+				
+				line = br.readLine();
+			}		
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		log.info("done...");
+	}	
+	
+	// Reads the agent attributes from MobTSet_1 as requested by PlansConstructor
 	public void runMZ (final String inputFile){
 		
 		log.info("Reading input file...");

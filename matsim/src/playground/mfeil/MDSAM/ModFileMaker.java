@@ -53,6 +53,95 @@ public class ModFileMaker {
 		this.actChains = actChains;
 	}
 	
+	public ModFileMaker() {
+		this.population = null;
+		this.actChains = null;
+		log.info("This constructor is allowed only when calling writeForSeasonTicket(outputFile)");
+	}
+	
+	public void writeForSeasonTicket (String outputFile){
+		log.info("Writing mod file...");
+		
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputFile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		// Model description
+		stream.println("[ModelDescription]");
+		stream.println("\"Multinomial logit, estimating parameters of MATSim utility function.\"");
+		stream.println();
+		
+		//Choice
+		stream.println("[Choice]");
+		stream.println("Choice");
+		stream.println();
+		
+		//Beta
+		stream.println("[Beta]");
+		stream.println("//Name \tValue  \tLowerBound \tUpperBound  \tstatus (0=variable, 1=fixed");
+		
+		stream.println("beta_no_age \t1  \t-100 \t100  \t0");
+		stream.println("beta_no_gender \t1  \t-100 \t100  \t0");
+		stream.println("beta_no_license \t1  \t-100 \t100  \t0");
+		stream.println("beta_no_income \t1  \t-100 \t100  \t0");
+		stream.println("beta_no_carAlways \t1  \t-100 \t100  \t0");
+		stream.println("beta_no_carSometimes \t1  \t-100 \t100  \t0");
+		stream.println("beta_ht_age \t1  \t-100 \t100  \t0");
+		stream.println("beta_ht_gender \t1  \t-100 \t100  \t0");
+		stream.println("beta_ht_license \t1  \t-100 \t100  \t0");
+		stream.println("beta_ht_income \t1  \t-100 \t100  \t0");
+		stream.println("beta_ht_carAlways \t1  \t-100 \t100  \t0");
+		stream.println("beta_ht_carSometimes \t1  \t-100 \t100  \t0");
+		stream.println("beta_ga_age \t1  \t-100 \t100  \t0");
+		stream.println("beta_ga_gender \t1  \t-100 \t100  \t0");
+		stream.println("beta_ga_license \t1  \t-100 \t100  \t0");
+		stream.println("beta_ga_income \t1  \t-100 \t100  \t0");
+		stream.println("beta_ga_carAlways \t1  \t-100 \t100  \t0");
+		stream.println("beta_ga_carSometimes \t1  \t-100 \t100  \t0");
+		
+		stream.println("constant_ht \t1  \t-100 \t100  \t0");
+		stream.println("constant_ga \t1  \t-100 \t100  \t0");
+		stream.println();
+	
+		//Utilities
+		stream.println("[Utilities]");
+		stream.println("//Id \tName  \tAvail  \tlinear-in-parameter expression (beta1*x1 + beta2*x2 + ... )");	
+		
+		stream.print("1\tAlt1\tav1\t"); // Nothing
+		stream.println("beta_no_age * Age + beta_no_gender * Gender + beta_no_license * License + beta_no_income * Income + " +
+				"beta_no_carAlways * Car_always + beta_no_carSometimes * Car_sometimes");
+		
+		stream.print("2\tAlt2\tav2\t"); // Halbtax
+		stream.println("constant_ht * one + beta_ht_age * Age + beta_ht_gender * Gender + beta_ht_license * License + beta_ht_income * Income + " +
+				"beta_ht_carAlways * Car_always + beta_ht_carSometimes * Car_sometimes");
+		
+		stream.print("3\tAlt3\tav3\t"); // GA
+		stream.println("constant_ga * one + beta_ga_age * Age + beta_ga_gender * Gender + beta_ga_license * License + beta_ga_income * Income + " +
+				"beta_ga_carAlways * Car_always + beta_ga_carSometimes * Car_sometimes");
+			
+		stream.println();
+		
+		//Expressions
+		stream.println("[Expressions]");
+		stream.println("one = 1");
+		//stream.println("one_point_two = 1.2");
+		stream.println();
+		
+		//Model
+		stream.println("[Model]");
+		stream.println("// Currently, only $MNL (multinomial logit), $NL (nested logit), $CNL\n//(cross-nested logit) and $NGEV (Network GEV model) are valid keywords.");
+		stream.println("$MNL");
+		stream.println();
+		
+		stream.close();
+		log.info("done.");
+	}
+	
+	
 	/*
 	public void write (String outputFile){
 		log.info("Writing mod file...");
