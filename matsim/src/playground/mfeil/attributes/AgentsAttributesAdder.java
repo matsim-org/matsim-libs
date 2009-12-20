@@ -70,7 +70,11 @@ public class AgentsAttributesAdder {
 		new AgentsAttributesAdder().runMZZurich10(input1, output, ids);
 	}
 	
-	// reads the Ids of the Zurich10 agents from a Biogeme estimation data file
+	
+	/** Reads the Ids of the Zurich10 agents from a Biogeme estimation data file
+	 * @param input2
+	 * @return
+	 */
 	public ArrayList<String> readPlans (final String input2){
 		log.info("Reading input2 file...");
 		ArrayList<String> ids = new ArrayList<String>();
@@ -100,7 +104,12 @@ public class AgentsAttributesAdder {
 		return ids;
 	}
 	
-	// reads agent attributes for the selected Ids of the above class from the MobTSet_1 file
+	
+	/** Reads agents' attributes for the selected Ids of readPlans() from the MobTSet_1 file
+	 * @param inputFile
+	 * @param outputFile
+	 * @param ids
+	 */
 	public void runMZZurich10 (final String inputFile, final String outputFile, final ArrayList<String> ids){
 		
 		log.info("Reading input1 file...");
@@ -165,8 +174,8 @@ public class AgentsAttributesAdder {
 		log.info("done...");
 	}	
 	
-	/** reads some Biogeme-estimation attributes for the selected Ids of the above class from the MobTSet_1 file and writes them
-	 * Biogeme compatible
+	/** Reads some Biogeme-estimation attributes for the selected agent ids from the MobTSet_1 file and writes the
+	 * Biogeme-compatible choice set file
 	 * @param inputFile
 	 * @param outputFile
 	 * @param ids
@@ -242,7 +251,12 @@ public class AgentsAttributesAdder {
 		log.info("done...");
 	}	
 	
-	// Calculates the probabilities of the seasonticket type according to attributes
+	/** Calculates the probabilities for the seasonticket attribute according to other agent attributes
+	 * @param inputFile
+	 * @param outputFile
+	 * @param ids
+	 * @return
+	 */
 	public Map<String,double[]> runMZZurich10ForProbabilities (final String inputFile, final String outputFile, final ArrayList<String> ids){
 		
 		log.info("Starting probabilities calculation...");
@@ -302,7 +316,7 @@ public class AgentsAttributesAdder {
 				double incomeIn = Double.parseDouble(tokenizer.nextToken());
 				if (incomeIn<4) key[3]=0;
 				else if (incomeIn<8) key[3]=4;
-				else if (incomeIn<30) key[3]=8;
+				else if (incomeIn<12) key[3]=8;
 				else key[3]=12;
 				
 				for (int i=0;i<7;i++) tokenizer.nextToken();
@@ -318,6 +332,7 @@ public class AgentsAttributesAdder {
 				else if (ticketIn==11) ticket = 1;
 				else ticket = 2;
 				
+				// Create classes of same agent types
 				String index = key[0]+"_"+key[1]+"_"+key[2]+"_"+key[3]+"_"+key[4];
 				if (probabilities.containsKey(index)){
 					if (ticket==1) probabilities.get(index)[0]+=1.0;
@@ -334,6 +349,8 @@ public class AgentsAttributesAdder {
 				
 				line = br.readLine();
 			}		
+			
+			// now go through all agent types and calculate their seasonticket probabilities
 			for (Iterator<String> iterator = probabilities.keySet().iterator(); iterator.hasNext();){
 				String id = iterator.next();
 				String[] entries = id.split("_", -1);
@@ -362,7 +379,9 @@ public class AgentsAttributesAdder {
 		return probabilities;
 	}	
 	
-	// Reads the agent attributes from MobTSet_1 as requested by PlansConstructor
+	/** Reads the agent attributes from MobTSet_1 as requested by PlansConstructor
+	 * @param inputFile
+	 */
 	public void runMZ (final String inputFile){
 		
 		log.info("Reading input file...");
@@ -405,6 +424,33 @@ public class AgentsAttributesAdder {
 		log.info("done...");
 	}	
 	
+	
+	/** Adds income information to all agents of a scenario
+	 * 
+	 * @param scenario
+	 */
+		
+	public void loadIncomeData(ScenarioImpl scenario){
+		log.info("   adding agents income data...");
+		
+		this.runZurich10("/home/baug/mfeil/data/Zurich10/agents_income.txt");
+		
+		for (Iterator<? extends Person> iterator = scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = (PersonImpl) iterator.next();
+			try{
+				person.getCustomAttributes().put("income", this.getIncome().get(person.getId()));
+			} catch (Exception e) {
+				log.warn("No income information found for agent "+person.getId());
+			}
+		}	
+		log.info("   ... done.");
+	}
+	
+	
+	/** Conducts the income data collection from a corresponding file for the method loadIncomeData()
+	 * 
+	 * @param inputFile
+	 */
 	public void runZurich10 (final String inputFile){
 		
 		log.info("Reading input file...");
@@ -440,25 +486,7 @@ public class AgentsAttributesAdder {
 	}	
 	
 	
-	/* Adds income information to all agents of a scenario */	
-	public void loadIncomeData(ScenarioImpl scenario){
-		log.info("   adding agents income data...");
-		AgentsAttributesAdder adder = new AgentsAttributesAdder();
-		adder.runZurich10("/home/baug/mfeil/data/Zurich10/agents_income.txt");
-		Map<Id, Double> income = adder.getIncome();
-		
-		for (Iterator<? extends Person> iterator = scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = (PersonImpl) iterator.next();
-			try{
-				person.getCustomAttributes().put("income", income.get(person.getId()));
-			} catch (Exception e) {
-				log.warn("No income information found for agent "+person.getId());
-			}
-		}	
-		log.info("   ... done.");
-	}
-	
-	
+	// get methods
 	public Map<Id, Double> getIncome (){
 		return this.income;
 	}

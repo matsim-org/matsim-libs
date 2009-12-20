@@ -75,6 +75,7 @@ public class RunSeasonTicket {
 		ArrayList<String> ids = adder.readPlans (input2);
 		// Load probabilities
 		Map<String,double[]> probabilities = adder.runMZZurich10ForProbabilities(input1, output3, ids);
+		
 		// Load scenario and population
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
@@ -82,23 +83,26 @@ public class RunSeasonTicket {
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 		// load income information
 		adder.loadIncomeData(scenario);
+		
 		// go through every agent and assign seasonticket according to given probability or randomly if no info available
 		for (Iterator<? extends Person> iterator = scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = (PersonImpl) iterator.next();
 			double gen = MatsimRandom.getRandom().nextDouble();
+			
 			// get income
 			int income = -1;
 			if (Double.parseDouble(person.getCustomAttributes().get("income").toString())/1000<4) income=0;
 			else if (Double.parseDouble(person.getCustomAttributes().get("income").toString())/1000<8) income=4;
 			else if (Double.parseDouble(person.getCustomAttributes().get("income").toString())/1000<30) income=8;
 			else income=12;
+			
 			// transform key
 			String key = person.getAge()+"_"+person.getSex()+"_"+person.getLicense()+"_"+income+"_"+person.getCarAvail();
-			if (probabilities.containsKey(key)){ // assign according to information
+			if (probabilities.containsKey(key)){ // assign according to information, add nothing if no ticket to assign
 				if (gen>=probabilities.get(key)[0] && gen<probabilities.get(key)[0]+probabilities.get(key)[1])person.getTravelcards().add("halbtax");
 				else if (gen>=probabilities.get(key)[0])person.getTravelcards().add("ga");
 			}
-			else { // randomly chosen since no info available
+			else { // randomly chosen since no info available, add nothing if no ticket to assign
 				if (gen>=(1/3) && gen<(2/3))person.getTravelcards().add("halbtax");
 				else if (gen>=(1/3))person.getTravelcards().add("ga");
 			}
