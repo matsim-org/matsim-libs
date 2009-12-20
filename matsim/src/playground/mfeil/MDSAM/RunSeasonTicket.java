@@ -53,11 +53,11 @@ public class RunSeasonTicket {
 		final String populationFilename = "/home/baug/mfeil/data/Zurich10/plans.xml";
 		final String output_populationFilename = "/home/baug/mfeil/data/Zurich10/plans_with_seasonticket.xml.gz";
 		
-		final String input1 = "D:/Documents and Settings/Matthias Feil/Desktop/workspace/MATSim/plans/MobTSet_1.txt";
-		final String input2 = "D:/Documents and Settings/Matthias Feil/Desktop/workspace/MATSim/plans/plans.dat";
+		final String input1 = "/home/baug/mfeil/data/Zurich10/MobTSet_1.txt";
+		final String input2 = "/home/baug/mfeil/data/Zurich10/Zurich10_ids.dat";
 	//	final String output1 = "D:/Documents and Settings/Matthias Feil/Desktop/workspace/MATSim/plans/choiceSet_1.dat";
 	//	final String output2 = "D:/Documents and Settings/Matthias Feil/Desktop/workspace/MATSim/plans/modFile_1.mod";
-		final String output3 = "D:/Documents and Settings/Matthias Feil/Desktop/workspace/MATSim/plans/probabilities.xls";
+		final String output3 = "/home/baug/mfeil/data/Zurich10/probabilities.xls";
 		
 	/*// Biogeme code
 		AgentsAttributesAdder choiceSetter = new AgentsAttributesAdder();
@@ -85,26 +85,70 @@ public class RunSeasonTicket {
 		adder.loadIncomeData(scenario);
 		
 		// go through every agent and assign seasonticket according to given probability or randomly if no info available
+		int count =0;
 		for (Iterator<? extends Person> iterator = scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = (PersonImpl) iterator.next();
+			count++;
 			double gen = MatsimRandom.getRandom().nextDouble();
+			if (count<10) log.info("personId = "+person.getId()+ " und gen = "+gen);
+					
+			// transform key
+			// Age
+			int age = -1;
+			if (person.getAge()<10) age=0;
+			else if (person.getAge()<20) age=10;
+			else if (person.getAge()<30) age=20;
+			else if (person.getAge()<40) age=30;
+			else if (person.getAge()<50) age=40;
+			else if (person.getAge()<60) age=50;
+			else if (person.getAge()<70) age=60;
+			else age = 70;
 			
-			// get income
+			//Gender
+			int gender = -1;
+			if (person.getSex().equals("m")) gender=1;
+			else gender=0;
+			
+			// License
+			int license = -1;
+			if (person.getLicense().equals("yes")) license=1;
+			else license=0;
+			
+			// Income
 			int income = -1;
 			if (Double.parseDouble(person.getCustomAttributes().get("income").toString())/1000<4) income=0;
 			else if (Double.parseDouble(person.getCustomAttributes().get("income").toString())/1000<8) income=4;
 			else if (Double.parseDouble(person.getCustomAttributes().get("income").toString())/1000<30) income=8;
 			else income=12;
+			if (count<10) log.info("income = "+income);
 			
-			// transform key
-			String key = person.getAge()+"_"+person.getSex()+"_"+person.getLicense()+"_"+income+"_"+person.getCarAvail();
-			if (probabilities.containsKey(key)){ // assign according to information, add nothing if no ticket to assign
-				if (gen>=probabilities.get(key)[0] && gen<probabilities.get(key)[0]+probabilities.get(key)[1])person.getTravelcards().add("halbtax");
-				else if (gen>=probabilities.get(key)[0])person.getTravelcards().add("ga");
+			// CarAvail
+			int carAvail = -1;
+			if (person.getCarAvail().equals("never")) license=3;
+			else if (person.getCarAvail().equals("always")) license=1;
+			else license=2;
+			
+			String key = age+"_"+gender+"_"+license+"_"+income+"_"+carAvail;
+			if (count<10) log.info("key = "+key);
+			if (probabilities.containsKey(key) && probabilities.get(key)[3]!=1.0){ // assign according to information, add nothing if no ticket to assign
+				if (gen>=probabilities.get(key)[0] && gen<probabilities.get(key)[0]+probabilities.get(key)[1]){
+					if (count<10) log.info("adding ht with key");
+					person.addTravelcard("halbtax");
+				}
+				else if (gen>=probabilities.get(key)[0]){
+					if (count<10) log.info("adding ga with key");
+					person.addTravelcard("ga");
+				}
 			}
 			else { // randomly chosen since no info available, add nothing if no ticket to assign
-				if (gen>=(1/3) && gen<(2/3))person.getTravelcards().add("halbtax");
-				else if (gen>=(1/3))person.getTravelcards().add("ga");
+				if (gen>=0.3333 && gen<0.6667){
+					if (count<10) log.info("adding ht without key");
+					person.addTravelcard("halbtax");
+				}
+				else if (gen>=0.3333){
+					if (count<10) log.info("adding ga without key");
+					person.addTravelcard("ga");
+				}
 			}
 		}
 		new PopulationWriter(scenario.getPopulation()).writeFile(output_populationFilename);

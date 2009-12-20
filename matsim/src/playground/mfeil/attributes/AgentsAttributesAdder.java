@@ -272,7 +272,7 @@ public class AgentsAttributesAdder {
 		stream.println("Age\tGender\tLicense\tIncome\tCarAvail\tNothing\tHalbtax\tGA");		
 		
 		Map<String,double[]> probabilities = new TreeMap<String,double[]>();
-		
+		int count=0;
 		try {
 
 			FileReader fr = new FileReader(inputFile);
@@ -285,6 +285,7 @@ public class AgentsAttributesAdder {
 			String tokenId = null;
 			
 			while (line != null) {
+				count++;
 				tokenizer = new StringTokenizer(line);
 				
 				tokenId = tokenizer.nextToken();
@@ -294,7 +295,8 @@ public class AgentsAttributesAdder {
 				}
 								
 				int[] key = new int[5];
-				tokenizer.nextToken();
+				// Weight
+				double weight = Double.parseDouble(tokenizer.nextToken());
 				
 				// Age, 
 				int ageIn = Integer.parseInt(tokenizer.nextToken());
@@ -331,19 +333,20 @@ public class AgentsAttributesAdder {
 				if (ticketIn==2 || ticketIn==3) ticket = 3;
 				else if (ticketIn==11) ticket = 1;
 				else ticket = 2;
-				
+			
 				// Create classes of same agent types
 				String index = key[0]+"_"+key[1]+"_"+key[2]+"_"+key[3]+"_"+key[4];
 				if (probabilities.containsKey(index)){
-					if (ticket==1) probabilities.get(index)[0]+=1.0;
-					else if (ticket==2) probabilities.get(index)[1]+=1.0;
-					else if (ticket==3) probabilities.get(index)[2]+=1.0;
+					if (ticket==1) probabilities.get(index)[0]+=weight;
+					else if (ticket==2) probabilities.get(index)[1]+=weight;
+					else if (ticket==3) probabilities.get(index)[2]+=weight;
 					else log.warn("Something going wrong for the ticket documentation!");
+					probabilities.get(index)[3]+=1.0;
 				}
 				else {
-					if (ticket==1) probabilities.put(index,new double[]{1.0,0,0});
-					else if (ticket==2) probabilities.put(index,new double[]{0,1.0,0});
-					else if (ticket==3) probabilities.put(index,new double[]{0,0,1.0});
+					if (ticket==1) probabilities.put(index,new double[]{weight,0,0,1.0});
+					else if (ticket==2) probabilities.put(index,new double[]{0,weight,0,1.0});
+					else if (ticket==3) probabilities.put(index,new double[]{0,0,weight,1.0});
 					else log.warn("Something going wrong for the ticket documentation!");
 				}	
 				
@@ -351,6 +354,7 @@ public class AgentsAttributesAdder {
 			}		
 			
 			// now go through all agent types and calculate their seasonticket probabilities
+			
 			for (Iterator<String> iterator = probabilities.keySet().iterator(); iterator.hasNext();){
 				String id = iterator.next();
 				String[] entries = id.split("_", -1);
@@ -360,20 +364,14 @@ public class AgentsAttributesAdder {
 				double ht = probabilities.get(id)[1];
 				double ga = probabilities.get(id)[2];
 				double sum = nothing + ht + ga;
-				if (sum!=1){
-					probabilities.get(id)[0]=nothing/sum;
-					probabilities.get(id)[1]=ht/sum;
-					probabilities.get(id)[2]=ga/sum;
-				}
-				else {
-					probabilities.get(id)[0]=-1;
-					probabilities.get(id)[1]=-1;
-					probabilities.get(id)[2]=-1;
-				}
+				
+				probabilities.get(id)[0]=nothing/sum;
+				probabilities.get(id)[1]=ht/sum;
+				probabilities.get(id)[2]=ga/sum;
 			}
 						
 		} catch (Exception ex) {
-			System.out.println(ex);
+			System.out.println(ex+" at count "+count);
 		}
 		log.info("done...");
 		return probabilities;
