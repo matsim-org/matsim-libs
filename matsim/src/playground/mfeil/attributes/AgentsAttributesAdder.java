@@ -20,6 +20,7 @@
 
 package playground.mfeil.attributes;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.ArrayList;
@@ -31,7 +32,9 @@ import java.io.PrintStream;
 import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PersonImpl;
 
 
 
@@ -237,6 +240,126 @@ public class AgentsAttributesAdder {
 			System.out.println(ex);
 		}
 		log.info("done...");
+	}	
+	
+	// Calculates the probabilities of the seasonticket type according to attributes
+	public Map<String,double[]> runMZZurich10ForProbabilities (final String inputFile, final String outputFile, final ArrayList<String> ids){
+		
+		log.info("Starting probabilities calculation...");
+		
+		String outputfile = outputFile;
+		PrintStream stream;
+		try {
+			stream = new PrintStream (new File(outputfile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+		stream.println("Age\tGender\tLicense\tIncome\tCarAvail\tNothing\tHalbtax\tGA");		
+		
+		Map<String,double[]> probabilities = new TreeMap<String,double[]>();
+		
+		try {
+
+			FileReader fr = new FileReader(inputFile);
+			BufferedReader br = new BufferedReader(fr);
+			String line = null;
+			StringTokenizer tokenizer = null;
+			line = br.readLine(); // do not parse first line which just
+									// contains column headers
+			line = br.readLine();
+			String tokenId = null;
+			
+			while (line != null) {
+				tokenizer = new StringTokenizer(line);
+				
+				tokenId = tokenizer.nextToken();
+				if (!ids.contains(tokenId)) {
+					line = br.readLine();
+					continue;
+				}
+								
+				int[] key = new int[5];
+				tokenizer.nextToken();
+				
+				// Age, 
+				int ageIn = Integer.parseInt(tokenizer.nextToken());
+				if (ageIn<10) key[0]=0;
+				else if (ageIn<20) key[0]=10;
+				else if (ageIn<30) key[0]=20;
+				else if (ageIn<40) key[0]=30;
+				else if (ageIn<50) key[0]=40;
+				else if (ageIn<60) key[0]=50;
+				else if (ageIn<70) key[0]=60;
+				else key[0] = 70;
+				
+				// Gender, license
+				key[1] = Integer.parseInt(tokenizer.nextToken());
+				key[2] = Integer.parseInt(tokenizer.nextToken());
+				tokenizer.nextToken();
+				
+				// Income	
+				double incomeIn = Double.parseDouble(tokenizer.nextToken());
+				if (incomeIn<4) key[3]=0;
+				else if (incomeIn<8) key[3]=4;
+				else if (incomeIn<30) key[3]=8;
+				else key[3]=12;
+				
+				for (int i=0;i<7;i++) tokenizer.nextToken();
+				
+				// Car Avail	
+				key[4] = Integer.parseInt(tokenizer.nextToken());
+				for (int i=0;i<11;i++) tokenizer.nextToken();
+				
+				// Ticket
+				int ticketIn = Integer.parseInt(tokenizer.nextToken());
+				int ticket = -1;
+				if (ticketIn==2 || ticketIn==3) ticket = 3;
+				else if (ticketIn==11) ticket = 1;
+				else ticket = 2;
+				
+				String index = key[0]+"_"+key[1]+"_"+key[2]+"_"+key[3]+"_"+key[4];
+				if (probabilities.containsKey(index)){
+					if (ticket==1) probabilities.get(index)[0]+=1.0;
+					else if (ticket==2) probabilities.get(index)[1]+=1.0;
+					else if (ticket==3) probabilities.get(index)[2]+=1.0;
+					else log.warn("Something going wrong for the ticket documentation!");
+				}
+				else {
+					if (ticket==1) probabilities.put(index,new double[]{1.0,0,0});
+					else if (ticket==2) probabilities.put(index,new double[]{0,1.0,0});
+					else if (ticket==3) probabilities.put(index,new double[]{0,0,1.0});
+					else log.warn("Something going wrong for the ticket documentation!");
+				}	
+				
+				line = br.readLine();
+			}		
+			for (Iterator<String> iterator = probabilities.keySet().iterator(); iterator.hasNext();){
+				String id = iterator.next();
+				String[] entries = id.split("_", -1);
+				
+				stream.println(entries[0]+"\t"+entries[1]+"\t"+entries[2]+"\t"+entries[3]+"\t"+entries[4]+"\t"+probabilities.get(id)[0]+"\t"+probabilities.get(id)[1]+"\t"+probabilities.get(id)[2]+"\t");
+				double nothing = probabilities.get(id)[0];
+				double ht = probabilities.get(id)[1];
+				double ga = probabilities.get(id)[2];
+				double sum = nothing + ht + ga;
+				if (sum!=1){
+					probabilities.get(id)[0]=nothing/sum;
+					probabilities.get(id)[1]=ht/sum;
+					probabilities.get(id)[2]=ga/sum;
+				}
+				else {
+					probabilities.get(id)[0]=-1;
+					probabilities.get(id)[1]=-1;
+					probabilities.get(id)[2]=-1;
+				}
+			}
+						
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		log.info("done...");
+		return probabilities;
 	}	
 	
 	// Reads the agent attributes from MobTSet_1 as requested by PlansConstructor

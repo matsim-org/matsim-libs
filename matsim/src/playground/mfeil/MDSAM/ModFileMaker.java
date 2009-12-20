@@ -84,19 +84,19 @@ public class ModFileMaker {
 		stream.println("[Beta]");
 		stream.println("//Name \tValue  \tLowerBound \tUpperBound  \tstatus (0=variable, 1=fixed");
 		
-		stream.println("beta_no_age \t1  \t-100 \t100  \t0");
+		//stream.println("beta_no_age \t1  \t-100 \t100  \t0");
 		stream.println("beta_no_gender \t1  \t-100 \t100  \t0");
 		stream.println("beta_no_license \t1  \t-100 \t100  \t0");
 		stream.println("beta_no_income \t1  \t-100 \t100  \t0");
 		stream.println("beta_no_carAlways \t1  \t-100 \t100  \t0");
 		stream.println("beta_no_carSometimes \t1  \t-100 \t100  \t0");
-		stream.println("beta_ht_age \t1  \t-100 \t100  \t0");
+		//stream.println("beta_ht_age \t1  \t-100 \t100  \t0");
 		stream.println("beta_ht_gender \t1  \t-100 \t100  \t0");
 		stream.println("beta_ht_license \t1  \t-100 \t100  \t0");
 		stream.println("beta_ht_income \t1  \t-100 \t100  \t0");
 		stream.println("beta_ht_carAlways \t1  \t-100 \t100  \t0");
 		stream.println("beta_ht_carSometimes \t1  \t-100 \t100  \t0");
-		stream.println("beta_ga_age \t1  \t-100 \t100  \t0");
+		//stream.println("beta_ga_age \t1  \t-100 \t100  \t0");
 		stream.println("beta_ga_gender \t1  \t-100 \t100  \t0");
 		stream.println("beta_ga_license \t1  \t-100 \t100  \t0");
 		stream.println("beta_ga_income \t1  \t-100 \t100  \t0");
@@ -110,7 +110,7 @@ public class ModFileMaker {
 		//Utilities
 		stream.println("[Utilities]");
 		stream.println("//Id \tName  \tAvail  \tlinear-in-parameter expression (beta1*x1 + beta2*x2 + ... )");	
-		
+		/*
 		stream.print("1\tAlt1\tav1\t"); // Nothing
 		stream.println("beta_no_age * Age + beta_no_gender * Gender + beta_no_license * License + beta_no_income * Income + " +
 				"beta_no_carAlways * Car_always + beta_no_carSometimes * Car_sometimes");
@@ -122,7 +122,31 @@ public class ModFileMaker {
 		stream.print("3\tAlt3\tav3\t"); // GA
 		stream.println("constant_ga * one + beta_ga_age * Age + beta_ga_gender * Gender + beta_ga_license * License + beta_ga_income * Income + " +
 				"beta_ga_carAlways * Car_always + beta_ga_carSometimes * Car_sometimes");
+		*/
+		stream.print("1\tAlt1\tav1\t"); // Nothing
+		stream.println("beta_no_income * Income");
+		
+		stream.print("2\tAlt2\tav2\t"); // Halbtax
+		stream.println("constant_ht * one + beta_ht_income * Income");
+		
+		stream.print("3\tAlt3\tav3\t"); // GA
+		stream.println("constant_ga * one + beta_ga_income * Income");
 			
+		stream.println();
+		
+		//GeneralizedUtilities
+		stream.println("[GeneralizedUtilities]");
+		stream.println("//Id \tnonlinear-in-parameter expression");	
+		
+		stream.print("1\t"); // Nothing
+		stream.println("beta_no_carAlways * Car_always * Income");
+		
+		stream.print("2\t"); // HT
+		stream.println("beta_ht_carAlways * Car_always * Income");
+		
+		stream.print("3\t"); // GA
+		stream.println("beta_ga_carAlways * Car_always * Income");
+		
 		stream.println();
 		
 		//Expressions
