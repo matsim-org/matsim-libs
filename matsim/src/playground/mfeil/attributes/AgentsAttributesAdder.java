@@ -35,7 +35,7 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-
+import org.matsim.api.core.v01.ScenarioImpl;
 
 
 
@@ -438,6 +438,26 @@ public class AgentsAttributesAdder {
 		}
 		log.info("done...");
 	}	
+	
+	
+	/* Adds income information to all agents of a scenario */	
+	public void loadIncomeData(ScenarioImpl scenario){
+		log.info("   adding agents income data...");
+		AgentsAttributesAdder adder = new AgentsAttributesAdder();
+		adder.runZurich10("/home/baug/mfeil/data/Zurich10/agents_income.txt");
+		Map<Id, Double> income = adder.getIncome();
+		
+		for (Iterator<? extends Person> iterator = scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
+			PersonImpl person = (PersonImpl) iterator.next();
+			try{
+				person.getCustomAttributes().put("income", income.get(person.getId()));
+			} catch (Exception e) {
+				log.warn("No income information found for agent "+person.getId());
+			}
+		}	
+		log.info("   ... done.");
+	}
+	
 	
 	public Map<Id, Double> getIncome (){
 		return this.income;

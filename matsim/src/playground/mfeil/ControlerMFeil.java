@@ -81,33 +81,14 @@ public class ControlerMFeil extends Controler {
 			this.scenarioLoaded = true;
 			
 			// loading income data!
-			this.loadIncomeData();
+			new AgentsAttributesAdder().loadIncomeData(this.scenarioData);
 			
 			if (this.getWorld() != null) {
 				new WorldCheck().run(this.getWorld());
 			}
 		}
 	}
-	
-	/* Adds income information to all agents of the scenario */	
-	private void loadIncomeData(){
-		log.info("   adding agents income data...");
-		AgentsAttributesAdder adder = new AgentsAttributesAdder();
-		adder.runZurich10("/home/baug/mfeil/data/Zurich10/agents_income.txt");
-		Map<Id, Double> income = adder.getIncome();
 		
-		for (Iterator<? extends Person> iterator = this.scenarioData.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
-			PersonImpl person = (PersonImpl) iterator.next();
-			try{
-				person.getCustomAttributes().put("income", income.get(person.getId()));
-			} catch (Exception e) {
-				log.warn("No income information found for agent "+person.getId());
-			}
-		}	
-		log.info("   ... done.");
-	}
-	
-	
 	
 		/*
 		 * @return A fully initialized StrategyManager for the plans replanning.

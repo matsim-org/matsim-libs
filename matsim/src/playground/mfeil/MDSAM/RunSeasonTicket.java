@@ -59,7 +59,7 @@ public class RunSeasonTicket {
 	//	final String output2 = "D:/Documents and Settings/Matthias Feil/Desktop/workspace/MATSim/plans/modFile_1.mod";
 		final String output3 = "D:/Documents and Settings/Matthias Feil/Desktop/workspace/MATSim/plans/probabilities.xls";
 		
-		/*
+	/*// Biogeme code
 		AgentsAttributesAdder choiceSetter = new AgentsAttributesAdder();
 		ArrayList<String> ids = choiceSetter.readPlans (input2);
 		choiceSetter.runMZZurich10ForBiogeme(input1, output1, ids);
@@ -68,23 +68,31 @@ public class RunSeasonTicket {
 		modFiler.writeForSeasonTicket(output2);
 		*/
 		
-		AgentsAttributesAdder adder = new AgentsAttributesAdder();
-		ArrayList<String> ids = adder.readPlans (input2);
-		Map<String,double[]> probabilities = adder.runMZZurich10ForProbabilities(input1, output3, ids);
 		
+	// Probabilities code
+		AgentsAttributesAdder adder = new AgentsAttributesAdder();
+		// Load ids 
+		ArrayList<String> ids = adder.readPlans (input2);
+		// Load probabilities
+		Map<String,double[]> probabilities = adder.runMZZurich10ForProbabilities(input1, output3, ids);
+		// Load scenario and population
 		ScenarioImpl scenario = new ScenarioImpl();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 		new MatsimFacilitiesReader(scenario.getActivityFacilities()).readFile(facilitiesFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
-		
+		// load income information
+		adder.loadIncomeData(scenario);
+		// go through every agent and assign seasonticket according to given probability or randomly if no info available
 		for (Iterator<? extends Person> iterator = scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = (PersonImpl) iterator.next();
 			double gen = MatsimRandom.getRandom().nextDouble();
+			// get income
 			int income = -1;
 			if (Double.parseDouble(person.getCustomAttributes().get("income").toString())/1000<4) income=0;
 			else if (Double.parseDouble(person.getCustomAttributes().get("income").toString())/1000<8) income=4;
 			else if (Double.parseDouble(person.getCustomAttributes().get("income").toString())/1000<30) income=8;
 			else income=12;
+			// transform key
 			String key = person.getAge()+"_"+person.getSex()+"_"+person.getLicense()+"_"+income+"_"+person.getCarAvail();
 			if (probabilities.containsKey(key)){ // assign according to information
 				if (gen>=probabilities.get(key)[0] && gen<probabilities.get(key)[0]+probabilities.get(key)[1])person.getTravelcards().add("halbtax");
