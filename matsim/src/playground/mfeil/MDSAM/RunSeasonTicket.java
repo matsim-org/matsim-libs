@@ -89,6 +89,7 @@ public class RunSeasonTicket {
 		for (Iterator<? extends Person> iterator = scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = (PersonImpl) iterator.next();
 			count++;
+			if (person.getTravelcards()!=null) person.getTravelcards().clear();
 			double gen = MatsimRandom.getRandom().nextDouble();
 			if (count<10) log.info("personId = "+person.getId()+ " und gen = "+gen);
 					
@@ -124,9 +125,9 @@ public class RunSeasonTicket {
 			
 			// CarAvail
 			int carAvail = -1;
-			if (person.getCarAvail().equals("never")) license=3;
-			else if (person.getCarAvail().equals("always")) license=1;
-			else license=2;
+			if (person.getCarAvail().equals("never")) carAvail=3;
+			else if (person.getCarAvail().equals("always")) carAvail=1;
+			else carAvail=2;
 			
 			String key = age+"_"+gender+"_"+license+"_"+income+"_"+carAvail;
 			if (count<10) log.info("key = "+key);
