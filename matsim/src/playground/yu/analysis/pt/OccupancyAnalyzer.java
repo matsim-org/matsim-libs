@@ -25,38 +25,45 @@ package playground.yu.analysis.pt;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.matsim.api.basic.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
-import org.matsim.core.events.PersonLeavesVehicleEventImpl;
+import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
+
+import playground.yu.utils.io.SimpleWriter;
 
 /**
  * @author yu
  * 
  */
 public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
-		PersonLeavesVehicleEventHandler {
+		PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler,
+		VehicleDepartsAtFacilityEventHandler {
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
-	/**
-	 * Map<TransitRouteId,Map<VehId,value[]>>
-	 */
-	private final Map<Id, Map<Id, int[]>> occupancies, getOns, getDowns;
+	/** Map< stopFacilityId,value[]> */
+	private final Map<Id, int[]> boards, alights;
 
-	/**
-	 * 
-	 */
+	/** Map< vehId,stopFacilityId> */
+	private final Map<Id, Id> veh_stops = new HashMap<Id, Id>();
+
 	public OccupancyAnalyzer(final int timeBinSize, final double maxTime) {
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
 		this.maxSlotIndex = ((int) this.maxTime) / this.timeBinSize + 1;
-		occupancies = new HashMap<Id, Map<Id, int[]>>();
-		getOns = new HashMap<Id, Map<Id, int[]>>();
-		getDowns = new HashMap<Id, Map<Id, int[]>>();
+		this.boards = new HashMap<Id, int[]>();
+		this.alights = new HashMap<Id, int[]>();
 	}
 
 	private int getTimeSlotIndex(final double time) {
@@ -67,80 +74,142 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 	}
 
 	public void reset(int iteration) {
-		this.occupancies.clear();
-		this.getOns.clear();
-		this.getDowns.clear();
+		this.boards.clear();
+		this.alights.clear();
 	}
 
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		Id trId = ((PersonEntersVehicleEventImpl) event).getTransitRouteId();
-		Id vehId = event.getVehicleId();
+		Id vehId = event.getVehicleId(), stopId = this.veh_stops.get(vehId);
 		double time = event.getTime();
 		// --------------------------getOns---------------------------
-		Map<Id, int[]> veh_getOn = this.getOns.get(trId);
-		if (veh_getOn == null) {
-			veh_getOn = new HashMap<Id, int[]>();
-			this.getOns.put(trId, veh_getOn);
-		}
-
-		int[] getOn = veh_getOn.get(vehId);
+		int[] getOn = this.boards.get(stopId);
 		if (getOn == null) {
 			getOn = new int[this.maxSlotIndex + 1];
-			veh_getOn.put(vehId, getOn);
+			this.boards.put(stopId, getOn);
 		}
-
 		getOn[getTimeSlotIndex(time)]++;
-		// ------------------------occupancy-----------------------
-		Map<Id, int[]> veh_occup = this.occupancies.get(trId);
-		if (veh_occup == null) {
-			veh_occup = new HashMap<Id, int[]>();
-			this.occupancies.put(trId, veh_occup);
-		}
-
-		int[] occup = veh_occup.get(vehId);
-		if (occup == null) {
-			occup = new int[this.maxSlotIndex + 1];
-			veh_occup.put(vehId, occup);
-		}
-
-		occup[getTimeSlotIndex(time)]++;
 	}
 
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-
-		Id trId = ((PersonLeavesVehicleEventImpl) event).getTransitRouteId();
-		Id vehId = event.getVehicleId();
+		Id stopId = this.veh_stops.get(event.getVehicleId());
 		double time = event.getTime();
 		// --------------------------getDowns---------------------------
-		Map<Id, int[]> veh_getDown = this.getDowns.get(trId);
-		if (veh_getDown == null) {
-			veh_getDown = new HashMap<Id, int[]>();
-			this.getDowns.put(trId, veh_getDown);
-		}
-
-		int[] getDown = veh_getDown.get(vehId);
+		int[] getDown = this.alights.get(stopId);
 		if (getDown == null) {
 			getDown = new int[this.maxSlotIndex + 1];
-			veh_getDown.put(vehId, getDown);
+			this.alights.put(stopId, getDown);
 		}
-
 		getDown[getTimeSlotIndex(time)]++;
-		// ------------------------occupancy-----------------------
-		Map<Id, int[]> veh_occup = this.occupancies.get(trId);
-		try {
-			int[] occup = veh_occup.get(vehId);
-
-			occup[getTimeSlotIndex(time)]--;
-		} catch (NullPointerException e) {
-			System.err.println(e
-					+ "\nthere is not occupancy-data about TransitRoute:\t"
-					+ trId + "\tor TransitVehicle:\t" + vehId);
-			System.exit(138);
-		}
 	}
 
-	// private void stratify() {//this should be made by
-	// "PtCountsComparisonAlgorithm"
-	//
-	// }
+	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+		Id stopId = event.getFacilityId();
+		// double time = event.getTime();
+
+		this.veh_stops.put(event.getVehicleId(), stopId);
+
+		// int[] counter = this.vehCounter.get(stopId);
+		// if (counter == null) {
+		// counter = new int[this.maxSlotIndex + 1];
+		// this.vehCounter.put(stopId, counter);
+		// }
+		// counter[getTimeSlotIndex(time)]++;
+	}
+
+	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+		this.veh_stops.remove(event.getVehicleId());
+	}
+
+	/**
+	 * @param stopId
+	 * @return Array containing the number of agents boarding at the stop
+	 *         <code>stopId</code> per time bin, starting with time bin 0 from 0
+	 *         seconds to (timeBinSize-1)seconds.
+	 */
+	public int[] getBoardVolumesForStop(final Id stopId) {
+		return this.boards.get(stopId);
+	}
+
+	/**
+	 * @param stopId
+	 * @return Array containing the number of agents alighting at the stop
+	 *         {@code stopId} per time bin, starting with time bin 0 from 0
+	 *         seconds to (timeBinSize-1)seconds.
+	 */
+	public int[] getAlightVolumesForStop(final Id stopId) {
+		return this.alights.get(stopId);
+	}
+
+	/**
+	 * @return Set of {@code Id}s containing all stop ids, where the agents
+	 *         boarded, for which counting-values are available.
+	 */
+	public Set<Id> getBoardStopIds() {
+		return this.boards.keySet();
+	}
+
+	/**
+	 * @return Set of {@code Id}s containing all stop ids, where the agents
+	 *         alit, for which counting-values are available.
+	 */
+	public Set<Id> getAlightStopIds() {
+		return this.alights.keySet();
+	}
+
+	/**
+	 * @return Set of {@code Id}s containing all stop ids, where the agents alit
+	 *         or/and boarded, for which counting-values are available.
+	 */
+	public Set<Id> getAllStopIds() {
+		Set<Id> allStopIds = new TreeSet<Id>();
+		allStopIds.addAll(getBoardStopIds());
+		allStopIds.addAll(getAlightStopIds());
+		return allStopIds;
+	}
+
+	public void write(String filename) {
+		SimpleWriter writer = new SimpleWriter(filename);
+		// write filehead
+		writer.write("stopId\t");
+		for (int i = 0; i < 24; i++)
+			writer.write("bo" + i + "-" + (i + 1) + "\t");
+		for (int i = 0; i < 24; i++)
+			writer.write("al" + i + "-" + (i + 1) + "\t");
+		writer.writeln();
+		// write content
+		for (Id stopId : getAllStopIds()) {
+			writer.write(stopId + "\t");
+
+			int[] board = this.boards.get(stopId);
+			if (board == null)
+				System.out.println("stopId:\t" + stopId + "\thas null boards!");
+			for (int i = 0; i < 24; i++) {
+				writer.write((board != null ? board[i] : 0) + "\t");
+			}
+
+			int[] alight = this.alights.get(stopId);
+			if (alight == null)
+				System.out
+						.println("stopId:\t" + stopId + "\thas null alights!");
+			for (int i = 0; i < 24; i++) {
+				writer.write((alight != null ? alight[i] : 0) + "\t");
+			}
+
+			writer.writeln();
+		}
+		writer.close();
+	}
+
+	public static void main(String[] args) {
+		String eventsFilename = "../berlin-bvg09/pt/m2_schedule_delay/m2_out_100a_opt/ITERS/it.1000/1000.events.xml.gz";
+
+		EventsManager em = new EventsManagerImpl();
+		OccupancyAnalyzer oa = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
+		em.addHandler(oa);
+
+		new MatsimEventsReader(em).readFile(eventsFilename);
+
+		oa
+				.write("../berlin-bvg09/pt/m2_schedule_delay/m2_out_100a_opt/m2_out_100a_opt/ITERS/it.1000/m2_out_100a_opt.1000.oa.txt");
+	}
 }
