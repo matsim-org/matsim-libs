@@ -73,9 +73,8 @@ public class IncomeAttacher {
 		final String populationInput = "/home/baug/mfeil/data/Zurich10/plans.xml";
 		final String haushalte = "/home/baug/mfeil/data/Zurich10/Haushalte.txt";
 		final String zielpersonen = "/home/baug/mfeil/data/Zurich10/Zielpersonen.txt";
-		final String dataOutput = "/home/baug/mfeil/data/Zurich10/output_income.txt";
+		final String agentsIncome = "/home/baug/mfeil/data/Zurich10/agents_income.txt";
 		final String munStatsOutput = "/home/baug/mfeil/data/Zurich10/mun_stats.txt";
-		final String populationOutput = "/home/baug/mfeil/data/Zurich10/output_plans.xml";
 		
 		
 		/*
@@ -94,7 +93,10 @@ public class IncomeAttacher {
 		new MatsimWorldReader(scenario.getWorld()).readFile(world);
 
 		IncomeAttacher att = new IncomeAttacher(scenario);
-		att.run(municipalityIncome, agentsEducation, dataOutput, haushalte, zielpersonen, munStatsOutput, populationOutput);
+		att.run(municipalityIncome, agentsEducation, haushalte, zielpersonen);
+		//this.runSimplex(outputFile);
+		att.assignIncome(agentsIncome);
+		att.analyzeMunIncomes(munStatsOutput);
 		log.info("Process finished.");
 	}
 	
@@ -114,40 +116,27 @@ public class IncomeAttacher {
 	
 	private void run (String municipalityIncome, 
 			String agentsEducation, 
-			String outputFile, 
 			String haushalte, 
-			String zielpersonen, 
-			String munStatsOutput,
-			String populationOutput){
+			String zielpersonen){
 		
-		log.info("  parsing additional municipality information... ");
+		log.info("  reading municipality income information... ");
 		this.municipalities = new Municipalities(municipalityIncome);
 		Layer municipalityLayer = scenario.getWorld().getLayer(new IdImpl(Municipalities.MUNICIPALITY));
 		this.municipalities.parse(municipalityLayer);
 		log.info("  done.");
 		
-		log.info("  parsing education information... ");
+		log.info("  reading education information for the scenario's agents... ");
 		AgentsHighestEducationAdder adder = new AgentsHighestEducationAdder();
 		adder.runHighestEducation(agentsEducation);
 		this.education = adder.getEducation();
 		log.info("  done.");
 		
-		log.info("  parsing average income per education information... ");
+		log.info("  calculating average income per education from microcensus data... ");
 		adder = new AgentsHighestEducationAdder();
 		adder.runIncomePerEducation(haushalte, zielpersonen);
 		this.incomePerEducation = adder.getIncomePerEducation();
 		log.info("  done.");
 		
-		
-		String outputfile = outputFile;
-		PrintStream stream;
-		try {
-			stream = new PrintStream (new File(outputfile));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-		//stream.println("AgentID\tEducation\tMunicipalityID\tAverageIncome\tIndividualIncome");		
 		
 		this.incomePerMunicipality = new HashMap<Id,Double>();
 		this.agentsMuns = new HashMap<Id,Id>();
@@ -202,13 +191,8 @@ public class IncomeAttacher {
 				this.incomePerMunicipality.put(person.getId(), this.municipalities.getMunicipality(munAtts.get(0)).getIncome());
 			}
 			
-			//stream.println(person.getId()+"\t"+this.education.get(person.getId())+"\t"+listings.get(person.getId())+"\t"+income.get(person.getId()));
 		}
 		log.info(agentsMuns.size()+" agents in the scenario. Thereof "+doubleListings+" with double-listings and "+noListing+" with no-listings.");
-		//this.runSimplex(outputFile);
-		this.assignIncome(outputFile);
-	//	this.writePop(populationOutput);
-		this.analyzeMunIncomes(munStatsOutput);
 	}
 	
 	
@@ -247,6 +231,12 @@ public class IncomeAttacher {
 			else if (this.education.get(person.getId())==-8 || this.education.get(person.getId())==-9) person.getCustomAttributes().put("income", this.incomePerEducation.get(1)[0]);
 			else log.warn("No valid education match possible for agent "+person.getId()+" with education "+this.education.get(person.getId()));
 		
+			// set income of unavailable education types/keine Angabe to average mun income
+			if (Double.parseDouble(person.getCustomAttributes().get("income").toString())==0) {
+				person.getCustomAttributes().clear();
+				person.getCustomAttributes().put("income", this.municipalities.getMunicipality(this.agentsMuns.get(person.getId())));
+			}
+			
 			if (muns.containsKey(this.agentsMuns.get(person.getId()))){
 				muns.get(this.agentsMuns.get(person.getId()))[0]+=1.0;
 				muns.get(this.agentsMuns.get(person.getId()))[1]+=Double.parseDouble(person.getCustomAttributes().get("income").toString());

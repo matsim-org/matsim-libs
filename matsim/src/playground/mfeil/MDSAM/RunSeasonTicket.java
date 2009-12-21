@@ -86,6 +86,11 @@ public class RunSeasonTicket {
 		
 		// go through every agent and assign seasonticket according to given probability or randomly if no info available
 		int count =0;
+		int nothing=0;
+		int ht = 0;
+		int ga = 0;
+		int nokey=0;
+		int withkey=0;
 		for (Iterator<? extends Person> iterator = scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = (PersonImpl) iterator.next();
 			count++;
@@ -131,27 +136,44 @@ public class RunSeasonTicket {
 			
 			String key = age+"_"+gender+"_"+license+"_"+income+"_"+carAvail;
 			if (count<10) log.info("key = "+key);
-			if (probabilities.containsKey(key) && probabilities.get(key)[3]!=1.0){ // assign according to information, add nothing if no ticket to assign
+			if (probabilities.containsKey(key) && probabilities.get(key)[3]>1.0){ // assign according to information, add nothing if no ticket to assign
+				withkey++;
 				if (gen>=probabilities.get(key)[0] && gen<probabilities.get(key)[0]+probabilities.get(key)[1]){
 					if (count<10) log.info("adding ht with key");
 					person.addTravelcard("halbtax");
+					ht++;
 				}
 				else if (gen>=probabilities.get(key)[0]){
 					if (count<10) log.info("adding ga with key");
 					person.addTravelcard("ga");
+					ga++;
+				}
+				else {
+					if (count<10) log.info("adding nothing with key");
+					nothing++;
 				}
 			}
 			else { // randomly chosen since no info available, add nothing if no ticket to assign
-				if (gen>=0.3333 && gen<0.6667){
+				nokey++;
+				if (gen>=probabilities.get("total")[0] && gen<probabilities.get("total")[0]+probabilities.get("total")[1]){
 					if (count<10) log.info("adding ht without key");
 					person.addTravelcard("halbtax");
+					ht++;
 				}
-				else if (gen>=0.3333){
+				else if (gen>=probabilities.get("total")[0]){
 					if (count<10) log.info("adding ga without key");
 					person.addTravelcard("ga");
+					ga++;
+				}
+				else {
+					if (count<10) log.info("adding nothing without key");
+					nothing++;
 				}
 			}
 		}
+		log.info("No of assignments: "+nothing+" agents without any card, "+ht+" agents with Halbtax or similar, and "+ga+" agents with GA.");
+		log.info("No of assignments with key = "+withkey+", and without key "+nokey+".");
+		
 		new PopulationWriter(scenario.getPopulation()).writeFile(output_populationFilename);
 		
 		log.info("Process finished.");

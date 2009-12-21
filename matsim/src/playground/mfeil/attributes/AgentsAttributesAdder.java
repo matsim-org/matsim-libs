@@ -354,21 +354,29 @@ public class AgentsAttributesAdder {
 			}		
 			
 			// now go through all agent types and calculate their seasonticket probabilities
-			
+			double nothingTotal = 0;
+			double htTotal = 0;
+			double gaTotal = 0;
+			double total = 0;
 			for (Iterator<String> iterator = probabilities.keySet().iterator(); iterator.hasNext();){
 				String id = iterator.next();
 				String[] entries = id.split("_", -1);
 				
 				stream.println(entries[0]+"\t"+entries[1]+"\t"+entries[2]+"\t"+entries[3]+"\t"+entries[4]+"\t"+probabilities.get(id)[0]+"\t"+probabilities.get(id)[1]+"\t"+probabilities.get(id)[2]+"\t");
 				double nothing = probabilities.get(id)[0];
+				nothingTotal +=nothing;
 				double ht = probabilities.get(id)[1];
+				htTotal += ht; 
 				double ga = probabilities.get(id)[2];
+				gaTotal += ga;
 				double sum = nothing + ht + ga;
+				total += sum;
 				
 				probabilities.get(id)[0]=nothing/sum;
 				probabilities.get(id)[1]=ht/sum;
 				probabilities.get(id)[2]=ga/sum;
 			}
+		probabilities.put("total", new double[]{nothingTotal/total, htTotal/total, gaTotal/total});
 						
 		} catch (Exception ex) {
 			System.out.println(ex+" at count "+count);
