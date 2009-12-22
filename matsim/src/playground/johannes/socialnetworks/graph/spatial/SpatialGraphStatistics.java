@@ -183,7 +183,7 @@ public class SpatialGraphStatistics {
 	
 
 	public static Distribution normalizedEdgeLengthDistribution(Set<? extends SpatialSparseVertex> vertices, SpatialSparseGraph vertices2, double descretization, ZoneLayer zones) {
-		double bounds[] = vertices2.getBounds();
+//		double bounds[] = vertices2.getBounds();
 
 		HashMap<SpatialSparseVertex, TDoubleDoubleHashMap> normConstants = new HashMap<SpatialSparseVertex, TDoubleDoubleHashMap>();
 		for(SpatialSparseVertex v_i : vertices) {
@@ -203,43 +203,43 @@ public class SpatialGraphStatistics {
 				/*
 				 * determine density
 				 */
-				TDoubleDoubleHashMap b_d = new TDoubleDoubleHashMap();
+//				TDoubleDoubleHashMap b_d = new TDoubleDoubleHashMap();
 				TDoubleDoubleIterator it = n_d.iterator();
 				for(int k = 0; k < n_d.size(); k++) {
 					it.advance();
-					double r = it.key();
+//					double r = it.key();
 					double count = it.value();
 					/*
 					 * determine the distances to the system boundaries
 					 */
-					double dx1 = descretize(c_i.getX() - bounds[0]);//(c_i.getX() - xmin) / descretization;
-					double dx2 = descretize(bounds[2] - c_i.getX());//(xmax - c_i.getX()) / descretization;
-					double dy1 = descretize(c_i.getY() - bounds[1]);//(c_i.getY() - ymin) / descretization;
-					double dy2 = descretize(bounds[3] - c_i.getY());//(ymax - c_i.getY()) / descretization;
-					/*
-					 * calculate the circle segment for each quadrant
-					 */
-					double b = calculateCircleSegment(dx2, dy2, r);
-					b += calculateCircleSegment(dy1, dx2, r);
-					b += calculateCircleSegment(dx1, dy1, r);
-					b += calculateCircleSegment(dy2, dx1, r);
-					
-//					b = 2*Math.PI;
-					/*
-					 * do some checks
-					 */
-					if (Double.isNaN(b)) {
-						throw new IllegalArgumentException("b must not be NaN!");
-					} else if(Double.isInfinite(b)) {
-						throw new IllegalArgumentException("b must not be infinity!");
-					} else if(b == 0) {
-						b = 0.001; //TODO: Check this!
-					}
-					b_d.put(r, b);
-					/*
-					 * set the new value for z_d
-					 */
-					double a = b*(r - 0.5);
+//					double dx1 = descretize(c_i.getX() - bounds[0]);//(c_i.getX() - xmin) / descretization;
+//					double dx2 = descretize(bounds[2] - c_i.getX());//(xmax - c_i.getX()) / descretization;
+//					double dy1 = descretize(c_i.getY() - bounds[1]);//(c_i.getY() - ymin) / descretization;
+//					double dy2 = descretize(bounds[3] - c_i.getY());//(ymax - c_i.getY()) / descretization;
+//					/*
+//					 * calculate the circle segment for each quadrant
+//					 */
+//					double b = calculateCircleSegment(dx2, dy2, r);
+//					b += calculateCircleSegment(dy1, dx2, r);
+//					b += calculateCircleSegment(dx1, dy1, r);
+//					b += calculateCircleSegment(dy2, dx1, r);
+//					
+////					b = 2*Math.PI;
+//					/*
+//					 * do some checks
+//					 */
+//					if (Double.isNaN(b)) {
+//						throw new IllegalArgumentException("b must not be NaN!");
+//					} else if(Double.isInfinite(b)) {
+//						throw new IllegalArgumentException("b must not be infinity!");
+//					} else if(b == 0) {
+//						b = 0.001; //TODO: Check this!
+//					}
+//					b_d.put(r, b);
+//					/*
+//					 * set the new value for z_d
+//					 */
+//					double a = b*(r - 0.5);
 //					if(count == 0)
 //						count=1;	
 //					if(a==0)

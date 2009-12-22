@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ErgmTerm.java
+ * KMLWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.socialnetworks.spatial;
 
-/**
- * 
- */
-package playground.johannes.socialnetworks.graph.mcmc;
+import java.io.IOException;
 
+import playground.johannes.socialnetworks.graph.spatial.SpatialGraphStatistics;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
+import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
+import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
  * @author illenberger
  *
  */
-public abstract class ErgmTerm {
+public class NormalizedDistribution {
 
-	private double theta;
-	
-	public void setTheta(double theta) {
-		this.theta = theta;
-	}
-	
-	public double getTheta() {
-		return theta;
-	}
-	
-	abstract public double changeStatistic(AdjacencyMatrix y, int i, int j, boolean y_ij);
-	
-	protected void addEdge(AdjacencyMatrix y, int i, int j) {
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		SpatialSparseGraph graph;
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		graph = reader.readGraph(args[0]);
 		
-	}
-	
-	protected void removeEdge(AdjacencyMatrix y, int i, int j) {
+		ZoneLayer zones = ZoneLayer.createFromShapeFile(args[1]);
 		
+		String output = args[2];
+		
+		Distribution distr = SpatialGraphStatistics.normalizedEdgeLengthDistribution(graph.getVertices(), graph, 1000, zones);
+		Distribution.writeHistogram(distr.absoluteDistribution(1000), output + "distance.norm.txt");
+		Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistribution(1000)), output + "distance.norm.norm.txt");
+		Distribution.writeHistogram(distr.normalizedDistribution(distr.absoluteDistributionLog2(1000)), output + "distance.norm.log2.norm.txt");
 	}
-	
+
 }

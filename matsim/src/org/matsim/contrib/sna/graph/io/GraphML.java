@@ -21,7 +21,7 @@
 package org.matsim.contrib.sna.graph.io;
 
 /**
- * Constants used by {@link AbstractGraphMLReader} and {@link playground.johannes.socialnetworks.grpah.io.GraphMLWriter}.
+ * Constants used by {@link AbstractGraphMLReader}.
  * 
  * @author illenberger
  * 

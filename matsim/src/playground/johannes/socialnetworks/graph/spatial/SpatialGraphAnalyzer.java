@@ -97,7 +97,7 @@ public class SpatialGraphAnalyzer {
 		Geometry geo = null;
 		ZoneLayer zones = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
 		ZoneLayerDouble density = ZoneLayerDouble.createFromFile(new HashSet<Zone>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
-		TravelTimeMatrix matrix = TravelTimeMatrix.createFromFile(new HashSet<Zone>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/ttmatrix.txt");
+		TravelTimeMatrix matrix = null;//TravelTimeMatrix.createFromFile(new HashSet<Zone>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/ttmatrix.txt");
 //		if(gridfile != null)
 //			grid = SpatialGrid.readFromFile(gridfile);
 		
@@ -127,7 +127,11 @@ public class SpatialGraphAnalyzer {
 				 * edge length histogram
 				 */
 				Distribution.writeHistogram(edgeLengthDistr.absoluteDistribution(binsize), output + "distance.txt");
+				Distribution.writeHistogram(edgeLengthDistr.normalizedDistribution(edgeLengthDistr.absoluteDistribution(binsize)), output + "distance.normalized.txt");
 				Distribution.writeHistogram(edgeLengthDistr.normalizedDistribution(edgeLengthDistr.absoluteDistributionLog2(1000)), output + "distance.log2.norm.txt");
+				
+				Distribution.writeHistogram(new Distance<SpatialVertex>().vertexAccumulatedDistribution(graph.getVertices()).absoluteDistribution(1000), output + "accDistance.txt");
+				Distribution.writeHistogram(new Distance<SpatialVertex>().vertexAccumulatedCostDistribution(graph.getVertices()).absoluteDistribution(1), output + "accCost.txt");
 				/*
 				 * degree correlation
 				 */
@@ -151,7 +155,7 @@ public class SpatialGraphAnalyzer {
 				/*
 				 * reachablity
 				 */
-				if(zones != null && matrix != null) {
+				if(zones != null) {
 //					Distribution.writeHistogram(SpatialGraphStatistics.travelTimeDistribution(graph.getVertices(), zones, matrix).absoluteDistribution(60), output+"traveltime.txt");
 //					
 //					ZoneLayerDouble reachability = Reachability.createReachablityTable(matrix, zones);
@@ -188,7 +192,8 @@ public class SpatialGraphAnalyzer {
 				}
 				/*
 				 * density partitions
-				 */			
+				 */
+				if(zones != null) {
 				TDoubleObjectHashMap<?> rhoPartitions = SpatialGraphStatistics.createDensityPartitions(graph.getVertices(), zones, binsize);
 				it = rhoPartitions.iterator();
 				patitionOutput = output + "/rhoPartitions"; 
@@ -197,6 +202,7 @@ public class SpatialGraphAnalyzer {
 					it.advance();
 					String filename = String.format("%1$s/edgelength.%2$s.hist.txt", patitionOutput, (int)it.key());
 					Distribution.writeHistogram(SpatialGraphStatistics.edgeLengthDistribution((Set<SpatialSparseVertex>)it.value()).absoluteDistribution(binsize), filename);
+				}
 				}
 			}
 			

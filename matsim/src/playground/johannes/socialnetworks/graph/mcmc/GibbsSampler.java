@@ -108,7 +108,8 @@ public class GibbsSampler {
 				 */
 				if(!y_ij) {
 					m.addEdge(i, j);
-					accept = true;;
+					accept = true;
+					d.addEdge(m, i, j);
 				}
 			} else {
 				/*
@@ -117,6 +118,7 @@ public class GibbsSampler {
 				if(y_ij) {
 					m.removeEdge(i, j);
 					accept = true;
+					d.removeEdge(m, i, j);
 				}
 			}
 		}

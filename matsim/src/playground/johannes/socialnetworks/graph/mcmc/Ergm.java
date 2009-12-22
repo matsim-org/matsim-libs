@@ -62,40 +62,25 @@ public class Ergm implements ConditionalDistribution {
 		}
 		return Math.exp(sum);
 	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.socialnetworks.graph.mcmc.ConditionalDistribution#addEdge(playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix, int, int)
+	 */
+	public void addEdge(AdjacencyMatrix y, int i, int j) {
+		for(ErgmTerm term : ergmTerms) {
+			term.addEdge(y, i, j);
+		}
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.socialnetworks.graph.mcmc.ConditionalDistribution#removeEdge(playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix, int, int)
+	 */
+	public void removeEdge(AdjacencyMatrix y, int i, int j) {
+		for(ErgmTerm term : ergmTerms) {
+			term.removeEdge(y, i, j);
+		}
+		
+	}
 	
-//	public double getNormConstant(int i) {
-////		return norm_i.get(i);
-//		return 1.0;
-//	}
-//	
-//	public void init(AdjacencyMatrix y) {
-////		try {
-////			BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/fearonni/Desktop/normvals.txt"));
-////		
-////		int n = y.getVertexCount();
-////		
-////		for(int i = 0; i < n; i++) {
-////			double sum = 0;
-////			for(int j = 0; j < n; j++) {
-//////				if(i != j) {
-////					sum += 1/(1+changeStatistic(y, i, j, false));
-//////				}
-////			}
-////			
-////			norm_i.put(i, 5/sum);
-////			double dx = 50 - (i - Math.floor(i/100)*100);
-////			double dy = 50 - Math.floor(i/100);
-////			
-////			double d = Math.sqrt(dx*dx + dy*dy);
-////			writer.write(String.valueOf(d));
-////			writer.write("\t");
-////			writer.write(String.valueOf(sum));
-////			writer.newLine();
-////			
-////		}
-////		writer.close();
-////		} catch (Exception e) {
-////			
-////		}
-//	}
 }

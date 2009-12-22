@@ -63,4 +63,22 @@ public class Distance<V extends SpatialVertex> {
 		
 		return distribution;
 	}
+	
+	public Distribution vertexAccumulatedCostDistribution(Collection<? extends V> vertices) {
+		Distribution distribution = new Distribution();
+		
+		for(V v_i : vertices) {
+			double sum = 0;
+			for(Edge e : v_i.getEdges()) {
+				double d = ((SpatialEdge) e).length();
+				d= Math.ceil(d/1000.0);
+				d=Math.max(1,d);
+//				sum += 15 * Math.log(d/2.0 + 1);
+				sum += Math.log(d);
+			}
+			distribution.add(sum);
+		}
+		
+		return distribution;
+	}
 }
