@@ -26,15 +26,13 @@ import static javax.media.opengl.GL.GL_QUADS;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Set;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
+
+import org.matsim.api.basic.v01.Id;
 
 import com.sun.opengl.util.j2d.TextRenderer;
 
@@ -45,41 +43,43 @@ import com.sun.opengl.util.j2d.TextRenderer;
  * @author dstrippgen
  *
  */
-public  class InfoText implements Serializable {
-	private static LinkedList<InfoText> elements = new LinkedList<InfoText>(); 
-	private static Set<InfoText> elementsPermanent = new HashSet<InfoText>(); 
+public class InfoText implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	private static TextRenderer renderer = null;
 	
-	String line = null;
-	public float x=30,y=10,z = -1, size = 1.0f, fill = 0.0f;
-	public boolean isValid = true;
-	public boolean draw2D = false;
-	public boolean decorated = true;
-	public Color color = new Color(50, 50, 128, 200);
-	public boolean isValid() {return isValid;};
-	
-	public InfoText(String line) {
-		this.line = line;
+	public static void setRenderer(TextRenderer renderer) {
+		InfoText.renderer = renderer;
 	}
 	
-	public InfoText(String text, float x2, float y2, float z2) {
-		this(text);
+	public static Rectangle2D getBoundsOf(String testText) {
+		return renderer.getBounds(testText);
+	}
+	
+	private String line;
+	private float x;
+	private float y;
+	private float z;
+	private float size;
+	private float fill = 0.0f;
+	private boolean draw2D = false;
+	private boolean decorated = true;
+	private Color color = new Color(50, 50, 128, 200);
+	private Id linkId;
+
+	public InfoText(String text, float x2, float y2, float z2, float size2) {
+		this.line = text;
 		x = x2;
 		y = y2;
 		z = z2;
-		size = -0.5f/z;
-	}
-
-	public InfoText(String text, float x2, float y2, float z2, float size2) {
-		this(text, x2,y2,z2);
 		this.size = size2;
 	}
 
 	public Rectangle2D getBounds() {
 		return renderer.getBounds(line);
 	}
+	
 	public void draw3D(GL gl) {
-
 		float size = this.size; // kai: this is where font for labels can be made smaller
 		//z -= 0.5*z;
 		float border=15.f;
@@ -94,7 +94,7 @@ public  class InfoText implements Serializable {
         Rectangle2D rect = renderer.getBounds(line);
         float halfh = (float)rect.getHeight()/2; 
 
-        if(decorated) {
+        if(isDecorated()) {
             gl.glPushMatrix();
             gl.glEnable(GL.GL_BLEND);
             gl.glColor4f(0.9f, 0.9f, 0.9f, (color.getAlpha()/255.f));
@@ -136,13 +136,8 @@ public  class InfoText implements Serializable {
         }
         
         renderer.begin3DRendering();
-//        gl.glEnable(GL.GL_BLEND);
-//        gl.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
-//        gl.glBlendFunc(GL.GL_ONE_MINUS_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_COLOR);
         renderer.setColor(color);
-        //gl.glRotatef(0f, 0f, 0.5f, 0f);
         renderer.draw3D(line, x,y + 0.25f*halfh*size,z, size);
-//        gl.glDisable(GL.GL_BLEND);
         renderer.end3DRendering();
 	}
 	
@@ -157,57 +152,6 @@ public  class InfoText implements Serializable {
 	        // Render the text in 3D
 			draw3D(drawable.getGL());
 		}
-		
-       
-        if (color.getAlpha() <= 0) isValid = false;
-	}
-	
-	public static void showText (String text) {
-		elements.add(new InfoText(text));
-	}
-
-	public static void showText (String text, float x, float y, float size) {
-		elements.addFirst(new InfoText(text, x,y,0,size));
-	}
-
-	public static void showTextOnce (String text, float x, float y, float size) {
-		InfoText tt = new InfoText(text, x,y,0,size);
-		tt.isValid = false;
-		tt.decorated = false;
-		elements.addFirst(tt);
-	}
-
-
-	public static InfoText showTextPermanent (String text, float x, float y, float size) {
-		InfoText tt = null;
-		tt = new InfoText(text, x,y,0, size);
-		elementsPermanent.add(tt);
-		return tt;
-	}
-
-	public static void removeTextPermanent (InfoText text) {
-		elementsPermanent.remove(text);
-	}
-
-	public static void drawInfoTexts(GLAutoDrawable drawable) {
-		for (InfoText text : elements) {
-			text.y += 1;
-			text.setAlpha(Math.max(text.getAlpha() - 0.02f, 0));
-			if (renderer != null) text.draw(drawable);
-		}
-		
-		for (InfoText text : elementsPermanent) {
-			if (renderer != null) text.draw(drawable);
-		}
-		
-		ListIterator<InfoText> iter = elements.listIterator();
-		while(iter.hasNext()) {
-			if(!iter.next().isValid()) iter.remove();
-		}
-	}
-
-	public static void setRenderer(TextRenderer renderer) {
-		InfoText.renderer = renderer;
 	}
 
 	public float getAlpha() {
@@ -217,5 +161,80 @@ public  class InfoText implements Serializable {
 	public void setAlpha(float alpha) {
 		color = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int)(alpha*255));
 	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setX(float x) {
+		this.x = x;
+	}
+
+	public float getX() {
+		return x;
+	}
+
+	public void setY(float y) {
+		this.y = y;
+	}
+
+	public float getY() {
+		return y;
+	}
+
+	public void setZ(float z) {
+		this.z = z;
+	}
+
+	public float getZ() {
+		return z;
+	}
+
+	public void setSize(float size) {
+		this.size = size;
+	}
+
+	public float getSize() {
+		return size;
+	}
+
+	public void setFill(float fill) {
+		this.fill = fill;
+	}
+
+	public float getFill() {
+		return fill;
+	}
+
+	public void setDecorated(boolean decorated) {
+		this.decorated = decorated;
+	}
+
+	public boolean isDecorated() {
+		return decorated;
+	}
+
+	public Id getLinkId() {
+		return linkId;
+	}
+
+	/**
+	 * Associate this text with a link. If this is set to something not null,
+	 * the text is only rendered if the link is visible.
+	 * 
+	 * @param linkId the link for which this text is a label.
+	 */
+	public void setLinkId(Id linkId) {
+		this.linkId = linkId;
+	}
+
+	public void setText(String text) {
+		this.line = text;
+	}
+	
 }
 

@@ -27,6 +27,7 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.pt.queuesim.TransitStopAgentTracker;
 import org.matsim.transitSchedule.api.TransitSchedule;
@@ -37,8 +38,9 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
+import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-import org.matsim.vis.otfvis.opengl.queries.QueryDrawingUtils;
+import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 
 
 public class FacilityDrawer {
@@ -59,6 +61,7 @@ public class FacilityDrawer {
 			out.putInt(this.schedule.getFacilities().size());
 			for (TransitStopFacility facility : this.schedule.getFacilities().values()) {
 				ByteBufferUtils.putString(out, facility.getId().toString());
+				ByteBufferUtils.putString(out, facility.getLinkId().toString());
 				out.putDouble(facility.getCoord().getX() - OTFServerQuad2.offsetEast);
 				out.putDouble(facility.getCoord().getY() - OTFServerQuad2.offsetNorth);
 			}
@@ -98,19 +101,20 @@ public class FacilityDrawer {
 			for (int i = 0; i < numberOfEntries; i++) {
 				VisBusStop stop = new VisBusStop();
 				stop.id = ByteBufferUtils.getString(in);
+				stop.linkId = ByteBufferUtils.getString(in);
 				stop.x = in.getDouble();
 				stop.y = in.getDouble();
-//				System.out.println("Facility " + stop.id + " at " + stop.x + "/" + stop.y);
 				if (this.drawer != null) {
 					this.drawer.stops.add(stop);
 				}
 			}
+			drawer.initTexts();
 		}
 
 		@Override
 		public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
 			for (VisBusStop stop : this.drawer.stops) {
-				stop.nOfPeople = in.getInt();
+				stop.setnOfPeople(in.getInt());
 			}
 		}
 		
@@ -122,17 +126,47 @@ public class FacilityDrawer {
 		
 		public void onDraw(GL gl) {
 			for (VisBusStop stop : this.stops) {
-				QueryDrawingUtils.drawCircle(gl, (float) stop.x, (float) stop.y, 50.0f);
-				InfoText.showTextOnce(stop.id + ": " + stop.nOfPeople, (float) stop.x - 100.0f, (float) stop.y + 50.0f, 2.0f);
+				DrawingUtils.drawCircle(gl, (float) stop.x, (float) stop.y, 50.0f);			
 			}
 		}
+
+		public void initTexts() {
+			for (VisBusStop stop : this.stops) {
+				stop.stopText = InfoTextContainer.showTextPermanent(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f, 2.0f);
+				stop.stopText.setLinkId(new IdImpl(stop.linkId));
+			}
+		}
+
 	}
 	
-	protected static class VisBusStop {
+	private static class VisBusStop {
 		public double x = 0.0;
 		public double y = 0.0;
 		public String id = null;
-		public int nOfPeople = 0;
+		public String linkId;
+		private int nOfPeople = 0;
+		private InfoText stopText;
+		
+		public void setnOfPeople(int nOfPeople) {
+			int oldnOfPeople = this.nOfPeople;
+			this.nOfPeople = nOfPeople;
+			if (oldnOfPeople != nOfPeople) {
+				updateText();
+			}
+		}
+		
+		private void updateText() {
+			stopText.setText(buildText());
+		}
+
+		private String buildText() {
+			return id + ": " + getnOfPeople();
+		}
+		
+		private int getnOfPeople() {
+			return nOfPeople;
+		}
+		
 	}
 	
 }

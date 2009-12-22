@@ -67,11 +67,13 @@ public class NullFallFacilityRollout {
 
 	private static final Logger log = Logger.getLogger(NullFallFacilityRollout.class);
 
-	private static String InNetworkFile = "../berlin-bvg09/pt/nullfall_M44_344/intermediateNetwork.xml";
-	private static String InTransitScheduleFile = "../berlin-bvg09/pt/nullfall_M44_344/intermediateTransitSchedule.xml";
-	private static String OutNetworkFile = "../berlin-bvg09/pt/nullfall_M44_344/network.xml";
-	private static String OutTransitScheduleFile = "../berlin-bvg09/pt/nullfall_M44_344/transitSchedule.xml";
-	private static String OutVehicleFile = "../berlin-bvg09/pt/nullfall_M44_344/vehicles.xml";
+	private static String path = "../berlin-bvg09/pt/nullfall_alles/";
+	
+	private static String InNetworkFile = path + "intermediateNetwork.xml";
+	private static String InTransitScheduleFile = path + "intermediateTransitSchedule.xml";
+	private static String OutNetworkFile = path + "network.xml";
+	private static String OutTransitScheduleFile = path + "transitSchedule.xml";
+	private static String OutVehicleFile = path + "vehicles.xml";
 	private final ScenarioImpl inScenario;
 	private final Config inConfig;
 	private final ScenarioImpl outScenario;
@@ -150,19 +152,32 @@ public class NullFallFacilityRollout {
 		TransitSchedule inTransitSchedule = this.inScenario.getTransitSchedule();
 		TransitSchedule outTransitSchedule = this.outScenario.getTransitSchedule();
 		Map<Id, TransitStopFacility> facilityTemplates = new HashMap<Id, TransitStopFacility>(inTransitSchedule.getFacilities());
-		for (TransitLine transitLine : outTransitSchedule.getTransitLines().values()) {
-			for (TransitRoute transitRouteI: transitLine.getRoutes().values()) {
-				NetworkRouteWRefs linkNetworkRoute = transitRouteI.getRoute();
-				Collection<Link> links = getAllLink(linkNetworkRoute);
-				Iterator<Link> linkIterator = links.iterator();
-				for (TransitRouteStop stop : transitRouteI.getStops()) {
-					Link link = linkIterator.next();
-					Id stopPointNo = stop.getStopFacility().getId();
-					while (!stopPointNo.equals(link.getToNode().getId())) {
-						link = linkIterator.next();
-					}
-					enterNewFacilityIfNecessary(transitRouteI, stopPointNo, link, facilityTemplates);
+		Iterator<TransitLine> transitLineI = outTransitSchedule.getTransitLines().values().iterator();
+		while (transitLineI.hasNext()) {
+			TransitLine transitLine = transitLineI.next();
+			try {
+				enterFacilitiesForLine(facilityTemplates, transitLine);
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+				transitLineI.remove();
+			}
+		}
+	}
+
+	private void enterFacilitiesForLine(
+			Map<Id, TransitStopFacility> facilityTemplates,
+			TransitLine transitLine) {
+		for (TransitRoute transitRouteI: transitLine.getRoutes().values()) {
+			NetworkRouteWRefs linkNetworkRoute = transitRouteI.getRoute();
+			Collection<Link> links = getAllLink(linkNetworkRoute);
+			Iterator<Link> linkIterator = links.iterator();
+			for (TransitRouteStop stop : transitRouteI.getStops()) {
+				Link link = linkIterator.next();
+				Id stopPointNo = stop.getStopFacility().getId();
+				while (!stopPointNo.equals(link.getToNode().getId())) {
+					link = linkIterator.next();
 				}
+				enterNewFacilityIfNecessary(transitRouteI, stopPointNo, link, facilityTemplates);
 			}
 		}
 	}
@@ -271,8 +286,9 @@ public class NullFallFacilityRollout {
 		for (Umlauf umlauf : umlaeufe) {
 			for (UmlaufStueckI umlaufstueck : umlauf.getUmlaufStuecke()) {
 				NetworkRouteWRefs route = umlaufstueck.getCarRoute();
-				for (Node node : route.getNodes()) {
-					usedNodes.add(node);
+				for (Link link : getAllLink(route)) {
+					usedNodes.add(link.getFromNode());
+					usedNodes.add(link.getToNode());
 				}
 			}
 		}
@@ -280,6 +296,14 @@ public class NullFallFacilityRollout {
 		for (Node node : allNodes) {
 			if (!usedNodes.contains(node)) {
 				outScenario.getNetwork().removeNode(node);
+			}
+		}
+		Collection<TransitStopFacility> allFacilities = new ArrayList<TransitStopFacility>(outScenario.getTransitSchedule().getFacilities().values());
+		for (TransitStopFacility transitStopFacility : allFacilities) {
+			Link link = outScenario.getNetwork().getLink(transitStopFacility.getLinkId());
+			if (link == null) {
+				outScenario.getTransitSchedule().getFacilities().remove(transitStopFacility.getId());
+				log.warn("Removed facility "+transitStopFacility.getId());
 			}
 		}
 	}

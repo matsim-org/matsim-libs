@@ -32,10 +32,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -46,13 +44,14 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +65,6 @@ import javax.media.opengl.GLCapabilitiesChooser;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
-import javax.media.opengl.GLJPanel;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -95,6 +93,7 @@ import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
+import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.vis.otfvis.opengl.gui.OTFScaleBarDrawer;
 import org.matsim.vis.otfvis.opengl.gui.VisGUIMouseHandler;
@@ -183,19 +182,7 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 	private final float relY;
 	private final boolean opaque;
 	private final float size;
-	Texture t = null;
-
-	OTFGLOverlay(String texture, float relX, float relY, float size, boolean opaque) {
-		try {
-			this.texture = new FileInputStream(texture);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-		this.relX =relX;
-		this.relY = relY;
-		this.size = size;
-		this.opaque = opaque;
-	}
+	private Texture t = null;
 
 	OTFGLOverlay(final InputStream texture, float relX, float relY, float size, boolean opaque) {
 		this.texture = texture;
@@ -209,29 +196,23 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 		if(this.t == null) {
 			this.t = OTFOGLDrawer.createTexture(this.texture);
 		}
-
 		int[] viewport = new int[4];
 		gl.glGetIntegerv( GL_VIEWPORT, viewport ,0 );
-
 		float height = this.size*this.t.getHeight()/viewport[3];
 		float length = this.size*this.t.getWidth()/viewport[2];
 		int z = 0;
-
 		float startX = this.relX >= 0 ? -1.f + this.relX : 1.f -length +this.relX; 
 		float startY = this.relY >= 0 ? -1.f + this.relY : 1.f -height +this.relY; 
 
 		gl.glColor4d(1,1,1,1);
 
-
 		//push 1:1 screen matrix
 		gl.glMatrixMode( GL.GL_PROJECTION);
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
-		//glu.gluOrtho2D( 0.0, width, 0.0, height);
 		gl.glMatrixMode( GL.GL_MODELVIEW);
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
-		//gl.glViewport( 0, 0, 1, 1);
 		//drawQuad
 		if(!this.opaque) {
 			this.gl.glEnable(GL.GL_BLEND);
@@ -251,7 +232,6 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 		if(!this.opaque) {
 			this.gl.glDisable(GL.GL_BLEND);
 		}
-		//glu.gluOrtho2D( 0.0, width, 0.0, height);
 		gl.glMatrixMode( GL.GL_MODELVIEW);
 		gl.glPopMatrix();
 		gl.glMatrixMode( GL.GL_PROJECTION);
@@ -260,8 +240,6 @@ class OTFGLOverlay extends OTFGLDrawableImpl {
 
 	@Override
 	public void invalidate(SceneGraph graph) {
-		// TODO Auto-generated method stub
-
 	}
 
 }
@@ -279,34 +257,41 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	
 	private static int linkTexWidth = 0;
 	private static float agentSize = 10.f;
-	//private static float scaledAgentSize = 10.f;
 	private int netDisplList = 0;
-	private int agentDisplList = 0;
-
-	//private boolean isValid = false;
-	//	public boolean isActiveNet = false;
 	private GL gl = null;
 	private VisGUIMouseHandler mouseMan = null;
 	private final OTFClientQuad clientQ;
 	private String lastTime = "";
 	private int lastShot = -1;
 
-
 	//Handle these separately, as the agents needs textures set, which should only be done once
 	private final List<OTFGLDrawable> netItems = new ArrayList<OTFGLDrawable>();
-	private final List<OTFGLDrawable> agentItems = new ArrayList<OTFGLDrawable>();
 	private final List<OTFGLDrawable> overlayItems = new ArrayList<OTFGLDrawable>();
-	//private final List<OTFGLDrawable> otherItems = new ArrayList<OTFGLDrawable>();
-
-
-	//private final SimpleBackgroundDrawer background = null;
 
 	private static List<OTFGLDrawable> newItems = new ArrayList<OTFGLDrawable>();
+
+	private static volatile GLContext motherContext = null;
 
 	private StatusTextDrawer statusDrawer = null;
 
 	private OTFVisConfig config = null;
 	private OTFQueryHandler queryHandler = null;
+
+	private Component canvas = null;
+
+	private final OTFScaleBarDrawer scaleBar;
+
+	private BufferedImage current;
+
+	private ZoomEntry lastZoom = null;
+
+	private final Object blockRefresh = new Object();
+
+	private JDialog zoomD;
+
+	private int now;
+
+	private SceneGraph actGraph = null;
 
 	public static class StatusTextDrawer {
 
@@ -319,6 +304,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			initTextRenderer();
 			this.drawable = drawable;
 		}
+		
 		private void initTextRenderer() {
 			// Create the text renderer
 			Font font = new Font("SansSerif", Font.PLAIN, 32);
@@ -368,8 +354,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 				double value = i*step + this.minVal;
 				this.fastValues[i] = helper.getColor(value);
 			}
-
-
 		}
 
 		public FastColorizer(double[] ds, Color[] colors) {
@@ -381,10 +365,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			if (value < this.minVal) return this.fastValues[0];
 			return this.fastValues[(int)((value-this.minVal)*this.grain/this.valRange)];
 		}
-
-
 	}
-	public static class RandomColorizer{
+	
+	public static class RandomColorizer {
 		Color [] fastValues;
 		private static final Random rand = new Random();
 
@@ -426,28 +409,12 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		}
 
 		public void displayPS(GL gl) {
-
-			//GLUT glut = new GLUT();
-
-			/*float[] ambientDiffuse = {0f,0.7f,0f,1f};
-	        gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, ambientDiffuse);*/
-
-			//			gl.glEnable(GL.GL_TEXTURE_2D);
-			//			gl.glTexEnvf(GL.GL_POINT_SPRITE_NV, GL.GL_COORD_REPLACE_NV, GL.GL_TRUE);
-			//			gl.glBindTexture(GL.GL_TEXTURE_2D, spriteTexture[0]);
-
 			gl.glEnable(GL.GL_POINT_SPRITE_NV);
-
 			gl.glPointSize(agentSize/10);
-
 			gl.glBegin(GL.GL_POINTS);
 			gl.glVertex3f(this.startX,this.startY, 0);
 			gl.glEnd();
-
-
 			gl.glDisable(GL.GL_POINT_SPRITE_NV);
-			//			gl.glDisable(GL.GL_TEXTURE_2D);
-
 		}
 
 		protected void setColor(GL gl) {
@@ -460,32 +427,14 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		}
 
 		public void onDraw(GL gl) {
-			//			final int z = 0;
-			//			final float laneWidth = agentSize;
-			//			final float width = laneWidth*1.5f;
-			//			final float length = laneWidth*1.5f;
-
 			setColor(gl);
-
-			//			if (true) {
 			displayPS(gl);
-			//				return;
-			//			}
-			//
-			//			gl.glBegin(GL.GL_QUADS);
-			//			gl.glTexCoord2f(1,1); gl.glVertex3f(this.startX - length, this.startY - width, z);
-			//			gl.glTexCoord2f(1,0); gl.glVertex3f(this.startX - length, this.startY + width, z);
-			//			gl.glTexCoord2f(0,0); gl.glVertex3f(this.startX + length, this.startY + width, z);
-			//			gl.glTexCoord2f(0,1); gl.glVertex3f(this.startX + length, this.startY - width, z);
-			//			gl.glEnd();
 		}
 	}
 
-	protected static volatile GLContext motherContext = null;
+	private static class MyGLCanvas2 extends GLCanvas {
 
-	private static Object isPainting = new Object();
-
-	public static class MyGLCanvas2 extends GLCanvas {
+		private static final long serialVersionUID = 1L;
 
 		public MyGLCanvas2(GLCapabilities caps) {
 			super(caps);
@@ -505,79 +454,39 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		
 	}
 
-	public static class MyGLCanvas extends GLJPanel {
-
-		public MyGLCanvas(GLCapabilities arg0, GLCapabilitiesChooser arg1, GLContext arg2, GraphicsDevice arg3) {
-			super(arg0, arg1, arg2);
-			// TODO Auto-generated constructor stub
-		}
-		public Graphics2D graphics = null;
-		public MyGLCanvas(GLCapabilities caps) {
-			super(caps);
-		}
-		@Override
-		public void paint(Graphics arg0) {
-			this.graphics = (Graphics2D)arg0;
-			super.paint(arg0);
-		}
-		
-	}
-	private Component canvas = null;
-	private JFrame  frame = null;
-
-	private final OTFScaleBarDrawer scaleBar;
-	
-	public Insets getInsets() {
-		return this.frame.getInsets();
-	}
-	public int getWidth() {
-		return this.frame.getWidth();
-	}
-	public int getHeight() {
-		return this.frame.getHeight();
-	}
-	
-	protected Component createGLCanvas(final OTFOGLDrawer drawer, final GLCapabilities caps, final GLContext motherContext) {
-		GLCanvas canvas = null;
+	private Component createGLCanvas(final OTFOGLDrawer drawer, final GLCapabilities caps, final GLContext motherContext) {
+		GLCanvas canvas;
 		if (motherContext == null) {
 			canvas = new MyGLCanvas2(caps);
-//			motherContext = canvas.getContext();
 		} else {
 			canvas = new MyGLCanvas2(caps, null, motherContext, null);
 		}
-		
 		canvas.addGLEventListener(drawer);
 		return canvas;
 	}
-	public OTFOGLDrawer(OTFVisConfig visconf, JFrame frame, OTFClientQuad clientQ) {
+	
+	public OTFOGLDrawer (OTFVisConfig visconf, JFrame frame, OTFClientQuad clientQ) {
 		this.clientQ = clientQ;
-		this.frame = frame;
 		GLCapabilities caps = new GLCapabilities();
 		this.config = visconf;
-		
 		this.canvas = createGLCanvas(this, caps, motherContext);
-		
 		this.mouseMan = new VisGUIMouseHandler(this);
 		this.mouseMan.setBounds((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing(), 100);
-
 		Point3f initialZoom = this.config.getZoomValue("*Initial*");
-		if(initialZoom != null) this.mouseMan.setToNewPos(initialZoom);
-
+		if (initialZoom != null) {
+			this.mouseMan.setToNewPos(initialZoom);
+		}
 		this.canvas.addMouseListener(this.mouseMan);
 		this.canvas.addMouseMotionListener(this.mouseMan);
 		this.canvas.addMouseWheelListener(this.mouseMan);
-
 		this.canvas.setMinimumSize(new Dimension(50,50));
 		this.canvas.setPreferredSize(new Dimension(300,300));
 		this.canvas.setMaximumSize(new Dimension(1024,1024));
-		
 		OTFClientQuad.ClassCountExecutor counter = new ClassCountExecutor(OTFDefaultLinkHandler.class);
 		clientQ.execute(null, counter);
 		double linkcount = counter.getCount();
-
 		int size = linkTexWidth + (int)(0.5*Math.sqrt(linkcount))*2 +2;
 		linkTexWidth = size;
-
 		this.overlayItems.add(new OTFGLOverlay(MatsimResource.getAsInputStream("matsim_logo_blue.png"), -0.03f, 0.05f, 1.5f, false));
 		this.scaleBar = new OTFScaleBarDrawer();
 	}
@@ -588,39 +497,22 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			this.canvas.removeMouseListener(this.mouseMan);
 			this.canvas.removeMouseMotionListener(this.mouseMan);
 			this.canvas.removeMouseWheelListener(this.mouseMan);
-			
 			this.mouseMan = new VisGUIMouseHandler(this.mouseMan);
 		} else {
 			this.mouseMan = newHandler;
 		}
-		
 		this.canvas.addMouseListener(this.mouseMan);
 		this.canvas.addMouseMotionListener(this.mouseMan);
 		this.canvas.addMouseWheelListener(this.mouseMan);
-
 	}
 	
 	public VisGUIMouseHandler getMouseHandler() {
 		return this.mouseMan;
 	}
 
-//	public static GLContext getMotherContext() {
-//		return motherContext;
-//	}
-//
-//	public static void setMotherContext(GLContext motherContext) {
-//		OTFOGLDrawer.motherContext = motherContext;
-//	}
-
-	public static void addItem(OTFGLDrawable item) {
-		newItems.add(item);
-	}
-
-	public void drawNetList(){
+	private void drawNetList(){
 		// make quad filled to hit every pixel/texel
-
 		this.gl.glNewList(this.netDisplList, GL.GL_COMPILE);
-
 		log.info("DRAWING NET ONCE: objects count: " + this.netItems.size() );
 		OTFGLDrawableImpl.gl = this.gl;
 		for (OTFGLDrawable item : this.netItems) {
@@ -629,105 +521,89 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.gl.glEndList();
 	}
 
-	public void updateDisplay() {
-		// make quad filled to hit every pixel/texel
-
-		this.gl.glNewList(this.agentDisplList, GL.GL_COMPILE);
-
-		for (OTFGLDrawable item : this.agentItems) {
-			item.draw();
+	private void displayLinkIds(Map<CoordImpl, String> linkIds) {
+		String testText = "0000000";
+		Rectangle2D test = InfoText.getBoundsOf(testText);
+		Map<CoordImpl, Boolean> xymap = new HashMap<CoordImpl, Boolean>(); // Why is here a Map used, and not a Set?
+		double xRaster = test.getWidth(), yRaster = test.getHeight();
+		for( CoordImpl coord : linkIds.keySet()) {
+			float east = (float)coord.getX() ;
+			float north = (float)coord.getY() ;
+			float textX = (float) (((int)(east / xRaster) +1)*xRaster);
+			float textY = north -(float)(north % yRaster) +80;
+			CoordImpl text = new CoordImpl(textX,textY);
+			int i = 1;
+			while (xymap.get(text) != null) {
+				text = new CoordImpl(textX,  i* (float)yRaster + textY);
+				if(xymap.get(text) == null) break;
+				text = new CoordImpl(textX + i* (float)xRaster, textY);
+				if(xymap.get(text) == null) break;
+				i++;
+			}
+			xymap.put(text, Boolean.TRUE);
+			InfoTextContainer.showTextOnce(linkIds.get(coord), (float)text.getX(), (float)text.getY(), 1.f);
+			this.gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
+			this.gl.glLineWidth(2);
+			this.gl.glBegin(GL.GL_LINE_STRIP);
+			this.gl.glVertex3d(east, north,0);
+			this.gl.glVertex3d((float)text.getX(), (float)text.getY(),0);
+			this.gl.glEnd();
 		}
-		this.gl.glEndList();
-		//log.info("CLIENT DRAWER DRAWED  == " + netItems.size()  +"objects time");
 	}
 
-
-	public void displayLinkIds() {
-		// Check for linewidth of street
+	private boolean isZoomBigEnoughForLabels() {
+		CoordImpl size  = this.mouseMan.getPixelsize();
 		final double cellWidth = this.config.getLinkWidth();
 		final double pixelsizeStreet = 5;
-		Rectangle2D test = new InfoText("0000000").getBounds();
+		return (size.getX()*pixelsizeStreet < cellWidth) && (size.getX()*pixelsizeStreet < cellWidth);
+	}
 
-		CoordImpl size  = this.mouseMan.getPixelsize();
-		if((size.getX()*pixelsizeStreet < cellWidth) && (size.getX()*pixelsizeStreet < cellWidth)) {
-			Map<CoordImpl, Boolean> xymap = new HashMap<CoordImpl, Boolean>(); // Why is here a Map used, and not a Set?
-			// Query linkIds
+	private Map<CoordImpl, String> findVisibleLinks() {
+		if (isZoomBigEnoughForLabels()) {
 			Rect rect = this.mouseMan.getBounds();
 			Rectangle2D.Double dest = new Rectangle2D.Double(rect.minX , rect.minY , rect.maxX - rect.minX, rect.maxY - rect.minY);
 			CollectDrawLinkId linkIdQuery = new CollectDrawLinkId(dest);
 			linkIdQuery.prepare(this.clientQ);
-			double xRaster = test.getWidth(), yRaster = test.getHeight();
-
-			for( CoordImpl coord : linkIdQuery.linkIds.keySet()) {
-				// draw linkId
-				float east = (float)coord.getX() ;
-				float north = (float)coord.getY() ;
-
-				float textX = (float) (((int)(east / xRaster) +1)*xRaster);
-				float textY = north -(float)(north % yRaster) +80;
-				CoordImpl text = new CoordImpl(textX,textY);
-				int i = 1;
-
-				while (xymap.get(text) != null) {
-					text = new CoordImpl(textX,  i* (float)yRaster + textY);
-					if(xymap.get(text) == null) break;
-					text = new CoordImpl(textX + i* (float)xRaster, textY);
-					if(xymap.get(text) == null) break;
-					//					text = new Coord(textX - i* (float)xRaster, textY);
-					//					if(xymap.get(text) == null) break;
-					//					text = new Coord(textX,  -i* (float)yRaster + textY);
-					//					if(xymap.get(text) == null) break;
-					i++;
-				}
-				xymap.put(text, Boolean.TRUE);
-
-				InfoText.showTextOnce(linkIdQuery.linkIds.get(coord), (float)text.getX(), (float)text.getY(), 1.f);
-				this.gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
-				this.gl.glLineWidth(2);
-				this.gl.glBegin(GL.GL_LINE_STRIP);
-				this.gl.glVertex3d(east, north,0);
-				this.gl.glVertex3d((float)text.getX(), (float)text.getY(),0);
-				this.gl.glEnd();
-
-			}
+			Map<CoordImpl, String> linkIds = linkIdQuery.linkIds;
+			return linkIds;
+		} else {
+			return Collections.emptyMap();
 		}
-
 	}
 
-	BufferedImage current;
 	synchronized public void display(GLAutoDrawable drawable) {
-		this.gl = drawable.getGL();
-		
-
 		float[] components = this.config.getBackgroundColor().getColorComponents(new float[4]);
+		this.gl = drawable.getGL();
 		this.gl.glClearColor(components[0], components[1], components[2], components[3]);
 		this.gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		this.gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_FILL);
-
 		this.gl.glEnable(GL.GL_BLEND);
 		this.gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-
 		this.mouseMan.setFrustrum(this.gl);
-
 		components = this.config.getNetworkColor().getColorComponents(components);
 		this.gl.glColor4d(components[0], components[1], components[2], components[3]);
-
-		if ( this.actGraph != null) this.actGraph.draw();
-
-		if(this.queryHandler != null) this.queryHandler.drawQueries(this);
-
-		if(this.config.drawLinkIds()) displayLinkIds();
-
+		if (this.actGraph != null) {
+			this.actGraph.draw();
+		}
+		if (this.queryHandler != null) {
+			this.queryHandler.drawQueries(this);
+		}
+		Map<CoordImpl, String> coordStringPairs = findVisibleLinks();
+		if (this.config.drawLinkIds()) {
+			displayLinkIds(coordStringPairs);
+		}
 		this.gl.glDisable(GL.GL_BLEND);
-
 
 		// Mac OS X impl of TextRenderer is broken as of 2008/10/24
 		// remove this if there is --ever-- a fix
 		TextRenderHack.fixIt( this.statusDrawer.textRenderer );
-
-		InfoText.drawInfoTexts(drawable);
-		if(this.config.drawTime()) this.statusDrawer.displayStatusText(this.lastTime);
+		
+		Collection<String> visibleLinkIds = coordStringPairs.values();
+		InfoTextContainer.drawInfoTexts(drawable, visibleLinkIds);
+		
+		if (this.config.drawTime()) {
+			this.statusDrawer.displayStatusText(this.lastTime);
+		}
 
 		this.mouseMan.drawElements(this.gl);
 
@@ -741,7 +617,7 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			this.scaleBar.draw();
 		}
 		
-		if(this.config.renderImages() && (this.lastShot < this.now)){
+		if (this.config.renderImages() && (this.lastShot < this.now)){
 			this.lastShot = this.now;
 			String nr = String.format("%07d", this.now);
 			try {
@@ -754,11 +630,9 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 				e.printStackTrace();
 			}
 		}
-		if(this.current == null) this.current = Screenshot.readToBufferedImage(drawable.getWidth(), drawable.getHeight());
-	}
-
-	public void addOverlay(OTFGLDrawableImpl overlay) {
-		this.overlayItems.add(overlay);
+		if (this.current == null) {
+			this.current = Screenshot.readToBufferedImage(drawable.getWidth(), drawable.getHeight());
+		}
 	}
 
 	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
@@ -771,47 +645,28 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.gl.setSwapInterval(0);
 		float[] components = this.config.getBackgroundColor().getColorComponents(new float[4]);
 		this.gl.glClearColor(components[0], components[1], components[2], components[3]);
-
 		this.gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		this.mouseMan.init(this.gl);
 
-		AgentDrawer.carjpg = createTexture(MatsimResource.getAsInputStream("car.png"));
-		
-		
-		AgentDrawer.wavejpg = createTexture(MatsimResource.getAsInputStream("square.png"));
-		
-		
+		AgentDrawer.carjpg = createTexture(MatsimResource.getAsInputStream("car.png"));	
+		AgentDrawer.wavejpg = createTexture(MatsimResource.getAsInputStream("square.png"));		
 		AgentDrawer.pedpng = createTexture(MatsimResource.getAsInputStream("ped.png"));
 
-		//int test = this.gl.glGetError();
-		//log.info("GLerror = " + test);
-		//TextureIO.newTexture(new TextureData(GL.GL_RGBA, size,size,0,GL.GL_RGBA8,GL.GL_INT,false,false,true,IntBuffer.wrap(buffer),null));
-		//test = this.gl.glGetError();
-		//log.info("GLerror = " + test);
-
-		// create two new lists
 		this.netDisplList = this.gl.glGenLists(1);
-		this.agentDisplList = this.gl.glGenLists(1);
 
 		drawNetList();
-		//this.isValid = false;
 	}
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 			int height) {
 		GL gl = drawable.getGL();
-
 		gl.glViewport(0, 0, width, height);
 		this.mouseMan.setAspectRatio((double)width / (double)height);
 		this.mouseMan.setFrustrum(gl);
 		this.statusDrawer = new StatusTextDrawer(drawable);
 	}
 
-	private ZoomEntry lastZoom = null;
-	private JDialog zoomD;
-
-	void showZoomDialog() {
+	private void showZoomDialog() {
 		this.zoomD = new JDialog(  );
 		this.zoomD.setUndecorated(true);
 		this.zoomD.setLocationRelativeTo(this.canvas.getParent());
@@ -821,13 +676,11 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.zoomD.setPreferredSize(this.canvas.getSize());
 		GridLayout gbl = new GridLayout(3,3); 
 		this.zoomD.getContentPane().setLayout( gbl ); 
-		//zoomD.getContentPane().setLayout( new FlowLayout() ); 
 		ArrayList<JButton> buttons = new ArrayList<JButton>();
 		final List<ZoomEntry> zooms = this.config.getZooms();
 
 		for(int i=0; i<zooms.size();i++) {
 			ZoomEntry z = zooms.get(i);
-			//ImageIcon icon = new ImageIcon(z.snap);
 			JButton b = new JButton(z.getName());//icon);
 			b.setToolTipText(z.getName());
 			b.setPreferredSize(new Dimension(220, 100));
@@ -867,15 +720,12 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	private void storeZoom(boolean withName, String name) {
 		Point3f zoomstore = this.mouseMan.getView();
-
 		if(withName) {
-
 			final JDialog d = new JDialog((JFrame)null,"Name for this zoom", true);
 			JTextField field = new JTextField(20);
 			ActionListener al =  new ActionListener() { 
 				public void actionPerformed( ActionEvent e ) {
 					d.setVisible(false);
-
 				} }; 
 				field.addActionListener(al);
 				d.getContentPane().add(field);
@@ -900,41 +750,40 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 			popmen.add( menu1 );
 			popmen.addSeparator();
 			popmen.add( new AbstractAction("Store Zoom") { 
+				private static final long serialVersionUID = 1L;
 				public void actionPerformed( ActionEvent e ) {
 					storeZoom(false, "");
 				} 
 			} ); 
 			popmen.add( new AbstractAction("Store inital Zoom") { 
+				private static final long serialVersionUID = 1L;
 				public void actionPerformed( ActionEvent e ) {
 					storeZoom(false, "*Initial*");
 				} 
 			} ); 
 			popmen.add( new AbstractAction("Store named Zoom...") { 
+				private static final long serialVersionUID = 1L;
 				public void actionPerformed( ActionEvent e ) {
 					storeZoom(true, "");
 				} 
 			} );
 			popmen.addSeparator();
 			popmen.add( new AbstractAction("Load Zoom...") { 
+				private static final long serialVersionUID = 1L;
 				public void actionPerformed( ActionEvent e ) { 
 					showZoomDialog();
 					if(OTFOGLDrawer.this.lastZoom != null) OTFOGLDrawer.this.mouseMan.setToNewPos(OTFOGLDrawer.this.lastZoom.getZoomstart()); 
 				} 
 			} ); 
 			popmen.add( new AbstractAction("Delete last Zoom") { 
+				private static final long serialVersionUID = 1L;
 				public void actionPerformed( ActionEvent e ) { 
 					if(OTFOGLDrawer.this.lastZoom != null) {
 						OTFOGLDrawer.this.config.deleteZoom(OTFOGLDrawer.this.lastZoom);
 						OTFOGLDrawer.this.lastZoom = null;
 					}
 				} 
-			} ); 
-//			popmen.addSeparator();
-//			popmen.add( new AbstractAction("ChangeDrawers...") { 
-//				public void actionPerformed( ActionEvent e ) {
-//					doChangeDrawer(point);
-//				} 
-//			} ); 
+			} );  
 			popmen.show(this.getComponent(),e.getX(), e.getY());
 			return;
 		}
@@ -956,10 +805,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		this.canvas.repaint();
 	}
 
-	private final Object blockRefresh = new Object();
-	private SceneGraph actGraph = null;
-	private int now;
-
 	/***
 	 * invalidate, gets the actual correct data from the host, to display the given rect
 	 * This method is used in most cases
@@ -967,8 +812,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	 */
 	public void invalidate(int time) throws RemoteException {
 		agentSize = Float.parseFloat(Gbl.getConfig().getParam(OTFVisConfig.GROUP_NAME, OTFVisConfig.AGENT_SIZE));
-		//scaledAgentSize = agentSize * this.mouseMan.getScale();
-
 		if(time != -1) {
 			this.now = time;
 			this.lastTime = Time.writeTime(time, ':');
@@ -984,33 +827,14 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 				QuadTree.Rect rect = this.mouseMan.getBounds();
 				synchronized (newItems) {
-					//					clientQ.getDynData(rect);
-					//					Gbl.startMeasurement();
-					//					clientQ.invalidate(rect);
-
 					this.actGraph  = this.clientQ.getSceneGraph(time, rect, this);
-
-					//					if ( AgentPointDrawer.globalArrayDrawer.count != 0) {
-					//						AgentPointDrawer.globalArrayDrawer.compress();
-					//						graph.addItem(AgentPointDrawer.globalArrayDrawer);
-					//					}
-					//					List<OTFDrawable> list = graph.getAllItemsKILLTHIS();
-					//					newItems.clear();
-					//					for(OTFDrawable item : list) newItems.add((OTFGLDrawable)item);
-					//
-					//
-					//					moveNewItems();
-
 				}
 			}
-			//			log.info("Scale: " + scaledAgentSize + " Invalidate : " );
-			//			Gbl.printElapsedTime();
 		}
 		// Todo put drawing to displyLists here and in
 		// display(gl) we only display the two lists
 
 		if(this.queryHandler != null) this.queryHandler.updateQueries();
-		//this.isValid = false;
 		redraw();
 	}
 
@@ -1035,11 +859,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 
 	public Rect getViewBounds() {
 		return this.mouseMan.getBounds();
-	}
-
-	public void setView(Point3f point) {
-		this.mouseMan.setToNewPos(point);
-		redraw();
 	}
 
 	/**
@@ -1079,14 +898,6 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 		return t;
 	}
 
-	static public Texture createTexture(final BufferedImage data) {
-		Texture t = null;
-		t = TextureIO.newTexture(data, true);
-		t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		return t;
-	}
-
 	public void clearCache() {
 		if (this.clientQ != null) this.clientQ.clearCache();
 	}
@@ -1101,10 +912,5 @@ public class OTFOGLDrawer implements OTFDrawer, GLEventListener, OGLProvider{
 	public Point3f getOGLPos(int x, int y) {
 		return this.mouseMan.getOGLPos(x, y);
 	}
-	public static GLContext getMotherContext() {
-		// TODO Auto-generated method stub
-		return motherContext;
-	}
-
 
 }

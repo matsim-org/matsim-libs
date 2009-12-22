@@ -26,12 +26,10 @@ import java.util.Map;
 
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Executor;
-import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.data.OTFClientQuad;
 import org.matsim.vis.otfvis.handler.OTFDefaultLinkHandler;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.opengl.layer.SimpleStaticNetLayer.SimpleQuadDrawer;
 
 /**
@@ -51,11 +49,6 @@ public class CollectDrawLinkId {
 	
 	public Map<CoordImpl, String> linkIds = new HashMap<CoordImpl, String>();
 
-	public CollectDrawLinkId(double x,double y) {
-		this.sx = x;
-		this.sy = y;
-	}
-
 	public CollectDrawLinkId(Rectangle2D.Double rect) {
 		this.sx = rect.x;
 		this.sy = rect.y;
@@ -63,30 +56,9 @@ public class CollectDrawLinkId {
 		this.height = rect.height;
 	}
 
-	public CollectDrawLinkId(Rect rect) {
-		this.sx = rect.minX;
-		this.sy = rect.minY;
-		this.width = rect.maxX - sx;
-		this.height = rect.maxY - sy;
-	}
-
-	public void draw(OTFDrawer drawer) {
-	}
-
 	class AddIdStringExecutor implements Executor<OTFDataReader> {
-//		private final boolean nearestOnly;
-//		private double minDist = Double.POSITIVE_INFINITY;
-//		private static final double epsilon = 0.0001;
-//		private final double cellWidth;
-		
-		public AddIdStringExecutor(boolean nearestOnly) {
-//			this.nearestOnly = nearestOnly;
-//			cellWidth = ((OTFVisConfig)Gbl.getConfig().getModule("otfvis")).getLinkWidth();
-		}
-		
 		public void execute(double x, double y, OTFDataReader reader)  {
 			if(reader instanceof OTFDefaultLinkHandler) {
-				
 				SimpleQuadDrawer drawer = (SimpleQuadDrawer)((OTFDefaultLinkHandler)reader).getQuadReceiver();
 				if(drawer != null) drawer.prepareLinkId(linkIds);
 			}
@@ -94,19 +66,21 @@ public class CollectDrawLinkId {
 	}
 	
 	public void prepare(OTFClientQuad quad) {
-		
 		// just look in a certain region around the actual point, 
 		double regionWidth = (quad.getMaxEasting()-quad.getMinEasting())*0.1;
 		double regionHeight = (quad.getMaxNorthing()-quad.getMinNorthing())*0.1;
 		
-		QuadTree.Rect rect;
 		// The quadtree has its own coord system from (0,0) (max-minXY)
 		double qsx = sx - quad.getMinEasting();
 		double qsy = sy - quad.getMinNorthing();
-		
-		if (width == 0) rect = new QuadTree.Rect(qsx-regionWidth, qsy-regionHeight, qsx+regionWidth, qsy+regionHeight);
-		else rect = new QuadTree.Rect(qsx,qsy,qsx+width, qsy+height);
-		quad.execute(rect, new AddIdStringExecutor(width == 0));
 
+		QuadTree.Rect rect;
+		if (width == 0) {
+			rect = new QuadTree.Rect(qsx-regionWidth, qsy-regionHeight, qsx+regionWidth, qsy+regionHeight);
+		} else {
+			rect = new QuadTree.Rect(qsx,qsy,qsx+width, qsy+height);
+		}
+		quad.execute(rect, new AddIdStringExecutor());
 	}
+	
 }

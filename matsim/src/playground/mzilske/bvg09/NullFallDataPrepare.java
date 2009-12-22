@@ -62,13 +62,14 @@ public class NullFallDataPrepare {
 
 	private static final Logger log = Logger.getLogger(NullFallDataPrepare.class);
 
-	// INPUT FILES
-	private static String InVisumNetFile = "/Users/michaelzilske/Desktop/nullfall2009-05-25.net";
+	private static String OutPath = "../berlin-bvg09/pt/nullfall_alles/";
+	private static String InVisumNetFile = "../berlin-bvg09/urdaten/nullfall2009-05-25.net";
+	private static List<String> transitLineFilter = /* Arrays.asList("B-M44","B-344"); */ null;
 
 	// OUTPUT FILES
-	private static String OutNetworkFile = "../berlin-bvg09/pt/nullfall_M44_344/intermediateNetwork.xml";
-	private static String OutTransitScheduleFile = "../berlin-bvg09/pt/nullfall_M44_344/intermediateTransitSchedule.xml";
-	private static String OutVehicleFile = "../berlin-bvg09/pt/nullfall_M44_344/intermediateVehicles.xml";
+	private static String OutNetworkFile = OutPath + "intermediateNetwork.xml";
+	private static String OutTransitScheduleFile = OutPath + "intermediateTransitSchedule.xml";
+	private static String OutVehicleFile = OutPath + "intermediateVehicles.xml";
 	private final ScenarioImpl scenario;
 	private final Config config;
 	private Map<Node, Link> initialLinks = new HashMap<Node, Link>();
@@ -76,7 +77,7 @@ public class NullFallDataPrepare {
 
 	private final Pattern taktPattern = Pattern.compile("([0-9]*)s");
 
-	private static List<String> transitLineFilter = Arrays.asList("B-M44","B-344");
+	
 
 	public NullFallDataPrepare() {
 		this.scenario = new ScenarioImpl();
@@ -122,30 +123,41 @@ public class NullFallDataPrepare {
 	}
 
 	private void convertRoutes() {
-		for (TransitLine transitLine : this.scenario.getTransitSchedule().getTransitLines().values()) {
-			for (TransitRoute transitRouteI: transitLine.getRoutes().values()) {
-				VisumNetwork.TransitLineRoute transitLineRoute = getTransitLineRoute(transitLine, transitRouteI);
-				List<VisumNetwork.LineRouteItem> lineRouteItems = getLineRouteItems(transitLine, transitRouteI);
-				List<Link> links = new ArrayList<Link>();
-				Iterator<VisumNetwork.LineRouteItem> i = lineRouteItems.iterator();
-				VisumNetwork.LineRouteItem initialLineRouteItem = i.next();
-				Link initialLink = createOrFindInitialLink(initialLineRouteItem);
-				links.add(initialLink);
-				VisumNetwork.LineRouteItem previousLineRouteItem = initialLineRouteItem;
-				while (i.hasNext()) {
-					VisumNetwork.LineRouteItem nextLineRouteItem = i.next();
-					Link link = findLink(previousLineRouteItem, nextLineRouteItem);
-					links.add(link);
-					previousLineRouteItem = nextLineRouteItem;
-				}
-				NetworkRouteWRefs linkNetworkRoute = NetworkUtils.createLinkNetworkRoute(links);
-				transitRouteI.setRoute(linkNetworkRoute);
-				if (transitLineRoute.takt != null) {
-					int taktInSeconds = parseTaktToSeconds(transitLineRoute.takt);
-					Collection<Departure> departures = createDepartures(transitLine, transitRouteI, taktInSeconds);
-					for (Departure departure : departures) {
-						transitRouteI.addDeparture(departure);
-					}
+		Iterator<TransitLine> transitLineI = this.scenario.getTransitSchedule().getTransitLines().values().iterator();
+		while (transitLineI.hasNext()) {
+			TransitLine transitLine = transitLineI.next();
+			try {
+				convertLine(transitLine);
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+				transitLineI.remove();
+			}
+		}
+	}
+
+	private void convertLine(TransitLine transitLine) {
+		for (TransitRoute transitRouteI: transitLine.getRoutes().values()) {
+			VisumNetwork.TransitLineRoute transitLineRoute = getTransitLineRoute(transitLine, transitRouteI);
+			List<VisumNetwork.LineRouteItem> lineRouteItems = getLineRouteItems(transitLine, transitRouteI);
+			List<Link> links = new ArrayList<Link>();
+			Iterator<VisumNetwork.LineRouteItem> i = lineRouteItems.iterator();
+			VisumNetwork.LineRouteItem initialLineRouteItem = i.next();
+			Link initialLink = createOrFindInitialLink(initialLineRouteItem);
+			links.add(initialLink);
+			VisumNetwork.LineRouteItem previousLineRouteItem = initialLineRouteItem;
+			while (i.hasNext()) {
+				VisumNetwork.LineRouteItem nextLineRouteItem = i.next();
+				Link link = findLink(previousLineRouteItem, nextLineRouteItem);
+				links.add(link);
+				previousLineRouteItem = nextLineRouteItem;
+			}
+			NetworkRouteWRefs linkNetworkRoute = NetworkUtils.createLinkNetworkRoute(links);
+			transitRouteI.setRoute(linkNetworkRoute);
+			if (transitLineRoute.takt != null) {
+				int taktInSeconds = parseTaktToSeconds(transitLineRoute.takt);
+				Collection<Departure> departures = createDepartures(transitLine, transitRouteI, taktInSeconds);
+				for (Departure departure : departures) {
+					transitRouteI.addDeparture(departure);
 				}
 			}
 		}

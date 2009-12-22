@@ -35,16 +35,16 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.gl.InfoText;
+import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
@@ -211,7 +211,7 @@ public class QueryAgentPTBus implements OTFQuery {
 			gl.glVertex3d((float)pos.x +250, (float)pos.y +250,0);
 			gl.glEnd();
 			drawCircle(gl, (float)pos.x, (float)pos.y, 100.f);
-			InfoText.showTextOnce("Bus " + id, (float)pos.x+ 250, (float)pos.y+ 250, -0.0007f);
+			InfoTextContainer.showTextOnce("Bus " + id, (float)pos.x+ 250, (float)pos.y+ 250, -0.0007f);
 
 		}
 		gl.glDisable(GL.GL_BLEND);

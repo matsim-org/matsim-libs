@@ -53,7 +53,9 @@ import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
+import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
@@ -254,17 +256,17 @@ public class QueryAgentPlan implements OTFQuery {
 	}
 
 	private void drawCircleAroundAgent(Point2D.Double pos, GL gl) {
-		QueryDrawingUtils.drawCircle(gl, (float)pos.x, (float)pos.y, 200.f);
+		DrawingUtils.drawCircle(gl, (float)pos.x, (float)pos.y, 200.f);
 	}
 
 	private void resetAnyOldProgressbars() {
-		if (this.lastActivity >= 0) ((InfoText)this.acts[this.lastActivity]).fill = 0.0f;
+		if (this.lastActivity >= 0) ((InfoText)this.acts[this.lastActivity]).setFill(0.0f);
 	}
 
 	private void updateAgentTextPosition(Point2D.Double pos) {
 		if(this.agentText != null) {
-			this.agentText.x = (float)pos.x+ 250;
-			this.agentText.y = (float)pos.y + 250;
+			this.agentText.setX((float)pos.x+ 250);
+			this.agentText.setY((float)pos.y + 250);
 		}
 	}
 
@@ -275,8 +277,8 @@ public class QueryAgentPlan implements OTFQuery {
 		query = (QueryAgentActivityStatus) drawer.getQuad().doQuery(query);
 		if ((query != null) && (query.activityNr != -1) && (query.activityNr < this.acts.length)) {
 			InfoText posT = ((InfoText)this.acts[query.activityNr]);
-			posT.color = new Color(255,50,50,180);
-			posT.fill = (float)query.finished;
+			posT.setColor(new Color(255,50,50,180));
+			posT.setFill((float)query.finished);
 			this.lastActivity = query.activityNr;
 		}
 	}
@@ -295,12 +297,12 @@ public class QueryAgentPlan implements OTFQuery {
 			this.cols = BufferUtil.copyByteBuffer(ByteBuffer.wrap(this.colors));
 			for (int i=0;i< this.acts.length; i++) {
 				MyInfoText inf = (MyInfoText)this.acts[i];
-				this.acts[i] = InfoText.showTextPermanent(inf.name, inf.east - east, inf.north - north, -0.001f );
+				this.acts[i] = InfoTextContainer.showTextPermanent(inf.name, inf.east - east, inf.north - north, -0.001f );
 				((InfoText)this.acts[i]).setAlpha(0.5f);
 			}
 
 			if (pos != null) {
-				this.agentText = InfoText.showTextPermanent(this.agentId, (float)pos.x, (float)pos.y, -0.0005f );
+				this.agentText = InfoTextContainer.showTextPermanent(this.agentId, (float)pos.x, (float)pos.y, -0.0005f );
 				this.agentText.setAlpha(0.7f);
 			}
 			onEndInit();
@@ -337,10 +339,10 @@ public class QueryAgentPlan implements OTFQuery {
 		if (this.acts != null) {
 			for (int i=0;i< this.acts.length; i++) {
 				InfoText inf = (InfoText)this.acts[i];
-				if(inf != null) InfoText.removeTextPermanent(inf);
+				if(inf != null) InfoTextContainer.removeTextPermanent(inf);
 			}
 		}
-		if (this.agentText != null) InfoText.removeTextPermanent(this.agentText);
+		if (this.agentText != null) InfoTextContainer.removeTextPermanent(this.agentText);
 	}
 
 	public boolean isAlive() {

@@ -48,14 +48,14 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueNetwork;
-import org.matsim.ptproject.qsim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QueueNetwork;
+import org.matsim.ptproject.qsim.QueueVehicle;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -63,6 +63,7 @@ import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
+import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 
 import com.sun.opengl.util.BufferUtil;
 
@@ -304,7 +305,7 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 			}
 
 			this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
-			this.agentText = InfoText.showTextPermanent(this.linkId.toString(), this.vertex[0], this.vertex[1], -0.0005f );
+			this.agentText = InfoTextContainer.showTextPermanent(this.linkId.toString(), this.vertex[0], this.vertex[1], -0.0005f );
 	}
 
 		this.vert.position(0);
@@ -364,16 +365,16 @@ public class QuerySpinne implements OTFQuery, OTFQueryOptions, ItemListener {
 
 		double a=1,b=4,c=1,d=3;
 		drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c1);
-		InfoText.showTextOnce ("Count: 0" , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
+		InfoTextContainer.showTextOnce ("Count: 0" , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
 		a=1;b=4;c=5;d=7;
 		drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c2);
-		InfoText.showTextOnce ("Count: " + (maxCount/2) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
+		InfoTextContainer.showTextOnce ("Count: " + (maxCount/2) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
 		a=1;b=4;c=9;d=11;
 		drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c3);
-		InfoText.showTextOnce ("Count: " + (maxCount) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
+		InfoTextContainer.showTextOnce ("Count: " + (maxCount) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf), (float) horOf*.07f);
 	}
 	public void remove() {
-		if (this.agentText != null) InfoText.removeTextPermanent(this.agentText);
+		if (this.agentText != null) InfoTextContainer.removeTextPermanent(this.agentText);
 	}
 	
 	public boolean isAlive() {

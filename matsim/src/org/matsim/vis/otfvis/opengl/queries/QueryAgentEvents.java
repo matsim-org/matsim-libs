@@ -40,10 +40,11 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
-import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
+import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
 
@@ -60,9 +61,7 @@ public class QueryAgentEvents extends QueryAgentPlan {
 
 	private static final long serialVersionUID = -7388598935268835323L;
 
-	public List<String> events = new ArrayList<String>();
-
-	public  class MyEventsHandler implements PersonEventHandler, Serializable{
+	public class MyEventsHandler implements PersonEventHandler, Serializable {
 
 		private static final long serialVersionUID = 1L;
 		private final String agentId;
@@ -90,14 +89,13 @@ public class QueryAgentEvents extends QueryAgentPlan {
 			orig_events.clear();
 			return events;
 		}
+		
 	}
 
-	private  List<InfoText> texts = null;
-	//private  InfoText agentText = null;
-
+	public List<String> events = new ArrayList<String>();
+	private List<InfoText> texts = null;
 	private boolean calcOffset = true;
 	private MyEventsHandler handler = null;
-
 	
 	@Override
 	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad2 quad) {
@@ -126,7 +124,6 @@ public class QueryAgentEvents extends QueryAgentPlan {
 		result.agentId = this.agentId;
 		result.calcOffset = this.calcOffset;
 		result.events = handler.getEvents();
-
 		return result;
 	}
 
@@ -149,11 +146,10 @@ public class QueryAgentEvents extends QueryAgentPlan {
 			}
 
 			if (pos != null) {
-				this.agentText = InfoText.showTextPermanent(this.agentId, (float)pos.x, (float)pos.y, -0.0005f );
+				this.agentText = InfoTextContainer.showTextPermanent(this.agentId, (float)pos.x, (float)pos.y, -0.0005f );
 				this.agentText.setAlpha(0.7f);
 			}
 			this.texts = new ArrayList<InfoText>();
-			//InfoText.showText("Agent selected...");
 		}
 
 		GL gl = drawer.getGL();
@@ -170,25 +166,23 @@ public class QueryAgentEvents extends QueryAgentPlan {
 		gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
 		gl.glDisable(GL.GL_LINE_SMOOTH);
 		if (pos != null) {
-			//System.out.println("POS: " + pos.x + ", " + pos.y);
 			gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
 			gl.glLineWidth(2);
 			gl.glBegin(GL.GL_LINE_STRIP);
 			gl.glVertex3d((float)pos.x + 50, (float)pos.y + 50,0);
 			gl.glVertex3d((float)pos.x +250, (float)pos.y +250,0);
 			gl.glEnd();
-			QueryDrawingUtils.drawCircle(gl, (float)pos.x, (float)pos.y, 200.f);
+			DrawingUtils.drawCircle(gl, (float)pos.x, (float)pos.y, 200.f);
 			if(this.agentText != null) {
-				this.agentText.x = (float)pos.x+ 250;
-				this.agentText.y = (float)pos.y + 250;
+				this.agentText.setX((float)pos.x+ 250);
+				this.agentText.setY((float)pos.y + 250);
 			}
 
 			int offset = 0;
 			for(String event : events) {
-				this.texts.add(InfoText.showTextPermanent(event,(float)pos.x + 150, (float)pos.y + 150 + 80*offset++,-0.0005f));
+				this.texts.add(InfoTextContainer.showTextPermanent(event,(float)pos.x + 150, (float)pos.y + 150 + 80*offset++,-0.0005f));
 			}
 			events.clear();
-
 		}
 		gl.glDisable(GL.GL_BLEND);
 
@@ -199,10 +193,10 @@ public class QueryAgentEvents extends QueryAgentPlan {
 		// Check if we have already generated InfoText Objects, otherwise drop deleting
 		if (this.calcOffset == true) return;
 		for (InfoText inf : this.texts) {
-			if(inf != null) InfoText.removeTextPermanent(inf);
+			if(inf != null) InfoTextContainer.removeTextPermanent(inf);
 		}
 		this.texts.clear();
-		if (this.agentText != null) InfoText.removeTextPermanent(this.agentText);
+		if (this.agentText != null) InfoTextContainer.removeTextPermanent(this.agentText);
 		this.agentText = null;
 	}
 	
