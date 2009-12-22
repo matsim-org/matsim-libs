@@ -31,8 +31,14 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import org.matsim.world.algorithms.WorldCheck;
 
-import playground.gregor.sim2d.otfdebug.ForceArrowReader;
-import playground.gregor.sim2d.otfdebug.ForceArrowWriter;
+import playground.gregor.sim2d.otfdebug.drawer.Agent2DDrawer;
+import playground.gregor.sim2d.otfdebug.drawer.ForceArrowDrawer;
+import playground.gregor.sim2d.otfdebug.layer.Agent2DLayer;
+import playground.gregor.sim2d.otfdebug.layer.ForceArrowLayer;
+import playground.gregor.sim2d.otfdebug.readerwriter.Agent2DReader;
+import playground.gregor.sim2d.otfdebug.readerwriter.Agent2DWriter;
+import playground.gregor.sim2d.otfdebug.readerwriter.ForceArrowReader;
+import playground.gregor.sim2d.otfdebug.readerwriter.ForceArrowWriter;
 import playground.gregor.sim2d.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d.simulation.Sim2D;
 
@@ -45,7 +51,7 @@ public class Controller2D extends Controler {
 	protected OnTheFlyServer myOTFServer = null;
 	private final OTFConnectionManager connectionManager = new DefaultConnectionManagerFactory().createConnectionManager();
 
-	private final AgentWriter agentWriter;
+	private final Agent2DWriter agentWriter;
 
 	private final ForceArrowWriter forceArrowWriter;
 
@@ -79,15 +85,17 @@ public class Controller2D extends Controler {
 		}
 		
 		
-		this.agentWriter = new AgentWriter();
+		this.agentWriter = new Agent2DWriter();
 		this.myOTFServer.addAdditionalElement(this.agentWriter);
-		this.connectionManager.add(AgentWriter.class,  AgentReader.class);
-		this.connectionManager.add(AgentReader.class,  AgentDrawer.class);
-		this.connectionManager.add( AgentDrawer.class, AgentLayer.class);
+		this.connectionManager.add(Agent2DWriter.class,  Agent2DReader.class);
+		this.connectionManager.add(Agent2DReader.class,  Agent2DDrawer.class);
+		this.connectionManager.add( Agent2DDrawer.class, Agent2DLayer.class);
 		
 		this.forceArrowWriter = new ForceArrowWriter();
 		this.myOTFServer.addAdditionalElement(this.forceArrowWriter);
 		this.connectionManager.add(ForceArrowWriter.class,ForceArrowReader.class);
+		this.connectionManager.add(ForceArrowReader.class,ForceArrowDrawer.class);
+		this.connectionManager.add(ForceArrowDrawer.class,ForceArrowLayer.class);
 
 		OTFClientLive client = null;
 		client = new OTFClientLive("rmi:127.0.0.1:4019:OTFServer_" + idOne.toString(), this.connectionManager);

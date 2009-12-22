@@ -39,7 +39,7 @@ public class Agent2D  {
 
 	private AgentState state;
 	
-	private final double disieredVelocity = 0.3;
+	private final double disieredVelocity = 1 + MatsimRandom.getRandom().nextDouble()-0.5;
 
 	private Activity currentAct;
 
@@ -125,7 +125,7 @@ public class Agent2D  {
 		ActivityImpl firstAct = ((ActivityImpl)this.currentPlan.getPlanElements().get(this.actLegPointer));
 		double departureTime = firstAct.getEndTime();
 		this.currentLink = firstAct.getLink();
-		this.position = new Coordinate(this.currentLink.getToNode().getCoord().getX()+0.2*MatsimRandom.getRandom().nextDouble()-0.1,this.currentLink.getToNode().getCoord().getY()+0.2*MatsimRandom.getRandom().nextDouble()-0.1);
+		this.position = new Coordinate(this.currentLink.getToNode().getCoord().getX(),this.currentLink.getToNode().getCoord().getY());
 		if ((departureTime != Time.UNDEFINED_TIME) && (this.currentPlan.getPlanElements().size() > 1)) {
 			this.currentAct = (Activity) this.currentPlan.getPlanElements().get(this.actLegPointer);
 			this.simulation.scheduleActivityEnd(this);

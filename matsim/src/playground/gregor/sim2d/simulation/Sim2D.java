@@ -21,6 +21,7 @@ import org.matsim.core.mobsim.queuesim.AgentFactory;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.evacuation.otfvis.drawer.OTFBackgroundTexturesDrawer;
@@ -40,7 +41,9 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleBackgroundLayer;
 import org.matsim.vis.otfvis.server.OnTheFlyServer;
 import org.matsim.vis.snapshots.writers.PositionInfo.VehicleState;
 
-import playground.gregor.sim2d.otfdebug.ForceArrowWriter;
+import playground.gregor.sim2d.gisdebug.StaticForceFieldToShape;
+import playground.gregor.sim2d.otfdebug.readerwriter.Agent2DWriter;
+import playground.gregor.sim2d.otfdebug.readerwriter.ForceArrowWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -55,7 +58,7 @@ public class Sim2D {
 	private double stopTime;
 	private final Network2D network2D;
 	private double startTime;
-	private AgentWriter agentWriter;
+	private Agent2DWriter agentWriter;
 	private List<ExtendedPositionInfo> agentData;
 	
 	
@@ -70,15 +73,25 @@ public class Sim2D {
 		this.endTime = 10*3600+20*60;
 		this.network = (NetworkLayer) network;
 		Map<MultiPolygon,NetworkLayer> f = new HashMap<MultiPolygon, NetworkLayer>();
+		StaticForceFieldGenerator fg = null;
 		for (Entry<MultiPolygon,List<Link>> e : floors.entrySet()) {
 			f.put(e.getKey(),this.network);
+//			fg = new StaticForceFieldGenerator(e.getKey());
 		}
-		this.network2D = new Network2D(this.network,f);
-		((OTFVisConfig)Gbl.getConfig().getModule(OTFVisConfig.GROUP_NAME)).setAgentSize(20.f);
+		
+		QuadTree<Force> q;
+//		q = fg.loadStaticForceField();
+//		StaticForceFieldWriter s = new StaticForceFieldWriter();
+//		s.write("test.xml", q.values());
+//		
+		q = new StaticForceFieldReader("test.xml").getStaticForceField();
+		
+//		new StaticForceFieldToShape(q).createShp();
+		this.network2D = new Network2D(this.network,f,q);
 
 		this.population = (PopulationImpl) plans;
 		setEvents(events);
-		SimulationTimer.reset(this.config.simulation().getTimeStepSize());
+		SimulationTimer.reset(1);
 	}
 
 
@@ -212,12 +225,36 @@ public class Sim2D {
 			for (Agent2D agent : floor.getAgents()) {
 				Coordinate coord = agent.getPosition();
 				double velocity = floor.getAgentVelocity(agent);
-				ExtendedPositionInfo pos = new ExtendedPositionInfo(agent.getId(),coord.x,coord.y,0,0,velocity,VehicleState.Driving,Math.abs(agent.getId().hashCode())%10,1);
+				Force f = floor.getAgentForce(agent);
+				double alpha = getPhaseAngle(f);
+				alpha /= TWO_PI;
+				alpha *= 360;
+				alpha += 90;
+				ExtendedPositionInfo pos = new ExtendedPositionInfo(agent.getId(),coord.x,coord.y,0,alpha,velocity,VehicleState.Driving,Math.abs(agent.getId().hashCode())%10,1);
 				this.agentData.add(pos);
 			}
 		}
 	}
+	
+	private static final double TWO_PI = 2 * Math.PI;
+	private static final double PI_HALF =  Math.PI / 2;
 
+	private double getPhaseAngle(Force f) {
+		double alpha = 0.0;
+		if (f.getFx() > 0) {
+			alpha = Math.atan(f.getFy()/f.getFx());
+		} else if (f.getFx() < 0) {
+			alpha = Math.PI + Math.atan(f.getFy()/f.getFx());
+		} else { // i.e. DX==0
+			if (f.getFy() > 0) {
+				alpha = PI_HALF;
+			} else {
+				alpha = -PI_HALF;
+			}
+		}
+		if (alpha < 0.0) alpha += TWO_PI;
+		return alpha;
+	}
 
 	public static final EventsManager getEvents() {
 		return events;
@@ -228,9 +265,9 @@ public class Sim2D {
 	}
 
 
-	public void setOTFStuff(OnTheFlyServer myOTFServer, AgentWriter agentWriter, ForceArrowWriter forceArrowWriter) {
+	public void setOTFStuff(OnTheFlyServer myOTFServer, Agent2DWriter agentWriter2, ForceArrowWriter forceArrowWriter) {
 		this.myOTFServer = myOTFServer;
-		this.agentWriter = agentWriter;
+		this.agentWriter = agentWriter2;
 		this.forceArrowWriter = forceArrowWriter;
 		this.myOTFServer.reset();
 		try {

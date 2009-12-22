@@ -1,14 +1,18 @@
-package playground.gregor.sim2d.otfdebug;
+package playground.gregor.sim2d.otfdebug.readerwriter;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.matsim.evacuation.otfvis.drawer.AgentDrawer;
+import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataReceiver;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
-public class ForceArrowReader  extends OTFDataReader {
+import playground.gregor.sim2d.otfdebug.drawer.Agent2DDrawer;
+
+public class Agent2DReader extends OTFDataReader{
+
+	private Agent2DDrawer drawer;
 
 	@Override
 	public void connect(OTFDataReceiver receiver) {
@@ -18,8 +22,7 @@ public class ForceArrowReader  extends OTFDataReader {
 
 	@Override
 	public void invalidate(SceneGraph graph) {
-		// TODO Auto-generated method stub
-		
+		this.drawer.invalidate(graph);
 	}
 
 	@Override
@@ -27,21 +30,21 @@ public class ForceArrowReader  extends OTFDataReader {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void readAgent(ByteBuffer in) {
+		String id = ByteBufferUtils.getString(in);
+		float x = in.getFloat();
+		float y = in.getFloat();
+		float azimuth = in.getFloat();
+		this.drawer.addAgent(x, y,azimuth,id);
+	}
 
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		// read additional agent data
-		ForceArrowDrawer forces = new ForceArrowDrawer();
-		graph.addItem(forces);
+
+		 this.drawer = new Agent2DDrawer();
 		int count = in.getInt();
-		for(int i= 0; i< count; i++) {
-			float x = in.getFloat();
-			float y = in.getFloat();
-			float dx= in.getFloat();
-			float dy= in.getFloat();
-			float color = in.getFloat();
-			forces.addForce(x,y,dx,dy,color);
-		}
+		for(int i= 0; i< count; i++) readAgent(in);
 		
 	}
 

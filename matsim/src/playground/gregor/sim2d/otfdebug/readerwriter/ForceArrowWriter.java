@@ -1,4 +1,4 @@
-package playground.gregor.sim2d.otfdebug;
+package playground.gregor.sim2d.otfdebug.readerwriter;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

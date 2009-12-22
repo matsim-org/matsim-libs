@@ -1,4 +1,4 @@
-package playground.gregor.sim2d.otfdebug;
+package playground.gregor.sim2d.otfdebug.drawer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,8 @@ public class ForceArrowDrawer  extends OTFGLDrawableImpl  {
 
 	public void onDraw(GL gl) {
 
-
+		gl.glLineWidth(4.f);
+		
 		for (float [] force : this.forces) {
 			gl.glColor4f(force[4],force[5],force[6],.7f);
 			gl.glBegin(GL.GL_LINE_STRIP);

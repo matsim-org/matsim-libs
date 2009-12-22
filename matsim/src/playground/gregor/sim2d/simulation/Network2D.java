@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.utils.collections.QuadTree;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
@@ -13,12 +14,12 @@ public class Network2D {
 
 	private final List<Floor> floors = new ArrayList<Floor>();
 	
-	public Network2D(NetworkLayer network, Map<MultiPolygon, NetworkLayer> floors) {
+	public Network2D(NetworkLayer network, Map<MultiPolygon, NetworkLayer> floors, QuadTree<Force> staticForceField) {
 		if (floors.size() > 1) {
 			throw new RuntimeException("this has not been implemented yet!");
 		}
 		for (Entry<MultiPolygon,NetworkLayer> e : floors.entrySet()) {
-			this.floors.add(new Floor(e.getKey(),e.getValue()));
+			this.floors.add(new Floor(e.getKey(),e.getValue(),staticForceField));
 		}
 	}
 	
