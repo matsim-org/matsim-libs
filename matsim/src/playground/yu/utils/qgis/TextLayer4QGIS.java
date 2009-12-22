@@ -45,10 +45,14 @@ public abstract class TextLayer4QGIS extends AbstractPersonAlgorithm implements
 		Plan plan = person.getSelectedPlan();
 		if (toll == null)
 			run(plan);
-		else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity().getLink(), toll)) {
+		else if (TollTools.isInRange(((PlanImpl) plan).getFirstActivity()
+				.getLink(), toll)) {
 			run(plan);
 		}
+	}
 
+	public void writeln(String s) {
+		this.writer.writeln(s);
 	}
 
 	public void close() {
