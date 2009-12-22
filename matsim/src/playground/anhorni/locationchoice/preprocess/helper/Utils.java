@@ -23,6 +23,26 @@ public abstract class Utils {
 		return median(list);
 	}
 	
+	public static double getMin(List<Double> values) {		
+		double minVal = 9999999999999999999.0;
+		for (Double v : values) {
+			if (v < minVal) {
+				minVal = v;
+			}
+		}
+		return minVal;	
+	}
+	
+	public static double getMax(List<Double> values) {		
+		double maxVal = 0.0;
+		for (Double v : values) {
+			if (v > maxVal) {
+				maxVal = v;
+			}
+		}
+		return maxVal;	
+	}
+	
 	
 	public static double median(List<Double> values) {
 		
