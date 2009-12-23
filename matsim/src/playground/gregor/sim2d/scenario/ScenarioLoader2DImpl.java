@@ -12,6 +12,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 import playground.gregor.sim2d.controller.Sim2DConfig;
+import playground.gregor.sim2d.gisdebug.StaticForceFieldToShape;
 import playground.gregor.sim2d.network.NetworkLoader;
 import playground.gregor.sim2d.simulation.Force;
 import playground.gregor.sim2d.simulation.StaticForceField;
@@ -46,7 +47,7 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 			this.sff = new StaticForceFieldGenerator(this.mps.keySet().iterator().next()).loadStaticForceField();
 			new StaticForceFieldWriter().write(Sim2DConfig.STATIC_FORCE_FIELD_FILE, this.sff);
 		}
-		
+		new StaticForceFieldToShape(this.sff).createShp();
 	}
 
 	public Map<MultiPolygon,List<Link>> getFloorLinkMapping() {

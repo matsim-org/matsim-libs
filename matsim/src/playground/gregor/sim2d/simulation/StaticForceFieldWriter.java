@@ -81,9 +81,9 @@ public class StaticForceFieldWriter extends MatsimXmlWriter {
 			this.writer.write(NL);
 		
 			for (Force  force : sff.getForces()) {
-				writeEvent(force);
-				this.writer.write(NL);
-				this.writer.write(NL);
+				writeForce(force);
+//				this.writer.write(NL);
+//				this.writer.write(NL);
 			}
 			
 			this.writer.write(OPEN_TAG_2);
@@ -97,7 +97,7 @@ public class StaticForceFieldWriter extends MatsimXmlWriter {
 		}
 	}
 	
-	private void writeEvent(Force force) throws IOException {
+	private void writeForce(Force force) throws IOException {
 		this.writer.write(TAB);
 		this.writer.write(OPEN_TAG_1);
 		this.writer.write(STATIC_FORCE_TAG);
@@ -126,7 +126,7 @@ public class StaticForceFieldWriter extends MatsimXmlWriter {
 		this.writer.write(Double.toString(force.getFy()));
 		this.writer.write(QUOTE);
 		this.writer.write(CLOSE_TAG_2);
-		this.writer.write(NL);
+//		this.writer.write(NL);
 
 	}
 	

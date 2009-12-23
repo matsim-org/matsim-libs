@@ -2,6 +2,7 @@ package playground.gregor.sim2d.gisdebug;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.geotools.factory.FactoryRegistryException;
@@ -13,68 +14,75 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.Point;
 
-import playground.gregor.sim2d.simulation.Force;
-import playground.gregor.sim2d.simulation.StaticForceField;
+public class GisDebugger {
 
-public class StaticForceFieldToShape {
+	private static FeatureType ft;
 
-	private FeatureType ft;
-	private FeatureType ftLine;
-	private FeatureType ftPoint;
-	private final StaticForceField forces;
+	private static FeatureType ftLine;
 
-	double downScale = 100;
-
-	public StaticForceFieldToShape(StaticForceField sff) {
-		this.forces = sff;
+	private static FeatureType ftPoint;
+	
+	private static List<Geometry> geos = new ArrayList<Geometry>();
+	
+	private static boolean init = false;
+	
+	private static final GeometryFactory geofac = new GeometryFactory();
+	
+	public static void addGeometry(Geometry geo) {
+		geos.add(geo);
 	}
 	
-	public void createShp() {
-		initFeatures();
-		List<Coordinate[]> coords = new ArrayList<Coordinate[]>();
-		for (Force f : this.forces.getForces()) {
-			
-			Coordinate [] coord = {new Coordinate(f.getXCoord(),f.getYCoord()),new Coordinate(f.getXCoord()+f.getFx()/this.downScale,f.getYCoord()+f.getFy()/this.downScale),new Coordinate(f.getXCoord()+f.getFx()/this.downScale+0.01,f.getYCoord()+f.getFy()/this.downScale+0.01)};
-			coords.add(coord);
+	public static void dump(String file) {
+		if (!init) {
+			initFeatures();
+			init = true;
 		}
-		dump(coords);
-		
-	}
-	
-	private void dump(List<Coordinate[] > coords) {
-		initFeatures();		
-		List<Feature> fts = new ArrayList<Feature>();
-		GeometryFactory geofac = new GeometryFactory();
-		for (Coordinate [] coord : coords) {
-			LineString ls = geofac.createLineString(coord);
-			try {
-				fts.add(this.ftLine.create(new Object [] {ls,0,0}));
-			} catch (IllegalAttributeException e) {
-				e.printStackTrace();
+		Collection<Feature> fts = new  ArrayList<Feature>();
+		double d = 0;
+		for (Geometry geo : geos) {
+			if (geo instanceof MultiPolygon) {
+				try {
+					fts.add(ft.create(new Object[] {geo,d,d++}));
+				} catch (IllegalAttributeException e) {
+					e.printStackTrace();
+				}
+			} else if (geo instanceof Polygon) {
+				MultiPolygon mp = geofac.createMultiPolygon(new Polygon[]{(Polygon) geo});
+				try {
+					fts.add(ft.create(new Object[] {mp,d,d++}));
+				} catch (IllegalAttributeException e) {
+					e.printStackTrace();
+				}
+			} else {
+				throw new RuntimeException("type of Geometry is not supported" + geo);
 			}
+			
 		}
-
 		try {
-			ShapeFileWriter.writeGeometries(fts, "../../tmp/staticForces.shp");
+			ShapeFileWriter.writeGeometries(fts, file);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		geos.clear();
 	}
 
 
-	private void initFeatures() {
+
+	
+	
+	private static void initFeatures() {
 		CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
 		AttributeType p = DefaultAttributeTypeFactory.newAttributeType(
 				"MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
@@ -89,9 +97,9 @@ public class StaticForceFieldToShape {
 
 		Exception ex;
 		try {
-			this.ft = FeatureTypeFactory.newFeatureType(new AttributeType[] { p, z, t }, "Polygon");
-			this.ftLine = FeatureTypeFactory.newFeatureType(new AttributeType[] { l, z, t }, "Line");
-			this.ftPoint = FeatureTypeFactory.newFeatureType(new AttributeType[] { po, z, t }, "Point");
+			ft = FeatureTypeFactory.newFeatureType(new AttributeType[] { p, z, t }, "MultiPolygon");
+			ftLine = FeatureTypeFactory.newFeatureType(new AttributeType[] { l, z, t }, "Line");
+			ftPoint = FeatureTypeFactory.newFeatureType(new AttributeType[] { po, z, t }, "Point");
 			return;
 		} catch (FactoryRegistryException e) {
 			ex = e;
@@ -101,4 +109,5 @@ public class StaticForceFieldToShape {
 		throw new RuntimeException(ex);
 
 	}
+
 }
