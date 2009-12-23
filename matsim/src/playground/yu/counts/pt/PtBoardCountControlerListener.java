@@ -31,7 +31,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
-import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsGraphWriter;
 import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
@@ -52,7 +51,8 @@ public class PtBoardCountControlerListener implements StartupListener,
 
 	private final OccupancyAnalyzer oa;
 
-	public PtBoardCountControlerListener(final Config config, OccupancyAnalyzer oa) {
+	public PtBoardCountControlerListener(final Config config,
+			OccupancyAnalyzer oa) {
 		this.config = config;
 		this.counts = new Counts();
 		this.oa = oa;
@@ -100,11 +100,12 @@ public class PtBoardCountControlerListener implements StartupListener,
 					|| this.config.counts().getOutputFormat().contains("all")) {
 				String filename = Controler
 						.getIterationFilename("countscompare.kmz");
-				CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
-						cca.getComparison(), controler.getNetwork(),
-						TransformationFactory.getCoordinateTransformation(
-								this.config.global().getCoordinateSystem(),
-								TransformationFactory.WGS84));
+				PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(
+						cca.getComparison(), TransformationFactory
+								.getCoordinateTransformation(this.config
+										.global().getCoordinateSystem(),
+										TransformationFactory.WGS84),
+						this.counts);
 				kmlWriter.setIterationNumber(event.getIteration());
 				kmlWriter.writeFile(filename);
 			}
