@@ -40,6 +40,11 @@ public class MyLinkImpl extends LinkImpl{
 	protected double travelTime;
 	protected double travelCost;
 	
+	// for TravelTimeEstimator
+	private float[] linkVehicleCounts;
+	private int[] linkEnterCounts;
+	private int[] linkLeaveCounts;
+	
 	public MyLinkImpl(Id id, Node from, Node to, NetworkLayer network, double length, double freespeed, double capacity, double lanes)
 	{
 		super(id, from, to, network, length, freespeed, capacity, lanes);
@@ -67,5 +72,29 @@ public class MyLinkImpl extends LinkImpl{
 
 	public void setTravelCost(double travelCost) {
 		this.travelCost = travelCost;
+	}
+
+	public float[] getLinkVehicleCounts() {
+		return linkVehicleCounts;
+	}
+
+	public void setLinkVehicleCounts(float[] linkVehicleCounts) {
+		this.linkVehicleCounts = linkVehicleCounts;
+	}
+
+	public int[] getLinkEnterCounts() {
+		return linkEnterCounts;
+	}
+
+	public void setLinkEnterCounts(int[] linkEnterCounts) {
+		this.linkEnterCounts = linkEnterCounts;
+	}
+
+	public int[] getLinkLeaveCounts() {
+		return linkLeaveCounts;
+	}
+
+	public void setLinkLeaveCounts(int[] linkLeaveCounts) {
+		this.linkLeaveCounts = linkLeaveCounts;
 	}
 }

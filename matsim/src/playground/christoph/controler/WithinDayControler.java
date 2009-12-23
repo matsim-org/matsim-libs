@@ -30,6 +30,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.events.LinkReplanningMap;
@@ -46,9 +47,11 @@ import playground.christoph.mobsim.ReplanningQueueSimulation;
 import playground.christoph.network.MyLinkFactoryImpl;
 import playground.christoph.replanning.MyStrategyManagerConfigLoader;
 import playground.christoph.replanning.TravelTimeEstimator;
+import playground.christoph.replanning.TravelTimeEstimatorHandlerAndListener;
 import playground.christoph.router.KnowledgePlansCalcRoute;
 import playground.christoph.router.costcalculators.KnowledgeTravelTimeCalculator;
 import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import playground.christoph.router.costcalculators.SystemOptimalTravelCostCalculator;
 import playground.christoph.scoring.OnlyTimeDependentScoringFunctionFactory;
 
 /**
@@ -89,7 +92,7 @@ public class WithinDayControler extends Controler {
 	 */
 	protected int numReplanningThreads = 8;
 	
-	protected KnowledgeTravelTimeCalculator knowledgeTravelTime;
+	protected TravelTime travelTime;
 	protected ParallelInitialReplanner parallelInitialReplanner;
 	protected ParallelActEndReplanner parallelActEndReplanner;
 	protected ParallelLeaveLinkReplanner parallelLeaveLinkReplanner;
@@ -97,6 +100,7 @@ public class WithinDayControler extends Controler {
 	protected LinkReplanningMap linkReplanningMap;
 	protected ReplanningManager replanningManager;
 	protected ReplanningQueueSimulation sim;
+	protected FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
 	
 	private static final Logger log = Logger.getLogger(WithinDayControler.class);
 
@@ -139,13 +143,16 @@ public class WithinDayControler extends Controler {
 		 * Calculate the TravelTime based on the actual load of the links. Use only 
 		 * the TravelTime to find the LeastCostPath.
 		 */
-		KnowledgeTravelTimeCalculator travelTime = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
-//		TravelTimeEstimator travelTime = new TravelTimeEstimator(population, network, 60, 86400 * 2);
-//		sim.addQueueSimulationListeners(travelTime);
-//		this.events.addHandler(travelTime);
-		
+		travelTime = new KnowledgeTravelTimeCalculator(sim.getQueueNetwork());
+//		TravelTimeEstimatorHandlerAndListener handlerAndListener = new TravelTimeEstimatorHandlerAndListener(population, network, 60, 86400 * 2);
+//		travelTime = new TravelTimeEstimator(handlerAndListener);
+//		foqsl.addQueueSimulationInitializedListener((TravelTimeEstimatorHandlerAndListener)handlerAndListener); // for TravelTimeEstimator
+//		foqsl.addQueueSimulationBeforeSimStepListener((TravelTimeEstimatorHandlerAndListener)handlerAndListener);	// for TravelTimeEstimator
+//		this.events.addHandler((TravelTimeEstimatorHandlerAndListener)handlerAndListener);	// for TravelTimeEstimator
+				
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
-		
+//		SystemOptimalTravelCostCalculator travelCost = new SystemOptimalTravelCostCalculator(travelTime);
+			
 		KnowledgePlansCalcRoute dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
 		replanners.add(dijkstraRouter);
 	}
@@ -200,9 +207,7 @@ public class WithinDayControler extends Controler {
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
 		 * ensure that they are started in the needed order.
-		 */
-		FixedOrderQueueSimulationListener foqsl = new FixedOrderQueueSimulationListener();
-		
+		 */	
 		foqsl.addQueueSimulationInitializedListener(linkVehiclesCounter);
 		foqsl.addQueueSimulationAfterSimStepListener(linkVehiclesCounter);
 

@@ -21,10 +21,8 @@
 package playground.christoph.events.algorithms;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
 import org.matsim.core.population.ActivityImpl;
@@ -52,6 +50,7 @@ import playground.christoph.network.util.SubNetworkTools;
 public class ActEndReplanner {
 	
 	protected PlanAlgorithm replanner;
+	protected QueueVehicle vehicle;
 	protected PersonImpl person;
 	protected ActivityImpl fromAct;
 	protected LegImpl betweenLeg;
@@ -62,10 +61,10 @@ public class ActEndReplanner {
 	
 	private static final Logger log = Logger.getLogger(ActEndReplanner.class);
 
-	// used when starting the Replanner "by hand"
 	public ActEndReplanner(ActivityImpl fromAct, QueueVehicle vehicle, double time, PlanAlgorithm replanner)
 	{
 		this.fromAct = fromAct;
+		this.vehicle = vehicle;
 		this.person = (PersonImpl) vehicle.getDriver().getPerson();
 		this.time = time;
 		this.replanner = replanner;
@@ -90,87 +89,34 @@ public class ActEndReplanner {
 		}
 	}
 	
-	// used when starting the Replanner "by hand"
-	public ActEndReplanner(ActivityImpl fromAct, PersonImpl person, double time, PlanAlgorithm replanner)
-	{
-		this.fromAct = fromAct;
-		this.person = person;
-		this.time = time;
-		this.replanner = replanner;
+//	// used when starting the Replanner "by hand"
+//	public ActEndReplanner(ActivityImpl fromAct, PersonImpl person, double time, PlanAlgorithm replanner)
+//	{
+//		this.fromAct = fromAct;
+//		this.person = person;
+//		this.time = time;
+//		this.replanner = replanner;
+//
+//		Plan plan = person.getSelectedPlan();
+//		this.betweenLeg = ((PlanImpl) plan).getNextLeg(fromAct);
+//	
+//		if(betweenLeg != null)
+//		{
+//			toAct = ((PlanImpl) plan).getNextActivity(betweenLeg);
+//		}
+//		else 
+//		{
+//			toAct = null;
+//			log.error("An agents next activity is null - this should not happen!");
+//		}
+//		
+//		// calculate new Route
+//		if(toAct != null && replanner != null)
+//		{	
+//			doReplanning();
+//		}
+//	}
 
-		Plan plan = person.getSelectedPlan();
-		this.betweenLeg = ((PlanImpl) plan).getNextLeg(fromAct);
-	
-		if(betweenLeg != null)
-		{
-			toAct = ((PlanImpl) plan).getNextActivity(betweenLeg);
-		}
-		else 
-		{
-			toAct = null;
-			log.error("An agents next activity is null - this should not happen!");
-		}
-		
-		// calculate new Route
-		if(toAct != null && replanner != null)
-		{	
-			doReplanning();
-		}
-	}
-/*	
-	// used when acting as EventHandler
-	public ActEndReplanner(PopulationImpl population)
-	{	
-		this.population = population;
-	}
-	
-	// used when acting as EventHandler
-	public void handleEvent(ActivityEndEvent event) {
-
-		
-		Id personId = event.getPersonId();
-		this.person = population.getPersons().get(personId);
-
-		// If replanning flag is set in the Person
-		boolean replanning = (Boolean)this.person.getCustomAttributes().get("endActivityReplanning");
-		if(replanning) 
-		{
-			this.time = event.getTime();
-
-// TODO: We need the current Activity... (was part of ActivityEndEvents but not of ActivityEndEvents)
-//			this.fromAct = event.getAct();
-			
-			PlanImpl plan = person.getSelectedPlan();
-			this.betweenLeg = plan.getNextLeg(fromAct);
-			
-			if(betweenLeg != null)
-			{
-				toAct = (ActivityImpl)plan.getNextActivity(betweenLeg);
-			}
-			else 
-			{
-				toAct = null;
-				log.error("An agents next activity is null - this should not happen!");
-			}
-
-			this.replanner = (PlanAlgorithm)person.getCustomAttributes().get("Replanner");
-			if (replanner == null) log.error("No Replanner found in Person!");
-			
-//			log.info("ActEndReplanner....................." + event.agentId);
-			
-			// calculate new Route
-			if(toAct != null && replanner != null)
-			{	
-				doReplanning();
-			}
-		}
-	}
-
-	
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub	
-	}
-*/	
 	/*
 	 * Idea:
 	 * MATSim Routers create Routes for complete plans.
@@ -262,9 +208,18 @@ public class ActEndReplanner {
 		person.removePlan(newPlan);
 //		System.out.println("Do Replanning...");
 		
-		
+		double tt = betweenLeg.getTravelTime();
+		if(tt > 2147483640)
+		{
+			log.warn("To long TravelTime??? " + ((long)tt));
+		}
+
 		Route alternativeRoute = betweenLeg.getRoute();
 
+		// set VehicleId in original Route as well as in the alternative Route
+		((NetworkRouteWRefs)originalRoute).setVehicleId(this.vehicle.getId());
+		((NetworkRouteWRefs)alternativeRoute).setVehicleId(this.vehicle.getId());
+		
 		// create ReplanningEvent
 		QueueSimulation.getEvents().processEvent(new ExtendedAgentReplanEventImpl(time, person.getId(), (NetworkRouteWRefs)alternativeRoute, (NetworkRouteWRefs)originalRoute));
 		

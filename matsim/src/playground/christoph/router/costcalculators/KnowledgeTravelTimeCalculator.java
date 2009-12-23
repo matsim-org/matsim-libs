@@ -86,6 +86,9 @@ public class KnowledgeTravelTimeCalculator extends KnowledgeTravelTime {
 		// Vehicles don't drive backwards.
 		if (v < 0.0) v = 0.0;
 		
+		// We want that vehicles have at least a minimal speed
+		if (v == 0.0) v = 0.1;
+		
 		// limit the velocity if neccessary
 		if(v > vmax) v = vmax;
 		

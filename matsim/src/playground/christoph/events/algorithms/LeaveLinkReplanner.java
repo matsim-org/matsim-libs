@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.queuesim.PersonAgent;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueVehicle;
@@ -138,6 +137,9 @@ public class LeaveLinkReplanner {
 		int currentNodeIndex = this.personAgent.getCurrentNodeIndex();
 		NetworkRouteWRefs route = (NetworkRouteWRefs) this.leg.getRoute();
 		
+		// set VehicleId - seems that it currently null?
+		route.setVehicleId(this.vehicle.getId());
+		
 		// create dummy data for the "new" activities
 		String type = "w";
 		// This would be the "correct" Type - but it is slower and is not necessary
@@ -182,8 +184,12 @@ public class LeaveLinkReplanner {
 		// get new calculated Route
 		NetworkRouteWRefs newRoute = (NetworkRouteWRefs) newLeg.getRoute();
 		
+		// use VehicleId from existing Route
+		newRoute.setVehicleId(this.vehicle.getId());
+		
 		// get Nodes from the current Route
 		List<Node> nodesBuffer = route.getNodes();
+		
 		// remove Nodes after the current Position in the Route
 		nodesBuffer.subList(currentNodeIndex - 1, nodesBuffer.size()).clear();
 				
