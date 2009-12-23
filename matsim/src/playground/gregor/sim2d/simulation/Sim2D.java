@@ -67,27 +67,26 @@ public class Sim2D {
 	private final double endTime;
 	private ForceArrowWriter forceArrowWriter;
 
-	public Sim2D(final Network network, final Map<MultiPolygon,List<Link>> floors, final Population plans, final EventsManager events){
+	public Sim2D(final Network network, final Map<MultiPolygon,List<Link>> floors, final Population plans, final EventsManager events, final StaticForceField sff){
 		this.config = Gbl.getConfig();
 //		this.endTime = this.config.simulation().getEndTime();
 		this.endTime = 10*3600+20*60;
 		this.network = (NetworkLayer) network;
 		Map<MultiPolygon,NetworkLayer> f = new HashMap<MultiPolygon, NetworkLayer>();
-		StaticForceFieldGenerator fg = null;
 		for (Entry<MultiPolygon,List<Link>> e : floors.entrySet()) {
 			f.put(e.getKey(),this.network);
 //			fg = new StaticForceFieldGenerator(e.getKey());
 		}
 		
-		QuadTree<Force> q;
+//		QuadTree<Force> q;
 //		q = fg.loadStaticForceField();
 //		StaticForceFieldWriter s = new StaticForceFieldWriter();
 //		s.write("test.xml", q.values());
 //		
-		q = new StaticForceFieldReader("test.xml").getStaticForceField();
+//		q = new StaticForceFieldReader("test.xml").getStaticForceField();
 		
 //		new StaticForceFieldToShape(q).createShp();
-		this.network2D = new Network2D(this.network,f,q);
+		this.network2D = new Network2D(this.network,f,sff);
 
 		this.population = (PopulationImpl) plans;
 		setEvents(events);

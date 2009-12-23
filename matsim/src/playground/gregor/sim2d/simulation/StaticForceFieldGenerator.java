@@ -21,7 +21,7 @@ public class StaticForceFieldGenerator {
 	
 	private final GeometryFactory geofac = new GeometryFactory();
 
-	private QuadTree<Force> ret;
+	private StaticForceField ret;
 	
 	boolean loaded = false;
 	
@@ -29,7 +29,7 @@ public class StaticForceFieldGenerator {
 		this.structure = structure;
 	}
 	
-	public QuadTree<Force> loadStaticForceField() {
+	public StaticForceField loadStaticForceField() {
 	
 		if (this.loaded) {
 			return this.ret;
@@ -42,7 +42,8 @@ public class StaticForceFieldGenerator {
 		}
 		GeometryFactory geofac = new GeometryFactory();
 		QuadTree<ForcePoint> tmpTree = new QuadTree<ForcePoint>(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
-		this.ret = new QuadTree<Force>(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
+		QuadTree<Force> q = new QuadTree<Force>(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
+		this.ret = new StaticForceField(q);
 		int numOfGeos = 0;
 		for (double x = e.getMinX(); x <= e.getMaxX(); x += Sim2DConfig.STATIC_FORCE_RESOLUTION) {
 			for (double y = e.getMinY(); y <= e.getMaxY(); y += Sim2DConfig.STATIC_FORCE_RESOLUTION) {
@@ -85,7 +86,7 @@ public class StaticForceFieldGenerator {
 			}
 			fp.fX /= denom;
 			fp.fY /= denom;
-			this.ret.put(fp.x, fp.y, new Force(fp.fX,fp.fY,fp.x,fp.y));
+			this.ret.addForce(new Force(fp.fX,fp.fY,fp.x,fp.y));
 		}
 		return this.ret;
 	}

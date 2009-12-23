@@ -33,6 +33,8 @@ public class StaticForceFieldReader extends MatsimXmlParser {
 	
 	private Force currentForce = null;
 
+	private StaticForceField sff;
+
 	public StaticForceFieldReader(String file) {
 		this.file = file;
 	}
@@ -55,11 +57,12 @@ public class StaticForceFieldReader extends MatsimXmlParser {
 	
 	}
 
-	public QuadTree<Force> getStaticForceField() {
+	public StaticForceField getStaticForceField() {
 		if (this.ret == null) {
 			readStaticForceField();
+			this.sff = new StaticForceField(this.ret);
 		}
-		return this.ret;
+		return this.sff;
 	}
 	
 	@Override

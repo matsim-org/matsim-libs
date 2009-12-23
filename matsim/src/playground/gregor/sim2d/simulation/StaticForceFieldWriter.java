@@ -46,7 +46,7 @@ public class StaticForceFieldWriter extends MatsimXmlWriter {
 	
 
 	
-	public void write(String file, Collection<Force> forces) {
+	public void write(String file, StaticForceField sff) {
 		try {
 			openFile(file);
 			super.writeXmlHead();
@@ -80,7 +80,7 @@ public class StaticForceFieldWriter extends MatsimXmlWriter {
 			this.writer.write(NL);
 			this.writer.write(NL);
 		
-			for (Force  force : forces) {
+			for (Force  force : sff.getForces()) {
 				writeEvent(force);
 				this.writer.write(NL);
 				this.writer.write(NL);

@@ -32,15 +32,15 @@ public class Floor {
 	private final NetworkLayer graph;
 	private final Set<Agent2D> agents = new HashSet<Agent2D>();
 	private final Map<Agent2D,Force> agentForceMapping = new HashMap<Agent2D, Force>();
-	private final QuadTree<Force> staticForceQuadTree;
+	private final StaticForceField staticForceField;
 	
 	private List<double[]> forceInfos;
 
 	
-	public Floor(MultiPolygon structure, NetworkLayer subnet, QuadTree<Force> staticForceField) {
+	public Floor(MultiPolygon structure, NetworkLayer subnet, StaticForceField sff) {
 		this.structure = structure;
 		this.graph = subnet;
-		this.staticForceQuadTree = staticForceField;
+		this.staticForceField = sff;
 	}
 
 	public void move() {
@@ -132,12 +132,11 @@ public class Floor {
 		double x = 0;
 		double y = 0;
 		
-		Collection<Force> coll = this.staticForceQuadTree.get(agent.getPosition().x, agent.getPosition().y,Sim2DConfig.STATIC_FORCE_RESOLUTION);
-		if(coll.size() > 0){
-			 Force f = this.staticForceQuadTree.get(agent.getPosition().x, agent.getPosition().y);
+		Force f = this.staticForceField.getForceWithin(agent.getPosition(), Sim2DConfig.STATIC_FORCE_RESOLUTION);
+		
+		if(f != null){
 			 x = f.getFx();
 			 y = f.getFy();
-		
 		}
 
 		force.setFx(force.getFx() + (Sim2DConfig.Apw * x/agent.getWeight()));

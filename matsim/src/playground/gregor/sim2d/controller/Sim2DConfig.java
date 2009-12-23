@@ -12,4 +12,7 @@ public class Sim2DConfig {
 	public static final double App = 600.;
 	public static final double Apw = 600.;
 	public static final double tau = 1;
+	
+	public static final String STATIC_FORCE_FIELD_FILE = "../../inputs/networks/staticForceField.xml.gz";
+	public static final boolean LOAD_STATIC_FORCE_FIELD_FROM_FILE = true;
 }

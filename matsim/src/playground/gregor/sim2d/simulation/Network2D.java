@@ -14,12 +14,12 @@ public class Network2D {
 
 	private final List<Floor> floors = new ArrayList<Floor>();
 	
-	public Network2D(NetworkLayer network, Map<MultiPolygon, NetworkLayer> floors, QuadTree<Force> staticForceField) {
+	public Network2D(NetworkLayer network, Map<MultiPolygon, NetworkLayer> floors, StaticForceField sff) {
 		if (floors.size() > 1) {
 			throw new RuntimeException("this has not been implemented yet!");
 		}
 		for (Entry<MultiPolygon,NetworkLayer> e : floors.entrySet()) {
-			this.floors.add(new Floor(e.getKey(),e.getValue(),staticForceField));
+			this.floors.add(new Floor(e.getKey(),e.getValue(),sff));
 		}
 	}
 	

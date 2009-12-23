@@ -41,6 +41,7 @@ import playground.gregor.sim2d.otfdebug.readerwriter.ForceArrowReader;
 import playground.gregor.sim2d.otfdebug.readerwriter.ForceArrowWriter;
 import playground.gregor.sim2d.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d.simulation.Sim2D;
+import playground.gregor.sim2d.simulation.StaticForceField;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
@@ -54,6 +55,8 @@ public class Controller2D extends Controler {
 	private final Agent2DWriter agentWriter;
 
 	private final ForceArrowWriter forceArrowWriter;
+
+	private StaticForceField sff;
 
 	
 
@@ -116,7 +119,8 @@ public class Controller2D extends Controler {
 		if (!this.scenarioLoaded) {
 			this.loader = new ScenarioLoader2DImpl(this.scenarioData);
 			this.loader.loadScenario();
-			this.mps =((ScenarioLoader2DImpl)this.loader).getFloorLinkMapping();
+			this.mps = ((ScenarioLoader2DImpl)this.loader).getFloorLinkMapping();
+			this.sff = ((ScenarioLoader2DImpl)this.loader).getStaticForceField();
 			this.network = loadNetwork();
 			this.population = loadPopulation();
 			this.scenarioLoaded = true;
@@ -129,7 +133,7 @@ public class Controller2D extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		Sim2D sim = new Sim2D(this.network,this.mps,this.population,this.events);
+		Sim2D sim = new Sim2D(this.network,this.mps,this.population,this.events,this.sff);
 		sim.setOTFStuff(this.myOTFServer,this.agentWriter,this.forceArrowWriter);
 		sim.run();
 	}
