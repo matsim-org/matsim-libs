@@ -10,7 +10,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class Bins {
 	
-	protected int interval;
+	protected double interval;
 	protected int numberOfBins;
 	protected int [] bins;
 	protected double maxVal;
@@ -19,7 +19,7 @@ public class Bins {
 	
 	private final static Logger log = Logger.getLogger(Bins.class);
 	
-	public Bins(int interval, double maxVal, String desc) {
+	public Bins(double interval, double maxVal, String desc) {
 		this.interval = interval;
 		this.maxVal = maxVal;
 		this.numberOfBins = (int)Math.ceil(maxVal / interval);
@@ -29,8 +29,7 @@ public class Bins {
 		for (int i = 0; i < numberOfBins; i++) {
 			bins[i] = 0;
 		}
-	}
-	
+	}	
 	public void addValues(double[] values) {
 		for (double value : values) {
 			this.addVal(value);
@@ -63,9 +62,14 @@ public class Bins {
 		for (int i = 0; i < this.numberOfBins; i++) {
 			categories[i] = Integer.toString(i);
 		}		
-			
+		
+		String s = xLabel + " " + 
+		"[interval = " + this.interval + xUnit + "]" +
+		"[mean = " + Utils.mean(values) + xUnit + "]" +
+		"[variance = " + Utils.getVariance(values) + xUnit + "]";
+		
 		BarChart chart = 
-			new BarChart(desc, xLabel + " " + "[interval = " + this.interval + xUnit + "]", "#", categories);
+			new BarChart(desc, s , "#", categories);
 		chart.addSeries("Bin size", Utils.convert2double(this.bins));
 		chart.saveAsPng(path + desc + ".png", 1600, 800);
 				

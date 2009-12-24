@@ -23,6 +23,16 @@ public abstract class Utils {
 		return median(list);
 	}
 	
+	public static double getVariance(List<Double> values) {
+		double mean = Utils.mean(values);
+		
+		double sum = 0.0;
+		for (Double v : values) {
+			sum += (v-mean) * (v-mean);
+		}
+		return sum / values.size();	
+	}
+	
 	public static double getMin(List<Double> values) {		
 		double minVal = 9999999999999999999.0;
 		for (Double v : values) {
