@@ -28,6 +28,7 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
+import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialVertex;
 import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
@@ -90,7 +91,7 @@ public class TravelTimeHistogram3 {
 		/*
 		 * create partition
 		 */
-		Set<SampledSpatialVertex> vertices = (Set<SampledSpatialVertex>) SnowballPartitions.createSampledPartition(graph.getVertices());
+		Set<? extends SampledSpatialSparseVertex> vertices = SnowballPartitions.createSampledPartition(graph.getVertices());
 		/*
 		 * cache nearest nodes
 		 */
