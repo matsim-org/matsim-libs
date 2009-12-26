@@ -77,16 +77,22 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 			return false;
 		}
 		TransitRouteStopImpl other = (TransitRouteStopImpl) obj;
-		if (!stop.equals(other.getStopFacility())) {
-			return false;
+		if (this.stop == null) {
+			if (other.getStopFacility() != null) {
+				return false;
+			}
+		} else {
+			if (!stop.equals(other.getStopFacility())) {
+				return false;
+			}
 		}
-		if (departureOffset != other.getDepartureOffset()) {
+		if (this.departureOffset != other.getDepartureOffset()) {
 			return false;
 		} 
-		if (arrivalOffset != other.getArrivalOffset()) {
+		if (this.arrivalOffset != other.getArrivalOffset()) {
 			return false;
 		}
-		if (awaitDepartureTime != other.isAwaitDepartureTime()) {
+		if (this.awaitDepartureTime != other.isAwaitDepartureTime()) {
 			return false;
 		}
 		return true;

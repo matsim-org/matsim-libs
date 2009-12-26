@@ -67,5 +67,34 @@ public class TransitRouteStopTest extends MatsimTestCase {
 		routeStop.setAwaitDepartureTime(false);
 		assertFalse(routeStop.isAwaitDepartureTime());
 	}
+	
+	public void testEquals() {
+		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(2, 3), false);
+		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(new IdImpl(2), new CoordImpl(3, 4), false);
+		TransitRouteStop stop1 = createTransitRouteStop(stopFacility1, 10, 50);
+		TransitRouteStop stop2 = createTransitRouteStop(stopFacility1, 10, 50);
+		TransitRouteStop stop3 = createTransitRouteStop(stopFacility2, 10, 50);
+		TransitRouteStop stop4 = createTransitRouteStop(stopFacility1, 10, 30);
+		TransitRouteStop stop5 = createTransitRouteStop(stopFacility1, 20, 50);
+		TransitRouteStop stop6 = createTransitRouteStop(null, 10, 50);
+		TransitRouteStop stop7 = createTransitRouteStop(null, 10, 50);
+		
+		assertTrue(stop1.equals(stop2));
+		assertTrue(stop2.equals(stop1));
+		assertTrue(stop1.equals(stop1));
+		
+		assertFalse(stop1.equals(stop3)); // different stop facility
+		assertFalse(stop3.equals(stop1));
+		assertFalse(stop1.equals(stop4)); // different departureDelay
+		assertFalse(stop4.equals(stop1));
+		assertFalse(stop1.equals(stop5)); // different arrivalDelay
+		assertFalse(stop5.equals(stop1));
+		
+		assertFalse(stop1.equals(stop6)); // null stop facility in stop6
+		assertFalse(stop6.equals(stop1));
+		
+		assertTrue(stop6.equals(stop7)); // both stop facilities are null
+		assertTrue(stop7.equals(stop6));
+	}
 
 }
