@@ -20,11 +20,13 @@
 
 package playground.meisterk.phd.controler;
 
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+import junit.framework.TestCase;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -33,10 +35,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestCase;
 
-public class PersonTreatmentRecorderTest extends MatsimTestCase {
+public class PersonTreatmentRecorderTest extends TestCase {
 
 	private static final int DEFAULT_PERSON_NUMBER = 1;
 
@@ -45,9 +46,7 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		Config config = super.loadConfig(null);
-		
-		this.sc = new ScenarioImpl(config) ;
+		this.sc = new ScenarioImpl() ;
 		Population pop = this.sc.getPopulation() ;
 		PopulationFactory pf = pop.getFactory() ;
 		for (int personId : new int[]{1, 2, 3}) {
@@ -98,24 +97,14 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 
 	public void testIsSelectedPlanTheBestPlan() {
 
-		String javaVersion = System.getProperty("java.version");
-		
-		HashMap<Double, Long> expectedResults = new HashMap<Double, Long>();
+		Map<Double, Long> expectedResults = new LinkedHashMap<Double, Long>();
 		/*
 		 * TODO Intuitively, I should use Double.POSITIVE_INFINITY here (instead of Double.MAX_VALUE), but that doesn't work...
 		 */
 		expectedResults.put(Double.MAX_VALUE, 100000L);
-		expectedResults.put(2.0, 55055L);
+		expectedResults.put(2.0, 55012L);
+		expectedResults.put(0.0, 24881L);
 
-		/*
-		 * TODO the result depends on the version of the jre which is used to run this test
-		 * probably the random number generators produce different series of random numbers
-		 */
-		if (javaVersion.startsWith("1.5")) {
-			expectedResults.put(0.0, 24998L);
-		} else if (javaVersion.startsWith("1.6")) {
-			expectedResults.put(0.0, 24978L);
-		}
 		for (Double brainExpBeta : expectedResults.keySet()) {
 			this.sc.getConfig().charyparNagelScoring().setBrainExpBeta(brainExpBeta);
 			long cntBest = 0;
@@ -128,7 +117,7 @@ public class PersonTreatmentRecorderTest extends MatsimTestCase {
 					cntBest++;
 				}
 			}
-			assertEquals(expectedResults.get(brainExpBeta).longValue(), cntBest);
+			assertEquals("wrong results for brainExpBeta=" + brainExpBeta + ". ", expectedResults.get(brainExpBeta).longValue(), cntBest);
 		}
 
 	}
