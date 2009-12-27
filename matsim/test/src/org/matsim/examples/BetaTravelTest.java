@@ -198,7 +198,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			double timeEnter = this.enterTimes.get(idxEnter).doubleValue();
 			double time;
 
-			while (timeLeave != Double.POSITIVE_INFINITY && timeEnter != Double.POSITIVE_INFINITY) {
+			while ((timeLeave != Double.POSITIVE_INFINITY) && (timeEnter != Double.POSITIVE_INFINITY)) {
 				if (timeLeave <= timeEnter) {
 					time = timeLeave;
 					idxLeave++;
@@ -330,7 +330,7 @@ public class BetaTravelTest extends MatsimTestCase {
 			}
 
 			if (iteration % 50 == 0) {
-				this.ttAnalyzer.plot(Controler.getIterationFilename("bottleneck_times.png"));
+				this.ttAnalyzer.plot(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "bottleneck_times.png"));
 				event.getControler().getEvents().removeHandler(this.ttAnalyzer);
 			}
 			if (iteration == 100) {

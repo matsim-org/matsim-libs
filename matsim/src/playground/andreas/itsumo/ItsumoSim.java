@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.population.ActivityImpl;
@@ -41,6 +42,8 @@ import org.matsim.core.utils.io.IOUtils;
 public class ItsumoSim extends ExternalMobsim {
 
 	protected static final String CONFIG_MODULE = "itsumo";
+	private ControlerIO controlerio;
+	private Integer iteration;
 
 	public ItsumoSim(final Population population, final EventsManager events) {
 		super(population, events);
@@ -55,10 +58,10 @@ public class ItsumoSim extends ExternalMobsim {
 		// ONLY reason why this needs to be overridden is because of the different events file name !!
 		// Since it new exists, writeItsumoConfig is different from writeConfig.
 
-		String iterationPlansFile = Controler.getIterationFilename(this.plansFileName);
+		String iterationPlansFile = controlerIO.getIterationFilename(this.iteration, this.plansFileName);
 //		String iterationEventsFile = Controler.getIterationFilename(this.eventsFileName);
 		String iterationEventsFile = "./drivers.txt" ;
-		String iterationConfigFile = Controler.getIterationFilename(this.configFileName);
+		String iterationConfigFile = controlerIO.getIterationFilename(this.iteration, this.configFileName);
 
 		try {
 			writeConfig( iterationPlansFile, iterationEventsFile, "output/config.xml" ) ;
@@ -153,13 +156,13 @@ public class ItsumoSim extends ExternalMobsim {
 
 			out.write("  <sensor>"); out.newLine();
 			out.write("   <name>total_stopped_cars_in_network</name>"); out.newLine();
-			out.write("   <file>" + Controler.getIterationPath() + "/" + Controler.getIteration() + ".itsumo.total_stopped_cars_in_network.log</file>"); out.newLine();
+			out.write("   <file>" + this.controlerio.getIterationPath(this.iteration) + "/" + Controler.getIteration() + ".itsumo.total_stopped_cars_in_network.log</file>"); out.newLine();
 			out.write("   <state>OFF</state>"); out.newLine();
 			out.write("  </sensor>"); out.newLine();
 
 			out.write("  <sensor>"); out.newLine();
 			out.write("   <name>stopped_cars_in_lanesets</name>"); out.newLine();
-			out.write("   <file>" + Controler.getIterationPath() + "/" + Controler.getIteration() + ".itsumo.stopped_cars_in_lanesets.log</file>"); out.newLine();
+			out.write("   <file>" + this.controlerio.getIterationPath(this.iteration) + "/" + Controler.getIteration() + ".itsumo.stopped_cars_in_lanesets.log</file>"); out.newLine();
 			out.write("   <state>OFF</state>"); out.newLine();
 			out.write("  </sensor>"); out.newLine();
 
@@ -171,6 +174,15 @@ public class ItsumoSim extends ExternalMobsim {
 			Gbl.errorMsg(e);
 		}
 
+	}
+
+	@Override
+	public void setControlerIO(ControlerIO controlerIO) {
+		this.controlerio = controlerIO;
+	}
+
+	public void setIteration(int iteration) {
+		this.iteration = iteration;
 	}
 
 

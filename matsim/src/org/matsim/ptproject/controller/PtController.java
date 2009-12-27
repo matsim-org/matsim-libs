@@ -50,7 +50,8 @@ public class PtController extends Controler {
 	@Override
 	protected void runMobSim() {
 		QueueSimulation sim = new QueueSimulation(this.scenarioData, this.events);
-		
+		sim.setIterationNumber(this.getIteration());
+		sim.setControlerIO(this.getControlerIO());
 		for (QueueSimulationListener l : this.getQueueSimulationListener()) {
 			sim.addQueueSimulationListeners(l);
 		}

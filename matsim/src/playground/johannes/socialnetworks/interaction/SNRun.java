@@ -94,7 +94,7 @@ public class SNRun {
 
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			try {
-				handler.dumpVisitorStatisitcs(event.getControler().getIterationFilename("facilityStats.txt"));
+				handler.dumpVisitorStatisitcs(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "facilityStats.txt"));
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

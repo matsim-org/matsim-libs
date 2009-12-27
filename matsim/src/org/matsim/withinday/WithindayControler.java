@@ -155,7 +155,7 @@ public class WithindayControler extends PtController {
 
 		public void notifyIterationStarts(final IterationStartsEvent event) {
 			if (WithindayControler.this.trafficManagement != null) {
-				WithindayControler.this.trafficManagement.setupIteration(event.getIteration());
+				WithindayControler.this.trafficManagement.setupIteration(event);
 			}
 		}
 

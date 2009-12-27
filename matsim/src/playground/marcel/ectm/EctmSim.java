@@ -30,7 +30,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.utils.misc.ExeRunner;
@@ -69,7 +68,7 @@ public class EctmSim extends ExternalMobsim {
 		String cmd = this.executable + " " + iterationConfigFile + " " + this.eventsFile;// + " " + Controler.getIterationPath() + "/netvis";
 		log.info("running command: \"" + cmd);
 		Gbl.printMemoryUsage();
-		String logfileName = Controler.getIterationFilename("mobsim.log");
+		String logfileName = this.controlerIO.getIterationFilename(this.getIterationNumber(),  "mobsim.log");
 		int timeout = Gbl.getConfig().simulation().getExternalTimeOut();
 		int exitcode = ExeRunner.run(cmd, logfileName, timeout);
 		if (exitcode != 0) {

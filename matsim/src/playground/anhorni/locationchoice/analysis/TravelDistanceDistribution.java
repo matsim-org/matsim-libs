@@ -23,7 +23,6 @@ package playground.anhorni.locationchoice.analysis;
 import java.util.List;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -83,8 +82,8 @@ public class TravelDistanceDistribution implements StartupListener, IterationEnd
 				}	
 			}				
 		}
-		this.shopDistanceBins.plotDistribution(Controler.getIterationFilename("shopDistanceDistributions"), "");
-		this.leisureDistanceBins.plotDistribution(Controler.getIterationFilename("leisureDistanceDistributions"), "");
+		this.shopDistanceBins.plotDistribution(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "shopDistanceDistributions"), "");
+		this.leisureDistanceBins.plotDistribution(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "leisureDistanceDistributions"), "");
 	}
 
 	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {

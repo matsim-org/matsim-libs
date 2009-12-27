@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -61,8 +60,8 @@ public class PrintShopAndLeisureLocations implements StartupListener, IterationE
 		if (event.getIteration() % 10 != 0) return;
 		
 		this.initGeometries();
-		String shopFile = Controler.getIterationFilename("shopLocations.shp");
-		String leisureFile = Controler.getIterationFilename("leisureLocations.shp");
+		String shopFile = event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "shopLocations.shp");
+		String leisureFile = event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "leisureLocations.shp");
 		
 		ArrayList<Feature> featuresShop = new ArrayList<Feature>();
 		ArrayList<Feature> featuresLeisure = new ArrayList<Feature>();

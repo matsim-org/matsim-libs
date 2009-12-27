@@ -4,10 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.api.basic.v01.Id;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.ControlerEvent;
 import org.matsim.core.gbl.Gbl;
-
-import EDU.oswego.cs.dl.util.concurrent.FJTask.Par;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.V2G.BatteryStatistics;
@@ -93,21 +91,21 @@ public class OptimizedCharger {
 
 	}
 	
-	public void outputOptimizationData(){
+	public void outputOptimizationData(ControlerEvent event){
 		// write out charging events to file, if specified
 		// TODO: 'remove parameter main.chargingTimesOutputFilePath from config'
 		if (ParametersPSF.getMainChargingTimesOutputFilePath()!=null){
 			// write it to the iteration folder
-			ChargingTimes.writeChargingTimes(chargingTimes, Controler.getIterationFilename("chargingLog.txt"));
+			ChargingTimes.writeChargingTimes(chargingTimes, event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "chargingLog.txt"));
 			
 			// also write it directly into the output folder, so that it can be used by the PSS
-			ChargingTimes.writeChargingTimes(chargingTimes, Controler.getOutputFilename("chargingLog.txt"));
+			ChargingTimes.writeChargingTimes(chargingTimes, event.getControler().getControlerIO().getOutputFilename("chargingLog.txt"));
 		}
 		
 		
 		// write out energy usage statistics (data and graph)
 		// the hub link mapping is not on during testing mode.
-		if (ParametersPSF.getMainEnergyUsageStatistics()!=null && !ParametersPSF.isTestingModeOn()){
+		if ((ParametersPSF.getMainEnergyUsageStatistics()!=null) && !ParametersPSF.isTestingModeOn()){
 			double[][] energyUsageStatistics = ChargingTimes.getEnergyUsageStatistics(chargingTimes,ParametersPSF.getHubLinkMapping()); 
 			
 			//ChargingTimes.writeEnergyUsageStatisticsData(ParametersPSF.getMainEnergyUsageStatistics() + ".txt", energyUsageStatistics, ParametersPSF.getHubLinkMapping().getNumberOfHubs());
@@ -115,20 +113,20 @@ public class OptimizedCharger {
 			// TODO: remove the parameter ParametersPSF.getMainEnergyUsageStatistics() from the config file.
 			
 			// write data into iterations folder
-			ChargingTimes.writeEnergyUsageStatisticsData(Controler.getIterationFilename("vehicleEnergyConsumption.txt"), energyUsageStatistics);
+			ChargingTimes.writeEnergyUsageStatisticsData(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "vehicleEnergyConsumption.txt"), energyUsageStatistics);
 			
-			ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(Controler.getIterationFilename("vehicleEnergyConsumption.png"),energyUsageStatistics);
+			ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "vehicleEnergyConsumption.png"),energyUsageStatistics);
 			
 			
 			
 			// TODO: the v2g power could be changed later.
 			double[][] gridConnectedPower=BatteryStatistics.getGridConnectedPower(parkingTimes,ParametersPSF.getDefaultChargingPowerAtParking());
-			BatteryStatistics.writeGridConnectedPower(Controler.getIterationFilename("gridConnectedVehiclePower.png"), gridConnectedPower);
-			BatteryStatistics.writeGridConnectedPowerData(Controler.getIterationFilename("gridConnectedVehiclePower.txt"), gridConnectedPower);
+			BatteryStatistics.writeGridConnectedPower(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "gridConnectedVehiclePower.png"), gridConnectedPower);
+			BatteryStatistics.writeGridConnectedPowerData(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "gridConnectedVehiclePower.txt"), gridConnectedPower);
 		
 			double[][] gridConnectedEnergy=BatteryStatistics.getGridConnectedEnergy(chargingTimes, parkingTimes);
-			BatteryStatistics.writeGridConnectedEnergy(Controler.getIterationFilename("gridConnectedVehicleEnergy.png"), gridConnectedEnergy);
-			BatteryStatistics.writeGridConnectedEnergyData(Controler.getIterationFilename("gridConnectedVehicleEnergy.txt"), gridConnectedEnergy);
+			BatteryStatistics.writeGridConnectedEnergy(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "gridConnectedVehicleEnergy.png"), gridConnectedEnergy);
+			BatteryStatistics.writeGridConnectedEnergyData(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "gridConnectedVehicleEnergy.txt"), gridConnectedEnergy);
 		}
 		
 		// output the price graphics

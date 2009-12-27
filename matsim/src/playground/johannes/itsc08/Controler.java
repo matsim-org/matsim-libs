@@ -128,12 +128,12 @@ public class Controler extends WithindayControler {
 	private class WithindayControlerListener implements StartupListener, IterationStartsListener {
 
 		public void notifyStartup(StartupEvent event) {
-			Controler.this.factory = new GuidedAgentFactory(Controler.this.network, Controler.this.config.charyparNagelScoring(), Controler.this.reactTTs, Controler.this.equipmentFraction, config.global().getRandomSeed());
+			Controler.this.factory = new GuidedAgentFactory(Controler.this.network, Controler.this.config.charyparNagelScoring(), Controler.this.reactTTs, Controler.this.equipmentFraction, config.global().getRandomSeed(), Controler.this.getControlerIO());
 
 		}
 
 		public void notifyIterationStarts(IterationStartsEvent event) {
-			((GuidedAgentFactory)Controler.this.factory).reset();
+			((GuidedAgentFactory)Controler.this.factory).reset(event.getControler().getIterationNumber());
 		}
 
 	}

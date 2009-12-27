@@ -177,13 +177,13 @@ public class EUTController2 extends WithindayControler {
 	private class WithindayControlerListener implements StartupListener, IterationStartsListener {
 
 		public void notifyStartup(StartupEvent event) {
-			EUTController2.this.factory = new GuidedAgentFactory(EUTController2.this.network, EUTController2.this.config.charyparNagelScoring(), EUTController2.this.reactTTs, EUTController2.this.equipmentFraction, config.global().getRandomSeed());
+			EUTController2.this.factory = new GuidedAgentFactory(EUTController2.this.network, EUTController2.this.config.charyparNagelScoring(), EUTController2.this.reactTTs, EUTController2.this.equipmentFraction, config.global().getRandomSeed(), EUTController2.this.getControlerIO());
 			((GuidedAgentFactory)EUTController2.this.factory).setRouteAnalyzer(EUTController2.this.analyzer);
 
 		}
 
 		public void notifyIterationStarts(IterationStartsEvent event) {
-			((GuidedAgentFactory)EUTController2.this.factory).reset();
+			((GuidedAgentFactory)EUTController2.this.factory).reset(event.getControler().getIterationNumber());
 		}
 
 	}

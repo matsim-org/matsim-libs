@@ -46,6 +46,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
@@ -140,6 +141,9 @@ public class QueueSimulation implements Simulation{
 	private QueueSimSignalEngine signalEngine = null;
 
 	private final Set<TransportMode> notTeleportedModes = new HashSet<TransportMode>();
+	
+	private Integer iterationNumber = null;
+	private ControlerIO controlerIO;
 	
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -263,16 +267,16 @@ public class QueueSimulation implements Simulation{
 			String snapshotFormat =  this.config.simulation().getSnapshotFormat();
 
 			if (snapshotFormat.contains("plansfile")) {
-				String snapshotFilePrefix = Controler.getIterationPath() + "/positionInfoPlansFile";
+				String snapshotFilePrefix = 	 this.controlerIO.getIterationPath(this.iterationNumber) + "/positionInfoPlansFile";
 				String snapshotFileSuffix = "xml";
 				this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix));
 			}
 			if (snapshotFormat.contains("transims")) {
-				String snapshotFile = Controler.getIterationFilename("T.veh");
+				String snapshotFile = this.controlerIO.getIterationFilename(this.iterationNumber, "T.veh");
 				this.snapshotWriters.add(new TransimsSnapshotWriter(snapshotFile));
 			}
 			if (snapshotFormat.contains("googleearth")) {
-				String snapshotFile = Controler.getIterationFilename("googleearth.kmz");
+				String snapshotFile = this.controlerIO.getIterationFilename(this.iterationNumber, "googleearth.kmz");
 				String coordSystem = this.config.global().getCoordinateSystem();
 				this.snapshotWriters.add(new KmlSnapshotWriter(snapshotFile,
 						TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84)));
@@ -281,7 +285,7 @@ public class QueueSimulation implements Simulation{
 				String snapshotFile;
 
 				if (Controler.getIteration() == -1 ) snapshotFile = this.config.simulation().getSnapshotFile();
-				else snapshotFile = Controler.getIterationPath() + "/Snapshot";
+				else snapshotFile = this.controlerIO.getIterationPath(this.iterationNumber) + "/Snapshot";
 
 				File networkFile = new File(this.config.network().getInputFile());
 				VisConfig myvisconf = VisConfig.newDefaultConfig();
@@ -304,7 +308,7 @@ public class QueueSimulation implements Simulation{
 				this.netStateWriter.open();
 			}
 			if (snapshotFormat.contains("otfvis")) {
-				String snapshotFile = Controler.getIterationFilename("otfvis.mvi");
+				String snapshotFile = this.controlerIO.getIterationFilename(this.iterationNumber, "otfvis.mvi");
 				OTFFileWriter writer = new OTFFileWriter(this.snapshotPeriod, new OTFQueueSimServerQuadBuilder(this.network), snapshotFile, new OTFFileWriterQueueSimConnectionManagerFactory());
 				this.snapshotWriters.add(writer);
 			}
@@ -670,6 +674,19 @@ public class QueueSimulation implements Simulation{
 
 	public Set<TransportMode> getNotTeleportedModes() {
 		return notTeleportedModes;
+	}
+
+	
+	public Integer getIterationNumber() {
+		return iterationNumber;
+	}
+	
+	public void setIterationNumber(Integer iterationNumber) {
+		this.iterationNumber = iterationNumber;
+	}
+
+	public void setControlerIO(ControlerIO controlerIO) {
+		this.controlerIO = controlerIO;
 	}
 
 	

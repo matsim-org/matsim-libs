@@ -246,14 +246,14 @@ public class EUTController extends WithindayControler {
 	private class WithindayControlerListener implements StartupListener, IterationStartsListener {
 
 		public void notifyStartup(StartupEvent event) {
-			EUTController.this.factory = new GuidedAgentFactory(EUTController.this.network, EUTController.this.config.charyparNagelScoring(), EUTController.this.reactTTs, EUTController.this.equipmentFraction, config.global().getRandomSeed());
+			EUTController.this.factory = new GuidedAgentFactory(EUTController.this.network, EUTController.this.config.charyparNagelScoring(), EUTController.this.reactTTs, EUTController.this.equipmentFraction, config.global().getRandomSeed(), EUTController.this.getControlerIO());
 			((GuidedAgentFactory)EUTController.this.factory).setRouteAnalyzer(EUTController.this.routerAnalyzer);
 			((GuidedAgentFactory)EUTController.this.factory).setBenefitAnalyzer(EUTController.this.bAnalyzer);
 
 		}
 
 		public void notifyIterationStarts(IterationStartsEvent event) {
-			((GuidedAgentFactory)EUTController.this.factory).reset();
+			((GuidedAgentFactory)EUTController.this.factory).reset(event.getIteration());
 		}
 
 	}

@@ -7,16 +7,13 @@ import org.matsim.api.basic.v01.Id;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.gbl.Gbl;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.energy.charging.ChargeLog;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF.energy.charging.optimizedCharging.OptimizedCharger;
-import playground.wrashid.PSF.energy.consumption.EnergyConsumption;
 import playground.wrashid.PSF.energy.consumption.LogEnergyConsumption;
 import playground.wrashid.PSF.parking.LogParkingTimes;
-import playground.wrashid.PSF.parking.ParkingTimes;
 
 public class AfterSimulationListener implements AfterMobsimListener {
 
@@ -48,7 +45,7 @@ public class AfterSimulationListener implements AfterMobsimListener {
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 
 		optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes.getParkingTimes());
-		optimizedCharger.outputOptimizationData();
+		optimizedCharger.outputOptimizationData(event);
 		
 		chargingTimes = optimizedCharger.getChargingTimes();
 

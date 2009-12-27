@@ -23,6 +23,8 @@ package org.matsim.withinday.trafficmanagement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.core.controler.events.IterationStartsEvent;
+
 
 
 
@@ -52,9 +54,9 @@ public class TrafficManagement {
 		}
 	}
 
-	public void setupIteration(final int iteration) {
+	public void setupIteration(IterationStartsEvent event) {
 		for (VDSSign s : this.signs) {
-			s.setupIteration();
+			s.setupIteration(event);
 		}
 
 	}

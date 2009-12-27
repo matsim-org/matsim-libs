@@ -26,7 +26,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -45,7 +44,7 @@ public class MyCommercialActivityDensityListener implements IterationStartsListe
 	public void notifyIterationStarts(IterationStartsEvent event) {
 
 		event.getControler();
-		String outputCommercialActivityDensityFilename = Controler.getIterationPath() + "/" + Controler.getIteration() + ".eventsTruckMinor.txt";
+		String outputCommercialActivityDensityFilename = event.getControler().getControlerIO().getIterationPath(event.getControler().getIteration()) + "/" + event.getControler().getIteration() + ".eventsTruckMinor.txt";
 		try {
 			this.outputCommercialActivityDensity = new BufferedWriter(new FileWriter(new File( outputCommercialActivityDensityFilename )));
 			this.outputCommercialActivityDensity.write("Long");

@@ -220,6 +220,7 @@ public class Controler {
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 
 	private TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
+	private ControlerIO controlerIO;
 	
 	/** initializes Log4J */
 	static {
@@ -541,7 +542,13 @@ public class Controler {
 		if (outputPath.endsWith("/")) {
 			outputPath = outputPath.substring(0, outputPath.length() - 1);
 		}
-
+    if (this.config.controler().getRunId() != null) {
+    	this.controlerIO =  new ControlerIO(outputPath, this.scenarioData.createId(this.config.controler().getRunId()));
+    }
+    else {
+    	this.controlerIO =  new ControlerIO(outputPath);
+    }
+		
 		// make the tmp directory
 		File outputDir = new File(outputPath);
 		if (outputDir.exists()) {
@@ -793,6 +800,8 @@ public class Controler {
 				sim.run();
 			} else {
 				QueueSimulation sim = new QueueSimulation(this.scenarioData, this.events);
+				sim.setIterationNumber(this.getIteration());
+				sim.setControlerIO(this.controlerIO);
 				for (QueueSimulationListener l : this.getQueueSimulationListener()) {
 					sim.addQueueSimulationListeners(l);
 				}
@@ -815,6 +824,8 @@ public class Controler {
 			}
 		} else {
 			ExternalMobsim sim = new ExternalMobsim(this.population, this.events);
+			sim.setControlerIO(controlerIO);
+			sim.setIterationNumber(this.getIteration());
 			sim.run();
 		}
 	}
@@ -1028,7 +1039,10 @@ public class Controler {
 	 * Informational methods
 	 * ===================================================================
 	 */
-
+	/**
+	 * @deprecated use non static method getIterationNumber
+	 */
+	@Deprecated
 	public static final int getIteration() {
 		// I don't really like this to be static..., marcel, 17jan2008
 		return iteration;
@@ -1107,7 +1121,9 @@ public class Controler {
 	 * Returns the path to a directory where temporary files can be stored.
 	 *
 	 * @return path to a temp-directory.
+	 * @deprecated use non static member ControlerIO to generate the desired String
 	 */
+	@Deprecated
 	public static final String getTempPath() {
 		return outputPath + "/tmp";
 	}
@@ -1116,39 +1132,15 @@ public class Controler {
 	 * Returns the path to the specified iteration directory. The directory path
 	 * does not include the trailing '/'.
 	 *
-	 * @param iteration
+	 * @param iter
 	 *            the iteration the path to should be returned
 	 * @return path to the specified iteration directory
+	 * @deprecated use non static member ControlerIO to generate the desired String
 	 */
-	public static final String getIterationPath(final int iteration) {
-		return outputPath + "/" + Controler.DIRECTORY_ITERS + "/it." + iteration;
+	@Deprecated
+	public static final String getIterationPath(final int iter) {
+		return outputPath + "/" + Controler.DIRECTORY_ITERS + "/it." + iter;
 	}
-
-	/**
-	 * Returns the path of the current iteration directory. The directory path
-	 * does not include the trailing '/'.
-	 *
-	 * @return path to the current iteration directory
-	 */
-	public static final String getIterationPath() {
-		return getIterationPath(iteration);
-	}
-
-	/**
-	 * Returns the complete filename to access an iteration-file with the given
-	 * basename.
-	 *
-	 * @param filename
-	 *            the basename of the file to access
-	 * @return complete path and filename to a file in a iteration directory
-	 */
-	public static final String getIterationFilename(final String filename) {
-		if (iteration == -1) {
-			return filename;
-		}
-		return getIterationPath(iteration) + "/" + iteration + "." + filename;
-	}
-
 	/**
 	 * Returns the complete filename to access an iteration-file with the given
 	 * basename.
@@ -1158,7 +1150,9 @@ public class Controler {
 	 * @param iteration
 	 *            the iteration to which the path of the file should point
 	 * @return complete path and filename to a file in a iteration directory
+	 * @deprecated use non static member ControlerIO to generate the desired String
 	 */
+	@Deprecated
 	public static final String getIterationFilename(final String filename, final int iteration) {
 		return getIterationPath(iteration) + "/" + iteration + "." + filename;
 	}
@@ -1169,7 +1163,9 @@ public class Controler {
 	 * @return complete path to filename prefixed with the runId in the
 	 *         controler config module (if set) to a file in the
 	 *         output-directory
+	 * @deprecated use non static member ControlerIO to generate the desired String
 	 */
+	@Deprecated
 	public final String getNameForOutputFilename(final String filename) {
 		StringBuilder s = new StringBuilder(outputPath);
 		s.append('/');
@@ -1186,7 +1182,9 @@ public class Controler {
 	 * @return complete path to filename prefixed with the runId in the
 	 *         controler config module (if set) to a file in the
 	 *         output-directory  of the current iteration
+	 *  @deprecated use non static member ControlerIO to generate the desired String
 	 */
+	@Deprecated
 	public final String getNameForIterationFilename(final String filename){
 		StringBuilder s = new StringBuilder(getIterationPath(iteration));
 		s.append('/');
@@ -1206,7 +1204,9 @@ public class Controler {
 	 * @param filename
 	 *            the basename of the file to access
 	 * @return complete path and filename to a file in the output-directory
+	 * @deprecated use non static member ControlerIO to generate the desired String
 	 */
+	@Deprecated
 	public static final String getOutputFilename(final String filename) {
 		return outputPath + "/" + filename;
 	}
@@ -1290,7 +1290,7 @@ public class Controler {
 			}
 
 			if (controler.legTimes != null) {
-				controler.legTimes.writeStats(getIterationFilename("tripdurations.txt"));
+				controler.legTimes.writeStats(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "tripdurations.txt"));
 				// - print averages in log
 				log.info("[" + iteration + "] average trip duration is: " + (int) controler.legTimes.getAverageTripDuration()
 						+ " seconds = " + Time.writeTime(controler.legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));
@@ -1349,6 +1349,15 @@ public class Controler {
 	
 	public void setTravelCostCalculatorFactory(TravelCostCalculatorFactory travelCostCalculatorFactory) {
 		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
+	}
+
+	
+	public ControlerIO getControlerIO() {
+		return controlerIO;
+	}
+
+	public Integer getIterationNumber() {
+		return this.getIteration();
 	}
 
 }

@@ -98,8 +98,7 @@ public class PtBoardCountControlerListener implements StartupListener,
 			}
 			if (this.config.counts().getOutputFormat().contains("kml")
 					|| this.config.counts().getOutputFormat().contains("all")) {
-				String filename = Controler
-						.getIterationFilename("countscompare.kmz");
+				String filename = 	event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(),"countscompare.kmz");
 				PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(
 						cca.getComparison(), TransformationFactory
 								.getCoordinateTransformation(this.config
@@ -111,8 +110,7 @@ public class PtBoardCountControlerListener implements StartupListener,
 			}
 			if (this.config.counts().getOutputFormat().contains("txt")
 					|| this.config.counts().getOutputFormat().contains("all")) {
-				String filename = Controler
-						.getIterationFilename("countscompare.txt");
+				String filename = 	event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(),"countscompare.txt");
 				CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(
 						cca.getComparison(), Locale.ENGLISH);
 				ctw.writeFile(filename);

@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
@@ -46,7 +45,7 @@ public class DEQSimControlerListener implements IterationEndsListener {
 
 		File source = new File("deqsim.log"); // this name must not be changed, as it is given so by the deqsim!
 		if (source.exists()) {
-			File destination = new File(Controler.getIterationFilename("deqsim.log"));
+			File destination = new File(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "deqsim.log"));
 			if (!IOUtils.renameFile(source, destination)) {
 				log.info("WARNING: Could not move deqsim.log to its iteration directory.");
 			}
@@ -55,7 +54,7 @@ public class DEQSimControlerListener implements IterationEndsListener {
 		int parallelCnt = 0;
 		source = new File("deqsim.log." + parallelCnt);
 		while (source.exists()) {
-			File destination = new File(Controler.getIterationFilename("deqsim.log." + parallelCnt));
+			File destination = new File(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "deqsim.log." + parallelCnt));
 			if (!IOUtils.renameFile(source, destination)) {
 				log.info("WARNING: Could not move deqsim.log." + parallelCnt + " to its iteration directory.");
 			}
@@ -65,7 +64,7 @@ public class DEQSimControlerListener implements IterationEndsListener {
 
 		source = new File("loads_out.txt");
 		if (source.exists()) {
-			File destination = new File(Controler.getIterationFilename("loads_out.txt"));
+			File destination = new File(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "loads_out.txt"));
 			try {
 				IOUtils.copyFile(source, destination);
 			}
@@ -84,7 +83,7 @@ public class DEQSimControlerListener implements IterationEndsListener {
 
 		source = new File("linkprocs.txt"); // this name must not be changed, as it is given so by the deqsim!
 		if (source.exists()) {
-			File destination = new File(Controler.getIterationFilename("linkprocs.txt"));
+			File destination = new File(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "linkprocs.txt"));
 			if (!IOUtils.renameFile(source, destination)) {
 				log.info("WARNING: Could not move linkprocs.txt to its iteration directory.");
 			}

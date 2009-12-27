@@ -125,7 +125,7 @@ public class EUTRouterAnalyzer implements IterationStartsListener, IterationEnds
 			/*
 			 * Dump iteration analysis...
 			 */
-			String filename = Controler.getIterationFilename("routeranalysis.txt");
+			String filename = event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(), "routeranalysis.txt");
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 			writer.write("Person\tCE\troutesDiffer");
 			writer.newLine();

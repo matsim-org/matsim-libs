@@ -17,14 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether;
+package org.matsim.core.controler;
 
 import org.matsim.api.basic.v01.Id;
 /**
  * @author dgrether
  *
  */
-public class ControlerIo {
+public class ControlerIO {
 	
 	private static final String DIRECTORY_ITERS = "ITERS";
 	
@@ -32,11 +32,11 @@ public class ControlerIo {
 	
 	private String outputPath;
 	
-	public ControlerIo(String outputDirectory){
+	public ControlerIO(String outputDirectory){
 		this.outputPath = outputDirectory;
 	}
 	
-	public ControlerIo(String outputDirectory, Id runId){
+	public ControlerIO(String outputDirectory, Id runId){
 		this(outputDirectory);
 		this.runId = runId;	
 	}
@@ -99,5 +99,10 @@ public class ControlerIo {
 		}
 		s.append(filename);
 		return s.toString();
+	}
+
+	
+	public String getOutputPath() {
+		return outputPath;
 	}
 }

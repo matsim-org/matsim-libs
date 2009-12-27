@@ -21,7 +21,6 @@ package playground.dgrether;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.ptproject.controller.PtController;
 import org.matsim.run.OTFVis;
 
 
@@ -42,7 +41,7 @@ public class DgEquilControler {
 		final int iteration = 0;
 		
 		Controler controler = new Controler(config);
-		controler = new PtController(config);
+//		controler = new PtController(config);
 		controler.setOverwriteFiles(true);
 		
 		controler.addControlerListener(new StartupListener(){

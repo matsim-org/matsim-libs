@@ -26,14 +26,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.ptproject.qsim.SimulationTimer;
 import org.matsim.withinday.trafficmanagement.feedbackcontroler.FeedbackControler;
 
 /**
@@ -84,15 +84,15 @@ public class VDSSign {
 	public VDSSign() {
 	}
 
-	public void setupIteration() {
+	public void setupIteration(IterationStartsEvent event) {
 		this.controlUpdateTime = this.messageHoldTime * this.controlEvents;
 		// completes the routes, i.e. calculates out and inlinks
 		this.mainRoute = completeRoute(this.controlInput.getMainRoute());
 		this.alternativeRoute = completeRoute(this.controlInput.getAlternativeRoute());
 		this.currentRouteSet = new ArrayList<NetworkRouteWRefs>(this.controlEvents);
-		if (this.signOutput != null) {
+		if ((this.signOutput != null) && (event != null)) {
 			try {
-				this.signOutput.init();
+				this.signOutput.init(event);
 			} catch (IOException e) {
 				log.error("Cannot create output files for VDSSign, no output will be written");
 				e.printStackTrace();
@@ -101,6 +101,10 @@ public class VDSSign {
 		}
 	}
 
+	public void setupIteration(){
+		this.setupIteration(null);
+	}
+	
 	/**
 	 * Sets the time for the first guidance message generation.
 	 *

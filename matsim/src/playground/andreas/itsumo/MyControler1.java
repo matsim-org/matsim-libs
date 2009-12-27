@@ -101,6 +101,8 @@ public class MyControler1 extends Controler {
 	@Override
 	protected void runMobSim() {
 		ItsumoSim sim = new ItsumoSim(this.population, this.events);
+		sim.setControlerIO(this.getControlerIO());
+		sim.setIteration(this.getIteration());
 		sim.run();
 	}
 

@@ -33,6 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -82,6 +83,10 @@ public class ExternalModule implements PlanStrategyModule {
 	protected String exePath = "";
 	protected String moduleId = "";
 	protected String outFileRoot = "";
+	
+	private Integer iterationNumber = null;
+	private ControlerIO controlerIO;
+
 
 	public ExternalModule(final String exePath, final String moduleId, final Network network) {
 		this.exePath = exePath;
@@ -182,7 +187,7 @@ public class ExternalModule implements PlanStrategyModule {
 		writeExternalExeConfig();
 
 		String cmd = this.exePath + " " + this.outFileRoot + this.moduleId + ExternalConfigFileName;
-		String logfilename = Controler.getIterationFilename(this.moduleId + "stdout.log");
+		String logfilename = this.controlerIO.getIterationFilename(this.iterationNumber, this.moduleId + "stdout.log");
 
 		return (ExeRunner.run(cmd, logfilename, 3600) == 0);
 	}
@@ -220,4 +225,17 @@ public class ExternalModule implements PlanStrategyModule {
 		}
 	}
 
+	public Integer getIterationNumber() {
+		return iterationNumber;
+	}
+	
+	public void setIterationNumber(Integer iterationNumber) {
+		this.iterationNumber = iterationNumber;
+	}
+
+	public void setControlerIO(ControlerIO controlerIO) {
+		this.controlerIO = controlerIO;
+	}
+
+	
 }

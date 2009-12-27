@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -58,6 +58,10 @@ public class ExternalMobsim {
 
 	private static final Logger log = Logger.getLogger(ExternalMobsim.class);
 
+	private Integer iterationNumber = null;
+	protected ControlerIO controlerIO;
+
+	
 	public ExternalMobsim(final Population population, final EventsManager events) {
 		this.population = population;
 		this.events = events;
@@ -73,9 +77,9 @@ public class ExternalMobsim {
 	}
 
 	public void run() {
-		String iterationPlansFile = Controler.getIterationFilename(this.plansFileName);
-		String iterationEventsFile = Controler.getIterationFilename(this.eventsFileName);
-		String iterationConfigFile = Controler.getIterationFilename(this.configFileName);
+		String iterationPlansFile = this.controlerIO.getIterationFilename(this.iterationNumber, this.plansFileName);
+		String iterationEventsFile = this.controlerIO.getIterationFilename(this.iterationNumber, this.eventsFileName);
+		String iterationConfigFile = this.controlerIO.getIterationFilename(this.iterationNumber, configFileName);
 
 		try {
 			writePlans(iterationPlansFile);
@@ -168,7 +172,7 @@ public class ExternalMobsim {
 		String cmd = this.executable + " " + iterationConfigFile;
 		log.info("running command: " + cmd);
 		Gbl.printMemoryUsage();
-		String logfileName = Controler.getIterationFilename("mobsim.log");
+		String logfileName = this.controlerIO.getIterationFilename(this.getIterationNumber(), "mobsim.log");
 		int timeout = Gbl.getConfig().simulation().getExternalTimeOut();
 		int exitcode = ExeRunner.run(cmd, logfileName, timeout);
 		if (exitcode != 0) {
@@ -182,5 +186,18 @@ public class ExternalMobsim {
 		log.info("reading events from external mobsim");
 		new MatsimEventsReader(this.events).readFile(iterationEventsFile);
 	}
+	
+	public Integer getIterationNumber() {
+		return iterationNumber;
+	}
+	
+	public void setIterationNumber(Integer iterationNumber) {
+		this.iterationNumber = iterationNumber;
+	}
+
+	public void setControlerIO(ControlerIO controlerIO) {
+		this.controlerIO = controlerIO;
+	}
+
 
 }

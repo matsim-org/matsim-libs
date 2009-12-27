@@ -29,7 +29,7 @@ public class MZComparisonListener implements IterationEndsListener, StartupListe
 
 			mzcdi.setData2Compare(mzcd);
 			event.getControler();
-			mzcdi.write(Controler.getIterationFilename("MZ05Comparison"));
+			mzcdi.write(event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), "MZ05Comparison"));
 		}
 	}
 

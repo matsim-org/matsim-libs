@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.population.PersonImpl;
@@ -72,14 +72,18 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory implements It
 	private Map<Person, Plan> selectedPlans;
 	
 	private long randomSeed;
+
+	private ControlerIO controlerIo;
 	
 	/**#
 	 * @param network
 	 * @param scoringConfig
+	 * @param controlerIO 
 	 */
 	public GuidedAgentFactory(Network network,
-			CharyparNagelScoringConfigGroup scoringConfig, TravelTime reactTTs, double fraction, long randomSeed) {
+			CharyparNagelScoringConfigGroup scoringConfig, TravelTime reactTTs, double fraction, long randomSeed, ControlerIO controlerIO) {
 		super(network, scoringConfig);
+		this.controlerIo = controlerIO;
 		router = new ReactRouteGuidance(network, reactTTs);
 		equipmentFraction = fraction;
 		this.randomSeed = randomSeed;
@@ -124,13 +128,12 @@ public class GuidedAgentFactory extends WithindayAgentLogicFactory implements It
 		return guidedPersons;
 	}
 
-	public void reset() {
+	public void reset(int iteration) {
 		try {
 			if (writer != null)
 				writer.close();
 
-			writer = IOUtils.getBufferedWriter(Controler
-					.getIterationFilename("guidedPersons.txt"));
+			writer = IOUtils.getBufferedWriter(this.controlerIo.getIterationFilename(iteration, "guidedPersons.txt"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

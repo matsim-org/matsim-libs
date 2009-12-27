@@ -23,7 +23,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -58,8 +58,8 @@ public class VDSSignOutput {
 	}
 
 
-	public void init() throws IOException {
-		String fileName = Controler.getIterationFilename(this.spreadsheetFileName);
+	public void init(IterationStartsEvent event) throws IOException {
+		String fileName = event.getControler().getControlerIO().getIterationFilename(event.getControler().getIterationNumber(), spreadsheetFileName);
 		File spreadsheetFile = new File(fileName);
 		if (spreadsheetFile.exists()) {
 			boolean ret = IOUtils.renameFile(fileName, fileName + ".old");
