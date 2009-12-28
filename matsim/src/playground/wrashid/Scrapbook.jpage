@@ -1,6 +1,0 @@
-
-
-
-// the following code produces output on standard output for hub price info
-//playground.wrashid.PSF.data.HubPriceInfo hubPrice= new playground.wrashid.PSF.data.HubPriceInfo(20000,72000,0.3,0.8);
-//hubPrice.print();

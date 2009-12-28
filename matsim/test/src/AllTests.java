@@ -9,7 +9,6 @@ public class AllTests {
 
 		// run unit tests
 		suite.addTest(org.matsim.AllTests.suite());
-		suite.addTest(playground.AllTests.suite());
 		
 		//$JUnit-END$
 		return suite ;
