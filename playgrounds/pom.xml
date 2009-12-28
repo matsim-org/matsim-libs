@@ -22,7 +22,7 @@
 	</build>
 
 	<modules>
-		<module>andreas</module>
+    	<module>andreas</module>
     	<module>anhorni</module>
     	<module>balmermi</module>
     	<module>benjamin</module>
@@ -45,7 +45,6 @@
     	<module>meisterk</module>
     	<module>mfeil</module>
     	<module>mmoyo</module>
-    	<module>mohit</module>
     	<module>mrieser</module>
     	<module>msieg</module>
     	<module>mzilske</module>
