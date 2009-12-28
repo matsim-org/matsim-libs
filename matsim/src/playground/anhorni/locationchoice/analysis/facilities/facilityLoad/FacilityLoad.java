@@ -1,6 +1,6 @@
 package playground.anhorni.locationchoice.analysis.facilities.facilityLoad;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;
 
 public class FacilityLoad {

@@ -30,7 +30,7 @@ import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 
 import playground.dgrether.analysis.charts.utils.DgColorScheme;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;

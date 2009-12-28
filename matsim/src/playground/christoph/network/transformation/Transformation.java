@@ -2,7 +2,7 @@ package playground.christoph.network.transformation;
 
 import java.util.Map;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 
 /*
  * Modifies a given Network. Typically this is used to

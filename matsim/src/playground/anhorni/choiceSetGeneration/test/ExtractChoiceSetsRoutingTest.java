@@ -1,7 +1,7 @@
 package playground.anhorni.choiceSetGeneration.test;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;

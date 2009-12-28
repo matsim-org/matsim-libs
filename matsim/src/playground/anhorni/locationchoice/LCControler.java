@@ -22,7 +22,7 @@ package playground.anhorni.locationchoice;
 
 import java.util.TreeMap;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.LocationChoiceScoringFunctionFactory;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;

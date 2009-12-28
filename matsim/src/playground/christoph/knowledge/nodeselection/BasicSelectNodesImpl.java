@@ -23,7 +23,7 @@ package playground.christoph.knowledge.nodeselection;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 

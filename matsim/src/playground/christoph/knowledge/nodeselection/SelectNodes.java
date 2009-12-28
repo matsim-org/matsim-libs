@@ -32,7 +32,7 @@ package playground.christoph.knowledge.nodeselection;
 
 import java.util.Map;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 
 public interface SelectNodes extends Cloneable {

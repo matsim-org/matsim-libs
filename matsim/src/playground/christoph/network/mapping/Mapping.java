@@ -2,7 +2,7 @@ package playground.christoph.network.mapping;
 
 import java.util.List;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 
 /*
  * Every time Nodes and / or Links form a SubNetwork are

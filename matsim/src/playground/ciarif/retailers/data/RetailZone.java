@@ -3,8 +3,8 @@ package playground.ciarif.retailers.data;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.collections.QuadTree;

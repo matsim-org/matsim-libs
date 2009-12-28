@@ -3,7 +3,7 @@ package playground.christoph.knowledge.container;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 
 import playground.christoph.knowledge.container.CellKnowledge.CellData;

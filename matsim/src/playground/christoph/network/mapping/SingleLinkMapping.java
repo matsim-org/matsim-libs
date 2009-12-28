@@ -3,7 +3,7 @@ package playground.christoph.network.mapping;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 /*

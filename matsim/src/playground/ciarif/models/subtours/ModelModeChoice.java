@@ -22,7 +22,7 @@ package playground.ciarif.models.subtours;
 
 import java.util.TreeSet;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 

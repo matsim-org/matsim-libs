@@ -1,6 +1,6 @@
 package playground.anhorni.locationchoice.analysis.plans;
 
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 
 public class Trip {
 	private String purpose = null;
