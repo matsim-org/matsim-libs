@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class StreetParkingReader {

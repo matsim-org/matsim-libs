@@ -1,6 +1,6 @@
 package playground.wrashid.PSF.data.powerCharging;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 
 /**
  * This charger gives back always the default charging power (not considering
