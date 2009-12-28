@@ -187,7 +187,7 @@ public class StrategyManagerConfigLoader {
 //			// JH
 		} else if (name.equals("LocationChoice")) {
 			strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
-			strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, (controler.getScenarioData()).getKnowledges()));
+			strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, (controler.getScenario()).getKnowledges()));
 			strategy.addStrategyModule(new ReRoute(controler));
 			strategy.addStrategyModule(new TimeAllocationMutator(config));
 			/* not really happy about the following line. Imagine what happens if everybody does
@@ -214,7 +214,7 @@ public class StrategyManagerConfigLoader {
 					Constructor<? extends PlanStrategy> c = null;
 					try{
 						c = klas.getConstructor(args);
-						strategy = c.newInstance(controler.getScenarioData());
+						strategy = c.newInstance(controler.getScenario());
 					} catch(NoSuchMethodException e){
 						log.warn("Cannot find Constructor in PlanStrategy " + name + " with single argument of type BasicScenario. " +
 								"This is not fatal, trying to find other constructor, however a constructor expecting BasicScenario as " +

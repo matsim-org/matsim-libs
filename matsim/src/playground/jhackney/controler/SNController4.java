@@ -52,7 +52,7 @@ public class SNController4 extends Controler {
 		
 		// Adjust activity start times by social network and time windows
 		PlanStrategy strategy1 = new PlanStrategy(new RandomPlanSelector());// only facilities visited in last iteration are in time window hastable
-		PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(this.getConfig(), this.network,this.travelCostCalculator,this.travelTimeCalculator, ((ScenarioImpl)this.getScenarioData()).getKnowledges());
+		PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(this.getConfig(), this.network,this.travelCostCalculator,this.travelTimeCalculator, ((ScenarioImpl)this.getScenario()).getKnowledges());
 		strategy1.addStrategyModule(socialNetStrategyModule);
 		manager.addStrategy(strategy1, 0.15);
 		this.log.info("  added strategy SNCoordinateArrivalTimes with probability 0.15");

@@ -55,7 +55,7 @@ ActivityStartEventHandler
 	
 	public MyModule(Controler controler) {
 		
-		sc = controler.getScenarioData() ; // TODO in controler
+		sc = controler.getScenario() ; // TODO in controler
 		net = (NetworkLayer) sc.getNetwork() ;
 		pop = sc.getPopulation() ;
 		

@@ -127,7 +127,7 @@ public class TransitControler extends Controler {
 		public void notifyStartup(final StartupEvent event) {
 			if (this.config.getTransitScheduleFile() != null) {
 				try {
-					new TransitScheduleReaderV1(event.getControler().getScenarioData().getTransitSchedule(), event.getControler().getScenarioData().getNetwork()).readFile(this.config.getTransitScheduleFile());
+					new TransitScheduleReaderV1(event.getControler().getScenario().getTransitSchedule(), event.getControler().getScenario().getNetwork()).readFile(this.config.getTransitScheduleFile());
 				} catch (SAXException e) {
 					throw new RuntimeException("could not read transit schedule.", e);
 				} catch (ParserConfigurationException e) {
@@ -138,7 +138,7 @@ public class TransitControler extends Controler {
 			}
 			if (this.config.getVehiclesFile() != null) {
 				try {
-					new BasicVehicleReaderV1(event.getControler().getScenarioData().getVehicles()).parse(this.config.getVehiclesFile());
+					new BasicVehicleReaderV1(event.getControler().getScenario().getVehicles()).parse(this.config.getVehiclesFile());
 				} catch (SAXException e) {
 					throw new RuntimeException("could not read vehicles.", e);
 				} catch (ParserConfigurationException e) {

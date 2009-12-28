@@ -129,7 +129,7 @@ public class SNControllerListener4 implements StartupListener, BeforeMobsimListe
 	}
 
 	public void notifyStartup(final StartupEvent event) {
-		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
+		this.knowledges = ((ScenarioImpl)controler.getScenario()).getKnowledges();
 		// Complete the world to make sure that the layers all have relevant mapping rules
 		new WorldConnectLocations().run(controler.getWorld());
 

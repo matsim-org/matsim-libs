@@ -596,7 +596,7 @@ public class EventControler extends Controler {
 			log.info("Path: " + path);
 
 			// reading single File
-			new SelectionReaderMatsim(this.network, this.population,(((ScenarioImpl) this.getScenarioData()).getKnowledges())).readFile(path);
+			new SelectionReaderMatsim(this.network, this.population,(((ScenarioImpl) this.getScenario()).getKnowledges())).readFile(path);
 
 			// reading multiple Files automatically
 			// new SelectionReaderMatsim(this.network,

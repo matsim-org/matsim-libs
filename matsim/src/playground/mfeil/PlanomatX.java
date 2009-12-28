@@ -117,7 +117,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		
 		this.locator				= locator;	
 		
-		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
+		this.knowledges = ((ScenarioImpl)controler.getScenario()).getKnowledges();
 	}
 	
 		

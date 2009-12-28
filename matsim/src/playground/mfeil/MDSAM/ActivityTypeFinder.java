@@ -118,7 +118,7 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 	
 	private List<String> getKnActTypes (Person agent){
 		// get act options of agent
-		Collection<ActivityOptionImpl> agentActOptions = ((ScenarioImpl)(this.controler.getScenarioData())).getKnowledges().getKnowledgesByPersonId().get(agent.getId()).getActivities();
+		Collection<ActivityOptionImpl> agentActOptions = ((ScenarioImpl)(this.controler.getScenario())).getKnowledges().getKnowledgesByPersonId().get(agent.getId()).getActivities();
 		// convert them into act types
 		List<String> agentActTypes = new ArrayList<String>();
 		for (Iterator<ActivityOptionImpl> iterator = agentActOptions.iterator();iterator.hasNext();){

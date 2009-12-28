@@ -57,7 +57,7 @@ public class OTFVisControlerListener implements StartupListener, ShutdownListene
 
 	public void notifyStartup(StartupEvent e) {
 		UUID idOne = UUID.randomUUID();
-		Scenario sc = e.getControler().getScenarioData();
+		Scenario sc = e.getControler().getScenario();
 		this.queueNetwork = new QueueNetwork(sc.getNetwork());
 		this.otfserver = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), this.queueNetwork, sc.getPopulation(), e.getControler().getEvents(), false);
 		otfserver.setControllerStatus(STARTUP);
@@ -67,7 +67,7 @@ public class OTFVisControlerListener implements StartupListener, ShutdownListene
 	}
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent e) {
-		Scenario sc = e.getControler().getScenarioData();
+		Scenario sc = e.getControler().getScenario();
 		OTFVisQueueSim sim = new OTFVisQueueSim(sc, e.getControler().getEvents());
 		// overwrite network
 		sim.setQueueNetwork(this.queueNetwork);

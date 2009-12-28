@@ -107,7 +107,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.network = controler.getNetwork();
 		this.init(network);	
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.getTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
-		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, controler.getScenarioData().getKnowledges());
+		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, controler.getScenario().getKnowledges());
 		this.linker = new XY2Links (this.controler.getNetwork());
 		this.beta				= "no";
 		this.gamma				= "no";
@@ -150,7 +150,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	
 	public void prepareReplanning() {
 		// Read the external plans file.
-		new MatsimPopulationReader(this.controler.getScenarioData()).readFile(this.inputFile);		
+		new MatsimPopulationReader(this.controler.getScenario()).readFile(this.inputFile);		
 		log.info("Reading population done.");
 	}
 

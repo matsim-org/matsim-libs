@@ -63,7 +63,7 @@ public class PlansEvaluator extends PlansConstructor implements PlanStrategyModu
 	@Override
 	public void prepareReplanning() {
 		// Read the external plans file.
-		new MatsimPopulationReader(this.controler.getScenarioData()).readFile(this.inputFile);		
+		new MatsimPopulationReader(this.controler.getScenario()).readFile(this.inputFile);		
 		log.info("Reading population done.");
 	}
 

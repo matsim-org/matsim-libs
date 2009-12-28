@@ -50,7 +50,7 @@ import org.matsim.core.utils.io.IOUtils;
 public class PtcheckControler extends Controler {
 	private String scenario;
 
-	public String getScenario() {
+	public String getScenarioName() {
 		return scenario;
 	}
 
@@ -210,7 +210,7 @@ public class PtcheckControler extends Controler {
 		final PtcheckControler controler;
 		controler = new PtcheckControler(args, "Zurich");
 		controler.addControlerListener(new PtCheckListener(controler
-				.getScenario()));
+				.getScenarioName()));
 		controler.run();
 		System.exit(0);
 	}

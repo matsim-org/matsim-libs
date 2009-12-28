@@ -80,7 +80,7 @@ public class RecyclingModule implements PlanStrategyModule{
 	public RecyclingModule (ControlerMFeil controler, ActivityTypeFinder finder) {
 		
 		this.controler=controler;
-		this.knowledges 			= controler.getScenarioData().getKnowledges();
+		this.knowledges 			= controler.getScenario().getKnowledges();
 		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler, this.knowledges);
 		this.scorer 				= new PlanScorer (controler.getScoringFunctionFactory());
 		this.network 				= controler.getNetwork();

@@ -157,7 +157,7 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 				// JH
 			} else if (classname.equals("KSecLoc")){
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherK(config, network, travelCostCalc, travelTimeCalc, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
+				PlanStrategyModule socialNetStrategyModule= new RandomFacilitySwitcherK(config, network, travelCostCalc, travelTimeCalc, ((ScenarioImpl)controler.getScenario()).getKnowledges());
 				strategy.addStrategyModule(socialNetStrategyModule);
 			} else if (classname.equals("FSecLoc")){
 				strategy = new PlanStrategy(new RandomPlanSelector());
@@ -165,12 +165,12 @@ public class SocialStrategyManagerConfigLoader  extends StrategyManagerConfigLoa
 				strategy.addStrategyModule(socialNetStrategyModule);
 			} else if (classname.equals("SSecLoc")){
 				strategy = new PlanStrategy(new RandomPlanSelector());
-				PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(config, network,travelCostCalc,travelTimeCalc, ((ScenarioImpl)controler.getScenarioData()).getKnowledges());
+				PlanStrategyModule socialNetStrategyModule= new SNPickFacilityFromAlter(config, network,travelCostCalc,travelTimeCalc, ((ScenarioImpl)controler.getScenario()).getKnowledges());
 				strategy.addStrategyModule(socialNetStrategyModule);
 				// JH
 			} else if (classname.equals("LocationChoice")) {
 	    	strategy = new PlanStrategy(new ExpBetaPlanSelector(config.charyparNagelScoring()));
-	    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenarioData()).getKnowledges()));
+	    	strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenario()).getKnowledges()));
 	    	strategy.addStrategyModule(new ReRoute(controler));
 				strategy.addStrategyModule(new TimeAllocationMutator(config));
 			}

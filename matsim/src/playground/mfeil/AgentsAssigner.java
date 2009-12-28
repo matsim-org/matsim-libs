@@ -94,7 +94,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 		this.finder					= finder;
 		this.module					= recyclingModule;
 		this.nonassignedAgents		= nonassignedAgents;
-		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
+		this.knowledges = ((ScenarioImpl)controler.getScenario()).getKnowledges();
 		
 		this.coefficients = coefficients;
 		this.primActsDistance	="no";

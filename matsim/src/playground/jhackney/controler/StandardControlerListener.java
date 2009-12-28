@@ -18,7 +18,7 @@ public class StandardControlerListener implements StartupListener {
 	
 	public void notifyStartup(final StartupEvent event) {
 		this.controler = event.getControler();
-		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
+		this.knowledges = ((ScenarioImpl)controler.getScenario()).getKnowledges();
 		// Complete the world to make sure that the layers all have relevant mapping rules
 //		new WorldConnectLocations().run(Gbl.getWorld());
 

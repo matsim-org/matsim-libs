@@ -36,7 +36,7 @@ public class LocationChoiceTest  extends MatsimTestCase {
 	
 	private void initialize() {		
 		this.locationchoice = new LocationChoice(this.initializer.getControler().getNetwork(), 
-				this.initializer.getControler(), ((ScenarioImpl)this.initializer.getControler().getScenarioData()).getKnowledges());
+				this.initializer.getControler(), ((ScenarioImpl)this.initializer.getControler().getScenario()).getKnowledges());
 	}
 	
 	public void testConstructorandInitLocal() {

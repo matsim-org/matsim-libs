@@ -411,7 +411,7 @@ public class Controler {
 			}
 			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
 			// dump plans
-			new PopulationWriter(this.population, (this.getScenarioData()).getKnowledges()).writeFile(this
+			new PopulationWriter(this.population, (this.getScenario()).getKnowledges()).writeFile(this
 							.getNameForOutputFilename("output_plans.xml.gz"));
 			// dump network
 			new NetworkWriter(this.network).writeFile(this.getNameForOutputFilename("output_network.xml.gz"));
@@ -1081,7 +1081,7 @@ public class Controler {
 		return this.events;
 	}
 
-	public final ScenarioImpl getScenarioData() { // TODO [MR] rename to getScenario 
+	public final ScenarioImpl getScenario() { 
 		return this.scenarioData;
 	}
 

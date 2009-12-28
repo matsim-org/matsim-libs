@@ -141,7 +141,7 @@ public class SNControllerListener implements StartupListener, IterationStartsLis
 	
 	public void notifyStartup(final StartupEvent event) {
 		this.controler = event.getControler();
-		this.knowledges = ((ScenarioImpl)controler.getScenarioData()).getKnowledges();
+		this.knowledges = ((ScenarioImpl)controler.getScenario()).getKnowledges();
 		// Make a new zone layer (Raster)
 //		if(!(this.controler.getConfig().socnetmodule().getGridSpace().equals(null))){
 //		int gridSpacing = Integer.valueOf(this.controler.getConfig().socnetmodule().getGridSpace());
