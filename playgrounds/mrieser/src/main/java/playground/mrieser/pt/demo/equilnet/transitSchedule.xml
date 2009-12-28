@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="stop1" x="-24900.0" y="0.0" linkRefId="1" />
+		<stopFacility id="stop2" x="9900.0" y="0.0" linkRefId="20" />
+	</transitStops>
+
+	<transitLine id="Bus 1">
+		<transitRoute id="H">
+			<description></description>
+			<transportMode>bus</transportMode>
+			<routeProfile>
+				<stop refId="stop1" departureOffset="00:00:00" />
+				<stop refId="stop2" arrivalOffset="00:10:00" />
+			</routeProfile>
+			
+			<route>
+				<link refId="1" />
+				<link refId="6" />
+				<link refId="15" />
+				<link refId="20" />
+			</route>
+
+			<departures>
+				<departure id="T1.1" departureTime="05:50:00" vehicleRefId="tr_0" />
+				<departure id="T1.2" departureTime="06:00:00" vehicleRefId="tr_1" />
+				<departure id="T1.3" departureTime="06:10:00" vehicleRefId="tr_2" />
+				<departure id="T1.4" departureTime="06:20:00" vehicleRefId="tr_3" />
+			</departures>
+		</transitRoute>
+		
+		<transitRoute id="R">
+			<description></description>
+			<transportMode>bus</transportMode>
+			<routeProfile>
+				<stop refId="stop2" departureOffset="00:00:00" />
+				<stop refId="stop1" arrivalOffset="00:10:00" />
+			</routeProfile>
+			
+			<route>
+				<link refId="20" />
+				<link refId="21" />
+				<link refId="22" />
+				<link refId="23" />
+				<link refId="1" />
+			</route>
+
+			<departures>
+				<departure id="T2.1" departureTime="14:50:00" vehicleRefId="tr_0" />
+				<departure id="T2.2" departureTime="15:00:00" vehicleRefId="tr_1" />
+				<departure id="T2.3" departureTime="15:10:00" vehicleRefId="tr_2" />
+				<departure id="T2.4" departureTime="15:20:00" vehicleRefId="tr_3" />
+			</departures>
+		</transitRoute>
+		
+	</transitLine>
+
+</transitSchedule>
