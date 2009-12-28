@@ -21,7 +21,7 @@ package playground.johannes.plans.plain;
 
 import java.util.Map;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author illenberger

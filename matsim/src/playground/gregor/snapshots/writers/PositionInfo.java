@@ -22,7 +22,7 @@ package playground.gregor.snapshots.writers;
 
 import java.util.Map.Entry;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.evacuation.collections.gnuclasspath.TreeMap;
 

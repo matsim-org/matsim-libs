@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social.util;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;

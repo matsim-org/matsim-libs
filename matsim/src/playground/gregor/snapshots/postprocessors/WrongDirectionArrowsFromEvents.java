@@ -1,6 +1,6 @@
 package playground.gregor.snapshots.postprocessors;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.CoordImpl;

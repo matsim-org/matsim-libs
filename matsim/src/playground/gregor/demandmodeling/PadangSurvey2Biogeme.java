@@ -25,7 +25,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;

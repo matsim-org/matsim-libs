@@ -12,7 +12,7 @@ import java.util.Set;
 import net.opengis.kml._2.LinkType;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;

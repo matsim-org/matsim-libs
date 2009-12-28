@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.SparseEdge;
 import org.matsim.contrib.sna.graph.Vertex;

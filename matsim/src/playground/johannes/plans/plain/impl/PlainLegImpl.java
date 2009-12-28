@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.plans.plain.impl;
 
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 
 import playground.johannes.plans.plain.PlainLeg;
 import playground.johannes.plans.plain.PlainRoute;

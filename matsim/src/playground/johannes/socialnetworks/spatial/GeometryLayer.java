@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Coordinate;

@@ -29,8 +29,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;

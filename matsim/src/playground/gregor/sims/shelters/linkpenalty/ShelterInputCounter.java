@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.SortedMap;
 import java.util.Map.Entry;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;

@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 
 import playground.johannes.plans.plain.impl.PlainPersonImpl;
 import playground.johannes.plans.plain.impl.PlainPlanImpl;

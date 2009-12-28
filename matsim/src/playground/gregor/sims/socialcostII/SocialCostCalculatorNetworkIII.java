@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;

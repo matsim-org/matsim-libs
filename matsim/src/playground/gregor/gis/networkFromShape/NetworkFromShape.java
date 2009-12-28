@@ -8,7 +8,7 @@ import java.util.Iterator;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkLayer;

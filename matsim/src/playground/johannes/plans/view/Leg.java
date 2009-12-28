@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.plans.view;
 
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 
 
 /**

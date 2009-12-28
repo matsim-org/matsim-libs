@@ -8,7 +8,7 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.vis.otfvis.opengl.drawer.AbstractBackgroundDrawer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 

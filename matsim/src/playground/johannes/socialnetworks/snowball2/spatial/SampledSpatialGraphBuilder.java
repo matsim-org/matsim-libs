@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.spatial;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
 
 

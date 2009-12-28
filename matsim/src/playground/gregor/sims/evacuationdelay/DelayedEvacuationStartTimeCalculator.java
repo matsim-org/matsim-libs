@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;

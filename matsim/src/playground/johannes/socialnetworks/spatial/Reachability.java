@@ -28,7 +28,7 @@ import gnu.trove.TObjectDoubleIterator;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;

@@ -28,7 +28,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
@@ -64,7 +64,7 @@ public class TXT2GraphML {
 		String line = reader.readLine();
 		String[] tokens = line.split(TAB);
 		int idIdx = getIndex("Laufnr.", tokens);
-		int statusIdx = getIndex("TatsŠchlicher Teilnahmestatus FB", tokens);
+		int statusIdx = getIndex("Tatsï¿½chlicher Teilnahmestatus FB", tokens);
 		int longIdx = getIndex("long", tokens);
 		int latIdx = getIndex("lat", tokens);
 		

@@ -36,7 +36,7 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;

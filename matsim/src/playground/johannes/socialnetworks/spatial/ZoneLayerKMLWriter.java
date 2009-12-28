@@ -35,7 +35,7 @@ import net.opengis.kml._2.PolyStyleType;
 import net.opengis.kml._2.PolygonType;
 import net.opengis.kml._2.StyleType;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;

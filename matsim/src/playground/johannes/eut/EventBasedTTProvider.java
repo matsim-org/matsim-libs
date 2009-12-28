@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Map;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;

@@ -30,7 +30,7 @@ import gnu.trove.TIntIntIterator;
 import gnu.trove.TIntObjectHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrix;

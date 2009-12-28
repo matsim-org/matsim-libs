@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.spatial;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 
 import com.vividsolutions.jts.geom.Geometry;
 

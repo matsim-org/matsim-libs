@@ -36,7 +36,7 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsManagerImpl;

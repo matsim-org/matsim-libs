@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.plans.plain.impl;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 
 import playground.johannes.plans.plain.PlainActivity;
 import playground.johannes.plans.plain.PlainLeg;
