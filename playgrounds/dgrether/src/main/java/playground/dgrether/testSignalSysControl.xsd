@@ -1,0 +1,26 @@
+<xs:schema targetNamespace="http://www.matsim.org/files/dtd"
+           xmlns="http://www.matsim.org/files/dtd"
+           elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xml:lang="en">
+
+<xs:include schemaLocation="http://www.matsim.org/files/dtd/signalSystemsConfig_v1.1.xsd"/>
+
+<xs:complexType name="myAdaptiveSignalSystemControlInfoType">
+  <xs:annotation>
+    <xs:documentation>If there is an adaptive control mechanism implemented its id or name
+    can be set in the element of this type.</xs:documentation>
+  </xs:annotation>
+  <xs:complexContent>
+    <xs:extension base="adaptiveSignalSystemControlInfoType">
+      <xs:sequence>
+        <xs:element name="myParameter" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="mySecondParameter" type="xs:nonNegativeInteger" minOccurs="1" maxOccurs="unbounded">
+        </xs:element>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+           
+</xs:schema>

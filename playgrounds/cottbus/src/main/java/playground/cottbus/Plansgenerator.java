@@ -1,0 +1,247 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Plansgenerator.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.cottbus;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.population.routes.NodeNetworkRouteImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
+
+
+/**
+ * @author	rschneid-btu
+ * [based on same file from dgrether]
+ * generates an amount of agents
+ */
+public class Plansgenerator {
+
+	private static final String networkFilename = "./input/denver/networkDenver.xml";
+
+	private static final String plansOut = "./input/denver/plans.xml";
+
+	private NetworkLayer network;
+	private PopulationImpl plans;
+
+	private void init() {
+		Config config = Gbl.createConfig(null);
+		config.addCoreModules();
+
+		this.network = this.loadNetwork(networkFilename);
+	}
+
+	private void createPlans() throws Exception {
+		init();
+		this.plans = new PopulationImpl();
+		final int HOME_END_TIME = 6 * 3600; // time to start
+		
+		createDenverStraight(HOME_END_TIME);
+
+		new PopulationWriter(this.plans).writeFile(plansOut);
+	}
+	
+	/**
+	 * only for testing used, only to see how it looks like
+	 * @param HOME_END_TIME
+	 * @deprecated
+	 */
+	@Deprecated
+	private void createDenverTest(final int HOME_END_TIME) {
+		int currentId = 1;
+		int duration = 1 * 3600;
+		
+		currentId = addCommodity(
+				"11","122",HOME_END_TIME,duration,2000,
+				"8 9 10 11 12 6 5 4 3 2 1",currentId);
+
+		currentId = addCommodity(
+				"133","158",HOME_END_TIME,duration,2000,
+				"19 20 21 27 28 22 16 10 11 12 6 5 4",currentId);
+	}
+	
+	/**
+	 * generates agents for denver (straight) scenario
+	 * @param HOME_END_TIME
+	 */
+	private void createDenverStraight(final int HOME_END_TIME) {
+		int currentId = 1;
+		int duration = (int)(0.5 * 3600); // seconds
+		final int DEFAULT_CARS_PER_HOUR_PER_LANE = 500;
+		
+		// horizontal (east-west)
+		currentId = addCommodity(
+				"125","127",HOME_END_TIME,duration,4*DEFAULT_CARS_PER_HOUR_PER_LANE,
+				"7 8 9 10 11 12",currentId);
+
+		currentId = addCommodity(
+				"133","135",HOME_END_TIME,duration,4*DEFAULT_CARS_PER_HOUR_PER_LANE,
+				"19 20 21 22 23 24",currentId);
+		
+		currentId = addCommodity(
+				"124","122",HOME_END_TIME,duration,2*DEFAULT_CARS_PER_HOUR_PER_LANE,
+				"6 5 4 3 2 1",currentId);
+		
+		currentId = addCommodity(
+				"132","130",HOME_END_TIME,duration,3*DEFAULT_CARS_PER_HOUR_PER_LANE,
+				"18 17 16 15 14 13",currentId);
+		
+		currentId = addCommodity(
+				"144","142",HOME_END_TIME,duration,3*DEFAULT_CARS_PER_HOUR_PER_LANE,
+				"36 35 34 33 32 31",currentId);
+		
+		// bus lane (east-west)
+		currentId = addCommodity(
+				"137","139",HOME_END_TIME,duration,1*DEFAULT_CARS_PER_HOUR_PER_LANE,
+				"25 26 27 28 29 30",currentId);
+		currentId = addCommodity(
+				"140","138",HOME_END_TIME,duration,1*DEFAULT_CARS_PER_HOUR_PER_LANE,
+				"30 29 28 27 26 25",currentId);
+		
+		// vertical (north-south)
+		currentId = addCommodity(
+				"145","147",HOME_END_TIME,duration,2*DEFAULT_CARS_PER_HOUR_PER_LANE,
+				"1 7 13 19 25 31",currentId);
+		
+		currentId = addCommodity(
+				"153","155",HOME_END_TIME,duration,3*DEFAULT_CARS_PER_HOUR_PER_LANE,
+				"3 9 15 21 27 33",currentId);
+		
+		currentId = addCommodity(
+				"161","163",HOME_END_TIME,duration,3*DEFAULT_CARS_PER_HOUR_PER_LANE,
+				"5 11 17 23 29 35",currentId);
+		
+		currentId = addCommodity(
+				"152","150",HOME_END_TIME,duration,3*DEFAULT_CARS_PER_HOUR_PER_LANE,
+				"32 26 20 14 8 2",currentId);
+		
+		currentId = addCommodity(
+				"160","158",HOME_END_TIME,duration,3*DEFAULT_CARS_PER_HOUR_PER_LANE,
+				"34 28 22 16 10 4",currentId);
+		
+		currentId = addCommodity(
+				"168","166",HOME_END_TIME,duration,2*DEFAULT_CARS_PER_HOUR_PER_LANE,
+				"36 30 24 18 12 6",currentId);
+		
+	}
+	
+	/**
+	 * only for first testing used, probably used later
+	 * @param HOME_END_TIME
+	 * @deprecated
+	 */
+	@Deprecated
+	private void createDenverIndividual(final int HOME_END_TIME) {
+		int currentId = 1;
+		int duration = (int)(0.5 * 3600);
+		final int DEFAULT_CARS_PER_HOUR_PER_LANE = 500;
+		
+		currentId = addCommodity(
+				"168","166",HOME_END_TIME,duration,4*DEFAULT_CARS_PER_HOUR_PER_LANE,
+				"36 30 24 18 12 6",currentId);
+			
+	}
+	
+	/**
+	 * customized algorithm: automatically fills routes with agents, main parts by dgrether
+	 * start time of each agent is randomized, but between start_time and (start_time + duration) 
+	 * @param HOME_LINK
+	 * @param TARGET_LINK
+	 * @param START_TIME
+	 * @param DURATION
+	 * @param CARS_PER_HOUR
+	 * @param ROUTE
+	 * @param CURRENT_ID
+	 * @return next ID to continue
+	 */
+	private int addCommodity(final String HOME_LINK, final String TARGET_LINK, final int START_TIME, final int DURATION, final int CARS_PER_HOUR, final String ROUTE, int CURRENT_ID){
+		int homeEndtime = 0;
+		final LinkImpl start = network.getLink(new IdImpl(HOME_LINK));
+		final LinkImpl target = network.getLink(new IdImpl(TARGET_LINK));
+		final Coord homeCoord = new CoordImpl(-25000, 0);
+		final Coord workCoord = new CoordImpl(10000, 0);
+		
+		final int AMOUNT_OF_CARS = CARS_PER_HOUR * DURATION / 3600;
+		final int MAX_ID = CURRENT_ID+1 + AMOUNT_OF_CARS; 
+		
+		for (int i = CURRENT_ID+1; i <= MAX_ID; i++) {
+			homeEndtime = START_TIME;
+			
+			PersonImpl p = new PersonImpl(new IdImpl(i));
+			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
+			p.addPlan(plan);
+			//home
+			homeEndtime += Math.floor(Math.random() * DURATION); //0.05 * 60;
+			ActivityImpl a = plan.createAndAddActivity("h", homeCoord);
+			a.setLink(start);
+			a.setEndTime(homeEndtime);
+			//leg to work
+			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+			NetworkRouteWRefs route = new NodeNetworkRouteImpl(start, target);
+			route.setNodes(start, NetworkUtils.getNodes(network, ROUTE), target);
+			leg.setRoute(route);
+			//work
+			a = plan.createAndAddActivity("w", workCoord);
+			a.setLink(target);
+
+			this.plans.addPerson(p);
+			
+		}
+		
+		return MAX_ID;
+	}
+	
+
+	protected NetworkLayer loadNetwork(final String filename) {
+		// - read network: which buildertype??
+		NetworkLayer network = new NetworkLayer();
+
+		new MatsimNetworkReader(network).readFile(filename);
+
+		return network;
+	}
+
+
+	/**
+	 * @param args
+	 */
+	public static void main(final String[] args) {
+		try {
+			new Plansgenerator().createPlans();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
+}

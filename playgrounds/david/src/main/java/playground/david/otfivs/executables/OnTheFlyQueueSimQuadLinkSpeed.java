@@ -1,0 +1,158 @@
+package playground.david.otfivs.executables;
+
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.core.config.Config;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QueueSimulation;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.vis.netvis.streaming.SimStateWriterI;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
+import org.matsim.vis.otfvis.handler.OTFDefaultNodeHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkTravelTimesHandler;
+import org.matsim.vis.otfvis.opengl.layer.ColoredStaticNetLayer;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
+import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
+import org.matsim.vis.otfvis.server.OnTheFlyServer;
+import org.matsim.world.MatsimWorldReader;
+import org.matsim.world.World;
+
+
+/**
+ * @author DS
+ *
+ */
+public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
+	private final List<SimStateWriterI> writers = new ArrayList<SimStateWriterI>();
+	private OnTheFlyServer myOTFServer = null;
+
+	@Override
+	protected void prepareSim() {
+		this.myOTFServer = OnTheFlyServer.createInstance("AName1", this.network, this.population, getEvents(), false);
+
+		super.prepareSim();
+
+		// FOR TESTING ONLY!
+		OTFConnectionManager connect = new OTFConnectionManager();
+		connect.add(QueueLink.class, OTFLinkTravelTimesHandler.Writer.class);
+		connect.add(OTFLinkTravelTimesHandler.Writer.class, OTFLinkTravelTimesHandler.class);
+		connect.add(OTFLinkTravelTimesHandler.class, ColoredStaticNetLayer.QuadDrawerLinkSpeed.class);
+		connect.add(ColoredStaticNetLayer.QuadDrawerLinkSpeed.class, ColoredStaticNetLayer.class);
+		connect.add(OTFDefaultNodeHandler.Writer.class, OTFDefaultNodeHandler.class);
+		connect.add(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
+		connect.add(AgentPointDrawer.class, OGLAgentPointLayer.class);
+		connect.add(OTFAgentsListHandler.class,  AgentPointDrawer.class);
+
+		OTFClientLive client = new OTFClientLive("rmi:127.0.0.1:4019:AName1", connect);
+		client.start();
+		try {
+			this.myOTFServer.pause();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	protected void cleanupSim() {
+//		if (myOTFServer != null) myOTFServer.stop();
+		this.myOTFServer.cleanup();
+		this.myOTFServer = null;
+		super.cleanupSim();
+	}
+
+	@Override
+	protected void afterSimStep(final double time) {
+		super.afterSimStep(time);
+		int status = 0;
+
+		//Gbl.printElapsedTime();
+//		myOTFServer.updateOut(time);
+		status = this.myOTFServer.updateStatus(time);
+
+	}
+
+	public OnTheFlyQueueSimQuadLinkSpeed(final NetworkLayer net, final PopulationImpl plans, final EventsManagerImpl events) {
+		super(net, plans, events);
+	}
+
+	public static void main(final String[] args) {
+
+//		String studiesRoot = "../";
+		String localDtdBase = "../matsimGIS/dtd/";
+
+//		String netFileName = studiesRoot + "berlin-wip/network/wip_net.xml";
+//		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter001car_hwh.routes_wip.plans.xml.gz"; // 15931 agents
+//		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter010car_hwh.routes_wip.plans.xml.gz"; // 160171 agents
+//		String popFileName = studiesRoot + "berlin-wip/synpop-2006-04/kutter_population/kutter010car.routes_wip.plans.xml.gz";  // 299394 agents
+//		String worldFileName = studiesRoot + "berlin-wip/synpop-2006-04/world_TVZ.xml";
+
+		String runBase = "/Volumes/data/work/cvsRep/vsp-cvs/runs/";
+
+		String runDir = "run415/";
+
+		String netFileName = runBase + runDir + "output_network.xml.gz";
+
+		String popFileName = runBase + runDir + "output_plans.xml.gz";
+
+		String worldFileName = runBase + runDir + "output_world.xml.gz";
+
+
+		Config config = Gbl.createConfig(args);
+
+		config.global().setLocalDtdBase(localDtdBase);
+
+		config.controler().setOutputDirectory(runBase + runDir);
+
+		config.simulation().setStartTime(Time.parseTime("00:00:00"));
+		config.simulation().setEndTime(Time.parseTime("00:00:00"));
+
+		config.simulation().setFlowCapFactor(0.1);
+		config.simulation().setStorageCapFactor(0.5);
+
+
+		if(args.length >= 1) {
+			netFileName = config.network().getInputFile();
+			popFileName = config.plans().getInputFile();
+			worldFileName = config.world().getInputFile();
+		}
+
+		World world = Gbl.createWorld();
+
+		if (worldFileName != null) {
+			MatsimWorldReader world_parser = new MatsimWorldReader(world);
+			world_parser.readFile(worldFileName);
+		}
+
+		NetworkLayer net = new NetworkLayer();
+		new MatsimNetworkReader(net).readFile(netFileName);
+
+		PopulationImpl population = new PopulationImpl();
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, net);
+		plansReader.readFile(popFileName);
+		System.out.println("agents read: " + population.getPersons().size());
+
+		EventsManagerImpl events = new EventsManagerImpl();
+
+		OnTheFlyQueueSimQuadLinkSpeed sim = new OnTheFlyQueueSimQuadLinkSpeed(net, population, events);
+
+		config.simulation().setSnapshotFormat("none");// or just set the snapshotPeriod to zero ;-)
+
+
+		sim.run();
+
+	}
+
+
+}

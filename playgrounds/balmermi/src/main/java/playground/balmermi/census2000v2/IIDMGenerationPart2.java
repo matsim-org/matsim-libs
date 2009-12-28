@@ -1,0 +1,192 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PopulationCreation.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.balmermi.census2000v2;
+
+import org.apache.log4j.Logger;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.knowledges.Knowledges;
+import org.matsim.knowledges.KnowledgesImpl;
+import org.matsim.world.MatsimWorldReader;
+import org.matsim.world.World;
+import org.matsim.world.WorldWriter;
+import org.matsim.world.algorithms.WorldCheck;
+import org.matsim.world.algorithms.WorldMappingInfo;
+
+import playground.balmermi.census2000.data.Municipalities;
+import playground.balmermi.census2000v2.modules.PersonAssignAndNormalizeTimes;
+import playground.balmermi.census2000v2.modules.PersonAssignModeChoiceModel;
+import playground.balmermi.census2000v2.modules.PersonAssignPrimaryActivities;
+import playground.balmermi.census2000v2.modules.PersonAssignShopLeisureLocations;
+import playground.balmermi.census2000v2.modules.PersonSetLocationsFromKnowledge;
+import playground.balmermi.census2000v2.modules.WorldParseFacilityZoneMapping;
+import playground.balmermi.census2000v2.modules.WorldWriteFacilityZoneMapping;
+
+public class IIDMGenerationPart2 {
+
+	//////////////////////////////////////////////////////////////////////
+	// member variables
+	//////////////////////////////////////////////////////////////////////
+
+	private final static Logger log = Logger.getLogger(IIDMGenerationPart2.class);
+
+	//////////////////////////////////////////////////////////////////////
+	// createPopulation()
+	//////////////////////////////////////////////////////////////////////
+
+	public static void createIIDM(Config config) {
+
+		log.info("MATSim-DB: create iidm.");
+
+		World world = Gbl.createWorld();
+		
+		//////////////////////////////////////////////////////////////////////
+
+		log.info("  extracting input directory... ");
+		String indir = config.facilities().getInputFile();
+		indir = indir.substring(0,indir.lastIndexOf("/"));
+		log.info("    "+indir);
+		log.info("  done.");
+
+		log.info("  extracting output directory... ");
+		String outdir = config.facilities().getOutputFile();
+		outdir = outdir.substring(0,outdir.lastIndexOf("/"));
+		log.info("    "+outdir);
+		log.info("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+
+		log.info("  reading world xml file...");
+		final MatsimWorldReader worldReader = new MatsimWorldReader(world);
+		worldReader.readFile(config.world().getInputFile());
+		log.info("  done.");
+
+		log.info("  reading facilities xml file...");
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
+		world.complete();
+		log.info("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+
+		log.info("  parsing additional municipality information... ");
+		Municipalities municipalities = new Municipalities(indir+"/gg25_2001_infos.txt");
+		municipalities.parse(world.getLayer(new IdImpl("municipality")));
+		log.info("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+
+		log.info("  running world modules... ");
+		new WorldCheck().run(world);
+		new WorldMappingInfo().run(world);
+		log.info("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+
+		log.info("  parsing f2z_mapping... ");
+		new WorldParseFacilityZoneMapping(indir+"/f2z_mapping.txt").run(world);
+		log.info("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+
+		log.info("  running world modules... ");
+		new WorldCheck().run(world);
+		new WorldMappingInfo().run(world);
+		log.info("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+
+		System.out.println("  setting up population objects...");
+		PopulationImpl pop = new PopulationImpl();
+		Knowledges knowledges =  new KnowledgesImpl();
+		pop.setIsStreaming(true);
+		PopulationWriter pop_writer = new PopulationWriter(pop, knowledges);
+		pop_writer.startStreaming(config.plans().getOutputFile());
+		PopulationReader pop_reader = new MatsimPopulationReader(pop, null);
+		System.out.println("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+
+		System.out.println("  adding person modules... ");
+		pop.addAlgorithm(new PersonSetLocationsFromKnowledge(knowledges));
+		pop.addAlgorithm(new PersonAssignShopLeisureLocations(facilities));
+		pop.addAlgorithm(new PersonAssignAndNormalizeTimes());
+		PersonAssignModeChoiceModel pamcm = new PersonAssignModeChoiceModel(municipalities,outdir+"/subtours.txt", knowledges);
+		pop.addAlgorithm(pamcm);
+		pop.addAlgorithm(new PersonAssignPrimaryActivities(knowledges));
+		log.info("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+
+		System.out.println("  reading, processing, writing plans...");
+		pop.addAlgorithm(pop_writer);
+		pop_reader.readFile(config.plans().getInputFile());
+		pop.printPlansCount();
+		pop_writer.closeStreaming();
+		pamcm.close();
+		System.out.println("  done.");
+
+		//////////////////////////////////////////////////////////////////////
+
+		log.info("  writing f2z_mapping... ");
+		new WorldWriteFacilityZoneMapping(outdir+"/output_f2z_mapping.txt").run(world);
+		log.info("  done.");
+
+		log.info("  writing facilities xml file... ");
+		new FacilitiesWriter(facilities).writeFile(config.facilities().getOutputFile());
+		log.info("  done.");
+
+		log.info("  writing world xml file... ");
+		WorldWriter world_writer = new WorldWriter(world);
+		world_writer.writeFile(config.world().getOutputFile());
+		log.info("  done.");
+
+		log.info("  writing config xml file... ");
+		new ConfigWriter(config).writeFile(config.config().getOutputFile());
+		log.info("  done.");
+
+		log.info("done.");
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	// main
+	//////////////////////////////////////////////////////////////////////
+
+	public static void main(final String[] args) {
+
+		Gbl.startMeasurement();
+
+		Config config = Gbl.createConfig(args);
+
+		createIIDM(config);
+
+		Gbl.printElapsedTime();
+	}
+}

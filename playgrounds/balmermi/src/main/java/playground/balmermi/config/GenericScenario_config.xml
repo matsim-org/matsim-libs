@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+	[
+		<!ENTITY PROJBASE     ".">
+		<!ENTITY STUDYBASE    "input">
+		<!ENTITY RUNSBASE     "output">
+		<!ENTITY OUTPUTBASE   "output">
+		<!ENTITY INPUTBASE    "input">
+		<!ENTITY ANALYSISBASE "analysis">
+		<!ENTITY LOCALDTDBASE "dtd">
+		<!ENTITY HOMEPAGEBASE "http://www.matsim.org/files/dtd">
+	]
+>
+<config xml:lang="de-CH">
+
+	<module name="config">
+		<param name="outputConfigFile" value="&OUTPUTBASE;/output_config.xml" />
+	</module>
+
+	<!-- ====================================================================== -->
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="outputTimeFormat" value="HH:mm:ss" />
+		<param name="useRoadPricing" value="no" />
+	</module>
+
+	<!-- ====================================================================== -->
+	
+	<module name="world">
+		<param name="inputWorldFile" value="&STUDYBASE;/world.xml.gz" />
+		<param name="outputWorldFile" value="&OUTPUTBASE;/output_world.xml.gz" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="&STUDYBASE;/facilities.xml.gz" />
+		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/output_facilities.xml.gz" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="network">
+ 		<param name="inputNetworkFile" value="&STUDYBASE;/network.xml.gz" />
+		<param name="outputNetworkFile" value="&OUTPUTBASE;/output_network.xml.gz" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="matrices">
+		<param name="inputMatricesFile" value="&STUDYBASE;/matrices.xml.gz" />
+		<param name="outputMatricesFile" value="&OUTPUTBASE;/output_matrices.xml.gz" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="plans">
+		<param name="inputPlansFile" value="&STUDYBASE;/plans.xml.gz" />
+		<param name="outputPlansFile" value="&OUTPUTBASE;/output_plans.xml.gz" />
+		<param name="outputSample" value="1.00" />
+		<param name="switchOffPlansStreaming" value="yes" />
+	</module>
+
+<!-- ====================================================================== -->
+
+</config>

@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+	[
+		<!ENTITY PROJBASE     ".">
+		<!ENTITY STUDYBASE    "input">
+		<!ENTITY RUNSBASE     "runs">
+		<!ENTITY OUTPUTBASE   "output">
+		<!ENTITY INPUTBASE    "input">
+		<!ENTITY ANALYSISBASE "analysis">
+		<!ENTITY LOCALDTDBASE "dtd">
+		<!ENTITY HOMEPAGEBASE "http://www.matsim.org">
+	]
+>
+<config xml:lang="de-CH">
+
+	<module name="config">
+		<param name="outputConfigFile" value="&OUTPUTBASE;/output_config.xml" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="outputTimeFormat" value="HH:mm:ss" />
+		<param name="useRoadPricing" value="no" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="network">
+		<param name="inputNetworkFile" value="&STUDYBASE;/network.xml.gz" />
+		<param name="outputNetworkFile" value="&OUTPUTBASE;/output_network.xml.gz" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="plans">
+		<param name="inputPlansFile" value="&STUDYBASE;/plans.xml.gz" />
+		<param name="outputPlansFile" value="&OUTPUTBASE;/output_plans.xml.gz" />
+		<param name="outputSample" value="1.00" />
+		<param name="switchOffPlansStreaming" value="no" />
+	</module>
+
+<!-- ====================================================================== -->
+
+</config>

@@ -1,0 +1,141 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE config SYSTEM "./dtd/config_v1.dtd">
+
+<config>
+	
+	<module name="network">
+<!--		<param name="inputNetworkFile" value="./test/scenarios/berlin/network.xml.gz" />-->
+		<param name="inputNetworkFile" value="D:/Berlin/BVG/berlin-bvg09/net/miv_small/m44_344_small_ba.xml.gz"/>
+	</module>
+
+	<module name="plans">
+<!--		<param name="inputPlansFile" value="z:/output/raw_plans_out_w.xml" />-->
+		<param name="inputPlansFile" value="D:/Berlin/BVG/berlin-bvg09/pop/baseplan_900s_subset_bb.xml.gz" />
+		<param name="outputPlansFile" value="./baseplan_900s_subset_bb_xy2links.xml.gz" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="./output/bln" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="0" />
+	</module>
+
+	<module name="simulation">
+
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="30:00:00" />
+		
+		<param name = "snapshotperiod"	value = "00:05:00"/>
+ 		<param name = "snapshotFormat"	value = "otfvis"/> 
+ 		
+ 		<param name = "flowCapacityFactor"	value = "0.05"/> <!-- Yu uses 0.10 for 10% scenario -->
+ 		<param name = "storageCapacityFactor"	value = "0.15"/> <!-- Yu uses 0.30 for 10% scenario -->
+	</module>
+
+	<module name="planCalcScore">
+
+		<param name="learningRate" value="1.0" />
+		<param name="BrainExpBeta" value="2.0" />
+
+		<param name="lateArrival" value="-0" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+0" />
+		<param name="traveling" value="-6" />
+		<param name="waiting" value="-0" />
+		
+<!--		<param name="activityType_0"            value="home" />  home -->
+<!--		<param name="activityPriority_0"        value="1" />-->
+<!--		<param name="activityTypicalDuration_0" value="12:00:00" />-->
+<!--		<param name="activityMinimalDuration_0" value="08:00:00" />-->
+<!--	-->
+<!--		<param name="activityType_1"            value="work" /> -->
+<!--		<param name="activityPriority_1"        value="1" />-->
+<!--		<param name="activityTypicalDuration_1" value="12:00:00" />-->
+<!--		<param name="activityMinimalDuration_1" value="08:00:00" />-->
+		
+		<param name="activityType_0"            value="not specified" /> 
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+		<param name="activityMinimalDuration_0" value="08:00:00" />
+	
+		<param name="activityType_1"            value="work" /> 
+		<param name="activityPriority_1"        value="1" />
+		<param name="activityTypicalDuration_1" value="12:00:00" />
+		<param name="activityMinimalDuration_1" value="08:00:00" />
+		
+		<param name="activityType_2"            value="education" /> 
+		<param name="activityPriority_2"        value="1" />
+		<param name="activityTypicalDuration_2" value="12:00:00" />
+		<param name="activityMinimalDuration_2" value="08:00:00" />
+		
+		<param name="activityType_3"            value="business" /> 
+		<param name="activityPriority_3"        value="1" />
+		<param name="activityTypicalDuration_3" value="12:00:00" />
+		<param name="activityMinimalDuration_3" value="08:00:00" />
+		
+		<param name="activityType_4"            value="shopping" /> 
+		<param name="activityPriority_4"        value="1" />
+		<param name="activityTypicalDuration_4" value="12:00:00" />
+		<param name="activityMinimalDuration_4" value="08:00:00" />
+		
+		<param name="activityType_5"            value="Einkauf sonstiges" /> 
+		<param name="activityPriority_5"        value="1" />
+		<param name="activityTypicalDuration_5" value="12:00:00" />
+		<param name="activityMinimalDuration_5" value="08:00:00" />
+		
+		<param name="activityType_6"            value="leisure" /> 
+		<param name="activityPriority_6"        value="1" />
+		<param name="activityTypicalDuration_6" value="12:00:00" />
+		<param name="activityMinimalDuration_6" value="08:00:00" />
+		
+		<param name="activityType_7"            value="Freizeit (sonstiges incl.Sport)" /> 
+		<param name="activityPriority_7"        value="1" />
+		<param name="activityTypicalDuration_7" value="12:00:00" />
+		<param name="activityMinimalDuration_7" value="08:00:00" />
+		
+		<param name="activityType_8"            value="home" /> 
+		<param name="activityPriority_8"        value="1" />
+		<param name="activityTypicalDuration_8" value="12:00:00" />
+		<param name="activityMinimalDuration_8" value="08:00:00" />
+		
+		<param name="activityType_9"            value="see a doctor" /> 
+		<param name="activityPriority_9"        value="1" />
+		<param name="activityTypicalDuration_9" value="12:00:00" />
+		<param name="activityMinimalDuration_9" value="08:00:00" />
+		
+		<param name="activityType_10"            value="holiday / journey" /> 
+		<param name="activityPriority_10"        value="1" />
+		<param name="activityTypicalDuration_10" value="12:00:00" />
+		<param name="activityMinimalDuration_10" value="08:00:00" />
+		
+		<param name="activityType_11"            value="other" /> 
+		<param name="activityPriority_11"        value="1" />
+		<param name="activityTypicalDuration_11" value="12:00:00" />
+		<param name="activityMinimalDuration_11" value="08:00:00" />
+	
+		<param name="activityType_12"            value="multiple" /> 
+		<param name="activityPriority_12"        value="1" />
+		<param name="activityTypicalDuration_12" value="12:00:00" />
+		<param name="activityMinimalDuration_12" value="08:00:00" />
+		
+	</module>
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.9" />
+		<param name="Module_1" value="BestScore" />
+
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="ReRoute" />
+	</module>
+
+	<module name="vis">
+		<param name="logo"		value = "(c) 2009 TUB-VSP"/>
+		<param name="delay"		value = "200"/>
+		<param name="linkwidthfactor"	value = "15"/>
+		<param name="shownodelabels"	value = "false"/>
+		<param name="showlinklabels"  	value = "true"/>
+	</module>	
+	
+</config>

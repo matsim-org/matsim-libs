@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- $Id$ -->
+
+<!-- Author: Christoph Dobler -->
+
+<!ELEMENT selection     (person*)>
+<!ATTLIST selection
+					desc					CDATA											#IMPLIED>
+
+<!ELEMENT person        (knowledge?)>
+<!ATTLIST person
+          id            CDATA                     #REQUIRED
+          sex           (f|m)                     #IMPLIED
+          age           CDATA                     #IMPLIED
+          license       (yes|no)                  #IMPLIED
+          car_avail     (always|never|sometimes)	#IMPLIED
+          employed      (yes|no)                  #IMPLIED>
+
+<!ELEMENT knowledge (activityspace?)>
+<!ATTLIST	knowledge
+					desc					CDATA											#IMPLIED>
+
+<!ELEMENT activityspace	(nodes*)>
+<!ATTLIST activityspace>
+
+<!ELEMENT nodes					(node*)>
+<!ATTLIST nodes>
+
+<!ELEMENT node 					EMPTY>
+<!ATTLIST node
+					id						CDATA #REQUIRED>
+
+<!ELEMENT links         (link*)>
+
+<!ELEMENT link          EMPTY>
+<!ATTLIST link
+          id            CDATA #REQUIRED>
