@@ -28,7 +28,7 @@ import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -58,7 +58,7 @@ import playground.yu.utils.io.SimpleWriter;
  * make time variation curve of average {@code Leg} travel time and their sum.
  * This class can only be used with plansfile, in that all <code>Leg</code>s in
  * a <code>Plan</code> muss be equiped with the same {@code Mode}
- * {@link org.matsim.api.basic.v01.TransportMode} in a day.
+ * {@link org.matsim.api.core.v01.TransportMode} in a day.
  * 
  * @author ychen
  * 

@@ -4,7 +4,7 @@
 package playground.yu.analysis.forBln;
 
 import org.jfree.chart.plot.PlotOrientation;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;

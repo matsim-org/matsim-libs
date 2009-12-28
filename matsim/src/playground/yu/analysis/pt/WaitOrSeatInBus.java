@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.jfree.chart.plot.PlotOrientation;
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;

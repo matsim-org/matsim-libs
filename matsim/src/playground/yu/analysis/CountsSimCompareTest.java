@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.LinkImpl;
