@@ -21,7 +21,7 @@
 package org.matsim.core.config.groups;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PlanomatConfigGroupTest extends MatsimTestCase {

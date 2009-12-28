@@ -19,7 +19,7 @@
 
 package org.matsim.signalsystems;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.signalsystems.config.BasicAdaptivePlanBasedSignalSystemControlInfo;
 import org.matsim.signalsystems.config.BasicAdaptiveSignalSystemControlInfo;

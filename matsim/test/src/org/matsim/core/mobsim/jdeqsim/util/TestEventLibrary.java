@@ -2,7 +2,7 @@ package org.matsim.core.mobsim.jdeqsim.util;
 
 import java.util.LinkedList;
 
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
