@@ -22,10 +22,10 @@ import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.xml.sax.SAXException;
 import org.matsim.core.router.PlansCalcRoute;
 
-import playground.marcel.OTFDemo;
-import playground.marcel.pt.config.TransitConfigGroup;
-import playground.marcel.pt.router.PlansCalcTransitRoute;
 import playground.mmoyo.TransitSimulation.MMoyoPlansCalcTransitRoute;
+import playground.mrieser.OTFDemo;
+import playground.mrieser.pt.config.TransitConfigGroup;
+import playground.mrieser.pt.router.PlansCalcTransitRoute;
 
 /**read a config file, routes the transit plans and plays OFTDemo*/ 
 public class PlanRouter {

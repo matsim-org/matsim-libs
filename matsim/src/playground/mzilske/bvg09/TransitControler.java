@@ -47,9 +47,9 @@ import org.matsim.vehicles.BasicVehicleReaderV1;
 import org.xml.sax.SAXException;
 
 import playground.dgrether.utils.LogOutputEventHandler;
-import playground.marcel.pt.config.TransitConfigGroup;
-import playground.marcel.pt.replanning.TransitStrategyManagerConfigLoader;
-import playground.marcel.pt.router.PlansCalcTransitRoute;
+import playground.mrieser.pt.config.TransitConfigGroup;
+import playground.mrieser.pt.replanning.TransitStrategyManagerConfigLoader;
+import playground.mrieser.pt.router.PlansCalcTransitRoute;
 
 /**
  * @author mrieser

@@ -39,7 +39,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 
-import playground.marcel.pt.config.TransitConfigGroup;
+import playground.mrieser.pt.config.TransitConfigGroup;
 import playground.mzilske.bvg09.TransitControler;
 import playground.yu.analysis.pt.OccupancyAnalyzer;
 import playground.yu.counts.pt.PtBoardCountControlerListener;

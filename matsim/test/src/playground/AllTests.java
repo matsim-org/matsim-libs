@@ -36,7 +36,7 @@ public class AllTests {
 		suite.addTest(playground.benjamin.AllTests.suite());
 		suite.addTest(playground.jjoubert.AllTests.suite());
 		suite.addTest(playground.johannes.AllTests.suite());
-		suite.addTest(playground.marcel.AllTests.suite());
+		suite.addTest(playground.mrieser.AllTests.suite());
 		suite.addTest(playground.meisterk.AllTests.suite());
 		suite.addTest(playground.wrashid.AllTests.suite());
 		suite.addTest(playground.mmoyo.AllTests.suite());

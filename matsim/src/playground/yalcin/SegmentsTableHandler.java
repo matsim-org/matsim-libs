@@ -30,8 +30,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 
-import playground.marcel.visum.VisumNetwork;
-import playground.marcel.visum.VisumNetwork.Stop;
+import playground.mrieser.visum.VisumNetwork;
+import playground.mrieser.visum.VisumNetwork.Stop;
 
 public class SegmentsTableHandler implements TabularFileHandler {
 

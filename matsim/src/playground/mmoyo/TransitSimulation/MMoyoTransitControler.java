@@ -25,11 +25,11 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.queuesim.TransitQueueSimulation;
 
-import playground.marcel.pt.config.TransitConfigGroup;
-import playground.marcel.pt.controler.TransitControler;
 //import org.matsim.vis.otfvis.opengl.OnTheFlyClientQuad;
 //import org.matsim.run.OTFVis;
-import playground.marcel.OTFDemo;
+import playground.mrieser.OTFDemo;
+import playground.mrieser.pt.config.TransitConfigGroup;
+import playground.mrieser.pt.controler.TransitControler;
 
 public class MMoyoTransitControler extends TransitControler {
 	boolean launchOTFDemo=false;

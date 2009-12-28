@@ -29,8 +29,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
-import playground.marcel.visum.VisumNetwork;
-import playground.marcel.visum.VisumNetworkReader;
+import playground.mrieser.visum.VisumNetwork;
+import playground.mrieser.visum.VisumNetworkReader;
 
 public class VisumRuns {
 

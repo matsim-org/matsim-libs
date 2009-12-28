@@ -20,7 +20,7 @@
 
 package playground.yu.newPlans;
 
-import playground.marcel.MyRuns;
+import playground.mrieser.MyRuns;
 
 public class FilterPlansWithRouteInArea {
 	/**

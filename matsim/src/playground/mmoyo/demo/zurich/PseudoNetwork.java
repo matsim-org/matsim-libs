@@ -1,6 +1,6 @@
 package playground.mmoyo.demo.zurich;
 
-import playground.marcel.pt.demo.PseudoNetworkDemo;
+import playground.mrieser.pt.demo.PseudoNetworkDemo;
 
 public class PseudoNetwork {
 
