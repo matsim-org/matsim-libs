@@ -23,7 +23,7 @@ package playground.meisterk.org.matsim.config.groups;
 import java.util.EnumSet;
 import java.util.Iterator;
 
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.testcases.MatsimTestCase;
 
 public class MeisterkConfigGroupTest extends MatsimTestCase {

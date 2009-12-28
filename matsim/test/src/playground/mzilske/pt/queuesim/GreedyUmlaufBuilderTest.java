@@ -3,9 +3,9 @@ package playground.mzilske.pt.queuesim;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;

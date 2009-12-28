@@ -24,6 +24,7 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.core.population.PersonImpl;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
@@ -50,7 +51,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.TransportMode;
 
 import playground.mfeil.FilesForTests.Initializer;
 import playground.mfeil.FilesForTests.JohScoringTestFunctionFactory;

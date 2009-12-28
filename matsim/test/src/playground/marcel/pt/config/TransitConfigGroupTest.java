@@ -25,7 +25,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 
 /**
  * @author mrieser
