@@ -23,7 +23,7 @@ package playground.meisterk.org.matsim.config.groups;
 import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 
 public class MeisterkConfigGroup extends Module {

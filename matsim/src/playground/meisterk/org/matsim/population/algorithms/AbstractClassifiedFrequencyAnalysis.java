@@ -28,7 +28,7 @@ import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPersonAlgorithm {

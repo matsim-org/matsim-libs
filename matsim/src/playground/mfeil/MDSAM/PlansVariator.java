@@ -25,7 +25,7 @@ package playground.mfeil.MDSAM;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;

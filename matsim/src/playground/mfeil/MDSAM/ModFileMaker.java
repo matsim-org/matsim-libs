@@ -21,7 +21,6 @@
 package playground.mfeil.MDSAM;
 
 import java.io.File;
-import org.matsim.api.basic.v01.TransportMode;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.List;
@@ -31,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.PlanElement;
 
 

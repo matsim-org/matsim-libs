@@ -22,9 +22,9 @@ package playground.marcel.pt.demo;
 
 import java.util.ArrayList;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.PopulationFactory;

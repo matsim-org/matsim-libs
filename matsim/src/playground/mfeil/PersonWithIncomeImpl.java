@@ -21,7 +21,7 @@
 package playground.mfeil;
 
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.PersonImpl;
 
 public class PersonWithIncomeImpl extends PersonImpl {

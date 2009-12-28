@@ -1,6 +1,6 @@
 package playground.meisterk.kti.controler;
 
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;

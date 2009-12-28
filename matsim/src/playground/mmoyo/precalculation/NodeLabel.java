@@ -1,6 +1,6 @@
 package playground.mmoyo.precalculation;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 
 /**Node labels in a shortest distance tree*/
 public class NodeLabel {

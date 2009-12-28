@@ -3,7 +3,7 @@ package playground.mmoyo.PTRouter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;

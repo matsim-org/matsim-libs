@@ -5,8 +5,8 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.network.LinkImpl;

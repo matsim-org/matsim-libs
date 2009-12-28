@@ -40,7 +40,7 @@ import net.opengis.kml._2.StyleType;
 import net.opengis.kml._2.TimeSpanType;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.utils.geometry.CoordImpl;

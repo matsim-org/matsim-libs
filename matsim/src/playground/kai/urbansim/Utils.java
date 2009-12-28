@@ -12,9 +12,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.population.ActivityImpl;

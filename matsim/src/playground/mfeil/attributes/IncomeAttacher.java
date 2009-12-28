@@ -30,6 +30,7 @@ import java.io.PrintStream;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -38,7 +39,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.world.Layer;
 import org.matsim.world.MatsimWorldReader;
-import org.matsim.api.basic.v01.Id;
 import org.matsim.world.World;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.api.core.v01.population.Person;
@@ -357,7 +357,7 @@ public class IncomeAttacher {
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==22) {
-				index.get(count)[5]+=1; // Maturitätsschule
+				index.get(count)[5]+=1; // Maturitï¿½tsschule
 				index.get(count)[1]++;
 				}
 			else if (this.education.get(id)==23) {
@@ -365,11 +365,11 @@ public class IncomeAttacher {
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==31) {
-				index.get(count)[7]+=1; // Höhere Fach- und Berufsausbildung
+				index.get(count)[7]+=1; // Hï¿½here Fach- und Berufsausbildung
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==32) {
-				index.get(count)[8]+=1; // Höhere Fachschule
+				index.get(count)[8]+=1; // Hï¿½here Fachschule
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==33) {
@@ -377,7 +377,7 @@ public class IncomeAttacher {
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==34) {
-				index.get(count)[10]+=1; // Universität
+				index.get(count)[10]+=1; // Universitï¿½t
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==-7) {
