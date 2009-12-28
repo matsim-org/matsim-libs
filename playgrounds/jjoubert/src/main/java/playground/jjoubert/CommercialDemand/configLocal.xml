@@ -1,0 +1,103 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="WGS84_UTM35S" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Input/networkSA.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/plansGauteng5000_Sample10.xml" />
+		<param name="outputPlansFile" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Input/plansGauteng5000_Sample10.xml" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Output/" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="2" />
+	</module>
+
+    <module name="counts">
+        <param name="inputCountsFile" value="/Users/johanwjoubert/MATSim/workspace/MATSimData/Commercial/Input/2001_counts_1000m+.xml" />
+        <param name="outputformat" value="kml" />
+        <!-- these parameters are used in case you dont want to use the entire counting
+        station file
+        pick centre node 1203, and use all sations within 30km:
+        <param name="distanceFilterCenterNode" value="1203" />
+		<param name="distanceFilter" value="30000" />
+		scale simulation counts (10%) up by factor 10:
+        <param name="countsScaleFactor" value="10" />
+        -->
+        <param name="countsScaleFactor" value="10" />
+    </module>
+
+	<module name="simulation">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="24:00:00" />
+		<param name="flowCapacityFactor" value="0.1" />
+		<param name="storageCapacityFactor" value="0.3" />
+		<param name = "snapshotperiod"	value = "00:15:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims, otfvis -->
+	</module>
+
+	<module name="planCalcScore">
+		<param name="learningRate" value="1.0" />
+		<param name="BrainExpBeta" value="2.0" />
+
+		<param name="lateArrival" value="-18" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+6" />
+		<param name="traveling" value="-6" />
+		<param name="waiting" value="-0" />
+		
+		<param name="activityType_0"            value="major" /> <!-- major -->
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="06:00:00" />
+		<param name="activityMinimalDuration_0" value="00:00:00" />
+	
+		<param name="activityType_1"            value="minor" /> <!-- minor -->
+		<param name="activityPriority_1"        value="1" />
+		<param name="activityTypicalDuration_1" value="00:30:00" />
+		<param name="activityMinimalDuration_1" value="00:10:00" />
+		<param name="activityOpeningTime_1"     value="00:00:00" />
+		<param name="activityLatestStartTime_1" value="23:59:00" />
+		<param name="activityEarliestEndTime_1" value="" />
+		<param name="activityClosingTime_1"     value="23:59:59" />
+		
+		<param name="activityType_2"            value="home" />
+		<param name="activityPriority_2"        value="1" />
+		<param name="activityTypicalDuration_2" value="12:00:00" />
+		<param name="activityMinimalDuration_2" value="08:00:00" />
+
+		<param name="activityType_3"            value="work" />
+		<param name="activityPriority_3"        value="1" />
+		<param name="activityTypicalDuration_3" value="09:00:00" />
+		<param name="activityMinimalDuration_3" value="07:00:00" />
+		<param name="activityOpeningTime_3"     value="07:00:00" />
+		<param name="activityLatestStartTime_3" value="09:00:00" />
+		<param name="activityEarliestEndTime_3" value="" />
+		<param name="activityClosingTime_3"     value="18:00:00" />
+		
+	</module>
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.8" />
+		<param name="Module_1" value="SelectExpBeta" />
+
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="ReRoute" />
+		
+		<param name="ModuleProbability_3" value="0.1" />
+		<param name="Module_3" value="TimeAllocationMutator" />
+		
+	</module>
+
+</config>

@@ -1,0 +1,14 @@
+Statistics for crossover type 2:
+	                   Genome length:  100
+	                 Population size:  100
+	           Number of generations:  1000
+	               Incumbent fitness:  5684.24
+	Average time per generation (ms):  19.91
+
+
+Statistics for crossover type 3:
+	                   Genome length:  100
+	                 Population size:  100
+	           Number of generations:  1000
+	               Incumbent fitness:  3497.12
+	Average time per generation (ms):  12.50

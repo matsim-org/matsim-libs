@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+
+<plans>
+
+<!-- ====================================================================== -->
+
+	<person id="1">
+		<plan selected="yes">
+			<act type="h" link="44" x="1050.0" y="3000.0" end_time="07:50:00" />
+			<leg mode="undefined" trav_time="00:10:00">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="1100.0" y="2800.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:00:00">
+				<route dist="4000.0" trav_time="00:00:00">
+					PT1===stop1===Blue Line===Blue Route 0_20===stop3 
+				</route>
+			</leg>
+			<act type="pt interaction" link="22" x="1100.0" y="6800.0" dur="00:00:00" />
+			<leg mode="undefined" trav_time="00:02:33">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="w" link="12" x="1050.0" y="7000.0" end_time="16:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="2">
+		<plan selected="yes">
+			<act type="h" link="20" x="1000.0" y="2950.0" end_time="07:50:00" />
+			<leg mode="pt" trav_time="00:00:00">
+				<route dist="4000.0" trav_time="00:00:00">
+					PT1===stop1===Blue Line===Blue Route 0_20===stop3 
+				</route>
+			</leg>
+			<act type="w" link="22" x="1000.0" y="6990.0" end_time="16:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="3">
+		<plan selected="yes">
+			<act type="h" link="44" x="1050.0" y="3000.0" end_time="07:50:00" />
+			<leg mode="undefined" trav_time="00:10:00">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="pt interaction" link="20" x="1100.0" y="2800.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:00:00">
+				<route dist="4000.0" trav_time="00:00:00">
+					PT1===stop1===Blue Line===Blue Route 0_20===stop3 
+				</route>
+			</leg>
+			<act type="w" link="22" x="1000.0" y="6990.0" end_time="16:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="4">
+		<plan selected="yes">
+			<act type="h" link="20" x="1000.0" y="2950.0" end_time="07:50:00" />
+			<leg mode="pt" trav_time="00:00:00">
+				<route dist="4000.0" trav_time="00:00:00">
+					PT1===stop1===Blue Line===Blue Route 0_20===stop3 
+				</route>
+			</leg>
+			<act type="pt interaction" link="22" dur="00:00:00" />
+			<leg mode="undefined" trav_time="00:02:33">
+				<route>
+					
+				</route>
+			</leg>
+			<act type="w" link="12" x="1050.0" y="7000.0" end_time="16:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="5">
+		<plan selected="yes">
+			<act type="h" link="20" x="1000.0" y="2950.0" end_time="07:50:00" />
+			<leg mode="pt" trav_time="00:00:00">
+				<route dist="6000.0" trav_time="00:00:00">
+					PT1===stop1===Blue Line===Blue Route 0_20===stop4 
+				</route>
+			</leg>
+			<act type="pt interaction" link="23" x="1100.0" y="8800.0" dur="00:00:00" />
+			<leg mode="pt" trav_time="00:00:00">
+				<route dist="5702.93863659264" trav_time="00:00:00">
+					PT1===stop4===Green Line===Green Route 20_24===stop7 
+				</route>
+			</leg>
+			<act type="w" link="18" x="6980.0" y="9000.0" end_time="16:00:00" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+</plans>

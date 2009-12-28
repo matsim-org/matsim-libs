@@ -1,0 +1,36 @@
+
+
+
+Revision 8011 on Satawal
+Processing vehicle files in /home/jjoubert/data/Gauteng/Activities/...
+
+0%                 20%                 40%                 60%                 80%               100%
+|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|
+*****************************************************************************************************
+
+--------------------------------------
+Summary for: Gauteng
+--------------------------------------
+Number of vehicles processed: 31053
+Total home locations: 229799
+Total activity locations: 18066716
+Total time (sec): 46738
+Boink points: 23688
+--------------------------------------
+
+Revision 8013 on Satawal
+Processing vehicle files in /home/jjoubert/data/WesternCape/Activities/...
+
+0%                 20%                 40%                 60%                 80%               100%
+|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|
+*****************************************************************************************************
+
+--------------------------------------
+Summary for: WesternCape
+--------------------------------------
+Number of vehicles processed: 31053
+Total home locations: 229799
+Total activity locations: 18066716
+Total time (sec): 581009
+Boink points: 23688
+--------------------------------------

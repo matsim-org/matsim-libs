@@ -1,0 +1,2 @@
+Meant for "stable" entry points into matsim similar to org.matsim.run, but in cases where code is used that
+resides in playground (since classes in org.matsim are not allowed to point into the playground).  Kai, dec/08

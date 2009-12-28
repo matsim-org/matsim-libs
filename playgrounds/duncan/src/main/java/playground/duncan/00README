@@ -1,0 +1,13 @@
+Duncan,
+
+Everything you should need to get started is now in three files:
+
+- OSM2MATSim.java: The network transform from OSM to matsim.  The coordinate issue has NOT yet been fixed.
+
+- MyControler2.java, which does everything else
+
+- myconfig1.xml, which configures most (but not all) of MyControler2
+
+Good luck
+
+Kai

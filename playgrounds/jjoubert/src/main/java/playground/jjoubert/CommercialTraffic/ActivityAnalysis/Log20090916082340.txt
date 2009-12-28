@@ -1,0 +1,263 @@
+2009-09-16 08:23:40,819  INFO ShapeFileReader:48 reading features from: /Users/johanwjoubert/MATSim/workspace/MATSimData//Shapefiles/Gauteng/Gauteng_UTM35S.shp
+16-Sep-2009 08:23:41 org.geotools.data.db2.DB2DataStoreFactory isAvailable
+INFO: DB2 driver found: false
+2009-09-16 08:23:42,106  INFO CommercialActivityAnalyser:95 ================================================
+2009-09-16 08:23:42,106  INFO CommercialActivityAnalyser:96 Extracting vehicle chains for sample 1.
+2009-09-16 08:23:42,111  INFO CommercialActivityAnalyser:97 Minor/major threshold value: 179.6
+2009-09-16 08:23:42,111  INFO CommercialActivityAnalyser:98 ================================================
+2009-09-16 08:23:42,111  INFO MyFileSampler:102 Sampling 200 files from /Users/johanwjoubert/MATSim/workspace/MATSimData/DigiCore/SortedVehicles
+2009-09-16 08:23:42,404  INFO MyFileSampler:128 File sampling complete.
+2009-09-16 08:23:42,408  INFO CommercialActivityExtractor:86 A CommercialActivityExtractor has been created
+16-Sep-2009 08:23:42 FactoryRegistry scanForPlugins
+WARNING: Can't load a service for category "DataSource". Cause is "NoClassDefFoundError: sun/jdbc/odbc/ee/DataSource".
+2009-09-16 08:23:44,714  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     1 [0.90%]
+2009-09-16 08:23:45,581  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     2 [0.46%]
+2009-09-16 08:23:45,970  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     4 [0.59%]
+2009-09-16 08:23:48,497  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     8 [0.63%]
+2009-09-16 08:23:55,978  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    16 [0.71%]
+2009-09-16 08:24:05,861  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    32 [0.87%]
+2009-09-16 08:24:38,048  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    64 [0.82%]
+2009-09-16 08:25:52,105  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:   128 [0.71%]
+2009-09-16 08:27:01,334  INFO CommercialActivityAnalyser:152 Building activity list. Files processed:   200 [0.76%] (Done)
+2009-09-16 08:27:01,485  INFO DJCluster:93 Clustering input points. This may take a while.
+2009-09-16 08:27:02,235  INFO DJCluster:202    Points clustered: 1
+2009-09-16 08:27:02,235  INFO DJCluster:202    Points clustered: 2
+2009-09-16 08:27:02,236  INFO DJCluster:202    Points clustered: 4
+2009-09-16 08:27:02,239  INFO DJCluster:202    Points clustered: 8
+2009-09-16 08:27:02,240  INFO DJCluster:202    Points clustered: 16
+2009-09-16 08:27:02,241  INFO DJCluster:202    Points clustered: 32
+2009-09-16 08:27:02,242  INFO DJCluster:202    Points clustered: 64
+2009-09-16 08:27:02,243  INFO DJCluster:202    Points clustered: 128
+2009-09-16 08:27:02,244  INFO DJCluster:202    Points clustered: 256
+2009-09-16 08:27:02,246  INFO DJCluster:202    Points clustered: 512
+2009-09-16 08:27:02,248  INFO DJCluster:202    Points clustered: 1024
+2009-09-16 08:27:02,252  INFO DJCluster:202    Points clustered: 2048
+2009-09-16 08:27:02,263  INFO DJCluster:202    Points clustered: 4096
+2009-09-16 08:27:02,281  INFO DJCluster:202    Points clustered: 8192
+2009-09-16 08:27:02,326  INFO DJCluster:202    Points clustered: 16384
+2009-09-16 08:27:02,416  INFO DJCluster:202    Points clustered: 32768
+2009-09-16 08:27:02,583  INFO DJCluster:202    Points clustered: 65536
+2009-09-16 08:27:02,893  INFO DJCluster:202    Points clustered: 131072
+2009-09-16 08:27:03,953  INFO DJCluster:207    Points clustered: 254863 (Done)
+2009-09-16 08:27:03,953  INFO DJCluster:208 Sum should add up: 96265 (clustered) + 160723 (unclustered) = 254863
+2009-09-16 08:27:03,954  INFO DJCluster:219 Building the cluster list.
+2009-09-16 08:27:06,939  INFO DJCluster:244 Cluster list built.
+2009-09-16 08:27:07,000  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     1
+2009-09-16 08:27:08,563  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     2
+2009-09-16 08:27:13,587  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     4
+2009-09-16 08:27:18,660  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     8
+2009-09-16 08:27:36,950  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    16
+2009-09-16 08:27:56,961  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    32
+2009-09-16 08:28:57,472  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    64
+2009-09-16 08:29:12,004  WARN CommercialChainExtractor:175 Could not thin the list. There is only one element in the list.
+2009-09-16 08:30:10,746  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:   128
+2009-09-16 08:31:55,519  INFO CommercialActivityAnalyser:246 Processing vehicle chains. Files processed:   200 (Done)
+2009-09-16 08:31:55,519  INFO CommercialActivityAnalyser:248 Chain extraction complete.
+2009-09-16 08:31:55,570  INFO CommercialActivityAnalyser:95 ================================================
+2009-09-16 08:31:55,570  INFO CommercialActivityAnalyser:96 Extracting vehicle chains for sample 1.
+2009-09-16 08:31:55,571  INFO CommercialActivityAnalyser:97 Minor/major threshold value: 339.4
+2009-09-16 08:31:55,571  INFO CommercialActivityAnalyser:98 ================================================
+2009-09-16 08:31:55,571  INFO MyFileSampler:102 Sampling 200 files from /Users/johanwjoubert/MATSim/workspace/MATSimData/DigiCore/SortedVehicles
+2009-09-16 08:31:55,793  INFO MyFileSampler:128 File sampling complete.
+2009-09-16 08:31:55,794  INFO CommercialActivityExtractor:86 A CommercialActivityExtractor has been created
+2009-09-16 08:31:56,989  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     1 [0.87%]
+2009-09-16 08:31:57,597  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     2 [0.74%]
+2009-09-16 08:31:58,083  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     4 [1.12%]
+2009-09-16 08:31:59,608  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     8 [1.01%]
+2009-09-16 08:32:03,602  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    16 [1.07%]
+2009-09-16 08:32:19,540  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    32 [0.73%]
+2009-09-16 08:32:53,418  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    64 [0.76%]
+2009-09-16 08:33:51,023  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:   128 [0.91%]
+2009-09-16 08:35:21,642  INFO CommercialActivityAnalyser:152 Building activity list. Files processed:   200 [0.86%] (Done)
+2009-09-16 08:35:21,707  INFO DJCluster:93 Clustering input points. This may take a while.
+2009-09-16 08:35:22,229  INFO DJCluster:202    Points clustered: 1
+2009-09-16 08:35:22,229  INFO DJCluster:202    Points clustered: 2
+2009-09-16 08:35:22,229  INFO DJCluster:202    Points clustered: 4
+2009-09-16 08:35:22,230  INFO DJCluster:202    Points clustered: 8
+2009-09-16 08:35:22,236  INFO DJCluster:202    Points clustered: 16
+2009-09-16 08:35:22,236  INFO DJCluster:202    Points clustered: 32
+2009-09-16 08:35:22,237  INFO DJCluster:202    Points clustered: 64
+2009-09-16 08:35:22,238  INFO DJCluster:202    Points clustered: 128
+2009-09-16 08:35:22,239  INFO DJCluster:202    Points clustered: 256
+2009-09-16 08:35:22,240  INFO DJCluster:202    Points clustered: 512
+2009-09-16 08:35:22,244  INFO DJCluster:202    Points clustered: 1024
+2009-09-16 08:35:22,250  INFO DJCluster:202    Points clustered: 2048
+2009-09-16 08:35:22,274  INFO DJCluster:202    Points clustered: 4096
+2009-09-16 08:35:22,308  INFO DJCluster:202    Points clustered: 8192
+2009-09-16 08:35:22,339  INFO DJCluster:202    Points clustered: 16384
+2009-09-16 08:35:22,945  INFO DJCluster:202    Points clustered: 32768
+2009-09-16 08:35:23,112  INFO DJCluster:202    Points clustered: 65536
+2009-09-16 08:35:23,665  INFO DJCluster:202    Points clustered: 131072
+2009-09-16 08:35:24,298  INFO DJCluster:207    Points clustered: 261153 (Done)
+2009-09-16 08:35:24,298  INFO DJCluster:208 Sum should add up: 106112 (clustered) + 157544 (unclustered) = 261153
+2009-09-16 08:35:24,298  INFO DJCluster:219 Building the cluster list.
+2009-09-16 08:35:27,761  INFO DJCluster:244 Cluster list built.
+2009-09-16 08:35:28,141  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     1
+2009-09-16 08:35:31,873  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     2
+2009-09-16 08:35:40,972  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     4
+2009-09-16 08:35:44,531  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     8
+2009-09-16 08:35:54,564  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    16
+2009-09-16 08:36:26,818  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    32
+2009-09-16 08:37:45,742  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    64
+2009-09-16 08:39:06,449  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:   128
+2009-09-16 08:41:07,416  INFO CommercialActivityAnalyser:246 Processing vehicle chains. Files processed:   200 (Done)
+2009-09-16 08:41:07,416  INFO CommercialActivityAnalyser:248 Chain extraction complete.
+2009-09-16 08:41:07,418  INFO CommercialActivityAnalyser:95 ================================================
+2009-09-16 08:41:07,418  INFO CommercialActivityAnalyser:96 Extracting vehicle chains for sample 1.
+2009-09-16 08:41:07,418  INFO CommercialActivityAnalyser:97 Minor/major threshold value: 628.8
+2009-09-16 08:41:07,418  INFO CommercialActivityAnalyser:98 ================================================
+2009-09-16 08:41:07,419  INFO MyFileSampler:102 Sampling 200 files from /Users/johanwjoubert/MATSim/workspace/MATSimData/DigiCore/SortedVehicles
+2009-09-16 08:41:07,650  INFO MyFileSampler:128 File sampling complete.
+2009-09-16 08:41:07,651  INFO CommercialActivityExtractor:86 A CommercialActivityExtractor has been created
+2009-09-16 08:41:15,070  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     1 [0.43%]
+2009-09-16 08:41:16,078  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     2 [0.52%]
+2009-09-16 08:41:17,749  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     4 [0.53%]
+2009-09-16 08:41:21,416  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     8 [0.59%]
+2009-09-16 08:41:29,214  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    16 [0.57%]
+2009-09-16 08:41:42,154  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    32 [1.03%]
+2009-09-16 08:42:10,477  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    64 [0.83%]
+2009-09-16 08:43:09,000  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:   128 [0.73%]
+2009-09-16 08:44:34,954  INFO CommercialActivityAnalyser:152 Building activity list. Files processed:   200 [0.71%] (Done)
+2009-09-16 08:44:35,011  INFO DJCluster:93 Clustering input points. This may take a while.
+2009-09-16 08:44:35,803  INFO DJCluster:202    Points clustered: 1
+2009-09-16 08:44:35,804  INFO DJCluster:202    Points clustered: 2
+2009-09-16 08:44:35,804  INFO DJCluster:202    Points clustered: 4
+2009-09-16 08:44:35,804  INFO DJCluster:202    Points clustered: 8
+2009-09-16 08:44:35,804  INFO DJCluster:202    Points clustered: 16
+2009-09-16 08:44:35,804  INFO DJCluster:202    Points clustered: 32
+2009-09-16 08:44:35,805  INFO DJCluster:202    Points clustered: 64
+2009-09-16 08:44:35,805  INFO DJCluster:202    Points clustered: 128
+2009-09-16 08:44:35,807  INFO DJCluster:202    Points clustered: 256
+2009-09-16 08:44:35,808  INFO DJCluster:202    Points clustered: 512
+2009-09-16 08:44:35,811  INFO DJCluster:202    Points clustered: 1024
+2009-09-16 08:44:35,816  INFO DJCluster:202    Points clustered: 2048
+2009-09-16 08:44:35,826  INFO DJCluster:202    Points clustered: 4096
+2009-09-16 08:44:35,845  INFO DJCluster:202    Points clustered: 8192
+2009-09-16 08:44:35,881  INFO DJCluster:202    Points clustered: 16384
+2009-09-16 08:44:35,954  INFO DJCluster:202    Points clustered: 32768
+2009-09-16 08:44:36,094  INFO DJCluster:202    Points clustered: 65536
+2009-09-16 08:44:36,369  INFO DJCluster:202    Points clustered: 131072
+2009-09-16 08:44:36,927  INFO DJCluster:202    Points clustered: 262144
+2009-09-16 08:44:36,947  INFO DJCluster:207    Points clustered: 266214 (Done)
+2009-09-16 08:44:36,947  INFO DJCluster:208 Sum should add up: 106515 (clustered) + 161860 (unclustered) = 266214
+2009-09-16 08:44:36,947  INFO DJCluster:219 Building the cluster list.
+2009-09-16 08:44:41,976  INFO DJCluster:244 Cluster list built.
+2009-09-16 08:44:44,557  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     1
+2009-09-16 08:44:46,277  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     2
+2009-09-16 08:44:48,935  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     4
+2009-09-16 08:45:00,929  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     8
+2009-09-16 08:45:16,858  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    16
+2009-09-16 08:45:44,741  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    32
+2009-09-16 08:46:23,779  WARN CommercialChainExtractor:175 Could not thin the list. There is only one element in the list.
+2009-09-16 08:46:30,966  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    64
+2009-09-16 08:46:44,737  WARN CommercialChainExtractor:175 Could not thin the list. There is only one element in the list.
+2009-09-16 08:48:06,164  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:   128
+2009-09-16 08:48:06,195  WARN CommercialChainExtractor:175 Could not thin the list. There is only one element in the list.
+2009-09-16 08:50:12,307  INFO CommercialActivityAnalyser:246 Processing vehicle chains. Files processed:   200 (Done)
+2009-09-16 08:50:12,307  INFO CommercialActivityAnalyser:248 Chain extraction complete.
+2009-09-16 08:50:12,309  INFO CommercialActivityAnalyser:95 ================================================
+2009-09-16 08:50:12,309  INFO CommercialActivityAnalyser:96 Extracting vehicle chains for sample 1.
+2009-09-16 08:50:12,309  INFO CommercialActivityAnalyser:97 Minor/major threshold value: 931.5
+2009-09-16 08:50:12,309  INFO CommercialActivityAnalyser:98 ================================================
+2009-09-16 08:50:12,310  INFO MyFileSampler:102 Sampling 200 files from /Users/johanwjoubert/MATSim/workspace/MATSimData/DigiCore/SortedVehicles
+2009-09-16 08:50:12,573  INFO MyFileSampler:128 File sampling complete.
+2009-09-16 08:50:12,574  INFO CommercialActivityExtractor:86 A CommercialActivityExtractor has been created
+2009-09-16 08:50:15,562  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     1 [0.67%]
+2009-09-16 08:50:16,116  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     2 [0.66%]
+2009-09-16 08:50:16,905  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     4 [0.63%]
+2009-09-16 08:50:23,288  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     8 [0.74%]
+2009-09-16 08:50:34,399  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    16 [0.84%]
+2009-09-16 08:50:55,156  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    32 [0.82%]
+2009-09-16 08:51:27,493  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    64 [0.75%]
+2009-09-16 08:52:31,803  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:   128 [0.69%]
+2009-09-16 08:53:49,469  INFO CommercialActivityAnalyser:152 Building activity list. Files processed:   200 [0.70%] (Done)
+2009-09-16 08:53:49,547  INFO DJCluster:93 Clustering input points. This may take a while.
+2009-09-16 08:53:50,062  INFO DJCluster:202    Points clustered: 1
+2009-09-16 08:53:50,062  INFO DJCluster:202    Points clustered: 2
+2009-09-16 08:53:50,062  INFO DJCluster:202    Points clustered: 4
+2009-09-16 08:53:50,063  INFO DJCluster:202    Points clustered: 8
+2009-09-16 08:53:50,063  INFO DJCluster:202    Points clustered: 16
+2009-09-16 08:53:50,063  INFO DJCluster:202    Points clustered: 32
+2009-09-16 08:53:50,064  INFO DJCluster:202    Points clustered: 64
+2009-09-16 08:53:50,065  INFO DJCluster:202    Points clustered: 128
+2009-09-16 08:53:50,066  INFO DJCluster:202    Points clustered: 256
+2009-09-16 08:53:50,067  INFO DJCluster:202    Points clustered: 512
+2009-09-16 08:53:50,068  INFO DJCluster:202    Points clustered: 1024
+2009-09-16 08:53:50,071  INFO DJCluster:202    Points clustered: 2048
+2009-09-16 08:53:50,078  INFO DJCluster:202    Points clustered: 4096
+2009-09-16 08:53:50,102  INFO DJCluster:202    Points clustered: 8192
+2009-09-16 08:53:50,142  INFO DJCluster:202    Points clustered: 16384
+2009-09-16 08:53:50,224  INFO DJCluster:202    Points clustered: 32768
+2009-09-16 08:53:50,855  INFO DJCluster:202    Points clustered: 65536
+2009-09-16 08:53:51,149  INFO DJCluster:202    Points clustered: 131072
+2009-09-16 08:53:51,771  INFO DJCluster:202    Points clustered: 262144
+2009-09-16 08:53:51,810  INFO DJCluster:207    Points clustered: 269837 (Done)
+2009-09-16 08:53:51,810  INFO DJCluster:208 Sum should add up: 98993 (clustered) + 173357 (unclustered) = 269837
+2009-09-16 08:53:51,810  INFO DJCluster:219 Building the cluster list.
+2009-09-16 08:53:55,211  INFO DJCluster:244 Cluster list built.
+2009-09-16 08:53:58,584  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     1
+2009-09-16 08:54:04,164  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     2
+2009-09-16 08:54:04,615  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     4
+2009-09-16 08:54:07,957  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     8
+2009-09-16 08:54:27,885  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    16
+2009-09-16 08:55:12,168  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    32
+2009-09-16 08:56:08,058  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    64
+2009-09-16 08:56:27,219  WARN CommercialChainExtractor:175 Could not thin the list. There is only one element in the list.
+2009-09-16 08:56:27,338  WARN CommercialChainExtractor:175 Could not thin the list. There is only one element in the list.
+2009-09-16 08:57:15,276  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:   128
+2009-09-16 08:59:04,664  INFO CommercialActivityAnalyser:246 Processing vehicle chains. Files processed:   200 (Done)
+2009-09-16 08:59:04,664  INFO CommercialActivityAnalyser:248 Chain extraction complete.
+2009-09-16 08:59:04,719  INFO CommercialActivityAnalyser:95 ================================================
+2009-09-16 08:59:04,719  INFO CommercialActivityAnalyser:96 Extracting vehicle chains for sample 1.
+2009-09-16 08:59:04,719  INFO CommercialActivityAnalyser:97 Minor/major threshold value: 2062.5
+2009-09-16 08:59:04,719  INFO CommercialActivityAnalyser:98 ================================================
+2009-09-16 08:59:04,719  INFO MyFileSampler:102 Sampling 200 files from /Users/johanwjoubert/MATSim/workspace/MATSimData/DigiCore/SortedVehicles
+2009-09-16 08:59:04,945  INFO MyFileSampler:128 File sampling complete.
+2009-09-16 08:59:04,946  INFO CommercialActivityExtractor:86 A CommercialActivityExtractor has been created
+2009-09-16 08:59:05,307  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     1 [0.93%]
+2009-09-16 08:59:06,765  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     2 [0.31%]
+2009-09-16 08:59:10,231  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     4 [0.59%]
+2009-09-16 08:59:16,857  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:     8 [0.42%]
+2009-09-16 08:59:22,550  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    16 [1.13%]
+2009-09-16 08:59:36,955  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    32 [0.84%]
+2009-09-16 09:00:12,656  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:    64 [0.68%]
+2009-09-16 09:01:07,993  INFO CommercialActivityAnalyser:147 Building activity list. Files processed:   128 [0.73%]
+2009-09-16 09:02:47,963  INFO CommercialActivityAnalyser:152 Building activity list. Files processed:   200 [0.68%] (Done)
+2009-09-16 09:02:48,022  INFO DJCluster:93 Clustering input points. This may take a while.
+2009-09-16 09:02:48,745  INFO DJCluster:202    Points clustered: 1
+2009-09-16 09:02:48,746  INFO DJCluster:202    Points clustered: 2
+2009-09-16 09:02:48,746  INFO DJCluster:202    Points clustered: 4
+2009-09-16 09:02:48,746  INFO DJCluster:202    Points clustered: 8
+2009-09-16 09:02:48,747  INFO DJCluster:202    Points clustered: 16
+2009-09-16 09:02:48,747  INFO DJCluster:202    Points clustered: 32
+2009-09-16 09:02:48,747  INFO DJCluster:202    Points clustered: 64
+2009-09-16 09:02:48,748  INFO DJCluster:202    Points clustered: 128
+2009-09-16 09:02:48,748  INFO DJCluster:202    Points clustered: 256
+2009-09-16 09:02:48,750  INFO DJCluster:202    Points clustered: 512
+2009-09-16 09:02:48,753  INFO DJCluster:202    Points clustered: 1024
+2009-09-16 09:02:48,757  INFO DJCluster:202    Points clustered: 2048
+2009-09-16 09:02:48,765  INFO DJCluster:202    Points clustered: 4096
+2009-09-16 09:02:48,785  INFO DJCluster:202    Points clustered: 8192
+2009-09-16 09:02:48,815  INFO DJCluster:202    Points clustered: 16384
+2009-09-16 09:02:48,897  INFO DJCluster:202    Points clustered: 32768
+2009-09-16 09:02:49,068  INFO DJCluster:202    Points clustered: 65536
+2009-09-16 09:02:49,375  INFO DJCluster:202    Points clustered: 131072
+2009-09-16 09:02:50,001  INFO DJCluster:202    Points clustered: 262144
+2009-09-16 09:02:50,071  INFO DJCluster:207    Points clustered: 276758 (Done)
+2009-09-16 09:02:50,071  INFO DJCluster:208 Sum should add up: 117730 (clustered) + 161358 (unclustered) = 276758
+2009-09-16 09:02:50,071  INFO DJCluster:219 Building the cluster list.
+2009-09-16 09:02:56,368  INFO DJCluster:244 Cluster list built.
+2009-09-16 09:02:56,549  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     1
+2009-09-16 09:03:00,428  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     2
+2009-09-16 09:03:03,159  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     4
+2009-09-16 09:03:08,242  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:     8
+2009-09-16 09:03:22,715  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    16
+2009-09-16 09:03:48,760  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    32
+2009-09-16 09:04:46,127  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:    64
+2009-09-16 09:04:53,771  WARN CommercialChainExtractor:175 Could not thin the list. There is only one element in the list.
+2009-09-16 09:06:13,003  INFO CommercialActivityAnalyser:242 Processing vehicle chains. Files processed:   128
+2009-09-16 09:08:14,029  INFO CommercialActivityAnalyser:246 Processing vehicle chains. Files processed:   200 (Done)
+2009-09-16 09:08:14,029  INFO CommercialActivityAnalyser:248 Chain extraction complete.
+2009-09-16 09:08:14,030  INFO RunCommercialActivityAnalyser:79 =======================================================
+2009-09-16 09:08:14,031  INFO RunCommercialActivityAnalyser:80                   PROCESS COMPLETED                    
+2009-09-16 09:08:14,031  INFO RunCommercialActivityAnalyser:81 =======================================================

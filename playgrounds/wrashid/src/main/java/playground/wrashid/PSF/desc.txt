@@ -1,0 +1,33 @@
+Change name of framework to TESF (Transportation Energy Simulation Framework) or 
+MESF (Mobility Energy Simulation Framework).
+
+
+
+next:
+- add general charging cases also...
+
+
+
+===========
+- TO START PSS:
+1.) make results folder empty (a:\data\results
+2.) copy initial prices to: a:\data\PSS\output\hubPriceInfo.txt (for input of MATSim) 
+and a:\data\PSS\input\initialNodePriceInfo.txt (for input to PSS).
+
+
+Notes:
+======
+- the price info file in an iteration folder are the input of MATSim and the
+vehicle energy consumptions are the output of MATSim.
+- in matlab set the file->path to the right folder, where the IVT_main_base etc. are in. and remove paths, from
+other runs.
+- use matlab 2008(b)
+
+
+
+
+
+a:\scenario_uncongested\Multi_Manager_Network - > "data energy hub network.txt".
+hub.trafo.maxinput.hub1 = 3; => d.h 2MW * 3 = 6MW
+=> make this value higher, if need more power production.
+

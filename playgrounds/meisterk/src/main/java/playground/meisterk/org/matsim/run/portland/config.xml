@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+	[
+		<!ENTITY PROJBASE     ".">
+		<!ENTITY RUNSBASE     "runs">
+		<!ENTITY OUTPUTBASE   "output">
+		<!ENTITY INPUTBASE    "input">
+		<!ENTITY ANALYSISBASE "analysis">
+		<!ENTITY LOCALDTDBASE "dtd">
+		<!ENTITY HOMEPAGEBASE "http://www.matsim.org">
+	]
+>
+<config xml:lang="de-CH">
+
+	<module name="config">
+		<param name="outputConfigFile" value="&OUTPUTBASE;/output_config.xml" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="&INPUTBASE;/facilities.xml.gz" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="network">
+		<param name="inputNetworkFile" value="&INPUTBASE;/network.xml" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="plans">
+		<param name="inputPlansFile" value="&INPUTBASE;/plans.xml.gz" />
+		<param name="outputPlansFile" value="&OUTPUTBASE;/plans.xml.gz" />
+	</module>
+
+<!-- ====================================================================== -->
+
+</config>

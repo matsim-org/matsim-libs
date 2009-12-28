@@ -1,0 +1,17 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<scores xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/scores_v0.1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
+  <score>
+    <iteration>0</iteration>
+    <averageExecuted>-4933.8</averageExecuted>
+    <averageWorst>-4933.8</averageWorst>
+    <averageAverage>-4933.8</averageAverage>
+    <averageBest>-4933.8</averageBest>
+  </score>
+  <score>
+    <iteration>1</iteration>
+    <averageExecuted>-4613.76</averageExecuted>
+    <averageWorst>-4803.9</averageWorst>
+    <averageAverage>-4708.83</averageAverage>
+    <averageBest>-4613.76</averageBest>
+  </score>
+</scores>

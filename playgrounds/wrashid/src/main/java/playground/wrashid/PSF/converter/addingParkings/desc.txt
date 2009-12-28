@@ -1,0 +1,17 @@
+- This converter should do the following:
+1.) add parkings at the same place, where the activity facility is.
+2.) add walk legs between the parking and the facility
+3.) the user needs to add parameters to the scoring function for parking:
+
+
+		<param name="activityType_2"            value="parkingDeparture" /> <!-- depart from parking -->
+		<param name="activityPriority_2"        value="1" />
+		<param name="activityTypicalDuration_2" value="00:01:00" />
+		<param name="activityMinimalDuration_2" value="00:01:00" />
+		
+		<param name="activityType_3"            value="parkingArrival" /> <!-- arrival in parking -->
+		<param name="activityPriority_3"        value="1" />
+		<param name="activityTypicalDuration_3" value="00:01:00" />
+		<param name="activityMinimalDuration_3" value="00:01:00" />
+		
+4.) we need also an automatic facility generator from plans, when there are no facilities at all. e.g. for berlin scenario.

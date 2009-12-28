@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd" 
+        [
+        		<!ENTITY HOMEBASE     "/home/meisterk">
+                <!ENTITY OUTPUTBASE   "output">
+                <!ENTITY CVSBASE      "sandbox00">
+                <!ENTITY SHOPSMODULE  "ivt/studies/switzerland/facilities/shopsOf2005">
+                <!ENTITY FACILITIESMODULE  "ivt/studies/switzerland/facilities">
+        ]
+>
+
+<!-- for ShopsOf2005ToFacilities.transformGeocodedKMLToFacilities() -->
+
+
+<config>
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/&SHOPSMODULE;/shopsOf2005_geocoded.kml" />
+		<param name="outputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/&SHOPSMODULE;/facilities_shopsOf2005.xml" />
+	</module>
+</config>
+
+
+<!-- for --> 
+<!-- ShopsOf2005ToFacilities.shopsToTXT() -->
+
+<!--
+<config>
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/&SHOPSMODULE;/facilities_shopsOf2005.xml" />
+		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/facilities_shopsOf2005.txt" />
+	</module>
+</config>
+-->
+
+<!-- for --> 
+<!-- ShopsOf2005ToFacilities.shopsToOpentimesKML() -->
+
+<!--<config>-->
+<!--	<module name="facilities">-->
+<!--		<param name="inputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/&SHOPSMODULE;/facilities_shopsOf2005.xml" />-->
+<!--		<param name="outputFacilitiesFile" value="&HOMEBASE;/&CVSBASE;/&SHOPSMODULE;/shopsOf2005.kml" />-->
+<!--	</module>-->
+<!--</config>-->
+
+<!-- for --> 
+<!-- ShopsOf2005ToFacilities.applyOpentimesToEnterpriseCensus() -->
+
+<!--<config>-->
+<!--	<module name="facilities">-->
+<!--		<param name="inputFacilitiesFile" value="/home/meisterk/sandbox00/ivt/studies/switzerland/facilities/facilities_KTIYear2.xml.gz" />-->
+<!--		<param name="outputFacilitiesFile" value="&OUTPUTBASE;/output_facilities_KTIYear2.xml.gz" />-->
+<!--	</module>-->
+<!--</config>-->
+

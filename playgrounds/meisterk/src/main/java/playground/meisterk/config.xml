@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+	[
+		<!ENTITY PROJBASE     ".">
+		<!ENTITY STUDYBASE    "input">
+		<!ENTITY RUNSBASE     "runs">
+		<!ENTITY OUTPUTBASE   "output">
+		<!ENTITY INPUTBASE    "input">
+		<!ENTITY ANALYSISBASE "analysis">
+		<!ENTITY LOCALDTDBASE "dtd">
+		<!ENTITY HOMEPAGEBASE "http://www.matsim.org">
+	]
+>
+<config xml:lang="de-CH">
+
+<!-- ====================================================================== -->
+
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="&STUDYBASE;/facilities.xml.gz" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="network">
+		<param name="inputNetworkFile" value="&STUDYBASE;/network.xml" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="plans">
+		<param name="inputPlansFile" value="&STUDYBASE;/plans.xml.gz" />
+		<param name="outputPlansFile" value="&OUTPUTBASE;/output_plans.xml.gz" />
+	</module>
+
+<!-- ====================================================================== -->
+
+</config>

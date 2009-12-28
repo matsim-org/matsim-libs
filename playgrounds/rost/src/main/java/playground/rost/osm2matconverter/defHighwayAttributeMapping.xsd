@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	
+	<xs:complexType name="atomicHighwayMapping">
+		<xs:sequence>
+			<xs:element name="value" type="xs:string"/>
+			<xs:element name="width" type="xs:decimal"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="HighwayMapping">
+	  <xs:sequence>
+	  	<xs:element name="MappingElement" type="atomicHighwayMapping" minOccurs="0" maxOccurs="unbounded"/>
+	  </xs:sequence>
+	</xs:complexType>
+	
+</xs:schema>
+
+
+
+
