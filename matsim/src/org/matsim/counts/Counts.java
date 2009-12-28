@@ -22,7 +22,7 @@ package org.matsim.counts;
 
 import java.util.TreeMap;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 
 public class Counts {
 

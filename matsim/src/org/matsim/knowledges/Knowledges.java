@@ -21,7 +21,7 @@ package org.matsim.knowledges;
 
 import java.util.Map;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 /**
  * This is just a refactoring of the current code within matsim.

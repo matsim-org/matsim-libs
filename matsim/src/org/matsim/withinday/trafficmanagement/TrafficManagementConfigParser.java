@@ -22,7 +22,7 @@ package org.matsim.withinday.trafficmanagement;
 import java.util.ArrayList;
 import java.util.Stack;
 
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;

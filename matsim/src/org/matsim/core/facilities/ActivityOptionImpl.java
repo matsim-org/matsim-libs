@@ -26,7 +26,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.matsim.api.basic.v01.BasicLocation;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 

@@ -23,7 +23,7 @@ package org.matsim.core.events.algorithms;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;

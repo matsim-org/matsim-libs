@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicIdentifiable.java
+ * Mode.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,10 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.api.basic.v01;
+/**
+ * 
+ */
+package org.matsim.api.core.v01;
 
-public interface Identifiable {
-
-	public Id getId();
-
+/**
+ * Enumeration of transport modes known to MATSim.
+ */
+public enum TransportMode {
+	miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, other, undefined
 }

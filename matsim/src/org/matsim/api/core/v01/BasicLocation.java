@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CoordI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.api.basic.v01;
+package org.matsim.api.core.v01;
+
+import java.io.Serializable;
+
 
 /**
- * In MATSim, generally Cartesian Coordinates are used, with x increasing
- * to the right, and y increasing to the top:
- * 
- *     ^
- *   y |
- *     |     x
- *   (0/0) ---->
+ * @author dgrether
  */
-public interface Coord {
+public interface BasicLocation extends Serializable {
 
-	public void setX(final double x); 
-
-	public void setY(final double y);
-
-	public void setXY(final double x, final double y);
-
-	public double getX();
-
-	public double getY();
-
+	public Coord getCoord();
+	
+//	public void setCoord( Coord coord ) ;
+	
 }

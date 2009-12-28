@@ -3,8 +3,8 @@ package org.matsim.api.core.v01.network;
 import java.io.Serializable;
 import java.util.Set;
 
-import org.matsim.api.basic.v01.Identifiable;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.world.Location;

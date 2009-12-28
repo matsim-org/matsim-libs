@@ -23,7 +23,7 @@ package org.matsim.core.network;
 import java.util.Arrays;
 import java.util.TreeMap;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 

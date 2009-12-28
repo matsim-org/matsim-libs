@@ -22,7 +22,7 @@ package org.matsim.planomat;
 
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.planomat.Planomat.StepThroughPlanAction;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;

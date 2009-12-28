@@ -20,8 +20,8 @@
 
 package org.matsim.world;
 
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -90,7 +90,7 @@ public class Zone extends AbstractLocation {
 	 * </p>
 	 *
 	 * @param coord
-	 * @see org.matsim.world.AbstractLocation#calcDistance(org.matsim.api.basic.v01.Coord)
+	 * @see org.matsim.world.AbstractLocation#calcDistance(org.matsim.api.core.v01.Coord)
 	 * @return distance to that zone
 	 */
 	@Override

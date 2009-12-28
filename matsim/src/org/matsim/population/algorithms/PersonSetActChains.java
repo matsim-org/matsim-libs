@@ -23,7 +23,7 @@ package org.matsim.population.algorithms;
 import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;

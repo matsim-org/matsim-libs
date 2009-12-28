@@ -20,7 +20,7 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.misc.StringUtils;

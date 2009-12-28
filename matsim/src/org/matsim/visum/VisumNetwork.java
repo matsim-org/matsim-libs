@@ -25,8 +25,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author mrieser

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.lanes.basic;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 
 
 /**
@@ -29,13 +29,13 @@ import org.matsim.api.basic.v01.Id;
  */
 public class BasicLaneDefinitionsFactoryImpl implements BasicLaneDefinitionsFactory {
 	/**
-	 * @see org.matsim.lanes.basic.BasicLaneDefinitionsFactory#createLanesToLinkAssignment(org.matsim.api.basic.v01.Id)
+	 * @see org.matsim.lanes.basic.BasicLaneDefinitionsFactory#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
 	 */
 	public BasicLanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference) {
 		return new BasicLanesToLinkAssignmentImpl(linkIdReference);
 	}
 	/**
-	 * @see org.matsim.lanes.basic.BasicLaneDefinitionsFactory#createLane(org.matsim.api.basic.v01.Id)
+	 * @see org.matsim.lanes.basic.BasicLaneDefinitionsFactory#createLane(org.matsim.api.core.v01.Id)
 	 */
 	public BasicLane createLane(Id id) {
 		return new BasicLaneImpl(id);

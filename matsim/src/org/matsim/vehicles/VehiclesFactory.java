@@ -1,6 +1,6 @@
 package org.matsim.vehicles;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.vehicles.BasicEngineInformation.FuelType;
 

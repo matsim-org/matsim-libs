@@ -23,8 +23,8 @@ package org.matsim.locationchoice.constrained;
 import java.util.List;
 import java.util.Vector;
 
-import org.matsim.api.basic.v01.Coord;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.ActivityImpl;
 
 public class SubChain {

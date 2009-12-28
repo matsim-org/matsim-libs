@@ -22,7 +22,7 @@ package org.matsim.vis.snapshots.writers;
 
 import java.awt.geom.Point2D;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;

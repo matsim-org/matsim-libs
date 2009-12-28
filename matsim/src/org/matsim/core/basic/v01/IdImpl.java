@@ -22,7 +22,7 @@ package org.matsim.core.basic.v01;
 
 import java.io.Serializable;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 
 
 public class IdImpl implements Id, Serializable {

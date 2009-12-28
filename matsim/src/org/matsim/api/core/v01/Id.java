@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Mode.java
+ * IdI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,14 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package org.matsim.api.basic.v01;
+package org.matsim.api.core.v01;
+
 
 /**
- * Enumeration of transport modes known to MATSim.
+ * Represents a unique identifier.  This is essentially a c++ typedef, except that
+ * typedefs don't exist in Java.
  */
-public enum TransportMode {
-	miv, car, ride, motorbike, pt, train, bus, tram, bike, walk, other, undefined
+public interface Id extends Comparable<Id> {
+
 }

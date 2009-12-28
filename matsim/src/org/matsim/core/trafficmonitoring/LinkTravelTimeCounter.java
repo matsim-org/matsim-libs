@@ -23,7 +23,7 @@ package org.matsim.core.trafficmonitoring;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;

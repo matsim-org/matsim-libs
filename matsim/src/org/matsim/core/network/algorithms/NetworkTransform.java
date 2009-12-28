@@ -22,7 +22,7 @@ package org.matsim.core.network.algorithms;
 
 import java.util.Iterator;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;

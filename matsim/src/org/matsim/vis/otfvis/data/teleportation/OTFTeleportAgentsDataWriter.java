@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 

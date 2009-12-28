@@ -20,7 +20,7 @@
 
 package org.matsim.core.trafficmonitoring;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 
 public class TravelTimeDataArrayFactory implements TravelTimeDataFactory {

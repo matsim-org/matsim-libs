@@ -23,7 +23,7 @@ package org.matsim.run;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;

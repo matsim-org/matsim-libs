@@ -20,7 +20,7 @@
 
 package org.matsim.vis.routervis;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 
 public class LinkAttribute {
 	private Id id;

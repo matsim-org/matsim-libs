@@ -20,7 +20,7 @@
 
 package org.matsim.core.network.algorithms;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;

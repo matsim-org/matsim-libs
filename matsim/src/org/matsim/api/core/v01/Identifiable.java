@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IdI.java
+ * BasicIdentifiable.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,13 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.api.basic.v01;
+package org.matsim.api.core.v01;
 
+public interface Identifiable {
 
-/**
- * Represents a unique identifier.  This is essentially a c++ typedef, except that
- * typedefs don't exist in Java.
- */
-public interface Id extends Comparable<Id> {
+	public Id getId();
 
 }

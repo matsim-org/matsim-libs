@@ -22,7 +22,7 @@ package org.matsim.api.core.v01.population;
 
 import java.util.List;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author nagel

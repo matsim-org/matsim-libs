@@ -2,7 +2,7 @@
  * The purpose of this package is to provide "external" programmers a stable way to access matsim.  The
  * idea is that matsim calls some external module as something like
  * 
- * ExternalModule extMod = new ExternalModule( BasicScenario sc ) ;
+ * ExternalModule extMod = new ExternalModule( Scenario sc ) ;
  * ...
  * extMod.run() ;
  * 
@@ -15,8 +15,8 @@
  * If the external module needs any functionality beyond the "basic" functionality, it needs to build its own objects, e.g.
  * 
  * class RouteNode {
- *     private BasicNode node ;
- *     public getBasicNodeInfo() { return node ;}
+ *     private Node node ;
+ *     public getNodeInfo() { return node ;}
  *     private double arrivalTimeArray ;
  *     ...
  * }
@@ -27,4 +27,4 @@
  * (Which assumes that, for the time being, no <em> implementations </em> of the interfaces exist except inside matsim.)
  * 
  */
-package org.matsim.api.basic.v01;
+package org.matsim.api.core.v01;

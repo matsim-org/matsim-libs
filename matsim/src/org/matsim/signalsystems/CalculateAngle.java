@@ -20,7 +20,7 @@ package org.matsim.signalsystems;
 
 import java.util.TreeMap;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordImpl;
 

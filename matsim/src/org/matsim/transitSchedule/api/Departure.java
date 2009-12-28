@@ -20,8 +20,8 @@
 
 package org.matsim.transitSchedule.api;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.Identifiable;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 
 /**
  * Describes a single departure along a route in a transit line.

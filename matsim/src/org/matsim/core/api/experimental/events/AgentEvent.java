@@ -20,8 +20,8 @@
 
 package org.matsim.core.api.experimental.events;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 
 public interface AgentEvent extends PersonEvent {
 

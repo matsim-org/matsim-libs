@@ -23,7 +23,7 @@ package org.matsim.population.algorithms;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PopulationImpl;
 

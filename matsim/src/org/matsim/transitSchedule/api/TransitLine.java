@@ -22,8 +22,8 @@ package org.matsim.transitSchedule.api;
 
 import java.util.Map;
 
-import org.matsim.api.basic.v01.Id;
-import org.matsim.api.basic.v01.Identifiable;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 
 /**
  * Description of a single transit line. Can have multiple routes (e.g. from A to B and from B to A).

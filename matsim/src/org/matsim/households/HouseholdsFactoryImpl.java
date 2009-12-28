@@ -21,7 +21,7 @@ package org.matsim.households;
 
 import java.util.ArrayList;
 
-import org.matsim.api.basic.v01.Id;
+import org.matsim.api.core.v01.Id;
 import org.matsim.households.Income.IncomePeriod;
 
 /**

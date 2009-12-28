@@ -22,7 +22,7 @@ package org.matsim.core.controler.corelisteners;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
-import org.matsim.api.basic.v01.TransportMode;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;

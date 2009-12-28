@@ -20,7 +20,7 @@
 
 package org.matsim.core.utils.geometry;
 
-import org.matsim.api.basic.v01.Coord;
+import org.matsim.api.core.v01.Coord;
 
 public abstract class CoordUtils {
 
