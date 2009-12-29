@@ -38,8 +38,8 @@
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
           <showWarnings>false</showWarnings>
           <showDeprecation>false</showDeprecation>
           <!-- configure initial and maximal memory for compiling -->
@@ -77,15 +77,9 @@
           <excludes>
             <exclude>**/*$*</exclude> <!-- exclude all inner classes -->
             <exclude>org/matsim/testcases/TestDepth.java</exclude>
-            <!-- <exclude>playground/mfeil/ControlerTest.java</exclude>    
-            <exclude>playground/yu/visum/test/NewPlansTest.java</exclude>
-            <exclude>playground/wrashid/test/**/*.java</exclude>-->
-            <exclude>playground/**/*.java</exclude>
             <exclude>org/matsim/**/*AllTests*.java</exclude>
-            <exclude>org/matsim/**/*SimpleTests.java</exclude>
+            <exclude>org/matsim/SimpleTests.java</exclude>
             <exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
-			      <exclude>org/matsim/core/mobsim/jdeqsim/util/TestHandlerDetailedEventChecker</exclude>
-            <exclude>org/matsim/core/mobsim/jdeqsim/TestDESStarter_Berlin.java</exclude>
           </excludes>
           <forkMode>once</forkMode>
           <!-- avoid out of memory errors: -->
@@ -148,8 +142,8 @@
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
               <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
           <showWarnings>false</showWarnings>
           <showDeprecation>false</showDeprecation>
           <!-- configure initial and maximal memory for compiling -->
@@ -183,8 +177,6 @@
                   <exclude>org/matsim/**/*AllTests*.java</exclude>
                   <exclude>org/matsim/**/*SimpleTests.java</exclude>
                   <exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
-                  <exclude>org/matsim/mobsim/jdeqsim/util/TestHandlerDetailedEventChecker</exclude>
-                  <exclude>org/matsim/core/mobsim/jdeqsim/TestDESStarter_Berlin.java</exclude>
           </excludes>
           <forkMode>once</forkMode>
           <!-- avoid out of memory errors: -->
@@ -223,7 +215,7 @@
 					<artifactId>maven-pmd-plugin</artifactId>
 					<version>2.4</version>
 					<configuration>
-						<targetJdk>1.5</targetJdk>
+						<targetJdk>1.6</targetJdk>
 					</configuration>
 				</plugin>
 				<plugin>
