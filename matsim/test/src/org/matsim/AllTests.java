@@ -77,9 +77,6 @@ public class AllTests {
 		// run applications and examples (=extensive integration tests)
 		suite.addTest(org.matsim.run.AllTests.suite());
 		suite.addTest(org.matsim.examples.AllTests.suite());
-
-		// run contrib tests
-		suite.addTest(org.matsim.contrib.AllTests.suite());
 		
 		//$JUnit-END$
 		return suite;
