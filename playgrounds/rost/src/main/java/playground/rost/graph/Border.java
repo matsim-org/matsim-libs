@@ -242,7 +242,7 @@ public class Border {
 		double s12 = Math.sqrt(Math.pow((node2.getCoord().getY() - node1.getCoord().getY()),2) + Math.pow((node2.getCoord().getX() - node1.getCoord().getX()),2));
 		double s23 = Math.sqrt(Math.pow((node2.getCoord().getY() - node3.getCoord().getY()),2) + Math.pow((node2.getCoord().getX() - node3.getCoord().getX()),2));
 		
-		//Heronsche Fl‰chenformel
+		//Heronsche Fl√§chenformel
 		double s = (s13+s12+s23)/2;
 		area = Math.sqrt(s*(s-s12)*(s-s13)*(s-s23));
 		return area;
