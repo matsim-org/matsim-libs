@@ -30,7 +30,7 @@ public class PrintStreamUDANET extends PrintStreamVisum9_3A {
 						new FileOutputStream(new File(fileName))));
 
 				out
-						.writeBytes("$VISION\n* Technische Universität Berlin\n* "
+						.writeBytes("$VISION\n* Technische Universitaet Berlin\n* "
 								+ new SimpleDateFormat("dd.MM.yy",
 										Locale.GERMANY).format(new Date())
 								+ "\n"
