@@ -24,7 +24,7 @@ public class Ping {
 		        int         len     = packet.getLength();
 		        data  = packet.getData();
 
-		        System.out.println( " Länge " + len +
+		        System.out.println( " LÃ¤nge " + len +
 		                            "\n" + new String( data, 0, len ) );
 		        
 		        int number=data[0];

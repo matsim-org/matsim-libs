@@ -2,7 +2,6 @@ package playground.wrashid.PHEV.parking.data;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.LinkedList;
 import java.util.StringTokenizer;
 
 public class StreetParking {
@@ -17,7 +16,7 @@ public class StreetParking {
 			
 			
 			FileReader fr = new FileReader(
-					"C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkh‰user\\facilities\\input\\streetParking2007_1.txt");
+					"C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkh√§user\\facilities\\input\\streetParking2007_1.txt");
 			BufferedReader br = new BufferedReader(fr);
 			String line = null;
 			StringTokenizer tokenizer = null;
@@ -45,7 +44,7 @@ public class StreetParking {
 			
 			Facility.finalizeFacilities();
 			//Facility.printFacilities();
-			Facility.writeToXml("C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkh‰user\\facilities\\output\\streetpark_facilities.xml"); 
+			Facility.writeToXml("C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkh√§user\\facilities\\output\\streetpark_facilities.xml"); 
 			
 
 		} catch (Exception ex) {

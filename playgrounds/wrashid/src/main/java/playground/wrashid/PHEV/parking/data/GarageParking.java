@@ -13,7 +13,7 @@ public class GarageParking {
 			// open coordinate and capacity file
 			
 			FileReader fr = new FileReader(
-					"C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkh‰user\\facilities\\input\\garagesZHCity.txt");
+					"C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkh√§user\\facilities\\input\\garagesZHCity.txt");
 			BufferedReader br = new BufferedReader(fr);
 			String line = null;
 			StringTokenizer tokenizer = null;
@@ -46,7 +46,7 @@ public class GarageParking {
 			
 			
 			// open opening times
-			fr = new FileReader("C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkh‰user\\facilities\\input\\opening_times_garageZH.txt");
+			fr = new FileReader("C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkh√§user\\facilities\\input\\opening_times_garageZH.txt");
 			br = new BufferedReader(fr);
 			line = br.readLine();
 			tokenizer = null;
@@ -71,7 +71,7 @@ public class GarageParking {
 			
 			
 			// write out data
-			Facility.writeToXml("C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkh‰user\\facilities\\output\\garage_facilities.xml"); 
+			Facility.writeToXml("C:\\data\\Projekte\\ETH TH-22 07-3 PHEV\\Parkh√§user\\facilities\\output\\garage_facilities.xml"); 
 			
 
 		} catch (Exception ex) {
