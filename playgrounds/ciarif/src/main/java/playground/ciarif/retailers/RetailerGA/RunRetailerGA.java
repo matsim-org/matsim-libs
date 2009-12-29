@@ -4,14 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-//import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.TreeMap;
-
-import org.matsim.api.core.v01.Id;
 
 import playground.ciarif.retailers.models.GravityModel;
-import playground.jjoubert.Utilities.DateString;
 
 
 public class RunRetailerGA
@@ -58,8 +53,7 @@ public class RunRetailerGA
     System.out.printf("\t               Incumbent fitness:  %6.2f\n", new Object[] { Double.valueOf(ga.getIncumbent().getFitness()) });
     System.out.printf("\tAverage time per generation (ms):  %6.2f\n", new Object[] { Double.valueOf(avgTime) });
 
-    DateString ds = new DateString();
-    
+    //DateString ds = new DateString();
     //String fileName = "C:/Documents and Settings/ciarif/My Documents/output/triangle/GA_results/GA-Progress-" + ds.toString() + ".txt";
     //String fileName = "/scr/baug/ciarif/output/zurich_10pc/GA_results/GA-Progress-" + ds.toString() + ".txt"; //change in a way that it 
     //is taken from the config file

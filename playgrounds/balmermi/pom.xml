@@ -9,4 +9,6 @@
   <artifactId>balmermi</artifactId>
   <name>balmermi</name>
   <version>0.1.0-SNAPSHOT</version>
+  <dependencies>
+  </dependencies>
 </project>

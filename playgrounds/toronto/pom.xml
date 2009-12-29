@@ -9,4 +9,11 @@
   <artifactId>toronto</artifactId>
   <name>toronto</name>
   <version>0.1.0-SNAPSHOT</version>
+  <dependencies>
+  	<dependency>
+  		<groupId>playground</groupId>
+  		<artifactId>yu</artifactId>
+  		<version>0.1.0-SNAPSHOT</version>
+  	</dependency>
+  </dependencies>
 </project>

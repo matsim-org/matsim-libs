@@ -26,12 +26,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -45,14 +43,6 @@ import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 import org.matsim.world.Zone;
 
 import playground.balmermi.census2000.data.Municipalities;
-import playground.balmermi.census2000v2.data.CAtts;
-import playground.ciarif.models.subtours.ModelModeChoice;
-import playground.ciarif.models.subtours.ModelModeChoiceEducation18Minus;
-import playground.ciarif.models.subtours.ModelModeChoiceEducation18Plus;
-import playground.ciarif.models.subtours.ModelModeChoiceLeisure18Plus;
-import playground.ciarif.models.subtours.ModelModeChoiceOther18Minus;
-import playground.ciarif.models.subtours.ModelModeChoiceShop18Plus;
-import playground.ciarif.models.subtours.ModelModeChoiceWork18Plus;
 
 public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -161,21 +151,21 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final ModelModeChoice createModel(int mainpurpose, Plan p) {
-		ModelModeChoice m = null;
-		if (((PersonImpl) p.getPerson()).getAge() >= 18) {
-			if (mainpurpose == 0) { m = new ModelModeChoiceWork18Plus(); }
-			else if (mainpurpose == 1) { m = new ModelModeChoiceEducation18Plus(); }
-			else if (mainpurpose == 2) { m = new ModelModeChoiceShop18Plus(); }
-			else if (mainpurpose == 3) { m = new ModelModeChoiceLeisure18Plus(); }
-			else { Gbl.errorMsg("This should never happen!"); }
-		}
-		else {
-			if (mainpurpose == 1) { m = new ModelModeChoiceEducation18Minus (); }
-			else { m = new ModelModeChoiceOther18Minus (); }
-		}
-		return m;
-	}
+//	private final ModelModeChoice createModel(int mainpurpose, Plan p) {
+//		ModelModeChoice m = null;
+//		if (((PersonImpl) p.getPerson()).getAge() >= 18) {
+//			if (mainpurpose == 0) { m = new ModelModeChoiceWork18Plus(); }
+//			else if (mainpurpose == 1) { m = new ModelModeChoiceEducation18Plus(); }
+//			else if (mainpurpose == 2) { m = new ModelModeChoiceShop18Plus(); }
+//			else if (mainpurpose == 3) { m = new ModelModeChoiceLeisure18Plus(); }
+//			else { Gbl.errorMsg("This should never happen!"); }
+//		}
+//		else {
+//			if (mainpurpose == 1) { m = new ModelModeChoiceEducation18Minus (); }
+//			else { m = new ModelModeChoiceOther18Minus (); }
+//		}
+//		return m;
+//	}
 	
 	//////////////////////////////////////////////////////////////////////
 
@@ -240,6 +230,11 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			
 			// CREATE the model
 			int mainpurpose = this.getMainPurpose(act_indices,p);
+			throw new RuntimeException("ModeChoiceModel deactivated, see Source Code.");
+			/* I (mrieser) had to disable the inclusion of the mode choice model in this place 
+			 * because of a circular dependency between the playgrounds of balmermi and ciarif. 
+			 */
+			/* ***** disable mode choice -- begin ****
 			ModelModeChoice model = this.createModel(mainpurpose,p);
 			
 			// SET variables
@@ -296,7 +291,6 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 			else if (modechoice == 3) { mode = TransportMode.bike; }
 			else if (modechoice == 4) { mode = TransportMode.walk; }
 			else { Gbl.errorMsg("pid="+person.getId()+": modechoice="+modechoice+" knot known!"); }
-
 			// SET the mode for the legs of the subtour
 			for (int j=0; j<leg_indices.size(); j++) {
 				LegImpl l = (LegImpl)p.getPlanElements().get(leg_indices.get(j));
@@ -343,6 +337,8 @@ public class PersonAssignModeChoiceModel extends AbstractPersonAlgorithm impleme
 				e.printStackTrace();
 				System.exit(-1);
 			}
+		 ********** disable mode choice model -- end *********** */
+
 		}
 	}
 	
