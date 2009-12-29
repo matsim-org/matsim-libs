@@ -27,87 +27,87 @@ public class NOGATypes {
 	
 	// Exact definition of Supermarket etc.
 	public String [] shopGrocery = {
-			"B015211A",		// 52.11A Verbraucherm‰rkte 	(> 2500 m2)
-			"B015211B", 	// 52.11B Grosse Superm‰rkte 	(1000-2499 m2)
-			"B015211C",		// 52.11C Kleine Superm‰rkte 	(400-999 m2)
-			"B015211D",		// 52.11D Grosse Gesch‰fte 		(100-399 m2)
-			"B015211E",		// 52.11E Kleine Gesch‰fte 		(< 100 m2)
-			"B015212A",     // 52.12A Warenh‰user
-			"B015221A",     // 52.21A Detailhandel mit Obst und Gem¸se
+			"B015211A",		// 52.11A Verbraucherm√§rkte 	(> 2500 m2)
+			"B015211B", 	// 52.11B Grosse Superm√§rkte 	(1000-2499 m2)
+			"B015211C",		// 52.11C Kleine Superm√§rkte 	(400-999 m2)
+			"B015211D",		// 52.11D Grosse Gesch√§fte 		(100-399 m2)
+			"B015211E",		// 52.11E Kleine Gesch√§fte 		(< 100 m2)
+			"B015212A",     // 52.12A Warenh√§user
+			"B015221A",     // 52.21A Detailhandel mit Obst und Gem√ºse
 			"B015222A",     // 52.22A Detailhandel mit Fleisch und Fleischwaren
-			"B015223A",     // 52.23A Detailhandel mit Fisch und Meeresfr¸chten
-			"B015224A",     // 52.24A Detailhandel mit Brot, Back- und S¸sswaren
-			"B015225A",     // 52.25A Detailhandel mit Getr‰nken
+			"B015223A",     // 52.23A Detailhandel mit Fisch und Meeresfr√ºchten
+			"B015224A",     // 52.24A Detailhandel mit Brot, Back- und S√ºsswaren
+			"B015225A",     // 52.25A Detailhandel mit Getr√§nken
 			"B015227A",     // 52.27A Detailhandel mit Milcherzeugnissen und Eiern
-			"B015227B",     // 52.27B Sonstiger Fachdetailhandel mit Nahrungsmitteln, Getr‰nken und Tabak a.n.g. (in Verkaufsr‰umen)
+			"B015227B",     // 52.27B Sonstiger Fachdetailhandel mit Nahrungsmitteln, Getr√§nken und Tabak a.n.g. (in Verkaufsr√§umen)
 	};
 	
 	public String [] shopNonGrocery = {
-		"B015211A",		// 52.11A Verbraucherm‰rkte 		(> 2500 m2)
-		"B015211B", 	// 52.11B Grosse Superm‰rkte 		(1000-2499 m2)
-		"B015211C",		// 52.11C Kleine Superm‰rkte 		(400-999 m2)
-		"B015211D",		// 52.11D Grosse Gesch‰fte 			(100-399 m2)
-		"B015211E",		// 52.11E Kleine Gesch‰fte 			(< 100 m2)
-		"B015212A",     // 52.12A Warenh‰user
+		"B015211A",		// 52.11A Verbraucherm√§rkte 		(> 2500 m2)
+		"B015211B", 	// 52.11B Grosse Superm√§rkte 		(1000-2499 m2)
+		"B015211C",		// 52.11C Kleine Superm√§rkte 		(400-999 m2)
+		"B015211D",		// 52.11D Grosse Gesch√§fte 			(100-399 m2)
+		"B015211E",		// 52.11E Kleine Gesch√§fte 			(< 100 m2)
+		"B015212A",     // 52.12A Warenh√§user
 		"B015212B",     // 52.12B Sonstiger Detailhandel mit Waren verschiedener Art, Hauptrichtung Nichtnahrungsmittel
-//		"B015221A",     // 52.21A Detailhandel mit Obst und Gem¸se
+//		"B015221A",     // 52.21A Detailhandel mit Obst und Gem√ºse
 //		"B015222A",     // 52.22A Detailhandel mit Fleisch und Fleischwaren
-//		"B015223A",     // 52.23A Detailhandel mit Fisch und Meeresfr¸chten
-//		"B015224A",     // 52.24A Detailhandel mit Brot, Back- und S¸sswaren
-//		"B015225A",     // 52.25A Detailhandel mit Getr‰nken
+//		"B015223A",     // 52.23A Detailhandel mit Fisch und Meeresfr√ºchten
+//		"B015224A",     // 52.24A Detailhandel mit Brot, Back- und S√ºsswaren
+//		"B015225A",     // 52.25A Detailhandel mit Getr√§nken
 		"B015226A",     // 52.26A Detailhandel mit Tabakwaren
 //		"B015227A",     // 52.27A Detailhandel mit Milcherzeugnissen und Eiern
-//		"B015227B",     // 52.27B Sonstiger Fachdetailhandel mit Nahrungsmitteln, Getr‰nken und Tabak a.n.g. (in Verkaufsr‰umen)
+//		"B015227B",     // 52.27B Sonstiger Fachdetailhandel mit Nahrungsmitteln, Getr√§nken und Tabak a.n.g. (in Verkaufsr√§umen)
 		"B015231A",     // 52.31A Fachdetailhandel mit pharmazeutischen Produkten
-		"B015232A",     // 52.32A Detailhandel mit medizinischen und orthop‰dischen Artikeln
+		"B015232A",     // 52.32A Detailhandel mit medizinischen und orthop√§dischen Artikeln
 		"B015233A",     // 52.33A Drogerien
-		"B015233B",     // 52.33B Parf¸merien und sonstiger Detailhandel mit kosmetischen Artikeln und Kˆrperpflegemitteln
+		"B015233B",     // 52.33B Parf√ºmerien und sonstiger Detailhandel mit kosmetischen Artikeln und K√∂rperpflegemitteln
 		"B015241A",     // 52.41A Detailhandel mit Textilien
 		"B015242A",     // 52.42A Detailhandel mit Damenbekleidung
 		"B015242B",     // 52.42B Detailhandel mit Herrenbekleidung
-		"B015242C",     // 52.42C Detailhandel mit S‰uglings- und Kinderbekleidung
+		"B015242C",     // 52.42C Detailhandel mit S√§uglings- und Kinderbekleidung
 		"B015242D",     // 52.42D Detailhandel mit Pelzwaren
-		"B015242E",     // 52.42E Detailhandel mit Bekleidungszubehˆr und Bekleidung ohne ausgepr‰gten Schwerpunkt
+		"B015242E",     // 52.42E Detailhandel mit Bekleidungszubeh√∂r und Bekleidung ohne ausgepr√§gten Schwerpunkt
 		"B015243A",     // 52.43A Detailhandel mit Schuhen
 		"B015243B",     // 52.43B Detailhandel mit Lederwaren und Reiseartikeln
-		"B015244A",     // 52.44A Detailhandel mit Mˆbeln
+		"B015244A",     // 52.44A Detailhandel mit M√∂beln
 		"B015244B",     // 52.44B Detailhandel mit Teppichen
-		"B015244C",     // 52.44C Detailhandel mit Beleuchtungs- und Haushaltsgegenst‰nden
-		"B015245A",     // 52.45A Detailhandel mit elektrischen Haushaltsger‰ten
-		"B015245B",     // 52.45B Detailhandel mit Radio- und Fernsehger‰ten
-		"B015245C",     // 52.45C Detailhandel mit Ton- und Bildtr‰gern
+		"B015244C",     // 52.44C Detailhandel mit Beleuchtungs- und Haushaltsgegenst√§nden
+		"B015245A",     // 52.45A Detailhandel mit elektrischen Haushaltsger√§ten
+		"B015245B",     // 52.45B Detailhandel mit Radio- und Fernsehger√§ten
+		"B015245C",     // 52.45C Detailhandel mit Ton- und Bildtr√§gern
 		"B015245D",     // 52.45D Detailhandel mit Musikinstrumenten
-		"B015245E",     // 52.45E Detailhandel mit elektrischen Haushalts-, Radio- und Fernsehger‰ten ohne ausgepr‰gten Schwerpunkt
+		"B015245E",     // 52.45E Detailhandel mit elektrischen Haushalts-, Radio- und Fernsehger√§ten ohne ausgepr√§gten Schwerpunkt
 		"B015246A",     // 52.46A Detailhandel mit Eisen- und Metallwaren
 		"B015246B",     // 52.46B Sonstiger Detailhandel mit Metallwaren, Anstrichmitteln, Glaswaren, Bau- und Heimwerkerbedarf
-		"B015247A",     // 52.47A Detailhandel mit B¸chern
+		"B015247A",     // 52.47A Detailhandel mit B√ºchern
 		"B015247B",     // 52.47B Detailhandel mit Zeitungen und Zeitschriften; Kioske
 		"B015247C",     // 52.47C Detailhandel mit Schreib- und Papeteriewaren
 		"B015248A",     // 52.48A Detailhandel mit Getreide, Futtermitteln und Landesprodukten
 		"B015248B",     // 52.48B Detailhandel mit Blumen und Pflanzen
 		"B015248C",     // 52.48C Detailhandel mit Haustieren und zoologischem Bedarf
 		"B015248D",     // 52.48D Detailhandel mit Brennstoffen und Heizmaterial
-		"B015248E",     // 52.48E Detailhandel mit Boden- und Wandbel‰gen (ohne Teppiche)
+		"B015248E",     // 52.48E Detailhandel mit Boden- und Wandbel√§gen (ohne Teppiche)
 		"B015248F",     // 52.48F Detailhandel mit Brillen und anderen Sehhilfen
 		"B015248G",     // 52.48G Detailhandel mit fotografischen Artikeln
 		"B015248H",     // 52.48H Detailhandel mit Uhren und Schmuck
-		"B015248I",     // 52.48I Detailhandel mit B¸romaschinen und -einrichtungen
+		"B015248I",     // 52.48I Detailhandel mit B√ºromaschinen und -einrichtungen
 		"B015248J",     // 52.48J Detailhandel mit Computern und Software
 		"B015248K",     // 52.48K Detailhandel mit Spielwaren
-		"B015248L",     // 52.48L Detailhandel mit Fahrr‰dern
+		"B015248L",     // 52.48L Detailhandel mit Fahrr√§dern
 		"B015248M",     // 52.48M Detailhandel mit Sportartikeln
 		"B015248N",     // 52.48N Detailhandel mit Geschenkartikeln und Souvenirs
 		"B015248O",     // 52.48O Kunsthandel
-		"B015248P",     // 52.48P Sonstiger Fachdetailhandel a.n.g. (in Verkaufsr‰umen)
-		"B015250A",     // 52.50A Detailhandel mit Antiquit‰ten
-		"B015250B",     // 52.50B Detailhandel mit Gebrauchtwaren a.n.g. (in Verkaufsr‰umen)
+		"B015248P",     // 52.48P Sonstiger Fachdetailhandel a.n.g. (in Verkaufsr√§umen)
+		"B015250A",     // 52.50A Detailhandel mit Antiquit√§ten
+		"B015250B",     // 52.50B Detailhandel mit Gebrauchtwaren a.n.g. (in Verkaufsr√§umen)
 //		"B015261A",     // 52.61A Versandhandel
-		"B015262A",     // 52.62A Detailhandel an Verkaufsst‰nden und auf M‰rkten
-		"B015263A",     // 52.63A Sonstiger Detailhandel (nicht in Verkaufsr‰umen)
+		"B015262A",     // 52.62A Detailhandel an Verkaufsst√§nden und auf M√§rkten
+		"B015263A",     // 52.63A Sonstiger Detailhandel (nicht in Verkaufsr√§umen)
 		"B015271A",     // 52.71A Reparatur von Schuhen und Lederwaren
-		"B015272A",     // 52.72A Reparatur von elektrischen Haushaltsger‰ten
+		"B015272A",     // 52.72A Reparatur von elektrischen Haushaltsger√§ten
 		"B015273A",     // 52.73A Reparatur von Uhren und Schmuck
-		"B015274A",     // 52.74A Reparatur von sonstigen Gebrauchsg¸tern
+		"B015274A",     // 52.74A Reparatur von sonstigen Gebrauchsg√ºtern
 	};
 	
 	public List<String> getGroceryTypes() {
