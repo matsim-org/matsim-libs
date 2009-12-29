@@ -7,10 +7,10 @@
   <groupId>org.matsim</groupId>
   <artifactId>matsim</artifactId>
   <name>MATSim</name>
-  <version>0.1</version>
+  <version>0.1.0-SNAPSHOT</version>
   <description></description>
   <url>matsim.org</url>
-  <inceptionYear>2006</inceptionYear>
+  <inceptionYear>2005</inceptionYear>
   <licenses>
     <license>
       <name>GNU General Public License</name>
@@ -55,8 +55,6 @@
           <includes>
             <include>org/matsim/**/*.java</include>
             <include>tutorial/**/*.java</include>
-             <include>playground/**/*.java</include> 
-            <include>de/schlichtherle/**/*.java</include>
           </includes>
 <!--          <excludes>-->
 <!--            <exclude></exclude>-->
@@ -132,6 +130,10 @@
       <id>org.codehaus.mojo</id>
       <url>http://repository.codehaus.org/org/codehaus/mojo/</url>
     </repository>
+    <repository>
+      <id>matsim</id>
+      <url>http://matsim.org/m2repo</url>
+    </repository>
   </repositories>
   
   <profiles>
@@ -178,8 +180,6 @@
                 <excludes>
                   <exclude>**/*$*</exclude> <!-- exclude all inner classes -->
                   <exclude>org/matsim/testcases/TestDepth.java</exclude>
-                  <exclude>playground/wrashid/test/**/*.java</exclude>-->
-                  <exclude>playground/**/*.java</exclude>
                   <exclude>org/matsim/**/*AllTests*.java</exclude>
                   <exclude>org/matsim/**/*SimpleTests.java</exclude>
                   <exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
@@ -236,95 +236,63 @@
 	</profile>
 
   </profiles>
-  
-  
+
   <dependencies>
-    <!--todo: take care about the library as it is not a registered
-    dependency shipped with the geotools maven version we use -->
     <dependency>
-      <groupId>geotoolsmysql</groupId>
-      <artifactId>geotoolsmysql</artifactId>
-      <version>3.0.10</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/geotools/mysql-connector-java-3.0.10.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>jama</groupId>
-      <artifactId>jama</artifactId>
-      <version>1.0.2</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/Jama-1.0.2.jar</systemPath>
+      <groupId>gov.nist.math.javanumerics</groupId>
+  		<artifactId>jama</artifactId>
+  		<version>1.0.2</version>
     </dependency>
     <dependency>
       <groupId>trove</groupId>
       <artifactId>trove</artifactId>
       <version>2.0.3</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/trove-2.0.3/lib/trove-2.0.3.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>org.jgap</groupId>
+      <groupId>jgap</groupId>
       <artifactId>jgap</artifactId>
       <version>3.4.1</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/jgap-3.4.1.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>jogl</groupId>
-      <artifactId>jogl</artifactId>
-      <version>1.1</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/jogl-1.1.1/jogl.jar</systemPath>
+			<artifactId>jogl</artifactId>
+			<version>1.1.1</version>
     </dependency>
     <dependency>
-      <groupId>gluegen</groupId>
-      <artifactId>jogl-gluegen</artifactId>
-      <version>1.1</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/jogl-1.1.1/gluegen-rt.jar</systemPath>
+      <groupId>jogl</groupId>
+			<artifactId>gluegen-rt</artifactId>
+			<version>1.1.1</version>
     </dependency>
     <dependency>
       <groupId>kml</groupId>
-      <artifactId>kml22jaxb21</artifactId>
-      <version>2.2</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/kml-2.2-jaxb-2.1.7.jar</systemPath>
+      <artifactId>kml</artifactId>
+      <version>2.2.0</version>
     </dependency>
     <dependency>
-      <groupId>prefuse</groupId>
-      <artifactId>prefuse</artifactId>
-      <version>2007.10.21</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/prefuse/prefuse.jar</systemPath>
+    	<groupId>org.prefuse</groupId>
+  		<artifactId>prefuse</artifactId>
+  		<version>2007.10.21</version>
     </dependency>
-    <!-- jaxb 2.1.7 system scope dependencies -->
+    <!-- jaxb 2.1.7 dependencies -->
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-activation-217</artifactId>
-      <version>2.1.7</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/jaxb-2.1.7/lib/activation.jar</systemPath>
+      <groupId>javax.xml.bind.jaxb</groupId>
+  		<artifactId>activation</artifactId>
+  		<version>2.1.7</version>
     </dependency>
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api-217</artifactId>
-      <version>2.1.7</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/jaxb-2.1.7/lib/jaxb-api.jar</systemPath>
+      <groupId>javax.xml.bind.jaxb</groupId>
+  		<artifactId>jaxb-api</artifactId>
+			<version>2.1.7</version>
     </dependency>
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-impl-217</artifactId>
-      <version>2.1.7</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/jaxb-2.1.7/lib/jaxb-impl.jar</systemPath>
+      <groupId>javax.xml.bind.jaxb</groupId>
+  		<artifactId>jaxb-impl</artifactId>
+			<version>2.1.7</version>
     </dependency>
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-xjc-217</artifactId>
-      <version>2.1.7</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/jaxb-2.1.7/lib/jaxb-xjc.jar</systemPath>
+			<groupId>javax.xml.bind.jaxb</groupId>
+			<artifactId>jaxb-xjc</artifactId>
+			<version>2.1.7</version>
     </dependency>
 <!--    <dependency>-->
 <!--      <groupId>javax.xml.bind</groupId>-->
@@ -334,20 +302,16 @@
 <!--      <systemPath>${basedir}/libs/jaxb-2.1.7/lib/jaxb1-impl.jar</systemPath>-->
 <!--    </dependency>-->
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-jsr173-217</artifactId>
-      <version>2.1.7</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/jaxb-2.1.7/lib/jsr173_1.0_api.jar</systemPath>
+      <groupId>javax.xml.bind.jaxb</groupId>
+  		<artifactId>jsr173</artifactId>
+			<version>2.1.7</version>
     </dependency>
     <dependency>
-      <groupId>unidata.ucar.edu</groupId>
-      <artifactId>netcdfAll-4.0.jar</artifactId>
-      <version>4.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/libs/netcdfAll-4.0.jar</systemPath>
+      <groupId>edu.ucar.unidata.netcdf-java</groupId>
+  		<artifactId>netcdfAll</artifactId>
+  		<version>4.0.0</version>
     </dependency>
-    <!--End of jaxb 2.1.7 system scope dependencies -->
+    <!--End of jaxb 2.1.7 dependencies -->
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-main</artifactId>
@@ -425,6 +389,7 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.2</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>jfree</groupId>
