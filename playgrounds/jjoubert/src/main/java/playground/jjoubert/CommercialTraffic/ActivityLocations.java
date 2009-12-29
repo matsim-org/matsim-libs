@@ -508,7 +508,7 @@ public class ActivityLocations {
 						} catch(NumberFormatException e2){
 							System.out.print("");
 						} catch(Exception e3){
-							// Points with coordinates outside the range (±90¼) are ignored.
+							// Points with coordinates outside the range (Â±90Âº) are ignored.
 							System.out.print("");						
 						}
 					}

@@ -176,7 +176,7 @@ public class CommercialActivityExtractor {
 						} catch(NumberFormatException e2){
 							e2.printStackTrace();
 						} catch(Exception e3){
-							// Points with coordinates outside the range (±90¼) are ignored.
+							// Points with coordinates outside the range (Â±90Âº) are ignored.
 //							e3.printStackTrace();						
 						}
 					} else{
