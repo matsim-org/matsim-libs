@@ -8,30 +8,20 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.evacuation.collections.gnuclasspath.TreeMap;
 import org.matsim.evacuation.flooding.FloodingInfo;
-import org.matsim.evacuation.flooding.FloodingReader;
 import org.matsim.evacuation.otfvis.readerwriter.InundationData;
 import org.matsim.evacuation.otfvis.readerwriter.InundationData.InundationGeometry;
 import org.matsim.evacuation.otfvis.readerwriter.InundationData.Polygon;
 import org.matsim.evacuation.otfvis.readerwriter.InundationData.Quad;
-import org.matsim.evacuation.otfvis.readerwriter.InundationData.Triangle;
 
 import playground.gregor.MY_STATIC_STUFF;
-import playground.gregor.flooding.ConvexMeshSimplifier;
 import playground.gregor.flooding.TriangularMeshSimplifier;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
 public class InundationDataFromNetcdfReaderII {
 
 

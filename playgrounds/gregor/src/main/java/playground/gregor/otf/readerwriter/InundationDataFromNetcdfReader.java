@@ -9,12 +9,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.evacuation.collections.gnuclasspath.TreeMap;
 import org.matsim.evacuation.flooding.FloodingInfo;
 import org.matsim.evacuation.flooding.FloodingReader;
 import org.matsim.evacuation.otfvis.readerwriter.InundationData;

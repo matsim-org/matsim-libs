@@ -23,6 +23,7 @@ package playground.gregor.snapshots.writers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.network.Link;
@@ -30,7 +31,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.evacuation.collections.gnuclasspath.TreeMap;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;

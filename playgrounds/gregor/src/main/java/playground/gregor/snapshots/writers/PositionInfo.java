@@ -20,12 +20,11 @@
 
 package playground.gregor.snapshots.writers;
 
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.evacuation.collections.gnuclasspath.TreeMap;
-
 
 import com.vividsolutions.jts.geom.LineSegment;
 
@@ -67,7 +66,6 @@ public class PositionInfo extends org.matsim.vis.snapshots.writers.PositionInfo 
 		this.agentId = agentId;
 		this.link = link;
 		final TreeMap<Double,LineSegment> lsMap = lsTree.getTreeMap(link.getId().toString());
-		
 		
 		final Entry<Double, LineSegment> e  = lsMap.floorEntry(distanceOnLink);
 		

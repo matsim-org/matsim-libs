@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -35,7 +36,6 @@ import org.geotools.feature.FeatureIterator;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -182,7 +182,7 @@ public class PolygonNodesGenerator {
 				
 				
 				
-				org.matsim.evacuation.collections.gnuclasspath.TreeMap<Double,LineString> sortedLsTree = new org.matsim.evacuation.collections.gnuclasspath.TreeMap<Double,LineString>(sortedLs);
+				TreeMap<Double,LineString> sortedLsTree = new TreeMap<Double,LineString>(sortedLs);
 				if (sortedLsTree.values().size() < 3) {
 					log.warn("intersection with only: " + sortedLsTree.values().size() + " LineString found, this should not happen!" );
 //					this.pg.createLineStringFeature(currLs, lsId, "");
@@ -261,15 +261,15 @@ public class PolygonNodesGenerator {
 		
 		return this.pg.getGeofac().createPolygon(this.pg.getGeofac().createLinearRing(coords), null);
 	}
-	private Polygon getControlPolygon(Point p, double angle1, org.matsim.evacuation.collections.gnuclasspath.TreeMap<Double, LineString> sortedLs) {
+	private Polygon getControlPolygon(Point p, double angle1, TreeMap<Double, LineString> sortedLs) {
 		
 		LineString ls1 = sortedLs.get(angle1);
-		Entry e = sortedLs.higherEntry(angle1);
+		Entry<Double, LineString> e = sortedLs.higherEntry(angle1);
 		if (e == null) {
 			e = sortedLs.firstEntry();
 		}
-		LineString ls2 = (LineString) e.getValue();
-		double angle2 = (Double) e.getKey();
+		LineString ls2 = e.getValue();
+		double angle2 = e.getKey();
 		double dA = angle2 - angle1;
 		dA = dA > 0  ? dA : 360 + dA;
 		

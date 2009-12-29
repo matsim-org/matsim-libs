@@ -2,6 +2,7 @@ package playground.gregor.sims.shelters.linkpenalty;
 
 import java.util.HashMap;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
@@ -15,7 +16,6 @@ import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.evacuation.base.Building;
-import org.matsim.evacuation.collections.gnuclasspath.TreeMap;
 import org.matsim.signalsystems.control.SignalSystemController;
 
 
