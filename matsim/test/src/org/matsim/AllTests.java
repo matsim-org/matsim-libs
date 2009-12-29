@@ -61,6 +61,7 @@ public class AllTests {
 		suite.addTest(org.matsim.planomat.AllTests.suite());
 		suite.addTest(org.matsim.population.AllTests.suite());
 		suite.addTest(org.matsim.pt.AllTests.suite());
+		suite.addTest(org.matsim.ptproject.AllTests.suite());
 		suite.addTest(org.matsim.roadpricing.AllTests.suite());
 		suite.addTest(org.matsim.signalsystems.AllTests.suite());
 		suite.addTest(org.matsim.transitSchedule.AllTests.suite());
