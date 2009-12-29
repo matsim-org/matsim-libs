@@ -19,7 +19,14 @@
  * *********************************************************************** */
 package playground.wisinee.IPF;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -133,9 +140,9 @@ import java.util.Properties;
 			System.out.println();
 			checkDataHeading(inFile1,inFile2,inFile3);	
 			System.out.println("From 'HOUSEHOLD/PERSON DATA' and 'SURVEY DATA'");
-			System.out.println("Using Column:"+zoneCol+"Å@to identify zone");
+			System.out.println("Using Column:"+zoneCol+" @to identify zone");
 			System.out.println();
-			System.out.println("Number of independent variablesÅ@(x):"+nx);
+			System.out.println("Number of independent variables @(x):"+nx);
 			for(int i=0;i<nx;i++){
 				System.out.println("x"+(i+1)+" from Column:"+xCol[i]);
 				System.out.println("Number of categories for x"+(i+1)+":"+ncx[i]);
