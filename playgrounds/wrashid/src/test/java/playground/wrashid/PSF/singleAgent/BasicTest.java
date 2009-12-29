@@ -22,7 +22,7 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 import playground.wrashid.PSF.parking.ParkLog;
 import playground.wrashid.PSF.parking.ParkingTimes;
 
-public class BasicTests extends MatsimTestCase {
+public class BasicTest extends MatsimTestCase {
 
 	Controler controler;
 	

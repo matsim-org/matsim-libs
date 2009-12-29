@@ -7,26 +7,26 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.jhackney.controler.SNController2;
 import playground.jhackney.controler.SNControllerListener2;
 
-public class SocialNetworksTest4 extends MatsimTestCase{
+//import playground.jhackney.controler.SNControllerListener2;
 
-	public final void test4EvolvingNetwork(){
+public class SocialNetworks1Test extends MatsimTestCase{
 
-		String config = getInputDirectory() + "config_triangle4.xml";
-
+	public final void test1EvolvingNetwork(){
+		String config = getInputDirectory() + "config_triangle1.xml";
 		String referenceEventsFile = getInputDirectory() + "5.events.txt.gz";
 		String referencePlansFile = getInputDirectory() + "output_plans.xml.gz";
 		String referenceSocNetFile = getInputDirectory() + "edge.txt";
-
+		
 		String eventsFile = getOutputDirectory() + "ITERS/it.5/5.events.txt.gz";
 		String plansFile = getOutputDirectory() + "output_plans.xml.gz";
 		String socNetFile = getOutputDirectory() + "socialnets/stats/edge.txt";
 
 		final Controler controler = new SNController2(new String[] {config});
-		controler.addControlerListener(new SNControllerListener2()); // had to comment this line out because SNControllerListener2 is in the playground, but this class is in core
+		controler.addControlerListener(new SNControllerListener2());
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);
 		controler.run();
-
+	
 		long checksum1 = 0;
 		long checksum2 = 0;
 
@@ -41,13 +41,14 @@ public class SocialNetworksTest4 extends MatsimTestCase{
 		checksum2 = CRCChecksum.getCRCFromFile(plansFile);
 		System.out.println(plansFile+" checksum = " + checksum2 + " should be: " + referencePlansFile + checksum1);
 		assertEquals("different plans files", checksum1, checksum2);
-
+		
 		System.out.println("checking social net edges file ...");
 		checksum1 = CRCChecksum.getCRCFromFile(referenceSocNetFile);
 		checksum2 = CRCChecksum.getCRCFromFile(socNetFile);
 		System.out.println(socNetFile+" checksum = " + checksum2 + " should be: " + referenceSocNetFile + checksum1);
-//		assertEquals("different socnet files", checksum1, checksum2);
-
+		assertEquals("different socnet files", checksum1, checksum2);
+		
 		System.out.println("\nTest Succeeded");
 	}
+
 }

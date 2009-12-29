@@ -2,7 +2,7 @@ package playground.wrashid.PSF.PSS;
 
 import junit.framework.TestCase;
 
-public class FirstPriceSignalMaintainingAlgorithmTests extends TestCase {
+public class FirstPriceSignalMaintainingAlgorithmTest extends TestCase {
 
 	public void testProcessPriceSignal(){
 		

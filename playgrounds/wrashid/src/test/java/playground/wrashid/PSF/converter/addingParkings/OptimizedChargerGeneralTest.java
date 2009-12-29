@@ -18,12 +18,12 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 /*
  * Just testing, that the scenario runs without errors.
  */
-public class GeneralTestOptimizedCharger extends MatsimTestCase implements
+public class OptimizedChargerGeneralTest extends MatsimTestCase implements
 		ParametersPSFMutator {
 
 	Controler controler;
 
-	public GeneralTestOptimizedCharger(Controler controler) {
+	public OptimizedChargerGeneralTest(Controler controler) {
 		this.controler = controler;
 	}
 

@@ -44,7 +44,7 @@ import playground.benjamin.income2.BKickIncome2Controler;
  * @author dgrether
  *
  */
-public class BKickRouterTestIATBR extends MatsimTestCase {
+public class BKickRouterIATBRTest extends MatsimTestCase {
 
 	/*package*/ final static Id id1 = new IdImpl("1");
 	/*package*/ final static Id id2 = new IdImpl("2");

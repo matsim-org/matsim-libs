@@ -7,11 +7,11 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.jhackney.controler.SNController2;
 import playground.jhackney.controler.SNControllerListener2;
 
-public class SocialNetworksTest2  extends MatsimTestCase{
+public class SocialNetworks3Test extends MatsimTestCase{
 
-	public final void test2EvolvingNetwork(){
+	public final void test3EvolvingNetwork(){
 
-		String config = getInputDirectory() + "config_triangle2.xml";
+		String config = getInputDirectory() + "config_triangle3.xml";
 
 		String referenceEventsFile = getInputDirectory() + "5.events.txt.gz";
 		String referencePlansFile = getInputDirectory() + "output_plans.xml.gz";
@@ -50,4 +50,5 @@ public class SocialNetworksTest2  extends MatsimTestCase{
 
 		System.out.println("\nTest Succeeded");
 	}
+
 }

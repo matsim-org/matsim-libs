@@ -7,16 +7,16 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.jhackney.controler.SNController2;
 import playground.jhackney.controler.SNControllerListener2;
 
-//import playground.jhackney.controler.SNControllerListener2;
+public class SocialNetworks2Test  extends MatsimTestCase{
 
-public class SocialNetworksTest1 extends MatsimTestCase{
+	public final void test2EvolvingNetwork(){
 
-	public final void test1EvolvingNetwork(){
-		String config = getInputDirectory() + "config_triangle1.xml";
+		String config = getInputDirectory() + "config_triangle2.xml";
+
 		String referenceEventsFile = getInputDirectory() + "5.events.txt.gz";
 		String referencePlansFile = getInputDirectory() + "output_plans.xml.gz";
 		String referenceSocNetFile = getInputDirectory() + "edge.txt";
-		
+
 		String eventsFile = getOutputDirectory() + "ITERS/it.5/5.events.txt.gz";
 		String plansFile = getOutputDirectory() + "output_plans.xml.gz";
 		String socNetFile = getOutputDirectory() + "socialnets/stats/edge.txt";
@@ -26,7 +26,7 @@ public class SocialNetworksTest1 extends MatsimTestCase{
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);
 		controler.run();
-	
+
 		long checksum1 = 0;
 		long checksum2 = 0;
 
@@ -41,14 +41,13 @@ public class SocialNetworksTest1 extends MatsimTestCase{
 		checksum2 = CRCChecksum.getCRCFromFile(plansFile);
 		System.out.println(plansFile+" checksum = " + checksum2 + " should be: " + referencePlansFile + checksum1);
 		assertEquals("different plans files", checksum1, checksum2);
-		
+
 		System.out.println("checking social net edges file ...");
 		checksum1 = CRCChecksum.getCRCFromFile(referenceSocNetFile);
 		checksum2 = CRCChecksum.getCRCFromFile(socNetFile);
 		System.out.println(socNetFile+" checksum = " + checksum2 + " should be: " + referenceSocNetFile + checksum1);
 		assertEquals("different socnet files", checksum1, checksum2);
-		
+
 		System.out.println("\nTest Succeeded");
 	}
-
 }

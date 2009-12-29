@@ -26,7 +26,7 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
  * @author rashid_waraich
  * 
  */
-public class AdvancedTests extends MatsimTestCase {
+public class AdvancedTest extends MatsimTestCase {
 
 	Controler controler;
 	SimulationStartupListener simulationStartupListener;

@@ -11,7 +11,7 @@ import playground.wrashid.PSF.energy.AfterSimulationListener;
 import playground.wrashid.PSF.energy.charging.ChargeLog;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
 
-public class ScoringTests extends MatsimTestCase {
+public class ScoringTest extends MatsimTestCase {
 	
 	// this test has unveiled a bug in the optimized charger, therefore it is added.
 	public void testScoring1() {
