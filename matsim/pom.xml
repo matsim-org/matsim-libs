@@ -20,10 +20,6 @@
   </licenses>
   <build>
   	<defaultGoal>compiler:compile</defaultGoal>
-    <sourceDirectory>src/</sourceDirectory>
-    <testSourceDirectory>test/src/</testSourceDirectory>
-    <outputDirectory>bin/</outputDirectory>
-    <testOutputDirectory>bin/</testOutputDirectory>
     
     <resources>
       <resource>
@@ -31,6 +27,7 @@
         <includes>
           <include>res/**/*.*</include>
           <include>dtd/**/*.*</include>
+          <include>src/main/resources/**/*.*</include>
         </includes>
       </resource>
     </resources>
