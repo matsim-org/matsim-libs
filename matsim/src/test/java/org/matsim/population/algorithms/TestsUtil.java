@@ -2,6 +2,7 @@ package org.matsim.population.algorithms;
 
 import java.util.List;
 
+import org.junit.Ignore;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -17,8 +18,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.world.Layer;
 import org.matsim.world.Location;
 
+@Ignore
 public class TestsUtil {
-	
 
 	static PlanImpl createPlan(Layer layer, PersonImpl person, TransportMode mode,
 			String facString, PlanomatConfigGroup planomatConfigGroup) {

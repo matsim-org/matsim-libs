@@ -24,10 +24,12 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+import org.junit.Ignore;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
+@Ignore
 public class MatsimTestCase extends TestCase {
 
 	/** A constant for the exactness when comparing doubles. */
