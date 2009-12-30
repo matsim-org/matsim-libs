@@ -27,8 +27,10 @@
         <includes>
           <include>res/**/*.*</include>
           <include>dtd/**/*.*</include>
-          <include>src/main/resources/**/*.*</include>
         </includes>
+      </resource>
+      <resource>
+      	<directory>src/main/resources</directory>
       </resource>
     </resources>
     <plugins>
