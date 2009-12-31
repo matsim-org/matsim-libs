@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="1" x="5000" y="5000" />
+		<stopFacility id="2" x="11000" y="16000" />
+		<stopFacility id="3" x="15000" y="20000" />
+		<stopFacility id="3a" x="15000" y="20000" />
+		<stopFacility id="4" x="21000" y="21000" />
+		<stopFacility id="5" x="26000" y="25000" />
+		<stopFacility id="6" x="28000" y="25000" />
+		<stopFacility id="7" x="32000" y="23000" />
+		<stopFacility id="8" x="40000" y="20000" />
+		<stopFacility id="8a" x="40000" y="20000" />
+		<stopFacility id="9" x="44000" y="24000" />
+		<stopFacility id="10" x="10000" y="25000" />
+		<stopFacility id="11" x="42500" y="17500" />
+		<stopFacility id="12" x="29000" y="30000" />
+		<stopFacility id="13" x="23000" y="10000" />
+	</transitStops>
+
+	<transitLine id="S7">
+		<transitRoute id="1">
+			<description>Potsdam --> Ahrensfelde</description>
+			<transportMode>car</transportMode>
+
+			<routeProfile>
+				<!-- arrival is optional, departure required for all but last, time infos are just offsets -->
+				<stop refId="1" departureOffset="00:00:00" />
+				<stop refId="2" arrivalOffset="00:03:00" departureOffset="00:03:30" />
+				<stop refId="3" departureOffset="00:06:00" />
+				<stop refId="4" departureOffset="00:09:00" />
+				<stop refId="5" departureOffset="00:12:20" />
+				<stop refId="6" departureOffset="00:15:00" />
+				<stop refId="7" departureOffset="00:18:40" />
+				<stop refId="8" departureOffset="00:22:00" />
+				<stop refId="9" arrivalOffset="00:24:00" />
+			</routeProfile>
+
+			<route>
+				<link refId="1" />
+				<link refId="2" />
+				<link refId="3" />
+				<link refId="4" />
+				<link refId="5" />
+				<link refId="6" />
+				<link refId="7" />
+				<link refId="8" />
+				<link refId="9" />
+			</route>
+
+			<departures>
+				<departure id="T1.1" departureTime="07:00:00" />
+				<departure id="T1.2" departureTime="07:10:00" />
+				<departure id="T1.3" departureTime="07:20:00" />
+				<departure id="T1.4" departureTime="07:30:00" />
+				<departure id="T1.5" departureTime="07:40:00" />
+				<departure id="T1.6" departureTime="07:50:00" />
+				<departure id="T1.7" departureTime="08:00:00" />
+				<departure id="T1.8" departureTime="08:10:00" />
+				<departure id="T1.9" departureTime="08:20:00" />
+			</departures>
+		</transitRoute>
+	</transitLine>
+	
+	<transitLine id="Sx">
+		<transitRoute id="1">
+			<transportMode>car</transportMode>
+			<routeProfile>
+				<stop refId="12" departureOffset="00:00:00" />
+				<stop refId="3a" departureOffset="00:03:00" />
+				<stop refId="13" departureOffset="00:05:10" />
+				<stop refId="8" departureOffset="00:07:30" />
+				<stop refId="12" arrivalOffset="00:09:30" />
+			</routeProfile>
+			<route>
+				<link refId="-13" />
+				<link refId="-12" />
+				<link refId="19" />
+				<link refId="-18" />
+				<link refId="-17" />
+				<link refId="-16" />
+				<link refId="-15" />
+				<link refId="-14" />
+				<link refId="-13" />
+			</route>
+			<departures>
+				<departure id="T2.1" departureTime="07:05:00" />
+				<departure id="T2.2" departureTime="07:15:00" />
+				<departure id="T2.3" departureTime="07:25:00" />
+				<departure id="T2.4" departureTime="07:35:00" />
+				<departure id="T2.5" departureTime="07:45:00" />
+				<departure id="T2.6" departureTime="07:55:00" />
+				<departure id="T2.7" departureTime="08:05:00" />
+				<departure id="T2.8" departureTime="08:15:00" />
+				<departure id="T2.9" departureTime="08:25:00" />
+			</departures>
+		</transitRoute>
+	</transitLine>
+
+</transitSchedule>

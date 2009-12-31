@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plans SYSTEM "http://www.matsim.org/files/dtd/plans_v4.dtd">
+<plans>
+
+<person id="1">
+	<plan>
+		<act type="h" link="2" end_time="06:55:00" />
+		<leg mode="car">
+			<route>3 4 5 6 7</route>
+		</leg>
+		<act type="w" link="7" dur="09:02:22" />
+	</plan>
+</person>
+
+<person id="2">
+	<plan>
+		<act type="h" link="2" end_time="06:53:00" />
+		<leg mode="car">
+			<route trav_time="00:03:00">3</route>
+		</leg>
+		<act type="transitInteraction" end_time="00:00:00" link="3" />
+ 		<leg mode="pt">
+			<route trav_time="01:00:00">PT1===stop2===T1===1===stop5</route>
+		</leg>
+		<act type="transitInteraction" end_time="00:00:00" link="6" />
+		<leg mode="car">
+			<route trav_time="00:04:00" >7</route>
+		</leg>
+		<act type="w" link="7" />
+	</plan>
+</person>
+
+</plans>

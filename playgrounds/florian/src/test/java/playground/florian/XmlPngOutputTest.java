@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
@@ -32,7 +33,9 @@ public class XmlPngOutputTest extends MatsimTestCase {
 		String outputFile = getOutputDirectory() + "scores.xml";
 		
 		//put up the controler and add the ScoreStatsOutputListener
-		Controler con = new Controler(configFile);
+		Config config = super.loadConfig(configFile);
+		Controler con = new Controler(config);
+		con.setCreateGraphs(false);
 		ScoreStatsOutput scoreOut = new ScoreStatsOutput(outputFile, true);
 		con.addControlerListener(scoreOut);
 		con.run();

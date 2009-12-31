@@ -34,8 +34,8 @@ public class EquilIterTest extends MatsimTestCase {
 		
 		MMoyoEquilnetDemo.main(new String[]{"NoOTFDemo"});
 		
-		BufferedReader expected = new BufferedReader(new FileReader(new File(expectedFile)));
-		BufferedReader output = new BufferedReader(new FileReader(new File(outputFile)));
+		BufferedReader expected = IOUtils.getBufferedReader(expectedFile);
+		BufferedReader output = IOUtils.getBufferedReader(outputFile);
 		assertNotNull(expected);
 		assertNotNull(output);
 		expected.close();

@@ -12,7 +12,7 @@ public class TestConfig3 extends MatsimTestCase {
 		Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		
-		new OptimizedChargerGeneralTest(controler).optimizedChargerTest();
+		new OptimizedChargerTestGeneral(controler).optimizedChargerTest();
 	}
 	
 } 

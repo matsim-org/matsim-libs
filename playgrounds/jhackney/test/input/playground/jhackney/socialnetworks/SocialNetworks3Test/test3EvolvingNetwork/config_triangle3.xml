@@ -5,7 +5,7 @@
 		<!ENTITY STUDYBASE    "test/scenarios/triangle/complete">
 		<!-- ENTITY STUDYBASE    "input" -->
 		<!ENTITY RUNSBASE     "runs">
-		<!ENTITY OUTPUTBASE   "test/output/playground/jhackney/socialnetworks/SocialNetworksTest3/test3EvolvingNetwork">
+		<!ENTITY OUTPUTBASE   "test/output/playground/jhackney/socialnetworks/SocialNetworks3Test/test3EvolvingNetwork">
 		<!-- ENTITY OUTPUTBASE   "C:/Documents and Settings/jhackney/My Documents/sandbox00/ivt/studies/jhackney/output" -->
 		<!ENTITY INPUTBASE    "input">
 		<!ENTITY ANALYSISBASE "analysis">
