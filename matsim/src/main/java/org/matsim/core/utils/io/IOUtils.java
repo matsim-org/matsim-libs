@@ -150,6 +150,23 @@ public class IOUtils {
 			}
 		} else if (new File(filename + GZ).exists()) {
 			infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(filename  + GZ))));
+		} else {
+			InputStream stream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
+			if (stream != null) {
+				if (filename.endsWith(GZ)) {
+					infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(stream)));
+					log.info("loading file from classpath: " + filename);
+				} else {
+					infile = new BufferedReader(new InputStreamReader(stream));
+					log.info("loading file from classpath: " + filename);
+				}
+			} else {
+				stream = IOUtils.class.getClassLoader().getResourceAsStream(filename + GZ);
+				if (stream != null) {
+					infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(stream)));
+					log.info("loading file from classpath: " + filename + GZ);
+				}
+			}
 		}
 
 		if (infile == null) {

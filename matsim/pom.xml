@@ -33,6 +33,17 @@
       	<directory>src/main/resources</directory>
       </resource>
     </resources>
+    <testResources>
+    	<testResource>
+    		<directory>src/test/resources</directory>
+    	</testResource>
+    	<testResource>
+    		<directory>./</directory>
+    		<includes>
+    			<include>test/input/**/*</include>
+    		</includes>
+    	</testResource>
+    </testResources>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
