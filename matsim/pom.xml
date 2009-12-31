@@ -41,6 +41,7 @@
     		<directory>./</directory>
     		<includes>
     			<include>test/input/**/*</include>
+    			<include>test/scenarios/**/*</include>
     		</includes>
     	</testResource>
     </testResources>
