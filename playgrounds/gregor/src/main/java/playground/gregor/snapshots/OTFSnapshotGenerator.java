@@ -30,27 +30,27 @@ import playground.gregor.snapshots.writers.SnapshotGenerator;
 
 public class OTFSnapshotGenerator {
 
-	private final static String lsFile = "../../../workspace/vsp-cvs/studies/padang/gis/network_v20080618/d_ls.shp";
+	private final static String lsFile = "../../../../../workspace/vsp-cvs/studies/padang/gis/network_v20080618/d_ls.shp";
 
 	private final static double VIS_OUTPUT_SAMPLE = 1.;
 	
 	private final ScenarioImpl scenario;
 	private final String eventsFile;
 	
-//	private final String txtSnapshotFile = null;
-	private final String txtSnapshotFile = "../../outputs/output/snapshots.txt.gz";
+	private final String txtSnapshotFile = null;
+//	private final String txtSnapshotFile = "../../../outputs/output/snapshots.txt.gz";
 	
 	public OTFSnapshotGenerator() {
 		
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl("../../outputs/output/output_config.xml.gz");
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl("../../../../outputs/output/output_config.xml.gz");
 		
 		this.scenario = sl.getScenario();
-		this.scenario.getConfig().network().setInputFile("../../outputs/output/output_network.xml.gz");
+		this.scenario.getConfig().network().setInputFile("../../../../outputs/output/output_network.xml.gz");
 		this.scenario.getConfig().simulation().setSnapshotFormat("otfvis");
 		this.scenario.getConfig().simulation().setSnapshotPeriod(60);
 		this.scenario.getConfig().simulation().setEndTime(4*3600+30*60);
 		
-		this.scenario.getConfig().evacuation().setBuildingsFile("../../inputs/networks/evac_zone_buildings_v20090728.shp");
+		this.scenario.getConfig().evacuation().setBuildingsFile("../../../../inputs/networks/evac_zone_buildings_v20090728.shp");
 //		this.scenario.getConfig().evacuation().setSampleSize("0.1");
 //		this.scenario.getConfig().controler().setLastIteration(75);
 		int it = this.scenario.getConfig().controler().getLastIteration();

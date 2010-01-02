@@ -148,7 +148,7 @@ public class TriangularMeshSimplifier {
 		}
 
 
-		dumpGeos();
+//		dumpGeos();
 
 		this.initialized = true;
 	}
