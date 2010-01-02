@@ -67,7 +67,7 @@ public class StaticForceFieldToShape {
 		}
 
 		try {
-			ShapeFileWriter.writeGeometries(fts, "../../tmp/staticForces.shp");
+			ShapeFileWriter.writeGeometries(fts, "../../../../tmp/staticForces.shp");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

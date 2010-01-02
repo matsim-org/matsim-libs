@@ -71,7 +71,7 @@ public class Controller2D extends Controler {
 		QueueNetwork fakeQNetwork = new QueueNetwork(fakeNetwork);
 		UUID idOne = UUID.randomUUID();
 		this.myOTFServer = OnTheFlyServer.createInstance("OTFServer_" + idOne.toString(), fakeQNetwork, this.population, getEvents(), false);
-		OTFBackgroundTexturesDrawer sbg = new OTFBackgroundTexturesDrawer("../../sim2d/sg4.png");
+		OTFBackgroundTexturesDrawer sbg = new OTFBackgroundTexturesDrawer("../../../../sim2d/sg4.png");
 //		sbg.addLocation(new CoordImpl(386124.75,5820130.6), 0, 33.33);
 		sbg.addLocation(386108.0859f,5820114.04f,386141.2f,5820147.092897f);
 		
@@ -81,7 +81,7 @@ public class Controller2D extends Controler {
 		
 		float [] linksColor = new float [] {.5f,.5f,.5f,.7f};
 		try {
-			this.myOTFServer.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile("../../tmp/simplifiedNetwork.shp"),linksColor));
+			this.myOTFServer.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile("../../../../tmp/simplifiedNetwork.shp"),linksColor));
 			this.connectionManager.add(PolygonDataWriter.class,PolygonDataReader.class);
 		} catch (IOException e1) {
 			e1.printStackTrace();

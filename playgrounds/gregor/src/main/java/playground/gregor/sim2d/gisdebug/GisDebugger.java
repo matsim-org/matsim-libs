@@ -65,6 +65,12 @@ public class GisDebugger {
 				} catch (IllegalAttributeException e) {
 					e.printStackTrace();
 				}
+			}else if (geo instanceof LineString) {
+				try {
+					fts.add(ftLine.create(new Object[] {geo,d,d++}));
+				} catch (IllegalAttributeException e) {
+					e.printStackTrace();
+				}				
 			} else {
 				throw new RuntimeException("type of Geometry is not supported" + geo);
 			}

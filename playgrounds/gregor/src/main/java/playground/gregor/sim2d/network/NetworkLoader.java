@@ -65,7 +65,7 @@ public class NetworkLoader {
 	private static final double RANGE = 0.25;
 
 	private static final double OVER_LENGTH = 2.;
-	private static final double OVER_LENGTHII = 3./600;
+	private static final double OVER_LENGTHII = 1./600;
 
 	private static final boolean DEBUG = true;
 
@@ -151,7 +151,7 @@ public class NetworkLoader {
 			builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 			builder.setWidthCoefficient(0.5);
 			builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);		
-			new Links2ESRIShape(this.network,"../../tmp/simplifiedNetwork.shp", builder).write();
+			new Links2ESRIShape(this.network,"../../../../tmp/simplifiedNetwork.shp", builder).write();
 		}
 
 		return ret;
@@ -263,7 +263,7 @@ public class NetworkLoader {
 		}
 
 		if (DEBUG) {
-			dumpLineStrings(this.visibilityGraph,"../../tmp/visibilityGraph.shp");
+			dumpLineStrings(this.visibilityGraph,"../../../../tmp/visibilityGraph.shp");
 		}
 	}
 
@@ -431,7 +431,7 @@ public class NetworkLoader {
 		}
 
 		if (DEBUG) {
-			dumpPoints(quad.values(),"../../tmp/nodes.shp");
+			dumpPoints(quad.values(),"../../../../tmp/nodes.shp");
 		}
 	}
 
