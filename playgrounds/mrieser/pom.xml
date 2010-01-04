@@ -10,10 +10,5 @@
   <name>mrieser</name>
   <version>0.1.0-SNAPSHOT</version>
   <dependencies>
-  	<dependency>
-  		<groupId>playground</groupId>
-  		<artifactId>meisterk</artifactId>
-  		<version>0.1.0-SNAPSHOT</version>
-  	</dependency>
   </dependencies>
 </project>
