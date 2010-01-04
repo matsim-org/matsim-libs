@@ -333,12 +333,12 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 					kmlObjectFactory.createScreenOverlay(errorGraph));
 		}
 
-		ScreenOverlayType awtv = this.createAWTVGraph();
-		if (awtv != null) {
-			awtv.setVisibility(Boolean.FALSE);
-			this.mainFolder.getAbstractFeatureGroup().add(
-					kmlObjectFactory.createScreenOverlay(awtv));
-		}
+//		ScreenOverlayType awtv = this.createAWTVGraph();
+//		if (awtv != null) {
+//			awtv.setVisibility(Boolean.FALSE);
+//			this.mainFolder.getAbstractFeatureGroup().add(
+//					kmlObjectFactory.createScreenOverlay(awtv));
+//		}
 
 		// link graphs
 		this.createCountsLoadCurveGraphs();

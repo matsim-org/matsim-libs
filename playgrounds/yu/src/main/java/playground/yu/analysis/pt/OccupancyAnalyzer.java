@@ -76,6 +76,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 	public void reset(int iteration) {
 		this.boards.clear();
 		this.alights.clear();
+		this.veh_stops.clear();
 	}
 
 	public void handleEvent(PersonEntersVehicleEvent event) {

@@ -25,10 +25,8 @@ package playground.yu.run;
 
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.listener.StartupListener;
 
 import playground.mrieser.pt.controler.TransitControler;
 import playground.yu.analysis.pt.OccupancyAnalyzer;
@@ -39,39 +37,36 @@ import playground.yu.counts.pt.PtBoardCountControlerListener;
  * 
  */
 public class TrCtl extends TransitControler {
-	public static class OccupancyAnalyzerListener implements StartupListener,
+	public static class OccupancyAnalyzerListener implements
 			BeforeMobsimListener, AfterMobsimListener {
-		private OccupancyAnalyzer oa = null;
-
-		public OccupancyAnalyzer getOccupancyAnalysis() {
-			return oa;
-		}
-
-		public void notifyStartup(StartupEvent event) {
-			this.oa = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
-		}
-
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-			if (event.getIteration() % 10 == 0) {
-				this.oa.reset(event.getIteration());
-				event.getControler().getEvents().addHandler(oa);
+			int iter = event.getIteration();
+			if (iter % 10 == 0) {
+				TrCtl ctl = (TrCtl) event.getControler();
+				ctl.oa.reset(iter);
+				event.getControler().getEvents().addHandler(ctl.oa);
 			}
 		}
 
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
 			int it = event.getIteration();
 			if (it % 10 == 0 && it > event.getControler().getFirstIteration()) {
+				TrCtl ctl = (TrCtl) event.getControler();
 				// TODO transfer oa 2 countscompare
-				event.getControler().getEvents().removeHandler(oa);
-				this.oa.write(event.getControler().getNameForIterationFilename(
-						"occupancyAnalysis.txt"));
+				event.getControler().getEvents().removeHandler(ctl.oa);
+				ctl.oa.write(event.getControler().getControlerIO()
+						.getIterationFilename(it, "occupancyAnalysis.txt"));
 			}
 		}
 
 	}
 
+	// ---------------------------------------------------------------------
+	OccupancyAnalyzer oa = null;
+
 	public TrCtl(String[] args) {
 		super(args);
+		this.oa = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
 	}
 
 	/**
@@ -82,7 +77,7 @@ public class TrCtl extends TransitControler {
 		OccupancyAnalyzerListener oal = new OccupancyAnalyzerListener();
 		ctl.addControlerListener(oal);
 		ctl.addControlerListener(new PtBoardCountControlerListener(ctl.config,
-				oal.getOccupancyAnalysis()));
+				ctl.oa));
 		ctl.setOverwriteFiles(true);
 		ctl.setCreateGraphs(false);
 		ctl.run();

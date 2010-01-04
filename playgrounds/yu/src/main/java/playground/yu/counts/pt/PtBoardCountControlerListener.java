@@ -20,8 +20,6 @@
 
 package playground.yu.counts.pt;
 
-import java.util.Locale;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -31,12 +29,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
-import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
-import org.matsim.counts.algorithms.CountsGraphWriter;
-import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
-import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
-import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
-import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
 
 import playground.yu.analysis.pt.OccupancyAnalyzer;
 
@@ -48,7 +40,7 @@ public class PtBoardCountControlerListener implements StartupListener,
 
 	private final Config config;
 	private final Counts counts;
-
+	final String MODULE_NAME = "ptCounts";
 	private final OccupancyAnalyzer oa;
 
 	public PtBoardCountControlerListener(final Config config,
@@ -59,8 +51,11 @@ public class PtBoardCountControlerListener implements StartupListener,
 	}
 
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
-		MatsimCountsReader counts_parser = new MatsimCountsReader(this.counts);
-		counts_parser.readFile(this.config.counts().getCountsFileName());
+		// MatsimCountsReader counts_parser = new
+		// MatsimCountsReader(this.counts);
+		// counts_parser.readFile(this.config.counts().getCountsFileName());
+		new MatsimCountsReader(this.counts).readFile(this.config.findParam(
+				MODULE_NAME, "inputCountsFile"));
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
@@ -70,35 +65,51 @@ public class PtBoardCountControlerListener implements StartupListener,
 			controler.stopwatch.beginOperation("compare with counts");
 			PtBoardCountsComparisonAlgorithm cca = new PtBoardCountsComparisonAlgorithm(
 					this.oa, this.counts, controler.getNetwork());
-			if ((this.config.counts().getDistanceFilter() != null)
-					&& (this.config.counts().getDistanceFilterCenterNode() != null)) {
-				cca.setDistanceFilter(this.config.counts().getDistanceFilter(),
-						this.config.counts().getDistanceFilterCenterNode());
+			Double distanceFilter = new Double(this.config.findParam(
+					MODULE_NAME, "distanceFilter"));
+			String distanceFilterCenterNodeId = this.config.findParam(
+					MODULE_NAME, "distanceFilterCenterNode");
+			if ((distanceFilter
+			// .counts().getDistanceFilter()
+					!= null)
+					&& (distanceFilterCenterNodeId
+					// counts().getDistanceFilterCenterNode()
+					!= null)) {
+				cca.setDistanceFilter(distanceFilter,
+						distanceFilterCenterNodeId);
 			}
-			cca.setCountsScaleFactor(this.config.counts()
-					.getCountsScaleFactor());
+			cca.setCountsScaleFactor(Double.parseDouble(this.config.findParam(
+					MODULE_NAME, "countsScaleFactor"))
+			// counts().getCountsScaleFactor()
+					);
 			cca.run();
 
-			if (this.config.counts().getOutputFormat().contains("html")
-					|| this.config.counts().getOutputFormat().contains("all")) {
-				// html and pdf output
-				boolean htmlset = true;
-				boolean pdfset = true;
-				CountsGraphWriter cgw = new CountsGraphWriter(Controler
-						.getIterationPath(event.getIteration()), cca
-						.getComparison(), event.getIteration(), htmlset, pdfset);
-				cgw.setGraphsCreator(new CountsSimRealPerHourGraphCreator(
-						"sim and real volumes"));
-				cgw.setGraphsCreator(new CountsErrorGraphCreator("errors"));
-				cgw.setGraphsCreator(new CountsLoadCurveGraphCreator(
-						"link volumes"));
-				cgw.setGraphsCreator(new CountsSimReal24GraphCreator(
-						"average working day sim and count volumes"));
-				cgw.createGraphs();
-			}
-			if (this.config.counts().getOutputFormat().contains("kml")
-					|| this.config.counts().getOutputFormat().contains("all")) {
-				String filename = 	event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(),"countscompare.kmz");
+			// if (this.config.counts().getOutputFormat().contains("html")
+			// || this.config.counts().getOutputFormat().contains("all")) {
+			// // html and pdf output
+			// boolean htmlset = true;
+			// boolean pdfset = true;
+			// CountsGraphWriter cgw = new CountsGraphWriter(Controler
+			// .getIterationPath(event.getIteration()), cca
+			// .getComparison(), event.getIteration(), htmlset, pdfset);
+			// cgw.setGraphsCreator(new CountsSimRealPerHourGraphCreator(
+			// "sim and real volumes"));
+			// cgw.setGraphsCreator(new CountsErrorGraphCreator("errors"));
+			// cgw.setGraphsCreator(new CountsLoadCurveGraphCreator(
+			// "link volumes"));
+			// cgw.setGraphsCreator(new CountsSimReal24GraphCreator(
+			// "average working day sim and count volumes"));
+			// cgw.createGraphs();
+			// }
+			String outputFormat = this.config.findParam(MODULE_NAME,
+					"outputformat");
+			if (outputFormat
+			// counts().getOutputFormat()
+					.contains("kml") || outputFormat.contains("all")) {
+				String filename = event.getControler().getControlerIO()
+						.getIterationFilename(
+								event.getControler().getIteration(),
+								"countscompare.kmz");
 				PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(
 						cca.getComparison(), TransformationFactory
 								.getCoordinateTransformation(this.config
@@ -108,13 +119,15 @@ public class PtBoardCountControlerListener implements StartupListener,
 				kmlWriter.setIterationNumber(event.getIteration());
 				kmlWriter.writeFile(filename);
 			}
-			if (this.config.counts().getOutputFormat().contains("txt")
-					|| this.config.counts().getOutputFormat().contains("all")) {
-				String filename = 	event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(),"countscompare.txt");
-				CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(
-						cca.getComparison(), Locale.ENGLISH);
-				ctw.writeFile(filename);
-			}
+			// if (this.config.counts().getOutputFormat().contains("txt")
+			// || this.config.counts().getOutputFormat().contains("all")) {
+			// String filename =
+			// event.getControler().getControlerIO().getIterationFilename(event.getControler().getIteration(),"countscompare.txt");
+			// CountSimComparisonTableWriter ctw = new
+			// CountSimComparisonTableWriter(
+			// cca.getComparison(), Locale.ENGLISH);
+			// ctw.writeFile(filename);
+			// }
 			controler.stopwatch.endOperation("compare with counts");
 		}
 	}

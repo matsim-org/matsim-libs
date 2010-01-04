@@ -24,8 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -77,8 +76,8 @@ public class PtBoardCountsComparisonAlgorithm {
 		this.countSimComp = new ArrayList<CountSimComparison>();
 		this.network = network;
 		if (Gbl.getConfig() != null) {
-			this.countsScaleFactor = Gbl.getConfig().counts()
-					.getCountsScaleFactor();
+			this.countsScaleFactor = Double.parseDouble(Gbl.getConfig()
+					.findParam("ptCounts", "countsScaleFactor"));
 		} else {
 			this.countsScaleFactor = 1.0;
 		}
@@ -92,12 +91,16 @@ public class PtBoardCountsComparisonAlgorithm {
 		double countValue;
 
 		for (Count count : this.counts.getCounts().values()) {
-			if (!isInRange(count.getLocId())) {
+			if (!isInRange(count.getCoord())) {
+				System.out.println("InRange?\t" + isInRange(count.getCoord()));
 				continue;
 			}
 			int[] volumes = this.oa.getBoardVolumesForStop(count.getLocId());
-			if (volumes.length == 0) {
-				log.warn("No volumes for link: " + count.getLocId().toString());
+			if (volumes==null) {
+				log.warn("No volumes for stop: " + count.getLocId().toString());
+				continue;
+			}else/*volumes!=null*/if (volumes.length==0){
+				log.warn("No volumes for stop: " + count.getLocId().toString());
 				continue;
 			}
 			for (int hour = 1; hour <= 24; hour++) {
@@ -118,21 +121,17 @@ public class PtBoardCountsComparisonAlgorithm {
 
 	/**
 	 * 
-	 * @param linkid
+	 * @param stopCoord
 	 * @return
 	 *         <code>true</true> if the Link with the given Id is not farther away than the
 	 * distance specified by the distance filter from the center node of the filter.
 	 */
-	private boolean isInRange(final Id linkid) {
+	private boolean isInRange(final Coord stopCoord) {
 		if ((this.distanceFilterNode == null) || (this.distanceFilter == null)) {
 			return true;
 		}
-		Link l = this.network.getLinks().get(linkid);
-		if (l == null) {
-			log.warn("Cannot find requested link: " + linkid.toString());
-			return false;
-		}
-		double dist = CoordUtils.calcDistance(l.getCoord(),
+
+		double dist = CoordUtils.calcDistance(stopCoord,
 				this.distanceFilterNode.getCoord());
 		return dist < this.distanceFilter.doubleValue();
 	}
