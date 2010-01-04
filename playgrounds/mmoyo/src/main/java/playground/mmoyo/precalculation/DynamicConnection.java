@@ -21,7 +21,7 @@ public class DynamicConnection {
 	private double walkDistance2= Double.NEGATIVE_INFINITY;
 	private double walkTime1 =  Double.NEGATIVE_INFINITY;
 	private double walkTime2 =  Double.NEGATIVE_INFINITY;
-	private double avgWalkSpeed = new PTValues().AV_WALKING_SPEED;
+	private double avgWalkSpeed = PTValues.AV_WALKING_SPEED;
 	private TransitSchedule transitSchedule;
 	private PlainTimeTable plainTimeTable;
 	private Map <Coord, Collection<NodeImpl>> nearStopMap; 
