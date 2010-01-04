@@ -96,7 +96,6 @@ public class OnTheFlyServer extends UnicastRemoteObject implements OTFLiveServer
 	protected int stepToIteration = 0;
 	protected int requestStatus = 0;
 
-//	private final OTFNetHandler handler = null;
 	private transient Population pop = null;
 	public transient ByteArrayOutputStream out = null;
 	public transient QueueNetwork network = null;
