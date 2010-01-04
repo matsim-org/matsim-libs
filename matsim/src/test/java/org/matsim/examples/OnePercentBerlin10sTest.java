@@ -21,6 +21,7 @@
 package org.matsim.examples;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -58,11 +59,12 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		
 		config.charyparNagelScoring().setLearningRate(1.0);
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFileName);
 
-		PopulationImpl population = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		PopulationImpl population = scenario.getPopulation();
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(popFileName);
 		population.printPlansCount();
 

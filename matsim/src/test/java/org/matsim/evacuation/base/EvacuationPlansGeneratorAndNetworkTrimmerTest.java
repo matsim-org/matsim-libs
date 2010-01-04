@@ -1,5 +1,6 @@
 package org.matsim.evacuation.base;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -19,12 +20,12 @@ public class EvacuationPlansGeneratorAndNetworkTrimmerTest extends MatsimTestCas
 		String refPlans = getInputDirectory() + "evacuationplans.xml";
 		String refNet = getInputDirectory() + "evacuationnetwork.xml";
 		
-		
-		NetworkLayer net = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl(c);
+		NetworkLayer net = scenario.getNetwork();
 		new MatsimNetworkReader(net).readFile(c.network().getInputFile());
 				
-		PopulationImpl pop = new PopulationImpl();
-		new MatsimPopulationReader(pop,net).readFile(c.plans().getInputFile());
+		PopulationImpl pop = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(c.plans().getInputFile());
 		
 		new EvacuationNetGenerator(net,c).run();
 		

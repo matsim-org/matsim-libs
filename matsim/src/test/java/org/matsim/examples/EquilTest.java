@@ -20,6 +20,8 @@
 
 package org.matsim.examples;
 
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -27,7 +29,6 @@ import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -37,18 +38,20 @@ import org.matsim.testcases.MatsimTestCase;
 public class EquilTest extends MatsimTestCase {
 
 	public void testEquil() {
-		loadConfig(null);
+		Config c = loadConfig(null);
 		String netFileName = "test/scenarios/equil/network.xml";
 		String popFileName = "test/scenarios/equil/plans100.xml";
 
 		String eventsFileName = getOutputDirectory() + "events.txt";
 		String referenceFileName = getInputDirectory() + "events.txt.gz";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl(c);
+		
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFileName);
 
-		PopulationImpl population = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		PopulationImpl population = scenario.getPopulation();
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(popFileName);
 
 		EventsManagerImpl events = new EventsManagerImpl();
