@@ -35,7 +35,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
-import org.matsim.vis.otfvis.gui.PoolFactory;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServerRemote;
@@ -213,8 +212,6 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 		this.execute(bound, new ReadDataExecutor(in, readConst, result));
 		if (readAdd) getAdditionalData(in, readConst, result);
 //		Gbl.printElapsedTime();
-		PoolFactory.resetAll();
-
 	}
 
 	public synchronized void getConstData() throws RemoteException {
