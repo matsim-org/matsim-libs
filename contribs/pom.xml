@@ -24,6 +24,12 @@
 	<modules>
 		<module>sna</module>
 	</modules>
+	<repositories>
+		<repository>
+      <id>matsim</id>
+      <url>http://matsim.org/m2repo</url>
+    </repository>
+	</repositories>
 
 	<dependencies>
 		<dependency>

@@ -59,6 +59,12 @@
     	<module>yalcin</module>
     	<module>yu</module>
 	</modules>
+	<repositories>
+		<repository>
+      <id>matsim</id>
+      <url>http://matsim.org/m2repo</url>
+    </repository>
+	</repositories>
 
 	<dependencies>
 		<dependency>
