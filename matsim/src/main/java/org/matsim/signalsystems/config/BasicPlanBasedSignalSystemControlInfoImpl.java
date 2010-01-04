@@ -19,8 +19,8 @@
 
 package org.matsim.signalsystems.config;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
@@ -29,12 +29,12 @@ import org.matsim.api.core.v01.Id;
  */
 public class BasicPlanBasedSignalSystemControlInfoImpl implements  BasicPlanBasedSignalSystemControlInfo {
 
-	private Map<Id, BasicSignalSystemPlan> plans;
+	private SortedMap<Id, BasicSignalSystemPlan> plans;
 	
 	/**
 	 * @see org.matsim.signalsystems.config.BasicPlanBasedSignalSystemControlInfo#getPlans()
 	 */
-	public Map<Id, BasicSignalSystemPlan> getPlans() {
+	public SortedMap<Id, BasicSignalSystemPlan> getPlans() {
 		return plans;
 	}
 
@@ -43,7 +43,7 @@ public class BasicPlanBasedSignalSystemControlInfoImpl implements  BasicPlanBase
 	 */
 	public void addPlan(BasicSignalSystemPlan plan) {
 		if (this.plans == null) {
-			this.plans = new HashMap<Id, BasicSignalSystemPlan>();
+			this.plans = new TreeMap<Id, BasicSignalSystemPlan>();
 		}
 		this.plans.put(plan.getId(), plan);
 	}

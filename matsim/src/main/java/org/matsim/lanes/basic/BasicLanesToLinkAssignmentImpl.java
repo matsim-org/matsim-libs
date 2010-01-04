@@ -21,9 +21,9 @@ package org.matsim.lanes.basic;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
@@ -32,9 +32,9 @@ import org.matsim.api.core.v01.Id;
  */
 public class BasicLanesToLinkAssignmentImpl implements BasicLanesToLinkAssignment {
 
-	private Id linkId;
+	private final Id linkId;
 
-	private Map<Id, BasicLane> lanes = new LinkedHashMap<Id, BasicLane>();
+	private final SortedMap<Id, BasicLane> lanes = new TreeMap<Id, BasicLane>();
 	
 	/**
 	 * @param linkId
@@ -66,7 +66,7 @@ public class BasicLanesToLinkAssignmentImpl implements BasicLanesToLinkAssignmen
 		return linkId;
 	}
 
-	public Map<Id, BasicLane> getLanes() {
+	public SortedMap<Id, BasicLane> getLanes() {
 		return this.lanes;
 	}
 

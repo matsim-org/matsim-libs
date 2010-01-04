@@ -358,7 +358,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 	protected void prepareLanes(){
 		if (this.laneDefintions != null){
 			log.info("Lanes enabled...");
-			for (BasicLanesToLinkAssignment laneToLink : this.laneDefintions.getLanesToLinkAssignmentsList()){
+			for (BasicLanesToLinkAssignment laneToLink : this.laneDefintions.getLanesToLinkAssignments().values()){
 				QueueLink link = this.network.getQueueLink(laneToLink.getLinkId());
 				if (link == null) {
 					String message = "No Link with Id: " + laneToLink.getLinkId() + ". Cannot create lanes, check lanesToLinkAssignment of signalsystems definition!";

@@ -21,9 +21,9 @@ package org.matsim.lanes.basic;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
@@ -34,9 +34,9 @@ import org.matsim.api.core.v01.Id;
  */
 public class BasicLaneDefinitionsImpl implements BasicLaneDefinitions {
 	
-	private Map<Id, BasicLanesToLinkAssignment> lanesToLinkAssignments =  new LinkedHashMap<Id, BasicLanesToLinkAssignment>();
+	private SortedMap<Id, BasicLanesToLinkAssignment> lanesToLinkAssignments =  new TreeMap<Id, BasicLanesToLinkAssignment>();
 
-	private BasicLaneDefinitionsFactory builder = new BasicLaneDefinitionsFactoryImpl();
+	private final BasicLaneDefinitionsFactory builder = new BasicLaneDefinitionsFactoryImpl();
 	
 	/**
 	 * @see org.matsim.lanes.basic.BasicLaneDefinitions#getLanesToLinkAssignmentsList()
@@ -47,7 +47,7 @@ public class BasicLaneDefinitionsImpl implements BasicLaneDefinitions {
 		return Collections.unmodifiableList(ret);
 	}
 	
-	public Map<Id, BasicLanesToLinkAssignment> getLanesToLinkAssignments() {
+	public SortedMap<Id, BasicLanesToLinkAssignment> getLanesToLinkAssignments() {
 		return this.lanesToLinkAssignments;
 	}
 
@@ -56,7 +56,7 @@ public class BasicLaneDefinitionsImpl implements BasicLaneDefinitions {
 	 */
 	public void addLanesToLinkAssignment(BasicLanesToLinkAssignment assignment) {
 		if (this.lanesToLinkAssignments == null) {
-			this.lanesToLinkAssignments = new LinkedHashMap<Id, BasicLanesToLinkAssignment>();
+			this.lanesToLinkAssignments = new TreeMap<Id, BasicLanesToLinkAssignment>();
 		}
 		this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
 	}

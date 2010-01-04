@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.config;
 
-import java.util.Map;
+import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 /**
@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Id;
  */
 public interface BasicPlanBasedSignalSystemControlInfo extends BasicSignalSystemControlInfo {
 
-	public Map<Id, BasicSignalSystemPlan> getPlans();
+	public SortedMap<Id, BasicSignalSystemPlan> getPlans();
 
 	public void addPlan(BasicSignalSystemPlan plan);
 

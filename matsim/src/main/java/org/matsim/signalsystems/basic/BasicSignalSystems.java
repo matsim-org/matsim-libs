@@ -19,7 +19,7 @@
 package org.matsim.signalsystems.basic;
 
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
@@ -28,9 +28,9 @@ public interface BasicSignalSystems extends MatsimToplevelContainer {
 	
 	public BasicSignalSystemsFactory getFactory();
 
-	public Map<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions();
+	public SortedMap<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions();
 
-	public Map<Id, BasicSignalGroupDefinition> getSignalGroupDefinitions();
+	public SortedMap<Id, BasicSignalGroupDefinition> getSignalGroupDefinitions();
 
 	/**
 	 * 

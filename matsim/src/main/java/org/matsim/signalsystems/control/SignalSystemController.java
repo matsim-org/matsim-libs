@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.control;
 
-import java.util.Map;
+import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.queuesim.SignalEngine;
@@ -40,7 +40,7 @@ public interface SignalSystemController {
 	
 	public void setDefaultInterGreenTime(Double seconds);
 	
-	public Map<Id, BasicSignalGroupDefinition> getSignalGroups();
+	public SortedMap<Id, BasicSignalGroupDefinition> getSignalGroups();
 
 	public SignalEngine getSignalEngine();
 	

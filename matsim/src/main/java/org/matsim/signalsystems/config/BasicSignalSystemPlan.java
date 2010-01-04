@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.config;
 
-import java.util.Map;
+import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 /**
@@ -41,7 +41,7 @@ public interface BasicSignalSystemPlan {
 
 	public double getEndTime();
 
-	public Map<Id, BasicSignalGroupSettings> getGroupConfigs();
+	public SortedMap<Id, BasicSignalGroupSettings> getGroupConfigs();
 
 	public void setCycleTime(Integer circulationTimeSec);
 

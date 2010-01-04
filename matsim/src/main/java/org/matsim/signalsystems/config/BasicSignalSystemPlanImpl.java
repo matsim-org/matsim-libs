@@ -19,8 +19,8 @@
 
 package org.matsim.signalsystems.config;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
@@ -29,10 +29,10 @@ import org.matsim.api.core.v01.Id;
  */
 public class BasicSignalSystemPlanImpl implements BasicSignalSystemPlan {
 
-	private Id id;
+	private final Id id;
 	private double startTime;
 	private double endTime;
-	private Map<Id, BasicSignalGroupSettings> groupConfigs;
+	private SortedMap<Id, BasicSignalGroupSettings> groupConfigs;
 	private Integer syncronizationOffset = 0;
 	private Integer circulationTime = null;
 	private Integer powerOnTime = null;
@@ -69,7 +69,7 @@ public class BasicSignalSystemPlanImpl implements BasicSignalSystemPlan {
 	public void addLightSignalGroupConfiguration(
 			BasicSignalGroupSettings groupConfig) {
 		if (this.groupConfigs == null) {
-			this.groupConfigs = new HashMap<Id, BasicSignalGroupSettings>();
+			this.groupConfigs = new TreeMap<Id, BasicSignalGroupSettings>();
 		}
 		this.groupConfigs.put(groupConfig.getReferencedSignalGroupId(), groupConfig);
 	}
@@ -91,7 +91,7 @@ public class BasicSignalSystemPlanImpl implements BasicSignalSystemPlan {
 	/**
 	 * @see org.matsim.signalsystems.config.BasicSignalSystemPlan#getGroupConfigs()
 	 */
-	public Map<Id, BasicSignalGroupSettings> getGroupConfigs() {
+	public SortedMap<Id, BasicSignalGroupSettings> getGroupConfigs() {
 		return groupConfigs;
 	}
 

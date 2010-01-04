@@ -1,7 +1,7 @@
 package org.matsim.lanes.basic;
 
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
@@ -18,7 +18,7 @@ public interface BasicLaneDefinitions extends MatsimToplevelContainer {
 	 * 
 	 * @return Map with Link Ids as keys and assignments as values
 	 */
-	public Map<Id, BasicLanesToLinkAssignment> getLanesToLinkAssignments();
+	public SortedMap<Id, BasicLanesToLinkAssignment> getLanesToLinkAssignments();
 	
 	/**
 	 * @param assignment

@@ -20,9 +20,9 @@ package org.matsim.signalsystems.basic;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
@@ -33,10 +33,10 @@ import org.matsim.api.core.v01.Id;
  */
 public class BasicSignalSystemsImpl implements BasicSignalSystems {
 
-	private BasicSignalSystemsFactory builder = new BasicSignalSystemsFactory();
+	private final BasicSignalSystemsFactory builder = new BasicSignalSystemsFactory();
 	
-	private Map<Id, BasicSignalSystemDefinition> signalSystemDefinitions = new LinkedHashMap<Id, BasicSignalSystemDefinition>();
-	private Map<Id, BasicSignalGroupDefinition> signalGroupDefinitions = new LinkedHashMap<Id, BasicSignalGroupDefinition>();;
+	private final SortedMap<Id, BasicSignalSystemDefinition> signalSystemDefinitions = new TreeMap<Id, BasicSignalSystemDefinition>();
+	private final SortedMap<Id, BasicSignalGroupDefinition> signalGroupDefinitions = new TreeMap<Id, BasicSignalGroupDefinition>();;
 
 	/**
 	 * @see org.matsim.signalsystems.basic.BasicSignalSystems#getSignalSystemDefinitionsList()
@@ -80,12 +80,12 @@ public class BasicSignalSystemsImpl implements BasicSignalSystems {
 	}
 
 
-	public Map<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions() {
+	public SortedMap<Id, BasicSignalSystemDefinition> getSignalSystemDefinitions() {
 		return this.signalSystemDefinitions;
 	}
 
 
-	public Map<Id, BasicSignalGroupDefinition> getSignalGroupDefinitions() {
+	public SortedMap<Id, BasicSignalGroupDefinition> getSignalGroupDefinitions() {
 		return this.signalGroupDefinitions;
 	}
 

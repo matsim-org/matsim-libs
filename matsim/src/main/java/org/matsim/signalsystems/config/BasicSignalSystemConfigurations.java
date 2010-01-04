@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.config;
 
-import java.util.Map;
+import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
@@ -37,7 +37,7 @@ public interface BasicSignalSystemConfigurations extends MatsimToplevelContainer
 	 * @return a map containing all signal system configurations organized by the
 	 *         Id of the SignalSystem
 	 */
-	public Map<Id, BasicSignalSystemConfiguration> getSignalSystemConfigurations();
+	public SortedMap<Id, BasicSignalSystemConfiguration> getSignalSystemConfigurations();
 
 	/**
 	 * adds the given SignalSystemConfiguration to the map of this container.

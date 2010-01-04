@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.config;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
@@ -32,9 +32,9 @@ import org.matsim.api.core.v01.Id;
 public class BasicSignalSystemConfigurationsImpl implements
 		BasicSignalSystemConfigurations {
 
-	private BasicSignalSystemConfigurationsFactory factory = new BasicSignalSystemConfigurationsFactory();
+	private final BasicSignalSystemConfigurationsFactory factory = new BasicSignalSystemConfigurationsFactory();
 	
-	private Map<Id, BasicSignalSystemConfiguration> signalSystemConfigs = new HashMap<Id, BasicSignalSystemConfiguration>();
+	private final SortedMap<Id, BasicSignalSystemConfiguration> signalSystemConfigs = new TreeMap<Id, BasicSignalSystemConfiguration>();
 
 	public BasicSignalSystemConfigurationsImpl(){
 	}
@@ -42,7 +42,7 @@ public class BasicSignalSystemConfigurationsImpl implements
 	/**
 	 * @see org.matsim.signalsystems.config.BasicSignalSystemConfigurations#getSignalSystemConfigurations()
 	 */
-	public Map<Id, BasicSignalSystemConfiguration> getSignalSystemConfigurations() {
+	public SortedMap<Id, BasicSignalSystemConfiguration> getSignalSystemConfigurations() {
 		return this.signalSystemConfigs;
 	}
 
