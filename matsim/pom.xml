@@ -256,7 +256,29 @@
       	</plugin>
     	</plugins>
 		</reporting>
-		
+	</profile>
+	<profile>
+		<id>nightly</id>
+		<!-- special settings for building a jar as nightly-build -->
+		<!-- that can be used without maven -->
+		<build>
+			<pluginManagement>
+				<plugins>
+					<plugin>
+      	   	<artifactId>maven-jar-plugin</artifactId>
+        	 	<configuration>
+          		<archive>
+            		<manifest>
+              		<addClasspath>true</addClasspath>
+              		<classpathPrefix>libs/</classpathPrefix>
+	              	<mainClass>org.matsim.run.ReleaseInfo</mainClass>
+  	          	</manifest>
+    	      	</archive>
+      	  	</configuration>
+     			</plugin>
+				</plugins>
+			</pluginManagement>
+		</build>
 	</profile>
 
   </profiles>
