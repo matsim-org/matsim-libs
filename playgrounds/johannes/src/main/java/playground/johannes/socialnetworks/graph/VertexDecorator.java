@@ -58,11 +58,19 @@ public class VertexDecorator<V extends Vertex> extends SparseVertex {
 		return delegate;
 	}
 
+	/**
+	 * @see {@link SparseVertex#getEdges()}.
+	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<? extends EdgeDecorator<?>> getEdges() {
 		return (List<? extends EdgeDecorator<?>>) super.getEdges();
 	}
 
+	/**
+	 * @see {@link SparseVertex#getNeighbours()}.
+	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<? extends VertexDecorator<V>> getNeighbours() {
 		return (List<? extends VertexDecorator<V>>) super.getNeighbours();

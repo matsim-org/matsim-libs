@@ -24,11 +24,16 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 
 /**
+ * An extension to GraphProjectionBuilder to build SparseGraphProjections.
+ * 
  * @author illenberger
  *
  */
 public class SparseGraphProjectionBuilder<G extends Graph, V extends Vertex, E extends Edge> extends GraphProjectionBuilder<G, V, E, GraphProjection<G,V,E>, VertexDecorator<V>, EdgeDecorator<E>> {
 	
+	/**
+	 * Creates a new SparseGraphProjectionBuilder.
+	 */
 	public SparseGraphProjectionBuilder() {
 		super(new SparseGraphProjectionFactory<G, V, E>());
 	}

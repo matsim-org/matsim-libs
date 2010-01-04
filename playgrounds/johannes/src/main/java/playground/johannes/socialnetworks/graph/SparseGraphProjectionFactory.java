@@ -24,19 +24,43 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 
 /**
+ * Implementation of GraphProjectionFactory to creates instances of GraphProjection,
+ * VertexDecorator and EdgeDecorator.
+ * 
  * @author illenberger
  *
  */
 public class SparseGraphProjectionFactory<G extends Graph, V extends Vertex, E extends Edge> implements GraphProjectionFactory<G, V, E, GraphProjection<G,V,E>, VertexDecorator<V>, EdgeDecorator<E>>{
 
+	/**
+	 * Creates and returns an edge decorator that decorates <tt>delegate</tt>.
+	 * 
+	 * @param delegate the original edge.
+	 * 
+	 * @return an edge decorator.
+	 */
 	public EdgeDecorator<E> createEdge(E delegate) {
 		return new EdgeDecorator<E>(delegate);
 	}
 
+	/**
+	 * Creates and returns an empty graph projection on <tt>delegate</tt>.
+	 * 
+	 * @param delegate the original graph.
+	 * 
+	 * @return an empty graph projection.
+	 */
 	public GraphProjection<G, V, E> createGraph(G delegate) {
 		return new GraphProjection<G, V, E>(delegate);
 	}
 
+	/**
+	 * Creates and returns a vertex decorator that decorates <tt>delegate</tt>.
+	 * 
+	 * @param delegate the original vertex.
+	 * 
+	 * @return a new vertex decorator.
+	 */
 	public VertexDecorator<V> createVertex(V delegate) {
 		return new VertexDecorator<V>(delegate);
 	}

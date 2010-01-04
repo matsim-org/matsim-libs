@@ -35,24 +35,12 @@ import org.matsim.contrib.sna.graph.SparseEdge;
 public class EdgeDecorator<E extends Edge> extends SparseEdge {
 
 	private E delegate;
-
-	/**
-	 * Creates a new decorator for edge <tt>delegate</tt>.
-	 * 
-	 * @param v1
-	 *            one of the two vertices this edge is connected to.
-	 * @param v2
-	 *            one of the two vertices this edge is connected to.
-	 *            
-	 *  @deprecated
-	 */
-	@Deprecated
-	protected EdgeDecorator(VertexDecorator<?> v1, VertexDecorator<?> v2,
-			E delegate) {
-		super(v1, v2);
-		this.delegate = delegate;
-	}
 	
+	/**
+	 * Creates a new orphaned edge decorator.
+	 * 
+	 * @param delegate the original edge.
+	 */
 	protected EdgeDecorator(E delegate) {
 		this.delegate = delegate;
 	}

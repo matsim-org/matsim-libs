@@ -482,14 +482,14 @@ public class GraphStatistics {
 		
 		private double betweenness;
 		
-		/**
-		 * @deprecated
-		 * 
-		 */
-		@Deprecated
-		protected CentralityEdge(CentralityVertex<V> v1, CentralityVertex<V> v2, E delegate) {
-			super(v1, v2,delegate);
-		}
+//		/**
+//		 * @deprecated
+//		 * 
+//		 */
+//		@Deprecated
+//		protected CentralityEdge(CentralityVertex<V> v1, CentralityVertex<V> v2, E delegate) {
+//			super(v1, v2,delegate);
+//		}
 		
 		protected CentralityEdge(E delegate) {
 			super(delegate);
