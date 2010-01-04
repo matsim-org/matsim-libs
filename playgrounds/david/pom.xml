@@ -9,4 +9,11 @@
   <artifactId>david</artifactId>
   <name>david</name>
   <version>0.1.0-SNAPSHOT</version>
+  <dependencies>
+    <dependency>
+    	<groupId>org.prefuse</groupId>
+  		<artifactId>prefuse</artifactId>
+  		<version>2007.10.21</version>
+    </dependency>
+  </dependencies>
 </project>
