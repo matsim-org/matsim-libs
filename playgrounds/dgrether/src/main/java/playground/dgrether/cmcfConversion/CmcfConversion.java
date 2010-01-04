@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.cmcfConversion;
 
-import playground.msieg.cmcf.BestFitRouter;
 
 
 /**
@@ -38,7 +37,7 @@ public class CmcfConversion {
 		String cmcf = base + "cmcf/plans/flowG001.cmcf";
 		String out = base + "cmcf/plans/plans_miv_zrh30km_10pct_cmcf_flowG001.xml.gz";
 		String[] args2 = {net, plans, cmcf, out};
-		BestFitRouter.main(args2);
+//		BestFitRouter.main(args2);
 		
 	}
 
