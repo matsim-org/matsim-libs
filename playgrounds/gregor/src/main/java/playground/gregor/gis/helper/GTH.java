@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.analysis;
+package playground.gregor.gis.helper;
 
 import java.util.List;
 
