@@ -53,9 +53,8 @@ public class PTActWriter {
 	private PTRouter ptRouter;
 	private LogicIntoPlainTranslator logicToPlainConverter;
 	
-	public PTActWriter(final LogicFactory logicFactory, final PTValues ptValues, final String configFile, final String plansFile, final String outputFile){
+	public PTActWriter(final LogicFactory logicFactory, final String configFile, final String plansFile, final String outputFile){
 		this.outputFile= outputFile;
-		this.ptValues= ptValues;
 		this.logicNet= logicFactory.getLogicNet();
 		//03dic no Plain net this.plainNet= logicFactory.getPlainNet();
 		this.ptRouter = new PTRouter(logicNet);

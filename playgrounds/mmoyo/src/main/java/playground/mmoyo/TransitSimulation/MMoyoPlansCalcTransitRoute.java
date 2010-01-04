@@ -160,6 +160,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 						}
 						
 						//remove legs between a same link
+						/**
 						boolean sameLink = (lastActLink.getId().equals(nextPeLink.getId()));
 						if (!sameLink){currentTuple.getSecond().get(0).setMode(TransportMode.undefined);}else{currentTuple.getSecond().remove(0);}					
 						if (fromLink.equals(toLink)) currentTuple.getSecond().remove(lastLeg);
@@ -171,7 +172,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 								ii--;
 							}
 						}
-						///////////////////
+						**///////////////////
 						
 					lastLeg.setRoute(new GenericRouteImpl(fromLink, toLink));							
 						boolean isFirstLeg = true;

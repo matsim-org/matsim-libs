@@ -51,12 +51,12 @@ public class RouterTest extends MatsimTestCase {
 		
 		// setup very simple scenario
 		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile("test/input/playground/mmoyo/pt/router/network.xml");
+		new MatsimNetworkReader(network).readFile("../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/network.xml");
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
-		new TransitScheduleReaderV1(schedule, network).readFile("test/input/playground/mmoyo/pt/router/transitSchedule.xml");
+		new TransitScheduleReaderV1(schedule, network).readFile("../playgrounds/mmoyo/test/input/playground/mmoyo/pt/router/transitSchedule.xml");
 		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile("test/input/playground/mmoyo/pt/plans.xml");
+		new MatsimPopulationReader(population, network).readFile("../playgrounds/mmoyo/test/input/playground/mmoyo/pt/plans.xml");
 		Person person = population.getPersons().get(new IdImpl(1));
 		ActivityImpl fromAct = (ActivityImpl) person.getPlans().get(0).getPlanElements().get(0);
 		ActivityImpl toAct = (ActivityImpl) person.getPlans().get(0).getPlanElements().get(2);

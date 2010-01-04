@@ -22,15 +22,14 @@ import playground.mmoyo.PTRouter.PTRouter;
 import playground.mmoyo.PTRouter.PTValues;
 
 /**shows the average result values (travelTime, distance, number of transfers) of the whole population with different travel time and distance coefficients*/
-public class Counter {
+public class TravParameterAnalysis {
 	private PopulationImpl population;
 	private List<PopulationResult> populationResultList = new ArrayList<PopulationResult>();
-	private PTValues ptValues = new PTValues();
 	
 	private List<Path> pathListA = new ArrayList<Path>();
 	private List<Path> pathListB = new ArrayList<Path>();
 	
-	public Counter(final String plansFile, final LogicFactory logicFactory){
+	public TravParameterAnalysis(final String plansFile, final LogicFactory logicFactory){
 		NetworkLayer logicNet = logicFactory.getLogicNet();
 		
 		this.population = new PopulationImpl();
@@ -107,7 +106,7 @@ public class Counter {
 			    		Coord actCoord = thisAct.getCoord();
 						//trips++;
 			    		double distanceToDestination = CoordUtils.calcDistance(lastActCoord, actCoord);
-			    		double distToWalk= ptValues.FIRST_WALKRANGE;
+			    		double distToWalk= PTValues.FIRST_WALKRANGE;
 			    		if (distanceToDestination<= distToWalk){
 			    			//inWalkRange++;
 			    		}else{

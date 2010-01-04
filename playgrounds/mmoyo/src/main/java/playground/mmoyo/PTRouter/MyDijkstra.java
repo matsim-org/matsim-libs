@@ -12,12 +12,7 @@ import org.matsim.api.core.v01.network.Network;
  */
 
 public class MyDijkstra extends Dijkstra{
-	final static String ACCESS = "Access";     			//1
-	final static String STANDARD = "Standard";			//2
-	final static String TRANSFER = "Transfer";			//3
-	final static String DETTRANSFER = "DetTransfer";	//4
-	final static String EGRESS = "Egress"; 				//5
-	
+
 	public MyDijkstra(final Network network, final TravelCost costFunction, final TravelTime timeFunction) {
 		super(network, costFunction, timeFunction);
 	}
@@ -32,12 +27,12 @@ public class MyDijkstra extends Dijkstra{
 		String type= thisLink.getType();
 		if (lastLink!=null){
 			String lastType = lastLink.getType();
-			if (type.equals(DETTRANSFER))  {pass = lastType.equals(STANDARD);}
-			else if (type.equals(TRANSFER)){pass = lastType.equals(STANDARD); }
-			else if (type.equals(STANDARD)){pass = !lastType.equals(EGRESS);  }
-			else if (type.equals(EGRESS))  {pass = lastType.equals(STANDARD); }
+			if (type.equals(PTValues.DETTRANSFER_STR))  {pass = lastType.equals(PTValues.STANDARD_STR); }
+			else if (type.equals(PTValues.TRANSFER_STR)){pass = lastType.equals(PTValues.STANDARD_STR); }
+			else if (type.equals(PTValues.STANDARD_STR)){pass = !lastType.equals(PTValues.EGRESS_STR);  }
+			else if (type.equals(PTValues.EGRESS_STR))  {pass = lastType.equals(PTValues.STANDARD_STR); }
        }else{
-    	   pass = type.equals(ACCESS);
+    	   pass = type.equals(PTValues.ACCESS_STR);
        }
 		return pass;
 		

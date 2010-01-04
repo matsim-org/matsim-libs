@@ -36,7 +36,6 @@ public class PTRouter{
 	private NodeImpl originNode;
 	private NodeImpl destinationNode;
 	public PTTravelTime ptTravelTime;   //> make private
-	PTValues ptValues = new PTValues();
 
 	public PTRouter(final NetworkLayer logicNet) {
 		init(logicNet);
@@ -134,11 +133,11 @@ public class PTRouter{
 	/** looks for  a number of near stations around a node*/
 	private Collection <NodeImpl> findnStations(final NodeImpl node){
 		Collection <NodeImpl> nearStations;
-		double walkRange = ptValues.FIRST_WALKRANGE;
+		double walkRange = PTValues.FIRST_WALKRANGE;
 		do{
 			nearStations = logicNet.getNearestNodes(node.getCoord(), walkRange);  //walkRange
 			walkRange += 300;
-		} while (nearStations.size()<ptValues.INI_STATIONS_NUM);
+		} while (nearStations.size()<PTValues.INI_STATIONS_NUM);
 		nearStations.remove(node);
 		return nearStations;
 	}

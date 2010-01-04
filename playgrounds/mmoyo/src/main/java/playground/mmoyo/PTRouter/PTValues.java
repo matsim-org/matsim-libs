@@ -3,20 +3,26 @@ package playground.mmoyo.PTRouter;
 /**
  * This class contains common constant values for routing
  */
-public class PTValues {
+public abstract class PTValues {
 	
-	public final static byte ACCESS 	= 1;
-	public final static byte STANDARD 	= 2;
-	public final static byte TRANSFER 	= 3;
-	public final static byte DETTRANSFER= 4;
-	public final static byte EGRESS 	= 5;
+	public final static byte ACCESS_BYT 	= 1;
+	public final static byte STANDARD_BYT 	= 2;
+	public final static byte TRANSFER_BYT 	= 3;
+	public final static byte DETTRANSFER_BYT= 4;
+	public final static byte EGRESS_BYT 	= 5;
 	
-	public final double AV_WALKING_SPEED = 1/1.34;  //1.34 [Weidmann93], [Antonini2004].  0.836 by [Al-Azzawi 07]  
-	public final double DETTRANSFER_RANGE = 100;	//300 original distance to search station to build det transfer links
-	public final double FIRST_WALKRANGE = 600;  	//initial distance for station search 
-	public final double WALKRANGE_EXT = 300;   		//progressive extension distance of the station search
+	public final static String ACCESS_STR 		= "Access";
+	public final static String STANDARD_STR 	= "Standard";
+	public final static String TRANSFER_STR 	= "Transfer";
+	public final static String DETTRANSFER_STR	= "DetTransfer";
+	public final static String EGRESS_STR 		= "Egress";
 	
-	public final int INI_STATIONS_NUM = 2;			//number of stations to find in order to start the route search
+	public final static double AV_WALKING_SPEED = 1/1.34;  //1.34 [Weidmann93], [Antonini2004].  0.836 by [Al-Azzawi 07]  
+	public final static double DETTRANSFER_RANGE = 300;	//300 original distance to search station to build det transfer links
+	public final static double FIRST_WALKRANGE = 600;  	//initial distance for station search 
+	public final static double WALKRANGE_EXT = 300;   		//progressive extension distance of the station search
+	
+	public final static int INI_STATIONS_NUM = 2;			//number of stations to find in order to start the route search
 }
 
 /*

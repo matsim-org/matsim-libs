@@ -30,17 +30,16 @@ import org.xml.sax.SAXException;
 import playground.mmoyo.PTRouter.LogicFactory;
 import playground.mmoyo.PTRouter.LogicIntoPlainTranslator;
 import playground.mmoyo.PTRouter.PTRouter;
-import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.TransitSimulation.TransitRouteFinder;
 
 /** makes tests with the transit router on the 5x5 scenario*/
 public class PTRouterTest extends MatsimTestCase {
-	final static PTValues ptvalues = new PTValues();
 	
 	public void testRouter() throws SAXException, ParserConfigurationException, IOException {
 	
-		final String PATH= getInputDirectory();
-		final String NETWORK = "src/playground/mmoyo/demo/X5/network.xml";
+		//final String PATH= getInputDirectory();
+		final String PATH="../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/";
+		final String NETWORK = PATH + "network.xml";
 		final String TRANSITSCHEDULE= PATH + "transitSchedule.xml";
 		final String PLANFILE = PATH +  "plans.xml";
 		

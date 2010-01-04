@@ -13,14 +13,14 @@ public class PTTravelCost implements TravelCost{
 	double travelTime;
 	double travelDistance;
 	double waitTime;
-	byte aliasType;
+	//byte aliasType;
 	
 	////coefficients with original values set to count only travelTime///
 	double timeCoefficient =.85;
 	double distanceCoefficient=.15;
 	double transferPenalty=60;
 	double walkCoefficient= 0; 
-	double waitCoefficient=0;
+	//double waitCoefficient=0;
 	
 	public PTTravelCost(final PTTravelTime ptTravelTime) {
 		this.ptTravelTime = ptTravelTime;
@@ -34,31 +34,24 @@ public class PTTravelCost implements TravelCost{
 	}
 
 	public double getLinkTravelCost(Link link, double time){
-		cost=0;
-		travelTime = ptTravelTime.getLinkTravelTime(link, time) ;
+		cost = ptTravelTime.getLinkTravelTime(link, time) ;  //the first assignation is only the travelTime
 		
-		/*1.-  for analysis with coefficients///////////////////////////*/
-		travelDistance = link.getLength();
 		String type = ((LinkImpl)link).getType();
-		if (type.equals("DetTransfer") || type.equals("Transfer")){
-			cost = (travelTime + transferPenalty);
-		}else if (type.equals("Standard")){
-			cost = (travelTime * timeCoefficient) + (travelDistance * distanceCoefficient) ;
-		}else if (type.equals("Access") || type.equals("Egress")){
-			cost = travelTime * walkCoefficient;
+		if (type.equals( PTValues.DETTRANSFER_STR ) || type.equals( PTValues.TRANSFER_STR )){
+			cost += transferPenalty;
+		}
+		
+		//with coefficients
+		else if (type.equals( PTValues.STANDARD_STR )){
+			cost = (cost * timeCoefficient) + (link.getLength() * distanceCoefficient) ;
+		}
+		else if (type.equals( PTValues.ACCESS_STR ) || type.equals( PTValues.EGRESS_STR )){
+			cost = cost * walkCoefficient;
+		}else{
+			throw new java.lang.RuntimeException("the pt link does not have a defined type: " + link.getId());
 		}
 		////////////////////////////////////////////////////////////////
-
 		
-		//2.- calculation only with transfer penalty//////////////////////////
-		/*
-		cost= travelTime;
-		aliasType = ((PTLink)link).getAliasType();
-		if (aliasType == 3 || aliasType == 4 ){  //transfer or dettransfer
-			cost += transferPenalty ;
-		}
-		/*///////////////////////////////////////////////////////////////*/
-	
 		return cost;
 	}
 }

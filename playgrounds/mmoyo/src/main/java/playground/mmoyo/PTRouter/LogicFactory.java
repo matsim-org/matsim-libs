@@ -36,7 +36,6 @@ public class LogicFactory{
 	private NetworkLayer logicNet= new NetworkLayer();
 	private NetworkLayer plainNet= new NetworkLayer();
 	private LogicIntoPlainTranslator logicToPlainTranslator; 
-	private PTValues ptValues= new PTValues(); 
 	//03 dic private Map<Id,List<PTNode>> facilityNodeMap = new TreeMap<Id,List<PTNode>>(); /* <key =PlainStop, value = List of logicStops to be joined by transfer links>*/
 	
 	long newLinkId=0;
@@ -142,16 +141,16 @@ public class LogicFactory{
 	
 		//create transfer and DetTransfer links
 		for (NodeImpl centerNode: logicNet.getNodes().values()){
-			Collection<NodeImpl> nearNodes= logicNet.getNearestNodes(centerNode.getCoord(), ptValues.DETTRANSFER_RANGE );
+			Collection<NodeImpl> nearNodes= logicNet.getNearestNodes(centerNode.getCoord(), PTValues.DETTRANSFER_RANGE );
 			for (NodeImpl nearNode : nearNodes){
 				Station fromNode= (Station)centerNode;
 				Station toNode =  (Station)nearNode;
 				if (fromNode.getTransitLine() != toNode.getTransitLine()) { 
 					if (!fromNode.isFirstStation() && !toNode.isLastStation()) {
 						if (fromNode.getTransitRouteStop().getStopFacility() != toNode.getTransitRouteStop().getStopFacility()) {
-							new PTLink(new IdImpl("DT" + ++newDetTransfLinkId),centerNode, nearNode, logicNet,"DetTransfer");
+							new PTLink(new IdImpl("DT" + ++newDetTransfLinkId),centerNode, nearNode, logicNet, PTValues.DETTRANSFER_STR);
 						}else{
-							new PTLink(new IdImpl("T" + ++newTransfLinkId), centerNode, nearNode, logicNet, "Transfer");
+							new PTLink(new IdImpl("T" + ++newTransfLinkId), centerNode, nearNode, logicNet, PTValues.TRANSFER_STR);
 						}
 					}
 				}
