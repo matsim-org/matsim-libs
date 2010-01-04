@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<!-- This is a fairly minimal config file; see console or logfile output for more options. -->
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="./examples/equil/network.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="./examples/equil/plans100trips.xml" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="./output/example5trips" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="10" />
+		<param name="eventsFileFormat" value="xml" />
+	</module>
+
+
+	<module name="simulation">
+	        <param name="snapshotFormat" value="otfvis" />
+<!-- 		Produces visualiser output in the following formats: -->
+<!-- 		"otfvis": matsim native visualizer format.  Two ways to use it: -->
+<!-- 		          () without hardware acceleration.  Simpler, but slower -->
+<!--                      () with hardware acceleration.  A bit more complicated to set up, but indispensable for larger matsim  -->
+<!--                         scenarios -->
+<!-- 		The visualiser output files are in <outputDirectory>/ITERS/it..../... -->
+
+		<param name="snapshotperiod" value="00:01:00" />
+
+	</module>
+
+	<module name="planCalcScore" >
+		<param name="activityType_0"            value="dummy" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+	</module>
+
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.9" />
+		<param name="Module_1" value="ChangeExpBeta" />
+
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="ReRoute_Dijkstra" />
+<!-- 		<param name="ModuleDisableAfterIteration_2" value="50" /> -->
+	</module>
+
+
+</config>
