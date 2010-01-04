@@ -66,6 +66,7 @@ public class Sim2D {
 	private OnTheFlyServer myOTFServer;
 	private final double endTime;
 	private ForceArrowWriter forceArrowWriter;
+	protected final PriorityBlockingQueue<Agent2D>  agentsToRemoveList  = new PriorityBlockingQueue<Agent2D>(500, new Agent2DDepartureTimeComparator());
 
 	public Sim2D(final Network network, final Map<MultiPolygon,List<Link>> floors, final Population plans, final EventsManager events, final StaticForceField sff){
 		this.config = Gbl.getConfig();
@@ -117,11 +118,27 @@ public class Sim2D {
 
 	private boolean doSimStep(double time) {
 		handleActivityEnds(time);
+		handleAgentRemoves(time);
 		moveFloors();
 		if (time >= this.endTime) {
 			return false;
 		}
 		return true;
+	}
+	
+	private void handleAgentRemoves(double time) {
+		while (this.agentsToRemoveList.peek() != null) {
+			Agent2D agent = this.agentsToRemoveList.poll();
+			//TODO works only as long as there is only one floor!!
+			Floor floor = this.network2D.getFloors().get(0);
+			floor.removeAgent(agent);
+		}
+	}
+
+
+	public void scheduleAgentRemove(Agent2D agent2d) {
+		this.agentsToRemoveList.add(agent2d);
+		
 	}
 
 	protected void scheduleActivityEnd(final Agent2D agent) {
@@ -276,5 +293,8 @@ public class Sim2D {
 		}
 		
 	}
+
+
+
 
 }

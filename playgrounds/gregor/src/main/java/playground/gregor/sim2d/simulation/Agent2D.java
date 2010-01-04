@@ -39,8 +39,10 @@ public class Agent2D  {
 
 	private AgentState state;
 	
-	private final double disieredVelocity = 1 + MatsimRandom.getRandom().nextDouble()-0.5;
-
+	private final double disieredVelocity = 1.0 + MatsimRandom.getRandom().nextDouble()/2-0.25;
+//	private final double disieredVelocity = 1.34;
+	private final double weight = 1000*(90 + 40*MatsimRandom.getRandom().nextDouble()-20);
+	
 	private Activity currentAct;
 
 
@@ -94,6 +96,8 @@ public class Agent2D  {
 			this.currentAct = (Activity) this.currentPlan.getPlanElements().get(this.actLegPointer);
 			if (this.actLegPointer < this.currentPlan.getPlanElements().size()-1) {
 				this.simulation.scheduleActivityEnd(this);
+			} else {
+				this.simulation.scheduleAgentRemove(this);
 			}
 			for (Link link :  this.currentLink.getToNode().getOutLinks().values()) {
 				if (link.getId().equals(this.currentAct.getLinkId())) {
@@ -125,6 +129,7 @@ public class Agent2D  {
 		ActivityImpl firstAct = ((ActivityImpl)this.currentPlan.getPlanElements().get(this.actLegPointer));
 		double departureTime = firstAct.getEndTime();
 		this.currentLink = firstAct.getLink();
+//		this.position = new Coordinate(this.currentLink.getToNode().getCoord().getX()+MatsimRandom.getRandom().nextDouble()/5-.1,this.currentLink.getToNode().getCoord().getY()+MatsimRandom.getRandom().nextDouble()/5-.1);
 		this.position = new Coordinate(this.currentLink.getToNode().getCoord().getX(),this.currentLink.getToNode().getCoord().getY());
 		if ((departureTime != Time.UNDEFINED_TIME) && (this.currentPlan.getPlanElements().size() > 1)) {
 			this.currentAct = (Activity) this.currentPlan.getPlanElements().get(this.actLegPointer);
@@ -140,7 +145,7 @@ public class Agent2D  {
 	}
 
 	public double getWeight() {
-		return 70*1000;
+		return weight;
 	}
 
 

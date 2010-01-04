@@ -7,10 +7,12 @@ public class Sim2DConfig {
 	public static double STATIC_FORCE_RESOLUTION = 0.05;
 	public static final double TIME_STEP_SIZE = 0.1;
 	
+	public static final double Bpath = 0.5;
 	public static final double Bp = 1.5;
 	public static final double Bw = 0.75;
 	public static final double App = 50.;
-	public static final double Apw = 200.;
+	public static final double Apath =500.;
+	public static final double Apw = 1125.;
 	public static final double tau = 1;
 	public static final double B_PATH = 3;
 	
@@ -19,4 +21,5 @@ public class Sim2DConfig {
 	
 	public static final boolean LOAD_NETWORK_FROM_XML_FILE = true;
 	public static final String FLOOR_SHAPE_FILE = "../../../../inputs/networks/floorShapeFile.shp";
+	
 }

@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
@@ -62,7 +63,7 @@ public class Floor {
 	
 	
 	private Map<Link,LineString> finishLines;
-
+	private Map<Link,LineString> linksGeos;
 
 
 
@@ -81,6 +82,7 @@ public class Floor {
 	private void init() {
 		this.finishLines = new HashMap<Link,LineString>();
 		this.drivingDirections = new HashMap<Link, Coordinate>();
+		this.linksGeos = new HashMap<Link,LineString>();
 		for (Link link : this.graph.getLinks().values()) {
 			LineString ls = getPerpendicularFinishLine(link, link.getToNode());
 			this.finishLines.put(link, ls);
@@ -90,7 +92,8 @@ public class Floor {
 			 c.y /= length;
 			 this.drivingDirections.put(link,c);
 			 
-//			 LineString ls1 = this.geofac.createLineString(new Coordinate[] {ls.getStartPoint().getCoordinate(),new Coordinate(ls.getStartPoint().getCoordinate().x+c.x,ls.getStartPoint().getCoordinate().y+c.y)});
+			 LineString ls1 = this.geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()),MGC.coord2Coordinate(link.getToNode().getCoord())});
+			this.linksGeos.put(link, ls1);
 //				GisDebugger.addGeometry(ls1);
 //				GisDebugger.dump("../../tmp/finishLine.shp");
 		}
@@ -102,7 +105,7 @@ public class Floor {
 	private LineString getPerpendicularFinishLine(Link link, Node node) {
 		
 		Coordinate c = new Coordinate(link.getFromNode().getCoord().getX()-link.getToNode().getCoord().getX(),link.getFromNode().getCoord().getY()-link.getToNode().getCoord().getY());
-		double scale = Sim2DConfig.B_PATH / Math.sqrt(Math.pow(c.x, 2)+Math.pow(c.y, 2));
+		double scale = 3/ Math.sqrt(Math.pow(c.x, 2)+Math.pow(c.y, 2));
 		c.x *= scale;
 		c.y *= scale;
 		Coordinate c1 = new Coordinate(COS_LEFT*c.x + SIN_LEFT*c.y,-SIN_LEFT*c.x+COS_LEFT*c.y);
@@ -130,6 +133,7 @@ public class Floor {
 		for (Agent2D agent : this.agents) {
 			Force force = this.agentForceMapping.get(agent);
 			Coordinate oldPos = agent.getPosition();
+
 			agent.setPosition(oldPos.x+force.getFx(),oldPos.y+force.getFy());
 			force.setOldFx(force.getFx());
 			force.setOldFy(force.getFy());
@@ -155,7 +159,8 @@ public class Floor {
 				updateAgentInteractionForce(agent,force);
 				updateAgentEnvForce(agent,force);
 				updateDrivingForce(agent,force);
-
+				updatePathForce(agent,force);
+				
 				validateForce(agent,force);
 			}
 
@@ -168,8 +173,11 @@ public class Floor {
 			this.forceInfos.add(tmp3);
 			double [] tmp4 = {agent.getPosition().x,agent.getPosition().y,force.driveX, force.driveY,3.f};
 			this.forceInfos.add(tmp4);
+			double [] tmp5 = {agent.getPosition().x,agent.getPosition().y,force.pathX, force.pathY,4.f};
+			this.forceInfos.add(tmp5);
 		}
 	}
+
 
 	private void validateForce(Agent2D agent, Force force) {
 		double norm= Math.sqrt(Math.pow(force.getFx(),2)  + Math.pow(force.getFy(),2));
@@ -179,21 +187,57 @@ public class Floor {
 		}
 	}
 
+	private void updatePathForce(Agent2D agent, Force force) {
+		
+		
+		Link link = agent.getCurrentLink();
+		LineString lsL = this.linksGeos.get(link);
+		Coordinate c = this.drivingDirections.get(link);
+		Point p = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y);
+		double dist = p.distance(lsL);
+		if (dist <= 0) {
+			return;
+		}
+		
+		double hypotenuse = agent.getPosition().distance(MGC.coord2Coordinate(link.getFromNode().getCoord()));
+		double dist2 = Math.sqrt(Math.pow(hypotenuse, 2)-Math.pow(dist, 2));
+		double deltaX = (link.getFromNode().getCoord().getX() + c.x * dist2) - agent.getPosition().x;
+		double deltaY = (link.getFromNode().getCoord().getY() + c.y * dist2) - agent.getPosition().y;
+		
+		
+		double f = Math.exp(dist/Sim2DConfig.Bpath);
+		deltaX *= f/dist;
+		deltaY *= f/dist;
+		
+		force.setFx(force.getFx() +Sim2DConfig.Apath * deltaX/agent.getWeight() );
+		force.setFy(force.getFy() +Sim2DConfig.Apath * deltaY/agent.getWeight() );
+		
+//		log.info(agent.getId() + " deltaX: " + Sim2DConfig.Apath * deltaX/agent.getWeight() + " deltaY:" + Sim2DConfig.Apath * deltaY/agent.getWeight());
+		
+		//DEBUG		
+		force.pathX = Sim2DConfig.Apath * deltaX/agent.getWeight();
+		force.pathY = Sim2DConfig.Apath * deltaY/agent.getWeight();
+	}
 	private void updateDrivingForce(Agent2D agent, Force force) {
 		Link link = agent.getCurrentLink();
 		LineString ls = this.finishLines.get(link);
 		Point p = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y);
 		double dist = p.distance(ls);
-		if (dist == 0) {
+		if (dist <= 0.2) {
 			link = agent.chooseNextLink();
-			ls = this.finishLines.get(link);
-			p = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y);
-			dist = p.distance(ls);
+			if (link != null) {
+				ls = this.finishLines.get(link);
+				p = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y);
+				dist = p.distance(ls);
+			}
 		}
 		if (link == null) {
 			force.driveX = 0;
 			force.driveY = 0;
 		} else {
+			
+			
+			
 			Coordinate d = this.drivingDirections.get(link);
 			double driveX = d.x;
 			double driveY = d.y;
@@ -210,6 +254,9 @@ public class Floor {
 				agent.chooseNextLink();
 			}
 
+//			double rX = MatsimRandom.getRandom().nextDouble()/50-.05;
+//			double rY = MatsimRandom.getRandom().nextDouble()/50-.05;
+			
 			force.setFx(force.getFx() + ((driveX-force.getOldFx())/Sim2DConfig.tau));
 			force.setFy(force.getFy() + ((driveY-force.getOldFy())/Sim2DConfig.tau));
 			force.driveX = (driveX-force.getOldFx() )/Sim2DConfig.tau;
@@ -290,5 +337,10 @@ public class Floor {
 	
 	public Force getAgentForce(Agent2D agent) {
 		return this.agentForceMapping.get(agent);
+	}
+
+	public void removeAgent(Agent2D agent) {
+		this.agents.remove(agent);
+		this.agentForceMapping.remove(agent);
 	}
 }

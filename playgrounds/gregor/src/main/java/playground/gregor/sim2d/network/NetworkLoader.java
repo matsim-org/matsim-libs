@@ -62,14 +62,14 @@ public class NetworkLoader {
 
 	private static final Logger log = Logger.getLogger(NetworkLoader.class);
 	
-	private static final double RANGE = 0.25;
+	private static final double RANGE = 0.45;
 
 	private static final double OVER_LENGTH = 2.;
 	private static final double OVER_LENGTHII = 1./600;
 
 	private static final boolean DEBUG = true;
 
-	String shapefile = "../../sim2d/sg4model.shp";
+	String shapefile = "../../../../sim2d/sg4model.shp";
 	boolean initialized = false;
 	private Envelope env;
 	private FeatureSource fs;
@@ -319,7 +319,7 @@ public class NetworkLoader {
 		//		}
 
 		if (DEBUG) {
-			dumpPolygons(this.geos,"../../tmp/mergedGeometries.shp");
+			dumpPolygons(this.geos,"../../../../tmp/mergedGeometries.shp");
 		}
 
 	}

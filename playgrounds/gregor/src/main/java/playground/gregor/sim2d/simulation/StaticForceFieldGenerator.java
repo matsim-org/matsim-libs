@@ -1,11 +1,10 @@
 package playground.gregor.sim2d.simulation;
 
 
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.gregor.sim2d.controller.Sim2DConfig;
-import playground.gregor.sim2d.gisdebug.GisDebugger;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -19,6 +18,8 @@ import com.vividsolutions.jts.operation.distance.DistanceOp;
 
 public class StaticForceFieldGenerator {
 
+	private static final Logger log = Logger.getLogger(StaticForceFieldGenerator.class);
+	
 	private static final double incr = 2*Math.PI/32;
 	
 	private final MultiPolygon structure;
@@ -47,8 +48,12 @@ public class StaticForceFieldGenerator {
 	}
 	
 	private void calculateForces() {
+		int loop = 0;
+		int yloop = 0;
 		for (double x = this.envelope.getMinX(); x <= this.envelope.getMaxX(); x += Sim2DConfig.STATIC_FORCE_RESOLUTION) {
+			log.info("xloop:" + ++loop + "  yloop:" + yloop);
 			for (double y = this.envelope.getMinY(); y <= this.envelope.getMaxY(); y += Sim2DConfig.STATIC_FORCE_RESOLUTION) {
+				yloop++;
 				Point point = this.geofac.createPoint(new Coordinate(x,y));
 				if (!this.structure.covers(point) && this.structure.distance(point)>0.1) {
 					Force f = calculateForce(x,y);

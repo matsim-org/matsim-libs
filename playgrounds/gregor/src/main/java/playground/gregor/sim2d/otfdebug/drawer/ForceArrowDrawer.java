@@ -36,6 +36,8 @@ public class ForceArrowDrawer  extends OTFGLDrawableImpl  {
 			arrowColor = new float[] {.99f,0.f,0.f};
 		} else if (color <= 3.f) {
 			arrowColor = new float[] {0.f,.99f,0.f};
+		} else if (color <= 4.f) {
+			arrowColor = new float[] {.0f,.99f,.99f};
 		}
 			
 		this.forces.add(new float[] {x,y,x+dx,y+dy,arrowColor[0],arrowColor[1],arrowColor[2]});
