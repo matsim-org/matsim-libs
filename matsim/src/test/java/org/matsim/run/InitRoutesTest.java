@@ -22,6 +22,7 @@ package org.matsim.run;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -58,7 +59,8 @@ public class InitRoutesTest extends MatsimTestCase {
 		final String CONFIG_FILE = getOutputDirectory() + "config.xml";
 
 		// prepare data like world and network
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).parse(NETWORK_FILE);
 
 		// create one person with missing link in act
@@ -89,8 +91,8 @@ public class InitRoutesTest extends MatsimTestCase {
 
 		// now perform some tests
 		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
-		PopulationImpl population2 = new PopulationImpl();
-		new MatsimPopulationReader(population2, network).parse(PLANS_FILE_TESTOUTPUT);
+		PopulationImpl population2 = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).parse(PLANS_FILE_TESTOUTPUT);
 		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
 		Person person2 = population2.getPersons().get(new IdImpl("1"));
 		assertNotNull("person 1 missing", person2);

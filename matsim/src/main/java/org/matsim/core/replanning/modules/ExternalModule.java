@@ -24,10 +24,14 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -35,7 +39,6 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -78,7 +81,7 @@ public class ExternalModule implements PlanStrategyModule {
 	protected PopulationWriter plansWriter = null;
 	private PopulationWriterHandler handler = null;
 	private BufferedWriter writer = null;
-	private final Network network;
+	private final ScenarioImpl scenario;
 	protected Config extConfig;
 	protected String exePath = "";
 	protected String moduleId = "";
@@ -88,11 +91,11 @@ public class ExternalModule implements PlanStrategyModule {
 	private ControlerIO controlerIO;
 
 
-	public ExternalModule(final String exePath, final String moduleId, final Network network) {
+	public ExternalModule(final String exePath, final String moduleId, final ScenarioImpl scenario) {
 		this.exePath = exePath;
 		this.moduleId = moduleId + "_";
 		this.outFileRoot = Controler.getTempPath() + "/";
-		this.network = network;
+		this.scenario = scenario;
 	}
 
 	public void prepareReplanning() {
@@ -200,8 +203,8 @@ public class ExternalModule implements PlanStrategyModule {
 		new UpdatePlansAlgo(this.persons).run(plans);
 	}
 
-	protected PopulationReader getPlansReader(final PopulationImpl plans) {
-		PopulationReader plansReader = new MatsimPopulationReader(plans, (NetworkLayer) this.network);
+	private PopulationReader getPlansReader(final PopulationImpl plans) {
+		PopulationReader plansReader = new MatsimPopulationReader(new PseudoScenario(this.scenario, plans));
 		return plansReader;
 	}
 
@@ -237,5 +240,47 @@ public class ExternalModule implements PlanStrategyModule {
 		this.controlerIO = controlerIO;
 	}
 
+	/**
+	 * Provides a real scenario, but exchanges the population.
+	 * Still, network and facilities can be reused that way.
+	 * 
+	 * @author mrieser
+	 */
+	private static class PseudoScenario implements Scenario {
+		
+		private final ScenarioImpl scenario;
+		private Population myPopulation;
+		
+		public PseudoScenario(final ScenarioImpl scenario, final PopulationImpl population) {
+			this.scenario = scenario;
+			this.myPopulation = population;
+		}
+
+		@Override
+		public Population getPopulation() {
+			return this.myPopulation;
+		}
+
+		@Override
+		public Coord createCoord(double x, double y) {
+			return this.scenario.createCoord(x, y);
+		}
+
+		@Override
+		public Id createId(String string) {
+			return this.scenario.createId(string);
+		}
+
+		@Override
+		public Config getConfig() {
+			return this.scenario.getConfig();
+		}
+
+		@Override
+		public Network getNetwork() {
+			return this.scenario.getNetwork();
+		}
+		
+	}
 	
 }

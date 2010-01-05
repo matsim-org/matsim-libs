@@ -22,11 +22,10 @@ package org.matsim.utils.gis.matsim2esri.plans;
 
 import java.io.IOException;
 
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -48,12 +47,12 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		String outShp = getOutputDirectory() + "acts.shp";
 //		String outDbf = getOutputDirectory() + "acts.dbf";
 
-		Gbl.createConfig(null);
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl(super.loadConfig(null));
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(populationFilename);
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, crs, outputDir);
@@ -85,12 +84,12 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		String outShp = getOutputDirectory() + "legs.shp";
 //		String outDbf = getOutputDirectory() + "legs.dbf";
 
-		Gbl.createConfig(null);
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl(super.loadConfig(null));
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(populationFilename);
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, crs, outputDir);

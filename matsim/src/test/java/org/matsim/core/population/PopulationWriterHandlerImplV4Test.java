@@ -20,12 +20,12 @@
 
 package org.matsim.core.population;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -36,12 +36,11 @@ import org.matsim.testcases.MatsimTestCase;
 public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 
 	public void testWriteGenericRoute() {
-		super.loadConfig(null);
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl(super.loadConfig(null));
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile("test/scenarios/equil/network.xml");
 		LinkImpl link1 = network.getLinks().get(new IdImpl(1));
 		LinkImpl link2 = network.getLinks().get(new IdImpl(2));
-		Gbl.createWorld().setNetworkLayer(network);
 		
 		PopulationImpl pop = new PopulationImpl();
 		PopulationFactory pb = pop.getFactory();
@@ -62,8 +61,8 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		String filename = getOutputDirectory() + "population.xml";
 		new PopulationWriter(pop).writeV4(filename);
 		
-		PopulationImpl pop2 = new PopulationImpl();
-		new MatsimPopulationReader(pop2, network).readFile(filename);
+		PopulationImpl pop2 = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(filename);
 		Person person2 = pop2.getPersons().get(new IdImpl(1));
 		LegImpl leg2 = (LegImpl) person2.getPlans().get(0).getPlanElements().get(1);
 		RouteWRefs route2 = leg2.getRoute();

@@ -21,6 +21,7 @@
 package playground.mrieser;
 
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
@@ -745,19 +746,8 @@ public class MyRuns {
 
 		Gbl.printSystemInfo();
 		
-		String[] array = {"a", "b", "c"};
-		String[][] array2 = {{"A1", "B1"}, {"A2", "B2"}};
-		for (String[] sub : array2) {
-			for (String str : sub) {
-				System.out.println(str);
-			}
-		}
-		int i = 0;
-		for (i = 0; i<5;i++) {
-			System.out.print(i);
-		}
-		System.out.print(i);
-
+		System.out.println(new File("/Users/mrieser/Desktop/Umlautä.txt").exists());
+		
 		System.out.println("stop at " + (new Date()));
 		System.exit(0); // currently only used for calcRouteMT();
 	}

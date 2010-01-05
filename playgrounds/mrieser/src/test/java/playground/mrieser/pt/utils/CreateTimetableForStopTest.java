@@ -20,10 +20,14 @@
 
 package playground.mrieser.pt.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Test;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -37,14 +41,13 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.xml.sax.SAXException;
 
-import playground.mrieser.pt.utils.CreateTimetableForStop;
 
-
-public class CreateTimetableForStopTest extends MatsimTestCase {
+public class CreateTimetableForStopTest {
 
 	public static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
 	public static final String INPUT_TEST_FILE_NETWORK = "network.xml";
 
+	@Test
 	public void testGetDeparturesAtStop() throws SAXException, ParserConfigurationException, IOException {
 		final String inputDir = "test/input/" + TransitScheduleReaderTest.class.getCanonicalName().replace('.', '/') + "/";
 
@@ -67,8 +70,8 @@ public class CreateTimetableForStopTest extends MatsimTestCase {
 
 		assertEquals("wrong number of departures.", 3, departures.length);
 		double baseDepartureTime = Time.parseTime("07:00:00") + Time.parseTime("00:03:00");
-		assertEquals("wrong departure time for 1st departure.", baseDepartureTime, departures[0], EPSILON);
-		assertEquals("wrong departure time for 2nd departure.", baseDepartureTime + 600, departures[1], EPSILON);
-		assertEquals("wrong departure time for 3rd departure.", baseDepartureTime + 1200, departures[2], EPSILON);
+		assertEquals("wrong departure time for 1st departure.", baseDepartureTime, departures[0], MatsimTestCase.EPSILON);
+		assertEquals("wrong departure time for 2nd departure.", baseDepartureTime + 600, departures[1], MatsimTestCase.EPSILON);
+		assertEquals("wrong departure time for 3rd departure.", baseDepartureTime + 1200, departures[2], MatsimTestCase.EPSILON);
 	}
 }
