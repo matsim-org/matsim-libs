@@ -47,7 +47,6 @@ import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
@@ -59,7 +58,6 @@ import org.matsim.counts.algorithms.graphs.BiasErrorGraph;
 import org.matsim.counts.algorithms.graphs.BoxPlotErrorGraph;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
-import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24Graph;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraph;
 import org.matsim.vis.kml.KMZWriter;
@@ -71,9 +69,9 @@ import org.matsim.vis.kml.NetworkFeatureFactory;
  */
 public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	/**
-	 * constant for the name of the links
+	 * constant for the name of the stops
 	 */
-	private static final String LINK = "Link: ";
+	private static final String STOP = "Stop: ";
 	/**
 	 * constant for the link description
 	 */
@@ -164,7 +162,7 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	private StyleType greyCrossStyle;
 	private StyleType greyMinusStyle;
 	/**
-	 * maps linkids to filenames in the kmz
+	 * maps stopids to filenames in the kmz
 	 */
 	private Map<String, String> countsLoadCurveGraphMap;
 	private Counts counts;
@@ -333,12 +331,12 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 					kmlObjectFactory.createScreenOverlay(errorGraph));
 		}
 
-//		ScreenOverlayType awtv = this.createAWTVGraph();
-//		if (awtv != null) {
-//			awtv.setVisibility(Boolean.FALSE);
-//			this.mainFolder.getAbstractFeatureGroup().add(
-//					kmlObjectFactory.createScreenOverlay(awtv));
-//		}
+		// ScreenOverlayType awtv = this.createAWTVGraph();
+		// if (awtv != null) {
+		// awtv.setVisibility(Boolean.FALSE);
+		// this.mainFolder.getAbstractFeatureGroup().add(
+		// kmlObjectFactory.createScreenOverlay(awtv));
+		// }
 
 		// link graphs
 		this.createCountsLoadCurveGraphs();
@@ -419,21 +417,21 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	/**
 	 * Creates a placemark
 	 * 
-	 * @param linkid
+	 * @param stopid
 	 * @param csc
 	 * @param relativeError
 	 * @param timestep
 	 * @return the Placemark instance with description and name set
 	 */
-	private PlacemarkType createPlacemark(final String linkid,
+	private PlacemarkType createPlacemark(final String stopid,
 			final CountSimComparison csc, final double relativeError,
 			final int timestep) {
 		StringBuffer stringBuffer = new StringBuffer();
 		PlacemarkType placemark = kmlObjectFactory.createPlacemarkType();
 		stringBuffer.delete(0, stringBuffer.length());
-		stringBuffer.append(LINK);
-		stringBuffer.append(linkid);
-		placemark.setDescription(createPlacemarkDescription(linkid, csc,
+		stringBuffer.append(STOP);
+		stringBuffer.append(stopid);
+		placemark.setDescription(createPlacemarkDescription(stopid, csc,
 				relativeError, timestep));
 		return placemark;
 	}
@@ -451,7 +449,6 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 			final List<CountSimComparison> countSimComparisonList,
 			final FolderType folder) {
 		Id stopid;
-		Link link;
 		PlacemarkType placemark;
 		double relativeError;
 		Coord coord;
@@ -519,13 +516,13 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 
 	/**
 	 * 
-	 * @param linkid
+	 * @param stopid
 	 * @param csc
 	 * @param relativeError
 	 * @param timestep
 	 * @return A String containing the description for each placemark
 	 */
-	private String createPlacemarkDescription(final String linkid,
+	private String createPlacemarkDescription(final String stopid,
 			final CountSimComparison csc, final double relativeError,
 			final int timestep) {
 		StringBuffer buffer = new StringBuffer(100);
@@ -535,15 +532,15 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		// buffer.append(linkid);
 		// buffer.append(ENDH1);
 		buffer.append(NetworkFeatureFactory.STARTH2);
-		buffer.append(LINK);
-		buffer.append(linkid);
+		buffer.append(STOP);
+		buffer.append(stopid);
 		buffer.append(NetworkFeatureFactory.ENDH2);
 		buffer.append(NetworkFeatureFactory.STARTH3);
 		buffer.append(H24OVERVIEW);
 		buffer.append(NetworkFeatureFactory.ENDH3);
 		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append(IMG);
-		buffer.append(this.countsLoadCurveGraphMap.get(linkid));
+		buffer.append(this.countsLoadCurveGraphMap.get(stopid));
 		buffer.append(IMGEND);
 		buffer.append(NetworkFeatureFactory.ENDP);
 		buffer.append(NetworkFeatureFactory.STARTH3);
@@ -639,26 +636,27 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	}
 
 	/**
-	 * Creates CountsLoadCurveGraphs for each link and puts them in the kmz as
+	 * Creates CountsLoadCurveGraphs for each stop and puts them in the kmz as
 	 * pngs
 	 */
 	private void createCountsLoadCurveGraphs() {
-		CountsLoadCurveGraphCreator cgc = new CountsLoadCurveGraphCreator("");
+		PtCountsLoadCurveGraphCreator cgc = new PtCountsLoadCurveGraphCreator(
+				"");
 		List<CountsGraph> graphs = cgc.createGraphs(this.countComparisonFilter
 				.getCountsForHour(null), this.iterationNumber);
 
 		this.countsLoadCurveGraphMap = new HashMap<String, String>(graphs
 				.size());
-		String linkid;
+		String stopId;
 		StringBuffer filename;
 		for (CountsGraph cg : graphs) {
 			try {
 				filename = new StringBuffer();
-				linkid = ((CountsLoadCurveGraph) cg).getLinkId();
-				filename.append(linkid);
+				stopId = ((CountsLoadCurveGraph) cg).getLinkId();
+				filename.append(stopId);
 				filename.append(PNG);
 				writeChartToKmz(filename.toString(), cg.getChart());
-				this.countsLoadCurveGraphMap.put(linkid, filename.toString());
+				this.countsLoadCurveGraphMap.put(stopId, filename.toString());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
