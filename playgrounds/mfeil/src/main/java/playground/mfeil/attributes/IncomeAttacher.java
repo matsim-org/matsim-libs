@@ -357,7 +357,7 @@ public class IncomeAttacher {
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==22) {
-				index.get(count)[5]+=1; // Maturitätsschule
+				index.get(count)[5]+=1; // MaturitÃ¤tsschule
 				index.get(count)[1]++;
 				}
 			else if (this.education.get(id)==23) {
@@ -365,11 +365,11 @@ public class IncomeAttacher {
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==31) {
-				index.get(count)[7]+=1; // Höhere Fach- und Berufsausbildung
+				index.get(count)[7]+=1; // HÃ¶here Fach- und Berufsausbildung
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==32) {
-				index.get(count)[8]+=1; // Höhere Fachschule
+				index.get(count)[8]+=1; // HÃ¶here Fachschule
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==33) {
@@ -377,7 +377,7 @@ public class IncomeAttacher {
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==34) {
-				index.get(count)[10]+=1; // Universität
+				index.get(count)[10]+=1; // UniversitÃ¤t
 				index.get(count)[1]++;
 			}
 			else if (this.education.get(id)==-7) {
