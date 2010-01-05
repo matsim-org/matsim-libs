@@ -20,7 +20,6 @@
 
 package org.matsim.core.mobsim.queuesim;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -45,7 +44,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
@@ -69,7 +67,6 @@ import org.matsim.signalsystems.config.BasicSignalSystemConfigurations;
 import org.matsim.vehicles.BasicVehicleImpl;
 import org.matsim.vehicles.BasicVehicleType;
 import org.matsim.vehicles.BasicVehicleTypeImpl;
-import org.matsim.vis.netvis.VisConfig;
 import org.matsim.vis.netvis.streaming.SimStateWriterI;
 import org.matsim.vis.otfvis.data.fileio.OTFFileWriter;
 import org.matsim.vis.otfvis.data.fileio.queuesim.OTFFileWriterQueueSimConnectionManagerFactory;
@@ -261,59 +258,44 @@ public class QueueSimulation implements Simulation{
 		this.config.simulation().setSnapshotFile(snapshotFilename);
 	}
 
-	private void createSnapshotwriter() {
-		// A snapshot period of 0 or less indicates that there should be NO snapshot written
-		if (this.snapshotPeriod > 0 ) {
-			String snapshotFormat =  this.config.simulation().getSnapshotFormat();
-
-			if (snapshotFormat.contains("plansfile")) {
-				String snapshotFilePrefix = 	 this.controlerIO.getIterationPath(this.iterationNumber) + "/positionInfoPlansFile";
-				String snapshotFileSuffix = "xml";
-				this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix));
-			}
-			if (snapshotFormat.contains("transims")) {
-				String snapshotFile = this.controlerIO.getIterationFilename(this.iterationNumber, "T.veh");
-				this.snapshotWriters.add(new TransimsSnapshotWriter(snapshotFile));
-			}
-			if (snapshotFormat.contains("googleearth")) {
-				String snapshotFile = this.controlerIO.getIterationFilename(this.iterationNumber, "googleearth.kmz");
-				String coordSystem = this.config.global().getCoordinateSystem();
-				this.snapshotWriters.add(new KmlSnapshotWriter(snapshotFile,
-						TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84)));
-			}
-			if (snapshotFormat.contains("netvis")) {
-				String snapshotFile;
-
-				if (Controler.getIteration() == -1 ) snapshotFile = this.config.simulation().getSnapshotFile();
-				else snapshotFile = this.controlerIO.getIterationPath(this.iterationNumber) + "/Snapshot";
-
-				File networkFile = new File(this.config.network().getInputFile());
-				VisConfig myvisconf = VisConfig.newDefaultConfig();
-				String[] params = {VisConfig.LOGO, VisConfig.DELAY, VisConfig.LINK_WIDTH_FACTOR, VisConfig.SHOW_NODE_LABELS, VisConfig.SHOW_LINK_LABELS};
-				for (String param : params) {
-					String value = this.config.findParam("vis", param);
-					if (value != null) {
-						myvisconf.set(param, value);
-					}
-				}
-				// OR do it like this: buffers = Integer.parseInt(Config.getSingleton().getParam("temporal", "buffersize"));
-				// Automatic reasoning about buffersize, so that the file will be about 5MB big...
-				int buffers = this.network.getLinks().size();
-				String buffString = this.config.findParam("vis", "buffersize");
-				if (buffString == null) {
-					buffers = Math.max(5, Math.min(500000/buffers, 100));
-				} else buffers = Integer.parseInt(buffString);
-
-				this.netStateWriter = new QueueNetStateWriter(this.network, this.network.getNetworkLayer(), networkFile.getAbsolutePath(), myvisconf, snapshotFile, this.snapshotPeriod, buffers);
-				this.netStateWriter.open();
-			}
-			if (snapshotFormat.contains("otfvis")) {
-				String snapshotFile = this.controlerIO.getIterationFilename(this.iterationNumber, "otfvis.mvi");
-				OTFFileWriter writer = new OTFFileWriter(this.snapshotPeriod, new OTFQueueSimServerQuadBuilder(this.network), snapshotFile, new OTFFileWriterQueueSimConnectionManagerFactory());
-				this.snapshotWriters.add(writer);
-			}
-		} else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
-	}
+  private void createSnapshotwriter() {
+    // A snapshot period of 0 or less indicates that there should be NO snapshot written
+    if (this.snapshotPeriod > 0 ) {
+      String snapshotFormat =  this.config.simulation().getSnapshotFormat();
+      Integer itNumber = this.iterationNumber;
+      if (this.controlerIO == null) {
+        log.error("Not able to create io path via ControlerIO in mobility simulation, not able to write visualizer output!");
+        return;
+      }
+      else if (itNumber == null) {
+        log.warn("No iteration number set in mobility simulation using iteration number 0 for snapshot file...");
+        itNumber = 0;
+      }
+      if (snapshotFormat.contains("plansfile")) {
+        String snapshotFilePrefix = this.controlerIO.getIterationPath(itNumber) + "/positionInfoPlansFile";
+        String snapshotFileSuffix = "xml";
+        this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix));
+      }
+      if (snapshotFormat.contains("transims")) {
+        String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "T.veh");
+        this.snapshotWriters.add(new TransimsSnapshotWriter(snapshotFile));
+      }
+      if (snapshotFormat.contains("googleearth")) {
+        String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "googleearth.kmz");
+        String coordSystem = this.config.global().getCoordinateSystem();
+        this.snapshotWriters.add(new KmlSnapshotWriter(snapshotFile,
+            TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84)));
+      }
+      if (snapshotFormat.contains("netvis")) {
+        throw new IllegalStateException("netvis is no longer supported by this simulation");
+      }
+      if (snapshotFormat.contains("otfvis")) {
+        String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "otfvis.mvi");
+        OTFFileWriter writer = new OTFFileWriter(this.snapshotPeriod, new OTFQueueSimServerQuadBuilder(this.network), snapshotFile, new OTFFileWriterQueueSimConnectionManagerFactory());
+        this.snapshotWriters.add(writer);
+      }
+    } else this.snapshotPeriod = Integer.MAX_VALUE; // make sure snapshot is never called
+  }
 
 	private void prepareNetworkChangeEventsQueue() {
 		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)(this.networkLayer)).getNetworkChangeEvents();

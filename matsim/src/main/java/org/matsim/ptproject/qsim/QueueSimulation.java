@@ -117,8 +117,8 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 	private QueueSimSignalEngine signalEngine = null;
 	private final Set<TransportMode> notTeleportedModes = new HashSet<TransportMode>();
 	
-	private List<QueueSimulationFeature> queueSimulationFeatures = new ArrayList<QueueSimulationFeature>();
-	private List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
+	private final List<QueueSimulationFeature> queueSimulationFeatures = new ArrayList<QueueSimulationFeature>();
+	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
 	
 	private Integer iterationNumber = null;
 	private ControlerIO controlerIO;
@@ -255,27 +255,35 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 		// A snapshot period of 0 or less indicates that there should be NO snapshot written
 		if (this.snapshotPeriod > 0 ) {
 			String snapshotFormat =  this.config.simulation().getSnapshotFormat();
-
+			Integer itNumber = this.iterationNumber;
+			if (this.controlerIO == null) {
+			  log.error("Not able to create io path via ControlerIO in mobility simulation, not able to write visualizer output!");
+			  return;
+			}
+			else if (itNumber == null) {
+			  log.warn("No iteration number set in mobility simulation using iteration number 0 for snapshot file...");
+			  itNumber = 0;
+			}
 			if (snapshotFormat.contains("plansfile")) {
-				String snapshotFilePrefix = this.controlerIO.getIterationPath(this.iterationNumber) + "/positionInfoPlansFile";
+				String snapshotFilePrefix = this.controlerIO.getIterationPath(itNumber) + "/positionInfoPlansFile";
 				String snapshotFileSuffix = "xml";
 				this.snapshotWriters.add(new PlansFileSnapshotWriter(snapshotFilePrefix,snapshotFileSuffix));
 			}
 			if (snapshotFormat.contains("transims")) {
-				String snapshotFile = this.controlerIO.getIterationFilename(this.iterationNumber, "T.veh");
+				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "T.veh");
 				this.snapshotWriters.add(new TransimsSnapshotWriter(snapshotFile));
 			}
 			if (snapshotFormat.contains("googleearth")) {
-				String snapshotFile = this.controlerIO.getIterationFilename(this.iterationNumber, "googleearth.kmz");
+				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "googleearth.kmz");
 				String coordSystem = this.config.global().getCoordinateSystem();
 				this.snapshotWriters.add(new KmlSnapshotWriter(snapshotFile,
 						TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84)));
 			}
 			if (snapshotFormat.contains("netvis")) {
-				throw new IllegalStateException("netvis is no longer supported by this simulation");
+				log.warn("Snapshot format netvis is no longer supported by this simulation");
 			}
 			if (snapshotFormat.contains("otfvis")) {
-				String snapshotFile = this.controlerIO.getIterationFilename(this.iterationNumber, "otfvis.mvi");
+				String snapshotFile = this.controlerIO.getIterationFilename(itNumber, "otfvis.mvi");
 				OTFFileWriter writer = null;
 				writer = new OTFFileWriter(this.snapshotPeriod, new OTFQSimServerQuadBuilder(this.network), snapshotFile, new OTFFileWriterQSimConnectionManagerFactory());
 //				if (this.config.scenario().isUseLanes() && ! this.config.scenario().isUseSignalSystems()) {

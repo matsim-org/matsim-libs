@@ -31,6 +31,7 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -181,7 +182,10 @@ public class OTFVis {
 		loader.loadScenario();
 		ScenarioImpl scenario = loader.getScenario();
 		EventsManagerImpl events = new EventsManagerImpl();
+		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
 		OTFVisQueueSim queueSimulation = new OTFVisQueueSim(scenario, events);
+		queueSimulation.setControlerIO(controlerIO);
+		queueSimulation.setIterationNumber(scenario.getConfig().controler().getLastIteration());
 		queueSimulation.run();
 	}
 	
