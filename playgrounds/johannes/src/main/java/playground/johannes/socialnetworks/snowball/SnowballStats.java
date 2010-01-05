@@ -36,15 +36,10 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.sna.graph.GraphProjection;
+import org.matsim.contrib.sna.graph.VertexDecorator;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.johannes.socialnetworks.graph.GraphProjection;
-import playground.johannes.socialnetworks.graph.VertexDecorator;
-
-/**
- * @author illenberger
- *
- */
 public class SnowballStats extends GraphPropertyEstimator {
 
 	private BufferedWriter edgeCountWriter;

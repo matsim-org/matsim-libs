@@ -21,7 +21,7 @@ package playground.johannes.socialnetworks.graph.spatial;
 
 import java.util.Set;
 
-import playground.johannes.socialnetworks.graph.GraphProjection;
+import org.matsim.contrib.sna.graph.GraphProjection;
 
 /**
  * @author illenberger

@@ -30,8 +30,13 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.EdgeDecorator;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphProjection;
+import org.matsim.contrib.sna.graph.GraphProjectionBuilder;
+import org.matsim.contrib.sna.graph.GraphProjectionFactory;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.VertexDecorator;
 
 /**
  * Representation of an unweighted Dijkstra best path algorithm. This algorithm
@@ -346,10 +351,18 @@ public class UnweightedDijkstra<V extends Vertex> {
 		}
 	}
 	
+	private class DijkstraEdge<E extends Edge> extends EdgeDecorator<E> {
+
+		protected DijkstraEdge(E delegate) {
+			super(delegate);
+			// TODO Auto-generated constructor stub
+		}
+		
+	}
 	private class DijkstraGraphFactory implements GraphProjectionFactory<Graph, V, Edge, DijkstraGraph, DijkstraVertex, EdgeDecorator<Edge>> {
 
 		public EdgeDecorator<Edge> createEdge(Edge delegate) {
-			return new EdgeDecorator<Edge>(delegate);
+			return new DijkstraEdge<Edge>(delegate);
 		}
 
 		public DijkstraGraph createGraph(Graph delegate) {

@@ -25,8 +25,6 @@ package playground.johannes.socialnetworks.graph;
 
 
 import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntIterator;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 
@@ -40,11 +38,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.EdgeDecorator;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphProjection;
+import org.matsim.contrib.sna.graph.GraphProjectionBuilder;
+import org.matsim.contrib.sna.graph.GraphProjectionFactory;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.VertexDecorator;
 
-import playground.johannes.socialnetworks.graph.matrix.Centrality;
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
 import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.socialnetworks.statistics.Distribution;
 

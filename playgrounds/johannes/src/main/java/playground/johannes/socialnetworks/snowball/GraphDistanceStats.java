@@ -28,10 +28,10 @@ import java.io.IOException;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.GraphProjection;
+import org.matsim.contrib.sna.graph.VertexDecorator;
 
-import playground.johannes.socialnetworks.graph.GraphProjection;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
-import playground.johannes.socialnetworks.graph.VertexDecorator;
 import playground.johannes.socialnetworks.graph.GraphStatistics.GraphDistance;
 import playground.johannes.socialnetworks.statistics.Distribution;
 

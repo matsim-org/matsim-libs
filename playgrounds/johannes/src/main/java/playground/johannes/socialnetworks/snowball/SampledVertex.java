@@ -26,9 +26,7 @@ package playground.johannes.socialnetworks.snowball;
 import java.util.List;
 
 import org.matsim.contrib.sna.graph.SparseVertex;
-
-import playground.johannes.socialnetworks.graph.VertexDecorator;
-
+import org.matsim.contrib.sna.graph.VertexDecorator;
 /**
  * @author illenberger
  *

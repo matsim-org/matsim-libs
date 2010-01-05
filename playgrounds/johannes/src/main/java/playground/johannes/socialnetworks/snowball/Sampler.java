@@ -33,14 +33,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import playground.johannes.socialnetworks.graph.GraphProjection;
-import playground.johannes.socialnetworks.graph.SparseGraphProjectionBuilder;
-import playground.johannes.socialnetworks.graph.VertexDecorator;
+import org.matsim.contrib.sna.graph.GraphProjection;
+import org.matsim.contrib.sna.graph.SparseGraphProjectionBuilder;
+import org.matsim.contrib.sna.graph.VertexDecorator;
 
-/**
- * @author illenberger
- *
- */
 public class Sampler {
 
 	private int iteration;

@@ -22,9 +22,7 @@ package playground.johannes.socialnetworks.graph.spatial;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
-
-import playground.johannes.socialnetworks.graph.VertexDecorator;
-
+import org.matsim.contrib.sna.graph.VertexDecorator;
 /**
  * @author illenberger
  *

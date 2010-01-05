@@ -23,6 +23,10 @@
  */
 package playground.johannes.socialnetworks.graph;
 
+import gnu.trove.TDoubleObjectHashMap;
+import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectDoubleIterator;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -35,12 +39,11 @@ import java.util.TreeSet;
 
 import org.matsim.contrib.sna.graph.Edge;
 import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.GraphProjection;
+import org.matsim.contrib.sna.graph.SparseGraphProjectionBuilder;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.VertexDecorator;
 import org.matsim.core.utils.collections.Tuple;
-
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
 
 /**
  * @author illenberger

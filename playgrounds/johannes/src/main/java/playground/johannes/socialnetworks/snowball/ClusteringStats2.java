@@ -27,15 +27,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.sna.graph.GraphProjection;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.VertexDecorator;
 
-import playground.johannes.socialnetworks.graph.GraphProjection;
-import playground.johannes.socialnetworks.graph.VertexDecorator;
-
-/**
- * @author illenberger
- * 
- */
 public class ClusteringStats2 extends GraphPropertyEstimator {
 
 	private double globalResponseRate;

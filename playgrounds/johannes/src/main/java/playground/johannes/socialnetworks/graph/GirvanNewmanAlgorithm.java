@@ -35,15 +35,16 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.EdgeDecorator;
 import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.SparseEdge;
+import org.matsim.contrib.sna.graph.GraphProjection;
+import org.matsim.contrib.sna.graph.SparseGraphProjectionBuilder;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.VertexDecorator;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
 import playground.johannes.socialnetworks.graph.io.PajekCommunityColorizer;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLCommunityStlyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;

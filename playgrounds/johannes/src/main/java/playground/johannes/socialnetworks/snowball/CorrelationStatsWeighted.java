@@ -24,15 +24,10 @@
 package playground.johannes.socialnetworks.snowball;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.sna.graph.EdgeDecorator;
+import org.matsim.contrib.sna.graph.GraphProjection;
+import org.matsim.contrib.sna.graph.VertexDecorator;
 
-import playground.johannes.socialnetworks.graph.EdgeDecorator;
-import playground.johannes.socialnetworks.graph.GraphProjection;
-import playground.johannes.socialnetworks.graph.VertexDecorator;
-
-/**
- * @author illenberger
- *
- */
 public class CorrelationStatsWeighted extends GraphPropertyEstimator {
 
 //	private double globalResponseRate;

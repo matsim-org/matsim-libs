@@ -32,16 +32,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.sna.graph.GraphProjection;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.VertexDecorator;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.johannes.socialnetworks.graph.GraphProjection;
-import playground.johannes.socialnetworks.graph.VertexDecorator;
-
-/**
- * @author illenberger
- * 
- */
 public class MutualityStats extends GraphPropertyEstimator {
 
 	private double responseRate;

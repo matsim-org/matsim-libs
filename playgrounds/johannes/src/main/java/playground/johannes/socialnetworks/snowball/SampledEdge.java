@@ -23,15 +23,13 @@
  */
 package playground.johannes.socialnetworks.snowball;
 
+import org.matsim.contrib.sna.graph.EdgeDecorator;
 import org.matsim.contrib.sna.graph.SparseEdge;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.johannes.socialnetworks.graph.EdgeDecorator;
-
 /**
- * @author illenberger
- *
+ * @author illenberger 
  */
 public class SampledEdge extends SparseEdge {
 
