@@ -90,8 +90,8 @@ public class PlanomatXTest extends MatsimTestCase{
 		// Compare the two plans; <1 because of double rounding errors
 		for (int i=0;i<plan.getPlanElements().size();i++){
 			if (i%2==0){
-				System.out.println("start: "+((ActivityImpl)(plan.getPlanElements().get(i))).getStartTime());
-				System.out.println("end: "+((ActivityImpl)(plan.getPlanElements().get(i))).getEndTime());
+	//			System.out.println("start: "+((ActivityImpl)(plan.getPlanElements().get(i))).getStartTime());
+	//			System.out.println("end: "+((ActivityImpl)(plan.getPlanElements().get(i))).getEndTime());
 				assertEquals(Math.floor(((ActivityImpl)(plan.getPlanElements().get(i))).getStartTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getStartTime()));
 				assertEquals(Math.floor(((ActivityImpl)(plan.getPlanElements().get(i))).getEndTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getEndTime()));
 			}
