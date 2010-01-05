@@ -50,4 +50,6 @@ public interface DgPaths {
 	final String IVTCHBASE = SHAREDSVN + "studies/schweiz-ivtch/";
 
 	final String STUDIESDG = SHAREDSVN + "studies/dgrether/";
+
+  final String EXAMPLEBASE = STUDIESDG + "examples/";
 }

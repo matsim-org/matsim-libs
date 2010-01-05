@@ -28,14 +28,14 @@ import org.matsim.run.OTFVis;
  * @author dgrether
  *
  */
-public class DgEquilControler {
+public class DgEquilController {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		
-		final String config = "../testData/examples/equil/config.xml";
+		final String config = DgPaths.EXAMPLEBASE + "equil/configPlans100.xml";
 		
 //		final int iteration = 0;
 		final int iteration = 0;
