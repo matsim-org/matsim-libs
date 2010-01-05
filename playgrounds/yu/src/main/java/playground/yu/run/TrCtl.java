@@ -30,7 +30,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 
 import playground.mrieser.pt.controler.TransitControler;
 import playground.yu.analysis.pt.OccupancyAnalyzer;
-import playground.yu.counts.pt.PtBoardCountControlerListener;
+import playground.yu.counts.pt.PtCountControlerListener;
 
 /**
  * @author yu
@@ -76,7 +76,7 @@ public class TrCtl extends TransitControler {
 		TrCtl ctl = new TrCtl(args);
 		OccupancyAnalyzerListener oal = new OccupancyAnalyzerListener();
 		ctl.addControlerListener(oal);
-		ctl.addControlerListener(new PtBoardCountControlerListener(ctl.config,
+		ctl.addControlerListener(new PtCountControlerListener(ctl.config,
 				ctl.oa));
 		ctl.setOverwriteFiles(true);
 		ctl.setCreateGraphs(false);

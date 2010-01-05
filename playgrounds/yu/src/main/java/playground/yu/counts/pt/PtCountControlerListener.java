@@ -35,18 +35,18 @@ import playground.yu.analysis.pt.OccupancyAnalyzer;
 /**
  * @author dgrether
  */
-public class PtBoardCountControlerListener implements StartupListener,
+public class PtCountControlerListener implements StartupListener,
 		IterationEndsListener {
 
 	private final Config config;
-	private final Counts counts;
+	private final Counts boardCounts, alightCounts;
 	final String MODULE_NAME = "ptCounts";
 	private final OccupancyAnalyzer oa;
 
-	public PtBoardCountControlerListener(final Config config,
-			OccupancyAnalyzer oa) {
+	public PtCountControlerListener(final Config config, OccupancyAnalyzer oa) {
 		this.config = config;
-		this.counts = new Counts();
+		this.boardCounts = new Counts();
+		this.alightCounts = new Counts();
 		this.oa = oa;
 	}
 
@@ -54,8 +54,10 @@ public class PtBoardCountControlerListener implements StartupListener,
 		// MatsimCountsReader counts_parser = new
 		// MatsimCountsReader(this.counts);
 		// counts_parser.readFile(this.config.counts().getCountsFileName());
-		new MatsimCountsReader(this.counts).readFile(this.config.findParam(
-				MODULE_NAME, "inputCountsFile"));
+		new MatsimCountsReader(this.boardCounts).readFile(this.config
+				.findParam(MODULE_NAME, "inputBoardCountsFile"));
+		new MatsimCountsReader(this.alightCounts).readFile(this.config
+				.findParam(MODULE_NAME, "inputAlightCountsFile"));
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
@@ -63,8 +65,12 @@ public class PtBoardCountControlerListener implements StartupListener,
 		int iter = event.getIteration();
 		if ((iter % 10 == 0) && (iter > controler.getFirstIteration())) {
 			controler.stopwatch.beginOperation("compare with counts");
-			PtBoardCountsComparisonAlgorithm cca = new PtBoardCountsComparisonAlgorithm(
-					this.oa, this.counts, controler.getNetwork());
+
+			PtCountsComparisonAlgorithm ccaBoard = new PtBoardCountComparisonAlgorithm(
+					this.oa, this.boardCounts, controler.getNetwork());
+			PtCountsComparisonAlgorithm ccaAlight = new PtAlightCountComparisonAlgorithm(
+					this.oa, this.alightCounts, controler.getNetwork());
+
 			Double distanceFilter = new Double(this.config.findParam(
 					MODULE_NAME, "distanceFilter"));
 			String distanceFilterCenterNodeId = this.config.findParam(
@@ -75,15 +81,21 @@ public class PtBoardCountControlerListener implements StartupListener,
 					&& (distanceFilterCenterNodeId
 					// counts().getDistanceFilterCenterNode()
 					!= null)) {
-				cca.setDistanceFilter(distanceFilter,
+				ccaBoard.setDistanceFilter(distanceFilter,
+						distanceFilterCenterNodeId);
+				ccaAlight.setDistanceFilter(distanceFilter,
 						distanceFilterCenterNodeId);
 			}
-			cca.setCountsScaleFactor(Double.parseDouble(this.config.findParam(
-					MODULE_NAME, "countsScaleFactor"))
+
+			ccaBoard.setCountsScaleFactor(Double.parseDouble(this.config
+					.findParam(MODULE_NAME, "countsScaleFactor"))
 			// counts().getCountsScaleFactor()
 					);
-			cca.run();
+			ccaAlight.setCountsScaleFactor(Double.parseDouble(this.config
+					.findParam(MODULE_NAME, "countsScaleFactor")));
 
+			ccaBoard.run();
+			ccaAlight.run();
 			// if (this.config.counts().getOutputFormat().contains("html")
 			// || this.config.counts().getOutputFormat().contains("all")) {
 			// // html and pdf output
@@ -109,11 +121,11 @@ public class PtBoardCountControlerListener implements StartupListener,
 				String filename = event.getControler().getControlerIO()
 						.getIterationFilename(iter, "countscompare.kmz");
 				PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(
-						cca.getComparison(), TransformationFactory
-								.getCoordinateTransformation(this.config
-										.global().getCoordinateSystem(),
-										TransformationFactory.WGS84),
-						this.counts);
+						ccaBoard.getComparison(), ccaAlight.getComparison(),
+						TransformationFactory.getCoordinateTransformation(
+								this.config.global().getCoordinateSystem(),
+								TransformationFactory.WGS84), this.boardCounts,
+						this.alightCounts);
 				kmlWriter.setIterationNumber(iter);
 				kmlWriter.writeFile(filename);
 			}
@@ -128,9 +140,5 @@ public class PtBoardCountControlerListener implements StartupListener,
 			// }
 			controler.stopwatch.endOperation("compare with counts");
 		}
-	}
-
-	public Counts getCounts() {
-		return this.counts;
 	}
 }

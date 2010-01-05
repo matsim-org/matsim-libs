@@ -44,32 +44,32 @@ import playground.yu.analysis.pt.OccupancyAnalyzer;
  * 
  * @author dgrether
  */
-public class PtBoardCountsComparisonAlgorithm {
+public abstract class PtCountsComparisonAlgorithm {
 	/**
-	 * The LinkAttributes of the simulation
+	 * The StopAttributes of the simulation
 	 */
-	private final OccupancyAnalyzer oa;
+	protected final OccupancyAnalyzer oa;
 	/**
 	 * The counts object
 	 */
-	private Counts counts;
+	protected Counts counts;
 	/**
 	 * The result list
 	 */
-	private final List<CountSimComparison> countSimComp;
+	protected final List<CountSimComparison> countSimComp;
 
-	private Node distanceFilterNode = null;
+	protected Node distanceFilterNode = null;
 
-	private Double distanceFilter = null;
+	protected Double distanceFilter = null;
 
-	private final Network network;
+	protected final Network network;
 
-	private double countsScaleFactor;
+	protected double countsScaleFactor;
 
-	private final static Logger log = Logger
-			.getLogger(PtBoardCountsComparisonAlgorithm.class);
+	protected final static Logger log = Logger
+			.getLogger(PtCountsComparisonAlgorithm.class);
 
-	public PtBoardCountsComparisonAlgorithm(final OccupancyAnalyzer oa,
+	public PtCountsComparisonAlgorithm(final OccupancyAnalyzer oa,
 			final Counts counts, final Network network) {
 		this.oa = oa;
 		this.counts = counts;
@@ -87,37 +87,7 @@ public class PtBoardCountsComparisonAlgorithm {
 	 * Creates the List with the counts vs sim values stored in the
 	 * countAttribute Attribute of this class.
 	 */
-	private void compare() {
-		double countValue;
-
-		for (Count count : this.counts.getCounts().values()) {
-			if (!isInRange(count.getCoord())) {
-				System.out.println("InRange?\t" + isInRange(count.getCoord()));
-				continue;
-			}
-			int[] volumes = this.oa.getBoardVolumesForStop(count.getLocId());
-			if (volumes==null) {
-				log.warn("No volumes for stop: " + count.getLocId().toString());
-				continue;
-			}else/*volumes!=null*/if (volumes.length==0){
-				log.warn("No volumes for stop: " + count.getLocId().toString());
-				continue;
-			}
-			for (int hour = 1; hour <= 24; hour++) {
-				// real volumes:
-				Volume volume = count.getVolume(hour);
-				if (volume != null) {
-					countValue = volume.getValue();
-					double simValue = volumes[hour - 1];
-					simValue *= this.countsScaleFactor;
-					this.countSimComp.add(new CountSimComparisonImpl(count
-							.getLocId(), hour, countValue, simValue));
-				} else {
-					countValue = 0.0;
-				}
-			}
-		}
-	}
+	protected abstract void compare();
 
 	/**
 	 * 
@@ -126,7 +96,7 @@ public class PtBoardCountsComparisonAlgorithm {
 	 *         <code>true</true> if the Link with the given Id is not farther away than the
 	 * distance specified by the distance filter from the center node of the filter.
 	 */
-	private boolean isInRange(final Coord stopCoord) {
+	protected boolean isInRange(final Coord stopCoord) {
 		if ((this.distanceFilterNode == null) || (this.distanceFilter == null)) {
 			return true;
 		}

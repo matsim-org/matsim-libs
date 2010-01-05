@@ -51,14 +51,11 @@ import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
-import org.matsim.counts.algorithms.CountSimComparisonWriter;
-import org.matsim.counts.algorithms.graphs.BiasErrorGraph;
-import org.matsim.counts.algorithms.graphs.BoxPlotErrorGraph;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
-import org.matsim.counts.algorithms.graphs.CountsSimReal24Graph;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraph;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
@@ -67,7 +64,7 @@ import org.matsim.vis.kml.NetworkFeatureFactory;
 /**
  * @author dgrether
  */
-public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
+public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	/**
 	 * constant for the name of the stops
 	 */
@@ -164,8 +161,9 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	/**
 	 * maps stopids to filenames in the kmz
 	 */
-	private Map<String, String> countsLoadCurveGraphMap;
-	private Counts counts;
+	private Map<String, String> boardCountsLoadCurveGraphMap,
+			alightCountsLoadCurveGraphMap;
+	private Counts boardCounts, alightCounts;
 
 	/** The logging object for this class. */
 	private static final Logger log = Logger
@@ -179,13 +177,16 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param coordTransform
 	 */
 	public PtCountSimComparisonKMLWriter(
-			final List<CountSimComparison> countSimCompList,
+			final List<CountSimComparison> boardCountSimCompList,
+			final List<CountSimComparison> alightCountSimCompList,
 			// final Network network,
-			final CoordinateTransformation coordTransform, final Counts counts) {
-		super(countSimCompList);
+			final CoordinateTransformation coordTransform,
+			final Counts boradCounts, final Counts alightCounts) {
+		super(boardCountSimCompList, alightCountSimCompList);
 		// this.network = network;
 		this.coordTransform = coordTransform;
-		this.counts = counts;
+		this.boardCounts = boradCounts;
+		this.alightCounts = alightCounts;
 	}
 
 	/**
@@ -279,8 +280,7 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		createStyles();
 		// create a folder
 		this.mainFolder = kmlObjectFactory.createFolderType();
-		this.mainFolder
-				.setName("Comparison, Iteration " + this.iterationNumber);
+		this.mainFolder.setName("Comparison, Iteration " + this.iter);
 		this.mainDoc.getAbstractFeatureGroup().add(
 				kmlObjectFactory.createFolder(this.mainFolder));
 		// the writer
@@ -318,26 +318,16 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		this.mainFolder.getAbstractFeatureGroup().add(
 				kmlObjectFactory.createFolder(simRealFolder));
 
-		// error graphs and awtv graph
-//		ScreenOverlayType errorGraph = createBiasErrorGraph(filename);
-//		errorGraph.setVisibility(Boolean.TRUE);
-//		this.mainFolder.getAbstractFeatureGroup().add(
-//				kmlObjectFactory.createScreenOverlay(errorGraph));
-//
-//		errorGraph = createBoxPlotErrorGraph();
-//		if (errorGraph != null) {
-//			errorGraph.setVisibility(Boolean.FALSE);
-//			this.mainFolder.getAbstractFeatureGroup().add(
-//					kmlObjectFactory.createScreenOverlay(errorGraph));
-//		}
-
-		// ScreenOverlayType awtv = this.createAWTVGraph();
-		// if (awtv != null) {
-		// awtv.setVisibility(Boolean.FALSE);
-		// this.mainFolder.getAbstractFeatureGroup().add(
-		// kmlObjectFactory.createScreenOverlay(awtv));
-		// }
-
+		// error graphs and awtv graph - board
+		ScreenOverlayType errorGraphBoard = createBiasErrorGraphBoard(filename);
+		errorGraphBoard.setVisibility(Boolean.TRUE);
+		this.mainFolder.getAbstractFeatureGroup().add(
+				kmlObjectFactory.createScreenOverlay(errorGraphBoard));
+		// error graphs and awtv graph - alight
+		ScreenOverlayType errorGraphAlight = createBiasErrorGraphAlight(filename);
+		errorGraphAlight.setVisibility(Boolean.TRUE);
+		this.mainFolder.getAbstractFeatureGroup().add(
+				kmlObjectFactory.createScreenOverlay(errorGraphAlight));
 		// link graphs
 		this.createCountsLoadCurveGraphs();
 
@@ -359,8 +349,10 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 			this.mainFolder.getAbstractFeatureGroup().add(
 					kmlObjectFactory.createFolder(subfolder));
 
-			writeStopData(this.countComparisonFilter.getCountsForHour(Integer
-					.valueOf(h)), subfolder);
+			writeStopData(this.boardCountComparisonFilter
+					.getCountsForHour(Integer.valueOf(h)), subfolder, "board");
+			writeStopData(this.alightCountComparisonFilter
+					.getCountsForHour(Integer.valueOf(h)), subfolder, "alight");
 		}
 		finish();
 	}
@@ -425,14 +417,14 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 */
 	private PlacemarkType createPlacemark(final String stopid,
 			final CountSimComparison csc, final double relativeError,
-			final int timestep) {
+			final int timestep, String countsType) {
 		StringBuffer stringBuffer = new StringBuffer();
 		PlacemarkType placemark = kmlObjectFactory.createPlacemarkType();
 		stringBuffer.delete(0, stringBuffer.length());
 		stringBuffer.append(STOP);
 		stringBuffer.append(stopid);
 		placemark.setDescription(createPlacemarkDescription(stopid, csc,
-				relativeError, timestep));
+				relativeError, timestep, countsType));
 		return placemark;
 	}
 
@@ -444,10 +436,11 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 *            provides "the data"
 	 * @param folder
 	 *            The folder to which to add the data in the kml-file.
+	 * @param counts
 	 */
 	private void writeStopData(
 			final List<CountSimComparison> countSimComparisonList,
-			final FolderType folder) {
+			final FolderType folder, String type) {
 		Id stopid;
 		PlacemarkType placemark;
 		double relativeError;
@@ -456,13 +449,16 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		for (CountSimComparison csc : countSimComparisonList) {
 			stopid = csc.getId();
 			// link = this.network.getLinks().get(stopid);
-
-			coord = this.coordTransform.transform(this.counts.getCount(stopid)
-					.getCoord());
+			Count count;
+			if (type.equals("board"))
+				count = this.boardCounts.getCount(stopid);
+			else
+				count = this.alightCounts.getCount(stopid);
+			coord = this.coordTransform.transform(count.getCoord());
 			relativeError = csc.calculateRelativeError();
 			// build placemark
 			placemark = createPlacemark(stopid.toString(), csc, relativeError,
-					csc.getHour());
+					csc.getHour(), type);
 			point = kmlObjectFactory.createPointType();
 			point.getCoordinates().add(
 					Double.toString(coord.getX()) + ","
@@ -520,11 +516,13 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param csc
 	 * @param relativeError
 	 * @param timestep
+	 * @param countsType
+	 *            board or alight
 	 * @return A String containing the description for each placemark
 	 */
 	private String createPlacemarkDescription(final String stopid,
 			final CountSimComparison csc, final double relativeError,
-			final int timestep) {
+			final int timestep, String countsType) {
 		StringBuffer buffer = new StringBuffer(100);
 		// buffer.append(NetworkFeatureFactory.STARTCDATA);
 		// buffer.append(STARTH1);
@@ -533,15 +531,23 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		// buffer.append(ENDH1);
 		buffer.append(NetworkFeatureFactory.STARTH2);
 		buffer.append(STOP);
-		buffer.append(stopid);
+		buffer.append(stopid + "\t" + countsType + "ing");
 		buffer.append(NetworkFeatureFactory.ENDH2);
 		buffer.append(NetworkFeatureFactory.STARTH3);
 		buffer.append(H24OVERVIEW);
 		buffer.append(NetworkFeatureFactory.ENDH3);
 		buffer.append(NetworkFeatureFactory.STARTP);
-		buffer.append(IMG);
-		buffer.append(this.countsLoadCurveGraphMap.get(stopid));
-		buffer.append(IMGEND);
+
+		if (countsType.equals("board")) {
+			buffer.append(IMG);
+			buffer.append(this.boardCountsLoadCurveGraphMap.get(stopid + "b"));
+			buffer.append(IMGEND);
+		} else {
+			buffer.append(IMG);
+			buffer.append(this.alightCountsLoadCurveGraphMap.get(stopid + "a"));
+			buffer.append(IMGEND);
+		}
+
 		buffer.append(NetworkFeatureFactory.ENDP);
 		buffer.append(NetworkFeatureFactory.STARTH3);
 		buffer.append(DETAILSFROM);
@@ -591,45 +597,83 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 */
 	private void addCountsSimRealPerHourGraphs(final FolderType folder,
 			final int timestep, final TimeSpanType timespan) {
-		StringBuffer filename;
-		ScreenOverlayType overlay;
+		StringBuffer filenameBoard, filenameAlight;
+		ScreenOverlayType overlayBoard, overlayAlight;
 
 		try {
 			// add the file to the kmz
-			filename = new StringBuffer(SIMREALGRAPHNAME);
-			filename.append(Integer.toString(timestep));
-			filename.append(PNG);
+			filenameBoard = new StringBuffer("board-" + SIMREALGRAPHNAME
+					+ Integer.toString(timestep) + PNG);
+			filenameAlight = new StringBuffer("alight-" + SIMREALGRAPHNAME
+					+ Integer.toString(timestep) + PNG);
 
-			CountsSimRealPerHourGraph graph = new CountsSimRealPerHourGraph(
-					this.countComparisonFilter.getCountsForHour(null),
-					this.iterationNumber, filename.toString());
-			graph.createChart(timestep);
+			CountsSimRealPerHourGraph graphBoard = new CountsSimRealPerHourGraph(
+					this.boardCountComparisonFilter.getCountsForHour(null),
+					this.iter, filenameBoard.toString());
+			CountsSimRealPerHourGraph graphAlight = new CountsSimRealPerHourGraph(
+					this.alightCountComparisonFilter.getCountsForHour(null),
+					this.iter, filenameAlight.toString());
 
-			this.writeChartToKmz(filename.toString(), graph.getChart());
+			graphBoard.createChart(timestep);
+			graphAlight.createChart(timestep);
+
+			this.writeChartToKmz(filenameBoard.toString(), graphBoard
+					.getChart());
+			this.writeChartToKmz(filenameAlight.toString(), graphAlight
+					.getChart());
+
 			// and link with the overlay
-			overlay = kmlObjectFactory.createScreenOverlayType();
-			LinkType icon = kmlObjectFactory.createLinkType();
-			icon.setHref("./" + filename.toString());
-			overlay.setIcon(icon);
-			overlay.setName(graph.getChartTitle());
-			// place the image top left
-			Vec2Type overlayXY = kmlObjectFactory.createVec2Type();
-			overlayXY.setX(1.0);
-			overlayXY.setY(1.0);
-			overlayXY.setXunits(UnitsEnumType.FRACTION);
-			overlayXY.setYunits(UnitsEnumType.FRACTION);
-			overlay.setOverlayXY(overlayXY);
-			Vec2Type screenXY = kmlObjectFactory.createVec2Type();
-			screenXY.setX(0.98);
-			screenXY.setY(0.98);
-			screenXY.setXunits(UnitsEnumType.FRACTION);
-			screenXY.setYunits(UnitsEnumType.FRACTION);
-			overlay.setScreenXY(screenXY);
-			overlay.setAbstractTimePrimitiveGroup(kmlObjectFactory
+			overlayBoard = kmlObjectFactory.createScreenOverlayType();
+			LinkType iconBoard = kmlObjectFactory.createLinkType();
+			iconBoard.setHref("./" + filenameBoard.toString());
+			overlayBoard.setIcon(iconBoard);
+			overlayBoard.setName(graphBoard.getChartTitle());
+
+			// place the image top right
+			Vec2Type overlayXYBoard = kmlObjectFactory.createVec2Type();
+			overlayXYBoard.setX(1.0);
+			overlayXYBoard.setY(1.0);
+			overlayXYBoard.setXunits(UnitsEnumType.FRACTION);
+			overlayXYBoard.setYunits(UnitsEnumType.FRACTION);
+			overlayBoard.setOverlayXY(overlayXYBoard);
+			Vec2Type screenXYBoard = kmlObjectFactory.createVec2Type();
+			screenXYBoard.setX(0.98);
+			screenXYBoard.setY(0.98);
+			screenXYBoard.setXunits(UnitsEnumType.FRACTION);
+			screenXYBoard.setYunits(UnitsEnumType.FRACTION);
+			overlayBoard.setScreenXY(screenXYBoard);
+			overlayBoard.setAbstractTimePrimitiveGroup(kmlObjectFactory
 					.createTimeSpan(timespan));
 			// add the overlay to the folder
 			folder.getAbstractFeatureGroup().add(
-					kmlObjectFactory.createScreenOverlay(overlay));
+					kmlObjectFactory.createScreenOverlay(overlayBoard));
+
+			// and link with the overlay
+			overlayAlight = kmlObjectFactory.createScreenOverlayType();
+			LinkType iconAlight = kmlObjectFactory.createLinkType();
+			iconAlight.setHref("./" + filenameAlight.toString());
+			overlayAlight.setIcon(iconAlight);
+			overlayAlight.setName(graphAlight.getChartTitle());
+
+			// place the image top right
+			Vec2Type overlayXYAlight = kmlObjectFactory.createVec2Type();
+			overlayXYAlight.setX(1.0);
+			overlayXYAlight.setY(0.75);
+			overlayXYAlight.setXunits(UnitsEnumType.FRACTION);
+			overlayXYAlight.setYunits(UnitsEnumType.FRACTION);
+			overlayAlight.setOverlayXY(overlayXYAlight);
+			Vec2Type screenXYAlight = kmlObjectFactory.createVec2Type();
+			screenXYAlight.setX(0.98);
+			screenXYAlight.setY(0.73);
+			screenXYAlight.setXunits(UnitsEnumType.FRACTION);
+			screenXYAlight.setYunits(UnitsEnumType.FRACTION);
+			overlayAlight.setScreenXY(screenXYAlight);
+			overlayAlight.setAbstractTimePrimitiveGroup(kmlObjectFactory
+					.createTimeSpan(timespan));
+			// add the overlay to the folder
+			folder.getAbstractFeatureGroup().add(
+					kmlObjectFactory.createScreenOverlay(overlayAlight));
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -642,21 +686,38 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	private void createCountsLoadCurveGraphs() {
 		PtCountsLoadCurveGraphCreator cgc = new PtCountsLoadCurveGraphCreator(
 				"");
-		List<CountsGraph> graphs = cgc.createGraphs(this.countComparisonFilter
-				.getCountsForHour(null), this.iterationNumber);
+		List<CountsGraph> graphsBoard = cgc.createGraphs(
+				this.boardCountComparisonFilter.getCountsForHour(null),
+				this.iter);
+		List<CountsGraph> graphsAlight = cgc.createGraphs(
+				this.alightCountComparisonFilter.getCountsForHour(null),
+				this.iter);
 
-		this.countsLoadCurveGraphMap = new HashMap<String, String>(graphs
-				.size());
+		this.boardCountsLoadCurveGraphMap = new HashMap<String, String>(
+				graphsBoard.size());
+		this.alightCountsLoadCurveGraphMap = new HashMap<String, String>(
+				graphsAlight.size());
+
 		String stopId;
-		StringBuffer filename;
-		for (CountsGraph cg : graphs) {
+		String filename;
+
+		for (CountsGraph cg : graphsBoard) {
 			try {
-				filename = new StringBuffer();
 				stopId = ((CountsLoadCurveGraph) cg).getLinkId();
-				filename.append(stopId);
-				filename.append(PNG);
-				writeChartToKmz(filename.toString(), cg.getChart());
-				this.countsLoadCurveGraphMap.put(stopId, filename.toString());
+				filename = stopId + "b" + PNG;
+				writeChartToKmz(filename, cg.getChart());
+				this.boardCountsLoadCurveGraphMap.put(stopId + "b", filename);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		for (CountsGraph cg : graphsAlight) {
+			try {
+				stopId = ((CountsLoadCurveGraph) cg).getLinkId();
+				filename = stopId + "a" + PNG;
+				writeChartToKmz(filename, cg.getChart());
+				this.alightCountsLoadCurveGraphMap.put(stopId + "a", filename);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -683,50 +744,13 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	/**
 	 * Creates the CountsErrorGraph for all the data
 	 * 
-	 * @param visible
-	 *            true if initially visible
-	 * @return the ScreenOverlay Feature
-	 */
-	private ScreenOverlayType createBoxPlotErrorGraph() {
-
-		CountsGraph ep;
-		try {
-			ep = new BoxPlotErrorGraph(this.countComparisonFilter
-					.getCountsForHour(null), this.iterationNumber, null,
-					"error graph");
-			ep.createChart(0);
-		} catch (IllegalArgumentException e) {
-			log.error("Could not create BoxPlot-ErrorGraph.", e);
-			return null;
-		}
-
-		String filename = "errorGraphBoxPlot.png";
-		try {
-			writeChartToKmz(filename, ep.getChart());
-			return createOverlayBottomRight(filename, "Error Graph [Box-Plot]");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	/**
-	 * Creates the CountsErrorGraph for all the data
-	 * 
 	 * @param kmlFilename
 	 *            the filename of the kml file
 	 * @param visible
 	 *            true if initially visible
 	 * @return the ScreenOverlay Feature
 	 */
-	private ScreenOverlayType createBiasErrorGraph(String kmlFilename) {
-		BiasErrorGraph ep = new BiasErrorGraph(this.countComparisonFilter
-				.getCountsForHour(null), this.iterationNumber, null,
-				"error graph");
-		ep.createChart(0);
-
-		double[] meanError = ep.getMeanRelError();
-		double[] meanBias = ep.getMeanAbsBias();
+	private ScreenOverlayType createBiasErrorGraphBoard(String kmlFilename) {
 		int index = kmlFilename.lastIndexOf(System
 				.getProperty("file.separator"));
 		if (index == -1) {
@@ -739,21 +763,32 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 			outdir = kmlFilename.substring(0, index)
 					+ System.getProperty("file.separator");
 		}
-		String file = outdir + "biasErrorGraphData.txt";
-		log.info("writing chart data to " + new File(file).getAbsolutePath());
+		// ------------------------------------------------------------------------------
+
+		PtBiasErrorGraph epBoard = new PtBiasErrorGraph(
+				this.boardCountComparisonFilter.getCountsForHour(null),
+				this.iter, null, "error graph - boarding");
+		epBoard.createChart(0);
+
+		double[] meanErrorBoard = epBoard.getMeanRelError();
+		double[] meanBiasBoard = epBoard.getMeanAbsBias();
+
+		String fileBoard = outdir + "biasErrorGraphDataBoard.txt";
+		log.info("writing chart data to "
+				+ new File(fileBoard).getAbsolutePath());
 		try {
-			BufferedWriter bwriter = IOUtils.getBufferedWriter(file);
+			BufferedWriter bwriter = IOUtils.getBufferedWriter(fileBoard);
 			StringBuffer buffer = new StringBuffer();
 			buffer.append("hour \t mean relative error \t mean absolute bias");
 			bwriter.write(buffer.toString());
 			bwriter.newLine();
-			for (int i = 0; i < meanError.length; i++) {
+			for (int i = 0; i < meanErrorBoard.length; i++) {
 				buffer.delete(0, buffer.length());
 				buffer.append(i + 1);
 				buffer.append("\t");
-				buffer.append(meanError[i]);
+				buffer.append(meanErrorBoard[i]);
 				buffer.append("\t");
-				buffer.append(meanBias[i]);
+				buffer.append(meanBiasBoard[i]);
 				bwriter.write(buffer.toString());
 				bwriter.newLine();
 			}
@@ -764,10 +799,10 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 			e.printStackTrace();
 		}
 
-		String filename = "errorGraphErrorBias.png";
+		String chartBoard = "errorGraphErrorBiasBoard.png";
 		try {
-			writeChartToKmz(filename, ep.getChart());
-			return createOverlayBottomRight(filename,
+			writeChartToKmz(chartBoard, epBoard.getChart());
+			return createOverlayBottomRight(chartBoard,
 					"Error Graph [Error/Bias]");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -775,25 +810,63 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		return null;
 	}
 
-	/**
-	 * Creates the CountsSimReal24Graph for all the data
-	 * 
-	 * @param visible
-	 *            true if initially visible
-	 * @return the ScreenOverlay Feature
-	 */
-	private ScreenOverlayType createAWTVGraph() {
-		CountsGraph awtv = new CountsSimReal24Graph(this.countComparisonFilter
-				.getCountsForHour(null), this.iterationNumber, "awtv graph");
-		awtv.createChart(0);
+	private ScreenOverlayType createBiasErrorGraphAlight(String kmlFilename) {
+		int index = kmlFilename.lastIndexOf(System
+				.getProperty("file.separator"));
+		if (index == -1) {
+			index = kmlFilename.lastIndexOf("/");
+		}
+		String outdir;
+		if (index == -1) {
+			outdir = "";
+		} else {
+			outdir = kmlFilename.substring(0, index)
+					+ System.getProperty("file.separator");
+		}
+		// ------------------------------------------------------------------------------
+		PtBiasErrorGraph epAlight = new PtBiasErrorGraph(
+				this.alightCountComparisonFilter.getCountsForHour(null),
+				this.iter, null, "error graph - Alighting");
+		epAlight.createChart(0);
 
-		String filename = "awtv.png";
+		double[] meanErrorAlight = epAlight.getMeanRelError();
+		double[] meanBiasAlight = epAlight.getMeanAbsBias();
+
+		String fileAlight = outdir + "biasErrorGraphDataAlight.txt";
+		log.info("writing chart data to "
+				+ new File(fileAlight).getAbsolutePath());
 		try {
-			writeChartToKmz(filename, awtv.getChart());
-			return createOverlayBottomRight("./" + filename, "AWTV");
+			BufferedWriter bwriter = IOUtils.getBufferedWriter(fileAlight);
+			StringBuffer buffer = new StringBuffer();
+			buffer.append("hour \t mean relative error \t mean absolute bias");
+			bwriter.write(buffer.toString());
+			bwriter.newLine();
+			for (int i = 0; i < meanErrorAlight.length; i++) {
+				buffer.delete(0, buffer.length());
+				buffer.append(i + 1);
+				buffer.append("\t");
+				buffer.append(meanErrorAlight[i]);
+				buffer.append("\t");
+				buffer.append(meanBiasAlight[i]);
+				bwriter.write(buffer.toString());
+				bwriter.newLine();
+			}
+			bwriter.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		String chartAlight = "errorGraphErrorBiasAlight.png";
+		try {
+			writeChartToKmz(chartAlight, epAlight.getChart());
+			return createOverlayBottomRight(chartAlight,
+					"Error Graph [Error/Bias]");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		return null;
 	}
 
