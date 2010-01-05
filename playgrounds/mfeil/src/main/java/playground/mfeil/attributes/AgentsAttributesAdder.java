@@ -31,10 +31,10 @@ import java.io.FileReader;
 import java.io.PrintStream;
 import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 
 
@@ -440,7 +440,7 @@ public class AgentsAttributesAdder {
 		log.info("   adding agents income data...");
 		
 		this.runZurich10("/home/baug/mfeil/data/Zurich10/agents_income.txt");
-		
+		if (this.income.isEmpty()) return; // No income loaded
 		for (Iterator<? extends Person> iterator = scenario.getPopulation().getPersons().values().iterator(); iterator.hasNext();){
 			PersonImpl person = (PersonImpl) iterator.next();
 			try{
@@ -486,7 +486,7 @@ public class AgentsAttributesAdder {
 				line = br.readLine();
 			}		
 		} catch (Exception ex) {
-			System.out.println(ex);
+			log.warn(ex+". No income will be loaded.");
 		}
 		log.info("done...");
 	}	
