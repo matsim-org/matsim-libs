@@ -60,8 +60,8 @@ public class PtBoardCountControlerListener implements StartupListener,
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		Controler controler = event.getControler();
-		if ((event.getIteration() % 10 == 0)
-				&& (event.getIteration() > controler.getFirstIteration())) {
+		int iter = event.getIteration();
+		if ((iter % 10 == 0) && (iter > controler.getFirstIteration())) {
 			controler.stopwatch.beginOperation("compare with counts");
 			PtBoardCountsComparisonAlgorithm cca = new PtBoardCountsComparisonAlgorithm(
 					this.oa, this.counts, controler.getNetwork());
@@ -107,16 +107,14 @@ public class PtBoardCountControlerListener implements StartupListener,
 			// counts().getOutputFormat()
 					.contains("kml") || outputFormat.contains("all")) {
 				String filename = event.getControler().getControlerIO()
-						.getIterationFilename(
-								event.getControler().getIteration(),
-								"countscompare.kmz");
+						.getIterationFilename(iter, "countscompare.kmz");
 				PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(
 						cca.getComparison(), TransformationFactory
 								.getCoordinateTransformation(this.config
 										.global().getCoordinateSystem(),
 										TransformationFactory.WGS84),
 						this.counts);
-				kmlWriter.setIterationNumber(event.getIteration());
+				kmlWriter.setIterationNumber(iter);
 				kmlWriter.writeFile(filename);
 			}
 			// if (this.config.counts().getOutputFormat().contains("txt")

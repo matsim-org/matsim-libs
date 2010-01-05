@@ -319,17 +319,17 @@ public class PtCountSimComparisonKMLWriter extends CountSimComparisonWriter {
 				kmlObjectFactory.createFolder(simRealFolder));
 
 		// error graphs and awtv graph
-		ScreenOverlayType errorGraph = createBiasErrorGraph(filename);
-		errorGraph.setVisibility(Boolean.TRUE);
-		this.mainFolder.getAbstractFeatureGroup().add(
-				kmlObjectFactory.createScreenOverlay(errorGraph));
-
-		errorGraph = createBoxPlotErrorGraph();
-		if (errorGraph != null) {
-			errorGraph.setVisibility(Boolean.FALSE);
-			this.mainFolder.getAbstractFeatureGroup().add(
-					kmlObjectFactory.createScreenOverlay(errorGraph));
-		}
+//		ScreenOverlayType errorGraph = createBiasErrorGraph(filename);
+//		errorGraph.setVisibility(Boolean.TRUE);
+//		this.mainFolder.getAbstractFeatureGroup().add(
+//				kmlObjectFactory.createScreenOverlay(errorGraph));
+//
+//		errorGraph = createBoxPlotErrorGraph();
+//		if (errorGraph != null) {
+//			errorGraph.setVisibility(Boolean.FALSE);
+//			this.mainFolder.getAbstractFeatureGroup().add(
+//					kmlObjectFactory.createScreenOverlay(errorGraph));
+//		}
 
 		// ScreenOverlayType awtv = this.createAWTVGraph();
 		// if (awtv != null) {
