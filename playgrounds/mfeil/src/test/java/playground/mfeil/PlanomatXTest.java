@@ -21,6 +21,7 @@
 package playground.mfeil;
 
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.core.population.PopulationWriter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -70,15 +71,18 @@ public class PlanomatXTest extends MatsimTestCase{
 	public void testRun (){
 		log.info("Running PlX testRun...");
 		
+		/*
+		log.info("Writing reference plan...");
+		this.testee.run(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
+		new PopulationWriter(this.scenario_input.getPopulation()).writeFile("D:/Documents and Settings/Matthias Feil/Desktop/test_plans.xml");
+		log.info("done.");
+		*/
+		
 		PlanImpl plan = new PlanImpl (this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)));
 		plan.copyPlan(this.scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan());
 		
 		this.testee.run(plan);
-		/*
-		log.info("Writing plans...");
-		new PopulationWriter(this.scenario_input.getPopulation(), "plans/test_plans.xml.gz").write();
-		log.info("done.");
-		*/
+		
 		// Import expected output plan into population
 		this.scenario_input.getPopulation().getPersons().clear();
 		new MatsimPopulationReader(this.scenario_input).readFile(this.getPackageInputDirectory()+"PLX_expected_output.xml");
@@ -86,6 +90,8 @@ public class PlanomatXTest extends MatsimTestCase{
 		// Compare the two plans; <1 because of double rounding errors
 		for (int i=0;i<plan.getPlanElements().size();i++){
 			if (i%2==0){
+				System.out.println("start: "+((ActivityImpl)(plan.getPlanElements().get(i))).getStartTime());
+				System.out.println("end: "+((ActivityImpl)(plan.getPlanElements().get(i))).getEndTime());
 				assertEquals(Math.floor(((ActivityImpl)(plan.getPlanElements().get(i))).getStartTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getStartTime()));
 				assertEquals(Math.floor(((ActivityImpl)(plan.getPlanElements().get(i))).getEndTime()), Math.floor(((ActivityImpl)(scenario_input.getPopulation().getPersons().get(new IdImpl(this.TEST_PERSON_ID)).getSelectedPlan().getPlanElements().get(i))).getEndTime()));
 			}

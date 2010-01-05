@@ -6,22 +6,39 @@
 <!-- ====================================================================== -->
 
 	<person id="1" age="30">
-		<plan score="106.667997900254" selected="yes">
+		<plan score="145.485595880786" selected="yes">
 			<act type="home" link="91" facility="1" x="0.0" y="500.0" start_time="00:00:00" dur="07:30:00" end_time="07:30:00" />
 			<leg mode="car" dep_time="07:30:00" trav_time="00:22:13" arr_time="07:52:13">
 				<route dist="9000.0">
 					1 11 21 31 41 51 61 71 81 91 
 				</route>
 			</leg>
-			<act type="work" link="172" facility="10" x="9000.0" y="500.0" start_time="07:52:13" dur="10:04:33" end_time="17:56:46" />
-			<leg mode="car" dep_time="17:56:46" trav_time="00:52:40" arr_time="18:49:27">
-				<route dist="9000.0">
-					92 82 72 62 52 42 32 22 12 2 
+			<act type="work" link="172" facility="10" x="9000.0" y="500.0" start_time="07:52:13" dur="05:56:30" end_time="13:48:43" />
+			<leg mode="car" dep_time="13:48:43" trav_time="00:20:02" arr_time="14:08:45">
+				<route dist="8000.0">
+					92 82 72 62 52 42 32 33 43 
 				</route>
 			</leg>
-			<act type="home" link="91" facility="1" x="0.0" y="500.0" start_time="18:49:27" dur="05:10:32" end_time="24:00:00" />
+			<act type="shopping" link="14" facility="38" x="4500.0" y="2000.0" start_time="14:08:45" dur="01:28:00" end_time="15:36:45" />
+			<leg mode="car" dep_time="15:36:45" trav_time="00:13:20" arr_time="15:50:05">
+				<route dist="5000.0">
+					53 63 62 52 42 41 
+				</route>
+			</leg>
+			<act type="shopping" link="5" facility="37" x="4500.0" y="0.0" start_time="15:50:05" dur="01:46:39" end_time="17:36:45" />
+			<leg mode="car" dep_time="17:36:45" trav_time="00:26:52" arr_time="18:03:38">
+				<route dist="7000.0">
+					51 61 71 72 73 74 64 54 
+				</route>
+			</leg>
+			<act type="leisure" link="59" facility="43" x="4500.0" y="3000.0" start_time="18:03:38" dur="03:49:40" end_time="21:53:18" />
+			<leg mode="car" dep_time="21:53:18" trav_time="00:15:35" arr_time="22:08:53">
+				<route dist="6000.0">
+					44 34 24 14 4 3 2 
+				</route>
+			</leg>
+			<act type="home" link="91" facility="1" x="0.0" y="500.0" start_time="22:08:53" dur="01:51:06" end_time="24:00:00" />
 		</plan>
-
 	</person>
 
 <!-- ====================================================================== -->
