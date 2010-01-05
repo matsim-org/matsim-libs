@@ -72,9 +72,13 @@ public abstract class OTFClient extends Thread {
 	@Override
 	public void run() {
 		getOTFVisConfig();
+		log.info("got OTFVis config");
 		createMainFrame();
+		log.info("created MainFrame");
 		createHostControlBar();
+		log.info("created HostControlBar");
 		createDrawer();
+		log.info("created drawer");
 		addDrawerToSplitPane();
 		this.hostControlBar.addDrawer(this.url, mainDrawer);
 		try {
@@ -83,7 +87,7 @@ public abstract class OTFClient extends Thread {
 			e.printStackTrace();
 		}
 		frame.setVisible(true);
-		System.out.println("Finished init");
+		log.info("OTFVis finished init");
 	}
 
 	private void addDrawerToSplitPane() {
@@ -110,6 +114,7 @@ public abstract class OTFClient extends Thread {
 		clientQ.getConstData();
 		this.hostControlBar.updateTimeLabel();
 		hostControl.getQuads().put(id, clientQ);
+		log.info("Created OTFClientQuad!");
 		return clientQ;
 	}
 	

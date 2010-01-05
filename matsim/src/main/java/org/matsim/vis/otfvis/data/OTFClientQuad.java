@@ -199,23 +199,28 @@ public class OTFClientQuad extends QuadTree<OTFDataReader> {
 	}
 	private void getData(QuadTree.Rect bound, final boolean readConst, final SceneGraph result, final boolean readAdd)
 			throws RemoteException {
-		bound = this.host.isLive() ? bound : this.top.getBounds();
+//		log.debug("  reading QuadTree data...");
+	  bound = this.host.isLive() ? bound : this.top.getBounds();
 		byte[] bbyte;
-//		Gbl.startMeasurement();
-		if( readConst )bbyte = this.host.getQuadConstStateBuffer(this.id);
-		else bbyte= this.host.getQuadDynStateBuffer(this.id, bound);
-
+		if( readConst ){
+		  bbyte = this.host.getQuadConstStateBuffer(this.id);
+		}
+		else {
+		  bbyte= this.host.getQuadDynStateBuffer(this.id, bound);
+		}
+		
 		ByteBuffer in = ByteBuffer.wrap(bbyte);
-//		Gbl.printElapsedTime();
-//		System.out.println("^from serv time -- v read in time");
-//		Gbl.startMeasurement();
+		
 		this.execute(bound, new ReadDataExecutor(in, readConst, result));
-		if (readAdd) getAdditionalData(in, readConst, result);
-//		Gbl.printElapsedTime();
+		if (readAdd) {
+//		  log.debug("  reading additional element data...");
+		  getAdditionalData(in, readConst, result);
+		}
 	}
 
 	public synchronized void getConstData() throws RemoteException {
 		getData(null, true, null, true);
+		log.info("  read constant data");
 	}
 
 	synchronized protected void getDynData(final QuadTree.Rect bound, final SceneGraph result, final boolean readAdd) throws RemoteException {
