@@ -28,9 +28,9 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 
-public class Run {
+public class RunUtilFunctionEstimation {
 	
-	private static final Logger log = Logger.getLogger(Run.class);
+	private static final Logger log = Logger.getLogger(RunUtilFunctionEstimation.class);
 
 	/**
 	 * Class to run PlansConstructor, MDSAM, and/or ModFileMaker
