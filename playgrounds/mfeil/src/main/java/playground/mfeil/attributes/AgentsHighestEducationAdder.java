@@ -22,25 +22,15 @@ package playground.mfeil.attributes;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.TreeMap;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.world.Location;
-import org.matsim.world.Zone;
-
-import playground.balmermi.census2000.data.Municipality;
 
 
 
@@ -152,13 +142,14 @@ public class AgentsHighestEducationAdder {
 				xcor = Double.parseDouble(tokenizer.nextToken()); // xcor
 				ycor = Double.parseDouble(tokenizer.nextToken()); // ycor
 				
+				/*
 				// exclude non-Zurich households
 				if (CoordUtils.calcDistance(new CoordImpl(xcor, ycor), new CoordImpl(683518.0,246836.0))>30000){
 					line = br.readLine();
 					citycentrecountOut++;
 					continue;
 				}
-				
+				*/
 				citycentrecountIn++;
 				
 				token = tokenizer.nextToken();	 // income
