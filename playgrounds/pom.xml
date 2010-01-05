@@ -127,7 +127,7 @@
 	        	<groupId>org.codehaus.mojo</groupId>
 	        	<artifactId>findbugs-maven-plugin</artifactId>
 	        	<configuration>
-	          	<effort>Max</effort>
+	          	<!--effort>Max</effort-->
 	          	<threshold>Low</threshold>
 	        	</configuration>
 	      	</plugin>
