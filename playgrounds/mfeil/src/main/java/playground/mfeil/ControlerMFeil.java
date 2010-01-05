@@ -20,18 +20,12 @@
 package playground.mfeil;
 
 
-import java.util.Iterator;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
-import java.util.Map;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.PlanomatModule;
@@ -55,8 +49,6 @@ import playground.mfeil.attributes.AgentsAttributesAdder;
  * Adjusting the Controler in order to call the PlanomatX. Replaces also the StrategyManagerConfigLoader.
  */
 public class ControlerMFeil extends Controler {
-	
-	private static final Logger log = Logger.getLogger(Controler.class);
 	
 	public ControlerMFeil (String [] args){
 		super(args);
@@ -110,7 +102,7 @@ public class ControlerMFeil extends Controler {
 			
 			if (classname.equals("PlanomatX")) {
 				ActivityTypeFinder finder = new ActivityTypeFinder (this);
-				finder.run(this.getFacilities());
+				//finder.run(this.getFacilities());
 				strategy = new PlanStrategy(new RandomPlanSelector());
 				PlanStrategyModule planomatXStrategyModule = new PlanomatXInitialiser(this, finder);
 				strategy.addStrategyModule(planomatXStrategyModule);

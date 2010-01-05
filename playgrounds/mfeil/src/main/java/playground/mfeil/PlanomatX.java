@@ -21,6 +21,7 @@ package playground.mfeil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.ScenarioImpl;
@@ -448,18 +449,29 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 			List<String> actTypes, ArrayList<ActivityOptionImpl> primActs) {
 		
 		if (neighbourhood[0].getPlanElements().size()>=5){
+			
+			// change order
 			int neighbourPos;
 			int [] changePositions = {2,4};
 			for (neighbourPos = 0; neighbourPos<(int)(NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos++){
 				infoOnNeighbourhood[neighbourPos] = this.changeOrder(neighbourhood[neighbourPos], changePositions, primActs);
 			}
+			
+			// change number
 			int[] numberPositions = {0,0,1,1};		// "where to add activity, where to remove activity, number of adding cycles, number of removing cycles"
 			int[] actsToBeAdded = new int [(int)(neighbourhood[0].getPlanElements().size()/2)+1];
-			for (neighbourPos = (int) (NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos<(int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos++){
+			/*for (neighbourPos = (int) (NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos<(int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos++){
 				infoOnNeighbourhood[neighbourPos] = this.changeNumber(neighbourhood[neighbourPos], numberPositions, actsToBeAdded, actTypes, primActs);
+			}*/
+			for (neighbourPos = (int) (NEIGHBOURHOOD_SIZE*WEIGHT_CHANGE_ORDER); neighbourPos<(int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+(WEIGHT_CHANGE_NUMBER*this.WEIGHT_INC_NUMBER))); neighbourPos++){
+				infoOnNeighbourhood[neighbourPos] = this.increaseNumber(neighbourhood[neighbourPos], numberPositions, actsToBeAdded, actTypes, primActs);
 			}
-			int [] typePosition = {(int)(MatsimRandom.getRandom().nextDouble()*((int)(neighbourhood[0].getPlanElements().size()/2)-1))+1,1};
+			for (neighbourPos = (int) (NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+(WEIGHT_CHANGE_NUMBER*this.WEIGHT_INC_NUMBER))); neighbourPos<(int)(NEIGHBOURHOOD_SIZE*(WEIGHT_CHANGE_ORDER+WEIGHT_CHANGE_NUMBER)); neighbourPos++){
+				infoOnNeighbourhood[neighbourPos] = this.reduceNumber(neighbourhood[neighbourPos], numberPositions, actsToBeAdded, actTypes, primActs);
+			}
 			
+			// change type
+			int [] typePosition = {(int)(MatsimRandom.getRandom().nextDouble()*((int)(neighbourhood[0].getPlanElements().size()/2)-1))+1,1};
 			int [] actsToBeChanged = new int [actsToBeAdded.length];
 			for (int i = 0; i<actsToBeChanged.length;i++){
 				actsToBeChanged[i] = (int)(MatsimRandom.getRandom().nextDouble()* actTypes.size());
@@ -519,6 +531,101 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 		}
 	}
 	
+	
+	private int[] reduceNumber (PlanomatXPlan basePlan, int [] positions, int [] actsToBeAdded, 
+			List<String> actTypes, ArrayList<ActivityOptionImpl> primActs){
+		
+		/* Removing an activity, "cycling"*/
+		if (basePlan.getPlanElements().size()==5){
+			if (this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(2), primActs)		&&
+					!(this.checkForSamePrimary(basePlan, 1))) return (new int[]{1,0,0});
+			else {
+				/*this.removeAct(1, basePlan);
+				positions[3]++;*/
+				
+				// NEW (24th Oct 2009 MF): When removing act from plan with 3 acts, reduce to 24h of "home"
+				this.removeAct(1, basePlan);
+				this.removeAct(0, basePlan);
+				((ActivityImpl)(basePlan.getPlanElements().get(0))).setDuration(86400);
+				((ActivityImpl)(basePlan.getPlanElements().get(0))).setStartTime(0);
+				((ActivityImpl)(basePlan.getPlanElements().get(0))).setEndTime(86400);
+				positions[3]++;
+				return (new int[]{0,-1,-1});
+			}
+		}
+		
+		// Randomly define position when removing an act for the first time
+		if(positions[1]==0){
+			positions[1] = (int)(MatsimRandom.getRandom().nextDouble()*((int)(basePlan.getPlanElements().size()/2)-1))+1;
+		}
+		
+		OuterLoop:
+		while (positions[3]<(int)(basePlan.getPlanElements().size()/2)){
+			
+			// proceed through planElements
+			if (positions[1]<=(int)(basePlan.getPlanElements().size()/2)-1){
+				if ((this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(positions[1]*2), primActs) && !(this.checkForSamePrimary(basePlan, positions[1])))  ||
+						!this.checkForHomeSequenceRemoving(basePlan, positions[1]*2)) {
+					positions[1]++;
+					positions[3]++;
+					continue OuterLoop;
+				}
+				else this.removeAct(positions[1], basePlan);
+			}
+			// jump back to second act of plan
+			else {
+				positions[1] = 1;
+				if ((this.checkPrimary((ActivityImpl)basePlan.getPlanElements().get(positions[1]*2), primActs) && !(this.checkForSamePrimary(basePlan, positions[1]))) ||
+						!this.checkForHomeSequenceRemoving(basePlan, positions[1]*2)) {
+					positions[1]++;
+					positions[3]++;
+					continue OuterLoop;
+				}
+				else this.removeAct(positions[1], basePlan);
+			}
+			positions[1]++;
+			positions[3]++;
+			return (new int[]{0,-1,-1});
+		}
+		return (new int[]{1,0,0});
+	}
+	
+	
+	private int[] increaseNumber (PlanomatXPlan basePlan, int [] positions, int [] actsToBeAdded, 
+			List<String> actTypes, ArrayList<ActivityOptionImpl> primActs){
+		
+		/* Adding an activity, "cycling"*/			
+		if (positions[2]<=actTypes.size()+(actTypes.size()-1)*((int)(basePlan.getPlanElements().size()/2)-1)){ //maximum number of possible insertions
+			
+			boolean [] HomeActInserted = {false,false};  // {"insertion failed", "home act inserted"}
+			
+			if (positions[0]==0){ //first insertion
+				positions[0] = 1;
+				for (int i = 0; i < actsToBeAdded.length;i++){
+					actsToBeAdded[i] = (int)(MatsimRandom.getRandom().nextDouble()* actTypes.size());
+				}
+				HomeActInserted = this.insertAct(positions[0], actsToBeAdded, basePlan, actTypes);
+				
+			}
+			else if (positions[0]<=(int)(basePlan.getPlanElements().size()/2)){ // going through activity list
+				HomeActInserted = this.insertAct(positions[0], actsToBeAdded, basePlan, actTypes);				
+			}
+			else { // jumping back to first activity
+				positions[0] = 1;
+				HomeActInserted = this.insertAct(positions[0], actsToBeAdded, basePlan, actTypes);
+				
+			}
+			positions[0]++;
+			positions[2]++;
+			
+			if (HomeActInserted[0]) return (new int[]{1,0,0}); // insertion was unsuccessful 
+			if (!HomeActInserted[1]) return (new int[]{0,positions[0]-1,-1}); // if no home act inserted indicate position of new act to location choice
+			return (new int[]{0,-1,-1}); // if home act inserted treat like act removed -> no location choice
+		}
+		return (new int[]{1,0,0});
+	}
+	
+	@Deprecated
 	public int[] changeNumber (PlanomatXPlan basePlan, int [] positions, int [] actsToBeAdded, 
 			List<String> actTypes, ArrayList<ActivityOptionImpl> primActs){
 				

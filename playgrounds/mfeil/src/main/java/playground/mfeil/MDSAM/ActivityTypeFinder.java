@@ -57,6 +57,7 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 	public ActivityTypeFinder (Controler controler){
 		this.controler = controler;
 		this.actTypes = new ArrayList<String>();
+		this.run(controler.getFacilities());
 	}
 	
 	@Override
@@ -69,6 +70,7 @@ public class ActivityTypeFinder extends AbstractFacilityAlgorithm {
 		else log.info("No tta act type found.");
 		log.info("Searching available activity types done.");
 	}
+	
 	public void run(ActivityFacility facility){
 		Collection<ActivityOptionImpl> facActTypes = facility.getActivityOptions().values();
 		for (Iterator<ActivityOptionImpl> iterator = facActTypes.iterator();iterator.hasNext();){
