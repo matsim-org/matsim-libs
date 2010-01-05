@@ -65,14 +65,6 @@
       <url>http://matsim.org/m2repo</url>
     </repository>
 	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>maven2-repository.dev.java.net</id>
-			<name>Java.net Repository for Maven</name>
-			<url>http://download.java.net/maven/2/</url>
-			<layout>default</layout>
-		</pluginRepository>
-	</pluginRepositories>
 
 	<dependencies>
 		<dependency>
@@ -113,17 +105,6 @@
 								</formats>
 							</configuration>
 						</plugin>
-						<plugin>
-							<groupId>org.jvnet.maven.incrementalbuild</groupId>
-							<artifactId>incremental-build-plugin</artifactId>
-							<executions>
-								<execution>
-									<goals>
-										<goal>incremental-build</goal>
-									</goals>
-								</execution>
-							</executions>
-						</plugin>
 					</plugins>
 				</pluginManagement>
 			</build>
@@ -146,7 +127,7 @@
 	        	<groupId>org.codehaus.mojo</groupId>
 	        	<artifactId>findbugs-maven-plugin</artifactId>
 	        	<configuration>
-	          	<!--effort>Max</effort-->
+	          	<effort>Max</effort>
 	          	<threshold>Low</threshold>
 	        	</configuration>
 	      	</plugin>
