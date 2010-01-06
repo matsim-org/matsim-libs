@@ -25,17 +25,13 @@ import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
+import org.junit.Assert;
 import org.junit.Ignore;
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Test;
 
-public class PlanomatJGAPChromosomeTest extends MatsimTestCase {
+public class PlanomatJGAPChromosomeTest {
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	@Ignore
+	@Ignore @Test
 	public void testHashCode() throws InvalidConfigurationException {
 		
 		Configuration jgapConfiguration = new Configuration();
@@ -74,7 +70,7 @@ public class PlanomatJGAPChromosomeTest extends MatsimTestCase {
 		IChromosome testee = new PlanomatJGAPChromosome(jgapConfiguration, testGenes);
 		System.out.println(Integer.toString(testee.hashCode(), 16));
 		
-		fail("Not yet implemented");
+		Assert.fail("Not yet implemented");
 	}
 
 }
