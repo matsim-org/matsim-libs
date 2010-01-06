@@ -36,7 +36,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 public class XYLineChart extends ChartUtil {
 
 	private final XYSeriesCollection dataset;
-	private boolean isLogarithmicAxis;
+	private final boolean isLogarithmicAxis;
 
 	public XYLineChart(final String title, final String xAxisLabel, final String yAxisLabel) {
 		this(title, xAxisLabel, yAxisLabel, false);
@@ -52,7 +52,7 @@ public class XYLineChart extends ChartUtil {
 	}
 
 	@Override
-	protected JFreeChart getChart() {
+	public JFreeChart getChart() {
 		return this.chart;
 	}
 
