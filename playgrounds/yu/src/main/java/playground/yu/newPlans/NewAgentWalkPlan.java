@@ -23,16 +23,13 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.Config;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -124,17 +121,10 @@ public class NewAgentWalkPlan extends NewPopulation {
 	}
 
 	public static void main(final String[] args) {
-		Config config = new ScenarioLoaderImpl(args[0]).loadScenario().getConfig();
+		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network()
-				.getInputFile());
-
-		PopulationImpl population = new PopulationImpl();
-		NewAgentWalkPlan nawp = new NewAgentWalkPlan(population);
-		new MatsimPopulationReader(population, network).readFile(config.plans()
-				.getInputFile());
-		nawp.run(population);
+		NewAgentWalkPlan nawp = new NewAgentWalkPlan(scenario.getPopulation());
+		nawp.run(scenario.getPopulation());
 		nawp.writeEndPlans();
 	}
 }

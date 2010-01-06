@@ -8,14 +8,13 @@ import java.util.ArrayList;
 
 import org.geotools.feature.Feature;
 import org.jfree.util.Log;
-
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -65,11 +64,12 @@ public class SelectedLegs2QGIS extends SelectedPlans2ESRIShapeChanged {
 		final String populationFilename = "../runs_SVN/run674/it.1000/1000.plans.xml.gz";
 		final String networkFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		final String outputDir = "../runs_SVN/run674/it.1000/1000.analysis/";
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population, network)
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario)
 				.readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");

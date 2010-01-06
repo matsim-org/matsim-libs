@@ -20,6 +20,7 @@
 
 package playground.yu.newPlans;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -27,7 +28,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -59,17 +59,15 @@ public class SelectedPlans extends NewPopulation {
 	public static void main(final String[] args) {
 		final String netFilename = "../data/schweiz/input/ch.xml";
 		final String plansFilename = "../data/schweiz/input/459.100.plans.xml.gz";
-		new ScenarioLoaderImpl("../data/schweiz/selectedPlans.xml").loadScenario()
-				.getConfig();
-
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
-		SelectedPlans sp = new SelectedPlans(population);
-		PopulationReader plansReader = new MatsimPopulationReader(population,
-				network);
+		PopulationImpl population = scenario.getPopulation();
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFilename);
+		
+		SelectedPlans sp = new SelectedPlans(population);
 		sp.run(population);
 		sp.writeEndPlans();
 	}

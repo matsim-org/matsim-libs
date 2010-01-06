@@ -181,7 +181,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		for (int i = 6; i < 20; i++) {
 			SpeedLevel2QGIS sl2q = new SpeedLevel2QGIS();
 
-			sl2q.setCrs(ch1903, mn2q.network, mn2q.crs, linkIds);
+			sl2q.setCrs(ch1903, mn2q.getNetwork(), mn2q.crs, linkIds);
 			sl2q.addParameter("sl", Double.class, sls.get(i));
 			sl2q
 					.writeShapeFile("../matsimTests/Calibration/e5_700/speedLevels/700."

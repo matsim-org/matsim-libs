@@ -101,7 +101,7 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 		Counts2QGIS c2q = new Counts2QGIS();
 		c2q.readNetwork(netFilename);
 		c2q.setCrs(general);
-		c2q.setN2g(new Counts2PolygonGraph(c2q.network, c2q.crs, c2q
+		c2q.setN2g(new Counts2PolygonGraph(c2q.getNetwork(), c2q.crs, c2q
 				.readCounts(countsFilename)));
 		c2q.writeShapeFile("../matsimTests/berlinQGIS/counts4bb_5_hermannstr_counts4Kantstr.shp");
 

@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -49,14 +50,15 @@ public class RouterTest extends MatsimTestCase {
 	public void testWithVerySimpleTransitSchedule() throws SAXException, ParserConfigurationException, IOException {
 		/* for integration into MATSim, the following must work */
 		
+		ScenarioImpl scenario = new ScenarioImpl();
 		// setup very simple scenario
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile("../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/network.xml");
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).readFile("../playgrounds/mmoyo/test/input/playground/mmoyo/pt/router/transitSchedule.xml");
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile("../playgrounds/mmoyo/test/input/playground/mmoyo/pt/plans.xml");
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile("../playgrounds/mmoyo/test/input/playground/mmoyo/pt/plans.xml");
 		Person person = population.getPersons().get(new IdImpl(1));
 		ActivityImpl fromAct = (ActivityImpl) person.getPlans().get(0).getPlanElements().get(0);
 		ActivityImpl toAct = (ActivityImpl) person.getPlans().get(0).getPlanElements().get(2);

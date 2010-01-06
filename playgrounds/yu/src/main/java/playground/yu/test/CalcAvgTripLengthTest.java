@@ -21,6 +21,7 @@
 package playground.yu.test;
 
 import org.matsim.analysis.CalcAverageTripLength;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -35,11 +36,12 @@ public class CalcAvgTripLengthTest {
 		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		String popFilename = "../matsimTests/Calibration/fi4/1800.plans.xml.gz";
 
-		NetworkLayer net = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer net = scenario.getNetwork();
 		new MatsimNetworkReader(net).readFile(netFilename);
 
-		PopulationImpl pop = new PopulationImpl();
-		new MatsimPopulationReader(pop, net).readFile(popFilename);
+		PopulationImpl pop = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(popFilename);
 
 		CalcAverageTripLength catl = new CalcAverageTripLength();
 		catl.run(pop);

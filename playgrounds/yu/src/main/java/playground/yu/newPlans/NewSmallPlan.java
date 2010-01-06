@@ -29,7 +29,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -78,11 +77,9 @@ public class NewSmallPlan extends NewPopulation {
 		pcg.setOutputFile(outputPopFilename);
 		pcg.setOutputSample(0.0001);
 
-		NewSmallPlan nsp = new NewSmallPlan(population);
-		PopulationReader plansReader = new MatsimPopulationReader(population,
-				network);
-		plansReader.readFile(inputPopFilename);
+		new MatsimPopulationReader(s).readFile(inputPopFilename);
 
+		NewSmallPlan nsp = new NewSmallPlan(population);
 		nsp.run(population);
 		nsp.writeEndPlans();
 	}

@@ -8,6 +8,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
@@ -76,11 +77,12 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 		// final String textFilename =
 		// "../matsimTests/scoringTest/output/ITERS/it.100/mode.txt";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
 		try {

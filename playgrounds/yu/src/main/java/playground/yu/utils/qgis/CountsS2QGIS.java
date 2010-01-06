@@ -17,7 +17,7 @@ public class CountsS2QGIS implements X2QGIS {
 			Counts2QGIS c2q = new Counts2QGIS();
 			c2q.readNetwork(netFilename);
 			c2q.setCrs(ch1903);
-			c2q.setN2g(new Counts2PolygonGraph(c2q.network, c2q.crs, c2q
+			c2q.setN2g(new Counts2PolygonGraph(c2q.getNetwork(), c2q.crs, c2q
 					.readCounts(countsFilenameBase + i + ".xml")));
 			c2q.writeShapeFile(countsFilenameBase + i + ".shp");
 		}

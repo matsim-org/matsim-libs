@@ -9,6 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
@@ -31,14 +32,14 @@ public class Controller {
 	
 	
 	public static void main(String[] args) {
-		NetworkLayer net= new NetworkLayer(new NetworkFactoryImpl());
+		ScenarioImpl scenario = new ScenarioImpl();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = builder.createTransitSchedule();
 		
 		/***************reads the transitSchedule file**********/
-		new MatsimNetworkReader(net).readFile(NETWORK);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK);
 		try {
-			new TransitScheduleReaderV1(transitSchedule, net).readFile(TRANSITSCHEDULEFILE);
+			new TransitScheduleReaderV1(transitSchedule, scenario.getNetwork()).readFile(TRANSITSCHEDULEFILE);
 		} catch (SAXException e){
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
@@ -52,15 +53,14 @@ public class Controller {
 		Map <Coord, Collection<NodeImpl>> nearStopMap = new TreeMap <Coord, Collection<NodeImpl>>();
 		
 		//read population 
-		PopulationImpl population = new PopulationImpl();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, net);
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(PLANFILE);
 		
 		//Create Kroutecalculator with global variables to fill the connection map and near stations
-		KroutesCalculator kRoutesCalculator= new KroutesCalculator(transitSchedule, net, connectionMap, nearStopMap);
+		KroutesCalculator kRoutesCalculator= new KroutesCalculator(transitSchedule, scenario.getNetwork(), connectionMap, nearStopMap);
 		
 		//precalculate routes and near stations of the population
-		PlanRouteCalculator precalPopulation = new PlanRouteCalculator(transitSchedule, net, connectionMap, population, kRoutesCalculator);
+		PlanRouteCalculator precalPopulation = new PlanRouteCalculator(transitSchedule, scenario.getNetwork(), connectionMap, scenario.getPopulation(), kRoutesCalculator);
 		precalPopulation.PreCalRoutes();
 		
 		

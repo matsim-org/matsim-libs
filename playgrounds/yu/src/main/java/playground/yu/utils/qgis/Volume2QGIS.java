@@ -124,7 +124,7 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 
 		for (int i = 0; i < 24; i++) {
 			Volume2QGIS v2q = new Volume2QGIS();
-			v2q.setCrs(ch1903, mn2q.network, mn2q.crs, rps.getLinkIds());
+			v2q.setCrs(ch1903, mn2q.getNetwork(), mn2q.crs, rps.getLinkIds());
 			v2q.addParameter("vol", Integer.class, vols.get(i));
 			v2q.addParameter("sl", Double.class, sls.get(i));
 			v2q.writeShapeFile("../runs-svn/run669/it.1000/1000.Volume.QGIS/1000."

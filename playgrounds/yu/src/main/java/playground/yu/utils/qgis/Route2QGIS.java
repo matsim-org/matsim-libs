@@ -18,11 +18,11 @@ import org.geotools.referencing.CRS;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
@@ -166,15 +166,16 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		final String populationFilename = args[1];
 		final String outputDir = args[2];
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 
 		RouteSummary rs = new RouteSummary(outputDir + "/routeCompare.txt.gz");
 
 		System.out.println("-->reading plansfile: " + populationFilename);
-		new MatsimPopulationReader(population, network)
+		new MatsimPopulationReader(scenario)
 				.readFile(populationFilename);
 
 		rs.run(population);

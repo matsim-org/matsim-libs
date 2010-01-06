@@ -6,6 +6,7 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
@@ -67,17 +68,18 @@ public class CarPlansExtractor extends NewPopulation implements PlanAlgorithm {
 		final String netFilename = args[0];
 		final String plansFilename = args[1];
 		final String outputFilename = args[2];
-
-		NetworkLayer network = new NetworkLayer();
+		
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 		population.setIsStreaming(true);
 
 		CarPlansExtractor cpe = new CarPlansExtractor(population,
 				outputFilename);
 		population.addAlgorithm(cpe);
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 		population.runAlgorithms();
 
 		// cpe.run(population);

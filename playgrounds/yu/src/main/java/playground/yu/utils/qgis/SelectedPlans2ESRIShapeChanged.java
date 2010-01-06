@@ -33,20 +33,15 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -239,41 +234,6 @@ public class SelectedPlans2ESRIShapeChanged extends
 			e.printStackTrace();
 		} catch (SchemaException e) {
 			e.printStackTrace();
-		}
-	}
-
-	public static void main(final String[] args) {
-		// FIXME hard-coded file names; does this class really need a
-		// main-method?
-		final String populationFilename = "./examples/equil/plans100.xml";
-		final String networkFilename = "./examples/equil/network.xml";
-		// final String populationFilename =
-		// "./test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-		// final String networkFilename =
-		// "./test/scenarios/berlin/network.xml.gz";
-
-		final String outputDir = "./plans/";
-
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkFilename);
-
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population, network)
-				.readFile(populationFilename);
-
-		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-		SelectedPlans2ESRIShapeChanged sp = new SelectedPlans2ESRIShapeChanged(
-				population, crs, outputDir);
-		sp.setOutputSample(1);
-		sp.setActBlurFactor(100);
-		sp.setLegBlurFactor(100);
-		sp.setWriteActs(false);
-		sp.setWriteLegs(true);
-
-		try {
-			sp.write();
-		} catch (IOException e) {
-			Log.error(e.getMessage(), e);
 		}
 	}
 

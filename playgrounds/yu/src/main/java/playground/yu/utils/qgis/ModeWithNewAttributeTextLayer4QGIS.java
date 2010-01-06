@@ -4,6 +4,7 @@
 package playground.yu.utils.qgis;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
@@ -98,11 +99,12 @@ public class ModeWithNewAttributeTextLayer4QGIS extends ModeTextLayer4QGIS {
 		final String plansFilename = "../matsimTests/timeAllocationMutatorTest/it.100/100.plans.xml.gz";
 		final String textFilename = "../matsimTests/timeAllocationMutatorTest/it.100/mode_1.endTime.txt";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		ModeWithNewAttributeTextLayer4QGIS mwnatl = new ModeWithNewAttributeTextLayer4QGIS(
 				textFilename, "1.actEndTime");

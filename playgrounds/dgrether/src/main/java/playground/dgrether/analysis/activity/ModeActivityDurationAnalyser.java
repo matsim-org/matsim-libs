@@ -20,6 +20,7 @@ package playground.dgrether.analysis.activity;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -60,19 +61,23 @@ public class ModeActivityDurationAnalyser {
 	private final Config config;
 
 	public ModeActivityDurationAnalyser() {
+		
+		this.config = Gbl.createConfig(new String[] {CONFIGFILE});
+//	config = Gbl.createConfig(null);
+//	Gbl.getWorld().setNetworkLayer(net);
+//	Gbl.getWorld().complete();
+
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		
 		File f = new File("test.txt");
 		System.out.println(f.getAbsolutePath());
-		NetworkLayer net = new NetworkLayer();
+		
+		NetworkLayer net = scenario.getNetwork();
 		MatsimNetworkReader reader = new MatsimNetworkReader(net);
 		reader.readFile(NETWORK);
 
-		this.config = Gbl.createConfig(new String[] {CONFIGFILE});
-//		config = Gbl.createConfig(null);
-//		Gbl.getWorld().setNetworkLayer(net);
-//		Gbl.getWorld().complete();
-
-		PopulationImpl plans = new PopulationImpl();
-		MatsimPopulationReader plansParser = new MatsimPopulationReader(plans, net);
+		PopulationImpl plans = scenario.getPopulation();
+		MatsimPopulationReader plansParser = new MatsimPopulationReader(scenario);
 		plansParser.readFile(PLANSFILE);
 
 		double homeActivityDurationsCar = 0.0;

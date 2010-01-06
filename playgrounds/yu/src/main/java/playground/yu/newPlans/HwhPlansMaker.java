@@ -25,6 +25,7 @@ package playground.yu.newPlans;
 
 import java.util.Set;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -83,19 +84,18 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 	public static void main(final String[] args) {
 		final String netFilename = "./test/yu/ivtch/input/network.xml";
 		final String plansFilename = "./test/yu/ivtch/input/allPlansZuerich.xml.gz";
-		Config config = new ScenarioLoaderImpl(
-				"./test/yu/ivtch/config_for_make_hwhPlans.xml").loadScenario()
-				.getConfig();
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(
+				"./test/yu/ivtch/config_for_make_hwhPlans.xml");
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = sl.getScenario();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 
-		HwhPlansMaker hpm = new HwhPlansMaker(network, config, population);
+		HwhPlansMaker hpm = new HwhPlansMaker(network, scenario.getConfig(), population);
 
-		PopulationReader plansReader = new MatsimPopulationReader(population,
-				network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFilename);
 
 		hpm.run(population);

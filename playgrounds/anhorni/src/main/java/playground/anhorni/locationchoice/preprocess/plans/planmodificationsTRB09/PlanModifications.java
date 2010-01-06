@@ -1,9 +1,9 @@
 package playground.anhorni.locationchoice.preprocess.plans.planmodificationsTRB09;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -82,20 +82,21 @@ public class PlanModifications {
 	private void init(final String plansfilePath, final String networkfilePath,
 			final String facilitiesfilePath, final String worldfilePath) {
 
+		ScenarioImpl scenario = new ScenarioImpl();
 
 		System.out.println("  create world ... ");
-		World world = Gbl.createWorld();
+		World world = scenario.getWorld();
 		//final MatsimWorldReader worldReader = new MatsimWorldReader(this.world);
 		//worldReader.readFile(worldfilePath);
 		System.out.println("  done.");
 
 
-		this.network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		this.network = scenario.getNetwork();
 		new MatsimNetworkReader(this.network).readFile(networkfilePath);
 		log.info("network reading done");
 
 		//this.facilities=new Facilities();
-		this.facilities=(ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		this.facilities = scenario.getActivityFacilities();
 		new FacilitiesReaderMatsimV1(this.facilities).readFile(facilitiesfilePath);
 		log.info("facilities reading done");
 
@@ -107,8 +108,8 @@ public class PlanModifications {
 		log.info("world checking done.");
 
 
-		this.plans=new PopulationImpl();
-		final PopulationReader plansReader = new MatsimPopulationReader(this.plans, this.network);
+		this.plans=scenario.getPopulation();
+		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansfilePath);
 		log.info("plans reading done");
 		log.info(this.plans.getPersons().size() + " persons");

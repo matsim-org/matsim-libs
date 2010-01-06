@@ -96,7 +96,7 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 		t2q.setCrs(ch1903);
 
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
-				t2q.network);
+				t2q.getNetwork());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {
@@ -107,7 +107,7 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 			e.printStackTrace();
 		}
 
-		t2q.setN2g(new Toll2PolygonGraph(t2q.network, t2q.crs, tollReader
+		t2q.setN2g(new Toll2PolygonGraph(t2q.getNetwork(), t2q.crs, tollReader
 				.getScheme()));
 		t2q.writeShapeFile("../matsimTests/toll/ivtch-osm_toll.shp");
 	}

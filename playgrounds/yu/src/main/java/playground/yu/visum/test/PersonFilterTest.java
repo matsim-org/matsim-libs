@@ -1,5 +1,6 @@
 package playground.yu.visum.test;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -23,18 +24,17 @@ public class PersonFilterTest {
 	public static void testRunIDandActTypeundDepTimeFilter(Config config) {
 
 		System.out.println("TEST RUN ---FilterTest---:");
+		ScenarioImpl scenario = new ScenarioImpl(config);
 		// reading all available input
-		System.out.println("  creating network layer... ");
-		NetworkLayer network = new NetworkLayer();
-		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
 		System.out.println("  done.");
 
@@ -51,8 +51,7 @@ public class PersonFilterTest {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans,
-				network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 

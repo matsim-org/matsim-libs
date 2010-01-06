@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
@@ -327,15 +328,16 @@ public class CompareScenarios {
 
 		for (String scenarioName : this.scenarioNames) {
 
-			NetworkLayer network = new NetworkLayer();
+			ScenarioImpl scenario = new ScenarioImpl();
+			NetworkLayer network = scenario.getNetwork();
 			new MatsimNetworkReader(network).readFile(this.networkInputFilenames.get(scenarioName));
 			scenarioNetworks.put(scenarioName, network);
 			world.setNetworkLayer(network);
 			world.complete();
 
 			//Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(plansInputFilenames.get(scenarioName), false, null, network);
-			PopulationImpl plans = new PopulationImpl();
-			PopulationReader plansReader = new MatsimPopulationReader(plans, network);
+			PopulationImpl plans = scenario.getPopulation();
+			PopulationReader plansReader = new MatsimPopulationReader(scenario);
 			plansReader.readFile(this.plansInputFilenames.get(scenarioName));
 			plans.printPlansCount();
 

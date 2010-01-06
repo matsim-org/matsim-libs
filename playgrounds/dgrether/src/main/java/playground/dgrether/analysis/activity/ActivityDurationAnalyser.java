@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -75,14 +76,15 @@ public class ActivityDurationAnalyser {
 	private RoadPricingScheme roadPricingScheme;
 
 	public ActivityDurationAnalyser() {
-		//reading network
-		NetworkLayer net = new NetworkLayer();
-		MatsimNetworkReader reader = new MatsimNetworkReader(net);
-		reader.readFile(network);
 		//set config
 		this.config = Gbl.createConfig(new String[] {configfile});
 //		config = Gbl.createConfig(null);
 
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
+		//reading network
+		NetworkLayer net = scenario.getNetwork();
+		MatsimNetworkReader reader = new MatsimNetworkReader(net);
+		reader.readFile(network);
 
 		//reading road pricing scheme for filtering
 //		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(net);
@@ -99,8 +101,8 @@ public class ActivityDurationAnalyser {
 
 		//reading plans, filter and calculate activity durations
 		for (String file : plansFiles) {
-			PopulationImpl plans = new PopulationImpl();
-			MatsimPopulationReader plansParser = new MatsimPopulationReader(plans, net);
+			PopulationImpl plans = scenario.getPopulation();
+			MatsimPopulationReader plansParser = new MatsimPopulationReader(scenario);
 			plansParser.readFile(file);
 			ActivityDurationCounter adc = new ActivityDurationCounter();
 			System.out.println("Handling plans: " + file);
@@ -113,8 +115,6 @@ public class ActivityDurationAnalyser {
 
 			calculateActivityDurations(adc.getTypeActivityMap());
 			calculateActivityDurations(adc.getSimpleTypeActivityMap());
-
-
 		}
 	}
 

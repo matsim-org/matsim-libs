@@ -25,7 +25,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -71,7 +70,7 @@ public class DgAnalysisPopulationReader {
 			this.loadedNetworks.put(networkPath, net);
 		}
 		// load first plans file
-		population = loadPopulationFile(firstPlanPath, sc.getNetwork());
+		population = loadPopulationFile(firstPlanPath, sc);
 		new PlanCalcType().run(population);
 		Plan plan;
 		ActivityImpl act;
@@ -134,7 +133,7 @@ public class DgAnalysisPopulationReader {
 		sc.getConfig().network().setInputFile(networkPath);
 		sl.loadNetwork();
 		// load first plans file
-		population = loadPopulationFile(firstPlanPath, sc.getNetwork());
+		population = loadPopulationFile(firstPlanPath, sc);
 		new PlanCalcType().run(population);
 		
 		analysisPopulation = new DgAnalysisPopulation();
@@ -163,7 +162,7 @@ public class DgAnalysisPopulationReader {
 		population = null;
 		System.gc();
 		// load second population
-		population = loadPopulationFile(secondPlanPath, sc.getNetwork());
+		population = loadPopulationFile(secondPlanPath, sc);
 		new PlanCalcType().run(population);
 		for (Id id : population.getPersons().keySet()) {
 			plan = population.getPersons().get(id).getSelectedPlan();
@@ -185,11 +184,11 @@ public class DgAnalysisPopulationReader {
    *          the path to the filename
    * @return the Plans object containing the population
    */
-	protected PopulationImpl loadPopulationFile(final String filename, Network network) {
+	protected PopulationImpl loadPopulationFile(final String filename, ScenarioImpl sc) {
 		PopulationImpl plans = new PopulationImpl();
 
 		log.info("  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
+		PopulationReader plansReader = new MatsimPopulationReader(sc);
 		plansReader.readFile(filename);
 		log.info("  done");
 

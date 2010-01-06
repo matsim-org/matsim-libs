@@ -25,6 +25,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -79,17 +80,19 @@ public class EventModeActivityDurationAnalyser {
 
 	public EventModeActivityDurationAnalyser() {
 
-		NetworkLayer net = new NetworkLayer();
-		MatsimNetworkReader reader = new MatsimNetworkReader(net);
-		reader.readFile(NETWORK);
-
 		this.config = Gbl.createConfig(new String[] {CONFIGFILE});
 //		config = Gbl.createConfig(null);
 //		Gbl.getWorld().setNetworkLayer(net);
 //		Gbl.getWorld().complete();
 
-		PopulationImpl plans = new PopulationImpl();
-		MatsimPopulationReader plansParser = new MatsimPopulationReader(plans, net);
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		
+		NetworkLayer net = scenario.getNetwork();
+		MatsimNetworkReader reader = new MatsimNetworkReader(net);
+		reader.readFile(NETWORK);
+
+		PopulationImpl plans = scenario.getPopulation();
+		MatsimPopulationReader plansParser = new MatsimPopulationReader(scenario);
 		plansParser.readFile(PLANSFILE);
 
 		EventsManagerImpl events = new EventsManagerImpl();
@@ -97,9 +100,6 @@ public class EventModeActivityDurationAnalyser {
 		MatsimEventsReader eventsReader = new MatsimEventsReader(events);
 		eventsReader.readFile(EVENTSFILE);
 		events.resetHandlers(0);
-
-
-
 	}
 
 	private static class ActivityDurationHandler implements DeprecatedActivityEndEventHandler, DeprecatedActivityStartEventHandler{

@@ -301,12 +301,11 @@ public class MyRuns {
 		logger.info("Writing plans file...DONE.");
 	}
 	
-	public static PopulationImpl initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos, NetworkLayer network) {
+	public static PopulationImpl initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos, ScenarioImpl scenario) {
 
-		PopulationImpl population = null;
+		PopulationImpl population = scenario.getPopulation();
 
 		System.out.println("  reading plans xml file... ");
-		population = new PopulationImpl();
 		population.setIsStreaming(isStreaming);
 
 		if (isStreaming) {
@@ -317,7 +316,7 @@ public class MyRuns {
 				}
 			}
 		}
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(inputFilename);
 		population.printPlansCount();
 		System.out.println("  done.");

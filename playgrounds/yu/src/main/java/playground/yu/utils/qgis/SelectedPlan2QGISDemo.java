@@ -4,11 +4,10 @@ import java.io.IOException;
 
 import org.geotools.referencing.CRS;
 import org.jfree.util.Log;
-
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
 import org.opengis.referencing.FactoryException;
@@ -39,11 +38,12 @@ public class SelectedPlan2QGISDemo implements X2QGIS {
 		// final String outputDir = "output/bvg";
 		final String outputDir = "output/bse";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population, network)
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario)
 				.readFile(populationFilename);
 		/*
 		 * ----------------------------------------------------------------------

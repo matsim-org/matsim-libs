@@ -23,6 +23,7 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -126,19 +127,15 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 		final String plansFilename = "../matsimTests/Calibration/test/plans100.xml";
 		final String outputFilename = "../matsimTests/Calibration/test/plans100withPt.xml";
 
-		Gbl.createConfig(null);
-
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		NewPtPlans npwp = new NewPtPlans(population, outputFilename);
-
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
-
 		npwp.run(population);
-
 		npwp.writeEndPlans();
 
 		System.out.println("--> Done!");

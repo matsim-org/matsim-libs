@@ -23,6 +23,7 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -30,7 +31,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.yu.analysis.PlanModeJudger;
@@ -78,15 +78,15 @@ public class NewAgentCarPlan extends NewPopulation implements PlanAlgorithm {
 		final String plansFilename = "../schweiz-ivtch-SVN/baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
 		final String outputPlansFilename = "../schweiz-ivtch-SVN/baseCase/plans/plans_all_with_car_zrh30km_transitincl_10pct.xml.gz";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
+		
 		NewAgentCarPlan nac = new NewAgentCarPlan(population,
 				outputPlansFilename);
-		PopulationReader plansReader = new MatsimPopulationReader(population,
-				network);
-		plansReader.readFile(plansFilename);
 		nac.run(population);
 		nac.writeEndPlans();
 	}

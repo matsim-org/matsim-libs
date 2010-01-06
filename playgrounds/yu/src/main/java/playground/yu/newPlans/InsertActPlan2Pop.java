@@ -5,7 +5,6 @@ package playground.yu.newPlans;
 
 import java.util.Random;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -63,20 +62,16 @@ public class InsertActPlan2Pop extends NewPopulation implements PlanAlgorithm {
 		final String plansFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/plan.routedOevModell.BVB344.xml";
 		final String outputFilename = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/plan.routedOevModell.BVB344.moreLegPlan.xml";
 
-		Scenario s = new ScenarioImpl();
+		ScenarioImpl s = new ScenarioImpl();
 
-		NetworkLayer network = (NetworkLayer) s.getNetwork();
+		NetworkLayer network = s.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = (PopulationImpl) s.getPopulation();
+		PopulationImpl population = s.getPopulation();
+		new MatsimPopulationReader(s).readFile(plansFilename);
 
-		InsertActPlan2Pop npwp = new InsertActPlan2Pop(population,
-				outputFilename);
-
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
-
+		InsertActPlan2Pop npwp = new InsertActPlan2Pop(population, outputFilename);
 		npwp.run(population);
-
 		npwp.writeEndPlans();
 
 		System.out.println("--> Done!");

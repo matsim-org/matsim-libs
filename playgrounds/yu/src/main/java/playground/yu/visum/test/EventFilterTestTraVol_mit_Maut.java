@@ -22,6 +22,7 @@ package playground.yu.visum.test;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -46,28 +47,28 @@ public class EventFilterTestTraVol_mit_Maut {
 	public static void testRunTraVolCal_mit_Maut(Config config)
 			throws IOException {
 
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		
 		// network
-		System.out.println("  creating network object... ");
-		NetworkLayer network = new NetworkLayer();
-		System.out.println("  done.");
-
 		System.out.println("  reading network file... ");
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 		System.out.println("  done.");
+
 		// plans
 		System.out.println("  creating plans object... ");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
 		System.out.println("  done.");
+
 		// events
 		System.out.println("  creating events object... ");
 		EventsManagerImpl events = new EventsManagerImpl();
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans,
-				network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 

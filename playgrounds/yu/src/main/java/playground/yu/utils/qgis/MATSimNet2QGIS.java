@@ -37,13 +37,13 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.opengis.referencing.FactoryException;
@@ -81,13 +81,12 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	protected static double flowCapFactor = 0.1;
-	protected NetworkLayer network;
+	private ScenarioImpl scenario = new ScenarioImpl();
 	protected CoordinateReferenceSystem crs = null;
 	private Network2PolygonGraph n2g = null;
 
 	public void readNetwork(final String netFilename) {
-		network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(netFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
 	}
 
 	/**
@@ -96,7 +95,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 	 */
 	public void setCrs(final String wkt) {
 		crs = MGC.getCRS(wkt);
-		n2g = new Network2PolygonGraph(network, crs);
+		n2g = new Network2PolygonGraph(scenario.getNetwork(), crs);
 	}// TODO override e.g. set(N2g)
 
 	/**
@@ -138,7 +137,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 	 * @return the network
 	 */
 	public NetworkLayer getNetwork() {
-		return network;
+		return scenario.getNetwork();
 	}
 
 	public void readEvents(final String eventsFilename,
@@ -151,9 +150,8 @@ public class MATSimNet2QGIS implements X2QGIS {
 
 	public void readPlans(final String plansFilename,
 			final AbstractPersonAlgorithm pa) {
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
-		pa.run(population);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
+		pa.run(scenario.getPopulation());
 	}
 
 	public CoordinateReferenceSystem getCrs() {

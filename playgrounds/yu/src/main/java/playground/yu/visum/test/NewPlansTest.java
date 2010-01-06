@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
@@ -26,19 +27,17 @@ public class NewPlansTest {
 	public static void testRun(Config config) {
 
 		System.out.println("TEST RUN ---FilterTest---:");
+		ScenarioImpl scenario = new ScenarioImpl(config);
 		// reading all available input
 
-		System.out.println("  creating network layer... ");
-		NetworkLayer network = new NetworkLayer();
-		System.out.println("  done.");
-
 		System.out.println("  reading network xml file... ");
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  creating plans object... ");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
 		System.out.println("  done.");
 
@@ -129,8 +128,7 @@ public class NewPlansTest {
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(plans,
-				network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 

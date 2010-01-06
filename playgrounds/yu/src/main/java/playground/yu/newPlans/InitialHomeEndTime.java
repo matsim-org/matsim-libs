@@ -3,6 +3,7 @@
  */
 package playground.yu.newPlans;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -46,19 +47,16 @@ public class InitialHomeEndTime extends NewPopulation implements PlanAlgorithm {
 		final String plansFilename = "../schweiz-ivtch-SVN/baseCase/plans/plans_all_zrh30km_transitincl_10pct.xml.gz";
 		final String outputPlansFilename = "output/plans_all_zrh30km_transitincl_10pct_home_end_6h.xml.gz";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
-		InitialHomeEndTime ihet = new InitialHomeEndTime(population,
-				outputPlansFilename);
-
-		PopulationReader plansReader = new MatsimPopulationReader(population,
-				network);
+		PopulationImpl population = scenario.getPopulation();
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFilename);
 
+		InitialHomeEndTime ihet = new InitialHomeEndTime(population, outputPlansFilename);
 		ihet.run(population);
-
 		ihet.writeEndPlans();
 	}
 

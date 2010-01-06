@@ -23,16 +23,14 @@ package playground.yu.newPlans;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -92,22 +90,17 @@ public class AvoidOldNodes extends NewPopulation {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		Config config = new ScenarioLoaderImpl(args[0]).loadScenario().getConfig();
+		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
+	
+		PopulationImpl population = scenario.getPopulation();
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(config.network()
-				.getInputFile());
-
-		PopulationImpl population = new PopulationImpl();
-		AvoidOldNodes aon = new AvoidOldNodes(network, population);
+		AvoidOldNodes aon = new AvoidOldNodes(scenario.getNetwork(), population);
 		aon.addNode("100000");
 		aon.addLink("3000000");
 		aon.addLink("3000001");
 		for (int i = 3000022; i <= 3000025; i++) {
 			aon.addLink(Integer.toString(i));
 		}
-		new MatsimPopulationReader(population, network).readFile(config.plans()
-				.getInputFile());
 		aon.run(population);
 		aon.writeEndPlans();
 	}

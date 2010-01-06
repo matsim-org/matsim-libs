@@ -81,14 +81,11 @@ public class NewPopWithRouteFilter extends NewPopulation {
 		new MatsimNetworkReader(network).readFile(netFilename);
 
 		PopulationImpl population = (PopulationImpl) s.getPopulation();
+		new MatsimPopulationReader(s).readFile(plansFilename);
 
 		NewPopWithRouteFilter npwp = new NewPopWithRouteFilter(population,
 				outputFilename, "BVB----344");
-
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
-
 		npwp.run(population);
-
 		npwp.writeEndPlans();
 
 		System.out.println("--> Done!");

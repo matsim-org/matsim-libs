@@ -27,13 +27,13 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -143,19 +143,15 @@ public class ScoreTest extends AbstractPersonAlgorithm {
 
 		Gbl.startMeasurement();
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
+		System.out.println("-->reading plansfile: " + plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		ScoreTest st = new ScoreTest(outputFilename);
-		population.addAlgorithm(st);
-
-		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
-
-		population.runAlgorithms();
-
+		st.run(scenario.getPopulation());
 		st.end();
 
 		System.out.println("--> Done!");

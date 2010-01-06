@@ -96,8 +96,7 @@ public class DoublePlan extends NewPopulation {
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
 		PopulationImpl population = s.getPopulation();
-		PopulationReader plansReader = new MatsimPopulationReader(population,
-				network);
+		PopulationReader plansReader = new MatsimPopulationReader(s);
 		plansReader.readFile(plansFilename);
 
 		DoublePlan dp = new DoublePlan(population, outputPlansFilename);

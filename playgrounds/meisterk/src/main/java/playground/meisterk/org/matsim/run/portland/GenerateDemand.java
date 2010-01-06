@@ -20,6 +20,7 @@
 
 package playground.meisterk.org.matsim.run.portland;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -48,35 +49,34 @@ public class GenerateDemand {
 
 	private static void generateDemand(Config config) {
 
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		World world = scenario.getWorld();
 
 		System.out.println("Reading network...");
-		NetworkLayer networkLayer = new NetworkLayer();
+		NetworkLayer networkLayer = scenario.getNetwork();
 		new MatsimNetworkReader(networkLayer).readFile(config.network().getInputFile());
-		world.setNetworkLayer(networkLayer);
 		System.out.println("Reading network...done.");
 
 		System.out.println("Reading facilities...");
-		ActivityFacilitiesImpl facilityLayer = new ActivityFacilitiesImpl();
+		ActivityFacilitiesImpl facilityLayer = scenario.getActivityFacilities();
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(facilityLayer);
 		//facilities_reader.setValidating(false);
 		facilities_reader.readFile(config.facilities().getInputFile());
 		facilityLayer.printFacilitiesCount();
-		world.setFacilityLayer(facilityLayer);
 		world.complete();
 		System.out.println("Reading facilities...done.");
 
 		System.out.println("Setting up plans objects...");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		plansWriter.startStreaming(config.plans().getOutputFile());
-		PopulationReader plansReader = new MatsimPopulationReader(plans, networkLayer);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("Setting up plans objects...done.");
 
 		System.out.println("Setting up person modules...");
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		plans.addAlgorithm(new PlansCalcRoute(networkLayer, timeCostCalc, timeCostCalc));
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		plans.addAlgorithm(new PlansCalcRoute(config.plansCalcRoute(), networkLayer, timeCostCalc, timeCostCalc));
 		System.out.println("Setting up person modules...done.");
 
 		System.out.println("Reading, processing and writing plans...");

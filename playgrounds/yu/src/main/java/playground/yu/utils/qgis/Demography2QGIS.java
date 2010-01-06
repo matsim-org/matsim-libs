@@ -27,16 +27,15 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -52,11 +51,12 @@ import playground.yu.utils.CompareSelectedPlansTable;
  * 
  */
 public class Demography2QGIS extends CompareSelectedPlansTable {
-	private PopulationImpl plans;
+	private final ScenarioImpl scenario = new ScenarioImpl();
+//	private PopulationImpl plans;
 	private static final String HEADER = "personId;sex;age;license;caravail;employed;homex;homey;homelink;"
 			+ "planType;planScore;departureTime;"
 			+ "planTravelTime;planTravelDistance;numberOfTrips";
-	private NetworkLayer network;
+//	private NetworkLayer network;
 
 	/**
 	 * @param args
@@ -79,17 +79,13 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 	}
 
 	private void init(final String networkPath) {
-		this.plans = new PopulationImpl();
-
 		System.out.println("  reading the network...");
-		this.network = new NetworkLayer();
-		new MatsimNetworkReader(this.network).readFile(networkPath);
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkPath);
 	}
 
 	private void readFiles(final String plansfilePath) {
 		System.out.println("  reading file " + plansfilePath);
-		PopulationReader plansReader0 = new MatsimPopulationReader(this.plans,
-				this.network);
+		PopulationReader plansReader0 = new MatsimPopulationReader(this.scenario);
 		plansReader0.readFile(plansfilePath);
 	}
 
@@ -99,11 +95,11 @@ public class Demography2QGIS extends CompareSelectedPlansTable {
 			out.write(Demography2QGIS.HEADER);
 			out.newLine();
 
-			for (Id person_id : this.plans.getPersons().keySet()) {
-
+			for (Person p : this.scenario.getPopulation().getPersons().values()) {
+				
+				PersonImpl person = (PersonImpl) p;
 				// method person.toString() not appropriate
-				out.write(person_id.toString() + ";");
-				PersonImpl person = (PersonImpl) this.plans.getPersons().get(person_id);
+				out.write(person.getId().toString() + ";");
 				out.write(person.getSex() + ";");
 				out.write(person.getAge() + ";");
 				out.write(person.getLicense() + ";");
