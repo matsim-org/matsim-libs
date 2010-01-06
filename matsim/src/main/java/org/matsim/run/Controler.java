@@ -20,6 +20,8 @@
 
 package org.matsim.run;
 
+import org.matsim.api.core.v01.Scenario;
+
 
 /**
  * This is currently only a substitute to the full Controler. 
@@ -40,6 +42,10 @@ public class Controler {
 	
 	public void setOverwriteFiles(final boolean overwriteFiles) {
 		this.controler.setOverwriteFiles(overwriteFiles);
+	}
+	
+	public Scenario getScenario() {
+		return this.controler.getScenario() ;
 	}
 	
 	public void run() {
