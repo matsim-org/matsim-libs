@@ -20,12 +20,6 @@
 
 package org.matsim.vis.otfvis.gui;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
@@ -36,25 +30,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
-import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
 import org.matsim.vis.otfvis.interfaces.OTFQuery.Type;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentEvents;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentId;
@@ -71,16 +52,15 @@ import org.matsim.vis.otfvis.opengl.queries.QuerySpinneNOW;
  * @author dstrippgen
  *
  */
-public class OTFQueryControlBar extends JToolBar implements ActionListener, ItemListener, ChangeListener, OTFQueryHandler {
+public class OTFQueryControl implements OTFQueryHandler {
   
-	private static final Logger log = Logger.getLogger(OTFQueryControlBar.class);
-	
-	public IdResolver agentIdResolver = null;
+	private static final Logger log = Logger.getLogger(OTFQueryControl.class);
+  
+	private JTextField textField;
+  
+	private IdResolver agentIdResolver = null;
 
 	private final OTFHostControlBar hostControlBar;
-	private JTextField textField;
-	private JComboBox queryTypeComboBox;
-	private final JTabbedPane pane;
 	private final List<OTFQuery> queryItems = new ArrayList<OTFQuery>();
 
 	private final Vector<QueryEntry> queries = new Vector<QueryEntry>(Arrays.asList(
@@ -91,119 +71,16 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 			new QueryEntry("linkSpinneNOW", "show Spinne of all veh on the link NOW", QuerySpinneNOW.class)
 	));
 
-	private OTFVisConfig config; 
+	private final OTFVisConfig config; 
 
 
-	public OTFQueryControlBar(OTFHostControlBar handler, final OTFVisConfig config) {
-		super();
+	public OTFQueryControl(OTFHostControlBar handler, final OTFVisConfig config) {
 		this.config = config;
-		if(agentIdResolver == null) agentIdResolver  = new myIdResolver();
+		if(agentIdResolver == null) {
+		  agentIdResolver  = new myIdResolver();
+		}
 		this.hostControlBar = handler;
-		pane = new JTabbedPane();
-		this.add(pane);
-		JPanel com = new JPanel();
-		com.setSize(500, 60);
-
-		{
-			JLabel jLabel3 = new JLabel();
-			com.add(jLabel3);
-			jLabel3.setText("Query:");
-			jLabel3.setBounds(344, 45, 36, 31);
-		}
-		{
-			ComboBoxModel leftMFuncModel =	new DefaultComboBoxModel(queries);
-			leftMFuncModel.setSelectedItem(queries.get(0));
-			this.config.setQueryType(queries.get(0).clazz.getCanonicalName());
-			queryTypeComboBox = new JComboBox();
-			com.add(queryTypeComboBox);
-			queryTypeComboBox.setActionCommand("type_changed");
-			queryTypeComboBox.setModel(leftMFuncModel);
-			queryTypeComboBox.setBounds(57, 76, 92, 27);
-			queryTypeComboBox.setMaximumSize(new Dimension(250,60));
-			queryTypeComboBox.addActionListener(this);
-			queryTypeComboBox.setToolTipText(queries.get(0).toolTip);
-		}
-		{
-			JLabel jLabel3 = new JLabel();
-			com.add(jLabel3);
-			jLabel3.setText(" Id:");
-			textField = new JTextField();
-			com.add(textField);
-			textField.setActionCommand("id_changed");
-			textField.setPreferredSize(new Dimension(350,30));
-			textField.setMaximumSize(new Dimension(350,40));
-			textField.addActionListener(this);
-		}
-		{
-			JLabel jLabel3 = new JLabel();
-			com.add(jLabel3);
-			jLabel3.setText("  ");
-
-			JButton button = new JButton();
-			button.setText("Clear!");
-			button.setActionCommand("clear");
-			button.addActionListener(this);
-			button.setToolTipText("Clears all queries!");
-			com.add(button);
-
-			JCheckBox SynchBox = new JCheckBox("multiple select");
-			SynchBox.setMnemonic(KeyEvent.VK_M);
-			SynchBox.setSelected(config.isMultipleSelect());
-			SynchBox.addItemListener(this);
-			com.add(SynchBox);
-		}
-		com.doLayout();
-		com.setBounds(250, 130, 220, 160);
-		pane.addTab("Query", com);
-	}
-
-	public void actionPerformed(ActionEvent e) {
-		OTFVisConfig cfg = this.config;
-		String command = e.getActionCommand();
-		if("id_changed".equals(command)) {
-			String id = ((JTextField)e.getSource()).getText();
-			if (!cfg.isMultipleSelect()){
-				removeQueries();
-			}
-			handleIdQuery(id, cfg.getQueryType());
-		} 
-		else if ("type_changed".equals(command)) {
-			JComboBox cb = (JComboBox)e.getSource();
-			QueryEntry queryType = (QueryEntry)cb.getSelectedItem();
-			cfg.setQueryType(queryType.clazz.getCanonicalName());
-			cfg.setQueryType(queryType.clazz.getCanonicalName());
-			removeQueries();
-			OTFQuery test = createQuery(queryType.clazz.getCanonicalName());
-
-			if(pane.getTabCount() > 1) pane.remove(1);
-
-			if(test instanceof OTFQueryOptions) {
-				JComponent settings = ((OTFQueryOptions)test).getOptionsGUI(pane);
-				pane.addTab("Options", settings);
-			}
-
-			cb.setToolTipText(queryType.toolTip);
-		} else if ("clear".equals(command)) {
-			removeQueries();
-		}
-
-	}
-
-	public void itemStateChanged(ItemEvent e) {
-		JCheckBox source = (JCheckBox)e.getItemSelectable();
-		if (source.getText().equals("multiple select")) {
-			this.config.setMultipleSelect(e.getStateChange() != ItemEvent.DESELECTED);
-		}
-	}
-
-	public void stateChanged(ChangeEvent e) {
-	}
-
-	public void addQueryEntry(String name, String tooltip, Class clazz) {
-		queries.add(new QueryEntry(name, tooltip, clazz));
-		ComboBoxModel leftMFuncModel =	new DefaultComboBoxModel(queries);
-		queryTypeComboBox.setModel(leftMFuncModel);
-		queryTypeComboBox.invalidate();
+		this.config.setQueryType(queries.get(0).clazz.getCanonicalName());
 	}
 
 	synchronized public void handleIdQuery(String id, String queryName) {
@@ -214,13 +91,10 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 	}
 
 	public void handleIdQuery(Collection<String> list, String queryName) {
-
 		if (!this.config.isMultipleSelect()) {
 			removeQueries();
 		}
-
 		StringBuilder infoText = new StringBuilder(textField.getText());
-
 		for(String id : list) {
 			if (infoText.length() != 0) {
 				infoText.append(", ");
@@ -243,7 +117,7 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		if ((mouseButton==1) || (mouseButton==4)) handleClick(viewId, origRect, mouseButton);
 	}
 
-	private OTFQuery createQuery(String className) {
+	protected OTFQuery createQuery(String className) {
 		try {
 			Class classDefinition = Class.forName(className);
 			return (OTFQuery) classDefinition.newInstance();
@@ -298,7 +172,9 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 
 	synchronized public void removeQueries(){
 		for(OTFQuery query : this.queryItems){
-			if(query != null) query.remove();
+			if(query != null) {
+			  query.remove();
+			}
 		}
 		this.queryItems.clear();
 		textField.setText("");
@@ -326,19 +202,6 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		queryItems.addAll(replacedItems);
 	}
 
-	private static class QueryEntry {
-		public QueryEntry(String string, String string2, Class class1) {
-			this.shortName = string;
-			this.toolTip = string2;
-			this.clazz = class1;
-		}
-		@Override
-		public String toString() { return shortName;}
-
-		public String shortName;
-		public String toolTip;
-		public Class clazz;
-	}
 
 	public interface IdResolver {
 		List<String> resolveId(Double origRect);
@@ -354,6 +217,30 @@ public class OTFQueryControlBar extends JToolBar implements ActionListener, Item
 		}
 	}
 
+  
+  public Vector<QueryEntry> getQueries() {
+    return queries;
+  }
 
+  public void setQueryTextField(JTextField textField2) {
+    this.textField = textField2;
+  }
+}
+
+ class QueryEntry {
+   public String shortName;
+   public String toolTip;
+   public Class<? extends OTFQuery> clazz;
+   
+   public QueryEntry(String string, String string2, Class<? extends OTFQuery> class1) {
+    this.shortName = string;
+    this.toolTip = string2;
+    this.clazz = class1;
+  }
+  @Override
+  public String toString() { 
+    return shortName;
+  }
 
 }
+
