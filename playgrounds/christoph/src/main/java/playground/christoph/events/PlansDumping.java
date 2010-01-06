@@ -2,6 +2,7 @@ package playground.christoph.events;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -35,7 +36,6 @@ public class PlansDumping {
 		
 		Config config = new Config();
 		config.addCoreModules();
-		config.checkConsistency();
 		try 
 		{
 			new MatsimConfigReader(config).readFile(configFileName, dtdFileName);
@@ -46,17 +46,17 @@ public class PlansDumping {
 			throw new RuntimeException(e);
 		}
 		Gbl.setConfig(config);
+		ScenarioImpl scenario = new ScenarioImpl(config);
 		
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFile);
 		
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(populationFile);
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(populationFile);
 		
 		for (Person person : population.getPersons().values())
 		{
 			((PersonImpl) person).removeUnselectedPlans();
-			//person.getSelectedPlan().setScore(PlanImpl.UNDEF_SCORE);
 			person.getSelectedPlan().setScore(null);
 		}
 		

@@ -30,6 +30,7 @@ import java.util.StringTokenizer;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -49,6 +50,7 @@ public abstract class CMCFRouter implements NetworkReader{
 
 	private final String networkFile, plansFile, cmcfFile;
 
+	private final ScenarioImpl scenario;
 	protected NetworkLayer network;
 	protected PopulationImpl population;
 	protected PathFlow<Node, Link> pathFlow;
@@ -59,6 +61,7 @@ public abstract class CMCFRouter implements NetworkReader{
 		this.networkFile = networkFile;
 		this.plansFile = plansFile;
 		this.cmcfFile = cmcfFile;
+		this.scenario = new ScenarioImpl();
 	}
 
 	public void read() throws IOException{
@@ -82,7 +85,7 @@ public abstract class CMCFRouter implements NetworkReader{
 	protected void loadNetwork(){
 		//this.network = (NetworkLayer) Gbl.getWorld().createLayer(NetworkLayer.LAYER_TYPE, null);
 		//new MatsimNetworkReader(network).readFile(networkFile);
-		this.network = new NetworkLayer();
+		this.network = scenario.getNetwork();
 		MatsimNetworkReader reader = null;
 		try {
 			reader = new MatsimNetworkReader( this.network );
@@ -98,9 +101,9 @@ public abstract class CMCFRouter implements NetworkReader{
 		}
 	}
 
-	protected void loadPopulation(){
-		this.population = new PopulationImpl();
-		new MatsimPopulationReader(this.population, this.network).readFile(this.plansFile);
+	private void loadPopulation(){
+		this.population = scenario.getPopulation();
+		new MatsimPopulationReader(this.scenario).readFile(this.plansFile);
 	}
 
 	protected void loadCMCFSolution() throws NumberFormatException, IOException{

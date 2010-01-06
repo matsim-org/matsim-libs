@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -16,10 +17,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 
 import playground.christoph.knowledge.container.dbtools.DBConnectionTool;
 import playground.christoph.knowledge.nodeselection.SelectNodesDijkstra;
@@ -28,9 +27,8 @@ import playground.christoph.router.costcalculators.OnlyTimeDependentTravelCostCa
 public class TestCellKnowledge {
 
 	private final static Logger log = Logger.getLogger(TestCellKnowledge.class);
-	
-	private NetworkLayer network;
-	private PopulationImpl population;
+
+	private final ScenarioImpl scenario;
 	private Config config;
 	private Person person;
 	private SelectNodesDijkstra selectNodesDijkstra;
@@ -57,15 +55,16 @@ public class TestCellKnowledge {
 		DBConnectionTool dbct = new DBConnectionTool();
 		dbct.connect();		 
 		
+		loadConfig();
+		this.scenario = new ScenarioImpl(this.config);
 		loadNetwork();
 		loadPopulation();
-		loadConfig();
 				
-		log.info("Network size: " + network.getLinks().size());
-		log.info("Population size: " + population.getPersons().size());
+		log.info("Network size: " + this.scenario.getNetwork().getLinks().size());
+		log.info("Population size: " + this.scenario.getPopulation().getPersons().size());
 		
 		//Person person = population.getPersons().values().iterator().next();
-		person = population.getPersons().get(new IdImpl(100000));
+		person = this.scenario.getPopulation().getPersons().get(new IdImpl(100000));
 		log.info("Person: " + person);
 		log.info("ID: " + person.getId());
 		
@@ -73,7 +72,7 @@ public class TestCellKnowledge {
 		createKnownNodes();
 		log.info("Found known Nodes: " + nodesMap.size());
 		
-		cellNetworkMapping = new CellNetworkMapping(network);
+		cellNetworkMapping = new CellNetworkMapping(this.scenario.getNetwork());
 		cellNetworkMapping.createMapping();
 		
 		CreateCellKnowledge();
@@ -125,22 +124,20 @@ public class TestCellKnowledge {
 	
 	private void initNodeSelector()
 	{
-		selectNodesDijkstra = new SelectNodesDijkstra((NetworkLayer)this.network);
+		selectNodesDijkstra = new SelectNodesDijkstra(this.scenario.getNetwork());
 		selectNodesDijkstra.setCostCalculator(new OnlyTimeDependentTravelCostCalculator(null));
 		selectNodesDijkstra.setCostFactor(20.0);
 	}
 	
 	private void loadNetwork()
 	{
-		network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(networkFile);
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFile);
 		log.info("Loading Network ... done");
 	}
 	
 	private void loadPopulation()
 	{
-		population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(populationFile);
+		new MatsimPopulationReader(this.scenario).readFile(populationFile);
 		log.info("Loading Population ... done");
 	}
 	
@@ -148,7 +145,6 @@ public class TestCellKnowledge {
 	{
 		this.config = new Config();
 		this.config.addCoreModules();
-		this.config.checkConsistency();
 		try {
 			new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
 		} catch (IOException e) {

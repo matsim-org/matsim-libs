@@ -27,6 +27,7 @@ import java.io.Writer;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -71,9 +72,10 @@ public class CMCFDemandWriter{
 		this.networkPath = networkPath == null ? Gbl.getConfig().network().getInputFile(): networkPath;
 		this.plansPath = plansPath == null ? Gbl.getConfig().plans().getInputFile(): plansPath;
 
-		this.network = new NetworkLayer();
-		this.plans = new PopulationImpl();
-		this.popReader = new MatsimPopulationReader(this.plans, this.network);
+		ScenarioImpl scenario = new ScenarioImpl();
+		this.network = scenario.getNetwork();
+		this.plans = scenario.getPopulation();
+		this.popReader = new MatsimPopulationReader(scenario);
 
 		this.init();
 	}

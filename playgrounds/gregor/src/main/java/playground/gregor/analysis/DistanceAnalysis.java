@@ -40,13 +40,13 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.LegImpl;
@@ -62,7 +62,6 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.world.World;
 
 import playground.gregor.gis.helper.GTH;
 
@@ -85,7 +84,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *   gefiltert (dieses Vorgehen ist wesentlich effizienter als immer ???ber alle
  *   Personen zu iterieren):
  *
- * - Aus dem QuadTree holt man sich zun???chst alle Personen im Umkreis von  min
+ * - Aus dem QuadTree holt man sich zunaechst alle Personen im Umkreis von  min
  *   d/2 des Mittelpunkts eines Polygons.  (DistanceAnalysis.iteratePolygons -
  *   Zeile 158)
  *
@@ -359,19 +358,14 @@ public class DistanceAnalysis {
 		Config config = Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
 		district_shape_file = args[1];
 
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl(config);
 
 		log.info("loading network from " + config.network().getInputFile());
-		NetworkFactoryImpl fc = new NetworkFactoryImpl();
-		fc.setLinkFactory(new TimeVariantLinkFactory());
+		NetworkLayer network = scenario.getNetwork();
+		network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
 
-		NetworkLayer network = new NetworkLayer(fc);
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-		world.setNetworkLayer(network);
-		world.complete();
 		log.info("done.");
-
-
 
 
 		log.info("loading shape file from " + district_shape_file);
@@ -385,12 +379,11 @@ public class DistanceAnalysis {
 
 
 		log.info("loading population from " + config.plans().getInputFile());
-		PopulationImpl population = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		PopulationImpl population = scenario.getPopulation();
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(config.plans().getInputFile());
 //		plansReader.readFile("./badPersons.xml");
 		log.info("done.");
-
 
 		try {
 			new DistanceAnalysis(features,population,network);

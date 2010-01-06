@@ -31,6 +31,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -40,7 +41,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.TimeVariantLinkFactory;
@@ -54,7 +54,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.evacuation.base.EvacuationAreaFileReader;
 import org.matsim.evacuation.base.EvacuationAreaFileWriter;
 import org.matsim.evacuation.base.EvacuationAreaLink;
-import org.matsim.world.World;
 import org.xml.sax.SAXException;
 
 
@@ -158,11 +157,10 @@ public class CutNetwork {
 	
 	public static void main(final String [] args) {
 		Config c = Gbl.createConfig(args);
-		World w = Gbl.createWorld();
-		
-		NetworkFactoryImpl nf = new NetworkFactoryImpl();
-		nf.setLinkFactory(new TimeVariantLinkFactory());
-		NetworkLayer net = new NetworkLayer(nf);
+		ScenarioImpl scenario = new ScenarioImpl();
+
+		NetworkLayer net = scenario.getNetwork();
+		net.getFactory().setLinkFactory(new TimeVariantLinkFactory());
 		new MatsimNetworkReader(net).readFile(c.network().getInputFile());
 		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(net);
 		try {
@@ -177,10 +175,9 @@ public class CutNetwork {
 		net.setNetworkChangeEvents(parser.getEvents());
 		
 		
-		w.setNetworkLayer(net);
-		PopulationImpl pop = new PopulationImpl();
+		PopulationImpl pop = scenario.getPopulation();
 		try {
-			new MatsimPopulationReader(pop,net).parse(c.plans().getInputFile());
+			new MatsimPopulationReader(scenario).parse(c.plans().getInputFile());
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

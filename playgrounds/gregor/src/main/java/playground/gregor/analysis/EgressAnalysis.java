@@ -39,10 +39,12 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -59,7 +61,6 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.world.World;
 
 import playground.gregor.gis.helper.GTH;
 
@@ -228,19 +229,15 @@ public class EgressAnalysis {
 
 		if (args.length != 2) {
 			throw new RuntimeException("wrong number of arguments! Pleas run DistanceAnalysis config.xml shapefile.shp" );
-		} else {
-			Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
-			district_shape_file = args[1];
-
 		}
+		Config config = Gbl.createConfig(new String[]{args[0], "config_v1.dtd"});
+		district_shape_file = args[1];
 
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl(config);
 
-		log.info("loading network from " + Gbl.getConfig().network().getInputFile());
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile(Gbl.getConfig().network().getInputFile());
-		world.setNetworkLayer(network);
-		world.complete();
+		log.info("loading network from " + config.network().getInputFile());
+		NetworkLayer network = scenario.getNetwork();
+		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		log.info("done.");
 
 		log.info("loading shape file from " + district_shape_file);
@@ -253,10 +250,10 @@ public class EgressAnalysis {
 		log.info("done");
 
 
-		log.info("loading population from " + Gbl.getConfig().plans().getInputFile());
-		PopulationImpl population = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		log.info("loading population from " + config.plans().getInputFile());
+		PopulationImpl population = scenario.getPopulation();
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+		plansReader.readFile(config.plans().getInputFile());
 		log.info("done.");
 
 

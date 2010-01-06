@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -19,7 +20,6 @@ import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.Dijkstra;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
@@ -42,8 +42,7 @@ public class TestSubNetwork {
 
 	private final static Logger log = Logger.getLogger(TestSubNetwork.class);
 	
-	private NetworkLayer network;
-	private PopulationImpl population;
+	private final ScenarioImpl scenario;
 	private Config config;
 	private PersonImpl person;
 	private SelectNodesDijkstra selectNodesDijkstra;
@@ -75,12 +74,13 @@ public class TestSubNetwork {
 		DBConnectionTool dbct = new DBConnectionTool();
 		dbct.connect();		 
 		
+		loadConfig();
+		this.scenario = new ScenarioImpl(this.config);
 		loadNetwork();
 		loadPopulation();
-		loadConfig();
 				
-		log.info("Network size: " + network.getLinks().size());
-		log.info("Population size: " + population.getPersons().size());
+		log.info("Network size: " + this.scenario.getNetwork().getLinks().size());
+		log.info("Population size: " + this.scenario.getPopulation().getPersons().size());
 				
 		setKnowledgeStorageHandler();
 		
@@ -91,11 +91,8 @@ public class TestSubNetwork {
 	
 	private void loadNetwork()
 	{
-		networkFactory = new NetworkFactoryImpl(this.network);
-		networkFactory.setLinkFactory(new MyLinkFactoryImpl());
-
-		network = new NetworkLayer();
-		network.setFactory(networkFactory);
+		NetworkLayer network = this.scenario.getNetwork();
+		network.getFactory().setLinkFactory(new MyLinkFactoryImpl());
 		
 		new MatsimNetworkReader(network).readFile(networkFile);
 		
@@ -104,14 +101,13 @@ public class TestSubNetwork {
 	
 	private void loadPopulation()
 	{
-		population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(populationFile);
+		new MatsimPopulationReader(this.scenario).readFile(populationFile);
 		log.info("Loading Population ... done");
 	}
 	
 	private void setKnowledgeStorageHandler()
 	{
-		for(Person person : population.getPersons().values())
+		for(Person person : this.scenario.getPopulation().getPersons().values())
 		{
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 
@@ -119,7 +115,7 @@ public class TestSubNetwork {
 			
 			MapKnowledgeDB mapKnowledgeDB = new MapKnowledgeDB();
 			mapKnowledgeDB.setPerson(person);
-			mapKnowledgeDB.setNetwork(network);
+			mapKnowledgeDB.setNetwork(this.scenario.getNetwork());
 			
 			customAttributes.put("NodeKnowledge", mapKnowledgeDB);
 		}
@@ -127,7 +123,7 @@ public class TestSubNetwork {
 	
 	private void initReplanner()
 	{
-		queueNetwork = new QueueNetwork(network);
+		queueNetwork = new QueueNetwork(this.scenario.getNetwork());
 		
 		travelTime = new KnowledgeTravelTimeCalculator(queueNetwork);
 		travelTimeWrapper = new KnowledgeTravelTimeWrapper(travelTime);
@@ -139,21 +135,21 @@ public class TestSubNetwork {
 		travelCostWrapper.checkNodeKnowledge(false);
 		
 		// Don't use Knowledge for CostCalculations
-		dijkstra = new MyDijkstra(network, travelCostWrapper, travelTimeWrapper);
+		dijkstra = new MyDijkstra(this.scenario.getNetwork(), travelCostWrapper, travelTimeWrapper);
 //		dijkstraWrapper = new DijkstraWrapper(dijkstra, travelCostWrapper, travelTimeWrapper, network);
 	
-		dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
+		dijkstraRouter = new KnowledgePlansCalcRoute(new PlansCalcRouteConfigGroup(), this.scenario.getNetwork(), 
 				travelCostWrapper, travelTimeWrapper, new DijkstraWrapperFactory());
 	}
 	
 	private void createSubNetworks()
 	{
-		SubNetworkCreator snc = new SubNetworkCreator(this.network);
+		SubNetworkCreator snc = new SubNetworkCreator(this.scenario.getNetwork());
 		SubNetworkTools snt = new SubNetworkTools();
 		KnowledgeTools kt = new KnowledgeTools();
 		
 		int i = 0;
-		for(Person person : population.getPersons().values())
+		for(Person person : this.scenario.getPopulation().getPersons().values())
 		{
 			Map<String, Object> customAttributes = person.getCustomAttributes();
 
