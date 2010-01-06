@@ -56,7 +56,6 @@ import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
-import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraph;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.NetworkFeatureFactory;
@@ -607,12 +606,12 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 			filenameAlight = new StringBuffer("alight-" + SIMREALGRAPHNAME
 					+ Integer.toString(timestep) + PNG);
 
-			CountsSimRealPerHourGraph graphBoard = new CountsSimRealPerHourGraph(
+			PtCountsSimRealPerHourGraph graphBoard = new PtCountsSimRealPerHourGraph(
 					this.boardCountComparisonFilter.getCountsForHour(null),
-					this.iter, filenameBoard.toString());
-			CountsSimRealPerHourGraph graphAlight = new CountsSimRealPerHourGraph(
+					this.iter, filenameBoard.toString(), "board");
+			PtCountsSimRealPerHourGraph graphAlight = new PtCountsSimRealPerHourGraph(
 					this.alightCountComparisonFilter.getCountsForHour(null),
-					this.iter, filenameAlight.toString());
+					this.iter, filenameAlight.toString(), "alight");
 
 			graphBoard.createChart(timestep);
 			graphAlight.createChart(timestep);
@@ -658,13 +657,13 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 			// place the image top right
 			Vec2Type overlayXYAlight = kmlObjectFactory.createVec2Type();
 			overlayXYAlight.setX(1.0);
-			overlayXYAlight.setY(0.75);
+			overlayXYAlight.setY(0.6);
 			overlayXYAlight.setXunits(UnitsEnumType.FRACTION);
 			overlayXYAlight.setYunits(UnitsEnumType.FRACTION);
 			overlayAlight.setOverlayXY(overlayXYAlight);
 			Vec2Type screenXYAlight = kmlObjectFactory.createVec2Type();
 			screenXYAlight.setX(0.98);
-			screenXYAlight.setY(0.73);
+			screenXYAlight.setY(0.58);
 			screenXYAlight.setXunits(UnitsEnumType.FRACTION);
 			screenXYAlight.setYunits(UnitsEnumType.FRACTION);
 			overlayAlight.setScreenXY(screenXYAlight);
