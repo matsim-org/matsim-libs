@@ -98,7 +98,7 @@ public class ShuffleCoords extends NewPopulation {
 		new MatsimNetworkReader(net).readFile(networkFile);
 
 		PopulationImpl inPop = sc.getPopulation();
-		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
+		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
 		ShuffleCoords shuffleCoords = new ShuffleCoords(inPop, outPlansFile, 10.0);

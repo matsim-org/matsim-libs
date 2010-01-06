@@ -33,13 +33,13 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
+import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
@@ -118,7 +118,7 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 
 		ScenarioImpl s = new ScenarioImpl();
 
-		NetworkLayer network = (NetworkLayer) s.getNetwork();
+		NetworkLayer network = s.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 		// facilities
 		ActivityFacilitiesImpl af = null;
@@ -165,8 +165,7 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 			ld = new LegDistance(network, toll, population);
 			// in future, add some PersonAlgorithm and EventsHandler
 
-			new MatsimPopulationReader(population, network)
-					.readFile(plansFilename);
+			new MatsimPopulationReader(s).readFile(plansFilename);
 
 			catl.run(population);
 			dd.run(population);

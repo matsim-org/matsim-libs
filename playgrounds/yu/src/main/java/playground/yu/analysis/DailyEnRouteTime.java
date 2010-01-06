@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -511,10 +512,11 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		String outputFilename = "../matsimTests/run684/DailyEnRouteTime/";
 		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
 		try {
@@ -530,7 +532,7 @@ public class DailyEnRouteTime extends AbstractPersonAlgorithm implements
 		DailyEnRouteTime ert = new DailyEnRouteTime(tollReader.getScheme());
 
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		ert.run(population);
 		ert.write(outputFilename);

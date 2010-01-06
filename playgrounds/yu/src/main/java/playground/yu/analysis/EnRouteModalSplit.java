@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -428,11 +429,12 @@ public class EnRouteModalSplit implements AgentDepartureEventHandler,
 		String chartFilename = "../matsimTests/analysis/";
 		// String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		// RoadPricingReaderXMLv1 tollReader = new
 		// RoadPricingReaderXMLv1(network);

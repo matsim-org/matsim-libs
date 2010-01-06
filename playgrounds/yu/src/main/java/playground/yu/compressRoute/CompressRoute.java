@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -171,8 +172,9 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 	public static void main(final String[] args) throws IOException {
 		Config config = new ScenarioLoaderImpl(args[0]).loadScenario().getConfig();
 
+		ScenarioImpl scenario = new ScenarioImpl();
 		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network()
 				.getInputFile());
 		System.out.println("  done.");
@@ -184,10 +186,9 @@ public class CompressRoute extends AbstractPersonAlgorithm {
 		System.out.println("-->done.");
 
 		System.out.println("  setting up plans objects...");
-		final PopulationImpl plans = new PopulationImpl();
+		final PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
-		PopulationReader plansReader = new MatsimPopulationReader(plans,
-				network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		// compress routes
 		CompressRoute cr = new CompressRoute(ss.getSsLinks(), plans,
 				"./test/yu/output/linkrout_capacity.txt");

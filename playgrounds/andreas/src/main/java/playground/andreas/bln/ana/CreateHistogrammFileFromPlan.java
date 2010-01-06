@@ -172,7 +172,7 @@ public class CreateHistogrammFileFromPlan extends NewPopulation {
 		new MatsimNetworkReader(net).readFile(networkFile);
 
 		PopulationImpl inPop = sc.getPopulation();
-		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
+		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
 		CreateHistogrammFileFromPlan dp = new CreateHistogrammFileFromPlan(inPop, outPlansFile);

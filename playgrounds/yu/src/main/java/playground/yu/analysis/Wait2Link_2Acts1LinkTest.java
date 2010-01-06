@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -196,15 +197,15 @@ public class Wait2Link_2Acts1LinkTest {
 		final String eventsFilename = "../data/ivtch/carPt_opt_run266/ITERS/it.100/100.events.txt.gz";
 		final String outputFilename = "../data/ivtch/Wait2Links_2Acts1Link.txt.gz";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
-		PopulationImpl population = new PopulationImpl();
+
+		PopulationImpl population = scenario.getPopulation();
+		System.out.println("-->reading plansfile: " + plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		SameActLoc sal = new SameActLoc();
-
-		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
-
 		sal.run(population);
 
 		System.out.println("there is " + sal.getPersonCount() + " persons, "

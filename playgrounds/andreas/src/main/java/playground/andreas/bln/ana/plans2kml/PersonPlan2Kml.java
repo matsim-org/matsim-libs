@@ -75,7 +75,7 @@ public class PersonPlan2Kml extends NewPopulation{
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
 		PopulationImpl population = s.getPopulation();
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		PopulationReader plansReader = new MatsimPopulationReader(s);
 		plansReader.readFile(plansFilename);
 
 		PersonPlan2Kml myPP2Kml = new PersonPlan2Kml(network, population, outputDirectory, agentIds);

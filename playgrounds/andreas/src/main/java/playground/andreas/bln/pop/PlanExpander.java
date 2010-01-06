@@ -36,7 +36,7 @@ public class PlanExpander {
 		new MatsimNetworkReader(net).readFile(networkFile);
 
 		PopulationImpl inPop = sc.getPopulation();
-		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
+		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(plansFile + ".xml.gz");
 
 		DuplicatePlans dp = new DuplicatePlans(inPop, "tmp.xml.gz", numberOfAdditionalCopies);
@@ -47,7 +47,7 @@ public class PlanExpander {
 		Gbl.printElapsedTime();
 		
 		inPop = new PopulationImpl();
-		popReader = new MatsimPopulationReader(inPop, net);
+		popReader = new MatsimPopulationReader(new SharedNetScenario(sc, inPop));
 		popReader.readFile("tmp.xml.gz");
 
 		ShuffleCoords shuffleCoords = new ShuffleCoords(inPop, plansFile + "_" + (numberOfAdditionalCopies + 1) + "x.xml.gz", radiusOfPerimeter);

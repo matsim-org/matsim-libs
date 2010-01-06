@@ -23,6 +23,7 @@
  */
 package playground.yu.analysis;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
@@ -82,16 +83,16 @@ public class CarIllegal extends AbstractPersonAlgorithm {
 
 		Gbl.startMeasurement();
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
-
-		CarIllegal cl = new CarIllegal();
+		PopulationImpl population = scenario.getPopulation();
 
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
+		CarIllegal cl = new CarIllegal();
 		cl.run(population);
 
 		System.out.println("--> Done!\n-->There is " + cl.getCount()

@@ -94,7 +94,6 @@ public class SetPersonCoordsToBoundingBox extends NewPopulation {
 		Gbl.startMeasurement();
 		
 		ScenarioImpl sc = new ScenarioImpl();
-		Gbl.setConfig(sc.getConfig());
 
 		String networkFile = "D:/Berlin/BVG/berlin-bvg09/net/miv_small/m44_344_small_ba.xml.gz";
 		String inPlansFile = "D:/Berlin/BVG/berlin-bvg09/pop/baseplan_900s_subset.xml.gz";
@@ -103,11 +102,11 @@ public class SetPersonCoordsToBoundingBox extends NewPopulation {
 		Coord minXY = new CoordImpl(4590999.0, 5805999.0);
 		Coord maxXY = new CoordImpl(4606021.0, 5822001.0);
 
-		NetworkLayer net = new NetworkLayer();
+		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(networkFile);
 
-		PopulationImpl inPop = new PopulationImpl();
-		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
+		PopulationImpl inPop = sc.getPopulation();
+		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
 		SetPersonCoordsToBoundingBox dp = new SetPersonCoordsToBoundingBox(inPop, outPlansFile, minXY, maxXY);

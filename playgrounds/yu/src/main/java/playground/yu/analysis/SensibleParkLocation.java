@@ -25,6 +25,7 @@ package playground.yu.analysis;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -152,12 +153,13 @@ public class SensibleParkLocation extends AbstractPersonAlgorithm implements
 		// final String outputFilename =
 		// "/net/ils/chen/tests/changeLegMode/output/ITERS/it.500/500.plans.sensibleParkLocation.txt.gz";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
 		System.out.println("-----> begins \"read population\"");
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 		System.out.println("-----> done \"read population\"");
 
 		SensibleParkLocation spl = new SensibleParkLocation(outputFilename);

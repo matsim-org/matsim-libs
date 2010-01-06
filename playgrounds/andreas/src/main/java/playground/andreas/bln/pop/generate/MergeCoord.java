@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -159,16 +160,15 @@ public class MergeCoord {
 		int changed = 0;
 		int tripNonWalking = 0;
 
+		ScenarioImpl scenario = new ScenarioImpl();
 		log.info("Start reading file " + plansFilename);
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
 		log.info("Start reading file " + plansFilename);
-		PopulationImpl population = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(population,
-				network);
+		PopulationImpl population = scenario.getPopulation();
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFilename);
-
 
 		// Find persons with walking trips over 60 minutes long
 		for (Person person : population.getPersons().values()) {
@@ -239,14 +239,14 @@ public class MergeCoord {
 		int unchanged = 0;
 		int changed = 0;
 
+		ScenarioImpl scenario = new ScenarioImpl();
 		log.info("Start reading file " + plansFilename);
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFilename);
 
 		log.info("Start reading file " + plansFilename);
-		PopulationImpl population = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(population,
-				network);
+		PopulationImpl population = scenario.getPopulation();
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(plansFilename);
 
 

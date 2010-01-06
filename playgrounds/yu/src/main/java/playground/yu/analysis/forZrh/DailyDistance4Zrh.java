@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -460,10 +461,9 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		String outputFilename = "../matsimTests/run684/dailyDistance/";
 		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
-
-		PopulationImpl population = new PopulationImpl();
 
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
 		try {
@@ -475,10 +475,11 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
+
 		DailyDistance4Zrh dd = new DailyDistance4Zrh(tollReader.getScheme());
-
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
-
 		dd.run(population);
 		dd.write(outputFilename);
 

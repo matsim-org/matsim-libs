@@ -23,6 +23,7 @@
  */
 package playground.yu.analysis;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -72,16 +73,16 @@ public class License extends AbstractPersonAlgorithm {
 
 		Gbl.startMeasurement();
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
-
-		License l = new License();
+		PopulationImpl population = scenario.getPopulation();
 
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
+		License l = new License();
 		l.run(population);
 
 		System.out.println("--> Done!\n-->There is " + l.getHasLicenseCount()

@@ -3,6 +3,7 @@
  */
 package playground.yu.analysis;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -244,13 +245,14 @@ public class DailyDistanceModalSplit extends AbstractPersonAlgorithm implements
 		final String plansFilename = "../runs_SVN/run669/it.1000/1000.plans.xml.gz";
 		final String outputFilename = "../runs_SVN/run669/it.1000/ModalSplitDailyDistance";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		DailyDistanceModalSplit ddms = new DailyDistanceModalSplit();
 		ddms.run(population);

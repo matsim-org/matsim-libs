@@ -15,6 +15,7 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 import playground.andreas.bln.pop.NewPopulation;
+import playground.andreas.bln.pop.SharedNetScenario;
 
 
 /**
@@ -85,7 +86,7 @@ public class GeoFilterPersonPlan extends NewPopulation {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 		
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl bigNetScenario = new ScenarioImpl();
 
 		String bigNetworkFile = "./bb_cl.xml.gz";
 		String targetNetworkFile = "./hundekopf_cl.xml.gz";
@@ -93,18 +94,18 @@ public class GeoFilterPersonPlan extends NewPopulation {
 		String inPlansFile = "./0.plans.xml.gz";
 		String outPlansFile = "./plan_hundekopf2.xml.gz";
 		
-		NetworkLayer bigNet = new NetworkLayer();
+		NetworkLayer bigNet = bigNetScenario.getNetwork();
 		new MatsimNetworkReader(bigNet).readFile(bigNetworkFile);
 
 		NetworkLayer targetNet = new NetworkLayer();
 		new MatsimNetworkReader(targetNet).readFile(targetNetworkFile);
 
 		PopulationImpl inPop = new PopulationImpl();
-		PopulationReader popReader = new MatsimPopulationReader(inPop, bigNet);
+		PopulationReader popReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, inPop));
 		popReader.readFile(inPlansFile);
 		
 		PopulationImpl origPop = new PopulationImpl();
-		PopulationReader origPopReader = new MatsimPopulationReader(origPop, bigNet);
+		PopulationReader origPopReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, origPop));
 		origPopReader.readFile(origPlansFile);
 
 		GeoFilterPersonPlan dp = new GeoFilterPersonPlan(inPop, outPlansFile, origPop, targetNet);

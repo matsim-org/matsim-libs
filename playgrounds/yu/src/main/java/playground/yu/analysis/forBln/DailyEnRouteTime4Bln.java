@@ -8,6 +8,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jfree.chart.plot.PlotOrientation;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -596,10 +597,9 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		String outputFilename = "../matsimTests/run756/dailyEnRouteTime/";
 		String tollFilename = "../berlin data/Hundekopf/osm/tollBerlinHundekopf.xml";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
-
-		PopulationImpl population = new PopulationImpl();
 
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
 		try {
@@ -612,12 +612,11 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 			e.printStackTrace();
 		}
 
-		DailyEnRouteTime4Bln ert = new DailyEnRouteTime4Bln(tollReader
-				.getScheme());
-
+		PopulationImpl population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
+		DailyEnRouteTime4Bln ert = new DailyEnRouteTime4Bln(tollReader.getScheme());
 		ert.run(population);
 		ert.write(outputFilename);
 

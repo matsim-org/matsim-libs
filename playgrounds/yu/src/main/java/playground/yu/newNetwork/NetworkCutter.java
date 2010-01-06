@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -93,11 +94,12 @@ public class NetworkCutter {
 	 */
 	public void run(final String inputNetworkFile, final String plansFile,
 			final String outputNetworkFile) {
-		final NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(inputNetworkFile);
 
-		final PopulationImpl pop = new PopulationImpl();
-		new MatsimPopulationReader(pop, network).readFile(plansFile);
+		final PopulationImpl pop = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFile);
 
 		run(network, pop);
 

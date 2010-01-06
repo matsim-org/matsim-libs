@@ -3,6 +3,7 @@
  */
 package playground.yu.analysis.forZrh;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
@@ -167,12 +168,13 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 		Gbl.startMeasurement();
 		// Gbl.createConfig(null);
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		// RoadPricingReaderXMLv1 tollReader = new
 		// RoadPricingReaderXMLv1(network);

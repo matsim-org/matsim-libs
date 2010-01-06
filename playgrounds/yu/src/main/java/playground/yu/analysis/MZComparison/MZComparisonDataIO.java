@@ -17,11 +17,10 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jfree.chart.plot.PlotOrientation;
-
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -167,10 +166,9 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		MZComparisonDataIO mzcdi = new MZComparisonDataIO();
 		mzcdi.readMZData(inputFilename);
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFilename);
-
-		PopulationImpl population = new PopulationImpl();
 
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
 		try {
@@ -183,7 +181,8 @@ public class MZComparisonDataIO implements TabularFileHandler {
 			e.printStackTrace();
 		}
 
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		MZComparisonData mzcd = new MZComparisonData(tollReader.getScheme());
 		mzcd.run(population);

@@ -4,6 +4,7 @@
 package playground.yu.analysis;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -69,13 +70,14 @@ public class LegDepartureTimeChecker extends AbstractPersonAlgorithm implements
 		final String plansFilename = "../runs/run669/it.1000/1000.plans.xml.gz";
 		final String outputFilename = "output/legDepTime_669.1000.txt";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
-		LegDepartureTimeChecker fldtc = new LegDepartureTimeChecker(
-				outputFilename);
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
+
+		LegDepartureTimeChecker fldtc = new LegDepartureTimeChecker(outputFilename);
 		fldtc.run(population);
 
 		fldtc.close();

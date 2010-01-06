@@ -113,7 +113,7 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 		
-		ScenarioImpl sc = new ScenarioImpl();
+		ScenarioImpl bigScenario = new ScenarioImpl();
 
 		String wholeBigNetworkFile = "D:/Berlin/BVG/berlin-bvg09/pt/baseplan_900s_bignetwork/network.multimodal.xml.gz";
 		String unroutedWholePlansFile = "D:/Berlin/BVG/berlin-bvg09/pop/baseplan_900s.xml.gz";
@@ -131,17 +131,17 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 //		String ptLinesToKeep = "./linien_im_untersuchungsgebiet.txt";
 		
 		System.out.println("Reading network " + wholeBigNetworkFile);
-		NetworkLayer wholeBigNet = new NetworkLayer();
+		NetworkLayer wholeBigNet = bigScenario.getNetwork();
 		new MatsimNetworkReader(wholeBigNet).readFile(wholeBigNetworkFile);
 
 		System.out.println("Reading routed population: " + wholeRoutedPlansFile);
 		PopulationImpl wholeRoutedPop = new PopulationImpl();
-		PopulationReader popReader = new MatsimPopulationReader(wholeRoutedPop, wholeBigNet);
+		PopulationReader popReader = new MatsimPopulationReader(new SharedNetScenario(bigScenario, wholeRoutedPop));
 		popReader.readFile(wholeRoutedPlansFile);
 		
 		System.out.println("Reading unrouted population: " + unroutedWholePlansFile);
 		PopulationImpl unroutedWholePop = new PopulationImpl();
-		PopulationReader origPopReader = new MatsimPopulationReader(unroutedWholePop, wholeBigNet);
+		PopulationReader origPopReader = new MatsimPopulationReader(new SharedNetScenario(bigScenario, unroutedWholePop));
 		origPopReader.readFile(unroutedWholePlansFile);
 
 		PopGeoFilter dp = new PopGeoFilter(wholeRoutedPop, outPlansFile, unroutedWholePop, xyMin, xyMax);

@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -211,17 +212,16 @@ public class RouteSummaryTest {
 
 		Gbl.startMeasurement();
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		System.out.println("-->reading networkfile: " + netFilename);
 		new MatsimNetworkReader(network).readFile(netFilename);
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
+		System.out.println("-->reading plansfile: " + plansFilename);
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		RouteSummary rs = new RouteSummary(outFilename);
-
-		System.out.println("-->reading plansfile: " + plansFilename);
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
-
 		rs.run(population);
 		rs.write();
 		rs.end();

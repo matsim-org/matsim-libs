@@ -28,14 +28,14 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.analysis.CalcAverageTripLength;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vis.otfvis.executables.OTFEvent2MVI;
@@ -97,7 +97,8 @@ public class AnalysisTest4Bln {
 		}
 		String tollFilename = (withToll) ? args[args.length - 3] : null;
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl sc = new ScenarioImpl();
+		NetworkLayer network = sc.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
 
 		// toll
@@ -128,7 +129,7 @@ public class AnalysisTest4Bln {
 		LegDistance ld = null;
 		// only PersonAlgorithm begins.
 		if (plansFilename != null) {
-			PopulationImpl population = new PopulationImpl();
+			PopulationImpl population = sc.getPopulation();
 
 			catl = new CalcAverageTripLength();
 			ms = new ModeSplit(toll);
@@ -139,8 +140,7 @@ public class AnalysisTest4Bln {
 			ld = new LegDistance(network, toll, population);
 			// in future, add some PersonAlgorithm and EventsHandler
 
-			new MatsimPopulationReader(population, network)
-					.readFile(plansFilename);
+			new MatsimPopulationReader(sc).readFile(plansFilename);
 
 			catl.run(population);
 			dd.run(population);

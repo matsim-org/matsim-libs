@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -528,10 +529,9 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		String outputFilename = "../matsimTests/run684/dailyDistance/";
 		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
 
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFilename);
-
-		PopulationImpl population = new PopulationImpl();
 
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(network);
 		try {
@@ -543,10 +543,11 @@ public class DailyDistance extends AbstractPersonAlgorithm implements
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		PopulationImpl population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
+
 		DailyDistance dd = new DailyDistance(tollReader.getScheme());
-
-		new MatsimPopulationReader(population, network).readFile(plansFilename);
-
 		dd.run(population);
 		dd.write(outputFilename);
 
