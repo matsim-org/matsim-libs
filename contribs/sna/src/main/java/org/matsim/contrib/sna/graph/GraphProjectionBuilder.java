@@ -86,9 +86,10 @@ public class GraphProjectionBuilder<G2 extends Graph, V2 extends Vertex, E2 exte
 	 */
 	public V addVertex(G graph, V2 delegate) {
 		V vertex = factory.createVertex(delegate);
-		if(insertVertex(graph, vertex))
+		if(insertVertex(graph, vertex)) {
+			graph.setMapping(delegate, vertex);
 			return vertex;
-		else
+		} else
 			return null;
 	}
 	
@@ -124,8 +125,7 @@ public class GraphProjectionBuilder<G2 extends Graph, V2 extends Vertex, E2 exte
 		G projection = createGraph(delegate);
 		
 		for(Vertex v : delegate.getVertices()) {
-			V v2 = this.addVertex(projection, (V2) v);
-			projection.setMapping((V2)v, v2);
+			addVertex(projection, (V2) v);
 		}
 		
 		for(Edge e : delegate.getEdges()) {

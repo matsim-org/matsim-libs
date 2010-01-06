@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphProjectionFactory.java
+ * SpatialVertex.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,49 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.sna.graph;
+package org.matsim.contrib.sna.graph.spatial;
+
+import java.util.List;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+
+import com.vividsolutions.jts.geom.Point;
 
 
 /**
- * Implementation of GraphProjectionFactory to create instances of GraphProjection,
- * VertexDecorator and EdgeDecorator.
+ * Representation of a vertex embedded in space.
  * 
  * @author illenberger
  *
  */
-public class SparseGraphProjectionFactory<G extends Graph, V extends Vertex, E extends Edge> implements GraphProjectionFactory<G, V, E, GraphProjection<G,V,E>, VertexDecorator<V>, EdgeDecorator<E>>{
+public interface SpatialVertex extends Vertex {
+	
+	/**
+	 * @see {@link Vertex#getEdges()}
+	 */
+	public List<? extends SpatialEdge> getEdges();
+	
+	/**
+	 * @see {@link Vertex#getNeighbours()}
+	 */
+	public List<? extends SpatialVertex> getNeighbours();
 
 	/**
-	 * Creates and returns an edge decorator that decorates <tt>delegate</tt>.
+	 * Returns the 2-dimensional coordinate of this vertex.
 	 * 
-	 * @param delegate the original edge.
-	 * 
-	 * @return an edge decorator.
+	 * @deprecated will be replaced by {@link #getPoint()}.
+	 * @return the 2-dimensional coordinate of this vertex.
 	 */
-	public EdgeDecorator<E> createEdge(E delegate) {
-		return new EdgeDecorator<E>(delegate);
-	}
-
+	public Coord getCoordinate();
+	
 	/**
-	 * Creates and returns an empty graph projection on <tt>delegate</tt>.
+	 * Returns the point in space this vertex is located at.
 	 * 
-	 * @param delegate the original graph.
-	 * 
-	 * @return an empty graph projection.
+	 * @return the point in space this vertex is located at.
 	 */
-	public GraphProjection<G, V, E> createGraph(G delegate) {
-		return new GraphProjection<G, V, E>(delegate);
-	}
-
-	/**
-	 * Creates and returns a vertex decorator that decorates <tt>delegate</tt>.
-	 * 
-	 * @param delegate the original vertex.
-	 * 
-	 * @return a new vertex decorator.
-	 */
-	public VertexDecorator<V> createVertex(V delegate) {
-		return new VertexDecorator<V>(delegate);
-	}
-
+	public Point getPoint();
+	
 }

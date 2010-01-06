@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphProjectionFactory.java
+ * SpatialEdge.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,49 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.sna.graph;
+package org.matsim.contrib.sna.graph.spatial;
+
+import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.core.utils.collections.Tuple;
 
 
 /**
- * Implementation of GraphProjectionFactory to create instances of GraphProjection,
- * VertexDecorator and EdgeDecorator.
+ * Representation of a spatially embedded edge.
  * 
  * @author illenberger
  *
  */
-public class SparseGraphProjectionFactory<G extends Graph, V extends Vertex, E extends Edge> implements GraphProjectionFactory<G, V, E, GraphProjection<G,V,E>, VertexDecorator<V>, EdgeDecorator<E>>{
-
+public interface SpatialEdge extends Edge {
+	
 	/**
-	 * Creates and returns an edge decorator that decorates <tt>delegate</tt>.
-	 * 
-	 * @param delegate the original edge.
-	 * 
-	 * @return an edge decorator.
+	 * @see {@link Edge#getVertices()}
 	 */
-	public EdgeDecorator<E> createEdge(E delegate) {
-		return new EdgeDecorator<E>(delegate);
-	}
-
+	public Tuple<? extends SpatialVertex, ? extends SpatialVertex> getVertices();
+	
 	/**
-	 * Creates and returns an empty graph projection on <tt>delegate</tt>.
-	 * 
-	 * @param delegate the original graph.
-	 * 
-	 * @return an empty graph projection.
+	 * @see {@link Edge#getOpposite(Vertex)}
 	 */
-	public GraphProjection<G, V, E> createGraph(G delegate) {
-		return new GraphProjection<G, V, E>(delegate);
-	}
-
+	public SpatialVertex getOpposite(Vertex v);
+	
 	/**
-	 * Creates and returns a vertex decorator that decorates <tt>delegate</tt>.
+	 * Returns the orthodromic distance (great-circle distance) between both vertices.
 	 * 
-	 * @param delegate the original vertex.
-	 * 
-	 * @return a new vertex decorator.
+	 * @return the orthodromic distance (great-circle distance) distance between both vertices.
 	 */
-	public VertexDecorator<V> createVertex(V delegate) {
-		return new VertexDecorator<V>(delegate);
-	}
+	public double length();
 
 }

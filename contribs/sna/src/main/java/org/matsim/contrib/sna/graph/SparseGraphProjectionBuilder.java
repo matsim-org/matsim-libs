@@ -26,7 +26,8 @@ package org.matsim.contrib.sna.graph;
  * @author illenberger
  *
  */
-public class SparseGraphProjectionBuilder<G extends Graph, V extends Vertex, E extends Edge> extends GraphProjectionBuilder<G, V, E, GraphProjection<G,V,E>, VertexDecorator<V>, EdgeDecorator<E>> {
+public class SparseGraphProjectionBuilder<G extends Graph, V extends Vertex, E extends Edge> extends
+		GraphProjectionBuilder<G, V, E, GraphProjection<G, V, E>, VertexDecorator<V>, EdgeDecorator<E>> {
 	
 	/**
 	 * Creates a new SparseGraphProjectionBuilder.

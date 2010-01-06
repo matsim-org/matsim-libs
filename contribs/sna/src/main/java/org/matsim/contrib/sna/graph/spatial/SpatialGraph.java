@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphProjectionFactory.java
+ * SpatialGraph.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,49 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.sna.graph;
+package org.matsim.contrib.sna.graph.spatial;
+
+import java.util.Set;
+
+import org.matsim.contrib.sna.graph.Graph;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
 
 /**
- * Implementation of GraphProjectionFactory to create instances of GraphProjection,
- * VertexDecorator and EdgeDecorator.
+ * Representation of a spatially embedded graph, i.e., each vertex has a coordinate.
  * 
  * @author illenberger
  *
  */
-public class SparseGraphProjectionFactory<G extends Graph, V extends Vertex, E extends Edge> implements GraphProjectionFactory<G, V, E, GraphProjection<G,V,E>, VertexDecorator<V>, EdgeDecorator<E>>{
+public interface SpatialGraph extends Graph {
 
 	/**
-	 * Creates and returns an edge decorator that decorates <tt>delegate</tt>.
-	 * 
-	 * @param delegate the original edge.
-	 * 
-	 * @return an edge decorator.
+	 * @see {@link Graph#getVertices()}
 	 */
-	public EdgeDecorator<E> createEdge(E delegate) {
-		return new EdgeDecorator<E>(delegate);
-	}
-
+	public Set<? extends SpatialVertex> getVertices();
+	
 	/**
-	 * Creates and returns an empty graph projection on <tt>delegate</tt>.
-	 * 
-	 * @param delegate the original graph.
-	 * 
-	 * @return an empty graph projection.
+	 * @see {@link Graph#getEdges()}
 	 */
-	public GraphProjection<G, V, E> createGraph(G delegate) {
-		return new GraphProjection<G, V, E>(delegate);
-	}
-
-	/**
-	 * Creates and returns a vertex decorator that decorates <tt>delegate</tt>.
-	 * 
-	 * @param delegate the original vertex.
-	 * 
-	 * @return a new vertex decorator.
-	 */
-	public VertexDecorator<V> createVertex(V delegate) {
-		return new VertexDecorator<V>(delegate);
-	}
-
+	public Set<? extends SpatialEdge> getEdges();
 }

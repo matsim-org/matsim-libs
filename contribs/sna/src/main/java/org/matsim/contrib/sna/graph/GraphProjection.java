@@ -29,11 +29,9 @@ import java.util.Set;
 
 
 /**
- * This class allows to extract subgrimport org.matsim.contrib.sna.graph.EdgeDecorator;
-aphs from existing graphs by projecting
+ * This class allows to extract subgraphs from existing graphs by projecting
  * specific vertices and edges onto a new graph. A GraphProjection works similar
- * to a decorator, however, the connectivity of vertices and edgeimport org.matsim.contrib.sna.graph.VertexDecorator;
-s can differ
+ * to a decorator, however, the connectivity of vertices and edges can differ
  * from the original graph.
  * 
  * @author illenberger
