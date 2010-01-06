@@ -20,20 +20,15 @@
 
 package playground.david;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
@@ -42,11 +37,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.utils.misc.Time;
-
-import de.schlichtherle.io.FileInputStream;
 
 public class StandaloneSimTest {
 
@@ -69,14 +61,13 @@ public class StandaloneSimTest {
 		config.global().setLocalDtdBase(localDtdBase);
 
 
-		Gbl.startMeasurement();
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFileName);
 
-		PopulationImpl population = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		PopulationImpl population = scenario.getPopulation();
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(popFileName);
-		Gbl.printElapsedTime();
 
 		if(true){
 //				FileOutputStream fos;
@@ -163,7 +154,7 @@ public class StandaloneSimTest {
 
 //		QueueLink link = (QueueLink)network.getLinks().get("15");
 //		link.setCapacity()
-		QueueSimulation sim = new QueueSimulation(network, population, events);
+		QueueSimulation sim = new QueueSimulation(scenario, events);
 		//sim.openNetStateWriter("testWrite", netFileName, 10);
 		config.simulation().setSnapshotFormat("none");
 		config.simulation().setSnapshotPeriod(300);

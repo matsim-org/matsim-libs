@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -112,20 +114,18 @@ public class MultiSourceEAF {
 	 * @param filename path of the Population file
 	 * @return
 	 */
-	private static HashMap<Node,Integer> readPopulation(final NetworkLayer network, final String filename){
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population,network).readFile(filename);
-		network.connect();
+	private static HashMap<Node,Integer> readPopulation(final Scenario scenario, final String filename){
+		new MatsimPopulationReader(scenario).readFile(filename);
 		HashMap<Node,Integer> allnodes = new HashMap<Node,Integer>();
 
-		for(Person person : population.getPersons().values() ){
+		for(Person person : scenario.getPopulation().getPersons().values() ){
 
 			Plan plan = person.getPlans().get(0);
 			if(((PlanImpl) plan).getFirstActivity().getLinkId()==null){
 				continue;
 			}
 
-			Node node = network.getLink(((PlanImpl) plan).getFirstActivity().getLinkId()).getToNode();
+			Node node = scenario.getNetwork().getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId()).getToNode();
 			if(allnodes.containsKey(node)){
 				int temp = allnodes.get(node);
 				allnodes.put(node, temp + 1);
@@ -441,8 +441,9 @@ public class MultiSourceEAF {
 		String sinkid ="supersink"; //siouxsink
 		//boolean emptylegs = false; // really bad! use EmptyPlans.class instead 		
 
+		ScenarioImpl scenario = new ScenarioImpl();
 		//read network
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
 		networkReader.readFile(networkfile);
 		Node sink = network.getNode(sinkid);		
@@ -450,7 +451,7 @@ public class MultiSourceEAF {
 		//read demands
 		HashMap<Node, Integer> demands;
 		if(plansfile!=null){
-			demands = readPopulation(network, plansfile);			
+			demands = readPopulation(scenario, plansfile);			
 		}else if (demandsfile != null){
 			try {
 				demands = readDemands(network,demandsfile);

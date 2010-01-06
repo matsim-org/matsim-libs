@@ -37,16 +37,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.rost.controller.gui.helpers.progressinformation.ProgressInformationProvider;
@@ -120,20 +119,18 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 	 * @param filename path of the Population file
 	 * @return
 	 */
-	private static HashMap<Node,Integer> readPopulation(final NetworkLayer network, final String filename){
-		PopulationImpl population = new PopulationImpl();
-		new MatsimPopulationReader(population,network).readFile(filename);
-		network.connect();
+	private static HashMap<Node,Integer> readPopulation(final Scenario scenario, final String filename){
+		new MatsimPopulationReader(scenario).readFile(filename);
 		HashMap<Node,Integer> allnodes = new HashMap<Node,Integer>();
 
-		for(Person person : population.getPersons().values() ){
+		for(Person person : scenario.getPopulation().getPersons().values() ){
 
 			Plan plan = person.getPlans().get(0);
 			if(((PlanImpl) plan).getFirstActivity().getLinkId()==null){
 				continue;
 			}
 
-			Node node = network.getLink(((PlanImpl) plan).getFirstActivity().getLinkId()).getToNode();
+			Node node = scenario.getNetwork().getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId()).getToNode();
 			if(allnodes.containsKey(node)){
 				int temp = allnodes.get(node);
 				allnodes.put(node, temp + 1);
@@ -213,7 +210,7 @@ public class MultiSourceEAF implements ProgressInformationProvider{
 		}
 		for(Link link : toRemove)
 		{
-			network.removeLink((LinkImpl)link);
+			network.removeLink(link);
 		}
 		if(_debug){
 			System.out.println("starting to read input");

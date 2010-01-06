@@ -20,6 +20,7 @@
 
 package playground.balmermi.datapuls;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
@@ -54,13 +55,14 @@ public class CBPopulationPreparation {
 	public static void main(String[] args) {
 		if (args.length != 3) { printUsage(); return; }
 
-		final PopulationImpl population = new PopulationImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
+		final PopulationImpl population = scenario.getPopulation();
 		population.setIsStreaming(true);
-		PopulationReader plansReader = new MatsimPopulationReader(population,null);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		PopulationWriter plansWriter = new PopulationWriter(population);
 		plansWriter.startStreaming(args[1].trim());
 		
-		ActivityFacilitiesImpl afs = new ActivityFacilitiesImpl();
+		ActivityFacilitiesImpl afs = scenario.getActivityFacilities();
 
 		System.out.println("adding algorithms...");
 		population.addAlgorithm(new PersonAdaptPlanAndCreateFacilities(afs));

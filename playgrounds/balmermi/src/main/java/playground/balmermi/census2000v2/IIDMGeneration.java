@@ -173,8 +173,9 @@ public class IIDMGeneration {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reding mz plans xml file... ");
-		PopulationImpl mz_pop = new PopulationImpl();
-		new MatsimPopulationReader(mz_pop, null).readFile(indir+"/mz.plans.xml.gz");
+		ScenarioImpl mzScenario = new ScenarioImpl();
+		PopulationImpl mz_pop = mzScenario.getPopulation();
+		new MatsimPopulationReader(mzScenario).readFile(indir+"/mz.plans.xml.gz");
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

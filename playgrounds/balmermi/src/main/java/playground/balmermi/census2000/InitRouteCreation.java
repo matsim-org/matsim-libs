@@ -20,6 +20,7 @@
 
 package playground.balmermi.census2000;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
@@ -33,7 +34,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.population.algorithms.XY2Links;
-import org.matsim.world.World;
 
 public class InitRouteCreation {
 
@@ -41,32 +41,31 @@ public class InitRouteCreation {
 
 		System.out.println("MATSim-IIDM: create initial routes.");
 
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl(config);
 		
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading network xml file...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		plansWriter.startStreaming(config.plans().getOutputFile());
-		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
 		plans.addAlgorithm(new XY2Links(network));
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		plans.addAlgorithm(new PlansCalcRoute(network, timeCostCalc, timeCostCalc));
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		plans.addAlgorithm(new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc));
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

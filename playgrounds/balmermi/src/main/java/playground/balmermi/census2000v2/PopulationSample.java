@@ -21,6 +21,7 @@
 package playground.balmermi.census2000v2;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -52,7 +53,8 @@ public class PopulationSample {
 
 		log.info("samplePopulation...");
 
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		World world = scenario.getWorld();
 		
 		//////////////////////////////////////////////////////////////////////
 
@@ -73,14 +75,14 @@ public class PopulationSample {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reading facilities xml file...");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		world.complete();
 		Gbl.printMemoryUsage();
 		log.info("  done.");
 
 		System.out.println("  reading the network xml file...");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		world.complete();
 		Gbl.printMemoryUsage();
@@ -89,12 +91,12 @@ public class PopulationSample {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up population objects...");
-		PopulationImpl pop = new PopulationImpl();
+		PopulationImpl pop = scenario.getPopulation();
 		pop.setIsStreaming(true);
 		PopulationWriter pop_writer = new PopulationWriter(pop);
 		pop_writer.startStreaming(config.plans().getOutputFile());
 		pop.addAlgorithm(pop_writer);
-		PopulationReader pop_reader = new MatsimPopulationReader(pop, network);
+		PopulationReader pop_reader = new MatsimPopulationReader(scenario);
 		Gbl.printMemoryUsage();
 		System.out.println("  done.");
 

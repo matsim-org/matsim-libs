@@ -20,6 +20,7 @@
 
 package playground.balmermi.census2000;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
@@ -30,7 +31,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.world.World;
 
 import playground.balmermi.census2000.modules.PersonVaryTimes;
 
@@ -40,23 +40,23 @@ public class InitTimesVariation {
 
 		System.out.println("MATSim-IIDM: vary init times.");
 
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl();
+
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading network xml file...");
-		NetworkLayer network = null;
-		network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		plansWriter.startStreaming(config.plans().getOutputFile());
-		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@ public class InitTimesVariation {
 
 		System.out.println("  reading, processing, writing plans...");
 		plans.addAlgorithm(plansWriter);
-		plansReader.readFile(Gbl.getConfig().plans().getInputFile());
+		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();
 		plansWriter.closeStreaming();
 		System.out.println("  done.");

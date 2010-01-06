@@ -69,8 +69,9 @@ public class InitDemandCreation {
 		System.out.println("MATSim-IIDM: create initial demand based on census2000 data.");
 
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
-		Config config = sl.getScenario().getConfig();
-		World world = ((ScenarioImpl) sl.getScenario()).getWorld();
+		ScenarioImpl scenario = sl.getScenario();
+		Config config = scenario.getConfig();
+		World world = scenario.getWorld();
 		
 		System.out.println("  reading world xml file... ");
 		new MatsimWorldReader(world).readFile(config.world().getInputFile());
@@ -114,11 +115,11 @@ public class InitDemandCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		plansWriter.startStreaming(config.plans().getOutputFile());
-		PopulationReader plansReader = new MatsimPopulationReader(plans, null);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -182,7 +183,7 @@ public class InitDemandCreation {
 
 		System.out.println("  writing matrices xml file... ");
 		MatricesWriter mat_writer = new MatricesWriter(matrices);
-		mat_writer.writeFile(Gbl.getConfig().matrices().getOutputFile());
+		mat_writer.writeFile(config.matrices().getOutputFile());
 		System.out.println("  done.");
 
 		System.out.println("  writing facilities xml file... ");
@@ -209,8 +210,6 @@ public class InitDemandCreation {
 	public static void main(final String[] args) {
 
 		Gbl.startMeasurement();
-
-		Config config = new ScenarioLoaderImpl(args[0]).getScenario().getConfig();
 
 		createInitDemand(args);
 

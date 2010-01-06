@@ -25,17 +25,16 @@
 package playground.rost.eaflow.ea_flow;
 
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 
 /**
  * @author Manuel Schneider
@@ -88,15 +87,16 @@ public class EmptyPlans {
 		
 		//String sinkid = "supersink";
 				
+		ScenarioImpl scenario = new ScenarioImpl();
 		//read network
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
 		networkReader.readFile(networkfile);
 	//	Node sink = network.getNode(sinkid);
 		
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 			
-		new MatsimPopulationReader(population,network).readFile(plansfile);
+		new MatsimPopulationReader(scenario).readFile(plansfile);
 		network.connect();
 		
 
@@ -107,14 +107,14 @@ public class EmptyPlans {
 
 
 
-		Config config = Gbl.createConfig(new String[] {});
+		Config config = scenario.getConfig(); //Gbl.createConfig(new String[] {});
 
 //		World world = Gbl.getWorld();
 //		world.setNetworkLayer(network);
 //		world.complete();
 
-		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
-		PlansCalcRoute router = new PlansCalcRoute(network, new FakeTravelTimeCost(), new FakeTravelTimeCost());
+//		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.charyparNagelScoring());
+		PlansCalcRoute router = new PlansCalcRoute(config.plansCalcRoute(), network, new FakeTravelTimeCost(), new FakeTravelTimeCost());
 		//PlansCalcRoute router = new PlansCalcRouteDijkstra(network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), new FakeTravelTimeCost());
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getPlans().get(0);

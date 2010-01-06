@@ -20,6 +20,7 @@
 
 package playground.david;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -30,7 +31,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.vis.netvis.NetVis;
 
@@ -50,8 +50,8 @@ public class SimRunKreisverkehr {
 		String localDtdBase = "./dtd/";
 		config.global().setLocalDtdBase(localDtdBase);
 		
-
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFileName);
 
 		int cellcount = 0;
@@ -82,9 +82,8 @@ public class SimRunKreisverkehr {
 //		}
 //		System.exit(0);
 
-		PopulationImpl population = new MyPopulation();
 		// Read plans file with special Reader Implementation
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(popFileName);
 
 		EventsManagerImpl events = new EventsManagerImpl() ;
@@ -94,7 +93,7 @@ public class SimRunKreisverkehr {
 		//Config.getSingleton().setParam(Simulation.SIMULATION, Simulation.STARTTIME, "05:55:00");
 		//Config.getSingleton().setParam(Simulation.SIMULATION, Simulation.ENDTIME, "08:00:00");
 
-		QueueSimulation sim = new QueueSimulation(network, population, events);
+		QueueSimulation sim = new QueueSimulation(scenario, events);
 		sim.openNetStateWriter("../../tmp/testWrite2", netFileName, 60);
 
 		sim.run();

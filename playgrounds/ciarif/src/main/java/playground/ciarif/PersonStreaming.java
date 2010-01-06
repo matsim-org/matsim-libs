@@ -20,6 +20,7 @@
 
 package playground.ciarif;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -38,6 +39,7 @@ public class PersonStreaming {
 
 		//Config config = Gbl.createConfig(args);
 		Config config = Scenario.setUpScenarioConfig();
+		ScenarioImpl scenario = new ScenarioImpl(config);
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -45,12 +47,12 @@ public class PersonStreaming {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		plansWriter.startStreaming(config.plans().getOutputFile());
 		//SubtoursWriteTable subtoursWriteTable = new SubtoursWriteTable ("output/output_persons_subtours.txt");
-		PopulationReader plansReader = new MatsimPopulationReader(plans, null);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

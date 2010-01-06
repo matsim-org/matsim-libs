@@ -23,10 +23,12 @@ package playground.david;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
@@ -81,14 +83,15 @@ public class CopyOfFilterBerlinKutter {
 		String outpopFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\10plans_with_non_car_mode.xml";
 
 		Gbl.startMeasurement();
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
+		ScenarioImpl scenario = new ScenarioImpl(config);
 
-		network = new NetworkLayer();
+		network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFileName);
 
 		relevantPopulation = new PopulationImpl();
-		PopulationImpl population = new MyPopulation();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, network);
+//		PopulationImpl population = scenario.getPopulation();
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
 //		population.addAlgorithm(new FilterPersonsNonCarMode());
 		plansReader.readFile(popFileName);
 //		population.runAlgorithms();

@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -32,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -184,10 +186,10 @@ public class ReducePopulationExe {
 		String popFileName = "../../tmp/studies/ivtch/Diss/input/plans_all_187k.xml";
 		String outnetFileName = "../../tmp/studies/ivtch/Diss/input/ivtch_red100.xml";
 
-		Gbl.startMeasurement();
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
+		ScenarioImpl scenario = new ScenarioImpl(config);
 
-		network = new NetworkLayer();
+		network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFileName);
 
 		relevantPopulation = new PopulationImpl();
@@ -203,9 +205,9 @@ public class ReducePopulationExe {
 		plansWriter50.startStreaming(outpopFileName + "50p.xml");
 		plansWriter100.startStreaming(outpopFileName + "100p.xml");
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 		population.setIsStreaming(true);
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, network);
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
 		FilterPersons2 filter = new FilterPersons2();
 		population.addAlgorithm(filter);
 		plansReader.readFile(popFileName);

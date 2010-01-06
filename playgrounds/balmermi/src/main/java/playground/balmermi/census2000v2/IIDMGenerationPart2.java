@@ -21,6 +21,7 @@
 package playground.balmermi.census2000v2;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -33,7 +34,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
 import org.matsim.world.WorldWriter;
@@ -65,7 +65,8 @@ public class IIDMGenerationPart2 {
 
 		log.info("MATSim-DB: create iidm.");
 
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		World world = scenario.getWorld();
 		
 		//////////////////////////////////////////////////////////////////////
 
@@ -89,7 +90,7 @@ public class IIDMGenerationPart2 {
 		log.info("  done.");
 
 		log.info("  reading facilities xml file...");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		world.complete();
 		log.info("  done.");
@@ -124,12 +125,12 @@ public class IIDMGenerationPart2 {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up population objects...");
-		PopulationImpl pop = new PopulationImpl();
-		Knowledges knowledges =  new KnowledgesImpl();
+		PopulationImpl pop = scenario.getPopulation();
+		Knowledges knowledges =  scenario.getKnowledges();
 		pop.setIsStreaming(true);
 		PopulationWriter pop_writer = new PopulationWriter(pop, knowledges);
 		pop_writer.startStreaming(config.plans().getOutputFile());
-		PopulationReader pop_reader = new MatsimPopulationReader(pop, null);
+		PopulationReader pop_reader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

@@ -25,6 +25,7 @@
 package playground.dressler.ea_flow;
 
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -88,15 +89,16 @@ public class EmptyPlans {
 		
 		//String sinkid = "supersink";
 				
+		ScenarioImpl scenario = new ScenarioImpl();
 		//read network
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
 		networkReader.readFile(networkfile);
 	//	Node sink = network.getNode(sinkid);
 		
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 			
-		new MatsimPopulationReader(population,network).readFile(plansfile);
+		new MatsimPopulationReader(scenario).readFile(plansfile);
 		network.connect();
 		
 

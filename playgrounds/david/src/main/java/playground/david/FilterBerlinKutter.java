@@ -24,10 +24,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -103,15 +105,14 @@ public class FilterBerlinKutter {
 		String popFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\30.plans.xml";
 		String outpopFileName = "..\\..\\tmp\\studies\\berlin-wip\\kutter_population\\30_Jakob-Kaiser-RingONLY.plans.v4.xml";
 
-		Gbl.startMeasurement();
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
+		ScenarioImpl scenario = new ScenarioImpl(config);
 
-		network = new NetworkLayer();
+		network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFileName);
 		
 		relevantPopulation = new PopulationImpl();
-		PopulationImpl population = new MyPopulation();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, network);
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
 //		population.addAlgorithm(new FilterPersons());
 		plansReader.readFile(popFileName);
 //		population.runAlgorithms();

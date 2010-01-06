@@ -19,6 +19,7 @@
  * *********************************************************************** */
 
 package playground.ciarif.modechoice_old;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -41,7 +42,8 @@ public class ModeChoiceNavteqMain {
 
 
 	public static void testRun01(Config config) {
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		World world = scenario.getWorld();
 		
 //		System.out.println("TEST RUN 01:");
 //		System.out.println("  reading world xml file... ");
@@ -49,10 +51,8 @@ public class ModeChoiceNavteqMain {
 //		world_parser.parse();
 //		System.out.println("  done.");
 
-		System.out.println("  creating network layer... ");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
-		System.out.println("  done.");
 		System.out.println("  reading network xml file... ");
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -79,7 +79,7 @@ public class ModeChoiceNavteqMain {
 //		System.out.println("3. CREATING A POPULATION BASED ON THE NETWORK");
 //		System.out.println();
 //		System.out.println("  creating plans object... ");
-		PopulationImpl plans = new PopulationImpl();
+		PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
 //		System.out.println("  done.");
 //		System.out.println("  running plans algorithms... ");
@@ -91,7 +91,7 @@ public class ModeChoiceNavteqMain {
 //		PlansParser plansParser = new MatsimPopulationReader(plans);
 		PopulationWriter plansWriter = new PopulationWriter(plans);
 		plansWriter.startStreaming(config.plans().getOutputFile());
-		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 		System.out.println("  adding plans algorithm... ");
 		//plans.addAlgorithm (new ModeChoiceAlgorithm2 ());

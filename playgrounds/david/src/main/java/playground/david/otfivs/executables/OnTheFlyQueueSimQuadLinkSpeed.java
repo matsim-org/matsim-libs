@@ -4,17 +4,17 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.QueueLink;
-import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.QueueLink;
+import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.vis.netvis.streaming.SimStateWriterI;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -128,18 +128,19 @@ public class OnTheFlyQueueSimQuadLinkSpeed extends QueueSimulation{
 			worldFileName = config.world().getInputFile();
 		}
 
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl(config);
 
 		if (worldFileName != null) {
+			World world = scenario.getWorld();
 			MatsimWorldReader world_parser = new MatsimWorldReader(world);
 			world_parser.readFile(worldFileName);
 		}
 
-		NetworkLayer net = new NetworkLayer();
+		NetworkLayer net = scenario.getNetwork();
 		new MatsimNetworkReader(net).readFile(netFileName);
 
-		PopulationImpl population = new PopulationImpl();
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(population, net);
+		PopulationImpl population = scenario.getPopulation();
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(popFileName);
 		System.out.println("agents read: " + population.getPersons().size());
 

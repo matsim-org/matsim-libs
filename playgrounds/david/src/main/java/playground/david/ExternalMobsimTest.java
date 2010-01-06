@@ -20,35 +20,33 @@
 
 package playground.david;
 
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.SimulationTimer;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
 public class ExternalMobsimTest {
 
 	public static void main(final String[] args) {
 		String[] defaultArgs = {"test/simple/default_config.xml"};
-		Gbl.createConfig(defaultArgs);
+		Config config = Gbl.createConfig(defaultArgs);
+		ScenarioImpl scenario = new ScenarioImpl(config);
 
-		NetworkLayer network = new NetworkLayer();
-		new MatsimNetworkReader(network).readFile("e:/Development/tmp/studies/equil//equil_netENG.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("e:/Development/tmp/studies/equil//equil_netENG.xml");
 
 		System.out.println("[External MOBSIM called"  + "]");
 
 		EventsManagerImpl events_ = new EventsManagerImpl();
-		PopulationImpl population_ = new PopulationImpl();
 
 		//load pop from popfile
 		System.out.println("[External MOBSIM"  + "] loading plansfile: " + args[0]);
-		PopulationReader plansReader = new MatsimPopulationReader(population_, network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(args[0]);
 		System.out.println("[External MOBSIM"  + "]...done");
 
@@ -61,7 +59,7 @@ public class ExternalMobsimTest {
 		//
 		System.out.println("["  + "] mobsim starts");
 		SimulationTimer.setTime(0);
-		QueueSimulation sim = new QueueSimulation(network, population_, events_);
+		QueueSimulation sim = new QueueSimulation(scenario, events_);
 		sim.run();
 
 		writer.reset(1);

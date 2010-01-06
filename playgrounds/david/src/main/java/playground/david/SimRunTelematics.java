@@ -20,13 +20,14 @@
 
 package playground.david;
 
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 
 public class SimRunTelematics {
@@ -35,13 +36,13 @@ public class SimRunTelematics {
 		String netFileName = "test/simple/equil_net.xml";
 		String popFileName = "test/simple/equil_plans.xml";
 
-		Gbl.createConfig(args);
+		Config config = Gbl.createConfig(args);
+		ScenarioImpl scenario = new ScenarioImpl(config);
 
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netFileName);
 
-		PopulationImpl population = new MyPopulation();
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(popFileName);
 
 		EventsManagerImpl events = new EventsManagerImpl();

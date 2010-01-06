@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -60,7 +61,8 @@ public class IIDMAssign2Network {
 
 		log.info("MATSim-DB: assignNetwork...");
 
-		World world = Gbl.createWorld();
+		ScenarioImpl scenario = new ScenarioImpl(config);
+		World world = scenario.getWorld();
 		
 		//////////////////////////////////////////////////////////////////////
 
@@ -79,12 +81,12 @@ public class IIDMAssign2Network {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reading facilities xml file...");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		log.info("  done.");
 
 		System.out.println("  reading the network xml file...");
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		world.complete();
 		System.out.println("  done.");
@@ -116,11 +118,11 @@ public class IIDMAssign2Network {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up population objects...");
-		PopulationImpl pop = new PopulationImpl();
+		PopulationImpl pop = scenario.getPopulation();
 		pop.setIsStreaming(true);
 		PopulationWriter pop_writer = new PopulationWriter(pop);
 		pop_writer.startStreaming(config.plans().getOutputFile());
-		PopulationReader pop_reader = new MatsimPopulationReader(pop, network);
+		PopulationReader pop_reader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
