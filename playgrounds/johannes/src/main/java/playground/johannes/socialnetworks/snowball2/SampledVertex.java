@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2;
 
-import java.util.List;
-
 import org.matsim.contrib.sna.graph.Vertex;
 
 
@@ -30,9 +28,21 @@ import org.matsim.contrib.sna.graph.Vertex;
  */
 public interface SampledVertex extends Vertex {
 
-	public List<? extends SampledEdge> getEdges();
+	/*
+	 * Due to a bug in Sun's java compiler the return type of this method cannot
+	 * be generic, since otherwise multiple inheritance (e.g. in
+	 * SampledSpatialGraph) would result in a compile error. See also
+	 * http://bugs.sun.com/view_bug.do;jsessionid=3cb252856515e1983e4affdf768e?bug_id=6294779
+	 */
+//	public List getEdges();
 	
-	public List<? extends Vertex> getNeighbours();
+	/*
+	 * Due to a bug in Sun's java compiler the return type of this method cannot
+	 * be generic, since otherwise multiple inheritance (e.g. in
+	 * SampledSpatialGraph) would result in a compile error. See also
+	 * http://bugs.sun.com/view_bug.do;jsessionid=3cb252856515e1983e4affdf768e?bug_id=6294779
+	 */
+//	public List getNeighbours();
 	
 	public void detect(int iteration);
 	

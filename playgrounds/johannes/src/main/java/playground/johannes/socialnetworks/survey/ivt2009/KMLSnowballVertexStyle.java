@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
-import org.matsim.contrib.sna.graph.Vertex;
-
 import gnu.trove.TDoubleObjectHashMap;
 import net.opengis.kml._2.LinkType;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle;
@@ -48,7 +46,7 @@ public class KMLSnowballVertexStyle extends KMLVertexColorStyle<SampledGraph, Sa
 	protected TDoubleObjectHashMap<String> getValues(SampledGraph graph) {
 		
 		TDoubleObjectHashMap<String> values = new TDoubleObjectHashMap<String>();
-		for(Vertex v : graph.getVertices()) {
+		for(Object v : graph.getVertices()) {
 			values.put(((SampledVertex) v).getIterationSampled(), String.valueOf(((SampledVertex) v).getIterationSampled()));
 		}
 		values.put(1.0, "1.0");

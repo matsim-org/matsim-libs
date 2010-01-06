@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialEdge.java
+ * CRSTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial;
+package playground.johannes.socialnetworks.spatial;
 
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.core.utils.collections.Tuple;
-
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author illenberger
  *
  */
-public interface SpatialEdge extends Edge {
-	
-	public Tuple<? extends SpatialVertex, ? extends SpatialVertex> getVertices();
-	
-	public Vertex getOpposite(Vertex v);
-	
-	public double length();
+public class CRSTest {
+
+	/**
+	 * @param args
+	 * @throws FactoryException 
+	 * @throws NoSuchAuthorityCodeException 
+	 */
+	public static void main(String[] args) throws NoSuchAuthorityCodeException, FactoryException {
+		int srid = 3452;
+		CRSAuthorityFactory   factory = CRS.getAuthorityFactory(false);
+		CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("EPSG:4326");
+		System.out.println(crs.getName());
+
+	}
 
 }

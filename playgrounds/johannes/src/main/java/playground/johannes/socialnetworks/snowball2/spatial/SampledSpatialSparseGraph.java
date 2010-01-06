@@ -24,12 +24,13 @@ import java.util.Set;
 import org.matsim.contrib.sna.graph.SparseVertex;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
+import playground.johannes.socialnetworks.snowball2.SampledGraph;
 
 /**
  * @author illenberger
  *
  */
-public class SampledSpatialSparseGraph extends SpatialSparseGraph implements SampledSpatialGraph {
+public class SampledSpatialSparseGraph extends SpatialSparseGraph implements SampledGraph {
 
 	@Override
 	@SuppressWarnings("unchecked")

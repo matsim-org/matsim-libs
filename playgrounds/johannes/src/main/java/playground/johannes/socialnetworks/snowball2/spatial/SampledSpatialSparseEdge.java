@@ -20,11 +20,12 @@
 package playground.johannes.socialnetworks.snowball2.spatial;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
+import playground.johannes.socialnetworks.snowball2.SampledEdge;
 
 /**
  * @author illenberger
  *
  */
-public class SampledSpatialSparseEdge extends SpatialSparseEdge implements SampledSpatialEdge {
+public class SampledSpatialSparseEdge extends SpatialSparseEdge implements SampledEdge {
 
 }

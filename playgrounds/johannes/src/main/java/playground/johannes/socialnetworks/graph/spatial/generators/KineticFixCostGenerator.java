@@ -31,6 +31,7 @@ import java.util.Random;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -39,7 +40,6 @@ import org.xml.sax.SAXException;
 
 import playground.johannes.socialnetworks.graph.io.PajekClusteringColorizer;
 import playground.johannes.socialnetworks.graph.io.PajekDegreeColorizer;
-import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphAnalyzer;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;

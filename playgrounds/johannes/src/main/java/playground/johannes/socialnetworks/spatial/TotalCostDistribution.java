@@ -19,20 +19,18 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.spatial;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleDoubleIterator;
 import gnu.trove.TIntDoubleHashMap;
 import gnu.trove.TIntDoubleIterator;
 import gnu.trove.TIntIntHashMap;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
-import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.statistics.Distribution;
 

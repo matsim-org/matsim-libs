@@ -23,12 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 
 /**
  * @author illenberger

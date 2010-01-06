@@ -29,10 +29,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.statistics.Distribution;
 

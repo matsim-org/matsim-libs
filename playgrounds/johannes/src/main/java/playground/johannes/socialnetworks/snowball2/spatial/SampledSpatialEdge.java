@@ -19,13 +19,21 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.spatial;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
+import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.core.utils.collections.Tuple;
+
 import playground.johannes.socialnetworks.snowball2.SampledEdge;
+
 
 /**
  * @author illenberger
  *
  */
 public interface SampledSpatialEdge extends SampledEdge, SpatialEdge {
+	
+	public Tuple<? extends SampledSpatialVertex, ? extends SampledSpatialVertex> getVertices();
+	
+	public SampledSpatialVertex getOpposite(Vertex v);
 
 }

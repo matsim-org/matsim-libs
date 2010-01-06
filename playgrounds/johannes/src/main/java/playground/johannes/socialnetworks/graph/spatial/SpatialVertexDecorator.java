@@ -23,6 +23,10 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.graph.VertexDecorator;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+
+import com.vividsolutions.jts.geom.Point;
 /**
  * @author illenberger
  *
@@ -46,6 +50,11 @@ public class SpatialVertexDecorator<V extends SpatialVertex> extends VertexDecor
 
 	public Coord getCoordinate() {
 		return getDelegate().getCoordinate();
+	}
+
+	@Override
+	public Point getPoint() {
+		return getDelegate().getPoint();
 	}
 
 }

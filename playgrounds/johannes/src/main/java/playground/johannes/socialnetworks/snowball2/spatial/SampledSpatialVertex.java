@@ -21,8 +21,10 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 
 import java.util.List;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+
 import playground.johannes.socialnetworks.snowball2.SampledVertex;
+
 
 /**
  * @author illenberger
@@ -30,7 +32,7 @@ import playground.johannes.socialnetworks.snowball2.SampledVertex;
  */
 public interface SampledSpatialVertex extends SampledVertex, SpatialVertex {
 
-	public List getNeighbours();
+	public List<? extends SampledSpatialVertex> getNeighbours();
 	
 	public List<? extends SampledSpatialEdge> getEdges();
 	

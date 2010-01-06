@@ -26,5 +26,21 @@ import org.matsim.contrib.sna.graph.Edge;
  *
  */
 public interface SampledEdge extends Edge {
+	
+	/*
+	 * Due to a bug in Sun's java compiler the return type of this method cannot
+	 * be generic, since otherwise multiple inheritance (e.g. in
+	 * SampledSpatialGraph) would result in a compile error. See also
+	 * http://bugs.sun.com/view_bug.do;jsessionid=3cb252856515e1983e4affdf768e?bug_id=6294779
+	 */
+//	public Tuple<? extends SampledVertex, ? extends SampledVertex> getVertices();
+	
+	/*
+	 * Due to a bug in Sun's java compiler the return type of this method cannot
+	 * be generic, since otherwise multiple inheritance (e.g. in
+	 * SampledSpatialGraph) would result in a compile error. See also
+	 * http://bugs.sun.com/view_bug.do;jsessionid=3cb252856515e1983e4affdf768e?bug_id=6294779
+	 */
+//	public SampledVertex getOpposite(Vertex v);
 
 }

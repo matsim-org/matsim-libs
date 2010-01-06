@@ -18,18 +18,17 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.xml.sax.SAXException;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialGraph;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
-import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialVertex;
 import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
 import playground.johannes.socialnetworks.statistics.Distribution;
@@ -96,11 +95,11 @@ public class TravelTimeHistogram3 {
 		 * cache nearest nodes
 		 */
 		Map<Vertex, Node> nearestNodes = new HashMap<Vertex, Node>();
-		for(SampledSpatialVertex v : vertices) {
+		for(SampledSpatialSparseVertex v : vertices) {
 			nearestNodes.put(v, getNearestNode(v.getCoordinate(), nodes));
 		}
 		TObjectIntHashMap<Vertex> vertex2Idx = new TObjectIntHashMap<Vertex>();
-		for(SampledSpatialVertex v : vertices) {
+		for(SampledSpatialSparseVertex v : vertices) {
 			Node n = nearestNodes.get(v);
 			int i = node2Idx.get(n);
 			vertex2Idx.put(v, i);
@@ -125,7 +124,7 @@ public class TravelTimeHistogram3 {
 		logger.info("Calculating normalization contants...");
 		count = 0;
 		Map<Vertex, TIntIntHashMap> numNodes_i = new HashMap<Vertex, TIntIntHashMap>();
-		for(SampledSpatialVertex v : vertices) {
+		for(SampledSpatialSparseVertex v : vertices) {
 			if(boundaries.getZone(v.getCoordinate()) != null) {
 				TIntIntHashMap n_tt = new TIntIntHashMap();
 				
@@ -156,7 +155,7 @@ public class TravelTimeHistogram3 {
 		
 		count = 0;
 		int samenode = 0;
-		for(SampledSpatialVertex v : vertices) {
+		for(SampledSpatialSparseVertex v : vertices) {
 			if(boundaries.getZone(v.getCoordinate()) != null) {
 				TIntIntHashMap n_tt = numNodes_i.get(v);
 				for(Object v_j : v.getNeighbours()) {

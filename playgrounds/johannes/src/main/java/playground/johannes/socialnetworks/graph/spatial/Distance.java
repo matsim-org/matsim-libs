@@ -24,6 +24,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.Edge;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
 import playground.johannes.socialnetworks.statistics.Distribution;
 

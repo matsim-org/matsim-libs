@@ -22,11 +22,14 @@ package playground.johannes.socialnetworks.graph.spatial;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.graph.SparseEdge;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 
 /**
+ * Implementation of {@link SpatialEdge} following the definitions of {@link SparseEdge}.
+ * 
  * @author illenberger
  *
  */
@@ -36,13 +39,20 @@ public class SpatialSparseEdge extends SparseEdge implements SpatialEdge {
 		Coord c1 = getVertices().getFirst().getCoordinate();
 		Coord c2 = getVertices().getSecond().getCoordinate();
 		return CoordUtils.calcDistance(c1, c2);
+//		JTS.orthodromicDistance(p1, p2, crs)
 	}
 	
+	/**
+	 * @see {@link SparseEdge#getOpposite(Vertex)}
+	 */
 	@Override
 	public SpatialSparseVertex getOpposite(Vertex v) {
 		return (SpatialSparseVertex) super.getOpposite(v);
 	}
 
+	/**
+	 * @see {@link SparseEdge#getVertices()}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public Tuple<? extends SpatialSparseVertex, ? extends SpatialSparseVertex> getVertices() {

@@ -27,15 +27,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 
-import playground.johannes.socialnetworks.graph.spatial.SpatialEdge;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraphBuilder;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
-import playground.johannes.socialnetworks.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
+
 
 /**
  * @author illenberger

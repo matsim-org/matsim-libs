@@ -21,6 +21,8 @@ package playground.johannes.socialnetworks.graph.spatial;
 
 import org.matsim.contrib.sna.graph.EdgeDecorator;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.core.utils.collections.Tuple;
 
 public class SpatialEdgeDecorator<E extends SpatialEdge> extends EdgeDecorator<E> implements
