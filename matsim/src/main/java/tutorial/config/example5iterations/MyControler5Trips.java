@@ -22,6 +22,8 @@ package tutorial.config.example5iterations;
 
 import org.apache.log4j.Logger;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.run.Controler;
 
 
@@ -43,10 +45,10 @@ public class MyControler5Trips {
 		controler.setOverwriteFiles(true) ;
 		controler.run() ;
 		
-//		Scenario sc = controler.getScenario() ;
-//		Config cf = sc.getConfig() ;
-//		String dir = cf.controler().getOutputDirectory();
-//		log.warn("Output is in " + dir + ".  Use otfvis (preferably hardware-accelerated) to play movies." ) ; 
+		Scenario sc = controler.getScenario() ;
+		Config cf = sc.getConfig() ;
+		String dir = cf.controler().getOutputDirectory();
+		log.warn("Output is in " + dir + ".  Use otfvis (preferably hardware-accelerated) to play movies." ) ; 
 	}
 
 }
