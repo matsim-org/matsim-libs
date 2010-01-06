@@ -20,7 +20,7 @@
 
 package playground.toronto;
 
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -39,14 +39,14 @@ import org.matsim.core.population.PopulationImpl;
 public class PrepareModeChoicePlans {
 
 	public static void run(final String inputPlansFile, final String inputNetworkFile, final String outputPlansFile) {
-		Gbl.createConfig(null);
-		NetworkLayer network = new NetworkLayer();
+		ScenarioImpl scenario = new ScenarioImpl();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(inputNetworkFile);
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 		population.setIsStreaming(true);
 		NewAgentPtPlan planGenerator = new NewAgentPtPlan(population, outputPlansFile);
 		population.addAlgorithm(planGenerator);
-		new MatsimPopulationReader(population, network).readFile(inputPlansFile);
+		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
 		population.printPlansCount();
 		planGenerator.writeEndPlans();
 		System.out.println("done.");

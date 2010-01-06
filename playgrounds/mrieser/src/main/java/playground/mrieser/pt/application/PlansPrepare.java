@@ -41,6 +41,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 
+import playground.mrieser.PseudoScenario;
+
 public class PlansPrepare {
 
 	private final static String NETWORK_FILENAME = "/Volumes/Data/VSP/svn/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch-osm.xml";
@@ -98,7 +100,7 @@ public class PlansPrepare {
 		filter.setAlternativeAOI(center, radius);
 		pop.addAlgorithm(filter);
 
-		new MatsimPopulationReader(pop, network).readFile(fromFile);
+		new MatsimPopulationReader(new PseudoScenario(this.scenario, pop)).readFile(fromFile);
 
 		writer.closeStreaming();
 
@@ -112,7 +114,7 @@ public class PlansPrepare {
 		final PopulationWriter plansWriter = new PopulationWriter(pop, percentage);
 		plansWriter.startStreaming(toFile);
 		pop.addAlgorithm(plansWriter);
-		PopulationReader plansReader = new MatsimPopulationReader(pop, this.scenario.getNetwork());
+		PopulationReader plansReader = new MatsimPopulationReader(new PseudoScenario(this.scenario, pop));
 
 		log.info("extracting sample from population:");
 		log.info("  input-file:  " + fromFile);
@@ -128,7 +130,7 @@ public class PlansPrepare {
 		PopulationImpl pop = new PopulationImpl();
 
 		log.info("reading plans from file: " + fromFile);
-		new MatsimPopulationReader(pop, this.scenario.getNetwork()).readFile(fromFile);
+		new MatsimPopulationReader(new PseudoScenario(this.scenario, pop)).readFile(fromFile);
 		pop.printPlansCount();
 
 		log.info("filter plans with " + mode + "-legs");

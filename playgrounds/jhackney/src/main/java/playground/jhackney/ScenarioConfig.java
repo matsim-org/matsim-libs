@@ -34,9 +34,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scoring.EventsToScore;
-import org.matsim.counts.Counts;
-import org.matsim.counts.MatsimCountsReader;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.world.MatsimWorldReader;
 import org.matsim.world.World;
@@ -242,14 +239,14 @@ public abstract class ScenarioConfig {
 		return network;
 	}
 
-	public static final Counts readCounts() {
-		System.out.println("  reading the counts...");
-		final Counts counts = new Counts();
-		new MatsimCountsReader(counts).readFile(scenario.getConfig().counts().getCountsFileName());
-
-		System.out.println("  done.");
-		return counts;
-	}
+//	public static final Counts readCounts() {
+//		System.out.println("  reading the counts...");
+//		final Counts counts = new Counts();
+//		new MatsimCountsReader(counts).readFile(scenario.getConfig().counts().getCountsFileName());
+//
+//		System.out.println("  done.");
+//		return counts;
+//	}
 
 //	public static final Matrices readMatrices() {
 //		System.out.println("  reading matrices xml file... ");
@@ -269,19 +266,18 @@ public abstract class ScenarioConfig {
 //		System.out.println("  done.");
 //		return plans;
 //	}
-	public static final PopulationImpl readPlans(final NetworkLayer network, final int i) {
-		System.out.println("  reading plans xml file... ");
-		PopulationImpl plans = new PopulationImpl();
-//		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
-//		String filename=input_directory +Gbl.getConfig().plans().getInputFile();
-		String filename=input_directory +popFileName;
+//	public static final PopulationImpl readPlans(final NetworkLayer network, final int i) {
+//		System.out.println("  reading plans xml file... ");
+////		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().plans().getInputFile();
+////		String filename=input_directory +Gbl.getConfig().plans().getInputFile();
+//		String filename=input_directory +popFileName;
+////		System.out.println(filename);
 //		System.out.println(filename);
-		System.out.println(filename);
-		new MatsimPopulationReader(plans, network).readFile(filename);
-
-		System.out.println("  done.");
-		return plans;
-	}
+//		new MatsimPopulationReader(scenario).readFile(filename);
+//
+//		System.out.println("  done.");
+//		return scenario.getPopulation();
+//	}
 	
 	public static final PopulationImpl readPlansAndKnowledges(final NetworkLayer network, Knowledges kn) {
 		System.out.println("  reading plans xml file... ");
@@ -294,32 +290,32 @@ public abstract class ScenarioConfig {
 	}
 
 
-	public static final EventsManagerImpl readEvents(final int i, final EventsMapStartEndTimes epp) {
-		System.out.println("  reading plans xml file... ");
-		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+scenario.getConfig().events().getInputFile();
+//	public static final EventsManagerImpl readEvents(final int i, final EventsMapStartEndTimes epp) {
+//		System.out.println("  reading plans xml file... ");
+//		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+scenario.getConfig().events().getInputFile();
+////		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
+//		EventsManagerImpl events = new EventsManagerImpl();
+//		events.addHandler(epp);
+//		System.out.println(filename);
+//		new MatsimEventsReader(events).readFile(filename);
+//
+//		System.out.println("  done.");
+//		return events;
+//	}
+//
+//	public static final EventsManagerImpl readEvents(final int i, final EventsMapStartEndTimes epp, final EventsToScore scoring) {
+//		System.out.println("  reading plans xml file... ");
+////		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
 //		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
-		EventsManagerImpl events = new EventsManagerImpl();
-		events.addHandler(epp);
-		System.out.println(filename);
-		new MatsimEventsReader(events).readFile(filename);
-
-		System.out.println("  done.");
-		return events;
-	}
-
-	public static final EventsManagerImpl readEvents(final int i, final EventsMapStartEndTimes epp, final EventsToScore scoring) {
-		System.out.println("  reading plans xml file... ");
-//		String filename=input_directory +"ITERS/it."+i+"/"+i+"."+Gbl.getConfig().events().getInputFile();
-		String filename=input_directory +"ITERS/it."+i+"/"+i+".events.txt";
-		EventsManagerImpl events = new EventsManagerImpl();
-		events.addHandler(epp);
-		events.addHandler(scoring);
-		System.out.println(filename);
-		new MatsimEventsReader(events).readFile(filename);
-
-		System.out.println("  done.");
-		return events;
-	}
+//		EventsManagerImpl events = new EventsManagerImpl();
+//		events.addHandler(epp);
+//		events.addHandler(scoring);
+//		System.out.println(filename);
+//		new MatsimEventsReader(events).readFile(filename);
+//
+//		System.out.println("  done.");
+//		return events;
+//	}
 
 	public static final EventsManagerImpl readEvents(final int i, final EventsMapStartEndTimes epp, final playground.jhackney.scoring.EventsToScoreAndReport scoring) {
 		System.out.println("  reading plans xml file... ");
@@ -379,20 +375,20 @@ public abstract class ScenarioConfig {
 //		new ConfigWriter(config).write();
 //		System.out.println("  done.");
 //	}
-	public static Config getConfig(){
-		return scenario.getConfig();
-	}
-	public static String getSNOutDir(){
-		return output_directory;
-	}
+//	public static Config getConfig(){
+//		return scenario.getConfig();
+//	}
+//	public static String getSNOutDir(){
+//		return output_directory;
+//	}
 	public static String getSNInDir(){
 		return input_directory;
 	}
-	public static String getOut1(){
-		return output_directory + out1;
-	}
-	public static String getOut2(){
-		return output_directory + out2;
-	}
+//	public static String getOut1(){
+//		return output_directory + out1;
+//	}
+//	public static String getOut2(){
+//		return output_directory + out2;
+//	}
 }
 

@@ -20,6 +20,7 @@
 
 package playground.jhackney;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -28,11 +29,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.world.World;
 import org.matsim.world.algorithms.WorldConnectLocations;
 
 import playground.jhackney.algorithms.PersonSetActToLinkWithNonNullFacility;
@@ -47,7 +46,7 @@ public class MakeScenario {
 
 		System.out.println("Make Scenario SAMPLE OF FACILITIES:");
 
-		World world = Scenario.getWorld();
+		ScenarioImpl scenario = new ScenarioImpl(config);
 		
 		System.out.println("Uses output of a CUT. Samples 100x\"pct\"% of the facilities and moves Acts to take place at these");
 
@@ -57,14 +56,13 @@ public class MakeScenario {
 //		System.out.println("  done.");
 
 		System.out.println("  reading facilities xml file... ");
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(config.facilities().getInputFile());
 		System.out.println("  done.");
 
 		System.out.println("  reading the network xml file...");
 //		NetworkLayer network = null;
-//		NetworkLayerBuilder.setNetworkLayerType(NetworkLayerBuilder.NETWORK_DEFAULT);
-		NetworkLayer network = (NetworkLayer)world.createLayer(NetworkLayer.LAYER_TYPE,null);
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
@@ -74,8 +72,8 @@ public class MakeScenario {
 //		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");
-		PopulationImpl plans = new PopulationImpl();
-		PopulationReader plansReader = new MatsimPopulationReader(plans, network);
+		PopulationImpl plans = scenario.getPopulation();
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(config.plans().getInputFile());
 		System.out.println("  done.");
 
@@ -92,7 +90,7 @@ public class MakeScenario {
 
 		//////////////////////////////////////////////////////////////////////
 		System.out.println("  Completing World ... ");
-		new WorldConnectLocations().run(world);
+		new WorldConnectLocations().run(scenario.getWorld());
 		System.out.println("  done.");
 		//////////////////////////////////////////////////////////////////////
 
@@ -123,8 +121,8 @@ public class MakeScenario {
 
 		new PersonSetActToLinkWithNonNullFacility(facilities).run(plans);
 //    	new XY2Links(network).run(plans);
-		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost();
-		new PlansCalcRoute(network,timeCostCalc,timeCostCalc).run(plans);
+		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.charyparNagelScoring());
+		new PlansCalcRoute(config.plansCalcRoute(), network,timeCostCalc,timeCostCalc).run(plans);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -138,7 +136,7 @@ public class MakeScenario {
 		Scenario.writePlans(plans);
 		Scenario.writeNetwork(network);
 		Scenario.writeFacilities(facilities);
-		Scenario.writeWorld(world);
+		Scenario.writeWorld(scenario.getWorld());
 		Scenario.writeConfig();
 
 		System.out.println("TEST SUCCEEDED.");

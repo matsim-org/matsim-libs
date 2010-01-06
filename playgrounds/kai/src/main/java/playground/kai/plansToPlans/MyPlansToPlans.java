@@ -21,6 +21,7 @@ package playground.kai.plansToPlans;
 
 import java.io.PrintWriter;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
@@ -37,12 +38,11 @@ import org.matsim.core.population.PopulationWriter;
 public class MyPlansToPlans {
 
 	private Config config;
-	private final String configfile = null;
-	private final String dtdfile = null;
 
 	public void run(final String[] args) {
 		this.config = Gbl.createConfig(new String[]{"../padang/dlr-network/pconfig.xml"});
 		new ConfigWriter(this.config).writeStream(new PrintWriter(System.out));
+		ScenarioImpl scenario = new ScenarioImpl(this.config);
 
 //		final World world = Gbl.getWorld();
 //
@@ -51,12 +51,12 @@ public class MyPlansToPlans {
 //			worldReader.readFile(this.config.world().getInputFile());
 //		}
 
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(this.config.network().getInputFile());
 
-		final PopulationImpl plans = new PopulationImpl();
+		final PopulationImpl plans = scenario.getPopulation();
 		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(plans, network);
+		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans);
 		plansWriter.startStreaming(this.config.plans().getOutputFile());
 //		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));

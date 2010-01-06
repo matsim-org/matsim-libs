@@ -54,6 +54,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -375,11 +376,11 @@ public class MyRuns {
 		population.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(population);
 		plansWriter.startStreaming(scenario.getConfig().plans().getOutputFile());
-		final PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		population.addAlgorithm(new ActLocationFalsifier(200));
 		population.addAlgorithm(new XY2Links(network));
-		final FreespeedTravelTimeCost timeCostFunction = new FreespeedTravelTimeCost();
-		population.addAlgorithm(new PlansCalcRoute(network, timeCostFunction, timeCostFunction));
+		final FreespeedTravelTimeCost timeCostFunction = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
+		population.addAlgorithm(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), network, timeCostFunction, timeCostFunction));
 		population.addAlgorithm(plansWriter);
 		plansReader.readFile(scenario.getConfig().plans().getInputFile());
 		population.printPlansCount();
@@ -448,7 +449,7 @@ public class MyRuns {
 						}
 
 						public void run(final Plan plan) {
-							final List actslegs = plan.getPlanElements();
+							final List<PlanElement> actslegs = plan.getPlanElements();
 							for (int i = 1, max = actslegs.size(); i < max; i+=2) {
 								final LegImpl leg = (LegImpl)actslegs.get(i);
 								run((NetworkRouteWRefs) leg.getRoute(), leg.getDepartureTime());

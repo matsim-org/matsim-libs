@@ -1,5 +1,6 @@
 package playground.wrashid.tryouts.plan;
 
+import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -21,17 +22,18 @@ public class PlanShrinker {
 		String configFile = outputPath +  "config.xml";
 
 		Config config = Gbl.createConfig(new String[] {configFile});
+		ScenarioImpl scenario = new ScenarioImpl();
 
 		System.out.println("  reading the network...");
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
-		PopulationImpl population = new PopulationImpl();
+		PopulationImpl population = scenario.getPopulation();
 		population.setIsStreaming(true);
 
 		System.out.println("reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(population, network);
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(config.plans().getInputFile());
 		population.printPlansCount();
 

@@ -38,16 +38,16 @@ public class KeepOnlyMIVPlans extends NewPopulation {
 		//String facilitiesPath = "./test/scenarios/chessboard/facilities.xml";
 		
 		
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl)world.createLayer(ActivityFacilitiesImpl.LAYER_TYPE, null);
+		ActivityFacilitiesImpl facilities = sc.getActivityFacilities();
 		new MatsimFacilitiesReader(facilities).readFile(facilitiesPath);
 		world.complete();
 		
-		PopulationImpl inPop = new PopulationImpl();
+		PopulationImpl inPop = sc.getPopulation();
 
-		NetworkLayer net = new NetworkLayer();
+		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(networkFile);
 
-		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
+		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inputPlansFile);
 
 		KeepOnlyMIVPlans dp = new KeepOnlyMIVPlans(inPop, outputPlansFile);

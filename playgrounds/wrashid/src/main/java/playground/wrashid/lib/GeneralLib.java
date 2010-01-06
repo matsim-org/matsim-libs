@@ -11,7 +11,6 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -22,7 +21,6 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -35,12 +33,13 @@ public class GeneralLib {
 	 * Note: use the other method with the same name, if this poses problems.
 	 */
 	public static Population readPopulation(String plansFile, String networkFile) {
-		Population population = new PopulationImpl();
+		ScenarioImpl scenario = new ScenarioImpl();
+		Population population = scenario.getPopulation();
 
-		NetworkLayer network = new NetworkLayer();
+		NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(networkFile);
 
-		PopulationReader popReader = new MatsimPopulationReader(population, network);
+		PopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(plansFile);
 
 		return population;
@@ -50,13 +49,13 @@ public class GeneralLib {
 	 * Reads the population from the plans file.
 	 */
 	public static Population readPopulation(String plansFile, String networkFile, String facilititiesPath) {
-		Scenario sc = new ScenarioImpl();
+		ScenarioImpl sc = new ScenarioImpl();
 
 		sc.getConfig().setParam("plans", "inputPlansFile", plansFile);
 		sc.getConfig().setParam("network", "inputNetworkFile", networkFile);
 		sc.getConfig().setParam("facilities", "inputFacilitiesFile", facilititiesPath);
 
-		ScenarioLoaderImpl sl = new ScenarioLoaderImpl((ScenarioImpl) sc);
+		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc);
 
 		sl.loadScenario();
 

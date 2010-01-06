@@ -28,7 +28,7 @@ public class ProcessPlansFile extends NewPopulation {
 		NetworkLayer net = sc.getNetwork();
 		new MatsimNetworkReader(net).readFile(networkFile);
 
-		PopulationReader popReader = new MatsimPopulationReader(inPop, net);
+		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inputPlansFile);
 
 		ProcessPlansFile dp = new ProcessPlansFile(inPop, outputPlansFile);
