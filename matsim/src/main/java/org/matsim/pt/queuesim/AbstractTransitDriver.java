@@ -27,7 +27,7 @@ import org.matsim.transitSchedule.api.TransitStopFacility;
 
 public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	
-	private static final Logger log = Logger.getLogger(TransitDriver.class);
+	private static final Logger log = Logger.getLogger(AbstractTransitDriver.class);
 
 	private TransitVehicle vehicle = null;
 	private int nextLinkIndex = 0;
