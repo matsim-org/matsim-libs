@@ -28,6 +28,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.media.opengl.GL;
 
@@ -37,8 +38,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -73,23 +77,11 @@ public class QueryAgentPlan implements OTFQuery {
 	
   private static final long serialVersionUID = -8415337571576184768L;
 
-	private static class MyInfoText implements Serializable{
-
-		private static final long serialVersionUID = 1L;
-		float east, north;
-		String name;
-		public MyInfoText(float east, float north, String name) {
-			this.east = east;
-			this.north = north;
-			this.name = name;
-		}
-	}
-
 	protected String agentId;
 	protected float[] vertex = null;
 	private byte[] colors = null;
 	private transient FloatBuffer vert;
-	private Object [] acts;
+	private List<Object> acts;
 	protected InfoText agentText = null;
 	private int lastActivity = -1;
 	private ByteBuffer cols; 
@@ -117,7 +109,7 @@ public class QueryAgentPlan implements OTFQuery {
 		return count;
 	}
 
-	protected void setCol(int pos, Color col) {
+	protected void setColor(int pos, Color col) {
 		this.colors[pos*4 +0 ] = (byte)col.getRed();
 		this.colors[pos*4 +1 ] = (byte)col.getGreen();
 		this.colors[pos*4 +2 ] = (byte)col.getBlue();
@@ -127,7 +119,7 @@ public class QueryAgentPlan implements OTFQuery {
 	protected void setCoord(int pos, Coord coord, Color col) {
 		this.vertex[pos*2 +0 ] = (float)coord.getX();
 		this.vertex[pos*2 +1 ] = (float)coord.getY();
-		setCol(pos, col);
+		setColor(pos, col);
 	}
 
 	public void buildRoute(Plan plan) {
@@ -140,17 +132,22 @@ public class QueryAgentPlan implements OTFQuery {
 
 		Color carColor = Color.ORANGE;
 		Color actColor = Color.BLUE;
-		Color ptColor = Color.RED;
+		Color ptColor = Color.YELLOW;
+		Color walkColor = Color.MAGENTA;
+		Color otherColor = Color.PINK;
 
 		for (Object o : plan.getPlanElements()) {
 			if(o instanceof ActivityImpl) {
 				Color col = actColor;
 				ActivityImpl act = (ActivityImpl)o;
 				Coord coord = act.getCoord();
-				if (coord == null) coord = act.getLink().getCoord();
+				if (coord == null) {
+				  coord = act.getLink().getCoord();
+				}
 				setCoord(pos++, coord, col);
-			} else if (o instanceof LegImpl) {
-				LegImpl leg = (LegImpl) o;
+			} 
+			else if (o instanceof LegImpl) {
+				Leg leg = (Leg) o;
 				if (leg.getMode().equals(TransportMode.car)) {
 					Node last = null;
 					for (Link driven : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
@@ -158,11 +155,20 @@ public class QueryAgentPlan implements OTFQuery {
 						last = driven.getToNode();
 						setCoord(pos++, node.getCoord(), carColor);
 					}
-					if(last != null) setCoord(pos++, last.getCoord(), carColor);
-				} else {
-					setCol(pos-1, ptColor); // replace act Color with pt color... here we need walk etc too
+					if(last != null) {
+					  setCoord(pos++, last.getCoord(), carColor);
+					}
 				}
-			}
+				else if (leg.getMode().equals(TransportMode.pt)){
+				  setColor(pos-1, ptColor); 
+				}
+        else if (leg.getMode().equals(TransportMode.walk)){
+          setColor(pos-1, walkColor); 
+        }
+				else {
+					setColor(pos-1, otherColor); // replace act Color with pt color... here we need walk etc too
+				}
+			} // end leg handling
 		}
 	}
 
@@ -170,14 +176,17 @@ public class QueryAgentPlan implements OTFQuery {
 		Person person = plans.getPersons().get(new IdImpl(this.agentId));
 		if (person != null) {
 			Plan plan = person.getSelectedPlan();
-			this.acts = new Object[plan.getPlanElements().size() / 2];
-			for (int i = 0; i < this.acts.length; i++) {
-				ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(i * 2);
-				Coord coord = act.getCoord();
-				if (coord == null) {
-					coord = act.getLink().getCoord();
-				}
-				this.acts[i] = new MyInfoText((float) coord.getX(), (float) coord.getY(), act.getType());
+			this.acts = new Vector<Object>();
+			for (PlanElement e : plan.getPlanElements()){
+			  if (e instanceof Activity){
+			    Activity act = (Activity) e;
+	        Coord coord = act.getCoord();
+	        if (coord == null) {
+	          Link link = net.getLinks().get(act.getLinkId()).getLink();
+	          coord = link.getCoord();
+	        }
+	        this.acts.add(new MyInfoText((float) coord.getX(), (float) coord.getY(), act.getType()));
+			  }
 			}
 			buildRoute(plan);
 		}
@@ -190,6 +199,9 @@ public class QueryAgentPlan implements OTFQuery {
 	public void draw(OTFDrawer drawer) {
 		if(drawer instanceof OTFOGLDrawer) {
 			drawWithGLDrawer((OTFOGLDrawer)drawer);
+		}
+		else {
+		  log.error("cannot draw query cause no OTFOGLDrawer is used!");
 		}
 	}
 
@@ -260,7 +272,7 @@ public class QueryAgentPlan implements OTFQuery {
 	}
 
 	private void resetAnyOldProgressbars() {
-		if (this.lastActivity >= 0) ((InfoText)this.acts[this.lastActivity]).setFill(0.0f);
+		if (this.lastActivity >= 0) ((InfoText)this.acts.get(this.lastActivity)).setFill(0.0f);
 	}
 
 	private void updateAgentTextPosition(Point2D.Double pos) {
@@ -275,8 +287,9 @@ public class QueryAgentPlan implements OTFQuery {
 		query.setId(this.agentId);
 		query.setNow(drawer.getActGraph().getTime());
 		query = (QueryAgentActivityStatus) drawer.getQuad().doQuery(query);
-		if ((query != null) && (query.activityNr != -1) && (query.activityNr < this.acts.length)) {
-			InfoText posT = ((InfoText)this.acts[query.activityNr]);
+		
+		if ((query != null) && (query.activityNr != -1) && (query.activityNr < this.acts.size())) {
+			InfoText posT = ((InfoText)this.acts.get(query.activityNr));
 			posT.setColor(new Color(255,50,50,180));
 			posT.setFill((float)query.finished);
 			this.lastActivity = query.activityNr;
@@ -295,10 +308,12 @@ public class QueryAgentPlan implements OTFQuery {
 			}
 			this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
 			this.cols = BufferUtil.copyByteBuffer(ByteBuffer.wrap(this.colors));
-			for (int i=0;i< this.acts.length; i++) {
-				MyInfoText inf = (MyInfoText)this.acts[i];
-				this.acts[i] = InfoTextContainer.showTextPermanent(inf.name, inf.east - east, inf.north - north, -0.001f );
-				((InfoText)this.acts[i]).setAlpha(0.5f);
+			
+			
+			for (int i=0;i< this.acts.size(); i++) {
+				MyInfoText inf = (MyInfoText)this.acts.get(i);
+				this.acts.set(i,InfoTextContainer.showTextPermanent(inf.name, inf.east - east, inf.north - north, -0.001f ));
+				((InfoText)this.acts.get(i)).setAlpha(0.5f);
 			}
 
 			if (pos != null) {
@@ -337,12 +352,16 @@ public class QueryAgentPlan implements OTFQuery {
 		// Check if we have already generated InfoText Objects, otherwise drop deleting
 		if (this.calcOffset == true) return;
 		if (this.acts != null) {
-			for (int i=0;i< this.acts.length; i++) {
-				InfoText inf = (InfoText)this.acts[i];
-				if(inf != null) InfoTextContainer.removeTextPermanent(inf);
+			for (int i=0;i< this.acts.size(); i++) {
+				InfoText inf = (InfoText)this.acts.get(i);
+				if(inf != null) {
+				  InfoTextContainer.removeTextPermanent(inf);
+				}
 			}
 		}
-		if (this.agentText != null) InfoTextContainer.removeTextPermanent(this.agentText);
+		if (this.agentText != null) {
+		  InfoTextContainer.removeTextPermanent(this.agentText);
+		}
 	}
 
 	public boolean isAlive() {
@@ -356,5 +375,19 @@ public class QueryAgentPlan implements OTFQuery {
 	protected void onEndInit() {
 		// for derived classes
 	}
+	
+	 private static class MyInfoText implements Serializable{
+
+	    private static final long serialVersionUID = 1L;
+	    float east, north;
+	    String name;
+	    
+	    public MyInfoText(float east, float north, String name) {
+	      this.east = east;
+	      this.north = north;
+	      this.name = name;
+	    }
+	  }
+
 
 }

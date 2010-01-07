@@ -117,10 +117,11 @@ public class OTFQueryControl implements OTFQueryHandler {
 		if ((mouseButton==1) || (mouseButton==4)) handleClick(viewId, origRect, mouseButton);
 	}
 
-	protected OTFQuery createQuery(String className) {
+	@SuppressWarnings("unchecked")
+  protected OTFQuery createQuery(String className) {
 		try {
-			Class classDefinition = Class.forName(className);
-			return (OTFQuery) classDefinition.newInstance();
+			Class<? extends OTFQuery> classDefinition = (Class<? extends OTFQuery>) Class.forName(className);
+			return classDefinition.newInstance();
 		} catch (InstantiationException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {

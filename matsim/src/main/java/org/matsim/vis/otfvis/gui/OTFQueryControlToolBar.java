@@ -70,11 +70,11 @@ public class OTFQueryControlToolBar extends JToolBar implements ActionListener, 
   private void initGui(){
     this.pane = new JTabbedPane();
     this.add(pane);
-    JPanel com = new JPanel();
-    com.setSize(500, 60);
+    JPanel panel = new JPanel();
+    panel.setSize(500, 60);
     {
       JLabel jLabel3 = new JLabel();
-      com.add(jLabel3);
+      panel.add(jLabel3);
       jLabel3.setText("Query:");
       jLabel3.setBounds(344, 45, 36, 31);
     }
@@ -82,7 +82,7 @@ public class OTFQueryControlToolBar extends JToolBar implements ActionListener, 
       ComboBoxModel leftMFuncModel =  new DefaultComboBoxModel(this.queryControl.getQueries());
       leftMFuncModel.setSelectedItem(this.queryControl.getQueries().get(0));
       queryTypeComboBox = new JComboBox();
-      com.add(queryTypeComboBox);
+      panel.add(queryTypeComboBox);
       queryTypeComboBox.setActionCommand("type_changed");
       queryTypeComboBox.setModel(leftMFuncModel);
       queryTypeComboBox.setBounds(57, 76, 92, 27);
@@ -92,10 +92,10 @@ public class OTFQueryControlToolBar extends JToolBar implements ActionListener, 
     }
     {
       JLabel jLabel3 = new JLabel();
-      com.add(jLabel3);
+      panel.add(jLabel3);
       jLabel3.setText(" Id:");
       textField = new JTextField();
-      com.add(textField);
+      panel.add(textField);
       textField.setActionCommand("id_changed");
       textField.setPreferredSize(new Dimension(350,30));
       textField.setMaximumSize(new Dimension(350,40));
@@ -103,7 +103,7 @@ public class OTFQueryControlToolBar extends JToolBar implements ActionListener, 
     }
     {
       JLabel jLabel3 = new JLabel();
-      com.add(jLabel3);
+      panel.add(jLabel3);
       jLabel3.setText("  ");
 
       JButton button = new JButton();
@@ -111,17 +111,17 @@ public class OTFQueryControlToolBar extends JToolBar implements ActionListener, 
       button.setActionCommand("clear");
       button.addActionListener(this);
       button.setToolTipText("Clears all queries!");
-      com.add(button);
+      panel.add(button);
 
       JCheckBox SynchBox = new JCheckBox("multiple select");
       SynchBox.setMnemonic(KeyEvent.VK_M);
       SynchBox.setSelected(config.isMultipleSelect());
       SynchBox.addItemListener(this);
-      com.add(SynchBox);
+      panel.add(SynchBox);
     }
-    com.doLayout();
-    com.setBounds(250, 130, 220, 160);
-    pane.addTab("Query", com);
+    panel.doLayout();
+    panel.setBounds(250, 130, 220, 160);
+    pane.addTab("Query", panel);
   }
 
   public void actionPerformed(ActionEvent e) {
@@ -129,10 +129,11 @@ public class OTFQueryControlToolBar extends JToolBar implements ActionListener, 
     String command = e.getActionCommand();
     if("id_changed".equals(command)) {
       String id = ((JTextField)e.getSource()).getText();
+      log.error("action performed on textfield with text " + id);
       if (!cfg.isMultipleSelect()){
         this.queryControl.removeQueries();
       }
-      this.queryControl.handleIdQuery(id, cfg.getQueryType());
+      this.queryControl.handleIdQuery(id.trim(), cfg.getQueryType());
     } 
     else if ("type_changed".equals(command)) {
       JComboBox cb = (JComboBox)e.getSource();
@@ -165,7 +166,7 @@ public class OTFQueryControlToolBar extends JToolBar implements ActionListener, 
   }
 
   
-  public JTextField getTextField() {
+  public synchronized JTextField getTextField() {
     return textField;
   } 
 }
