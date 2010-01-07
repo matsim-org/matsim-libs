@@ -38,7 +38,6 @@ import org.matsim.core.population.routes.RouteWRefs;
  * @author dgrether
  */
 public class NetworkFactoryImpl implements Serializable, NetworkFactory {
-	// yyyyyy is it NetworkFactory or NetworkBuilder or do we really need both?  kai, jul09
 
 	private LinkFactory linkFactory = null;
 
@@ -69,13 +68,6 @@ public class NetworkFactoryImpl implements Serializable, NetworkFactory {
 	 */
 	public LinkImpl createLink(final Id id, final Id fromNodeId, final Id toNodeId) {
 		return this.linkFactory.createLink(id, this.network.getNode(fromNodeId), this.network.getNode(toNodeId), this.network, 1.0, 1.0, 1.0, 1.0);
-	}
-	/**
-	 * @deprecated use createNode(Id id) instead and set the rest yourself
-	 */
-	@Deprecated
-	public NodeImpl createNode(final Id id, final Coord coord, final String type) {
-		return new NodeImpl(id, coord, type);
 	}
 
 	public LinkImpl createLink(final Id id, final Node from, final Node to,
