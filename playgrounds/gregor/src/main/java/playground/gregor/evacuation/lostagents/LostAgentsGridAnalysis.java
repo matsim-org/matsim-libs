@@ -19,7 +19,7 @@ import playground.gregor.gis.helper.GTH;
 
 public class LostAgentsGridAnalysis {
 
-	private static final double WIDTH = 150;
+	private static final double WIDTH = 300;
 	
 	public static void main(String [] args) {
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl("../../../../outputs/output/output_config.xml.gz");

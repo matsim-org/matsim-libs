@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.log4j.Logger;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -37,6 +38,8 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArrivalEventHandler{
+	
+	private static final Logger log = Logger.getLogger(LostAgentsAnalyser.class);
 	
 	private List<MultiPolygon> polygons;
 	private String out;
@@ -138,7 +141,13 @@ public class LostAgentsAnalyser implements AgentDepartureEventHandler, AgentArri
 		LinkImpl link = this.network.getLink(event.getLinkId());
 		PolygonFeature pf = this.quad.get(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 		if (!pf.p.contains(MGC.coord2Point(link.getToNode().getCoord()))) {
-			throw new RuntimeException("got wrong polygon! check the quad tree!");
+			log.warn("got wrong polygon! check the quad tree! Performing linear search! this will slow done the programm significant!");
+			for (PolygonFeature pf2 : this.quad.values()) {
+				if (pf2.p.contains(MGC.coord2Point(link.getToNode().getCoord()))) {
+					pf = pf2;
+					break;
+				}
+			}
 		}
 		pf.agDepart++;
 		pf.agLost++;
