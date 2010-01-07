@@ -44,9 +44,6 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.matsim.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.transitSchedule.api.TransitStopFacility;
 
-import playground.mrieser.pt.router.TransitRouter;
-import playground.mrieser.pt.router.TransitRouterConfig;
-
 
 public class TransitRouterTest extends TestCase {
 
@@ -398,20 +395,13 @@ public class TransitRouterTest extends TestCase {
 
 			// network
 			NetworkImpl network = this.scenario.getNetwork();
-			NodeImpl node1 = network.getFactory().createNode(this.scenario.createId("1"));
-			node1.setCoord(this.coord1);
-			NodeImpl node2 = network.getFactory().createNode(this.scenario.createId("2"));
-			node2.setCoord(this.coord2);
-			NodeImpl node3 = network.getFactory().createNode(this.scenario.createId("3"));
-			node3.setCoord(this.coord3);
-			NodeImpl node4 = network.getFactory().createNode(this.scenario.createId("4"));
-			node4.setCoord(this.coord4);
-			NodeImpl node5 = network.getFactory().createNode(this.scenario.createId("5"));
-			node5.setCoord(this.coord5);
-			NodeImpl node6 = network.getFactory().createNode(this.scenario.createId("6"));
-			node6.setCoord(this.coord6);
-			NodeImpl node7 = network.getFactory().createNode(this.scenario.createId("7"));
-			node7.setCoord(this.coord7);
+			NodeImpl node1 = network.getFactory().createNode(this.scenario.createId("1"), this.coord1);
+			NodeImpl node2 = network.getFactory().createNode(this.scenario.createId("2"), this.coord2);
+			NodeImpl node3 = network.getFactory().createNode(this.scenario.createId("3"), this.coord3);
+			NodeImpl node4 = network.getFactory().createNode(this.scenario.createId("4"), this.coord4);
+			NodeImpl node5 = network.getFactory().createNode(this.scenario.createId("5"), this.coord5);
+			NodeImpl node6 = network.getFactory().createNode(this.scenario.createId("6"), this.coord6);
+			NodeImpl node7 = network.getFactory().createNode(this.scenario.createId("7"), this.coord7);
 			network.getNodes().put(node1.getId(), node1);
 			network.getNodes().put(node2.getId(), node2);
 			network.getNodes().put(node3.getId(), node3);

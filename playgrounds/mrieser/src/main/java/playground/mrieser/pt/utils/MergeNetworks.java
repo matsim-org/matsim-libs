@@ -41,16 +41,15 @@ public class MergeNetworks {
 
 	public static void merge(final Network networkA, final String prefixA, final Network networkB, final String prefixB, final NetworkImpl mergedNetwork) {
 		double capacityFactor = mergedNetwork.getCapacityPeriod() / networkA.getCapacityPeriod();
-		NetworkFactory builder = mergedNetwork.getFactory();
+		NetworkFactory factory = mergedNetwork.getFactory();
 		for (Node node : networkA.getNodes().values()) {
-			NodeImpl node2 = (NodeImpl) builder.createNode(new IdImpl(prefixA + node.getId().toString()));
-			node2.setCoord(node.getCoord());
+			NodeImpl node2 = (NodeImpl) factory.createNode(new IdImpl(prefixA + node.getId().toString()), node.getCoord());
 			mergedNetwork.getNodes().put(node2.getId(), node2);
 		}
 		for (Link link : networkA.getLinks().values()) {
 			Id fromNodeId = new IdImpl(prefixA + link.getFromNode().getId().toString());
 			Id toNodeId = new IdImpl(prefixA + link.getToNode().getId().toString());
-			Link link2 = builder.createLink(new IdImpl(prefixA + link.getId().toString()),
+			Link link2 = factory.createLink(new IdImpl(prefixA + link.getId().toString()),
 					fromNodeId, toNodeId);
 			link2.setAllowedModes(link.getAllowedModes());
 			link2.setCapacity(link.getCapacity(Time.UNDEFINED_TIME) * capacityFactor);
@@ -63,14 +62,13 @@ public class MergeNetworks {
 		}
 		capacityFactor = mergedNetwork.getCapacityPeriod() / networkB.getCapacityPeriod();
 		for (Node node : networkB.getNodes().values()) {
-			NodeImpl node2 = (NodeImpl) builder.createNode(new IdImpl(prefixB + node.getId().toString()));
-			node2.setCoord(node.getCoord());
+			NodeImpl node2 = (NodeImpl) factory.createNode(new IdImpl(prefixB + node.getId().toString()), node.getCoord());
 			mergedNetwork.getNodes().put(node2.getId(), node2);
 		}
 		for (Link link : networkB.getLinks().values()) {
 			Id fromNodeId = new IdImpl(prefixB + link.getFromNode().getId().toString());
 			Id toNodeId = new IdImpl(prefixB + link.getToNode().getId().toString());
-			Link link2 = builder.createLink(new IdImpl(prefixB + link.getId().toString()),
+			Link link2 = factory.createLink(new IdImpl(prefixB + link.getId().toString()),
 					fromNodeId, toNodeId);
 			link2.setAllowedModes(link.getAllowedModes());
 			link2.setCapacity(link.getCapacity(Time.UNDEFINED_TIME) * capacityFactor);

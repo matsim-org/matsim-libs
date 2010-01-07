@@ -14,13 +14,13 @@ public class SubNode extends NodeImpl {
 	
 	public SubNode(Node node) 
 	{
-		super(node.getId(), node.getCoord(), null);
+		super(node.getId(), node.getCoord());
 		this.parentNode = node;
 	}
 
 	public SubNode(Node node, boolean equalsParent) 
 	{
-		super(node.getId(), node.getCoord(), null);
+		super(node.getId(), node.getCoord());
 		this.parentNode = node;
 		
 		if (equalsParent)

@@ -930,10 +930,8 @@ public class QueueSimulationTest extends TestCase {
 		
 		// build simple network with 1 link
 		NetworkImpl network = scenario.getNetwork();
-		NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"));
-		node1.setCoord(scenario.createCoord(0.0, 0.0));
-		NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"));
-		node2.setCoord(scenario.createCoord(1000.0, 0.0));
+		NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
+		NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
 		network.getNodes().put(node1.getId(), node1);
 		network.getNodes().put(node2.getId(), node2);
 		LinkImpl link = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());

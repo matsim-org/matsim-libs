@@ -53,6 +53,10 @@ public class NodeImpl implements Node {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
+	protected NodeImpl(final Id id, final Coord coord) {
+		this(id, coord, null);
+	}
+
 	protected NodeImpl(final Id id, final Coord coord, final String type) {
 		this(id);
 		this.coord = coord;

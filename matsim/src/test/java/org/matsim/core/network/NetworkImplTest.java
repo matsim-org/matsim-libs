@@ -45,10 +45,10 @@ public class NetworkImplTest extends TestCase {
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		Id id4 = new IdImpl(4);
-		NodeImpl node1 = new NodeImpl(id1, new CoordImpl(0, 0), null);
-		NodeImpl node2 = new NodeImpl(id2, new CoordImpl(1000, 0), null);
-		NodeImpl node3 = new NodeImpl(id3, new CoordImpl(2000, 500), null);
-		NodeImpl node4 = new NodeImpl(id4, new CoordImpl(2000, -500), null);
+		NodeImpl node1 = new NodeImpl(id1, new CoordImpl(0, 0));
+		NodeImpl node2 = new NodeImpl(id2, new CoordImpl(1000, 0));
+		NodeImpl node3 = new NodeImpl(id3, new CoordImpl(2000, 500));
+		NodeImpl node4 = new NodeImpl(id4, new CoordImpl(2000, -500));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);

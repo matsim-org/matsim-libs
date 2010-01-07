@@ -312,14 +312,14 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 
 		public MultiModeFixture() {
 			this.network.setCapacityPeriod(3600.0);
-			this.nodes[0] = network.createAndAddNode(new IdImpl(0), new CoordImpl(0, 0), null);
-			this.nodes[1] = network.createAndAddNode(new IdImpl(1), new CoordImpl(1000, 0), null);
-			this.nodes[2] = network.createAndAddNode(new IdImpl(2), new CoordImpl(2000, 0), null);
-			this.nodes[3] = network.createAndAddNode(new IdImpl(3), new CoordImpl(3000, 0), null);
-			this.nodes[4] = network.createAndAddNode(new IdImpl(4), new CoordImpl(0, 1000), null);
-			this.nodes[5] = network.createAndAddNode(new IdImpl(5), new CoordImpl(1000, 1000), null);
-			this.nodes[6] = network.createAndAddNode(new IdImpl(6), new CoordImpl(2000, 1000), null);
-			this.nodes[7] = network.createAndAddNode(new IdImpl(7), new CoordImpl(3000, 1000), null);
+			this.nodes[0] = network.createAndAddNode(new IdImpl(0), new CoordImpl(0, 0));
+			this.nodes[1] = network.createAndAddNode(new IdImpl(1), new CoordImpl(1000, 0));
+			this.nodes[2] = network.createAndAddNode(new IdImpl(2), new CoordImpl(2000, 0));
+			this.nodes[3] = network.createAndAddNode(new IdImpl(3), new CoordImpl(3000, 0));
+			this.nodes[4] = network.createAndAddNode(new IdImpl(4), new CoordImpl(0, 1000));
+			this.nodes[5] = network.createAndAddNode(new IdImpl(5), new CoordImpl(1000, 1000));
+			this.nodes[6] = network.createAndAddNode(new IdImpl(6), new CoordImpl(2000, 1000));
+			this.nodes[7] = network.createAndAddNode(new IdImpl(7), new CoordImpl(3000, 1000));
 			this.links[0] = network.createAndAddLink(new IdImpl(0), this.nodes[0], this.nodes[1], 1000.0, 100.0, 3600.0, 1.0);
 			this.links[1] = network.createAndAddLink(new IdImpl(1), this.nodes[1], this.nodes[2], 1000.0, 100.0, 3600.0, 1.0);
 			this.links[2] = network.createAndAddLink(new IdImpl(2), this.nodes[2], this.nodes[3], 1000.0, 100.0, 3600.0, 1.0);

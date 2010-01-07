@@ -65,11 +65,6 @@ import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.population.routes.NodeNetworkRouteImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.queuesim.TransitDriver;
-import org.matsim.pt.queuesim.TransitDriverAgent;
-import org.matsim.pt.queuesim.TransitQueueSimulation;
-import org.matsim.pt.queuesim.TransitQueueVehicle;
-import org.matsim.pt.queuesim.TransitStopAgentTracker;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.DriverAgent;
@@ -529,12 +524,9 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// build simple network with 2 links
 		NetworkImpl network = scenario.getNetwork();
-		NodeImpl node1 = (NodeImpl) network.getFactory().createNode(scenario.createId("1"));
-		node1.setCoord(scenario.createCoord(0.0, 0.0));
-		NodeImpl node2 = (NodeImpl) network.getFactory().createNode(scenario.createId("2"));
-		node2.setCoord(scenario.createCoord(1000.0, 0.0));
-		NodeImpl node3 = (NodeImpl) network.getFactory().createNode(scenario.createId("3"));
-		node3.setCoord(scenario.createCoord(2000.0, 0.0));
+		NodeImpl node1 = (NodeImpl) network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
+		NodeImpl node2 = (NodeImpl) network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
+		NodeImpl node3 = (NodeImpl) network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
 		network.getNodes().put(node1.getId(), node1);
 		network.getNodes().put(node2.getId(), node2);
 		network.getNodes().put(node3.getId(), node3);
@@ -621,12 +613,9 @@ public class TransitQueueSimulationTest extends TestCase {
 
 		// build simple network with 2 links
 		NetworkImpl network = scenario.getNetwork();
-		NodeImpl node1 = (NodeImpl) network.getFactory().createNode(scenario.createId("1"));
-		node1.setCoord(scenario.createCoord(0.0, 0.0));
-		NodeImpl node2 = (NodeImpl) network.getFactory().createNode(scenario.createId("2"));
-		node2.setCoord(scenario.createCoord(1000.0, 0.0));
-		NodeImpl node3 = (NodeImpl) network.getFactory().createNode(scenario.createId("3"));
-		node3.setCoord(scenario.createCoord(2000.0, 0.0));
+		NodeImpl node1 = (NodeImpl) network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
+		NodeImpl node2 = (NodeImpl) network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
+		NodeImpl node3 = (NodeImpl) network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
 		network.getNodes().put(node1.getId(), node1);
 		network.getNodes().put(node2.getId(), node2);
 		network.getNodes().put(node3.getId(), node3);

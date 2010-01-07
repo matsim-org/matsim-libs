@@ -52,21 +52,17 @@ public class NetworkLayer extends NetworkImpl implements Layer {
 	}
 
 	public final Node createAndAddNode(final Id id, final Coord coord) {
-		return createAndAddNode(id, coord, null);
-	}
-
-	public final Node createAndAddNode(final Id id, final Coord coord, final String nodeType) {
 		if (this.nodes.containsKey(id)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
-		NodeImpl n = this.factory.createNode(id, coord, nodeType);
-//		this.nodes.put(id, n);
-//		if (this.nodeQuadTree != null) {
-//			// we changed the nodes, invalidate the quadTree
-//			this.nodeQuadTree.clear();
-//			this.nodeQuadTree = null;
-//		}
-		this.addNode( n ) ;
+		NodeImpl n = this.factory.createNode(id, coord);
+		this.addNode(n) ;
+		return n;
+	}
+
+	public final Node createAndAddNode(final Id id, final Coord coord, final String nodeType) {
+		NodeImpl n = (NodeImpl) createAndAddNode(id, coord);
+		n.setType(nodeType);
 		return n;
 	}
 
