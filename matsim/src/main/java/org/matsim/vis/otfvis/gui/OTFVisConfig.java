@@ -138,7 +138,7 @@ public class OTFVisConfig extends Module {
 	private int bigTimeStep = 600;
 //	private final int timeStep = 1;
 	private String queryType = "agentPlan";
-	private boolean multipleSelect = true;
+	private boolean multipleSelect = false;
 	private boolean showParking = false;
 	private Color backgroundColor = new Color(255, 255, 255, 0);
 	private Color networkColor = new Color(128, 128, 128, 200);
