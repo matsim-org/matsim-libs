@@ -18,52 +18,60 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
 	<modules>
-    	<module>andreas</module>
-    	<module>anhorni</module>
-    	<module>balmermi</module>
-    	<module>benjamin</module>
-    	<module>cgray</module>
-    	<module>christoph</module>
-    	<module>ciarif</module>
-    	<module>cottbus</module>
-    	<module>david</module>
-    	<module>dgrether</module>
-    	<module>dressler</module>
-    	<module>dsantani</module>
-    	<module>duncan</module>
-    	<module>fabrice</module>
-    	<module>florian</module>
-    	<module>gregor</module>
-    	<module>jhackney</module>
-    	<module>jjoubert</module>
-    	<module>johannes</module>
-    	<module>kai</module>
-    	<module>meisterk</module>
-    	<module>mfeil</module>
-    	<module>mmoyo</module>
-    	<module>mrieser</module>
-    	<module>msieg</module>
-    	<module>mzilske</module>
-    	<module>pedro</module>
-    	<module>pieter</module>
-    	<module>rost</module>
-    	<module>run</module>
-    	<module>scnadine</module>
-    	<module>toronto</module>
-    	<module>wisinee</module>
-    	<module>wrashid</module>
-    	<module>yalcin</module>
-    	<module>yu</module>
+		<module>andreas</module>
+		<module>anhorni</module>
+		<module>balmermi</module>
+		<module>benjamin</module>
+		<module>cgray</module>
+		<module>christoph</module>
+		<module>ciarif</module>
+		<module>cottbus</module>
+		<module>david</module>
+		<module>dgrether</module>
+		<module>dressler</module>
+		<module>dsantani</module>
+		<module>duncan</module>
+		<module>fabrice</module>
+		<module>florian</module>
+		<module>gregor</module>
+		<module>jhackney</module>
+		<module>jjoubert</module>
+		<module>johannes</module>
+		<module>kai</module>
+		<module>meisterk</module>
+		<module>mfeil</module>
+		<module>mmoyo</module>
+		<module>mrieser</module>
+		<module>msieg</module>
+		<module>mzilske</module>
+		<module>pedro</module>
+		<module>pieter</module>
+		<module>rost</module>
+		<module>run</module>
+		<module>scnadine</module>
+		<module>toronto</module>
+		<module>wisinee</module>
+		<module>wrashid</module>
+		<module>yalcin</module>
+		<module>yu</module>
 	</modules>
 	<repositories>
 		<repository>
-      <id>matsim</id>
-      <url>http://matsim.org/m2repo</url>
-    </repository>
+			<id>matsim</id>
+			<url>http://matsim.org/m2repo</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -124,20 +132,20 @@
 						<version>2.0</version>
 					</plugin>
 					<plugin>
-	        	<groupId>org.codehaus.mojo</groupId>
-	        	<artifactId>findbugs-maven-plugin</artifactId>
-	        	<configuration>
-	          	<effort>Max</effort>
-	          	<threshold>Low</threshold>
-	        	</configuration>
-	      	</plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>findbugs-maven-plugin</artifactId>
+						<configuration>
+							<effort>Max</effort>
+							<threshold>Low</threshold>
+						</configuration>
+					</plugin>
 				</plugins>
 			</reporting>
 		</profile>
 	</profiles>
-	
+
 	<properties>
-  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 </project>
