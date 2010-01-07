@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -41,15 +40,11 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
-
 /**
  * @author dgrether
- *
  */
 public class DemandGenerationTest extends MatsimTestCase {
 
-	private static final Logger log = Logger.getLogger(DemandGenerationTest.class);
-	
 	private static final String populationFile = "population.xml";
 	private final double homeEndTime = 9*3600.0;
 	private final double workEndTime = 19*3600.0;
@@ -72,12 +67,11 @@ public class DemandGenerationTest extends MatsimTestCase {
 		super.tearDown();
 	}
 	
-	
 	public void testDemandGeneration(){
 		Config conf = sc.getConfig();
 		assertNotNull(conf);
 		
-		this.createFakeNetwork(sc, (Network)sc.getNetwork());
+		this.createFakeNetwork(sc, sc.getNetwork());
 		
 		Population pop = sc.getPopulation();
 		PopulationFactory builder = pop.getFactory();
@@ -99,6 +93,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 			//create the plan and add it to the person
 			plan = builder.createPlan();
 			assertNotNull(plan);
+			assertNull(plan.getPerson());
 			assertEquals(0, person.getPlans().size());
 			person.addPlan(plan);
 			assertEquals(person, plan.getPerson());
@@ -167,20 +162,13 @@ public class DemandGenerationTest extends MatsimTestCase {
 		Coord coord = scenario.createCoord(0,0 ) ;
 
 		Node n1 = network.getFactory().createNode(ids.get(0),coord);
-//		((NodeImpl)n1).setCoord(scenario.createCoord(0, 0));		
-//		((Map)network.getNodes()).put(n1.getId(), n1);
 		network.addNode( n1 ) ;
 
 		Node n2 = network.getFactory().createNode(ids.get(1),coord);
-//		((NodeImpl)n2).setCoord(scenario.createCoord(0, 0));
-//		((Map)network.getNodes()).put(n2.getId(), n2);
 		network.addNode( n2 ) ;
 
 		for (Id id : ids){
-//			Link l = ((NetworkLayer)network).getFactory().createLink(id, n1.getId(), n2.getId());
 			Link l = network.getFactory().createLink(id, n1.getId(), n2.getId() ) ;
-			
-//			((Map)network.getLinks()).put(l.getId(), l);
 			network.addLink( l ) ;
 		}
 	}
@@ -208,14 +196,11 @@ public class DemandGenerationTest extends MatsimTestCase {
 			assertEquals(Time.UNDEFINED_TIME, ((Activity)p.getPlanElements().get(4)).getEndTime(), EPSILON);
 			assertEquals(ids.get(0), ((Activity)p.getPlanElements().get(4)).getLinkId());
 			
-			
 			assertEquals(TransportMode.car, ((Leg)p.getPlanElements().get(1)).getMode());
 			assertNull(((Leg)p.getPlanElements().get(1)).getRoute());
 			assertEquals(TransportMode.car, ((Leg)p.getPlanElements().get(3)).getMode());
 			assertNull(((Leg)p.getPlanElements().get(3)).getRoute());
 		}
-		
-		
 	}
 
 }
