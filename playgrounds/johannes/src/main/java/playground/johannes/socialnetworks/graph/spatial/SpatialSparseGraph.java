@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.graph.SparseGraph;
 import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -35,6 +36,12 @@ import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
  */
 public class SpatialSparseGraph extends SparseGraph implements SpatialGraph {
 
+	private final CoordinateReferenceSystem crs;
+	
+	public SpatialSparseGraph(CoordinateReferenceSystem crs) {
+		this.crs = crs;
+	}
+	
 	/**
 	 * @see {@link SparseGraph#getEdges()}
 	 */
@@ -87,5 +94,10 @@ public class SpatialSparseGraph extends SparseGraph implements SpatialGraph {
 		bounds[3] = ymax;
 		
 		return bounds;
+	}
+
+	@Override
+	public CoordinateReferenceSystem getCoordinateReferenceSysten() {
+		return crs;
 	}
 }

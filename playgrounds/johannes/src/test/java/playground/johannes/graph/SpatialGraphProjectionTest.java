@@ -34,11 +34,11 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraphBuilder;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.SpatialVertexDecorator;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * @author illenberger
@@ -50,7 +50,7 @@ public class SpatialGraphProjectionTest extends TestCase {
 		/*
 		 * Create a geometry (rectangle).
 		 */
-		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 21781); // use CH1903LV03 for now
+		GeometryFactory geometryFactory = new GeometryFactory();
 		
 		Coordinate[] coordinates = new Coordinate[5];
 		coordinates[0] = new Coordinate(0, 0);
@@ -63,7 +63,7 @@ public class SpatialGraphProjectionTest extends TestCase {
 		/*
 		 * Create a spatial graph with vertices inside and outside the geometry.
 		 */
-		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder();
+		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(CRSUtils.getCRS(21781)); //TODO use CH1903LV03 for now.
 		SpatialSparseGraph graph = builder.createGraph();
 		
 		SpatialSparseVertex v1 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(0, 0)));

@@ -27,6 +27,7 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexColorStyle;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 public class KMLTravelTimeStyle extends KMLVertexColorStyle<Graph, Vertex> {
 	
@@ -127,7 +128,7 @@ public class KMLTravelTimeStyle extends KMLVertexColorStyle<Graph, Vertex> {
 	}
 	
 	public static void main(String args[]) throws IOException {
-		SpatialGraph graph = new Population2SpatialGraph(21781).read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
+		SpatialGraph graph = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
 		
 		KMLWriter writer = new KMLWriter();
 		writer.setCoordinateTransformation(new CH1903LV03toWGS84());

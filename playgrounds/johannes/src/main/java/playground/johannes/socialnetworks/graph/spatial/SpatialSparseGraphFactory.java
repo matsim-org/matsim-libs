@@ -19,7 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.GraphFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -30,12 +34,25 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class SpatialSparseGraphFactory implements GraphFactory<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> {
 
+	private static final Logger logger = Logger.getLogger(SpatialSparseGraphFactory.class);
+	
+	private final CoordinateReferenceSystem crs;
+	
+	private final int SRID;
+	
+	public SpatialSparseGraphFactory(CoordinateReferenceSystem crs) {
+		this.crs = crs;
+		SRID = CRSUtils.getSRID(crs);
+		if(SRID == 0)
+			logger.warn("Coordinate reference system has no SRID. Setting SRID to 0.");
+	}
+	
 	public SpatialSparseEdge createEdge() {
 		return new SpatialSparseEdge();
 	}
 
 	public SpatialSparseGraph createGraph() {
-		return new SpatialSparseGraph();
+		return new SpatialSparseGraph(crs);
 	}
 
 	public SpatialSparseVertex createVertex() {
@@ -43,6 +60,7 @@ public class SpatialSparseGraphFactory implements GraphFactory<SpatialSparseGrap
 	}
 	
 	public SpatialSparseVertex createVertex(Point point) {
+		point.setSRID(SRID);
 		return new SpatialSparseVertex(point);
 	}
 

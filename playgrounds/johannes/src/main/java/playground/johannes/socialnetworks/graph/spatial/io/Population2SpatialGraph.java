@@ -27,6 +27,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -64,10 +65,13 @@ public class Population2SpatialGraph {
 	
 	private int numVertex;
 	
-	private final GeometryFactory geometryFactory;
+	private final GeometryFactory geometryFactory = new GeometryFactory();
 	
-	public Population2SpatialGraph(int SRID) {
-		geometryFactory = new GeometryFactory(new PrecisionModel(), SRID);
+	private final CoordinateReferenceSystem crs; 
+	
+	public Population2SpatialGraph(CoordinateReferenceSystem crs) {
+		this.crs = crs;
+//		geometryFactory = new GeometryFactory(new PrecisionModel(), SRID);
 	}
 	
 	public SpatialSparseGraph read(String filename) {
@@ -87,8 +91,8 @@ public class Population2SpatialGraph {
 			reader.setContentHandler(handler);
 			
 			
-			builder = new SpatialSparseGraphBuilder();
-			graph = new SpatialSparseGraph();
+			builder = new SpatialSparseGraphBuilder(crs);
+			graph = builder.createGraph();
 			
 			reader.parse(new InputSource(IOUtils.getBufferedReader(filename)));
 			printProgress();

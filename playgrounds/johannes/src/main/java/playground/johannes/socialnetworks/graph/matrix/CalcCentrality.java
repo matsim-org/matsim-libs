@@ -37,7 +37,7 @@ public class CalcCentrality {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SpatialGraphMLReader reader = new SpatialGraphMLReader(21781);
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 		SpatialSparseGraph graph = reader.readGraph("/Volumes/hertz:ils-raid/socialnets/mcmc/runs/run45/output/2000000000/graph.graphml"); 
 		logger.info("Converting matrix...");
 		AdjacencyMatrixDecorator<SparseVertex> y = new AdjacencyMatrixDecorator<SparseVertex>(graph);

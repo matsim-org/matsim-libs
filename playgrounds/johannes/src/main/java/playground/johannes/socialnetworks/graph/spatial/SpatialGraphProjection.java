@@ -26,6 +26,7 @@ import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author illenberger
@@ -56,5 +57,10 @@ public class SpatialGraphProjection<G extends SpatialGraph, V extends SpatialVer
 	@Override
 	public SpatialVertexDecorator<V> getVertex(V v) {
 		return (SpatialVertexDecorator<V>) super.getVertex(v);
+	}
+
+	@Override
+	public CoordinateReferenceSystem getCoordinateReferenceSysten() {
+		return getDelegate().getCoordinateReferenceSysten();
 	}
 }

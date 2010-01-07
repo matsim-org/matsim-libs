@@ -38,10 +38,9 @@ import playground.johannes.socialnetworks.graph.mcmc.ErgmDensity;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTriangles;
 import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeSwitch;
-import playground.johannes.socialnetworks.graph.mcmc.GibbsEdgeFlip;
 import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
-import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
+import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 
 /**
@@ -64,7 +63,7 @@ public class GravityAnnealer {
 		MatsimConfigReader creader = new MatsimConfigReader(config);
 		creader.parse(args[0]);
 		
-		SpatialGraphMLReader reader = new SpatialGraphMLReader(21781);
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 		SpatialSparseGraph graph = reader.readGraph(config.findParam(MODULE_NAME, "graphfile"));
 		
 		GravityAnnealer generator = new GravityAnnealer();

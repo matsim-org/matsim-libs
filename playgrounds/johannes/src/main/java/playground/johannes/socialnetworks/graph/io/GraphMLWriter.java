@@ -96,6 +96,15 @@ public class GraphMLWriter extends MatsimXmlWriter {
 	}
 	
 	/**
+	 * Returns the currently written graph.
+	 * 
+	 * @return the currently written graph.
+	 */
+	protected Graph getGraph() {
+		return graph;
+	}
+	
+	/**
 	 * Returns a list of graph attributes stored in String-String-tuples. The
 	 * returned list has one entry:
 	 * <ul>

@@ -22,6 +22,7 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 import java.util.Set;
 
 import org.matsim.contrib.sna.graph.SparseVertex;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.snowball2.SampledGraph;
@@ -31,6 +32,10 @@ import playground.johannes.socialnetworks.snowball2.SampledGraph;
  *
  */
 public class SampledSpatialSparseGraph extends SpatialSparseGraph implements SampledGraph {
+
+	public SampledSpatialSparseGraph(CoordinateReferenceSystem crs) {
+		super(crs);
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")

@@ -56,6 +56,7 @@ import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGra
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.Zone;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
@@ -153,10 +154,10 @@ public class SpatialRandomGraphGenerator<G extends SpatialSparseGraph, V extends
 		String graphFile = config.findParam(MODULE_NAME, "graphfile");
 		
 		if(graphFile == null) {
-			Population2SpatialGraph reader = new Population2SpatialGraph(21781);
+			Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 			graph = reader.read(config.findParam("plans", "inputPlansFile"));
 		} else {
-			SpatialGraphMLReader reader = new SpatialGraphMLReader(21781);
+			SpatialGraphMLReader reader = new SpatialGraphMLReader();
 			graph = reader.readGraph(graphFile);
 		}
 
@@ -183,7 +184,7 @@ public class SpatialRandomGraphGenerator<G extends SpatialSparseGraph, V extends
 	
 		new File(outputDir).mkdirs();
 		
-		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder();
+		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(CRSUtils.getCRS(21781));
 		SpatialRandomGraphGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new SpatialRandomGraphGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(builder);
 		
 		graph = generator.generate(graph, -1.6, k_mean, randomSeed);

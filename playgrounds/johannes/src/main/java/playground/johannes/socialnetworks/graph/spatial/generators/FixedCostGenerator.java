@@ -36,6 +36,7 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 /**
  * @author illenberger
@@ -52,7 +53,7 @@ public class FixedCostGenerator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Population2SpatialGraph reader = new Population2SpatialGraph(21781);
+		Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 		SpatialSparseGraph graph = reader.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.003.xml");
 		SpatialAdjacencyMatrix y = new SpatialAdjacencyMatrix(graph);
 		

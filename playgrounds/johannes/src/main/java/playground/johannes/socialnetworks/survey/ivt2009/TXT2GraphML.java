@@ -34,16 +34,17 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.PrecisionModel;
-
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraphBuilder;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
 import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLWriter;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * @author illenberger
@@ -60,7 +61,7 @@ public class TXT2GraphML {
 	private static final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 21781);
 	
 	public static void main(String[] args) throws IOException {
-		SampledSpatialGraphBuilder builder = new SampledSpatialGraphBuilder();
+		SampledSpatialGraphBuilder builder = new SampledSpatialGraphBuilder(CRSUtils.getCRS(21781));
 		SampledSpatialSparseGraph graph = builder.createGraph();
 		/*
 		 * read ego table

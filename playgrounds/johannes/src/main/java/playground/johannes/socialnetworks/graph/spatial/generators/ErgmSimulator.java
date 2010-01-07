@@ -41,6 +41,7 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraphBuilder;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 import playground.johannes.socialnetworks.spatial.Zone;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
@@ -65,7 +66,7 @@ public class ErgmSimulator {
 		MatsimConfigReader creader = new MatsimConfigReader(config);
 		creader.parse(args[0]);
 		
-		Population2SpatialGraph reader = new Population2SpatialGraph(21781);
+		Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 		SpatialSparseGraph graph = reader.read(config.findParam("plans", "inputPlansFile"));
 		
 		String zonesFile = config.findParam(MODULE_NAME, "zonesFile");
@@ -96,7 +97,7 @@ public class ErgmSimulator {
 		double descretization = Double.parseDouble(config.getParam(MODULE_NAME, "descretization"));
 		
 		logger.info("Creating random graph...");
-		ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(new SpatialSparseGraphBuilder());
+		ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(new SpatialSparseGraphBuilder(graph.getCoordinateReferenceSysten()));
 		int k = (int)k_mean;
 		double p = k / (double)graph.getVertices().size();
 		generator.generate(graph, p, randomSeed);

@@ -20,6 +20,7 @@
 package playground.johannes.socialnetworks.graph.spatial;
 
 import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -29,9 +30,9 @@ import com.vividsolutions.jts.geom.Point;
  *
  */
 public class SpatialSparseGraphBuilder extends AbstractSparseGraphBuilder<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> {
-
-	public SpatialSparseGraphBuilder() {
-		super(new SpatialSparseGraphFactory());
+	
+	public SpatialSparseGraphBuilder(CoordinateReferenceSystem crs) {
+		super(new SpatialSparseGraphFactory(crs));
 	}
 	
 	public SpatialSparseVertex addVertex(SpatialSparseGraph graph, Point point) {

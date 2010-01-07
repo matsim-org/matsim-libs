@@ -52,6 +52,7 @@ import playground.johannes.socialnetworks.graph.spatial.io.PajekDistanceColorize
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.Zone;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
@@ -78,7 +79,7 @@ public class KineticFixCostGenerator<G extends SpatialSparseGraph, V extends Spa
 		creader.parse(args[0]);
 		
 		SpatialSparseGraph graph = null;
-		Population2SpatialGraph reader = new Population2SpatialGraph(21781);
+		Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 		graph = reader.read(config.findParam("plans", "inputPlansFile"));
 		
 		long randomSeed = Long.parseLong(config.getParam("global", "randomSeed"));
@@ -151,7 +152,7 @@ public class KineticFixCostGenerator<G extends SpatialSparseGraph, V extends Spa
 	}
 
 	public G generate(G graph, double gamma, double k_mean, long randomSeed, double totalCost) {
-		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder();
+		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(CRSUtils.getCRS(21781)); //FIXME
 		double z = getNormConstant(graph, gamma, k_mean);
 		
 		List<V> pending = new ArrayList<V>();

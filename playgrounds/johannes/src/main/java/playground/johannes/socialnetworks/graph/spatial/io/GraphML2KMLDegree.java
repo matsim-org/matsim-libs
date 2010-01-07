@@ -49,11 +49,11 @@ public class GraphML2KMLDegree {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		SpatialGraphMLReader reader = new SpatialGraphMLReader(21781);
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 		SpatialSparseGraph socialnet = reader.readGraph(args[0]);
 		
 		ZoneLayer layer = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/gemeindegrenzen2008.zip Folder/g1g08_shp_080606.zip Folder/G1L08.shp");
-		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder();
+		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(socialnet.getCoordinateReferenceSysten());
 		List<SpatialVertex> remove = new ArrayList<SpatialVertex>();
 		for(SpatialVertex v : socialnet.getVertices()) {
 			if(layer.getZone(v.getCoordinate()) == null) {

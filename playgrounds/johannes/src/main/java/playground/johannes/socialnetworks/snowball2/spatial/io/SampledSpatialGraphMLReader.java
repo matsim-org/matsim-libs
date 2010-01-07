@@ -20,17 +20,14 @@
 package playground.johannes.socialnetworks.snowball2.spatial.io;
 
 import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.Attributes;
 
-import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
+import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphML;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraphBuilder;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseEdge;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * @author illenberger
@@ -38,12 +35,13 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  */
 public class SampledSpatialGraphMLReader extends AbstractGraphMLReader<SampledSpatialSparseGraph, SampledSpatialSparseVertex, SampledSpatialSparseEdge> {
 
-	private SampledSpatialGraphBuilder builder = new SampledSpatialGraphBuilder();
+	private SampledSpatialGraphBuilder builder;
 	
-	private final GeometryFactory geometryFactory;
+//	private final GeometryFactory geometryFactory;
 	
 	public SampledSpatialGraphMLReader(int SRID) {
-		geometryFactory = new GeometryFactory(new PrecisionModel(), SRID);
+//		geometryFactory = new GeometryFactory();
+//		builder = new SampledSpatialGraphBuilder(CRSUtils.getCRS(SRID));
 	}
 	
 	@Override
@@ -59,9 +57,9 @@ public class SampledSpatialGraphMLReader extends AbstractGraphMLReader<SampledSp
 
 	@Override
 	protected SampledSpatialSparseVertex addVertex(Attributes attrs) {
-		double x = Double.parseDouble(attrs.getValue(SpatialGraphMLReader.COORD_X_TAG));
-		double y = Double.parseDouble(attrs.getValue(SpatialGraphMLReader.COORD_Y_TAG));
-		SampledSpatialSparseVertex v = builder.addVertex((SampledSpatialSparseGraph)getGraph(), geometryFactory.createPoint(new Coordinate(x, y)));
+//		double x = Double.parseDouble(attrs.getValue(SpatialGraphMLHelper.COORD_X_TAG));
+//		double y = Double.parseDouble(attrs.getValue(SpatialGraphMLHelper.COORD_Y_TAG));
+		SampledSpatialSparseVertex v = builder.addVertex((SampledSpatialSparseGraph)getGraph(), SpatialGraphML.newPoint(attrs));
 		
 		String str = attrs.getValue(SampledSpatialGraphMLWriter.DETECTED_TAG);
 		if(str != null)
@@ -76,6 +74,8 @@ public class SampledSpatialGraphMLReader extends AbstractGraphMLReader<SampledSp
 
 	@Override
 	protected SampledSpatialSparseGraph newGraph(Attributes attrs) {
+		CoordinateReferenceSystem crs = SpatialGraphML.newCRS(attrs); 
+		builder = new SampledSpatialGraphBuilder(crs);
 		return builder.createGraph();
 	}
 

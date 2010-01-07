@@ -20,6 +20,7 @@
 package playground.johannes.socialnetworks.snowball2.spatial;
 
 import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -31,8 +32,8 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class SampledSpatialGraphBuilder extends AbstractSparseGraphBuilder<SampledSpatialSparseGraph, SampledSpatialSparseVertex, SampledSpatialSparseEdge> {
 	
-	public SampledSpatialGraphBuilder() {
-		super(new SampledSpatialGraphFactory());
+	public SampledSpatialGraphBuilder(CoordinateReferenceSystem crs) {
+		super(new SampledSpatialGraphFactory(crs));
 	}
 
 	@Override

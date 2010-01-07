@@ -28,6 +28,7 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraphBuilde
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLWriter;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 /**
  * @author illenberger
@@ -40,10 +41,10 @@ public class RandomGraphGenerator {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		Population2SpatialGraph reader = new Population2SpatialGraph(21781);
+		Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 		SpatialSparseGraph graph = reader.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.01.xml");
 		
-		ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(new SpatialSparseGraphBuilder());
+		ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(new SpatialSparseGraphBuilder(graph.getCoordinateReferenceSysten()));
 		graph = generator.generate(graph, 0.0001, 4711);
 		
 //		SpatialGraphAnalyzer.analyze(graph, "/Users/fearonni/vsp-work/work/socialnets/mcmc/", false, SpatialGrid.readFromFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/popdensity/popdensity.1000.xml"));

@@ -28,11 +28,13 @@ import java.util.List;
 
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.socialnetworks.graph.io.GraphMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 /**
  * @author illenberger
@@ -49,11 +51,25 @@ public class SpatialGraphMLWriter extends GraphMLWriter {
 	}
 
 	@Override
+	protected SpatialGraph getGraph() {
+		return (SpatialGraph) super.getGraph();
+	}
+
+	@Override
+	protected List<Tuple<String, String>> getGraphAttributes() {
+		List<Tuple<String, String>> attrs = super.getGraphAttributes();
+		int srid = CRSUtils.getSRID(getGraph().getCoordinateReferenceSysten());
+		attrs.add(new Tuple<String, String>(SpatialGraphML.SRID_ATTR, String.valueOf(srid)));
+		
+		return attrs;
+	}
+
+	@Override
 	protected List<Tuple<String, String>> getVertexAttributes(Vertex v) {
 		List<Tuple<String, String>> attrs = super.getVertexAttributes(v);
 		
-		attrs.add(new Tuple<String, String>(SpatialGraphMLReader.COORD_X_TAG, String.valueOf(((SpatialSparseVertex)v).getCoordinate().getX())));
-		attrs.add(new Tuple<String, String>(SpatialGraphMLReader.COORD_Y_TAG, String.valueOf(((SpatialSparseVertex)v).getCoordinate().getY())));
+		attrs.add(new Tuple<String, String>(SpatialGraphML.COORD_X_TAG, String.valueOf(((SpatialSparseVertex)v).getCoordinate().getX())));
+		attrs.add(new Tuple<String, String>(SpatialGraphML.COORD_Y_TAG, String.valueOf(((SpatialSparseVertex)v).getCoordinate().getY())));
 		
 		return attrs;
 	}

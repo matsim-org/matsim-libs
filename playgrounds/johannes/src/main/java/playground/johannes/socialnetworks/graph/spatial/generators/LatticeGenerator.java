@@ -27,6 +27,7 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraphBuilder;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -39,13 +40,13 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 public class LatticeGenerator {
 
 	public SpatialSparseGraph generate(int width, int height, int gap) {
-		SpatialSparseGraphBuilder factory = new SpatialSparseGraphBuilder();
-		SpatialSparseGraph graph = new SpatialSparseGraph();
+		SpatialSparseGraphBuilder factory = new SpatialSparseGraphBuilder(CRSUtils.getCRS(21781)); // use CH1903LV03 for now
+		SpatialSparseGraph graph = factory.createGraph();
 		
 //		double x_center = width/2.0;
 //		double y_center = height/2.0;
 		
-		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 21781); // use CH1903LV03 for now
+		GeometryFactory geometryFactory = new GeometryFactory();
 		
 		int step = gap + 1;
 		for(int i = 1; i <= width; i += step) {

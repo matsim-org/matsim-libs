@@ -41,6 +41,7 @@ import playground.johannes.socialnetworks.graph.GraphAnalyser;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
 import playground.johannes.socialnetworks.graph.Partitions;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.Zone;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
@@ -87,7 +88,7 @@ public class SpatialGraphAnalyzer {
 		}
 		
 		logger.info(String.format("Loading graph %1$s...", graphfile));
-		SpatialGraphMLReader reader = new SpatialGraphMLReader(21781);
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 		SpatialSparseGraph g = reader.readGraph(graphfile);
 		
 		if(!output.endsWith("/"))

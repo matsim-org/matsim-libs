@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.graph.SparseVertex;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 /**
  * @author illenberger
@@ -40,8 +41,11 @@ public class SocialNetwork<P extends Person> extends SpatialSparseGraph {
 	
 	private Map<P, Ego<P>> personEgoMapping = new HashMap<P, Ego<P>>();
 	
+	/**
+	 * @deprecated
+	 */
 	public SocialNetwork() {
-		super();
+		super(CRSUtils.getCRS(21781)); //FIXME
 	}
 	
 //	@Deprecated

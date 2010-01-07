@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.spatial;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.GraphFactory;
+import org.opengis.metadata.Identifier;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -30,12 +33,34 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class SampledSpatialGraphFactory implements GraphFactory<SampledSpatialSparseGraph, SampledSpatialSparseVertex, SampledSpatialSparseEdge>{
 
+	private static final Logger logger = Logger.getLogger(SampledSpatialGraphFactory.class);
+	
+	private final CoordinateReferenceSystem crs;
+	
+	private final int SRID;
+	
+	public SampledSpatialGraphFactory(CoordinateReferenceSystem crs) {
+		this.crs = crs;
+		/*
+		 * Randomly get one identifier.
+		 */
+		int code;
+		Identifier identifier = (Identifier)(crs.getIdentifiers().iterator().next()); 
+		if(identifier == null) {
+			logger.warn("Coordinate reference system has no identifier. Setting SRID to 0.");
+			code = 0;
+		} else {
+			code = Integer.parseInt(identifier.getCode());
+		}
+		SRID = code;
+	}
+	
 	public SampledSpatialSparseEdge createEdge() {
 		return new SampledSpatialSparseEdge();
 	}
 
 	public SampledSpatialSparseGraph createGraph() {
-		return new SampledSpatialSparseGraph();
+		return new SampledSpatialSparseGraph(crs);
 	}
 
 	public SampledSpatialSparseVertex createVertex() {
@@ -43,6 +68,7 @@ public class SampledSpatialGraphFactory implements GraphFactory<SampledSpatialSp
 	}
 	
 	public SampledSpatialSparseVertex createVertex(Point point) {
+		point.setSRID(SRID);
 		return new SampledSpatialSparseVertex(point);
 	}
 

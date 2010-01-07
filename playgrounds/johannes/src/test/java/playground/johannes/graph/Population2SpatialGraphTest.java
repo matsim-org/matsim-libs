@@ -23,6 +23,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 /**
  * @author illenberger
@@ -35,7 +36,7 @@ public class Population2SpatialGraphTest extends MatsimTestCase {
 	private static final int numVertex = 2827;
 	
 	public void testRead() {
-		Population2SpatialGraph reader = new Population2SpatialGraph(21781);
+		Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 		SpatialSparseGraph graph = reader.read(getPackageInputDirectory() + PLANS_FILE);
 		
 		assertEquals(numVertex, graph.getVertices().size());

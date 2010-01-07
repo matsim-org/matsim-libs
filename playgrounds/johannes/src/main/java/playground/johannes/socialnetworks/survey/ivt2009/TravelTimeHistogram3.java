@@ -30,6 +30,7 @@ import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
 import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
@@ -108,7 +109,7 @@ public class TravelTimeHistogram3 {
 		 * make normalization 
 		 */
 		int count = 0;
-		SpatialGraph g2 = new Population2SpatialGraph(21781).read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.02.xml");
+		SpatialGraph g2 = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.02.xml");
 		logger.info("Caching nearest nodes...");
 		for(Object v : g2.getVertices()) {
 			Node n = getNearestNode(((SpatialVertex) v).getCoordinate(), nodes);

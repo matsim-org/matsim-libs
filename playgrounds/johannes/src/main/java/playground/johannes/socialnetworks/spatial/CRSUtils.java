@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.referencing.CRS;
+import org.opengis.metadata.Identifier;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -35,17 +36,29 @@ public class CRSUtils {
 
 	private static final Map<Integer, CoordinateReferenceSystem> crsMappings = new HashMap<Integer, CoordinateReferenceSystem>();
 	
-	public static CoordinateReferenceSystem getCRS(int code) {
-		CoordinateReferenceSystem crs = crsMappings.get(code);
+	public static CoordinateReferenceSystem getCRS(int srid) {
+		CoordinateReferenceSystem crs = crsMappings.get(srid);
 		if(crs == null) {
 			CRSAuthorityFactory factory = CRS.getAuthorityFactory(false); //TODO: check this!
 			try {
-				crs = factory.createCoordinateReferenceSystem("EPSG:" + code);
+				crs = factory.createCoordinateReferenceSystem("EPSG:" + srid);
 			} catch (FactoryException e) {
 				e.printStackTrace();
 			}
 		}
 		
 		return crs;
+	}
+	
+	public static int getSRID(CoordinateReferenceSystem crs) {
+		/*
+		 * Randomly get one identifier.
+		 */
+		Identifier identifier = (Identifier)(crs.getIdentifiers().iterator().next()); 
+		if(identifier == null) {
+			return 0;
+		} else {
+			return Integer.parseInt(identifier.getCode());
+		}
 	}
 }

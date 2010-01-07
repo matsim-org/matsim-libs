@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial;
 
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntObjectHashMap;
 import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
@@ -29,13 +31,16 @@ import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
  */
 public class SpatialAdjacencyMatrix extends AdjacencyMatrixDecorator<SpatialSparseVertex> {
 	
+	private final CoordinateReferenceSystem crs;
+	
 	public SpatialAdjacencyMatrix(SpatialSparseGraph g) {
 		super(g);
+		crs = g.getCoordinateReferenceSysten();
 	}
 
 	public SpatialSparseGraph getGraph() {
-		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder();
-		SpatialSparseGraph g = new SpatialSparseGraph();
+		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder(crs);
+		SpatialSparseGraph g = builder.createGraph();
 
 		TIntObjectHashMap<SpatialSparseVertex> vertexIdx = new TIntObjectHashMap<SpatialSparseVertex>();
 		for (int i = 0; i < getVertexCount(); i++) {

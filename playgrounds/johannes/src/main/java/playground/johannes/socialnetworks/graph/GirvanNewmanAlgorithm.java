@@ -50,6 +50,7 @@ import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 
 /**
  * @author illenberger
@@ -178,7 +179,7 @@ public class GirvanNewmanAlgorithm {
 	}
 	
 	public static void main(String args[]) throws IOException {
-		SpatialGraphMLReader reader = new SpatialGraphMLReader(21781);
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
 		Graph graph = reader.readGraph(args[0]);
 //		ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge>(new SparseGraphFactory());
 //		System.out.println("Generating graph...");

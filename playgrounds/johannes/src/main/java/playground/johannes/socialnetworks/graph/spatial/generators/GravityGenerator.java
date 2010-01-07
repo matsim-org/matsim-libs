@@ -46,6 +46,7 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.Zone;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
@@ -70,10 +71,10 @@ public class GravityGenerator {
 		String graphFile = config.findParam(MODULE_NAME, "graphfile");
 		
 		if(graphFile == null) {
-			Population2SpatialGraph reader = new Population2SpatialGraph(21781);
+			Population2SpatialGraph reader = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 			graph = reader.read(config.findParam("plans", "inputPlansFile"));
 		} else {
-			SpatialGraphMLReader reader = new SpatialGraphMLReader(21781);
+			SpatialGraphMLReader reader = new SpatialGraphMLReader();
 			graph = reader.readGraph(graphFile);
 		}
 

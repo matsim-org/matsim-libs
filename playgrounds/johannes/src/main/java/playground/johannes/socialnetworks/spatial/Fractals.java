@@ -74,7 +74,7 @@ public class Fractals {
 	}
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		SpatialSparseGraph graph = new Population2SpatialGraph(21781).read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/random/randompop.xml");
+		SpatialSparseGraph graph = new Population2SpatialGraph(CRSUtils.getCRS(21781)).read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/random/randompop.xml");
 		TDoubleDoubleHashMap d_c = new Fractals().correlationDimension(graph.getVertices(), 500.0);
 		Distribution.writeHistogram(d_c, "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/d_c.txt");
 	}

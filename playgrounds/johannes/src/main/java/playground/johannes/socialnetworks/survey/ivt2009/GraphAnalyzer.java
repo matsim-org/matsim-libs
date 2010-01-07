@@ -41,6 +41,7 @@ import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
 import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 import playground.johannes.socialnetworks.spatial.Reachability;
 import playground.johannes.socialnetworks.spatial.TravelTimeMatrix;
 import playground.johannes.socialnetworks.spatial.Zone;
@@ -78,7 +79,7 @@ public class GraphAnalyzer {
 //		SpatialGrid<Double> grid = SpatialGrid.readFromFile(args[2]);
 		analyze(graph, density, matrix, args[1]);
 		
-		Population2SpatialGraph pop2graph = new Population2SpatialGraph(21781);
+		Population2SpatialGraph pop2graph = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 		SpatialSparseGraph g2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.003.xml");
 //		analyze(graph, g2, args[1], zonesCH.getZones().iterator().next().getBorder());
 		analyze(graph, g2, args[1], zones);

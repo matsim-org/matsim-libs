@@ -32,6 +32,7 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 import playground.johannes.socialnetworks.statistics.Distribution;
 
 /**
@@ -49,7 +50,7 @@ public class PopNorm {
 		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader(21781);
 		SampledSpatialSparseGraph graph = reader.readGraph("/Users/fearonni/vsp-work/work/socialnets/mcmc/graph.graphml");
 		
-		Population2SpatialGraph pop2graph = new Population2SpatialGraph(21781);
+		Population2SpatialGraph pop2graph = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 		SpatialSparseGraph g2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/plans/plans.1.xml");
 //		SpatialGraph g2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/plans/plans.10.xml");
 		

@@ -51,6 +51,7 @@ import playground.johannes.socialnetworks.snowball2.SnowballPartitions;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
 import playground.johannes.socialnetworks.snowball2.spatial.io.SampledSpatialGraphMLReader;
+import playground.johannes.socialnetworks.spatial.CRSUtils;
 import playground.johannes.socialnetworks.spatial.Zone;
 import playground.johannes.socialnetworks.spatial.ZoneLayer;
 import playground.johannes.socialnetworks.spatial.ZoneLayerDouble;
@@ -97,7 +98,7 @@ public class TravelTimeHistogram2 {
 		SampledSpatialSparseGraph graph = reader.readGraph(config.getParam("tthistogram", "graph"));
 		
 		
-		Population2SpatialGraph pop2graph = new Population2SpatialGraph(21781);
+		Population2SpatialGraph pop2graph = new Population2SpatialGraph(CRSUtils.getCRS(21781));
 		SpatialSparseGraph graph2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.04.xml");
 		double bounds[] = graph2.getBounds();
 		/*

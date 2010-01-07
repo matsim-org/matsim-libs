@@ -43,7 +43,7 @@ public class TotalCostDistribution {
 	private static final double beta = 1;
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		SpatialSparseGraph graph = new SpatialGraphMLReader(21781).readGraph("/Volumes/hertz:ils-raid/socialnets/mcmc/runs/run137/output/2000000000/graph.graphml");
+		SpatialSparseGraph graph = new SpatialGraphMLReader().readGraph("/Volumes/hertz:ils-raid/socialnets/mcmc/runs/run137/output/2000000000/graph.graphml");
 		
 		TIntDoubleHashMap accValues = new TIntDoubleHashMap();
 		TIntIntHashMap counts = new TIntIntHashMap();
