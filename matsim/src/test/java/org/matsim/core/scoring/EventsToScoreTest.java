@@ -47,7 +47,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(e2s);
 
-		events.processEvent(new AgentMoneyEventImpl(3600.0, person, 3.4));
+		events.processEvent(new AgentMoneyEventImpl(3600.0, person.getId(), 3.4));
 
 		assertEquals("exactly one instance should have been requested.", 1, sfFactory.counter);
 		assertEquals(0, sfFactory.sf.cntEndAct);

@@ -304,8 +304,8 @@ public class QueueLink {
 		this.originalLane.add(veh, now);
 		veh.setCurrentLink(this.getLink());
 		QueueSimulation.getEvents().processEvent(
-				new LinkEnterEventImpl(now, veh.getDriver().getPerson(),
-						this.getLink()));
+				new LinkEnterEventImpl(now, veh.getDriver().getPerson().getId(),
+						this.getLink().getId()));
 	}
 	
 	/*package*/ void clearVehicles() {

@@ -64,15 +64,15 @@ public class LinkToLinkTravelTimeCalculatorTest extends MatsimTestCase {
 		double linkTravelTime2 = 10.0 * 60; // 10 minutes
 		double linkTravelTime3 = 16.0 * 60; // 16 minutes
 		
-		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime1, person1, link1));
-		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime1 + linkTravelTime1, person1, link1));
-		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime1 + linkTravelTime1, person1, link2));
-		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2, person2, link1));
-		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2, person3, link1));
-		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime2 + linkTravelTime2, person2, link1));
-		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2 + linkTravelTime2, person2, link2));
-		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime2 + linkTravelTime3, person3, link1));
-		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2 + linkTravelTime3, person3, link3));
+		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime1, person1.getId(), link1.getId()));
+		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime1 + linkTravelTime1, person1.getId(), link1.getId()));
+		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime1 + linkTravelTime1, person1.getId(), link2.getId()));
+		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2, person2.getId(), link1.getId()));
+		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2, person3.getId(), link1.getId()));
+		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime2 + linkTravelTime2, person2.getId(), link1.getId()));
+		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2 + linkTravelTime2, person2.getId(), link2.getId()));
+		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime2 + linkTravelTime3, person3.getId(), link1.getId()));
+		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2 + linkTravelTime3, person3.getId(), link3.getId()));
 
 		assertEquals(50 * 60, ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60), EPSILON); // linkTravelTime1
 		assertEquals(35 * 60, ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 1*timeBinSize), EPSILON);  // linkTravelTime1 - 1*timeBinSize

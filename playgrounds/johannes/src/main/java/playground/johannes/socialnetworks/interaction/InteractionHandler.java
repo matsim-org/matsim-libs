@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.ActivityEndEventImpl;
@@ -38,7 +40,6 @@ import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.handler.DeprecatedActivityEndEventHandler;
 import org.matsim.core.events.handler.DeprecatedActivityStartEventHandler;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -54,9 +55,12 @@ DeprecatedActivityEndEventHandler {
 	
 	private Map<ActivityFacility, PhysicalFacility> pfacilities;
 	
-	public InteractionHandler(InteractionSelector selector, Interactor interactor, ActivityFacilities facilities) {
+	private final Population population;
+	
+	public InteractionHandler(InteractionSelector selector, Interactor interactor, ActivityFacilities facilities, Population population) {
 		this.selector = selector;
 		this.interactor = interactor;
+		this.population = population;
 		this.pfacilities = new HashMap<ActivityFacility, PhysicalFacility>();
 		
 		for(ActivityFacility f : facilities.getFacilities().values()) {
@@ -72,13 +76,12 @@ DeprecatedActivityEndEventHandler {
 //			facilities.put(f, pf);
 //		}
 		
-		pf.enterPerson(event.getPerson(), event.getTime());
+		pf.enterPerson(event.getPersonId(), event.getTime());
 	}
 
 	public void reset(int iteration) {
 		for(PhysicalFacility pf : pfacilities.values())
 			pf.reset();
-
 	}
 
 	public void handleEvent(ActivityEndEventImpl event) {
@@ -89,7 +92,7 @@ DeprecatedActivityEndEventHandler {
 		if(pf == null)
 			 throw new RuntimeException("Tried to remove a visitor from a non-existing physical facility!");
 		else
-			pf.leavePerson(event.getPerson(), event.getTime());
+			pf.leavePerson(event.getPersonId(), event.getTime());
 
 		}
 	}
@@ -129,17 +132,17 @@ DeprecatedActivityEndEventHandler {
 		
 		private DescriptiveStatistics concurrentVisitors = new DescriptiveStatistics();
 		
-		private Map<PersonImpl, Visitor> visitors = new HashMap<PersonImpl, Visitor>();
+		private Map<Id, Visitor> visitors = new HashMap<Id, Visitor>(); // <PersonId, Visitor>
 		
-		private void enterPerson(PersonImpl p, double time) {
-			visitors.put(p, new Visitor(p, time));
+		private void enterPerson(Id personId, double time) {
+			visitors.put(personId, new Visitor(personId, time));
 			
 			// only for statistics
 			totalVisitors++;
 		}
 		
-		private void leavePerson(PersonImpl p, double time) {
-			Visitor v = visitors.remove(p);
+		private void leavePerson(Id personId, double time) {
+			Visitor v = visitors.remove(personId);
 			if(v == null)
 				throw new RuntimeException("Tried to remove a visitor that did not enter this facility!");
 			else {
@@ -147,7 +150,7 @@ DeprecatedActivityEndEventHandler {
 				Collection<Visitor> targets = selector.select(v, visitors.values());
 				for(Visitor target : targets) {
 					double startTime = Math.max(v.getEnterTime(), target.getEnterTime());
-					interactor.interact(v.getPerson(), target.getPerson(), startTime, time);
+					interactor.interact(population.getPersons().get(v.getPersonId()), population.getPersons().get(target.getPersonId()), startTime, time);
 				}
 			}
 			

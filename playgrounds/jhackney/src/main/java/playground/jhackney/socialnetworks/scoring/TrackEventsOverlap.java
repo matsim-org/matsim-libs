@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
@@ -46,11 +47,14 @@ public class TrackEventsOverlap implements DeprecatedActivityStartEventHandler, 
 	LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>>();
 	LinkedHashMap<Activity,Double> startMap = new LinkedHashMap<Activity,Double>();
 	LinkedHashMap<Activity,Double> endMap = new LinkedHashMap<Activity,Double>();
+	
+	final Population population;
 
 	static final private Logger log = Logger.getLogger(TrackEventsOverlap.class);
 
-	public TrackEventsOverlap() {
+	public TrackEventsOverlap(Population population) {
 		super();
+		this.population = population;
 //		makeTimeWindows();
 		log.info(" Looking through plans and mapping social interactions for scoring");
 	}
@@ -67,7 +71,7 @@ public class TrackEventsOverlap implements DeprecatedActivityStartEventHandler, 
 			}
 		}
 		if(eventStartTime>0){// if a valid start event is found, make a timeWindow and add to Map
-			PersonImpl agent = event.getPerson();
+			PersonImpl agent = (PersonImpl) this.population.getPersons().get(event.getPersonId());
 
 			ActivityFacility facility = event.getAct().getFacility();
 			if(this.timeWindowMap.containsKey(facility)){
@@ -96,7 +100,7 @@ public class TrackEventsOverlap implements DeprecatedActivityStartEventHandler, 
 			}
 		}
 		if(eventEndTime>0){// if a valid end time is found, make a timeWindow and add to Map
-			PersonImpl agent = event.getPerson();
+			PersonImpl agent = (PersonImpl) this.population.getPersons().get(event.getPersonId());
 
 			ActivityFacility facility = event.getAct().getFacility();
 			if(this.timeWindowMap.containsKey(facility)){

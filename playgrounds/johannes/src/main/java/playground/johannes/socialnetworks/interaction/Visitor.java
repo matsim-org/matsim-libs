@@ -23,7 +23,7 @@
  */
 package playground.johannes.socialnetworks.interaction;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author illenberger
@@ -31,20 +31,20 @@ import org.matsim.core.population.PersonImpl;
  */
 public class Visitor {
 
-	private PersonImpl p;
+	private Id personId;
 	
 	private double enterTime;
 	
 	private double leaveTime;
 	
-	Visitor(PersonImpl p, double enterTime) {
-		this.p = p;
+	Visitor(Id personId, double enterTime) {
+		this.personId = personId;
 		this.enterTime = enterTime;
 		this.leaveTime = Double.NaN;
 	}
 	
-	public PersonImpl getPerson() {
-		return p;
+	public Id getPersonId() {
+		return personId;
 	}
 	
 	public double getEnterTime() {

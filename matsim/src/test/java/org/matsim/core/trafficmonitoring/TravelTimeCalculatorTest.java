@@ -182,10 +182,10 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		double linkEnterTime2 = 7.75 * 3600 + 10;
 		double linkTravelTime2 = 10.0 * 60; // 10minutes!
 		
-		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime1, person, link1));
-		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime1 + linkTravelTime1, person, link1));
-		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2, person, link1));
-		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime2 + linkTravelTime2, person, link1));
+		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime1, person.getId(), link1.getId()));
+		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime1 + linkTravelTime1, person.getId(), link1.getId()));
+		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2, person.getId(), link1.getId()));
+		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime2 + linkTravelTime2, person.getId(), link1.getId()));
 
 		assertEquals(50 * 60, ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60), EPSILON); // linkTravelTime1
 		assertEquals(35 * 60, ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 1*timeBinSize), EPSILON);  // linkTravelTime1 - 1*timeBinSize

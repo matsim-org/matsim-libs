@@ -23,7 +23,6 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 
 /**
@@ -41,20 +40,6 @@ public final class AgentMoneyEventImpl extends PersonEventImpl implements AgentM
 	public static final String EVENT_TYPE = "agentMoney";
 
 	private final double amount;
-
-	/**
-	 * Creates a new event describing that the given <tt>agent</tt> has <em>gained</em>
-	 * some money at the specified <tt>time</tt>. Positive values for <tt>amount</tt>
-	 * mean the agent has gained money, negative values that the agent has paid money.
-	 *
-	 * @param time
-	 * @param agent
-	 * @param amount
-	 */
-	public AgentMoneyEventImpl(final double time, final Person agent, final double amount) {
-		super(time, agent);
-		this.amount = amount;
-	}
 
 	/**
 	 * Creates a new event describing that the given <tt>agent</tt> has <em>gained</em>

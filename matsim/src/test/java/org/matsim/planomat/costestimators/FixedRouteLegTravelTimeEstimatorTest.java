@@ -168,7 +168,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 					TEST_PERSON_ID,
 					originAct.getLink().getId(),
 					TransportMode.car);
-			LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(departureTime + depDelay, testPerson, originAct.getLink());
+			LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(departureTime + depDelay, testPerson.getId(), originAct.getLinkId());
 
 			for (EventImpl event : new EventImpl[]{depEvent, leaveEvent}) {
 				events.processEvent(event);
@@ -203,13 +203,13 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				for (int linkCnt = 0; linkCnt < links.size(); linkCnt++) {
 					event = new LinkEnterEventImpl(
 							Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
-							testPerson,
-							(LinkImpl) links.get(linkCnt));
+							testPerson.getId(),
+							links.get(linkCnt).getId());
 					events.processEvent(event);
 					event = new LinkLeaveEventImpl(
 							Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
-							testPerson,
-							(LinkImpl) links.get(linkCnt));
+							testPerson.getId(),
+							links.get(linkCnt).getId());
 					events.processEvent(event);
 				}
 			}
@@ -354,13 +354,13 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			for (int linkCnt = 0; linkCnt < links.size(); linkCnt++) {
 				event = new LinkEnterEventImpl(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
-						this.testPerson,
-						(LinkImpl)links.get(linkCnt));
+						this.testPerson.getId(),
+						links.get(linkCnt).getId());
 				events.processEvent(event);
 				event = new LinkLeaveEventImpl(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
-						this.testPerson,
-						(LinkImpl)links.get(linkCnt));
+						this.testPerson.getId(),
+						links.get(linkCnt).getId());
 				events.processEvent(event);
 			}
 		}
@@ -423,8 +423,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		events.printEventHandlers();
 
 		// we have one agent on this link, taking 1 minute and 48 seconds
-		LinkEnterEventImpl enterEvent = new LinkEnterEventImpl(Time.parseTime("06:05:00"), this.testPerson, this.scenario.getNetwork().getLink(linkId));
-		LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(Time.parseTime("06:06:48"), this.testPerson, this.scenario.getNetwork().getLink(linkId));
+		LinkEnterEventImpl enterEvent = new LinkEnterEventImpl(Time.parseTime("06:05:00"), this.testPerson.getId(), linkId);
+		LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(Time.parseTime("06:06:48"), this.testPerson.getId(), linkId);
 
 		for (EventImpl event : new EventImpl[]{enterEvent, leaveEvent}) {
 			events.processEvent(event);

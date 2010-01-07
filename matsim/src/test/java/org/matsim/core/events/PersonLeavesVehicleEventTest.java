@@ -37,7 +37,7 @@ public class PersonLeavesVehicleEventTest extends MatsimTestCase {
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		BasicVehicleType vehicleType = new BasicVehicleTypeImpl(new IdImpl("testVehType"));
 		BasicVehicle vehicle = new BasicVehicleImpl(new IdImpl(80), vehicleType);
-		PersonLeavesVehicleEventImpl event = new PersonLeavesVehicleEventImpl(5.0 * 3600 + 11.0 * 60, person, vehicle, new IdImpl("testRouteId"));
+		PersonLeavesVehicleEventImpl event = new PersonLeavesVehicleEventImpl(5.0 * 3600 + 11.0 * 60, person.getId(), vehicle.getId(), new IdImpl("testRouteId"));
 		PersonLeavesVehicleEventImpl event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event);
 		assertEquals("wrong time of event.", 5.0 * 3600 + 11.0 * 60, event2.getTime(), EPSILON);
 		assertEquals("wrong vehicle id.", "80", event2.getVehicleId().toString());

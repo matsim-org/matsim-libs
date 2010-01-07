@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
@@ -46,11 +47,13 @@ public class TrackEventsOverlapII implements DeprecatedActivityStartEventHandler
 	LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>> timeWindowMap=new LinkedHashMap<ActivityFacility,ArrayList<TimeWindow>>();
 	LinkedHashMap<Activity,Double> startMap = new LinkedHashMap<Activity,Double>();
 	LinkedHashMap<Activity,Double> endMap = new LinkedHashMap<Activity,Double>();
+	final Population population;
 
 	static final private Logger log = Logger.getLogger(TrackEventsOverlapII.class);
 
-	public TrackEventsOverlapII() {
+	public TrackEventsOverlapII(final Population population) {
 		super();
+		this.population = population;
 //		makeTimeWindows();
 		log.info(" Looking through plans and mapping social interactions for scoring");
 	}
@@ -68,7 +71,7 @@ public class TrackEventsOverlapII implements DeprecatedActivityStartEventHandler
 		}
 		// Make a TimeWindow and add to TimeWindowMap
 		if(eventStartTime>=0){// TODO probably wrong
-			PersonImpl agent = event.getPerson();
+			PersonImpl agent = (PersonImpl) this.population.getPersons().get(event.getPersonId());
 
 			ActivityFacility facility = event.getAct().getFacility();
 			if(this.timeWindowMap.containsKey(facility)){
@@ -99,7 +102,7 @@ public class TrackEventsOverlapII implements DeprecatedActivityStartEventHandler
 			eventEndTime=3600.*30;
 		}
 		if(eventEndTime>=0){// if a valid end time is found, make a timeWindow and add to Map
-			PersonImpl agent = event.getPerson();
+			PersonImpl agent = (PersonImpl) this.population.getPersons().get(event.getPersonId());
 
 			ActivityFacility facility = event.getAct().getFacility();
 			if(this.timeWindowMap.containsKey(facility)){

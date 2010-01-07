@@ -102,26 +102,26 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		LegImpl leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:10:00"));
 		leg.setArrivalTime(Time.parseTime("07:30:00"));
-		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), defaultPerson, DEFAULT_LINK_ID, leg));
-		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), defaultPerson, DEFAULT_LINK_ID, leg));
+		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg));
+		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg));
 
 		leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:00:00"));
 		leg.setArrivalTime(Time.parseTime("07:10:00"));
-		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), defaultPerson, DEFAULT_LINK_ID, leg));
-		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), defaultPerson, DEFAULT_LINK_ID, leg));
+		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg));
+		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg));
 		
 		leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("31:12:00"));
 		leg.setArrivalTime(Time.parseTime("31:22:00"));
-		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), defaultPerson, DEFAULT_LINK_ID, leg));
-		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), defaultPerson, DEFAULT_LINK_ID, leg));
+		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg));
+		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg));
 		
 		leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("30:12:00"));
 		leg.setArrivalTime(Time.parseTime("30:12:01"));
-		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), defaultPerson, DEFAULT_LINK_ID, leg));
-		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), defaultPerson, DEFAULT_LINK_ID, leg));
+		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg));
+		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg));
 		
 		this.runTest(testee);
 	}

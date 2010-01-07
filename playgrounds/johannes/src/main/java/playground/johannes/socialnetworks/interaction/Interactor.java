@@ -25,6 +25,7 @@ package playground.johannes.socialnetworks.interaction;
 
 import org.matsim.api.core.v01.population.Person;
 
+
 /**
  * @author illenberger
  *

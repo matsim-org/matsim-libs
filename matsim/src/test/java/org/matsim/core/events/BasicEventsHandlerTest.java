@@ -43,7 +43,7 @@ public class BasicEventsHandlerTest extends MatsimTestCase {
 		Node node2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
 		LinkImpl link1 = network.getFactory().createLink(new IdImpl(1), node1, node2, network, 1000.0, 10.0, 3600.0, 0);
 
-		events.processEvent(new LinkEnterEventImpl(8.0*3600, new PersonImpl(new IdImpl(1)), link1));
+		events.processEvent(new LinkEnterEventImpl(8.0*3600, new PersonImpl(new IdImpl(1)).getId(), link1.getId()));
 		assertEquals("expected number of handled events wrong.", 1, handler.counter);
 	}
 	

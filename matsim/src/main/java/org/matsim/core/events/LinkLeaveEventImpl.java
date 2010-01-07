@@ -21,17 +21,11 @@
 package org.matsim.core.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 
 public class LinkLeaveEventImpl extends LinkEventImpl implements LinkLeaveEvent {
 
 	public static final String EVENT_TYPE = "left link";
-
-	public LinkLeaveEventImpl(final double time, final Person agent, final Link link) {
-		super(time, agent, link);
-	}
 
 	public LinkLeaveEventImpl(final double time, final Id agentId, final Id linkId) {
 		super(time, agentId, linkId);

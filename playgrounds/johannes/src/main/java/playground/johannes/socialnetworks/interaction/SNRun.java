@@ -84,12 +84,10 @@ public class SNRun {
 			 */
 			InteractionSelector selector = new RandomSelector(1, event.getControler().getConfig().global().getRandomSeed());
 			BefriendInteractor interactor = new BefriendInteractor(socialnet, builder, 1, event.getControler().getConfig().global().getRandomSeed());
-			handler = new InteractionHandler(selector, interactor, event.getControler().getFacilities());
+			handler = new InteractionHandler(selector, interactor, event.getControler().getFacilities(), event.getControler().getPopulation());
 			
 			event.getControler().addControlerListener(interactor);
 			event.getControler().getEvents().addHandler(handler);
-			
-			
 		}
 
 		public void notifyIterationEnds(IterationEndsEvent event) {

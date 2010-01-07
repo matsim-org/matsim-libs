@@ -105,13 +105,13 @@ public class EndLegMessage extends EventMessage {
 		// schedule enter link event
 		// only, if car leg and is not empty
 		if (vehicle.getCurrentLeg().getMode().equals(TransportMode.car) && (vehicle.getCurrentLinkRoute()!=null && vehicle.getCurrentLinkRoute().length!=0)){
-			event = new LinkEnterEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson(), vehicle.getCurrentLink());
+			event = new LinkEnterEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLink().getId());
 
 			SimulationParameters.getProcessEventThread().processEvent(event);
 		}
 		
 		// schedule AgentArrivalEvent
-		event = new AgentArrivalEventImpl(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson(), this.vehicle.getCurrentLink().getId(), this.vehicle.getCurrentLeg());
+		event = new AgentArrivalEventImpl(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLink().getId(), this.vehicle.getCurrentLeg());
 
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
@@ -123,7 +123,7 @@ public class EndLegMessage extends EventMessage {
 			actStartEventTime = this.getMessageArrivalTime();
 		}
 
-		event = new ActivityStartEventImpl(actStartEventTime, this.vehicle.getOwnerPerson(), this.vehicle.getCurrentLink().getId(), nextAct);
+		event = new ActivityStartEventImpl(actStartEventTime, this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLink().getId(), nextAct);
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
 	}

@@ -348,7 +348,7 @@ public class QueueLane {
 			}
 
 			QueueSimulation.getEvents().processEvent(
-					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson(), this.queueLink.getLink().getId(), veh.getDriver().getCurrentLeg()));
+					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), veh.getDriver().getCurrentLeg()));
 			
 			boolean addToBuffer = true;
 			if (veh.getDriver() instanceof TransitDriverAgent) {
@@ -520,7 +520,7 @@ public class QueueLane {
 				if (toQueueLane.hasSpace()) {
 					this.buffer.poll();
 					QueueSimulation.getEvents().processEvent(
-							new LaneLeaveEventImpl(now, veh.getDriver().getPerson(), this.queueLink.getLink(), this.getLaneId()));
+							new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getLaneId()));
 					toQueueLane.add(veh, now);
 				}
 				else {
@@ -561,7 +561,7 @@ public class QueueLane {
 		this.vehQueue.add(veh);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
 		if (this.isFireLaneEvents()){
-			QueueSimulation.getEvents().processEvent(new LaneEnterEventImpl(now, veh.getDriver().getPerson(), this.queueLink.getLink(), this.getLaneId()));
+			QueueSimulation.getEvents().processEvent(new LaneEnterEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getLaneId()));
 		}
 		double departureTime;
 		if (this.originalLane) {
@@ -616,9 +616,9 @@ public class QueueLane {
 		QueueVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if (this.isFireLaneEvents()){
-			QueueSimulation.getEvents().processEvent(new LaneLeaveEventImpl(now, veh.getDriver().getPerson(), this.queueLink.getLink(), this.getLaneId()));
+			QueueSimulation.getEvents().processEvent(new LaneLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), this.getLaneId()));
 		}
-		QueueSimulation.getEvents().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson(), this.queueLink.getLink()));
+		QueueSimulation.getEvents().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId()));
 
 		return veh;
 	}
@@ -672,7 +672,7 @@ public class QueueLane {
 
 		for (QueueVehicle veh : this.waitingList) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg()));
+					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg()));
 		}
 		AbstractSimulation.decLiving(this.waitingList.size());
 		AbstractSimulation.incLost(this.waitingList.size());
@@ -680,7 +680,7 @@ public class QueueLane {
 
 		for (QueueVehicle veh : this.vehQueue) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg()));
+					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg()));
 		}
 		AbstractSimulation.decLiving(this.vehQueue.size());
 		AbstractSimulation.incLost(this.vehQueue.size());
@@ -688,7 +688,7 @@ public class QueueLane {
 
 		for (QueueVehicle veh : this.buffer) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg()));
+					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg()));
 		}
 		AbstractSimulation.decLiving(this.buffer.size());
 		AbstractSimulation.incLost(this.buffer.size());

@@ -23,9 +23,7 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.PersonEvent;
-import org.matsim.core.population.PersonImpl;
 
 /**
  * @author mrieser
@@ -34,14 +32,7 @@ public abstract class PersonEventImpl extends EventImpl implements PersonEvent {
 
 	public static final String ATTRIBUTE_PERSON = "person";
 
-	private Person person;
 	private final Id personId;
-
-	public PersonEventImpl(final double time, final Person person) {
-		super(time);
-		this.person = person;
-		this.personId = person.getId();
-	}
 
 	public PersonEventImpl(final double time, final Id personId)	{
 		super(time);
@@ -53,12 +44,6 @@ public abstract class PersonEventImpl extends EventImpl implements PersonEvent {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
 		return attr;
-	}
-
-	/** @deprecated use {@link #getPersonId()} instead */
-	@Deprecated
-	public PersonImpl getPerson() {
-		return (PersonImpl)this.person;
 	}
 
 	public Id getPersonId() {

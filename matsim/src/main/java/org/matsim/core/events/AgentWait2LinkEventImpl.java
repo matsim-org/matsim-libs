@@ -23,15 +23,14 @@ package org.matsim.core.events;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 
 public class AgentWait2LinkEventImpl extends AgentEventImpl implements AgentWait2LinkEvent {
 
 	public static final String EVENT_TYPE = "wait2link";
 
-	public AgentWait2LinkEventImpl(final double time, final Person agent, final Id linkId, final Leg leg) {
-		super(time, agent, linkId, leg);
+	public AgentWait2LinkEventImpl(final double time, final Id agentId, final Id linkId, final Leg leg) {
+		super(time, agentId, linkId, leg);
 	}
 
 	public AgentWait2LinkEventImpl(final double time, final Id agentId, final Id linkId, final TransportMode legMode) {
