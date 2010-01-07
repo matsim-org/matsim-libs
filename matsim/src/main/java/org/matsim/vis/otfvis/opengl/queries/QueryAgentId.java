@@ -103,8 +103,6 @@ public class QueryAgentId implements OTFQuery {
 	}
 
 	public void remove() {
-		// TODO Auto-generated method stub
-
 	}
 
 	public boolean isAlive() {
@@ -116,8 +114,6 @@ public class QueryAgentId implements OTFQuery {
 	}
 
 	public void setId(String id) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }
