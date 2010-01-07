@@ -24,6 +24,7 @@ import java.util.Set;
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -43,4 +44,12 @@ public interface SpatialGraph extends Graph {
 	 * @see {@link Graph#getEdges()}
 	 */
 	public Set<? extends SpatialEdge> getEdges();
+	
+	/**
+	 * Returns the coordinate reference system of this graph.
+	 * 
+	 * @return the coordinate reference system of this graph.
+	 */
+	public CoordinateReferenceSystem getCoordinateReferenceSysten();
+	
 }
