@@ -22,7 +22,6 @@ package org.matsim.core.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -31,8 +30,8 @@ public class AgentStuckEventImpl extends AgentEventImpl implements AgentStuckEve
 
 	public static final String EVENT_TYPE = "stuckAndAbort";
 
-	public AgentStuckEventImpl(final double time, final Person agent, final Link link, final Leg leg) {
-		super(time, agent, link, leg);
+	public AgentStuckEventImpl(final double time, final Person agent, final Id linkId, final Leg leg) {
+		super(time, agent, linkId, leg);
 	}
 
 	public AgentStuckEventImpl(final double time, final Id agentId, final Id linkId, final TransportMode legMode) {

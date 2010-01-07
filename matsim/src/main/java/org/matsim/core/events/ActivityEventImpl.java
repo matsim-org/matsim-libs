@@ -23,7 +23,6 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.ActivityEvent;
@@ -37,14 +36,12 @@ abstract class ActivityEventImpl extends PersonEventImpl implements ActivityEven
 	private final Id linkId;
 	private final String acttype;
 
-	private transient Link link;
 	private transient Activity act;
 
-	ActivityEventImpl(final double time, final Person agent, final Link link, final Activity act) {
+	ActivityEventImpl(final double time, final Person agent, final Id linkId, final Activity act) {
 		super(time, agent);
 		this.act = act;
-		this.link = link;
-		this.linkId = link.getId();
+		this.linkId = linkId;
 		this.acttype = act.getType();
 	}
 

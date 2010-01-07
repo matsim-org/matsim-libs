@@ -28,7 +28,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -99,31 +98,30 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		events.addHandler(testee);
 
 		Person defaultPerson = this.population.getPersons().get(DEFAULT_PERSON_ID);
-		LinkImpl defaultLink = this.network.getLinks().get(DEFAULT_LINK_ID);
 
 		LegImpl leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:10:00"));
 		leg.setArrivalTime(Time.parseTime("07:30:00"));
-		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), defaultPerson, defaultLink, leg));
-		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), defaultPerson, defaultLink, leg));
+		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), defaultPerson, DEFAULT_LINK_ID, leg));
+		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), defaultPerson, DEFAULT_LINK_ID, leg));
 
 		leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:00:00"));
 		leg.setArrivalTime(Time.parseTime("07:10:00"));
-		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), defaultPerson, defaultLink, leg));
-		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), defaultPerson, defaultLink, leg));
+		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), defaultPerson, DEFAULT_LINK_ID, leg));
+		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), defaultPerson, DEFAULT_LINK_ID, leg));
 		
 		leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("31:12:00"));
 		leg.setArrivalTime(Time.parseTime("31:22:00"));
-		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), defaultPerson, defaultLink, leg));
-		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), defaultPerson, defaultLink, leg));
+		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), defaultPerson, DEFAULT_LINK_ID, leg));
+		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), defaultPerson, DEFAULT_LINK_ID, leg));
 		
 		leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("30:12:00"));
 		leg.setArrivalTime(Time.parseTime("30:12:01"));
-		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), defaultPerson, defaultLink, leg));
-		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), defaultPerson, defaultLink, leg));
+		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), defaultPerson, DEFAULT_LINK_ID, leg));
+		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), defaultPerson, DEFAULT_LINK_ID, leg));
 		
 		this.runTest(testee);
 	}

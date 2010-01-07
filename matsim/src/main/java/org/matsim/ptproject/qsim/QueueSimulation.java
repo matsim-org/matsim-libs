@@ -390,12 +390,12 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 		double now = SimulationTimer.getTime();
 		for (Tuple<Double, DriverAgent> entry : this.teleportationList) {
 			DriverAgent agent = entry.getSecond();
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson(), agent.getDestinationLink(), agent.getCurrentLeg()));
+			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson(), agent.getDestinationLink().getId(), agent.getCurrentLeg()));
 		}
 		this.teleportationList.clear();
 
 		for (DriverAgent agent : this.activityEndsList) {
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson(), agent.getDestinationLink(), agent.getCurrentLeg()));
+			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson(), agent.getDestinationLink().getId(), agent.getCurrentLeg()));
 		}
 		this.activityEndsList.clear();
 
@@ -520,7 +520,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 			queueSimulationFeature.beforeHandleAgentArrival(agent);
 		}
 		getEvents().processEvent(new AgentArrivalEventImpl(now, agent.getPerson(),
-				agent.getDestinationLink(), agent.getCurrentLeg()));
+				agent.getDestinationLink().getId(), agent.getCurrentLeg()));
 	}
 
 	private void handleNetworkChangeEvents(final double time) {
@@ -567,7 +567,7 @@ public class QueueSimulation implements org.matsim.core.mobsim.Simulation {
 	public void agentDeparts(double now, final DriverAgent agent, final Link link) {
 		Leg leg = agent.getCurrentLeg();
 		TransportMode mode = leg.getMode();
-		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson(), link, leg));
+		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson(), link.getId(), leg));
 		if (this.notTeleportedModes.contains(mode)){
 			this.handleKnownLegModeDeparture(now, agent, link, leg);
 		} else {

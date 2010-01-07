@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 
 /**
  * Represents a node in the QueueSimulation.
@@ -140,7 +139,7 @@ public class QueueNode {
 					Simulation.decLiving();
 					Simulation.incLost();
 					QueueSimulation.getEvents().processEvent(
-							new AgentStuckEventImpl(now, veh.getDriver().getPerson(), (LinkImpl)currentLink, veh.getDriver().getCurrentLeg()));
+							new AgentStuckEventImpl(now, veh.getDriver().getPerson(), currentLink.getId(), veh.getDriver().getCurrentLeg()));
 				} else {
 					currentLane.popFirstFromBuffer();
 					veh.getDriver().moveOverNode();

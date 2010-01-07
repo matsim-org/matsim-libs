@@ -23,6 +23,7 @@ package playground.meisterk.org.matsim.analysis;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -86,25 +87,26 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 		Node node2 = testNetwork.createAndAddNode(new IdImpl("2"), new CoordImpl(100.0, 100.0));
 		Link link = testNetwork.createAndAddLink(new IdImpl("200"), node1, node2, 0, 0, 0, 0);
 		LegImpl leg = new LegImpl(TransportMode.car);
+		Id linkId = link.getId();
 		
-		events.processEvent(new AgentDepartureEventImpl(Time.parseTime("06:00:00"), testPerson, link, leg));
-		events.processEvent(new AgentArrivalEventImpl(Time.parseTime("06:30:00"), testPerson, link, leg));
+		events.processEvent(new AgentDepartureEventImpl(Time.parseTime("06:00:00"), testPerson, linkId, leg));
+		events.processEvent(new AgentArrivalEventImpl(Time.parseTime("06:30:00"), testPerson, linkId, leg));
 		
 		assertEquals(1, testee.getNumberOfModes());
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, timeBins[5], timeBins[6]));
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, timeBins[6], timeBins[5]));
 
 		leg.setMode(TransportMode.pt);
-		events.processEvent(new AgentDepartureEventImpl(Time.parseTime("06:00:00"), testPerson, link, leg));
-		events.processEvent(new AgentArrivalEventImpl(Time.parseTime("06:00:01"), testPerson, link, leg));
+		events.processEvent(new AgentDepartureEventImpl(Time.parseTime("06:00:00"), testPerson, linkId, leg));
+		events.processEvent(new AgentArrivalEventImpl(Time.parseTime("06:00:01"), testPerson, linkId, leg));
 
 		assertEquals(2, testee.getNumberOfModes());
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.pt, timeBins[0], timeBins[1]));
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.pt, timeBins[1], timeBins[0]));
 
 		leg.setMode(TransportMode.car);
-		events.processEvent(new AgentDepartureEventImpl(Time.parseTime("06:00:00"), testPerson, link, leg));
-		events.processEvent(new AgentArrivalEventImpl(Time.parseTime("06:00:00"), testPerson, link, leg));
+		events.processEvent(new AgentDepartureEventImpl(Time.parseTime("06:00:00"), testPerson, linkId, leg));
+		events.processEvent(new AgentArrivalEventImpl(Time.parseTime("06:00:00"), testPerson, linkId, leg));
 
 		assertEquals(3, testee.getNumberOfLegs());
 		assertEquals(2, testee.getNumberOfLegs(TransportMode.car));

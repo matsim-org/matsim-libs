@@ -173,7 +173,7 @@ public class PersonAgent implements DriverAgent {
 	 */
 	public void activityEnds(final double now) {
 		ActivityImpl act = (ActivityImpl) this.getPlanElements().get(this.currentPlanElementIndex);
-		QueueSimulation.getEvents().processEvent(new ActivityEndEventImpl(now, this.getPerson(), act.getLink(), act));
+		QueueSimulation.getEvents().processEvent(new ActivityEndEventImpl(now, this.getPerson(), act.getLinkId(), act));
 		advancePlanElement(now);
 	}
 
@@ -222,7 +222,7 @@ public class PersonAgent implements DriverAgent {
 	 * @param act the activity the agent reaches
 	 */
 	private void reachActivity(final double now, final ActivityImpl act) {
-		QueueSimulation.getEvents().processEvent(new ActivityStartEventImpl(now, this.getPerson(),  this.currentLink, act));
+		QueueSimulation.getEvents().processEvent(new ActivityStartEventImpl(now, this.getPerson(),  this.currentLink.getId(), act));
 		/* schedule a departure if either duration or endtime is set of the activity.
 		 * Otherwise, the agent will just stay at this activity for ever...
 		 */
