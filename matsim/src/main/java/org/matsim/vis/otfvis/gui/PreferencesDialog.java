@@ -51,7 +51,6 @@ import org.matsim.vis.otfvis.opengl.queries.QueryToggleShowParking;
 
 /**
  * The class responsible for drawing the PreferencesDialog.
- * This class is not used anymore, but the PreferencesDialog2 that inherits from this class.
  * 
  * @author dstrippgen
  *
