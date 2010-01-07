@@ -38,7 +38,7 @@ public class NormalizedDistribution {
 	 */
 	public static void main(String[] args) throws IOException {
 		SpatialSparseGraph graph;
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraphMLReader reader = new SpatialGraphMLReader(21781);
 		graph = reader.readGraph(args[0]);
 		
 		ZoneLayer zones = ZoneLayer.createFromShapeFile(args[1]);

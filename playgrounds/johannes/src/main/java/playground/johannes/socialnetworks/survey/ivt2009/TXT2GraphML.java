@@ -34,6 +34,10 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
+
 import playground.johannes.socialnetworks.graph.spatial.io.KMLVertexDescriptor;
 import playground.johannes.socialnetworks.graph.spatial.io.KMLWriter;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialGraphBuilder;
@@ -52,6 +56,8 @@ public class TXT2GraphML {
 	private static final String TAB = "\t";
 	
 	private static CoordinateTransformation transform = new WGS84toCH1903LV03();
+	
+	private static final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 21781);
 	
 	public static void main(String[] args) throws IOException {
 		SampledSpatialGraphBuilder builder = new SampledSpatialGraphBuilder();
@@ -87,7 +93,7 @@ public class TXT2GraphML {
 
 					Coord c = getCoord(tokens, longIdx, latIdx);
 					if (c != null) {
-						SampledSpatialSparseVertex v = builder.addVertex(graph, c);
+						SampledSpatialSparseVertex v = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(c.getX(), c.getY())));
 						v.sample(0);
 						if(vertexIds.put(id, v) != null)
 							System.err.println("Overwriting ego with id " + id);
@@ -148,7 +154,7 @@ public class TXT2GraphML {
 					if (alter == null) {
 						Coord c = getCoord(tokens, longIdx, latIdx);
 						if (c != null) {
-							alter = builder.addVertex(graph, c);
+							alter = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(c.getX(), c.getY())));
 							if(vertexIds.put(id, alter) != null)
 								System.err.println("Overwriting alter with id " + id);
 							altercount++;

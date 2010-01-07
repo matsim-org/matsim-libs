@@ -46,10 +46,10 @@ public class PopNorm {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
+		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader(21781);
 		SampledSpatialSparseGraph graph = reader.readGraph("/Users/fearonni/vsp-work/work/socialnets/mcmc/graph.graphml");
 		
-		Population2SpatialGraph pop2graph = new Population2SpatialGraph();
+		Population2SpatialGraph pop2graph = new Population2SpatialGraph(21781);
 		SpatialSparseGraph g2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/plans/plans.1.xml");
 //		SpatialGraph g2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/zrh100km/plans/plans.10.xml");
 		

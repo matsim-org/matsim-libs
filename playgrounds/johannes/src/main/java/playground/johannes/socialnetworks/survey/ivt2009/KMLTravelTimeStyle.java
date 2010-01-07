@@ -127,7 +127,7 @@ public class KMLTravelTimeStyle extends KMLVertexColorStyle<Graph, Vertex> {
 	}
 	
 	public static void main(String args[]) throws IOException {
-		SpatialGraph graph = new Population2SpatialGraph().read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
+		SpatialGraph graph = new Population2SpatialGraph(21781).read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
 		
 		KMLWriter writer = new KMLWriter();
 		writer.setCoordinateTransformation(new CH1903LV03toWGS84());

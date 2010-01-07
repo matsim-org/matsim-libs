@@ -24,13 +24,16 @@
 package playground.johannes.socialnetworks.graph.spatial.io;
 
 import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.xml.sax.Attributes;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseEdge;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraphBuilder;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * @author illenberger
@@ -43,6 +46,12 @@ public class SpatialGraphMLReader extends AbstractGraphMLReader<SpatialSparseGra
 	public static final String COORD_Y_TAG = "y";
 	
 	private SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder();
+	
+	private final GeometryFactory geometryFactory;
+	
+	public SpatialGraphMLReader(int SRID) {
+		geometryFactory = new GeometryFactory(new PrecisionModel(), SRID);
+	}
 	
 	@Override
 	public SpatialSparseGraph readGraph(String file) {
@@ -59,7 +68,7 @@ public class SpatialGraphMLReader extends AbstractGraphMLReader<SpatialSparseGra
 	protected SpatialSparseVertex addVertex(Attributes attrs) {
 		double x = Double.parseDouble(attrs.getValue(COORD_X_TAG));
 		double y = Double.parseDouble(attrs.getValue(COORD_Y_TAG));
-		return builder.addVertex((SpatialSparseGraph)getGraph(), new CoordImpl(x, y));
+		return builder.addVertex((SpatialSparseGraph)getGraph(), geometryFactory.createPoint(new Coordinate(x, y)));
 	}
 
 	@Override

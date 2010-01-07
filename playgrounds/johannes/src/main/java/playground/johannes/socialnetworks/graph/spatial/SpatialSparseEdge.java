@@ -19,12 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial;
 
-import org.matsim.api.core.v01.Coord;
+import org.geotools.geometry.jts.JTS;
 import org.matsim.contrib.sna.graph.SparseEdge;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordUtils;
+import org.opengis.referencing.operation.TransformException;
+
+import playground.johannes.socialnetworks.spatial.CRSUtils;
+
+import com.vividsolutions.jts.geom.Point;
 
 
 /**
@@ -36,10 +40,23 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class SpatialSparseEdge extends SparseEdge implements SpatialEdge {
 
 	public double length() {
-		Coord c1 = getVertices().getFirst().getCoordinate();
-		Coord c2 = getVertices().getSecond().getCoordinate();
-		return CoordUtils.calcDistance(c1, c2);
-//		JTS.orthodromicDistance(p1, p2, crs)
+//		Coord c1 = getVertices().getFirst().getCoordinate();
+//		Coord c2 = getVertices().getSecond().getCoordinate();
+//		return CoordUtils.calcDistance(c1, c2);
+		
+		Point p1 = getVertices().getFirst().getPoint();
+		Point p2 = getVertices().getSecond().getPoint();
+		if(p1.getSRID() == p2.getSRID()) {
+			try {
+				return JTS.orthodromicDistance(p1.getCoordinate(), p2.getCoordinate(), CRSUtils.getCRS(p1.getSRID()));
+			} catch (TransformException e) {
+				e.printStackTrace();
+				return Double.NaN;
+			}			
+		} else {
+			throw new RuntimeException("Incompatible coordinate reference systems.");
+		}
+
 	}
 	
 	/**

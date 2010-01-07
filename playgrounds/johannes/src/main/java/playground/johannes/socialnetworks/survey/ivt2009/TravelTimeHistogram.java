@@ -79,7 +79,7 @@ public class TravelTimeHistogram {
 		/*
 		 * read graph
 		 */
-		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
+		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader(21781);
 		SampledSpatialSparseGraph graph = reader.readGraph("/Users/fearonni/vsp-work/work/socialnets/data/ivt2009/graph/graph.graphml");
 		/*
 		 * read zones

@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.spatial;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.graph.GraphFactory;
+
+import com.vividsolutions.jts.geom.Point;
 
 
 /**
@@ -41,8 +42,8 @@ public class SampledSpatialGraphFactory implements GraphFactory<SampledSpatialSp
 		throw new UnsupportedOperationException();
 	}
 	
-	public SampledSpatialSparseVertex createVertex(Coord coord) {
-		return new SampledSpatialSparseVertex(coord);
+	public SampledSpatialSparseVertex createVertex(Point point) {
+		return new SampledSpatialSparseVertex(point);
 	}
 
 }

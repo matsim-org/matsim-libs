@@ -36,7 +36,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
 import playground.johannes.socialnetworks.graph.GraphAnalyser;
 import playground.johannes.socialnetworks.graph.GraphStatistics;
@@ -88,7 +87,7 @@ public class SpatialGraphAnalyzer {
 		}
 		
 		logger.info(String.format("Loading graph %1$s...", graphfile));
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraphMLReader reader = new SpatialGraphMLReader(21781);
 		SpatialSparseGraph g = reader.readGraph(graphfile);
 		
 		if(!output.endsWith("/"))

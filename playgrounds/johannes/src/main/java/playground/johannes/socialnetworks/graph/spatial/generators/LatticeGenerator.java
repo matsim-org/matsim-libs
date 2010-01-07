@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
-import org.matsim.core.utils.geometry.CoordImpl;
-
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmDensity;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
@@ -29,6 +27,10 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialAdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGrid;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraphBuilder;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * @author illenberger
@@ -43,6 +45,8 @@ public class LatticeGenerator {
 //		double x_center = width/2.0;
 //		double y_center = height/2.0;
 		
+		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 21781); // use CH1903LV03 for now
+		
 		int step = gap + 1;
 		for(int i = 1; i <= width; i += step) {
 			for(int k = 1; k <= width; k += step) {
@@ -50,7 +54,7 @@ public class LatticeGenerator {
 //				double dy = Math.abs(y_center - k);
 //				double d = Math.sqrt(dx*dx + dy*dy);
 //				if(d <= width/2.0)
-					factory.addVertex(graph, new CoordImpl(i, k));
+					factory.addVertex(graph, geometryFactory.createPoint(new Coordinate(i, k)));
 			}
 		}
 		

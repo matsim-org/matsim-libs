@@ -69,10 +69,10 @@ public class TTGenerator {
 		String graphFile = config.findParam(MODULE_NAME, "graphfile");
 		
 		if(graphFile == null) {
-			Population2SpatialGraph reader = new Population2SpatialGraph();
+			Population2SpatialGraph reader = new Population2SpatialGraph(21781);
 			graph = reader.read(config.findParam("plans", "inputPlansFile"));
 		} else {
-			SpatialGraphMLReader reader = new SpatialGraphMLReader();
+			SpatialGraphMLReader reader = new SpatialGraphMLReader(21781);
 			graph = reader.readGraph(graphFile);
 		}
 

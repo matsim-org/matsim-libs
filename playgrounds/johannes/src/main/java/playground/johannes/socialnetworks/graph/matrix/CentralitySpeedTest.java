@@ -40,7 +40,7 @@ public class CentralitySpeedTest extends TestCase {
 //		ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge>(new SparseGraphFactory());
 //		logger.info("Generating grah...");
 //		SparseGraph graph = generator.generate(1000, 0.1, 4711);
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraphMLReader reader = new SpatialGraphMLReader(21781);
 		SpatialSparseGraph graph = reader.readGraph("/Volumes/hertz:ils-raid/socialnets/mcmc/runs/run45/output/2000000000/graph.graphml"); 
 		logger.info("Converting matrix...");
 		AdjacencyMatrixDecorator<SparseVertex> y = new AdjacencyMatrixDecorator<SparseVertex>(graph);

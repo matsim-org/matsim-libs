@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialAdjacencyMatrix.java
+ * CRSUtils.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,46 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.spatial;
+package playground.johannes.socialnetworks.spatial;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntObjectHashMap;
-import playground.johannes.socialnetworks.graph.mcmc.AdjacencyMatrixDecorator;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * @author illenberger
  *
  */
-public class SpatialAdjacencyMatrix extends AdjacencyMatrixDecorator<SpatialSparseVertex> {
+public class CRSUtils {
+
+	private static final Map<Integer, CoordinateReferenceSystem> crsMappings = new HashMap<Integer, CoordinateReferenceSystem>();
 	
-	public SpatialAdjacencyMatrix(SpatialSparseGraph g) {
-		super(g);
-	}
-
-	public SpatialSparseGraph getGraph() {
-		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder();
-		SpatialSparseGraph g = new SpatialSparseGraph();
-
-		TIntObjectHashMap<SpatialSparseVertex> vertexIdx = new TIntObjectHashMap<SpatialSparseVertex>();
-		for (int i = 0; i < getVertexCount(); i++) {
-			SpatialSparseVertex ego = builder.addVertex(g, getVertex(i).getPoint());
-			vertexIdx.put(i, ego);
-		}
-
-		for (int i = 0; i < getVertexCount(); i++) {
-			TIntArrayList row = getNeighbours(i);
-			if (row != null) {
-				for (int idx = 0; idx < row.size(); idx++) {
-					int j = row.get(idx);
-					if (j > i) {
-						if (builder.addEdge(g, vertexIdx.get(i), vertexIdx
-								.get(j)) == null)
-							throw new RuntimeException();
-					}
-				}
+	public static CoordinateReferenceSystem getCRS(int code) {
+		CoordinateReferenceSystem crs = crsMappings.get(code);
+		if(crs == null) {
+			CRSAuthorityFactory factory = CRS.getAuthorityFactory(false); //TODO: check this!
+			try {
+				crs = factory.createCoordinateReferenceSystem("EPSG:" + code);
+			} catch (FactoryException e) {
+				e.printStackTrace();
 			}
 		}
-
-		return g;
+		
+		return crs;
 	}
 }

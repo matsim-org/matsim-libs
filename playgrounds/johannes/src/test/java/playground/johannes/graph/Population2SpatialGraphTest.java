@@ -35,7 +35,7 @@ public class Population2SpatialGraphTest extends MatsimTestCase {
 	private static final int numVertex = 2827;
 	
 	public void testRead() {
-		Population2SpatialGraph reader = new Population2SpatialGraph();
+		Population2SpatialGraph reader = new Population2SpatialGraph(21781);
 		SpatialSparseGraph graph = reader.read(getPackageInputDirectory() + PLANS_FILE);
 		
 		assertEquals(numVertex, graph.getVertices().size());

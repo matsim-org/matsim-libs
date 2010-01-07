@@ -20,7 +20,6 @@
 package playground.johannes.socialnetworks.snowball2.spatial.io;
 
 import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.xml.sax.Attributes;
 
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialGraphMLReader;
@@ -29,6 +28,10 @@ import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparse
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseGraph;
 import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparseVertex;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
+
 /**
  * @author illenberger
  *
@@ -36,6 +39,12 @@ import playground.johannes.socialnetworks.snowball2.spatial.SampledSpatialSparse
 public class SampledSpatialGraphMLReader extends AbstractGraphMLReader<SampledSpatialSparseGraph, SampledSpatialSparseVertex, SampledSpatialSparseEdge> {
 
 	private SampledSpatialGraphBuilder builder = new SampledSpatialGraphBuilder();
+	
+	private final GeometryFactory geometryFactory;
+	
+	public SampledSpatialGraphMLReader(int SRID) {
+		geometryFactory = new GeometryFactory(new PrecisionModel(), SRID);
+	}
 	
 	@Override
 	public SampledSpatialSparseGraph readGraph(String file) {
@@ -52,7 +61,7 @@ public class SampledSpatialGraphMLReader extends AbstractGraphMLReader<SampledSp
 	protected SampledSpatialSparseVertex addVertex(Attributes attrs) {
 		double x = Double.parseDouble(attrs.getValue(SpatialGraphMLReader.COORD_X_TAG));
 		double y = Double.parseDouble(attrs.getValue(SpatialGraphMLReader.COORD_Y_TAG));
-		SampledSpatialSparseVertex v = builder.addVertex((SampledSpatialSparseGraph)getGraph(), new CoordImpl(x, y));
+		SampledSpatialSparseVertex v = builder.addVertex((SampledSpatialSparseGraph)getGraph(), geometryFactory.createPoint(new Coordinate(x, y)));
 		
 		String str = attrs.getValue(SampledSpatialGraphMLWriter.DETECTED_TAG);
 		if(str != null)

@@ -93,11 +93,11 @@ public class TravelTimeHistogram2 {
 		/*
 		 * read graph
 		 */
-		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
+		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader(21781);
 		SampledSpatialSparseGraph graph = reader.readGraph(config.getParam("tthistogram", "graph"));
 		
 		
-		Population2SpatialGraph pop2graph = new Population2SpatialGraph();
+		Population2SpatialGraph pop2graph = new Population2SpatialGraph(21781);
 		SpatialSparseGraph graph2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.04.xml");
 		double bounds[] = graph2.getBounds();
 		/*

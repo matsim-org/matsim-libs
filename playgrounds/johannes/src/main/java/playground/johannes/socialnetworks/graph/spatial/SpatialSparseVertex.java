@@ -24,9 +24,8 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.graph.SparseVertex;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import org.matsim.core.utils.geometry.CoordImpl;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 
@@ -38,18 +37,19 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class SpatialSparseVertex extends SparseVertex implements SpatialVertex {
 
-	private final static GeometryFactory geometryFactory = new GeometryFactory();
+//	private final static GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 21781); //FIXME
 	
-	/**
-	 * @deprecated will be replaced by point.
-	 */
-	private Coord coord;
+//	/**
+//	 * @deprecated will be replaced by point.
+//	 */
+//	private Coord coord;
 	
 	private Point point;
 	
-	protected SpatialSparseVertex(Coord coord) {
-		this.coord = coord;
-		point = geometryFactory.createPoint(new Coordinate(coord.getX(), coord.getY()));
+	protected SpatialSparseVertex(Point point) {
+//		this.coord = coord;
+//		point = geometryFactory.createPoint(new Coordinate(coord.getX(), coord.getY()));
+		this.point = point;
 	}
 	
 	/**
@@ -74,7 +74,7 @@ public class SpatialSparseVertex extends SparseVertex implements SpatialVertex {
 	 * @deprecated will be replaced by {@link #getPoint()}.
 	 */
 	public Coord getCoordinate() {
-		return coord;
+		return new CoordImpl(point.getCoordinate().x, point.getCoordinate().y);
 	}
 
 	/**

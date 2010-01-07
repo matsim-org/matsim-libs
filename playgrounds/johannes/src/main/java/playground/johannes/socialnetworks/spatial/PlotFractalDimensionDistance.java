@@ -42,7 +42,7 @@ public class PlotFractalDimensionDistance {
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		SpatialSparseGraph graph = new Population2SpatialGraph().read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
+		SpatialSparseGraph graph = new Population2SpatialGraph(21781).read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
 		
 		Distribution dist = new Distribution();
 		Distribution cost = new Distribution();

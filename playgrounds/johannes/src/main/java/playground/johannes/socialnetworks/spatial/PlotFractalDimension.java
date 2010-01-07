@@ -108,7 +108,7 @@ public class PlotFractalDimension {
 		/*
 		 * read graph
 		 */
-		SpatialSparseGraph graph = new Population2SpatialGraph().read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
+		SpatialSparseGraph graph = new Population2SpatialGraph(21781).read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.001.xml");
 		/*
 		 * cache nearest nodes
 		 */

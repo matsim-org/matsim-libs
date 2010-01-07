@@ -80,7 +80,7 @@ public class TravelTimeHistogram3 {
 		/*
 		 * read graph
 		 */
-		SampledSpatialGraphMLReader graphReader = new SampledSpatialGraphMLReader();
+		SampledSpatialGraphMLReader graphReader = new SampledSpatialGraphMLReader(21781);
 		SampledSpatialSparseGraph graph = graphReader.readGraph("/Users/fearonni/vsp-work/work/socialnets/data/ivt2009/graph/graph.graphml");
 		/*
 		 * read swiss boundary
@@ -108,7 +108,7 @@ public class TravelTimeHistogram3 {
 		 * make normalization 
 		 */
 		int count = 0;
-		SpatialGraph g2 = new Population2SpatialGraph().read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.02.xml");
+		SpatialGraph g2 = new Population2SpatialGraph(21781).read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.02.xml");
 		logger.info("Caching nearest nodes...");
 		for(Object v : g2.getVertices()) {
 			Node n = getNearestNode(((SpatialVertex) v).getCoordinate(), nodes);

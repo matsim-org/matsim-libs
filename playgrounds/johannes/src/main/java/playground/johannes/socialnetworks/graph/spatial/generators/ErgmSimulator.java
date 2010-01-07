@@ -65,7 +65,7 @@ public class ErgmSimulator {
 		MatsimConfigReader creader = new MatsimConfigReader(config);
 		creader.parse(args[0]);
 		
-		Population2SpatialGraph reader = new Population2SpatialGraph();
+		Population2SpatialGraph reader = new Population2SpatialGraph(21781);
 		SpatialSparseGraph graph = reader.read(config.findParam("plans", "inputPlansFile"));
 		
 		String zonesFile = config.findParam(MODULE_NAME, "zonesFile");

@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.graph.GraphFactory;
+
+import com.vividsolutions.jts.geom.Point;
 
 
 /**
@@ -41,8 +42,8 @@ public class SpatialSparseGraphFactory implements GraphFactory<SpatialSparseGrap
 		return new SpatialSparseVertex(null);
 	}
 	
-	public SpatialSparseVertex createVertex(Coord coord) {
-		return new SpatialSparseVertex(coord);
+	public SpatialSparseVertex createVertex(Point point) {
+		return new SpatialSparseVertex(point);
 	}
 
 }

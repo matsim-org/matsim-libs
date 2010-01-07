@@ -52,7 +52,7 @@ public class FixedCostGenerator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Population2SpatialGraph reader = new Population2SpatialGraph();
+		Population2SpatialGraph reader = new Population2SpatialGraph(21781);
 		SpatialSparseGraph graph = reader.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.003.xml");
 		SpatialAdjacencyMatrix y = new SpatialAdjacencyMatrix(graph);
 		

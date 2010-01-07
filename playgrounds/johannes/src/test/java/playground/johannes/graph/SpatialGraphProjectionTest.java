@@ -27,7 +27,6 @@ import junit.framework.TestCase;
 import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphProjection;
 import playground.johannes.socialnetworks.graph.spatial.SpatialGraphProjectionBuilder;
@@ -39,6 +38,7 @@ import playground.johannes.socialnetworks.graph.spatial.SpatialVertexDecorator;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * @author illenberger
@@ -50,7 +50,7 @@ public class SpatialGraphProjectionTest extends TestCase {
 		/*
 		 * Create a geometry (rectangle).
 		 */
-		GeometryFactory geometryFactory = new GeometryFactory();
+		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 21781); // use CH1903LV03 for now
 		
 		Coordinate[] coordinates = new Coordinate[5];
 		coordinates[0] = new Coordinate(0, 0);
@@ -66,12 +66,12 @@ public class SpatialGraphProjectionTest extends TestCase {
 		SpatialSparseGraphBuilder builder = new SpatialSparseGraphBuilder();
 		SpatialSparseGraph graph = builder.createGraph();
 		
-		SpatialSparseVertex v1 = builder.addVertex(graph, new CoordImpl(0, 0));
-		SpatialSparseVertex v2 = builder.addVertex(graph, new CoordImpl(0, 10));
-		SpatialSparseVertex v3 = builder.addVertex(graph, new CoordImpl(0, 20));
-		SpatialSparseVertex v4 = builder.addVertex(graph, new CoordImpl(10, 20));
-		SpatialSparseVertex v5 = builder.addVertex(graph, new CoordImpl(10, 10));
-		SpatialSparseVertex v6 = builder.addVertex(graph, new CoordImpl(10, 0));
+		SpatialSparseVertex v1 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(0, 0)));
+		SpatialSparseVertex v2 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(0, 10)));
+		SpatialSparseVertex v3 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(0, 20)));
+		SpatialSparseVertex v4 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(10, 20)));
+		SpatialSparseVertex v5 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(10, 10)));
+		SpatialSparseVertex v6 = builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(10, 0)));
 		
 		builder.addEdge(graph, v1, v2);
 		builder.addEdge(graph, v2, v3);

@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.spatial;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.sna.graph.AbstractSparseGraphBuilder;
+
+import com.vividsolutions.jts.geom.Point;
 
 
 
@@ -39,8 +40,8 @@ public class SampledSpatialGraphBuilder extends AbstractSparseGraphBuilder<Sampl
 		throw new UnsupportedOperationException();
 	}
 	
-	public SampledSpatialSparseVertex addVertex(SampledSpatialSparseGraph graph, Coord coord) {
-		SampledSpatialSparseVertex vertex = ((SampledSpatialGraphFactory)getFactory()).createVertex(coord);
+	public SampledSpatialSparseVertex addVertex(SampledSpatialSparseGraph graph, Point point) {
+		SampledSpatialSparseVertex vertex = ((SampledSpatialGraphFactory)getFactory()).createVertex(point);
 		if(insertVertex(graph, vertex))
 			return vertex;
 		else

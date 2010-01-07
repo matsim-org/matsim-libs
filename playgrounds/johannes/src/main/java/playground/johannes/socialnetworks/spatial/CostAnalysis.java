@@ -40,7 +40,7 @@ public class CostAnalysis {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SpatialSparseGraph graph = new Population2SpatialGraph().read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.005.xml");
+		SpatialSparseGraph graph = new Population2SpatialGraph(21781).read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.005.xml");
 		
 		List<SpatialVertex> vertices = new ArrayList<SpatialVertex>(graph.getVertices());
 		int N = vertices.size();

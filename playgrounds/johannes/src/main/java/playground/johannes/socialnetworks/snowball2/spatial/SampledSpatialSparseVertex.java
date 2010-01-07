@@ -21,11 +21,11 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.Coord;
-
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.snowball2.SampledVertex;
 import playground.johannes.socialnetworks.snowball2.SnowballAttributes;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
@@ -36,8 +36,8 @@ public class SampledSpatialSparseVertex extends SpatialSparseVertex implements
 
 	private SnowballAttributes attributes;
 	
-	protected SampledSpatialSparseVertex(Coord coord) {
-		super(coord);
+	protected SampledSpatialSparseVertex(Point point) {
+		super(point);
 		attributes = new SnowballAttributes();
 	}
 

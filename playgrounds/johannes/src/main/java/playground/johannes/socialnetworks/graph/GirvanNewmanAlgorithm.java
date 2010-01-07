@@ -178,7 +178,7 @@ public class GirvanNewmanAlgorithm {
 	}
 	
 	public static void main(String args[]) throws IOException {
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraphMLReader reader = new SpatialGraphMLReader(21781);
 		Graph graph = reader.readGraph(args[0]);
 //		ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge> generator = new ErdosRenyiGenerator<SparseGraph, SparseVertex, SparseEdge>(new SparseGraphFactory());
 //		System.out.println("Generating graph...");

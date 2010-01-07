@@ -78,7 +78,7 @@ public class KineticFixCostGenerator<G extends SpatialSparseGraph, V extends Spa
 		creader.parse(args[0]);
 		
 		SpatialSparseGraph graph = null;
-		Population2SpatialGraph reader = new Population2SpatialGraph();
+		Population2SpatialGraph reader = new Population2SpatialGraph(21781);
 		graph = reader.read(config.findParam("plans", "inputPlansFile"));
 		
 		long randomSeed = Long.parseLong(config.getParam("global", "randomSeed"));

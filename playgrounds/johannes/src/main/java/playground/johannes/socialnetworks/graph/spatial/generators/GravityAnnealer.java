@@ -64,7 +64,7 @@ public class GravityAnnealer {
 		MatsimConfigReader creader = new MatsimConfigReader(config);
 		creader.parse(args[0]);
 		
-		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		SpatialGraphMLReader reader = new SpatialGraphMLReader(21781);
 		SpatialSparseGraph graph = reader.readGraph(config.findParam(MODULE_NAME, "graphfile"));
 		
 		GravityAnnealer generator = new GravityAnnealer();

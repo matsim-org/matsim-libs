@@ -26,7 +26,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -36,6 +35,10 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.SpatialSparseGraphBuilder;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * @author illenberger
@@ -61,7 +64,14 @@ public class Population2SpatialGraph {
 	
 	private int numVertex;
 	
+	private final GeometryFactory geometryFactory;
+	
+	public Population2SpatialGraph(int SRID) {
+		geometryFactory = new GeometryFactory(new PrecisionModel(), SRID);
+	}
+	
 	public SpatialSparseGraph read(String filename) {
+		
 		numVertex = 0;
 		
 		SAXParserFactory saxfactory = SAXParserFactory.newInstance();
@@ -94,7 +104,7 @@ public class Population2SpatialGraph {
 	}
 	
 	private void addVertex(double x, double y) {
-		if(builder.addVertex(graph, new CoordImpl(x, y)) == null) {
+		if(builder.addVertex(graph, geometryFactory.createPoint(new Coordinate(x, y))) == null) {
 			logger.warn("Failed to add vertex!");
 		} else
 			numVertex++;

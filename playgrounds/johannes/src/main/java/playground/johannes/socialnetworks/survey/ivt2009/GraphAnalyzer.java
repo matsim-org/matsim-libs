@@ -63,14 +63,14 @@ public class GraphAnalyzer {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader();
+		SampledSpatialGraphMLReader reader = new SampledSpatialGraphMLReader(21781);
 		SampledSpatialSparseGraph graph = reader.readGraph(args[0]);
 		
 		ZoneLayer zones = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/zones/gg-qg.merged.shp");
 		ZoneLayerDouble density = ZoneLayerDouble.createFromFile(new HashSet<Zone>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/popdensity/popdensity.txt");
 		TravelTimeMatrix matrix = TravelTimeMatrix.createFromFile(new HashSet<Zone>(zones.getZones()), "/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/ttmatrix.txt");
 		
-		ZoneLayer zonesCH = ZoneLayer.createFromShapeFile("/Users/fearonni/Desktop/gemeindegrenzen2008.zip Folder/g1g08_shp_080606.zip Folder/G1L08.shp");
+		ZoneLayer zonesCH = ZoneLayer.createFromShapeFile("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/g1g08_shp_080606/G1L08.shp");
 		analyze(graph, args[1], zonesCH);
 
 		
@@ -78,7 +78,7 @@ public class GraphAnalyzer {
 //		SpatialGrid<Double> grid = SpatialGrid.readFromFile(args[2]);
 		analyze(graph, density, matrix, args[1]);
 		
-		Population2SpatialGraph pop2graph = new Population2SpatialGraph();
+		Population2SpatialGraph pop2graph = new Population2SpatialGraph(21781);
 		SpatialSparseGraph g2 = pop2graph.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.003.xml");
 //		analyze(graph, g2, args[1], zonesCH.getZones().iterator().next().getBorder());
 		analyze(graph, g2, args[1], zones);

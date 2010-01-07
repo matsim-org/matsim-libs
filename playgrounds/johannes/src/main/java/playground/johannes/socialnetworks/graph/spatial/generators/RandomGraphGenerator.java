@@ -40,7 +40,7 @@ public class RandomGraphGenerator {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		Population2SpatialGraph reader = new Population2SpatialGraph();
+		Population2SpatialGraph reader = new Population2SpatialGraph(21781);
 		SpatialSparseGraph graph = reader.read("/Users/fearonni/vsp-work/work/socialnets/data/schweiz/complete/plans/plans.0.01.xml");
 		
 		ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> generator = new ErdosRenyiGenerator<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge>(new SpatialSparseGraphBuilder());
