@@ -81,9 +81,9 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	protected static double flowCapFactor = 0.1;
-	private ScenarioImpl scenario = new ScenarioImpl();
+	protected ScenarioImpl scenario = new ScenarioImpl();
 	protected CoordinateReferenceSystem crs = null;
-	private Network2PolygonGraph n2g = null;
+	protected Network2PolygonGraph n2g = null;
 
 	public void readNetwork(final String netFilename) {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
