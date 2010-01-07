@@ -64,5 +64,6 @@ public class TransitQueueVehicle extends QueueVehicleImpl implements TransitVehi
 		boolean removed = this.passengers.remove(passenger);
 		return removed;
 	}
+	
 
 }

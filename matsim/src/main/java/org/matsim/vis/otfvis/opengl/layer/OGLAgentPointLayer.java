@@ -243,17 +243,6 @@ public class OGLAgentPointLayer extends DefaultSceneLayer {
 		}
 		
 	}
-	
-	private static OTFOGLDrawer.FastColorizer colorizerBlue = new OTFOGLDrawer.FastColorizer(
-			new double[] { 0.0, 50.}, new Color[] {	Color.BLUE, Color.YELLOW});
-	
-	public class AgentPointDrawerBlue extends AgentPointDrawer {
-		
-		@Override
-		public void setAgent(char[] id, float startX, float startY, int state, int user, float color) {
-				OGLAgentPointLayer.this.drawer.addAgent(id, startX, startY, colorizerBlue.getColor(0.1 + 0.9*color), true);
-		}
-	}
 
 	public class AgentPointDrawerByID extends AgentPointDrawer {
 		public Color getColorFromID(char[] id){

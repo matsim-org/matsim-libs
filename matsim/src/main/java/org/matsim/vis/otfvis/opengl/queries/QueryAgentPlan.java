@@ -27,14 +27,12 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import javax.media.opengl.GL;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -51,7 +49,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.ptproject.qsim.QueueNetwork;
-import org.matsim.vis.otfvis.caching.ClientDataBase;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
 import org.matsim.vis.otfvis.interfaces.OTFDrawer;
@@ -325,22 +322,7 @@ public class QueryAgentPlan implements OTFQuery {
 	}
 
 	private Point2D.Double tryToFindAgentPosition(OGLAgentPointLayer layer) {
-		ClientDataBase clientDataBase = ClientDataBase.getInstance();
-		Map<Id, Id> piggyBackingMap = clientDataBase.getPiggyBackingMap();
 		Point2D.Double pos = getAgentPositionFromPointLayer(this.agentId, layer);
-		if (pos == null) {
-			// The agent visualizer doesn't know where the agent is. Presumably
-			// they are in a transit vehicle.
-			Id piggyBackingAgentId = piggyBackingMap.get(new IdImpl(this.agentId));
-			if (piggyBackingAgentId != null) {
-				pos = getAgentPositionFromPointLayer(piggyBackingAgentId.toString(), layer);
-			}
-		} else {
-			// The agent visualizer DOES know where the agent is, so we give the
-			// piggy-backing database a hint that the agent is not with someone else anymore.
-			// Ugly, but OK for now.
-			piggyBackingMap.put(new IdImpl(this.agentId), null);
-		}
 		return pos;
 	}
 

@@ -96,7 +96,7 @@ public class QueueNode {
 	 */
 	protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLane currentLane, final double now) {
 		Link nextLink = veh.getDriver().chooseNextLink();
-		Link currentLink = currentLane.queueLink.getLink();
+		Link currentLink = currentLane.getQueueLink().getLink();
 
 		// veh has to move over node
 		if (nextLink != null) {
