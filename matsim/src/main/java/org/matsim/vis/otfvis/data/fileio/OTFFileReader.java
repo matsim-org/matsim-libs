@@ -199,6 +199,10 @@ public class OTFFileReader implements OTFServerRemote {
 				name = name.replaceFirst("org.matsim.utils.collections",
 				"org.matsim.core.utils.collections");
 				return Class.forName(name);
+			}else if (name.startsWith("playground.gregor.otf.readerwriter.InundationData")) {
+				name = name.replaceFirst("playground.gregor.otf.readerwriter",
+				"org.matsim.evacuation.otfvis.legacy.readerwriter");
+				return Class.forName(name);
 			}else if (name.startsWith("playground.gregor.otf.readerwriter")) {
 				name = name.replaceFirst("playground.gregor.otf.readerwriter",
 				"org.matsim.evacuation.otfvis.readerwriter");
@@ -209,7 +213,11 @@ public class OTFFileReader implements OTFServerRemote {
 				return Class.forName(name);
 			}else if (name.startsWith("playground.gregor.collections")) {
 				name = name.replaceFirst("playground.gregor.collections",
-				"org.matsim.evacuation.collections");
+				"org.matsim.evacuation.otfvis.legacy.collections");
+				return Class.forName(name);
+			}else if (name.startsWith("org.matsim.evacuation.otfvis.readerwriter.InundationData")) {
+				name = name.replaceFirst("org.matsim.evacuation.otfvis.readerwriter.InundationData",
+				"org.matsim.evacuation.otfvis.legacy.readerwriter.InundationData");
 				return Class.forName(name);
 			}
 			return super.resolveClass(desc);
