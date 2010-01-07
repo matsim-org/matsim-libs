@@ -12,18 +12,17 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.cppdeqsim.DEQSimControler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
+import playground.anhorni.choiceSetGeneration.choicesetextractors.ExtractChoiceSetsRouting;
 import playground.anhorni.choiceSetGeneration.filters.ActTypeAndAreaTripFilter;
 import playground.anhorni.choiceSetGeneration.filters.SampleDrawer;
 import playground.anhorni.choiceSetGeneration.filters.SampleDrawerFixedSizeRandom;
 import playground.anhorni.choiceSetGeneration.filters.SampleDrawerFixedSizeTravelCosts;
 import playground.anhorni.choiceSetGeneration.filters.TripFilter;
-import playground.anhorni.choiceSetGeneration.choicesetextractors.ExtractChoiceSetsRouting;
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSets;
 import playground.anhorni.choiceSetGeneration.helper.ZHFacilities;
 import playground.anhorni.choiceSetGeneration.io.CSShapeFileWriter;
@@ -207,8 +206,9 @@ public class GenerateChoiceSets {
 		}
 
 		if (this.DEQSim.equals("true")) {
-			String [] args = {this.matsimRunConfigFile};
-			this.controler = new DEQSimControler(args);
+//			String [] args = {this.matsimRunConfigFile};
+//			this.controler = new DEQSimControler(args);
+			throw new RuntimeException("Support for C++ DEQSim has been removed.");
 		}
 		else {
 			this.controler = new Controler(this.matsimRunConfigFile);

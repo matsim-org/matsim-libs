@@ -21,7 +21,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.cppdeqsim.EventsReaderDEQv1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.population.ActivityImpl;
@@ -474,9 +473,10 @@ public class CompareScenarios {
 
 				results.add(new CaseStudyResult(scenarioName, plansSubPop, calcLegTimes, planAverageScore, calcAverageTripLength));
 
-				EventsReaderDEQv1 eventsReader = new EventsReaderDEQv1(events);
-				log.info("events filename: " + this.eventsInputFilenames.get(scenarioName));
-				eventsReader.readFile(this.eventsInputFilenames.get(scenarioName));
+//				EventsReaderDEQv1 eventsReader = new EventsReaderDEQv1(events);
+//				log.info("events filename: " + this.eventsInputFilenames.get(scenarioName));
+//				eventsReader.readFile(this.eventsInputFilenames.get(scenarioName));
+				throw new RuntimeException("reading binary events is no longer supported.");
 
 			}
 			this.scenarioComparisonLines.add("Analysis: " + this.analysisNames.get(analysis));
