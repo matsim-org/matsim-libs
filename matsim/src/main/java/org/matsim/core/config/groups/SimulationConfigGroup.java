@@ -20,6 +20,7 @@
 
 package org.matsim.core.config.groups;
 
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -175,6 +176,14 @@ public class SimulationConfigGroup extends Module {
 		map.put(TIMEOUT, getValue(TIMEOUT));
 		return map;
 	}
+	
+	@Override
+	protected final Map<String, String> getComments() {
+		Map<String,String> map = super.getComments();
+		map.put(SNAPSHOT_STYLE,"snapshotStyle: `equidist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link)");
+		return map ;
+	}
+
 
 	/* direct access */
 
