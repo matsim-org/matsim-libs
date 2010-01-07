@@ -6,6 +6,11 @@ import java.util.SortedMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 
+/**
+ * Top level container for lanes within MATSim. See package-info for documentation.
+ * @author dgrether
+ *
+ */
 public interface BasicLaneDefinitions extends MatsimToplevelContainer {
 
 	/**
@@ -21,10 +26,13 @@ public interface BasicLaneDefinitions extends MatsimToplevelContainer {
 	public SortedMap<Id, BasicLanesToLinkAssignment> getLanesToLinkAssignments();
 	
 	/**
+	 * Adds a LanesToLinkAssignment to the container.
 	 * @param assignment
 	 */
 	public void addLanesToLinkAssignment(BasicLanesToLinkAssignment assignment);
-
+	/**
+	 * Get the factory to create container content. 
+	 */
 	public BasicLaneDefinitionsFactory getFactory();
 
 }
