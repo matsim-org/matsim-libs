@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SparseGraphMLReaderTest.java
+ * SNGraphMLReader.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,28 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.sna.graph.io;
 
-import org.matsim.contrib.sna.graph.SparseGraph;
+/**
+ * 
+ */
+package org.matsim.contrib.sna.graph.spatial.io;
 
-import junit.framework.TestCase;
+import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
+import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.xml.sax.Attributes;
+
 
 /**
  * @author illenberger
  *
  */
-public class SparseGraphMLReaderTest extends TestCase {
+public class SpatialGraphMLReader extends AbstractGraphMLReader<SpatialSparseGraph, SpatialSparseVertex, SpatialSparseEdge> {
 
-	/*
-	 * Not sure if this the way to access input files?
-	 */
-	private static final String GRPAH_FILE = "sna/test/input/org/matsim/contrib/sna/graph/io/test.graphml.gz";
+	private SpatialSparseGraphBuilder builder;
 	
-	public void test() {
-		SparseGraphMLReader reader = new SparseGraphMLReader();
-		SparseGraph graph = reader.readGraph(GRPAH_FILE);
-		
-		assertEquals("The graph does not contain 1000 vertices.", 1000, graph.getVertices().size());
-		assertEquals("the graph does not contain 49334 edges.", 49334, graph.getEdges().size());
+	@Override
+	public SpatialSparseGraph readGraph(String file) {
+		return (SpatialSparseGraph) super.readGraph(file);
+	}
+
+	@Override
+	protected SpatialSparseEdge addEdge(SpatialSparseVertex v1, SpatialSparseVertex v2,
+			Attributes attrs) {
+		return builder.addEdge(getGraph(), v1, v2);
+	}
+
+	@Override
+	protected SpatialSparseVertex addVertex(Attributes attrs) {
+		return builder.addVertex((SpatialSparseGraph)getGraph(), SpatialGraphML.newPoint(attrs));
+	}
+
+	@Override
+	protected SpatialSparseGraph newGraph(Attributes attrs) {
+		CoordinateReferenceSystem crs = SpatialGraphML.newCRS(attrs);
+		builder = new SpatialSparseGraphBuilder(crs);
+		return builder.createGraph();
 	}
 }

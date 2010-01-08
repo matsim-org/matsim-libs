@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GraphML.java
+ * SpatialGraphMLIoTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.contrib.sna.graph.spatial.io;
 
-package org.matsim.contrib.sna.graph.io;
+import java.io.IOException;
+
+import junit.framework.TestCase;
+
+import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
+import org.matsim.core.utils.misc.CRCChecksum;
+
 
 /**
- * Constants used by {@link AbstractGraphMLReader}.
- * 
  * @author illenberger
- * 
+ *
  */
-public interface GraphML {
+public class SpatialGraphMLIoTest extends TestCase {
 
-	public static final String GRAPHML_TAG = "graphml";
-
-	public static final String XMLNS_TAG = "xmlns";
-
-	public static final String XMLNS_URL = "http://graphml.graphdrawing.org/xmlns";
-
-	public static final String GRAPH_TAG = "graph";
-
-	public static final String EDGEDEFAULT_ATTR = "edgedefault";
-
-	public static final String UNDIRECTED = "undirected";
-
-	public static final String DIRECTED = "directed";
-
-	public static final String ID_ATTR = "id";
-
-	public static final String SOURCE_ATTR = "source";
-
-	public static final String TARGET_ATTR = "target";
-
-	public static final String NODE_TAG = "node";
-
-	public static final String EDGE_TAG = "edge";
-
+	/*
+	 * Not sure if this the way to access input files?
+	 */
+	private static final String INPUT_FILE = "sna/test/input/org/matsim/contrib/sna/graph/spatial/io/SpatialGraph.k7.graphml.gz";
+	
+	private static final String OUTPUT_FILE = "sna/test/output/tmpgraph.graphml";
+	
+	public void test() {
+		SpatialGraphMLReader reader = new SpatialGraphMLReader();
+		
+		SpatialGraph graph = reader.readGraph(INPUT_FILE);
+		
+		assertEquals(7187, graph.getVertices().size());
+		assertEquals(25680, graph.getEdges().size());
+		
+		SpatialGraphMLWriter writer = new SpatialGraphMLWriter();
+		try {
+			writer.write(graph, OUTPUT_FILE);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		double reference = CRCChecksum.getCRCFromFile(INPUT_FILE);
+		double actual = CRCChecksum.getCRCFromFile(OUTPUT_FILE);
+		
+		assertEquals(reference, actual);
+	}
 }

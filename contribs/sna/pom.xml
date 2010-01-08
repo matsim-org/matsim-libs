@@ -9,11 +9,23 @@
   <artifactId>sna</artifactId>
   <name>sna</name>
   <version>0.1.0-SNAPSHOT</version>
+  <repositories>
+  	<repository>
+  		<id>geotools</id>
+  		<name>Geotools repository</name>
+  		<url>http://maven.geotools.fr/repository</url>
+  	</repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>trove</groupId>
       <artifactId>trove</artifactId>
       <version>2.0.3</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.geotools</groupId>
+    	<artifactId>gt2-epsg-hsql</artifactId>
+    	<version>2.3.5</version>
     </dependency>
   </dependencies>
 </project>

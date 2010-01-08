@@ -175,7 +175,7 @@ public abstract class AbstractGraphMLReader<G extends Graph, V extends Vertex, E
 			throw new IllegalArgumentException("A vertex must not be null!");
 		
 		numVertex++;
-		int id = Integer.parseInt(attrs.getValue(GraphML.ID_TAG));
+		int id = Integer.parseInt(attrs.getValue(GraphML.ID_ATTR));
 		vertexMappings.put(id, v);
 		
 		if(numVertex % 100000 == 0)
@@ -185,8 +185,8 @@ public abstract class AbstractGraphMLReader<G extends Graph, V extends Vertex, E
 	}
 	
 	private Edge newEdge(Attributes attrs) {
-		int id1 = Integer.parseInt(attrs.getValue(GraphML.SOURCE_TAG));
-		int id2 = Integer.parseInt(attrs.getValue(GraphML.TARGET_TAG));
+		int id1 = Integer.parseInt(attrs.getValue(GraphML.SOURCE_ATTR));
+		int id2 = Integer.parseInt(attrs.getValue(GraphML.TARGET_ATTR));
 		V v1 = vertexMappings.get(id1);
 		V v2 = vertexMappings.get(id2);
 		if(v1 != null && v2 != null) {
