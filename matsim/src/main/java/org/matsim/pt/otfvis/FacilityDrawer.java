@@ -27,6 +27,11 @@ import java.util.List;
 
 import javax.media.opengl.GL;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.pt.queuesim.TransitStopAgentTracker;
@@ -41,17 +46,21 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLDrawableImpl;
 import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 
 
 public class FacilityDrawer {
+	private static final Logger log = Logger.getLogger(FacilityDrawer.class);
 	
 	public static class DataWriter_v1_0 extends OTFDataWriter {
 
 		private static final long serialVersionUID = 1L;
 		private final transient TransitSchedule schedule;
 		private final transient TransitStopAgentTracker agentTracker;
+		private final transient Network network ;
 		
-		public DataWriter_v1_0(final TransitSchedule schedule, final TransitStopAgentTracker agentTracker) {
+		public DataWriter_v1_0(final Network network, final TransitSchedule schedule, final TransitStopAgentTracker agentTracker) {
+			this.network = network ;
 			this.schedule = schedule;
 			this.agentTracker = agentTracker;
 		}
@@ -62,8 +71,19 @@ public class FacilityDrawer {
 			for (TransitStopFacility facility : this.schedule.getFacilities().values()) {
 				ByteBufferUtils.putString(out, facility.getId().toString());
 				ByteBufferUtils.putString(out, facility.getLinkId().toString());
-				out.putDouble(facility.getCoord().getX() - OTFServerQuad2.offsetEast);
-				out.putDouble(facility.getCoord().getY() - OTFServerQuad2.offsetNorth);
+
+				// yyyy would most probably make sense to have something that generates coordinates for facilities
+				Link link = this.network.getLinks().get( facility.getLinkId() ) ;
+				if ( link==null ) {
+					log.warn( " link not found; linkId: " + facility.getLinkId() ) ;
+				}
+				PositionInfo ps = new PositionInfo(facility.getId(),link) ;
+				
+				out.putDouble( ps.getEasting() - OTFServerQuad2.offsetEast ) ;
+				out.putDouble( ps.getNorthing() - OTFServerQuad2.offsetNorth ) ;
+				
+//				out.putDouble(facility.getCoord().getX() - OTFServerQuad2.offsetEast);
+//				out.putDouble(facility.getCoord().getY() - OTFServerQuad2.offsetNorth);
 			}
 
 		}

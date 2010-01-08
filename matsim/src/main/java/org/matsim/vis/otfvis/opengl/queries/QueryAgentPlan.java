@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -48,6 +49,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.ptproject.qsim.QueueNetwork;
 import org.matsim.vis.otfvis.data.OTFServerQuad2;
 import org.matsim.vis.otfvis.gui.OTFVisConfig;
@@ -59,6 +61,7 @@ import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.InfoTextContainer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer.AgentPointDrawer;
+import org.matsim.vis.snapshots.writers.PositionInfo;
 
 import com.sun.opengl.util.BufferUtil;
 
@@ -70,9 +73,9 @@ import com.sun.opengl.util.BufferUtil;
  */
 public class QueryAgentPlan implements OTFQuery {
 
-  private static final Logger log = Logger.getLogger(QueryAgentPlan.class);
-	
-  private static final long serialVersionUID = -8415337571576184768L;
+	private static final Logger log = Logger.getLogger(QueryAgentPlan.class);
+
+	private static final long serialVersionUID = -8415337571576184768L;
 
 	protected String agentId;
 	protected float[] vertex = null;
@@ -84,6 +87,8 @@ public class QueryAgentPlan implements OTFQuery {
 	private ByteBuffer cols; 
 
 	private boolean calcOffset = true;
+	
+	private Network net ;
 
 	public void setId(String id) {
 		this.agentId = id;
@@ -134,12 +139,16 @@ public class QueryAgentPlan implements OTFQuery {
 		Color otherColor = Color.PINK;
 
 		for (Object o : plan.getPlanElements()) {
-			if(o instanceof ActivityImpl) {
+			if(o instanceof Activity) {
 				Color col = actColor;
-				ActivityImpl act = (ActivityImpl)o;
+				Activity act = (Activity)o;
 				Coord coord = act.getCoord();
 				if (coord == null) {
-				  coord = act.getLink().getCoord();
+					assert( net!=null ) ;
+					Link link = net.getLinks().get( act.getLinkId() ) ;
+					PositionInfo pi = new PositionInfo( new IdImpl(this.agentId), link ) ;
+					coord = new CoordImpl( pi.getEasting(), pi.getNorthing() ) ;
+//					coord = link.getCoord();
 				}
 				setCoord(pos++, coord, col);
 			} 
@@ -153,15 +162,15 @@ public class QueryAgentPlan implements OTFQuery {
 						setCoord(pos++, node.getCoord(), carColor);
 					}
 					if(last != null) {
-					  setCoord(pos++, last.getCoord(), carColor);
+						setCoord(pos++, last.getCoord(), carColor);
 					}
 				}
 				else if (leg.getMode().equals(TransportMode.pt)){
-				  setColor(pos-1, ptColor); 
+					setColor(pos-1, ptColor); 
 				}
-        else if (leg.getMode().equals(TransportMode.walk)){
-          setColor(pos-1, walkColor); 
-        }
+				else if (leg.getMode().equals(TransportMode.walk)){
+					setColor(pos-1, walkColor); 
+				}
 				else {
 					setColor(pos-1, otherColor); // replace act Color with pt color... here we need walk etc too
 				}
@@ -170,20 +179,22 @@ public class QueryAgentPlan implements OTFQuery {
 	}
 
 	public OTFQuery query(QueueNetwork net, Population plans, EventsManager events, OTFServerQuad2 quad) {
+		this.net = net.getNetworkLayer();
+		
 		Person person = plans.getPersons().get(new IdImpl(this.agentId));
 		if (person != null) {
 			Plan plan = person.getSelectedPlan();
 			this.acts = new Vector<Object>();
 			for (PlanElement e : plan.getPlanElements()){
-			  if (e instanceof Activity){
-			    Activity act = (Activity) e;
-	        Coord coord = act.getCoord();
-	        if (coord == null) {
-	          Link link = net.getLinks().get(act.getLinkId()).getLink();
-	          coord = link.getCoord();
-	        }
-	        this.acts.add(new MyInfoText((float) coord.getX(), (float) coord.getY(), act.getType()));
-			  }
+				if (e instanceof Activity){
+					Activity act = (Activity) e;
+					Coord coord = act.getCoord();
+					if (coord == null) {
+						Link link = net.getLinks().get(act.getLinkId()).getLink();
+						coord = link.getCoord();
+					}
+					this.acts.add(new MyInfoText((float) coord.getX(), (float) coord.getY(), act.getType()));
+				}
 			}
 			buildRoute(plan);
 		}
@@ -198,7 +209,7 @@ public class QueryAgentPlan implements OTFQuery {
 			drawWithGLDrawer((OTFOGLDrawer)drawer);
 		}
 		else {
-		  log.error("cannot draw query cause no OTFOGLDrawer is used!");
+			log.error("cannot draw query cause no OTFOGLDrawer is used!");
 		}
 	}
 
@@ -284,7 +295,7 @@ public class QueryAgentPlan implements OTFQuery {
 		query.setId(this.agentId);
 		query.setNow(drawer.getActGraph().getTime());
 		query = (QueryAgentActivityStatus) drawer.getQuad().doQuery(query);
-		
+
 		if ((query != null) && (query.activityNr != -1) && (query.activityNr < this.acts.size())) {
 			InfoText posT = ((InfoText)this.acts.get(query.activityNr));
 			posT.setColor(new Color(255,50,50,180));
@@ -305,8 +316,8 @@ public class QueryAgentPlan implements OTFQuery {
 			}
 			this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
 			this.cols = BufferUtil.copyByteBuffer(ByteBuffer.wrap(this.colors));
-			
-			
+
+
 			for (int i=0;i< this.acts.size(); i++) {
 				MyInfoText inf = (MyInfoText)this.acts.get(i);
 				this.acts.set(i,InfoTextContainer.showTextPermanent(inf.name, inf.east - east, inf.north - north, -0.001f ));
@@ -329,7 +340,7 @@ public class QueryAgentPlan implements OTFQuery {
 	private Double getAgentPositionFromPointLayer(String agentIdString, OGLAgentPointLayer layer) {
 		return layer.getAgentCoords(agentIdString.toCharArray());
 	}
-		
+
 	public void remove() {
 		// Check if we have already generated InfoText Objects, otherwise drop deleting
 		if (this.calcOffset == true) return;
@@ -337,12 +348,12 @@ public class QueryAgentPlan implements OTFQuery {
 			for (int i=0;i< this.acts.size(); i++) {
 				InfoText inf = (InfoText)this.acts.get(i);
 				if(inf != null) {
-				  InfoTextContainer.removeTextPermanent(inf);
+					InfoTextContainer.removeTextPermanent(inf);
 				}
 			}
 		}
 		if (this.agentText != null) {
-		  InfoTextContainer.removeTextPermanent(this.agentText);
+			InfoTextContainer.removeTextPermanent(this.agentText);
 		}
 	}
 
@@ -357,19 +368,19 @@ public class QueryAgentPlan implements OTFQuery {
 	protected void onEndInit() {
 		// for derived classes
 	}
-	
-	 private static class MyInfoText implements Serializable{
 
-	    private static final long serialVersionUID = 1L;
-	    float east, north;
-	    String name;
-	    
-	    public MyInfoText(float east, float north, String name) {
-	      this.east = east;
-	      this.north = north;
-	      this.name = name;
-	    }
-	  }
+	private static class MyInfoText implements Serializable{
+
+		private static final long serialVersionUID = 1L;
+		float east, north;
+		String name;
+
+		public MyInfoText(float east, float north, String name) {
+			this.east = east;
+			this.north = north;
+			this.name = name;
+		}
+	}
 
 
 }

@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkLayer;
@@ -67,7 +68,7 @@ public class TransitQueueSimulationFeature implements QueueSimulationFeature, De
 
 	public void startOTFServer(final String serverName) {
 		this.otfServer = OnTheFlyServer.createInstance(serverName, queueSimulation.getNetwork(), queueSimulation.getPopulation(), queueSimulation.getEvents(), false);
-		this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(this.schedule, this.agentTracker));
+		this.otfServer.addAdditionalElement(new FacilityDrawer.DataWriter_v1_0(queueSimulation.getNetwork().getNetworkLayer(),this.schedule, this.agentTracker));
 		this.teleportationWriter = new OTFTeleportAgentsDataWriter();
 		this.visTeleportationData = new LinkedHashMap<Id, TeleportationVisData>();
 		this.otfServer.addAdditionalElement(this.teleportationWriter);

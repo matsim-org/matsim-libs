@@ -82,6 +82,9 @@ public class PositionInfo {
 	public PositionInfo( final Id agentId, final Link link ) {
 		this( agentId, link, 0.9*link.getLength(), 10, 0., VehicleState.Parking, "") ;
 	}
+	public PositionInfo( final Id agentId, final Link link, int cnt ) {
+		this( agentId, link, 0.9*link.getLength(), 10+2*cnt, 0., VehicleState.Parking, "") ;
+	}
 
 	/**
 	 * Creates a new PositionInfo based on the agent's position between to nodes.

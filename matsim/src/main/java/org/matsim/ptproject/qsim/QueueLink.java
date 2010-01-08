@@ -513,11 +513,14 @@ public class QueueLink {
 				}
 	
 				// add the parked vehicles
+				int cnt2 = 0 ;
 				for (QueueVehicle veh : parkedVehicles.values()) {
-					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(),
-							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
+					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(), cnt2 ) ;
+//							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
+//					PositionInfo position = new PositionInfo(veh.getDriver().getPerson().getId(), getLink(),
+//							distFromFromNode, lane, 0.0, PositionInfo.VehicleState.Parking, null);
 					positions.add(position);
-					distFromFromNode -= cellSize;
+					distFromFromNode -= cellSize; cnt2++ ;
 				}
 			}
 			return positions;
