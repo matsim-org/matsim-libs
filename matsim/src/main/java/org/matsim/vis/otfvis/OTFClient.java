@@ -25,6 +25,8 @@ import java.awt.Toolkit;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import org.apache.log4j.Logger;
@@ -79,7 +81,7 @@ public abstract class OTFClient extends Thread {
 		log.info("created HostControlBar");
 		createDrawer();
 		log.info("created drawer");
-		addDrawerToSplitPane();
+		addDrawerToSplitPane(this.url);
 		this.hostControlBar.addDrawer(this.url, mainDrawer);
 		try {
 			mainDrawer.invalidate((int)hostControlBar.getOTFHostControl().getTime());
@@ -90,10 +92,18 @@ public abstract class OTFClient extends Thread {
 		log.info("OTFVis finished init");
 	}
 
-	private void addDrawerToSplitPane() {
-		pane.setRightComponent(mainDrawer.getComponent());
+	private void addDrawerToSplitPane(String url2) {
+	  pane.setRightComponent(this.createDrawerPanel(url2, mainDrawer));
 		pane.validate();
-
+	}
+	
+	protected JPanel createDrawerPanel(String url, OTFDrawer drawer){
+    JPanel panel = new JPanel(new BorderLayout());
+    JLabel label = new JLabel();
+    label.setText(url);
+    panel.add(drawer.getComponent(), BorderLayout.CENTER);
+    panel.add(label, BorderLayout.NORTH);
+    return panel;
 	}
 
 	public OTFClientQuad createNewView(String id, OTFConnectionManager connect, OTFHostConnectionManager hostControl) throws RemoteException {

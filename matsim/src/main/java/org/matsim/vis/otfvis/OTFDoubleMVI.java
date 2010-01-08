@@ -87,7 +87,7 @@ public class OTFDoubleMVI extends OTFClientFile {
 			drawer2.invalidate((int)hostControlBar.getOTFHostControl().getTime());
 			drawer2.replaceMouseHandler(((OTFOGLDrawer) this.mainDrawer).getMouseHandler());
 			hostControlBar.addDrawer("test", drawer2);
-			this.pane.setLeftComponent(drawer2.getComponent());
+			this.pane.setLeftComponent(this.createDrawerPanel(filename2, drawer2));
 			pane.setResizeWeight(0.5);
 
 		} catch (RemoteException e) {
