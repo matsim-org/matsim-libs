@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.dgrether;
 
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -41,7 +42,7 @@ public class DgEquilController {
 		final int iteration = 0;
 		
 		Controler controler = new Controler(config);
-//		controler = new PtController(config);
+		controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		controler.setOverwriteFiles(true);
 		
 		controler.addControlerListener(new StartupListener(){

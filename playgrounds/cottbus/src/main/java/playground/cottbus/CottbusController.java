@@ -24,7 +24,8 @@ package playground.cottbus;
  * [based on tutorial.example7]
  */
 
-import org.matsim.ptproject.controller.PtController;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.vis.netvis.NetVis;
 
 public class CottbusController {
@@ -33,7 +34,8 @@ public class CottbusController {
 		String config = "./input/denver/config.xml";
 		// configuration that describes current scenario
 		
-		PtController controler = new PtController(config);
+		Controler controler = new Controler(config);
+		controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		controler.setOverwriteFiles(true);
 		// effects output-folder
 		controler.run();

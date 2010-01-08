@@ -22,6 +22,7 @@ package playground.dgrether.daganzosignal;
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -33,7 +34,6 @@ import org.matsim.core.mobsim.queuesim.events.QueueSimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationInitializedListener;
-import org.matsim.ptproject.controller.PtController;
 import org.matsim.ptproject.qsim.QueueSimulation;
 import org.matsim.run.OTFVis;
 
@@ -66,7 +66,8 @@ public class DaganzoRunner {
 			conf = configFile;
 		}
 //		String c = DgPaths.STUDIESDG + "daganzo/daganzoConfig2Agents.xml"; 
-		PtController controler = new PtController(conf);
+		Controler controler = new Controler(conf);
+		controler.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		controler.setOverwriteFiles(true);
 		Config config = controler.getConfig();
 		
@@ -101,11 +102,17 @@ public class DaganzoRunner {
 		//add some EventHandler to the EventsManager after the controler is started
 		handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));
 		handler4 = new TTInOutflowEventHandler(new IdImpl("4"));
+		
 		c.addControlerListener(new StartupListener() {
+		  
 			public void notifyStartup(StartupEvent e) {
 				e.getControler().getEvents().addHandler(handler3);
 				e.getControler().getEvents().addHandler(handler4);
-			}});
+			}
+		});
+		
+		MyStartupListener startupListener = new MyStartupListener();
+		c.addControlerListener(startupListener);
 
 		//write some output after each iteration
 		c.addControlerListener(new IterationEndsListener() {
@@ -130,6 +137,16 @@ public class DaganzoRunner {
 				DgChartWriter.writeChart(event.getControler().getNameForOutputFilename("countPerIteration"), chart.createChart());
 			}
 		});
+	}
+	
+	class MyStartupListener implements StartupListener {
+
+    @Override
+    public void notifyStartup(StartupEvent event) {
+      // TODO Auto-generated method stub
+      
+    }
+	  
 	}
 	
 	

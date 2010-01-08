@@ -34,6 +34,7 @@ import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.analysis.charts.utils.DgChartWriter;
 
 
 /**
@@ -45,8 +46,8 @@ public class IncomeStats {
 	
 	private static final Logger log = Logger.getLogger(IncomeStats.class);
 	
-	private Households households;
-	private double totalIncome;
+	private final Households households;
+	private final double totalIncome;
 
 
 	public IncomeStats(Households hhs){
@@ -119,6 +120,7 @@ public class IncomeStats {
 		
 		XYLineChart chart = new XYLineChart("Lorenz", "number of hh percent", "percentage of income");
 		chart.addSeries("incomes", xValues, yValues);
+		DgChartWriter.writeChartDataToFile(outdir + "lorenz.txt", chart.getChart());
 		chart.saveAsPng(outdir + "lorenz.png", 800, 600);
 	}
 
@@ -127,8 +129,11 @@ public class IncomeStats {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outdir = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/";
-		String hhFile = outdir + "households.xml";
+//	  String outdir = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/";
+//	  String hhFile = outdir + "households.xml";
+	  String outdir = DgPaths.STUDIESDG + "einkommenSchweiz/";
+	  String hhFile = outdir + "households_all_zrh30km_10pct.xml.gz";
+//	  String hhFile = outdir + "households_all_zrh30km_transitincl_10pct.xml.gz";
 		Households hhs = new HouseholdsImpl();
 		new HouseholdsReaderV10(hhs).readFile(hhFile);
 		IncomeStats istats = new IncomeStats(hhs);

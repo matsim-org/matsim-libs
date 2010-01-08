@@ -21,26 +21,30 @@ package playground.benjamin;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.population.algorithms.PlanCalcType;
-import org.matsim.ptproject.controller.PtController;
 
 
 /**
  * @author dgrether
  *
  */
-public class BKickControler extends PtController {
+public class BKickControler extends Controler {
 
 	public BKickControler(String configFileName) {
 		super(configFileName);
+		this.config.setQSimConfigGroup(new QSimConfigGroup());
 	}
 	
 	public BKickControler(Config conf){
 		super(conf);
+		this.config.setQSimConfigGroup(new QSimConfigGroup());
 	}
 
 	public BKickControler(String[] args) {
 		super(args);
+		this.config.setQSimConfigGroup(new QSimConfigGroup());
 	}
 
 	@Override

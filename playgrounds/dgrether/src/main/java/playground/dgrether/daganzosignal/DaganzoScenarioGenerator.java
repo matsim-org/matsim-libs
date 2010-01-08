@@ -196,12 +196,12 @@ public class DaganzoScenarioGenerator {
 		int homeEndTime = firstHomeEndTime;
 		Link l1 = network.getLinks().get(scenario.createId("1"));
 		Link l7 = network.getLinks().get(scenario.createId("7"));
-		PopulationFactory builder = population.getFactory();
+		PopulationFactory factory = population.getFactory();
 
 		for (int i = 1; i <= 1000; i++) {
-			PersonImpl p = (PersonImpl) builder.createPerson(scenario.createId(Integer
+			PersonImpl p = (PersonImpl) factory.createPerson(scenario.createId(Integer
 					.toString(i)));
-			Plan plan = builder.createPlan();
+			Plan plan = factory.createPlan();
 			p.addPlan(plan);
 			// home
 			// homeEndTime = homeEndTime + ((i - 1) % 3);
@@ -210,11 +210,11 @@ public class DaganzoScenarioGenerator {
 //				homeEndTime++;
 //			}
 
-			ActivityImpl act1 = (ActivityImpl) builder.createActivityFromLinkId("h", l1.getId());
+			ActivityImpl act1 = (ActivityImpl) factory.createActivityFromLinkId("h", l1.getId());
 			act1.setEndTime(homeEndTime);
 			plan.addActivity(act1);
 			// leg to home
-			LegImpl leg = (LegImpl) builder.createLeg(TransportMode.car);
+			LegImpl leg = (LegImpl) factory.createLeg(TransportMode.car);
 			// TODO check this
 			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(l1, l7);
 			if (isAlternativeRouteEnabled) {
@@ -227,7 +227,7 @@ public class DaganzoScenarioGenerator {
 
 			plan.addLeg(leg);
 			
-			ActivityImpl act2 = (ActivityImpl) builder.createActivityFromLinkId("h", l7.getId());
+			ActivityImpl act2 = (ActivityImpl) factory.createActivityFromLinkId("h", l7.getId());
 			act2.setLink(l7);
 			plan.addActivity(act2);
 			population.addPerson(p);
@@ -281,17 +281,17 @@ public class DaganzoScenarioGenerator {
 
 	private BasicLaneDefinitions createLanes(ScenarioImpl scenario) {
 		BasicLaneDefinitions lanes = scenario.getLaneDefinitions();
-		BasicLaneDefinitionsFactory builder = lanes.getFactory();
+		BasicLaneDefinitionsFactory factory = lanes.getFactory();
 		//lanes for link 4
-		BasicLanesToLinkAssignment lanesForLink4 = builder.createLanesToLinkAssignment(id4);
-		BasicLane link4lane1 = builder.createLane(id1);
+		BasicLanesToLinkAssignment lanesForLink4 = factory.createLanesToLinkAssignment(id4);
+		BasicLane link4lane1 = factory.createLane(id1);
 		link4lane1.addToLinkId(id6);
 		link4lane1.setNumberOfRepresentedLanes(3);
 		lanesForLink4.addLane(link4lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink4);
 		//lanes for link 5
-		BasicLanesToLinkAssignment lanesForLink5 = builder.createLanesToLinkAssignment(id5);
-		BasicLane link5lane1 = builder.createLane(id1);
+		BasicLanesToLinkAssignment lanesForLink5 = factory.createLanesToLinkAssignment(id5);
+		BasicLane link5lane1 = factory.createLane(id1);
 		link5lane1.setNumberOfRepresentedLanes(3);
 		link5lane1.addToLinkId(id6);
 		lanesForLink5.addLane(link5lane1);
@@ -302,13 +302,13 @@ public class DaganzoScenarioGenerator {
 	
 	private BasicSignalSystems createSignalSystems(ScenarioImpl scenario) {
 		BasicSignalSystems systems = scenario.getSignalSystems();
-		BasicSignalSystemsFactory builder = systems.getFactory();
+		BasicSignalSystemsFactory factory = systems.getFactory();
 		//create the signal system no 1
-		BasicSignalSystemDefinition definition = builder.createSignalSystemDefinition(id1);
+		BasicSignalSystemDefinition definition = factory.createSignalSystemDefinition(id1);
 		systems.addSignalSystemDefinition(definition);
 		
 		//create signal group for traffic on link 4 on lane 1 with toLink 6
-		BasicSignalGroupDefinition groupLink4 = builder.createSignalGroupDefinition(id4, id1);
+		BasicSignalGroupDefinition groupLink4 = factory.createSignalGroupDefinition(id4, id1);
 		groupLink4.addLaneId(id1);
 		groupLink4.addToLinkId(id6);
 		//assing the group to the system
@@ -317,7 +317,7 @@ public class DaganzoScenarioGenerator {
 		systems.addSignalGroupDefinition(groupLink4);
 		
 		//create signal group  with id no 2 for traffic on link 5 on lane 1 with toLink 6
-		BasicSignalGroupDefinition groupLink5 = builder.createSignalGroupDefinition(id5, id2);
+		BasicSignalGroupDefinition groupLink5 = factory.createSignalGroupDefinition(id5, id2);
 		groupLink5.addLaneId(id1);
 		groupLink5.addToLinkId(id6);
 		//assing the group to the system
@@ -332,10 +332,10 @@ public class DaganzoScenarioGenerator {
 	private BasicSignalSystemConfigurations createSignalSystemsConfig(
 			ScenarioImpl scenario) {
 		BasicSignalSystemConfigurations configs = scenario.getSignalSystemConfigurations();
-		BasicSignalSystemConfigurationsFactory builder = configs.getFactory();
+		BasicSignalSystemConfigurationsFactory factory = configs.getFactory();
 		
-		BasicSignalSystemConfiguration systemConfig = builder.createSignalSystemConfiguration(id1);
-		BasicAdaptiveSignalSystemControlInfo controlInfo = builder.createAdaptiveSignalSystemControlInfo();
+		BasicSignalSystemConfiguration systemConfig = factory.createSignalSystemConfiguration(id1);
+		BasicAdaptiveSignalSystemControlInfo controlInfo = factory.createAdaptiveSignalSystemControlInfo();
 		controlInfo.addSignalGroupId(id1);
 		controlInfo.addSignalGroupId(id2);
 		controlInfo.setAdaptiveControlerClass(controllerClass);
