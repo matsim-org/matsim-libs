@@ -35,7 +35,5 @@ public class MyDijkstra extends Dijkstra{
     	   pass = type.equals(PTValues.ACCESS_STR);
        }
 		return pass;
-		
 	}
-
 }

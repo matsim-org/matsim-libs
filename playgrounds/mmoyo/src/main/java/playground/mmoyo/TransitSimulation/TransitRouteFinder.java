@@ -19,6 +19,7 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import playground.mmoyo.PTRouter.LogicFactory;
 import playground.mmoyo.PTRouter.LogicIntoPlainTranslator;
 import playground.mmoyo.PTRouter.PTRouter;
+import playground.mmoyo.PTRouter.PTValues;
 
 /**
  * Receives two acts and returns a list of PT legs connecting their coordinates 
@@ -51,7 +52,7 @@ public class TransitRouteFinder {
 				
 				if (i>1){
 					if (!linkType.equals(lastLinkType)){
-						if (!lastLinkType.equals("Transfer")){    //transfers will not be described in legs
+						if (!lastLinkType.equals(PTValues.TRANSFER_STR)){    //transfers will not be described in legs
 							LegImpl newLeg = createLeg(selectMode(lastLinkType), linkList, depTime, travTime);  
 							legList.add(newLeg);
 						}
@@ -76,10 +77,10 @@ public class TransitRouteFinder {
 	
 	private TransportMode selectMode(final String linkType){
 		TransportMode mode = null;
-		if (linkType.equals("Standard")){ 
+		if (linkType.equals(PTValues.STANDARD_STR)){ 
 			mode=  TransportMode.pt;
 		}else{
-			mode=  TransportMode.walk;
+			mode=  TransportMode.undefined;
 		}
 		return mode;
 	}

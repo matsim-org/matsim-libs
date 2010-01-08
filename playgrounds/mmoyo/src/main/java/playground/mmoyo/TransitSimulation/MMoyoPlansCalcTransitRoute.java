@@ -1,23 +1,3 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * PlansCalcPtRoute.java
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 package playground.mmoyo.TransitSimulation;
 
 import java.util.EnumSet;
@@ -52,10 +32,6 @@ import playground.mmoyo.PTRouter.PTRouter;
 import playground.mrieser.pt.config.TransitConfigGroup;
 import playground.mrieser.pt.router.TransitActsRemover;
 import playground.mrieser.pt.router.TransitRouterConfig;
-
-/**
- * @author mrieser
- */
 
 /**copy of marcel.pt.router.PlansCalcTransitRoute.java to test the ptRouter in the simulation*/
 public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
@@ -102,7 +78,6 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 		super.handlePlan(plan);
 		this.replaceLegs();
 		this.currentPlan = null;
-
 	}
 
 	@Override
@@ -114,7 +89,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 	}
 
 	private double handlePtPlan(final LegImpl leg, final ActivityImpl fromAct, final ActivityImpl toAct, final double depTime) {
-		List<Leg> legs= this.transitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
+		List<Leg> legs= this.transitRouter.calcRoute(fromAct, toAct, depTime);
 		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
 
 		double travelTime = 0.0;
@@ -160,7 +135,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 						}
 						
 						//remove legs between a same link
-						/**
+						/*
 						boolean sameLink = (lastActLink.getId().equals(nextPeLink.getId()));
 						if (!sameLink){currentTuple.getSecond().get(0).setMode(TransportMode.undefined);}else{currentTuple.getSecond().remove(0);}					
 						if (fromLink.equals(toLink)) currentTuple.getSecond().remove(lastLeg);
@@ -171,15 +146,13 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 								currentTuple.getSecond().remove(ii);
 								ii--;
 							}
-						}
-						**///////////////////
+						}*/
+						///////////////////
 						
-					lastLeg.setRoute(new GenericRouteImpl(fromLink, toLink));							
+						lastLeg.setRoute(new GenericRouteImpl(fromLink, toLink));							
+						
 						boolean isFirstLeg = true;
 						Coord nextCoord = null;
-						
-						
-						
 						for (Leg leg2 : currentTuple.getSecond()) {												
 							if (isFirstLeg) {																						
 								planElements.set(i, leg2);														
@@ -187,6 +160,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 							} else {
 								i++;															
 								if (leg2.getRoute() instanceof ExperimentalTransitRoute) {						
+								
 									ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg2.getRoute();   // 
 									ActivityImpl act = new ActivityImpl(TRANSIT_ACTIVITY_TYPE, this.schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), (LinkImpl) tRoute.getStartLink());
 									act.setDuration(0.0);
@@ -197,6 +171,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 									act.setDuration(0.0);
 									planElements.add(i, act);
 									leg2.setMode(TransportMode.undefined);
+									//TODO:  set route distance
 								}
 								i++;
 								planElements.add(i, leg2);

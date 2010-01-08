@@ -15,29 +15,38 @@ import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.xml.sax.SAXException;
 import org.matsim.core.router.PlansCalcRoute;
 
+import playground.mmoyo.PTRouter.PTValues;
 import playground.mmoyo.TransitSimulation.MMoyoPlansCalcTransitRoute;
 import playground.mrieser.pt.config.TransitConfigGroup;
 import playground.mrieser.pt.router.PlansCalcTransitRoute;
 
-/**read a config file, routes the transit plans and writes a routed plans file*/ 
+/**reads a config file, routes the transit plans and writes a routed plans file*/ 
 public class PlanRouter {
 
-	private boolean useMoyoRouter  = true;     //true= MmoyoPtRouter)   false= transitRouter
+	///private static boolean useMoyoRouter  = true;     //true= MmoyoPtRouter)   false= transitRouter
 	
 	public PlanRouter(ScenarioImpl scenario) {
-		PlansCalcRoute router;
+		
+		PlansCalcRoute router= null;
 		String routedPlansFile = scenario.getConfig().controler().getOutputDirectory();
 
 		/**route plans*/
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
-		if (useMoyoRouter){
-			router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-			routedPlansFile += "/moyo_routedPlans.xml" ;
-		}else {
-			router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
-			routedPlansFile += "/routedPlans.xml" ;
+		System.out.println( PTValues.routerCalculator );
+		switch (PTValues.routerCalculator){
+			case 1:  //moyo time
+				router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
+				routedPlansFile += "/moyo_routedPlans_time.xml" ;
+				 break;
+			case 2:	 //moyo parameterized
+				router = new MMoyoPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
+				routedPlansFile += "/moyo_routedPlans_parameterized.xml" ;
+				 break;
+			default:
+				router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, scenario.getTransitSchedule(), transitConfig);
+				routedPlansFile += "/routedPlans.xml" ;
 		}
 		router.run(scenario.getPopulation());	
 
@@ -51,10 +60,13 @@ public class PlanRouter {
 		
 		String configFile;
 	
-		if (args.length==1){
-			configFile = args[0];} 
-		else {
-			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/Comparison_config.xml";
+		if (args.length>0){
+			configFile = args[0]; 
+		}else {
+			//configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_10x_900s_big.xml";
+			//configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_900s_big.xml";
+			//configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/comparison/config_900s_small.xml";
+			configFile = "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/simplePlan1/config.xml";
 		}
  
 		/**load scenario */

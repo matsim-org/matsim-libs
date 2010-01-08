@@ -47,9 +47,7 @@ import playground.mrieser.pt.analysis.VehicleTracker;
 
 public class OccupancyCounts {
 
-	private static String transitLineStrId = "BVB----344";
-	private static String transitRouteStrId1 = "BVB----344.3.BVB----344.H";
-	private static String transitRouteStrId2 = "BVB----344.5.BVB----344.R";
+	
 	
 	private static final String SERVERNAME = "OcuppancyCounter";
 
@@ -63,7 +61,13 @@ public class OccupancyCounts {
 
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
 		String configFile = args[0]; 
-		String scheduleFile = args[1];
+		String transitLineStrId = args[1];
+		String transitRouteStrId1 = args[2];
+		String transitRouteStrId2 = args[3];
+		
+		//private static String transitLineStrId = "BVB----344";
+		//private static String transitRouteStrId1 = "BVB----344.3.BVB----344.H";
+		//private static String transitRouteStrId2 = "BVB----344.5.BVB----344.R";
 		
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(configFile);
 		ScenarioImpl scenario = sl.getScenario();
@@ -77,9 +81,10 @@ public class OccupancyCounts {
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 
-		TransitSchedule schedule = scenario.getTransitSchedule();
-		new TransitScheduleReaderV1(schedule, network).parse(scheduleFile);
-		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
+		//TransitSchedule schedule = scenario.getTransitSchedule();
+		//new TransitScheduleReaderV1(schedule, network).parse(scheduleFile);
+		new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork()).parse(scenario.getConfig().getParam("transit", "transitScheduleFile"));
+		new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getVehicles()).run();
 
 		//////////////////
 		

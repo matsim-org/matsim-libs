@@ -23,6 +23,9 @@ public abstract class PTValues {
 	public final static double WALKRANGE_EXT = 300;   		//progressive extension distance of the station search
 	
 	public final static int INI_STATIONS_NUM = 2;			//number of stations to find in order to start the route search
+
+	public static byte routerCalculator = 0;
+	
 }
 
 /*

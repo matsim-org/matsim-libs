@@ -8,11 +8,11 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="src/playground/mmoyo/demo/X5/network.xml"/>
+		<param name="inputNetworkFile" value="../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/network.xml"/>
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="src/playground/mmoyo/demo/X5/transfer_det/output_plans.xml" />
+		<param name="inputPlansFile" value="../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/transfer_det/output_plans.xml" />
 	</module>
 
 	<module name="controler">

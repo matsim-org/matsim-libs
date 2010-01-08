@@ -65,6 +65,7 @@ public class LogicFactory{
 				
 				//iterates in each transit stop to create nodes and links */
 				int transitStopIndex=0;
+				double lastDepartureOffset=0;
 				for (TransitRouteStop transitRouteStop: transitRoute.getStops()) { 
 					TransitStopFacility transitStopFacility = transitRouteStop.getStopFacility(); 
 					
@@ -97,7 +98,8 @@ public class LogicFactory{
 					if (transitStopIndex>0){
 						Link plainLink= createPlainLink(lastPlainNode, plainNode);
 						//03 dic Id logicLinkId = new IdImpl(newLinkId++);
-						PTLink logicLink = new PTLink(new IdImpl(newLinkId++), lastLogicNode, logicStation, logicNet, "Standard");
+						PTLink logicLink = new PTLink(new IdImpl(newLinkId++), lastLogicNode, logicStation, logicNet, PTValues.STANDARD_STR);
+						logicLink.setTravelTime(transitRouteStop.getDepartureOffset() -lastDepartureOffset);
 						logicLink.setPlainLink(plainLink);
 						logicLink.setTransitLine(transitLine);
 						logicLink.setTransitRoute(transitRoute);
@@ -119,6 +121,7 @@ public class LogicFactory{
 					transitStopIndex++;
 					lastLogicNode= logicStation;
 					lastPlainNode= plainNode;
+					lastDepartureOffset = transitRouteStop.getDepartureOffset();
 				}
 			}
 		}
@@ -140,6 +143,10 @@ public class LogicFactory{
 		*/
 	
 		//create transfer and DetTransfer links
+		
+		final String DETTRANS_PREFIX ="DT";
+		final String TRANS_PREFIX ="T";
+		
 		for (NodeImpl centerNode: logicNet.getNodes().values()){
 			Collection<NodeImpl> nearNodes= logicNet.getNearestNodes(centerNode.getCoord(), PTValues.DETTRANSFER_RANGE );
 			for (NodeImpl nearNode : nearNodes){
@@ -148,9 +155,9 @@ public class LogicFactory{
 				if (fromNode.getTransitLine() != toNode.getTransitLine()) { 
 					if (!fromNode.isFirstStation() && !toNode.isLastStation()) {
 						if (fromNode.getTransitRouteStop().getStopFacility() != toNode.getTransitRouteStop().getStopFacility()) {
-							new PTLink(new IdImpl("DT" + ++newDetTransfLinkId),centerNode, nearNode, logicNet, PTValues.DETTRANSFER_STR);
+							new PTLink(new IdImpl(DETTRANS_PREFIX + ++newDetTransfLinkId),centerNode, nearNode, logicNet, PTValues.DETTRANSFER_STR);
 						}else{
-							new PTLink(new IdImpl("T" + ++newTransfLinkId), centerNode, nearNode, logicNet, PTValues.TRANSFER_STR);
+							new PTLink(new IdImpl(TRANS_PREFIX + ++newTransfLinkId), centerNode, nearNode, logicNet, PTValues.TRANSFER_STR);
 						}
 					}
 				}

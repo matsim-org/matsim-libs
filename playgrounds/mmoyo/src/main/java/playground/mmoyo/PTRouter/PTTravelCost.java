@@ -19,7 +19,7 @@ public class PTTravelCost implements TravelCost{
 	double timeCoefficient =.85;
 	double distanceCoefficient=.15;
 	double transferPenalty=60;
-	double walkCoefficient= 0; 
+	double walkCoefficient= 1; 
 	//double waitCoefficient=0;
 	
 	public PTTravelCost(final PTTravelTime ptTravelTime) {
@@ -39,19 +39,15 @@ public class PTTravelCost implements TravelCost{
 		String type = ((LinkImpl)link).getType();
 		if (type.equals( PTValues.DETTRANSFER_STR ) || type.equals( PTValues.TRANSFER_STR )){
 			cost += transferPenalty;
-		}
-		
-		//with coefficients
-		else if (type.equals( PTValues.STANDARD_STR )){
-			cost = (cost * timeCoefficient) + (link.getLength() * distanceCoefficient) ;
-		}
-		else if (type.equals( PTValues.ACCESS_STR ) || type.equals( PTValues.EGRESS_STR )){
-			cost = cost * walkCoefficient;
+		}else if (type.equals( PTValues.STANDARD_STR )){
+			if(PTValues.routerCalculator==2){	
+				cost = (cost * timeCoefficient) + (link.getLength() * distanceCoefficient);}
+		}else if (type.equals( PTValues.ACCESS_STR ) || type.equals( PTValues.EGRESS_STR )){
+				//cost = cost * walkCoefficient;  //add a walk coefficient 
 		}else{
 			throw new java.lang.RuntimeException("the pt link does not have a defined type: " + link.getId());
 		}
-		////////////////////////////////////////////////////////////////
-		
+
 		return cost;
 	}
 }

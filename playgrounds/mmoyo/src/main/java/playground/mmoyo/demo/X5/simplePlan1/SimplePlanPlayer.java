@@ -9,8 +9,8 @@ public class SimplePlanPlayer {
 
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
 		//invoke controler first
-		String configFile = "src/playground/mmoyo/demo/X5/simplePlan1/config.xml";
-		String scheduleFile =  "src/playground/mmoyo/demo/X5/simplePlan1/simple1TransitSchedule.xml";
+		String configFile = "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/simplePlan1/config.xml";
+		String scheduleFile =  "../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/simplePlan1/simple1TransitSchedule.xml";
 		ScenarioPlayer.main(new String[]{configFile, scheduleFile});
 	}
 }

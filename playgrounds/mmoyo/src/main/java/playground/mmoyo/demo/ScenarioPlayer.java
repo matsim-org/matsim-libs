@@ -41,9 +41,6 @@ import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
 import playground.mrieser.OTFDemo;
-
-
-
 /**
  * @author mrieser
  */
@@ -88,8 +85,8 @@ public class ScenarioPlayer {
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 
 		final EventsManager events = (new EventsManagerFactoryImpl()).createEventsManager() ;
-		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
-		EventWriterTXT writertxt = new EventWriterTXT("./output/testEvents.txt");
+		EventWriterXML writer = new EventWriterXML("../playgrounds/mmoyo/output/testEvents.xml");
+		EventWriterTXT writertxt = new EventWriterTXT("../playgrounds/mmoyo/output/testEvents.txt");
 		events.addHandler(writer);
 		events.addHandler(writertxt);
 

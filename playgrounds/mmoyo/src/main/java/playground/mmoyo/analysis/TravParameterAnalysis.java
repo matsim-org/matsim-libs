@@ -165,10 +165,10 @@ class ConnectionResult{
 			distance += link.getLength();
 
 			String type  = ((LinkImpl)link).getType();  
-			if (type.equals("DetTransfer")){    //type.equals("Egress") || type.equals("Access") || <- we don't want to count the access and egress walk time until the radius search be defined.
+			if (type.equals(PTValues.DETTRANSFER_STR)){    //type.equals("Egress") || type.equals("Access") || <- we don't want to count the access and egress walk time until the radius search be defined.
 				walkDistance += link.getLength();
 				detTransfers++;
-			}else if (type.equals("Transfer")){
+			}else if (type.equals(PTValues.TRANSFER_STR)){
 				transfers++;
 			}
 		}	

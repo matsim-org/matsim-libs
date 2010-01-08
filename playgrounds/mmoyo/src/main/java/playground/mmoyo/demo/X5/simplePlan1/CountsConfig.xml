@@ -18,7 +18,7 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/simplePlan1/plansFile.xml" />
+		<param name="inputPlansFile" value="../playgrounds/mmoyo/src/main/java/playground/mmoyo/demo/X5/simplePlan1/moyo_routedPlansReducedLegs.xml" />
 	</module>
 
 	<module name="scenario">

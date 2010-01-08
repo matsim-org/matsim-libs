@@ -24,7 +24,7 @@ public class Station extends NodeImpl {
 	private boolean isLastStation; 
 	
 	public Station(final Id id, final Coord coord) {
-		super(id, coord);
+		super(id, coord, null);
 	}
 
 	public TransitRoute getTransitRoute() {

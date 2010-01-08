@@ -261,8 +261,8 @@ public class PTActWriter {
 			linkTravelTime=this.ptRouter.ptTravelTime.getLinkTravelTime(link,accumulatedTime);
 			linkDistance = link.getLength();
 			
-			if (link.getType().equals("Standard")){
-				if (!lastLink.getType().equals("Standard")){  //reset to start a new ptLeg
+			if (link.getType().equals(PTValues.STANDARD_STR)){
+				if (!lastLink.getType().equals(PTValues.STANDARD_STR)){  //reset to start a new ptLeg
 					legRouteLinks.clear();
 					depTime=accumulatedTime;
 					legTravelTime=0;
@@ -277,7 +277,7 @@ public class PTActWriter {
 					newPlan.addActivity(newPTAct("exit pt veh", link.getToNode().getCoord(), link, arrTime, arrTime)); //describes the location
 				}
 
-			}else if(link.getType().equals("Transfer") ){  //add the PTleg and a Transfer Act
+			}else if(link.getType().equals(PTValues.TRANSFER_STR) ){  //add the PTleg and a Transfer Act
 				//if (lastLink.getType().equals(STANDARD)){
 					arrTime= depTime+ legTravelTime;
 					legDistance= legDistance+ linkDistance;
@@ -322,13 +322,13 @@ public class PTActWriter {
 				double endTime= depTime + linkTravelTime; // The ptTravelTime must be calculated like this: travelTime = walk + transferTime;
 				newPlan.addActivity(newPTAct("transf on", link.getToNode().getCoord(), link, arrTime, endTime));
 			
-			}else if (link.getType().equals("Egress")){
+			}else if (link.getType().equals(PTValues.EGRESS_STR)){
 				legRouteLinks.clear();
 				legRouteLinks.add(link);
 				arrTime= accumulatedTime+ linkTravelTime;
 				newPlan.addLeg(newPTLeg(TransportMode.walk, legRouteLinks, linkDistance, accumulatedTime, linkTravelTime, arrTime));
 			
-			}else if (link.getType().equals("Access")){
+			}else if (link.getType().equals(PTValues.ACCESS_STR)){
 					
 				/**like a Walking leg*/
 				walkTime= linkDistance * ptValues.AV_WALKING_SPEED;
@@ -394,8 +394,8 @@ public class PTActWriter {
 		destinationNode= createWalkingNode(new IdImpl("W2"), coord2);
 		path.nodes.add(0, originNode);
 		path.nodes.add(destinationNode);
-		accessLink = logicNet.createAndAddLink( new IdImpl("Access"), originNode, path.nodes.get(1), CoordUtils.calcDistance(originNode.getCoord(), path.nodes.get(1).getCoord()), 3600, 1, 1, "0", "Access"); 
-		egressLink = logicNet.createAndAddLink( new IdImpl("Egress"), path.nodes.get(path.nodes.size()-2), destinationNode, CoordUtils.calcDistance(path.nodes.get(path.nodes.size()-2).getCoord(), destinationNode.getCoord()), 3600, 1, 1, "0", "Egress");
+		accessLink = logicNet.createAndAddLink( new IdImpl(PTValues.ACCESS_STR), originNode, path.nodes.get(1), CoordUtils.calcDistance(originNode.getCoord(), path.nodes.get(1).getCoord()), 3600, 1, 1, "0", PTValues.ACCESS_STR); 
+		egressLink = logicNet.createAndAddLink( new IdImpl(PTValues.EGRESS_STR), path.nodes.get(path.nodes.size()-2), destinationNode, CoordUtils.calcDistance(path.nodes.get(path.nodes.size()-2).getCoord(), destinationNode.getCoord()), 3600, 1, 1, "0", PTValues.EGRESS_STR);
 	}
 	
 	/**
@@ -407,9 +407,11 @@ public class PTActWriter {
 		return node;
 	}
 	
+	/*
 	public LinkImpl createPTLink999(final String strIdLink, final Node fromNode, final Node toNode, final String type){
 		return logicNet.createAndAddLink( new IdImpl(strIdLink), (NodeImpl) fromNode, (NodeImpl) toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()), 3600, 1, 1, "0", type); 
 	}
+	*/
 	
 	private void removeWlinks(){
 		logicNet.removeLink(accessLink);
