@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Simulation
+ * ObservableSimulation
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,17 +19,16 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim;
 
+import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
+
+
 /**
- * Interface to make a simulation work together with
- * simulation events and a Control(l)er
+ * 
+ * Must be implemented by simulations using SimulationListeners
  * @author dgrether
  *
  */
-public interface Simulation {
+public interface ObservableSimulation extends Simulation {
 
-  /**
-   * Start the simulation
-   */
-  public void run();
-
+  public void addQueueSimulationListeners(final QueueSimulationListener listener);
 }

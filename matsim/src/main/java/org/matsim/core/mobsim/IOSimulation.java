@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalSystemIntegrationTest
+ * Simulation
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.integration.signalsystems;
+package org.matsim.core.mobsim;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.core.controler.ControlerIO;
 
 
 /**
+ * Must be implemented by simulations using the default matsim io.
  * @author dgrether
  *
  */
-public class SignalSystemsIntegrationTest extends MatsimTestCase {
+public interface IOSimulation extends Simulation {
+  
+  public void setControlerIO(ControlerIO cio);
+  
+  public void setIterationNumber(Integer iterationNumber);
 
-	private final static String CONFIG_FILE_NAME = "signalSystemsIntegrationConfig.xml";
-
-	public void testSignalSystems() {
-		Config config = this.loadConfig(this.getClassInputDirectory() + CONFIG_FILE_NAME);
-		config.controler().setOutputDirectory(this.getOutputDirectory());
-		config.setQSimConfigGroup(new QSimConfigGroup());
-		Controler c = new Controler(config);
-		c.setCreateGraphs(false);
-		c.run();
-		
-		String iterationOutput = this.getOutputDirectory() + "/ITERS/it.10/";
-		assertEquals("different events files", 
-				CRCChecksum.getCRCFromFile(this.getInputDirectory() + "10.events.xml.gz"), 
-				CRCChecksum.getCRCFromFile(iterationOutput + "10.events.xml.gz"));
-
-		assertEquals("different population files", 
-				CRCChecksum.getCRCFromFile(this.getInputDirectory() + "10.plans.xml.gz"), 
-				CRCChecksum.getCRCFromFile(iterationOutput + "10.plans.xml.gz"));
-	}
-	
-	
 }

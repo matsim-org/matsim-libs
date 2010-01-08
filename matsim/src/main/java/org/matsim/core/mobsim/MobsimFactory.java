@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Simulation
+ * MobsimFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,17 +19,16 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+
+
 /**
- * Interface to make a simulation work together with
- * simulation events and a Control(l)er
  * @author dgrether
  *
  */
-public interface Simulation {
-
-  /**
-   * Start the simulation
-   */
-  public void run();
+public interface MobsimFactory {
+  
+  public Simulation createMobsim(Scenario sc, EventsManager eventsManager);
 
 }

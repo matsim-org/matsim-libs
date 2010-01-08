@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.groups.CharyparNagelScoringConfigGroup;
 import org.matsim.core.config.groups.ConfigConfigGroup;
@@ -42,6 +41,7 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.RoadPricingConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
@@ -94,10 +94,11 @@ public class Config {
 	private SignalSystemsConfigGroup signalSystemConfigGroup = null;
 	private ScenarioConfigGroup scenarioConfigGroup = null;
 	private VspExperimentalConfigGroup vspExperimentalGroup = null;
+	private QSimConfigGroup qSimConfigGroup = null;
 
 	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup;
 
-	private List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
+	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
 
 	private HouseholdsConfigGroup households;
 	
@@ -475,4 +476,14 @@ public class Config {
 	public OTFVisConfig otfVis() {
 		return this.otfVis ;
 	}
+
+  
+  public QSimConfigGroup getQSimConfigGroup() {
+    return qSimConfigGroup;
+  }
+
+  public void setQSimConfigGroup(QSimConfigGroup qSimConfigGroup) {
+    this.qSimConfigGroup = qSimConfigGroup;
+    this.modules.put(QSimConfigGroup.GROUP_NAME, qSimConfigGroup);
+  }
 }

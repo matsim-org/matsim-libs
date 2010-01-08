@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Simulation
+ * ParallelQSimFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,19 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim;
+package org.matsim.ptproject.qsim;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.IOSimulation;
+import org.matsim.core.mobsim.MobsimFactory;
+
 
 /**
- * Interface to make a simulation work together with
- * simulation events and a Control(l)er
  * @author dgrether
  *
  */
-public interface Simulation {
-
-  /**
-   * Start the simulation
-   */
-  public void run();
+public class ParallelQSimFactory implements MobsimFactory {
+  
+  private static final Logger log = Logger.getLogger(ParallelQSimFactory.class);
+  
+  @Override
+  public IOSimulation createMobsim(Scenario sc, EventsManager eventsManager) {
+    SynchronizedEventsManagerImpl em = new SynchronizedEventsManagerImpl(eventsManager);
+    ParallelQueueSimulation sim = new ParallelQueueSimulation(sc, em);
+    log.info("Using parallel QSim...");
+    return sim;
+  }
 
 }

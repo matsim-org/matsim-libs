@@ -50,7 +50,8 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.Simulation;
+import org.matsim.core.mobsim.IOSimulation;
+import org.matsim.core.mobsim.ObservableSimulation;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimListenerManager;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -85,7 +86,7 @@ import org.matsim.vis.snapshots.writers.TransimsSnapshotWriter;
  * @author mrieser
  * @author dgrether
  */
-public class QueueSimulation implements Simulation{
+public class QueueSimulation implements IOSimulation, ObservableSimulation {
 
 	private int snapshotPeriod = 0;
 	private double snapshotTime = 0.0;

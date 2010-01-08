@@ -30,12 +30,17 @@ public class ControlerIO {
 	
 	private Id runId = null;
 	
-	private String outputPath;
+	private final String outputPath;
 	
 	public ControlerIO(String outputDirectory){
 		this.outputPath = outputDirectory;
 	}
 	
+	/**
+	 * 
+	 * @param outputDirectory the path to the output directory
+	 * @param runId the runId, may be null
+	 */
 	public ControlerIO(String outputDirectory, Id runId){
 		this(outputDirectory);
 		this.runId = runId;	

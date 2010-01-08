@@ -53,6 +53,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.controler.corelisteners.LegHistogramListener;
@@ -63,10 +64,12 @@ import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -76,11 +79,15 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.IOSimulation;
+import org.matsim.core.mobsim.MobsimFactory;
+import org.matsim.core.mobsim.ObservableSimulation;
+import org.matsim.core.mobsim.Simulation;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.jdeqsim.parallel.PJDEQSimulation;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
+import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationListener;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkImpl;
@@ -114,6 +121,8 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.ptproject.qsim.ParallelQSimFactory;
+import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.world.World;
@@ -179,8 +188,6 @@ public class Controler {
 
 	private boolean createGraphs = true;
 
-	private String externalMobsim = null;
-
 	public final IterationStopWatch stopwatch = new IterationStopWatch();
 	final protected ScenarioImpl scenarioData;
 	protected boolean scenarioLoaded = false;
@@ -221,6 +228,9 @@ public class Controler {
 
 	private TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 	private ControlerIO controlerIO;
+	
+  private MobsimFactory mobsimFactory = new QueueSimulationFactory();
+
 	
 	/** initializes Log4J */
 	static {
@@ -480,8 +490,6 @@ public class Controler {
 		this.volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network);
 		this.legTimes = new CalcLegTimes(this.population);
 		this.events.addHandler(this.legTimes);
-
-		this.externalMobsim = this.config.simulation().getExternalExe();
 
 		if (this.scoringFunctionFactory == null) {
 			this.scoringFunctionFactory = loadScoringFunctionFactory();
@@ -782,7 +790,7 @@ public class Controler {
 		 * well, that's the user's problem if he doesn't know what settings he
 		 * starts his simulation with. mr/mar09
 		 */
-		if (this.externalMobsim == null) {
+		if (this.config.simulation().getExternalExe() == null) {
 			final String JDEQ_SIM = "JDEQSim";
 			final String NUMBER_OF_THREADS = "numberOfThreads";
 			String numberOfThreads = this.config.findParam(JDEQ_SIM, NUMBER_OF_THREADS);
@@ -799,28 +807,17 @@ public class Controler {
 				JDEQSimulation sim = new JDEQSimulation(this.network, this.population, this.events);
 				sim.run();
 			} else {
-				QueueSimulation sim = new QueueSimulation(this.scenarioData, this.events);
-				sim.setIterationNumber(this.getIteration());
-				sim.setControlerIO(this.controlerIO);
-				for (QueueSimulationListener l : this.getQueueSimulationListener()) {
-					sim.addQueueSimulationListeners(l);
-				}
-				sim.setUseActivityDurations(this.getConfig().vspExperimental().isUseActivityDurations());
-				if (this.config.scenario().isUseLanes()) {
-					if (this.scenarioData.getLaneDefinitions() == null) {
-						throw new IllegalStateException("Lane definition have to be set if feature is enabled!");
-					}
-					sim.setLaneDefinitions(this.scenarioData.getLaneDefinitions());
-				}
-				if (this.config.scenario().isUseSignalSystems()) {
-					if ((this.scenarioData.getSignalSystems() == null)
-							|| (this.scenarioData.getSignalSystemConfigurations() == null)) {
-						throw new IllegalStateException(
-								"Signal systems and signal system configurations have to be set if feature is enabled!");
-					}
-					sim.setSignalSystems(this.scenarioData.getSignalSystems(), this.scenarioData.getSignalSystemConfigurations());
-				}
-				sim.run();
+			  Simulation simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
+			  if (simulation instanceof IOSimulation){
+			    ((IOSimulation)simulation).setControlerIO(this.getControlerIO());
+			    ((IOSimulation)simulation).setIterationNumber(this.getIterationNumber());
+			  }
+			  if (simulation instanceof ObservableSimulation){
+          for (QueueSimulationListener l : this.getQueueSimulationListener()) {
+            ((ObservableSimulation)simulation).addQueueSimulationListeners(l);
+          }
+			  }
+				simulation.run();
 			}
 		} else {
 			ExternalMobsim sim = new ExternalMobsim(this.population, this.events);
@@ -1226,7 +1223,7 @@ public class Controler {
 	 * implemented as a ControlerListener, to keep the structure of the
 	 * Controler as simple as possible.
 	 */
-	protected static class CoreControlerListener implements BeforeMobsimListener, AfterMobsimListener,
+	protected static class CoreControlerListener implements StartupListener, BeforeMobsimListener, AfterMobsimListener,
 			ShutdownListener {
 
 		private final List<EventWriter> eventWriters = new LinkedList<EventWriter>();
@@ -1235,6 +1232,20 @@ public class Controler {
 			// empty public constructor for protected class
 		}
 
+		@Override
+    public void notifyStartup(StartupEvent event) {
+		  Config c = event.getControler().getScenario().getConfig();
+		  QSimConfigGroup conf = (QSimConfigGroup) c.getModule(QSimConfigGroup.GROUP_NAME);
+		  if (conf != null){
+		    if (conf.getNumberOfThreads() > 1){
+		      event.getControler().setMobsimFactory(new ParallelQSimFactory());
+		    }
+		    else {
+		      event.getControler().setMobsimFactory(new QSimFactory());
+		    }
+		  }
+    }
+		
 		public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 			Controler controler = event.getControler();
 			controler.events.resetHandlers(event.getIteration());
@@ -1302,7 +1313,6 @@ public class Controler {
 				writer.closeFile();
 			}
 		}
-
 	}
 
 	/*
@@ -1360,4 +1370,12 @@ public class Controler {
 		return this.getIteration();
 	}
 
+  public MobsimFactory getMobsimFactory() {
+    return mobsimFactory;
+  }
+  
+  public void setMobsimFactory(MobsimFactory mobsimFactory) {
+    this.mobsimFactory = mobsimFactory;
+  }
+	
 }

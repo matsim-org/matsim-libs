@@ -27,12 +27,12 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.utils.io.MatsimXmlParser;
 
 /**
  * A reader for config-files of MATSim according to <code>config_v1.dtd</code>.
@@ -79,9 +79,19 @@ public class ConfigReaderMatsimV1 extends MatsimXmlParser implements MatsimSomeR
 	}
 
 	private void startModule(final Attributes atts) {
-		this.currmodule = this.config.getModule(atts.getValue("name"));
+		String name = atts.getValue("name");
+	  this.currmodule = this.config.getModule(name);
+		
 		if (this.currmodule == null) {
-			this.currmodule = this.config.createModule(atts.getValue("name"));
+		  //if there are type safe optional modules they have to be added here
+		  if (name.equals(QSimConfigGroup.GROUP_NAME)){
+		    this.currmodule = new QSimConfigGroup();
+		    this.config.setQSimConfigGroup((QSimConfigGroup) this.currmodule);
+		  }
+		  //it must be a not type safe generic module
+		  else {
+		    this.currmodule = this.config.createModule(atts.getValue("name"));
+		  }
 		}
 	}
 

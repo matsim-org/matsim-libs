@@ -21,8 +21,6 @@
 package org.matsim.ptproject.qsim;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -31,16 +29,10 @@ public class ParallelQueueSimulation extends QueueSimulation{
 	/*
 	 * We just use a ParallelQueueSimEngine.
 	 */
-	public ParallelQueueSimulation(final Network network, final Population population, final EventsManager eventsManager)
-	{
-		super(network, population, eventsManager);
-		
-		// use the ParallelQueueSimEngine
-		this.simEngine = new ParallelQueueSimEngine(this.network, MatsimRandom.getRandom());
-	}
-	
 	public ParallelQueueSimulation(final Scenario scenario, final EventsManager eventsManager)
 	{
-		this(scenario.getNetwork(), scenario.getPopulation(), eventsManager);
+	  super(scenario, eventsManager);
+	  // use the ParallelQueueSimEngine
+	  this.simEngine = new ParallelQueueSimEngine(this.network, MatsimRandom.getRandom());
 	}
 }

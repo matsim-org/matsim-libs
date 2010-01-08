@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Simulation
+ * SynchronizedEventsManagerImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,19 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim;
+package org.matsim.ptproject.qsim;
+
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.handler.EventHandler;
+
 
 /**
- * Interface to make a simulation work together with
- * simulation events and a Control(l)er
  * @author dgrether
  *
  */
-public interface Simulation {
+public class SynchronizedEventsManagerImpl implements EventsManager {
 
-  /**
-   * Start the simulation
-   */
-  public void run();
+  private final EventsManager delegate;
+  
+  public SynchronizedEventsManagerImpl(EventsManager eventsManager){
+    this.delegate = eventsManager;
+  }
+  
+  @Override
+  public void addHandler(EventHandler handler) {
+    this.delegate.addHandler(handler);
+  }
+
+  @Override
+  public synchronized EventsFactory getFactory() {
+    return this.delegate.getFactory();
+  }
+
+  @Override
+  public synchronized void processEvent(Event event) {
+    this.delegate.processEvent(event);
+  }
+  @Override
+  public void removeHandler(EventHandler handler) {
+    this.delegate.removeHandler(handler);
+  }
 
 }

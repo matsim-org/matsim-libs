@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Simulation
+ * QueueSimulationFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,19 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim;
+package org.matsim.core.mobsim.queuesim;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.MobsimFactory;
+import org.matsim.core.mobsim.IOSimulation;
+
 
 /**
- * Interface to make a simulation work together with
- * simulation events and a Control(l)er
  * @author dgrether
  *
  */
-public interface Simulation {
+public class QueueSimulationFactory implements MobsimFactory {
 
-  /**
-   * Start the simulation
-   */
-  public void run();
+  @Override
+  public IOSimulation createMobsim(Scenario sc, EventsManager eventsManager) {
+    return new QueueSimulation(sc, eventsManager);
+  }
 
 }
