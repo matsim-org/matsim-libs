@@ -43,6 +43,18 @@
  * ----------------
  * </pre> 
  * </p> 
+ * <p>
+ * Adding lanes to a link means the following:
+ * <ul>
+ *   <li>The link is split in two parts: The original lane at the beginning of the link and
+ *   the lane part at it's end.</li>
+ *   <li>The original lane preserves the properties of the link without lanes. </li>
+ *   <li>The link may be widened or narrowed at its end due to the lanes. </li>
+ *   <li>Bottleneck is at the end of the original lane. This may have the consequence that
+ *   spillback occurs faster.</li>
+ * </ul>
+ * </p>
+ * 
  * <p> 
  * All lane information is given by the top-level container LaneDefinitions. 
  * 
@@ -58,6 +70,7 @@
  * <ul>
  *   <li> Each link's lanes must cover all toLinks of the link's toNode within the toLink information
  *   of the lanes. </li>
+ *   <li> Each link's lanes must have the same length. </li>
  * </ul>
  * 
  * <h2>Package Maintainer(s):</h2>
@@ -65,6 +78,6 @@
  *   <li>Dominik Grether</li>
  * </ul>
  * 
- * Changes by non-maintainers are prohibited. Patches very welcome!
+ * Changes by non-maintainers are prohibited. Patches containing bugfixes or extensions however very welcome!
  */
 package org.matsim.lanes;
