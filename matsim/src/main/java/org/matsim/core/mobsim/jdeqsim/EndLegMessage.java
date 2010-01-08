@@ -111,7 +111,7 @@ public class EndLegMessage extends EventMessage {
 		}
 		
 		// schedule AgentArrivalEvent
-		event = new AgentArrivalEventImpl(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLink().getId(), this.vehicle.getCurrentLeg());
+		event = new AgentArrivalEventImpl(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLink().getId(), this.vehicle.getCurrentLeg().getMode());
 
 		SimulationParameters.getProcessEventThread().processEvent(event);
 

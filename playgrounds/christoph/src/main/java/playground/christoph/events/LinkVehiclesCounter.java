@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -21,10 +20,9 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.mobsim.queuesim.AbstractSimulation;
 import org.matsim.core.mobsim.queuesim.QueueLink;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
-import org.matsim.core.mobsim.queuesim.AbstractSimulation;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.queuesim.events.QueueSimulationInitializedEvent;
 import org.matsim.core.mobsim.queuesim.listener.QueueSimulationAfterSimStepListener;
@@ -185,9 +183,9 @@ public class LinkVehiclesCounter implements LinkEnterEventHandler,
 //		log.info("AgentDepartureEvent " + event.getLinkId().toString() + " " + event.getTime());
 
 		// Handling depends on the Route of the Agent
-		Leg leg = ((AgentDepartureEventImpl) event).getLeg();
+		TransportMode legMode = event.getLegMode();
 
-		if (leg.getMode().equals(TransportMode.car)) {
+		if (legMode.equals(TransportMode.car)) {
 			Id id = event.getLinkId();
 
 			int vehCount;

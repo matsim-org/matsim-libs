@@ -375,12 +375,12 @@ public class QueueSimulation implements Simulation{
 		double now = SimulationTimer.getTime();
 		for (Tuple<Double, DriverAgent> entry : this.teleportationList) {
 			DriverAgent agent = entry.getSecond();
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLink().getId(), agent.getCurrentLeg()));
+			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLink().getId(), agent.getCurrentLeg().getMode()));
 		}
 		this.teleportationList.clear();
 
 		for (DriverAgent agent : this.activityEndsList) {
-			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLink().getId(), agent.getCurrentLeg()));
+			events.processEvent(new AgentStuckEventImpl(now, agent.getPerson().getId(), agent.getDestinationLink().getId(), agent.getCurrentLeg().getMode()));
 		}
 		this.activityEndsList.clear();
 
@@ -496,7 +496,7 @@ public class QueueSimulation implements Simulation{
 	 */
 	protected void handleAgentArrival(final double now, DriverAgent agent){
 		getEvents().processEvent(new AgentArrivalEventImpl(now, agent.getPerson().getId(),
-				agent.getDestinationLink().getId(), agent.getCurrentLeg()));
+				agent.getDestinationLink().getId(), agent.getCurrentLeg().getMode()));
 	}
 
 	private void handleNetworkChangeEvents(final double time) {
@@ -543,7 +543,7 @@ public class QueueSimulation implements Simulation{
 	protected void agentDeparts(double now, final DriverAgent agent, final Link link) {
 		Leg leg = agent.getCurrentLeg();
 		TransportMode mode = leg.getMode();
-		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), link.getId(), leg));
+		events.processEvent(new AgentDepartureEventImpl(now, agent.getPerson().getId(), link.getId(), leg.getMode()));
 		if (this.notTeleportedModes.contains(mode)){
 			this.handleKnownLegModeDeparture(now, agent, link, mode);
 		}

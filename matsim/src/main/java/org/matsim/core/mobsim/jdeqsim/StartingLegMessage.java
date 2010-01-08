@@ -77,7 +77,7 @@ public class StartingLegMessage extends EventMessage {
 
 		// schedule AgentDepartureEvent
 		event = new AgentDepartureEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLink().getId(),
-				vehicle.getCurrentLeg());
+				vehicle.getCurrentLeg().getMode());
 
 		SimulationParameters.getProcessEventThread().processEvent(event);
 

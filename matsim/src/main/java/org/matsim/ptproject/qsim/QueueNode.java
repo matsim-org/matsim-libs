@@ -139,7 +139,7 @@ public class QueueNode {
 					Simulation.decLiving();
 					Simulation.incLost();
 					QueueSimulation.getEvents().processEvent(
-							new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg()));
+							new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), currentLink.getId(), veh.getDriver().getCurrentLeg().getMode()));
 				} else {
 					currentLane.popFirstFromBuffer();
 					veh.getDriver().moveOverNode();

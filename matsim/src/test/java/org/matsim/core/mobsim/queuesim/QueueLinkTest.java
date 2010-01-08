@@ -24,13 +24,17 @@ import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -102,7 +106,18 @@ public class QueueLinkTest extends MatsimTestCase {
 
 		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(23));
-		veh.setDriver(new PersonAgent(p, qsim));
+		Plan plan = new PlanImpl();
+		p.addPlan(plan);
+		plan.addActivity(new ActivityImpl("home", f.link1));
+		Leg leg = new LegImpl(TransportMode.car);
+		leg.setRoute(new LinkNetworkRouteImpl(f.link1, f.link2));
+		plan.addLeg(leg);
+		plan.addActivity(new ActivityImpl("work", f.link2));
+		PersonAgent driver = new PersonAgent(p, qsim);
+		driver.initialize();
+		veh.setDriver(driver);
+		driver.setVehicle(veh);
+		driver.activityEnds(0);
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.bufferIsEmpty());
@@ -148,7 +163,18 @@ public class QueueLinkTest extends MatsimTestCase {
 
 		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(42));
-		veh.setDriver(new PersonAgent(p, qsim));
+		Plan plan = new PlanImpl();
+		p.addPlan(plan);
+		plan.addActivity(new ActivityImpl("home", f.link1));
+		Leg leg = new LegImpl(TransportMode.car);
+		leg.setRoute(new LinkNetworkRouteImpl(f.link1, f.link2));
+		plan.addLeg(leg);
+		plan.addActivity(new ActivityImpl("work", f.link2));
+		PersonAgent driver = new PersonAgent(p, qsim);
+		driver.initialize();
+		veh.setDriver(driver);
+		driver.setVehicle(veh);
+		driver.activityEnds(0);
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.bufferIsEmpty());
@@ -183,7 +209,18 @@ public class QueueLinkTest extends MatsimTestCase {
 
 		QueueVehicle veh = new QueueVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(80));
-		veh.setDriver(new PersonAgent(p, qsim));
+		Plan plan = new PlanImpl();
+		p.addPlan(plan);
+		plan.addActivity(new ActivityImpl("home", f.link1));
+		Leg leg = new LegImpl(TransportMode.car);
+		leg.setRoute(new LinkNetworkRouteImpl(f.link1, f.link2));
+		plan.addLeg(leg);
+		plan.addActivity(new ActivityImpl("work", f.link2));
+		PersonAgent driver = new PersonAgent(p, qsim);
+		driver.initialize();
+		veh.setDriver(driver);
+		driver.setVehicle(veh);
+		driver.activityEnds(0);
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.bufferIsEmpty());

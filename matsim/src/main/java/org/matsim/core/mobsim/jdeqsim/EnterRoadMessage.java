@@ -48,7 +48,7 @@ public class EnterRoadMessage extends EventMessage {
 
 		// the first EnterLink in a leg is a Wait2LinkEvent
 		if (vehicle.getLinkIndex() == -1) {
-			event = new AgentWait2LinkEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLink().getId(), vehicle.getCurrentLeg());
+			event = new AgentWait2LinkEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLink().getId(), vehicle.getCurrentLeg().getMode());
 		} else {
 			event = new LinkEnterEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLink().getId());
 		}

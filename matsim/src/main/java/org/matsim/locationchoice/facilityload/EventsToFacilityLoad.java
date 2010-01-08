@@ -68,8 +68,8 @@ public class EventsToFacilityLoad implements DeprecatedActivityStartEventHandler
 	 * Home activities are excluded.
 	 */
 	public void handleEvent(final ActivityStartEventImpl event) {
-		ActivityFacility facility = event.getAct().getFacility();
-		if (!(event.getAct().getType().startsWith("h") || event.getAct().getType().startsWith("tta"))) {
+		if (!(event.getActType().startsWith("h") || event.getActType().startsWith("tta"))) {
+			ActivityFacility facility = event.getAct().getFacility();
 			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addArrival(event.getTime());
 		}
 	}
@@ -79,8 +79,8 @@ public class EventsToFacilityLoad implements DeprecatedActivityStartEventHandler
 	 * Home activities are excluded
 	 */
 	public void handleEvent(final ActivityEndEventImpl event) {
-		ActivityFacility facility = event.getAct().getFacility();
-		if (!(event.getAct().getType().startsWith("h") || event.getAct().getType().startsWith("tta"))) {
+		if (!(event.getActType().startsWith("h") || event.getActType().startsWith("tta"))) {
+			ActivityFacility facility = event.getAct().getFacility();
 			this.facilityPenalties.get(facility.getId()).getFacilityLoad().addDeparture(event.getTime());
 		}
 	}
@@ -93,7 +93,6 @@ public class EventsToFacilityLoad implements DeprecatedActivityStartEventHandler
 		}
 		log.info("EventsToFacilityLoad finished");
 	}
-
 
 	public void reset(final int iteration) {
 		log.info("Not really resetting anything here."); 

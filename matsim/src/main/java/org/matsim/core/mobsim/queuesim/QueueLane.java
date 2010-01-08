@@ -348,7 +348,7 @@ public class QueueLane {
 			}
 
 			QueueSimulation.getEvents().processEvent(
-					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), veh.getDriver().getCurrentLeg()));
+					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 			
 			boolean addToBuffer = true;
 			if (veh.getDriver() instanceof TransitDriverAgent) {
@@ -672,7 +672,7 @@ public class QueueLane {
 
 		for (QueueVehicle veh : this.waitingList) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg()));
+					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		AbstractSimulation.decLiving(this.waitingList.size());
 		AbstractSimulation.incLost(this.waitingList.size());
@@ -680,7 +680,7 @@ public class QueueLane {
 
 		for (QueueVehicle veh : this.vehQueue) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg()));
+					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		AbstractSimulation.decLiving(this.vehQueue.size());
 		AbstractSimulation.incLost(this.vehQueue.size());
@@ -688,7 +688,7 @@ public class QueueLane {
 
 		for (QueueVehicle veh : this.buffer) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg()));
+					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		AbstractSimulation.decLiving(this.buffer.size());
 		AbstractSimulation.incLost(this.buffer.size());

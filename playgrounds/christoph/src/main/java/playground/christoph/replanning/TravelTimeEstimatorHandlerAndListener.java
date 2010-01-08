@@ -26,7 +26,6 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.AgentEventImpl;
 import org.matsim.core.mobsim.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueNetwork;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
@@ -73,6 +72,7 @@ public class TravelTimeEstimatorHandlerAndListener implements
 	private int travelTimeBinSize;
 	private int numSlots;
 	private TravelTimeEstimator travelTimeEstimator;
+	private Map<Id, Integer> personLegCounter = new HashMap<Id, Integer>();
 
 	private boolean useMyLinkImpls = true;
 	/*
@@ -386,10 +386,9 @@ public class TravelTimeEstimatorHandlerAndListener implements
 	// implements AgentDepartureEventHandler
 	public synchronized void handleEvent(AgentDepartureEvent event)
 	{
-		if (event instanceof AgentEventImpl)
+		Leg leg = getNextPersonLeg(event.getPersonId());
+		if (leg != null)
 		{
-			Leg leg = ((AgentEventImpl) event).getLeg();
-
 			this.activeRoutes.put(event.getPersonId(), (NetworkRouteWRefs)leg.getRoute());
 		}
 		else
@@ -398,6 +397,28 @@ public class TravelTimeEstimatorHandlerAndListener implements
 		}
 	}
 
+	private Leg getNextPersonLeg(Id personId) {
+		Integer i = this.personLegCounter.get(personId);
+		int ii;
+		if (i == null) {
+			ii = 1;
+		} else {
+			ii = i.intValue() + 1;
+		}
+		this.personLegCounter.put(personId, Integer.valueOf(ii));
+		Person p = this.population.getPersons().get(personId);
+		int cnt = 1;
+		for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Leg) {
+				if (cnt == ii) {
+					return (Leg) pe;
+				}
+				cnt++;
+			}
+		}
+		return null;
+	}
+	
 	// implements LinkLeaveEventHandler
 	public synchronized void handleEvent(LinkLeaveEvent event)
 	{

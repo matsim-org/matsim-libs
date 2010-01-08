@@ -341,7 +341,7 @@ public class QueueLane {
 			}
 
 			QueueSimulation.getEvents().processEvent(
-			new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), veh.getDriver().getCurrentLeg()));
+			new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.queueLink.getLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 			boolean handled = transitQueueLaneFeature.handleMoveWaitToBuffer(now, veh);
 
 			if (!handled) {
@@ -611,7 +611,7 @@ public class QueueLane {
 
 		for (QueueVehicle veh : this.waitingList) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg()));
+					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		Simulation.decLiving(this.waitingList.size());
 		Simulation.incLost(this.waitingList.size());
@@ -619,7 +619,7 @@ public class QueueLane {
 
 		for (QueueVehicle veh : this.vehQueue) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg()));
+					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		Simulation.decLiving(this.vehQueue.size());
 		Simulation.incLost(this.vehQueue.size());
@@ -627,7 +627,7 @@ public class QueueLane {
 
 		for (QueueVehicle veh : this.buffer) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg()));
+					new AgentStuckEventImpl(now, veh.getDriver().getPerson().getId(), veh.getCurrentLink().getId(), veh.getDriver().getCurrentLeg().getMode()));
 		}
 		Simulation.decLiving(this.buffer.size());
 		Simulation.incLost(this.buffer.size());
