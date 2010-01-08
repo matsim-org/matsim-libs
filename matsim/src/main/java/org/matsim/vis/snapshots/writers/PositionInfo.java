@@ -44,7 +44,7 @@ public class PositionInfo {
 	//would be comfortable with this idea? Is there a solution to do this in a strict OO manner 
 	//(without a static Gbl)? [GL] - april 08
 	//
-	// Could put this as a subclass into "Network".  That's probably where it belongs: convert "position on graph" to
+	// yyyy Could put this as a subclass into "Network".  That's probably where it belongs: convert "position on graph" to
 	// "x/y-positions". Kai
 
 	/**
@@ -74,14 +74,21 @@ public class PositionInfo {
 	final private VehicleState vehicleState;
 	final private Link link;
 
-
+	/**Uses PositionInfo to generate a position for facilities.  This looks like an abuse of PositionInfo only because it was 
+	 * made quite vehicle-oriented over the last years.
+	 * @param agentId
+	 * @param link
+	 */
+	public PositionInfo( final Id agentId, final Link link ) {
+		this( agentId, link, 0.9*link.getLength(), 10, 0., VehicleState.Parking, "") ;
+	}
 
 	/**
 	 * Creates a new PositionInfo based on the agent's position between to nodes.
 	 *
 	 * @param agentId The id of the agent.
 	 * @param link The link the vehicle is currently driving or parking on.
-	 * @param distanceOnLink The distance of the agent from the fromNode of the link (measured on the link's real length, not its euklidean length)
+	 * @param distanceOnLink The distance of the agent from the fromNode of the link (measured on the link's real length, not its Euklidean length)
 	 * @param lane The number of the lane the agent is on.
 	 * 		Lanes are counted from the middle of a bi-directional link, beginning with 1.
 	 * @param speed The speed the agent is traveling with.
@@ -165,7 +172,10 @@ public class PositionInfo {
 			}
 		}
 		if (theta < 0.0) theta += TWO_PI;
-		double correction = ((LinkImpl)link).getEuklideanDistance() / link.getLength();
+		double correction = 0. ;
+		if ( link.getLength() != 0 ){
+			correction = ((LinkImpl)link).getEuklideanDistance() / link.getLength();
+		}
 		if (linkScale != 1.0) {
 			Tuple<Point2D.Double, Point2D.Double> scaledLinkTuple = VectorUtils.scaleVector(linkStart, linkEnd, linkScale);
 			linkStart = scaledLinkTuple.getFirst();
