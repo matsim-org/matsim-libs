@@ -38,7 +38,6 @@ import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.transitSchedule.api.TransitRoute;
 import org.matsim.transitSchedule.api.TransitRouteStop;
-import org.matsim.transitSchedule.api.TransitSchedule;
 import org.xml.sax.SAXException;
 
 import playground.mrieser.OTFDemo;
@@ -47,8 +46,6 @@ import playground.mrieser.pt.analysis.VehicleTracker;
 
 public class OccupancyCounts {
 
-	
-	
 	private static final String SERVERNAME = "OcuppancyCounter";
 
 	public static void play(final ScenarioImpl scenario, final EventsManager events) {
