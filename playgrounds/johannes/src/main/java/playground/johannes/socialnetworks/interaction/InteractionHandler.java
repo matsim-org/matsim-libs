@@ -85,7 +85,7 @@ DeprecatedActivityEndEventHandler {
 	}
 
 	public void handleEvent(ActivityEndEventImpl event) {
-		if(!event.getAct().getType().equalsIgnoreCase("home")) {
+		if(!event.getActType().equalsIgnoreCase("home")) {
 		ActivityFacility f = event.getAct().getFacility();
 		PhysicalFacility pf = pfacilities.get(f);
 		

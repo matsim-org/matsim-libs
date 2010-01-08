@@ -39,7 +39,7 @@ import playground.johannes.socialnetworks.graph.io.GraphMLWriter;
  * @author illenberger
  *
  */
-public class ReadWriteAnalyze extends MatsimTestCase {
+public class ReadWriteAnalyzeTest extends MatsimTestCase {
 
 	private static final String GRAPH_INPUT_FILE = "berlin.8571.k=11.graphml.gz";
 	
