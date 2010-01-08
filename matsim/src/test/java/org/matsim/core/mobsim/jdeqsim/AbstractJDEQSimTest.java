@@ -9,7 +9,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -106,7 +105,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 						// each leg ends with enter on act link
 						// => only for non empty car legs and non-cars legs this
 						// statement is true
-						if (leg.getMode().equals(TransportMode.car) && ((NetworkRouteWRefs) leg.getRoute()).getLinks().size() > 0) {
+						if (leg.getMode().equals(TransportMode.car) && ((NetworkRouteWRefs) leg.getRoute()).getLinkIds().size() > 0) {
 							assertTrue(list.get(index) instanceof LinkEnterEventImpl);
 							assertTrue(act.getLinkId().toString().equalsIgnoreCase(
 									((LinkEnterEventImpl) list.get(index)).getLinkId().toString()));
@@ -143,7 +142,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 
 						// if car leg contains empty route, then this check is
 						// not applicable
-						if (((NetworkRouteWRefs) leg.getRoute()).getLinks().size() > 0) {
+						if (((NetworkRouteWRefs) leg.getRoute()).getLinkIds().size() > 0) {
 							// the first LinkEnterEvent is a AgentWait2LinkEvent
 							assertTrue(list.get(index) instanceof AgentWait2LinkEventImpl);
 							assertTrue(act.getLinkId().toString().equalsIgnoreCase(
@@ -156,16 +155,14 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 							index++;
 						}
 
-						for (Link link : ((NetworkRouteWRefs) leg.getRoute()).getLinks()) {
+						for (Id linkId : ((NetworkRouteWRefs) leg.getRoute()).getLinkIds()) {
 							// enter link and leave each link on route
 							assertTrue(list.get(index) instanceof LinkEnterEventImpl);
-							assertTrue(link.getId().toString().equalsIgnoreCase(
-									((LinkEnterEventImpl) list.get(index)).getLinkId().toString()));
+							assertTrue(linkId.equals(	((LinkEnterEventImpl) list.get(index)).getLinkId()) );
 							index++;
 
 							assertTrue(list.get(index) instanceof LinkLeaveEventImpl);
-							assertTrue(link.getId().toString().equalsIgnoreCase(
-									((LinkLeaveEventImpl) list.get(index)).getLinkId().toString()));
+							assertTrue(linkId.equals( ((LinkLeaveEventImpl) list.get(index)).getLinkId()));
 							index++;
 						}
 					}

@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -149,17 +148,17 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter {
 
 			// optimization: only create one List for multiple departures
 			List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(1);
-			attributes.add(this.createTuple(Constants.REF_ID, route.getStartLink().getId().toString()));
+			attributes.add(this.createTuple(Constants.REF_ID, route.getStartLinkId().toString()));
 			this.writeStartTag(Constants.LINK, attributes, true);
 
-			for (Link link : route.getLinks()) {
+			for (Id linkId : route.getLinkIds()) {
 				attributes.clear();
-				attributes.add(this.createTuple(Constants.REF_ID, link.getId().toString()));
+				attributes.add(this.createTuple(Constants.REF_ID, linkId.toString()));
 				this.writeStartTag(Constants.LINK, attributes, true);
 			}
 
 			attributes.clear();
-			attributes.add(this.createTuple(Constants.REF_ID, route.getEndLink().getId().toString()));
+			attributes.add(this.createTuple(Constants.REF_ID, route.getEndLinkId().toString()));
 			this.writeStartTag(Constants.LINK, attributes, true);
 
 			this.writeEndTag(Constants.ROUTE);

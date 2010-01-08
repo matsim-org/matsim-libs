@@ -62,10 +62,10 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 	}
 	
 	public Link chooseNextLink() {
-		if (this.nextLinkIndex < getCarRoute().getLinks().size()) {
+		if (this.nextLinkIndex < getCarRoute().getLinkIds().size()) {
 			return getCarRoute().getLinks().get(this.nextLinkIndex);
 		}
-		if (this.nextLinkIndex == getCarRoute().getLinks().size()) {
+		if (this.nextLinkIndex == getCarRoute().getLinkIds().size()) {
 			return getCarRoute().getEndLink();
 		}
 		return null;
@@ -263,6 +263,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 			return this.delegate.getLinkIds();
 		}
 
+		@Deprecated
 		public List<Link> getLinks() {
 			return this.delegate.getLinks();
 		}
@@ -271,6 +272,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 			return this.delegate.getNodes();
 		}
 
+		@Deprecated
 		public Link getStartLink() {
 			return this.delegate.getStartLink();
 		}
@@ -308,6 +310,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
+		@Deprecated
 		public Link getEndLink() {
 			return this.delegate.getEndLink();
 		}
@@ -332,6 +335,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent {
 			return this.delegate.getStartLinkId();
 		}
 
+		@Deprecated
 		public double getTravelTime() {
 			return this.delegate.getTravelTime();
 		}

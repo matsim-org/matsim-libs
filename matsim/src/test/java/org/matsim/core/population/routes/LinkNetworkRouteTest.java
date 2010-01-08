@@ -50,7 +50,7 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 
 		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1, link2);
 		route.setLinks(link1, null, link2);
-		assertEquals("number of links.", 0, route.getLinks().size());
+		assertEquals("number of links.", 0, route.getLinkIds().size());
 		assertEquals("number of nodes.", 1, route.getNodes().size());
 		assertEquals("wrong node.", node2, route.getNodes().get(0));
 	}
@@ -65,7 +65,7 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 
 		NetworkRouteWRefs route = new LinkNetworkRouteImpl(link1, link2);
 		route.setNodes(link1, nodes, link2);
-		assertEquals("number of links.", 0, route.getLinks().size());
+		assertEquals("number of links.", 0, route.getLinkIds().size());
 		assertEquals("number of nodes.", 1, route.getNodes().size());
 		assertEquals("wrong node.", node2, route.getNodes().get(0));
 	}
@@ -86,15 +86,15 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 		srcRoute.add(link3);
 		srcRoute.add(link4);
 		route1.setLinks(startLink, srcRoute, endLink);
-		assertEquals(2, route1.getLinks().size());
+		assertEquals(2, route1.getLinkIds().size());
 
 		LinkNetworkRouteImpl route2 = route1.clone();
 
 		srcRoute.add(link5);
 		route1.setLinks(startLink, srcRoute, endLink);
 
-		assertEquals(3, route1.getLinks().size());
-		assertEquals(2, route2.getLinks().size());
+		assertEquals(3, route1.getLinkIds().size());
+		assertEquals(2, route2.getLinkIds().size());
 	}
 
 }

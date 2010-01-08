@@ -73,8 +73,8 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		Link link1 = new FakeLink(new IdImpl(1));
 		Link link2 = new FakeLink(new IdImpl(2));
 		KtiPtRoute testee = new KtiPtRoute(link1, link2, this.plansCalcRouteKtiInfo);
-		assertEquals(link1, testee.getStartLink());
-		assertEquals(link2, testee.getEndLink());
+		assertEquals(link1.getId(), testee.getStartLinkId());
+		assertEquals(link2.getId(), testee.getEndLinkId());
 		assertEquals(null, testee.getFromStop());
 		assertEquals(null, testee.getFromMunicipality());
 		assertEquals(null, testee.getInVehicleTime());
@@ -99,8 +99,8 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		Location toMunicipality = new Zone(municipalities, new IdImpl("30001"), dummyMuniCoord, dummyMuniCoord, dummyMuniCoord, 0.0, "Ypslikon");
 		
 		KtiPtRoute testee = new KtiPtRoute(link1, link2, this.plansCalcRouteKtiInfo, fromStop, fromMunicipality, toMunicipality, toStop);
-		assertEquals(link1, testee.getStartLink());
-		assertEquals(link2, testee.getEndLink());
+		assertEquals(link1.getId(), testee.getStartLinkId());
+		assertEquals(link2.getId(), testee.getEndLinkId());
 		assertEquals(fromStop, testee.getFromStop());
 		assertEquals(toStop, testee.getToStop());
 		assertEquals(fromMunicipality, testee.getFromMunicipality());

@@ -135,7 +135,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			events.printEventHandlers();
 
 			NetworkRouteWRefs route = (NetworkRouteWRefs) testLeg.getRoute();
-			List<Link> links = route.getLinks();
+			List<Id> linkIds = route.getLinkIds();
 
 			// let's test a route without events first
 			// should result in free speed travel time, without departure delay
@@ -152,7 +152,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
 				expectedLegEndTime += ((LinkImpl) originAct.getLink()).getFreespeedTravelTime(Time.UNDEFINED_TIME);
 			}
-			for (Link link : links) {
+			for (Id linkId : linkIds) {
+				Link link = scenario.getNetwork().getLinks().get(linkId);
 				expectedLegEndTime += link.getLength()/link.getFreespeed(Time.UNDEFINED_TIME);
 			}
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
@@ -183,7 +184,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
 				expectedLegEndTime += ((LinkImpl) originAct.getLink()).getFreespeedTravelTime(Time.UNDEFINED_TIME);
 			}
-			for (Link link : links) {
+			for (Id linkId : linkIds) {
+				Link link = this.scenario.getNetwork().getLinks().get(linkId);
 				expectedLegEndTime += link.getLength()/link.getFreespeed(Time.UNDEFINED_TIME);
 			}
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
@@ -200,16 +202,16 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 			EventImpl event = null;
 			for (int eventTimesCnt = 0; eventTimesCnt < eventTimes.length; eventTimesCnt++) {
-				for (int linkCnt = 0; linkCnt < links.size(); linkCnt++) {
+				for (int linkCnt = 0; linkCnt < linkIds.size(); linkCnt++) {
 					event = new LinkEnterEventImpl(
 							Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
 							testPerson.getId(),
-							links.get(linkCnt).getId());
+							linkIds.get(linkCnt));
 					events.processEvent(event);
 					event = new LinkLeaveEventImpl(
 							Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
 							testPerson.getId(),
-							links.get(linkCnt).getId());
+							linkIds.get(linkCnt));
 					events.processEvent(event);
 				}
 			}
@@ -342,8 +344,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		// generate some travel times
 		EventImpl event = null;
 
-		List<Link> links = route.getLinks();
-		System.out.println(links.size());
+		List<Id> linkIds = route.getLinkIds();
+		System.out.println(linkIds.size());
 
 		String[][] eventTimes = new String[][]{
 			new String[]{"06:05:00", "06:07:00", "06:09:00"},
@@ -351,16 +353,16 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		};
 
 		for (int eventTimesCnt = 0; eventTimesCnt < eventTimes.length; eventTimesCnt++) {
-			for (int linkCnt = 0; linkCnt < links.size(); linkCnt++) {
+			for (int linkCnt = 0; linkCnt < linkIds.size(); linkCnt++) {
 				event = new LinkEnterEventImpl(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
 						this.testPerson.getId(),
-						links.get(linkCnt).getId());
+						linkIds.get(linkCnt));
 				events.processEvent(event);
 				event = new LinkLeaveEventImpl(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
 						this.testPerson.getId(),
-						links.get(linkCnt).getId());
+						linkIds.get(linkCnt));
 				events.processEvent(event);
 			}
 		}
@@ -384,14 +386,14 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		startTime = Time.parseTime("05:59:00");
 		routeEndTime = testee.processRouteTravelTime(route.getLinks(), startTime);
 		assertEquals(
-				testee.processLink(links.get(1), startTime + this.scenario.getNetwork().getLink(links.get(0).getId()).getFreespeedTravelTime(Time.UNDEFINED_TIME)),
+				testee.processLink(this.scenario.getNetwork().getLinks().get(linkIds.get(1)), startTime + this.scenario.getNetwork().getLink(linkIds.get(0)).getFreespeedTravelTime(Time.UNDEFINED_TIME)),
 				routeEndTime, EPSILON);
 
 		// test a start time in the second bin, having second departure in the free speed bin
 		startTime = Time.parseTime("06:28:00");
 		routeEndTime = testee.processRouteTravelTime(route.getLinks(), startTime);
 		assertEquals(
-				testee.processLink(links.get(0), startTime) + this.scenario.getNetwork().getLink(links.get(1).getId()).getFreespeedTravelTime(Time.UNDEFINED_TIME),
+				testee.processLink(this.scenario.getNetwork().getLinks().get(linkIds.get(0)), startTime) + this.scenario.getNetwork().getLink(linkIds.get(1)).getFreespeedTravelTime(Time.UNDEFINED_TIME),
 				routeEndTime, EPSILON);
 
 	}
@@ -416,7 +418,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				PlanomatConfigGroup.RoutingCapability.fixedRoute,
 				plansCalcRoute);
 
-		Id linkId = ((NetworkRouteWRefs) this.testLeg.getRoute()).getLinks().get(0).getId();
+		Id linkId = ((NetworkRouteWRefs) this.testLeg.getRoute()).getLinkIds().get(0);
 
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(linkTravelTimeEstimator);

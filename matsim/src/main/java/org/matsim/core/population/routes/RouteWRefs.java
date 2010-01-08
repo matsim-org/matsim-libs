@@ -30,9 +30,11 @@ import org.matsim.api.core.v01.population.Route;
  */
 public interface RouteWRefs extends Route {
 
+	@Deprecated // use getStartLinkId()
 	public Link getStartLink();
 	public void setStartLink(final Link link);
 
+	@Deprecated // use getEndLinkId()
 	public Link getEndLink();
 	public void setEndLink(final Link link);
 

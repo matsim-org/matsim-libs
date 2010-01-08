@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -179,12 +180,12 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 				} else {
 					NetworkRouteWRefs netRouteA = routeA.getRoute();
 					assertNotNull("bad network route, must not be null.", netRouteA);
-					assertEquals("wrong start link.", netRouteE.getStartLink(), netRouteA.getStartLink());
-					assertEquals("wrong end link.", netRouteE.getEndLink(), netRouteA.getEndLink());
-					List<Link> linksE = netRouteE.getLinks();
-					List<Link> linksA = netRouteA.getLinks();
-					for (int i = 0, n = linksE.size(); i < n; i++) {
-						assertEquals("wrong link in network route", linksE.get(i), linksA.get(i));
+					assertEquals("wrong start link.", netRouteE.getStartLinkId(), netRouteA.getStartLinkId());
+					assertEquals("wrong end link.", netRouteE.getEndLinkId(), netRouteA.getEndLinkId());
+					List<Id> linkIdsE = netRouteE.getLinkIds();
+					List<Id> linkIdsA = netRouteA.getLinkIds();
+					for (int i = 0, n = linkIdsE.size(); i < n; i++) {
+						assertEquals("wrong link in network route", linkIdsE.get(i), linkIdsA.get(i));
 					}
 				}
 

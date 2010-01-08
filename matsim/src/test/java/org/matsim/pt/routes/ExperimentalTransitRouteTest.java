@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.fakes.FakeLink;
 import org.matsim.transitSchedule.TransitScheduleFactoryImpl;
@@ -45,8 +44,8 @@ public class ExperimentalTransitRouteTest extends TestCase {
 		Link link1 = new FakeLink(new IdImpl(1));
 		Link link2 = new FakeLink(new IdImpl(2));
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(link1, link2);
-		assertEquals(link1, route.getStartLink());
-		assertEquals(link2, route.getEndLink());
+		assertEquals(link1.getId(), route.getStartLinkId());
+		assertEquals(link2.getId(), route.getEndLinkId());
 		assertNull(route.getAccessStopId());
 		assertNull(route.getLineId());
 		assertNull(route.getEgressStopId());
@@ -67,8 +66,8 @@ public class ExperimentalTransitRouteTest extends TestCase {
 		assertEquals(line.getId(), route.getLineId());
 		assertEquals(tRoute.getId(), route.getRouteId());
 		assertEquals(stop2.getId(), route.getEgressStopId());
-		assertEquals(link1, route.getStartLink());
-		assertEquals(link2, route.getEndLink());
+		assertEquals(link1.getId(), route.getStartLinkId());
+		assertEquals(link2.getId(), route.getEndLinkId());
 	}
 
 	public void testLinks() {
@@ -77,12 +76,12 @@ public class ExperimentalTransitRouteTest extends TestCase {
 		Link link3 = new FakeLink(new IdImpl(3));
 		Link link4 = new FakeLink(new IdImpl(4));
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(link1, link2);
-		assertEquals(link1, route.getStartLink());
-		assertEquals(link2, route.getEndLink());
+		assertEquals(link1.getId(), route.getStartLinkId());
+		assertEquals(link2.getId(), route.getEndLinkId());
 		route.setStartLink(link3);
 		route.setEndLink(link4);
-		assertEquals(link3, route.getStartLink());
-		assertEquals(link4, route.getEndLink());
+		assertEquals(link3.getId(), route.getStartLinkId());
+		assertEquals(link4.getId(), route.getEndLinkId());
 	}
 
 	public void testTravelTime() {

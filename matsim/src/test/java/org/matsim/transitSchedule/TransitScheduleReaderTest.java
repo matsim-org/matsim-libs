@@ -80,8 +80,8 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 
 		NetworkRouteWRefs route = route1.getRoute();
 		assertNotNull("could not get route.", route);
-		assertEquals("wrong start link.", network.getLinks().get(new IdImpl("1")), route.getStartLink());
-		assertEquals("wrong end link.", network.getLinks().get(new IdImpl("8")), route.getEndLink());
+		assertEquals("wrong start link.", network.getLinks().get(new IdImpl("1")).getId(), route.getStartLinkId());
+		assertEquals("wrong end link.", network.getLinks().get(new IdImpl("8")).getId(), route.getEndLinkId());
 		assertEquals("wrong number of links in route.", 4, route.getLinkIds().size());
 	}
 

@@ -24,18 +24,18 @@ public class CarDepartureHandler implements DepartureHandler {
 	public void handleDeparture(double now, DriverAgent agent, Link link,
 			Leg leg) {
 		if (leg.getMode().equals(TransportMode.car)) {
-			handleCarDeparture(now, agent, link, leg);
+			handleCarDeparture(now, agent, link.getId(), leg);
 		}
 	}
 
-	private void handleCarDeparture(double now, DriverAgent agent, Link link,
+	private void handleCarDeparture(double now, DriverAgent agent, Id linkId,
 			Leg leg) {
 		NetworkRouteWRefs route = (NetworkRouteWRefs) leg.getRoute();
 		Id vehicleId = route.getVehicleId();
 		if (vehicleId == null) {
 			vehicleId = agent.getPerson().getId(); // backwards-compatibility
 		}
-		QueueLink qlink = queueSimulation.network.getQueueLink(link.getId());
+		QueueLink qlink = queueSimulation.network.getQueueLink(linkId);
 		QueueVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 		if (vehicle == null) {
 			// try to fix it somehow
@@ -45,7 +45,7 @@ public class CarDepartureHandler implements DepartureHandler {
 					if (vehicle.getCurrentLink() != null) {
 						if (cntTeleportVehicle < 9) {
 							cntTeleportVehicle++;
-							log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + link.getId());
+							log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + linkId);
 							if (cntTeleportVehicle == 9) {
 								log.info("No more occurrences of teleported vehicles will be reported.");
 							}
@@ -57,10 +57,10 @@ public class CarDepartureHandler implements DepartureHandler {
 			}
 		}
 		if (vehicle == null) {
-			throw new RuntimeException("vehicle not available for agent " + agent.getPerson().getId() + " on link " + link.getId());
+			throw new RuntimeException("vehicle not available for agent " + agent.getPerson().getId() + " on link " + linkId);
 		}
 		vehicle.setDriver(agent);
-		if ((route.getEndLink() == link) && (agent.chooseNextLink() == null)) {
+		if ((route.getEndLinkId() == linkId) && (agent.chooseNextLink() == null)) {
 			agent.legEnds(now);
 			qlink.processVehicleArrival(now, vehicle);
 		} else {

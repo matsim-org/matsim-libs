@@ -764,9 +764,9 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId1);
 		NetworkRouteWRefs netRoute = route.getRoute();
 		assertNotNull(netRoute);
-		assertEquals(link2, netRoute.getStartLink());
-		assertEquals(link2, netRoute.getEndLink());
-		assertEquals(0, netRoute.getLinks().size());
+		assertEquals(link2.getId(), netRoute.getStartLinkId());
+		assertEquals(link2.getId(), netRoute.getEndLinkId());
+		assertEquals(0, netRoute.getLinkIds().size());
 		assertEquals(0, netRoute.getNodes().size());
 	}
 
@@ -825,9 +825,9 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId1);
 		NetworkRouteWRefs netRoute = route.getRoute();
 		assertNotNull(netRoute);
-		assertEquals(link3, netRoute.getStartLink());
-		assertEquals(link4, netRoute.getEndLink());
-		assertEquals(0, netRoute.getLinks().size());
+		assertEquals(link3.getId(), netRoute.getStartLinkId());
+		assertEquals(link4.getId(), netRoute.getEndLinkId());
+		assertEquals(0, netRoute.getLinkIds().size());
 		assertEquals(1, netRoute.getNodes().size());
 		assertEquals(node4, netRoute.getNodes().get(0));
 	}
@@ -891,11 +891,11 @@ public class TransitScheduleReaderV1Test extends TestCase {
 		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId1);
 		NetworkRouteWRefs netRoute = route.getRoute();
 		assertNotNull(netRoute);
-		assertEquals(link1, netRoute.getStartLink());
-		assertEquals(link4, netRoute.getEndLink());
-		assertEquals(2, netRoute.getLinks().size());
-		assertEquals(link2, netRoute.getLinks().get(0));
-		assertEquals(link3, netRoute.getLinks().get(1));
+		assertEquals(link1.getId(), netRoute.getStartLinkId());
+		assertEquals(link4.getId(), netRoute.getEndLinkId());
+		assertEquals(2, netRoute.getLinkIds().size());
+		assertEquals(link2.getId(), netRoute.getLinkIds().get(0));
+		assertEquals(link3.getId(), netRoute.getLinkIds().get(1));
 		assertEquals(3, netRoute.getNodes().size());
 		assertEquals(node2, netRoute.getNodes().get(0));
 		assertEquals(node3, netRoute.getNodes().get(1));

@@ -35,9 +35,6 @@ public abstract class AbstractRoute implements RouteWRefs {
 
 	private double travTime = Time.UNDEFINED_TIME;
 	
-	private Id startLinkId = null;
-	private Id endLinkId = null;
-	
 	private Link startLink = null;
 	private Link endLink = null;
 
@@ -51,8 +48,6 @@ public abstract class AbstractRoute implements RouteWRefs {
 	}
 
 	public AbstractRoute(final Link startLink, final Link endLink) {
-		this.startLinkId = (startLink == null ? null : startLink.getId());
-		this.endLinkId = (endLink == null ? null : endLink.getId());
 		this.startLink = startLink;
 		this.endLink = endLink;
 	}
@@ -72,14 +67,6 @@ public abstract class AbstractRoute implements RouteWRefs {
 	public final void setTravelTime(final double travTime) {
 		this.travTime = travTime;
 	}
-//	
-//	public Id getStartLinkId() {
-//		return this.startLinkId;
-//	}
-//	
-//	public Id getEndLinkId() {
-//		return this.endLinkId;
-//	}
 	
 	public Link getEndLink() {
 		return this.endLink;

@@ -65,6 +65,7 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 		return cloned;
 	}
 
+	@Deprecated
 	public List<Link> getLinks() {
 		if (this.uncompressedLength < 0) { // it seems the route never got initialized correctly
 			return new ArrayList<Link>(0);

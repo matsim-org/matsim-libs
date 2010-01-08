@@ -36,6 +36,7 @@ import org.matsim.core.network.LinkImpl;
  */
 public interface NetworkRouteWRefs extends RouteWRefs {
 
+	@Deprecated // use getStartLinkId()
 	public Link getStartLink();
 
 	public List<Node> getNodes();
@@ -60,7 +61,9 @@ public interface NetworkRouteWRefs extends RouteWRefs {
 	 * starts and ends (the links where the activities are on) are <b>not</b>
 	 * included in the list.
 	 * @return a list containing the links the agents plans to travel along
+	 * @deprecated use getLinkIds()
 	 */
+	@Deprecated // use getLinkIds()
 	public List<Link> getLinks();
 
 	public List<Id> getLinkIds();
