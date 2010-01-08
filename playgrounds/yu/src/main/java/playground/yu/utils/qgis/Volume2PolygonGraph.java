@@ -53,13 +53,9 @@ import com.vividsolutions.jts.geom.Polygon;
 public class Volume2PolygonGraph extends Network2PolygonGraph {
 	private Set<Id> linkIds;
 
-	public Volume2PolygonGraph() {
-	}
-
 	public Volume2PolygonGraph(NetworkLayer network,
 			CoordinateReferenceSystem crs, Set<Id> linkIds) {
-		this.network = network;
-		this.crs = crs;
+		super(network, crs);
 		this.linkIds = linkIds;
 		this.geofac = new GeometryFactory();
 		features = new ArrayList<Feature>();

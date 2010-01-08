@@ -106,7 +106,7 @@ public class DeparTime2QGIS implements X2QGIS {
 	 *            3nd Shape-filename (.shp-file)
 	 */
 	public static void main(String[] args) {
-		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
+		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(args[0], ch1903);
 		/*
 		 * ///////////////////////////////////////////////////////////////
 		 * DepartureTime and MATSim-network to Shp-file // *
@@ -120,8 +120,6 @@ public class DeparTime2QGIS implements X2QGIS {
 		// mn2q.addParameter("DeparTime", Double.class, ldt.getAvgDeparTime());
 		// mn2q
 		// .writeShapeFile("/net/ils/run466/output/ITERS/it.500/466.500.deparTime.shp");
-		mn2q.readNetwork(args[0]);
-		mn2q.setCrs(ch1903);
 		LinkDeparTime lprA = new LinkDeparTime();
 		mn2q.readPlans(args[1], lprA);
 		LinkDeparTime lprB = new LinkDeparTime();

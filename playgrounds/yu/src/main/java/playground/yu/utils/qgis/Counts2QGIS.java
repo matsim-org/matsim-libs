@@ -32,6 +32,10 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  */
 public class Counts2QGIS extends MATSimNet2QGIS {
+	public Counts2QGIS(String netFilename, String coordRefSys) {
+		super(netFilename, coordRefSys);
+	}
+
 	public static class Counts2PolygonGraph extends Network2PolygonGraph {
 		private Set<Id> linkIds = null;
 
@@ -98,12 +102,11 @@ public class Counts2QGIS extends MATSimNet2QGIS {
 		String netFilename = "../berlin/network/bb_5_hermannstr.xml.gz";
 		String countsFilename = "../berlin/counts/counts4bb_5_hermannstr_counts4Kantstr.xml";
 
-		Counts2QGIS c2q = new Counts2QGIS();
-		c2q.readNetwork(netFilename);
-		c2q.setCrs(general);
+		Counts2QGIS c2q = new Counts2QGIS(netFilename, gk4);
 		c2q.setN2g(new Counts2PolygonGraph(c2q.getNetwork(), c2q.crs, c2q
 				.readCounts(countsFilename)));
-		c2q.writeShapeFile("../matsimTests/berlinQGIS/counts4bb_5_hermannstr_counts4Kantstr.shp");
+		c2q
+				.writeShapeFile("../matsimTests/berlinQGIS/counts4bb_5_hermannstr_counts4Kantstr.shp");
 
 		Gbl.printElapsedTime();
 	}

@@ -40,7 +40,6 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
 
 /**
@@ -49,8 +48,12 @@ import org.xml.sax.SAXException;
  */
 public class Volume2QGIS extends MATSimNet2QGIS {
 
-	public static List<Map<Id, Integer>> createVolumes(Collection<? extends Link> links,
-			final VolumesAnalyzer va) {
+	public Volume2QGIS(String netFilename, String coordRefSys) {
+		super(netFilename, coordRefSys);
+	}
+
+	public static List<Map<Id, Integer>> createVolumes(
+			Collection<? extends Link> links, final VolumesAnalyzer va) {
 		List<Map<Id, Integer>> volumes = new ArrayList<Map<Id, Integer>>(24);
 		for (int i = 0; i < 24; i++)
 			volumes.add(i, null);
@@ -69,27 +72,28 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		return volumes;
 	}
 
-	public void setCrs(final String wkt, final NetworkLayer network,
-			final CoordinateReferenceSystem crs, Set<Id> linkIds) {
-		super.setCrs(wkt);
-		setN2g(new Volume2PolygonGraph(network, crs, linkIds));
+	public void setLinkIds(Set<Id> linkIds) {
+		setN2g(new Volume2PolygonGraph(getNetwork(), crs, linkIds));
 	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
+
 		// String netFilename = "../schweiz-ivtch/network/ivtch-osm.xml";
 		// String netFilename = "test/yu/test/equil_net.xml";
 		// String netFilename =
 		// "../swiss-advest/ch.cut.640000.200000.740000.310000.xml";
 		String netFilename = "../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml";
 		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
+
 		// String eventsFilenameA = "../runs/r145_20/1000.events.txt.gz";
 		// String eventsFilenameB =
 		// "../runs_SVN/run669/it.1000/1000.events.txt.gz";
 		// String shapeFilepath = "../runs/r145_20/vsRun669/";
+
+		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(netFilename, ch1903);
 		// ////////////////////////////////////////
 		// MATSimNet2QGIS.setFlowCapFactor(0.1);
 		// //////////////////////////////////////
@@ -98,12 +102,10 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		 * Traffic Volumes and MATSim-network to Shp-file //
 		 * ///////////////////////////////////////////////////////////////
 		 */
-		mn2q.readNetwork(netFilename);
-		mn2q.setCrs(ch1903);
 		NetworkLayer net = mn2q.getNetwork();
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
 		mn2q.readEvents("../runs-svn/run669/it.1000/1000.events.txt.gz",
-				new EventHandler[]{va});
+				new EventHandler[] { va });
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(net);
 		try {
 			tollReader.parse(tollFilename);
@@ -123,12 +125,13 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 				.createSaturationLevels(net, rps, va);
 
 		for (int i = 0; i < 24; i++) {
-			Volume2QGIS v2q = new Volume2QGIS();
-			v2q.setCrs(ch1903, mn2q.getNetwork(), mn2q.crs, rps.getLinkIds());
+			Volume2QGIS v2q = new Volume2QGIS(netFilename, ch1903);
+			v2q.setLinkIds(rps.getLinkIds());
 			v2q.addParameter("vol", Integer.class, vols.get(i));
 			v2q.addParameter("sl", Double.class, sls.get(i));
-			v2q.writeShapeFile("../runs-svn/run669/it.1000/1000.Volume.QGIS/1000."
-					+ (i + 1) + ".shp");
+			v2q
+					.writeShapeFile("../runs-svn/run669/it.1000/1000.Volume.QGIS/1000."
+							+ (i + 1) + ".shp");
 		}
 		/*
 		 * //////////////////////////////////////////////////////////////

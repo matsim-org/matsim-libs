@@ -43,6 +43,10 @@ import org.matsim.roadpricing.RoadPricingScheme;
  */
 public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 
+	public SaturationLevel2QGIS(String netFilename, String coordRefSys) {
+		super(netFilename, coordRefSys);
+	}
+
 	public static List<Map<Id, Double>> createSaturationLevels(
 			NetworkLayer net, VolumesAnalyzer va) {
 		List<Map<Id, Double>> saturationLevels = new ArrayList<Map<Id, Double>>(
@@ -94,14 +98,13 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
+		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(
+				"../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml", ch1903);
 		/*
 		 * //////////////////////////////////////////////////////////////////////
 		 * /Traffic saturation level and MATSim-network to Shp-file
 		 * /////////////////////////////////////////////////////////////////////
 		 */
-		mn2q.readNetwork("../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml");
-		mn2q.setCrs(ch1903);
 		NetworkLayer net = mn2q.getNetwork();
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
 		mn2q.readEvents("../matsimTests/Calibration/680.events.txt.gz",

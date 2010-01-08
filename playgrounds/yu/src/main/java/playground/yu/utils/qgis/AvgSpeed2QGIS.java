@@ -71,17 +71,16 @@ public class AvgSpeed2QGIS implements X2QGIS {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
+		MATSimNet2QGIS mn2q = new MATSimNet2QGIS("test/yu/test/equil_net.xml",
+				ch1903);
 		/*
 		 * ///////////////////////////////////////////////////////////////
 		 * Traffic Volumes and MATSim-network to Shp-file // *
 		 * ///////////////////////////////////////////////////////////////
 		 */
-		mn2q.readNetwork("test/yu/test/equil_net.xml");
-		mn2q.setCrs(ch1903);
 		NetworkLayer net = mn2q.getNetwork();
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(net);
-		mn2q.readEvents("test/yu/test/events.txt", new EventHandler[]{clas});
+		mn2q.readEvents("test/yu/test/events.txt", new EventHandler[] { clas });
 		List<Map<Id, Double>> speeds = createSpeeds(net, clas);
 		for (int i = 0; i < 24; i++) {
 			mn2q.addParameter("aS" + i + "-" + (i + 1) + "h", Double.class,

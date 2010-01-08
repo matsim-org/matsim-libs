@@ -22,8 +22,6 @@ package playground.yu.utils.qgis;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -33,7 +31,6 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -49,18 +46,8 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  * 
  * @author ychen
  */
-public class Network2LinkGraph {
-
-	protected NetworkLayer network;
-	protected CoordinateReferenceSystem crs;
-	protected GeometryFactory geofac;
-	protected Collection<Feature> features;
-	protected DefaultFeatureTypeFactory defaultFeatureTypeFactory;
-	protected List<Map<Id, ?>> parameters = new ArrayList<Map<Id, ?>>();
-	protected List<AttributeType> attrTypes = new ArrayList<AttributeType>();
-
-	public Network2LinkGraph() {
-	}// dummy constructor
+public class Network2LinkGraph extends X2GraphImpl implements
+		X2Graph {
 
 	public Network2LinkGraph(NetworkLayer network,
 			CoordinateReferenceSystem coordinateReferenceSystem) {
@@ -86,14 +73,8 @@ public class Network2LinkGraph {
 				"freespeed", Double.class);
 		defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
 		defaultFeatureTypeFactory.setName("link");
-		defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, id, fromNode, toNode, length,
-				cap, type, freespeed });
-	}
-
-	// //////////////////////////////////////////
-	public void addParameter(String paramName, Class<?> clazz, Map<Id, ?> params) {
-		attrTypes.add(AttributeTypeFactory.newAttributeType(paramName, clazz));
-		this.parameters.add(params);
+		defaultFeatureTypeFactory.addTypes(new AttributeType[] { geom, id,
+				fromNode, toNode, length, cap, type, freespeed });
 	}
 
 	// ////////////////////////////////////////////
@@ -123,7 +104,8 @@ public class Network2LinkGraph {
 			o[2] = link.getFromNode().getId().toString();
 			o[3] = link.getToNode().getId().toString();
 			o[4] = link.getLength();
-			o[5] = link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
+			o[5] = link
+					.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 					/ network.getCapacityPeriod() * 3600.0;
 			o[6] = Integer.parseInt(link.getType());
 			o[7] = link.getFreespeed(0);

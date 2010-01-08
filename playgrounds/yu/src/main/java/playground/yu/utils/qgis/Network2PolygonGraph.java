@@ -51,9 +51,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  * @author yu
  * 
  */
-public class Network2PolygonGraph extends Network2LinkGraph {
-	public Network2PolygonGraph() {
-	}
+public class Network2PolygonGraph extends X2GraphImpl {
 
 	/**
 	 * @param network
@@ -140,7 +138,7 @@ public class Network2PolygonGraph extends Network2LinkGraph {
 			o[6] = (((LinkImpl) link).getType() != null) ? Integer
 					.parseInt(((LinkImpl) link).getType()) : 0;
 			o[7] = link.getFreespeed(0);
-			o[8]=link.getAllowedModes();
+			o[8] = link.getAllowedModes();
 			for (int i = 0; i < parameters.size(); i++) {
 				o[i + 8] = parameters.get(i).get(link.getId());
 			}

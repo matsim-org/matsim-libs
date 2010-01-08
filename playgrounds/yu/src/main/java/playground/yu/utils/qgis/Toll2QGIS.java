@@ -15,7 +15,6 @@ import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -30,6 +29,10 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  */
 public class Toll2QGIS extends MATSimNet2QGIS {
+	public Toll2QGIS(String netFilename, String coordRefSys) {
+		super(netFilename, coordRefSys);
+	}
+
 	public static class Toll2PolygonGraph extends Network2PolygonGraph {
 		private RoadPricingScheme toll;
 
@@ -62,8 +65,8 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 				o[5] = link
 						.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME)
 						/ network.getCapacityPeriod() * 3600.0;
-				o[6] = (((LinkImpl) link).getType() != null) ? Integer.parseInt(((LinkImpl) link)
-						.getType()) : 0;
+				o[6] = (((LinkImpl) link).getType() != null) ? Integer
+						.parseInt(((LinkImpl) link).getType()) : 0;
 				o[7] = link.getFreespeed(0);
 				for (int i = 0; i < parameters.size(); i++) {
 					o[i + 8] = parameters.get(i).get(link.getId());
@@ -78,11 +81,6 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 
 	}
 
-	@Override
-	public void setCrs(String wkt) {
-		this.crs = MGC.getCRS(wkt);
-	}
-
 	/**
 	 * @param args
 	 */
@@ -91,12 +89,10 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 		// String netFilename = "../matsimTests/scoringTest/network.xml";
 		String tollFilename = "../matsimTests/toll/KantonZurichToll.xml";
 
-		Toll2QGIS t2q = new Toll2QGIS();
-		t2q.readNetwork(netFilename);
-		t2q.setCrs(ch1903);
+		Toll2QGIS t2q = new Toll2QGIS(netFilename, ch1903);
 
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
-				t2q.getNetwork());
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(t2q
+				.getNetwork());
 		try {
 			tollReader.parse(tollFilename);
 		} catch (SAXException e) {

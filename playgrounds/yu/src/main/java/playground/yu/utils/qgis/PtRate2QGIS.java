@@ -116,7 +116,7 @@ public class PtRate2QGIS implements X2QGIS {
 	 *            path of the Shapefile (.shp) to output
 	 */
 	public static void main(String[] args) {
-		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
+		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(args[0], ch1903);
 		/*
 		 * ///////////////////////////////////////////////////////////////
 		 * pt-rate and MATSim-network to Shp-file //
@@ -125,7 +125,7 @@ public class PtRate2QGIS implements X2QGIS {
 		// mn2q.readNetwork("../data/ivtch/input/ivtch-osm-wu.xml");
 		// mn2q.setCrs(ch1903);
 		// LinkPtRate lpr = new LinkPtRate();
-		//mn2q.readPlans("/net/ils/run466/output/ITERS/it.500/500.plans.xml.gz",
+		// mn2q.readPlans("/net/ils/run466/output/ITERS/it.500/500.plans.xml.gz",
 		// lpr);
 		// mn2q.addParameter("PtRate", Double.class, lpr.getPtRate());
 		// mn2q.addParameter("PtUsers", Integer.class, lpr.getPtUsers());
@@ -139,9 +139,9 @@ public class PtRate2QGIS implements X2QGIS {
 		 * Differenz-Network for pt-rate to Shp-file //
 		 * /////////////////////////////////////////////////////////////////////
 		 */
-		mn2q.readNetwork(args[0]);
+
 		// mn2q.readNetwork("../schweiz-ivtch/network/ivtch-osm-wu.xml");
-		mn2q.setCrs(ch1903);
+
 		LinkPtRate lprA = new LinkPtRate();
 		mn2q.readPlans(args[1], lprA);
 		// mn2q.readPlans("../runs/run465/500.plans.xml.gz", lprA);

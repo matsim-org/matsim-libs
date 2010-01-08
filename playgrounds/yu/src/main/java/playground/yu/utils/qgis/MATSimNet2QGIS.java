@@ -57,6 +57,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  */
 public class MATSimNet2QGIS implements X2QGIS {
+
 	/**
 	 * this class is only a copy of
 	 * <class>playground.gregor.shapeFileToMATSim.ShapeFileWriter</class> Gregor
@@ -83,20 +84,13 @@ public class MATSimNet2QGIS implements X2QGIS {
 	protected static double flowCapFactor = 0.1;
 	protected ScenarioImpl scenario = new ScenarioImpl();
 	protected CoordinateReferenceSystem crs = null;
-	protected Network2PolygonGraph n2g = null;
+	protected X2GraphImpl n2g = null;
 
-	public void readNetwork(final String netFilename) {
+	public MATSimNet2QGIS(String netFilename, String coordRefSys) {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFilename);
-	}
-
-	/**
-	 * @param crs
-	 *            the crs to set
-	 */
-	public void setCrs(final String wkt) {
-		crs = MGC.getCRS(wkt);
+		crs = MGC.getCRS(coordRefSys);
 		n2g = new Network2PolygonGraph(scenario.getNetwork(), crs);
-	}// TODO override e.g. set(N2g)
+	}
 
 	/**
 	 * @param flowCapFactor
@@ -162,16 +156,14 @@ public class MATSimNet2QGIS implements X2QGIS {
 	 * @param n2g
 	 *            the n2g to set
 	 */
-	public void setN2g(final Network2PolygonGraph n2g) {
-		this.n2g = n2g;
+	public void setN2g(final X2Graph n2g) {
+		this.n2g = (X2GraphImpl) n2g;
 	}
 
 	public static void main(final String[] args) {
-		String netFilename = "../berlin-bvg09/pt/nullfall_M44_344/network.xml";
+		String netFilename = "../berlin-bvg09/net/miv_small/m44_344_small_ba.xml.gz";
 
-		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
-		mn2q.readNetwork(netFilename);
-		mn2q.setCrs(general);
-		mn2q.writeShapeFile("../berlin-bvg09/pt/nullfall_M44_344/network.shp");
+		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(netFilename, gk4);
+		mn2q.writeShapeFile("../berlin-bvg09/net/miv_small/m44_344_small_ba.shp");
 	}
 }

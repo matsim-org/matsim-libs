@@ -64,13 +64,16 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  */
 public class SpeedLevel2QGIS extends MATSimNet2QGIS {
+	public SpeedLevel2QGIS(String netFilename, String coordRefSys) {
+		super(netFilename, coordRefSys);
+	}
+
 	public static class SpeedLevel2PolygonGraph extends Network2PolygonGraph {
 		private Set<Id> linkIds;
 
 		public SpeedLevel2PolygonGraph(NetworkLayer network,
 				CoordinateReferenceSystem crs, Set<Id> linkIds) {
-			this.network = network;
-			this.crs = crs;
+			super(network, crs);
 			this.linkIds = linkIds;
 			this.geofac = new GeometryFactory();
 			features = new ArrayList<Feature>();
@@ -126,32 +129,31 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 					m = new HashMap<Id, Double>();
 					speeds.add(i, m);
 				}
-				double speed = clas.getAvgSpeed(linkId, (i * 3600))
-						/ 3.6 / link.getFreespeed(i * 3600.0);
+				double speed = clas.getAvgSpeed(linkId, (i * 3600)) / 3.6
+						/ link.getFreespeed(i * 3600.0);
 				m.put(linkId, speed);
 			}
 		}
 		return speeds;
 	}
 
-	public void setCrs(final String wkt, final NetworkLayer network,
-			final CoordinateReferenceSystem crs, Set<Id> linkIds) {
-		super.setCrs(wkt);
-		setN2g(new SpeedLevel2PolygonGraph(network, crs, linkIds));
+	public void setLinkIds(Set<Id> linkIds) {
+		setN2g(new SpeedLevel2PolygonGraph(getNetwork(), crs, linkIds));
 	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
-		mn2q.setCrs(ch1903);
+		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(
+				"../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml", ch1903);
+
 		/*
 		 * //////////////////////////////////////////////////////////////////////
 		 * /Traffic speed level and MATSim-network to Shp-file
 		 * /////////////////////////////////////////////////////////////////////
 		 */
-		mn2q.readNetwork("../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml");
+
 		NetworkLayer net = mn2q.getNetwork();
 
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(net, 3600);
@@ -179,9 +181,11 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		Set<Id> linkIds = (rps != null) ? rps.getLinkIds() : net.getLinks()
 				.keySet();
 		for (int i = 6; i < 20; i++) {
-			SpeedLevel2QGIS sl2q = new SpeedLevel2QGIS();
+			SpeedLevel2QGIS sl2q = new SpeedLevel2QGIS(
+					"../schweiz-ivtch-SVN/baseCase/network/ivtch-osm.xml",
+					ch1903);
 
-			sl2q.setCrs(ch1903, mn2q.getNetwork(), mn2q.crs, linkIds);
+			sl2q.setLinkIds(linkIds);
 			sl2q.addParameter("sl", Double.class, sls.get(i));
 			sl2q
 					.writeShapeFile("../matsimTests/Calibration/e5_700/speedLevels/700."
