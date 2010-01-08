@@ -63,7 +63,7 @@ public class Sim2D {
 	
 	
 	protected final PriorityBlockingQueue<Agent2D> activityEndsList = new PriorityBlockingQueue<Agent2D>(500, new Agent2DDepartureTimeComparator());
-	private OnTheFlyServer myOTFServer;
+	private OnTheFlyServer myOTFServer = null;
 	private final double endTime;
 	private ForceArrowWriter forceArrowWriter;
 	protected final PriorityBlockingQueue<Agent2D>  agentsToRemoveList  = new PriorityBlockingQueue<Agent2D>(500, new Agent2DDepartureTimeComparator());

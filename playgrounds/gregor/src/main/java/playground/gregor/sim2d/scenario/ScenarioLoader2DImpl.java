@@ -31,6 +31,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.gregor.sim2d.controller.Sim2DConfig;
 import playground.gregor.sim2d.gisdebug.StaticForceFieldToShape;
 import playground.gregor.sim2d.network.NetworkLoader;
+import playground.gregor.sim2d.network.NetworkLoaderImpl;
+import playground.gregor.sim2d.network.NetworkLoaderImplII;
 import playground.gregor.sim2d.simulation.StaticForceField;
 import playground.gregor.sim2d.simulation.StaticForceFieldGenerator;
 import playground.gregor.sim2d.simulation.StaticForceFieldReader;
@@ -53,33 +55,10 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 	public void loadNetwork() {
 		if (Sim2DConfig.LOAD_NETWORK_FROM_XML_FILE) {
 			super.loadNetwork();
-			FeatureSource fs = null;
-			try {
-				fs = ShapeFileReader.readDataFile(Sim2DConfig.FLOOR_SHAPE_FILE);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			loadMps();
 			
-			Iterator it = null;
-			try {
-				it = fs.getFeatures().iterator();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-			Feature ft = (Feature)it.next();
-			if (it.hasNext()) {
-				throw new RuntimeException("multiple floors are not supported yet");
-			}
-			Geometry geo = ft.getDefaultGeometry();
-			if (!(geo instanceof MultiPolygon)) {
-				throw new RuntimeException("MultiPolygon expected but got:" + geo);
-			}
-			List<Link> links = new ArrayList<Link>(super.getScenario().getNetwork().getLinks().values());
-			this.mps = new HashMap<MultiPolygon, List<Link>>();
-			this.mps.put((MultiPolygon)geo, links);
-			
-		} else {
-			NetworkLoader loader = new NetworkLoader(getScenario().getNetwork());
+		} else if (!Sim2DConfig.NETWORK_LOADERII) {
+			NetworkLoader loader = new NetworkLoaderImpl(getScenario().getNetwork());
 			this.mps = loader.getFloors();
 			if (this.mps.size() > 1) {
 				throw new RuntimeException("multiple floors are not supported yet");
@@ -100,10 +79,43 @@ public class ScenarioLoader2DImpl extends ScenarioLoaderImpl {
 				throw new RuntimeException(e);
 			}
 			new NetworkWriter(getScenario().getNetwork()).writeFile(getScenario().getConfig().network().getInputFile());
+		} else {
+			NetworkLoader loader = new NetworkLoaderImplII(getScenario().getNetwork());
+			loader.loadNetwork();
+			new NetworkWriter(getScenario().getNetwork()).writeFile(getScenario().getConfig().network().getInputFile());
+			loadMps();
 		}
 		loadStaticForceField();
 	}
 	
+	private void loadMps() {
+		FeatureSource fs = null;
+		try {
+			fs = ShapeFileReader.readDataFile(Sim2DConfig.FLOOR_SHAPE_FILE);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		
+		Iterator it = null;
+		try {
+			it = fs.getFeatures().iterator();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		Feature ft = (Feature)it.next();
+		if (it.hasNext()) {
+			throw new RuntimeException("multiple floors are not supported yet");
+		}
+		Geometry geo = ft.getDefaultGeometry();
+		if (!(geo instanceof MultiPolygon)) {
+			throw new RuntimeException("MultiPolygon expected but got:" + geo);
+		}
+		List<Link> links = new ArrayList<Link>(super.getScenario().getNetwork().getLinks().values());
+		this.mps = new HashMap<MultiPolygon, List<Link>>();
+		this.mps.put((MultiPolygon)geo, links);
+		
+	}
+
 	private FeatureType initFeatureType() {
 		CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
 		AttributeType p = DefaultAttributeTypeFactory.newAttributeType(

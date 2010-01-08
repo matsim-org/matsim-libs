@@ -26,7 +26,7 @@ public class ForceArrowWriter  extends OTFDataWriter {
 		
 		List<double []> data = null; 
 		if (this.src instanceof ArrayList) {
-			if (((ArrayList)this.src).get(0) instanceof double [] ) {
+			if (((ArrayList)this.src).size() > 0 && ((ArrayList)this.src).get(0) instanceof double [] ) {
 				data = (ArrayList<double []>)this.src;
 			}
 		}

@@ -14,6 +14,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.Time;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -30,6 +31,7 @@ public class Agent2D  {
 	int actLegPointer = 0;
 	private Link currentLink;
 	private LegImpl currentLeg;
+	
 	private List<Node> cacheRouteNodes;
 	private int currentNodeIndex;
 
@@ -45,20 +47,34 @@ public class Agent2D  {
 	
 	private Activity currentAct;
 
+	private boolean departed = false;
+
+	private Activity oldAct;
+
 
 	public Agent2D(Person p, Sim2D sim2D) {
 		this.person = p;
 		this.currentPlan = p.getSelectedPlan();
 		this.simulation = sim2D;
 	}
+	
+	public Activity getAct() {
+		return this.currentAct;
+	}
+	
+	public Activity getOldAct() {
+		return this.oldAct;
+	}
 
 	public void depart() {
 		this.actLegPointer++;
 		this.currentLeg = (LegImpl)this.currentPlan.getPlanElements().get(this.actLegPointer);
+		this.oldAct = this.currentAct;
 		this.currentAct = null;
 		this.currentNodeIndex  = 0;
 		this.cacheRouteNodes = null;
 		this.state = AgentState.MOVING;
+		this.departed  = true;
 	}
 	
 	
@@ -129,8 +145,8 @@ public class Agent2D  {
 		ActivityImpl firstAct = ((ActivityImpl)this.currentPlan.getPlanElements().get(this.actLegPointer));
 		double departureTime = firstAct.getEndTime();
 		this.currentLink = firstAct.getLink();
-//		this.position = new Coordinate(this.currentLink.getToNode().getCoord().getX()+MatsimRandom.getRandom().nextDouble()/5-.1,this.currentLink.getToNode().getCoord().getY()+MatsimRandom.getRandom().nextDouble()/5-.1);
 		this.position = new Coordinate(this.currentLink.getToNode().getCoord().getX(),this.currentLink.getToNode().getCoord().getY());
+//		this.position = MGC.coord2Coordinate(firstAct.getCoord());
 		if ((departureTime != Time.UNDEFINED_TIME) && (this.currentPlan.getPlanElements().size() > 1)) {
 			this.currentAct = (Activity) this.currentPlan.getPlanElements().get(this.actLegPointer);
 			this.simulation.scheduleActivityEnd(this);
@@ -147,6 +163,16 @@ public class Agent2D  {
 	public double getWeight() {
 		return weight;
 	}
+
+	public boolean departed() {
+		if (this.departed) {
+			this.departed = false;
+			return true;
+		}
+		return false;
+	}
+
+
 
 
 

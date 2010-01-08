@@ -81,7 +81,7 @@ public class Controller2D extends Controler {
 		
 		float [] linksColor = new float [] {.5f,.5f,.5f,.7f};
 		try {
-			this.myOTFServer.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile("../../../../tmp/simplifiedNetwork.shp"),linksColor));
+			this.myOTFServer.addAdditionalElement(new PolygonDataWriter(ShapeFileReader.readDataFile("../../../../sim2d/sg4graph.shp"),linksColor));
 			this.connectionManager.add(PolygonDataWriter.class,PolygonDataReader.class);
 		} catch (IOException e1) {
 			e1.printStackTrace();

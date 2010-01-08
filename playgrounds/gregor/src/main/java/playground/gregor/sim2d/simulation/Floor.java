@@ -9,8 +9,17 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.events.ActivityEndEventImpl;
+import org.matsim.core.events.ActivityStartEventImpl;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.collections.QuadTree;
@@ -155,6 +164,10 @@ public class Floor {
 				force.setFy(0.);
 			}
 			else if  (agent.getState() == AgentState.MOVING) {
+				if (agent.departed()) {
+					agentDepart(agent);
+				}
+				
 				//				updateAgentForce(agent);
 				updateAgentInteractionForce(agent,force);
 				updateAgentEnvForce(agent,force);
@@ -177,6 +190,8 @@ public class Floor {
 			this.forceInfos.add(tmp5);
 		}
 	}
+
+
 
 
 	private void validateForce(Agent2D agent, Force force) {
@@ -220,18 +235,23 @@ public class Floor {
 	}
 	private void updateDrivingForce(Agent2D agent, Force force) {
 		Link link = agent.getCurrentLink();
+		Id oldLink = link.getId();
 		LineString ls = this.finishLines.get(link);
 		Point p = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y);
 		double dist = p.distance(ls);
 		if (dist <= 0.2) {
 			link = agent.chooseNextLink();
+
 			if (link != null) {
+				Id newLink = link.getId();
+				agentNextLink(agent,oldLink,newLink);
 				ls = this.finishLines.get(link);
 				p = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y);
 				dist = p.distance(ls);
 			}
 		}
 		if (link == null) {
+			agentArrival(agent,oldLink);
 			force.driveX = 0;
 			force.driveY = 0;
 		} else {
@@ -251,7 +271,9 @@ public class Floor {
 			
 			
 			if (dist < Sim2DConfig.TIME_STEP_SIZE*agent.getDisiredVelocity()) {
-				agent.chooseNextLink();
+				link = agent.chooseNextLink();
+				Id newLink = link.getId();
+				agentNextLink(agent,oldLink,newLink);
 			}
 
 //			double rX = MatsimRandom.getRandom().nextDouble()/50-.05;
@@ -264,6 +286,28 @@ public class Floor {
 
 		}		
 
+	}
+
+	private void agentNextLink(Agent2D agent, Id oldLink, Id newLink) {
+		
+		Event e1 = new LinkLeaveEventImpl(SimulationTimer.getTime(), agent.getId(), oldLink);
+		Event e2 = new LinkEnterEventImpl(SimulationTimer.getTime(), agent.getId(), newLink);
+		Sim2D.getEvents().processEvent(e1);
+		Sim2D.getEvents().processEvent(e2);
+		
+	}
+
+	private void agentArrival(Agent2D agent,Id linkId) {
+		Event e1 = new AgentArrivalEventImpl(SimulationTimer.getTime(), agent.getId(), linkId, TransportMode.car);
+		Event e2 = new ActivityStartEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), agent.getAct());
+		Sim2D.getEvents().processEvent(e1);
+	}
+	
+	private void agentDepart(Agent2D agent) {
+		Event e1 = new AgentDepartureEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), TransportMode.car);
+		Event e2 = new ActivityEndEventImpl(SimulationTimer.getTime(), agent.getId(), agent.getCurrentLink().getId(), agent.getOldAct());
+		Sim2D.getEvents().processEvent(e1);
+		
 	}
 
 	private void updateAgentEnvForce(Agent2D agent, Force force) {
