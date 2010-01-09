@@ -23,7 +23,6 @@ package org.matsim.analysis;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
@@ -96,8 +95,6 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(testee);
-
-		Person defaultPerson = this.population.getPersons().get(DEFAULT_PERSON_ID);
 
 		LegImpl leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:10:00"));
