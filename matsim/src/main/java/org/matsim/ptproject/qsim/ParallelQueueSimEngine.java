@@ -45,7 +45,7 @@ public class ParallelQueueSimEngine extends QueueSimEngine{
 	private ParallelMoveLinks parallelMoveLinks;
 	private ParallelMoveNodes parallelMoveNodes;
 	private ParallelMoveNodesAndLinks parallelMoveNodesAndLinks;
-	private int numOfThreads = 6;
+	private int numOfThreads = 1;
 	
 	/*
 	 * @cdobler
@@ -54,10 +54,10 @@ public class ParallelQueueSimEngine extends QueueSimEngine{
 	 * 
 	 * TODO discuss which implementation should be preferred
 	 */
-	ParallelQueueSimEngine(Collection<QueueLink> links, Collection<QueueNode> nodes, Random random)
+	ParallelQueueSimEngine(Collection<QueueLink> links, Collection<QueueNode> nodes, Random random, int numOfThreads)
 	{
 		super(links, nodes, random);
-		
+				
 //		/*
 //		 * parallel moveNodes
 //		 */
@@ -77,9 +77,9 @@ public class ParallelQueueSimEngine extends QueueSimEngine{
 		parallelMoveNodesAndLinks.initNodesAndLinks(simNodesArray, allLinks, simActivateThis, numOfThreads);
 	}
 
-	public ParallelQueueSimEngine(final QueueNetwork network, final Random random)
+	public ParallelQueueSimEngine(final QueueNetwork network, final Random random, int numOfThreads)
 	{
-		this(network.getLinks().values(), network.getNodes().values(), random);
+		this(network.getLinks().values(), network.getNodes().values(), random, numOfThreads);
 	}
 
 	@Override

@@ -22,6 +22,7 @@ package org.matsim.ptproject.qsim;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 
 public class ParallelQueueSimulation extends QueueSimulation{
@@ -32,7 +33,12 @@ public class ParallelQueueSimulation extends QueueSimulation{
 	public ParallelQueueSimulation(final Scenario scenario, final EventsManager eventsManager)
 	{
 	  super(scenario, eventsManager);
+	  
+	  // Get number of parallel Threads
+	  QSimConfigGroup conf = (QSimConfigGroup) scenario.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
+	  int numOfThreads = conf.getNumberOfThreads();
+	  
 	  // use the ParallelQueueSimEngine
-	  this.simEngine = new ParallelQueueSimEngine(this.network, MatsimRandom.getRandom());
+	  this.simEngine = new ParallelQueueSimEngine(this.network, MatsimRandom.getRandom(), numOfThreads);
 	}
 }

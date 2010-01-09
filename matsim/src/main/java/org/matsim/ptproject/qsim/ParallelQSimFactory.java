@@ -22,6 +22,7 @@ package org.matsim.ptproject.qsim;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.IOSimulation;
 import org.matsim.core.mobsim.MobsimFactory;
 
@@ -36,10 +37,15 @@ public class ParallelQSimFactory implements MobsimFactory {
   
   @Override
   public IOSimulation createMobsim(Scenario sc, EventsManager eventsManager) {
-    SynchronizedEventsManagerImpl em = new SynchronizedEventsManagerImpl(eventsManager);
-    ParallelQueueSimulation sim = new ParallelQueueSimulation(sc, em);
-    log.info("Using parallel QSim...");
-    return sim;
+	  SynchronizedEventsManagerImpl em = new SynchronizedEventsManagerImpl(eventsManager);
+	  ParallelQueueSimulation sim = new ParallelQueueSimulation(sc, em);
+	  
+	  // Get number of parallel Threads
+	  QSimConfigGroup conf = (QSimConfigGroup) sc.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
+	  int numOfThreads = conf.getNumberOfThreads();
+	  log.info("Using parallel QSim with " + numOfThreads + " parallel Threads.");
+	  
+	  return sim;
   }
 
 }
