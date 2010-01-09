@@ -24,6 +24,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -223,8 +224,8 @@ import org.matsim.core.utils.misc.Time;
 
 	protected static void compareRoutes(final String expectedRoute, final NetworkRouteWRefs realRoute) {
 		StringBuilder strBuilder = new StringBuilder();
-		for (Node node : realRoute.getNodes()) {
-			strBuilder.append(node.getId().toString());
+		for (Id linkId : realRoute.getLinkIds()) {
+			strBuilder.append(linkId.toString());
 			strBuilder.append(' ');
 		}
 		String route = strBuilder.toString();
