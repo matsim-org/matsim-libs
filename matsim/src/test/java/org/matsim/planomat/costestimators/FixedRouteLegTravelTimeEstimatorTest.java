@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -54,7 +54,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
-	protected ScenarioImpl scenario = null;
+	protected Scenario scenario = null;
 	
 	protected static final Id TEST_PERSON_ID = new IdImpl("1");
 	private static final int TEST_PLAN_NR = 0;
@@ -286,7 +286,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		}
 
 		double startTime = 6.00 * 3600;
-		double delayEndTime = testee.processDeparture(this.scenario.getNetwork().getLink(new IdImpl("1")), startTime);
+		double delayEndTime = testee.processDeparture(this.scenario.getNetwork().getLinks().get(new IdImpl("1")), startTime);
 		assertEquals(delayEndTime, startTime + 36.0, EPSILON);
 
 		// let's add another delay of 72s, should result in an average of 54s
@@ -298,18 +298,18 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		}
 
 		startTime = 6.00 * 3600;
-		delayEndTime = testee.processDeparture(this.scenario.getNetwork().getLink(linkId), startTime);
+		delayEndTime = testee.processDeparture(this.scenario.getNetwork().getLinks().get(linkId), startTime);
 		assertEquals(delayEndTime, startTime + (36.0 + 72.0) / 2, EPSILON);
 
 		// the time interval for the previously tested events was for departure times from 6.00 to 6.25
 		// for other time intervals, we don't have event information, so estimated delay should be 0s
 
 		startTime = 5.9 * 3600;
-		delayEndTime = testee.processDeparture(this.scenario.getNetwork().getLink(linkId), startTime);
+		delayEndTime = testee.processDeparture(this.scenario.getNetwork().getLinks().get(linkId), startTime);
 		assertEquals(delayEndTime, startTime, EPSILON);
 
 		startTime = 6.26 * 3600;
-		delayEndTime = testee.processDeparture(this.scenario.getNetwork().getLink(linkId), 6.26 * 3600);
+		delayEndTime = testee.processDeparture(this.scenario.getNetwork().getLinks().get(linkId), 6.26 * 3600);
 		assertEquals(delayEndTime, startTime, EPSILON);
 
 	}
@@ -386,14 +386,14 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		startTime = Time.parseTime("05:59:00");
 		routeEndTime = testee.processRouteTravelTime(route.getLinks(), startTime);
 		assertEquals(
-				testee.processLink(this.scenario.getNetwork().getLinks().get(linkIds.get(1)), startTime + this.scenario.getNetwork().getLink(linkIds.get(0)).getFreespeedTravelTime(Time.UNDEFINED_TIME)),
+				testee.processLink(this.scenario.getNetwork().getLinks().get(linkIds.get(1)), startTime + ((LinkImpl) this.scenario.getNetwork().getLinks().get(linkIds.get(0))).getFreespeedTravelTime(Time.UNDEFINED_TIME)),
 				routeEndTime, EPSILON);
 
 		// test a start time in the second bin, having second departure in the free speed bin
 		startTime = Time.parseTime("06:28:00");
 		routeEndTime = testee.processRouteTravelTime(route.getLinks(), startTime);
 		assertEquals(
-				testee.processLink(this.scenario.getNetwork().getLinks().get(linkIds.get(0)), startTime) + this.scenario.getNetwork().getLink(linkIds.get(1)).getFreespeedTravelTime(Time.UNDEFINED_TIME),
+				testee.processLink(this.scenario.getNetwork().getLinks().get(linkIds.get(0)), startTime) + ((LinkImpl) this.scenario.getNetwork().getLinks().get(linkIds.get(1))).getFreespeedTravelTime(Time.UNDEFINED_TIME),
 				routeEndTime, EPSILON);
 
 	}
@@ -434,22 +434,22 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		// for start times inside the time bin, the predicted travel time is always the same
 		double startTime = Time.parseTime("06:10:00");
-		double linkEndTime = testee.processLink(this.scenario.getNetwork().getLink(linkId), startTime);
+		double linkEndTime = testee.processLink(this.scenario.getNetwork().getLinks().get(linkId), startTime);
 		assertEquals(linkEndTime, Time.parseTime("06:11:48"), EPSILON);
 
 		startTime = Time.parseTime("06:01:00");
-		linkEndTime = testee.processLink(this.scenario.getNetwork().getLink(linkId), startTime);
+		linkEndTime = testee.processLink(this.scenario.getNetwork().getLinks().get(linkId), startTime);
 		assertEquals(linkEndTime, Time.parseTime("06:02:48"), EPSILON);
 
 		// for start times outside the time bin, the free speed travel time is returned
 		double freeSpeedTravelTime = ((NetworkLayer)this.scenario.getNetwork()).getLink(linkId.toString()).getFreespeedTravelTime(Time.UNDEFINED_TIME);
 
 		startTime = Time.parseTime("05:59:00");
-		linkEndTime = testee.processLink(this.scenario.getNetwork().getLink(linkId), startTime);
+		linkEndTime = testee.processLink(this.scenario.getNetwork().getLinks().get(linkId), startTime);
 		assertEquals(startTime + freeSpeedTravelTime, linkEndTime, EPSILON);
 
 		startTime = Time.parseTime("08:12:00");
-		linkEndTime = testee.processLink(this.scenario.getNetwork().getLink(linkId), startTime);
+		linkEndTime = testee.processLink(this.scenario.getNetwork().getLinks().get(linkId), startTime);
 		assertEquals(startTime + freeSpeedTravelTime, linkEndTime, EPSILON);
 
 	}

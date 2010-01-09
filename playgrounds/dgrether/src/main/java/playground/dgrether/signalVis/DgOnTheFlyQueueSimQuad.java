@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.signalVis;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.vis.otfvis.OTFVisQueueSim;
 
@@ -34,13 +34,7 @@ import org.matsim.vis.otfvis.OTFVisQueueSim;
  */
 public class DgOnTheFlyQueueSimQuad extends OTFVisQueueSim {
 
-	/**
-	 * @param net
-	 * @param plans
-	 * @param events
-	 * @param laneDefsvoid
-	 */
-	public DgOnTheFlyQueueSimQuad(ScenarioImpl scenario, EventsManagerImpl events) {
+	public DgOnTheFlyQueueSimQuad(Scenario scenario, EventsManagerImpl events) {
 		super(scenario, events);
 		this.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
 	}

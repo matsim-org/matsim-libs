@@ -227,7 +227,7 @@ public class NetworkImpl implements Network {
 
 		this.networkChangeEvents = events;
 		for (NetworkChangeEvent event : events) {
-			for (LinkImpl link : event.getLinks()) {
+			for (Link link : event.getLinks()) {
 				((TimeVariantLinkImpl)link).applyEvent(event);
 			}
 		}
@@ -251,7 +251,7 @@ public class NetworkImpl implements Network {
 		}
 
 		this.networkChangeEvents.add(event);
-		for (LinkImpl link : event.getLinks()) {
+		for (Link link : event.getLinks()) {
 			((TimeVariantLinkImpl)link).applyEvent(event);
 		}
 	}

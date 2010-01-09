@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -40,7 +41,7 @@ public class PopulationCut {
 	//////////////////////////////////////////////////////////////////////
 	
 	private static void reduceScenario(String[] args) {
-		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
+		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 		Coord min = new CoordImpl(args[1],args[2]);
 		Coord max = new CoordImpl(args[3],args[4]);
 
@@ -65,7 +66,7 @@ public class PopulationCut {
 		for (Id id : toRemove) { scenario.getPopulation().getPersons().remove(id); }
 		System.out.println("=> "+scenario.getPopulation().getPersons().size()+" persons left.");
 		System.out.println("done. " + (new Date()));
-		new PopulationWriter(scenario.getPopulation(),scenario.getKnowledges()).writeFile(scenario.getConfig().plans().getOutputFile());
+		new PopulationWriter(scenario.getPopulation(),((ScenarioImpl) scenario).getKnowledges()).writeFile(scenario.getConfig().plans().getOutputFile());
 	}
 	
 	//////////////////////////////////////////////////////////////////////

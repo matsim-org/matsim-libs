@@ -14,7 +14,6 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.evacuation.base.EvacuationStartTimeCalculator;
 
-
 import com.vividsolutions.jts.geom.Envelope;
 
 public class DelayedEvacuationStartTimeCalculator implements EvacuationStartTimeCalculator {

@@ -28,7 +28,7 @@ import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.IntegerGene;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -66,7 +66,7 @@ public class PlanomatTest extends MatsimTestCase {
 	
 	private static final Logger log = Logger.getLogger(PlanomatTest.class);
 
-	private ScenarioImpl scenario;
+	private Scenario scenario;
 	
 	@Override
 	protected void setUp() throws Exception {
@@ -325,9 +325,9 @@ public class PlanomatTest extends MatsimTestCase {
 
 	private static final class ScenarioCreatePersonEventHandler implements PersonEventHandler{
 
-		private ScenarioImpl scenario;
+		private Scenario scenario;
 
-		public ScenarioCreatePersonEventHandler(ScenarioImpl scenario) {
+		public ScenarioCreatePersonEventHandler(Scenario scenario) {
 			this.scenario = scenario;
 		}
 
@@ -340,8 +340,6 @@ public class PlanomatTest extends MatsimTestCase {
 			
 		}
 		
-		
 	}
-	
 	
 }

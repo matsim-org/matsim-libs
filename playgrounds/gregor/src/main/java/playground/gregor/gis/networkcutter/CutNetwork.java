@@ -32,6 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -103,14 +104,14 @@ public class CutNetwork {
 		//CHANGE EVENTS
 		ConcurrentLinkedQueue<NetworkChangeEvent> eq = new ConcurrentLinkedQueue<NetworkChangeEvent>();
 		for (NetworkChangeEvent e : events) {
-			ConcurrentLinkedQueue<LinkImpl> lq = new ConcurrentLinkedQueue<LinkImpl>();
-			for (LinkImpl l : e.getLinks()) {
+			ConcurrentLinkedQueue<Link> lq = new ConcurrentLinkedQueue<Link>();
+			for (Link l : e.getLinks()) {
 				if (!eal.containsKey(l.getId())) {
 					lq.add(l);
 				}
 			}
 			while (lq.size() > 0) {
-				LinkImpl l = lq.poll();
+				Link l = lq.poll();
 				e.removeLink(l);
 			}
 			if (e.getLinks().size() == 0) {

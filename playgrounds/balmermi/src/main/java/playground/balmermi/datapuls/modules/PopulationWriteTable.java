@@ -11,13 +11,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class PopulationWriteTable {
@@ -52,7 +52,7 @@ public class PopulationWriteTable {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public void run(PopulationImpl population, final String outdir) {
+	public void run(Population population, final String outdir) {
 		log.info("running " + this.getClass().getName() + " module...");
 		try {
 			BufferedWriter out = IOUtils.getBufferedWriter(outdir+"/population.txt.gz");

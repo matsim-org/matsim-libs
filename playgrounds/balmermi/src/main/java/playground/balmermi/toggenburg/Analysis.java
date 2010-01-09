@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -77,7 +77,7 @@ public class Analysis {
 	public static void main(String[] args) {
 		
 		log.info("loading scenario...");
-		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
+		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 		log.info("done.");
 		
 		log.info("extracting output directory... ");

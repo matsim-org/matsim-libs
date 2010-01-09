@@ -21,7 +21,7 @@
 package org.matsim.core.mobsim.queuesim.listener;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.Gbl;
@@ -36,7 +36,7 @@ public class QueueSimulationBeforeAfterSimStepListenerTest extends MatsimTestCas
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.simulation().setStartTime(6.0 * 3600);
 		config.simulation().setEndTime(6.0 * 3600 + 10);
-		ScenarioImpl scenario = new ScenarioLoaderImpl(config).loadScenario();
+		Scenario scenario = new ScenarioLoaderImpl(config).loadScenario();
 		QueueSimulation qsim = new QueueSimulation(scenario, new EventsManagerImpl());
 		
 		MockQueueSimStepListener mockListener = new MockQueueSimStepListener(1.0);

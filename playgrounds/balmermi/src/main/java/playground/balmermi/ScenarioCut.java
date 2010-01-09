@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -42,7 +43,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -57,10 +57,10 @@ public class ScenarioCut {
 
 	//////////////////////////////////////////////////////////////////////
 	
-	private static void calcExtent(ScenarioImpl scenario) {
+	private static void calcExtent(Scenario scenario) {
 		Coord min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
 		Coord max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
-		for (ActivityFacilityImpl f : scenario.getActivityFacilities().getFacilities().values()) {
+		for (ActivityFacilityImpl f : ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().values()) {
 			if (f.getCoord().getX() < min.getX()) { min.setX(f.getCoord().getX()); }
 			if (f.getCoord().getY() < min.getY()) { min.setY(f.getCoord().getY()); }
 			if (f.getCoord().getX() > max.getX()) { max.setX(f.getCoord().getX()); }
@@ -70,7 +70,7 @@ public class ScenarioCut {
 
 		min = new CoordImpl(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY);
 		max = new CoordImpl(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
-		for (NodeImpl n : scenario.getNetwork().getNodes().values()) {
+		for (Node n : scenario.getNetwork().getNodes().values()) {
 			if (n.getCoord().getX() < min.getX()) { min.setX(n.getCoord().getX()); }
 			if (n.getCoord().getY() < min.getY()) { min.setY(n.getCoord().getY()); }
 			if (n.getCoord().getX() > max.getX()) { max.setX(n.getCoord().getX()); }
@@ -113,8 +113,8 @@ public class ScenarioCut {
 					}
 				}
 			}
-			if (scenario.getKnowledges().getKnowledgesByPersonId().get(p.getId()) != null) {
-				for (ActivityOptionImpl ao : scenario.getKnowledges().getKnowledgesByPersonId().get(p.getId()).getActivities()) {
+			if (((ScenarioImpl) scenario).getKnowledges().getKnowledgesByPersonId().get(p.getId()) != null) {
+				for (ActivityOptionImpl ao : ((ScenarioImpl) scenario).getKnowledges().getKnowledgesByPersonId().get(p.getId()).getActivities()) {
 					ActivityFacilityImpl f = ao.getFacility();
 					if (f.getCoord().getX() < min.getX()) { min.setX(f.getCoord().getX()); }
 					if (f.getCoord().getY() < min.getY()) { min.setY(f.getCoord().getY()); }
@@ -273,7 +273,7 @@ public class ScenarioCut {
 	//////////////////////////////////////////////////////////////////////
 	
 	private static void reduceScenario(String[] args) {
-		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
+		ScenarioImpl scenario = (ScenarioImpl) new ScenarioLoaderImpl(args[0]).loadScenario();
 		calcExtent(scenario);
 		if (args.length == 4) {
 			Coord center = new CoordImpl(args[1],args[2]);

@@ -25,14 +25,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -57,9 +57,9 @@ public class PlanFilter {
 		double[] bigRadiuses = {10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000, 25000, 30000, 40000, 50000};
 
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
-		ScenarioImpl sc = sl.loadScenario();
+		Scenario sc = sl.loadScenario();
 		final Network network = sc.getNetwork();
-		final PopulationImpl population = sc.getPopulation();
+		final Population population = sc.getPopulation();
 
 		System.out.println("  finding sub-networks... " + (new Date()));
 		System.out.println("smallRadius\tbigRadius\t#linksSmall\t#linksBig\t#peopleSmall\t#peopleLeavingBig");
@@ -115,10 +115,10 @@ public class PlanFilter {
 		double bigRadius = 14000;
 
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(args[0]);
-		ScenarioImpl sc = sl.loadScenario();
+		Scenario sc = sl.loadScenario();
 		final Config config = sc.getConfig();
 		final Network network = sc.getNetwork();
-		final PopulationImpl population = sc.getPopulation();
+		final Population population = sc.getPopulation();
 
 		System.out.println("  finding AOI links");
 

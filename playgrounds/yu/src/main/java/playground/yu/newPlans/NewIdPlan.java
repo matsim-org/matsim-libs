@@ -23,9 +23,9 @@
  */
 package playground.yu.newPlans;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 /**
@@ -34,10 +34,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
  */
 public class NewIdPlan extends NewPopulation {
 
-	/**
-	 * @param plans
-	 */
-	public NewIdPlan(final PopulationImpl plans) {
+	public NewIdPlan(final Population plans) {
 		super(plans);
 	}
 
@@ -47,11 +44,8 @@ public class NewIdPlan extends NewPopulation {
 			this.pw.writePerson(person);
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(final String[] args) {
-		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
+		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 
 		NewIdPlan nip = new NewIdPlan(scenario.getPopulation());
 		nip.run(scenario.getPopulation());

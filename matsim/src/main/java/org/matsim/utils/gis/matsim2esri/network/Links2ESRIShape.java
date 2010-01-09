@@ -26,8 +26,6 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
@@ -35,6 +33,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkLayer;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Simple class to convert the links of MATSim network files to ESRI shape files. The network could be written either
@@ -103,7 +102,7 @@ public class Links2ESRIShape {
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		log.info("loading network from " + netfile);
-		final NetworkLayer network = new NetworkLayer();
+		final NetworkLayer network = scenario.getNetwork();
 		new MatsimNetworkReader(network).readFile(netfile);
 		log.info("done.");
 

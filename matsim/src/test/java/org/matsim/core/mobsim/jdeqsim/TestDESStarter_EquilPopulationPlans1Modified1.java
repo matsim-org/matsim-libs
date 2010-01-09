@@ -1,6 +1,6 @@
 package org.matsim.core.mobsim.jdeqsim;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.jdeqsim.scenarios.EquilPopulationPlans1Modified1;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
@@ -9,7 +9,7 @@ public class TestDESStarter_EquilPopulationPlans1Modified1 extends AbstractJDEQS
 	public void test_EquilPopulationPlans1Modified1_TestHandlerDetailedEventChecker() {
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl("test/scenarios/equil/config.xml");
 		sl.getScenario().getConfig().plans().setInputFile("test/scenarios/equil/plans1.xml");
-		ScenarioImpl scenario = sl.loadScenario();
+		Scenario scenario = sl.loadScenario();
 		new EquilPopulationPlans1Modified1().modifyPopulation(scenario.getPopulation());
 		this.runJDEQSim(scenario);
 		

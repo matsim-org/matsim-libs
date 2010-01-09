@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
@@ -35,7 +36,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEndEventHandler  {
@@ -51,18 +51,18 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 	private final String outdir;
 	private BufferedWriter out = null;
 	
-	private final PopulationImpl population;
+	private final Population population;
 	private final Map<Id,ActivityImpl> fromActs = new TreeMap<Id, ActivityImpl>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public LinkTablesEventHandler(final String outdir, final PopulationImpl population) {
+	public LinkTablesEventHandler(final String outdir, final Population population) {
 		this(60*15,outdir, population);
 	}
 
-	public LinkTablesEventHandler(final int timeBinSize, final String outdir, final PopulationImpl population) {
+	public LinkTablesEventHandler(final int timeBinSize, final String outdir, final Population population) {
 		log.info("init " + this.getClass().getName() + " module...");
 		this.timeBinSize = timeBinSize;
 		this.outdir = outdir;

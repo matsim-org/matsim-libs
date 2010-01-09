@@ -8,11 +8,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 
 public class PopulationAnalysis {
@@ -36,7 +36,7 @@ public class PopulationAnalysis {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private final void populationStats(PopulationImpl population, Set<IdImpl> toggenLinks) {
+	private final void populationStats(Population population, Set<IdImpl> toggenLinks) {
 		// Geschlechter Verteilung (Anzahl), Altersverteilung, Fahrausweis, Autoverf�gbarkeit, Berufst�tig, �V Abo Verf�gbarkeit
 		// index  : 0..99  100    101  102  103          104           105          106       107       108    109     110     111
 		// meaning: 0..99  >=100  m    f    licenseTrue  licenseFalse  availAlways  availSom  availNev  eTrue  eFalse  ptTrue  ptFalse
@@ -89,7 +89,7 @@ public class PopulationAnalysis {
 		System.out.println(count+" out of "+population.getPersons().size()+" analyzed.");
 	}
 	
-	private final void tripStats(PopulationImpl population) {
+	private final void tripStats(Population population) {
 		// \    h  w  e  s  l
 		// car
 		// pt
@@ -138,7 +138,7 @@ public class PopulationAnalysis {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public void run(PopulationImpl population, Set<IdImpl> toggenLinks) {
+	public void run(Population population, Set<IdImpl> toggenLinks) {
 		log.info("running " + this.getClass().getName() + " module...");
 		this.populationStats(population,toggenLinks);
 		this.tripStats(population);

@@ -23,6 +23,7 @@ package playground.balmermi.datapuls;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -61,11 +62,11 @@ public class DatapulsConverter {
 		log.info("done.");
 		
 		log.info("loading scenario...");
-		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
+		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 		log.info("done.");
 
-		new FacilitiesWriteTables().run(scenario.getActivityFacilities(),outdir);
-		new PopulationWriteTable(scenario.getActivityFacilities()).run(scenario.getPopulation(),outdir);
+		new FacilitiesWriteTables().run(((ScenarioImpl) scenario).getActivityFacilities(),outdir);
+		new PopulationWriteTable(((ScenarioImpl) scenario).getActivityFacilities()).run(scenario.getPopulation(),outdir);
 
 		EventsManagerImpl events = new EventsManagerImpl();
 		

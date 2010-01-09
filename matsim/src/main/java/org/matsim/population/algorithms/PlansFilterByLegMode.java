@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
 
 /**
  * This algorithm filters out all persons having plans with legs with a certain leg mode.
@@ -66,7 +66,7 @@ public class PlansFilterByLegMode {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(PopulationImpl plans) {
+	public void run(Population plans) {
 		int planCount = 0;
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 		String never = "never";

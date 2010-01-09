@@ -23,11 +23,12 @@ package playground.yu.newPlans;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -52,7 +53,7 @@ public class NewAgentWalkPlan extends NewPopulation {
 	 * @param plans
 	 *            - a Plans Object, which derives from MATSim plansfile
 	 */
-	public NewAgentWalkPlan(final PopulationImpl plans) {
+	public NewAgentWalkPlan(final Population plans) {
 		super(plans);
 	}
 
@@ -121,7 +122,7 @@ public class NewAgentWalkPlan extends NewPopulation {
 	}
 
 	public static void main(final String[] args) {
-		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
+		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 
 		NewAgentWalkPlan nawp = new NewAgentWalkPlan(scenario.getPopulation());
 		nawp.run(scenario.getPopulation());

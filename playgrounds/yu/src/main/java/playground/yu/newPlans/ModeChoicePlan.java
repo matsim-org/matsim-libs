@@ -22,14 +22,14 @@ package playground.yu.newPlans;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.yu.analysis.PlanModeJudger;
@@ -44,7 +44,7 @@ public class ModeChoicePlan extends NewPopulation {
 	/**
 	 * @param plans
 	 */
-	public ModeChoicePlan(final PopulationImpl plans) {
+	public ModeChoicePlan(final Population plans) {
 		super(plans);
 	}
 
@@ -108,7 +108,7 @@ public class ModeChoicePlan extends NewPopulation {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
+		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 		
 		ModeChoicePlan mcp = new ModeChoicePlan(scenario.getPopulation());
 		mcp.run(scenario.getPopulation());

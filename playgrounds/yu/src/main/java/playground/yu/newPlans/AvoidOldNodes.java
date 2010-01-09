@@ -23,15 +23,16 @@ package playground.yu.newPlans;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkLayer;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRouteWRefs;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
@@ -43,7 +44,7 @@ public class AvoidOldNodes extends NewPopulation {
 	private boolean nullRoute = false;
 	private final Set<String> nodeIds;
 
-	public AvoidOldNodes(final NetworkLayer network, final PopulationImpl plans) {
+	public AvoidOldNodes(final Network network, final Population plans) {
 		super(network, plans);
 		this.nodeIds = new HashSet<String>();
 	}
@@ -53,7 +54,7 @@ public class AvoidOldNodes extends NewPopulation {
 	}
 
 	public void addLink(final String linkId) {
-		LinkImpl l = this.net.getLink(linkId);
+		Link l = this.net.getLinks().get(new IdImpl(linkId));
 		this.nodeIds.add(l.getFromNode().getId().toString());
 		this.nodeIds.add(l.getToNode().getId().toString());
 	}
@@ -90,9 +91,9 @@ public class AvoidOldNodes extends NewPopulation {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
+		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 	
-		PopulationImpl population = scenario.getPopulation();
+		Population population = scenario.getPopulation();
 
 		AvoidOldNodes aon = new AvoidOldNodes(scenario.getNetwork(), population);
 		aon.addNode("100000");

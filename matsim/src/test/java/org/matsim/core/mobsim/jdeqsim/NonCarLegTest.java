@@ -2,7 +2,7 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.LinkedList;
 
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
@@ -13,7 +13,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 public class NonCarLegTest extends AbstractJDEQSimTest {
 
 	public void test_EmptyCarRoute() {
-		ScenarioImpl scenario = new ScenarioLoaderImpl("test/input/org/matsim/core/mobsim/jdeqsim/config2.xml").loadScenario();
+		Scenario scenario = new ScenarioLoaderImpl("test/input/org/matsim/core/mobsim/jdeqsim/config2.xml").loadScenario();
 		this.runJDEQSim(scenario);
 		
 		// at least one event

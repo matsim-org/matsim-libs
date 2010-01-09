@@ -39,7 +39,7 @@ public class AssignShopAndLeisure {
 	public void run(String variant) {
 		this.init();
 		if (variant.equals("0")) {
-			ActivityDifferentiationShop differentiator = new ActivityDifferentiationShop(this.scenario.getPopulation());
+			ActivityDifferentiationShop differentiator = new ActivityDifferentiationShop(this.scenario);
 			differentiator.run();
 		}
 		// handle leisure

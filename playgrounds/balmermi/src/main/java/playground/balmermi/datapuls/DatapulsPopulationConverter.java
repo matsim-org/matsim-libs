@@ -23,6 +23,7 @@ package playground.balmermi.datapuls;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.ScenarioImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -43,7 +44,7 @@ public class DatapulsPopulationConverter {
 		log.info("done.");
 		
 		log.info("loading scenario...");
-		ScenarioImpl scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
+		Scenario scenario = new ScenarioLoaderImpl(args[0]).loadScenario();
 		log.info("done.");
 
 		log.info("extracting output directory... ");
@@ -52,8 +53,8 @@ public class DatapulsPopulationConverter {
 		log.info("=> "+outdir);
 		log.info("done.");
 		
-		new FacilitiesWriteTables().run(scenario.getActivityFacilities(),outdir);
-		new PopulationWriteTable(scenario.getActivityFacilities()).run(scenario.getPopulation(),outdir);
+		new FacilitiesWriteTables().run(((ScenarioImpl) scenario).getActivityFacilities(),outdir);
+		new PopulationWriteTable(((ScenarioImpl) scenario).getActivityFacilities()).run(scenario.getPopulation(),outdir);
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(scenario.getConfig().charyparNagelScoring());
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(scenario.getNetwork(), timeCostCalculator);
 		LinkTablesFromPopulation planAlgo = new LinkTablesFromPopulation(timeBinSize, outdir, scenario.getNetwork(), factory.createPathCalculator(scenario.getNetwork(), timeCostCalculator, timeCostCalculator), scenario.getConfig().plansCalcRoute());

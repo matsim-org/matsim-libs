@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.ScenarioImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -40,7 +40,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 	// if populationModifier == null, then the DummyPopulationModifier is used
 	// if planFilePath == null, then the plan specified in the config file is
 	// used
-	public void runJDEQSim(ScenarioImpl scenario) {
+	public void runJDEQSim(Scenario scenario) {
 /*
 		Config config = loadConfig(configFilePath);
 		if (planFilePath != null) {
